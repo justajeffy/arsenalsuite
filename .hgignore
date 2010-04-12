@@ -1,0 +1,14 @@
+syntax: glob
+
+*.o
+*.so*
+*.pyc
+.out
+sipStone
+sipStonegui
+sipClasses
+sipClassesui
+sipBach
+sipAssburner
+sipAssfreezer
+sipAbsubmit
