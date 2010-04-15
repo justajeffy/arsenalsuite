@@ -3,6 +3,8 @@ syntax: glob
 *.o
 *.so*
 *.pyc
+*.a
+*.ini
 .out
 sipStone
 sipStonegui
@@ -12,3 +14,19 @@ sipBach
 sipAssburner
 sipAssfreezer
 sipAbsubmit
+autocore
+
+# switch to regexp syntax.
+syntax: regexp
+
+.*/psmon/Makefile$
+.*/assburner_1_3/Makefile$
+.*/absubmit/Makefile$
+.*/assfreezer/Makefile$
+.*/classes/Makefile$
+.*/classesui/Makefile$
+.*/stone/Makefile$
+.*/stonegui/Makefile$
+.*_version\.txt$
+.*/qrc_.*\.cpp$
+
