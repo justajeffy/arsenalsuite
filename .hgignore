@@ -15,37 +15,6 @@ sipAssburner
 sipAssfreezer
 sipAbsubmit
 autocore
-assburner
-*-svnrev.nsi
-svnrev.h
-
-cpp/apps/assburner_1_3/Makefile
-cpp/apps/assburner_1_3/assburner
-cpp/apps/assburner_1_3/assburner.ini
-cpp/apps/assburner_1_3/include/svnrev.h
-cpp/apps/assburner_1_3/psmon/Makefile
-cpp/apps/assburner_1_3/qrc_assburner.cpp
-cpp/apps/assfreezer/Makefile
-cpp/apps/assfreezer/assfreezer
-cpp/apps/assfreezer/assfreezer-svnrev.nsi
-cpp/apps/assfreezer/assfreezer.ini
-cpp/apps/assfreezer/assfreezer_version.txt
-cpp/apps/assfreezer/qrc_assfreezer.cpp
-cpp/apps/assfreezer/src/svnrev.h
-cpp/apps/classmaker/.log
-cpp/apps/classmaker/Makefile
-cpp/apps/classmaker/classmaker-svnrev.nsi
-cpp/apps/classmaker/classmaker.ini
-cpp/apps/classmaker/classmaker_version.txt
-cpp/lib/absubmit/Makefile
-cpp/lib/assfreezer/Makefile
-cpp/lib/assfreezer/include/svnrev.h
-cpp/lib/classes/Makefile
-cpp/lib/classesui/Makefile
-cpp/lib/classesui/qrc_threadview.cpp
-cpp/lib/sip/siplib/libsip.a
-cpp/lib/stone/Makefile
-cpp/lib/stonegui/Makefile
 
 # switch to regexp syntax.
 syntax: regexp
