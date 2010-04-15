@@ -107,17 +107,15 @@ class MantraBurner(JobBurner):
             self.jobErrored("process exited before frame was complete")
         
     def slotProcessOutputLine(self,line,channel):
-        #JobBurner.slotProcessOutputLine(self,line,channel)
-
         # Frame status
         if self.jobProgress.indexIn(line) >= 0:
+            if self.CurrentFrame == None:
+                self.jobErrored("output path is improperly formed")
+
             self.progress = int(self.jobProgress.cap(1))
             tasks = self.currentTasks()
             tasks.setProgresses(self.progress)
             tasks.commit()
-            if False and self.progress == 100:
-                Log("MantraBurner: current frame is %s" % self.CurrentFrame)
-                self.taskDone(self.CurrentFrame)
         elif self.frameStart.indexIn(line) >= 0:
             self.progress == 0
             Log("MantraBurner: start frame %s" % self.frameStart.cap(2))
@@ -131,10 +129,6 @@ class MantraBurner(JobBurner):
                 Log("MantraBurner: updating outputPath based on IFD info to %s" % outputPath)
                 self.Job.setOutputPath(outputPath)
                 self.Job.commit()
-
-        elif False and self.jobDone.indexIn(line) >= 0:
-            self.taskDone(self.CurrentFrame)
-            self.jobFinished()
         else:
             for e in self.errors:
                 if line.contains(e):
