@@ -86,6 +86,7 @@ JobBurner::JobBurner( const JobAssignment & jobAssignment, Slave * slave, int op
 
 	mCheckupTimer = new QTimer( this );
 	connect( mCheckupTimer, SIGNAL( timeout() ), SLOT( checkup() ) );
+    mCheckupTimer->start(30000);
 
 	/* Ensure we are actually assigned some tasks to work on */
 	mTaskAssignments = mJobAssignment.jobTaskAssignments();
