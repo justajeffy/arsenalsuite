@@ -35,12 +35,12 @@ config().readFromFile( dbConfig, False )
 
 initStone(sys.argv)
 
-blur.RedirectOutputToLog()
+#blur.RedirectOutputToLog()
 
 # Load all the database tables
 classes_loader()
 
-VERBOSE_DEBUG = True
+VERBOSE_DEBUG = False
 
 if VERBOSE_DEBUG:
 	Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete ) #| Database.EchoSelect )
@@ -255,7 +255,7 @@ class JobAssign:
         hasHost = 0
         if self.JobStatus.hostsOnJob() > 0: hasHost = 1
         sortKey = '%01d-%03d-%04d-%04d-%10d' % (hasHost,self.Job.priority(), self.JobStatus.hostsOnJob(), self.JobStatus.errorCount(), self.Job.submittedts().toTime_t())
-        if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
+        #if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
         return sortKey
 
     def mapServerWeight( self ):
@@ -349,84 +349,23 @@ class JobAssign:
         packetSize = self.Job.packetSize()
 
         self.logString = ' PT: '
-        if self.Job.prioritizeOuterTasks() and not self.Job.outerTasksAssigned():
-            tasks = self.retrieveOuterTasks(limit=packetSize)
-            self.Job.setOuterTasksAssigned(True)
-            self.Job.commit()
-        else:
-            if packetSize < 1:
-                packetSize = self.calculateAutoPacketSize( totalHosts, totalTasks )
-            packetType = self.Job.packetType()
-            if VERBOSE_DEBUG: print "Finding Tasks For PacketType:", packetType, " packetSize: ", packetSize
-            if packetType == 'random':
-                tasks = self.retrieveRandomTasks(limit = packetSize)
-            elif packetType == 'preassigned':
-                tasks = self.retrievePreassignedTasks(hostStatus)
-            elif packetType == 'continuous':
-                tasks = self.retrieveContinuousTasks(limit=packetSize)
-            else: # sequential
-                tasks = self.retrieveSequentialTasks(limit=packetSize)
+        if packetSize < 1:
+            packetSize = self.calculateAutoPacketSize( totalHosts, totalTasks )
+        packetType = self.Job.packetType()
+        if VERBOSE_DEBUG: print "Finding Tasks For PacketType:", packetType, " packetSize: ", packetSize
 
-        if not tasks or tasks.isEmpty():
-            if VERBOSE_DEBUG: print "No tasks returned to assign"
-            return 0
-
-        jtal = JobTaskAssignmentList()
-        for jt in tasks:
-            jat = JobTaskAssignment()
-            jat.setJobTask( jt )
-            jtal += jat
-        jtal.setJobAssignmentStatuses( JobAssignmentStatus.recordByName( 'ready' ) )
-
-        Database.current().beginTransaction()
-
-        # Lock the row(reloads host)
-        hostStatus.reload()
-        if hostStatus.slaveStatus() != 'ready':
-            Database.current().rollbackTransaction();
-            print "Host %s is no longer ready for frames(status is %s) returning" % (hostStatus.host().name(),hostStatus.slaveStatus())
-            return 0
-
-        ja = JobAssignment()
-        ja.setJob( self.Job )
-        ja.setJobAssignmentStatus( JobAssignmentStatus.recordByName( 'ready' ) )
-        ja.setHost( hostStatus.host() )
-        ja.commit()
-
-        jtal.setJobAssignments( ja )
-        jtal.commit()
-
-        # deduct memory requirement from available so we don't over allocate the host
-        min = self.Job.minMemory()
-        if( min == 0 ): min = self.Job.jobStatus().averageMemory()
-        hostStatus.setAvailableMemory( (hostStatus.availableMemory()*1024 - min) / 1024 )
-        if( hostStatus.activeAssignmentCount() > 0 and hostStatus.availableMemory() <= 0 ):
-            Database.current().rollbackTransaction();
-            print "Host %s does not have the memory required returning" % (hostStatus.host().name())
-            return 0
-        hostStatus.commit()
-
-        tasks = JobTaskList()
-        for jta in jtal:
-            task = jta.jobTask()
-            task.setJobTaskAssignment( jta )
-            task.setStatus( 'assigned' )
-            task.setHost( hostStatus.host() )
-            tasks += task
-        tasks.commit()
-
-        # Keep hostsOnJob up to date while assigning.  It is accurately updated periodically by the reaper
-        if self.Job.maxHosts() > 0:
-            Database.current().exec_("UPDATE jobstatus SET hostsOnJob=hostsOnJob+1 WHERE fkeyjob=%i" % self.Job.key())
-        Database.current().commitTransaction();
+        taskCount = 0
+        q = Database.current().exec_( "SELECT * FROM assign_single_host(%s, %s, %s)" % (self.Job.key(), hostStatus.host().key(), packetSize ) )
+        if q.next():
+            taskCount = q.value(0).toInt()[0]
 
         # Increment hosts on job count,  this is taken care of by a trigger at the database level
         # but we increment here to get more accurate calculated priority until the next refresh of
         # the job list
         self.JobStatus.setHostsOnJob( self.JobStatus.hostsOnJob() + 1 )
 
-        Log( "Assigned tasks " + numberListToString(tasks.frameNumbers()) + " from job " + str(self.Job.key()) + " to host " + hostStatus.host().name() + self.logString )
-        return tasks.size()
+        Log( "Assigned tasks " + str(taskCount) + " from job " + str(self.Job.key()) + " to host " + hostStatus.host().name() + self.logString )
+        return taskCount
 
 def updateProjectTempo():
 	Database.current().exec_( "SELECT * from update_project_tempo()" )
@@ -902,7 +841,7 @@ class FarmResourceSnapshot(object):
 			# Return so that we can recalculate assignment priorities
 			if tasksAssigned > 0:
 				assignSuccess = True
-				break
+				break 
 			
 			# This shouldn't get hit, because there should be tasks available if we
 			# Are assigning, and we should already break above if they get assigned
@@ -992,8 +931,9 @@ class FarmResourceSnapshot(object):
 			
 			if len(jobAssignList) == 0:
 				raise AllJobsAssignedException()
-			
+	
 			jobAssignList.sort()
+
 			for jobAssign in jobAssignList:
 				try:
 					# Recalc priority and resort job list after every assignment
