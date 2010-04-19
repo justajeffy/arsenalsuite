@@ -180,11 +180,13 @@ macx{
   INCLUDEPATH+=/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include/
 }
 
-unix{
-#	LIBS+=-lCgGL
+isEmpty( PYTHON ) {
+    PYTHON="python"
+}
 
-	PY_VERSION = $$system("python -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'")
-
+unix {
+    PY_CMD =  $$PYTHON " -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'"
+    PY_VERSION = $$system($$PY_CMD)
 	message(Python Version is $$PY_VERSION)
 	INCLUDEPATH += /usr/include/python$${PY_VERSION}/
 	LIBS+=-lpython$${PY_VERSION}
@@ -206,7 +208,7 @@ TEMPLATE=lib
 CONFIG += qt thread opengl
 QT+=xml sql opengl network
 TARGET=assfreezer
-target.path=/usr/local/lib
+target.path=$$(DESTDIR)/usr/local/lib
 INSTALLS += target
 
 DESTDIR=./

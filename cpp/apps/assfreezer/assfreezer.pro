@@ -36,6 +36,11 @@ win32{
 	LIBS+=-lws2_32
 	LIBS+=-lopengl32
 }
+
+isEmpty( PYTHON ) {
+    PYTHON="python"
+}
+
 unix{
 #	Link libassfreezer and libblurqt statically
 #	Link them dynamically
@@ -50,8 +55,8 @@ unix{
     LIBS+=-Wl,-rpath .
     LIBS+=-lMagick++
 
-	PY_VERSION = $$system("python -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'")
-
+    PY_CMD =  $$PYTHON " -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'"
+    PY_VERSION = $$system($$PY_CMD)
 	message(Python Version is $$PY_VERSION)
 	INCLUDEPATH += /usr/include/python$${PY_VERSION}/
 	LIBS+=-lpython$${PY_VERSION}
@@ -82,5 +87,5 @@ DESTDIR=./
 RC_FILE = assfreezer.rc
 
 TARGET = assfreezer
-target.path=/usr/local/lib
+target.path=$$(DESTDIR)/usr/local/bin
 INSTALLS += target

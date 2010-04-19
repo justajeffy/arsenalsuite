@@ -193,7 +193,7 @@ RESOURCES+=ui/threadview.qrc
 
 TEMPLATE=lib
 TARGET=classesui
-target.path=/usr/local/lib
+target.path=$$(DESTDIR)/usr/local/lib
 INSTALLS += target
 
 CONFIG+=qt thread

@@ -97,9 +97,13 @@ win32 {
 	LIBS+=-L$${PY_PATH}\libs -lpython$${PY_VERSION}
 }
 
-unix {
-	PY_VERSION = $$system("python -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'")
+isEmpty( PYTHON ) {
+    PYTHON="python"
+}
 
+unix {
+    PY_CMD =  $$PYTHON " -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'"
+    PY_VERSION = $$system($$PY_CMD)
 	message(Python Version is $$PY_VERSION)
 	INCLUDEPATH += /usr/include/python$${PY_VERSION}/
 	INCLUDEPATH += ../sip/siplib/
@@ -118,7 +122,7 @@ contains( DEFINES, versioned ) {
 }
 
 unix {
-	target.path=/usr/local/lib
+	target.path=$$(DESTDIR)/usr/local/lib
 }
 win32 {
 	target.path=c:/blur/common/

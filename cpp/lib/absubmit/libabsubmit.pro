@@ -30,5 +30,5 @@ TARGET=absubmit
 
 DESTDIR=./
 
-target.path=/usr/local/lib
+target.path=$$(DESTDIR)/usr/local/lib
 INSTALLS += target

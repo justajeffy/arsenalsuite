@@ -279,7 +279,10 @@ class SipTarget(Target):
 		return Target.is_built(self)
 	
 	def build_run(self):
-		config = "python configure.py"
+		if os.environ.has_key('PYTHON'):
+			config = os.environ['PYTHON'] + " configure.py"
+		else:
+			config = "python configure.py"
 		if self.Static:
 			config += " -k"
 		if self.Platform:
@@ -345,6 +348,8 @@ class QMakeTarget(Target):
 			Args.append("CONFIG+=console")
 		for d in self.Defines:
 			Args.append("DEFINES+=\"" + d + "\"")
+		if os.environ.has_key('PYTHON'):
+			Args.append("PYTHON="+os.environ['PYTHON'])
 		if self.Target:
 			Args.append(self.Target)
 		return string.join(Args,' ')

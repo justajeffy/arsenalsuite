@@ -6,16 +6,6 @@ UI_DIR         = .out
 
 INCLUDEPATH+=../../../lib/stone/include
 
-unix {
-	INCLUDEPATH+=/usr/include/stone
-
-	PY_VERSION = $$system("python -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'")
-
-	message(Python Version is $$PY_VERSION)
-	INCLUDEPATH += /usr/include/python$${PY_VERSION}/
-	LIBS+=-lpython$${PY_VERSION}
-}
-
 LIBS+=-L../../../lib/stone -lstone
 
 SOURCES += \
@@ -38,7 +28,7 @@ win32 {
 DESTDIR=./
 
 unix {
-	target.path=/usr/bin/
+	target.path=$$(DESTDIR)/usr/bin/
 	INSTALLS += target
 }
 macx:CONFIG-=app_bundle
