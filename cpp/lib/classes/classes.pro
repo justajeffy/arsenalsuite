@@ -30,14 +30,6 @@ unix {
 	LIBS+=-lpython$${PY_VERSION}
 }
 
-# Python modules
-#debug {
-#    #LIBS+=-L../../lib/sip/siplib -lsip_d
-#} else {
-    #LIBS+=-L../../lib/sip/siplib -lsip
-#}
-
-
 DEFINES+=CLASSES_MAKE_DLL
 TEMPLATE=lib
 CONFIG+=qt thread

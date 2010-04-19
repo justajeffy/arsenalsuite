@@ -7,7 +7,7 @@ sippath = os.path.join(path,'sipClasses')
 
 try:
 	os.mkdir(sippath)
-except:	pass
+except: pass
 
 pre_deps = ["stone"]
 post_deps = []
