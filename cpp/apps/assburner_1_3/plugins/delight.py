@@ -131,10 +131,10 @@ class DelightBurner(JobBurner):
         JobBurner.slotProcessOutputLine(self,line,channel)
 
         # Frame status
-        if self.frameDone.indexIn(line) >= 0:
-            frame = int(self.frameDone.cap(1))
-            self.taskDone(frame)
-        elif self.frameStart.indexIn(line) >= 0:
+        #if self.frameDone.indexIn(line) >= 0:
+        #    frame = int(self.frameDone.cap(1))
+        #    self.taskDone(frame)
+        if self.frameStart.indexIn(line) >= 0:
             #if self.burnFile().endsWith("..rib"):
             #	frame = int(self.frameStart.cap(1))
 
