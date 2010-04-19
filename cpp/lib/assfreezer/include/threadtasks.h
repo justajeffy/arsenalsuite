@@ -35,7 +35,8 @@ enum {
 	STATIC_JOB_LIST_DATA,
 	STATIC_HOST_LIST_DATA,
 	HOST_ERROR_LIST,
-	JOB_HISTORY_LIST
+	JOB_HISTORY_LIST,
+    UPDATE_JOB_LIST
 };
 
 class JobListTask : public ThreadTask
@@ -51,6 +52,16 @@ public:
 	ProjectList mProjects;
 	bool mFetchJobServices, mFetchJobDeps;
 	JobServiceList mJobServices;
+};
+
+class UpdateJobListTask : public ThreadTask
+{
+public:
+	UpdateJobListTask( QObject * rec, const JobList & jobList, const QString & status );
+	void run();
+
+	JobList mReturn;
+    QString mStatus;
 };
 
 class HostListTask : public ThreadTask

@@ -301,3 +301,18 @@ void JobHistoryListTask::run()
 {
 	mReturn = mJobs.jobHistories();
 }
+
+UpdateJobListTask::UpdateJobListTask( QObject * rec, const JobList & jobs, const QString & status )
+: ThreadTask( UPDATE_JOB_LIST, rec )
+, mReturn( jobs )
+, mStatus( status )
+{
+}
+
+void UpdateJobListTask::run()
+{
+    Job::updateJobStatuses( mReturn, mStatus, false );
+    //mReturn.setStatuses(mStatus);
+    //mReturn.commit();
+}
+

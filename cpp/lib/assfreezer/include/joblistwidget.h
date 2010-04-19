@@ -111,7 +111,7 @@ public slots:
 
 	/// selected jobs are told to stop burning, all running tasks stop immediately, job is deleted
 	void deleteJobs();
-	void updateSelectedJobs(const QString & jobStatus, bool resetTasks);
+	void updateSelectedJobs(const QString & jobStatus);
 
 	/// toggles whether to only show jobs owned by current user
 	void showMine(bool);
