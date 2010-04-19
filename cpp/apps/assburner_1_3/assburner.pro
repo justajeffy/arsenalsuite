@@ -24,13 +24,17 @@ INCLUDEPATH+=../../lib/stone/include
 INCLUDEPATH+=../../lib/stonegui/include
 INCLUDEPATH+=idle
 
+isEmpty( PYTHON ) {
+    PYTHON="python"
+}
+
 unix {
 	INCLUDEPATH+=/usr/include/stone
 	INCLUDEPATH+=/usr/include/classes
 	INCLUDEPATH+=/usr/include/stonegui
 
-	PY_VERSION = $$system("python -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'")
-
+    PY_CMD =  $$PYTHON " -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'"
+    PY_VERSION = $$system($$PY_CMD)
 	message(Python Version is $$PY_VERSION)
 	INCLUDEPATH += /usr/include/python$${PY_VERSION}/
 	LIBS+=-lpython$${PY_VERSION}
@@ -155,5 +159,5 @@ win32 {
 }
 
 DESTDIR=./
-target.path=/usr/local/bin
+target.path=$$(DESTDIR)/usr/local/bin
 INSTALLS += target

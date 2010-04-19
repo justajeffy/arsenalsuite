@@ -25,5 +25,5 @@ TARGET=absubmit
 
 DESTDIR=./
 
-target.path=/usr/local/bin
+target.path=$$(DESTDIR)/usr/local/bin
 INSTALLS += target

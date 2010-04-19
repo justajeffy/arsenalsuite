@@ -45,5 +45,5 @@ MOC_DIR        = .out
 OBJECTS_DIR    = .out
 UI_DIR         = .out
 
-target.path=/usr/local/bin
+target.path=$$(DESTDIR)/usr/local/bin
 INSTALLS += target
