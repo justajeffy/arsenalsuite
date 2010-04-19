@@ -5,6 +5,7 @@ syntax: glob
 *.pyc
 *.a
 *.ini
+*.log
 .out
 sipStone
 sipStonegui
@@ -15,6 +16,8 @@ sipAssburner
 sipAssfreezer
 sipAbsubmit
 autocore
+svnrev.h
+*-svnrev.nsi
 
 # switch to regexp syntax.
 syntax: regexp
@@ -23,8 +26,10 @@ syntax: regexp
 .*/assburner_1_3/Makefile$
 .*/absubmit/Makefile$
 .*/assfreezer/Makefile$
+.*/assfreezer/assfreezer$
 .*/classes/Makefile$
 .*/classesui/Makefile$
+.*/classmaker/Makefile$
 .*/stone/Makefile$
 .*/stonegui/Makefile$
 .*_version\.txt$
