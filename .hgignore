@@ -25,7 +25,9 @@ syntax: regexp
 
 .*/psmon/Makefile$
 .*/assburner_1_3/Makefile$
+.*/assburner_1_3/assburner$
 .*/absubmit/Makefile$
+.*/absubmit/absubmit$
 .*/assfreezer/Makefile$
 .*/assfreezer/assfreezer$
 .*/classes/Makefile$

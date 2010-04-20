@@ -1,5 +1,5 @@
 # Tell the original .pro file about additional directories.
-INCLUDEPATH = /usr/include/python2.5
+INCLUDEPATH = c:\Python25\include
 
 CONFIG += release
 
