@@ -31,8 +31,15 @@ syntax: regexp
 .*/classes/Makefile$
 .*/classesui/Makefile$
 .*/classmaker/Makefile$
+.*/classmaker/classmaker$
 .*/stone/Makefile$
 .*/stonegui/Makefile$
 .*_version\.txt$
 .*/qrc_.*\.cpp$
+.*/sip/Makefile
+.*/sip/sipconfig.py
+.*/sip/sipgen/Makefile
+.*/sip/sipgen/sip
+.*/sip/siplib/Makefile
+
 
