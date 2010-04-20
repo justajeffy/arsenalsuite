@@ -44,4 +44,8 @@ syntax: regexp
 .*/sip/sipgen/sip
 .*/sip/siplib/Makefile
 
-
+.*/PyQt4/cfgtest_.*
+.*/PyQt4/Qt.*
+.*/PyQt4/qpy/QtDesigner/.*cpp
+.*/PyQt4/.*Makefile$
+.*/PyQt4/qtdirs.*
