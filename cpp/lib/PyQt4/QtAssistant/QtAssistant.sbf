@@ -1,3 +1,0 @@
-target = QtAssistant
-sources = sipQtAssistantcmodule.cpp sipQtAssistantQAssistantClient.cpp
-headers = sipAPIQtAssistant.h
