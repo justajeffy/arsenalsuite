@@ -6,6 +6,7 @@ syntax: glob
 *.a
 *.ini
 *.log
+*.dylib
 .out
 sipStone
 sipStonegui
