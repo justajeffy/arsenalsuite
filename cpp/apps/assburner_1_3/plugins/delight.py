@@ -33,6 +33,7 @@ class DelightBurner(JobBurner):
         self.errors.append(QRegExp("^renderdl: cannot open input file"))
         self.errors.append(QRegExp("^3DL INFO L2374: no license available"))
         self.errors.append(QRegExp("Could not find file:"))
+        self.errors.append(QRegExp("Received signal"))
         #self.errors.append(QRegExp("^3DL SEVERE ERROR"))
 
     def __del__(self):
