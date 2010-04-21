@@ -193,7 +193,14 @@ RESOURCES+=ui/threadview.qrc
 
 TEMPLATE=lib
 TARGET=classesui
-target.path=$$(DESTDIR)/usr/local/lib
+
+unix {
+	target.path=$$(DESTDIR)/usr/local/lib
+}
+win32 {
+	target.path=$$(DESTDIR)/blur/common/
+}
+
 INSTALLS += target
 
 CONFIG+=qt thread

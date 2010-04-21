@@ -208,7 +208,14 @@ TEMPLATE=lib
 CONFIG += qt thread opengl
 QT+=xml sql opengl network
 TARGET=assfreezer
-target.path=$$(DESTDIR)/usr/local/lib
+
+unix {
+	target.path=$$(DESTDIR)/usr/local/lib
+}
+win32 {
+	target.path=$$(DESTDIR)/blur/common/
+}
+
 INSTALLS += target
 
 DESTDIR=./

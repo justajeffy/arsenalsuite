@@ -39,37 +39,15 @@ Section "install"
     SetOutPath $INSTDIR
 	File absubmit.exe
 	File absubmit.ini
-	File absubmit_version.txt
 	File ..\..\lib\stone\stone.dll
 	File ..\..\lib\classes\classes.dll
 	File ..\..\lib\absubmit\absubmit.dll
-	File c:\mingw\bin\exchndl.dll
 	File /r fusionsubmit
 	File /r fusionvideomakersubmit
 	File /r cinema4d
 	File /r realflow
 	SetOutPath "C:\\blur\\"
-	File ..\..\..\binaries\zip.exe
-	IfFileExists "C:\\Maxon\\Cinema 4D R10\\plugins\\*.*" Cinema4DExists PastCinema4D
-	Cinema4DExists:
-		SetOutPath "C:\\Maxon\\Cinema 4D R10\\plugins\\"
-		File cinema4d\blur_render_submit.cof
-	PastCinema4D:
-	IfFileExists "C:\\fusion\\Fusion_5.2\\Scripts\\Comp\\*.*" Fusion52Exists PastFusion52Exists
-	Fusion52Exists:
-		SetOutPath "C:\\fusion\\Fusion_5.2\\Scripts\\Comp\\Blur_Tools\\"
-		File "..\..\..\fusion\Submit Render.eyeonscript"
-	PastFusion52Exists:
-	IfFileExists "C:\\fusion\\Fusion_5.3\\Scripts\\Comp\\*.*" Fusion53Exists PastFusion53Exists
-	Fusion53Exists:
-		SetOutPath "C:\\fusion\\Fusion_5.3\\Scripts\\Comp\\Blur_Tools\\"
-		File "..\..\..\fusion\Submit Render.eyeonscript"
-	PastFusion53Exists:
-	IfFileExists "C:\\fusion\\Fusion_5.3_x64\\Scripts\\Comp\\*.*" Fusion53x64Exists PastFusion53x64Exists
-	Fusion53x64Exists:
-		SetOutPath "C:\\fusion\\Fusion_5.3_x64\\Scripts\\Comp\\Blur_Tools\\"
-		File "..\..\..\fusion\Submit Render.eyeonscript"
-	PastFusion53x64Exists:
+
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "DisplayName" "${MUI_PRODUCT} (remove only)"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "UninstallString" "$INSTDIR\uninstall.exe"
 	WriteUninstaller "$INSTDIR\uninstall.exe"

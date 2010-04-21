@@ -13,8 +13,6 @@ import blur.build
 # dynamic system if needed(database)
 blur.build.Config_Replacement_File = os.path.join(path,'config_replacements.ini')
 
-All_Targets.append( RPMTarget('blurperlrpm','blur-perl',os.path.join(path,'perl'),'../rpm/spec/blur-perl.spec.template','1.0') )
-
 All_Targets.append( Target('allrpms',os.path.abspath(os.getcwd()),[
 		"stonerpm","stoneguirpm","classmakerrpm","classesrpm","pystonerpm","pyclassesrpm",
 		"perlqtrpm","blurperlrpm","joberrorhandlerrpm","rrdstatscollectorrpm",
