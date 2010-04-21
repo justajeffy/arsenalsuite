@@ -30,13 +30,6 @@ sst = SipTarget("pystonestatic",path,True)
 # Create the main qmake target
 QMakeTarget("stone",path,"stone.pro")
 
-# Create versioned dll and lib file
-svnpri = WCRevTarget("stonelibsvnrevpri",path,"../..","svnrev-template.pri","svnrev.pri")
-#post_deps.append(LibVersionTarget("stonelibversion","lib/stone","../..","stone"))
-
-#sv = QMakeTarget("stoneversioned",path,"stone.pro",[],[svnpri])
-#sv.Defines = ["versioned"]
-
 rpm = RPMTarget('stonerpm','libstone',path,'../../../rpm/spec/stone.spec.template','1.0')
 rpm.pre_deps = ["pyqtrpm"]
 

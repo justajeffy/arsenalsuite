@@ -46,6 +46,7 @@ syntax: regexp
 
 .*/PyQt4/cfgtest_.*
 .*/PyQt4/Qt.*
+.*/PyQt4/phonon.*
 .*/PyQt4/qpy/QtDesigner/.*cpp
 .*/PyQt4/.*Makefile$
 .*/PyQt4/qtdirs.*
