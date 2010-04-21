@@ -1,7 +1,6 @@
 ; DESCRIPTION: Assburner installer script
 ; (C) Blur Studio 2005
 
-!include assburner-svnrev.nsi
 !define MUI_PRODUCT "Assburner"
 !define MUI_VERSION "v1.3.X"
 
@@ -13,7 +12,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 #!include "MUI.nsh"
 
 ; Name of resulting executable installer
-OutFile "ab_install_${MUI_SVNREV}_${PLATFORM}.exe"
+OutFile "ab_install_${PLATFORM}.exe"
 InstallDir "C:\blur\assburner\"
 
 Page directory
