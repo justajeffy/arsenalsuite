@@ -21,7 +21,10 @@
  *
  */
 
-/* $Header$
+/* $Author$
+ * $LastChangedDate: 2008-04-16 03:17:04 +1000 (Wed, 16 Apr 2008) $
+ * $Rev: 6305 $
+ * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/include/displayprefsdialog.h $
  */
 
 #ifndef DISPLAY_PREFS_DIALOG_H

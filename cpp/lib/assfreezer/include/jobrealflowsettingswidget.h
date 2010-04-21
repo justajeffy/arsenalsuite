@@ -21,7 +21,10 @@
  *
  */
 
-/* $Header$
+/* $Author$
+ * $LastChangedDate: 2008-04-17 14:13:22 -0700 (Thu, 17 Apr 2008) $
+ * $Rev: 6353 $
+ * $HeadURL: svn://newellm@ocelot/blur/trunk/cpp/lib/assfreezer/include/jobrealflowsettingswidget.h $
  */
 
 #ifndef JOBREALFLOWSETTINGS_WIDGET_H

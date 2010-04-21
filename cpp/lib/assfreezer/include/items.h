@@ -21,7 +21,10 @@
  *
  */
 
-/* $Header$
+/* $Author$
+ * $LastChangedDate: 2009-11-23 11:30:56 +1100 (Mon, 23 Nov 2009) $
+ * $Rev: 9055 $
+ * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/include/items.h $
  */
 
 #ifndef ITEMS_H

@@ -1,5 +1,8 @@
 
-/* $Header$
+/* $Author$
+ * $LastChangedDate: 2010-02-02 16:49:52 +1100 (Tue, 02 Feb 2010) $
+ * $Rev: 9298 $
+ * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/jobsettingswidgetplugin.cpp $
  */
 
 #include "hostviewerfactory.h"

@@ -22,7 +22,10 @@
  *
  */
 
-/* $Header$
+/* $Author$
+ * $LastChangedDate: 2010-02-16 17:20:26 +1100 (Tue, 16 Feb 2010) $
+ * $Rev: 9358 $
+ * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/jobshakesettingswidget.cpp $
  */
 
 #include <qmessagebox.h>
