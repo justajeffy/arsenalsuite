@@ -1,6 +1,4 @@
 
-include(svnrev.pri)
-
 MOC_DIR=.out
 OBJECTS_DIR=.out
 UI_DIR=.out

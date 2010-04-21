@@ -1,5 +1,5 @@
 # Tell the original .pro file about additional directories.
-INCLUDEPATH = c:\Python25\include ../../QtCore
+INCLUDEPATH = /usr/include/python2.5 ../../QtCore
 
 CONFIG += release
 
