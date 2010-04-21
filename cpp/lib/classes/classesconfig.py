@@ -5,8 +5,8 @@ import pyqtconfig
 # The following line will be replaced when this template is used to create
 # the final configuration module.
 _pkg_config = {
-    'classes_sip_dir':    '/usr/share/sip',
-    'classes_sip_flags':  '-x VendorID -t WS_X11 -x PyQt_NoPrintRangeBug -t Qt_4_5_0 -x Py_v3 -g'
+    'classes_sip_dir':    'c:\\Python25\\sip',
+    'classes_sip_flags':  '-x VendorID -t WS_WIN -x PyQt_OpenSSL -x PyQt_NoPrintRangeBug -t Qt_4_5_0 -x Py_v3 -g'
 }
 
 _default_macros = None

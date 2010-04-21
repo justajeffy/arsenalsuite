@@ -23,7 +23,11 @@ qt_sip_flags = config.pyqt_sip_flags
 #config.pyqt_sip_dir = "c:\\python24\\sip\\PyQt4\\"
 
 config.__dict__["AR"] = "ar r"
-sipgencmd = " ".join([config.sip_bin, "-c", "sipAssburner", "-b", "sipAssburner/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, qt_sip_flags, "sip/assburner.sip"])
+if sys.platform=="win32":
+	sip_bin = "..\\..\\lib\\sip\\sipgen\\sip.exe"
+else:
+	sip_bin = config.sip_bin
+sipgencmd = " ".join([sip_bin, "-c", "sipAssburner", "-b", "sipAssburner/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, qt_sip_flags, "sip/assburner.sip"])
 #print sipgencmd
 ret = os.system(sipgencmd)
 if ret:
