@@ -31,18 +31,12 @@ Section "install"
 	File assburner.exe
 	File psmon\abpsmon.exe
 	File assburner.ini
-	File assburner_version.txt
 	File runScriptJob.ms
     File ..\..\lib\stone\stone.dll
     File ..\..\lib\stonegui\stonegui.dll
     File ..\..\lib\classes\classes.dll
-    File ..\..\..\binaries\libpq.dll
 	CreateShortCut "$DESKTOP\Assburner.lnk" "$INSTDIR\assburner.exe" ""
 	CreateShortCut "$QUICKLAUNCH\Assburner.lnk" "$INSTDIR\assburner.exe" ""
-	File ..\..\..\binaries\unzip.exe
-	File ..\..\..\binaries\zip.exe
-	File ..\..\..\binaries\unziplicense.txt
-	File ..\..\..\binaries\Tail.exe
     SetOutPath $INSTDIR\plugins
     File /r "plugins\*.*"
 	; delete old assburner3 dir!!!
