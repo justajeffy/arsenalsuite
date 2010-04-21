@@ -165,6 +165,13 @@ void HostListWidget::customEvent( QEvent * evt )
 			}
 			break;
 		}
+		case UPDATE_HOST_LIST:
+		{
+			HostList hl = ((UpdateHostListTask*)evt)->mReturn;
+			mHostTree->model()->updated(hl);
+            refresh();
+			break;
+		}
 		default:
 			break;
 	}
@@ -230,40 +237,29 @@ void HostListWidget::populateViewMenu( QMenu * viewMenu )
 
 void HostListWidget::setHostsStatus(const QString & status)
 {
-	// Get a list of ids for the selected hosts
-	HostList hosts = mHostTree->selection();
-	if( hosts.size()==0 )
-		return;
+    HostList hosts = mHostTree->selection();
 
-	Database::current()->beginTransaction();
+    foreach( Host h, hosts )
+        FreezerCore::addTask( new UpdateHostListTask( this, HostList(h), status ) );
+    FreezerCore::wakeup();
 
     HostStatusList hsl = hosts.hostStatuses();
     hsl.setSlaveStatuses(status);
-    hsl.commit();
-
-	QStringList returnTasksSql;
-	foreach( Host h, hosts )
-		returnTasksSql += "return_slave_tasks_3(" + QString::number( h.key() ) + ")";
-	Database::current()->exec("SELECT " + returnTasksSql.join(",") + ";");
-	Database::current()->commitTransaction();
 }
 
 void HostListWidget::setHostsOnline()
 {
 	setHostsStatus("starting");
-	refresh();
 }
 
 void HostListWidget::setHostsOffline()
 {
 	setHostsStatus("stopping");
-	refresh();
 }
 
 void HostListWidget::setHostsRestart()
 {
 	setHostsStatus("restart");
-	refresh();
 }
 
 void HostListWidget::setHostsRestartWhenDone()
@@ -273,13 +269,11 @@ void HostListWidget::setHostsRestartWhenDone()
 		return;
 
 	Database::current()->exec( "UPDATE HostStatus SET slaveStatus = 'restart-when-done' WHERE fkeyHost IN(" + hosts.keyString() + ");" );
-	refresh();
 }
 
 void HostListWidget::setHostsReboot()
 {
 	setHostsStatus("reboot");
-	refresh();
 }
 
 void HostListWidget::setHostsRebootWhenDone()
@@ -289,13 +283,11 @@ void HostListWidget::setHostsRebootWhenDone()
 		return;
 
 	Database::current()->exec( "UPDATE HostStatus SET slaveStatus = 'reboot-when-done' WHERE fkeyHost IN(" + hosts.keyString() + ");" );
-	refresh();
 }
 
 void HostListWidget::setHostsClientUpdate()
 {
 	setHostsStatus("client-update");
-	refresh();
 }
 
 void HostListWidget::vncHosts()
@@ -382,3 +374,4 @@ void HostListWidget::showHostPopup(const QPoint & point)
 	if( !mHostMenu ) mHostMenu = new AssfreezerHostMenu( this );
 	mHostMenu->popup( mHostTree->mapToGlobal(point) );
 }
+
