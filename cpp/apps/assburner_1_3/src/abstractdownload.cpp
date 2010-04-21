@@ -32,7 +32,6 @@
 #include "abstractdownload.h"
 #include "blurqt.h"
 #include "config.h"
-#include "svnrev.h"
 #include "maindialog.h"
 
 AbstractDownload::AbstractDownload( QObject * parent )

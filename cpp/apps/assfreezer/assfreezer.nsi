@@ -3,7 +3,6 @@
 ; DESCRIPTION: AssFreezer installer script
 ; (C) Blur Studio 2005
 
-!include assfreezer-svnrev.nsi
 !define MUI_PRODUCT "AssFreezer"
 !define MUI_VERSION "v1.0.X"
 
@@ -14,7 +13,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 !include "MUI.nsh"
 
 ; Name of resulting executable installer
-OutFile "af_install_${MUI_SVNREV}_${PLATFORM}.exe"
+OutFile "af_install_${PLATFORM}.exe"
 InstallDir "C:\\blur\\assfreezer\\"
 
 !define MUI_FINISHPAGE
