@@ -104,7 +104,7 @@ void MainDialog::setDisplay( const QString & button, const QString & status, con
 {
 	QString statusText = QString("<p align=\"center\">Status [ <font size=\"+1\" color=\"%1\">%2</font> ]</p>").arg( color ).arg( status );
 	mStatusLabel->setText( statusText );
-	setWindowTitle(QString(cAppName+" Client [ %1 ] - Version %2, build %3").arg(status).arg(VERSION).arg(SVN_REVSTR) );
+	setWindowTitle(QString(cAppName+" Client [ %1 ] - Version %2, build %3").arg(status).arg(VERSION).arg(QString("$Date$").remove(QRegExp("[^\\d]"))) );
 	DisableButton->setText( button );
 }
 

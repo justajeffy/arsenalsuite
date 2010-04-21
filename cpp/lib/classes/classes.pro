@@ -1,5 +1,4 @@
 
-include( svnrev.pri )
 include( auto.pri )
 
 MOC_DIR=.out
@@ -38,13 +37,8 @@ unix {
 DEFINES+=CLASSES_MAKE_DLL
 TEMPLATE=lib
 CONFIG+=qt thread
-contains( DEFINED, versioned ) {
-	TARGET=classes$$SVNREV
-	LIBS+=-L../stone -lstone$$SVNREV
-} else {
-	TARGET=classes
-	LIBS+=-L../stone -lstone
-}
+TARGET=classes
+LIBS+=-L../stone -lstone
 
 unix {
 	target.path=$$(DESTDIR)/usr/local/lib

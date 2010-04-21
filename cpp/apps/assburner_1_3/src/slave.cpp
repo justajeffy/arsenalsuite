@@ -43,7 +43,6 @@
 #include "mapwarningdialog.h"
 #include "slave.h"
 #include "spooler.h"
-#include "svnrev.h"
 
 #include "blurqt.h"
 #include "freezercore.h"
@@ -159,7 +158,7 @@ void Slave::startup()
 	}
 
 	// Set host version string.
-	mHost.setAbVersion( "v" + QString(VERSION) + " r" + QString(SVN_REVSTR));
+	mHost.setAbVersion( "v" + QString(VERSION) + " r" + QString("$Date$").remove(QRegExp("[^\\d]")));
 	mHost.commit();
 
 	// Reset any frame assignments and set our host status

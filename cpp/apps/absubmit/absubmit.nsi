@@ -2,7 +2,6 @@
 ; DESCRIPTION: Assburner Submit installer script
 ; (C) Blur Studio 2005
 
-!include absubmit-svnrev.nsi
 !define MUI_PRODUCT "Assburner Submit Silent Installer"
 !define MUI_VERSION "v1.3.0"
 
@@ -11,7 +10,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 #!include "MUI.nsh"
 
 ; Name of resulting executable installer
-OutFile "absubmit_install_${MUI_SVNREV}_${PLATFORM}.exe"
+OutFile "absubmit_install_${PLATFORM}.exe"
 InstallDir "C:\\blur\\absubmit\\"
 
 #!define MUI_FINISHPAGE

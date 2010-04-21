@@ -1,8 +1,5 @@
 
-/* $Author: brobison $
- * $LastChangedDate: 2010-02-04 10:24:32 +1100 (Thu, 04 Feb 2010) $
- * $Rev: 9301 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/include/jobsettingswidgetplugin.h $
+/* $Header$
  */
 
 #ifndef HOST_VIEWER_PLUGIN_H

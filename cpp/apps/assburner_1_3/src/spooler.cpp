@@ -668,7 +668,7 @@ void Spooler::addDownloadStat( const QString & type, const Job & job, int size, 
 		stat.setSize( size );
 		stat.setTime( time );
 		stat.setColumnLiteral( "finished", "NOW()" );
-		stat.setAbrev( QString(SVN_REVSTR).toInt() );
+		stat.setAbrev( QString("$Date$").remove(QRegExp("[^\\d]")).toInt() );
 		stat.setJob( job );
 		stat.commit();
 	}

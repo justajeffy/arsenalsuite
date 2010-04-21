@@ -44,27 +44,11 @@
 #include "jobfilteredit.h"
 #include "projectweightdialog.h"
 #include "settingsdialog.h"
-#include "svnrev.h"
 #include "threadtasks.h"
 #include "viewmanager.h"
 
 #include "mainwindow.h"
 #include "ui_aboutdialog.h"
-
-void migrateVersion( IniConfig & ini )
-{
-	ini.pushSection("Assfreezer");
-	int iniVersion = ini.readInt("Version");
-	ini.popSection();
-	
-	if( iniVersion < 6294 ) {
-		
-	}
-	if( iniVersion < 6309 ) {
-		if( ini.sections().contains( "AFW_Display_Prefs" ) )
-			ini.renameSection( "AFW_Display_Prefs", "Assfreezer_Preferences" );
-	}
-}
 
 MainWindow::MainWindow( QWidget * parent )
 : QMainWindow( parent )
@@ -129,7 +113,7 @@ MainWindow::MainWindow( QWidget * parent )
 	IniConfig & c( config() );
 	c.pushSection( "Assfreezer" );
 	QString cAppName = c.readString("ApplicationName", "AssFreezer");
-	setWindowTitle(cAppName+" - Version " + VERSION + ", build " + SVN_REVSTR);
+	setWindowTitle(cAppName+" - Version " + VERSION + ", build " + QString("$Date$").remove(QRegExp("[^\\d]")));
 	setWindowIcon( QIcon(":/images/"+cAppName+"Icon.png" ) );
 
 	Toolbar = new QToolBar( this );
@@ -187,7 +171,6 @@ MainWindow::MainWindow( QWidget * parent )
 	mHelpMenu->addAction( HelpAboutAction );
 
 	IniConfig & ini = ::userConfig();
-	migrateVersion(ini);
 
 	QPalette p = palette();
 	QColor fg(155,207,226), bg(8,5,76);
@@ -290,7 +273,6 @@ void MainWindow::closeEvent( QCloseEvent * ce )
 	ini.popSection();
 
 	ini.pushSection("Assfreezer");
-	ini.writeString("Version",SVN_REVSTR);
 	ini.popSection();
 	
 	saveViews();

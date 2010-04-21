@@ -33,7 +33,6 @@
 #include "ui_maindialogui.h"
 #include "iniconfig.h"
 #include "slave.h"
-#include "svnrev.h"
 #include "common.h"
 
 class QTimer;

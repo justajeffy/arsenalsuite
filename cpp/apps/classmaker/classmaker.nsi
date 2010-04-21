@@ -3,7 +3,6 @@
 ; DESCRIPTION: Classmaker installer script
 ; (C) Blur Studio 2005
 
-!include classmaker-svnrev.nsi
 !define MUI_PRODUCT "Classmaker"
 !define MUI_VERSION "v1.0.X"
 
@@ -14,7 +13,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION}"
 !include "MUI.nsh"
 
 ; Name of resulting executable installer
-OutFile "classmaker_install_${MUI_SVNREV}.exe"
+OutFile "classmaker_install.exe"
 InstallDir "C:\\blur\\classmaker\\"
 
 !define MUI_FINISHPAGE
