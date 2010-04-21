@@ -21,7 +21,7 @@
  *
  */
 
-/* $Author: brobison $
+/* $Author$
  * $LastChangedDate: 2010-01-29 14:55:03 +1100 (Fri, 29 Jan 2010) $
  * $Rev: 9285 $
  * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/afcommon.cpp $

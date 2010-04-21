@@ -1,6 +1,6 @@
 
 
-/* $Author: newellm $
+/* $Author$
  * $LastChangedDate: 2008-11-18 09:01:32 +1100 (Tue, 18 Nov 2008) $
  * $Rev: 7307 $
  * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/include/batchsubmitdialog.h $
