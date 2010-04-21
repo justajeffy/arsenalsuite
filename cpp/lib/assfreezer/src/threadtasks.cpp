@@ -1,5 +1,5 @@
 
-/* $Author: brobison $
+/* $Author$
  * $LastChangedDate: 2010-01-28 11:47:32 +1100 (Thu, 28 Jan 2010) $
  * $Rev: 9262 $
  * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/threadtasks.cpp $
