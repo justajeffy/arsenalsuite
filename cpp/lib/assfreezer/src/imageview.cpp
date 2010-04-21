@@ -21,10 +21,7 @@
  *
  */
 
-/* $Author: brobison $
- * $LastChangedDate: 2010-03-19 16:42:26 +1100 (Fri, 19 Mar 2010) $
- * $Rev: 9544 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/imageview.cpp $
+/* $Header$
  */
 
 #include <qfile.h>

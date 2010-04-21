@@ -21,10 +21,7 @@
  *
  */
 
-/* $Author: brobison $
- * $LastChangedDate: 2007-09-22 05:48:04 +1000 (Sat, 22 Sep 2007) $
- * $Rev: 5069 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/tabtoolbar.cpp $
+/* $Header$
  */
 
 

@@ -22,10 +22,7 @@
  *
  */
 
-/* $Author: newellm $
- * $LastChangedDate: 2008-02-04 11:45:25 -0800 (Mon, 04 Feb 2008) $
- * $Rev: 5578 $
- * $HeadURL: svn://newellm@ocelot/blur/trunk/cpp/lib/assfreezer/src/jobfusionsettingswidget.cpp $
+/* $Header$
  */
 
 #include <qfileinfo.h>

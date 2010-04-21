@@ -1,8 +1,5 @@
 
-/* $Author: brobison $
- * $LastChangedDate: 2009-11-27 13:20:11 +1100 (Fri, 27 Nov 2009) $
- * $Rev: 9100 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/include/threadtasks.h $
+/* $Header$
  */
 
 #include <qevent.h>
