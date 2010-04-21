@@ -1,15 +1,17 @@
 
 import os
+import sys
 from blur.build import *
 
 path = os.path.dirname(os.path.abspath(__file__))
 QMakeTarget("libabsubmit",path,"libabsubmit.pro", ["stone","classes"],[])
 
-rpm = RPMTarget('libabsubmitrpm','libabsubmit',path,'../../../rpm/spec/libabsubmit.spec.template','1.0')
-rpm.pre_deps = ['classesrpm','stonerpm']
+if sys.platform=="linux2":
+	rpm = RPMTarget('libabsubmitrpm','libabsubmit',path,'../../../rpm/spec/libabsubmit.spec.template','1.0')
+	rpm.pre_deps = ['classesrpm','stonerpm']
 
-pyrpm = RPMTarget('pyabsubmitrpm','pyabsubmit',path,'../../../rpm/spec/pyabsubmit.spec.template','1.0')
-pyrpm.pre_deps = ['pystonerpm','pyclassesrpm','libabsubmitrpm']
+	pyrpm = RPMTarget('pyabsubmitrpm','pyabsubmit',path,'../../../rpm/spec/pyabsubmit.spec.template','1.0')
+	pyrpm.pre_deps = ['pystonerpm','pyclassesrpm','libabsubmitrpm']
 
 # Python module target
 pc = SipTarget("pyabsubmit",path)

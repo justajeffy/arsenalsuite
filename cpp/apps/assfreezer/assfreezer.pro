@@ -85,7 +85,13 @@ CONFIG += qt thread warn_on opengl
 QT+=opengl xml sql network
 DESTDIR=./
 RC_FILE = assfreezer.rc
-
 TARGET = assfreezer
-target.path=$$(DESTDIR)/usr/local/bin
+
+unix {
+	target.path=$$(DESTDIR)/usr/local/bin
+}
+win32 {
+	target.path=$$(DESTDIR)/blur/common/
+}
+
 INSTALLS += target

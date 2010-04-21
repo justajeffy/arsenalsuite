@@ -44,11 +44,9 @@ Section "install"
 	Delete "$QUICKLAUNCH\short*classmaker*lnk"
 	SetOutPath $INSTDIR
 	File classmaker.exe
-	File c:\mingw\bin\exchndl.dll
   	CreateShortCut "$DESKTOP\Classmaker 1.0.lnk" "$INSTDIR\classmaker.exe" ""
 	CreateShortcut "$QUICKLAUNCH\Classmaker 1.0.lnk" "$INSTDIR\classmaker.exe" ""
 	File classmaker.ini
-	File classmaker_version.txt
     File ..\..\lib\stone\stone.dll
     File ..\..\lib\stonegui\stonegui.dll
 	SetOutPath $INSTDIR\images

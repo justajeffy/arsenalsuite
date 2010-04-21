@@ -20,8 +20,9 @@ else:
 QMakeTarget("libassfreezer",path,"libassfreezer.pro",deps)
 #QMakeTarget("libassfreezerstatic",path,"libassfreezer.pro",["stonestatic","stoneguistatic","classesuistatic","libabsubmit"],[],True)
 
-rpm = RPMTarget('libassfreezerrpm','libassfreezer',path,'../../../rpm/spec/libassfreezer.spec.template','1.0')
-rpm.pre_deps = ["libabsubmitrpm"]
+if sys.platform=="linux2":
+	rpm = RPMTarget('libassfreezerrpm','libassfreezer',path,'../../../rpm/spec/libassfreezer.spec.template','1.0')
+	rpm.pre_deps = ["libabsubmitrpm"]
 
 
 if __name__ == "__main__":

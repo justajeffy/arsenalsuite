@@ -1,4 +1,5 @@
 
+import sys
 from blur.build import *
 from distutils import sysconfig
 
@@ -11,8 +12,9 @@ makensis_extra_options.append( '/DPYTHON_VERSION=%s' % sysconfig.get_python_vers
 nsis = NSISTarget( "pyqt_installer", path, "PyQt4.nsi", makensis_extra_options = makensis_extra_options )
 pyqt = SipTarget("pyqt",path,False,None,["sip"] )
 
-rpm = RPMTarget("pyqtrpm","pyqt",path,"../../../rpm/spec/pyqt.spec.template","1.0")
-rpm.pre_deps = ["siprpm"]
+if sys.platform=="linux2":
+	rpm = RPMTarget("pyqtrpm","pyqt",path,"../../../rpm/spec/pyqt.spec.template","1.0")
+	rpm.pre_deps = ["siprpm"]
 
 pyqt.post_deps = [nsis]
 

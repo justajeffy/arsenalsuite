@@ -26,8 +26,9 @@ assburner = QMakeTarget("assburner",path, "assburner.pro", deps)
 abpsmon = QMakeTarget("abpsmon",os.path.join(path,'psmon'), "psmon.pro", ["stonegui","classes",ini])
 Target("assburner_1_3",path, [assburner,abpsmon],[nsi])
 
-rpm = RPMTarget('assburnerrpm','assburner',path,'../../../rpm/spec/assburner.spec.template','1.0')
-rpm.pre_deps = ['stoneguirpm','classesrpm','stonerpm']
+if sys.platform=="linux2":
+	rpm = RPMTarget('assburnerrpm','assburner',path,'../../../rpm/spec/assburner.spec.template','1.0')
+	rpm.pre_deps = ['stoneguirpm','classesrpm','stonerpm']
 
 if __name__ == "__main__":
 	build()
