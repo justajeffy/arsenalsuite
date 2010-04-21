@@ -1,8 +1,5 @@
 
-/* $Author: brobison $
- * $LastChangedDate: 2010-03-26 13:17:37 +1100 (Fri, 26 Mar 2010) $
- * $Rev: 9598 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/batchsubmitdialog.cpp $
+/* $Header$
  */
 
 #include <qmessagebox.h>

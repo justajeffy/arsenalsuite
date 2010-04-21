@@ -21,10 +21,7 @@
  *
  */
 
-/* $Author: brobison $
- * $LastChangedDate: 2010-03-25 12:18:02 +1100 (Thu, 25 Mar 2010) $
- * $Rev: 9589 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/include/settingsdialog.h $
+/* $Header$
  */
 
 #ifndef SETTINGS_DIALOG_H

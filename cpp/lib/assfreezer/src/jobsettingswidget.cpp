@@ -1,8 +1,5 @@
 
-/* $Author: brobison $
- * $LastChangedDate: 2010-02-18 14:36:10 +1100 (Thu, 18 Feb 2010) $
- * $Rev: 9369 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/jobsettingswidget.cpp $
+/* $Header$
  */
 
 #include "database.h"

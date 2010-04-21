@@ -1,8 +1,5 @@
 
-/* $Author: brobison $
- * $LastChangedDate: 2007-06-18 11:27:47 -0700 (Mon, 18 Jun 2007) $
- * $Rev: 4632 $
- * $HeadURL: svn://brobision@66.93.150.126/blur/trunk/cpp/lib/assfreezer/src/jobsettingswidget.cpp $
+/* $Header$
  */
 
 #include "jobenvironmentwindow.h"

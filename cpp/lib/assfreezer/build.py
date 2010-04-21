@@ -5,8 +5,6 @@ from blur.build import *
 path = os.path.dirname(os.path.abspath(__file__))
 rev_path = os.path.join(path,'../..')
 
-svn = WCRevTarget("libassfreezersvnrev",path,rev_path,"include/svnrev-template.h","include/svnrev.h")
-
 # Python module target
 pc = SipTarget("pyassfreezer",path)
 pc.pre_deps = ["libassfreezer","pyclasses:install"]
@@ -15,9 +13,9 @@ pcs = SipTarget("pyassfreezerstatic",path,True)
 pcs.pre_deps = ["pyclassesstatic:install"]
 
 if sys.platform == 'win32':
-	deps = ["sipstatic","pystonestatic","pyclassesstatic","pyclassesui","classesui","pyassfreezerstatic",svn]
+	deps = ["sipstatic","pystonestatic","pyclassesstatic","pyclassesui","classesui","pyassfreezerstatic"]
 else:
-	deps = ["sipstatic","pyclassesui","classesui","pyassfreezerstatic",svn]
+	deps = ["sipstatic","pyclassesui","classesui","pyassfreezerstatic"]
 
 QMakeTarget("libassfreezer",path,"libassfreezer.pro",deps)
 #QMakeTarget("libassfreezerstatic",path,"libassfreezer.pro",["stonestatic","stoneguistatic","classesuistatic","libabsubmit"],[],True)
