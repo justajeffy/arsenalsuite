@@ -28,7 +28,6 @@
 #include <QMainWindow>
 
 #include "afcommon.h"
-#include "svnrev.h"
 
 const QString VERSION("1.0");
 
