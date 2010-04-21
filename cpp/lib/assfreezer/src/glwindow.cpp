@@ -20,7 +20,10 @@
  *
  */
 
-/* $Header$
+/* $Author$
+ * $LastChangedDate: 2009-11-23 11:09:07 +1100 (Mon, 23 Nov 2009) $
+ * $Rev: 9043 $
+ * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/glwindow.cpp $
  */
 
 #include <qimage.h>
