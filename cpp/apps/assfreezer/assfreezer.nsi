@@ -47,11 +47,9 @@ Section "install"
 	Delete "$QUICKLAUNCH\short*assfreezer*lnk"
 	SetOutPath $INSTDIR
 	File assfreezer.exe
-	File c:\mingw\bin\exchndl.dll
   	CreateShortCut "$DESKTOP\AssFreezer 1.0.lnk" "$INSTDIR\assfreezer.exe" ""
 	CreateShortcut "$QUICKLAUNCH\AssFreezer 1.0.lnk" "$INSTDIR\assfreezer.exe" ""
 	File assfreezer.ini
-	File assfreezer_version.txt
     File ..\..\lib\stone\stone.dll
     File ..\..\lib\stonegui\stonegui.dll
     File ..\..\lib\classes\classes.dll
