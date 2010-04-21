@@ -316,3 +316,26 @@ void UpdateJobListTask::run()
     //mReturn.commit();
 }
 
+UpdateHostListTask::UpdateHostListTask( QObject * rec, const HostList & hosts, const QString & status )
+: ThreadTask( UPDATE_JOB_LIST, rec )
+, mReturn( hosts )
+, mStatus( status )
+{
+}
+
+void UpdateHostListTask::run()
+{
+    Database::current()->beginTransaction();
+
+    HostStatusList hsl = mReturn.hostStatuses();
+    hsl.setSlaveStatuses(mStatus);
+    hsl.commit();
+
+    QStringList returnTasksSql;
+    foreach( Host h, mReturn )
+        returnTasksSql += "return_slave_tasks_3(" + QString::number( h.key() ) + ")";
+    Database::current()->exec("SELECT " + returnTasksSql.join(",") + ";");
+
+    Database::current()->commitTransaction();
+}
+

@@ -647,7 +647,8 @@ void JobListWidget::deleteJobs()
 
 void JobListWidget::updateSelectedJobs(const QString & jobStatus)
 {
-    FreezerCore::addTask( new UpdateJobListTask( this, mJobTree->selection(), jobStatus ) );
+    foreach( Job j, mJobTree->selection() )
+        FreezerCore::addTask( new UpdateJobListTask( this, JobList(j), jobStatus ) );
     FreezerCore::wakeup();
 }
 
