@@ -21,7 +21,7 @@
  *
  */
 
-/* $Author: brobison $
+/* $Author$
  * $LastChangedDate: 2007-06-18 11:27:47 -0700 (Mon, 18 Jun 2007) $
  * $Rev: 4632 $
  * $HeadURL: svn://newellm@ocelot/blur/trunk/cpp/lib/assfreezer/include/jobxsisettingswidget.h $
