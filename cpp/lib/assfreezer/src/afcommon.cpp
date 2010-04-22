@@ -21,13 +21,8 @@
  *
  */
 
-/* $Author$
- * $LastChangedDate: 2010-01-29 14:55:03 +1100 (Fri, 29 Jan 2010) $
- * $Rev: 9285 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/afcommon.cpp $
+/* $Header$
  */
-
-#include "Python.h"
 
 #include <qdir.h>
 #include <qimage.h>
@@ -89,85 +84,3 @@ void exploreFile( QString path )
 	}
 }
 
-#ifdef Q_OS_WIN
-extern "C" void initsip(void);
-extern "C" void initStone(void);
-extern "C" void initClasses(void);
-#endif
-extern "C" void initAssfreezer(void);
-
-void loadPythonPlugins()
-{
-	LOG_5( "Loading Python" );
-	/*
-	 * This structure specifies the names and initialisation functions of
-	 * the builtin modules.
-	 */
-	struct _inittab builtin_modules[] = {
-#ifdef Q_OS_WIN
-		{"sip", initsip},
-		{"blur.Stone",initStone},
-		{"blur.Classes",initClasses},
-		{"blur.Assfreezer", initAssfreezer},
-#endif
-		{NULL, NULL}
-	};
-
-	PyImport_ExtendInittab(builtin_modules);
-	
-	Py_Initialize();
-
-	const char * builtinModuleImportStr = 
-#ifdef Q_OS_WIN
-		"import imp,sys\n"
-		"class MetaLoader(object):\n"
-		"\tdef __init__(self):\n"
-		"\t\tself.modules = {}\n"
-
-		"\t\tself.modules['blur.Stone'] = imp.load_module('blur.Stone',None,'',('','',imp.C_BUILTIN))\n"
-		"\t\tself.modules['blur.Classes'] = imp.load_module('blur.Classes',None,'',('','',imp.C_BUILTIN))\n"
-
-		"\t\tself.modules['blur.Assfreezer'] = imp.load_module('blur.Assfreezer',None,'',('','',imp.C_BUILTIN))\n"
-		"\tdef find_module(self,fullname,path=None):\n"
-//		"\t\tprint 'MetaLoader.find_module: ', fullname, path\n"
-		"\t\tif fullname in self.modules:\n"
-		"\t\t\treturn self.modules[fullname]\n"
-//		"\t\tprint 'MetaLoader.find_module: Returning None'\n"
-		"sys.meta_path.append(MetaLoader())\n"
-		"import blur\n"
-		"blur.RedirectOutputToLog()\n";
-#else
-		"import imp,sys\n"
-		"class MetaLoader(object):\n"
-		"\tdef __init__(self):\n"
-		"\t\tself.modules = {}\n"
-//  blur.Stone and blur.Classes dynamically loaded
-		"\t\tself.modules['blur.Assfreezer'] = imp.load_module('blur.Assfreezer',None,'',('','',imp.C_BUILTIN))\n"
-		"\tdef find_module(self,fullname,path=None):\n"
-//		"\t\tprint 'MetaLoader.find_module: ', fullname, path\n"
-		"\t\tif fullname in self.modules:\n"
-		"\t\t\treturn self.modules[fullname]\n"
-//		"\t\tprint 'MetaLoader.find_module: Returning None'\n"
-		"sys.meta_path.append(MetaLoader())\n"
-		"import blur\n"
-		"blur.RedirectOutputToLog()\n";
-#endif
-	PyRun_SimpleString(builtinModuleImportStr);
-
-	LOG_5( "Loading python plugins" );
-	
-	QDir plugin_dir( "plugins" );
-	QStringList el = plugin_dir.entryList(QStringList() << "*.py" << "*.pys" << "*.pyw", QDir::Files);
-	foreach( QString plug, el ) {
-		QString name("plugins/" + plug);
-		LOG_5( "Loading plugin: " + name );
-		bool error = false;
-		QString contents = readFullFile( name, &error );
-		if( error ) {
-			LOG_3( "Unable to open " + name + " for reading" );
-			continue;
-		}
-		contents.replace("\r","");
-		PyRun_SimpleString(contents.toLatin1());
-	}
-}
