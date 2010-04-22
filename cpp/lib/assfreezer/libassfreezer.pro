@@ -132,40 +132,9 @@ win32 {
 	LIBS+=-L$${PY_PATH}\libs -lpython$${PY_VERSION}
 	LIBS += -lpsapi -lMpr -lws2_32 -lgdi32
 }
-    LIBS+=-LsipAssfreezer -lAssfreezer
-    win32 {
-	LIBS+=-L../../lib/classes/sipClasses -lpyClasses
-	LIBS+=-L../../lib/stone/sipStone -lpyStone
-	LIBS+=-L../../lib/sip/siplib -lsip
-    }
-
-
-
-# Linux out of tree include paths
-unix {
-	INCLUDEPATH += /usr/include/stone /usr/include/stonegui /usr/include/classes /usr/include/classesui /usr/include/absubmit
-}
-
-# Python modules
-debug:win32 {
-    LIBS+=-L../../lib/assfreezer/sipAssfreezer -lAssfreezer_d
-    LIBS+=-L../../lib/classes/sipClasses -lpyClasses_d
-    LIBS+=-L../../lib/stone/sipStone -lpyStone_d
-    LIBS+=-L../../lib/sip/siplib -lsip_d
-} else {
-    LIBS+=-LsipAssfreezer -lAssfreezer
-	win32 {
-	    LIBS+=-L../../lib/classes/sipClasses -lpyClasses
-		LIBS+=-L../../lib/stone/sipStone -lpyStone
-		LIBS+=-L../../lib/sip/siplib -lsip
-	}
-}
 
 win32{
-#	INCLUDEPATH+=c:\nvidia\cg\include
-#	LIBS+=-Lc:\nvidia\cg\lib -lcgGL -lcg
 	LIBS+=-lPsapi
-#	LIBS+=-Lc:\IntelLib
 
 	INCLUDEPATH+=c:/source/sip/siplib
 	PY_PATH=$$system("python -c \"from distutils.sysconfig import get_config_vars; print get_config_vars()['prefix']\"")
@@ -173,7 +142,6 @@ win32{
 	PY_VERSION=$$system("python -c \"from distutils.sysconfig import get_python_version; print get_python_version().replace('.','')\"")
 	message(Python Version is $$PY_VERSION Python lib path is $$PY_LIB_PATH)
 	LIBS+=-L$${PY_PATH}\libs -lpython$${PY_VERSION}
-
 }
 
 macx{
@@ -201,6 +169,10 @@ contains( DEFINES, USE_IMAGE_MAGICK ) {
 	unix:LIBS+=-lMagick++
 	macx:INCLUDEPATH+=/usr/local/include
 	macx:LIBS+=-lMagick++ -lMagick
+
+	win32:LIBS+=-lMagick++
+	win32:LIBS+=-L/ImageMagick/lib
+	win32:INCLUDEPATH+=/ImageMagick/include
 }
 
 TEMPLATE=lib
