@@ -19,6 +19,16 @@ sipAbsubmit
 autocore
 svnrev.h
 *-svnrev.nsi
+Makefile.Release
+Makefile.Debug
+*.swp
+*.exe
+*.exp
+*.pdb
+*.obj
+*.lib
+*.pyd
+*.dll
 
 # switch to regexp syntax.
 syntax: regexp
@@ -28,8 +38,12 @@ syntax: regexp
 .*/assburner_1_3/assburner$
 .*/absubmit/Makefile$
 .*/absubmit/absubmit$
+.*/absubmit/absubmit.dll$
+.*/absubmit/absubmit.lib$
 .*/assfreezer/Makefile$
 .*/assfreezer/assfreezer$
+.*/assfreezer/assfreezer.dll$
+.*/assfreezer/assfreezer.lib$
 .*/classes/Makefile$
 .*/classesui/Makefile$
 .*/classmaker/Makefile$
