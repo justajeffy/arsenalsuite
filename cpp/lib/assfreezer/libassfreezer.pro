@@ -124,7 +124,8 @@ INCLUDEPATH += ../classesui/include ../classesui/.out/
 INCLUDEPATH += ../absubmit/include ../absubmit/.out
 
 win32 {
-	#INCLUDEPATH+=c:/source/sip/siplib
+	LIBS+=-L../absubmit/sipAbsubmit -lpyAbsubmit
+
 	PY_PATH=$$system("python -c \"from distutils.sysconfig import get_config_vars; print get_config_vars()['prefix']\"")
 	INCLUDEPATH+=$$system("python -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
 	PY_VERSION=$$system("python -c \"from distutils.sysconfig import get_python_version; print get_python_version().replace('.','')\"")

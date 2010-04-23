@@ -11,7 +11,7 @@ pc.pre_deps = ["libassfreezer","pyclasses:install"]
 
 pcs = SipTarget("pyassfreezerstatic",path,True)
 
-QMakeTarget("libassfreezer",path,"libassfreezer.pro",["classes","absubmit"])
+QMakeTarget("libassfreezer",path,"libassfreezer.pro",["classesui","absubmit"])
 
 if sys.platform=="linux2":
 	rpm = RPMTarget('libassfreezerrpm','libassfreezer',path,'../../../rpm/spec/libassfreezer.spec.template','1.0')

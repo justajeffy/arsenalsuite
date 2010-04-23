@@ -13,7 +13,7 @@ deps = None
 if sys.platform == 'win32':
 	deps = ["sipstatic","pystonestatic","pyclassesstatic","classes","libassfreezer","pyassfreezerstatic",ini]
 else:
-	deps = ["sipstatic","pystone","pyclasses","classes","libassfreezer","pyassfreezerstatic",ini]
+	deps = ["sipstatic","pystone","pyclasses","classes","libassfreezer","pyassfreezer",ini]
 
 QMakeTarget("assfreezer",path,"assfreezer.pro",deps,[nsi])
 
