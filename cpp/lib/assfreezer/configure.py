@@ -104,7 +104,6 @@ def doit():
 	makefile.extra_lib_dirs.append( ".." );
 	makefile.extra_lib_dirs.append( "../../stone" );
 	makefile.extra_lib_dirs.append( "../../classes" );
-	
 
 	# Generate the Makefile itself.
 	makefile.generate()

@@ -63,18 +63,12 @@ unix{
 }
 
 # Python modules
-debug:win32 {
-    LIBS+=-L../../lib/assfreezer/sipAssfreezer -lAssfreezer_d
-    LIBS+=-L../../lib/classes/sipClasses -lpyClasses_d
-    LIBS+=-L../../lib/stone/sipStone -lpyStone_d
-    LIBS+=-L../../lib/sip/siplib -lsip_d
-} else {
-    LIBS+=-L../../lib/assfreezer/sipAssfreezer -lAssfreezer
-	win32 {
-	    LIBS+=-L../../lib/classes/sipClasses -lpyClasses
-		LIBS+=-L../../lib/stone/sipStone -lpyStone
-		LIBS+=-L../../lib/sip/siplib -lsip
-	}
+win32 {
+	LIBS+=-L../../lib/assfreezer/sipAssfreezer -lpyAssfreezer
+	LIBS+=-L../../lib/classes/sipClasses -lpyClasses
+	LIBS+=-L../../lib/stone/sipStone -lpyStone
+	LIBS+=-L../../lib/absubmit/sipAbsubmit -lpyAbsubmit
+	LIBS+=-L../../lib/sip/siplib -lsip
 }
 
 macx: CONFIG-=app_bundle
