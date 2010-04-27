@@ -421,7 +421,7 @@ bool JobBurner::checkup()
 		mJob.reload();
 		if( exceededMaxTime() ) {
 			QString action( taskStarted() ? "Task" : "Load" );
-			QString msg = action + " exceeded max " + action + " time of " + QString::number( taskStarted() ? mJob.maxTaskTime() : mJob.maxLoadTime() ) + " seconds";
+			QString msg = action + " exceeded max " + action + " time of " + Interval( mLoaded ? mJob.maxTaskTime() : mJob.maxLoadTime() ).toDisplayString();
 			jobErrored( msg, /*timeout=*/ true );
 			return false;
 		}
