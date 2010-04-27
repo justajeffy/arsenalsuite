@@ -37,8 +37,8 @@ class RenderArea(QtGui.QWidget):
         self.setFont(newFont)
 
         fontMetrics = QtGui.QFontMetrics(newFont)
-        self.xBoundingRect = fontMetrics.boundingRect(self.tr("x"))
-        self.yBoundingRect = fontMetrics.boundingRect(self.tr("y"))
+        self.xBoundingRect = fontMetrics.boundingRect("x")
+        self.yBoundingRect = fontMetrics.boundingRect("y")
         self.shape = QtGui.QPainterPath()
         self.operations = []
 
@@ -80,13 +80,13 @@ class RenderArea(QtGui.QWidget):
         painter.drawLine(48, -2, 50, 0)
         painter.drawLine(48, 2, 50, 0)
         painter.drawText(60 - self.xBoundingRect.width() / 2,
-                         0 + self.xBoundingRect.height() / 2, self.tr("x"))
+                         0 + self.xBoundingRect.height() / 2, "x")
 
         painter.drawLine(0, 0, 0, 50)
         painter.drawLine(-2, 48, 0, 50)
         painter.drawLine(2, 48, 0, 50)
         painter.drawText(0 - self.yBoundingRect.width() / 2,
-                         60 + self.yBoundingRect.height() / 2, self.tr("y"))
+                         60 + self.yBoundingRect.height() / 2, "y")
 
     def drawOutline(self, painter):
         painter.setPen(QtCore.Qt.darkGreen)
@@ -120,10 +120,10 @@ class Window(QtGui.QWidget):
         self.originalRenderArea = RenderArea()
 
         self.shapeComboBox = QtGui.QComboBox()
-        self.shapeComboBox.addItem(self.tr("Clock"))
-        self.shapeComboBox.addItem(self.tr("House"))
-        self.shapeComboBox.addItem(self.tr("Text"))
-        self.shapeComboBox.addItem(self.tr("Truck"))
+        self.shapeComboBox.addItem("Clock")
+        self.shapeComboBox.addItem("House")
+        self.shapeComboBox.addItem("Text")
+        self.shapeComboBox.addItem("Truck")
 
         layout = QtGui.QGridLayout()
         layout.addWidget(self.originalRenderArea, 0, 0)
@@ -136,10 +136,10 @@ class Window(QtGui.QWidget):
             self.transformedRenderAreas[i] = RenderArea()
 
             self.operationComboBoxes[i] = QtGui.QComboBox()
-            self.operationComboBoxes[i].addItem(self.tr("No transformation"))
-            self.operationComboBoxes[i].addItem(self.tr("Rotate by 60\xB0"))
-            self.operationComboBoxes[i].addItem(self.tr("Scale to 75%"))
-            self.operationComboBoxes[i].addItem(self.tr("Translate by (50, 50)"))
+            self.operationComboBoxes[i].addItem("No transformation")
+            self.operationComboBoxes[i].addItem("Rotate by 60\xB0")
+            self.operationComboBoxes[i].addItem("Scale to 75%")
+            self.operationComboBoxes[i].addItem("Translate by (50, 50)")
 
             self.operationComboBoxes[i].activated.connect(self.operationChanged)
 
@@ -150,7 +150,7 @@ class Window(QtGui.QWidget):
         self.setupShapes()
         self.shapeSelected(0)
 
-        self.setWindowTitle(self.tr("Transformations"))
+        self.setWindowTitle("Transformations")
 
     def setupShapes(self):
         truck = QtGui.QPainterPath()
@@ -197,8 +197,8 @@ class Window(QtGui.QWidget):
         text = QtGui.QPainterPath()
         font = QtGui.QFont()
         font.setPixelSize(50)
-        fontBoundingRect = QtGui.QFontMetrics(font).boundingRect(self.tr("Qt"))
-        text.addText(-QtCore.QPointF(fontBoundingRect.center()), font, self.tr("Qt"))
+        fontBoundingRect = QtGui.QFontMetrics(font).boundingRect("Qt")
+        text.addText(-QtCore.QPointF(fontBoundingRect.center()), font, "Qt")
 
         self.shapes = (clock, house, text, truck)
 

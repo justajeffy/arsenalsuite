@@ -9,16 +9,16 @@ class Window(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
 
-        browseButton = self.createButton(self.tr("&Browse..."), self.browse)
-        findButton = self.createButton(self.tr("&Find"), self.find)
+        browseButton = self.createButton("&Browse...", self.browse)
+        findButton = self.createButton("&Find", self.find)
 
-        self.fileComboBox = self.createComboBox(self.tr("*"))
+        self.fileComboBox = self.createComboBox("*")
         self.textComboBox = self.createComboBox()
         self.directoryComboBox = self.createComboBox(QtCore.QDir.currentPath())
 
-        fileLabel = QtGui.QLabel(self.tr("Named:"))
-        textLabel = QtGui.QLabel(self.tr("Containing text:"))
-        directoryLabel = QtGui.QLabel(self.tr("In directory:"))
+        fileLabel = QtGui.QLabel("Named:")
+        textLabel = QtGui.QLabel("Containing text:")
+        directoryLabel = QtGui.QLabel("In directory:")
         self.filesFoundLabel = QtGui.QLabel()
 
         self.createFilesTable()
@@ -40,14 +40,14 @@ class Window(QtGui.QDialog):
         mainLayout.addLayout(buttonsLayout, 5, 0, 1, 3)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Find Files"))
+        self.setWindowTitle("Find Files")
         self.resize(700, 300)
 
     def browse(self):
-        directory = QtGui.QFileDialog.getExistingDirectory(self,
-                self.tr("Find Files"), QtCore.QDir.currentPath())
+        directory = QtGui.QFileDialog.getExistingDirectory(self, "Find Files",
+                QtCore.QDir.currentPath())
 
-        if not directory.isEmpty():
+        if directory:
             if self.directoryComboBox.findText(directory) == -1:
                 self.directoryComboBox.addItem(directory)
 
@@ -70,28 +70,27 @@ class Window(QtGui.QDialog):
         self.updateComboBox(self.directoryComboBox)
 
         self.currentDir = QtCore.QDir(path)
-        if fileName.isEmpty():
+        if not fileName:
             fileName = "*"
-        files = self.currentDir.entryList(QtCore.QStringList(fileName),
+        files = self.currentDir.entryList([fileName],
                 QtCore.QDir.Files | QtCore.QDir.NoSymLinks)
 
-        if not text.isEmpty():
+        if text:
             files = self.findFiles(files, text)
         self.showFiles(files)
 
     def findFiles(self, files, text):
         progressDialog = QtGui.QProgressDialog(self)
 
-        progressDialog.setCancelButtonText(self.tr("&Cancel"))
+        progressDialog.setCancelButtonText("&Cancel")
         progressDialog.setRange(0, files.count())
-        progressDialog.setWindowTitle(self.tr("Find Files"))
+        progressDialog.setWindowTitle("Find Files")
 
-        foundFiles = QtCore.QStringList()
+        foundFiles = []
 
         for i in range(files.count()):
             progressDialog.setValue(i)
-            progressDialog.setLabelText(self.tr("Searching file number %1 of %2...")
-                                                .arg(i).arg(files.count()))
+            progressDialog.setLabelText("Searching file number %d of %d..." % (i, files.count()))
             QtGui.qApp.processEvents()
 
             if progressDialog.wasCanceled():
@@ -100,14 +99,13 @@ class Window(QtGui.QDialog):
             inFile = QtCore.QFile(self.currentDir.absoluteFilePath(files[i]))
 
             if inFile.open(QtCore.QIODevice.ReadOnly):
-                line = QtCore.QString()
                 stream = QtCore.QTextStream(inFile)
                 while not stream.atEnd():
                     if progressDialog.wasCanceled():
                         break
                     line = stream.readLine()
-                    if line.contains(text):
-                        foundFiles << files[i]
+                    if text in line:
+                        foundFiles.append(files[i])
                         break
 
         progressDialog.close()
@@ -115,13 +113,13 @@ class Window(QtGui.QDialog):
         return foundFiles
 
     def showFiles(self, files):
-        for i in range(files.count()):
-            file = QtCore.QFile(self.currentDir.absoluteFilePath(files[i]))
+        for fn in files:
+            file = QtCore.QFile(self.currentDir.absoluteFilePath(fn))
             size = QtCore.QFileInfo(file).size()
 
-            fileNameItem = QtGui.QTableWidgetItem(files[i])
+            fileNameItem = QtGui.QTableWidgetItem(fn)
             fileNameItem.setFlags(fileNameItem.flags() ^ QtCore.Qt.ItemIsEditable)
-            sizeItem = QtGui.QTableWidgetItem(QtCore.QString("%1 KB").arg(int((size + 1023) / 1024)))
+            sizeItem = QtGui.QTableWidgetItem("%d KB" % (int((size + 1023) / 1024)))
             sizeItem.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignRight)
             sizeItem.setFlags(sizeItem.flags() ^ QtCore.Qt.ItemIsEditable)
 
@@ -130,7 +128,7 @@ class Window(QtGui.QDialog):
             self.filesTable.setItem(row, 0, fileNameItem)
             self.filesTable.setItem(row, 1, sizeItem)
 
-        self.filesFoundLabel.setText(self.tr("%1 file(s) found").arg(files.count()) + " (Double click on a file to open it)")
+        self.filesFoundLabel.setText("%d file(s) found (Double click on a file to open it)" % len(files))
 
     def createButton(self, text, member):
         button = QtGui.QPushButton(text)
@@ -149,9 +147,7 @@ class Window(QtGui.QDialog):
         self.filesTable = QtGui.QTableWidget(0, 2)
         self.filesTable.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 
-        labels = QtCore.QStringList()
-        labels << self.tr("File Name") << self.tr("Size")
-        self.filesTable.setHorizontalHeaderLabels(labels)
+        self.filesTable.setHorizontalHeaderLabels(("File Name", "Size"))
         self.filesTable.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Stretch)
         self.filesTable.verticalHeader().hide()
         self.filesTable.setShowGrid(False)

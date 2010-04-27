@@ -1,18 +1,17 @@
 /*
  * The SIP parser.
  *
- * Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
- * 
+ * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ *
  * This file is part of SIP.
- * 
+ *
  * This copy of SIP is licensed for use under the terms of the SIP License
  * Agreement.  See the file LICENSE for more details.
- * 
+ *
  * This copy of SIP may also used under the terms of the GNU General Public
  * License v2 or v3 as published by the Free Software Foundation which can be
- * found in the files LICENSE-GPL2.txt and LICENSE-GPL3.txt included in this
- * package.
- * 
+ * found in the files LICENSE-GPL2 and LICENSE-GPL3 included in this package.
+ *
  * SIP is supplied WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
@@ -51,6 +50,8 @@ static int sectFlagsStack[MAX_NESTED_SCOPE];    /* The section flags stack. */
 static int currentScopeIdx;             /* The scope stack index. */
 static int currentTimelineOrder;        /* The current timeline order. */
 static classList *currentSupers;        /* The current super-class list. */
+static int defaultKwdArgs;              /* Support keyword arguments by default. */
+static int makeProtPublic;              /* Treat protected items as public. */
 
 
 static const char *getPythonName(optFlags *optflgs, const char *cname);
@@ -59,7 +60,7 @@ static classDef *findClass(sipSpec *pt, ifaceFileType iftype,
 static classDef *findClassWithInterface(sipSpec *pt, ifaceFileDef *iff);
 static classDef *newClass(sipSpec *pt, ifaceFileType iftype,
         apiVersionRangeDef *api_range, scopedNameDef *snd);
-static void finishClass(sipSpec *,moduleDef *,classDef *,optFlags *);
+static void finishClass(sipSpec *, moduleDef *, classDef *, optFlags *);
 static exceptionDef *findException(sipSpec *pt, scopedNameDef *fqname, int new);
 static mappedTypeDef *newMappedType(sipSpec *,argDef *, optFlags *);
 static enumDef *newEnum(sipSpec *pt, moduleDef *mod, mappedTypeDef *mt_scope,
@@ -69,10 +70,10 @@ static void newTypedef(sipSpec *, moduleDef *, char *, argDef *, optFlags *);
 static void newVar(sipSpec *, moduleDef *, char *, int, argDef *, optFlags *,
         codeBlock *, codeBlock *, codeBlock *);
 static void newCtor(char *, int, signatureDef *, optFlags *, codeBlock *,
-        throwArgs *, signatureDef *, int);
+        throwArgs *, signatureDef *, int, codeBlock *);
 static void newFunction(sipSpec *, moduleDef *, classDef *, mappedTypeDef *,
         int, int, int, char *, signatureDef *, int, int, optFlags *,
-        codeBlock *, codeBlock *, throwArgs *, signatureDef *);
+        codeBlock *, codeBlock *, throwArgs *, signatureDef *, codeBlock *);
 static optFlag *findOptFlag(optFlags *,char *,flagType);
 static memberDef *findFunction(sipSpec *, moduleDef *, classDef *,
         mappedTypeDef *, const char *, int, int, int);
@@ -83,8 +84,7 @@ static moduleDef *allocModule();
 static void parseFile(FILE *fp, char *name, moduleDef *prevmod, int optional);
 static void handleEOF(void);
 static void handleEOM(void);
-static qualDef *findQualifier(char *);
-static nameDef *findAPI(sipSpec *pt, const char *name);
+static qualDef *findQualifier(const char *name);
 static scopedNameDef *text2scopedName(ifaceFileDef *scope, char *text);
 static scopedNameDef *scopeScopedName(ifaceFileDef *scope,
         scopedNameDef *name);
@@ -103,6 +103,8 @@ static int getReleaseGIL(optFlags *optflgs);
 static int getHoldGIL(optFlags *optflgs);
 static int getDeprecated(optFlags *optflgs);
 static int getAllowNone(optFlags *optflgs);
+static const char *getDocType(optFlags *optflgs);
+static const char *getDocValue(optFlags *optflgs);
 static void templateSignature(signatureDef *sd, int result, classTmplDef *tcd, templateDef *td, classDef *ncd);
 static void templateType(argDef *ad, classTmplDef *tcd, templateDef *td, classDef *ncd);
 static int search_back(const char *end, const char *start, const char *target);
@@ -133,7 +135,11 @@ static argType convertEncoding(const char *encoding);
 static apiVersionRangeDef *getAPIRange(optFlags *optflgs);
 static apiVersionRangeDef *convertAPIRange(moduleDef *mod, nameDef *name,
         int from, int to);
+static char *convertFeaturedString(char *fs);
 static scopedNameDef *text2scopePart(char *text);
+static int usesKeywordArgs(optFlags *optflgs, signatureDef *sd);
+static char *strip(char *s);
+static int isEnabledFeature(const char *name);
 %}
 
 %union {
@@ -160,6 +166,7 @@ static scopedNameDef *text2scopePart(char *text);
 %token          TK_API
 %token          TK_DEFENCODING
 %token          TK_PLUGIN
+%token          TK_DOCSTRING
 %token          TK_DOC
 %token          TK_EXPORTEDDOC
 %token          TK_MAKEFILE
@@ -313,6 +320,8 @@ static scopedNameDef *text2scopePart(char *text);
 %type <codeb>           virtualcatchercode
 %type <codeb>           methodcode
 %type <codeb>           raisecode
+%type <codeb>           docstring
+%type <codeb>           optdocstring
 %type <text>            operatorname
 %type <text>            optfilename
 %type <text>            optname
@@ -494,6 +503,9 @@ exception:  TK_EXCEPTION scopedname baseexception optflags '{' opttypehdrcode ra
                 xd->base = $3.base;
                 xd->raisecode = $7;
 
+                if (findOptFlag(&$4, "Default", bool_flag) != NULL)
+                    currentModule->defexception = xd;
+
                 if (xd->bibase != NULL || xd->base != NULL)
                     xd->exceptionnr = currentModule->nrexceptions++;
             }
@@ -589,7 +601,7 @@ mappedtype: TK_MAPPEDTYPE basetype optflags {
         } mtdefinition
     ;
 
-mappedtypetmpl: template TK_MAPPEDTYPE basetype {
+mappedtypetmpl: template TK_MAPPEDTYPE basetype optflags {
             int a;
 
             if (currentSpec->genc)
@@ -624,6 +636,7 @@ mappedtypetmpl: template TK_MAPPEDTYPE basetype {
 
                 mtt->sig = $1;
                 mtt->mt = allocMappedType(currentSpec, &$3);
+                mtt->mt->doctype = getDocType(&$4);
                 mtt->next = currentSpec->mappedtypetemplates;
 
                 currentSpec->mappedtypetemplates = mtt;
@@ -682,7 +695,7 @@ mtline:     typehdrcode {
     |   mtfunction
     ;
 
-mtfunction: TK_STATIC cpptype TK_NAME '(' arglist ')' optconst optexceptions optflags optsig ';' methodcode {
+mtfunction: TK_STATIC cpptype TK_NAME '(' arglist ')' optconst optexceptions optflags optsig ';' optdocstring methodcode {
             if (notSkipping())
             {
                 applyTypeFlags(currentModule, &$2, &$9);
@@ -691,7 +704,7 @@ mtfunction: TK_STATIC cpptype TK_NAME '(' arglist ')' optconst optexceptions opt
 
                 newFunction(currentSpec, currentModule, NULL,
                         currentMappedType, 0, TRUE, FALSE, $3, &$5, $7, FALSE,
-                        &$9, $12, NULL, $8, $10);
+                        &$9, $13, NULL, $8, $10, $12);
             }
         }
     ;
@@ -768,13 +781,13 @@ platformlist:   platform
     |   platformlist platform
     ;
 
-platform:   TK_NAME {
-            newQualifier(currentModule,-1,-1,$1,platform_qualifier);
+virterrorhandler:    TK_VIRTERRORHANDLER TK_NAME {
+            currentModule->virterrorhandler = $2;
         }
     ;
 
-virterrorhandler:    TK_VIRTERRORHANDLER TK_NAME {
-            currentModule->virterrorhandler = $2;
+platform:   TK_NAME {
+            newQualifier(currentModule,-1,-1,$1,platform_qualifier);
         }
     ;
 
@@ -1597,6 +1610,16 @@ classline:  ifstart
     |   exception
     |   typedef
     |   enum
+    |   docstring {
+            if (notSkipping())
+            {
+                classDef *scope = currentScope();
+
+                /* Make sure this is before any ctor docstrings. */
+                $1->next = scope->docstring;
+                scope->docstring = $1;
+            }
+        }
     |   typecode {
             if (notSkipping())
                 appendCodeBlock(&currentScope()->cppcode, $1);
@@ -1786,7 +1809,12 @@ dtor:       optvirtual '~' TK_NAME '(' ')' optexceptions optabstract optflags ';
                 cd -> dealloccode = $10;
                 cd -> dtorcode = $11;
                 cd -> dtorexceptions = $6;
-                cd -> classflags |= sectionFlags;
+
+                /*
+                 * Note that we don't apply the protected/public hack to dtors
+                 * as it (I think) may change the behaviour of the wrapped API.
+                 */
+                cd->classflags |= sectionFlags;
 
                 if ($7)
                 {
@@ -1820,14 +1848,14 @@ ctor:       TK_EXPLICIT {currentCtorIsExplicit = TRUE;} simplector
     |   simplector
     ;
 
-simplector: TK_NAME '(' arglist ')' optexceptions optflags optctorsig ';' methodcode {
+simplector: TK_NAME '(' arglist ')' optexceptions optflags optctorsig ';' optdocstring methodcode {
             /* Note that we allow ctors in C modules. */
 
             if (notSkipping())
             {
                 if (currentSpec -> genc)
                 {
-                    if ($9 == NULL && $3.nrArgs != 0)
+                    if ($10 == NULL && $3.nrArgs != 0)
                         yyerror("Constructors with arguments in C modules must include %MethodCode");
 
                     if (currentCtorIsExplicit)
@@ -1837,7 +1865,8 @@ simplector: TK_NAME '(' arglist ')' optexceptions optflags optctorsig ';' method
                 if ((sectionFlags & (SECT_IS_PUBLIC | SECT_IS_PROT | SECT_IS_PRIVATE)) == 0)
                     yyerror("Constructor must be in the public, private or protected sections");
 
-                newCtor($1,sectionFlags,&$3,&$6,$9,$5,$7,currentCtorIsExplicit);
+                newCtor($1, sectionFlags, &$3, &$6, $10, $5, $7,
+                        currentCtorIsExplicit, $9);
             }
 
             free($1);
@@ -1875,7 +1904,7 @@ optvirtual: {
         }
     ;
 
-function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract optflags optsig ';' methodcode virtualcatchercode {
+function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract optflags optsig ';' optdocstring methodcode virtualcatchercode {
             if (notSkipping())
             {
                 applyTypeFlags(currentModule, &$1, &$9);
@@ -1884,7 +1913,7 @@ function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract o
 
                 newFunction(currentSpec, currentModule, currentScope(), NULL,
                         sectionFlags, currentIsStatic, currentOverIsVirt, $2,
-                        &$4, $6, $8, &$9, $12, $13, $7, $10);
+                        &$4, $6, $8, &$9, $13, $14, $7, $10, $12);
             }
 
             currentIsStatic = FALSE;
@@ -1928,7 +1957,7 @@ function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract o
 
                 newFunction(currentSpec, currentModule, cd, NULL,
                         sectionFlags, currentIsStatic, currentOverIsVirt, $3,
-                        &$5, $7, $9, &$10, $13, $14, $8, $11);
+                        &$5, $7, $9, &$10, $13, $14, $8, $11, NULL);
             }
 
             currentIsStatic = FALSE;
@@ -1985,7 +2014,7 @@ function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract o
 
                     newFunction(currentSpec, currentModule, scope, NULL,
                             sectionFlags, currentIsStatic, currentOverIsVirt,
-                            sname, &$4, $6, $8, &$9, $12, $13, $7, $10);
+                            sname, &$4, $6, $8, &$9, $12, $13, $7, $10, NULL);
                 }
                 else
                 {
@@ -2099,17 +2128,17 @@ flagvalue:  dottedname {
             $$.fvalue.sval = $1;
         }
     |   TK_NAME ':' optnumber '-' optnumber {
-            nameDef *name;
+            apiVersionRangeDef *avd;
             int from, to;
 
             $$.ftype = api_range_flag;
 
             /* Check that the API is known. */
-            if ((name = findAPI(currentSpec, $1)) == NULL)
+            if ((avd = findAPI(currentSpec, $1)) == NULL)
                 yyerror("unknown API name in API annotation");
 
             if (inMainModule())
-                setIsUsedName(name);
+                setIsUsedName(avd->api_name);
 
             /* Unbounded values are represented by 0. */
             if ((from = $3) < 0)
@@ -2118,16 +2147,28 @@ flagvalue:  dottedname {
             if ((to = $5) < 0)
                 to = 0;
 
-            $$.fvalue.aval = convertAPIRange(currentModule, name, from, to);
+            $$.fvalue.aval = convertAPIRange(currentModule, avd->api_name,
+                    from, to);
         }
     |   TK_STRING {
             $$.ftype = string_flag;
-            $$.fvalue.sval = $1;
+            $$.fvalue.sval = convertFeaturedString($1);
         }
     |   TK_NUMBER {
             $$.ftype = integer_flag;
             $$.fvalue.ival = $1;
         }
+    ;
+
+docstring:  TK_DOCSTRING codeblock {
+            $$ = $2;
+        }
+    ;
+
+optdocstring: {
+            $$ = NULL;
+        }
+    |   docstring
     ;
 
 methodcode: {
@@ -2236,7 +2277,7 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             $$.atype = signal_type;
             $$.argflags = ARG_IS_CONST;
             $$.nrderefs = 0;
-            $$.name = $2;
+            $$.name = cacheName(currentSpec, $2);
             $$.defval = $4;
 
             currentSpec -> sigslots = TRUE;
@@ -2245,7 +2286,7 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             $$.atype = slot_type;
             $$.argflags = ARG_IS_CONST;
             $$.nrderefs = 0;
-            $$.name = $2;
+            $$.name = cacheName(currentSpec, $2);
             $$.defval = $4;
 
             currentSpec -> sigslots = TRUE;
@@ -2254,7 +2295,7 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             $$.atype = anyslot_type;
             $$.argflags = ARG_IS_CONST;
             $$.nrderefs = 0;
-            $$.name = $2;
+            $$.name = cacheName(currentSpec, $2);
             $$.defval = $4;
 
             currentSpec -> sigslots = TRUE;
@@ -2263,7 +2304,7 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             $$.atype = rxcon_type;
             $$.argflags = 0;
             $$.nrderefs = 0;
-            $$.name = $2;
+            $$.name = cacheName(currentSpec, $2);
 
             if (findOptFlag(&$3, "SingleShot", bool_flag) != NULL)
                 $$.argflags |= ARG_SINGLE_SHOT;
@@ -2274,7 +2315,7 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             $$.atype = rxdis_type;
             $$.argflags = 0;
             $$.nrderefs = 0;
-            $$.name = $2;
+            $$.name = cacheName(currentSpec, $2);
 
             currentSpec -> sigslots = TRUE;
         }
@@ -2282,11 +2323,10 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             $$.atype = slotcon_type;
             $$.argflags = ARG_IS_CONST;
             $$.nrderefs = 0;
-            $$.name = $5;
+            $$.name = cacheName(currentSpec, $5);
 
+            memset(&$3.result, 0, sizeof (argDef));
             $3.result.atype = void_type;
-            $3.result.argflags = 0;
-            $3.result.nrderefs = 0;
 
             $$.u.sa = sipMalloc(sizeof (signatureDef));
             *$$.u.sa = $3;
@@ -2297,11 +2337,10 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             $$.atype = slotdis_type;
             $$.argflags = ARG_IS_CONST;
             $$.nrderefs = 0;
-            $$.name = $5;
+            $$.name = cacheName(currentSpec, $5);
 
+            memset(&$3.result, 0, sizeof (argDef));
             $3.result.atype = void_type;
-            $3.result.argflags = 0;
-            $3.result.nrderefs = 0;
 
             $$.u.sa = sipMalloc(sizeof (signatureDef));
             *$$.u.sa = $3;
@@ -2312,7 +2351,7 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             $$.atype = qobject_type;
             $$.argflags = 0;
             $$.nrderefs = 0;
-            $$.name = $2;
+            $$.name = cacheName(currentSpec, $2);
         }
     |   argtype optassign {
             $$ = $1;
@@ -2371,19 +2410,17 @@ cpptype:    TK_CONST basetype deref optref {
             $$ = $2;
             $$.nrderefs += $3;
             $$.argflags |= ARG_IS_CONST | $4;
-            $$.name = NULL;
         }
     |   basetype deref optref {
             $$ = $1;
             $$.nrderefs += $2;
             $$.argflags |= $3;
-            $$.name = NULL;
         }
     ;
 
 argtype:    cpptype optname optflags {
             $$ = $1;
-            $$.name = $2;
+            $$.name = cacheName(currentSpec, $2);
 
             if (getAllowNone(&$3))
                 $$.argflags |= ARG_ALLOW_NONE;
@@ -2421,6 +2458,9 @@ argtype:    cpptype optname optflags {
             if (findOptFlag(&$3, "ResultSize", bool_flag) != NULL)
                 $$.argflags |= ARG_RESULT_SIZE;
 
+            if (findOptFlag(&$3, "NoCopy", bool_flag) != NULL)
+                $$.argflags |= ARG_NO_COPY;
+
             if (findOptFlag(&$3,"Constrained",bool_flag) != NULL)
             {
                 $$.argflags |= ARG_CONSTRAINED;
@@ -2446,6 +2486,7 @@ argtype:    cpptype optname optflags {
             }
 
             applyTypeFlags(currentModule, &$$, &$3);
+            $$.docval = getDocValue(&$3);
         }
     ;
 
@@ -2469,10 +2510,7 @@ deref:      {
     ;
 
 basetype:   scopedname {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = defined_type;
             $$.u.snd = $1;
 
@@ -2486,17 +2524,12 @@ basetype:   scopedname {
             td->fqname = $1;
             td->types = $3;
 
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = template_type;
             $$.u.td = td;
         }
     |   TK_STRUCT scopedname {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
+            memset(&$$, 0, sizeof (argDef));
 
             /* In a C module all structures must be defined. */
             if (currentSpec -> genc)
@@ -2511,178 +2544,103 @@ basetype:   scopedname {
             }
         }
     |   TK_UNSIGNED TK_SHORT {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = ushort_type;
         }
     |   TK_SHORT {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = short_type;
         }
     |   TK_UNSIGNED {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = uint_type;
         }
     |   TK_UNSIGNED TK_INT {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = uint_type;
         }
     |   TK_INT {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = int_type;
         }
     |   TK_LONG {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = long_type;
         }
     |   TK_UNSIGNED TK_LONG {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = ulong_type;
         }
     |   TK_LONG TK_LONG {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = longlong_type;
         }
     |   TK_UNSIGNED TK_LONG TK_LONG {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = ulonglong_type;
         }
     |   TK_FLOAT {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = float_type;
         }
     |   TK_DOUBLE {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = double_type;
         }
     |   TK_BOOL {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = bool_type;
         }
     |   TK_SIGNED TK_CHAR {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = sstring_type;
         }
     |   TK_UNSIGNED TK_CHAR {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = ustring_type;
         }
     |   TK_CHAR {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = string_type;
         }
     |   TK_WCHAR_T {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = wstring_type;
         }
     |   TK_VOID {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = void_type;
         }
     |   TK_PYOBJECT {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = pyobject_type;
         }
     |   TK_PYTUPLE {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = pytuple_type;
         }
     |   TK_PYLIST {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = pylist_type;
         }
     |   TK_PYDICT {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = pydict_type;
         }
     |   TK_PYCALLABLE {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = pycallable_type;
         }
     |   TK_PYSLICE {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = pyslice_type;
         }
     |   TK_PYTYPE {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = pytype_type;
         }
     |   TK_ELLIPSIS {
-            $$.nrderefs = 0;
-            $$.argflags = 0;
-            $$.original_type = NULL;
-
+            memset(&$$, 0, sizeof (argDef));
             $$.atype = ellipsis_type;
         }
     ;
@@ -2756,7 +2714,7 @@ exceptionlist:  {
  * Parse the specification.
  */
 void parse(sipSpec *spec, FILE *fp, char *filename, stringList *tsl,
-        stringList *xfl)
+        stringList *xfl, int kwdArgs, int protHack)
 {
     classTmplDef *tcd;
 
@@ -2792,6 +2750,8 @@ void parse(sipSpec *spec, FILE *fp, char *filename, stringList *tsl,
     skipStackPtr = 0;
     currentScopeIdx = 0;
     sectionFlags = 0;
+    defaultKwdArgs = kwdArgs;
+    makeProtPublic = protHack;
 
     newModule(fp, filename);
     spec->module = currentModule;
@@ -2871,9 +2831,17 @@ void appendToClassList(classList **clp,classDef *cd)
  */
 static void newModule(FILE *fp, char *filename)
 {
+    moduleDef *mod;
+
     parseFile(fp, filename, currentModule, FALSE);
-    currentModule = allocModule();
-    currentModule->file = filename;
+
+    mod = allocModule();
+    mod->file = filename;
+
+    if (currentModule != NULL)
+        mod->defexception = currentModule->defexception;
+
+    currentModule = mod;
 }
 
 
@@ -3189,7 +3157,7 @@ static classDef *newClass(sipSpec *pt, ifaceFileType iftype,
 
     if ((scope = currentScope()) != NULL)
     {
-        if (sectionFlags & SECT_IS_PROT)
+        if (sectionFlags & SECT_IS_PROT && !makeProtPublic)
         {
             flags = CLASS_IS_PROTECTED;
 
@@ -3256,7 +3224,8 @@ static classDef *newClass(sipSpec *pt, ifaceFileType iftype,
 /*
  * Tidy up after finishing a class definition.
  */
-static void finishClass(sipSpec *pt, moduleDef *mod, classDef *cd, optFlags *of)
+static void finishClass(sipSpec *pt, moduleDef *mod, classDef *cd,
+        optFlags *of)
 {
     const char *pyname;
     optFlag *flg;
@@ -3302,8 +3271,8 @@ static void finishClass(sipSpec *pt, moduleDef *mod, classDef *cd, optFlags *of)
                 cd->ctors = sipMalloc(sizeof (ctorDef));
  
                 cd->ctors->ctorflags = SECT_IS_PUBLIC;
-                cd->ctors->pysig.nrArgs = 0;
-                cd->ctors->cppsig = &cd -> ctors -> pysig;
+                cd->ctors->pysig.result.atype = void_type;
+                cd->ctors->cppsig = &cd->ctors->pysig;
 
                 cd->defctor = cd->ctors;
 
@@ -3361,7 +3330,6 @@ static void finishClass(sipSpec *pt, moduleDef *mod, classDef *cd, optFlags *of)
         {
             cd->virterrorhandler = flg->fvalue.sval;
         }
-
 
         /*
          * There are subtle differences between the add and concat methods and
@@ -3561,6 +3529,8 @@ static mappedTypeDef *newMappedType(sipSpec *pt, argDef *ad, optFlags *of)
     if (getAllowNone(of))
         setHandlesNone(mtd);
 
+    mtd->doctype = getDocType(of);
+
     mtd->iff = iff;
     mtd->next = pt->mappedtypes;
 
@@ -3666,6 +3636,12 @@ static enumDef *newEnum(sipSpec *pt, moduleDef *mod, mappedTypeDef *mt_scope,
         ed->pyname = NULL;
         ed->fqcname = NULL;
         ed->cname = NULL;
+    }
+
+    if (flags & SECT_IS_PROT && makeProtPublic)
+    {
+        flags &= ~SECT_IS_PROT;
+        flags |= SECT_IS_PUBLIC;
     }
 
     ed->enumflags = flags;
@@ -3995,7 +3971,7 @@ static void instantiateClassTemplate(sipSpec *pt, moduleDef *mod,
 
     /* Handle the interface file. */
     cd->iff = findIfaceFile(pt, mod, fqname, class_iface,
-            scope->iff->api_range, NULL);
+            (scope != NULL ? scope->iff->api_range : NULL), NULL);
     cd->iff->module = mod;
 
     /* Make a copy of the used list and add the enclosing scope. */
@@ -4793,7 +4769,7 @@ static void newVar(sipSpec *pt,moduleDef *mod,char *name,int isstatic,
  */
 static void newCtor(char *name, int sectFlags, signatureDef *args,
         optFlags *optflgs, codeBlock *methodcode, throwArgs *exceptions,
-        signatureDef *cppsig, int explicit)
+        signatureDef *cppsig, int explicit, codeBlock *docstring)
 {
     ctorDef *ct, **ctp;
     classDef *cd = currentScope();
@@ -4802,8 +4778,21 @@ static void newCtor(char *name, int sectFlags, signatureDef *args,
     if (strcmp(classBaseName(cd), name) != 0)
         yyerror("Constructor doesn't have the same name as its class");
 
+    if (docstring != NULL)
+        appendCodeBlock(&cd->docstring, docstring);
+
     /* Add to the list of constructors. */
     ct = sipMalloc(sizeof (ctorDef));
+
+    if (sectFlags & SECT_IS_PROT && makeProtPublic)
+    {
+        sectFlags &= ~SECT_IS_PROT;
+        sectFlags |= SECT_IS_PUBLIC;
+    }
+
+    /* Allow the signature to be used like an function signature. */
+    memset(&args->result, 0, sizeof (argDef));
+    args->result.atype = void_type;
 
     ct->ctorflags = sectFlags;
     ct->api_range = getAPIRange(optflgs);
@@ -4833,6 +4822,9 @@ static void newCtor(char *name, int sectFlags, signatureDef *args,
 
     if (getDeprecated(optflgs))
         setIsDeprecatedCtor(ct);
+
+    if (!isPrivateCtor(ct) && usesKeywordArgs(optflgs, &ct->pysig))
+        setUseKeywordArgsCtor(ct);
 
     if (findOptFlag(optflgs, "NoDerived", bool_flag) != NULL)
     {
@@ -4868,7 +4860,7 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
         mappedTypeDef *mt_scope, int sflags, int isstatic, int isvirt,
         char *name, signatureDef *sig, int isconst, int isabstract,
         optFlags *optflgs, codeBlock *methodcode, codeBlock *vcode,
-        throwArgs *exceptions, signatureDef *cppsig)
+        throwArgs *exceptions, signatureDef *cppsig, codeBlock *docstring)
 {
     int factory, xferback, no_arg_parser;
     overDef *od, **odp, **headp;
@@ -4923,6 +4915,12 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
 
     /* Set the overload flags. */
 
+    if (sflags & SECT_IS_PROT && makeProtPublic)
+    {
+        sflags &= ~SECT_IS_PROT;
+        sflags |= SECT_IS_PUBLIC | OVER_REALLY_PROT;
+    }
+
     od -> overflags = sflags;
 
     if (factory)
@@ -4975,18 +4973,8 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
 
     if ((of = findOptFlag(optflgs, "AutoGen", opt_name_flag)) != NULL)
     {
-        setIsAutoGen(od);
-
-        if (of->fvalue.sval != NULL)
-        {
-            qualDef *qd;
-
-            if ((qd = findQualifier(of->fvalue.sval)) == NULL || qd->qtype != feature_qualifier)
-                yyerror("No such feature");
-
-            if (excludedFeature(excludedQualifiers, qd))
-                resetIsAutoGen(od);
-        }
+        if (of->fvalue.sval == NULL || isEnabledFeature(of->fvalue.sval))
+            setIsAutoGen(od);
     }
 
     of = findOptFlag(optflgs,"VirtualErrorHandler",opt_name_flag);
@@ -5008,7 +4996,7 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
         vhd->cppsig = (cppsig != NULL ? cppsig : &od->pysig);
         vhd->virtcode = vcode;
         od->virterrorhandler = ((of && of -> fvalue.sval) ? of -> fvalue.sval : 0);
- 
+
         if( od->virterrorhandler ) {
             printf( "VirtualErrorHandler set to %s\n", od->virterrorhandler );
         }
@@ -5030,14 +5018,11 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
 
         if (of && !of -> fvalue.sval)
             yyerror("%VirtualErrorHandler annotation must provide the name of the handler");
-    }
+   }
     else
     {
         if (vcode != NULL)
             yyerror("%VirtualCatcherCode provided for non-virtual function");
-
-        if (of != NULL)
-            yyerror("%VirtualErrorHandler provided for non-virtual function");
 
         vhd = NULL;
     }
@@ -5057,9 +5042,15 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
             yyerror("%MethodCode must be supplied if /NoArgParser/ is specified");
     }
 
+    if (findOptFlag(optflgs, "NoCopy", bool_flag) != NULL)
+        setNoCopy(&od->pysig.result);
+
     od->common = findFunction(pt, mod, c_scope, mt_scope,
             getPythonName(optflgs, name), (methodcode != NULL), sig->nrArgs,
             no_arg_parser);
+
+    if (docstring != NULL)
+        appendCodeBlock(&od->common->docstring, docstring);
 
     od->api_range = getAPIRange(optflgs);
 
@@ -5099,6 +5090,12 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
     if (getDeprecated(optflgs))
         setIsDeprecated(od);
 
+    if (!isPrivate(od) && !isSignal(od) && od->common->slot == no_slot && usesKeywordArgs(optflgs, &od->pysig))
+    {
+        setUseKeywordArgs(od);
+        setUseKeywordArgsFunction(od->common);
+    }
+
     od -> next = NULL;
 
     /* Append to the list. */
@@ -5118,7 +5115,7 @@ static const char *getPythonName(optFlags *optflgs, const char *cname)
     optFlag *of;
 
     if ((of = findOptFlag(optflgs, "PyName", name_flag)) != NULL)
-        pname = of -> fvalue.sval;
+        pname = of->fvalue.sval;
     else
         pname = cname;
 
@@ -5132,10 +5129,17 @@ static const char *getPythonName(optFlags *optflgs, const char *cname)
  */
 nameDef *cacheName(sipSpec *pt, const char *name)
 {
-    nameDef *nd, **ndp = &pt->namecache;
-    size_t len = strlen(name);
+    nameDef *nd, **ndp;
+    size_t len;
+
+    /* Allow callers to be lazy about checking if there is really a name. */
+    if (name == NULL)
+        return NULL;
 
     /* Skip entries that are too large. */
+    ndp = &pt->namecache;
+    len = strlen(name);
+
     while (*ndp != NULL && (*ndp)->len > len)
         ndp = &(*ndp)->next;
 
@@ -5500,26 +5504,27 @@ static void handleEOF()
  */
 static void handleEOM()
 {
-    moduleDef *imported_module = currentModule;
+    moduleDef *from;
 
     /* Check it has been named. */
     if (currentModule->name == NULL)
         fatal("No %%Module has been specified for module defined in %s\n",
                 previousFile);
 
-    /* The previous module is now current. */
-    currentModule = currentContext.prevmod;
+    from = currentContext.prevmod;
 
-    /* Import any defaults from the parsed module. */
-    if (currentModule != NULL && currentModule->encoding == no_type)
-        currentModule->encoding = imported_module->encoding;
+    if (from != NULL && from->encoding == no_type)
+        from->encoding = currentModule->encoding;
+
+    /* The previous module is now current. */
+    currentModule = from;
 }
 
 
 /*
  * Find an existing qualifier.
  */
-static qualDef *findQualifier(char *name)
+static qualDef *findQualifier(const char *name)
 {
     moduleDef *mod;
 
@@ -5539,7 +5544,7 @@ static qualDef *findQualifier(char *name)
 /*
  * Find an existing API.
  */
-static nameDef *findAPI(sipSpec *pt, const char *name)
+apiVersionRangeDef *findAPI(sipSpec *pt, const char *name)
 {
     moduleDef *mod;
 
@@ -5549,7 +5554,7 @@ static nameDef *findAPI(sipSpec *pt, const char *name)
 
         for (avd = mod->api_versions; avd != NULL; avd = avd->next)
             if (strcmp(avd->api_name->text, name) == 0)
-                return avd->api_name;
+                return avd;
     }
 
     return NULL;
@@ -5887,6 +5892,11 @@ static void newImport(char *filename)
         newModule(NULL, filename);
         mod = currentModule;
     }
+    else if (from->encoding == no_type)
+    {
+        /* Import any defaults from the already parsed module. */
+        from->encoding = mod->encoding;
+    }
 
     /* Add the new import unless it has already been imported. */
     for (mld = from->imports; mld != NULL; mld = mld->next)
@@ -5962,6 +5972,34 @@ static int getDeprecated(optFlags *optflgs)
 static int getAllowNone(optFlags *optflgs)
 {
     return (findOptFlag(optflgs, "AllowNone", bool_flag) != NULL);
+}
+
+
+/*
+ * Get the /DocType/ option flag.
+ */
+static const char *getDocType(optFlags *optflgs)
+{
+    optFlag *of = findOptFlag(optflgs, "DocType", string_flag);
+
+    if (of == NULL)
+        return NULL;
+
+    return of->fvalue.sval;
+}
+
+
+/*
+ * Get the /DocValue/ option flag.
+ */
+static const char *getDocValue(optFlags *optflgs)
+{
+    optFlag *of = findOptFlag(optflgs, "DocValue", string_flag);
+
+    if (of == NULL)
+        return NULL;
+
+    return of->fvalue.sval;
 }
 
 
@@ -6089,6 +6127,8 @@ static void addVariable(sipSpec *pt, varDef *vd)
  */
 static void applyTypeFlags(moduleDef *mod, argDef *ad, optFlags *flags)
 {
+    ad->doctype = getDocType(flags);
+
     if (ad->atype == string_type && !isArray(ad) && !isReference(ad))
     {
         optFlag *of;
@@ -6176,4 +6216,114 @@ static apiVersionRangeDef *convertAPIRange(moduleDef *mod, nameDef *name,
     *avdp = avd;
 
     return avd;
+}
+
+
+/*
+ * Return TRUE if a signature with annotations uses keyword arguments.
+ */
+static int usesKeywordArgs(optFlags *optflgs, signatureDef *sd)
+{
+    int kwd_args_anno, no_kwd_args_anno;
+
+    kwd_args_anno = (findOptFlag(optflgs, "KeywordArgs", bool_flag) != NULL);
+    no_kwd_args_anno = (findOptFlag(optflgs, "NoKeywordArgs", bool_flag) != NULL);
+
+    /*
+     * An ellipsis cannot be used with keyword arguments.  Only complain if it
+     * has been explicitly requested.
+     */
+    if (kwd_args_anno && sd->nrArgs > 0 && sd->args[sd->nrArgs - 1].atype == ellipsis_type)
+        yyerror("/KeywordArgs/ cannot be specified for calls with a variable number of arguments");
+
+    if ((defaultKwdArgs || kwd_args_anno) && !no_kwd_args_anno)
+    {
+        int a, is_name = FALSE;
+
+        /*
+         * Mark argument names as being used and check there is at least one.
+         */
+        for (a = 0; a < sd->nrArgs; ++a)
+        {
+            nameDef *nd = sd->args[a].name;
+
+            if (sd->args[a].name != NULL)
+            {
+                setIsUsedName(nd);
+                is_name = TRUE;
+            }
+        }
+
+        return is_name;
+    }
+
+    return FALSE;
+}
+
+
+/*
+ * Extract the version of a string value optionally associated with a
+ * particular feature.
+ */
+static char *convertFeaturedString(char *fs)
+{
+    while (fs != NULL)
+    {
+        char *next, *value;
+
+        /* Individual values are ';' separated. */
+        if ((next = strchr(fs, ';')) != NULL)
+            *next++ = '\0';
+
+        /* Features and values are ':' separated. */
+        if ((value = strchr(fs, ':')) == NULL)
+        {
+            /* This is an unconditional value so just return it. */
+            return strip(fs);
+        }
+
+        *value++ = '\0';
+
+        if (isEnabledFeature(strip(fs)))
+            return strip(value);
+
+        fs = next;
+    }
+
+    /* No value was enabled. */
+    return NULL;
+}
+
+
+/*
+ * Return the stripped version of a string.
+ */
+static char *strip(char *s)
+{
+    while (*s == ' ')
+        ++s;
+
+    if (*s != '\0')
+    {
+        char *cp = &s[strlen(s) - 1];
+
+        while (*cp == ' ')
+            *cp-- = '\0';
+    }
+
+    return s;
+}
+
+
+/*
+ * Return TRUE if the given feature is enabled.
+ */
+static int isEnabledFeature(const char *name)
+{
+    qualDef *qd;
+
+    if ((qd = findQualifier(name)) == NULL || qd->qtype != feature_qualifier)
+        yyerror("No such feature");
+
+    return !excludedFeature(excludedQualifiers, qd);
 }

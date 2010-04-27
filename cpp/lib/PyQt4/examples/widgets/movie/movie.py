@@ -33,13 +33,13 @@ class MoviePlayer(QtGui.QWidget):
         self.movie = QtGui.QMovie(self)
         self.movie.setCacheMode(QtGui.QMovie.CacheAll)
 
-        self.movieLabel = QtGui.QLabel(self.tr("No movie loaded"))
+        self.movieLabel = QtGui.QLabel("No movie loaded")
         self.movieLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.movieLabel.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
         self.movieLabel.setBackgroundRole(QtGui.QPalette.Dark)
         self.movieLabel.setAutoFillBackground(True)
 
-        self.currentMovieDirectory = "movies"
+        self.currentMovieDirectory = 'movies'
 
         self.createControls()
         self.createButtons()
@@ -59,14 +59,14 @@ class MoviePlayer(QtGui.QWidget):
         self.updateFrameSlider()
         self.updateButtons()
 
-        self.setWindowTitle(self.tr("Movie Player"))
+        self.setWindowTitle("Movie Player")
         self.resize(400, 400)
 
     def open(self):
-        fileName = QtGui.QFileDialog.getOpenFileName(self,
-                self.tr("Open a Movie"), self.currentMovieDirectory)
+        fileName = QtGui.QFileDialog.getOpenFileName(self, "Open a Movie",
+                self.currentMovieDirectory)
 
-        if not fileName.isEmpty():
+        if fileName:
             self.openFile(fileName)
 
     def openFile(self, fileName):
@@ -113,20 +113,20 @@ class MoviePlayer(QtGui.QWidget):
         self.stopButton.setEnabled(state != QtGui.QMovie.NotRunning)
 
     def createControls(self):
-        self.fitCheckBox = QtGui.QCheckBox(self.tr("Fit to Window"))
+        self.fitCheckBox = QtGui.QCheckBox("Fit to Window")
 
-        self.frameLabel = QtGui.QLabel(self.tr("Current frame:"))
+        self.frameLabel = QtGui.QLabel("Current frame:")
 
         self.frameSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.frameSlider.setTickPosition(QtGui.QSlider.TicksBelow)
         self.frameSlider.setTickInterval(10)
 
-        speedLabel = QtGui.QLabel(self.tr("Speed:"))
+        speedLabel = QtGui.QLabel("Speed:")
 
         self.speedSpinBox = QtGui.QSpinBox()
         self.speedSpinBox.setRange(1, 9999)
         self.speedSpinBox.setValue(100)
-        self.speedSpinBox.setSuffix(self.tr("%"))
+        self.speedSpinBox.setSuffix("%")
 
         self.controlsLayout = QtGui.QGridLayout()
         self.controlsLayout.addWidget(self.fitCheckBox, 0, 0, 1, 2)
@@ -141,32 +141,32 @@ class MoviePlayer(QtGui.QWidget):
         openButton = QtGui.QToolButton()
         openButton.setIcon(self.style().standardIcon(QtGui.QStyle.SP_DialogOpenButton))
         openButton.setIconSize(iconSize)
-        openButton.setToolTip(self.tr("Open File"))
+        openButton.setToolTip("Open File")
         openButton.clicked.connect(self.open)
 
         self.playButton = QtGui.QToolButton()
         self.playButton.setIcon(self.style().standardIcon(QtGui.QStyle.SP_MediaPlay))
         self.playButton.setIconSize(iconSize)
-        self.playButton.setToolTip(self.tr("Play"))
+        self.playButton.setToolTip("Play")
         self.playButton.clicked.connect(self.movie.start)
 
         self.pauseButton = QtGui.QToolButton()
         self.pauseButton.setCheckable(True)
         self.pauseButton.setIcon(self.style().standardIcon(QtGui.QStyle.SP_MediaPause))
         self.pauseButton.setIconSize(iconSize)
-        self.pauseButton.setToolTip(self.tr("Pause"))
+        self.pauseButton.setToolTip("Pause")
         self.pauseButton.clicked.connect(self.movie.setPaused)
 
         self.stopButton = QtGui.QToolButton()
         self.stopButton.setIcon(self.style().standardIcon(QtGui.QStyle.SP_MediaStop))
         self.stopButton.setIconSize(iconSize)
-        self.stopButton.setToolTip(self.tr("Stop"))
+        self.stopButton.setToolTip("Stop")
         self.stopButton.clicked.connect(self.movie.stop)
 
         quitButton = QtGui.QToolButton()
         quitButton.setIcon(self.style().standardIcon(QtGui.QStyle.SP_DialogCloseButton))
         quitButton.setIconSize(iconSize)
-        quitButton.setToolTip(self.tr("Quit"))
+        quitButton.setToolTip("Quit")
         quitButton.clicked.connect(self.close)
 
         self.buttonsLayout = QtGui.QHBoxLayout()
@@ -179,7 +179,7 @@ class MoviePlayer(QtGui.QWidget):
         self.buttonsLayout.addStretch()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

@@ -1,10 +1,10 @@
 Introduction
 ============
 
-This is the reference guide for SIP @RM_LATEST@.  SIP is a tool for
+This is the reference guide for SIP snapshot-4.10.1-724e4236428b.  SIP is a tool for
 automatically generating `Python <http://www.python.org>`__ bindings for C and
 C++ libraries.  SIP was originally developed in 1998 for
-`PyQt <http://www.riverbankcomputing.com/software/pyqt/>`__ - the Python
+`PyQt <http://www.riverbankcomputing.com/software/pyqt>`__ - the Python
 bindings for the Qt GUI toolkit - but is suitable for generating bindings for
 any C or C++ library.
 
@@ -17,9 +17,13 @@ started out as a small SWIG.  Unlike SWIG, SIP is specifically designed for
 bringing together Python and C/C++ and goes to great lengths to make the
 integration as tight as possible.
 
-The homepage for SIP is http://www.riverbankcomputing.com/software/sip/.  Here
-you will always find the latest stable version, current development snapshots,
-and the latest version of this documentation.
+The homepage for SIP is http://www.riverbankcomputing.com/software/sip.  Here
+you will always find the latest stable version and the latest version of this
+documentation.
+
+SIP can also be downloaded from the
+`Mercurial <http://mercurial.selenic.com/>`__ repository at
+http://www.riverbankcomputing.com/hg/sip.
 
 
 License
@@ -42,6 +46,10 @@ SIP, and the bindings it produces, have the following features:
 - automatic conversion between standard Python and C/C++ data types
 
 - overloading of functions and methods with different argument signatures
+
+- support for Python's keyword argument syntax
+
+- support for both explicitly specified and automatically generated docstrings
 
 - access to a C++ class's protected methods
 

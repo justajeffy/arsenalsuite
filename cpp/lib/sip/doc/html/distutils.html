@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Building Your Extension with distutils &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>Building Your Extension with distutils &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" />
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" />
     <link rel="next" title="Builtin Modules and Custom Interpreters" href="builtin.html" />
     <link rel="prev" title="The Build System" href="build_system.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="build_system.html" title="The Build System"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -70,6 +70,20 @@ files to build, and hook-up SIP into distutils:</p>
 <p>As we can see, the above is a normal distutils setup script, with just a
 special line which is needed so that SIP can see and process <tt class="docutils literal"><span class="pre">word.sip</span></tt>.
 Then, running <tt class="docutils literal"><span class="pre">setup.py</span> <span class="pre">build</span></tt> will build our extension module.</p>
+<p>If you want to use any of sip&#8217;s command-line options described in
+<a class="reference external" href="command_line.html#ref-command-line"><em>The SIP Command Line</em></a>, there is a new option available for the
+<tt class="docutils literal"><span class="pre">build_ext</span></tt> command in distutils: <tt class="docutils literal"><span class="pre">--sip-opts</span></tt>. So you can either invoke
+distutils as follows:</p>
+<div class="highlight-python"><pre>$ python setup.py build_ext --sip-opts="-e -g" build</pre>
+</div>
+<p>or you can leverage distutils&#8217; config file support by creating a <tt class="docutils literal"><span class="pre">setup.cfg</span></tt>
+file in the supported system or local paths (eg: in the same directory of
+<tt class="docutils literal"><span class="pre">setup.py</span></tt>) with these contents:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">build_ext</span><span class="p">]</span>
+<span class="n">sip</span><span class="o">-</span><span class="n">opts</span> <span class="o">=</span> <span class="o">-</span><span class="n">e</span> <span class="o">-</span><span class="n">g</span>
+</pre></div>
+</div>
+<p>and then run <tt class="docutils literal"><span class="pre">setup.py</span> <span class="pre">build</span></tt> as usual.</p>
 </div>
 
 
@@ -116,12 +130,12 @@ Then, running <tt class="docutils literal"><span class="pre">setup.py</span> <sp
         <li class="right" >
           <a href="build_system.html" title="The Build System"
              >previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

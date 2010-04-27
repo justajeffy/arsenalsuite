@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using SIP &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>Using SIP &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" />
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" />
     <link rel="next" title="The SIP Command Line" href="command_line.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -256,7 +256,7 @@ class Hello : public QLabel {
     Q_OBJECT
 
 public:
-    Hello(QWidget *parent, const char *name = 0, WFlags f = 0);
+    Hello(QWidget *parent = 0);
 
 private:
     // Prevent instances from being copied.
@@ -273,7 +273,7 @@ void setDefault(const QString &amp;def);
 
 %Module hello 0
 
-%Import QtCore/QtCoremod.sip
+%Import QtGui/QtGuimod.sip
 
 %If (Qt_4_2_0 -)
 
@@ -284,7 +284,7 @@ class Hello : QLabel {
 %End
 
 public:
-    Hello(QWidget *parent /TransferThis/, const char *name = 0, WFlags f = 0);
+    Hello(QWidget *parent /TransferThis/ = 0);
 
 private:
     Hello(const Hello &amp;);
@@ -301,9 +301,9 @@ previous examples.</p>
 <blockquote>
 <ul class="simple">
 <li>The <a class="reference external" href="directives.html#directive-%Import"><tt class="xref docutils literal"><span class="pre">%Import</span></tt></a> directive has been added to specify that we are
-extending the class hierarchy defined in the file
-<tt class="docutils literal"><span class="pre">QtCore/QtCoremod.sip</span></tt>.  This file is part of PyQt.  The build system
-will take care of finding the file&#8217;s exact location.</li>
+extending the class hierarchy defined in the file <tt class="docutils literal"><span class="pre">QtGui/QtGuimod.sip</span></tt>.
+This file is part of PyQt.  The build system will take care of finding
+the file&#8217;s exact location.</li>
 <li>The <a class="reference external" href="directives.html#directive-%If"><tt class="xref docutils literal"><span class="pre">%If</span></tt></a> directive has been added to specify that everything
 <a class="footnote-reference" href="#id11" id="id8">[4]</a> up to the matching <a class="reference external" href="directives.html#directive-%End"><tt class="xref docutils literal"><span class="pre">%End</span></tt></a> directive only applies to Qt
 v4.2 and later.  <tt class="docutils literal"><span class="pre">Qt_4_2_0</span></tt> is a <em>tag</em> defined in <tt class="docutils literal"><span class="pre">QtCoremod.sip</span></tt>
@@ -315,12 +315,12 @@ scripts for working out the correct tags to use according to which
 version of the library is actually installed.</li>
 <li>The <tt class="docutils literal"><span class="pre">public</span></tt> keyword used in defining the super-classes has been
 removed.  This is not supported by SIP.</li>
-<li>The <a class="reference external" href="annotations.html#aanno-TransferThis"><tt class="xref docutils literal"><span class="pre">TransferThis</span></tt></a> annotation has been added to the first argument
-of the constructor.  It specifies that if the argument is not 0 (i.e. the
-<tt class="docutils literal"><span class="pre">Hello</span></tt> instance being constructed has a parent) then ownership of the
-instance is transferred from Python to C++.  It is needed because Qt
-maintains objects (i.e. instances derived from the <tt class="docutils literal"><span class="pre">QObject</span></tt> class) in
-a hierachy.  When an object is destroyed all of its children are also
+<li>The <a class="reference external" href="annotations.html#aanno-TransferThis"><tt class="xref docutils literal"><span class="pre">TransferThis</span></tt></a> annotation has been added to the constructor&#8217;s
+argument.  It specifies that if the argument is not 0 (i.e. the <tt class="docutils literal"><span class="pre">Hello</span></tt>
+instance being constructed has a parent) then ownership of the instance
+is transferred from Python to C++.  It is needed because Qt maintains
+objects (i.e. instances derived from the <tt class="docutils literal"><span class="pre">QObject</span></tt> class) in a
+hierachy.  When an object is destroyed all of its children are also
 automatically destroyed.  It is important, therefore, that the Python
 garbage collector doesn&#8217;t also try and destroy them.  This is covered in
 more detail in <a class="reference internal" href="#ref-object-ownership"><em>Ownership of Objects</em></a>.  SIP provides many other
@@ -354,7 +354,7 @@ life easier for them.</p>
 <p>Now we have two scripts.  First the <tt class="docutils literal"><span class="pre">configure.py</span></tt> script:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sipconfig</span>
-<span class="kn">import</span> <span class="nn">pyqtconfig</span>
+<span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">pyqtconfig</span>
 
 <span class="c"># The name of the SIP build file generated by SIP and used by the build</span>
 <span class="c"># system.</span>
@@ -363,14 +363,14 @@ life easier for them.</p>
 <span class="c"># Get the PyQt configuration information.</span>
 <span class="n">config</span> <span class="o">=</span> <span class="n">pyqtconfig</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
 
-<span class="c"># Get the extra SIP flags needed by the imported qt module.  Note that</span>
+<span class="c"># Get the extra SIP flags needed by the imported PyQt modules.  Note that</span>
 <span class="c"># this normally only includes those flags (-x and -t) that relate to SIP&#39;s</span>
 <span class="c"># versioning system.</span>
-<span class="n">qt_sip_flags</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pyqt_qt_sip_flags</span>
+<span class="n">pyqt_sip_flags</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pyqt_sip_flags</span>
 
 <span class="c"># Run SIP to generate the code.  Note that we tell SIP where to find the qt</span>
 <span class="c"># module&#39;s specification files using the -I flag.</span>
-<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">config</span><span class="o">.</span><span class="n">sip_bin</span><span class="p">,</span> <span class="s">&quot;-c&quot;</span><span class="p">,</span> <span class="s">&quot;.&quot;</span><span class="p">,</span> <span class="s">&quot;-b&quot;</span><span class="p">,</span> <span class="n">build_file</span><span class="p">,</span> <span class="s">&quot;-I&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">pyqt_sip_dir</span><span class="p">,</span> <span class="n">qt_sip_flags</span><span class="p">,</span> <span class="s">&quot;hello.sip&quot;</span><span class="p">]))</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">config</span><span class="o">.</span><span class="n">sip_bin</span><span class="p">,</span> <span class="s">&quot;-c&quot;</span><span class="p">,</span> <span class="s">&quot;.&quot;</span><span class="p">,</span> <span class="s">&quot;-b&quot;</span><span class="p">,</span> <span class="n">build_file</span><span class="p">,</span> <span class="s">&quot;-I&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">pyqt_sip_dir</span><span class="p">,</span> <span class="n">pyqt_sip_flags</span><span class="p">,</span> <span class="s">&quot;hello.sip&quot;</span><span class="p">]))</span>
 
 <span class="c"># We are going to install the SIP specification file for this module and</span>
 <span class="c"># its configuration module.</span>
@@ -380,10 +380,10 @@ life easier for them.</p>
 
 <span class="n">installs</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s">&quot;helloconfig.py&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">default_mod_dir</span><span class="p">])</span>
 
-<span class="c"># Create the Makefile.  The QtModuleMakefile class provided by the</span>
+<span class="c"># Create the Makefile.  The QtGuiModuleMakefile class provided by the</span>
 <span class="c"># pyqtconfig module takes care of all the extra preprocessor, compiler and</span>
 <span class="c"># linker flags needed by the Qt library.</span>
-<span class="n">makefile</span> <span class="o">=</span> <span class="n">pyqtconfig</span><span class="o">.</span><span class="n">QtModuleMakefile</span><span class="p">(</span>
+<span class="n">makefile</span> <span class="o">=</span> <span class="n">pyqtconfig</span><span class="o">.</span><span class="n">QtGuiModuleMakefile</span><span class="p">(</span>
     <span class="n">configuration</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
     <span class="n">build_file</span><span class="o">=</span><span class="n">build_file</span><span class="p">,</span>
     <span class="n">installs</span><span class="o">=</span><span class="n">installs</span>
@@ -409,7 +409,7 @@ life easier for them.</p>
     <span class="c"># same flags needed by the qt module we could leave it out, but this</span>
     <span class="c"># allows us to change the flags at a later date without breaking</span>
     <span class="c"># scripts that import the configuration module.</span>
-    <span class="s">&quot;hello_sip_flags&quot;</span><span class="p">:</span>  <span class="n">qt_sip_flags</span>
+    <span class="s">&quot;hello_sip_flags&quot;</span><span class="p">:</span>  <span class="n">pyqt_sip_flags</span>
 <span class="p">}</span>
 
 <span class="c"># This creates the helloconfig.py module from the helloconfig.py.in</span>
@@ -418,7 +418,7 @@ life easier for them.</p>
 </pre></div>
 </div>
 <p>Next we have the <tt class="docutils literal"><span class="pre">helloconfig.py.in</span></tt> template script:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pyqtconfig</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">pyqtconfig</span>
 
 <span class="c"># These are installation specific values created when Hello was configured.</span>
 <span class="c"># The following line will be replaced when this template is used to create</span>
@@ -445,7 +445,7 @@ life easier for them.</p>
 
         <span class="n">pyqtconfig</span><span class="o">.</span><span class="n">Configuration</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">HelloModuleMakefile</span><span class="p">(</span><span class="n">pyqtconfig</span><span class="o">.</span><span class="n">QtModuleMakefile</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">HelloModuleMakefile</span><span class="p">(</span><span class="n">pyqtconfig</span><span class="o">.</span><span class="n">QtGuiModuleMakefile</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;The Makefile class for modules that %Import hello.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">finalise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -455,7 +455,7 @@ life easier for them.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">extra_libs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
 
         <span class="c"># Let the super-class do what it needs to.</span>
-        <span class="n">pyqtconfig</span><span class="o">.</span><span class="n">QtModuleMakefile</span><span class="o">.</span><span class="n">finalise</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">pyqtconfig</span><span class="o">.</span><span class="n">QtGuiModuleMakefile</span><span class="o">.</span><span class="n">finalise</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Again, we hope that the scripts are self documenting.</p>
@@ -720,12 +720,12 @@ instead as might be expected.</p>
         <li class="right" >
           <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

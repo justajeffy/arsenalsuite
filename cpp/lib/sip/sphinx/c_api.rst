@@ -41,6 +41,17 @@ specification files.
     to fail if the Python object being converted is ``Py_None``.
 
 
+.. cmacro:: SIP_PROTECTED_IS_PUBLIC
+
+    .. versionadded:: 4.10
+
+    This is a C preprocessor macro that is set automatically by the build
+    system to specify that the generated code is being compiled with
+    ``protected`` redefined as ``public``.  This allows handwritten code to
+    determine if the generated helper functions for accessing protected C++
+    functions are available (see :directive:`%MethodCode`).
+
+
 .. cmacro:: SIP_SSIZE_T
 
     This is a C preprocessor macro that is defined as ``Py_ssize_t`` for Python
@@ -67,6 +78,25 @@ specification files.
     This is a C preprocessor symbol that defines the SIP version number
     represented as a string.  For development snapshots it will start with
     ``snapshot-``.
+
+
+.. cfunction:: sipErrorState sipBadCallableArg(int arg_nr, PyObject *arg)
+
+    .. versionadded:: 4.10
+
+    This is called from :directive:`%MethodCode` to raise a Python exception
+    when an argument to a function, a C++ constructor or method is found to
+    have an unexpected type.  This should be used when the
+    :directive:`%MethodCode` does additional type checking of the supplied
+    arguments.
+
+    :param arg_nr:
+        the number of the argument.  Arguments are numbered from 0 but are
+        numbered from 1 in the detail of the exception.
+    :param arg:
+        the argument.
+    :return:
+        the value that should be assigned to ``sipError``.
 
 
 .. cfunction:: void sipBadCatcherResult(PyObject *method)

@@ -36,7 +36,7 @@ class HighlightedTextEdit(QtGui.QTextEdit):
     
     def __init__(self, parent=None):
     
-        supe(HighlightedTextEdit, self).__init__(parent)
+        super(HighlightedTextEdit, self).__init__(parent)
         
         self.setFrameShape(QtGui.QFrame.Box)
         self.setFrameShadow(QtGui.QFrame.Plain)
@@ -130,11 +130,11 @@ class PythonHighlighter(QtGui.QSyntaxHighlighter):
     
         for expression, format in self.rules:
         
-            index = text.indexOf(expression, start)
+            index = expression.indexIn(text, start)
             while index >= start and index < finish:
                 length = expression.matchedLength()
                 self.setFormat(index, min(length, finish - index), format)
-                index = text.indexOf(expression, index + length)
+                index = expression.indexIn(text, index + length)
     
     def updateFonts(self, font):
     

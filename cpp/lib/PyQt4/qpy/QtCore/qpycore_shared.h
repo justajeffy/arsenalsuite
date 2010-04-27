@@ -1,7 +1,7 @@
 // This defines the interfaces to various odd and ends that are used internally
 // by this library and called from handwritten code.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 

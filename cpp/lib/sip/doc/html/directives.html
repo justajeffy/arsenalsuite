@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Directives &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>Directives &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" />
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" />
     <link rel="next" title="Annotations" href="annotations.html" />
     <link rel="prev" title="SIP Specification Files" href="specification_files.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="specification_files.html" title="SIP Specification Files"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -130,8 +130,8 @@ structure must be populated.</dd>
 <dd>The handwritten code should set this to 0 if there was no error or -1 if
 there was an error.</dd>
 <dt>PyObject *sipSelf</dt>
-<dd>This is the Python object that wraps the the structure or class instance,
-i.e. <tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
+<dd>This is the Python object that wraps the structure or class instance, i.e.
+<tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
 </dl>
 <dl class="directive">
 <dt id="directive-%BIGetCharBufferCode">
@@ -160,8 +160,8 @@ or -1 if there was an error.</dd>
 <dt><a title="SIP_SSIZE_T" class="reference external" href="c_api.html#SIP_SSIZE_T"><tt class="xref docutils literal"><span class="pre">SIP_SSIZE_T</span></tt></a> sipSegment</dt>
 <dd>This is the number of the segment of the character buffer.</dd>
 <dt>PyObject *sipSelf</dt>
-<dd>This is the Python object that wraps the the structure or class instance,
-i.e. <tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
+<dd>This is the Python object that wraps the structure or class instance, i.e.
+<tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
 </dl>
 <dl class="directive">
 <dt id="directive-%BIGetReadBufferCode">
@@ -190,8 +190,8 @@ pointer to the structure or class.</dd>
 <dt><a title="SIP_SSIZE_T" class="reference external" href="c_api.html#SIP_SSIZE_T"><tt class="xref docutils literal"><span class="pre">SIP_SSIZE_T</span></tt></a> sipSegment</dt>
 <dd>This is the number of the segment of the read buffer.</dd>
 <dt>PyObject *sipSelf</dt>
-<dd>This is the Python object that wraps the the structure or class instance,
-i.e. <tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
+<dd>This is the Python object that wraps the structure or class instance, i.e.
+<tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
 </dl>
 <dl class="directive">
 <dt id="directive-%BIGetSegCountCode">
@@ -219,8 +219,8 @@ segments of the buffer.</dd>
 <dd>The handwritten code should set this to the number of segments that make
 up the buffer.</dd>
 <dt>PyObject *sipSelf</dt>
-<dd>This is the Python object that wraps the the structure or class instance,
-i.e. <tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
+<dd>This is the Python object that wraps the structure or class instance, i.e.
+<tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
 </dl>
 <dl class="directive">
 <dt id="directive-%BIGetWriteBufferCode">
@@ -249,8 +249,8 @@ pointer to the structure or class.</dd>
 <dt><a title="SIP_SSIZE_T" class="reference external" href="c_api.html#SIP_SSIZE_T"><tt class="xref docutils literal"><span class="pre">SIP_SSIZE_T</span></tt></a> sipSegment</dt>
 <dd>This is the number of the segment of the write buffer.</dd>
 <dt>PyObject *sipSelf</dt>
-<dd>This is the Python object that wraps the the structure or class instance,
-i.e. <tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
+<dd>This is the Python object that wraps the structure or class instance, i.e.
+<tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
 </dl>
 <dl class="directive">
 <dt id="directive-%BIReleaseBufferCode">
@@ -273,8 +273,8 @@ used then this is ignored.</p>
 <dd>This is a pointer to the structure or class instance.  Its <em>type</em> is a
 pointer to the structure or class.</dd>
 <dt>PyObject *sipSelf</dt>
-<dd>This is the Python object that wraps the the structure or class instance,
-i.e. <tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
+<dd>This is the Python object that wraps the structure or class instance, i.e.
+<tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
 </dl>
 <dl class="directive">
 <dt id="directive-%CModule">
@@ -386,14 +386,14 @@ list of <tt class="docutils literal"><span class="pre">QWidget</span></tt> insta
     PyObject *l;
 
     // Create the Python list of the correct length.
-    if ((l = PyList_New(sipCpp -&gt; size())) == NULL)
+    if ((l = PyList_New(sipCpp-&gt;size())) == NULL)
         return NULL;
 
     // Go through each element in the C++ instance and convert it to a
     // wrapped QWidget.
-    for (int i = 0; i &lt; sipCpp -&gt; size(); ++i)
+    for (int i = 0; i &lt; sipCpp-&gt;size(); ++i)
     {
-        QWidget *w = sipCpp -&gt; at(i);
+        QWidget *w = sipCpp-&gt;at(i);
         PyObject *wobj;
 
         // Get the Python wrapper for the QWidget instance, creating a new
@@ -607,7 +607,7 @@ returned instance is a derived class.  See
             return 0;
         }
 
-        ql -&gt; append(*qp);
+        ql-&gt;append(*qp);
 
         // A copy of the QPoint was appended to the list so we no longer
         // need it.  It may be a temporary instance that should be
@@ -660,7 +660,7 @@ Copyright (c) 2009 Riverbank Computing Limited
 <pre class="literal-block">
 %DefaultEncoding <em>string</em>
 </pre>
-<p>This directory is used to specify the default encoding used for for <tt class="docutils literal"><span class="pre">char</span></tt>,
+<p>This directive is used to specify the default encoding used for <tt class="docutils literal"><span class="pre">char</span></tt>,
 <tt class="docutils literal"><span class="pre">const</span> <span class="pre">char</span></tt>, <tt class="docutils literal"><span class="pre">char</span> <span class="pre">*</span></tt> or <tt class="docutils literal"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*</span></tt> values.  The encoding can be
 either <tt class="docutils literal"><span class="pre">&quot;ASCII&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;Latin-1&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;UTF-8&quot;</span></tt> or <tt class="docutils literal"><span class="pre">&quot;None&quot;</span></tt>.  An encoding of
 <tt class="docutils literal"><span class="pre">&quot;None&quot;</span></tt> means that the value is unencoded.  The default can be overridden
@@ -679,7 +679,7 @@ directive is not specified then <tt class="docutils literal"><span class="pre">&
 </pre>
 <p>This directive is used to specify the Python type that should be used as the
 meta-type for any C/C++ data type defined in the same module, and by importing
-modules, that doesn&#8217;t have an explicit super-type.</p>
+modules, that doesn&#8217;t have an explicit meta-type.</p>
 <p>If this is not specified then <tt class="docutils literal"><span class="pre">sip.wrappertype</span></tt> is used.</p>
 <p>You can also use the <a class="reference external" href="annotations.html#canno-Metatype"><tt class="xref docutils literal"><span class="pre">Metatype</span></tt></a> class annotation to specify the
 meta-type used by a particular C/C++ type.</p>
@@ -733,6 +733,43 @@ which it is defined.
 %End</pre>
 </div>
 <dl class="directive">
+<dt id="directive-%Docstring">
+<tt class="descname">%Docstring</tt><a class="headerlink" href="#directive-%Docstring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<pre class="literal-block">
+%Docstring
+    <em>text</em>
+%End
+</pre>
+<p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This directive is used to specify explicit docstrings for classes, functions
+and methods.</p>
+<p>The docstring of a class is made up of the docstring specified for the class
+itself, with the docstrings specified for each contructor appended.</p>
+<p>The docstring of a function or method is made up of the concatenated docstrings
+specified for each of the overloads.</p>
+<p>Specifying an explicit docstring will prevent SIP from generating an automatic
+docstring that describes the Python signature of a function or method overload.
+This means that SIP will generate less informative exceptions (i.e. without a
+full signature) when it fails to match a set of arguments to any function or
+method overload.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>class Klass
+{
+%Docstring
+This will be at the start of the class's docstring.
+%End
+
+public:
+    Klass();
+%Docstring
+This will be appended to the class's docstring.
+%End
+};</pre>
+</div>
+<dl class="directive">
 <dt id="directive-%End">
 <tt class="descname">%End</tt><a class="headerlink" href="#directive-%End" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -782,6 +819,8 @@ code that converts a reference to the C++ exception to the Python exception.</p>
 <p>In this example we map the standard C++ exception to a new Python exception.
 The new exception is called <tt class="docutils literal"><span class="pre">StdException</span></tt> and is derived from the standard
 Python exception <tt class="docutils literal"><span class="pre">Exception</span></tt>.</p>
+<p>An exception may be annotated with <a class="reference external" href="annotations.html#xanno-Default"><tt class="xref docutils literal"><span class="pre">Default</span></tt></a> to specify that it should
+be caught by default if there is no <tt class="docutils literal"><span class="pre">throw</span></tt> clause.</p>
 <dl class="directive">
 <dt id="directive-%ExportedDoc">
 <tt class="descname">%ExportedDoc</tt><a class="headerlink" href="#directive-%ExportedDoc" title="Permalink to this definition">¶</a></dt>
@@ -884,10 +923,10 @@ always a Python object and so should be handled by the garbage collector:</p>
     PyObject *obj;
 
     // Get the object.
-    obj = reinterpret_cast&lt;PyObject *&gt;(sipCpp -&gt; data());
+    obj = reinterpret_cast&lt;PyObject *&gt;(sipCpp-&gt;data());
 
     // Clear the pointer.
-    sipCpp -&gt; setData(0);
+    sipCpp-&gt;setData(0);
 
     // Clear the reference.
     Py_XDECREF(obj);
@@ -927,7 +966,7 @@ collector.</dd>
     PyObject *obj;
 
     // Get the object.
-    obj = reinterpret_cast&lt;PyObject *&gt;(sipCpp -&gt; data());
+    obj = reinterpret_cast&lt;PyObject *&gt;(sipCpp-&gt;data());
 
     // Call the visit function if there was an object.
     if (obj)
@@ -975,7 +1014,7 @@ PyTypeObject * or a sipWrapperType *.</dd>
      */
     char *buffer;
 %GetCode
-        sipPy = PyString_FromStringAndSize(sipCpp -&gt; buffer, 100);
+        sipPy = PyString_FromStringAndSize(sipCpp-&gt;buffer, 100);
 %End
 %SetCode
         char *ptr;
@@ -993,7 +1032,7 @@ PyTypeObject * or a sipWrapperType *.</dd>
             sipErr = 1;
         }
         else
-            memcpy(sipCpp -&gt; buffer, ptr, 100);
+            memcpy(sipCpp-&gt;buffer, ptr, 100);
 %End
 }</pre>
 </div>
@@ -1255,7 +1294,7 @@ object.</p>
         }
 
         // Add the pointer to the C++ instance.
-        ql -&gt; append(t);
+        ql-&gt;append(t);
     }
 
     // Return the instance on the heap.
@@ -1269,14 +1308,14 @@ object.</p>
     PyObject *l;
 
     // Create the Python list of the correct length.
-    if ((l = PyList_New(sipCpp -&gt; size())) == NULL)
+    if ((l = PyList_New(sipCpp-&gt;size())) == NULL)
         return NULL;
 
     // Go through each element in the C++ instance and convert it to the
     // corresponding Python object.
-    for (int i = 0; i &lt; sipCpp -&gt; size(); ++i)
+    for (int i = 0; i &lt; sipCpp-&gt;size(); ++i)
     {
-        Type *t = sipCpp -&gt; at(i);
+        Type *t = sipCpp-&gt;at(i);
         PyObject *tobj;
 
         if ((tobj = sipConvertFromType(t, sipType_Type, sipTransferObj)) == NULL)
@@ -1330,7 +1369,7 @@ If compatibility with SIP v3.x is required then the GIL must be released
 immediately before the C++ call and reacquired immediately afterwards as shown
 in this example fragment:</p>
 <div class="highlight-python"><pre>Py_BEGIN_ALLOW_THREADS
-sipCpp -&gt; foo();
+sipCpp-&gt;foo();
 Py_END_ALLOW_THREADS</pre>
 </div>
 <p>If compatibility with SIP v3.x is not required then this is optional but
@@ -1371,9 +1410,24 @@ a pointer to the C structure or C++ class instance.</p>
 <p class="last">Standard binary operator methods follow the same convention as global
 functions and instead define two arguments called <tt class="docutils literal"><span class="pre">a0</span></tt> and <tt class="docutils literal"><span class="pre">a1</span></tt>.</p>
 </dd>
+<dt>sipErrorState sipError</dt>
+<dd><p class="first">The handwritten code should set this to either <tt class="docutils literal"><span class="pre">sipErrorContinue</span></tt> or
+<tt class="docutils literal"><span class="pre">sipErrorFail</span></tt>, and raise an appropriate Python exception, if an error
+is detected.  Its initial value will be <tt class="docutils literal"><span class="pre">sipErrorNone</span></tt>.</p>
+<p>When <tt class="docutils literal"><span class="pre">sipErrorContinue</span></tt> is used, SIP will remember the exception as the
+reason why the particular overloaded callable could not be invoked.  It
+will then continue to try the next overloaded callable.  It is typically
+used by code that needs to do additional type checking of the callable&#8217;s
+arguments.</p>
+<p>When <tt class="docutils literal"><span class="pre">sipErrorFail1</span></tt> is used, SIP will report the exception immediately
+and will not attempt to invoke other overloaded callables.</p>
+<p class="last"><tt class="docutils literal"><span class="pre">sipError</span></tt> is not provided for destructors.</p>
+</dd>
 <dt>int sipIsErr</dt>
 <dd><p class="first">The handwritten code should set this to a non-zero value, and raise an
-appropriate Python exception, if an error is detected.</p>
+appropriate Python exception, if an error is detected.  This is the
+equivalent of setting <tt class="docutils literal"><span class="pre">sipError</span></tt> to <tt class="docutils literal"><span class="pre">sipErrorFail</span></tt>.  Its initial value
+will be <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
 <p class="last"><tt class="docutils literal"><span class="pre">sipIsErr</span></tt> is not provided for destructors.</p>
 </dd>
 <dt><em>type</em> sipRes</dt>
@@ -1391,8 +1445,8 @@ constructors or destructors.</p>
 </dd>
 <dt>PyObject *sipSelf</dt>
 <dd>If the directive is used in the context of a class constructor, destructor
-or method then this is the Python object that wraps the the structure or
-class instance, i.e. <tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
+or method then this is the Python object that wraps the structure or class
+instance, i.e. <tt class="docutils literal"><span class="pre">self</span></tt>.</dd>
 <dt>bool sipSelfWasArg</dt>
 <dd><p class="first">This is only made available for non-abstract, virtual methods.  It is set
 if <tt class="docutils literal"><span class="pre">self</span></tt> was explicitly passed as the first argument of the method
@@ -1428,8 +1482,8 @@ public:
         if (PyArg_ParseTuple(a0, "ii", &amp;iarr[0], &amp;iarr[1]))
         {
             Py_BEGIN_ALLOW_THREADS
-            sipRes = sipSelfWasArg ? sipCpp -&gt; Klass::foo(iarr)
-                                   : sipCpp -&gt; foo(iarr);
+            sipRes = sipSelfWasArg ? sipCpp-&gt;Klass::foo(iarr)
+                                   : sipCpp-&gt;foo(iarr);
             Py_END_ALLOW_THREADS
         }
         else
@@ -1442,13 +1496,24 @@ public:
 </div>
 <p>As the example is a virtual method <a class="footnote-reference" href="#id2" id="id1">[1]</a>, note the use of <tt class="docutils literal"><span class="pre">sipSelfWasArg</span></tt> to
 determine exactly which implementation of <tt class="docutils literal"><span class="pre">foo()</span></tt> to call.</p>
-<p>If a method is in the <tt class="docutils literal"><span class="pre">protected</span></tt> section of a C++ class then the call
-should instead be:</p>
-<div class="highlight-python"><pre>sipRes = sipCpp -&gt; sipProtectVirt_foo(sipSelfWasArg, iarr);</pre>
+<p>If a method is in the <tt class="docutils literal"><span class="pre">protected</span></tt> section of a C++ class then SIP generates
+helpers that provide access to method.  However, these are not available if
+the Python module is being built with <tt class="docutils literal"><span class="pre">protected</span></tt> redefined as <tt class="docutils literal"><span class="pre">public</span></tt>.</p>
+<p>The following pattern should be used to cover all possibilities:</p>
+<div class="highlight-python"><pre>#if defined(SIP_PROTECTED_IS_PUBLIC)
+    sipRes = sipSelfWasArg ? sipCpp-&gt;Klass::foo(iarr)
+                           : sipCpp-&gt;foo(iarr);
+#else
+    sipRes = sipCpp-&gt;sipProtectVirt_foo(sipSelfWasArg, iarr);
+#endif</pre>
 </div>
 <p>If a method is in the <tt class="docutils literal"><span class="pre">protected</span></tt> section of a C++ class but is not virtual
-then the call should instead be:</p>
-<div class="highlight-python"><pre>sipRes = sipCpp -&gt; sipProtect_foo(iarr);</pre>
+then the pattern should instead be:</p>
+<div class="highlight-python"><pre>#if defined(SIP_PROTECTED_IS_PUBLIC)
+    sipRes = sipCpp-&gt;foo(iarr);
+#else
+    sipRes = sipCpp-&gt;sipProtect_foo(iarr);
+#endif</pre>
 </div>
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
@@ -1762,7 +1827,7 @@ class.</p>
 // Print an instance on stderr for debugging purposes.
 static void dump_klass(const Klass *k)
 {
-    fprintf(stderr,"Klass %s at %p\n", k -&gt; name(), k);
+    fprintf(stderr,"Klass %s at %p\n", k-&gt;name(), k);
 }
 %End
 
@@ -1896,7 +1961,7 @@ public:
         if (PyArg_ParseTuple(a0, "ii", &amp;iarr[0], &amp;iarr[1]))
         {
             Py_BEGIN_ALLOW_THREADS
-            sipRes = sipCpp -&gt; Klass::foo(iarr);
+            sipRes = sipCpp-&gt;Klass::foo(iarr);
             Py_END_ALLOW_THREADS
         }
         else
@@ -1969,12 +2034,12 @@ public:
         <li class="right" >
           <a href="specification_files.html" title="SIP Specification Files"
              >previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

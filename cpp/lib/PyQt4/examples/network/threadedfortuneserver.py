@@ -47,7 +47,7 @@ class FortuneThread(QtCore.QThread):
         outstr = QtCore.QDataStream(block, QtCore.QIODevice.WriteOnly)
         outstr.setVersion(QtCore.QDataStream.Qt_4_0)
         outstr.writeUInt16(0)
-        outstr << self.text
+        outstr.writeString(self.text)
         outstr.device().seek(0)
         outstr.writeUInt16(block.count() - 2)
 
@@ -60,17 +60,25 @@ class FortuneServer(QtNetwork.QTcpServer):
     def __init__(self, parent=None):
         super(FortuneServer, self).__init__(parent)
 
-        self.fortunes = [
-                self.tr("You've been leading a dog's life. Stay off the furniture."),
-                self.tr("You've got to think about tomorrow."),
-                self.tr("You will be surprised by a loud noise."),
-                self.tr("You will feel hungry again in another hour."),
-                self.tr("You might have mail."),
-                self.tr("You cannot kill time without injuring eternity."),
-                self.tr("Computers are not intelligent. They only think they are.")]
+        self.fortunes = (
+                "You've been leading a dog's life. Stay off the furniture.",
+                "You've got to think about tomorrow.",
+                "You will be surprised by a loud noise.",
+                "You will feel hungry again in another hour.",
+                "You might have mail.",
+                "You cannot kill time without injuring eternity.",
+                "Computers are not intelligent. They only think they are.")
 
     def incomingConnection(self, socketDescriptor):
         fortune = self.fortunes[random.randint(0, len(self.fortunes) - 1)]
+
+        try:
+            # Python v3.
+            fortune = bytes(fortune, encoding='ascii')
+        except:
+            # Python v2.
+            pass
+
         thread = FortuneThread(socketDescriptor, fortune, self)
         thread.finished.connect(thread.deleteLater)
         thread.start()
@@ -83,18 +91,17 @@ class Dialog(QtGui.QDialog):
         self.server = FortuneServer()
 
         statusLabel = QtGui.QLabel()
-        quitButton = QtGui.QPushButton(self.tr("Quit"))
+        quitButton = QtGui.QPushButton("Quit")
         quitButton.setAutoDefault(False)
 
         if not self.server.listen():
-            QtGui.QMessageBox.critical(self,
-                    self.tr("Threaded Fortune Server"),
-                    self.tr("Unable to start the server: %1.".arg(self.server.errorString())))
+            QtGui.QMessageBox.critical(self, "Threaded Fortune Server",
+                    "Unable to start the server: %s." % self.server.errorString())
             self.close()
             return
 
-        statusLabel.setText(self.tr("The server is running on port %1.\n"
-                                    "Run the Fortune Client example now.").arg(self.server.serverPort()))
+        statusLabel.setText("The server is running on port %d.\nRun the "
+                "Fortune Client example now." % self.server.serverPort())
 
         quitButton.clicked.connect(self.close)
 
@@ -108,7 +115,7 @@ class Dialog(QtGui.QDialog):
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Threaded Fortune Server"))
+        self.setWindowTitle("Threaded Fortune Server")
 
 
 if __name__ == '__main__':

@@ -26,7 +26,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.list_ = []
 
         self.startTimer(40)
-        self.setWindowTitle(self.tr("Sample Buffers"))
+        self.setWindowTitle("Sample Buffers")
 
     def initializeGL(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
@@ -133,14 +133,14 @@ if __name__ == '__main__':
     QtOpenGL.QGLFormat.setDefaultFormat(f)
 
     if not QtOpenGL.QGLFormat.hasOpenGL():
-        QMessageBox.information(None, "OpenGL samplebuffers",
+        QtGui.QMessageBox.information(None, "OpenGL samplebuffers",
                 "This system does not support OpenGL.")
         sys.exit(0)
 
     widget = GLWidget(None)
 
     if not widget.format().sampleBuffers():
-        QMessageBox.information(None, "OpenGL samplebuffers",
+        QtGui.QMessageBox.information(None, "OpenGL samplebuffers",
                 "This system does not have sample buffer support.")
         sys.exit(0)
 

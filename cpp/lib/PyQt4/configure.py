@@ -1,6 +1,6 @@
 # This script generates the PyQt configuration and generates the Makefiles.
 #
-# Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 # 
 # This file is part of PyQt.
 # 
@@ -38,10 +38,10 @@ import sipconfig
 
 
 # Initialise the globals.
-pyqt_version = 0x040601
-pyqt_version_str = "4.6.1"
+pyqt_version = 0x040701
+pyqt_version_str = "snapshot-4.7.1-5014f7c72a58"
 
-sip_min_version = 0x040900
+sip_min_version = 0x040a00
 
 qt_version = 0
 qt_edition = ""
@@ -60,6 +60,7 @@ qt_sip_flags = []
 
 pyqt_modules = []
 pyqt_modroot = None
+src_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Get the SIP configuration.
 sipcfg = sipconfig.Configuration()
@@ -125,6 +126,8 @@ def create_optparser():
     # Note: we don't use %default to be compatible with Python 2.3.
     p.add_option("-k", "--static", action="store_true", default=False,
             dest="static", help="build modules as static libraries")
+    p.add_option("--no-docstrings", action="store_true", default=False,
+            dest="no_docstrings", help="disable the generation of docstrings")
     p.add_option("-r", "--trace", action="store_true", default=False,
             dest="tracing", help="build modules with tracing enabled")
     p.add_option("-u", "--debug", action="store_true", default=False,
@@ -171,6 +174,20 @@ def create_optparser():
             "list be linked (if Qt is built as static libraries)")
 
     if sys.platform != 'win32':
+        if sys.platform in ('linux2', 'darwin'):
+            pip_default = True
+            pip_default_str = "enabled"
+        else:
+            pip_default = False
+            pip_default_str = "disabled"
+
+        g.add_option("--protected-is-public", action="store_true",
+                default=pip_default, dest="prot_is_public",
+                help="enable building with 'protected' redefined as 'public' "
+                        "[default: %s]" % pip_default_str)
+        g.add_option("--protected-not-public", action="store_false",
+                dest="prot_is_public",
+                help="disable building with 'protected' redefined as 'public'")
         g.add_option("-q", "--qmake", action="callback", metavar="FILE",
                 default=qmake, dest="qmake", callback=store_abspath_file,
                 type="string",
@@ -257,10 +274,10 @@ class pyrccMakefile(sipconfig.ProgramMakefile):
 
     def __init__(self):
         sipconfig.ProgramMakefile.__init__(self, configuration=sipcfg,
-                build_file="pyrcc.sbf", dir="pyrcc",
-                install_dir=opts.pyqtbindir, console=1, qt=["QtCore", "QtXml"],
-                debug=opts.debug, warnings=1, universal=sipcfg.universal,
-                arch=sipcfg.arch)
+                build_file=os.path.join(src_dir, "pyrcc", "pyrcc.sbf"),
+                dir="pyrcc", install_dir=opts.pyqtbindir, console=1,
+                qt=["QtCore", "QtXml"], debug=opts.debug, warnings=1,
+                universal=sipcfg.universal, arch=sipcfg.arch)
 
     def generate_target_default(self, mfile):
         """Generate the default target."""
@@ -307,7 +324,10 @@ class ConfigurePyQt4:
             0x040400: "Qt_4_3_3",
             0x040401: "Qt_4_4_0",
             0x040500: "Qt_4_4_1",
-            0x050000: "Qt_4_5_0"
+            0x040501: "Qt_4_5_0",
+            0x040600: "Qt_4_5_1",
+            0x040601: "Qt_4_6_0",
+            0x050000: "Qt_4_6_1"
         }
 
     def check_modules(self):
@@ -329,6 +349,8 @@ class ConfigurePyQt4:
 
         check_module("QtGui", "qwidget.h", "new QWidget()")
         check_module("QtHelp", "qhelpengine.h", "new QHelpEngine(\"foo\")")
+        check_module("QtMultimedia", "QAudioDeviceInfo",
+                "new QAudioDeviceInfo()")
         check_module("QtNetwork", "qhostaddress.h", "new QHostAddress()")
         check_module("QtOpenGL", "qgl.h", "new QGLWidget()")
         check_module("QtScript", "qscriptengine.h", "new QScriptEngine()")
@@ -341,7 +363,7 @@ class ConfigurePyQt4:
         check_module("QtWebKit", "qwebpage.h", "new QWebPage()")
         check_module("QtXml", "qdom.h", "new QDomDocument()")
         check_module("QtXmlPatterns", "qxmlname.h", "new QXmlName()")
-        check_module("phonon", "Phonon/VideoWidget",
+        check_module("phonon", "phonon/VideoWidget",
                 "new Phonon::VideoWidget()")
         check_module("QtAssistant", "qassistantclient.h",
                 "new QAssistantClient(\"foo\")", extra_lib_dirs=ass_lib_dirs,
@@ -411,10 +433,14 @@ class ConfigurePyQt4:
         if "QtHelp" in pyqt_modules:
             generate_code("QtHelp")
 
+        if "QtMultimedia" in pyqt_modules:
+            generate_code("QtMultimedia")
+
         if "QtNetwork" in pyqt_modules:
             generate_code("QtNetwork")
 
         if "QtOpenGL" in pyqt_modules:
+            generate_OpenGL_extras()
             generate_code("QtOpenGL")
 
         if "QtScript" in pyqt_modules:
@@ -590,7 +616,7 @@ class ConfigurePyQt4:
 
         mname is the name of the module.
         """
-        qpy_dir = os.path.abspath(os.path.join("qpy", mname))
+        qpy_dir = os.path.join("qpy", mname)
 
         if sys.platform == 'win32':
             if opts.debug:
@@ -600,7 +626,7 @@ class ConfigurePyQt4:
         else:
             qpy_lib_dir = qpy_dir
 
-        return qpy_dir, qpy_lib_dir
+        return os.path.join(src_dir, qpy_dir), os.path.abspath(qpy_lib_dir)
 
     def _static_plugins(self, mname):
         """Return a tuple of the libraries (in platform neutral format) and the
@@ -671,7 +697,7 @@ class ConfigurePyQt4:
         return libs, libdirs
 
     def module_installs(self):
-        return ["__init__.py", "pyqtconfig.py"]
+        return [os.path.join(src_dir, "__init__.py"), "pyqtconfig.py"]
 
     def qpy_libs(self):
         # See which QPy support libraries to build.
@@ -693,7 +719,9 @@ class ConfigurePyQt4:
         for qpy, pro in qpylibs.items():
             sipconfig.inform("Creating QPy support library for %s Makefile..." % qpy)
 
-            os.chdir(os.path.join("qpy", qpy))
+            qpydir = os.path.join("qpy", qpy)
+            mk_clean_dir(qpydir, clean=0)
+            os.chdir(qpydir)
 
             wrapped_pro = "w_" + pro
 
@@ -722,14 +750,21 @@ class ConfigurePyQt4:
             else:
                 pro_config = 'release'
 
+            if src_dir != os.path.curdir:
+                src_qpydir = os.path.join(src_dir, "qpy", qpy)
+                pro = os.path.join(src_qpydir, pro)
+                vpath = "VPATH = " + src_qpydir
+                inc_path.append(src_qpydir)
+            else:
+                vpath = ""
+
             f.write(
 """# Tell the original .pro file about additional directories.
-INCLUDEPATH = %s
-
+INCLUDEPATH = ./ %s
 CONFIG += %s
-
+%s
 include(%s)
-""" % (" ".join(inc_path), pro_config, pro))
+""" % (" ".join(inc_path), pro_config, vpath, pro))
 
             f.close()
 
@@ -754,7 +789,7 @@ include(%s)
 
             makefile = sipconfig.ModuleMakefile(
                 configuration=sipcfg,
-                build_file="dbus.sbf",
+                build_file=os.path.join(src_dir, "dbus", "dbus.sbf"),
                 dir="dbus",
                 install_dir=pydbusmoddir,
                 qt=["QtCore"],
@@ -801,7 +836,7 @@ include(%s)
         makefile = sipconfig.PythonModuleMakefile(
             configuration=sipcfg,
             dstdir=uicdir,
-            srcdir="uic",
+            srcdir=os.path.join(src_dir, "pyuic", "uic"),
             dir="pyuic",
             installs=[[os.path.basename(wrapper), opts.pyqtbindir]]
         )
@@ -814,7 +849,7 @@ include(%s)
 
             makefile = sipconfig.ProgramMakefile(
                 configuration=sipcfg,
-                build_file="pylupdate.sbf",
+                build_file=os.path.join(src_dir, "pylupdate", "pylupdate.sbf"),
                 dir="pylupdate",
                 install_dir=opts.pyqtbindir,
                 console=1,
@@ -825,6 +860,7 @@ include(%s)
                 arch=sipcfg.arch
             )
 
+            makefile.extra_include_dirs.append(os.path.join(src_dir, "pylupdate"))
             makefile.generate()
             tool.append("pylupdate")
 
@@ -869,10 +905,12 @@ include(%s)
                 # Run qmake to generate the Makefile.
                 qmake_args = fix_qmake_args()
                 cwd = os.getcwd()
+
+                mk_clean_dir("designer", clean=0)
                 os.chdir("designer")
 
                 # Create the qmake project file.
-                fin = open("python.pro-in")
+                fin = open(os.path.join(src_dir, "designer", "python.pro-in"))
                 prj = fin.read()
                 fin.close()
 
@@ -889,6 +927,9 @@ include(%s)
 
                 if sipcfg.universal:
                     fout.write("QMAKE_MAC_SDK = %s\n" % sipcfg.universal)
+
+                if src_dir != os.path.curdir:
+                    fout.write("VPATH = %s\n" % os.path.join(src_dir, "designer"))
 
                 fout.write(prj)
                 fout.close()
@@ -952,6 +993,14 @@ def inform_user():
     sipconfig.inform("The Qt mkspecs directory is in %s." % qt_datadir)
     sipconfig.inform("These PyQt modules will be built: %s." % ", ".join(pyqt_modules))
     sipconfig.inform("The PyQt Python package will be installed in %s." % opts.pyqtmoddir)
+
+    if opts.no_docstrings:
+        sipconfig.inform("PyQt is being built without generated docstrings.")
+    else:
+        sipconfig.inform("PyQt is being built with generated docstrings.")
+
+    if opts.prot_is_public:
+        sipconfig.inform("PyQt is being built with 'protected' redefined as 'public'.")
 
     if opts.designer_plugin:
         sipconfig.inform("The Designer plugin will be installed in %s." % os.path.join(opts.plugindir, "designer"))
@@ -1040,6 +1089,66 @@ def remove_file(fname):
         pass
 
 
+def generate_OpenGL_extras():
+    """Generate the extras needed by the QtOpenGL module (i.e. the .sip file
+    defining the correct typedefs for the OpenGL data types.
+    """
+    sipconfig.inform("Determining the OpenGL data types...")
+
+    src = "opengl_extras.cpp"
+
+    f = open(src, "w")
+
+    f.write(
+"""#include <QFile>
+#include <QTextStream>
+#include <qgl.h>
+
+int main(int, char **)
+{
+    QFile outf("./sip/QtOpenGL/opengl_types.sip");
+
+    if (!outf.open(QIODevice::WriteOnly|QIODevice::Truncate|QIODevice::Text))
+        return 1;
+
+    QTextStream out(&outf);
+
+    if (sizeof (long) == sizeof (GLint))
+        out << "typedef long GLint;\\n";
+    else
+        out << "typedef int GLint;\\n";
+
+    if (sizeof (unsigned long) == sizeof (GLuint))
+        out << "typedef unsigned long GLuint;\\n";
+    else
+        out << "typedef unsigned GLuint;\\n";
+
+    if (sizeof (unsigned long) == sizeof (GLenum))
+        out << "typedef unsigned long GLenum;\\n";
+    else
+        out << "typedef unsigned GLenum;\\n";
+
+    if (sizeof (unsigned long) == sizeof (GLbitfield))
+        out << "typedef unsigned long GLbitfield;\\n";
+    else
+        out << "typedef unsigned GLbitfield;\\n";
+
+    out << "typedef float GLfloat;\\n";
+
+    return 0;
+}
+""")
+
+    f.close()
+
+    cmd = compile_qt_program(src, "QtOpenGL")
+
+    if cmd is None:
+        sipconfig.error("Unable to determine the OpenGL data types.")
+
+    run_command(cmd)
+
+
 def compile_qt_program(name, mname, extra_include_dirs=None, extra_lib_dirs=None, extra_libs=None):
     """Compile a simple Qt application.
 
@@ -1055,7 +1164,7 @@ def compile_qt_program(name, mname, extra_include_dirs=None, extra_lib_dirs=None
     opengl = (mname == "QtOpenGL")
 
     qt = [mname]
-    if mname == "QtWebKit":
+    if mname in ("QtOpenGL", "QtWebKit"):
         qt.append("QtCore")
 
     makefile = sipconfig.ProgramMakefile(sipcfg, console=1, qt=qt, warnings=0,
@@ -1215,7 +1324,7 @@ def check_module(mname, incfile, test, extra_include_dirs=None, extra_lib_dirs=N
         return
 
     # Check the module's main .sip file exists.
-    if os.access(os.path.join("sip", mname, mname + "mod.sip"), os.F_OK):
+    if os.access(os.path.join(src_dir, "sip", mname, mname + "mod.sip"), os.F_OK):
         sipconfig.inform("Checking to see if the %s module should be built..." % mname)
 
         if check_api(incfile, test, mname, extra_include_dirs=extra_include_dirs, extra_lib_dirs=extra_lib_dirs, extra_libs=extra_libs):
@@ -1319,6 +1428,7 @@ def needed_qt_libs(mname, qt_libs):
         "QtCore": [],
         "QtGui": ["QtCore"],
         "QtHelp": ["QtGui"],
+        "QtMultimedia": ["QtGui"],
         "QtNetwork": ["QtCore"],
         "QtOpenGL": ["QtGui"],
         "QtScript": ["QtCore"],
@@ -1343,20 +1453,22 @@ def needed_qt_libs(mname, qt_libs):
         qt_libs.insert(0, mname)
 
 
-def mk_clean_dir(name):
+def mk_clean_dir(name, clean=1):
     """Create a clean (ie. empty) directory.
 
     name is the name of the directory.
     """
-    try:
-        shutil.rmtree(name)
-    except:
-        pass
+    if clean:
+        try:
+            shutil.rmtree(name)
+        except:
+            pass
 
     try:
-        os.mkdir(name)
+        os.makedirs(name)
     except:
-        sipconfig.error("Unable to create the %s directory." % name)
+        if clean:
+            sipconfig.error("Unable to create the %s directory." % name)
 
 
 def generate_code(mname, extra_include_dirs=None, extra_lib_dirs=None, extra_libs=None, extra_sip_flags=None):
@@ -1398,8 +1510,14 @@ def generate_code(mname, extra_include_dirs=None, extra_lib_dirs=None, extra_lib
             qt_libs = []
             needed_qt_libs(mname, qt_libs)
 
-    # Build the SIP command line.
-    argv = ['"' + sipcfg.sip_bin + '"']
+    # Build the SIP command line.  Keyword argument support is enabled.
+    argv = ['"' + sipcfg.sip_bin + '"', '-k']
+
+    if not opts.no_docstrings:
+        argv.append("-o");
+
+    if opts.prot_is_public:
+        argv.append("-P");
 
     argv.extend(qt_sip_flags)
     argv.extend(cons_args)
@@ -1426,10 +1544,18 @@ def generate_code(mname, extra_include_dirs=None, extra_lib_dirs=None, extra_lib
     argv.append(buildfile)
 
     argv.append("-I")
-    argv.append("sip")
+    argv.append(os.path.join(src_dir, "sip"))
 
-    # SIP assumes POSIX style path separators.
-    argv.append("/".join(["sip", mname, mname + "mod.sip"]))
+    # Add the name of the .sip file keeping in mind SIP assumes POSIX style
+    # path separators.  The Qt module's .sip file is generated by this script
+    # and so will be in a different place if this is an out-of-tree build.
+    if mname == "Qt":
+        argv.append("sip/Qt/Qtmod.sip")
+    else:
+        drive, path = os.path.splitdrive(src_dir)
+        parts = path.split(os.pathsep)
+        parts.extend(["sip", mname, mname + "mod.sip"])
+        argv.append(drive + "/".join(parts))
 
     cmd = " ".join(argv)
 
@@ -1450,8 +1576,15 @@ def generate_code(mname, extra_include_dirs=None, extra_lib_dirs=None, extra_lib
     if opts.install_sipfiles:
         sipfiles = []
 
-        for s in glob.glob("sip/" + mname + "/*.sip"):
-            sipfiles.append(os.path.join("..", "sip", mname, os.path.basename(s)))
+        sipdir = os.path.join("sip", mname)
+        if mname != "Qt":
+            sipdir = os.path.join(src_dir, sipdir)
+            rel_sipdir = sipdir
+        else:
+            rel_sipdir = os.path.join("..", sipdir)
+
+        for s in glob.glob(os.path.join(sipdir, "*.sip")):
+            sipfiles.append(os.path.join(rel_sipdir, os.path.basename(s)))
 
         installs.append([sipfiles, os.path.join(opts.pyqtsipdir, mname)])
 
@@ -1469,7 +1602,8 @@ def generate_code(mname, extra_include_dirs=None, extra_lib_dirs=None, extra_lib
         static=opts.static,
         debug=opts.debug,
         universal=sipcfg.universal,
-        arch=sipcfg.arch
+        arch=sipcfg.arch,
+        prot_is_public=opts.prot_is_public
     )
 
     add_makefile_extras(makefile, extra_include_dirs, extra_lib_dirs, extra_libs)
@@ -1552,7 +1686,7 @@ Type 'no' to decline the terms of the license.
 
     # If there should be a license file then check it is where it should be.
     if lfile:
-        if os.access(os.path.join("sip", lfile), os.F_OK):
+        if os.access(os.path.join(src_dir, "sip", lfile), os.F_OK):
             sipconfig.inform("Found the license file %s." % lfile)
         else:
             sipconfig.error("Please copy the license file %s to the sip directory." % lfile)
@@ -1645,13 +1779,6 @@ def get_qt_configuration():
     """
     sipconfig.inform("Determining the layout of your Qt installation...")
 
-    if sys.platform == 'win32':
-        # There is no -q flag so set the default explicitly.
-        opts.qmake = find_default_qmake()
-
-    if not opts.qmake:
-        sipconfig.error(MSG_CHECK_QMAKE)
-
     # The file names we will use to get the directory information.
     app = "qtdirs"
     pro_file = app + ".pro"
@@ -1715,11 +1842,11 @@ int main(int, char **)
 
     out << QLibraryInfo::licensee() << '\\n';
 
-#if defined(QT_SHARED) || defined(QT_DLL)
+//#if defined(QT_SHARED) || defined(QT_DLL)
     out << "shared\\n";
-#else
-    out << "\\n";
-#endif
+//#else
+ //   out << "\\n";
+//#endif
 
     // Determine which features should be disabled.
 
@@ -1751,8 +1878,32 @@ int main(int, char **)
     out << "PyQt_SizeGrip\\n";
 #endif
 
+#if defined(QT_NO_SYSTEMTRAYICON)
+    out << "PyQt_SystemTrayIcon\\n";
+#endif
+
+#if defined(QT_NO_PRINTDIALOG)
+    out << "PyQt_PrintDialog\\n";
+#endif
+
+#if defined(QT_NO_PRINTER)
+    out << "PyQt_Printer\\n";
+#endif
+
+#if defined(QT_NO_PRINTPREVIEWDIALOG)
+    out << "PyQt_PrintPreviewDialog\\n";
+#endif
+
+#if defined(QT_NO_PRINTPREVIEWWIDGET)
+    out << "PyQt_PrintPreviewWidget\\n";
+#endif
+
 #if !defined(QT3_SUPPORT) || QT_VERSION >= 0x040200
     out << "PyQt_NoPrintRangeBug\\n";
+#endif
+
+#if defined(QT_OPENGL_ES)
+    out << "PyQt_NoOpenGLES\\n";
 #endif
 
     if (sizeof (qreal) != sizeof (double))
@@ -1815,7 +1966,8 @@ int main(int, char **)
     qt_shared = lines[9]
     qt_xfeatures = lines[10:]
 
-    if qt_licensee == 'Open Source':
+    # 'Nokia' is the value that is used by Maemo's version of Qt.
+    if qt_licensee in ('Open Source', 'Nokia'):
         qt_licensee = None
 
     try:
@@ -1869,6 +2021,14 @@ def main():
     # Parse the command line.
     p = create_optparser()
     opts, args = p.parse_args()
+
+    # Provide defaults for platform-specific options.
+    if sys.platform == 'win32':
+        opts.qmake = find_default_qmake()
+        opts.prot_is_public = False
+
+    if not opts.qmake:
+        sipconfig.error(MSG_CHECK_QMAKE)
 
     # Where the modules will be placed.
     global pyqt_modroot
@@ -1952,7 +2112,8 @@ def main():
     ).generate()
 
     # Install the configuration module.
-    create_config("pyqtconfig.py", "pyqtconfig.py.in", macros)
+    create_config("pyqtconfig.py", os.path.join(src_dir, "pyqtconfig.py.in"),
+            macros)
 
 
 ###############################################################################

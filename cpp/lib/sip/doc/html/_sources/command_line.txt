@@ -1,3 +1,5 @@
+.. _ref-command-line:
+
 The SIP Command Line
 ====================
 
@@ -73,10 +75,35 @@ The full set of command line options is:
     ``make``.  By default 1 file is generated for each C structure or C++
     class.
 
+.. cmdoption:: -k
+
+    .. versionadded:: 4.10
+
+    All functions and methods will, by default, support passing parameters
+    using the Python keyword argument syntax.
+
+.. cmdoption:: -o
+
+    .. versionadded:: 4.10
+
+    Docstrings will be automatically generated that describe the signature of
+    all functions, methods and constructors.
+
 .. cmdoption:: -p <MODULE>
 
     The name of the :directive:`%ConsolidatedModule` which will contain the
     wrapper code for this component module.
+
+.. cmdoption:: -P
+
+    .. versionadded:: 4.10
+
+    By default SIP generates code to provide access to protected C++ functions
+    from Python.  On some platforms (notably Linux, but not Windows) this code
+    can be avoided if the ``protected`` keyword is redefined as ``public``
+    during compilation.  This can result in a significant reduction in the size
+    of a generated Python module.  This option disables the generation of the
+    extra code.
 
 .. cmdoption:: -r
 

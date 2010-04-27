@@ -47,7 +47,10 @@ class TreeItem(object):
         return len(self.itemData)
 
     def data(self, column):
-        return self.itemData[column]
+        try:
+            return self.itemData[column]
+        except IndexError:
+            return None
 
     def parent(self):
         return self.parentItem
@@ -63,9 +66,8 @@ class TreeModel(QtCore.QAbstractItemModel):
     def __init__(self, data, parent=None):
         super(TreeModel, self).__init__(parent)
 
-        rootData = [QtCore.QVariant("Title"), QtCore.QVariant("Summary")]
-        self.rootItem = TreeItem(rootData)
-        self.setupModelData(data.split("\n"), self.rootItem)
+        self.rootItem = TreeItem(("Title", "Summary"))
+        self.setupModelData(data.split('\n'), self.rootItem)
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -75,14 +77,14 @@ class TreeModel(QtCore.QAbstractItemModel):
 
     def data(self, index, role):
         if not index.isValid():
-            return QtCore.QVariant()
+            return None
 
         if role != QtCore.Qt.DisplayRole:
-            return QtCore.QVariant()
+            return None
 
         item = index.internalPointer()
 
-        return QtCore.QVariant(item.data(index.column()))
+        return item.data(index.column())
 
     def flags(self, index):
         if not index.isValid():
@@ -94,7 +96,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
             return self.rootItem.data(section)
 
-        return QtCore.QVariant()
+        return None
 
     def index(self, row, column, parent):
         if not self.hasIndex(row, column, parent):
@@ -143,19 +145,15 @@ class TreeModel(QtCore.QAbstractItemModel):
         while number < len(lines):
             position = 0
             while position < len(lines[number]):
-                if lines[number][position] != " ":
+                if lines[number][position] != ' ':
                     break
                 position += 1
 
             lineData = lines[number][position:].trimmed()
 
-            if not lineData.isEmpty():
+            if lineData:
                 # Read the column data from the rest of the line.
-                columnStrings = lineData.split("\t",
-                        QtCore.QString.SkipEmptyParts)
-                columnData = []
-                for column in range(0, len(columnStrings)):
-                    columnData.append(columnStrings[column])
+                columnData = [s for s in lineData.split('\t') if s]
 
                 if position > indentations[-1]:
                     # The last child of the current parent is now the new
@@ -182,9 +180,9 @@ if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
 
-    f = QtCore.QFile(":/default.txt")
+    f = QtCore.QFile(':/default.txt')
     f.open(QtCore.QIODevice.ReadOnly)
-    model = TreeModel(QtCore.QString(f.readAll()))
+    model = TreeModel(f.readAll())
     f.close()
 
     view = QtGui.QTreeView()

@@ -1,6 +1,6 @@
 // This is the signal/slot helper code for SIP.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -213,10 +213,10 @@ extern "C" void sipQtDestroyUniversalSlot(void *rx)
 
         if (up == reinterpret_cast<QObject *>(rx))
         {
-            // Note that we must not delete this immediately as we may be
-            // disconnecting the proxy while we are still executing the slot
-            // that the proxy is wrapping.
-            up->deleteLater();
+            // If we are disconnecting within the slot that is connected then
+            // disable() will make sure the proxy isn't deleted until the slot
+            // returns.
+            up->disable();
             break;
         }
 
@@ -396,18 +396,34 @@ bool qpycore_emit(QObject *qtx, int signal_index,
 
     for (int a = 0; it != args.constEnd(); ++a)
     {
-        Chimera::Storage *val = (*it)->fromPyObjectToStorage(PyTuple_GET_ITEM(sigargs, a));
+        PyObject *arg_obj = PyTuple_GET_ITEM(sigargs, a);
+        Chimera::Storage *val = (*it)->fromPyObjectToStorage(arg_obj);
 
         if (!val)
         {
-            const char *sig = parsed_signature->signature.constData();
+            const char *sig;
 
-            // Bound signals include the type character.
-            if (*sig == '2')
+            // Use the docstring if there is one and it is auto-generated.
+            sig = parsed_signature->docstring;
+
+            if (!sig || *sig != '\1')
+            {
+                sig = parsed_signature->signature.constData();
+
+                // Bound signals include the type character.
+                if (*sig == '2')
+                    ++sig;
+            }
+            else
+            {
+                // Skip the auto-generated marker.
                 ++sig;
+            }
 
+            // Mimic SIP's exception text.
             PyErr_Format(PyExc_TypeError,
-                    "argument %d of signal %s has an invalid type", a, sig);
+                    "%s: argument %d has unexpected type '%s'", sig,
+                    a + 1, Py_TYPE(arg_obj)->tp_name);
 
             delete[] argv;
             qDeleteAll(values.constBegin(), values.constEnd());

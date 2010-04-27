@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Introduction &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>Introduction &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" />
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" />
     <link rel="next" title="Potential Incompatibilities with Earlier Versions" href="incompatibilities.html" />
     <link rel="prev" title="SIP Reference Guide" href="index.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="index.html" title="SIP Reference Guide"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -50,10 +50,10 @@
             
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>This is the reference guide for SIP &#64;RM_LATEST&#64;.  SIP is a tool for
+<p>This is the reference guide for SIP 4.10.2.  SIP is a tool for
 automatically generating <a class="reference external" href="http://www.python.org">Python</a> bindings for C and
 C++ libraries.  SIP was originally developed in 1998 for
-<a class="reference external" href="http://www.riverbankcomputing.com/software/pyqt/">PyQt</a> - the Python
+<a class="reference external" href="http://www.riverbankcomputing.com/software/pyqt">PyQt</a> - the Python
 bindings for the Qt GUI toolkit - but is suitable for generating bindings for
 any C or C++ library.</p>
 <p>This version of SIP generates bindings for Python v2.3 or later, including
@@ -63,9 +63,12 @@ is <a class="reference external" href="http://www.swig.org">SWIG</a> and, in fac
 started out as a small SWIG.  Unlike SWIG, SIP is specifically designed for
 bringing together Python and C/C++ and goes to great lengths to make the
 integration as tight as possible.</p>
-<p>The homepage for SIP is <a class="reference external" href="http://www.riverbankcomputing.com/software/sip/">http://www.riverbankcomputing.com/software/sip/</a>.  Here
-you will always find the latest stable version, current development snapshots,
-and the latest version of this documentation.</p>
+<p>The homepage for SIP is <a class="reference external" href="http://www.riverbankcomputing.com/software/sip">http://www.riverbankcomputing.com/software/sip</a>.  Here
+you will always find the latest stable version and the latest version of this
+documentation.</p>
+<p>SIP can also be downloaded from the
+<a class="reference external" href="http://mercurial.selenic.com/">Mercurial</a> repository at
+<a class="reference external" href="http://www.riverbankcomputing.com/hg/sip">http://www.riverbankcomputing.com/hg/sip</a>.</p>
 <div class="section" id="license">
 <h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
 <p>SIP is licensed under similar terms as Python itself.  SIP is also licensed
@@ -81,6 +84,8 @@ under the terms of the GPL.</p>
 only a small sub-set of a large library is being used</li>
 <li>automatic conversion between standard Python and C/C++ data types</li>
 <li>overloading of functions and methods with different argument signatures</li>
+<li>support for Python&#8217;s keyword argument syntax</li>
+<li>support for both explicitly specified and automatically generated docstrings</li>
 <li>access to a C++ class&#8217;s protected methods</li>
 <li>the ability to define a Python class that is a sub-class of a C++ class,
 including abstract C++ classes</li>
@@ -223,12 +228,12 @@ new Python signals, and allows any Python callable object to be used as a slot.<
         <li class="right" >
           <a href="index.html" title="SIP Reference Guide"
              >previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

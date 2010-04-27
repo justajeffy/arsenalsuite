@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The Build System &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>The Build System &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" />
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" />
     <link rel="next" title="Building Your Extension with distutils" href="distutils.html" />
     <link rel="prev" title="Python API for Applications" href="python_api.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="python_api.html" title="Python API for Applications"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -307,7 +307,8 @@ string.</p>
 
 <dl class="class">
 <dt id="sipconfig.Configuration">
-<em class="property">class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">Configuration</tt><a class="headerlink" href="#sipconfig.Configuration" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">Configuration</tt><a class="headerlink" href="#sipconfig.Configuration" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class encapsulates configuration values that can be accessed as
 instance objects.  A sub-class may provide a dictionary of additional
 configuration values in its constructor the elements of which will have
@@ -454,7 +455,8 @@ macros.</p>
 
 <dl class="class">
 <dt id="sipconfig.Makefile">
-<em class="property">class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">Makefile</tt><a class="headerlink" href="#sipconfig.Makefile" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">Makefile</tt><a class="headerlink" href="#sipconfig.Makefile" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class encapsulates a Makefile.  It is intended to be sub-classed to
 generate Makefiles for particular purposes.  It handles all platform and
 compiler specific flags, but allows them to be adjusted to suit the
@@ -562,9 +564,9 @@ enabled.</li>
 of <tt class="xref docutils literal"><span class="pre">None</span></tt> means that warnings are enabled for SIP v4.x and
 disabled for SIP v3.x.</li>
 <li><em>debug</em> &#8211; is set if debugging symbols should be generated.</li>
-<li><em>dir</em> &#8211; the name of the directory where build files are read from and
-Makefiles are written to.  The default of <tt class="xref docutils literal"><span class="pre">None</span></tt> means the
-current directory is used.</li>
+<li><em>dir</em> &#8211; the name of the directory where build files are read from (if they
+are not absolute file names) and Makefiles are written to.  The
+default of <tt class="xref docutils literal"><span class="pre">None</span></tt> means the current directory is used.</li>
 <li><em>makefile</em> &#8211; the name of the generated Makefile.</li>
 <li><em>installs</em> &#8211; the list of extra install targets.  Each element is a two part
 list, the first of which is the source and the second is the
@@ -803,7 +805,8 @@ not exist or has an empty value.</td>
 
 <dl class="class">
 <dt id="sipconfig.ModuleMakefile">
-<em class="property">class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">ModuleMakefile</tt><a class="headerlink" href="#sipconfig.ModuleMakefile" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">ModuleMakefile</tt><a class="headerlink" href="#sipconfig.ModuleMakefile" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class is derived from <a title="sipconfig.Makefile" class="reference internal" href="#sipconfig.Makefile"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile</span></tt></a>.</p>
 <p>This class encapsulates a Makefile to build a generic Python extension
 module.</p>
@@ -900,7 +903,8 @@ used with SIP v4.x modules.</p>
 
 <dl class="class">
 <dt id="sipconfig.ParentMakefile">
-<em class="property">class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">ParentMakefile</tt><a class="headerlink" href="#sipconfig.ParentMakefile" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">ParentMakefile</tt><a class="headerlink" href="#sipconfig.ParentMakefile" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class is derived from <a title="sipconfig.Makefile" class="reference internal" href="#sipconfig.Makefile"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile</span></tt></a>.</p>
 <p>This class encapsulates a Makefile that sits above a number of other
 Makefiles in sub-directories.</p>
@@ -952,7 +956,8 @@ Makefiles in sub-directories.</p>
 
 <dl class="class">
 <dt id="sipconfig.ProgramMakefile">
-<em class="property">class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">ProgramMakefile</tt><a class="headerlink" href="#sipconfig.ProgramMakefile" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">ProgramMakefile</tt><a class="headerlink" href="#sipconfig.ProgramMakefile" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class is derived from <a title="sipconfig.Makefile" class="reference internal" href="#sipconfig.Makefile"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile</span></tt></a>.</p>
 <p>This class encapsulates a Makefile to build an executable program.</p>
 <dl class="method">
@@ -1038,7 +1043,8 @@ command line.</td>
 
 <dl class="class">
 <dt id="sipconfig.PythonModuleMakefile">
-<em class="property">class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">PythonModuleMakefile</tt><a class="headerlink" href="#sipconfig.PythonModuleMakefile" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">PythonModuleMakefile</tt><a class="headerlink" href="#sipconfig.PythonModuleMakefile" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class is derived from <a title="sipconfig.Makefile" class="reference internal" href="#sipconfig.Makefile"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile</span></tt></a>.</p>
 <p>This class encapsulates a Makefile that installs a pure Python module.</p>
 <dl class="method">
@@ -1080,10 +1086,45 @@ module&#8217;s Python code.  It defaults to the same directory.</li>
 
 <dl class="class">
 <dt id="sipconfig.SIPModuleMakefile">
-<em class="property">class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">SIPModuleMakefile</tt><a class="headerlink" href="#sipconfig.SIPModuleMakefile" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">sipconfig.</tt><tt class="descname">SIPModuleMakefile</tt><a class="headerlink" href="#sipconfig.SIPModuleMakefile" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class is derived from <a title="sipconfig.ModuleMakefile" class="reference internal" href="#sipconfig.ModuleMakefile"><tt class="xref docutils literal"><span class="pre">sipconfig.ModuleMakefile</span></tt></a>.</p>
 <p>This class encapsulates a Makefile to build a SIP generated Python
 extension module.</p>
+<dl class="method">
+<dt id="sipconfig.SIPModuleMakefile.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>self</em>, <em>configuration</em>, <em>build_file</em><span class="optional">[</span>, <em>install_dir=None</em><span class="optional">[</span>, <em>static=0</em><span class="optional">[</span>, <em>console=0</em><span class="optional">[</span>, <em>opengl=0</em><span class="optional">[</span>, <em>threaded=0</em><span class="optional">[</span>, <em>warnings=None</em><span class="optional">[</span>, <em>debug=0</em><span class="optional">[</span>, <em>dir=None</em><span class="optional">[</span>, <em>makefile=&quot;Makefile&quot;</em><span class="optional">[</span>, <em>installs=None</em><span class="optional">[</span>, <em>strip=1</em><span class="optional">[</span>, <em>export_all=0</em><span class="optional">[</span>, <em>universal=None</em><span class="optional">[</span>, <em>arch=None</em><span class="optional">[</span>, <em>prot_is_public=0</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#sipconfig.SIPModuleMakefile.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>configuration</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>build_file</em> &#8211; see <a title="sipconfig.ModuleMakefile.__init__" class="reference internal" href="#sipconfig.ModuleMakefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.ModuleMakefile.__init__()</span></tt></a>.</li>
+<li><em>install_dir</em> &#8211; see <a title="sipconfig.ModuleMakefile.__init__" class="reference internal" href="#sipconfig.ModuleMakefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.ModuleMakefile.__init__()</span></tt></a>.</li>
+<li><em>static</em> &#8211; see <a title="sipconfig.ModuleMakefile.__init__" class="reference internal" href="#sipconfig.ModuleMakefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.ModuleMakefile.__init__()</span></tt></a>.</li>
+<li><em>console</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>qt</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>opengl</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>threaded</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>warnings</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>debug</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>dir</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>makefile</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>installs</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>strip</em> &#8211; see <a title="sipconfig.ModuleMakefile.__init__" class="reference internal" href="#sipconfig.ModuleMakefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.ModuleMakefile.__init__()</span></tt></a>.</li>
+<li><em>export_all</em> &#8211; see <a title="sipconfig.ModuleMakefile.__init__" class="reference internal" href="#sipconfig.ModuleMakefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.ModuleMakefile.__init__()</span></tt></a>.</li>
+<li><em>universal</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>arch</em> &#8211; see <a title="sipconfig.Makefile.__init__" class="reference internal" href="#sipconfig.Makefile.__init__"><tt class="xref docutils literal"><span class="pre">sipconfig.Makefile.__init__()</span></tt></a>.</li>
+<li><em>prot_is_public</em> &#8211; is set if <tt class="docutils literal"><span class="pre">protected</span></tt> should be redefined as <tt class="docutils literal"><span class="pre">public</span></tt> when
+compiling the generated module.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="sipconfig.SIPModuleMakefile.finalise">
 <tt class="descname">finalise</tt><big>(</big><big>)</big><a class="headerlink" href="#sipconfig.SIPModuleMakefile.finalise" title="Permalink to this definition">¶</a></dt>
@@ -1137,12 +1178,12 @@ extension module.</p>
         <li class="right" >
           <a href="python_api.html" title="Python API for Applications"
              >previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

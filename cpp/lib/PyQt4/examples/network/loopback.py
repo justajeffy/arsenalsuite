@@ -40,12 +40,12 @@ class Dialog(QtGui.QDialog):
         self.bytesReceived = 0
 
         self.clientProgressBar = QtGui.QProgressBar()
-        self.clientStatusLabel = QtGui.QLabel(self.tr("Client ready"))
+        self.clientStatusLabel = QtGui.QLabel("Client ready")
         self.serverProgressBar = QtGui.QProgressBar()
-        self.serverStatusLabel = QtGui.QLabel(self.tr("Server ready"))
+        self.serverStatusLabel = QtGui.QLabel("Server ready")
 
-        self.startButton = QtGui.QPushButton(self.tr("&Start"))
-        self.quitButton = QtGui.QPushButton(self.tr("&Quit"))
+        self.startButton = QtGui.QPushButton("&Start")
+        self.quitButton = QtGui.QPushButton("&Quit")
 
         buttonBox = QtGui.QDialogButtonBox()
         buttonBox.addButton(self.startButton, QtGui.QDialogButtonBox.ActionRole)
@@ -68,7 +68,7 @@ class Dialog(QtGui.QDialog):
         mainLayout.addWidget(buttonBox)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Loopback"))
+        self.setWindowTitle("Loopback")
 
     def start(self):
         self.startButton.setEnabled(False)
@@ -79,14 +79,14 @@ class Dialog(QtGui.QDialog):
         self.bytesReceived = 0
 
         while not self.tcpServer.isListening() and not self.tcpServer.listen():
-            ret = QtGui.QMessageBox.critical(self, self.tr("Loopback"),
-                    self.tr("Unable to start the test: %1.").arg(self.tcpServer.errorString()),
+            ret = QtGui.QMessageBox.critical(self, "Loopback",
+                    "Unable to start the test: %s." % self.tcpServer.errorString(),
                     QtGui.QMessageBox.Retry | QtGui.QMessageBox.Cancel)
             if ret == QtGui.QMessageBox.Cancel:
                 return
 
-        self.serverStatusLabel.setText(self.tr("Listening"))
-        self.clientStatusLabel.setText(self.tr("Connecting"))
+        self.serverStatusLabel.setText("Listening")
+        self.clientStatusLabel.setText("Connecting")
 
         self.tcpClient.connectToHost(QtNetwork.QHostAddress(QtNetwork.QHostAddress.LocalHost), self.tcpServer.serverPort())
 
@@ -95,12 +95,12 @@ class Dialog(QtGui.QDialog):
         self.tcpServerConnection.readyRead.connect(self.updateServerProgress)
         self.tcpServerConnection.error.connect(self.displayError)
 
-        self.serverStatusLabel.setText(self.tr("Accepted connection"))
+        self.serverStatusLabel.setText("Accepted connection")
         self.tcpServer.close()
 
     def startTransfer(self):
         self.bytesToWrite = Dialog.TotalBytes - self.tcpClient.write(QtCore.QByteArray(Dialog.PayloadSize, '@'))
-        self.clientStatusLabel.setText(self.tr("Connected"))
+        self.clientStatusLabel.setText("Connected")
 
     def updateServerProgress(self):
         self.bytesReceived += self.tcpServerConnection.bytesAvailable()
@@ -108,8 +108,7 @@ class Dialog(QtGui.QDialog):
 
         self.serverProgressBar.setMaximum(Dialog.TotalBytes)
         self.serverProgressBar.setValue(self.bytesReceived)
-        self.serverStatusLabel.setText(self.tr("Received %1MB")
-                                       .arg(self.bytesReceived / (1024 * 1024)))
+        self.serverStatusLabel.setText("Received %dMB" % (self.bytesReceived / (1024 * 1024)))
 
         if self.bytesReceived == Dialog.TotalBytes:
             self.tcpServerConnection.close()
@@ -124,22 +123,21 @@ class Dialog(QtGui.QDialog):
 
         self.clientProgressBar.setMaximum(Dialog.TotalBytes)
         self.clientProgressBar.setValue(self.bytesWritten)
-        self.clientStatusLabel.setText(self.tr("Sent %1MB")
-                                       .arg(self.bytesWritten / (1024 * 1024)))
+        self.clientStatusLabel.setText("Sent %dMB" % (self.bytesWritten / (1024 * 1024)))
 
     def displayError(self, socketError):
         if socketError == QtNetwork.QTcpSocket.RemoteHostClosedError:
             return
 
-        QtGui.QMessageBox.information(self, self.tr("Network error"),
-                self.tr("The following error occured: %1.").arg(self.tcpClient.errorString()))
+        QtGui.QMessageBox.information(self, "Network error",
+                "The following error occured: %s." % self.tcpClient.errorString())
 
         self.tcpClient.close()
         self.tcpServer.close()
         self.clientProgressBar.reset()
         self.serverProgressBar.reset()
-        self.clientStatusLabel.setText(self.tr("Client ready"))
-        self.serverStatusLabel.setText(self.tr("Server ready"))
+        self.clientStatusLabel.setText("Client ready")
+        self.serverStatusLabel.setText("Server ready")
         self.startButton.setEnabled(True)
         QtGui.QApplication.restoreOverrideCursor()
 

@@ -7,10 +7,12 @@ except NameError:
 
 from PyQt4 import QtGui
 
+
 class _QtGuiWrapper(object):
     def search(cls):
         return getattr(QtGui, cls, None)
     search = staticmethod(search)
+
 
 class _ModuleWrapper(object):
     def __init__(self, moduleName, classes):
@@ -31,6 +33,7 @@ class _ModuleWrapper(object):
         else:
             return None
 
+
 class _CustomWidgetLoader(object):
     def __init__(self):
         # should it stay this way?
@@ -42,7 +45,6 @@ class _CustomWidgetLoader(object):
         assert widgetClass not in self._widgets
         self._widgets[widgetClass] = module
     
-
     def search(self, cls):
         try:
             module = self._widgets[cls]
@@ -72,4 +74,8 @@ class LoaderCreatorPolicy(object):
         return method(*args)
 
     def getSlot(self, object, slotname):
+        # Rename slots that correspond to Python keyword arguments.
+        if slotname == 'raise':
+            slotname += '_'
+
         return getattr(object, slotname)

@@ -37,25 +37,25 @@ class DragWidget(QtGui.QFrame):
         self.setAcceptDrops(True)
 
         boatIcon = QtGui.QLabel(self)
-        boatIcon.setPixmap(QtGui.QPixmap(":/images/boat.png"))
+        boatIcon.setPixmap(QtGui.QPixmap(':/images/boat.png'))
         boatIcon.move(20, 20)
         boatIcon.show()
         boatIcon.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         carIcon = QtGui.QLabel(self)
-        carIcon.setPixmap(QtGui.QPixmap(":/images/car.png"))
+        carIcon.setPixmap(QtGui.QPixmap(':/images/car.png'))
         carIcon.move(120, 20)
         carIcon.show()
         carIcon.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         houseIcon = QtGui.QLabel(self)
-        houseIcon.setPixmap(QtGui.QPixmap(":/images/house.png"))
+        houseIcon.setPixmap(QtGui.QPixmap(':/images/house.png'))
         houseIcon.move(20, 120)
         houseIcon.show()
         houseIcon.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
     def dragEnterEvent(self, event):
-        if event.mimeData().hasFormat("application/x-dnditemdata"):
+        if event.mimeData().hasFormat('application/x-dnditemdata'):
             if event.source() == self:
                 event.setDropAction(QtCore.Qt.MoveAction)
                 event.accept()
@@ -67,8 +67,8 @@ class DragWidget(QtGui.QFrame):
     dragMoveEvent = dragEnterEvent
 
     def dropEvent(self, event):
-        if event.mimeData().hasFormat("application/x-dnditemdata"):
-            itemData = event.mimeData().data("application/x-dnditemdata")
+        if event.mimeData().hasFormat('application/x-dnditemdata'):
+            itemData = event.mimeData().data('application/x-dnditemdata')
             dataStream = QtCore.QDataStream(itemData, QtCore.QIODevice.ReadOnly)
 
             pixmap = QtGui.QPixmap()
@@ -101,7 +101,7 @@ class DragWidget(QtGui.QFrame):
         dataStream << pixmap << QtCore.QPoint(event.pos() - child.pos())
 
         mimeData = QtCore.QMimeData()
-        mimeData.setData("application/x-dnditemdata", itemData)
+        mimeData.setData('application/x-dnditemdata', itemData)
 
         drag = QtGui.QDrag(self)
         drag.setMimeData(mimeData)

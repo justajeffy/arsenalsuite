@@ -32,15 +32,15 @@ class ConfigurationPage(QtGui.QWidget):
     def __init__(self, parent=None):
         super(ConfigurationPage, self).__init__(parent)
 
-        configGroup = QtGui.QGroupBox(self.tr("Server configuration"))
+        configGroup = QtGui.QGroupBox("Server configuration")
 
-        serverLabel = QtGui.QLabel(self.tr("Server:"))
+        serverLabel = QtGui.QLabel("Server:")
         serverCombo = QtGui.QComboBox()
-        serverCombo.addItem(self.tr("Trolltech (Australia)"))
-        serverCombo.addItem(self.tr("Trolltech (Germany)"))
-        serverCombo.addItem(self.tr("Trolltech (Norway)"))
-        serverCombo.addItem(self.tr("Trolltech (People's Republic of China)"))
-        serverCombo.addItem(self.tr("Trolltech (USA)"))
+        serverCombo.addItem("Trolltech (Australia)")
+        serverCombo.addItem("Trolltech (Germany)")
+        serverCombo.addItem("Trolltech (Norway)")
+        serverCombo.addItem("Trolltech (People's Republic of China)")
+        serverCombo.addItem("Trolltech (USA)")
 
         serverLayout = QtGui.QHBoxLayout()
         serverLayout.addWidget(serverLabel)
@@ -61,22 +61,22 @@ class UpdatePage(QtGui.QWidget):
     def __init__(self, parent=None):
         super(UpdatePage, self).__init__(parent)
 
-        updateGroup = QtGui.QGroupBox(self.tr("Package selection"))
-        systemCheckBox = QtGui.QCheckBox(self.tr("Update system"))
-        appsCheckBox = QtGui.QCheckBox(self.tr("Update applications"))
-        docsCheckBox = QtGui.QCheckBox(self.tr("Update documentation"))
+        updateGroup = QtGui.QGroupBox("Package selection")
+        systemCheckBox = QtGui.QCheckBox("Update system")
+        appsCheckBox = QtGui.QCheckBox("Update applications")
+        docsCheckBox = QtGui.QCheckBox("Update documentation")
 
-        packageGroup = QtGui.QGroupBox(self.tr("Existing packages"))
+        packageGroup = QtGui.QGroupBox("Existing packages")
 
         packageList = QtGui.QListWidget()
         qtItem = QtGui.QListWidgetItem(packageList)
-        qtItem.setText(self.tr("Qt"))
+        qtItem.setText("Qt")
         qsaItem = QtGui.QListWidgetItem(packageList)
-        qsaItem.setText(self.tr("QSA"))
+        qsaItem.setText("QSA")
         teamBuilderItem = QtGui.QListWidgetItem(packageList)
-        teamBuilderItem.setText(self.tr("Teambuilder"))
+        teamBuilderItem.setText("Teambuilder")
 
-        startUpdateButton = QtGui.QPushButton(self.tr("Start update"))
+        startUpdateButton = QtGui.QPushButton("Start update")
 
         updateLayout = QtGui.QVBoxLayout()
         updateLayout.addWidget(systemCheckBox)
@@ -102,26 +102,26 @@ class QueryPage(QtGui.QWidget):
     def __init__(self, parent=None):
         super(QueryPage, self).__init__(parent)
 
-        packagesGroup = QtGui.QGroupBox(self.tr("Look for packages"))
+        packagesGroup = QtGui.QGroupBox("Look for packages")
 
-        nameLabel = QtGui.QLabel(self.tr("Name:"))
+        nameLabel = QtGui.QLabel("Name:")
         nameEdit = QtGui.QLineEdit()
 
-        dateLabel = QtGui.QLabel(self.tr("Released after:"))
+        dateLabel = QtGui.QLabel("Released after:")
         dateEdit = QtGui.QDateTimeEdit(QtCore.QDate.currentDate())
 
-        releasesCheckBox = QtGui.QCheckBox(self.tr("Releases"))
-        upgradesCheckBox = QtGui.QCheckBox(self.tr("Upgrades"))
+        releasesCheckBox = QtGui.QCheckBox("Releases")
+        upgradesCheckBox = QtGui.QCheckBox("Upgrades")
 
         hitsSpinBox = QtGui.QSpinBox()
-        hitsSpinBox.setPrefix(self.tr("Return up to "))
-        hitsSpinBox.setSuffix(self.tr(" results"))
-        hitsSpinBox.setSpecialValueText(self.tr("Return only the first result"))
+        hitsSpinBox.setPrefix("Return up to ")
+        hitsSpinBox.setSuffix(" results")
+        hitsSpinBox.setSpecialValueText("Return only the first result")
         hitsSpinBox.setMinimum(1)
         hitsSpinBox.setMaximum(100)
         hitsSpinBox.setSingleStep(10)
 
-        startQueryButton = QtGui.QPushButton(self.tr("Start query"))
+        startQueryButton = QtGui.QPushButton("Start query")
 
         packagesLayout = QtGui.QGridLayout()
         packagesLayout.addWidget(nameLabel, 0, 0)
@@ -158,7 +158,7 @@ class ConfigDialog(QtGui.QDialog):
         self.pagesWidget.addWidget(UpdatePage())
         self.pagesWidget.addWidget(QueryPage())
 
-        closeButton = QtGui.QPushButton(self.tr("Close"))
+        closeButton = QtGui.QPushButton("Close")
 
         self.createIcons()
         self.contentsWidget.setCurrentRow(0)
@@ -181,7 +181,7 @@ class ConfigDialog(QtGui.QDialog):
 
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Config Dialog"))
+        self.setWindowTitle("Config Dialog")
 
     def changePage(self, current, previous):
         if not current:
@@ -191,27 +191,27 @@ class ConfigDialog(QtGui.QDialog):
 
     def createIcons(self):
         configButton = QtGui.QListWidgetItem(self.contentsWidget)
-        configButton.setIcon(QtGui.QIcon(":/images/config.png"))
-        configButton.setText(self.tr("Configuration"))
+        configButton.setIcon(QtGui.QIcon(':/images/config.png'))
+        configButton.setText("Configuration")
         configButton.setTextAlignment(QtCore.Qt.AlignHCenter)
         configButton.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
 
         updateButton = QtGui.QListWidgetItem(self.contentsWidget)
-        updateButton.setIcon(QtGui.QIcon(":/images/update.png"))
-        updateButton.setText(self.tr("Update"))
+        updateButton.setIcon(QtGui.QIcon(':/images/update.png'))
+        updateButton.setText("Update")
         updateButton.setTextAlignment(QtCore.Qt.AlignHCenter)
         updateButton.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
 
         queryButton = QtGui.QListWidgetItem(self.contentsWidget)
-        queryButton.setIcon(QtGui.QIcon(":/images/query.png"))
-        queryButton.setText(self.tr("Query"))
+        queryButton.setIcon(QtGui.QIcon(':/images/query.png'))
+        queryButton.setText("Query")
         queryButton.setTextAlignment(QtCore.Qt.AlignHCenter)
         queryButton.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
 
         self.contentsWidget.currentItemChanged.connect(self.changePage)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

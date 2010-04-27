@@ -15,78 +15,74 @@ class MainWindow(QtGui.QMainWindow):
         self.createActions()
         self.createMenus()
 
-        self.statusBar().showMessage(self.tr("Ready"))
+        self.statusBar().showMessage("Ready")
 
-        self.setWindowTitle(self.tr("DOM Bookmarks"))
+        self.setWindowTitle("DOM Bookmarks")
         self.resize(480, 320)
 
     def open(self):
         fileName = QtGui.QFileDialog.getOpenFileName(self,
-                self.tr("Open Bookmark File"), QtCore.QDir.currentPath(),
-                self.tr("XBEL Files (*.xbel *.xml)"))
+                "Open Bookmark File", QtCore.QDir.currentPath(),
+                "XBEL Files (*.xbel *.xml)")
 
-        if fileName.isEmpty():
+        if not fileName:
             return
 
         inFile = QtCore.QFile(fileName)
         if not inFile.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, self.tr("DOM Bookmarks"),
-                    self.tr("Cannot read file %1:\n%2.").arg(fileName).arg(inFile.errorString()))
+            QtGui.QMessageBox.warning(self, "DOM Bookmarks",
+                    "Cannot read file %s:\n%s." % (fileName, inFile.errorString()))
             return
 
         if self.xbelTree.read(inFile):
-            self.statusBar().showMessage(self.tr("File loaded"), 2000)
+            self.statusBar().showMessage("File loaded", 2000)
 
     def saveAs(self):
         fileName = QtGui.QFileDialog.getSaveFileName(self,
-                self.tr("Save Bookmark File"), QtCore.QDir.currentPath(),
-                self.tr("XBEL Files (*.xbel *.xml)"))
+                "Save Bookmark File", QtCore.QDir.currentPath(),
+                "XBEL Files (*.xbel *.xml)")
 
-        if fileName.isEmpty():
+        if not fileName:
             return
 
         outFile = QtCore.QFile(fileName)
         if not outFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, self.tr("DOM Bookmarks"),
-                    self.tr("Cannot write file %1:\n%2.").arg(fileName).arg(outFile.errorString()))
+            QtGui.QMessageBox.warning(self, "DOM Bookmarks",
+                    "Cannot write file %s:\n%s." % (fileName, outFile.errorString()))
             return
 
         if self.xbelTree.write(outFile):
-            self.statusBar().showMessage(self.tr("File saved"), 2000)
+            self.statusBar().showMessage("File saved", 2000)
 
     def about(self):
-       QtGui.QMessageBox.about(self, self.tr("About DOM Bookmarks"),
-            self.tr("The <b>DOM Bookmarks</b> example demonstrates how to use "
-                    "Qt's DOM classes to read and write XML documents."))
+       QtGui.QMessageBox.about(self, "About DOM Bookmarks",
+            "The <b>DOM Bookmarks</b> example demonstrates how to use Qt's "
+            "DOM classes to read and write XML documents.")
 
     def createActions(self):
-        self.openAct = QtGui.QAction(self.tr("&Open..."), self)
-        self.openAct.setShortcut(self.tr("Ctrl+O"))
-        self.openAct.triggered.connect(self.open)
+        self.openAct = QtGui.QAction("&Open...", self, shortcut="Ctrl+O",
+                triggered=self.open)
 
-        self.saveAsAct = QtGui.QAction(self.tr("&Save As..."), self)
-        self.saveAsAct.setShortcut(self.tr("Ctrl+S"))
-        self.saveAsAct.triggered.connect(self.saveAs)
+        self.saveAsAct = QtGui.QAction("&Save As...", self, shortcut="Ctrl+S",
+                triggered=self.saveAs)
 
-        self.exitAct = QtGui.QAction(self.tr("E&xit"), self)
-        self.exitAct.setShortcut(self.tr("Ctrl+Q"))
-        self.exitAct.triggered.connect(self.close)
+        self.exitAct = QtGui.QAction("E&xit", self, shortcut="Ctrl+Q",
+                triggered=self.close)
 
-        self.aboutAct = QtGui.QAction(self.tr("&About"), self)
-        self.aboutAct.triggered.connect(self.about)
+        self.aboutAct = QtGui.QAction("&About", self, triggered=self.about)
 
-        self.aboutQtAct = QtGui.QAction(self.tr("About &Qt"), self)
-        self.aboutQtAct.triggered.connect(QtGui.qApp.aboutQt)
+        self.aboutQtAct = QtGui.QAction("About &Qt", self,
+                triggered=QtGui.qApp.aboutQt)
 
     def createMenus(self):
-        self.fileMenu = self.menuBar().addMenu(self.tr("&File"))
+        self.fileMenu = self.menuBar().addMenu("&File")
         self.fileMenu.addAction(self.openAct)
         self.fileMenu.addAction(self.saveAsAct)
         self.fileMenu.addAction(self.exitAct)
 
         self.menuBar().addSeparator()
 
-        self.helpMenu = self.menuBar().addMenu(self.tr("&Help"))
+        self.helpMenu = self.menuBar().addMenu("&Help")
         self.helpMenu.addAction(self.aboutAct)
         self.helpMenu.addAction(self.aboutQtAct)
 
@@ -95,11 +91,8 @@ class XbelTree(QtGui.QTreeWidget):
     def __init__(self, parent=None):
         super(XbelTree, self).__init__(parent)
 
-        labels = QtCore.QStringList()
-        labels << self.tr("Title") << self.tr("Location")
-
         self.header().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.setHeaderLabels(labels)
+        self.setHeaderLabels(("Title", "Location"))
 
         self.domDocument = QtXml.QDomDocument()
 
@@ -117,21 +110,18 @@ class XbelTree(QtGui.QTreeWidget):
     def read(self, device):     
         ok, errorStr, errorLine, errorColumn = self.domDocument.setContent(device, True)
         if not ok:
-            QtGui.QMessageBox.information(self.window(),
-                    self.tr("DOM Bookmarks"),
-                    self.tr("Parse error at line %1, column %2:\n%3").arg(errorLine).arg(errorColumn).arg(errorStr))
+            QtGui.QMessageBox.information(self.window(), "DOM Bookmarks",
+                    "Parse error at line %d, column %d:\n%s" % (errorLine, errorColumn, errorStr))
             return False
 
         root = self.domDocument.documentElement()
-        if root.tagName() != "xbel":
-            QtGui.QMessageBox.information(self.window(),
-                    self.tr("DOM Bookmarks"),
-                    self.tr("The file is not an XBEL file."))
+        if root.tagName() != 'xbel':
+            QtGui.QMessageBox.information(self.window(), "DOM Bookmarks",
+                    "The file is not an XBEL file.")
             return False
-        elif root.hasAttribute("version") and root.attribute("version") != "1.0":
-            QtGui.QMessageBox.information(self.window(),
-                    self.tr("DOM Bookmarks"),
-                    self.tr("The file is not an XBEL version 1.0 file."))
+        elif root.hasAttribute('version') and root.attribute('version') != '1.0':
+            QtGui.QMessageBox.information(self.window(), "DOM Bookmarks",
+                    "The file is not an XBEL version 1.0 file.")
             return False
 
         self.clear()
@@ -142,10 +132,10 @@ class XbelTree(QtGui.QTreeWidget):
         except:
             pass
 
-        child = root.firstChildElement("folder")
+        child = root.firstChildElement('folder')
         while not child.isNull():
             self.parseFolderElement(child)
-            child = child.nextSiblingElement("folder")
+            child = child.nextSiblingElement('folder')
 
         self.itemChanged.connect(self.updateDomElement)
 
@@ -162,50 +152,50 @@ class XbelTree(QtGui.QTreeWidget):
         element = self.domElementForItem.get(id(item))
         if not element.isNull():
             if column == 0:
-                oldTitleElement = element.firstChildElement("title")
-                newTitleElement = self.domDocument.createElement("title")
+                oldTitleElement = element.firstChildElement('title')
+                newTitleElement = self.domDocument.createElement('title')
 
                 newTitleText = self.domDocument.createTextNode(item.text(0))
                 newTitleElement.appendChild(newTitleText)
 
                 element.replaceChild(newTitleElement, oldTitleElement)
             else:
-                if element.tagName() == "bookmark":
-                    element.setAttribute("href", item.text(1))
+                if element.tagName() == 'bookmark':
+                    element.setAttribute('href', item.text(1))
 
     def parseFolderElement(self, element, parentItem=None):
         item = self.createItem(element, parentItem)
 
-        title = element.firstChildElement("title").text()
-        if title.isEmpty():
-            title = QtCore.QObject.tr("Folder")
+        title = element.firstChildElement('title').text()
+        if not title:
+            title = "Folder"
 
         item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
         item.setIcon(0, self.folderIcon)
         item.setText(0, title)
 
-        folded = (element.attribute("folded") != "no")
+        folded = (element.attribute('folded') != 'no')
         self.setItemExpanded(item, not folded)
 
         child = element.firstChildElement()
         while not child.isNull():
-            if child.tagName() == "folder":
+            if child.tagName() == 'folder':
                 self.parseFolderElement(child, item)
-            elif child.tagName() == "bookmark":
+            elif child.tagName() == 'bookmark':
                 childItem = self.createItem(child, item)
 
-                title = child.firstChildElement("title").text()
-                if title.isEmpty():
-                    title = QtCore.QObject.tr("Folder")
+                title = child.firstChildElement('title').text()
+                if not title:
+                    title = "Folder"
 
                 childItem.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
                 childItem.setIcon(0, self.bookmarkIcon)
                 childItem.setText(0, title)
-                childItem.setText(1, child.attribute("href"))
-            elif child.tagName() == "separator":
+                childItem.setText(1, child.attribute('href'))
+            elif child.tagName() == 'separator':
                 childItem = self.createItem(child, item)
                 childItem.setFlags(item.flags() & ~(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable))
-                childItem.setText(0, QtCore.QString(30 * "\xB7"))
+                childItem.setText(0, 30 * "\xb7")
 
             child = child.nextSiblingElement()
 

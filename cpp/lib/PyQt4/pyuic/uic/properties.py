@@ -52,6 +52,13 @@ class Properties(object):
             else:
                 return getattr(getattr(QtGui, prefix), membername)
         except ValueError:
+            pass
+
+        try:
+            return getattr(QtCore.Qt, cpp_name)
+        except AttributeError:
+            # There seems to be a bug where this can succeed when it shouldn't.
+            # If so it will be picked up when the generated code is run.
             return getattr(getattr(QtGui, self.wclass), cpp_name)
 
     def _set(self, prop):
@@ -146,9 +153,65 @@ class Properties(object):
     def _time(self, prop):
         return QtCore.QTime(*int_list(prop))
 
+    def _gradient(self, prop):
+        name = 'gradient'
+
+        # Create the specific gradient.
+        gtype = prop.get('type', '')
+
+        if gtype == 'LinearGradient':
+            startx = float(prop.get('startx'))
+            starty = float(prop.get('starty'))
+            endx = float(prop.get('endx'))
+            endy = float(prop.get('endy'))
+            gradient = self.factory.createQObject('QLinearGradient', name,
+                    (startx, starty, endx, endy), is_attribute=False)
+
+        elif gtype == 'ConicalGradient':
+            centralx = float(prop.get('centralx'))
+            centraly = float(prop.get('centraly'))
+            angle = float(prop.get('angle'))
+            gradient = self.factory.createQObject('QConicalGradient', name,
+                    (centralx, centraly, angle), is_attribute=False)
+
+        elif gtype == 'RadialGradient':
+            centralx = float(prop.get('centralx'))
+            centraly = float(prop.get('centraly'))
+            radius = float(prop.get('radius'))
+            focalx = float(prop.get('focalx'))
+            focaly = float(prop.get('focaly'))
+            gradient = self.factory.createQObject('QRadialGradient', name,
+                    (centralx, centraly, radius, focalx, focaly),
+                    is_attribute=False)
+
+        else:
+            raise UnsupportedPropertyError(prop.tag)
+
+        # Set the common values.
+        spread = prop.get('spread')
+        if spread:
+            gradient.setSpread(getattr(QtGui.QGradient, spread))
+
+        cmode = prop.get('coordinatemode')
+        if cmode:
+            gradient.setCoordinateMode(getattr(QtGui.QGradient, cmode))
+
+        # Get the gradient stops.
+        for gstop in prop:
+            if gstop.tag != 'gradientstop':
+                raise UnsupportedPropertyError(gstop.tag)
+
+            position = float(gstop.get('position'))
+            color = self._color(gstop[0])
+
+            gradient.setColorAt(position, color)
+
+        return name
+
     def _palette(self, prop):
         palette = self.factory.createQObject("QPalette", "palette", (),
-                                                   is_attribute=False)
+                is_attribute=False)
+
         for palette_elem in prop:
             sub_palette = getattr(QtGui.QPalette, palette_elem.tag.title())
             for role, color in enumerate(palette_elem):
@@ -159,13 +222,20 @@ class Properties(object):
                             QtGui.QPalette.ColorRole(role), self._color(color))
                 elif color.tag == 'colorrole':
                     role = getattr(QtGui.QPalette, color.get('role'))
-                    brushstyle = getattr(QtCore.Qt, color[0].get('brushstyle'))
-                    color = color[0][0]
 
-                    brush = self.factory.createQObject("QBrush", "brush",
-                                                    (self._color(color), ),
-                                                    is_attribute=False)
-                    brush.setStyle(brushstyle)
+                    brushstyle = color[0].get('brushstyle')
+                    if brushstyle in ('LinearGradientPattern', 'ConicalGradientPattern', 'RadialGradientPattern'):
+                        gradient = self._gradient(color[0][0])
+                        brush = self.factory.createQObject("QBrush", "brush",
+                                (gradient, ), is_attribute=False)
+                    else:
+                        color = self._color(color[0][0])
+                        brush = self.factory.createQObject("QBrush", "brush",
+                                (color, ), is_attribute=False)
+
+                        brushstyle = getattr(QtCore.Qt, brushstyle)
+                        brush.setStyle(brushstyle)
+
                     palette.setBrush(sub_palette, role, brush)
                 else:
                     raise UnsupportedPropertyError(color.tag)
