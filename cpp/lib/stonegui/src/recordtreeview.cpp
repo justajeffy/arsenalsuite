@@ -25,12 +25,13 @@
  * $Id: recordtreeview.cpp 9071 2009-11-24 00:57:41Z brobison $
  */
 
+#include <qapplication.h>
 #include <qevent.h>
 #include <qheaderview.h>
 #include <qmenu.h>
 #include <QPlastiqueStyle>
 #include <qpainter.h>
-#include <qapplication.h>
+#include <qtimer.h>
 
 #include "iniconfig.h"
 
@@ -46,6 +47,7 @@ ExtTreeView::ExtTreeView( QWidget * parent, ExtDelegate * delegate )
 , mColumnAutoResize( false )
 , mShowBranches( true )
 , mShowGrid( false )
+, mAutoResizeScheduled( false )
 {
 	header()->setClickable( true );
 	header()->setSortIndicatorShown( true );
@@ -211,9 +213,9 @@ void ExtTreeView::setColumnAutoResize( int column, bool acr )
 
 void ExtTreeView::doAutoColumnConnections()
 {
-	connect( model(), SIGNAL( dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT( resizeAutoColumns() ) );
-	connect( model(), SIGNAL( layoutChanged() ), SLOT( resizeAutoColumns() ), Qt::QueuedConnection );
-	connect( model(), SIGNAL( modelReset() ) , SLOT( resizeAutoColumns() ), Qt::QueuedConnection );
+	connect( model(), SIGNAL( dataChanged ( const QModelIndex &, const QModelIndex & ) ), SLOT( scheduleResizeAutoColumns() ) );
+	connect( model(), SIGNAL( layoutChanged() ), SLOT( scheduleResizeAutoColumns() ) );
+	connect( model(), SIGNAL( modelReset() ) , SLOT( scheduleResizeAutoColumns() ) );
 }
 
 void ExtTreeView::setShowGrid( bool showGrid )
@@ -279,8 +281,17 @@ bool ExtTreeView::columnAutoResize( int col ) const
 	return col < mAutoResizeColumns.size() && col >= 0 && mAutoResizeColumns.at(col);
 }
 
+void ExtTreeView::scheduleResizeAutoColumns()
+{
+    if ( !mAutoResizeScheduled ) {
+        mAutoResizeScheduled = true;
+        QTimer::singleShot( 0, this, SLOT( resizeAutoColumns() ) );
+    }
+}
+
 void ExtTreeView::resizeAutoColumns()
 {
+    mAutoResizeScheduled = false;
 	for( int i=0; i< qMin(model()->columnCount(),mAutoResizeColumns.size()); i++ ) {
 		//LOG_5( "ExtTreeView::resizeAutoColumns: Checking column " + QString::number(i) );
 		if( mAutoResizeColumns.at(i) ) {
