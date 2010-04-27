@@ -9,18 +9,18 @@ class FindDialog(QtGui.QDialog):
     def __init__(self, parent=None):
         super(FindDialog, self).__init__(parent)
 
-        label = QtGui.QLabel(self.tr("Find &what:"))
+        label = QtGui.QLabel("Find &what:")
         lineEdit = QtGui.QLineEdit()
         label.setBuddy(lineEdit)
 
-        caseCheckBox = QtGui.QCheckBox(self.tr("Match &case"))
-        fromStartCheckBox = QtGui.QCheckBox(self.tr("Search from &start"))
+        caseCheckBox = QtGui.QCheckBox("Match &case")
+        fromStartCheckBox = QtGui.QCheckBox("Search from &start")
         fromStartCheckBox.setChecked(True)
 
-        findButton = QtGui.QPushButton(self.tr("&Find"))
+        findButton = QtGui.QPushButton("&Find")
         findButton.setDefault(True)
 
-        moreButton = QtGui.QPushButton(self.tr("&More"))
+        moreButton = QtGui.QPushButton("&More")
         moreButton.setCheckable(True)
         moreButton.setAutoDefault(False)
 
@@ -30,9 +30,9 @@ class FindDialog(QtGui.QDialog):
 
         extension = QtGui.QWidget()
 
-        wholeWordsCheckBox = QtGui.QCheckBox(self.tr("&Whole words"))
-        backwardCheckBox = QtGui.QCheckBox(self.tr("Search &backward"))
-        searchSelectionCheckBox = QtGui.QCheckBox(self.tr("Search se&lection"))
+        wholeWordsCheckBox = QtGui.QCheckBox("&Whole words")
+        backwardCheckBox = QtGui.QCheckBox("Search &backward")
+        searchSelectionCheckBox = QtGui.QCheckBox("Search se&lection")
 
         moreButton.toggled.connect(extension.setVisible)
 
@@ -60,11 +60,11 @@ class FindDialog(QtGui.QDialog):
         mainLayout.addWidget(extension, 1, 0, 1, 2)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Extension"))
+        self.setWindowTitle("Extension")
         extension.hide()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

@@ -123,8 +123,11 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         glPopMatrix()
 
-    def resizeGL(self, height, width):
+    def resizeGL(self, width, height):
         side = min(width, height)
+        if side < 0:
+            return
+
         glViewport((width - side) / 2, (height - side) / 2, side, side)
 
         glMatrixMode(GL_PROJECTION)
@@ -307,7 +310,7 @@ class MainWindow(QtGui.QMainWindow):
         ySlider.setValue(345 * 16)
         zSlider.setValue(0 * 16)
 
-        self.setWindowTitle(self.tr("Grabber"))
+        self.setWindowTitle("Grabber")
         self.resize(400, 300)
 
     def renderIntoPixmap(self):
@@ -325,42 +328,37 @@ class MainWindow(QtGui.QMainWindow):
         self.setPixmap(QtGui.QPixmap())
 
     def about(self):
-        QtGui.QMessageBox.about(self, self.tr("About Grabber"),
-                self.tr("The <b>Grabber</b> example demonstrates two "
-                        "approaches for rendering OpenGL into a Qt pixmap."))
+        QtGui.QMessageBox.about(self, "About Grabber",
+                "The <b>Grabber</b> example demonstrates two approaches for "
+                "rendering OpenGL into a Qt pixmap.")
 
     def createActions(self):
-        self.renderIntoPixmapAct = QtGui.QAction(self.tr("&Render into Pixmap..."), self)
-        self.renderIntoPixmapAct.setShortcut(self.tr("Ctrl+R")) 
-        self.renderIntoPixmapAct.triggered.connect(self.renderIntoPixmap)
+        self.renderIntoPixmapAct = QtGui.QAction("&Render into Pixmap...",
+                self, shortcut="Ctrl+R", triggered=self.renderIntoPixmap)
 
-        self.grabFrameBufferAct = QtGui.QAction(self.tr("&Grab Frame Buffer"), self)
-        self.grabFrameBufferAct.setShortcut(self.tr("Ctrl+G"))
-        self.grabFrameBufferAct.triggered.connect(self.grabFrameBuffer)
+        self.grabFrameBufferAct = QtGui.QAction("&Grab Frame Buffer", self,
+                shortcut="Ctrl+G", triggered=self.grabFrameBuffer)
 
-        self.clearPixmapAct = QtGui.QAction(self.tr("&Clear Pixmap"), self)
-        self.clearPixmapAct.setShortcut(self.tr("Ctrl+L"))
-        self.clearPixmapAct.triggered.connect(self.clearPixmap)
+        self.clearPixmapAct = QtGui.QAction("&Clear Pixmap", self,
+                shortcut="Ctrl+L", triggered=self.clearPixmap)
 
-        self.exitAct = QtGui.QAction(self.tr("E&xit"), self)
-        self.exitAct.setShortcut(self.tr("Ctrl+Q"))
-        self.exitAct.triggered.connect(self.close)
+        self.exitAct = QtGui.QAction("E&xit", self, shortcut="Ctrl+Q",
+                triggered=self.close)
 
-        self.aboutAct = QtGui.QAction(self.tr("&About"), self)
-        self.aboutAct.triggered.connect(self.about)
+        self.aboutAct = QtGui.QAction("&About", self, triggered=self.about)
 
-        self.aboutQtAct = QtGui.QAction(self.tr("About &Qt"), self) 
-        self.aboutQtAct.triggered.connect(QtGui.qApp.aboutQt)
+        self.aboutQtAct = QtGui.QAction("About &Qt", self,
+                triggered=QtGui.qApp.aboutQt)
 
     def createMenus(self):
-        self.fileMenu = self.menuBar().addMenu(self.tr("&File"))
+        self.fileMenu = self.menuBar().addMenu("&File")
         self.fileMenu.addAction(self.renderIntoPixmapAct)
         self.fileMenu.addAction(self.grabFrameBufferAct)
         self.fileMenu.addAction(self.clearPixmapAct)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.exitAct)
 
-        self.helpMenu = self.menuBar().addMenu(self.tr("&Help"))
+        self.helpMenu = self.menuBar().addMenu("&Help")
         self.helpMenu.addAction(self.aboutAct)
         self.helpMenu.addAction(self.aboutQtAct)
 
@@ -387,14 +385,14 @@ class MainWindow(QtGui.QMainWindow):
         self.pixmapLabel.resize(size)
 
     def getSize(self):
-        text, ok = QtGui.QInputDialog.getText(self, self.tr("Grabber"),
-                self.tr("Enter pixmap size:"), QtGui.QLineEdit.Normal,
-                self.tr("%1 x %2").arg(self.glWidget.width()).arg(self.glWidget.height()))
+        text, ok = QtGui.QInputDialog.getText(self, "Grabber",
+                "Enter pixmap size:", QtGui.QLineEdit.Normal,
+                "%d x %d" % (self.glWidget.width(), self.glWidget.height()))
 
         if not ok:
             return QtCore.QSize()
 
-        regExp = QtCore.QRegExp(self.tr("([0-9]+) *x *([0-9]+)"))
+        regExp = QtCore.QRegExp("([0-9]+) *x *([0-9]+)")
 
         if regExp.exactMatch(text):
             width = regExp.cap(0).toInt()

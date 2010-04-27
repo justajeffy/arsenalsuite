@@ -35,21 +35,21 @@ class MainWindow(QtGui.QMainWindow):
 
         centralWidget = QtGui.QWidget()
 
-        dateLabel = QtGui.QLabel(self.tr("Date:"))
+        dateLabel = QtGui.QLabel("Date:")
         monthCombo = QtGui.QComboBox()
 
         for month in range(1, 13):
             monthCombo.addItem(QtCore.QDate.longMonthName(month))
 
         yearEdit = QtGui.QDateTimeEdit()
-        yearEdit.setDisplayFormat("yyyy")
+        yearEdit.setDisplayFormat('yyyy')
         yearEdit.setDateRange(QtCore.QDate(1753, 1, 1),
                 QtCore.QDate(8000, 1, 1))
 
         monthCombo.setCurrentIndex(self.selectedDate.month() - 1)
         yearEdit.setDate(self.selectedDate)
 
-        self.fontSizeLabel = QtGui.QLabel(self.tr("Font size:"))
+        self.fontSizeLabel = QtGui.QLabel("Font size:")
         self.fontSizeSpinBox = QtGui.QSpinBox()
         self.fontSizeSpinBox.setRange(1, 64)
         self.fontSizeSpinBox.setValue(10)
@@ -87,7 +87,7 @@ class MainWindow(QtGui.QMainWindow):
 
         tableFormat = QtGui.QTextTableFormat()
         tableFormat.setAlignment(QtCore.Qt.AlignHCenter)
-        tableFormat.setBackground(QtGui.QColor("#e0e0e0"))
+        tableFormat.setBackground(QtGui.QColor('#e0e0e0'))
         tableFormat.setCellPadding(2)
         tableFormat.setCellSpacing(4)
         constraints = [QtGui.QTextLength(QtGui.QTextLength.PercentageLength, 14),
@@ -119,7 +119,8 @@ class MainWindow(QtGui.QMainWindow):
         for weekDay in range(1, 8):
             cell = table.cellAt(0, weekDay-1)
             cellCursor = cell.firstCursorPosition()
-            cellCursor.insertText(QtCore.QString("%1").arg(QtCore.QDate.longDayName(weekDay)), boldFormat)
+            cellCursor.insertText(QtCore.QDate.longDayName(weekDay),
+                    boldFormat)
 
         table.insertRows(table.rows(), 1)
 
@@ -129,11 +130,9 @@ class MainWindow(QtGui.QMainWindow):
             cellCursor = cell.firstCursorPosition()
 
             if date == QtCore.QDate.currentDate():
-                cellCursor.insertText(QtCore.QString("%1").arg(date.day()),
-                        highlightedFormat)
+                cellCursor.insertText(str(date.day()), highlightedFormat)
             else:
-                cellCursor.insertText(QtCore.QString("%1").arg(date.day()),
-                        format)
+                cellCursor.insertText(str(date.day()), format)
 
             date = date.addDays(1)
 
@@ -142,7 +141,7 @@ class MainWindow(QtGui.QMainWindow):
 
         cursor.endEditBlock()
 
-        self.setWindowTitle(self.tr("Calendar for %1 %2").arg(QtCore.QDate.longMonthName(self.selectedDate.month())).arg(self.selectedDate.year()))
+        self.setWindowTitle("Calendar for %s %d" % (QtCore.QDate.longMonthName(self.selectedDate.month()), self.selectedDate.year()))
 
     def setfontSize(self, size):
         self.fontSize = size

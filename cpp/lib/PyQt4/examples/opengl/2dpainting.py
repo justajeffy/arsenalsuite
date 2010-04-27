@@ -33,9 +33,7 @@ try:
 except ImportError:
     app = QtGui.QApplication(sys.argv)
     QtGui.QMessageBox.critical(None, "OpenGL 2dpainting",
-                            "PyOpenGL must be installed to run this example.",
-                            QMessageBox.Ok | QMessageBox.Default,
-                            QMessageBox.NoButton)
+            "PyOpenGL must be installed to run this example.")
     sys.exit(1)
 
 
@@ -128,9 +126,9 @@ class Window(QtGui.QWidget):
         helper = Helper()
         native = Widget(helper, self)
         openGL = GLWidget(helper, self)
-        nativeLabel = QtGui.QLabel(self.tr("Native"))
+        nativeLabel = QtGui.QLabel("Native")
         nativeLabel.setAlignment(QtCore.Qt.AlignHCenter)
-        openGLLabel = QtGui.QLabel(self.tr("OpenGL"))
+        openGLLabel = QtGui.QLabel("OpenGL")
         openGLLabel.setAlignment(QtCore.Qt.AlignHCenter)
 
         layout = QtGui.QGridLayout()
@@ -145,7 +143,7 @@ class Window(QtGui.QWidget):
         timer.timeout.connect(openGL.animate)
         timer.start(50)
 
-        self.setWindowTitle(self.tr("2D Painting on Native and OpenGL Widgets"))
+        self.setWindowTitle("2D Painting on Native and OpenGL Widgets")
 
 
 if __name__ == '__main__':

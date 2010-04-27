@@ -129,7 +129,7 @@ class BubblesWidget(BaseClass):
 
         self.bubbleTimer = QtCore.QTimer()
         self.bubbleTimer.setSingleShot(False)
-        bubbleTimer.timeout.connect(self.expandBubble)
+        self.bubbleTimer.timeout.connect(self.expandBubble)
 
         self.setMouseTracking(True)
         self.setMinimumSize(QtCore.QSize(200, 200))

@@ -1,6 +1,6 @@
 // This is the interface of the Chimera and related classes.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -72,6 +72,10 @@ public:
         // but excluding a return type).
         QByteArray signature;
 
+        // The optional docstring which will start with '\1' if it is auto
+        // generated and so can be used in exceptions.
+        const char *docstring;
+
         // Return the parsed signature wrapped in a Python object.  Ownership
         // of the signature is passed to the Python object.  Return 0 if there
         // was an error.
@@ -99,7 +103,7 @@ public:
         bool _cached;
 
         Signature(const QByteArray &sig, bool cached)
-            : result(0), signature(sig), _cached(cached) {}
+            : result(0), signature(sig), docstring(0), _cached(cached) {}
 
         Signature(const Signature &);
         Signature &operator=(const Signature &);
@@ -235,8 +239,7 @@ private:
     Chimera();
 
     bool parse_cpp_type(const QByteArray &type);
-    bool parse_py_type(PyTypeObject *type_obj,
-            bool use_qvariant_containers=false);
+    bool parse_py_type(PyTypeObject *type_obj);
     sipAssignFunc get_assign_helper() const;
     void set_flag();
     bool to_QVariantList(PyObject *py, QVariantList &cpp) const;

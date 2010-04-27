@@ -10,14 +10,14 @@ class Window(QtGui.QWidget):
         super(Window, self).__init__()
 
         flowLayout = FlowLayout()
-        flowLayout.addWidget(QtGui.QPushButton(self.tr("Short")))
-        flowLayout.addWidget(QtGui.QPushButton(self.tr("Longer")))
-        flowLayout.addWidget(QtGui.QPushButton(self.tr("Different text")))
-        flowLayout.addWidget(QtGui.QPushButton(self.tr("More text")))
-        flowLayout.addWidget(QtGui.QPushButton(self.tr("Even longer button text")))
+        flowLayout.addWidget(QtGui.QPushButton("Short"))
+        flowLayout.addWidget(QtGui.QPushButton("Longer"))
+        flowLayout.addWidget(QtGui.QPushButton("Different text"))
+        flowLayout.addWidget(QtGui.QPushButton("More text"))
+        flowLayout.addWidget(QtGui.QPushButton("Even longer button text"))
         self.setLayout(flowLayout)
 
-        self.setWindowTitle(self.tr("Flow Layout"))
+        self.setWindowTitle("Flow Layout")
 
 
 class FlowLayout(QtGui.QLayout):

@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Python API for Applications &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>Python API for Applications &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" />
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" />
     <link rel="next" title="The Build System" href="build_system.html" />
     <link rel="prev" title="Using the C API when Embedding" href="embedding.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="embedding.html" title="Using the C API when Embedding"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -272,7 +272,8 @@ class instance.</p>
 
 <dl class="class">
 <dt id="sip.voidptr">
-<em class="property">class </em><tt class="descclassname">sip.</tt><tt class="descname">voidptr</tt><a class="headerlink" href="#sip.voidptr" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">sip.</tt><tt class="descname">voidptr</tt><a class="headerlink" href="#sip.voidptr" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the type object for the type SIP uses to represent a C/C++
 <tt class="docutils literal"><span class="pre">void</span> <span class="pre">*</span></tt>.  It may have a size associated with the address in which case
 the Python buffer protocol is supported.  This means that the memory can
@@ -287,7 +288,7 @@ builtin.  The type has the following methods.</p>
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><em>address</em> &#8211; the address, either another <a title="sip.voidptr" class="reference internal" href="#sip.voidptr"><tt class="xref docutils literal"><span class="pre">sip.voidptr</span></tt></a>, <tt class="xref docutils literal"><span class="pre">None</span></tt>, a
-Python CObject, or an integer.</li>
+Python Capsule, a Python CObject, or an integer.</li>
 <li><em>size</em> &#8211; the optional associated size of the block of memory and is negative
 if the size is not known.</li>
 <li><em>writeable</em> &#8211; set if the memory is writeable.  If it is not specified, and
@@ -329,14 +330,32 @@ used.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="sip.voidptr.ascobject">
-<tt class="descname">ascobject</tt><big>(</big><big>)</big> &rarr; cObject<a class="headerlink" href="#sip.voidptr.ascobject" title="Permalink to this definition">¶</a></dt>
-<dd><p>This returns the address as a Python CObject.</p>
+<dt id="sip.voidptr.ascapsule">
+<tt class="descname">ascapsule</tt><big>(</big><big>)</big> &rarr; capsule<a class="headerlink" href="#sip.voidptr.ascapsule" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This returns the address as an unnamed Python Capsule.  This requires
+Python v3.1 or later.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the CObject address.</td>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the Capsule.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sip.voidptr.ascobject">
+<tt class="descname">ascobject</tt><big>(</big><big>)</big> &rarr; cObject<a class="headerlink" href="#sip.voidptr.ascobject" title="Permalink to this definition">¶</a></dt>
+<dd><p>This returns the address as a Python CObject.  This is deprecated with
+Python v3.1 or later.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the CObject.</td>
 </tr>
 </tbody>
 </table>
@@ -445,12 +464,14 @@ object is returned.</p>
 
 <dl class="class">
 <dt id="sip.wrapper">
-<em class="property">class </em><tt class="descclassname">sip.</tt><tt class="descname">wrapper</tt><a class="headerlink" href="#sip.wrapper" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">sip.</tt><tt class="descname">wrapper</tt><a class="headerlink" href="#sip.wrapper" title="Permalink to this definition">¶</a></dt>
 <dd>This is the type object of the base type of all instances wrapped by SIP.</dd></dl>
 
 <dl class="class">
 <dt id="sip.wrappertype">
-<em class="property">class </em><tt class="descclassname">sip.</tt><tt class="descname">wrappertype</tt><a class="headerlink" href="#sip.wrappertype" title="Permalink to this definition">¶</a></dt>
+<em class="property">
+class </em><tt class="descclassname">sip.</tt><tt class="descname">wrappertype</tt><a class="headerlink" href="#sip.wrappertype" title="Permalink to this definition">¶</a></dt>
 <dd>This is the type object of the metatype of the <a title="sip.wrapper" class="reference internal" href="#sip.wrapper"><tt class="xref docutils literal"><span class="pre">sip.wrapper</span></tt></a> type.</dd></dl>
 
 </div>
@@ -499,12 +520,12 @@ object is returned.</p>
         <li class="right" >
           <a href="embedding.html" title="Using the C API when Embedding"
              >previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

@@ -1,6 +1,5 @@
 # Tell the original .pro file about additional directories.
-INCLUDEPATH = /usr/include/python2.5
-
+INCLUDEPATH = ./ /usr/include/python2.5 /drd/users/barry.robison/arsenalsuite/cpp/lib/PyQt4/qpy/QtGui
 CONFIG += release
-
-include(qpygui.pro)
+VPATH = /drd/users/barry.robison/arsenalsuite/cpp/lib/PyQt4/qpy/QtGui
+include(/drd/users/barry.robison/arsenalsuite/cpp/lib/PyQt4/qpy/QtGui/qpygui.pro)

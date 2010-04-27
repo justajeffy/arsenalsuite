@@ -35,7 +35,7 @@ class ShapeItem(object):
         self.myPath = QtGui.QPainterPath()
         self.myPosition = QtCore.QPoint()
         self.myColor  = QtGui.QColor()
-        self.myToolTip = QtCore.QString ()
+        self.myToolTip = ''
 
     def path(self):
         return self.myPath
@@ -80,12 +80,12 @@ class SortingBox(QtGui.QWidget):
 
         self.itemInMotion = None
 
-        self.newCircleButton = self.createToolButton(self.tr("New Circle"),
-                QtGui.QIcon(":/images/circle.png"), self.createNewCircle)
-        self.newSquareButton = self.createToolButton(self.tr("New Square"),
-                QtGui.QIcon(":/images/square.png"), self.createNewSquare)
-        self.newTriangleButton = self.createToolButton(self.tr("New Triangle"),
-                QtGui.QIcon(":/images/triangle.png"), self.createNewTriangle)
+        self.newCircleButton = self.createToolButton("New Circle",
+                QtGui.QIcon(':/images/circle.png'), self.createNewCircle)
+        self.newSquareButton = self.createToolButton("New Square",
+                QtGui.QIcon(':/images/square.png'), self.createNewSquare)
+        self.newTriangleButton = self.createToolButton("New Triangle",
+                QtGui.QIcon(':/images/triangle.png'), self.createNewTriangle)
 
         self.circlePath.addEllipse(0, 0, 100, 100)
         self.squarePath.addRect(0, 0, 100, 100)
@@ -97,16 +97,16 @@ class SortingBox(QtGui.QWidget):
         self.trianglePath.lineTo(120, 100)
         self.trianglePath.lineTo(x + 120 / 2, y)
 
-        self.setWindowTitle(self.tr("Tooltips"))
+        self.setWindowTitle("Tooltips")
         self.resize(500, 300)
 
-        self.createShapeItem(self.circlePath, self.tr("Circle"),
+        self.createShapeItem(self.circlePath, "Circle",
                 self.initialItemPosition(self.circlePath),
                 self.initialItemColor())
-        self.createShapeItem(self.squarePath, self.tr("Square"),
+        self.createShapeItem(self.squarePath, "Square",
                 self.initialItemPosition(self.squarePath),
                 self.initialItemColor())
-        self.createShapeItem(self.trianglePath, self.tr("Triangle"),
+        self.createShapeItem(self.trianglePath, "Triangle",
                 self.initialItemPosition(self.trianglePath),
                 self.initialItemColor())
 
@@ -168,19 +168,19 @@ class SortingBox(QtGui.QWidget):
     def createNewCircle(self):
         SortingBox.circle_count += 1
         self.createShapeItem(self.circlePath,
-                self.tr("Circle <%1>").arg(SortingBox.circle_count),
+                "Circle <%d>" % SortingBox.circle_count,
                 self.randomItemPosition(), self.randomItemColor())
 
     def createNewSquare(self):
         SortingBox.square_count += 1
         self.createShapeItem(self.squarePath,
-                self.tr("Square <%1>").arg(SortingBox.square_count),
+                "Square <%d>" % SortingBox.square_count,
                 self.randomItemPosition(), self.randomItemColor())
 
     def createNewTriangle(self):
         SortingBox.triangle_count += 1
         self.createShapeItem(self.trianglePath,
-                self.tr("Triangle <%1>").arg(SortingBox.triangle_count),
+                "Triangle <%d>" % SortingBox.triangle_count,
                 self.randomItemPosition(), self.randomItemColor())
 
     def itemAt(self, pos):

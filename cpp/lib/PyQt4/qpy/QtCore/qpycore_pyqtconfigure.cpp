@@ -1,6 +1,6 @@
 // This implements the helper for QObject.pyqtConfigure().
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -133,7 +133,8 @@ int qpycore_pyqtconfigure(PyObject *self, QObject *qobj, PyObject *kwds)
             if (unknown)
             {
                 PyErr_Format(PyExc_AttributeError,
-                        "'%s' is not a Qt property or a signal", name);
+                        "'%s' is not a Qt property or a signal",
+                        enc_name.constData());
                 return -1;
             }
         }

@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QString', 2)
+
 import math
 
 from PyQt4 import QtCore, QtGui
@@ -198,7 +202,7 @@ class DiagramItem(QtGui.QGraphicsPolygonItem):
             for arrow in self.arrows:
                 arrow.updatePosition()
 
-        return QtCore.QVariant(value)
+        return value
 
 
 class DiagramScene(QtGui.QGraphicsScene):
@@ -259,7 +263,7 @@ class DiagramScene(QtGui.QGraphicsScene):
         cursor.clearSelection()
         item.setTextCursor(cursor)
 
-        if item.toPlainText().isEmpty():
+        if item.toPlainText():
             self.removeItem(item)
             item.deleteLater()
 
@@ -498,7 +502,7 @@ class MainWindow(QtGui.QMainWindow):
         font = item.font()
         color = item.defaultTextColor()
         self.fontCombo.setCurrentFont(font)
-        self.fontSizeCombo.setEditText(QtCore.QString().setNum(font.pointSize()))
+        self.fontSizeCombo.setEditText(str(font.pointSize()))
         self.boldAction.setChecked(font.weight() == QtGui.QFont.Bold)
         self.italicAction.setChecked(font.italic())
         self.underlineAction.setChecked(font.underline())
@@ -569,49 +573,37 @@ class MainWindow(QtGui.QMainWindow):
     def createActions(self):
         self.toFrontAction = QtGui.QAction(
                 QtGui.QIcon(':/images/bringtofront.png'), "Bring to &Front",
-                self)
-        self.toFrontAction.setShortcut("Ctrl+F")
-        self.toFrontAction.setStatusTip("Bring item to front")
-        self.toFrontAction.triggered.connect(self.bringToFront)
+                self, shortcut="Ctrl+F", statusTip="Bring item to front",
+                triggered=self.bringToFront)
 
         self.sendBackAction = QtGui.QAction(
-                QtGui.QIcon(':/images/sendtoback.png'), "Send to &Back", self)
-        self.sendBackAction.setShortcut("Ctrl+B")
-        self.sendBackAction.setStatusTip("Send item to back")
-        self.sendBackAction.triggered.connect(self.sendToBack)
+                QtGui.QIcon(':/images/sendtoback.png'), "Send to &Back", self,
+                shortcut="Ctrl+B", statusTip="Send item to back",
+                triggered=self.sendToBack)
 
         self.deleteAction = QtGui.QAction(QtGui.QIcon(':/images/delete.png'),
-                "&Delete", self)
-        self.deleteAction.setShortcut("Delete")
-        self.deleteAction.setStatusTip("Delete item from diagram")
-        self.deleteAction.triggered.connect(self.deleteItem)
+                "&Delete", self, shortcut="Delete",
+                statusTip="Delete item from diagram",
+                triggered=self.deleteItem)
 
-        self.exitAction = QtGui.QAction("E&xit", self)
-        self.exitAction.setShortcut("Ctrl+X")
-        self.exitAction.setStatusTip("Quit Scenediagram example")
-        self.exitAction.triggered.connect(self.close)
+        self.exitAction = QtGui.QAction("E&xit", self, shortcut="Ctrl+X",
+                statusTip="Quit Scenediagram example", triggered=self.close)
 
         self.boldAction = QtGui.QAction(QtGui.QIcon(':/images/bold.png'),
-                "Bold", self)
-        self.boldAction.setCheckable(True)
-        self.boldAction.setShortcut("Ctrl+B")
-        self.boldAction.triggered.connect(self.handleFontChange)
+                "Bold", self, checkable=True, shortcut="Ctrl+B",
+                triggered=self.handleFontChange)
 
         self.italicAction = QtGui.QAction(QtGui.QIcon(':/images/italic.png'),
-                "Italic", self)
-        self.italicAction.setCheckable(True)
-        self.italicAction.setShortcut("Ctrl+I")
-        self.italicAction.triggered.connect(self.handleFontChange)
+                "Italic", self, checkable=True, shortcut="Ctrl+I",
+                triggered=self.handleFontChange)
 
         self.underlineAction = QtGui.QAction(
-                QtGui.QIcon(':/images/underline.png'), "Underline", self)
-        self.underlineAction.setCheckable(True)
-        self.underlineAction.setShortcut("Ctrl+U")
-        self.underlineAction.triggered.connect(self.handleFontChange)
+                QtGui.QIcon(':/images/underline.png'), "Underline", self,
+                checkable=True, shortcut="Ctrl+U",
+                triggered=self.handleFontChange)
 
-        self.aboutAction = QtGui.QAction("A&bout", self)
-        self.aboutAction.setShortcut("Ctrl+B")
-        self.aboutAction.triggered.connect(self.about)
+        self.aboutAction = QtGui.QAction("A&bout", self, shortcut="Ctrl+B",
+                triggered=self.about)
 
     def createMenus(self):
         self.fileMenu = self.menuBar().addMenu("&File")
@@ -638,7 +630,7 @@ class MainWindow(QtGui.QMainWindow):
         self.fontSizeCombo = QtGui.QComboBox()
         self.fontSizeCombo.setEditable(True)
         for i in range(8, 30, 2):
-            self.fontSizeCombo.addItem(QtCore.QString().setNum(i))
+            self.fontSizeCombo.addItem(str(i))
         validator = QtGui.QIntValidator(2, 64, self)
         self.fontSizeCombo.setValidator(validator)
         self.fontSizeCombo.currentIndexChanged.connect(self.fontSizeChanged)
@@ -752,10 +744,9 @@ class MainWindow(QtGui.QMainWindow):
 
         colorMenu = QtGui.QMenu(self)
         for color, name in zip(colors, names):
-            action = QtGui.QAction(name, self)
-            action.setData(QtCore.QVariant(QtGui.QColor(color))) 
-            action.setIcon(self.createColorIcon(color))
-            action.triggered.connect(slot)
+            action = QtGui.QAction(self.createColorIcon(color), name, self,
+                    triggered=slot)
+            action.setData(QtGui.QColor(color)) 
             colorMenu.addAction(action)
             if color == defaultColor:
                 colorMenu.setDefaultAction(action)

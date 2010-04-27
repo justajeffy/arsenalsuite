@@ -1,17 +1,16 @@
 # This script handles the SIP configuration and generates the Makefiles.
 #
-# Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
-# 
+# Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+#
 # This file is part of SIP.
-# 
+#
 # This copy of SIP is licensed for use under the terms of the SIP License
 # Agreement.  See the file LICENSE for more details.
-# 
+#
 # This copy of SIP may also used under the terms of the GNU General Public
 # License v2 or v3 as published by the Free Software Foundation which can be
-# found in the files LICENSE-GPL2.txt and LICENSE-GPL3.txt included in this
-# package.
-# 
+# found in the files LICENSE-GPL2 and LICENSE-GPL3 included in this package.
+#
 # SIP is supplied WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -26,8 +25,8 @@ import siputils
 
 
 # Initialise the globals.
-sip_version = 0x040901
-sip_version_str = "4.9.1"
+sip_version = 0x040a02
+sip_version_str = "4.10.2"
 py_version = sys.hexversion >> 8
 plat_py_site_dir = None
 plat_py_inc_dir = None
@@ -36,6 +35,7 @@ plat_py_lib_dir = None
 plat_sip_dir = None
 plat_bin_dir = None
 platform_specs = []
+src_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Constants.
 DEFAULT_MACOSX_ARCH = 'i386 ppc'
@@ -247,7 +247,8 @@ def create_makefiles(macros):
 
     macros is the dictionary of platform specific build macros.
     """
-    # Bootstrap.
+    # Bootstrap.  Make sure we get the right one.
+    sys.path.insert(0, os.path.curdir)
     import sipconfig
 
     cfg = sipconfig.Configuration()
@@ -259,14 +260,15 @@ def create_makefiles(macros):
     sipconfig.ParentMakefile(
         configuration=cfg,
         subdirs=["sipgen", "siplib"],
-        installs=(["sipconfig.py", "sipdistutils.py"], cfg.sip_mod_dir)
+        installs=(["sipconfig.py", os.path.join(src_dir, "sipdistutils.py")],
+                cfg.sip_mod_dir)
     ).generate()
 
     sipconfig.inform("Creating sip code generator Makefile...")
 
     sipconfig.ProgramMakefile(
         configuration=cfg,
-        build_file="sipgen.sbf",
+        build_file=os.path.join(src_dir, "sipgen", "sipgen.sbf"),
         dir="sipgen",
         install_dir=os.path.dirname(cfg.sip_bin),
         console=1,
@@ -279,10 +281,10 @@ def create_makefiles(macros):
 
     makefile = sipconfig.ModuleMakefile(
         configuration=cfg,
-        build_file="siplib.sbf",
+        build_file=os.path.join(src_dir, "siplib", "siplib.sbf"),
         dir="siplib",
         install_dir=cfg.sip_mod_dir,
-        installs=(["sip.h"], cfg.sip_inc_dir),
+        installs=([os.path.join(src_dir, "siplib", "sip.h")], cfg.sip_inc_dir),
         console=1,
         warnings=0,
         static=opts.static,
@@ -384,7 +386,7 @@ def main(argv):
     set_platform_directories()
 
     # Build up the list of valid specs.
-    for s in os.listdir("specs"):
+    for s in os.listdir(os.path.join(src_dir, "specs")):
         platform_specs.append(s)
 
     # Parse the command line.
@@ -433,8 +435,9 @@ def main(argv):
         opts.universal = ''
 
     # Get the platform specific macros for building.
-    macros = siputils.parse_build_macros(os.path.join("specs", opts.platform),
-            build_macro_names, args)
+    macros = siputils.parse_build_macros(
+            os.path.join(src_dir, "specs", opts.platform), build_macro_names,
+            args)
 
     if macros is None:
         p.print_help()
@@ -444,7 +447,8 @@ def main(argv):
     inform_user()
 
     # Install the configuration module.
-    create_config("sipconfig.py", "siputils.py", macros)
+    create_config("sipconfig.py", os.path.join(src_dir, "siputils.py"),
+            macros)
 
     # Create the Makefiles.
     create_makefiles(macros)

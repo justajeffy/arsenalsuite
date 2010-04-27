@@ -70,11 +70,11 @@ class ColorItem(QtGui.QGraphicsItem):
         ColorItem.n += 1
         if ColorItem.n > 2 and QtCore.qrand() % 3 == 0:
             image = QtGui.QImage(':/images/head.png')
-            mime.setImageData(QtCore.QVariant(image))
+            mime.setImageData(image)
             drag.setPixmap(QtGui.QPixmap.fromImage(image).scaled(30,40))
             drag.setHotSpot(QtCore.QPoint(15, 30))
         else:
-            mime.setColorData(QtCore.QVariant(self.color))
+            mime.setColorData(self.color)
             mime.setText("#%02x%02x%02x" % (self.color.red(), self.color.green(), self.color.blue()))
 
             pixmap = QtGui.QPixmap(34, 34)
@@ -261,7 +261,7 @@ if __name__== '__main__':
     view.setRenderHint(QtGui.QPainter.Antialiasing)
     view.setViewportUpdateMode(QtGui.QGraphicsView.BoundingRectViewportUpdate)
     view.setBackgroundBrush(QtGui.QColor(230, 200, 167))
-    view.setWindowTitle(view.tr("Drag and Drop Robot"))
+    view.setWindowTitle("Drag and Drop Robot")
     view.show()
 
     sys.exit(app.exec_())

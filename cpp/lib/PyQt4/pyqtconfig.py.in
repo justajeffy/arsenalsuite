@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 # 
 # This file is part of PyQt.
 # 
@@ -87,6 +87,18 @@ class QtHelpModuleMakefile(QtGuiModuleMakefile):
         """
         if "qt" not in kw:
             kw["qt"] = ["QtCore", "QtGui", "QtHelp"]
+
+        QtGuiModuleMakefile.__init__(self, *args, **kw)
+
+
+class QtMultimediaModuleMakefile(QtGuiModuleMakefile):
+    """The Makefile class for modules that %Import QtMultimedia.
+    """
+    def __init__(self, *args, **kw):
+        """Initialise an instance of a module Makefile.
+        """
+        if "qt" not in kw:
+            kw["qt"] = ["QtCore", "QtGui", "QtMultimedia"]
 
         QtGuiModuleMakefile.__init__(self, *args, **kw)
 

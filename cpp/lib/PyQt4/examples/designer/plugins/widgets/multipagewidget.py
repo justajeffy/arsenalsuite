@@ -16,7 +16,7 @@ class PyMultiPageWidget(QtGui.QWidget):
     pageTitleChanged = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
-        supe(PyMultiPageWidget, self).__init__(parent)
+        super(PyMultiPageWidget, self).__init__(parent)
 
         self.comboBox = QtGui.QComboBox()
         # MAGIC

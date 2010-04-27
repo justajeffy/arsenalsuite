@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The SIP Command Line &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>The SIP Command Line &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" />
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" />
     <link rel="next" title="SIP Specification Files" href="specification_files.html" />
     <link rel="prev" title="Using SIP" href="using.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="using.html" title="Using SIP"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -49,7 +49,7 @@
           <div class="body">
             
   <div class="section" id="the-sip-command-line">
-<h1>The SIP Command Line<a class="headerlink" href="#the-sip-command-line" title="Permalink to this headline">¶</a></h1>
+<span id="ref-command-line"></span><h1>The SIP Command Line<a class="headerlink" href="#the-sip-command-line" title="Permalink to this headline">¶</a></h1>
 <p>The syntax of the SIP command line is:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">sip</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="p">[</span><span class="n">specification</span><span class="p">]</span>
 </pre></div>
@@ -129,10 +129,41 @@ easier to use the parallel build facility of most modern implementations of
 class.</dd></dl>
 
 <dl class="cmdoption">
+<dt id="cmdoption-sip-k">
+<tt class="descname">-k</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-sip-k" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>All functions and methods will, by default, support passing parameters
+using the Python keyword argument syntax.</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-sip-o">
+<tt class="descname">-o</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-sip-o" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>Docstrings will be automatically generated that describe the signature of
+all functions, methods and constructors.</p>
+</dd></dl>
+
+<dl class="cmdoption">
 <dt id="cmdoption-sip-p">
 <tt class="descname">-p</tt><tt class="descclassname"> &lt;MODULE&gt;</tt><a class="headerlink" href="#cmdoption-sip-p" title="Permalink to this definition">¶</a></dt>
 <dd>The name of the <a class="reference external" href="directives.html#directive-%ConsolidatedModule"><tt class="xref docutils literal"><span class="pre">%ConsolidatedModule</span></tt></a> which will contain the
 wrapper code for this component module.</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-sip-P">
+<tt class="descname">-P</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-sip-P" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>By default SIP generates code to provide access to protected C++ functions
+from Python.  On some platforms (notably Linux, but not Windows) this code
+can be avoided if the <tt class="docutils literal"><span class="pre">protected</span></tt> keyword is redefined as <tt class="docutils literal"><span class="pre">public</span></tt>
+during compilation.  This can result in a significant reduction in the size
+of a generated Python module.  This option disables the generation of the
+extra code.</p>
+</dd></dl>
 
 <dl class="cmdoption">
 <dt id="cmdoption-sip-r">
@@ -217,12 +248,12 @@ disabled.</dd></dl>
         <li class="right" >
           <a href="using.html" title="Using SIP"
              >previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

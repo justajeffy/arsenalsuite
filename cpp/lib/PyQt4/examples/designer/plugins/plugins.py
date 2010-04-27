@@ -7,23 +7,9 @@
 
 
 import sys
-import os.path
+import os
 
 from PyQt4 import QtCore, QtGui
-
-
-# Set a specified environment variable with a directory name.
-def setEnvironment(env, var_name, dir_name):
-    # Convert the relative directory name to an absolute one.
-    dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), dir_name)
-
-    # Remove any existing value so that we have a controlled environment.
-    idx = env.indexOf(QtCore.QRegExp("^%s=.*" % var_name, QtCore.Qt.CaseInsensitive))
-
-    if idx >= 0:
-        env.removeAt(idx)
-
-    env << "%s=%s" % (var_name, dir)
 
 
 app = QtGui.QApplication(sys.argv)
@@ -44,20 +30,21 @@ QtGui.QMessageBox.information(None, "PyQt Designer Plugins",
 
 # Tell Qt Designer where it can find the directory containing the plugins and
 # Python where it can find the widgets.
-env = QtCore.QProcess.systemEnvironment()
-setEnvironment(env, "PYQTDESIGNERPATH", "python")
-setEnvironment(env, "PYTHONPATH", "widgets")
+env = os.environ.copy()
+env['PYQTDESIGNERPATH'] = 'python'
+env['PYTHONPATH'] = 'widgets'
+qenv = ['%s=%s' % (name, value) for name, value in env.items()]
 
 # Start Designer.
 designer = QtCore.QProcess()
-designer.setEnvironment(env)
+designer.setEnvironment(qenv)
 
 designer_bin = QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.BinariesPath)
 
-if sys.platform == "darwin":
-    designer_bin.append("/Designer.app/Contents/MacOS/Designer")
+if sys.platform == 'darwin':
+    designer_bin += '/Designer.app/Contents/MacOS/Designer'
 else:
-    designer_bin.append("/designer")
+    designer_bin += '/designer'
 
 designer.start(designer_bin)
 designer.waitForFinished(-1)

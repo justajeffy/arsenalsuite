@@ -30,10 +30,10 @@ class Sender(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Sender, self).__init__(parent)
 
-        self.statusLabel = QtGui.QLabel(self.tr("Ready to broadcast datagrams on port 45454"))
+        self.statusLabel = QtGui.QLabel("Ready to broadcast datagrams on port 45454")
 
-        self.startButton = QtGui.QPushButton(self.tr("&Start"))
-        quitButton = QtGui.QPushButton(self.tr("&Quit"))
+        self.startButton = QtGui.QPushButton("&Start")
+        quitButton = QtGui.QPushButton("&Quit")
 
         buttonBox = QtGui.QDialogButtonBox()
         buttonBox.addButton(self.startButton, QtGui.QDialogButtonBox.ActionRole)
@@ -52,14 +52,14 @@ class Sender(QtGui.QDialog):
         mainLayout.addWidget(buttonBox)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Broadcast Sender"))
+        self.setWindowTitle("Broadcast Sender")
 
     def startBroadcasting(self):
         self.startButton.setEnabled(False)
         self.timer.start(1000)
 
     def broadcastDatagramm(self):
-        self.statusLabel.setText(self.tr("Now broadcasting datagram %1").arg(self.messageNo))
+        self.statusLabel.setText("Now broadcasting datagram %d" % self.messageNo)
         datagram = "Broadcast message %d" % self.messageNo
         self.udpSocket.writeDatagram(datagram, QtNetwork.QHostAddress(QtNetwork.QHostAddress.Broadcast), 45454)
         self.messageNo += 1

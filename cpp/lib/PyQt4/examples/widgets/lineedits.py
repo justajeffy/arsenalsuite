@@ -30,55 +30,55 @@ class Window(QtGui.QWidget):
     def __init__(self):
         super(Window, self).__init__()
 
-        echoGroup = QtGui.QGroupBox(self.tr("Echo"))
+        echoGroup = QtGui.QGroupBox("Echo")
 
-        echoLabel = QtGui.QLabel(self.tr("Mode:"))
+        echoLabel = QtGui.QLabel("Mode:")
         echoComboBox = QtGui.QComboBox()
-        echoComboBox.addItem(self.tr("Normal"))
-        echoComboBox.addItem(self.tr("Password"))
-        echoComboBox.addItem(self.tr("PasswordEchoOnEdit"))
-        echoComboBox.addItem(self.tr("No Echo"))
+        echoComboBox.addItem("Normal")
+        echoComboBox.addItem("Password")
+        echoComboBox.addItem("PasswordEchoOnEdit")
+        echoComboBox.addItem("No Echo")
 
         self.echoLineEdit = QtGui.QLineEdit()
         self.echoLineEdit.setFocus()
 
-        validatorGroup = QtGui.QGroupBox(self.tr("Validator"))
+        validatorGroup = QtGui.QGroupBox("Validator")
 
-        validatorLabel = QtGui.QLabel(self.tr("Type:"))
+        validatorLabel = QtGui.QLabel("Type:")
         validatorComboBox = QtGui.QComboBox()
-        validatorComboBox.addItem(self.tr("No validator"))
-        validatorComboBox.addItem(self.tr("Integer validator"))
-        validatorComboBox.addItem(self.tr("Double validator"))
+        validatorComboBox.addItem("No validator")
+        validatorComboBox.addItem("Integer validator")
+        validatorComboBox.addItem("Double validator")
 
         self.validatorLineEdit = QtGui.QLineEdit()
 
-        alignmentGroup = QtGui.QGroupBox(self.tr("Alignment"))
+        alignmentGroup = QtGui.QGroupBox("Alignment")
 
-        alignmentLabel = QtGui.QLabel(self.tr("Type:"))
+        alignmentLabel = QtGui.QLabel("Type:")
         alignmentComboBox = QtGui.QComboBox()
-        alignmentComboBox.addItem(self.tr("Left"))
-        alignmentComboBox.addItem(self.tr("Centered"))
-        alignmentComboBox.addItem(self.tr("Right"))
+        alignmentComboBox.addItem("Left")
+        alignmentComboBox.addItem("Centered")
+        alignmentComboBox.addItem("Right")
 
         self.alignmentLineEdit = QtGui.QLineEdit()
 
-        inputMaskGroup = QtGui.QGroupBox(self.tr("Input mask"))
+        inputMaskGroup = QtGui.QGroupBox("Input mask")
 
-        inputMaskLabel = QtGui.QLabel(self.tr("Type:"))
+        inputMaskLabel = QtGui.QLabel("Type:")
         inputMaskComboBox = QtGui.QComboBox()
-        inputMaskComboBox.addItem(self.tr("No mask"))
-        inputMaskComboBox.addItem(self.tr("Phone number"))
-        inputMaskComboBox.addItem(self.tr("ISO date"))
-        inputMaskComboBox.addItem(self.tr("License key"))
+        inputMaskComboBox.addItem("No mask")
+        inputMaskComboBox.addItem("Phone number")
+        inputMaskComboBox.addItem("ISO date")
+        inputMaskComboBox.addItem("License key")
 
         self.inputMaskLineEdit = QtGui.QLineEdit()
 
-        accessGroup = QtGui.QGroupBox(self.tr("Access"))
+        accessGroup = QtGui.QGroupBox("Access")
 
-        accessLabel = QtGui.QLabel(self.tr("Read-only:"))
+        accessLabel = QtGui.QLabel("Read-only:")
         accessComboBox = QtGui.QComboBox()
-        accessComboBox.addItem(self.tr("False"))
-        accessComboBox.addItem(self.tr("True"))
+        accessComboBox.addItem("False")
+        accessComboBox.addItem("True")
 
         self.accessLineEdit = QtGui.QLineEdit()
 
@@ -126,7 +126,7 @@ class Window(QtGui.QWidget):
         layout.addWidget(accessGroup, 1, 1)
         self.setLayout(layout)
 
-        self.setWindowTitle(self.tr("Line Edits"))
+        self.setWindowTitle("Line Edits")
 
     def echoChanged(self, index):
         if index == 0:
@@ -158,15 +158,15 @@ class Window(QtGui.QWidget):
 
     def inputMaskChanged(self, index):
         if index == 0:
-            self.inputMaskLineEdit.setInputMask("")
+            self.inputMaskLineEdit.setInputMask('')
         elif index == 1:
-            self.inputMaskLineEdit.setInputMask("+99 99 99 99 99;_")
+            self.inputMaskLineEdit.setInputMask('+99 99 99 99 99;_')
         elif index == 2:
-            self.inputMaskLineEdit.setInputMask("0000-00-00")
-            self.inputMaskLineEdit.setText("00000000")
+            self.inputMaskLineEdit.setInputMask('0000-00-00')
+            self.inputMaskLineEdit.setText('00000000')
             self.inputMaskLineEdit.setCursorPosition(0)
         elif index == 3:
-            self.inputMaskLineEdit.setInputMask(">AAAAA-AAAAA-AAAAA-AAAAA-AAAAA;#")
+            self.inputMaskLineEdit.setInputMask('>AAAAA-AAAAA-AAAAA-AAAAA-AAAAA;#')
 
     def accessChanged(self, index):
         if index == 0:
@@ -175,7 +175,7 @@ class Window(QtGui.QWidget):
             self.accessLineEdit.setReadOnly(True)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

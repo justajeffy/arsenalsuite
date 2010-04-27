@@ -129,6 +129,23 @@ Argument Annotations
         void foo(int);
 
 
+.. argument-annotation:: DocType
+
+    .. versionadded:: 4.10
+
+    This string annotation specifies the type of the argument as it will appear
+    in any generated docstrings.  It is usually used with arguments of type
+    :stype:`SIP_PYOBJECT` to provide a more specific type.
+
+
+.. argument-annotation:: DocValue
+
+    .. versionadded:: 4.10
+
+    This string annotation specifies the default value of the argument as it
+    will appear in any generated docstrings.
+
+
 .. argument-annotation:: Encoding
 
     This string annotation specifies that the corresponding argument (which
@@ -181,6 +198,21 @@ Argument Annotations
     garbage collected.  If the method is called again with a new argument then
     the reference to the previous argument is discarded.  Note that ownership
     of the argument is not changed.
+
+
+.. function-annotation:: NoCopy
+
+    .. versionadded:: 4.10.1
+
+    This boolean annotation is used with arguments of virtual methods that are
+    a ``const`` reference to a class.  Normally, if the class defines a copy
+    constructor then a copy of the returned reference is automatically created
+    and wrapped before being passed to a Python reimplementation of the method.
+    The copy will be owned by Python.  This means that the reimplementation may
+    take a reference to the argument without having to make an explicit copy.
+    
+    If the annotation is specified then the copy is not made and the original
+    reference is wrapped instead and will be owned by C++.
 
 
 .. argument-annotation:: Out
@@ -421,6 +453,14 @@ Mapped Type Annotations
     See :ref:`ref-incompat-apis` for more detail.
 
 
+.. mapped-type-annotation:: DocType
+
+    .. versionadded:: 4.10
+
+    This string annotation specifies the name of the type as it will appear in
+    any generated docstrings.
+
+
 .. mapped-type-annotation:: NoRelease
 
     This boolean annotation is used to specify that the mapped type does not
@@ -448,6 +488,12 @@ Enum Annotations
 
 Exception Annotations
 ---------------------
+
+.. exception-annotation:: Default
+
+    This boolean annotation specifies that the exception being defined will be
+    used as the default exception to be caught if a function or constructor
+    does not have a ``throw`` clause.
 
 .. exception-annotation:: PyName
 
@@ -498,6 +544,15 @@ Function Annotations
     function is called.
 
 
+.. function-annotation:: DocType
+
+    .. versionadded:: 4.10
+
+    This string annotation specifies the name of the type of the returned value
+    as it will appear in any generated docstrings.  It is usually used with
+    values of type :stype:`SIP_PYOBJECT` to provide a more specific type.
+
+
 .. function-annotation:: Factory
 
     This boolean annotation specifies that the value returned by the function
@@ -514,6 +569,17 @@ Function Annotations
     See :ref:`ref-gil` and the :fanno:`ReleaseGIL` annotation.
 
 
+.. function-annotation:: KeywordArgs
+
+    .. versionadded:: 4.10
+
+    This boolean annotation specifies that the argument parser generated for
+    this function will support passing the parameters using Python's keyword
+    argument syntax.  Keyword arguments cannot be used for functions that have
+    unnamed arguments or use an ellipsis to designate that the function has a
+    variable number of arguments.
+
+
 .. function-annotation:: NewThread
 
     This boolean annotation specifies that the function will create a new
@@ -527,6 +593,19 @@ Function Annotations
     of the arguments.
 
 
+.. function-annotation:: NoCopy
+
+    .. versionadded:: 4.10.1
+
+    This boolean annotation is used with methods and global functions that
+    return a ``const`` reference to a class.  Normally, if the class defines a
+    copy constructor then a copy of the returned reference is automatically
+    created and wrapped.  The copy will be owned by Python.
+    
+    If the annotation is specified then the copy is not made and the original
+    reference is wrapped instead and will be owned by C++.
+
+
 .. function-annotation:: NoDerived
 
     This boolean annotation is only used with C++ constructors.  In many cases
@@ -536,6 +615,19 @@ Function Annotations
     to define a Python constructor that has no corresponding C++ constructor.
     This annotation is used to suppress the generation of the constructor in
     the derived class.
+
+
+.. function-annotation:: NoKeywordArgs
+
+    .. versionadded:: 4.10
+
+    This boolean annotation specifies that the argument parser generated for
+    this function will not support passing the parameters using Python's
+    keyword argument syntax.  In other words, the argument parser will only
+    support only normal positional arguments.  This annotation is useful when
+    the default setting of allowing keyword arguments has been changed via the
+    command line, but you would still like certain functions to only support
+    positional arguments.
 
 
 .. function-annotation:: Numeric
@@ -685,6 +777,15 @@ Typedef Annotations
 
 Variable Annotations
 --------------------
+
+.. variable-annotation:: DocType
+
+    .. versionadded:: 4.10
+
+    This string annotation specifies the name of the type of the variable as it
+    will appear in any generated docstrings.  It is usually used with variables
+    of type :stype:`SIP_PYOBJECT` to provide a more specific type.
+
 
 .. variable-annotation:: PyName
 

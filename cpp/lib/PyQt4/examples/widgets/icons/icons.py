@@ -23,33 +23,39 @@
 ##
 #############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QVariant', 2)
+
 from PyQt4 import QtCore, QtGui
 
 
 class IconSizeSpinBox(QtGui.QSpinBox):
-    def valueFromText(self, text):
-        regExp = QtCore.QRegExp(self.tr("(\\d+)(\\s*[xx]\\s*\\d+)?"))
+    @staticmethod
+    def valueFromText(text):
+        regExp = QtCore.QRegExp("(\\d+)(\\s*[xx]\\s*\\d+)?")
 
         if regExp.exactMatch(text):
-            return regExp.cap(1).toInt()
+            return int(regExp.cap(1))
         else:
             return 0
 
-    def textFromValue(self, value):
-        return self.tr("%1 x %1").arg(value)
+    @staticmethod
+    def textFromValue(value):
+        return "%d x %d" % (value, value)
 
 
 class ImageDelegate(QtGui.QItemDelegate):
     def createEditor(self, parent, option, index):
         comboBox = QtGui.QComboBox(parent)
         if index.column() == 1:
-            comboBox.addItem(self.tr("Normal"))
-            comboBox.addItem(self.tr("Active"))
-            comboBox.addItem(self.tr("Disabled"))
-            comboBox.addItem(self.tr("Selected"))
+            comboBox.addItem("Normal")
+            comboBox.addItem("Active")
+            comboBox.addItem("Disabled")
+            comboBox.addItem("Selected")
         elif index.column() == 2:
-            comboBox.addItem(self.tr("Off"))
-            comboBox.addItem(self.tr("On"))
+            comboBox.addItem("Off")
+            comboBox.addItem("On")
 
         comboBox.activated.connect(self.emitCommitData)
 
@@ -60,7 +66,7 @@ class ImageDelegate(QtGui.QItemDelegate):
         if not comboBox:
             return
 
-        pos = comboBox.findText(index.model().data(index).toString(),
+        pos = comboBox.findText(index.model().data(index),
                 QtCore.Qt.MatchExactly)
         comboBox.setCurrentIndex(pos)
 
@@ -69,7 +75,7 @@ class ImageDelegate(QtGui.QItemDelegate):
         if not comboBox:
             return
 
-        model.setData(index, QtCore.QVariant(comboBox.currentText()))
+        model.setData(index, comboBox.currentText())
 
     def emitCommitData(self):
         self.commitData.emit(self.sender())
@@ -88,13 +94,13 @@ class IconPreviewArea(QtGui.QWidget):
         self.modeLabels = []
         self.pixmapLabels = []
 
-        self.stateLabels.append(self.createHeaderLabel(self.tr("Off")))
-        self.stateLabels.append(self.createHeaderLabel(self.tr("On")))
+        self.stateLabels.append(self.createHeaderLabel("Off"))
+        self.stateLabels.append(self.createHeaderLabel("On"))
 
-        self.modeLabels.append(self.createHeaderLabel(self.tr("Normal")))
-        self.modeLabels.append(self.createHeaderLabel(self.tr("Active")))
-        self.modeLabels.append(self.createHeaderLabel(self.tr("Disabled")))
-        self.modeLabels.append(self.createHeaderLabel(self.tr("Selected")))
+        self.modeLabels.append(self.createHeaderLabel("Normal"))
+        self.modeLabels.append(self.createHeaderLabel("Active"))
+        self.modeLabels.append(self.createHeaderLabel("Disabled"))
+        self.modeLabels.append(self.createHeaderLabel("Selected"))
 
         for j, label in enumerate(self.stateLabels):
             mainLayout.addWidget(label, j + 1, 0)
@@ -117,7 +123,7 @@ class IconPreviewArea(QtGui.QWidget):
             self.updatePixmapLabels()
 
     def createHeaderLabel(self, text):
-        label = QtGui.QLabel(self.tr("<b>%1</b>").arg(text))
+        label = QtGui.QLabel("<b>%s</b>" % text)
         label.setAlignment(QtCore.Qt.AlignCenter)
         return label
 
@@ -172,40 +178,48 @@ class MainWindow(QtGui.QMainWindow):
         mainLayout.addWidget(self.iconSizeGroupBox, 1, 1)
         self.centralWidget.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Icons"))
+        self.setWindowTitle("Icons")
         self.checkCurrentStyle()
         self.otherRadioButton.click()
 
         self.resize(self.minimumSizeHint())
 
     def about(self):
-        QtGui.QMessageBox.about(self, self.tr("About Icons"), self.tr(
-            "The <b>Icons</b> example illustrates how Qt renders an icon in "
-            "different modes (active, normal, disabled and selected) and "
-            "states (on and off) based on a set of images."))
+        QtGui.QMessageBox.about(self, "About Icons",
+                "The <b>Icons</b> example illustrates how Qt renders an icon "
+                "in different modes (active, normal, disabled and selected) "
+                "and states (on and off) based on a set of images.")
 
     def changeStyle(self, checked):
         if not checked:
             return
 
         action = self.sender()
-        style = QtGui.QStyleFactory.create(action.data().toString())
+        style = QtGui.QStyleFactory.create(action.data())
+        if not style:
+            return
+
         QtGui.QApplication.setStyle(style)
 
-        self.smallRadioButton.setText(self.tr("Small (%1 x %1)")
-                .arg(style.pixelMetric(QtGui.QStyle.PM_SmallIconSize)))
-        self.largeRadioButton.setText(self.tr("Large (%1 x %1)")
-                .arg(style.pixelMetric(QtGui.QStyle.PM_LargeIconSize)))
-        self.toolBarRadioButton.setText(self.tr("Toolbars (%1 x %1)")
-                .arg(style.pixelMetric(QtGui.QStyle.PM_ToolBarIconSize)))
-        self.listViewRadioButton.setText(self.tr("List views (%1 x %1)")
-                .arg(style.pixelMetric(QtGui.QStyle.PM_ListViewIconSize)))
-        self.iconViewRadioButton.setText(self.tr("Icon views (%1 x %1)")
-                .arg(style.pixelMetric(QtGui.QStyle.PM_IconViewIconSize)))
-        self.tabBarRadioButton.setText(self.tr("Tab bars (%1 x %1)")
-                .arg(style.pixelMetric(QtGui.QStyle.PM_TabBarIconSize)))
+        self.setButtonText(self.smallRadioButton, "Small (%d x %d)",
+                style, QtGui.QStyle.PM_SmallIconSize)
+        self.setButtonText(self.largeRadioButton, "Large (%d x %d)",
+                style, QtGui.QStyle.PM_LargeIconSize)
+        self.setButtonText(self.toolBarRadioButton, "Toolbars (%d x %d)",
+                style, QtGui.QStyle.PM_ToolBarIconSize)
+        self.setButtonText(self.listViewRadioButton, "List views (%d x %d)",
+                style, QtGui.QStyle.PM_ListViewIconSize)
+        self.setButtonText(self.iconViewRadioButton, "Icon views (%d x %d)",
+                style, QtGui.QStyle.PM_IconViewIconSize)
+        self.setButtonText(self.tabBarRadioButton, "Tab bars (%d x %d)",
+                style, QtGui.QStyle.PM_TabBarIconSize)
 
         self.changeSize()
+
+    @staticmethod
+    def setButtonText(button, label, style, metric):
+        metric_value = style.pixelMetric(metric)
+        button.setText(label % (metric_value, metric_value))
 
     def changeSize(self, checked=True):
         if not checked:
@@ -241,21 +255,21 @@ class MainWindow(QtGui.QMainWindow):
             item2 = self.imagesTable.item(row, 2)
 
             if item0.checkState() == QtCore.Qt.Checked:
-                if item1.text() == self.tr("Normal"):
+                if item1.text() == "Normal":
                     mode = QtGui.QIcon.Normal
-                elif item1.text() == self.tr("Active"):
+                elif item1.text() == "Active":
                     mode = QtGui.QIcon.Active
-                elif item1.text() == self.tr("Disabled"):
+                elif item1.text() == "Disabled":
                     mode = QtGui.QIcon.Disabled
                 else:
                     mode = QtGui.QIcon.Selected
 
-                if item2.text() == self.tr("On"):
+                if item2.text() == "On":
                     state = QtGui.QIcon.On
                 else:
                     state = QtGui.QIcon.Off
 
-                fileName = item0.data(QtCore.Qt.UserRole).toString()
+                fileName = item0.data(QtCore.Qt.UserRole)
                 image = QtGui.QImage(fileName)
                 if not image.isNull():
                     icon.addPixmap(QtGui.QPixmap.fromImage(image), mode, state)
@@ -263,48 +277,46 @@ class MainWindow(QtGui.QMainWindow):
         self.previewArea.setIcon(icon)
 
     def addImage(self):
-        fileNames = QtGui.QFileDialog.getOpenFileNames(self,
-                self.tr("Open Images"), "",
-                self.tr("Images (*.png *.xpm *.jpg);;All Files (*)"))
+        fileNames = QtGui.QFileDialog.getOpenFileNames(self, "Open Images",
+                '', "Images (*.png *.xpm *.jpg);;All Files (*)")
 
-        if not fileNames.isEmpty():
-            for fileName in fileNames:
-                row = self.imagesTable.rowCount()
-                self.imagesTable.setRowCount(row + 1)
+        for fileName in fileNames:
+            row = self.imagesTable.rowCount()
+            self.imagesTable.setRowCount(row + 1)
 
-                imageName = QtCore.QFileInfo(fileName).baseName()
-                item0 = QtGui.QTableWidgetItem(imageName)
-                item0.setData(QtCore.Qt.UserRole, QtCore.QVariant(fileName))
-                item0.setFlags(item0.flags() & ~QtCore.Qt.ItemIsEditable)
+            imageName = QtCore.QFileInfo(fileName).baseName()
+            item0 = QtGui.QTableWidgetItem(imageName)
+            item0.setData(QtCore.Qt.UserRole, fileName)
+            item0.setFlags(item0.flags() & ~QtCore.Qt.ItemIsEditable)
 
-                item1 = QtGui.QTableWidgetItem(self.tr("Normal"))
-                item2 = QtGui.QTableWidgetItem(self.tr("Off"))
+            item1 = QtGui.QTableWidgetItem("Normal")
+            item2 = QtGui.QTableWidgetItem("Off")
 
-                if self.guessModeStateAct.isChecked():
-                    if fileName.contains("_act"):
-                        item1.setText(self.tr("Active"))
-                    elif fileName.contains("_dis"):
-                        item1.setText(self.tr("Disabled"))
-                    elif fileName.contains("_sel"):
-                        item1.setText(self.tr("Selected"))
+            if self.guessModeStateAct.isChecked():
+                if '_act' in fileName:
+                    item1.setText("Active")
+                elif '_dis' in fileName:
+                    item1.setText("Disabled")
+                elif '_sel' in fileName:
+                    item1.setText("Selected")
 
-                    if fileName.contains("_on"):
-                        item2.setText(self.tr("On"))
+                if '_on' in fileName:
+                    item2.setText("On")
 
-                self.imagesTable.setItem(row, 0, item0)
-                self.imagesTable.setItem(row, 1, item1)
-                self.imagesTable.setItem(row, 2, item2)
-                self.imagesTable.openPersistentEditor(item1)
-                self.imagesTable.openPersistentEditor(item2)
+            self.imagesTable.setItem(row, 0, item0)
+            self.imagesTable.setItem(row, 1, item1)
+            self.imagesTable.setItem(row, 2, item2)
+            self.imagesTable.openPersistentEditor(item1)
+            self.imagesTable.openPersistentEditor(item2)
 
-                item0.setCheckState(QtCore.Qt.Checked)
+            item0.setCheckState(QtCore.Qt.Checked)
 
     def removeAllImages(self):
         self.imagesTable.setRowCount(0)
         self.changeIcon()
 
     def createPreviewGroupBox(self):
-        self.previewGroupBox = QtGui.QGroupBox(self.tr("Preview"))
+        self.previewGroupBox = QtGui.QGroupBox("Preview")
 
         self.previewArea = IconPreviewArea()
 
@@ -313,18 +325,15 @@ class MainWindow(QtGui.QMainWindow):
         self.previewGroupBox.setLayout(layout)
 
     def createImagesGroupBox(self):
-        self.imagesGroupBox = QtGui.QGroupBox(self.tr("Images"))
+        self.imagesGroupBox = QtGui.QGroupBox("Images")
 
         self.imagesTable = QtGui.QTableWidget()
         self.imagesTable.setSelectionMode(QtGui.QAbstractItemView.NoSelection)
         self.imagesTable.setItemDelegate(ImageDelegate(self))
 
-        labels = QtCore.QStringList()
-        labels << self.tr("Image") << self.tr("Mode") << self.tr("State")
-
         self.imagesTable.horizontalHeader().setDefaultSectionSize(90)
         self.imagesTable.setColumnCount(3)
-        self.imagesTable.setHorizontalHeaderLabels(labels)
+        self.imagesTable.setHorizontalHeaderLabels(("Image", "Mode", "State"))
         self.imagesTable.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Stretch)
         self.imagesTable.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed)
         self.imagesTable.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed)
@@ -337,7 +346,7 @@ class MainWindow(QtGui.QMainWindow):
         self.imagesGroupBox.setLayout(layout)
 
     def createIconSizeGroupBox(self):
-        self.iconSizeGroupBox = QtGui.QGroupBox(self.tr("Icon Size"))
+        self.iconSizeGroupBox = QtGui.QGroupBox("Icon Size")
 
         self.smallRadioButton = QtGui.QRadioButton()
         self.largeRadioButton = QtGui.QRadioButton()
@@ -345,7 +354,7 @@ class MainWindow(QtGui.QMainWindow):
         self.listViewRadioButton = QtGui.QRadioButton()
         self.iconViewRadioButton = QtGui.QRadioButton()
         self.tabBarRadioButton = QtGui.QRadioButton()
-        self.otherRadioButton = QtGui.QRadioButton(self.tr("Other:"))
+        self.otherRadioButton = QtGui.QRadioButton("Other:")
 
         self.otherSpinBox = IconSizeSpinBox()
         self.otherSpinBox.setRange(8, 128)
@@ -377,45 +386,38 @@ class MainWindow(QtGui.QMainWindow):
         self.iconSizeGroupBox.setLayout(layout)
 
     def createActions(self):
-        self.addImagesAct = QtGui.QAction(self.tr("&Add Images..."), self)
-        self.addImagesAct.setShortcut(self.tr("Ctrl+A"))
-        self.addImagesAct.triggered.connect(self.addImage)
+        self.addImagesAct = QtGui.QAction("&Add Images...", self,
+                shortcut="Ctrl+A", triggered=self.addImage)
 
-        self.removeAllImagesAct = QtGui.QAction(self.tr("&Remove All Images"),
-                self)
-        self.removeAllImagesAct.setShortcut(self.tr("Ctrl+R"))
-        self.removeAllImagesAct.triggered.connect(self.removeAllImages)
+        self.removeAllImagesAct = QtGui.QAction("&Remove All Images", self,
+                shortcut="Ctrl+R", triggered=self.removeAllImages)
 
-        self.exitAct = QtGui.QAction(self.tr("&Quit"), self)
-        self.exitAct.setShortcut(self.tr("Ctrl+Q"))
-        self.exitAct.triggered.connect(self.close)
+        self.exitAct = QtGui.QAction("&Quit", self, shortcut="Ctrl+Q",
+                triggered=self.close)
 
         self.styleActionGroup = QtGui.QActionGroup(self)
         for styleName in QtGui.QStyleFactory.keys():
-            action = QtGui.QAction(self.styleActionGroup)
-            action.setText(self.tr("%1 Style").arg(styleName))
-            action.setData(QtCore.QVariant(styleName))
-            action.setCheckable(True)
-            action.triggered.connect(self.changeStyle)
+            action = QtGui.QAction(self.styleActionGroup,
+                    text="%s Style" % styleName, checkable=True,
+                    triggered=self.changeStyle)
+            action.setData(styleName)
 
-        self.guessModeStateAct = QtGui.QAction(self.tr("&Guess Image Mode/State"), self)
-        self.guessModeStateAct.setCheckable(True)
-        self.guessModeStateAct.setChecked(True)
+        self.guessModeStateAct = QtGui.QAction("&Guess Image Mode/State",
+                self, checkable=True, checked=True)
 
-        self.aboutAct = QtGui.QAction(self.tr("&About"), self)
-        self.aboutAct.triggered.connect(self.about)
+        self.aboutAct = QtGui.QAction("&About", self, triggered=self.about)
 
-        self.aboutQtAct = QtGui.QAction(self.tr("About &Qt"), self)
-        self.aboutQtAct.triggered.connect(QtGui.qApp.aboutQt)
+        self.aboutQtAct = QtGui.QAction("About &Qt", self,
+                triggered=QtGui.qApp.aboutQt)
 
     def createMenus(self):
-        self.fileMenu = self.menuBar().addMenu(self.tr("&File"))
+        self.fileMenu = self.menuBar().addMenu("&File")
         self.fileMenu.addAction(self.addImagesAct)
         self.fileMenu.addAction(self.removeAllImagesAct)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.exitAct)
 
-        self.viewMenu = self.menuBar().addMenu(self.tr("&View"))
+        self.viewMenu = self.menuBar().addMenu("&View")
         for action in self.styleActionGroup.actions():
             self.viewMenu.addAction(action)
         self.viewMenu.addSeparator()
@@ -423,7 +425,7 @@ class MainWindow(QtGui.QMainWindow):
 
         self.menuBar().addSeparator()
 
-        self.helpMenu = self.menuBar().addMenu(self.tr("&Help"))
+        self.helpMenu = self.menuBar().addMenu("&Help")
         self.helpMenu.addAction(self.aboutAct)
         self.helpMenu.addAction(self.aboutQtAct)
 
@@ -434,15 +436,17 @@ class MainWindow(QtGui.QMainWindow):
 
     def checkCurrentStyle(self):
         for action in self.styleActionGroup.actions():
-            styleName = action.data().toString()
+            styleName = action.data()
             candidate = QtGui.QStyleFactory.create(styleName)
+
+            if candidate is None:
+                return
 
             if candidate.metaObject().className() == QtGui.QApplication.style().metaObject().className():
                 action.trigger()
-                return
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

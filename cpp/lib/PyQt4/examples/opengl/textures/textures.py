@@ -114,6 +114,9 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def resizeGL(self, width, height):
         side = min(width, height)
+        if side < 0:
+            return
+
         glViewport((width - side) / 2, (height - side) / 2, side, side)
 
         glMatrixMode(GL_PROJECTION)
@@ -143,7 +146,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         glNewList(dlist, GL_COMPILE)
 
         for i in range(6):
-            self.bindTexture(QtGui.QPixmap(QtCore.QString(":/images/side%1.png").arg(i + 1)))
+            self.bindTexture(QtGui.QPixmap(':/images/side%d.png' % (i + 1)))
 
             glBegin(GL_QUADS)
             for j in range(4):
@@ -197,7 +200,7 @@ class Window(QtGui.QWidget):
         timer.timeout.connect(self.rotateOneStep)
         timer.start(20)
 
-        self.setWindowTitle(self.tr("Textures"))
+        self.setWindowTitle("Textures")
 
     def setCurrentGlWidget(self):
         self.currentGlWidget = self.sender()

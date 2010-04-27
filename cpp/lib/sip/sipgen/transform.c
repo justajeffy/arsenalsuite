@@ -1,18 +1,17 @@
 /*
  * The parse tree transformation module for SIP.
  *
- * Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
- * 
+ * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ *
  * This file is part of SIP.
- * 
+ *
  * This copy of SIP is licensed for use under the terms of the SIP License
  * Agreement.  See the file LICENSE for more details.
- * 
+ *
  * This copy of SIP may also used under the terms of the GNU General Public
  * License v2 or v3 as published by the Free Software Foundation which can be
- * found in the files LICENSE-GPL2.txt and LICENSE-GPL3.txt included in this
- * package.
- * 
+ * found in the files LICENSE-GPL2 and LICENSE-GPL3 included in this package.
+ *
  * SIP is supplied WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
@@ -81,12 +80,14 @@ static ifaceFileDef *getIfaceFile(argDef *ad);
 static mappedTypeDef *instantiateMappedTypeTemplate(sipSpec *pt, moduleDef *mod, mappedTypeTmplDef *mtt, argDef *type);
 static classDef *getProxy(moduleDef *mod, classDef *cd);
 static int generatingCodeForModule(sipSpec *pt, moduleDef *mod);
-static void checkAssignmentHelper(classDef *cd);
+static void checkAssignmentHelper(sipSpec *pt, classDef *cd);
 static void addComplementarySlots(sipSpec *pt, classDef *cd);
 static void addComplementarySlot(sipSpec *pt, classDef *cd, memberDef *md,
         slotType cslot, const char *cslot_name);
 static void resolveInstantiatedClassTemplate(sipSpec *pt, argDef *type);
 static void setStringPoolOffsets(sipSpec *pt);
+static const char *templateString(const char *src, scopedNameDef *names,
+        scopedNameDef *values);
 
 
 /*
@@ -282,7 +283,7 @@ void transform(sipSpec *pt)
 
     /* Mark classes that can have an assignment helper. */
     for (cd = pt->classes; cd != NULL; cd = cd->next)
-        checkAssignmentHelper(cd);
+        checkAssignmentHelper(pt, cd);
 
     setStringPoolOffsets(pt);
 }
@@ -487,7 +488,7 @@ static void addComplementarySlot(sipSpec *pt, classDef *cd, memberDef *md,
 /*
  * See if a class supports an assignment helper.
  */
-static void checkAssignmentHelper(classDef *cd)
+static void checkAssignmentHelper(sipSpec *pt, classDef *cd)
 {
     int pub_def_ctor, pub_copy_ctor;
     ctorDef *ct;
@@ -518,9 +519,17 @@ static void checkAssignmentHelper(classDef *cd)
         else if (ct->cppsig->nrArgs == 1)
         {
             argDef *ad = &ct->cppsig->args[0];
+            classDef *arg_cd;
 
-            if (ad->atype == class_type && ad->u.cd == cd && isReference(ad) &&
-                isConstArg(ad) && ad->nrderefs == 0 && ad->defval == NULL)
+            if (ad->atype == class_type)
+                arg_cd = ad->u.cd;
+            else if (ad->atype == mapped_type)
+                arg_cd = findAltClassImplementation(pt, ad->u.mtd);
+            else
+                arg_cd = NULL;
+
+            if (arg_cd == cd && isReference(ad) && isConstArg(ad) &&
+                ad->nrderefs == 0 && ad->defval == NULL)
                 pub_copy_ctor = TRUE;
         }
     }
@@ -639,6 +648,7 @@ static void moveClassCasts(sipSpec *pt, moduleDef *mod, classDef *cd)
         ct->cppsig = &ct->pysig;
 
         /* Add the source class as the only argument. */
+        ct->pysig.result.atype = void_type;
         ad = &ct->pysig.args[0];
 
         ad->atype = class_type;
@@ -859,11 +869,14 @@ static void moveGlobalSlot(sipSpec *pt, moduleDef *mod, memberDef *gmd)
             *mdhead = md;
         }
 
-        /* Move the overload. */
+        /* Move the overload to the end of the destination list. */
         setIsPublic(od);
         setIsGlobal(od);
         od->common = md;
-        od->next = *odhead;
+        od->next = NULL;
+
+        while (*odhead != NULL)
+            odhead = &(*odhead)->next;
 
         *odhead = od;
 
@@ -1422,10 +1435,25 @@ static void addDefaultCopyCtor(classDef *cd)
             argDef *ad = &ct -> pysig.args[0];
  
             /* See if is a copy ctor. */
-            if (ct->pysig.nrArgs == 1 && ad->nrderefs == 0 &&
-                isReference(ad) && ad->atype == class_type &&
-                ad->u.cd == mro->cd)
-                break;
+            if (ct->pysig.nrArgs == 1 && ad->nrderefs == 0 && isReference(ad))
+            {
+                ifaceFileDef *iff;
+
+                /* To check the type we have to look at all versions. */
+                if (ad->atype == class_type)
+                    iff = ad->u.cd->iff;
+                else if (ad->atype == mapped_type)
+                    iff = ad->u.mtd->iff;
+                else
+                    continue;
+
+                for (iff = iff->first_alt; iff != NULL; iff = iff->next_alt)
+                    if (mro->cd->iff == iff)
+                        break;
+
+                if (iff != NULL)
+                    break;
+            }
         }
 
         if (ct != NULL)
@@ -1453,7 +1481,7 @@ static void addDefaultCopyCtor(classDef *cd)
  
     copyct->ctorflags = SECT_IS_PUBLIC;
     copyct->pysig.nrArgs = 1;
-    copyct->pysig.args[0].name = "other";
+    copyct->pysig.result.atype = void_type;
     copyct->pysig.args[0].atype = class_type;
     copyct->pysig.args[0].u.cd = cd;
     copyct->pysig.args[0].argflags = (ARG_IS_REF | ARG_IS_CONST | ARG_IN);
@@ -2862,6 +2890,8 @@ static mappedTypeDef *instantiateMappedTypeTemplate(sipSpec *pt, moduleDef *mod,
             mappedtype_iface, NULL, type);
     mtd->iff->module = mod;
 
+    mtd->doctype = templateString(mtt->mt->doctype, type_names, type_values);
+
     appendCodeBlock(&mtd->iff->hdrcode, templateCode(pt, &mtd->iff->used, mtt->mt->iff->hdrcode, type_names, type_values));
     mtd->convfromcode = templateCode(pt, &mtd->iff->used, mtt->mt->convfromcode, type_names, type_values);
     mtd->convtocode = templateCode(pt, &mtd->iff->used, mtt->mt->convtocode, type_names, type_values);
@@ -2876,6 +2906,69 @@ static mappedTypeDef *instantiateMappedTypeTemplate(sipSpec *pt, moduleDef *mod,
         freeScopedName(type_values);
 
     return mtd;
+}
+
+
+/*
+ * Return a string based on an original with names replaced by corresponding
+ * values.
+ */
+static const char *templateString(const char *src, scopedNameDef *names,
+        scopedNameDef *values)
+{
+    char *dst;
+
+    /* Handle the trivial case. */
+    if (src == NULL)
+        return NULL;
+
+    dst = sipStrdup(src);
+
+    while (names != NULL && values != NULL)
+    {
+        char *cp, *vname = values->name;
+        size_t name_len, value_len;
+
+        name_len = strlen(names->name);
+        value_len = strlen(vname);
+
+        /* Translate any C++ scoping to Python. */
+        while ((cp = strstr(vname, "::")) != NULL)
+        {
+            char *new_vname = sipMalloc(value_len);
+            size_t pos = cp - vname;
+
+            memcpy(new_vname, vname, pos);
+            new_vname[pos] = '.';
+            strcpy(new_vname + pos + 1, cp + 2);
+
+            if (vname != values->name)
+                free(vname);
+
+            vname = new_vname;
+            --value_len;
+        }
+
+        while ((cp = strstr(dst, names->name)) != NULL)
+        {
+            char *new_dst = sipMalloc(strlen(dst) - name_len + value_len + 1);
+
+            memcpy(new_dst, dst, cp - dst);
+            memcpy(new_dst + (cp - dst), vname, value_len);
+            strcpy(new_dst + (cp - dst) + value_len, cp + name_len);
+
+            free(dst);
+            dst = new_dst;
+        }
+
+        if (vname != values->name)
+            free(vname);
+
+        names = names->next;
+        values = values->next;
+    }
+
+    return dst;
 }
 
 
@@ -2998,6 +3091,7 @@ void searchTypedefs(sipSpec *pt, scopedNameDef *snd, argDef *ad)
             ad->atype = td->type.atype;
             ad->argflags |= td->type.argflags;
             ad->nrderefs += td->type.nrderefs;
+            ad->doctype = td->type.doctype;
             ad->u = td->type.u;
 
             if (ad->original_type == NULL)
@@ -3251,7 +3345,7 @@ static void createSortedNumberedTypesTable(sipSpec *pt, moduleDef *mod)
 
         ad->atype = class_type;
         ad->u.cd = cd;
-        ad->name = cd->iff->name->text;
+        ad->name = cd->iff->name;
 
         ++ad;
     }
@@ -3266,7 +3360,7 @@ static void createSortedNumberedTypesTable(sipSpec *pt, moduleDef *mod)
 
         ad->atype = mapped_type;
         ad->u.mtd = mtd;
-        ad->name = mtd->cname->text;
+        ad->name = mtd->cname;
 
         ++ad;
     }
@@ -3287,7 +3381,7 @@ static void createSortedNumberedTypesTable(sipSpec *pt, moduleDef *mod)
 
         ad->atype = enum_type;
         ad->u.ed = ed;
-        ad->name = ed->cname->text;
+        ad->name = ed->cname;
 
         ++ad;
     }
@@ -3303,7 +3397,7 @@ static void createSortedNumberedTypesTable(sipSpec *pt, moduleDef *mod)
             ad->u.cd->iff->ifacenr = i;
 
             /* If we find a class called QObject, assume it's Qt. */
-            if (strcmp(ad->name, "QObject") == 0)
+            if (strcmp(ad->name->text, "QObject") == 0)
                 mod->qobjclass = i;
 
             break;
@@ -3325,7 +3419,7 @@ static void createSortedNumberedTypesTable(sipSpec *pt, moduleDef *mod)
  */
 static int compareTypes(const void *t1, const void *t2)
 {
-    return strcmp(((argDef *)t1)->name, ((argDef *)t2)->name);
+    return strcmp(((argDef *)t1)->name->text, ((argDef *)t2)->name->text);
 }
 
 
