@@ -85,6 +85,7 @@ signals:
 	void columnVisibilityChanged( int column, bool visible );
 
 protected slots:
+    void scheduleResizeAutoColumns();
 	void resizeAutoColumns();
 	virtual void slotCustomContextMenuRequested( const QPoint & );
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
@@ -102,7 +103,7 @@ protected:
 	bool eventFilter( QObject *, QEvent * );
 
 	ExtDelegate * mDelegate;
-	bool mColumnAutoResize, mShowBranches;
+	bool mColumnAutoResize, mShowBranches, mAutoResizeScheduled;
 	QBitArray mAutoResizeColumns;
 	bool mShowGrid;
 	QColor mGridColor, mGridColorHighlight;
