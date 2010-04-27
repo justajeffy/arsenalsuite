@@ -351,6 +351,20 @@ QString Interval::toString( Order maximumOrder, Order minimumOrder, int flags ) 
 	return ret;
 }
 
+QString Interval::toDisplayString() const
+{
+    if( mDays == 0 && mMonths == 0 ) {
+        qint64 _hours = hours(), _minutes = minutes(), _seconds = seconds();
+        if( _hours > 0 && (_minutes % 60 == 0) && (_seconds % 3600 == 0) )
+            return aip( "", _hours, " hour", false );
+        if( _hours == 0 && (_minutes > 0) && (_seconds % 60 == 0) )
+            return aip( "", _minutes, " minute", false );
+        if( _hours == 0 && _minutes == 0 )
+            return aip( "", _seconds, " second", false );
+    }
+    return toString();
+}
+
 Interval Interval::fromString( const QString & iso, bool * valid )
 {
 	bool parseDayString = true;

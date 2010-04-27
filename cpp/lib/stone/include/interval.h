@@ -107,12 +107,16 @@ public:
 	};
 
 	qint64 asOrder( Order order ) const;
-	
+
 	// Same as toString( Years, Microseconds, AutoChopMinimum | AutoChopMaximum ), which is compatible with postres output.
 	QString toString() const;
 
 	QString toString( Order maximumOrder, Order minimumOrder = Seconds, int flags = TrimMinimum | TrimMaximum ) const;
-	
+
+    /// Same as toString, except will write "1 hour", "12 minutes", "25 seconds", in the cases where the
+    /// interval is an even number of hours, minutes OR seconds
+    QString toDisplayString() const;
+
 	Interval addMillenia( double );
 	Interval addCenturies( double );
 	Interval addYears( double );
