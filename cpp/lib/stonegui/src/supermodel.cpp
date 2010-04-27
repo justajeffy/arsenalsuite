@@ -605,7 +605,7 @@ QVariant SuperModel::data ( const QModelIndex & index, int role ) const
 	QVariant ret = indexToNode(index)->data(index, role);
 	// Convert Interval types to strings
 	if( ret.userType() == qMetaTypeId<Interval>() )
-		return qvariant_cast<Interval>(ret).toString();
+		return qvariant_cast<Interval>(ret).toDisplayString();
 	return ret;
 }
 
