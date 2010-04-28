@@ -1,6 +1,6 @@
 // This contains the support for Python objects and Qt's metatype system.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -72,9 +72,14 @@ PyQt_PyObject::PyQt_PyObject(const PyQt_PyObject &other)
 // Destroy a wrapper.
 PyQt_PyObject::~PyQt_PyObject()
 {
-    SIP_BLOCK_THREADS
-    Py_XDECREF(pyobject);
-    SIP_UNBLOCK_THREADS
+    // Qt can still be tidying up after Python has gone so make sure that it
+    // hasn't.
+    if (Py_IsInitialized())
+    {
+        SIP_BLOCK_THREADS
+        Py_XDECREF(pyobject);
+        SIP_UNBLOCK_THREADS
+    }
 
     pyobject = 0;
 }
@@ -90,4 +95,108 @@ PyQt_PyObject &PyQt_PyObject::operator=(const PyQt_PyObject &other)
     SIP_UNBLOCK_THREADS
 
     return *this;
+}
+
+
+// Serialise operator.
+QDataStream &operator<<(QDataStream &out, const PyQt_PyObject &obj)
+{
+    PyObject *ser_obj = 0;
+    const char *ser = 0;
+    uint len = 0;
+
+    if (obj.pyobject)
+    {
+        static PyObject *dumps = 0;
+
+        SIP_BLOCK_THREADS
+
+        if (!dumps)
+        {
+            PyObject *pickle = PyImport_ImportModule("pickle");
+
+            if (pickle)
+            {
+                dumps = PyObject_GetAttrString(pickle, "dumps");
+                Py_DECREF(pickle);
+            }
+        }
+
+        if (dumps)
+        {
+            ser_obj = PyObject_CallFunctionObjArgs(dumps, obj.pyobject, 0);
+
+            if (ser_obj)
+            {
+                if (SIPBytes_Check(ser_obj))
+                {
+                    ser = SIPBytes_AS_STRING(ser_obj);
+                    len = SIPBytes_GET_SIZE(ser_obj);
+                }
+                else
+                {
+                    Py_DECREF(ser_obj);
+                    ser_obj = 0;
+                }
+            }
+        }
+
+        SIP_UNBLOCK_THREADS
+    }
+
+    out.writeBytes(ser, len);
+
+    if (ser_obj)
+    {
+        SIP_BLOCK_THREADS
+        Py_DECREF(ser_obj);
+        SIP_UNBLOCK_THREADS
+    }
+
+    return out;
+}
+
+
+// De-serialise operator.
+QDataStream &operator>>(QDataStream &in, PyQt_PyObject &obj)
+{
+    char *ser;
+    uint len;
+
+    in.readBytes(ser, len);
+
+    if (len)
+    {
+        static PyObject *loads = 0;
+
+        SIP_BLOCK_THREADS
+
+        if (!loads)
+        {
+            PyObject *pickle = PyImport_ImportModule("pickle");
+
+            if (pickle)
+            {
+                loads = PyObject_GetAttrString(pickle, "loads");
+                Py_DECREF(pickle);
+            }
+        }
+
+        if (loads)
+        {
+            PyObject *ser_obj = SIPBytes_FromStringAndSize(ser, len);
+
+            if (ser_obj)
+            {
+                obj.pyobject = PyObject_CallFunctionObjArgs(loads, ser_obj, 0);
+                Py_DECREF(ser_obj);
+            }
+        }
+
+        SIP_UNBLOCK_THREADS
+    }
+
+    delete[] ser;
+
+    return in;
 }

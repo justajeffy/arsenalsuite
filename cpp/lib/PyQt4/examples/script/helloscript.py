@@ -12,7 +12,7 @@ engine = QtScript.QScriptEngine()
 
 button = QtGui.QPushButton()
 scriptButton = engine.newQObject(button)
-engine.globalObject().setProperty("button", scriptButton)
+engine.globalObject().setProperty('button', scriptButton)
 
 engine.evaluate("button.text = 'Hello World!'")
 engine.evaluate("button.styleSheet = 'font-style: italic'")

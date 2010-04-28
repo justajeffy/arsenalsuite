@@ -36,6 +36,11 @@ win32{
 	LIBS+=-lws2_32
 	LIBS+=-lopengl32
 }
+
+isEmpty( PYTHON ) {
+    PYTHON="python"
+}
+
 unix{
 #	Link libassfreezer and libblurqt statically
 #	Link them dynamically
@@ -50,26 +55,20 @@ unix{
     LIBS+=-Wl,-rpath .
     LIBS+=-lMagick++
 
-	PY_VERSION = $$system("python -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'")
-
+    PY_CMD =  $$PYTHON " -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'"
+    PY_VERSION = $$system($$PY_CMD)
 	message(Python Version is $$PY_VERSION)
 	INCLUDEPATH += /usr/include/python$${PY_VERSION}/
 	LIBS+=-lpython$${PY_VERSION}
 }
 
 # Python modules
-debug:win32 {
-    LIBS+=-L../../lib/assfreezer/sipAssfreezer -lAssfreezer_d
-    LIBS+=-L../../lib/classes/sipClasses -lpyClasses_d
-    LIBS+=-L../../lib/stone/sipStone -lpyStone_d
-    LIBS+=-L../../lib/sip/siplib -lsip_d
-} else {
-    LIBS+=-L../../lib/assfreezer/sipAssfreezer -lAssfreezer
-	win32 {
-	    LIBS+=-L../../lib/classes/sipClasses -lpyClasses
-		LIBS+=-L../../lib/stone/sipStone -lpyStone
-		LIBS+=-L../../lib/sip/siplib -lsip
-	}
+win32 {
+	LIBS+=-L../../lib/assfreezer/sipAssfreezer -lpyAssfreezer
+	LIBS+=-L../../lib/classes/sipClasses -lpyClasses
+	LIBS+=-L../../lib/stone/sipStone -lpyStone
+	LIBS+=-L../../lib/absubmit/sipAbsubmit -lpyAbsubmit
+	LIBS+=-L../../lib/sip/siplib -lsip
 }
 
 macx: CONFIG-=app_bundle
@@ -80,7 +79,13 @@ CONFIG += qt thread warn_on opengl
 QT+=opengl xml sql network
 DESTDIR=./
 RC_FILE = assfreezer.rc
-
 TARGET = assfreezer
-target.path=/usr/local/lib
+
+unix {
+	target.path=$$(DESTDIR)/usr/local/bin
+}
+win32 {
+	target.path=$$(DESTDIR)/blur/common/
+}
+
 INSTALLS += target

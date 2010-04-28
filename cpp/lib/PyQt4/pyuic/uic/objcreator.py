@@ -9,6 +9,11 @@ else:
     from PyQt4.uic.port_v2.load_plugin import load_plugin
 
 
+# The list of directories that are searched for widget plugins.  This is
+# exposed as part of the API.
+widgetPluginPath = [os.path.join(os.path.dirname(__file__), 'widget-plugins')]
+
+
 MATCH = True
 NO_MATCH = False
 MODULE = 0
@@ -23,32 +28,35 @@ class QObjectCreator(object):
         self._modules = [self._cpolicy.createQtGuiWrapper()]
 
         # Get the optional plugins.
-        plugindir = os.path.join(os.path.split(__file__)[0], "widget-plugins")
+        for plugindir in widgetPluginPath:
+            try:
+                plugins = os.listdir(plugindir)
+            except:
+                plugins = []
 
-        try:
-            plugins = os.listdir(plugindir)
-        except:
-            plugins = []
+            for filename in plugins:
+                if not filename.endswith('.py'):
+                    continue
 
-        for filename in plugins:
-            if not filename.endswith(".py"):
-                continue
+                filename = os.path.join(plugindir, filename)
 
-            plugin_globals = {"MODULE":     MODULE,
-                              "CW_FILTER":  CW_FILTER,
-                              "MATCH":      MATCH,
-                              "NO_MATCH":   NO_MATCH}
-            plugin_locals = {}
+                plugin_globals = {
+                    "MODULE": MODULE,
+                    "CW_FILTER": CW_FILTER,
+                    "MATCH": MATCH,
+                    "NO_MATCH": NO_MATCH}
 
-            if load_plugin(open(os.path.join(plugindir, filename)), plugin_globals, plugin_locals):
-                pluginType = plugin_locals["pluginType"]
-                if pluginType == MODULE:
-                    modinfo = plugin_locals["moduleInformation"]()
-                    self._modules.append(self._cpolicy.createModuleWrapper(*modinfo))
-                elif pluginType == CW_FILTER:
-                    self._cwFilters.append(plugin_locals["getFilter"]())
-                else:
-                    raise WidgetPluginError("Unknown plugin type of %s" % filename)
+                plugin_locals = {}
+
+                if load_plugin(open(filename), plugin_globals, plugin_locals):
+                    pluginType = plugin_locals["pluginType"]
+                    if pluginType == MODULE:
+                        modinfo = plugin_locals["moduleInformation"]()
+                        self._modules.append(self._cpolicy.createModuleWrapper(*modinfo))
+                    elif pluginType == CW_FILTER:
+                        self._cwFilters.append(plugin_locals["getFilter"]())
+                    else:
+                        raise WidgetPluginError("Unknown plugin type of %s" % filename)
 
         self._customWidgets = self._cpolicy.createCustomWidgetLoader()
         self._modules.append(self._customWidgets)

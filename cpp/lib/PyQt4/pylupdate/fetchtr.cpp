@@ -359,9 +359,12 @@ static int getToken()
                     yyString[yyStringLen] = '\0';
 
                     if ( yyCh != quoteChar ) {
-                        printf("%c\n", yyCh);
-                        qWarning( "%s:%d: Unterminated string",
-                          (const char *) yyFileName, yyLineNo );
+                        if (trippelQuote)
+                            qWarning("%s:%d: Empty or unterminated triple quoted string",
+                                    (const char *)yyFileName, yyLineNo);
+                        else
+                            qWarning("%s:%d: Unterminated string",
+                                    (const char *)yyFileName, yyLineNo);
                     }
 
                     if ( yyCh == EOF ) {

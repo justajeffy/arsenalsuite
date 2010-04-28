@@ -1,5 +1,4 @@
 
-include( svnrev.pri )
 include( auto.pri )
 
 MOC_DIR=.out
@@ -23,37 +22,29 @@ win32 {
 	LIBS+=-L$${PY_PATH}\libs -lpython$${PY_VERSION}
 }
 
+isEmpty( PYTHON ) {
+    PYTHON="python"
+}
+
 unix {
-	PY_VERSION = $$system("python -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'")
+    PY_CMD =  $$PYTHON " -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'"
+	PY_VERSION = $$system($$PY_CMD)
 	message(Python Version is $$PY_VERSION)
 	INCLUDEPATH += /usr/include/python$${PY_VERSION}/
 	LIBS+=-lpython$${PY_VERSION}
 }
 
-# Python modules
-#debug {
-#    #LIBS+=-L../../lib/sip/siplib -lsip_d
-#} else {
-    #LIBS+=-L../../lib/sip/siplib -lsip
-#}
-
-
 DEFINES+=CLASSES_MAKE_DLL
 TEMPLATE=lib
 CONFIG+=qt thread
-contains( DEFINED, versioned ) {
-	TARGET=classes$$SVNREV
-	LIBS+=-L../stone -lstone$$SVNREV
-} else {
-	TARGET=classes
-	LIBS+=-L../stone -lstone
-}
+TARGET=classes
+LIBS+=-L../stone -lstone
 
 unix {
-	target.path=/usr/local/lib
+	target.path=$$(DESTDIR)/usr/local/lib
 }
 win32 {
-	target.path=c:/blur/common/
+	target.path=$$(DESTDIR)/blur/common/
 }
 
 INSTALLS += target

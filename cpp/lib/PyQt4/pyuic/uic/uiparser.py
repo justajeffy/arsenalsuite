@@ -124,6 +124,7 @@ class UIParser(object):
         self.actions = []
         self.currentActionGroup = None
         self.resources = []
+        self.button_groups = []
 
     def setupObject(self, clsname, parent, branch, is_attribute = True):
         name = self.uniqueName(branch.attrib.get("name") or clsname[1:].lower())
@@ -176,6 +177,22 @@ class UIParser(object):
                     widget.horizontalHeader())
             self.handleHeaderView(elem, "verticalHeader",
                     widget.verticalHeader())
+
+        elif isinstance(widget, QtGui.QAbstractButton):
+            bg_i18n = self.wprops.getAttribute(elem, "buttonGroup")
+            if bg_i18n is not None:
+                bg_name = bg_i18n.string
+
+                for bg in self.button_groups:
+                    if bg.objectName() == bg_name:
+                        break
+                else:
+                    bg = self.factory.createQObject("QButtonGroup", bg_name,
+                            (self.toplevelWidget, ))
+                    bg.setObjectName(bg_name)
+                    self.button_groups.append(bg)
+
+                bg.addButton(widget)
 
         if self.sorting_enabled is not None:
             widget.setSortingEnabled(self.sorting_enabled)
@@ -237,7 +254,7 @@ class UIParser(object):
                 if tbArea is None:
                     topwidget.addToolBar(widget)
                 else:
-                    if isinstance(tbArea, basestring):
+                    if isinstance(tbArea, str):
                         tbArea = getattr(QtCore.Qt, tbArea)
                     else:
                         tbArea = QtCore.Qt.ToolBarArea(tbArea)
@@ -441,8 +458,9 @@ class UIParser(object):
             elif isinstance(w, QtGui.QListWidget):
                 text = self.wprops.getProperty(elem, "text")
                 icon = self.wprops.getProperty(elem, "icon")
+                flags = self.wprops.getProperty(elem, "flags")
 
-                if icon:
+                if icon or flags:
                     item_name = "item"
                 else:
                     item_name = None
@@ -459,6 +477,9 @@ class UIParser(object):
 
                 if icon:
                     item.setIcon(icon)
+
+                if flags:
+                    item.setFlags(flags)
 
             elif isinstance(w, QtGui.QTreeWidget):
                 if self.itemstack:
@@ -487,13 +508,16 @@ class UIParser(object):
                 column = -1
                 for prop in elem.findall("property"):
                     c_prop = self.wprops.convert(prop)
+                    c_prop_name = prop.attrib["name"]
 
-                    if prop.attrib["name"] == "text":
+                    if c_prop_name == "text":
                         column += 1
                         if c_prop:
                             titm.setText(column, c_prop)
-                    elif c_prop:
+                    elif c_prop_name == "icon":
                         item.setIcon(column, c_prop)
+                    elif c_prop_name == "flags":
+                        item.setFlags(c_prop)
 
                 self.traverseWidgetTree(elem)
                 _, self.item_nr = self.itemstack.pop()
@@ -501,6 +525,7 @@ class UIParser(object):
             elif isinstance(w, QtGui.QTableWidget):
                 text = self.wprops.getProperty(elem, "text")
                 icon = self.wprops.getProperty(elem, "icon")
+                flags = self.wprops.getProperty(elem, "flags")
 
                 item = self.factory.createQObject("QTableWidgetItem", "item",
                         (), False)
@@ -517,6 +542,9 @@ class UIParser(object):
 
                 if icon:
                     item.setIcon(icon)
+
+                if flags:
+                    item.setFlags(flags)
 
                 w.setItem(row, col, item)
 

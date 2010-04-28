@@ -1,6 +1,6 @@
 // This is the post-initialisation support code for the QtCore module.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -84,6 +84,7 @@ void qpycore_post_init(PyObject *module_dict)
 
     // Register the C++ type that wraps Python objects.
     PyQt_PyObject::metatype = qRegisterMetaType<PyQt_PyObject>("PyQt_PyObject");
+    qRegisterMetaTypeStreamOperators<PyQt_PyObject>("PyQt_PyObject");
 
     // Register the lazy attribute getter.
     if (sipRegisterAttributeGetter(sipType_QObject, qpycore_get_lazy_attr) < 0)

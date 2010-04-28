@@ -26,7 +26,7 @@
 from PyQt4 import QtGui
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     tree.setIndentation(20)
     tree.setSortingEnabled(True)
 
-    tree.setWindowTitle(tree.tr("Dir View"))
+    tree.setWindowTitle("Dir View")
     tree.resize(640, 480)
     tree.show()
 

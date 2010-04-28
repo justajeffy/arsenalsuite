@@ -23,6 +23,11 @@
 ##
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QString', 2)
+sip.setapi('QVariant', 2)
+
 import math
 
 from PyQt4 import QtCore, QtGui
@@ -42,6 +47,7 @@ class PieView(QtGui.QAbstractItemView):
         self.pieSize = self.totalSize - 2*self.margin
         self.validItems = 0
         self.totalValue = 0.0
+        self.origin = QtCore.QPoint()
         self.rubberBand = None
 
     def dataChanged(self, topLeft, bottomRight):
@@ -53,9 +59,9 @@ class PieView(QtGui.QAbstractItemView):
         for row in range(self.model().rowCount(self.rootIndex())):
 
             index = self.model().index(row, 1, self.rootIndex())
-            value, _ = self.model().data(index).toDouble()
+            value = self.model().data(index)
 
-            if value > 0.0:
+            if value is not None and value > 0.0:
                 self.totalValue += value
                 self.validItems += 1
 
@@ -96,7 +102,7 @@ class PieView(QtGui.QAbstractItemView):
             for row in range(self.model().rowCount(self.rootIndex())):
 
                 index = self.model().index(row, 1, self.rootIndex())
-                value, _ = self.model().data(index).toDouble()
+                value = self.model().data(index)
 
                 if value > 0.0:
                     sliceAngle = 360*value/self.totalValue
@@ -114,7 +120,7 @@ class PieView(QtGui.QAbstractItemView):
             for row in range(self.model().rowCount(self.rootIndex())):
 
                 index = self.model().index(row, 1, self.rootIndex())
-                if self.model().data(index).toDouble()[0] > 0.0:
+                if self.model().data(index) > 0.0:
 
                     if listItem == validRow:
                         return self.model().index(row, 0, self.rootIndex())
@@ -140,11 +146,11 @@ class PieView(QtGui.QAbstractItemView):
         else:
             valueIndex = index
 
-        if self.model().data(valueIndex).toDouble()[0] > 0.0:
+        if self.model().data(valueIndex) > 0.0:
 
             listItem = 0
             for row in range(index.row()-1, -1, -1):
-                if self.model().data(self.model().index(row, 1, self.rootIndex())).toDouble()[0] > 0.0:
+                if self.model().data(self.model().index(row, 1, self.rootIndex())) > 0.0:
                     listItem += 1
 
             if index.column() == 0:
@@ -165,14 +171,14 @@ class PieView(QtGui.QAbstractItemView):
         if index.column() != 1:
             return QtGui.QRegion(self.itemRect(index))
 
-        if self.model().data(index).toDouble()[0] <= 0.0:
+        if self.model().data(index) <= 0.0:
             return QtGui.QRegion()
 
         startAngle = 0.0
         for row in range(self.model().rowCount(self.rootIndex())):
 
             sliceIndex = self.model().index(row, 1, self.rootIndex())
-            value, _ = self.model().data(sliceIndex).toDouble()
+            value = self.model().data(sliceIndex)
 
             if value > 0.0:
                 angle = 360*value/self.totalValue
@@ -197,16 +203,16 @@ class PieView(QtGui.QAbstractItemView):
     def mousePressEvent(self, event):
         super(PieView, self).mousePressEvent(event)
 
-        origin = event.pos()
+        self.origin = event.pos()
         if not self.rubberBand:
             self.rubberBand = QtGui.QRubberBand(QtGui.QRubberBand.Rectangle,
                     self)
-        self.rubberBand.setGeometry(QtCore.QRect(origin, QtCore.QSize()))
+        self.rubberBand.setGeometry(QtCore.QRect(self.origin, QtCore.QSize()))
         self.rubberBand.show()
 
     def mouseMoveEvent(self, event):
         if self.rubberBand:
-            self.rubberBand.setGeometry(QtCore.QRect(origin, event.pos()).normalized())
+            self.rubberBand.setGeometry(QtCore.QRect(self.origin, event.pos()).normalized())
 
         super(PieView, self).mouseMoveEvent(event)
 
@@ -276,14 +282,14 @@ class PieView(QtGui.QAbstractItemView):
             for row in range(self.model().rowCount(self.rootIndex())):
 
                 index = self.model().index(row, 1, self.rootIndex())
-                value, _ = self.model().data(index).toDouble()
+                value = self.model().data(index)
 
                 if value > 0.0:
                     angle = 360*value/self.totalValue
 
                     colorIndex = self.model().index(row, 0, self.rootIndex())
-                    color = QtGui.QColor(self.model().data(colorIndex,
-                                   QtCore.Qt.DecorationRole).toString())
+                    color = self.model().data(colorIndex,
+                            QtCore.Qt.DecorationRole)
 
                     if self.currentIndex() == index:
                         painter.setBrush(QtGui.QBrush(color,
@@ -305,7 +311,7 @@ class PieView(QtGui.QAbstractItemView):
 
             for row in range(self.model().rowCount(self.rootIndex())):
                 index = self.model().index(row, 1, self.rootIndex())
-                value, _ = self.model().data(index).toDouble()
+                value = self.model().data(index)
 
                 if value > 0.0:
                     labelIndex = self.model().index(row, 0, self.rootIndex())
@@ -329,9 +335,9 @@ class PieView(QtGui.QAbstractItemView):
     def rowsInserted(self, parent, start, end):
         for row in range(start, end + 1):
             index = self.model().index(row, 1, self.rootIndex())
-            value, _ = self.model().data(index).toDouble()
+            value = self.model().data(index)
 
-            if value > 0.0:
+            if value is not None and value > 0.0:
                 self.totalValue += value
                 self.validItems += 1
 
@@ -340,8 +346,9 @@ class PieView(QtGui.QAbstractItemView):
     def rowsAboutToBeRemoved(self, parent, start, end):
         for row in range(start, end + 1):
             index = self.model().index(row, 1, self.rootIndex())
-            value, _ = self.model().data(index).toDouble()
-            if value > 0.0:
+            value = self.model().data(index)
+
+            if value is not None and value > 0.0:
                 self.totalValue -= value
                 self.validItems -= 1
 
@@ -445,13 +452,13 @@ class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        fileMenu = QtGui.QMenu(self.tr("&File"), self)
-        openAction = fileMenu.addAction(self.tr("&Open..."))
-        openAction.setShortcut(QtGui.QKeySequence(self.tr("Ctrl+O")))
-        saveAction = fileMenu.addAction(self.tr("&Save As..."))
-        saveAction.setShortcut(QtGui.QKeySequence(self.tr("Ctrl+S")))
-        quitAction = fileMenu.addAction(self.tr("E&xit"))
-        quitAction.setShortcut(QtGui.QKeySequence(self.tr("Ctrl+Q")))
+        fileMenu = QtGui.QMenu("&File", self)
+        openAction = fileMenu.addAction("&Open...")
+        openAction.setShortcut("Ctrl+O")
+        saveAction = fileMenu.addAction("&Save As...")
+        saveAction.setShortcut("Ctrl+S")
+        quitAction = fileMenu.addAction("E&xit")
+        quitAction.setShortcut("Ctrl+Q")
 
         self.setupModel()
         self.setupViews()
@@ -463,17 +470,15 @@ class MainWindow(QtGui.QMainWindow):
         self.menuBar().addMenu(fileMenu)
         self.statusBar()
 
-        self.openFile(QtCore.QString(":/Charts/qtdata.cht"))
+        self.openFile(':/Charts/qtdata.cht')
 
-        self.setWindowTitle(self.tr("Chart"))
+        self.setWindowTitle("Chart")
         self.resize(870, 550)
 
     def setupModel(self):
         self.model = QtGui.QStandardItemModel(8, 2, self)
-        self.model.setHeaderData(0, QtCore.Qt.Horizontal,
-                QtCore.QVariant(self.tr("Label")))
-        self.model.setHeaderData(1, QtCore.Qt.Horizontal,
-                QtCore.QVariant(self.tr("Quantity")))
+        self.model.setHeaderData(0, QtCore.Qt.Horizontal, "Label")
+        self.model.setHeaderData(1, QtCore.Qt.Horizontal, "Quantity")
 
     def setupViews(self):
         splitter = QtGui.QSplitter()
@@ -495,15 +500,13 @@ class MainWindow(QtGui.QMainWindow):
 
         self.setCentralWidget(splitter)
 
-    def openFile(self, path=QtCore.QString()):
-        if path.isNull():
-            fileName = QtGui.QFileDialog.getOpenFileName(self,
-                    self.tr("Choose a data file"), "", "*.cht")
-        else:
-            fileName = path
+    def openFile(self, path=None):
+        if not path:
+            path = QtGui.QFileDialog.getOpenFileName(self,
+                    "Choose a data file", '', '*.cht')
 
-        if not fileName.isEmpty():
-            f = QtCore.QFile(fileName)
+        if path:
+            f = QtCore.QFile(path)
 
             if f.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text):
                 stream = QtCore.QTextStream(f)
@@ -513,49 +516,48 @@ class MainWindow(QtGui.QMainWindow):
                         QtCore.QModelIndex())
 
                 row = 0
-                while True:
+                line = stream.readLine()
+                while line:
+                    self.model.insertRows(row, 1, QtCore.QModelIndex())
+
+                    pieces = line.split(',')
+                    self.model.setData(self.model.index(row, 0, QtCore.QModelIndex()),
+                                pieces[0])
+                    self.model.setData(self.model.index(row, 1, QtCore.QModelIndex()),
+                                float(pieces[1]))
+                    self.model.setData(self.model.index(row, 0, QtCore.QModelIndex()),
+                                QtGui.QColor(pieces[2]),
+                                QtCore.Qt.DecorationRole)
+
+                    row += 1
                     line = stream.readLine()
-                    if not line.isEmpty():
-                        self.model.insertRows(row, 1, QtCore.QModelIndex())
-
-                        pieces = line.split(",", QtCore.QString.SkipEmptyParts)
-                        self.model.setData(self.model.index(row, 0, QtCore.QModelIndex()),
-                                QtCore.QVariant(pieces[0]))
-                        self.model.setData(self.model.index(row, 1, QtCore.QModelIndex()),
-                                QtCore.QVariant(pieces[1]))
-                        self.model.setData(self.model.index(row, 0, QtCore.QModelIndex()),
-                                QtCore.QVariant(QtGui.QColor(pieces[2])), QtCore.Qt.DecorationRole)
-                        row += 1
-
-                    if line.isEmpty():
-                        break
 
                 f.close()
-                self.statusBar().showMessage(self.tr("Loaded %1").arg(fileName), 2000)
+                self.statusBar().showMessage("Loaded %s" % path, 2000)
 
     def saveFile(self):
-        fileName = QtGui.QFileDialog.getSaveFileName(self,
-                self.tr("Save file as"), "", "*.cht")
+        fileName = QtGui.QFileDialog.getSaveFileName(self, "Save file as", '',
+                '*.cht')
 
-        if not fileName.isEmpty():
+        if fileName:
             f = QtCore.QFile(fileName)
 
             if f.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
                 for row in range(self.model.rowCount(QtCore.QModelIndex())):
-                    pieces = QtCore.QStringList()
+                    pieces = []
 
                     pieces.append(self.model.data(self.model.index(row, 0, QtCore.QModelIndex()),
-                            QtCore.Qt.DisplayRole).toString())
-                    pieces.append(self.model.data(self.model.index(row, 1, QtCore.QModelIndex()),
-                            QtCore.Qt.DisplayRole).toString())
+                            QtCore.Qt.DisplayRole))
+                    pieces.append(str(self.model.data(self.model.index(row, 1, QtCore.QModelIndex()),
+                            QtCore.Qt.DisplayRole)))
                     pieces.append(self.model.data(self.model.index(row, 0, QtCore.QModelIndex()),
-                            QtCore.Qt.DecorationRole).toString())
+                            QtCore.Qt.DecorationRole).name())
 
-                    f.write(QtCore.QByteArray(str(pieces.join(","))))
-                    f.write("\n")
+                    f.write(QtCore.QByteArray(','.join(pieces)))
+                    f.write('\n')
 
             f.close()
-            self.statusBar().showMessage(self.tr("Saved %1").arg(fileName), 2000)
+            self.statusBar().showMessage("Saved %s" % fileName, 2000)
 
 
 if __name__ == '__main__':

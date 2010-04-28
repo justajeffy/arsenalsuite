@@ -1,6 +1,6 @@
 // This contains the implementation of the PyQtProxy class.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -43,6 +43,8 @@
 
 // Proxy flags.  Note that SIP_SINGLE_SHOT is part of the same flag-space.
 #define PROXY_OWNS_SLOT_SIG 0x10    // The proxy owns the slot signature.
+#define PROXY_SLOT_INVOKED  0x20    // The proxied slot is executing.
+#define PROXY_SLOT_DISABLED 0x40    // The proxied slot is disabled.
 
 
 // The last QObject sender.
@@ -241,15 +243,20 @@ void PyQtProxy::init(QObject *qtx, PyQtProxy::ProxyHash *hash, void *key)
     // Detect when the transmitter is destroyed.  (Note that we used to do this
     // by making the proxy a child of the transmitter.  This doesn't work as
     // expected because QWidget destroys its children before emitting the
-    // destroyed signal.)
+    // destroyed signal.)  We use a queued connection in case the proxy is also
+    // connected to the same signal and we want to make sure it has a chance
+    // to invoke the slot before being destroyed.
     if (qtx)
-        connect(qtx, SIGNAL(destroyed(QObject *)), SLOT(disable()));
+        connect(qtx, SIGNAL(destroyed(QObject *)), SLOT(disable()),
+                Qt::QueuedConnection);
 }
 
 
 // Destroy a universal proxy.
 PyQtProxy::~PyQtProxy()
 {
+    Q_ASSERT((proxy_flags & PROXY_SLOT_INVOKED) == 0);
+
     if (hashed)
     {
         mutex->lock();
@@ -257,12 +264,36 @@ PyQtProxy::~PyQtProxy()
         switch (type)
         {
         case ProxySlot:
-            proxy_slots.remove(saved_key, this);
-            break;
+            {
+                ProxyHash::iterator it(proxy_slots.find(saved_key));
+                ProxyHash::iterator end(proxy_slots.end());
+
+                while (it != end && it.key() == saved_key)
+                {
+                    if (it.value() == this)
+                        it = proxy_slots.erase(it);
+                    else
+                        ++it;
+                }
+
+                break;
+            }
 
         case ProxySignal:
-            proxy_signals.remove(saved_key, this);
-            break;
+            {
+                ProxyHash::iterator it(proxy_signals.find(saved_key));
+                ProxyHash::iterator end(proxy_signals.end());
+
+                while (it != end && it.key() == saved_key)
+                {
+                    if (it.value() == this)
+                        it = proxy_signals.erase(it);
+                    else
+                        ++it;
+                }
+
+                break;
+            }
         }
 
         mutex->unlock();
@@ -339,7 +370,7 @@ int PyQtProxy::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id)
         {
         case 0:
-            delete this;
+            disable();
             break;
 
         case 1:
@@ -381,10 +412,12 @@ void PyQtProxy::unislot(void **qargs)
     }
     else
     {
+        proxy_flags |= PROXY_SLOT_INVOKED;
         res = invokeSlot(real_slot, qargs);
+        proxy_flags &= ~PROXY_SLOT_INVOKED;
 
-        // Self destruct if we are a single shot.
-        if (proxy_flags & SIP_SINGLE_SHOT)
+        // Self destruct if we are a single shot or disabled.
+        if (proxy_flags & (SIP_SINGLE_SHOT|PROXY_SLOT_DISABLED))
             delete this;
     }
 
@@ -396,6 +429,17 @@ void PyQtProxy::unislot(void **qargs)
     last_sender = saved_last_sender;
 
     SIP_UNBLOCK_THREADS
+}
+
+
+// Disable the slot by destroying it if possible, or delaying its destruction
+// until the proxied slot returns.
+void PyQtProxy::disable()
+{
+    if (proxy_flags & PROXY_SLOT_INVOKED)
+        proxy_flags |= PROXY_SLOT_DISABLED;
+    else
+        delete this;
 }
 
 
@@ -444,8 +488,9 @@ PyQtProxy *PyQtProxy::findSlotProxy(void *tx, const char *sig, PyObject *rxObj,
     mutex->lock();
 
     ProxyHash::const_iterator it(proxy_slots.find(tx));
+    ProxyHash::const_iterator end(proxy_slots.end());
 
-    while (it != proxy_slots.end() && it.key() == tx)
+    while (it != end && it.key() == tx)
     {
         PyQtProxy *up = it.value();
 
@@ -471,8 +516,9 @@ void PyQtProxy::deleteSlotProxies(void *tx, const char *sig)
     mutex->lock();
 
     ProxyHash::iterator it(proxy_slots.find(tx));
+    ProxyHash::iterator end(proxy_slots.end());
 
-    while (it != proxy_slots.end() && it.key() == tx)
+    while (it != end && it.key() == tx)
     {
         PyQtProxy *up = it.value();
 

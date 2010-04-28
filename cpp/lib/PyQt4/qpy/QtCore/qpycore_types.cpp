@@ -1,6 +1,6 @@
 // This contains the meta-type used by PyQt.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -420,23 +420,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         qo->str_data.append('\0');
 
         // Add the property flags.
-        uint flags = 0;
-
-        // Designable.
-        if (pp->pyqtprop_designable)
-            flags |= 0x00001000;
-
-        // Scriptable.
-        if (pp->pyqtprop_scriptable)
-            flags |= 0x00004000;
-
-        // Stored.
-        if (pp->pyqtprop_stored)
-            flags |= 0x00010000;
-
-        // User.
-        if (pp->pyqtprop_user)
-            flags |= 0x00100000;
+        uint flags = pp->pyqtprop_flags;
 
         // Enum or flag.
         if (pp->pyqtprop_parsed_type->isEnum() || pp->pyqtprop_parsed_type->isFlag())

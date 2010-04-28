@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Potential Incompatibilities with Earlier Versions &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>Potential Incompatibilities with Earlier Versions &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" />
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" />
     <link rel="next" title="Installation" href="installation.html" />
     <link rel="prev" title="Introduction" href="introduction.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="introduction.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -52,6 +52,17 @@
 <h1>Potential Incompatibilities with Earlier Versions<a class="headerlink" href="#potential-incompatibilities-with-earlier-versions" title="Permalink to this headline">¶</a></h1>
 <p>This section describes incompatibilities introduced by particular versions of
 SIP.  Normally these are the removal of previously deprecated features.</p>
+<div class="section" id="sip-v4-10-1">
+<h2>SIP v4.10.1<a class="headerlink" href="#sip-v4-10-1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="newly-deprecated-features">
+<h3>Newly Deprecated Features<a class="headerlink" href="#newly-deprecated-features" title="Permalink to this headline">¶</a></h3>
+<p>The following parts of the <a class="reference external" href="c_api.html#ref-c-api"><em>C API</em></a> are now deprecated (but
+still supported).</p>
+<ul class="simple">
+<li>The <tt class="docutils literal"><span class="pre">D</span></tt> format character of <a title="sipParseResult" class="reference external" href="c_api.html#sipParseResult"><tt class="xref docutils literal"><span class="pre">sipParseResult()</span></tt></a>.</li>
+</ul>
+</div>
+</div>
 <div class="section" id="sip-v4-8">
 <h2>SIP v4.8<a class="headerlink" href="#sip-v4-8" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="truediv">
@@ -100,8 +111,8 @@ been removed.</p>
 <li><tt class="xref docutils literal"><span class="pre">sipGetSender()</span></tt></li>
 </ul>
 </div>
-<div class="section" id="newly-deprecated-features">
-<h3>Newly Deprecated Features<a class="headerlink" href="#newly-deprecated-features" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h3>Newly Deprecated Features<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>The following parts of the <a class="reference external" href="c_api.html#ref-c-api"><em>C API</em></a> are now deprecated (but
 still supported).</p>
 <ul class="simple">
@@ -127,7 +138,7 @@ still supported).</p>
 <li><a title="sipWrapper_Check" class="reference external" href="c_api.html#sipWrapper_Check"><tt class="xref docutils literal"><span class="pre">sipWrapper_Check()</span></tt></a></li>
 <li>The <tt class="docutils literal"><span class="pre">B</span></tt>, <tt class="docutils literal"><span class="pre">C</span></tt> and <tt class="docutils literal"><span class="pre">E</span></tt> format characters of <a title="sipBuildResult" class="reference external" href="c_api.html#sipBuildResult"><tt class="xref docutils literal"><span class="pre">sipBuildResult()</span></tt></a> and
 <a title="sipCallMethod" class="reference external" href="c_api.html#sipCallMethod"><tt class="xref docutils literal"><span class="pre">sipCallMethod()</span></tt></a>.</li>
-<li>The <tt class="docutils literal"><span class="pre">s</span></tt>, <tt class="docutils literal"><span class="pre">C</span></tt> and <tt class="docutils literal"><span class="pre">E</span></tt> format character of <a title="sipParseResult" class="reference external" href="c_api.html#sipParseResult"><tt class="xref docutils literal"><span class="pre">sipParseResult()</span></tt></a>.</li>
+<li>The <tt class="docutils literal"><span class="pre">s</span></tt>, <tt class="docutils literal"><span class="pre">C</span></tt> and <tt class="docutils literal"><span class="pre">E</span></tt> format characters of <a title="sipParseResult" class="reference external" href="c_api.html#sipParseResult"><tt class="xref docutils literal"><span class="pre">sipParseResult()</span></tt></a>.</li>
 </ul>
 </div>
 </div>
@@ -169,8 +180,8 @@ the <a class="reference external" href="annotations.html#aanno-Transfer"><tt cla
 <h3>SIP_BUILD<a class="headerlink" href="#sip-build" title="Permalink to this headline">¶</a></h3>
 <p>The <tt class="xref docutils literal"><span class="pre">SIP_BUILD</span></tt> C preprocessor symbol has been removed.</p>
 </div>
-<div class="section" id="id1">
-<h3>Newly Deprecated Features<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Newly Deprecated Features<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>The following parts of the <a class="reference external" href="c_api.html#ref-c-api"><em>C API</em></a> are now deprecated (but
 still supported).</p>
 <ul class="simple">
@@ -191,12 +202,16 @@ still supported).</p>
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Potential Incompatibilities with Earlier Versions</a><ul>
+<li><a class="reference external" href="#sip-v4-10-1">SIP v4.10.1</a><ul>
+<li><a class="reference external" href="#newly-deprecated-features">Newly Deprecated Features</a></li>
+</ul>
+</li>
 <li><a class="reference external" href="#sip-v4-8">SIP v4.8</a><ul>
 <li><a class="reference external" href="#truediv">__truediv__</a></li>
 <li><a class="reference external" href="#sipwrapper-user-member">sipWrapper user Member</a></li>
 <li><a class="reference external" href="#removal-of-previously-deprecated-features">Removal of Previously Deprecated Features</a></li>
 <li><a class="reference external" href="#removal-of-pyqt-specific-features">Removal of PyQt-specific Features</a></li>
-<li><a class="reference external" href="#newly-deprecated-features">Newly Deprecated Features</a></li>
+<li><a class="reference external" href="#id1">Newly Deprecated Features</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#sip-v4-7-8">SIP v4.7.8</a><ul>
@@ -210,7 +225,7 @@ still supported).</p>
 <li><a class="reference external" href="#sip-v4-4">SIP v4.4</a><ul>
 <li><a class="reference external" href="#convertfromtypecode-and-converttotypecode">%ConvertFromTypeCode and %ConvertToTypeCode</a></li>
 <li><a class="reference external" href="#sip-build">SIP_BUILD</a></li>
-<li><a class="reference external" href="#id1">Newly Deprecated Features</a></li>
+<li><a class="reference external" href="#id2">Newly Deprecated Features</a></li>
 </ul>
 </li>
 </ul>
@@ -255,12 +270,12 @@ still supported).</p>
         <li class="right" >
           <a href="introduction.html" title="Introduction"
              >previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

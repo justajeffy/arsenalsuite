@@ -21,7 +21,12 @@
 ##
 #############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QVariant', 2)
+
 import sys
+
 from PyQt4 import QtCore, QtGui
 
 try:
@@ -64,7 +69,7 @@ class Window(QtGui.QWidget):
 
         for effect in Phonon.BackendCapabilities.availableAudioEffects():
             item = QtGui.QTreeWidgetItem(self.effectsTreeWidget)
-            item.setText(0, self.tr("Effect"))
+            item.setText(0, "Effect")
             item.setText(1, effect.name())
             item.setText(2, effect.description())
 
@@ -74,10 +79,10 @@ class Window(QtGui.QWidget):
                 minimumValue = parameter.minimumValue()
                 maximumValue = parameter.maximumValue()
 
-                valueString = QtCore.QString("%1 / %2 / %3").arg(defaultValue.toString()).arg(minimumValue.toString()).arg(maximumValue.toString())
+                valueString = "%s / %s / %s" % (defaultValue, minimumValue, maximumValue)
 
                 parameterItem = QtGui.QTreeWidgetItem(item)
-                parameterItem.setText(0, self.tr("Parameter"))
+                parameterItem.setText(0, "Parameter")
                 parameterItem.setText(1, parameter.name())
                 parameterItem.setText(2, parameter.description())
                 parameterItem.setText(3, QtCore.QVariant.typeToName(parameter.type()))
@@ -98,20 +103,19 @@ class Window(QtGui.QWidget):
         layout.addWidget(self.backendBox)
 
         self.setLayout(layout)
-        self.setWindowTitle(self.tr("Backend Capabilities Example"))
+        self.setWindowTitle("Backend Capabilities Example")
 
     def setupBackendBox(self):
-        self.devicesLabel = QtGui.QLabel(self.tr("Available Audio Devices:"))
+        self.devicesLabel = QtGui.QLabel("Available Audio Devices:")
         self.devicesListView = QtGui.QListView()
 
-        self.mimeTypesLabel = QtGui.QLabel(self.tr("Supported MIME Types:"))
+        self.mimeTypesLabel = QtGui.QLabel("Supported MIME Types:")
         self.mimeListWidget = QtGui.QListWidget()
 
-        self.effectsLabel = QtGui.QLabel(self.tr("Available Audio Effects:"))
+        self.effectsLabel = QtGui.QLabel("Available Audio Effects:")
 
-        headerLabels = [self.tr("Type"), self.tr("Name"),
-                self.tr("Description"), self.tr("Value Type"),
-                self.tr("Default/Min/Max Values")]
+        headerLabels = ("Type", "Name", "Description", "Value Type",
+                "Default/Min/Max Values")
 
         self.effectsTreeWidget = QtGui.QTreeWidget()
         self.effectsTreeWidget.setHeaderLabels(headerLabels)
@@ -126,7 +130,7 @@ class Window(QtGui.QWidget):
         layout.addWidget(self.effectsTreeWidget, 3, 0, 2, 2)
         layout.setRowStretch(3, 100)
 
-        self.backendBox = QtGui.QGroupBox(self.tr("Backend Capabilities"))
+        self.backendBox = QtGui.QGroupBox("Backend Capabilities")
         self.backendBox.setLayout(layout)
 
 

@@ -142,6 +142,7 @@ def loadUiType(uifile):
 
     uifile is a file name or file-like object containing the .ui file.
     """
+
     import sys
 
     from PyQt4 import QtGui
@@ -170,6 +171,11 @@ def loadUi(uifile, baseinstance=None):
     then the user interface is created in it.  Otherwise a new instance of the
     base class is automatically created.
     """
+
     from PyQt4.uic.Loader.loader import DynamicUILoader
 
     return DynamicUILoader().loadUi(uifile, baseinstance)
+
+
+# The list of directories that are searched for widget plugins.
+from PyQt4.uic.objcreator import widgetPluginPath

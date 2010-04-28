@@ -172,7 +172,7 @@ class Window(QtGui.QWidget):
         super(Window, self).__init__()
 
         centralWidget = QtGui.QTextBrowser()
-        centralWidget.setPlainText(self.tr("Central widget"))
+        centralWidget.setPlainText("Central widget")
 
         layout = BorderLayout()
         layout.addWidget(centralWidget, BorderLayout.Center)
@@ -198,7 +198,7 @@ class Window(QtGui.QWidget):
 
         self.setLayout(layout)
 
-        self.setWindowTitle(self.tr("Border Layout"))
+        self.setWindowTitle("Border Layout")
 
     def createLabel(self, text):
         label = QtGui.QLabel(text)

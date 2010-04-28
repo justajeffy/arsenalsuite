@@ -23,6 +23,10 @@
 ##
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QString', 2)
+
 from PyQt4 import QtCore, QtGui
 
 import fridgemagnets_rc
@@ -61,7 +65,7 @@ class DragLabel(QtGui.QLabel):
     def mousePressEvent(self, event):
         itemData = QtCore.QByteArray()
         dataStream = QtCore.QDataStream(itemData, QtCore.QIODevice.WriteOnly)
-        dataStream << self.labelText << QtCore.QPoint(event.pos() - self.rect().topLeft())
+        dataStream << QtCore.QByteArray(self.labelText) << QtCore.QPoint(event.pos() - self.rect().topLeft())
 
         mimeData = QtCore.QMimeData()
         mimeData.setData('application/x-fridgemagnet', itemData)
@@ -86,29 +90,25 @@ class DragWidget(QtGui.QWidget):
 
         dictionaryFile = QtCore.QFile(':/dictionary/words.txt')
         dictionaryFile.open(QtCore.QFile.ReadOnly)
-        inputStream = QtCore.QTextStream(dictionaryFile)
 
         x = 5
         y = 5
 
-        while not inputStream.atEnd():
-            word = QtCore.QString()
-            inputStream >> word
-            if not word.isEmpty():
-                wordLabel = DragLabel(word, self)
-                wordLabel.move(x, y)
-                wordLabel.show()
-                x += wordLabel.width() + 2
-                if x >= 245:
-                    x = 5
-                    y += wordLabel.height() + 2
+        for word in QtCore.QTextStream(dictionaryFile).readAll().split():
+            wordLabel = DragLabel(word, self)
+            wordLabel.move(x, y)
+            wordLabel.show()
+            x += wordLabel.width() + 2
+            if x >= 245:
+                x = 5
+                y += wordLabel.height() + 2
 
         newPalette = self.palette()
         newPalette.setColor(QtGui.QPalette.Window, QtCore.Qt.white)
         self.setPalette(newPalette)
 
         self.setMinimumSize(400, max(200, y))
-        self.setWindowTitle(self.tr("Fridge Magnets"))
+        self.setWindowTitle("Fridge Magnets")
         self.setAcceptDrops(True)
 
     def dragEnterEvent(self, event):
@@ -131,9 +131,16 @@ class DragWidget(QtGui.QWidget):
             itemData = mime.data('application/x-fridgemagnet')
             dataStream = QtCore.QDataStream(itemData, QtCore.QIODevice.ReadOnly)
 
-            text = QtCore.QString()
+            text = QtCore.QByteArray()
             offset = QtCore.QPoint()
             dataStream >> text >> offset
+
+            try:
+                # Python v3.
+                text = str(text, encoding='latin1')
+            except TypeError:
+                # Python v2.
+                text = str(text)
 
             newLabel = DragLabel(text, self)
             newLabel.move(event.pos() - offset)
@@ -145,8 +152,7 @@ class DragWidget(QtGui.QWidget):
             else:
                 event.acceptProposedAction()
         elif event.mimeData().hasText():
-            pieces = event.mimeData().text().split(QtCore.QRegExp("\\s+"),
-                    QtCore.QString.SkipEmptyParts)
+            pieces = event.mimeData().text().split()
             position = event.pos()
 
             for piece in pieces:

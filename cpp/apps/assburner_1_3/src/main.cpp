@@ -52,7 +52,6 @@
 #include "jobsync.h"
 #include "host.h"
 #include "hoststatus.h"
-#include "svnrev.h"
 
 #include "stonegui.h"
 #include "classes.h"
@@ -270,7 +269,7 @@ int main(int argc, char * argv[])
 
 	QString appName = cfg.readString("ApplicationName","Assburner");
 	a->setApplicationName( appName );
-	LOG_1( appName+" version " + VERSION + ", build " + SVN_REVSTR + " starting" );
+	LOG_1( appName+" version " + VERSION + ", build " + QString("$Date$").remove(QRegExp("[^\\d]")) + " starting" );
 
 	classes_loader();
 	initStoneGui();

@@ -23,6 +23,10 @@
 # 
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QVariant', 2)
+
 from PyQt4 import QtCore, QtGui
 
 import mdi_rc
@@ -39,19 +43,17 @@ class MdiChild(QtGui.QTextEdit):
 
     def newFile(self):
         self.isUntitled = True
-        self.curFile = self.tr("document%1.txt").arg(MdiChild.sequenceNumber)
+        self.curFile = "document%d.txt" % MdiChild.sequenceNumber
         MdiChild.sequenceNumber += 1
-        self.setWindowTitle(self.curFile + "[*]")
+        self.setWindowTitle(self.curFile + '[*]')
 
         self.document().contentsChanged.connect(self.documentWasModified)
 
     def loadFile(self, fileName):
         file = QtCore.QFile(fileName)
         if not file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, self.tr("MDI"),
-                        self.tr("Cannot read file %1:\n%2.")
-                        .arg(fileName)
-                        .arg(file.errorString()))
+            QtGui.QMessageBox.warning(self, "MDI",
+                    "Cannot read file %s:\n%s." % (fileName, file.errorString()))
             return False
 
         instr = QtCore.QTextStream(file)
@@ -72,9 +74,9 @@ class MdiChild(QtGui.QTextEdit):
             return self.saveFile(self.curFile)
 
     def saveAs(self):
-        fileName = QtGui.QFileDialog.getSaveFileName(self, self.tr("Save As"),
+        fileName = QtGui.QFileDialog.getSaveFileName(self, "Save As",
                 self.curFile)
-        if fileName.isEmpty:
+        if not fileName:
             return False
 
         return self.saveFile(fileName)
@@ -83,10 +85,8 @@ class MdiChild(QtGui.QTextEdit):
         file = QtCore.QFile(fileName)
 
         if not file.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, self.tr("MDI"),
-                    self.tr("Cannot write file %1:\n%2.")
-                    .arg(fileName)
-                    .arg(file.errorString()))
+            QtGui.QMessageBox.warning(self, "MDI",
+                    "Cannot write file %s:\n%s." % (fileName, file.errorString()))
             return False
 
         outstr = QtCore.QTextStream(file)
@@ -114,10 +114,9 @@ class MdiChild(QtGui.QTextEdit):
 
     def maybeSave(self):
         if self.document().isModified():
-            ret = QtGui.QMessageBox.warning(self, self.tr("MDI"),
-                    self.tr("'%1' has been modified.\n"\
-                            "Do you want to save your changes?")
-                    .arg(self.userFriendlyCurrentFile()),
+            ret = QtGui.QMessageBox.warning(self, "MDI",
+                    "'%s' has been modified.\nDo you want to save your "
+                    "changes?" % self.userFriendlyCurrentFile(),
                     QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard |
                     QtGui.QMessageBox.Cancel)
             if ret == QtGui.QMessageBox.Save:
@@ -159,7 +158,7 @@ class MainWindow(QtGui.QMainWindow):
 
         self.readSettings()
 
-        self.setWindowTitle(self.tr("MDI"))
+        self.setWindowTitle("MDI")
         self.setUnifiedTitleAndToolBarOnMac(True)
 
     def closeEvent(self, event):
@@ -177,7 +176,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def open(self):
         fileName = QtGui.QFileDialog.getOpenFileName(self)
-        if not fileName.isEmpty():
+        if fileName:
             existing = self.findMdiChild(fileName)
             if existing:
                 self.mdiArea.setActiveSubWindow(existing)
@@ -185,18 +184,18 @@ class MainWindow(QtGui.QMainWindow):
 
             child = self.createMdiChild()
             if child.loadFile(fileName):
-                self.statusBar().showMessage(self.tr("File loaded"), 2000)
+                self.statusBar().showMessage("File loaded", 2000)
                 child.show()
             else:
                 child.close()
 
     def save(self):
         if self.activeMdiChild() and self.activeMdiChild().save():
-            self.statusBar().showMessage(self.tr("File saved"), 2000)
+            self.statusBar().showMessage("File saved", 2000)
 
     def saveAs(self):
         if self.activeMdiChild() and self.activeMdiChild().saveAs():
-            self.statusBar().showMessage(self.tr("File saved"), 2000)
+            self.statusBar().showMessage("File saved", 2000)
 
     def cut(self):
         if self.activeMdiChild():
@@ -211,9 +210,9 @@ class MainWindow(QtGui.QMainWindow):
             self.activeMdiChild().paste()
 
     def about(self):
-        QtGui.QMessageBox.about(self, self.tr("About MDI"),
-                self.tr("The <b>MDI</b> example demonstrates how to write "
-                        "multiple document interface applications using Qt."))
+        QtGui.QMessageBox.about(self, "About MDI",
+                "The <b>MDI</b> example demonstrates how to write multiple "
+                "document interface applications using Qt.")
 
     def updateMenus(self):
         hasMdiChild = (self.activeMdiChild() is not None)
@@ -251,10 +250,9 @@ class MainWindow(QtGui.QMainWindow):
         for i, window in enumerate(windows):
             child = window.widget()
 
+            text = "%d %s" % (i + 1, child.userFriendlyCurrentFile())
             if i < 9:
-                text = self.tr("&%1 %2").arg(i + 1).arg(child.userFriendlyCurrentFile())
-            else:
-                text = self.tr("%1 %2").arg(i + 1).arg(child.userFriendlyFile())
+                text = '&' + text
 
             action = self.windowMenu.addAction(text)
             action.setCheckable(True)
@@ -272,145 +270,130 @@ class MainWindow(QtGui.QMainWindow):
         return child
 
     def createActions(self):
-        self.newAct = QtGui.QAction(QtGui.QIcon(":/images/new.png"),
-                self.tr("&New"), self)
-        self.newAct.setShortcut(QtGui.QKeySequence.New)
-        self.newAct.setStatusTip(self.tr("Create a new file"))
-        self.newAct.triggered.connect(self.newFile)
+        self.newAct = QtGui.QAction(QtGui.QIcon(':/images/new.png'), "&New",
+                self, shortcut=QtGui.QKeySequence.New,
+                statusTip="Create a new file", triggered=self.newFile)
 
-        self.openAct = QtGui.QAction(QtGui.QIcon(":/images/open.png"),
-                self.tr("&Open..."), self)
-        self.openAct.setShortcut(QtGui.QKeySequence.Open)
-        self.openAct.setStatusTip(self.tr("Open an existing file"))
-        self.openAct.triggered.connect(self.open)
+        self.openAct = QtGui.QAction(QtGui.QIcon(':/images/open.png'),
+                "&Open...", self, shortcut=QtGui.QKeySequence.Open,
+                statusTip="Open an existing file", triggered=self.open)
 
-        self.saveAct = QtGui.QAction(QtGui.QIcon(":/images/save.png"),
-                self.tr("&Save"), self)
-        self.saveAct.setShortcut(QtGui.QKeySequence.Save)
-        self.saveAct.setStatusTip(self.tr("Save the document to disk"))
-        self.saveAct.triggered.connect(self.save)
+        self.saveAct = QtGui.QAction(QtGui.QIcon(':/images/save.png'),
+                "&Save", self, shortcut=QtGui.QKeySequence.Save,
+                statusTip="Save the document to disk", triggered=self.save)
 
-        self.saveAsAct = QtGui.QAction(self.tr("Save &As..."), self)
-        self.saveAsAct.setShortcut(QtGui.QKeySequence.SaveAs)
-        self.saveAsAct.setStatusTip(self.tr("Save the document under a new name"))
-        self.saveAsAct.triggered.connect(self.saveAs)
+        self.saveAsAct = QtGui.QAction("Save &As...", self,
+                shortcut=QtGui.QKeySequence.SaveAs,
+                statusTip="Save the document under a new name",
+                triggered=self.saveAs)
 
-        self.exitAct = QtGui.QAction(self.tr("E&xit"), self)
-        self.exitAct.setShortcut(self.tr("Ctrl+Q"))
-        self.exitAct.setStatusTip(self.tr("Exit the application"))
-        self.exitAct.triggered.connect(QtGui.qApp.closeAllWindows)
+        self.exitAct = QtGui.QAction("E&xit", self, shortcut="Ctrl+Q",
+                statusTip="Exit the application",
+                triggered=QtGui.qApp.closeAllWindows)
 
-        self.cutAct = QtGui.QAction(QtGui.QIcon(":/images/cut.png"),
-                self.tr("Cu&t"), self)
-        self.cutAct.setShortcut(QtGui.QKeySequence.Cut)
-        self.cutAct.setStatusTip(self.tr("Cut the current selection's "
-                                         "contents to the clipboard"))
-        self.cutAct.triggered.connect(self.cut)
+        self.cutAct = QtGui.QAction(QtGui.QIcon(':/images/cut.png'), "Cu&t",
+                self, shortcut=QtGui.QKeySequence.Cut,
+                statusTip="Cut the current selection's contents to the clipboard",
+                triggered=self.cut)
 
-        self.copyAct = QtGui.QAction(QtGui.QIcon(":/images/copy.png"),
-                self.tr("&Copy"), self)
-        self.copyAct.setShortcut(QtGui.QKeySequence.Copy)
-        self.copyAct.setStatusTip(self.tr("Copy the current selection's "
-                                          "contents to the clipboard"))
-        self.copyAct.triggered.connect(self.copy)
+        self.copyAct = QtGui.QAction(QtGui.QIcon(':/images/copy.png'),
+                "&Copy", self, shortcut=QtGui.QKeySequence.Copy,
+                statusTip="Copy the current selection's contents to the clipboard",
+                triggered=self.copy)
 
-        self.pasteAct = QtGui.QAction(QtGui.QIcon(":/images/paste.png"),
-                self.tr("&Paste"), self)
-        self.pasteAct.setShortcut(QtGui.QKeySequence.Paste)
-        self.pasteAct.setStatusTip(self.tr("Paste the clipboard's contents "
-                                           "into the current selection"))
-        self.pasteAct.triggered.connect(self.paste)
+        self.pasteAct = QtGui.QAction(QtGui.QIcon(':/images/paste.png'),
+                "&Paste", self, shortcut=QtGui.QKeySequence.Paste,
+                statusTip="Paste the clipboard's contents into the current selection",
+                triggered=self.paste)
 
-        self.closeAct = QtGui.QAction(self.tr("Cl&ose"), self)
-        self.closeAct.setShortcut(self.tr("Ctrl+F4"))
-        self.closeAct.setStatusTip(self.tr("Close the active window"))
-        self.closeAct.triggered.connect(self.mdiArea.closeActiveSubWindow)
+        self.closeAct = QtGui.QAction("Cl&ose", self, shortcut="Ctrl+F4",
+                statusTip="Close the active window",
+                triggered=self.mdiArea.closeActiveSubWindow)
 
-        self.closeAllAct = QtGui.QAction(self.tr("Close &All"), self)
-        self.closeAllAct.setStatusTip(self.tr("Close all the windows"))
-        self.closeAllAct.triggered.connect(self.mdiArea.closeAllSubWindows)
+        self.closeAllAct = QtGui.QAction("Close &All", self,
+                statusTip="Close all the windows",
+                triggered=self.mdiArea.closeAllSubWindows)
 
-        self.tileAct = QtGui.QAction(self.tr("&Tile"), self)
-        self.tileAct.setStatusTip(self.tr("Tile the windows"))
-        self.tileAct.triggered.connect(self.mdiArea.tileSubWindows)
+        self.tileAct = QtGui.QAction("&Tile", self,
+                statusTip="Tile the windows",
+                triggered=self.mdiArea.tileSubWindows)
 
-        self.cascadeAct = QtGui.QAction(self.tr("&Cascade"), self)
-        self.cascadeAct.setStatusTip(self.tr("Cascade the windows"))
-        self.cascadeAct.triggered.connect(self.mdiArea.cascadeSubWindows)
+        self.cascadeAct = QtGui.QAction("&Cascade", self,
+                statusTip="Cascade the windows",
+                triggered=self.mdiArea.cascadeSubWindows)
 
-        self.nextAct = QtGui.QAction(self.tr("Ne&xt"), self)
-        self.nextAct.setShortcut(QtGui.QKeySequence.NextChild)
-        self.nextAct.setStatusTip(self.tr("Move the focus to the next window"))
-        self.nextAct.triggered.connect(self.mdiArea.activateNextSubWindow)
+        self.nextAct = QtGui.QAction("Ne&xt", self,
+                shortcut=QtGui.QKeySequence.NextChild,
+                statusTip="Move the focus to the next window",
+                triggered=self.mdiArea.activateNextSubWindow)
 
-        self.previousAct = QtGui.QAction(self.tr("Pre&vious"), self)
-        self.previousAct.setShortcut(QtGui.QKeySequence.PreviousChild)
-        self.previousAct.setStatusTip(self.tr("Move the focus to the previous "
-                                              "window"))
-        self.previousAct.triggered.connect(self.mdiArea.activatePreviousSubWindow)
+        self.previousAct = QtGui.QAction("Pre&vious", self,
+                shortcut=QtGui.QKeySequence.PreviousChild,
+                statusTip="Move the focus to the previous window",
+                triggered=self.mdiArea.activatePreviousSubWindow)
 
         self.separatorAct = QtGui.QAction(self)
         self.separatorAct.setSeparator(True)
 
-        self.aboutAct = QtGui.QAction(self.tr("&About"), self)
-        self.aboutAct.setStatusTip(self.tr("Show the application's About box"))
-        self.aboutAct.triggered.connect(self.about)
+        self.aboutAct = QtGui.QAction("&About", self,
+                statusTip="Show the application's About box",
+                triggered=self.about)
 
-        self.aboutQtAct = QtGui.QAction(self.tr("About &Qt"), self)
-        self.aboutQtAct.setStatusTip(self.tr("Show the Qt library's About box"))
-        self.aboutQtAct.triggered.connect(QtGui.qApp.aboutQt)
+        self.aboutQtAct = QtGui.QAction("About &Qt", self,
+                statusTip="Show the Qt library's About box",
+                triggered=QtGui.qApp.aboutQt)
 
     def createMenus(self):
-        self.fileMenu = self.menuBar().addMenu(self.tr("&File"))
+        self.fileMenu = self.menuBar().addMenu("&File")
         self.fileMenu.addAction(self.newAct)
         self.fileMenu.addAction(self.openAct)
         self.fileMenu.addAction(self.saveAct)
         self.fileMenu.addAction(self.saveAsAct)
         self.fileMenu.addSeparator()
-        action = self.fileMenu.addAction(self.tr("Switch layout direction"))
+        action = self.fileMenu.addAction("Switch layout direction")
         action.triggered.connect(self.switchLayoutDirection)
         self.fileMenu.addAction(self.exitAct)
 
-        self.editMenu = self.menuBar().addMenu(self.tr("&Edit"))
+        self.editMenu = self.menuBar().addMenu("&Edit")
         self.editMenu.addAction(self.cutAct)
         self.editMenu.addAction(self.copyAct)
         self.editMenu.addAction(self.pasteAct)
 
-        self.windowMenu = self.menuBar().addMenu(self.tr("&Window"))
+        self.windowMenu = self.menuBar().addMenu("&Window")
         self.updateWindowMenu()
         self.windowMenu.aboutToShow.connect(self.updateWindowMenu)
 
         self.menuBar().addSeparator()
 
-        self.helpMenu = self.menuBar().addMenu(self.tr("&Help"))
+        self.helpMenu = self.menuBar().addMenu("&Help")
         self.helpMenu.addAction(self.aboutAct)
         self.helpMenu.addAction(self.aboutQtAct)
 
     def createToolBars(self):
-        self.fileToolBar = self.addToolBar(self.tr("File"))
+        self.fileToolBar = self.addToolBar("File")
         self.fileToolBar.addAction(self.newAct)
         self.fileToolBar.addAction(self.openAct)
         self.fileToolBar.addAction(self.saveAct)
 
-        self.editToolBar = self.addToolBar(self.tr("Edit"))
+        self.editToolBar = self.addToolBar("Edit")
         self.editToolBar.addAction(self.cutAct)
         self.editToolBar.addAction(self.copyAct)
         self.editToolBar.addAction(self.pasteAct)
 
     def createStatusBar(self):
-        self.statusBar().showMessage(self.tr("Ready"))
+        self.statusBar().showMessage("Ready")
 
     def readSettings(self):
-        settings = QtCore.QSettings("Trolltech", "MDI Example")
-        pos = settings.value("pos", QtCore.QVariant(QtCore.QPoint(200, 200))).toPoint()
-        size = settings.value("size", QtCore.QVariant(QtCore.QSize(400, 400))).toSize()
+        settings = QtCore.QSettings('Trolltech', 'MDI Example')
+        pos = settings.value('pos', QtCore.QPoint(200, 200))
+        size = settings.value('size', QtCore.QSize(400, 400))
         self.move(pos)
         self.resize(size)
 
     def writeSettings(self):
-        settings = QtCore.QSettings("Trolltech", "MDI Example")
-        settings.setValue("pos", QtCore.QVariant(self.pos()))
-        settings.setValue("size", QtCore.QVariant(self.size()))
+        settings = QtCore.QSettings('Trolltech', 'MDI Example')
+        settings.setValue('pos', self.pos())
+        settings.setValue('size', self.size())
 
     def activeMdiChild(self):
         activeSubWindow = self.mdiArea.activeSubWindow()

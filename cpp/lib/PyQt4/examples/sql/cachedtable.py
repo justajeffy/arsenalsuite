@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 ############################################################################
 ##
@@ -37,20 +37,17 @@ class TableEditor(QtGui.QDialog):
         self.model.setEditStrategy(QtSql.QSqlTableModel.OnManualSubmit)
         self.model.select()
 
-        self.model.setHeaderData(0, QtCore.Qt.Horizontal,
-                QtCore.QVariant(self.tr("ID")))
-        self.model.setHeaderData(1, QtCore.Qt.Horizontal,
-                QtCore.QVariant(self.tr("First name")))
-        self.model.setHeaderData(2, QtCore.Qt.Horizontal,
-                QtCore.QVariant(self.tr("Last name")))
+        self.model.setHeaderData(0, QtCore.Qt.Horizontal, "ID")
+        self.model.setHeaderData(1, QtCore.Qt.Horizontal, "First name")
+        self.model.setHeaderData(2, QtCore.Qt.Horizontal, "Last name")
 
         view = QtGui.QTableView()
         view.setModel(self.model)
 
-        submitButton = QtGui.QPushButton(self.tr("Submit"))
+        submitButton = QtGui.QPushButton("Submit")
         submitButton.setDefault(True)
-        revertButton = QtGui.QPushButton(self.tr("&Revert"))
-        quitButton = QtGui.QPushButton(self.tr("Quit"))
+        revertButton = QtGui.QPushButton("&Revert")
+        quitButton = QtGui.QPushButton("Quit")
 
         buttonBox = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
         buttonBox.addButton(submitButton, QtGui.QDialogButtonBox.ActionRole)
@@ -66,7 +63,7 @@ class TableEditor(QtGui.QDialog):
         mainLayout.addWidget(buttonBox)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Cached Table"))
+        self.setWindowTitle("Cached Table")
 
     def submit(self):
         self.model.database().transaction()
@@ -74,9 +71,8 @@ class TableEditor(QtGui.QDialog):
             self.model.database().commit()
         else:
             self.model.database().rollback()
-            QtGui.QMessageBox.warning(self, self.tr("Cached Table"),
-                        self.tr("The database reported an error: %1")
-                                .arg(self.model.lastError().text()))
+            QtGui.QMessageBox.warning(self, "Cached Table",
+                        "The database reported an error: %s" % self.model.lastError().text())
 
 
 if __name__ == '__main__':
@@ -87,6 +83,6 @@ if __name__ == '__main__':
     if not connection.createConnection():
         sys.exit(1)
 
-    editor = TableEditor("person")
+    editor = TableEditor('person')
     editor.show()
     sys.exit(editor.exec_())

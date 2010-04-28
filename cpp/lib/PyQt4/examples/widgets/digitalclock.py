@@ -38,19 +38,19 @@ class DigitalClock(QtGui.QLCDNumber):
 
         self.showTime()
 
-        self.setWindowTitle(self.tr("Digital Clock"))
+        self.setWindowTitle("Digital Clock")
         self.resize(150, 60)
 
     def showTime(self):
         time = QtCore.QTime.currentTime()
-        text = time.toString("hh:mm")
+        text = time.toString('hh:mm')
         if (time.second() % 2) == 0:
             text = text[:2] + ' ' + text[3:]
 
         self.display(text)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

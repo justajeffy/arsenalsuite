@@ -116,7 +116,14 @@ contains( DEFINES, USE_PHONON ) {
 DEFINES+=STONEGUI_MAKE_DLL
 TEMPLATE=lib
 TARGET=stonegui
-target.path=/usr/local/lib
+
+unix {
+	target.path=$$(DESTDIR)/usr/local/lib
+}
+win32 {
+	target.path=$$(DESTDIR)/blur/common/
+}
+
 INSTALLS += target
 CONFIG+=qt thread
 QT+=sql xml gui network opengl

@@ -49,7 +49,7 @@ class AnalogClock(QtGui.QWidget):
         timer.timeout.connect(self.update)
         timer.start(1000)
 
-        self.setWindowTitle(self.tr("Analog Clock"))
+        self.setWindowTitle("Analog Clock")
         self.resize(200, 200)
 
     def paintEvent(self, event):
@@ -91,7 +91,7 @@ class AnalogClock(QtGui.QWidget):
             painter.rotate(6.0)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

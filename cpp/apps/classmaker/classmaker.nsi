@@ -3,7 +3,6 @@
 ; DESCRIPTION: Classmaker installer script
 ; (C) Blur Studio 2005
 
-!include classmaker-svnrev.nsi
 !define MUI_PRODUCT "Classmaker"
 !define MUI_VERSION "v1.0.X"
 
@@ -14,7 +13,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION}"
 !include "MUI.nsh"
 
 ; Name of resulting executable installer
-OutFile "classmaker_install_${MUI_SVNREV}.exe"
+OutFile "classmaker_install.exe"
 InstallDir "C:\\blur\\classmaker\\"
 
 !define MUI_FINISHPAGE
@@ -45,11 +44,9 @@ Section "install"
 	Delete "$QUICKLAUNCH\short*classmaker*lnk"
 	SetOutPath $INSTDIR
 	File classmaker.exe
-	File c:\mingw\bin\exchndl.dll
   	CreateShortCut "$DESKTOP\Classmaker 1.0.lnk" "$INSTDIR\classmaker.exe" ""
 	CreateShortcut "$QUICKLAUNCH\Classmaker 1.0.lnk" "$INSTDIR\classmaker.exe" ""
 	File classmaker.ini
-	File classmaker_version.txt
     File ..\..\lib\stone\stone.dll
     File ..\..\lib\stonegui\stonegui.dll
 	SetOutPath $INSTDIR\images

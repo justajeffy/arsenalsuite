@@ -190,7 +190,7 @@ if __name__ == '__main__':
     view.setCacheMode(QtGui.QGraphicsView.CacheBackground)
     view.setViewportUpdateMode(QtGui.QGraphicsView.BoundingRectViewportUpdate)
     view.setDragMode(QtGui.QGraphicsView.ScrollHandDrag)
-    view.setWindowTitle(QtCore.QT_TRANSLATE_NOOP(QtGui.QGraphicsView, "Colliding Mice"))
+    view.setWindowTitle("Colliding Mice")
     view.resize(400, 300)
     view.show()
 

@@ -50,14 +50,13 @@ class ShapedClock(QtGui.QWidget):
         timer.timeout.connect(self.update)
         timer.start(1000)
 
-        quitAction = QtGui.QAction(self.tr("E&xit"), self)
-        quitAction.setShortcut(self.tr("Ctrl+Q"))
-        quitAction.triggered.connect(QtGui.qApp.quit)
+        quitAction = QtGui.QAction("E&xit", self, shortcut="Ctrl+Q",
+                triggered=QtGui.qApp.quit)
         self.addAction(quitAction)
 
         self.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
-        self.setToolTip(self.tr("Drag the clock with the left mouse button.\n"
-                "Use the right mouse button to open a context menu."))
+        self.setToolTip("Drag the clock with the left mouse button.\n"
+                "Use the right mouse button to open a context menu.")
         self.setWindowTitle(self.tr("Shaped Analog Clock"))
 
     def mousePressEvent(self, event):
@@ -119,7 +118,7 @@ class ShapedClock(QtGui.QWidget):
         return QtCore.QSize(100, 100)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

@@ -1,7 +1,7 @@
 // This defines the API provided by this library.  It must not be explicitly
 // included by the library itself.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -94,6 +94,10 @@ bool qpycore_qobject_emit(QObject *qtx, const char *sig, PyObject *sigargs);
 // Support for QMetaObject::connectSlotsByName.
 void qpycore_qmetaobject_connectslotsbyname(QObject *qobj,
         PyObject *qobj_wrapper);
+
+// Support for signals.
+bool qpycore_pyqtsignal_get_parts(PyObject *sig_obj, QObject **qtx,
+        const char **sig);
 
 
 // Utilities.

@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>Index &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" /> 
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -71,6 +71,7 @@
 <dt><a href="directives.html#directive-%DefaultMetatype">%DefaultMetatype (directive)</a></dt>
 <dt><a href="directives.html#directive-%DefaultSupertype">%DefaultSupertype (directive)</a></dt>
 <dt><a href="directives.html#directive-%Doc">%Doc (directive)</a></dt>
+<dt><a href="directives.html#directive-%Docstring">%Docstring (directive)</a></dt>
 <dt><a href="directives.html#directive-%End">%End (directive)</a></dt>
 <dt><a href="directives.html#directive-%Exception">%Exception (directive)</a></dt>
 <dt><a href="directives.html#directive-%ExportedDoc">%ExportedDoc (directive)</a></dt>
@@ -116,11 +117,11 @@
 <dt>--version</dt>
   <dd><dl>
     <dt><a href="installation.html#cmdoption-configure.py--version">configure.py command line option</a></dt>
-  </dl></dd></dl></td><td width="33%" valign="top"><dl>
+  </dl></dd>
 <dt>-a &lt;FILE&gt;</dt>
   <dd><dl>
     <dt><a href="command_line.html#cmdoption-sip-a">sip command line option</a></dt>
-  </dl></dd>
+  </dl></dd></dl></td><td width="33%" valign="top"><dl>
 <dt>-b &lt;DIR&gt;, --bindir &lt;DIR&gt;</dt>
   <dd><dl>
     <dt><a href="installation.html#cmdoption-configure.py-b">configure.py command line option</a></dt>
@@ -169,6 +170,10 @@
   <dd><dl>
     <dt><a href="command_line.html#cmdoption-sip-j">sip command line option</a></dt>
   </dl></dd>
+<dt>-k</dt>
+  <dd><dl>
+    <dt><a href="command_line.html#cmdoption-sip-k">sip command line option</a></dt>
+  </dl></dd>
 <dt>-k, --static</dt>
   <dd><dl>
     <dt><a href="installation.html#cmdoption-configure.py-k">configure.py command line option</a></dt>
@@ -176,6 +181,14 @@
 <dt>-n, --universal</dt>
   <dd><dl>
     <dt><a href="installation.html#cmdoption-configure.py-n">configure.py command line option</a></dt>
+  </dl></dd>
+<dt>-o</dt>
+  <dd><dl>
+    <dt><a href="command_line.html#cmdoption-sip-o">sip command line option</a></dt>
+  </dl></dd>
+<dt>-P</dt>
+  <dd><dl>
+    <dt><a href="command_line.html#cmdoption-sip-P">sip command line option</a></dt>
   </dl></dd>
 <dt>-p &lt;MODULE&gt;</dt>
   <dd><dl>
@@ -240,6 +253,7 @@
     <dt><a href="build_system.html#sipconfig.ParentMakefile.__init__">(sipconfig.ParentMakefile method)</a></dt>
     <dt><a href="build_system.html#sipconfig.ProgramMakefile.__init__">(sipconfig.ProgramMakefile method)</a></dt>
     <dt><a href="build_system.html#sipconfig.PythonModuleMakefile.__init__">(sipconfig.PythonModuleMakefile method)</a></dt>
+    <dt><a href="build_system.html#sipconfig.SIPModuleMakefile.__init__">(sipconfig.SIPModuleMakefile method)</a></dt>
   </dl></dd></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="python_api.html#sip.voidptr.__int__">__int__() (sip.voidptr method)</a></dt>
 </dl></td></tr></table>
@@ -258,10 +272,11 @@
   <dd><dl>
     <dt><a href="annotations.html#fanno-API">(function annotation)</a></dt>
     <dt><a href="annotations.html#manno-API">(mapped type annotation)</a></dt>
-  </dl></dd></dl></td><td width="33%" valign="top"><dl>
-<dt><a href="build_system.html#sipconfig.Configuration.arch">arch (sipconfig.Configuration attribute)</a></dt>
+  </dl></dd>
+<dt><a href="build_system.html#sipconfig.Configuration.arch">arch (sipconfig.Configuration attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="annotations.html#aanno-Array">Array (argument annotation)</a></dt>
 <dt><a href="annotations.html#aanno-ArraySize">ArraySize (argument annotation)</a></dt>
+<dt><a href="python_api.html#sip.voidptr.ascapsule">ascapsule() (sip.voidptr method)</a></dt>
 <dt><a href="python_api.html#sip.voidptr.ascobject">ascobject() (sip.voidptr method)</a></dt>
 <dt><a href="python_api.html#sip.voidptr.asstring">asstring() (sip.voidptr method)</a></dt>
 <dt><a href="annotations.html#fanno-AutoGen">AutoGen (function annotation)</a></dt>
@@ -317,16 +332,26 @@
 <dt><a href="annotations.html#dd_name">dd_name (C member)</a></dt>
 <dt><a href="annotations.html#dd_next">dd_next (C member)</a></dt>
 <dt><a href="annotations.html#dd_ptr">dd_ptr (C member)</a></dt>
-<dt><a href="annotations.html#fanno-Default">Default (function annotation)</a></dt>
+<dt><a href="annotations.html#xanno-Default">Default (exception annotation)</a></dt>
+  <dd><dl>
+    <dt><a href="annotations.html#fanno-Default">(function annotation)</a></dt>
+  </dl></dd>
 <dt><a href="build_system.html#sipconfig.Configuration.default_bin_dir">default_bin_dir (sipconfig.Configuration attribute)</a></dt>
-<dt><a href="build_system.html#sipconfig.Configuration.default_mod_dir">default_mod_dir (sipconfig.Configuration attribute)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="build_system.html#sipconfig.Configuration.default_mod_dir">default_mod_dir (sipconfig.Configuration attribute)</a></dt>
 <dt><a href="build_system.html#sipconfig.Configuration.default_sip_dir">default_sip_dir (sipconfig.Configuration attribute)</a></dt>
-<dt><a href="annotations.html#canno-DelayDtor">DelayDtor (class annotation)</a></dt>
+<dt><a href="annotations.html#canno-DelayDtor">DelayDtor (class annotation)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="python_api.html#sip.delete">delete() (in module sip)</a></dt>
 <dt><a href="annotations.html#canno-Deprecated">Deprecated (class annotation)</a></dt>
   <dd><dl>
     <dt><a href="annotations.html#fanno-Deprecated">(function annotation)</a></dt>
   </dl></dd>
+<dt><a href="annotations.html#aanno-DocType">DocType (argument annotation)</a></dt>
+  <dd><dl>
+    <dt><a href="annotations.html#fanno-DocType">(function annotation)</a></dt>
+    <dt><a href="annotations.html#manno-DocType">(mapped type annotation)</a></dt>
+    <dt><a href="annotations.html#vanno-DocType">(variable annotation)</a></dt>
+  </dl></dd>
+<dt><a href="annotations.html#aanno-DocValue">DocValue (argument annotation)</a></dt>
 <dt><a href="python_api.html#sip.dump">dump() (in module sip)</a></dt>
 </dl></td></tr></table>
 
@@ -420,7 +445,8 @@
 <table width="100%" class="indextable"><tr><td width="33%" valign="top">
 <dl>
 
-<dt><a href="annotations.html#aanno-KeepReference">KeepReference (argument annotation)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="annotations.html#aanno-KeepReference">KeepReference (argument annotation)</a></dt>
+<dt><a href="annotations.html#fanno-KeywordArgs">KeywordArgs (function annotation)</a></dt></dl></td><td width="33%" valign="top"><dl>
 </dl></td></tr></table>
 
 <h2 id="L">L</h2>
@@ -447,8 +473,13 @@
 
 <dt><a href="annotations.html#fanno-NewThread">NewThread (function annotation)</a></dt>
 <dt><a href="annotations.html#fanno-NoArgParser">NoArgParser (function annotation)</a></dt>
+<dt><a href="annotations.html#aanno-NoCopy">NoCopy (argument annotation)</a></dt>
+  <dd><dl>
+    <dt><a href="annotations.html#fanno-NoCopy">(function annotation)</a></dt>
+  </dl></dd>
 <dt><a href="annotations.html#canno-NoDefaultCtors">NoDefaultCtors (class annotation)</a></dt>
 <dt><a href="annotations.html#fanno-NoDerived">NoDerived (function annotation)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="annotations.html#fanno-NoKeywordArgs">NoKeywordArgs (function annotation)</a></dt>
 <dt><a href="annotations.html#manno-NoRelease">NoRelease (mapped type annotation)</a></dt>
 <dt><a href="annotations.html#tanno-NoTypeName">NoTypeName (typedef annotation)</a></dt>
 <dt><a href="annotations.html#fanno-Numeric">Numeric (function annotation)</a></dt>
@@ -517,6 +548,7 @@
 <dt>sip command line option</dt>
   <dd><dl>
     <dt><a href="command_line.html#cmdoption-sip-I">-I &lt;DIR&gt;</a></dt>
+    <dt><a href="command_line.html#cmdoption-sip-P">-P</a></dt>
     <dt><a href="command_line.html#cmdoption-sip-V">-V</a></dt>
     <dt><a href="command_line.html#cmdoption-sip-a">-a &lt;FILE&gt;</a></dt>
     <dt><a href="command_line.html#cmdoption-sip-b">-b &lt;FILE&gt;</a></dt>
@@ -526,6 +558,8 @@
     <dt><a href="command_line.html#cmdoption-sip-g">-g</a></dt>
     <dt><a href="command_line.html#cmdoption-sip-h">-h</a></dt>
     <dt><a href="command_line.html#cmdoption-sip-j">-j &lt;NUMBER&gt;</a></dt>
+    <dt><a href="command_line.html#cmdoption-sip-k">-k</a></dt>
+    <dt><a href="command_line.html#cmdoption-sip-o">-o</a></dt>
     <dt><a href="command_line.html#cmdoption-sip-p">-p &lt;MODULE&gt;</a></dt>
     <dt><a href="command_line.html#cmdoption-sip-r">-r</a></dt>
     <dt><a href="command_line.html#cmdoption-sip-s">-s &lt;SUFFIX&gt;</a></dt>
@@ -544,6 +578,7 @@
 <dt><a href="build_system.html#sipconfig.Configuration.sip_mod_dir">sip_mod_dir (sipconfig.Configuration attribute)</a></dt>
 <dt><a href="c_api.html#SIP_NO_CONVERTORS">SIP_NO_CONVERTORS (C macro)</a></dt>
 <dt><a href="c_api.html#SIP_NOT_NONE">SIP_NOT_NONE (C macro)</a></dt>
+<dt><a href="c_api.html#SIP_PROTECTED_IS_PUBLIC">SIP_PROTECTED_IS_PUBLIC (C macro)</a></dt>
 <dt><a href="specification_files.html#stype-SIP_PYCALLABLE">SIP_PYCALLABLE (SIP type)</a></dt>
 <dt><a href="specification_files.html#stype-SIP_PYDICT">SIP_PYDICT (SIP type)</a></dt>
 <dt><a href="specification_files.html#stype-SIP_PYLIST">SIP_PYLIST (SIP type)</a></dt>
@@ -570,16 +605,17 @@
     <dt><a href="python_api.html#sip.SIP_VERSION_STR">(in module sip)</a></dt>
   </dl></dd>
 <dt><a href="build_system.html#sipconfig.Configuration.sip_version_str">sip_version_str (sipconfig.Configuration attribute)</a></dt>
+<dt><a href="c_api.html#sipBadCallableArg">sipBadCallableArg (C function)</a></dt>
 <dt><a href="c_api.html#sipBadCatcherResult">sipBadCatcherResult (C function)</a></dt>
 <dt><a href="c_api.html#sipBadLengthForSlice">sipBadLengthForSlice (C function)</a></dt>
 <dt><a href="c_api.html#sipBuildResult">sipBuildResult (C function)</a></dt>
 <dt><a href="c_api.html#sipCallMethod">sipCallMethod (C function)</a></dt>
 <dt><a href="c_api.html#sipCanConvertToEnum">sipCanConvertToEnum (C function)</a></dt>
 <dt><a href="c_api.html#sipCanConvertToInstance">sipCanConvertToInstance (C function)</a></dt>
-<dt><a href="c_api.html#sipCanConvertToMappedType">sipCanConvertToMappedType (C function)</a></dt>
+<dt><a href="c_api.html#sipCanConvertToMappedType">sipCanConvertToMappedType (C function)</a></dt></dl></td><td width="33%" valign="top"><dl>
 <dt><a href="c_api.html#sipCanConvertToType">sipCanConvertToType (C function)</a></dt>
 <dt><a href="c_api.html#sipClassName">sipClassName (C function)</a></dt>
-<dt><a href="build_system.html#module-sipconfig">sipconfig (module)</a></dt></dl></td><td width="33%" valign="top"><dl>
+<dt><a href="build_system.html#module-sipconfig">sipconfig (module)</a></dt>
 <dt><a href="c_api.html#sipConvertFromConstVoidPtr">sipConvertFromConstVoidPtr (C function)</a></dt>
 <dt><a href="c_api.html#sipConvertFromConstVoidPtrAndSize">sipConvertFromConstVoidPtrAndSize (C function)</a></dt>
 <dt><a href="c_api.html#sipConvertFromEnum">sipConvertFromEnum (C function)</a></dt>
@@ -736,12 +772,12 @@
         <li class="right" >
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

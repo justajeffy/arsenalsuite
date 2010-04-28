@@ -1,6 +1,6 @@
 # Sphinx inventory version 1
 # Project: SIP
-# Version: 4.9.1
+# Version: 4.10.2
 sipconfig mod build_system.html
 sip mod python_api.html
 sipGetState cfunction c_api.html
@@ -76,6 +76,7 @@ sipconfig.Makefile.mkdir attribute build_system.html
 sipForceConvertToType cfunction c_api.html
 sipconfig.ParentMakefile.generate_macros_and_rules method build_system.html
 dd_next cmember annotations.html
+sip.voidptr.ascapsule method python_api.html
 sip.SIP_VERSION_STR data python_api.html
 sipExportSymbol cfunction c_api.html
 sipconfig.Configuration.sip_version_str attribute build_system.html
@@ -121,6 +122,7 @@ sipconfig.Configuration.default_mod_dir attribute build_system.html
 SIP_NOT_NONE cmacro c_api.html
 sipConvertFromNewType cfunction c_api.html
 sipTypeFromPyTypeObject cfunction c_api.html
+SIP_PROTECTED_IS_PUBLIC cmacro c_api.html
 sipconfig.ModuleMakefile.__init__ method build_system.html
 sipconfig.Configuration.sip_bin attribute build_system.html
 SIP_VERSION_STR cmacro c_api.html
@@ -129,7 +131,7 @@ sipconfig.Makefile.generate_target_install method build_system.html
 sipClassName cfunction c_api.html
 sip.voidptr.setsize method python_api.html
 sipDelayedDtor ctype annotations.html
-sip.voidptr.setwriteable method python_api.html
+sipconfig.SIPModuleMakefile.__init__ method build_system.html
 sipconfig.Configuration.sip_inc_dir attribute build_system.html
 sipconfig.parse_build_macros function build_system.html
 sipConvertFromInstance cfunction c_api.html
@@ -154,6 +156,7 @@ sipconfig.Makefile class build_system.html
 SIP_UNBLOCK_THREADS cmacro c_api.html
 sipReleaseInstance cfunction c_api.html
 sip.transferto function python_api.html
+sip.voidptr.setwriteable method python_api.html
 sipconfig.ProgramMakefile.generate_target_install method build_system.html
 sipconfig.create_config_module function build_system.html
 sipWrapper_Check cfunction c_api.html
@@ -186,6 +189,7 @@ sipconfig.Makefile.extra_include_dirs attribute build_system.html
 sipGetWrapper cfunction c_api.html
 sipconfig.ModuleMakefile.generate_target_default method build_system.html
 sipconfig.ProgramMakefile.finalise method build_system.html
+sipBadCallableArg cfunction c_api.html
 sipMalloc cfunction c_api.html
 sipFindNamedEnum cfunction c_api.html
 user cmember c_api.html

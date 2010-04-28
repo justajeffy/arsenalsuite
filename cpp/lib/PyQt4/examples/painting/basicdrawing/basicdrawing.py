@@ -23,6 +23,10 @@
 ##
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QVariant', 2)
+
 from PyQt4 import QtCore, QtGui
 
 import basicdrawing_rc
@@ -132,7 +136,7 @@ class RenderArea(QtGui.QWidget):
                     painter.drawPath(path)
                 elif self.shape == RenderArea.Text:
                     painter.drawText(rect, QtCore.Qt.AlignCenter,
-                            self.tr("Qt by\nQt Software"))
+                            "Qt by\nQt Software")
                 elif self.shape == RenderArea.Pixmap:
                     painter.drawPixmap(10, 10, self.pixmap)
 
@@ -153,128 +157,90 @@ class Window(QtGui.QWidget):
         self.renderArea = RenderArea()
 
         self.shapeComboBox = QtGui.QComboBox()
-        self.shapeComboBox.addItem(self.tr("Polygon"),
-                QtCore.QVariant(RenderArea.Polygon))
-        self.shapeComboBox.addItem(self.tr("Rectangle"),
-                QtCore.QVariant(RenderArea.Rect))
-        self.shapeComboBox.addItem(self.tr("Rounded Rectangle"),
-                QtCore.QVariant(RenderArea.RoundedRect))
-        self.shapeComboBox.addItem(self.tr("Ellipse"),
-                QtCore.QVariant(RenderArea.Ellipse))
-        self.shapeComboBox.addItem(self.tr("Pie"),
-                QtCore.QVariant(RenderArea.Pie))
-        self.shapeComboBox.addItem(self.tr("Chord"),
-                QtCore.QVariant(RenderArea.Chord))
-        self.shapeComboBox.addItem(self.tr("Path"),
-                QtCore.QVariant(RenderArea.Path))
-        self.shapeComboBox.addItem(self.tr("Line"),
-                QtCore.QVariant(RenderArea.Line))
-        self.shapeComboBox.addItem(self.tr("Polyline"),
-                QtCore.QVariant(RenderArea.Polyline))
-        self.shapeComboBox.addItem(self.tr("Arc"),
-                QtCore.QVariant(RenderArea.Arc))
-        self.shapeComboBox.addItem(self.tr("Points"),
-                QtCore.QVariant(RenderArea.Points))
-        self.shapeComboBox.addItem(self.tr("Text"),
-                QtCore.QVariant(RenderArea.Text))
-        self.shapeComboBox.addItem(self.tr("Pixmap"),
-                QtCore.QVariant(RenderArea.Pixmap))
+        self.shapeComboBox.addItem("Polygon", RenderArea.Polygon)
+        self.shapeComboBox.addItem("Rectangle", RenderArea.Rect)
+        self.shapeComboBox.addItem("Rounded Rectangle", RenderArea.RoundedRect)
+        self.shapeComboBox.addItem("Ellipse", RenderArea.Ellipse)
+        self.shapeComboBox.addItem("Pie", RenderArea.Pie)
+        self.shapeComboBox.addItem("Chord", RenderArea.Chord)
+        self.shapeComboBox.addItem("Path", RenderArea.Path)
+        self.shapeComboBox.addItem("Line", RenderArea.Line)
+        self.shapeComboBox.addItem("Polyline", RenderArea.Polyline)
+        self.shapeComboBox.addItem("Arc", RenderArea.Arc)
+        self.shapeComboBox.addItem("Points", RenderArea.Points)
+        self.shapeComboBox.addItem("Text", RenderArea.Text)
+        self.shapeComboBox.addItem("Pixmap", RenderArea.Pixmap)
 
-        shapeLabel = QtGui.QLabel(self.tr("&Shape:"))
+        shapeLabel = QtGui.QLabel("&Shape:")
         shapeLabel.setBuddy(self.shapeComboBox)
 
         self.penWidthSpinBox = QtGui.QSpinBox()
         self.penWidthSpinBox.setRange(0, 20)
-        self.penWidthSpinBox.setSpecialValueText(self.tr("0 (cosmetic pen)"))
+        self.penWidthSpinBox.setSpecialValueText("0 (cosmetic pen)")
 
-        penWidthLabel = QtGui.QLabel(self.tr("Pen &Width:"))
+        penWidthLabel = QtGui.QLabel("Pen &Width:")
         penWidthLabel.setBuddy(self.penWidthSpinBox)
 
         self.penStyleComboBox = QtGui.QComboBox()
-        self.penStyleComboBox.addItem(self.tr("Solid"),
-                QtCore.QVariant(QtCore.Qt.SolidLine))
-        self.penStyleComboBox.addItem(self.tr("Dash"),
-                QtCore.QVariant(QtCore.Qt.DashLine))
-        self.penStyleComboBox.addItem(self.tr("Dot"),
-                QtCore.QVariant(QtCore.Qt.DotLine))
-        self.penStyleComboBox.addItem(self.tr("Dash Dot"),
-                QtCore.QVariant(QtCore.Qt.DashDotLine))
-        self.penStyleComboBox.addItem(self.tr("Dash Dot Dot"),
-                QtCore.QVariant(QtCore.Qt.DashDotDotLine))
-        self.penStyleComboBox.addItem(self.tr("None"),
-                QtCore.QVariant(QtCore.Qt.NoPen))
+        self.penStyleComboBox.addItem("Solid", QtCore.Qt.SolidLine)
+        self.penStyleComboBox.addItem("Dash", QtCore.Qt.DashLine)
+        self.penStyleComboBox.addItem("Dot", QtCore.Qt.DotLine)
+        self.penStyleComboBox.addItem("Dash Dot", QtCore.Qt.DashDotLine)
+        self.penStyleComboBox.addItem("Dash Dot Dot", QtCore.Qt.DashDotDotLine)
+        self.penStyleComboBox.addItem("None", QtCore.Qt.NoPen)
 
-        penStyleLabel = QtGui.QLabel(self.tr("&Pen Style:"))
+        penStyleLabel = QtGui.QLabel("&Pen Style:")
         penStyleLabel.setBuddy(self.penStyleComboBox)
 
         self.penCapComboBox = QtGui.QComboBox()
-        self.penCapComboBox.addItem(self.tr("Flat"),
-                QtCore.QVariant(QtCore.Qt.FlatCap))
-        self.penCapComboBox.addItem(self.tr("Square"),
-                QtCore.QVariant(QtCore.Qt.SquareCap))
-        self.penCapComboBox.addItem(self.tr("Round"),
-                QtCore.QVariant(QtCore.Qt.RoundCap))
+        self.penCapComboBox.addItem("Flat", QtCore.Qt.FlatCap)
+        self.penCapComboBox.addItem("Square", QtCore.Qt.SquareCap)
+        self.penCapComboBox.addItem("Round", QtCore.Qt.RoundCap)
 
-        penCapLabel = QtGui.QLabel(self.tr("Pen &Cap:"))
+        penCapLabel = QtGui.QLabel("Pen &Cap:")
         penCapLabel.setBuddy(self.penCapComboBox)
 
         self.penJoinComboBox = QtGui.QComboBox()
-        self.penJoinComboBox.addItem(self.tr("Miter"),
-                QtCore.QVariant(QtCore.Qt.MiterJoin))
-        self.penJoinComboBox.addItem(self.tr("Bevel"),
-                QtCore.QVariant(QtCore.Qt.BevelJoin))
-        self.penJoinComboBox.addItem(self.tr("Round"),
-                QtCore.QVariant(QtCore.Qt.RoundJoin))
+        self.penJoinComboBox.addItem("Miter", QtCore.Qt.MiterJoin)
+        self.penJoinComboBox.addItem("Bevel", QtCore.Qt.BevelJoin)
+        self.penJoinComboBox.addItem("Round", QtCore.Qt.RoundJoin)
 
-        penJoinLabel = QtGui.QLabel(self.tr("Pen &Join:"))
+        penJoinLabel = QtGui.QLabel("Pen &Join:")
         penJoinLabel.setBuddy(self.penJoinComboBox)
 
         self.brushStyleComboBox = QtGui.QComboBox()
-        self.brushStyleComboBox.addItem(self.tr("Linear Gradient"),
-                QtCore.QVariant(QtCore.Qt.LinearGradientPattern))
-        self.brushStyleComboBox.addItem(self.tr("Radial Gradient"),
-                QtCore.QVariant(QtCore.Qt.RadialGradientPattern))
-        self.brushStyleComboBox.addItem(self.tr("Conical Gradient"),
-                QtCore.QVariant(QtCore.Qt.ConicalGradientPattern))
-        self.brushStyleComboBox.addItem(self.tr("Texture"),
-                QtCore.QVariant(QtCore.Qt.TexturePattern))
-        self.brushStyleComboBox.addItem(self.tr("Solid"),
-                QtCore.QVariant(QtCore.Qt.SolidPattern))
-        self.brushStyleComboBox.addItem(self.tr("Horizontal"),
-                QtCore.QVariant(QtCore.Qt.HorPattern))
-        self.brushStyleComboBox.addItem(self.tr("Vertical"),
-                QtCore.QVariant(QtCore.Qt.VerPattern))
-        self.brushStyleComboBox.addItem(self.tr("Cross"),
-                QtCore.QVariant(QtCore.Qt.CrossPattern))
-        self.brushStyleComboBox.addItem(self.tr("Backward Diagonal"),
-                QtCore.QVariant(QtCore.Qt.BDiagPattern))
-        self.brushStyleComboBox.addItem(self.tr("Forward Diagonal"),
-                QtCore.QVariant(QtCore.Qt.FDiagPattern))
-        self.brushStyleComboBox.addItem(self.tr("Diagonal Cross"),
-                QtCore.QVariant(QtCore.Qt.DiagCrossPattern))
-        self.brushStyleComboBox.addItem(self.tr("Dense 1"),
-                QtCore.QVariant(QtCore.Qt.Dense1Pattern))
-        self.brushStyleComboBox.addItem(self.tr("Dense 2"),
-                QtCore.QVariant(QtCore.Qt.Dense2Pattern))
-        self.brushStyleComboBox.addItem(self.tr("Dense 3"),
-                QtCore.QVariant(QtCore.Qt.Dense3Pattern))
-        self.brushStyleComboBox.addItem(self.tr("Dense 4"),
-                QtCore.QVariant(QtCore.Qt.Dense4Pattern))
-        self.brushStyleComboBox.addItem(self.tr("Dense 5"),
-                QtCore.QVariant(QtCore.Qt.Dense5Pattern))
-        self.brushStyleComboBox.addItem(self.tr("Dense 6"),
-                QtCore.QVariant(QtCore.Qt.Dense6Pattern))
-        self.brushStyleComboBox.addItem(self.tr("Dense 7"),
-                QtCore.QVariant(QtCore.Qt.Dense7Pattern))
-        self.brushStyleComboBox.addItem(self.tr("None"),
-                QtCore.QVariant(QtCore.Qt.NoBrush))
+        self.brushStyleComboBox.addItem("Linear Gradient",
+                QtCore.Qt.LinearGradientPattern)
+        self.brushStyleComboBox.addItem("Radial Gradient",
+                QtCore.Qt.RadialGradientPattern)
+        self.brushStyleComboBox.addItem("Conical Gradient",
+                QtCore.Qt.ConicalGradientPattern)
+        self.brushStyleComboBox.addItem("Texture", QtCore.Qt.TexturePattern)
+        self.brushStyleComboBox.addItem("Solid", QtCore.Qt.SolidPattern)
+        self.brushStyleComboBox.addItem("Horizontal", QtCore.Qt.HorPattern)
+        self.brushStyleComboBox.addItem("Vertical", QtCore.Qt.VerPattern)
+        self.brushStyleComboBox.addItem("Cross", QtCore.Qt.CrossPattern)
+        self.brushStyleComboBox.addItem("Backward Diagonal",
+                QtCore.Qt.BDiagPattern)
+        self.brushStyleComboBox.addItem("Forward Diagonal",
+                QtCore.Qt.FDiagPattern)
+        self.brushStyleComboBox.addItem("Diagonal Cross",
+                QtCore.Qt.DiagCrossPattern)
+        self.brushStyleComboBox.addItem("Dense 1", QtCore.Qt.Dense1Pattern)
+        self.brushStyleComboBox.addItem("Dense 2", QtCore.Qt.Dense2Pattern)
+        self.brushStyleComboBox.addItem("Dense 3", QtCore.Qt.Dense3Pattern)
+        self.brushStyleComboBox.addItem("Dense 4", QtCore.Qt.Dense4Pattern)
+        self.brushStyleComboBox.addItem("Dense 5", QtCore.Qt.Dense5Pattern)
+        self.brushStyleComboBox.addItem("Dense 6", QtCore.Qt.Dense6Pattern)
+        self.brushStyleComboBox.addItem("Dense 7", QtCore.Qt.Dense7Pattern)
+        self.brushStyleComboBox.addItem("None", QtCore.Qt.NoBrush)
 
-        brushStyleLabel = QtGui.QLabel(self.tr("&Brush Style:"))
+        brushStyleLabel = QtGui.QLabel("&Brush Style:")
         brushStyleLabel.setBuddy(self.brushStyleComboBox)
 
-        otherOptionsLabel = QtGui.QLabel(self.tr("Other Options:"))
-        self.antialiasingCheckBox = QtGui.QCheckBox(self.tr("&Antialiasing"))
-        self.transformationsCheckBox = QtGui.QCheckBox(self.tr("&Transformations"))
+        otherOptionsLabel = QtGui.QLabel("Other Options:")
+        self.antialiasingCheckBox = QtGui.QCheckBox("&Antialiasing")
+        self.transformationsCheckBox = QtGui.QCheckBox("&Transformations")
 
         self.shapeComboBox.activated.connect(self.shapeChanged)
         self.penWidthSpinBox.valueChanged.connect(self.penChanged)
@@ -313,27 +279,27 @@ class Window(QtGui.QWidget):
         self.brushChanged()
         self.antialiasingCheckBox.setChecked(True)
 
-        self.setWindowTitle(self.tr("Basic Drawing"))
+        self.setWindowTitle("Basic Drawing")
 
     def shapeChanged(self):
-        shape = self.shapeComboBox.itemData(
-            self.shapeComboBox.currentIndex(), IdRole).toInt()[0]
+        shape = self.shapeComboBox.itemData(self.shapeComboBox.currentIndex(),
+                IdRole)
         self.renderArea.setShape(shape)
 
     def penChanged(self):
         width = self.penWidthSpinBox.value()
         style = QtCore.Qt.PenStyle(self.penStyleComboBox.itemData(
-            self.penStyleComboBox.currentIndex(), IdRole).toInt()[0])
+                self.penStyleComboBox.currentIndex(), IdRole))
         cap = QtCore.Qt.PenCapStyle(self.penCapComboBox.itemData(
-            self.penCapComboBox.currentIndex(), IdRole).toInt()[0])
+                self.penCapComboBox.currentIndex(), IdRole))
         join = QtCore.Qt.PenJoinStyle(self.penJoinComboBox.itemData(
-            self.penJoinComboBox.currentIndex(), IdRole).toInt()[0])
+                self.penJoinComboBox.currentIndex(), IdRole))
 
         self.renderArea.setPen(QtGui.QPen(QtCore.Qt.blue, width, style, cap, join))
 
     def brushChanged(self):
         style = QtCore.Qt.BrushStyle(self.brushStyleComboBox.itemData(
-            self.brushStyleComboBox.currentIndex(), IdRole).toInt()[0])
+                self.brushStyleComboBox.currentIndex(), IdRole))
 
         if style == QtCore.Qt.LinearGradientPattern:
             linearGradient = QtGui.QLinearGradient(0, 0, 100, 100)

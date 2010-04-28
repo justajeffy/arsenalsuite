@@ -1,18 +1,17 @@
 /*
  * The SIP module interface.
  *
- * Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
- * 
+ * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ *
  * This file is part of SIP.
- * 
+ *
  * This copy of SIP is licensed for use under the terms of the SIP License
  * Agreement.  See the file LICENSE for more details.
- * 
+ *
  * This copy of SIP may also used under the terms of the GNU General Public
  * License v2 or v3 as published by the Free Software Foundation which can be
- * found in the files LICENSE-GPL2.txt and LICENSE-GPL3.txt included in this
- * package.
- * 
+ * found in the files LICENSE-GPL2 and LICENSE-GPL3 included in this package.
+ *
  * SIP is supplied WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
@@ -55,8 +54,8 @@ extern "C" {
 /*
  * Define the SIP version number.
  */
-#define SIP_VERSION         0x040901
-#define SIP_VERSION_STR     "4.9.1"
+#define SIP_VERSION         0x040a02
+#define SIP_VERSION_STR     "4.10.2"
 
 
 /*
@@ -68,6 +67,20 @@ extern "C" {
  * to 0.
  *
  * History:
+ *
+ * 7.1  Added the 'H' format character to sip_api_parse_result().
+ *      Deprecated the 'D' format character of sip_api_parse_result().
+ *
+ * 7.0  Added sip_api_parse_kwd_args().
+ *      Added sipErrorState, sip_api_add_exception().
+ *      The type initialisation function is now passed a dictionary of keyword
+ *      arguments.
+ *      All argument parsers now update a set of error messages rather than an
+ *      argument count.
+ *      The signatures of sip_api_no_function() and sip_api_no_method() have
+ *      changed.
+ *      Added ctd_docstring to sipClassTypeDef.
+ *      Added vf_docstring to sipVersionedFunctionDef.
  *
  * 6.0  Added the sipContainerDef structure to define the contents of a class
  *      or mapped type.  Restructured sipClassDef and sipMappedTypeDef
@@ -155,8 +168,8 @@ extern "C" {
  *
  * 0.0  Original version.
  */
-#define SIP_API_MAJOR_NR    6
-#define SIP_API_MINOR_NR    0
+#define SIP_API_MAJOR_NR    7
+#define SIP_API_MINOR_NR    1
 
 
 /* Some compatibility stuff to help with handwritten code for SIP v3. */
@@ -340,8 +353,8 @@ typedef struct _sipEnumTypeObject {
 /*
  * Some convenient function pointers.
  */
-typedef void *(*sipInitFunc)(sipSimpleWrapper *, PyObject *, PyObject **,
-        int *);
+typedef void *(*sipInitFunc)(sipSimpleWrapper *, PyObject *, PyObject *,
+        PyObject **, PyObject **, PyObject **);
 typedef int (*sipTraverseFunc)(void *, visitproc, void *);
 typedef int (*sipClearFunc)(void *);
 #if PY_MAJOR_VERSION >= 3
@@ -464,6 +477,16 @@ typedef struct _sipSubClassConvertorDef {
     /* The base type. */
     struct _sipTypeDef *scc_basetype;
 } sipSubClassConvertorDef;
+
+
+/*
+ * The different error states of handwritten code.
+ */
+typedef enum {
+    sipErrorNone,       /* There is no error. */
+    sipErrorFail,       /* The error is a failure. */
+    sipErrorContinue    /* It may not apply if a later operation succeeds. */
+} sipErrorState;
 
 
 /*
@@ -672,6 +695,9 @@ typedef struct _sipClassTypeDef {
     /* The container information. */
     sipContainerDef ctd_container;
 
+    /* The docstring. */
+    const char *ctd_docstring;
+
     /*
      * The meta-type name, -1 to use the meta-type of the first super-type
      * (normally sipWrapperType).
@@ -752,11 +778,7 @@ typedef struct _sipMappedTypeDef {
     /* The base type information. */
     sipTypeDef mtd_base;
 
-    /*
-     * The container information.  (At the moment only the enum information is
-     * used but mapped types should be able to contain any static methods,
-     * variables, instances etc.)
-     */
+    /* The container information. */
     sipContainerDef mtd_container;
 
     /* The optional assignment function. */
@@ -848,6 +870,9 @@ typedef struct _sipVersionedFunctionDef {
 
     /* The METH_* flags. */
     int vf_flags;
+
+    /* The docstring. */
+    const char *vf_docstring;
 
     /* The API version range index. */
     int vf_api_range;
@@ -1255,6 +1280,7 @@ typedef struct _sipAPIDef {
     int (*api_register_attribute_getter)(const sipTypeDef *td,
             sipAttrGetterFunc getter);
     int (*api_is_api_enabled)(const char *name, int from, int to);
+    sipErrorState (*api_bad_callable_arg)(int arg_nr, PyObject *arg);
 
     /*
      * The following are deprecated parts of the public API.
@@ -1285,14 +1311,15 @@ typedef struct _sipAPIDef {
      * The following are not part of the public API.
      */
     int (*api_init_module)(sipExportedModuleDef *client, PyObject *mod_dict);
-    int (*api_parse_args)(int *argsParsedp, PyObject *sipArgs,
+    int (*api_parse_args)(PyObject **parseErrp, PyObject *sipArgs,
             const char *fmt, ...);
-    int (*api_parse_pair)(int *argsParsedp, PyObject *arg0, PyObject *arg1,
+    int (*api_parse_pair)(PyObject **parseErrp, PyObject *arg0, PyObject *arg1,
             const char *fmt, ...);
     void (*api_common_dtor)(sipSimpleWrapper *sipSelf);
-    void (*api_no_function)(int argsParsed, const char *func);
-    void (*api_no_method)(int argsParsed, const char *classname,
-            const char *method);
+    void (*api_no_function)(PyObject *parseErr, const char *func,
+            const char *doc);
+    void (*api_no_method)(PyObject *parseErr, const char *scope,
+            const char *method, const char *doc);
     void (*api_abstract_method)(const char *classname, const char *method);
     void (*api_bad_class)(const char *classname);
     void *(*api_get_cpp_ptr)(sipSimpleWrapper *w, const sipTypeDef *td);
@@ -1328,8 +1355,13 @@ typedef struct _sipAPIDef {
 #endif
     int (*api_deprecated)(const char *classname, const char *method);
     void (*api_keep_reference)(PyObject *self, int key, PyObject *obj);
+    int (*api_parse_kwd_args)(PyObject **parseErrp, PyObject *sipArgs,
+            PyObject *sipKwdArgs, const char **kwdlist, PyObject **unused,
+            const char *fmt, ...);
+    void (*api_add_exception)(sipErrorState es, PyObject **parseErrp);
 
     sipExportedModuleDef * (*api_find_module)(const char * name);
+
 } sipAPIDef;
 
 
@@ -1503,6 +1535,9 @@ typedef struct _pyqt3ClassTypeDef {
 typedef struct _pyqt4QtSignal {
     /* The C++ name and signature of the signal. */
     const char *signature;
+
+    /* The optional docstring. */
+    const char *docstring;
 
     /*
      * If the signal is an overload of regular methods then this points to the

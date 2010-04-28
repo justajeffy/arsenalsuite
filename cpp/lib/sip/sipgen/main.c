@@ -1,18 +1,17 @@
 /*
  * The main module for SIP.
  *
- * Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
- * 
+ * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ *
  * This file is part of SIP.
- * 
+ *
  * This copy of SIP is licensed for use under the terms of the SIP License
  * Agreement.  See the file LICENSE for more details.
- * 
+ *
  * This copy of SIP may also used under the terms of the GNU General Public
  * License v2 or v3 as published by the Free Software Foundation which can be
- * found in the files LICENSE-GPL2.txt and LICENSE-GPL3.txt included in this
- * package.
- * 
+ * found in the files LICENSE-GPL2 and LICENSE-GPL3 included in this package.
+ *
  * SIP is supplied WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
@@ -31,7 +30,7 @@
 #define PACKAGE "sip"
 #endif
 
-#define VERSION "4.9.1"
+#define VERSION "4.10.2"
 
 
 /* Global variables - see sip.h for their meaning. */
@@ -53,7 +52,7 @@ int main(int argc, char **argv)
 {
     char *filename, *docFile, *codeDir, *srcSuffix, *flagFile, *consModule;
     char arg, *optarg, *buildFile, *apiFile, *xmlFile;
-    int optnr, exceptions, tracing, releaseGIL, parts;
+    int optnr, exceptions, tracing, releaseGIL, parts, kwdArgs, protHack, docs;
     FILE *file;
     sipSpec spec;
     stringList *versions, *xfeatures;
@@ -75,16 +74,29 @@ int main(int argc, char **argv)
     tracing = FALSE;
     releaseGIL = FALSE;
     parts = 0;
+    kwdArgs = FALSE;
+    protHack = FALSE;
+    docs = FALSE;
 
     /* Parse the command line. */
     optnr = 1;
 
-    while ((arg = parseopt(argc, argv, "hVa:b:ec:d:gI:j:m:p:rs:t:wx:z:", &flagFile, &optnr, &optarg)) != '\0')
+    while ((arg = parseopt(argc, argv, "hVa:b:ec:d:gI:j:km:op:Prs:t:wx:z:", &flagFile, &optnr, &optarg)) != '\0')
         switch (arg)
         {
+        case 'o':
+            /* Generate docstrings. */
+            docs = TRUE;
+            break;
+
         case 'p':
             /* The name of the consolidated module. */
             consModule = optarg;
+            break;
+
+        case 'P':
+            /* Enable the protected/public hack. */
+            protHack = TRUE;
             break;
 
         case 'a':
@@ -165,6 +177,11 @@ int main(int argc, char **argv)
             warnings = TRUE;
             break;
 
+        case 'k':
+            /* Allow keyword arguments in functions and methods. */
+            kwdArgs = TRUE;
+            break;
+
         case 'h':
             /* Help message. */
             help();
@@ -194,14 +211,14 @@ int main(int argc, char **argv)
     }
 
     /* Parse the input file. */
-    parse(&spec, file, filename, versions, xfeatures);
+    parse(&spec, file, filename, versions, xfeatures, kwdArgs, protHack);
 
     /* Verify and transform the parse tree. */
     transform(&spec);
 
     /* Generate code. */
     generateCode(&spec, codeDir, buildFile, docFile, srcSuffix, exceptions,
-            tracing, releaseGIL, parts, xfeatures, consModule);
+            tracing, releaseGIL, parts, xfeatures, consModule, docs);
 
     /* Generate the API file. */
     if (apiFile != NULL)
@@ -459,7 +476,7 @@ static void help(void)
 {
     printf(
 "Usage:\n"
-"    %s [-h] [-V] [-a file] [-c dir] [-d file] [-e] [-g] [-I dir] [-j #] [-m file] [-p module] [-r] [-s suffix] [-t tag] [-w] [-x feature] [-z file] [file]\n"
+"    %s [-h] [-V] [-a file] [-b file] [-c dir] [-d file] [-e] [-g] [-I dir] [-j #] [-k] [-m file] [-o] [-p module] [-P] [-r] [-s suffix] [-t tag] [-w] [-x feature] [-z file] [file]\n"
 "where:\n"
 "    -h          display this help message\n"
 "    -V          display the %s version number\n"
@@ -471,8 +488,11 @@ static void help(void)
 "    -g          always release and reacquire the GIL [default only when specified]\n"
 "    -I dir      look in this directory when including files\n"
 "    -j #        split the generated code into # files [default 1 per class]\n"
+"    -k          support keyword arguments in functions and methods\n"
 "    -m file     the name of the XML export file [default not generated]\n"
-"    -p module   the name of the consoldated module that this is a component of\n"
+"    -o          enable the automatic generation of docstrings [default disabled]\n"
+"    -p module   the name of the consolidated module that this is a component of\n"
+"    -P          enable the protected/public hack\n"
 "    -r          generate code with tracing enabled [default disabled]\n"
 "    -s suffix   the suffix to use for C or C++ source files [default \".c\" or \".cpp\"]\n"
 "    -t tag      the version/platform to generate code for\n"
@@ -491,5 +511,5 @@ static void help(void)
  */
 static void usage(void)
 {
-    fatal("Usage: %s [-h] [-V] [-a file] [-c dir] [-d file] [-e] [-g] [-I dir] [-j #] [-m file] [-p module] [-r] [-s suffix] [-t tag] [-w] [-x feature] [-z file] [file]\n", sipPackage);
+    fatal("Usage: %s [-h] [-V] [-a file] [-b file] [-c dir] [-d file] [-e] [-g] [-I dir] [-j #] [-k] [-m file] [-o] [-p module] [-r] [-s suffix] [-t tag] [-w] [-x feature] [-z file] [file]\n", sipPackage);
 }

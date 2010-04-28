@@ -1,18 +1,17 @@
 /*
  * The implementation of the supprt for setting API versions.
  *
- * Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
- * 
+ * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ *
  * This file is part of SIP.
- * 
+ *
  * This copy of SIP is licensed for use under the terms of the SIP License
  * Agreement.  See the file LICENSE for more details.
- * 
+ *
  * This copy of SIP may also used under the terms of the GNU General Public
  * License v2 or v3 as published by the Free Software Foundation which can be
- * found in the files LICENSE-GPL2.txt and LICENSE-GPL3.txt included in this
- * package.
- * 
+ * found in the files LICENSE-GPL2 and LICENSE-GPL3 included in this package.
+ *
  * SIP is supplied WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
@@ -129,7 +128,7 @@ int sipInitAPI(sipExportedModuleDef *em, PyObject *mod_dict)
                 pmd->ml_name = SIP_MLNAME_CAST(func_name);
                 pmd->ml_meth = vf->vf_function;
                 pmd->ml_flags = vf->vf_flags;
-                pmd->ml_doc = NULL;
+                pmd->ml_doc = vf->vf_docstring;
 
                 if ((py_func = PyCFunction_New(pmd, NULL)) == NULL)
                     return -1;
@@ -228,7 +227,7 @@ PyObject *sipSetAPI(PyObject *self, PyObject *args)
         char *api_copy;
 
         /* Make a deep copy of the name. */
-        if ((api_copy = sip_api_malloc(strlen(api))) == NULL)
+        if ((api_copy = sip_api_malloc(strlen(api) + 1)) == NULL)
             return NULL;
 
         strcpy(api_copy, api);

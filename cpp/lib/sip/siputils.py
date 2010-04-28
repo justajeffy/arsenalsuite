@@ -2,18 +2,17 @@
 # extension modules created with SIP.  It provides information about file
 # locations, version numbers etc., and provides some classes and functions.
 #
-# Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
-# 
+# Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+#
 # This file is part of SIP.
-# 
+#
 # This copy of SIP is licensed for use under the terms of the SIP License
 # Agreement.  See the file LICENSE for more details.
-# 
+#
 # This copy of SIP may also used under the terms of the GNU General Public
 # License v2 or v3 as published by the Free Software Foundation which can be
-# found in the files LICENSE-GPL2.txt and LICENSE-GPL3.txt included in this
-# package.
-# 
+# found in the files LICENSE-GPL2 and LICENSE-GPL3 included in this package.
+#
 # SIP is supplied WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -253,9 +252,17 @@ class Makefile:
         self._python = python
         self._warnings = warnings
         self._debug = debug
-        self._dir = dir
         self._makefile = makefile
         self._installs = installs
+
+        # Make sure the destination directory is an absolute path.
+        if dir:
+            self.dir = os.path.abspath(dir)
+        else:
+            self.dir = os.path.curdir
+
+        # Assume we are building in the source tree.
+        self._src_dir = self.dir
 
         if universal is None:
             self._universal = configuration.universal
@@ -434,7 +441,7 @@ class Makefile:
                         py_lib = bpy_lib
 
                 if self._debug:
-                    #py_lib = py_lib + "_d"
+                    py_lib = py_lib + "_d"
 
                     if self.generator != "MINGW":
                         cflags.append("/D_DEBUG")
@@ -538,6 +545,8 @@ class Makefile:
                         defines.append("QT_CORE_LIB")
                     elif mod == "QtGui":
                         defines.append("QT_GUI_LIB")
+                    elif mod == "QtMultimedia":
+                        defines.append("QT_MULTIMEDIA_LIB")
                     elif mod == "QtNetwork":
                         defines.append("QT_NETWORK_LIB")
                     elif mod == "QtOpenGL":
@@ -581,6 +590,7 @@ class Makefile:
                     "QtAssistant":      ("QtNetwork", "QtGui", "QtCore"),
                     "QtGui":            ("QtCore", ),
                     "QtHelp":           ("QtSql", "QtGui", "QtCore"),
+                    "QtMultimedia":     ("QtGui", "QtCore"),
                     "QtNetwork":        ("QtCore", ),
                     "QtOpenGL":         ("QtGui", "QtCore"),
                     "QtScript":         ("QtCore", ),
@@ -692,9 +702,10 @@ class Makefile:
             libs.extend(self.optional_list("LIBS_OPENGL"))
 
         if self._qt or self._opengl:
-            incdir.extend(self.optional_list("INCDIR_X11"))
-            libdir.extend(self.optional_list("LIBDIR_X11"))
-            libs.extend(self.optional_list("LIBS_X11"))
+            if self.config.qt_version < 0x040000 or "QtGui" in self._qt:
+                incdir.extend(self.optional_list("INCDIR_X11"))
+                libdir.extend(self.optional_list("LIBDIR_X11"))
+                libs.extend(self.optional_list("LIBS_X11"))
 
         if self._threaded:
             libs.extend(self.optional_list("LIBS_THREAD"))
@@ -756,9 +767,9 @@ class Makefile:
 
         if sys.platform == "win32" and "shared" in self.config.qt_winconfig.split():
             if (mname in ("QtCore", "QtDesigner", "QtGui", "QtHelp",
-                          "QtNetwork", "QtOpenGL", "QtScript", "QtScriptTools",
-                          "QtSql", "QtSvg", "QtTest", "QtWebKit", "QtXml",
-                          "QtXmlPatterns", "phonon") or
+                          "QtMultimedia", "QtNetwork", "QtOpenGL", "QtScript",
+                          "QtScriptTools", "QtSql", "QtSvg", "QtTest",
+                          "QtWebKit", "QtXml", "QtXmlPatterns", "phonon") or
                 (self.config.qt_version >= 0x040200 and mname == "QtAssistant")):
                 lib = lib + "4"
 
@@ -874,10 +885,12 @@ class Makefile:
             bfname = "dictionary"
             bdict = filename
         else:
-            if self._dir:
-                bfname = os.path.join(self._dir, filename)
-            else:
+            if os.path.isabs(filename):
+                # We appear to be building out of the source tree.
+                self._src_dir = os.path.dirname(filename)
                 bfname = filename
+            else:
+                bfname = os.path.join(self.dir, filename)
 
             bdict = {}
 
@@ -968,10 +981,13 @@ class Makefile:
         """
         self.ready()
 
-        if self._dir:
-            mfname = os.path.join(self._dir, self._makefile)
-        else:
-            mfname = self._makefile
+        # Make sure the destination directory exists.
+        try:
+            os.makedirs(self.dir)
+        except:
+            pass
+
+        mfname = os.path.join(self.dir, self._makefile)
 
         try:
             mfile = open(mfname, "w")
@@ -1040,6 +1056,9 @@ class Makefile:
 
         if self._qt:
             mfile.write("MOC = %s\n" % _quote(self.required_string("MOC")))
+
+        if self._src_dir != self.dir:
+            mfile.write("VPATH = %s\n\n" % self._src_dir)
 
         # These probably don't matter.
         if self.generator == "MINGW":
@@ -1321,7 +1340,6 @@ class ModuleMakefile(Makefile):
 
         self._build = self.parse_build_file(build_file)
         self._install_dir = install_dir
-        self._dir = dir
         self.static = static
 
         self._manifest = ("embed_manifest_dll" in self.optional_list("CONFIG"))
@@ -1347,8 +1365,8 @@ class ModuleMakefile(Makefile):
         if sys.platform != "win32" and static:
             self._target = "lib" + self._target
 
-       # if sys.platform == "win32" and debug:
-        #    self._target = self._target + "_d"
+        if sys.platform == "win32" and debug:
+            self._target = self._target + "_d"
 
     def finalise(self):
         """Finalise the macros common to all module Makefiles.
@@ -1554,10 +1572,7 @@ class ModuleMakefile(Makefile):
                 mfile.write("|\n")
 
                 # Create the .def file that renames the entry point.
-                defname = self._target + ".def"
-
-                if self._dir:
-                    defname = os.path.join(self._dir, defname)
+                defname = os.path.join(self.dir, self._target + ".def")
 
                 try:
                     dfile = open(defname, "w")
@@ -1621,9 +1636,31 @@ class ModuleMakefile(Makefile):
 class SIPModuleMakefile(ModuleMakefile):
     """The class that represents a SIP generated module Makefile.
     """
+    def __init__(self, configuration, build_file, install_dir=None, static=0,
+                 console=0, qt=0, opengl=0, threaded=0, warnings=1, debug=0,
+                 dir=None, makefile="Makefile", installs=None, strip=1,
+                 export_all=0, universal=None, arch=None, prot_is_public=0):
+        """Initialise an instance of a SIP generated module Makefile.
+
+        prot_is_public is set if "protected" is to be redefined as "public".
+        If the platform's C++ ABI allows it this can significantly reduce the
+        size of the generated code.
+
+        For all other arguments see ModuleMakefile.
+        """
+        ModuleMakefile.__init__(self, configuration, build_file, install_dir,
+                static, console, qt, opengl, threaded, warnings, debug, dir,
+                makefile, installs, strip, export_all, universal, arch)
+
+        self._prot_is_public = prot_is_public
+
     def finalise(self):
         """Finalise the macros for a SIP generated module Makefile.
         """
+        if self._prot_is_public:
+            self.DEFINES.append('SIP_PROTECTED_IS_PUBLIC')
+            self.DEFINES.append('protected=public')
+
         self.INCDIR.append(self.config.sip_inc_dir)
 
         ModuleMakefile.finalise(self)
@@ -1789,8 +1826,11 @@ class ProgramMakefile(Makefile):
         mfile.write("\n$(OFILES): $(HFILES)\n")
 
         for mf in self._build["moc_headers"].split():
-            root, discard = os.path.splitext(mf)
+            root, _ = os.path.splitext(mf)
             cpp = "moc_" + root + ".cpp"
+
+            if self._src_dir != self.dir:
+                mf = os.path.join(self._src_dir, mf)
 
             mfile.write("\n%s: %s\n" % (cpp, mf))
             mfile.write("\t$(MOC) -o %s %s\n" % (cpp, mf))
@@ -2445,24 +2485,15 @@ def create_wrapper(script, wrapper, gui=0, use_arch=''):
         wf.write("@\"%s\" \"%s\" %%1 %%2 %%3 %%4 %%5 %%6 %%7 %%8 %%9\n" % (exe, script))
     elif sys.platform == "darwin":
         # The installation of MacOS's python is a mess that changes from
-        # version to version.
-        exe = sys.executable
+        # version to version and where sys.executable is useless.
 
         if gui:
-            # Append a "w" after the "python".
-            head, tail = os.path.split(exe)
-            if tail.startswith("python"):
-                tail = tail[:6] + "w" + tail[6:]
-                exe = os.path.join(head, tail)
+            exe = "pythonw"
+        else:
+            exe = "python"
 
-                if not os.path.exists(exe):
-                    exe = None
-            else:
-                exe = None
-
-            if exe is None:
-                # Fallback to a guess.
-                exe = "pythonw"
+        version = sys.version_info
+        exe = "%s%d.%d" % (exe, version[0], version[1])
 
         if use_arch:
             # Note that this may not work with the "standard" interpreter but

@@ -11,5 +11,4 @@ import stonegui
 import assfreezer
 import classesui
 import guiplugin
-import perlqt
 import qimageio

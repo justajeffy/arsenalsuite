@@ -21,6 +21,8 @@
  *
  */
 
+#include "Python.h"
+
 #include <qapplication.h>
 #include <qdir.h>
 #include <qhostaddress.h>
@@ -32,6 +34,7 @@
 #include "freezercore.h"
 #include "schema.h"
 #include "process.h"
+#include "path.h"
 
 #include "stonegui.h"
 #include "tardstyle.h"
@@ -70,6 +73,77 @@ BOOL CALLBACK AFEnumWindowsProc( HWND hwnd, LPARAM otherProcessId )
 
 HANDLE hMutex;
 #endif
+
+#ifdef Q_OS_WIN
+extern "C" void initsip(void);
+extern "C" void initStone(void);
+extern "C" void initClasses(void);
+extern "C" void initAssfreezer(void);
+#endif
+
+void loadPythonPlugins()
+{
+	LOG_5( "Loading Python" );
+
+#ifdef Q_OS_WIN
+	/*
+	 * This structure specifies the names and initialisation functions of
+	 * the builtin modules.
+	 */
+	struct _inittab builtin_modules[] = {
+		{"sip", initsip},
+		{"blur.Stone",initStone},
+		{"blur.Classes",initClasses},
+		{"blur.Assfreezer", initAssfreezer},
+		{NULL, NULL}
+	};
+
+	PyImport_ExtendInittab(builtin_modules);
+#endif
+	
+	Py_Initialize();
+
+	const char * builtinModuleImportStr = 
+#ifdef Q_OS_WIN
+		"import imp,sys\n"
+		"class MetaLoader(object):\n"
+		"\tdef __init__(self):\n"
+		"\t\tself.modules = {}\n"
+
+		"\t\tself.modules['blur.Stone'] = imp.load_module('blur.Stone',None,'',('','',imp.C_BUILTIN))\n"
+		"\t\tself.modules['blur.Classes'] = imp.load_module('blur.Classes',None,'',('','',imp.C_BUILTIN))\n"
+		"\t\tself.modules['blur.Absubmit'] = imp.load_module('blur.Absubmit',None,'',('','',imp.C_BUILTIN))\n"
+
+		"\t\tself.modules['blur.Assfreezer'] = imp.load_module('blur.Assfreezer',None,'',('','',imp.C_BUILTIN))\n"
+		"\tdef find_module(self,fullname,path=None):\n"
+		"\t\tif fullname in self.modules:\n"
+		"\t\t\treturn self.modules[fullname]\n"
+		"sys.meta_path.append(MetaLoader())\n"
+		"import blur\n"
+		"blur.RedirectOutputToLog()\n";
+#else
+		"import blur\n"
+		"blur.RedirectOutputToLog()\n";
+#endif
+	PyRun_SimpleString(builtinModuleImportStr);
+
+	LOG_5( "Loading python plugins" );
+	
+	QDir plugin_dir( "afplugins" );
+	QStringList el = plugin_dir.entryList(QStringList() << "*.py" << "*.pys" << "*.pyw", QDir::Files);
+	foreach( QString plug, el ) {
+		QString name("afplugins/" + plug);
+		LOG_5( "Loading plugin: " + name );
+		bool error = false;
+		QString contents = readFullFile( name, &error );
+		if( error ) {
+			LOG_3( "Unable to open " + name + " for reading" );
+			continue;
+		}
+		contents.replace("\r","");
+		PyRun_SimpleString(contents.toLatin1());
+	}
+}
 
 int main( int argc, char * argv[] )
 {
@@ -121,25 +195,6 @@ int main( int argc, char * argv[] )
 	initStone( argc, argv );
  	classes_loader();
 	initStoneGui();
-/*
-//	qApp->setStyle( new TardStyle );
-	QPalette p;// = qApp->palette();
-	p.setColor( QPalette::Background, QColor( 150, 150, 150 ) );
-	p.setColor( QPalette::Foreground, QColor( 255, 255, 255 ) );
-	p.setColor( QPalette::Base, QColor( 170, 170, 170 ) );
-	p.setColor( QPalette::Text, Qt::black );
-	p.setColor( QPalette::Button, QColor( 120, 120, 120 ) );
-	p.setColor( QPalette::ButtonText, QColor( 220, 220, 220 ) );
-	p.setColor( QPalette::Highlight, QColor( 140, 140, 190 ) );
-	p.setColor( QPalette::HighlightedText, QColor( 210, 210, 210 ) );
-	p.setColor( QPalette::Light, QColor( 150, 150, 150 ) );
-	p.setColor( QPalette::Midlight, QColor( 135, 135, 135 ) );
-	p.setColor( QPalette::Dark, QColor( 60, 60, 60 ) );
-	p.setColor( QPalette::Mid, QColor( 100, 100, 100 ) );
-	p.setColor( QPalette::Shadow, QColor( 60, 60, 60 ) );
-
-	QApplication::setPalette( p );
-*/
 	{
 		JobList showJobs;
 		bool showTime = false;
@@ -175,14 +230,6 @@ int main( int argc, char * argv[] )
 		FreezerCore::setDatabaseForThread( classesDb(), Connection::createFromIni( config(), "Database" ) );
 		
 		{
-			QDir schemaDir = QDir::current();
-			schemaDir.cd( "schemas" );
-			if( schemaDir.exists() ) {
-				QStringList schemas = schemaDir.entryList( QStringList() << "*.xml" );
-				foreach( QString schemaFile, schemas )
-					classesSchema()->mergeXmlSchema( schemaDir.path() + "/" + schemaFile );
-			}
-					
 			MainWindow m;
 			IniConfig & cfg = userConfig();
 			cfg.pushSection( "MainWindow" );

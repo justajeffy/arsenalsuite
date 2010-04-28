@@ -1,7 +1,7 @@
 // This is the implementation of the pySlot (and deprecated pyqtSignature)
 // decorator.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 

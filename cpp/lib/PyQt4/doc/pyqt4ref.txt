@@ -7,8 +7,8 @@
 -----------------
 
 :Contact:   info@riverbankcomputing.com
-:Version:   4.6.1
-:Copyright: Copyright (c) 2009 Riverbank Computing Limited
+:Version:   snapshot-4.7.1-5014f7c72a58
+:Copyright: Copyright (c) 2010 Riverbank Computing Limited
 
 .. contents::
 .. section-numbering::
@@ -17,9 +17,9 @@
 Introduction
 ============
 
-This is the reference guide for PyQt 4.6.1.  PyQt v4 is a set of
+This is the reference guide for PyQt snapshot-4.7.1-5014f7c72a58.  PyQt v4 is a set of
 `Python <http://www.python.org>`__ bindings for v4 of the Qt application
-framework from `Trolltech <http://www.trolltech.com>`__.
+framework from `Nokia <http://qt.nokia.com>`__.
 
 There is a separate `PyQt API Reference <html/classes.html>`__.
 
@@ -116,6 +116,10 @@ Python package.
       implement a cross-platform multimedia framework that enables the use of
       audio and video content in PyQt applications.
 
+    - The ``QtMultimedia`` module.  This module provides low-level multimedia
+      functionality.  Application developers would normally use the ``phonon``
+      module.
+
     - The ``QtAssistant`` module.  This module contains classes that allow Qt
       Assistant to be integrated with a PyQt application to provide online
       help.
@@ -194,6 +198,47 @@ libraries - for example `PyQwt and PyQwt3D <http://pyqwt.sourceforge.net/>`__.
 
 Potential Incompatibilities with Earlier Versions
 =================================================
+
+PyQt v4.7.1
+-----------
+
+QVariant
+********
+
+This version introduces a slight incompatibility in the conversion between
+sub-classes of standard Python types and ``QVariant``.
+
+Take, for example, the following code::
+
+    from PyQt4.QtCore import QVariant
+
+    class MyFloat(float):
+
+        pass
+
+    myfloat = MyFloat(5.0)
+    variant = QVariant(myfloat)
+
+With this version of PyQt ``myfloat`` will be converted in such a way as to
+preserve any additional attributes (including methods) and will not be
+converted to a C++ ``double``.  In other words, the following assertions are
+true::
+
+    assert(variant.type() != QVariant.Double)
+    assert(variant.toPyObject() is myfloat)
+
+Prior to this version ``myfloat`` would be converted to a C++ ``double``.  In
+other words, the following assertions would be true::
+
+    assert(variant.type() == QVariant.Double)
+    assert(variant.toPyObject() == myfloat)
+    assert(type(variant.toPyObject()) is float)
+
+The same change also affects objects that implement the sequence protocol.
+Prior to this version such an object would be converted to a ``QVariantList``
+which would mean that it was converted back to a Python ``list`` rather than to
+the original type.
+
 
 PyQt v4.5
 ---------
@@ -337,6 +382,9 @@ The full set of command line options is:
     building a custom interpreter with the PyQt modules built in to the
     interpreter.
 
+--no-docstrings
+    The PyQt modules will not contain automatically generated docstrings.
+
 -r, --trace
     The generated PyQt modules contain additional tracing code that is enabled
     using SIP's ``sip.settracemask()`` function.
@@ -420,6 +468,16 @@ The full set of command line options is:
     using the architecture ``ARCH``.  See the section
     `Configuring SIP and PyQt for MacOs 10.6 (Snow Leopard)`_.
 
+--protected-is-public
+    On certain platforms the size of PyQt modules can be significantly reduced
+    by redefining the C++ ``protected`` keyword as ``public`` during
+    compilation.  This option enables this behaviour and is the default on
+    Linux and MacOS/X.
+
+--protected-not-public
+    The default redefinition of ``protected`` to ``public`` during compilation
+    on Linux and MacOS/X is disabled.
+
 -i, --vendorid
     The checking of signed Python interpreters using the `VendorID
     <http://www.riverbankcomputing.com/software/vendorid/>`__ package is
@@ -469,12 +527,19 @@ When PyQt is configured it will automatically pick up the correct architecture
 from SIP's configuration.  However it is necessary to use the following
 command line option when configuring PyQt::
 
-    python configure.py --use_arch i386
+    python configure.py --use-arch i386
 
 This tells the different PyQt tools that execute the Python interpreter
 (actually only ``pyuic4`` at present) to use the i386 architecture rather than
 the default x86_64.  This ensures that the interpreter will be able to import
 the i386 PyQt modules.
+
+The other aspect to consider is the version of the SDK to use.  By default SIP
+will use the latest version it can find, probably ``MacOSX10.6.sdk``.  However
+the Qt binary installer is built with ``MacOSX10.4u.sdk`` so you will probably
+need to use the following command line option when configuring SIP::
+
+    python configure.py --sdk MacOSX10.4u.sdk
 
 
 Building PyQt
@@ -577,8 +642,10 @@ Version 2
 This is the default for Python v3.
 
 The ``QString`` class is implemented as a mapped type that is automatically
-converted to and from a Python string.  In addition a null ``QString`` is
-converted to and from ``None``.
+converted to and from a Python string.  In addition a None is converted to a
+null ``QString``.  However, a null ``QString`` is converted to an empty Python
+string (and not ``None``).  (This is because Qt often returns a null ``QString``
+when it should probably return an empty ``QString``.)
 
 The ``QChar`` and ``QStringRef`` classes are implemented as mapped types that
 are automatically converted to and from Python strings.
@@ -749,6 +816,24 @@ interpreted as an invalid ``QVariant``.  However, when Qt returns a
 object or an equivalent by calling its ``toPyObject()`` method.
 
 
+Support for Keyword Arguments
+=============================
+
+Starting with v4.7 PyQt supports the use of keyword arguments for optional
+arguments.
+
+One thing to be aware of is that, although the PyQt and Qt documentation may
+indicate that an argument has a particular name, you may find that PyQt
+actually uses a different name.  This is because the name of an argument is not
+part of the Qt API and there is some inconsistency in the way that similar
+arguments are named.  Different versions of Qt may use a different name for an
+argument which wouldn't affect the C++ API but would break the Python API.
+
+The docstrings that PyQt generates for all classes, functions and methods will
+contain the correct argument names.  In a future version of PyQt the
+documentation will also contain the correct argument names.
+
+
 Support for Qt Properties
 =========================
 
@@ -784,7 +869,7 @@ One of the key features of Qt is its use of signals and slots to communicate
 between objects.  Their use encourages the development of reusable components.
 
 A signal is emitted when something of potential interest happens.  A slot is a
-a Python callable.  If a signal is connected to a slot then the slot is called
+Python callable.  If a signal is connected to a slot then the slot is called
 when the signal is emitted.  If a signal isn't connected then nothing happens.
 The code (or component) that emits the signal does not know or care if the
 signal is being used.
@@ -884,7 +969,7 @@ Connecting, Disconnecting and Emitting Signals
 Signals are connected to slots using the ``connect()`` method of a bound
 signal::
 
-    connect(slot[, type=PyQt4.QtCore.Qt.AutoConnection)
+    connect(slot[, type=PyQt4.QtCore.Qt.AutoConnection])
 
         *slot* may be either a Python callable or another bound signal.
 
@@ -1460,7 +1545,12 @@ For a full description see the Qt Designer Manual in the Qt Documentation.
 The ``uic`` Module
 ------------------
 
-The ``uic`` module contains the following functions.
+The ``uic`` module contains the following functions and objects.
+
+widgetPluginPath
+    This is a list of the directories that are searched for widget plugins.
+    Initially it contains the name of the directory that contains the widget
+    plugins included with PyQt.
 
 compileUi(uifile, pyfile, execute=False, indent=4, pyqt3_wrapper=False)
     This function generates a Python module that will create a user interface 
@@ -1636,7 +1726,7 @@ simply as possible.
       also behave as Python properties.  The full signature of the function is
       as follows::
 
-          pyqtProperty(type, fget=None, fset=None, freset=None, fdel=None, doc=None, designable=True, scriptable=True, stored=True, user=False)
+          pyqtProperty(type, fget=None, fset=None, freset=None, fdel=None, doc=None, designable=True, scriptable=True, stored=True, user=False, constant=False, final=False)
 
       ``type`` is the type of the property.  It is either a Python type object
       or a string that is the name of a C++ type.
@@ -1646,13 +1736,15 @@ simply as possible.
       ``scriptable`` sets the Qt SCRIPTABLE flag.
       ``stored`` sets the Qt STORED flag.
       ``user`` sets the Qt USER flag.
+      ``constant`` sets the Qt CONSTANT flag.
+      ``final`` sets the Qt FINAL flag.
       
       The remaining arguments are the same as those used by the standard
       ``property()`` function.
       
       Qt makes no use of the ``fdel`` function and Python makes no use of the
-      ``freset`` function, or the ``designable``, ``scriptable``, ``stored``
-      and ``user`` flags.
+      ``freset`` function, or the ``designable``, ``scriptable``, ``stored``,
+      ``user``, ``constant`` and ``final`` flags.
 
 Note that the ability to define new Qt signals, slots and properties from
 Python is potentially useful to plugins conforming to any plugin interface and
@@ -1854,7 +1946,7 @@ For Python v3 the following conversions are done by default.
     - If Qt expects a ``QString`` then PyQt will accept a ``str``, a ``bytes``
       that contains only ASCII characters, a ``QChar`` or a ``QByteArray``.
 
-    - If Qt expects a ``QByteArray`` then PyQt will accept a ``str`` that
+    - If Qt expects a ``QByteArray`` then PyQt will also accept a ``str`` that
       contains only Latin-1 characters, or a ``bytes``.
 
 For Python v2 the following conversions are done by default.
@@ -2114,6 +2206,10 @@ QtGuiModuleMakefile(QtCoreModuleMakefile)
     This class encapsulates a Makefile to build a SIP generated Python
     extension module that is built on the PyQt ``QtGui`` module.
 
+QtMultimediaModuleMakefile(QtGuiModuleMakefile)
+    This class encapsulates a Makefile to build a SIP generated Python
+    extension module that is built on the PyQt ``QtMultimedia`` module.
+
 QtNetworkModuleMakefile(QtCoreModuleMakefile)
     This class encapsulates a Makefile to build a SIP generated Python
     extension module that is built on the PyQt ``QtNetwork`` module.
@@ -2134,7 +2230,7 @@ QtSvgModuleMakefile(QtGuiModuleMakefile)
     This class encapsulates a Makefile to build a SIP generated Python
     extension module that is built on the PyQt ``QtSvg`` module.
 
-QtTestModuleMakefile(QtCoreModuleMakefile)
+QtTestModuleMakefile(QtGuiModuleMakefile)
     This class encapsulates a Makefile to build a SIP generated Python
     extension module that is built on the PyQt ``QtTest`` module.
 

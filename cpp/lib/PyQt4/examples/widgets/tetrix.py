@@ -28,11 +28,11 @@ class TetrixWindow(QtGui.QWidget):
         linesLcd = QtGui.QLCDNumber(5)
         linesLcd.setSegmentStyle(QtGui.QLCDNumber.Filled)
 
-        startButton = QtGui.QPushButton(self.tr("&Start"))
+        startButton = QtGui.QPushButton("&Start")
         startButton.setFocusPolicy(QtCore.Qt.NoFocus)
-        quitButton = QtGui.QPushButton(self.tr("&Quit"))
+        quitButton = QtGui.QPushButton("&Quit")
         quitButton.setFocusPolicy(QtCore.Qt.NoFocus)
-        pauseButton = QtGui.QPushButton(self.tr("&Pause"))
+        pauseButton = QtGui.QPushButton("&Pause")
         pauseButton.setFocusPolicy(QtCore.Qt.NoFocus)
 
         startButton.clicked.connect(self.board.start)
@@ -43,21 +43,21 @@ class TetrixWindow(QtGui.QWidget):
         self.board.linesRemovedChanged.connect(linesLcd.display)
 
         layout = QtGui.QGridLayout()
-        layout.addWidget(self.createLabel(self.tr("NEXT")), 0, 0)
+        layout.addWidget(self.createLabel("NEXT"), 0, 0)
         layout.addWidget(nextPieceLabel, 1, 0)
-        layout.addWidget(self.createLabel(self.tr("LEVEL")), 2, 0)
+        layout.addWidget(self.createLabel("LEVEL"), 2, 0)
         layout.addWidget(levelLcd, 3, 0)
         layout.addWidget(startButton, 4, 0)
         layout.addWidget(self.board, 0, 1, 6, 1)
-        layout.addWidget(self.createLabel(self.tr("SCORE")), 0, 2)
+        layout.addWidget(self.createLabel("SCORE"), 0, 2)
         layout.addWidget(scoreLcd, 1, 2)
-        layout.addWidget(self.createLabel(self.tr("LINES REMOVED")), 2, 2)
+        layout.addWidget(self.createLabel("LINES REMOVED"), 2, 2)
         layout.addWidget(linesLcd, 3, 2)
         layout.addWidget(quitButton, 4, 2)
         layout.addWidget(pauseButton, 5, 2)
         self.setLayout(layout)
 
-        self.setWindowTitle(self.tr("Tetrix"))
+        self.setWindowTitle("Tetrix")
         self.resize(550, 370)
 
     def createLabel(self, text):
@@ -164,7 +164,7 @@ class TetrixBoard(QtGui.QFrame):
         rect = self.contentsRect()
 
         if self.isPaused:
-            painter.drawText(rect, QtCore.Qt.AlignCenter, self.tr("Pause"))
+            painter.drawText(rect, QtCore.Qt.AlignCenter, "Pause")
             return
 
         boardTop = rect.bottom() - TetrixBoard.BoardHeight * self.squareHeight()

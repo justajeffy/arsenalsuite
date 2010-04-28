@@ -23,9 +23,9 @@ sst.pre_deps = ["classesui"]
 Target = QMakeTarget("classesui",path,"classesui.pro",["stonegui","classes"],post_deps)
 StaticTarget = QMakeTarget("classesuistatic",path,"classesui.pro",["classesui"],[],True)
 
-rpm = RPMTarget('classesuirpm','libclassesui',path,'../../../rpm/spec/classesui.spec.template','1.0')
-
-pyrpm = RPMTarget('pyclassesuirpm','pyclassesui',path,'../../../rpm/spec/pyclassesui.spec.template','1.0')
+if sys.platform=="linux2":
+	rpm = RPMTarget('classesuirpm','libclassesui',path,'../../../rpm/spec/classesui.spec.template','1.0')
+	pyrpm = RPMTarget('pyclassesuirpm','pyclassesui',path,'../../../rpm/spec/pyclassesui.spec.template','1.0')
 
 if __name__ == "__main__":
 	build()

@@ -23,6 +23,11 @@
 ##
 #############################################################################
 
+# Using the QString v1 API is easier than using the v2 API and code that runs
+# under both Python v2.x and v3.x.
+import sip
+sip.setapi('QString', 1)
+
 from PyQt4 import QtCore, QtGui
 
 
@@ -41,7 +46,7 @@ class CharacterWidget(QtGui.QWidget):
 
     def updateFont(self, fontFamily):
         self.displayFont.setFamily(fontFamily)
-        self.squareSize = max(24, QtGui,QFontMetrics(self.displayFont).xHeight() * 3)
+        self.squareSize = max(24, QtGui.QFontMetrics(self.displayFont).xHeight() * 3)
         self.adjustSize()
         self.update()
 
@@ -51,7 +56,7 @@ class CharacterWidget(QtGui.QWidget):
         self.displayFont = fontDatabase.font(self.displayFont.family(),
                 fontStyle, self.displayFont.pointSize())
         self.displayFont.setStyleStrategy(oldStrategy)
-        self.squareSize = max(24, QtGui,QFontMetrics(self.displayFont).xHeight() * 3)
+        self.squareSize = max(24, QtGui.QFontMetrics(self.displayFont).xHeight() * 3)
         self.adjustSize()
         self.update()
 
@@ -120,7 +125,7 @@ class CharacterWidget(QtGui.QWidget):
 
                 painter.drawText(column * self.squareSize + (self.squareSize / 2) - fontMetrics.width(QtCore.QChar(key)) / 2,
                         row * self.squareSize + 4 + fontMetrics.ascent(),
-                        QtCore.QString(QtCore.QChar(key)))
+                        QtCore.QChar(key))
 
 
 class MainWindow(QtGui.QMainWindow):
@@ -129,13 +134,13 @@ class MainWindow(QtGui.QMainWindow):
 
         centralWidget = QtGui.QWidget()
 
-        fontLabel = QtGui.QLabel(self.tr("Font:"))
+        fontLabel = QtGui.QLabel("Font:")
         self.fontCombo = QtGui.QFontComboBox()
-        sizeLabel = QtGui.QLabel(self.tr("Size:"))
+        sizeLabel = QtGui.QLabel("Size:")
         self.sizeCombo = QtGui.QComboBox()
-        styleLabel = QtGui.QLabel(self.tr("Style:"))
+        styleLabel = QtGui.QLabel("Style:")
         self.styleCombo = QtGui.QComboBox()
-        fontMergingLabel = QtGui.QLabel(self.tr("Automatic Font Merging:"))
+        fontMergingLabel = QtGui.QLabel("Automatic Font Merging:")
         self.fontMerging = QtGui.QCheckBox()
         self.fontMerging.setChecked(True)
 
@@ -147,11 +152,11 @@ class MainWindow(QtGui.QMainWindow):
         self.findSizes(self.fontCombo.currentFont())
 
         self.lineEdit = QtGui.QLineEdit()
-        clipboardButton = QtGui.QPushButton(self.tr("&To clipboard"))
+        clipboardButton = QtGui.QPushButton("&To clipboard")
 
         self.clipboard = QtGui.QApplication.clipboard()
 
-        self.fontCombo.activated[str].connect(self.findStyles)
+        self.fontCombo.currentFontChanged.connect(self.findStyles)
         self.fontCombo.activated[str].connect(self.characterWidget.updateFont)
         self.styleCombo.activated[str].connect(self.characterWidget.updateStyle)
         self.characterWidget.characterSelected.connect(self.insertCharacter)
@@ -181,7 +186,7 @@ class MainWindow(QtGui.QMainWindow):
         centralWidget.setLayout(centralLayout)
 
         self.setCentralWidget(centralWidget)
-        self.setWindowTitle(self.tr("Character Map"))
+        self.setWindowTitle("Character Map")
 
     def findStyles(self, font):
         fontDatabase = QtGui.QFontDatabase()
@@ -205,11 +210,11 @@ class MainWindow(QtGui.QMainWindow):
 
         if fontDatabase.isSmoothlyScalable(font.family(), fontDatabase.styleString(font)):
             for size in QtGui.QFontDatabase.standardSizes():
-                self.sizeCombo.addItem(QtCore.QVariant(size).toString())
+                self.sizeCombo.addItem(str(size))
                 self.sizeCombo.setEditable(True)
         else:
             for size in fontDatabase.smoothSizes(font.family(), fontDatabase.styleString(font)):
-                self.sizeCombo.addItem(QtCore.QVariant(size).toString())
+                self.sizeCombo.addItem(str(size))
                 self.sizeCombo.setEditable(False)
 
         self.sizeCombo.blockSignals(False)
@@ -228,7 +233,7 @@ class MainWindow(QtGui.QMainWindow):
         self.clipboard.setText(self.lineEdit.text(), QtGui.QClipboard.Selection)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

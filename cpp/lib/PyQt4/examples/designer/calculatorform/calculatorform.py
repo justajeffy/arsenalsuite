@@ -38,14 +38,14 @@ class CalculatorForm(QtGui.QWidget):
 
     @QtCore.pyqtSlot(int)
     def on_inputSpinBox1_valueChanged(self, value):
-        self.ui.outputWidget.setText(QtCore.QString.number(value + self.ui.inputSpinBox2.value()))
+        self.ui.outputWidget.setText(str(value + self.ui.inputSpinBox2.value()))
 
     @QtCore.pyqtSlot(int)
     def on_inputSpinBox2_valueChanged(self, value):
-        self.ui.outputWidget.setText(QtCore.QString.number(value + self.ui.inputSpinBox1.value()))
+        self.ui.outputWidget.setText(str(value + self.ui.inputSpinBox1.value()))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import sys
 
     app = QtGui.QApplication(sys.argv)

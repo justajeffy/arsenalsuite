@@ -403,9 +403,9 @@ work of creating these additional configuration modules.
         :param debug:
             is set if debugging symbols should be generated.
         :param dir:
-            the name of the directory where build files are read from and
-            Makefiles are written to.  The default of ``None`` means the
-            current directory is used.
+            the name of the directory where build files are read from (if they
+            are not absolute file names) and Makefiles are written to.  The
+            default of ``None`` means the current directory is used.
         :param makefile:
             the name of the generated Makefile.
         :param installs:
@@ -797,6 +797,46 @@ work of creating these additional configuration modules.
 
     This class encapsulates a Makefile to build a SIP generated Python
     extension module.
+
+    .. method:: __init__(self, configuration, build_file[, install_dir=None[, static=0[, console=0[, opengl=0[, threaded=0[, warnings=None[, debug=0[, dir=None[, makefile="Makefile"[, installs=None[, strip=1[, export_all=0[, universal=None[, arch=None[, prot_is_public=0]]]]]]]]]]]]]]])
+
+        :param configuration:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param build_file:
+            see :meth:`sipconfig.ModuleMakefile.__init__`.
+        :param install_dir:
+            see :meth:`sipconfig.ModuleMakefile.__init__`.
+        :param static:
+            see :meth:`sipconfig.ModuleMakefile.__init__`.
+        :param console:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param qt:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param opengl:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param threaded:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param warnings:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param debug:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param dir:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param makefile:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param installs:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param strip:
+            see :meth:`sipconfig.ModuleMakefile.__init__`.
+        :param export_all:
+            see :meth:`sipconfig.ModuleMakefile.__init__`.
+        :param universal:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param arch:
+            see :meth:`sipconfig.Makefile.__init__`.
+        :param prot_is_public:
+            is set if ``protected`` should be redefined as ``public`` when
+            compiling the generated module.
 
     .. method:: finalise()
 

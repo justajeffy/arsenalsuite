@@ -2,6 +2,10 @@
 
 """PyQt4 port of the tools/regexp example from Qt v4.x"""
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QVariant', 2)
+
 from PyQt4 import QtCore, QtGui
 
 
@@ -16,7 +20,7 @@ class RegExpDialog(QtGui.QDialog):
         self.patternComboBox.setSizePolicy(QtGui.QSizePolicy.Expanding,
                 QtGui.QSizePolicy.Preferred)
 
-        patternLabel = QtGui.QLabel(self.tr("&Pattern:"))
+        patternLabel = QtGui.QLabel("&Pattern:")
         patternLabel.setBuddy(self.patternComboBox)
 
         self.escapedPatternLineEdit = QtGui.QLineEdit()
@@ -26,20 +30,19 @@ class RegExpDialog(QtGui.QDialog):
                 palette.brush(QtGui.QPalette.Disabled, QtGui.QPalette.Base))
         self.escapedPatternLineEdit.setPalette(palette)
 
-        escapedPatternLabel = QtGui.QLabel(self.tr("&Escaped Pattern:"))
+        escapedPatternLabel = QtGui.QLabel("&Escaped Pattern:")
         escapedPatternLabel.setBuddy(self.escapedPatternLineEdit)
 
         self.syntaxComboBox = QtGui.QComboBox()
-        self.syntaxComboBox.addItem(self.tr("Regular expression v1"),
-                QtCore.QVariant(QtCore.QRegExp.RegExp))
-        self.syntaxComboBox.addItem(self.tr("Regular expression v2"),
-                QtCore.QVariant(QtCore.QRegExp.RegExp2))
-        self.syntaxComboBox.addItem(self.tr("Wildcard"),
-                QtCore.QVariant(QtCore.QRegExp.Wildcard))
-        self.syntaxComboBox.addItem(self.tr("Fixed string"),
-                QtCore.QVariant(QtCore.QRegExp.FixedString))
+        self.syntaxComboBox.addItem("Regular expression v1",
+                QtCore.QRegExp.RegExp)
+        self.syntaxComboBox.addItem("Regular expression v2",
+                QtCore.QRegExp.RegExp2)
+        self.syntaxComboBox.addItem("Wildcard", QtCore.QRegExp.Wildcard)
+        self.syntaxComboBox.addItem("Fixed string",
+                QtCore.QRegExp.FixedString)
 
-        syntaxLabel = QtGui.QLabel(self.tr("&Pattern Syntax:"))
+        syntaxLabel = QtGui.QLabel("&Pattern Syntax:")
         syntaxLabel.setBuddy(self.syntaxComboBox)
 
         self.textComboBox = QtGui.QComboBox()
@@ -47,28 +50,28 @@ class RegExpDialog(QtGui.QDialog):
         self.textComboBox.setSizePolicy(QtGui.QSizePolicy.Expanding,
                 QtGui.QSizePolicy.Preferred)
 
-        textLabel = QtGui.QLabel(self.tr("&Text:"))
+        textLabel = QtGui.QLabel("&Text:")
         textLabel.setBuddy(self.textComboBox)
 
-        self.caseSensitiveCheckBox = QtGui.QCheckBox(self.tr("Case &Sensitive"))
+        self.caseSensitiveCheckBox = QtGui.QCheckBox("Case &Sensitive")
         self.caseSensitiveCheckBox.setChecked(True)
-        self.minimalCheckBox = QtGui.QCheckBox(self.tr("&Minimal"))
+        self.minimalCheckBox = QtGui.QCheckBox("&Minimal")
 
-        indexLabel = QtGui.QLabel(self.tr("Index of Match:"))
+        indexLabel = QtGui.QLabel("Index of Match:")
         self.indexEdit = QtGui.QLineEdit()
         self.indexEdit.setReadOnly(True)
 
-        matchedLengthLabel = QtGui.QLabel(self.tr("Matched Length:"))
+        matchedLengthLabel = QtGui.QLabel("Matched Length:")
         self.matchedLengthEdit = QtGui.QLineEdit()
         self.matchedLengthEdit.setReadOnly(True)
 
         self.captureLabels = []
         self.captureEdits = []
         for i in range(self.MaxCaptures):
-            self.captureLabels.append(QtGui.QLabel(self.tr("Capture %1:").arg(i)))
+            self.captureLabels.append(QtGui.QLabel("Capture %d:" % i))
             self.captureEdits.append(QtGui.QLineEdit())
             self.captureEdits[i].setReadOnly(True)
-        self.captureLabels[0].setText(self.tr("Match:"))
+        self.captureLabels[0].setText("Match:")
 
         checkBoxLayout = QtGui.QHBoxLayout()
         checkBoxLayout.addWidget(self.caseSensitiveCheckBox)
@@ -101,10 +104,10 @@ class RegExpDialog(QtGui.QDialog):
         self.minimalCheckBox.toggled.connect(self.refresh)
         self.syntaxComboBox.currentIndexChanged.connect(self.refresh)
 
-        self.patternComboBox.addItem(self.tr("[A-Za-z_]+([A-Za-z_0-9]*)"))
-        self.textComboBox.addItem(self.tr("(10 + delta4)* 32"))
+        self.patternComboBox.addItem("[A-Za-z_]+([A-Za-z_0-9]*)")
+        self.textComboBox.addItem("(10 + delta4)* 32")
 
-        self.setWindowTitle(self.tr("RegExp"))
+        self.setWindowTitle("RegExp")
         self.setFixedHeight(self.sizeHint().height())
         self.refresh()
 
@@ -114,12 +117,10 @@ class RegExpDialog(QtGui.QDialog):
         pattern = self.patternComboBox.currentText()
         text = self.textComboBox.currentText()
 
-        escaped = QtCore.QString(pattern)
-        escaped.replace("\\", "\\\\")
-        escaped.replace("\"", "\\\"")
-        escaped.prepend("\"")
-        escaped.append("\"")
-        self.escapedPatternLineEdit.setText(escaped)
+        escaped = str(pattern)
+        escaped.replace('\\', '\\\\')
+        escaped.replace('"', '\\"')
+        self.escapedPatternLineEdit.setText('"' + escaped + '"')
 
         rx = QtCore.QRegExp(pattern)
         cs = QtCore.Qt.CaseInsensitive
@@ -127,7 +128,7 @@ class RegExpDialog(QtGui.QDialog):
             cs = QtCore.Qt.CaseSensitive
         rx.setCaseSensitivity(cs)
         rx.setMinimal(self.minimalCheckBox.isChecked())
-        syntax, _ = self.syntaxComboBox.itemData(self.syntaxComboBox.currentIndex()).toInt()
+        syntax = self.syntaxComboBox.itemData(self.syntaxComboBox.currentIndex())
         rx.setPatternSyntax(syntax)
 
         palette = self.patternComboBox.palette()
@@ -138,9 +139,8 @@ class RegExpDialog(QtGui.QDialog):
             palette.setColor(QtGui.QPalette.Text, QtCore.Qt.red)
         self.patternComboBox.setPalette(palette)
 
-        self.indexEdit.setText(QtCore.QString.number(rx.indexIn(text)))
-        self.matchedLengthEdit.setText(
-            QtCore.QString.number(rx.matchedLength()))
+        self.indexEdit.setText(str(rx.indexIn(text)))
+        self.matchedLengthEdit.setText(str(rx.matchedLength()))
 
         for i in range(self.MaxCaptures):
             self.captureLabels[i].setEnabled(i <= rx.numCaptures())

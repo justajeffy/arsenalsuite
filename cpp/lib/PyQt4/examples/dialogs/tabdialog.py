@@ -33,9 +33,9 @@ class TabDialog(QtGui.QDialog):
         fileInfo = QtCore.QFileInfo(fileName)
 
         tabWidget = QtGui.QTabWidget()
-        tabWidget.addTab(GeneralTab(fileInfo), self.tr("General"))
-        tabWidget.addTab(PermissionsTab(fileInfo), self.tr("Permissions"))
-        tabWidget.addTab(ApplicationsTab(fileInfo), self.tr("Applications"))
+        tabWidget.addTab(GeneralTab(fileInfo), "General")
+        tabWidget.addTab(PermissionsTab(fileInfo), "Permissions")
+        tabWidget.addTab(ApplicationsTab(fileInfo), "Applications")
 
         buttonBox = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
 
@@ -47,30 +47,30 @@ class TabDialog(QtGui.QDialog):
         mainLayout.addWidget(buttonBox)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Tab Dialog"))
+        self.setWindowTitle("Tab Dialog")
 
 
 class GeneralTab(QtGui.QWidget):
     def __init__(self, fileInfo, parent=None):
         super(GeneralTab, self).__init__(parent)
 
-        fileNameLabel = QtGui.QLabel(self.tr("File Name:"))
+        fileNameLabel = QtGui.QLabel("File Name:")
         fileNameEdit = QtGui.QLineEdit(fileInfo.fileName())
 
-        pathLabel = QtGui.QLabel(self.tr("Path:"))
+        pathLabel = QtGui.QLabel("Path:")
         pathValueLabel = QtGui.QLabel(fileInfo.absoluteFilePath())
         pathValueLabel.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)
 
-        sizeLabel = QtGui.QLabel(self.tr("Size:"))
-        size = fileInfo.size() / 1024
-        sizeValueLabel = QtGui.QLabel(self.tr("%1 K").arg(size))
+        sizeLabel = QtGui.QLabel("Size:")
+        size = fileInfo.size() // 1024
+        sizeValueLabel = QtGui.QLabel("%d K" % size)
         sizeValueLabel.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)
 
-        lastReadLabel = QtGui.QLabel(self.tr("Last Read:"))
+        lastReadLabel = QtGui.QLabel("Last Read:")
         lastReadValueLabel = QtGui.QLabel(fileInfo.lastRead().toString())
         lastReadValueLabel.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)
 
-        lastModLabel = QtGui.QLabel(self.tr("Last Modified:"))
+        lastModLabel = QtGui.QLabel("Last Modified:")
         lastModValueLabel = QtGui.QLabel(fileInfo.lastModified().toString())
         lastModValueLabel.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)
 
@@ -93,27 +93,27 @@ class PermissionsTab(QtGui.QWidget):
     def __init__(self, fileInfo, parent=None):
         super(PermissionsTab, self).__init__(parent)
 
-        permissionsGroup = QtGui.QGroupBox(self.tr("Permissions"))
+        permissionsGroup = QtGui.QGroupBox("Permissions")
 
-        readable = QtGui.QCheckBox(self.tr("Readable"))
+        readable = QtGui.QCheckBox("Readable")
         if fileInfo.isReadable():
             readable.setChecked(True)
 
-        writable = QtGui.QCheckBox(self.tr("Writable"))
+        writable = QtGui.QCheckBox("Writable")
         if fileInfo.isWritable():
             writable.setChecked(True)
 
-        executable = QtGui.QCheckBox(self.tr("Executable"))
+        executable = QtGui.QCheckBox("Executable")
         if fileInfo.isExecutable():
             executable.setChecked(True)
 
-        ownerGroup = QtGui.QGroupBox(self.tr("Ownership"))
+        ownerGroup = QtGui.QGroupBox("Ownership")
 
-        ownerLabel = QtGui.QLabel(self.tr("Owner"))
+        ownerLabel = QtGui.QLabel("Owner")
         ownerValueLabel = QtGui.QLabel(fileInfo.owner())
         ownerValueLabel.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)
 
-        groupLabel = QtGui.QLabel(self.tr("Group"))
+        groupLabel = QtGui.QLabel("Group")
         groupValueLabel = QtGui.QLabel(fileInfo.group())
         groupValueLabel.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Sunken)
 
@@ -141,22 +141,24 @@ class ApplicationsTab(QtGui.QWidget):
     def __init__(self, fileInfo, parent=None):
         super(ApplicationsTab, self).__init__(parent)
 
-        topLabel = QtGui.QLabel(self.tr("Open with:"))
+        topLabel = QtGui.QLabel("Open with:")
 
         applicationsListBox = QtGui.QListWidget()
-        applications = QtCore.QStringList()
+        applications = []
 
         for i in range(1, 31):
-            applications.append(self.tr("Application %1").arg(i))
+            applications.append("Application %d" % i)
 
         applicationsListBox.insertItems(0, applications)
 
         alwaysCheckBox = QtGui.QCheckBox()
 
-        if fileInfo.suffix().isEmpty():
-            alwaysCheckBox = QtGui.QCheckBox(self.tr("Always use this application to open this type of file"))
+        if fileInfo.suffix():
+            alwaysCheckBox = QtGui.QCheckBox("Always use this application to "
+                    "open files with the extension '%s'" % fileInfo.suffix())
         else:
-            alwaysCheckBox = QtGui.QCheckBox(self.tr("Always use this application to open files with the extension '%1'").arg(fileInfo.suffix()))
+            alwaysCheckBox = QtGui.QCheckBox("Always use this application to "
+                    "open this type of file")
 
         layout = QtGui.QVBoxLayout()
         layout.addWidget(topLabel)
@@ -165,12 +167,11 @@ class ApplicationsTab(QtGui.QWidget):
         self.setLayout(layout)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 
     app = QtGui.QApplication(sys.argv)
-    fileName = QtCore.QString()
 
     if len(sys.argv) >= 2:
         fileName = sys.argv[1]
