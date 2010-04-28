@@ -29,6 +29,8 @@ Makefile.Debug
 *.lib
 *.pyd
 *.dll
+w_qpy*.pro
+Qtmod.sip
 
 # switch to regexp syntax.
 syntax: regexp
@@ -60,7 +62,9 @@ syntax: regexp
 
 .*/PyQt4/cfgtest_.*
 .*/PyQt4/Qt.*
+.*/PyQt4/QAx.*
 .*/PyQt4/phonon.*
 .*/PyQt4/qpy/QtDesigner/.*cpp
 .*/PyQt4/.*Makefile$
 .*/PyQt4/qtdirs.*
+.*/PyQt4/examples/.*
