@@ -23,6 +23,10 @@
 ##
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QString', 2)
+
 from PyQt4 import QtCore, QtGui
 
 import draggabletext_rc
@@ -65,22 +69,18 @@ class DragWidget(QtGui.QWidget):
 
         dictionaryFile = QtCore.QFile(':/dictionary/words.txt')
         dictionaryFile.open(QtCore.QIODevice.ReadOnly)
-        inputStream = QtCore.QTextStream(dictionaryFile)
 
         x = 5
         y = 5
 
-        while not inputStream.atEnd():
-            word = QtCore.QString()
-            inputStream >> word
-            if not word.isEmpty():
-                wordLabel = DragLabel(word, self)
-                wordLabel.move(x, y)
-                wordLabel.show()
-                x += wordLabel.width() + 2
-                if x >= 195:
-                    x = 5
-                    y += wordLabel.height() + 2
+        for word in QtCore.QTextStream(dictionaryFile).readAll().split():
+            wordLabel = DragLabel(word, self)
+            wordLabel.move(x, y)
+            wordLabel.show()
+            x += wordLabel.width() + 2
+            if x >= 195:
+                x = 5
+                y += wordLabel.height() + 2
 
         newPalette = self.palette()
         newPalette.setColor(QtGui.QPalette.Window, QtCore.Qt.white)
@@ -88,7 +88,7 @@ class DragWidget(QtGui.QWidget):
 
         self.setAcceptDrops(True)
         self.setMinimumSize(400, max(200, y))
-        self.setWindowTitle(self.tr("Draggable Text"))
+        self.setWindowTitle("Draggable Text")
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasText():
@@ -103,8 +103,7 @@ class DragWidget(QtGui.QWidget):
     def dropEvent(self, event):
         if event.mimeData().hasText():
             mime = event.mimeData()
-            pieces = mime.text().split(QtCore.QRegExp("\\s+"),
-                    QtCore.QString.SkipEmptyParts)
+            pieces = mime.text().split()
             position = event.pos()
             hotSpot = QtCore.QPoint()
 

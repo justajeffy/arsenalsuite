@@ -32,10 +32,10 @@
 !endif
 
 # These will change with different releases.
-!define PYQT_VERSION        "4.6.1"
+!define PYQT_VERSION        "4.7.0"
 !define PYQT_LICENSE        "GPL"
 !define PYQT_LICENSE_LC     "gpl"
-!define PYQT_QT_VERS        "4.5.2"
+!define PYQT_QT_VERS        "4.6.1"
 
 # These are all derived from the above.
 !define PYQT_NAME           "PyQt4 ${PYQT_LICENSE} v${PYQT_VERSION} ${PLATFORM}"
@@ -90,19 +90,39 @@ SetCompressor /SOLID lzma
 
 
 Function .onInit
+
+#    ${If} $0 == ""
+#        MessageBox MB_YESNO|MB_ICONQUESTION \
+#"This copy of PyQt has been built against Python v${PYTHON_VERSION}.x which \
+#doesn't seem to be installed.$\r$\n\
+#$\r$\n\
+#Do you with to continue with the installation?" IDYES GotPython
+#            Abort
+GotPython:
+    #${Endif}
+
 !ifdef _64_BIT
 	SetRegView 64
-!else
-	Abort
 !endif
 
-    ReadRegStr $0 HKLM "${PYQT_PYTHON_HKLM}" ""
+    # Check the right version of Qt has been installed.  Note we can't check if
+    # the right compiler was used.  This key seems to be present in the
+    # commercial version and missing in the GPL version.
+    ReadRegStr $0 HKLM "${PYQT_QT_HKLM}" "InstallDir"
+
     ${If} $0 != ""
-		StrCpy $INSTDIR $0
-	${Else}
-		Abort
+               StrCpy $0 $INSTDIR
     ${Endif}
-	
+
+#    ${If} $0 != ""
+#        MessageBox MB_YESNO|MB_ICONQUESTION \
+#"This copy of PyQt has been built with the ${PLATFORM} compiler against \
+#Qt v${PYQT_QT_VERS} which doesn't seem to be installed.$\r$\n\
+#$\r$\n\
+#Do you with to continue with the installation?" IDYES GotQt
+#            Abort
+GotQt:
+#    ${Endif}
 FunctionEnd
 
 
@@ -126,6 +146,10 @@ FunctionEnd
 
 Section "Extension modules" SecModules
     SectionIn 1 2 RO
+
+!ifdef _64_BIT
+    ${DisableX64FSRedirection}
+!endif
 
     # Make sure this is clean and tidy.
     RMDir /r $PROGRAMFILES\PyQt4
@@ -155,14 +179,13 @@ Section "Extension modules" SecModules
     File .\QtSvg\QtSvg.pyd
     File .\QtXml\QtXml.pyd
     File .\QtWebKit\QtWebKit.pyd
-    File .\QtXmlPatterns\QtXmlPatterns.pyd
+   # File .\QtXmlPatterns\QtXmlPatterns.pyd
     File .\QtDesigner\QtDesigner.pyd
     File .\QtHelp\QtHelp.pyd
     File .\QtScript\QtScript.pyd
     File .\QtScriptTools\QtScriptTools.pyd
     File .\QtTest\QtTest.pyd
     File .\phonon\phonon.pyd
-    File ..\pyqtwinmigrate\sipQtWinMigrate\QtWinMigrate.pyd
 SectionEnd
 
 Section "Developer tools" SecTools

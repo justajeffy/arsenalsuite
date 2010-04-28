@@ -1,6 +1,6 @@
 // This contains the implementation of the pyqtSignal type.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -49,20 +49,30 @@ static PyObject *pyqtSignal_descr_get(PyObject *self, PyObject *obj,
 static int pyqtSignal_init(PyObject *self, PyObject *args, PyObject *kwd_args);
 static PyObject *pyqtSignal_new(PyTypeObject *type, PyObject *args,
         PyObject *kwd_args);
+static PyObject *pyqtSignal_repr(PyObject *self);
+static PyObject *pyqtSignal_get_doc(PyObject *self, void *);
 }
 
 static int add_overload(qpycore_pyqtSignal *ps, const char *name,
         PyObject *types);
-static int add_overload(qpycore_pyqtSignal *ps, const char *sig);
+static int add_overload(qpycore_pyqtSignal *ps, const char *sig,
+        const char *docstring);
 static bool is_signal_name(const char *sig, const char *name, uint name_len);
 
 
+// The getters/setters.
+static PyGetSetDef pyqtSignal_getsets[] = {
+    {(char *)"__doc__", pyqtSignal_get_doc, NULL, NULL, NULL},
+    {NULL, NULL, NULL, NULL, NULL}
+};
+
+
 PyDoc_STRVAR(pyqtSignal_doc,
-"pyqtSignal(*types, name=str) -> signal attribute\n"
+"pyqtSignal(*types, name=str) -> signal\n"
 "\n"
 "types is normally a sequence of individual types.  Each type is either a\n"
-"type object or a string that is the name of a C++ type.  Alternatively each\n"
-"type could itself be a sequence of types each describing a different\n"
+"type object or a string that is the name of a C++ type.  Alternatively\n"
+"each type could itself be a sequence of types each describing a different\n"
 "overloaded signal.\n"
 "name is the optional C++ name of the signal.  If it is not specified then\n"
 "the name of the class attribute that is bound to the signal is used.");
@@ -79,7 +89,7 @@ PyTypeObject qpycore_pyqtSignal_Type = {
     0,                      /* tp_getattr */
     0,                      /* tp_setattr */
     0,                      /* tp_compare */
-    0,                      /* tp_repr */
+    pyqtSignal_repr,        /* tp_repr */
     0,                      /* tp_as_number */
     0,                      /* tp_as_sequence */
     0,                      /* tp_as_mapping */
@@ -99,7 +109,7 @@ PyTypeObject qpycore_pyqtSignal_Type = {
     0,                      /* tp_iternext */
     0,                      /* tp_methods */
     0,                      /* tp_members */
-    0,                      /* tp_getset */
+    pyqtSignal_getsets,     /* tp_getset */
     0,                      /* tp_base */
     0,                      /* tp_dict */
     pyqtSignal_descr_get,   /* tp_descr_get */
@@ -120,6 +130,76 @@ PyTypeObject qpycore_pyqtSignal_Type = {
     0,                      /* tp_version_tag */
 #endif
 };
+
+
+// Get the docstring for a signal.
+PyObject *qpycore_get_signal_doc(PyObject *self)
+{
+    qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)self;
+
+    QByteArray doc;
+
+    // Get any docstrings from any non-signal overloads.
+    if (ps->non_signals && ps->non_signals->ml_doc)
+    {
+        doc.append('\n');
+        doc.append(ps->non_signals->ml_doc);
+    }
+
+    // Get any docstrings from the signals.
+    for (int i = 0; i < ps->overloads->size(); ++i)
+    {
+        const char *docstring = ps->overloads->at(i)->docstring;
+
+        if (docstring)
+        {
+            if (*docstring == '\1')
+                ++docstring;
+
+            doc.append('\n');
+            doc.append(docstring);
+            doc.append(" [signal]");
+        }
+    }
+
+    if (doc.isEmpty())
+    {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
+    return
+#if PY_MAJOR_VERSION >= 3
+        PyUnicode_FromString
+#else
+        PyString_FromString
+#endif
+            (doc.constData() + 1);
+}
+
+
+// The __doc__ getter.
+static PyObject *pyqtSignal_get_doc(PyObject *self, void *)
+{
+    return qpycore_get_signal_doc(self);
+}
+
+
+// The type repr slot.
+static PyObject *pyqtSignal_repr(PyObject *self)
+{
+    qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)self;
+
+    QByteArray name = Chimera::Signature::name(ps->overloads->first()->signature);
+
+    return
+#if PY_MAJOR_VERSION >= 3
+        PyUnicode_FromFormat
+#else
+        PyString_FromFormat
+#endif
+            ("<unbound signal %s>", name.constData() + 1);
+}
 
 
 // The type call slot.
@@ -375,7 +455,7 @@ int qpycore_get_lazy_attr(const sipTypeDef *td, PyObject *dict)
         }
 
         // Add the new overload.
-        if (add_overload(curr, sigs->signature) < 0)
+        if (add_overload(curr, sigs->signature, sigs->docstring) < 0)
         {
             Py_DECREF((PyObject *)curr);
             return -1;
@@ -389,7 +469,8 @@ int qpycore_get_lazy_attr(const sipTypeDef *td, PyObject *dict)
 
 
 // Add an overload when given a native Qt signature.
-static int add_overload(qpycore_pyqtSignal *ps, const char *sig)
+static int add_overload(qpycore_pyqtSignal *ps, const char *sig,
+        const char *docstring)
 {
     QByteArray norm = QMetaObject::normalizedSignature(sig);
     Chimera::Signature *parsed = Chimera::parse(norm, "a native Qt signal");
@@ -399,6 +480,7 @@ static int add_overload(qpycore_pyqtSignal *ps, const char *sig)
         return -1;
 
     parsed->signature.prepend('2');
+    parsed->docstring = docstring;
 
     ps->overloads->append(parsed);
 

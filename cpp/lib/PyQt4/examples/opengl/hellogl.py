@@ -44,7 +44,7 @@ class Window(QtGui.QWidget):
         self.ySlider.setValue(345 * 16)
         self.zSlider.setValue(0 * 16)
 
-        self.setWindowTitle(self.tr("Hello GL"))
+        self.setWindowTitle("Hello GL")
 
     def createSlider(self):
         slider = QtGui.QSlider(QtCore.Qt.Vertical)
@@ -121,6 +121,9 @@ class GLWidget(QtOpenGL.QGLWidget):
 
     def resizeGL(self, width, height):
         side = min(width, height)
+        if side < 0:
+            return
+
         GL.glViewport((width - side) / 2, (height - side) / 2, side, side)
 
         GL.glMatrixMode(GL.GL_PROJECTION)

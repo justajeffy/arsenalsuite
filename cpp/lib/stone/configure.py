@@ -45,7 +45,11 @@ def doit():
 	# module's specification files using the -I flag.
 	#config.pyqt_sip_dir = "/usr/share/sip/PyQt4"
 	#config.pyqt_sip_dir = "c:\\python24\\sip\\PyQt4\\"
-	cmd = " ".join([config.sip_bin, "-c", "sipStone", "-b", "sipStone/"+build_file, "-I", config.pyqt_sip_dir, config.pyqt_sip_flags, "sip/blurqt.sip"])
+	if sys.platform=="win32":
+		sip_bin = "..\\sip\\sipgen\\sip.exe"
+	else: 
+		sip_bin = config.sip_bin
+	cmd = " ".join([sip_bin, "-c", "sipStone", "-b", "sipStone/"+build_file, "-I", config.pyqt_sip_dir, config.pyqt_sip_flags, "sip/blurqt.sip"])
 	ret = os.system(cmd)
 	
 	if ret:

@@ -1,6 +1,6 @@
 // This contains the definitions for the implementation of pyqtProperty.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -64,18 +64,8 @@ typedef struct {
     // The parsed type information.
     const Chimera *pyqtprop_parsed_type;
 
-    // This is set if the property is DESIGNABLE.  The default is true for
-    // writable properties and false otherwise.
-    bool pyqtprop_designable;
-
-    // This is set if the property is SCRIPTABLE.  The default is true.
-    bool pyqtprop_scriptable;
-
-    // This is set if the property is STORED.  The default is true.
-    bool pyqtprop_stored;
-
-    // This is set if the property is USER.  The default is false.
-    bool pyqtprop_user;
+    // The DESIGNABLE, SCIPTABLE, STORED, USER, CONSTANT and FINAL flags.
+    unsigned pyqtprop_flags;
 
     // The property's sequence number that determines the position of the
     // property in the QMetaObject.

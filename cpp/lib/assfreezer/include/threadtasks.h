@@ -1,5 +1,5 @@
 
-/* $Author: brobison $
+/* $Author$
  * $LastChangedDate: 2009-11-27 13:20:11 +1100 (Fri, 27 Nov 2009) $
  * $Rev: 9100 $
  * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/include/threadtasks.h $
@@ -35,7 +35,9 @@ enum {
 	STATIC_JOB_LIST_DATA,
 	STATIC_HOST_LIST_DATA,
 	HOST_ERROR_LIST,
-	JOB_HISTORY_LIST
+	JOB_HISTORY_LIST,
+    UPDATE_JOB_LIST,
+    UPDATE_HOST_LIST
 };
 
 class JobListTask : public ThreadTask
@@ -53,6 +55,16 @@ public:
 	JobServiceList mJobServices;
 };
 
+class UpdateJobListTask : public ThreadTask
+{
+public:
+	UpdateJobListTask( QObject * rec, const JobList & jobList, const QString & status );
+	void run();
+
+	JobList mReturn;
+    QString mStatus;
+};
+
 class HostListTask : public ThreadTask
 {
 public:
@@ -66,6 +78,16 @@ public:
 	JobAssignmentList mHostAssignments;
 	JobList mHostJobs;
 	bool mLoadHostServices;
+};
+
+class UpdateHostListTask : public ThreadTask
+{
+public:
+	UpdateHostListTask( QObject * rec, const HostList & jobList, const QString & status );
+	void run();
+
+	HostList mReturn;
+    QString mStatus;
 };
 
 class FrameListTask : public ThreadTask

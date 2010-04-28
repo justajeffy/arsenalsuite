@@ -23,6 +23,10 @@
 # 
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QVariant', 2)
+
 import random
 
 from PyQt4 import QtCore, QtGui
@@ -182,18 +186,20 @@ class PiecesModel(QtCore.QAbstractListModel):
 
     def data(self, index, role=QtCore.Qt.DisplayRole):
         if not index.isValid():
-            return QtCore.QVariant()
+            return None
 
         if role == QtCore.Qt.DecorationRole:
-            return QtCore.QVariant(QtGui.QIcon(self.pixmaps[index.row()].scaled(
-                                               60, 60, QtCore.Qt.KeepAspectRatio,
-                                               QtCore.Qt.SmoothTransformation)))
-        elif role == QtCore.Qt.UserRole:
-            return QtCore.QVariant(self.pixmaps[index.row()])
-        elif role == QtCore.Qt.UserRole + 1:
-            return QtCore.QVariant(self.locations[index.row()])
+            return QtGui.QIcon(self.pixmaps[index.row()].scaled(
+                    60, 60, QtCore.Qt.KeepAspectRatio,
+                    QtCore.Qt.SmoothTransformation))
 
-        return QtCore.QVariant()
+        if role == QtCore.Qt.UserRole:
+            return self.pixmaps[index.row()]
+
+        if role == QtCore.Qt.UserRole + 1:
+            return self.locations[index.row()]
+
+        return None
 
     def addPiece(self, pixmap, location):
         if random.random() < 0.5:
@@ -232,9 +238,7 @@ class PiecesModel(QtCore.QAbstractListModel):
         return True
 
     def mimeTypes(self):
-        types = QtCore.QStringList()
-        types << 'image/x-puzzle-piece'
-        return types
+        return ['image/x-puzzle-piece']
 
     def mimeData(self, indexes):
         mimeData = QtCore.QMimeData()
@@ -245,7 +249,7 @@ class PiecesModel(QtCore.QAbstractListModel):
         for index in indexes:
             if index.isValid():
                 pixmap = QtGui.QPixmap(self.data(index, QtCore.Qt.UserRole))
-                location = self.data(index, QtCore.Qt.UserRole + 1).toPoint()
+                location = self.data(index, QtCore.Qt.UserRole + 1)
                 stream << pixmap << location
 
         mimeData.setData('image/x-puzzle-piece', encodedData)
@@ -318,21 +322,18 @@ class MainWindow(QtGui.QMainWindow):
 
         self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,
                 QtGui.QSizePolicy.Fixed))
-        self.setWindowTitle(self.tr("Puzzle"))
+        self.setWindowTitle("Puzzle")
 
-    def openImage(self, path=QtCore.QString()):
-        fileName = path
-
-        if fileName.isNull():
-            fileName = QtGui.QFileDialog.getOpenFileName(self,
-                    self.tr("Open Image"), "",
+    def openImage(self, path=None):
+        if not path:
+            path = QtGui.QFileDialog.getOpenFileName(self, "Open Image", '',
                     "Image Files (*.png *.jpg *.bmp)")
 
-        if not fileName.isEmpty():
+        if path:
             newImage = QtGui.QPixmap()
-            if not newImage.load(fileName):
-                QtGui.QMessageBox.warning(self, self.tr("Open Image"),
-                        self.tr("The image file could not be loaded."),
+            if not newImage.load(path):
+                QtGui.QMessageBox.warning(self, "Open Image",
+                        "The image file could not be loaded.",
                         QtGui.QMessageBox.Cancel)
                 return
 
@@ -340,9 +341,9 @@ class MainWindow(QtGui.QMainWindow):
             self.setupPuzzle()
 
     def setCompleted(self):
-        QtGui.QMessageBox.information(self, self.tr("Puzzle Completed"),
-                self.tr("Congratulations! You have completed the puzzle!\n"
-                        "Click OK to start again."),
+        QtGui.QMessageBox.information(self, "Puzzle Completed",
+                "Congratulations! You have completed the puzzle!\nClick OK "
+                "to start again.",
                 QtGui.QMessageBox.Ok)
 
         self.setupPuzzle()
@@ -360,17 +361,17 @@ class MainWindow(QtGui.QMainWindow):
         self.puzzleWidget.clear()
 
     def setupMenus(self):
-        fileMenu = self.menuBar().addMenu(self.tr("&File"))
+        fileMenu = self.menuBar().addMenu("&File")
 
-        openAction = fileMenu.addAction(self.tr("&Open..."))
-        openAction.setShortcut(QtGui.QKeySequence(self.tr("Ctrl+O")))
+        openAction = fileMenu.addAction("&Open...")
+        openAction.setShortcut("Ctrl+O")
 
-        exitAction = fileMenu.addAction(self.tr("E&xit"))
-        exitAction.setShortcut(QtGui.QKeySequence(self.tr("Ctrl+Q")))
+        exitAction = fileMenu.addAction("E&xit")
+        exitAction.setShortcut("Ctrl+Q")
 
-        gameMenu = self.menuBar().addMenu(self.tr("&Game"))
+        gameMenu = self.menuBar().addMenu("&Game")
 
-        restartAction = gameMenu.addAction(self.tr("&Restart"))
+        restartAction = gameMenu.addAction("&Restart")
 
         openAction.triggered.connect(self.openImage)
         exitAction.triggered.connect(QtGui.qApp.quit)
@@ -409,6 +410,6 @@ if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
     window = MainWindow()
-    window.openImage(QtCore.QString(':/images/example.jpg'))
+    window.openImage(':/images/example.jpg')
     window.show()
     sys.exit(app.exec_())

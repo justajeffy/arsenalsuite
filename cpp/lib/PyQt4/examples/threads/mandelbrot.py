@@ -203,7 +203,7 @@ class MandelbrotWidget(QtGui.QWidget):
 
         self.thread.renderedImage.connect(self.updatePixmap)
 
-        self.setWindowTitle(self.tr("Mandelbrot"))
+        self.setWindowTitle("Mandelbrot")
         self.setCursor(QtCore.Qt.CrossCursor)
         self.resize(550, 400)
 
@@ -214,7 +214,7 @@ class MandelbrotWidget(QtGui.QWidget):
         if self.pixmap.isNull():
             painter.setPen(QtCore.Qt.white)
             painter.drawText(self.rect(), QtCore.Qt.AlignCenter,
-                    self.tr("Rendering initial image, please wait..."))
+                    "Rendering initial image, please wait...")
             return
 
         if self.curScale == self.pixmapScale:
@@ -234,8 +234,8 @@ class MandelbrotWidget(QtGui.QWidget):
             painter.drawPixmap(exposed, self.pixmap, exposed)
             painter.restore()
 
-        text = self.tr("Use mouse wheel or the '+' and '-' keys to zoom. "
-                       "Press and hold left mouse button to scroll.")
+        text = "Use mouse wheel or the '+' and '-' keys to zoom. Press and " \
+                "hold left mouse button to scroll."
         metrics = painter.fontMetrics()
         textWidth = metrics.width(text)
 

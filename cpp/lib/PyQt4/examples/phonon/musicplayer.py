@@ -21,6 +21,10 @@
 ##
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QString', 2)
+
 import sys
 from PyQt4 import QtCore, QtGui
 
@@ -64,11 +68,10 @@ class MainWindow(QtGui.QMainWindow):
         return QtCore.QSize(500, 300)
 
     def addFiles(self):
-        files = QtGui.QFileDialog.getOpenFileNames(self,
-                self.tr("Select Music Files"),
+        files = QtGui.QFileDialog.getOpenFileNames(self, "Select Music Files",
                 QtGui.QDesktopServices.storageLocation(QtGui.QDesktopServices.MusicLocation))
 
-        if files.isEmpty():
+        if not files:
             return
 
         index = len(self.sources)
@@ -80,18 +83,18 @@ class MainWindow(QtGui.QMainWindow):
             self.metaInformationResolver.setCurrentSource(self.sources[index])
 
     def about(self):
-        QtGui.QMessageBox.information(self, self.tr("About Music Player"),
-                self.tr("The Music Player example shows how to use Phonon - "
-                        "the multimedia framework that comes with Qt - to "
-                        "create a simple music player."))
+        QtGui.QMessageBox.information(self, "About Music Player",
+                "The Music Player example shows how to use Phonon - the "
+                "multimedia framework that comes with Qt - to create a "
+                "simple music player.")
 
     def stateChanged(self, newState, oldState):
         if newState == Phonon.ErrorState:
             if self.mediaObject.errorType() == Phonon.FatalError:
-                QtGui.QMessageBox.warning(self, self.tr("Fatal Error"),
+                QtGui.QMessageBox.warning(self, "Fatal Error",
                         self.mediaObject.errorString())
             else:
-                QtGui.QMessageBox.warning(self, self.tr("Error"),
+                QtGui.QMessageBox.warning(self, "Error",
                         self.mediaObject.errorString())
 
         elif newState == Phonon.PlayingState:
@@ -129,11 +132,11 @@ class MainWindow(QtGui.QMainWindow):
 
     def sourceChanged(self, source):
         self.musicTable.selectRow(self.sources.index(source))
-        self.timeLcd.display("00:00")
+        self.timeLcd.display('00:00')
 
     def metaStateChanged(self, newState, oldState):
         if newState == Phonon.ErrorState:
-            QtGui.QMessageBox.warning(self, self.tr("Error opening files"),
+            QtGui.QMessageBox.warning(self, "Error opening files",
                     self.metaInformationResolver.errorString())
 
             while self.sources and self.sources.pop() != self.metaInformationResolver.currentSource():
@@ -149,22 +152,22 @@ class MainWindow(QtGui.QMainWindow):
 
         metaData = self.metaInformationResolver.metaData()
 
-        title = metaData.get(QtCore.QString('TITLE'), [QtCore.QString()])[0]
-        if title.isEmpty():
+        title = metaData.get('TITLE', [''])[0]
+        if not title:
             title = self.metaInformationResolver.currentSource().fileName()
 
         titleItem = QtGui.QTableWidgetItem(title)
         titleItem.setFlags(titleItem.flags() ^ QtCore.Qt.ItemIsEditable)
 
-        artist = metaData.get(QtCore.QString('ARTIST'), [QtCore.QString()])[0]
+        artist = metaData.get('ARTIST', [''])[0]
         artistItem = QtGui.QTableWidgetItem(artist)
         artistItem.setFlags(artistItem.flags() ^ QtCore.Qt.ItemIsEditable)
 
-        album = metaData.get(QtCore.QString('ALBUM'), [QtCore.QString()])[0]
+        album = metaData.get('ALBUM', [''])[0]
         albumItem = QtGui.QTableWidgetItem(album)
         albumItem.setFlags(albumItem.flags() ^ QtCore.Qt.ItemIsEditable)
 
-        year = metaData.get(QtCore.QString('DATE'), [QtCore.QString()])[0]
+        year = metaData.get('DATE', [''])[0]
         yearItem = QtGui.QTableWidgetItem(year)
         yearItem.setFlags(yearItem.flags() ^ QtCore.Qt.ItemIsEditable)
 
@@ -195,51 +198,48 @@ class MainWindow(QtGui.QMainWindow):
             self.mediaObject.enqueue(self.sources[index])
 
     def setupActions(self):
-        self.playAction = QtGui.QAction(self.style().standardIcon(QtGui.QStyle.SP_MediaPlay), self.tr("Play"), self)
-        self.playAction.setShortcut(self.tr("Crl+P"))
-        self.playAction.setDisabled(True)
+        self.playAction = QtGui.QAction(
+                self.style().standardIcon(QtGui.QStyle.SP_MediaPlay), "Play",
+                self, shortcut="Ctrl+P", enabled=False,
+                triggered=self.mediaObject.play)
 
-        self.pauseAction = QtGui.QAction(self.style().standardIcon(QtGui.QStyle.SP_MediaPause), self.tr("Pause"), self)
-        self.pauseAction.setShortcut(self.tr("Ctrl+A"))
-        self.pauseAction.setDisabled(True)
+        self.pauseAction = QtGui.QAction(
+                self.style().standardIcon(QtGui.QStyle.SP_MediaPause),
+                "Pause", self, shortcut="Ctrl+A", enabled=False,
+                triggered=self.mediaObject.pause)
 
-        self.stopAction = QtGui.QAction(self.style().standardIcon(QtGui.QStyle.SP_MediaStop), self.tr("Stop"), self)
-        self.stopAction.setShortcut(self.tr("Ctrl+S"))
-        self.stopAction.setDisabled(True)
+        self.stopAction = QtGui.QAction(
+                self.style().standardIcon(QtGui.QStyle.SP_MediaStop), "Stop",
+                self, shortcut="Ctrl+S", enabled=False,
+                triggered=self.mediaObject.stop)
 
-        self.nextAction = QtGui.QAction(self.style().standardIcon(QtGui.QStyle.SP_MediaSkipForward), self.tr("Next"), self)
-        self.nextAction.setShortcut(self.tr("Ctrl+N"))
+        self.nextAction = QtGui.QAction(
+                self.style().standardIcon(QtGui.QStyle.SP_MediaSkipForward),
+                "Next", self, shortcut="Ctrl+N")
 
-        self.previousAction = QtGui.QAction(self.style().standardIcon(QtGui.QStyle.SP_MediaSkipBackward), self.tr("Previous"), self)
-        self.previousAction.setShortcut(self.tr("Ctrl+R"))
+        self.previousAction = QtGui.QAction(
+                self.style().standardIcon(QtGui.QStyle.SP_MediaSkipBackward),
+                "Previous", self, shortcut="Ctrl+R")
 
-        self.addFilesAction = QtGui.QAction(self.tr("Add &Files"), self)
-        self.addFilesAction.setShortcut(self.tr("Ctrl+F"))
+        self.addFilesAction = QtGui.QAction("Add &Files", self,
+                shortcut="Ctrl+F", triggered=self.addFiles)
 
-        self.exitAction = QtGui.QAction(self.tr("E&xit"), self)
-        self.exitAction.setShortcut(self.tr("Ctrl+X"))
+        self.exitAction = QtGui.QAction("E&xit", self, shortcut="Ctrl+X",
+                triggered=self.close)
 
-        self.aboutAction = QtGui.QAction(self.tr("A&bout"), self)
-        self.aboutAction.setShortcut(self.tr("Ctrl+B"))
+        self.aboutAction = QtGui.QAction("A&bout", self, shortcut="Ctrl+B",
+                triggered=self.about)
 
-        self.aboutQtAction = QtGui.QAction(self.tr("About &Qt"), self)
-        self.aboutQtAction.setShortcut(self.tr("Ctrl+Q"))
-
-        self.playAction.triggered.connect(self.mediaObject.play)
-        self.pauseAction.triggered.connect(self.mediaObject.pause)
-        self.stopAction.triggered.connect(self.mediaObject.stop)
-        self.addFilesAction.triggered.connect(self.addFiles)
-        self.exitAction.triggered.connect(self.close)
-        self.aboutAction.triggered.connect(self.about)
-        self.aboutQtAction.triggered.connect(QtGui.qApp.aboutQt)
+        self.aboutQtAction = QtGui.QAction("About &Qt", self,
+                shortcut="Ctrl+Q", triggered=QtGui.qApp.aboutQt)
 
     def setupMenus(self):
-        fileMenu = self.menuBar().addMenu(self.tr("&File"))
+        fileMenu = self.menuBar().addMenu("&File")
         fileMenu.addAction(self.addFilesAction)
         fileMenu.addSeparator()
         fileMenu.addAction(self.exitAction)
 
-        aboutMenu = self.menuBar().addMenu(self.tr("&Help"))
+        aboutMenu = self.menuBar().addMenu("&Help")
         aboutMenu.addAction(self.aboutAction)
         aboutMenu.addAction(self.aboutQtAction)
 
@@ -267,7 +267,7 @@ class MainWindow(QtGui.QMainWindow):
         self.timeLcd = QtGui.QLCDNumber()
         self.timeLcd.setPalette(palette)
 
-        headers = [self.tr("Title"), self.tr("Artist"), self.tr("Album"), self.tr("Year")]
+        headers = ("Title", "Artist", "Album", "Year")
 
         self.musicTable = QtGui.QTableWidget(0, 4)
         self.musicTable.setHorizontalHeaderLabels(headers)

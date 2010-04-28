@@ -30,5 +30,11 @@ TARGET=absubmit
 
 DESTDIR=./
 
-target.path=/usr/local/lib
+unix {
+	target.path=$$(DESTDIR)/usr/local/lib
+}
+win32 {
+	target.path=$$(DESTDIR)/blur/common/
+}
+
 INSTALLS += target

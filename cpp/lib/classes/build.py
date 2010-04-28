@@ -7,7 +7,7 @@ sippath = os.path.join(path,'sipClasses')
 
 try:
 	os.mkdir(sippath)
-except:	pass
+except: pass
 
 pre_deps = ["stone"]
 post_deps = []
@@ -39,15 +39,9 @@ if sys.platform != 'win32':
 
 QMakeTarget("classes",path,"classes.pro",pre_deps,post_deps)
 
-# Create versioned dll and lib file
-svnpri = WCRevTarget("classeslibsvnrevpri",path,"../..","svnrev-template.pri","svnrev.pri")
-#post_deps.append(LibVersionTarget("classeslibversion","lib/classes","../..","classes"))
-sv = QMakeTarget("classesversioned",path,"classes.pro",pre_deps + [svnpri],post_deps)
-sv.Defines = ["versioned"]
-
-rpm = RPMTarget('classesrpm','blur-classes',path,'../../../rpm/spec/classes.spec.template','1.0')
-
-pyrpm = RPMTarget('pyclassesrpm','pyclasses',path,'../../../rpm/spec/pyclasses.spec.template','1.0')
+if sys.platform=="linux2":
+	rpm = RPMTarget('classesrpm','blur-classes',path,'../../../rpm/spec/classes.spec.template','1.0')
+	pyrpm = RPMTarget('pyclassesrpm','pyclasses',path,'../../../rpm/spec/pyclasses.spec.template','1.0')
 
 if __name__ == "__main__":
 	build()

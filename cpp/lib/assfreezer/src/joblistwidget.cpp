@@ -365,6 +365,12 @@ void JobListWidget::customEvent( QEvent * evt )
 		{
 			mHistoryView->setHistory( ((JobHistoryListTask*)evt)->mReturn );
 		}
+		case UPDATE_JOB_LIST:
+		{
+			JobList jl = ((UpdateJobListTask*)evt)->mReturn;
+			mJobTree->model()->updated(jl);
+			break;
+		}
 		default:
 			break;
 	}
@@ -621,37 +627,29 @@ void JobListWidget::clearErrors()
 
 void JobListWidget::restartJobs()
 {
-	updateSelectedJobs("verify", true);
+	Job::updateJobStatuses( mJobTree->selection(), "verify", true );
 }
 
 void JobListWidget::resumeJobs()
 {
-	updateSelectedJobs("started", false);
-	refresh();
+	updateSelectedJobs("started");
 }
 
 void JobListWidget::pauseJobs()
 {
-	updateSelectedJobs("suspended", false);
-	refresh();
+	updateSelectedJobs("suspended");
 }
 
 void JobListWidget::deleteJobs()
 {
-	updateSelectedJobs("deleted", false);
-	refresh();
+	updateSelectedJobs("deleted");
 }
 
-void JobListWidget::updateSelectedJobs(const QString & jobStatus, bool resetTasks)
+void JobListWidget::updateSelectedJobs(const QString & jobStatus)
 {
-	JobList jl = mJobTree->selection(), checked;
-
-	foreach( Job j, jl ) {
-		if( jobStatus!="started" || j.status()=="suspended" )
-			checked += j;
-	}
-
-	Job::updateJobStatuses( checked, jobStatus, resetTasks );
+    foreach( Job j, mJobTree->selection() )
+        FreezerCore::addTask( new UpdateJobListTask( this, JobList(j), jobStatus ) );
+    FreezerCore::wakeup();
 }
 
 void JobListWidget::showMine(bool sm)

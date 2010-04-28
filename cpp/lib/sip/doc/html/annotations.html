@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Annotations &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>Annotations &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" />
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" />
     <link rel="next" title="C API for Handwritten Code" href="c_api.html" />
     <link rel="prev" title="Directives" href="directives.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="directives.html" title="Directives"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -159,6 +159,25 @@ void foo(int);</pre>
 </dd></dl>
 
 <dl class="argument-annotation">
+<dt id="aanno-DocType">
+<tt class="descname">DocType</tt><a class="headerlink" href="#aanno-DocType" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This string annotation specifies the type of the argument as it will appear
+in any generated docstrings.  It is usually used with arguments of type
+<a class="reference external" href="specification_files.html#stype-SIP_PYOBJECT"><tt class="xref docutils literal"><span class="pre">SIP_PYOBJECT</span></tt></a> to provide a more specific type.</p>
+</dd></dl>
+
+<dl class="argument-annotation">
+<dt id="aanno-DocValue">
+<tt class="descname">DocValue</tt><a class="headerlink" href="#aanno-DocValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This string annotation specifies the default value of the argument as it
+will appear in any generated docstrings.</p>
+</dd></dl>
+
+<dl class="argument-annotation">
 <dt id="aanno-Encoding">
 <tt class="descname">Encoding</tt><a class="headerlink" href="#aanno-Encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>This string annotation specifies that the corresponding argument (which
@@ -207,6 +226,21 @@ corresponding argument should be kept to ensure that the object is not
 garbage collected.  If the method is called again with a new argument then
 the reference to the previous argument is discarded.  Note that ownership
 of the argument is not changed.</dd></dl>
+
+<dl class="argument-annotation">
+<dt id="aanno-NoCopy">
+<tt class="descname">NoCopy</tt><a class="headerlink" href="#aanno-NoCopy" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.1.</span></p>
+<p>This boolean annotation is used with arguments of virtual methods that are
+a <tt class="docutils literal"><span class="pre">const</span></tt> reference to a class.  Normally, if the class defines a copy
+constructor then a copy of the returned reference is automatically created
+and wrapped before being passed to a Python reimplementation of the method.
+The copy will be owned by Python.  This means that the reimplementation may
+take a reference to the argument without having to make an explicit copy.</p>
+<p>If the annotation is specified then the copy is not made and the original
+reference is wrapped instead and will be owned by C++.</p>
+</dd></dl>
 
 <dl class="argument-annotation">
 <dt id="aanno-Out">
@@ -450,6 +484,15 @@ different ranges of version numbers then those ranges must not overlap.</p>
 </dd></dl>
 
 <dl class="mapped-type-annotation">
+<dt id="manno-DocType">
+<tt class="descname">DocType</tt><a class="headerlink" href="#manno-DocType" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This string annotation specifies the name of the type as it will appear in
+any generated docstrings.</p>
+</dd></dl>
+
+<dl class="mapped-type-annotation">
 <dt id="manno-NoRelease">
 <tt class="descname">NoRelease</tt><a class="headerlink" href="#manno-NoRelease" title="Permalink to this definition">¶</a></dt>
 <dd>This boolean annotation is used to specify that the mapped type does not
@@ -473,6 +516,13 @@ C++ scope.</dd></dl>
 </div>
 <div class="section" id="exception-annotations">
 <span id="ref-exception-annos"></span><h2>Exception Annotations<a class="headerlink" href="#exception-annotations" title="Permalink to this headline">¶</a></h2>
+<dl class="exception-annotation">
+<dt id="xanno-Default">
+<tt class="descname">Default</tt><a class="headerlink" href="#xanno-Default" title="Permalink to this definition">¶</a></dt>
+<dd>This boolean annotation specifies that the exception being defined will be
+used as the default exception to be caught if a function or constructor
+does not have a <tt class="docutils literal"><span class="pre">throw</span></tt> clause.</dd></dl>
+
 <dl class="exception-annotation">
 <dt id="xanno-PyName">
 <tt class="descname">PyName</tt><a class="headerlink" href="#xanno-PyName" title="Permalink to this definition">¶</a></dt>
@@ -521,6 +571,16 @@ is deprecated.  A deprecation warning is issued whenever the constructor or
 function is called.</dd></dl>
 
 <dl class="function-annotation">
+<dt id="fanno-DocType">
+<tt class="descname">DocType</tt><a class="headerlink" href="#fanno-DocType" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This string annotation specifies the name of the type of the returned value
+as it will appear in any generated docstrings.  It is usually used with
+values of type <a class="reference external" href="specification_files.html#stype-SIP_PYOBJECT"><tt class="xref docutils literal"><span class="pre">SIP_PYOBJECT</span></tt></a> to provide a more specific type.</p>
+</dd></dl>
+
+<dl class="function-annotation">
 <dt id="fanno-Factory">
 <tt class="descname">Factory</tt><a class="headerlink" href="#fanno-Factory" title="Permalink to this definition">¶</a></dt>
 <dd><p>This boolean annotation specifies that the value returned by the function
@@ -537,6 +597,18 @@ created instance and is owned by Python.</p>
 See <a class="reference external" href="using.html#ref-gil"><em>The Python Global Interpreter Lock</em></a> and the <a class="reference internal" href="#fanno-ReleaseGIL"><tt class="xref docutils literal"><span class="pre">ReleaseGIL</span></tt></a> annotation.</dd></dl>
 
 <dl class="function-annotation">
+<dt id="fanno-KeywordArgs">
+<tt class="descname">KeywordArgs</tt><a class="headerlink" href="#fanno-KeywordArgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This boolean annotation specifies that the argument parser generated for
+this function will support passing the parameters using Python&#8217;s keyword
+argument syntax.  Keyword arguments cannot be used for functions that have
+unnamed arguments or use an ellipsis to designate that the function has a
+variable number of arguments.</p>
+</dd></dl>
+
+<dl class="function-annotation">
 <dt id="fanno-NewThread">
 <tt class="descname">NewThread</tt><a class="headerlink" href="#fanno-NewThread" title="Permalink to this definition">¶</a></dt>
 <dd>This boolean annotation specifies that the function will create a new
@@ -550,6 +622,19 @@ specify that the supplied <a class="reference external" href="directives.html#di
 of the arguments.</dd></dl>
 
 <dl class="function-annotation">
+<dt id="fanno-NoCopy">
+<tt class="descname">NoCopy</tt><a class="headerlink" href="#fanno-NoCopy" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.1.</span></p>
+<p>This boolean annotation is used with methods and global functions that
+return a <tt class="docutils literal"><span class="pre">const</span></tt> reference to a class.  Normally, if the class defines a
+copy constructor then a copy of the returned reference is automatically
+created and wrapped.  The copy will be owned by Python.</p>
+<p>If the annotation is specified then the copy is not made and the original
+reference is wrapped instead and will be owned by C++.</p>
+</dd></dl>
+
+<dl class="function-annotation">
 <dt id="fanno-NoDerived">
 <tt class="descname">NoDerived</tt><a class="headerlink" href="#fanno-NoDerived" title="Permalink to this definition">¶</a></dt>
 <dd>This boolean annotation is only used with C++ constructors.  In many cases
@@ -559,6 +644,20 @@ the same C++ signatures as the class being wrapped.  Sometimes you may want
 to define a Python constructor that has no corresponding C++ constructor.
 This annotation is used to suppress the generation of the constructor in
 the derived class.</dd></dl>
+
+<dl class="function-annotation">
+<dt id="fanno-NoKeywordArgs">
+<tt class="descname">NoKeywordArgs</tt><a class="headerlink" href="#fanno-NoKeywordArgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This boolean annotation specifies that the argument parser generated for
+this function will not support passing the parameters using Python&#8217;s
+keyword argument syntax.  In other words, the argument parser will only
+support only normal positional arguments.  This annotation is useful when
+the default setting of allowing keyword arguments has been changed via the
+command line, but you would still like certain functions to only support
+positional arguments.</p>
+</dd></dl>
 
 <dl class="function-annotation">
 <dt id="fanno-Numeric">
@@ -700,6 +799,16 @@ code instead.</p>
 <div class="section" id="variable-annotations">
 <span id="ref-variable-annos"></span><h2>Variable Annotations<a class="headerlink" href="#variable-annotations" title="Permalink to this headline">¶</a></h2>
 <dl class="variable-annotation">
+<dt id="vanno-DocType">
+<tt class="descname">DocType</tt><a class="headerlink" href="#vanno-DocType" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This string annotation specifies the name of the type of the variable as it
+will appear in any generated docstrings.  It is usually used with variables
+of type <a class="reference external" href="specification_files.html#stype-SIP_PYOBJECT"><tt class="xref docutils literal"><span class="pre">SIP_PYOBJECT</span></tt></a> to provide a more specific type.</p>
+</dd></dl>
+
+<dl class="variable-annotation">
 <dt id="vanno-PyName">
 <tt class="descname">PyName</tt><a class="headerlink" href="#vanno-PyName" title="Permalink to this definition">¶</a></dt>
 <dd>This name annotation specifies an alternative name for the variable being
@@ -771,12 +880,12 @@ have the same name in the same C++ scope.</dd></dl>
         <li class="right" >
           <a href="directives.html" title="Directives"
              >previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

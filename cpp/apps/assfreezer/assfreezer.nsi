@@ -3,7 +3,6 @@
 ; DESCRIPTION: AssFreezer installer script
 ; (C) Blur Studio 2005
 
-!include assfreezer-svnrev.nsi
 !define MUI_PRODUCT "AssFreezer"
 !define MUI_VERSION "v1.0.X"
 
@@ -14,7 +13,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 !include "MUI.nsh"
 
 ; Name of resulting executable installer
-OutFile "af_install_${MUI_SVNREV}_${PLATFORM}.exe"
+OutFile "af_install_${PLATFORM}.exe"
 InstallDir "C:\\blur\\assfreezer\\"
 
 !define MUI_FINISHPAGE
@@ -48,11 +47,9 @@ Section "install"
 	Delete "$QUICKLAUNCH\short*assfreezer*lnk"
 	SetOutPath $INSTDIR
 	File assfreezer.exe
-	File c:\mingw\bin\exchndl.dll
   	CreateShortCut "$DESKTOP\AssFreezer 1.0.lnk" "$INSTDIR\assfreezer.exe" ""
 	CreateShortcut "$QUICKLAUNCH\AssFreezer 1.0.lnk" "$INSTDIR\assfreezer.exe" ""
 	File assfreezer.ini
-	File assfreezer_version.txt
     File ..\..\lib\stone\stone.dll
     File ..\..\lib\stonegui\stonegui.dll
     File ..\..\lib\classes\classes.dll

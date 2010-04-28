@@ -20,12 +20,7 @@ def i18n_print(string):
     
 def obj_to_argument(obj):
     if isinstance(obj, str):
-        arg = obj.replace('"', '\\"')
-
-        if '\n' in arg:
-            arg = '"""%s"""' % arg
-        else:
-            arg = '"%s"' % arg
+        arg = '"' + escape(obj) + '"'
     else:
         arg = str(obj)
 
@@ -50,21 +45,23 @@ def strict_getattr(module, clsname):
     else:
         return cls
     
-class i18n_string(object):
-    _esc_regex = re.compile(r"(\"|\'|\\)")
 
+_esc_regex = re.compile(r"(\"|\'|\\)")
+
+def escape(text):
+    # This escapes any escaped single or double quote or backslash.
+    x = _esc_regex.sub(r"\\\1", text)
+
+    # This replaces any '\n' with an escaped version and a real line break.
+    return re.sub(r'\n', r'\\n"\n"', x)
+
+
+class i18n_string(object):
     def __init__(self, string):
         self.string = string
 
-    def escape(self, text):
-        # This escapes any escaped single or double quote or backslash.
-        x = self._esc_regex.sub(r"\\\1", text)
-
-        # This replaces any '\n' with an escaped version and a real line break.
-        return re.sub(r'\n', r'\\n"\n"', x)
-
     def __str__(self):
-        return "QtGui.QApplication.translate(\"%s\", \"%s\", None, QtGui.QApplication.UnicodeUTF8)" % (i18n_context, self.escape(encode_utf8(self.string)))
+        return "QtGui.QApplication.translate(\"%s\", \"%s\", None, QtGui.QApplication.UnicodeUTF8)" % (i18n_context, escape(encode_utf8(self.string)))
 
 
 # Classes with this flag will be handled as literal values. If functions are
@@ -193,24 +190,28 @@ class QtCore(ProxyNamespace):
             return self._uic_name.split(".")[-1]
 
         def connect(cls, *args):
+            # Handle slots that have names corresponding to Python keywords.
+            slot_name = str(args[-1])
+            if slot_name.endswith('.raise'):
+                args = list(args[:-1])
+                args.append(Literal(slot_name + '_'))
+
             ProxyClassMember(cls, "connect", 0)(*args)
         connect = classmethod(connect)
 
 _qwidgets = (
     "QAbstractItemView",
-    "QCalendarWidget", "QCheckBox", "QColumnView", "QCommandLinkButton",
+    "QCalendarWidget", "QColumnView", "QCommandLinkButton",
     "QDateEdit", "QDateTimeEdit", "QDial", "QDialog", "QDialogButtonBox",
     "QDockWidget", "QDoubleSpinBox",
     "QFrame",
     "QGraphicsView", "QGroupBox",
     "QLabel", "QLCDNumber", "QLineEdit", "QListView",
     "QMainWindow", "QMdiArea", "QMenuBar",
-    "QPlainTextEdit", "QProgressBar", "QPushButton",
-    "QRadioButton", 
+    "QPlainTextEdit", "QProgressBar",
     "QScrollArea", "QScrollBar", "QSlider", "QSpinBox", "QSplitter",
     "QStackedWidget", "QStatusBar",
     "QTextBrowser", "QTextEdit", "QTimeEdit", "QToolBar",
-    "QToolButton",
     "QWizard", "QWizardPage")
 
 class QtGui(ProxyNamespace):
@@ -220,6 +221,9 @@ class QtGui(ProxyNamespace):
         translate = staticmethod(translate)
 
     class QIcon(ProxyClass): pass
+    class QConicalGradient(ProxyClass): pass
+    class QLinearGradient(ProxyClass): pass
+    class QRadialGradient(ProxyClass): pass
     class QBrush(ProxyClass): pass
     class QPalette(ProxyClass): pass
     class QFont(ProxyClass): pass
@@ -230,10 +234,12 @@ class QtGui(ProxyNamespace):
     ## isinstance(x, QtGui.QLayout) call in the ui parser
     class QAction(QtCore.QObject): pass
     class QActionGroup(QtCore.QObject): pass
+    class QButtonGroup(QtCore.QObject): pass
     class QLayout(QtCore.QObject): pass
     class QGridLayout(QLayout): pass
-    class QHBoxLayout(QLayout): pass
-    class QVBoxLayout(QLayout): pass
+    class QBoxLayout(QLayout): pass
+    class QHBoxLayout(QBoxLayout): pass
+    class QVBoxLayout(QBoxLayout): pass
     class QFormLayout(QLayout): pass
     
     class QWidget(QtCore.QObject):
@@ -336,6 +342,12 @@ class QtGui(ProxyNamespace):
     class QComboBox(QWidget): pass
     class QFontComboBox(QComboBox): pass
     
+    class QAbstractButton(QWidget): pass
+    class QCheckBox(QAbstractButton): pass
+    class QPushButton(QAbstractButton): pass
+    class QRadioButton(QAbstractButton): pass
+    class QToolButton(QAbstractButton): pass
+
     # Add all remaining classes.
     for _class in _qwidgets:
         if _class not in locals():

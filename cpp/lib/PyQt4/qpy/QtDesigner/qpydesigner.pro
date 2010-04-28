@@ -1,7 +1,7 @@
 # This is the qmake project file for the QPy support code for the QtDesigner
 # module.
 #
-# Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 # 
 # This file is part of PyQt.
 # 
@@ -35,7 +35,7 @@ TEMPLATE    = lib
 
 CONFIG(debug, debug|release) {
     mac: TARGET = $$join(TARGET,,,_debug)
-    win32: TARGET = $$join(TARGET,,d)
+#    win32: TARGET = $$join(TARGET,,d)
 }
 
 HEADERS   = \

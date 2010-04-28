@@ -123,7 +123,7 @@ class GLWidget(QtOpenGL.QGLWidget):
 
         self.setAutoFillBackground(False)
         self.setMinimumSize(200, 200)
-        self.setWindowTitle(self.tr("Overpainting a Scene"))
+        self.setWindowTitle("Overpainting a Scene")
 
     def __del__(self):
         self.makeCurrent()
@@ -323,8 +323,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         glMatrixMode(GL_MODELVIEW)
 
     def drawInstructions(self, painter):
-        text = self.tr("Click and drag with the left mouse button "
-                       "to rotate the Qt logo.")
+        text = "Click and drag with the left mouse button to rotate the Qt " \
+                "logo."
         metrics = QtGui.QFontMetrics(self.font())
         border = max(4, metrics.leading())
 

@@ -23,6 +23,10 @@
 # 
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QString', 2)
+
 from PyQt4 import QtCore, QtGui
 
 import dockwidgets_rc
@@ -41,7 +45,7 @@ class MainWindow(QtGui.QMainWindow):
         self.createStatusBar()
         self.createDockWindows()
 
-        self.setWindowTitle(self.tr("Dock Widgets"))
+        self.setWindowTitle("Dock Widgets")
 
         self.newLetter()
         self.setUnifiedTitleAndToolBarOnMac(True)
@@ -84,7 +88,7 @@ class MainWindow(QtGui.QMainWindow):
         cursor.insertText(",", textFormat)
         for i in range(3):
             cursor.insertBlock()
-        cursor.insertText(self.tr("Yours sincerely,"), textFormat)
+        cursor.insertText("Yours sincerely,", textFormat)
         for i in range(3):
             cursor.insertBlock()
         cursor.insertText("The Boss", textFormat)
@@ -101,21 +105,18 @@ class MainWindow(QtGui.QMainWindow):
 
         document.print_(printer)
 
-        self.statusBar().showMessage(self.tr("Ready"), 2000)
+        self.statusBar().showMessage("Ready", 2000)
 
     def save(self):
         filename = QtGui.QFileDialog.getSaveFileName(self,
-                    self.tr("Choose a file name"), ".",
-                    self.tr("HTML (*.html *.htm)"))
-        if filename.isEmpty():
+                "Choose a file name", '.', "HTML (*.html *.htm)")
+        if not filename:
             return
 
         file = QtCore.QFile(filename)
         if not file.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, self.tr("Dock Widgets"),
-                                      self.tr("Cannot write file %1:\n%2.")
-                                      .arg(filename)
-                                      .arg(file.errorString()))
+            QtGui.QMessageBox.warning(self, "Dock Widgets",
+                    "Cannot write file %s:\n%s." % (filename, file.errorString()))
             return
 
         out = QtCore.QTextStream(file)
@@ -123,36 +124,36 @@ class MainWindow(QtGui.QMainWindow):
         out << self.textEdit.toHtml()
         QtGui.QApplication.restoreOverrideCursor()
 
-        self.statusBar().showMessage(self.tr("Saved '%1'").arg(filename), 2000)
+        self.statusBar().showMessage("Saved '%s'" % filename, 2000)
 
     def undo(self):
         document = self.textEdit.document()
         document.undo()
 
     def insertCustomer(self, customer):
-        if customer.isEmpty():
+        if not customer:
             return
-        customerList = customer.split(", ")
+        customerList = customer.split(', ')
         document = self.textEdit.document()
-        cursor = document.find("NAME")
+        cursor = document.find('NAME')
         if not cursor.isNull():
             cursor.beginEditBlock()
             cursor.insertText(customerList[0])
             oldcursor = cursor
-            cursor = document.find("ADDRESS")
+            cursor = document.find('ADDRESS')
             if not cursor.isNull():
-                for i in range(1, customerList.count()):
+                for i in customerList[1:]:
                     cursor.insertBlock()
-                    cursor.insertText(customerList[i])
+                    cursor.insertText(i)
                 cursor.endEditBlock()
             else:
                 oldcursor.endEditBlock()
 
     def addParagraph(self, paragraph):
-        if paragraph.isEmpty():
+        if not paragraph:
             return
         document = self.textEdit.document()
-        cursor = document.find(self.tr("Yours sincerely,"))
+        cursor = document.find("Yours sincerely,")
         if cursor.isNull():
             return
         cursor.beginEditBlock()
@@ -164,116 +165,109 @@ class MainWindow(QtGui.QMainWindow):
         cursor.endEditBlock()
 
     def about(self):
-        QtGui.QMessageBox.about(self, self.tr("About Dock Widgets"),
-                self.tr("The <b>Dock Widgets</b> example demonstrates how to "
-                        "use Qt's dock widgets. You can enter your own text, "
-                        "click a customer to add a customer name and address, "
-                        "and click standard paragraphs to add them."))
+        QtGui.QMessageBox.about(self, "About Dock Widgets",
+                "The <b>Dock Widgets</b> example demonstrates how to use "
+                "Qt's dock widgets. You can enter your own text, click a "
+                "customer to add a customer name and address, and click "
+                "standard paragraphs to add them.")
 
     def createActions(self):
-        self.newLetterAct = QtGui.QAction(QtGui.QIcon(":/images/new.png"),
-                self.tr("&New Letter"), self)
-        self.newLetterAct.setShortcut(QtGui.QKeySequence.New)
-        self.newLetterAct.setStatusTip(self.tr("Create a new form letter"))
-        self.newLetterAct.triggered.connect(self.newLetter)
+        self.newLetterAct = QtGui.QAction(QtGui.QIcon(':/images/new.png'),
+                "&New Letter", self, shortcut=QtGui.QKeySequence.New,
+                statusTip="Create a new form letter",
+                triggered=self.newLetter)
 
-        self.saveAct = QtGui.QAction(QtGui.QIcon(":/images/save.png"),
-                self.tr("&Save..."), self)
-        self.saveAct.setShortcut(QtGui.QKeySequence.Save)
-        self.saveAct.setStatusTip(self.tr("Save the current form letter"))
-        self.saveAct.triggered.connect(self.save)
+        self.saveAct = QtGui.QAction(QtGui.QIcon(':/images/save.png'),
+                "&Save...", self, shortcut=QtGui.QKeySequence.Save,
+                statusTip="Save the current form letter",
+                triggered=self.save)
 
-        self.printAct = QtGui.QAction(QtGui.QIcon(":/images/print.png"),
-                self.tr("&Print..."), self)
-        self.printAct.setShortcut(QtGui.QKeySequence.Print)
-        self.printAct.setStatusTip(self.tr("Print the current form letter"))
-        self.printAct.triggered.connect(self.print_)
+        self.printAct = QtGui.QAction(QtGui.QIcon(':/images/print.png'),
+                "&Print...", self, shortcut=QtGui.QKeySequence.Print,
+                statusTip="Print the current form letter",
+                triggered=self.print_)
 
-        self.undoAct = QtGui.QAction(QtGui.QIcon(":/images/undo.png"),
-                self.tr("&Undo"), self)
-        self.undoAct.setShortcut(QtGui.QKeySequence.Undo)
-        self.undoAct.setStatusTip(self.tr("Undo the last editing action"))
-        self.undoAct.triggered.connect(self.undo)
+        self.undoAct = QtGui.QAction(QtGui.QIcon(':/images/undo.png'),
+                "&Undo", self, shortcut=QtGui.QKeySequence.Undo,
+                statusTip="Undo the last editing action", triggered=self.undo)
 
-        self.quitAct = QtGui.QAction(self.tr("&Quit"), self)
-        self.quitAct.setShortcut(self.tr("Ctrl+Q"))
-        self.quitAct.setStatusTip(self.tr("Quit the application"))
-        self.quitAct.triggered.connect(self.close)
+        self.quitAct = QtGui.QAction("&Quit", self, shortcut="Ctrl+Q",
+                statusTip="Quit the application", triggered=self.close)
 
-        self.aboutAct = QtGui.QAction(self.tr("&About"), self)
-        self.aboutAct.setStatusTip(self.tr("Show the application's About box"))
-        self.aboutAct.triggered.connect(self.about)
+        self.aboutAct = QtGui.QAction("&About", self,
+                statusTip="Show the application's About box",
+                triggered=self.about)
 
-        self.aboutQtAct = QtGui.QAction(self.tr("About &Qt"), self)
-        self.aboutQtAct.setStatusTip(self.tr("Show the Qt library's About box"))
-        self.aboutQtAct.triggered.connect(QtGui.qApp.aboutQt)
+        self.aboutQtAct = QtGui.QAction("About &Qt", self,
+                statusTip="Show the Qt library's About box",
+                triggered=QtGui.qApp.aboutQt)
 
     def createMenus(self):
-        self.fileMenu = self.menuBar().addMenu(self.tr("&File"))
+        self.fileMenu = self.menuBar().addMenu("&File")
         self.fileMenu.addAction(self.newLetterAct)
         self.fileMenu.addAction(self.saveAct)
         self.fileMenu.addAction(self.printAct)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.quitAct)
 
-        self.editMenu = self.menuBar().addMenu(self.tr("&Edit"))
+        self.editMenu = self.menuBar().addMenu("&Edit")
         self.editMenu.addAction(self.undoAct)
 
-        self.viewMenu = self.menuBar().addMenu(self.tr("&View"))
+        self.viewMenu = self.menuBar().addMenu("&View")
 
         self.menuBar().addSeparator()
 
-        self.helpMenu = self.menuBar().addMenu(self.tr("&Help"))
+        self.helpMenu = self.menuBar().addMenu("&Help")
         self.helpMenu.addAction(self.aboutAct)
         self.helpMenu.addAction(self.aboutQtAct)
 
     def createToolBars(self):
-        self.fileToolBar = self.addToolBar(self.tr("File"))
+        self.fileToolBar = self.addToolBar("File")
         self.fileToolBar.addAction(self.newLetterAct)
         self.fileToolBar.addAction(self.saveAct)
         self.fileToolBar.addAction(self.printAct)
 
-        self.editToolBar = self.addToolBar(self.tr("Edit"))
+        self.editToolBar = self.addToolBar("Edit")
         self.editToolBar.addAction(self.undoAct)
 
     def createStatusBar(self):
-        self.statusBar().showMessage(self.tr("Ready"))
+        self.statusBar().showMessage("Ready")
 
     def createDockWindows(self):
-        dock = QtGui.QDockWidget(self.tr("Customers"), self)
+        dock = QtGui.QDockWidget("Customers", self)
         dock.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea | QtCore.Qt.RightDockWidgetArea)
         self.customerList = QtGui.QListWidget(dock)
-        self.customerList.addItems(QtCore.QStringList()
-            << "John Doe, Harmony Enterprises, 12 Lakeside, Ambleton"
-            << "Jane Doe, Memorabilia, 23 Watersedge, Beaton"
-            << "Tammy Shea, Tiblanka, 38 Sea Views, Carlton"
-            << "Tim Sheen, Caraba Gifts, 48 Ocean Way, Deal"
-            << "Sol Harvey, Chicos Coffee, 53 New Springs, Eccleston"
-            << "Sally Hobart, Tiroli Tea, 67 Long River, Fedula")
+        self.customerList.addItems((
+            "John Doe, Harmony Enterprises, 12 Lakeside, Ambleton",
+            "Jane Doe, Memorabilia, 23 Watersedge, Beaton",
+            "Tammy Shea, Tiblanka, 38 Sea Views, Carlton",
+            "Tim Sheen, Caraba Gifts, 48 Ocean Way, Deal",
+            "Sol Harvey, Chicos Coffee, 53 New Springs, Eccleston",
+            "Sally Hobart, Tiroli Tea, 67 Long River, Fedula"))
         dock.setWidget(self.customerList)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, dock)
         self.viewMenu.addAction(dock.toggleViewAction())
 
-        dock = QtGui.QDockWidget(self.tr("Paragraphs"), self)
+        dock = QtGui.QDockWidget("Paragraphs", self)
         self.paragraphsList = QtGui.QListWidget(dock)
-        self.paragraphsList.addItems(QtCore.QStringList()
-            << "Thank you for your payment which we have received today."
-            << "Your order has been dispatched and should be with you "
-               "within 28 days."
-            << "We have dispatched those items that were in stock. The "
-               "rest of your order will be dispatched once all the "
-               "remaining items have arrived at our warehouse. No "
-               "additional shipping charges will be made."
-            << "You made a small overpayment (less than $5) which we "
-               "will keep on account for you, or return at your request."
-            << "You made a small underpayment (less than $1), but we have "
-               "sent your order anyway. We'll add this underpayment to "
-               "your next bill."
-            << "Unfortunately you did not send enough money. Please remit "
-               "an additional $. Your order will be dispatched as soon as "
-               "the complete amount has been received."
-            << "You made an overpayment (more than $5). Do you wish to "
-               "buy more items, or should we return the excess to you?")
+        self.paragraphsList.addItems((
+            "Thank you for your payment which we have received today.",
+            "Your order has been dispatched and should be with you within "
+                "28 days.",
+            "We have dispatched those items that were in stock. The rest of "
+                "your order will be dispatched once all the remaining items "
+                "have arrived at our warehouse. No additional shipping "
+                "charges will be made.",
+            "You made a small overpayment (less than $5) which we will keep "
+                "on account for you, or return at your request.",
+            "You made a small underpayment (less than $1), but we have sent "
+                "your order anyway. We'll add this underpayment to your next "
+                "bill.",
+            "Unfortunately you did not send enough money. Please remit an "
+                "additional $. Your order will be dispatched as soon as the "
+                "complete amount has been received.",
+            "You made an overpayment (more than $5). Do you wish to buy more "
+                "items, or should we return the excess to you?"))
         dock.setWidget(self.paragraphsList)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, dock)
         self.viewMenu.addAction(dock.toggleViewAction())

@@ -2,12 +2,16 @@
 
 """PyQt4 port of the richtext/textobject example from Qt v4.x"""
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QVariant', 2)
+
 from PyQt4 import QtCore, QtGui, QtSvg
 
 
 class SvgTextObject(QtGui.QPyTextObject):
     def intrinsicSize(self, doc, posInDocument, format):
-        renderer = QtSvg.QSvgRenderer(format.property(Window.SvgData).toByteArray())
+        renderer = QtSvg.QSvgRenderer(format.property(Window.SvgData))
         size = renderer.defaultSize()
 
         if size.height() > 25:
@@ -16,7 +20,7 @@ class SvgTextObject(QtGui.QPyTextObject):
         return QtCore.QSizeF(size)
 
     def drawObject(self, painter, rect, doc, posInDocument, format):
-        renderer = QtSvg.QSvgRenderer(format.property(Window.SvgData).toByteArray())
+        renderer = QtSvg.QSvgRenderer(format.property(Window.SvgData))
         renderer.render(painter, rect)
 
 
@@ -32,24 +36,31 @@ class Window(QtGui.QWidget):
         self.setupGui()
         self.setupTextObject()
 
-        self.setWindowTitle(self.tr("Text Object Example"))
+        self.setWindowTitle("Text Object Example")
 
     def insertTextObject(self):
         fileName = self.fileNameLineEdit.text()
         file = QtCore.QFile(fileName)
 
         if not file.open(QtCore.QIODevice.ReadOnly):
-            QtGui.QMessageBox.warning(self, self.tr("Error Opening File"),
-                    self.tr("Could not open '%1'").arg(fileName))
+            QtGui.QMessageBox.warning(self, "Error Opening File",
+                    "Could not open '%s'" % fileName)
 
         svgData = file.readAll()
 
         svgCharFormat = QtGui.QTextCharFormat()
         svgCharFormat.setObjectType(Window.SvgTextFormat)
-        svgCharFormat.setProperty(Window.SvgData, QtCore.QVariant(svgData))
+        svgCharFormat.setProperty(Window.SvgData, svgData)
+
+        try:
+            # Python v2.
+            orc = unichr(0xfffc)
+        except NameError:
+            # Python v3.
+            orc = chr(0xfffc)
 
         cursor = self.textEdit.textCursor()
-        cursor.insertText(QtCore.QString(QtCore.QChar.ObjectReplacementCharacter), svgCharFormat)
+        cursor.insertText(orc, svgCharFormat)
         self.textEdit.setTextCursor(cursor)
 
     def setupTextObject(self):
@@ -57,9 +68,9 @@ class Window(QtGui.QWidget):
         self.textEdit.document().documentLayout().registerHandler(Window.SvgTextFormat, svgInterface)
 
     def setupGui(self):
-        fileNameLabel = QtGui.QLabel(self.tr("Svg File Name:"))
+        fileNameLabel = QtGui.QLabel("Svg File Name:")
         self.fileNameLineEdit = QtGui.QLineEdit()
-        insertTextObjectButton = QtGui.QPushButton(self.tr("Insert Image"))
+        insertTextObjectButton = QtGui.QPushButton("Insert Image")
 
         self.fileNameLineEdit.setText('./files/heart.svg')
         insertTextObjectButton.clicked.connect(self.insertTextObject)

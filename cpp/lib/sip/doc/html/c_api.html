@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>C API for Handwritten Code &mdash; SIP v4.9.1 Reference Guide</title>
+    <title>C API for Handwritten Code &mdash; SIP 4.10.2 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.9.1',
+        VERSION:     '4.10.2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="SIP v4.9.1 Reference Guide" href="index.html" />
+    <link rel="top" title="SIP 4.10.2 Reference Guide" href="index.html" />
     <link rel="next" title="Using the C API when Embedding" href="embedding.html" />
     <link rel="prev" title="Annotations" href="annotations.html" /> 
   </head>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="annotations.html" title="Annotations"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -87,6 +87,18 @@ type&#8217;s <a class="reference external" href="directives.html#directive-%Conv
 to fail if the Python object being converted is <tt class="docutils literal"><span class="pre">Py_None</span></tt>.</dd></dl>
 
 <dl class="cmacro">
+<dt id="SIP_PROTECTED_IS_PUBLIC">
+<tt class="descname">SIP_PROTECTED_IS_PUBLIC</tt><a class="headerlink" href="#SIP_PROTECTED_IS_PUBLIC" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This is a C preprocessor macro that is set automatically by the build
+system to specify that the generated code is being compiled with
+<tt class="docutils literal"><span class="pre">protected</span></tt> redefined as <tt class="docutils literal"><span class="pre">public</span></tt>.  This allows handwritten code to
+determine if the generated helper functions for accessing protected C++
+functions are available (see <a class="reference external" href="directives.html#directive-%MethodCode"><tt class="xref docutils literal"><span class="pre">%MethodCode</span></tt></a>).</p>
+</dd></dl>
+
+<dl class="cmacro">
 <dt id="SIP_SSIZE_T">
 <tt class="descname">SIP_SSIZE_T</tt><a class="headerlink" href="#SIP_SSIZE_T" title="Permalink to this definition">¶</a></dt>
 <dd>This is a C preprocessor macro that is defined as <tt class="docutils literal"><span class="pre">Py_ssize_t</span></tt> for Python
@@ -113,6 +125,34 @@ represented as a 3 part hexadecimal number (e.g. v4.0.0 is represented as
 <dd>This is a C preprocessor symbol that defines the SIP version number
 represented as a string.  For development snapshots it will start with
 <tt class="docutils literal"><span class="pre">snapshot-</span></tt>.</dd></dl>
+
+<dl class="cfunction">
+<dt id="sipBadCallableArg">
+sipErrorState <tt class="descname">sipBadCallableArg</tt><big>(</big>int<em> arg_nr</em>, PyObject<em> *arg</em><big>)</big><a class="headerlink" href="#sipBadCallableArg" title="Permalink to this definition">¶</a></dt>
+<dd><p>
+<span class="versionmodified">New in version 4.10.</span></p>
+<p>This is called from <a class="reference external" href="directives.html#directive-%MethodCode"><tt class="xref docutils literal"><span class="pre">%MethodCode</span></tt></a> to raise a Python exception
+when an argument to a function, a C++ constructor or method is found to
+have an unexpected type.  This should be used when the
+<a class="reference external" href="directives.html#directive-%MethodCode"><tt class="xref docutils literal"><span class="pre">%MethodCode</span></tt></a> does additional type checking of the supplied
+arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><em>arg_nr</em> &#8211; the number of the argument.  Arguments are numbered from 0 but are
+numbered from 1 in the detail of the exception.</li>
+<li><em>arg</em> &#8211; the argument.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the value that should be assigned to <tt class="docutils literal"><span class="pre">sipError</span></tt>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="cfunction">
 <dt id="sipBadCatcherResult">
@@ -1464,8 +1504,9 @@ return its state as described in <a title="sipConvertToInstance" class="referenc
 character by adding <tt class="docutils literal"><span class="pre">0</span></tt> to the combined value:</p>
 <blockquote>
 <p>0x01 disallows the conversion of <tt class="docutils literal"><span class="pre">Py_None</span></tt> to <tt class="docutils literal"><span class="pre">NULL</span></tt></p>
-<p>0x02 implements the <a class="reference external" href="annotations.html#fanno-Factory"><tt class="xref docutils literal"><span class="pre">Factory</span></tt></a> annotation</p>
 <dl class="docutils">
+<dt>0x02 implements the <a class="reference external" href="annotations.html#fanno-Factory"><tt class="xref docutils literal"><span class="pre">Factory</span></tt></a> and <a class="reference external" href="annotations.html#fanno-TransferBack"><tt class="xref docutils literal"><span class="pre">TransferBack</span></tt></a></dt>
+<dd>annotations</dd>
 <dt>0x04 suppresses the return of the state of the returned C/C++</dt>
 <dd>instance.  Note that the <tt class="docutils literal"><span class="pre">int</span> <span class="pre">*</span></tt> used to return the state is
 not passed if this flag is specified.</dd>
@@ -1473,7 +1514,7 @@ not passed if this flag is specified.</dd>
 </blockquote>
 <div class="last admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This is deprecated from SIP v4.8.  Instead you should use <tt class="docutils literal"><span class="pre">Df</span></tt>.</p>
+<p class="last">This is deprecated from SIP v4.8.  Instead you should use <tt class="docutils literal"><span class="pre">Hf</span></tt>.</p>
 </div>
 </dd>
 <dt><tt class="docutils literal"><span class="pre">Df</span></tt> (wrapped instance) [const <tt class="xref docutils literal"><span class="pre">sipTypeDef</span></tt> *, int *, void **]</dt>
@@ -1482,15 +1523,21 @@ instance and return its state as described in
 <a title="sipConvertToType" class="reference internal" href="#sipConvertToType"><tt class="xref docutils literal"><span class="pre">sipConvertToType()</span></tt></a>.  <tt class="docutils literal"><span class="pre">f</span></tt> is a combination of the following
 flags encoded as an ASCII character by adding <tt class="docutils literal"><span class="pre">0</span></tt> to the combined
 value:</p>
-<blockquote class="last">
+<blockquote>
 <p>0x01 disallows the conversion of <tt class="docutils literal"><span class="pre">Py_None</span></tt> to <tt class="docutils literal"><span class="pre">NULL</span></tt></p>
-<p>0x02 implements the <a class="reference external" href="annotations.html#fanno-Factory"><tt class="xref docutils literal"><span class="pre">Factory</span></tt></a> annotation</p>
 <dl class="docutils">
+<dt>0x02 implements the <a class="reference external" href="annotations.html#fanno-Factory"><tt class="xref docutils literal"><span class="pre">Factory</span></tt></a> and <a class="reference external" href="annotations.html#fanno-TransferBack"><tt class="xref docutils literal"><span class="pre">TransferBack</span></tt></a></dt>
+<dd>annotations</dd>
 <dt>0x04 suppresses the return of the state of the returned C/C++</dt>
 <dd>instance.  Note that the <tt class="docutils literal"><span class="pre">int</span> <span class="pre">*</span></tt> used to return the state is
 not passed if this flag is specified.</dd>
 </dl>
 </blockquote>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is deprecated from SIP v4.10.1.  Instead you should use
+<tt class="docutils literal"><span class="pre">Hf</span></tt>.</p>
+</div>
 </dd>
 <dt><tt class="docutils literal"><span class="pre">E</span></tt> (wrapped enum) [PyTypeObject *, enum *]</dt>
 <dd><p class="first">Convert a Python named enum type to the corresponding C/C++ <tt class="docutils literal"><span class="pre">enum</span></tt>.</p>
@@ -1506,6 +1553,20 @@ not passed if this flag is specified.</dd>
 object to a C/C++ wide character array and its length.  If the Python
 object is <tt class="docutils literal"><span class="pre">Py_None</span></tt> then the array and length are <tt class="docutils literal"><span class="pre">NULL</span></tt> and zero
 respectively.</dd>
+<dt><tt class="docutils literal"><span class="pre">Hf</span></tt> (wrapped instance) [const <tt class="xref docutils literal"><span class="pre">sipTypeDef</span></tt> *, int *, void **]</dt>
+<dd><p class="first">Convert a Python object to a C structure, C++ class or mapped type
+instance as described in <a title="sipConvertToType" class="reference internal" href="#sipConvertToType"><tt class="xref docutils literal"><span class="pre">sipConvertToType()</span></tt></a>.  <tt class="docutils literal"><span class="pre">f</span></tt> is a
+combination of the following flags encoded as an ASCII character by
+adding <tt class="docutils literal"><span class="pre">0</span></tt> to the combined value:</p>
+<blockquote class="last">
+<p>0x01 disallows the conversion of <tt class="docutils literal"><span class="pre">Py_None</span></tt> to <tt class="docutils literal"><span class="pre">NULL</span></tt></p>
+<dl class="docutils">
+<dt>0x02 implements the <a class="reference external" href="annotations.html#fanno-Factory"><tt class="xref docutils literal"><span class="pre">Factory</span></tt></a> and <a class="reference external" href="annotations.html#fanno-TransferBack"><tt class="xref docutils literal"><span class="pre">TransferBack</span></tt></a></dt>
+<dd>annotations</dd>
+</dl>
+<p>0x04 returns a copy of the C/C++ instance.</p>
+</blockquote>
+</dd>
 <dt><tt class="docutils literal"><span class="pre">N</span></tt> (object) [PyTypeObject *, :PyObject **]</dt>
 <dd>A Python object is checked to see if it is a certain type and then
 returned without any conversions.  The reference count is incremented.
@@ -2094,12 +2155,12 @@ object for enum <tt class="docutils literal"><span class="pre">Except</span></tt
         <li class="right" >
           <a href="annotations.html" title="Annotations"
              >previous</a> |</li>
-        <li><a href="index.html">SIP v4.9.1 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">SIP 4.10.2 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2009, Riverbank Computing Limited.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+      &copy; Copyright 2010 Riverbank Computing Limited.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
 </html>

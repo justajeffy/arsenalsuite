@@ -1,6 +1,6 @@
 // This implements the helpers for QObject.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -177,10 +177,17 @@ static int qt_metacall_worker(sipSimpleWrapper *pySelf, PyTypeObject *pytype,
 
             if (prop->prop_set)
             {
-                // Get the underlying QVariant.
-                QVariant *var = reinterpret_cast<QVariant *>(_a[1]);
+                // _a is an array whose length and contents vary according to
+                // the version of Qt.  Prior to v4.6 _a[1] was the address of
+                // the QVariant containing the property value and _a[0] was the
+                // address of the actual data in the QVariant.  We used to
+                // convert the QVariant at _a[1], rather than the data at
+                // _a[0], which gave us a little bit more type checking.  In Qt
+                // v4.6 the QPropertyAnimation class contains an optimised path
+                // that bypasses QMetaProperty and only sets _a[0], so now
+                // that is all we can rely on.  
 
-                PyObject *py = prop->pyqtprop_parsed_type->toPyObject(*var);
+                PyObject *py = prop->pyqtprop_parsed_type->toPyObject(_a[0]);
 
                 if (py)
                 {

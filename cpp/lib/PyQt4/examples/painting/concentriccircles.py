@@ -80,10 +80,10 @@ class Window(QtGui.QWidget):
     def __init__(self):
         super(Window, self).__init__()
 
-        aliasedLabel = self.createLabel(self.tr("Aliased"))
-        antialiasedLabel = self.createLabel(self.tr("Antialiased"))
-        intLabel = self.createLabel(self.tr("Int"))
-        floatLabel = self.createLabel(self.tr("Float"))
+        aliasedLabel = self.createLabel("Aliased")
+        antialiasedLabel = self.createLabel("Antialiased")
+        intLabel = self.createLabel("Int")
+        floatLabel = self.createLabel("Float")
 
         layout = QtGui.QGridLayout()
         layout.addWidget(aliasedLabel, 0, 1)
@@ -108,7 +108,7 @@ class Window(QtGui.QWidget):
         timer.start(100)
         self.setLayout(layout)
 
-        self.setWindowTitle(self.tr("Concentric Circles"))
+        self.setWindowTitle("Concentric Circles")
 
     def createLabel(self, text):
         label = QtGui.QLabel(text)

@@ -2,6 +2,10 @@
 
 """PyQt4 port of the painting/svgviewer example from Qt v4.x"""
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QString', 2)
+
 from PyQt4 import QtCore, QtGui, QtOpenGL, QtSvg
 
 import svgviewer_rc
@@ -11,26 +15,26 @@ class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self.currentPath = QtCore.QString()
+        self.currentPath = ''
 
         self.view = SvgView()
 
-        fileMenu = QtGui.QMenu(self.tr("&File"), self)
-        openAction = fileMenu.addAction(self.tr("&Open..."))
-        openAction.setShortcut(QtGui.QKeySequence(self.tr("Ctrl+O")))
-        quitAction = fileMenu.addAction(self.tr("E&xit"))
-        quitAction.setShortcut(QtGui.QKeySequence(self.tr("Ctrl+Q")))
+        fileMenu = QtGui.QMenu("&File", self)
+        openAction = fileMenu.addAction("&Open...")
+        openAction.setShortcut("Ctrl+O")
+        quitAction = fileMenu.addAction("E&xit")
+        quitAction.setShortcut("Ctrl+Q")
 
         self.menuBar().addMenu(fileMenu)
 
-        viewMenu = QtGui.QMenu(self.tr("&View"), self)
-        self.backgroundAction = viewMenu.addAction(self.tr("&Background"))
+        viewMenu = QtGui.QMenu("&View", self)
+        self.backgroundAction = viewMenu.addAction("&Background")
         self.backgroundAction.setEnabled(False)
         self.backgroundAction.setCheckable(True)
         self.backgroundAction.setChecked(False)
         self.backgroundAction.toggled.connect(self.view.setViewBackground)
 
-        self.outlineAction = viewMenu.addAction(self.tr("&Outline"))
+        self.outlineAction = viewMenu.addAction("&Outline")
         self.outlineAction.setEnabled(False)
         self.outlineAction.setCheckable(True)
         self.outlineAction.setChecked(True)
@@ -38,21 +42,21 @@ class MainWindow(QtGui.QMainWindow):
 
         self.menuBar().addMenu(viewMenu)
 
-        rendererMenu = QtGui.QMenu(self.tr("&Renderer"), self)
-        self.nativeAction = rendererMenu.addAction(self.tr("&Native"))
+        rendererMenu = QtGui.QMenu("&Renderer", self)
+        self.nativeAction = rendererMenu.addAction("&Native")
         self.nativeAction.setCheckable(True)
         self.nativeAction.setChecked(True)
 
         if QtOpenGL.QGLFormat.hasOpenGL():
-            self.glAction = rendererMenu.addAction(self.tr("&OpenGL"))
+            self.glAction = rendererMenu.addAction("&OpenGL")
             self.glAction.setCheckable(True)
 
-        self.imageAction = rendererMenu.addAction(self.tr("&Image"))
+        self.imageAction = rendererMenu.addAction("&Image")
         self.imageAction.setCheckable(True)
 
         if QtOpenGL.QGLFormat.hasOpenGL():
             rendererMenu.addSeparator()
-            self.highQualityAntialiasingAction = rendererMenu.addAction(self.tr("&High Quality Antialiasing"))
+            self.highQualityAntialiasingAction = rendererMenu.addAction("&High Quality Antialiasing")
             self.highQualityAntialiasingAction.setEnabled(False)
             self.highQualityAntialiasingAction.setCheckable(True)
             self.highQualityAntialiasingAction.setChecked(False)
@@ -73,22 +77,18 @@ class MainWindow(QtGui.QMainWindow):
         rendererGroup.triggered.connect(self.setRenderer)
 
         self.setCentralWidget(self.view)
-        self.setWindowTitle(self.tr("SVG Viewer"))
+        self.setWindowTitle("SVG Viewer")
 
-    def openFile(self, path=''):
-        path = QtCore.QString(path)
-        if path.isEmpty():
-            fileName = QtGui.QFileDialog.getOpenFileName(self,
-                    self.tr("Open SVG File"), self.currentPath,
-                    "SVG files (*.svg *.svgz *.svg.gz)")
-        else:
-            fileName = path
+    def openFile(self, path=None):
+        if not path:
+            path = QtGui.QFileDialog.getOpenFileName(self, "Open SVG File",
+                    self.currentPath, "SVG files (*.svg *.svgz *.svg.gz)")
 
-        if not fileName.isEmpty():
-            svg_file = QtCore.QFile(fileName)
+        if path:
+            svg_file = QtCore.QFile(path)
             if not svg_file.exists():
-                QtGui.QMessageBox.critical(self, self.tr("Open SVG File"),
-                        QtCore.QString("Could not open file '%1'.").arg(fileName))
+                QtGui.QMessageBox.critical(self, "Open SVG File",
+                        "Could not open file '%s'." % path)
 
                 self.outlineAction.setEnabled(False)
                 self.backgroundAction.setEnabled(False)
@@ -96,9 +96,9 @@ class MainWindow(QtGui.QMainWindow):
 
             self.view.openFile(svg_file)
 
-            if not fileName.startsWith(":/"):
-                self.currentPath = fileName
-                self.setWindowTitle(self.tr("%1 - SVGViewer").arg(self.currentPath))
+            if not path.startswith(':/'):
+                self.currentPath = path
+                self.setWindowTitle("%s - SVGViewer" % self.currentPath)
 
             self.outlineAction.setEnabled(True)
             self.backgroundAction.setEnabled(True)
@@ -223,7 +223,7 @@ class SvgView(QtGui.QGraphicsView):
                         QtGui.QImage.Format_ARGB32_Premultiplied)
 
             imagePainter = QtGui.QPainter(self.image)
-            QtGui.QGraphicsView.render(imagePainter)
+            QtGui.QGraphicsView.render(self, imagePainter)
             imagePainter.end()
 
             p = QtGui.QPainter(self.viewport())

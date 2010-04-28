@@ -23,6 +23,10 @@
 ##
 #############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QString', 2)
+
 from PyQt4 import QtCore, QtGui
 
 import i18n_rc
@@ -119,14 +123,11 @@ class LanguageChooser(QtGui.QDialog):
             checkBox.setChecked(False)
 
     def findQmFiles(self):
-        trans_dir = QtCore.QDir(":/translations")
-        fileNames = trans_dir.entryList(QtCore.QStringList("*.qm"),
-                QtCore.QDir.Files, QtCore.QDir.Name)
+        trans_dir = QtCore.QDir(':/translations')
+        fileNames = trans_dir.entryList(['*.qm'], QtCore.QDir.Files,
+                QtCore.QDir.Name)
 
-        for i in fileNames:
-            fileNames.replaceInStrings(i, trans_dir.filePath(i))
-
-        return fileNames
+        return [trans_dir.filePath(fn) for fn in fileNames]
 
     def languageName(self, qmFile):
         translator = QtCore.QTranslator() 
@@ -165,14 +166,14 @@ class MainWindow(QtGui.QMainWindow):
         mainLayout.addWidget(listWidget)
         self.centralWidget.setLayout(mainLayout)
 
-        exitAction = QtGui.QAction(self.tr("E&xit"), self)
-        exitAction.triggered.connect(QtGui.qApp.quit)
+        exitAction = QtGui.QAction(self.tr("E&xit"), self,
+                triggered=QtGui.qApp.quit)
 
         fileMenu = self.menuBar().addMenu(self.tr("&File"))
         fileMenu.setPalette(QtGui.QPalette(QtCore.Qt.red))
         fileMenu.addAction(exitAction)
 
-        self.setWindowTitle(self.tr("Language: %1").arg(self.tr("English")))
+        self.setWindowTitle(self.tr("Language: %s") % self.tr("English"))
         self.statusBar().showMessage(self.tr("Internationalization Example"))
 
         if self.tr("LTR") == "RTL":

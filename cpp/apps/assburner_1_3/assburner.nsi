@@ -1,7 +1,6 @@
 ; DESCRIPTION: Assburner installer script
 ; (C) Blur Studio 2005
 
-!include assburner-svnrev.nsi
 !define MUI_PRODUCT "Assburner"
 !define MUI_VERSION "v1.3.X"
 
@@ -13,7 +12,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 #!include "MUI.nsh"
 
 ; Name of resulting executable installer
-OutFile "ab_install_${MUI_SVNREV}_${PLATFORM}.exe"
+OutFile "ab_install_${PLATFORM}.exe"
 InstallDir "C:\blur\assburner\"
 
 Page directory
@@ -32,18 +31,12 @@ Section "install"
 	File assburner.exe
 	File psmon\abpsmon.exe
 	File assburner.ini
-	File assburner_version.txt
 	File runScriptJob.ms
     File ..\..\lib\stone\stone.dll
     File ..\..\lib\stonegui\stonegui.dll
     File ..\..\lib\classes\classes.dll
-    File ..\..\..\binaries\libpq.dll
 	CreateShortCut "$DESKTOP\Assburner.lnk" "$INSTDIR\assburner.exe" ""
 	CreateShortCut "$QUICKLAUNCH\Assburner.lnk" "$INSTDIR\assburner.exe" ""
-	File ..\..\..\binaries\unzip.exe
-	File ..\..\..\binaries\zip.exe
-	File ..\..\..\binaries\unziplicense.txt
-	File ..\..\..\binaries\Tail.exe
     SetOutPath $INSTDIR\plugins
     File /r "plugins\*.*"
 	; delete old assburner3 dir!!!

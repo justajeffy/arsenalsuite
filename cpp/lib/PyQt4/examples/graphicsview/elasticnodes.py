@@ -300,7 +300,7 @@ class GraphWidget(QtGui.QGraphicsView):
 
         self.scale(0.8, 0.8)
         self.setMinimumSize(400, 400)
-        self.setWindowTitle(self.tr("Elastic Nodes"))
+        self.setWindowTitle("Elastic Nodes")
 
     def itemMoved(self):
         if not self.timerId:
@@ -370,8 +370,8 @@ class GraphWidget(QtGui.QGraphicsView):
         # Text.
         textRect = QtCore.QRectF(sceneRect.left() + 4, sceneRect.top() + 4,
                 sceneRect.width() - 4, sceneRect.height() - 4)
-        message = self.tr("Click and drag the nodes around, and zoom with the "
-                          "mouse wheel or the '+' and '-' keys")
+        message = "Click and drag the nodes around, and zoom with the " \
+                "mouse wheel or the '+' and '-' keys"
 
         font = painter.font()
         font.setBold(True)

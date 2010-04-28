@@ -30,8 +30,8 @@ class Receiver(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Receiver, self).__init__(parent)
 
-        self.statusLabel = QtGui.QLabel(self.tr("Listening for broadcasted messages"))
-        quitButton = QtGui.QPushButton(self.tr("&Quit"))
+        self.statusLabel = QtGui.QLabel("Listening for broadcasted messages")
+        quitButton = QtGui.QPushButton("&Quit")
 
         self.udpSocket = QtNetwork.QUdpSocket(self)
         self.udpSocket.bind(45454)
@@ -49,12 +49,20 @@ class Receiver(QtGui.QDialog):
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Broadcast Receiver"))
+        self.setWindowTitle("Broadcast Receiver")
 
     def processPendingDatagrams(self):
         while self.udpSocket.hasPendingDatagrams():
             datagram, host, port = self.udpSocket.readDatagram(self.udpSocket.pendingDatagramSize())
-            self.statusLabel.setText(self.tr("Received datagram: \"%1\"").arg(datagram))
+
+            try:
+                # Python v3.
+                datagram = str(datagram, encoding='ascii')
+            except TypeError:
+                # Python v2.
+                pass
+
+            self.statusLabel.setText("Received datagram: \"%s\"" % datagram)
 
 
 if __name__ == '__main__':

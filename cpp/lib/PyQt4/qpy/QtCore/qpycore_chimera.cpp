@@ -1,6 +1,6 @@
 // This is the implementation of the Chimera class.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -250,8 +250,7 @@ void Chimera::raiseParseException(const char *type, const char *context)
 
 
 // Parse the given Python type object.
-bool Chimera::parse_py_type(PyTypeObject *type_obj,
-        bool use_qvariant_containers)
+bool Chimera::parse_py_type(PyTypeObject *type_obj)
 {
     const sipTypeDef *td = sipTypeFromPyTypeObject(type_obj);
 
@@ -304,30 +303,27 @@ bool Chimera::parse_py_type(PyTypeObject *type_obj,
         }
     }
 #if PY_MAJOR_VERSION >= 3
-    else if (PyType_IsSubtype(type_obj, &PyUnicode_Type))
+    else if (type_obj == &PyUnicode_Type)
     {
         _type = sipType_QString;
         _metatype = QMetaType::QString;
     }
-    else if (PyType_IsSubtype(type_obj, &PyBytes_Type) ||
-             PyType_IsSubtype(type_obj, &PyByteArray_Type))
-    {
-        _type = sipType_QByteArray;
-        _metatype = QMetaType::QByteArray;
-    }
 #else
-    else if (PyType_IsSubtype(type_obj, &PyBaseString_Type))
+    else if (type_obj == &PyString_Type || type_obj == &PyUnicode_Type)
     {
+        // In this case we accept that the reverse conversion will result in an
+        // object of a different type (i.e. a QString rather than a Python
+        // string).
         _type = sipType_QString;
         _metatype = QMetaType::QString;
     }
 #endif
-    else if (PyType_IsSubtype(type_obj, &PyBool_Type))
+    else if (type_obj == &PyBool_Type)
     {
         _metatype = QMetaType::Bool;
     }
 #if PY_MAJOR_VERSION < 3
-    else if (PyType_IsSubtype(type_obj, &PyInt_Type))
+    else if (type_obj == &PyInt_Type)
     {
         // We choose to map to a C++ int, even though a Python int is
         // potentially much larger, as it represents the most common usage in
@@ -337,7 +333,7 @@ bool Chimera::parse_py_type(PyTypeObject *type_obj,
         _inexact = true;
     }
 #endif
-    else if (PyType_IsSubtype(type_obj, &PyLong_Type))
+    else if (type_obj == &PyLong_Type)
     {
         // We choose to map to a C++ int for the same reasons as above and to
         // be consistent with Python3 where everything is a long object.  If
@@ -346,24 +342,19 @@ bool Chimera::parse_py_type(PyTypeObject *type_obj,
         _metatype = QMetaType::Int;
         _inexact = true;
     }
-    else if (PyType_IsSubtype(type_obj, &PyFloat_Type))
+    else if (type_obj == &PyFloat_Type)
     {
         _metatype = QMetaType::Double;
     }
-    else if (use_qvariant_containers)
+    else if (type_obj == &PyList_Type)
     {
-        if (type_obj->tp_as_sequence && type_obj->tp_as_sequence->sq_item && type_obj->tp_as_sequence->sq_length)
-        {
-            _metatype = QMetaType::QVariantList;
-            _inexact = true;
-        }
-        else if (PyType_IsSubtype(type_obj, &PyDict_Type))
-        {
-            // Strictly speaking a QVariantHash is a closer match to a Python
-            // dict, but that is only Qt v4.5 and later.
-            _metatype = QMetaType::QVariantMap;
-            _inexact = true;
-        }
+        _metatype = QMetaType::QVariantList;
+    }
+    else if (type_obj == &PyDict_Type)
+    {
+        // Strictly speaking a QVariantHash is a closer match to a Python dict,
+        // but that is only Qt v4.5 and later.
+        _metatype = QMetaType::QVariantMap;
     }
 
     // Fallback to using a PyQt_PyObject.
@@ -611,55 +602,29 @@ bool Chimera::fromPyObject(PyObject *py, void *cpp) const
         }
 
     case QMetaType::QVariantMap:
-#if PY_VERSION_HEX >= 0x02040000
-        if (PyDict_CheckExact(py))
-#else
-        if (PyDict_Check(py))
-#endif
         {
             QVariantMap qm;
 
             if (to_QVariantMap(py, qm))
-            {
                 *reinterpret_cast<QVariantMap *>(cpp) = qm;
-            }
             else
-            {
                 iserr = 1;
-            }
-        }
-        else
-        {
-            iserr = 1;
-        }
 
-        break;
+            break;
+        }
 
 #if QT_VERSION >= 0x040500
     case QMetaType::QVariantHash:
-#if PY_VERSION_HEX >= 0x02040000
-        if (PyDict_CheckExact(py))
-#else
-        if (PyDict_Check(py))
-#endif
         {
             QVariantHash qh;
 
             if (to_QVariantHash(py, qh))
-            {
                 *reinterpret_cast<QVariantHash *>(cpp) = qh;
-            }
             else
-            {
                 iserr = 1;
-            }
-        }
-        else
-        {
-            iserr = 1;
-        }
 
-        break;
+            break;
+        }
 #endif
 
     default:
@@ -917,13 +882,6 @@ bool Chimera::fromPyObject(PyObject *py, QVariant *var) const
                 *var = QVariant(ql);
                 metatype_used = QMetaType::Void;
             }
-            else if (_inexact)
-            {
-                PyErr_Clear();
-
-                *var = keep_as_pyobject(py);
-                metatype_used = QMetaType::Void;
-            }
             else
             {
                 iserr = 1;
@@ -933,11 +891,6 @@ bool Chimera::fromPyObject(PyObject *py, QVariant *var) const
         }
 
     case QMetaType::QVariantMap:
-#if PY_VERSION_HEX >= 0x02040000
-        if (PyDict_CheckExact(py))
-#else
-        if (PyDict_Check(py))
-#endif
         {
             QVariantMap qm;
 
@@ -946,32 +899,20 @@ bool Chimera::fromPyObject(PyObject *py, QVariant *var) const
                 *var = QVariant(qm);
                 metatype_used = QMetaType::Void;
             }
-            else if (_inexact)
+            else
             {
+                // Assume the failure is because the key was the wrong type.
                 PyErr_Clear();
 
                 *var = keep_as_pyobject(py);
                 metatype_used = QMetaType::Void;
             }
-            else
-            {
-                iserr = 1;
-            }
-        }
-        else
-        {
-            iserr = 1;
-        }
 
-        break;
+            break;
+        }
 
 #if QT_VERSION >= 0x040500
     case QMetaType::QVariantHash:
-#if PY_VERSION_HEX >= 0x02040000
-        if (PyDict_CheckExact(py))
-#else
-        if (PyDict_Check(py))
-#endif
         {
             QVariantHash qh;
 
@@ -980,24 +921,17 @@ bool Chimera::fromPyObject(PyObject *py, QVariant *var) const
                 *var = QVariant(qh);
                 metatype_used = QMetaType::Void;
             }
-            else if (_inexact)
+            else
             {
+                // Assume the failure is because the key was the wrong type.
                 PyErr_Clear();
 
                 *var = keep_as_pyobject(py);
                 metatype_used = QMetaType::Void;
             }
-            else
-            {
-                iserr = 1;
-            }
-        }
-        else
-        {
-            iserr = 1;
-        }
 
-        break;
+            break;
+        }
 #endif
 
     default:
@@ -1060,7 +994,7 @@ QVariant Chimera::fromAnyPyObject(PyObject *py, int *is_err)
     {
         Chimera ct;
 
-        if (!ct.parse_py_type(Py_TYPE(py), true) || !ct.fromPyObject(py, &variant))
+        if (!ct.parse_py_type(Py_TYPE(py)) || !ct.fromPyObject(py, &variant))
             *is_err = 1;
     }
 
@@ -1089,7 +1023,15 @@ PyObject *Chimera::toPyObject(const QVariant &var) const
         {
             PyQt_PyObject pyobj_wrapper = qVariantValue<PyQt_PyObject>(var);
 
-            Py_XINCREF(pyobj_wrapper.pyobject);
+            if (!pyobj_wrapper.pyobject)
+            {
+                PyErr_SetString(PyExc_TypeError,
+                        "unable to convert a QVariant back to a Python object");
+
+                return 0;
+            }
+
+            Py_INCREF(pyobj_wrapper.pyobject);
 
             return pyobj_wrapper.pyobject;
         }
@@ -1118,7 +1060,15 @@ PyObject *Chimera::toPyObject(void *cpp) const
             // Otherwise unwrap the Python object.
             PyQt_PyObject *pyobj_wrapper = reinterpret_cast<PyQt_PyObject *>(cpp);
 
-            Py_XINCREF(pyobj_wrapper->pyobject);
+            if (!pyobj_wrapper->pyobject)
+            {
+                PyErr_SetString(PyExc_TypeError,
+                        "unable to convert a QVariant back to a Python object");
+
+                return 0;
+            }
+
+            Py_INCREF(pyobj_wrapper->pyobject);
 
             return pyobj_wrapper->pyobject;
         }
@@ -1371,18 +1321,15 @@ QVariant Chimera::keep_as_pyobject(PyObject *py)
 }
 
 
-// Convert a Python object to a QVariantList and return true if there was no
-// error.
+// Convert a Python list object to a QVariantList and return true if there was
+// no error.
 bool Chimera::to_QVariantList(PyObject *py, QVariantList &cpp) const
 {
-    SIP_SSIZE_T size = PySequence_Size(py);
+    Q_ASSERT(PyList_CheckExact(py));
 
-    if (size < 0)
-        return false;
-
-    for (SIP_SSIZE_T i = 0; i < size; ++i)
+    for (SIP_SSIZE_T i = 0; i < PyList_GET_SIZE(py); ++i)
     {
-        PyObject *val_obj = PySequence_GetItem(py, i);
+        PyObject *val_obj = PyList_GET_ITEM(py, i);
 
         if (!val_obj)
             return false;
@@ -1392,8 +1339,6 @@ bool Chimera::to_QVariantList(PyObject *py, QVariantList &cpp) const
         QVariant *val = reinterpret_cast<QVariant *>(sipForceConvertToType(
                 val_obj, sipType_QVariant, NULL, SIP_NOT_NONE, &val_state,
                 &iserr));
-
-        Py_DECREF(val_obj);
 
         if (iserr)
             return false;
@@ -1411,6 +1356,8 @@ bool Chimera::to_QVariantList(PyObject *py, QVariantList &cpp) const
 // error.
 bool Chimera::to_QVariantMap(PyObject *py, QVariantMap &cpp) const
 {
+    Q_ASSERT(PyDict_CheckExact(py));
+
     PyObject *key_obj, *val_obj;
     SIP_SSIZE_T i;
 
@@ -1445,6 +1392,8 @@ bool Chimera::to_QVariantMap(PyObject *py, QVariantMap &cpp) const
 // error.
 bool Chimera::to_QVariantHash(PyObject *py, QVariantHash &cpp) const
 {
+    Q_ASSERT(PyDict_CheckExact(py));
+
     PyObject *key_obj, *val_obj;
     SIP_SSIZE_T i;
 

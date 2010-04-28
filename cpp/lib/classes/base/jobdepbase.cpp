@@ -18,7 +18,7 @@ void JobDepSchema::postInsert( RecordList jobDeps )
 			}
 		}
 	}
-	Job::updateJobStatuses( toCommit, "holding", false );
+	Job::updateJobStatuses( toCommit, "holding" );
 	TableSchema::postInsert( jobDeps );
 }
 

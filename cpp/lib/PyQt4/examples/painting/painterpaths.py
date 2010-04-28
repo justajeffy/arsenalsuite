@@ -23,6 +23,10 @@
 ##
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QVariant', 2)
+
 from math import cos, pi, sin
 
 from PyQt4 import QtCore, QtGui
@@ -135,7 +139,7 @@ class Window(QtGui.QWidget):
         textPath = QtGui.QPainterPath()
         timesFont = QtGui.QFont("Times", 50)
         timesFont.setStyleStrategy(QtGui.QFont.ForceOutline)
-        textPath.addText(10, 70, timesFont, self.tr("Qt"))
+        textPath.addText(10, 70, timesFont, "Qt")
 
         bezierPath = QtGui.QPainterPath()
         bezierPath.moveTo(20, 30)
@@ -156,12 +160,10 @@ class Window(QtGui.QWidget):
         assert len(self.renderAreas) == 9
 
         self.fillRuleComboBox = QtGui.QComboBox()
-        self.fillRuleComboBox.addItem(self.tr("Odd Even"),
-                QtCore.QVariant(QtCore.Qt.OddEvenFill))
-        self.fillRuleComboBox.addItem(self.tr("Winding"),
-                QtCore.QVariant(QtCore.Qt.WindingFill))
+        self.fillRuleComboBox.addItem("Odd Even", QtCore.Qt.OddEvenFill)
+        self.fillRuleComboBox.addItem("Winding", QtCore.Qt.WindingFill)
 
-        fillRuleLabel = QtGui.QLabel(self.tr("Fill &Rule:"))
+        fillRuleLabel = QtGui.QLabel("Fill &Rule:")
         fillRuleLabel.setBuddy(self.fillRuleComboBox)
 
         self.fillColor1ComboBox = QtGui.QComboBox()
@@ -174,33 +176,33 @@ class Window(QtGui.QWidget):
         self.fillColor2ComboBox.setCurrentIndex(
                 self.fillColor2ComboBox.findText("cornsilk"))
 
-        fillGradientLabel = QtGui.QLabel(self.tr("&Fill Gradient:"))
+        fillGradientLabel = QtGui.QLabel("&Fill Gradient:")
         fillGradientLabel.setBuddy(self.fillColor1ComboBox)
 
-        fillToLabel = QtGui.QLabel(self.tr("to"))
+        fillToLabel = QtGui.QLabel("to")
         fillToLabel.setSizePolicy(QtGui.QSizePolicy.Fixed,
                 QtGui.QSizePolicy.Fixed)
 
         self.penWidthSpinBox = QtGui.QSpinBox()
         self.penWidthSpinBox.setRange(0, 20)
 
-        penWidthLabel = QtGui.QLabel(self.tr("&Pen Width:"))
+        penWidthLabel = QtGui.QLabel("&Pen Width:")
         penWidthLabel.setBuddy(self.penWidthSpinBox)
 
         self.penColorComboBox = QtGui.QComboBox()
         self.populateWithColors(self.penColorComboBox)
         self.penColorComboBox.setCurrentIndex(
-                self.penColorComboBox.findText("darkslateblue"))
+                self.penColorComboBox.findText('darkslateblue'))
 
-        penColorLabel = QtGui.QLabel(self.tr("Pen &Color:"))
+        penColorLabel = QtGui.QLabel("Pen &Color:")
         penColorLabel.setBuddy(self.penColorComboBox)
 
         self.rotationAngleSpinBox = QtGui.QSpinBox()
         self.rotationAngleSpinBox.setRange(0, 359)
         self.rotationAngleSpinBox.setWrapping(True)
-        self.rotationAngleSpinBox.setSuffix("\xB0")
+        self.rotationAngleSpinBox.setSuffix('\xB0')
 
-        rotationAngleLabel = QtGui.QLabel(self.tr("&Rotation Angle:"))
+        rotationAngleLabel = QtGui.QLabel("&Rotation Angle:")
         rotationAngleLabel.setBuddy(self.rotationAngleSpinBox)
 
         self.fillRuleComboBox.activated.connect(self.fillRuleChanged)
@@ -237,23 +239,23 @@ class Window(QtGui.QWidget):
         self.penColorChanged()
         self.penWidthSpinBox.setValue(2)
 
-        self.setWindowTitle(self.tr("Painter Paths"))
+        self.setWindowTitle("Painter Paths")
 
     def fillRuleChanged(self):
-        rule = QtCore.Qt.FillRule(self.currentItemData(self.fillRuleComboBox).toInt()[0])
+        rule = QtCore.Qt.FillRule(self.currentItemData(self.fillRuleComboBox))
 
         for i in range(Window.NumRenderAreas):
             self.renderAreas[i].setFillRule(rule)
 
     def fillGradientChanged(self):
-        color1 = QtGui.QColor(self.currentItemData(self.fillColor1ComboBox).toString())
-        color2 = QtGui.QColor(self.currentItemData(self.fillColor2ComboBox).toString())
+        color1 = QtGui.QColor(self.currentItemData(self.fillColor1ComboBox))
+        color2 = QtGui.QColor(self.currentItemData(self.fillColor2ComboBox))
 
         for i in range(Window.NumRenderAreas):
             self.renderAreas[i].setFillGradient(color1, color2)
 
     def penColorChanged(self):
-        color = QtGui.QColor(self.currentItemData(self.penColorComboBox).toString())
+        color = QtGui.QColor(self.currentItemData(self.penColorComboBox))
 
         for i in range(Window.NumRenderAreas):
             self.renderAreas[i].setPenColor(color)
@@ -261,7 +263,7 @@ class Window(QtGui.QWidget):
     def populateWithColors(self, comboBox):
         colorNames = QtGui.QColor.colorNames()
         for name in colorNames:
-            comboBox.addItem(name, QtCore.QVariant(name))
+            comboBox.addItem(name, name)
 
     def currentItemData(self, comboBox):
         return comboBox.itemData(comboBox.currentIndex())

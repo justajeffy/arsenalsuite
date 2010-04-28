@@ -23,6 +23,10 @@
 ##
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QVariant', 2)
+
 from PyQt4 import QtCore, QtGui
 
 
@@ -35,7 +39,7 @@ class SpinBoxDelegate(QtGui.QItemDelegate):
         return editor
 
     def setEditorData(self, spinBox, index):
-        value, _ = index.model().data(index, QtCore.Qt.EditRole).toInt()
+        value = index.model().data(index, QtCore.Qt.EditRole)
 
         spinBox.setValue(value)
 
@@ -43,7 +47,7 @@ class SpinBoxDelegate(QtGui.QItemDelegate):
         spinBox.interpretText()
         value = spinBox.value()
 
-        model.setData(index, QtCore.QVariant(value), QtCore.Qt.EditRole)
+        model.setData(index, value, QtCore.Qt.EditRole)
 
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
@@ -65,7 +69,7 @@ if __name__ == '__main__':
     for row in range(4):
         for column in range(2):
             index = model.index(row, column, QtCore.QModelIndex())
-            model.setData(index, QtCore.QVariant((row+1) * (column+1)))
+            model.setData(index, (row + 1) * (column + 1))
 
     tableView.setWindowTitle("Spin Box Delegate")
     tableView.show()

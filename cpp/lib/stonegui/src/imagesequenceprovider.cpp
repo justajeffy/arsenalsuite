@@ -31,7 +31,7 @@
 #include <qfileinfo.h>
 #include <QGLContext>
 
-#include "../stone/include/path.h"
+#include "path.h"
 namespace Stone {
 class Path;
 }

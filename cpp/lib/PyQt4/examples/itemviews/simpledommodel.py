@@ -23,6 +23,10 @@
 ##
 ############################################################################
 
+# This is only needed for Python v2 but is harmless for Python v3.
+import sip
+sip.setapi('QString', 2)
+
 from PyQt4 import QtCore, QtGui, QtXml
 
 
@@ -69,31 +73,36 @@ class DomModel(QtCore.QAbstractItemModel):
 
     def data(self, index, role):
         if not index.isValid():
-            return QtCore.QVariant()
+            return None
 
         if role != QtCore.Qt.DisplayRole:
-            return QtCore.QVariant()
+            return None
 
         item = index.internalPointer()
 
         node = item.node()
-        attributes = QtCore.QStringList()
+        attributes = []
         attributeMap = node.attributes()
 
         if index.column() == 0:
-            return QtCore.QVariant(node.nodeName())
+            return node.nodeName()
         
         elif index.column() == 1:
             for i in range(0, attributeMap.count()):
                 attribute = attributeMap.item(i)
-                attributes.append(attribute.nodeName() + "=\"" + \
-                                  attribute.nodeValue() + "\"")
+                attributes.append(attribute.nodeName() + '="' +
+                                  attribute.nodeValue() + '"')
 
-            return QtCore.QVariant(attributes.join(" "))
-        elif index.column() == 2:
-            return QtCore.QVariant(node.nodeValue().split("\n").join(" "))
-        else:
-            return QtCore.QVariant()
+            return " ".join(attributes)
+
+        if index.column() == 2:
+            value = node.nodeValue()
+            if value is None:
+                return ''
+
+            return ' '.join(node.nodeValue().split('\n'))
+
+        return None
 
     def flags(self, index):
         if not index.isValid():
@@ -104,15 +113,15 @@ class DomModel(QtCore.QAbstractItemModel):
     def headerData(self, section, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
             if section == 0:
-                return QtCore.QVariant(self.tr("Name"))
-            elif section == 1:
-                return QtCore.QVariant(self.tr("Attributes"))
-            elif section == 2:
-                return QtCore.QVariant(self.tr("Value"))
-            else:
-                return QtCore.QVariant()
+                return "Name"
 
-        return QtCore.QVariant()
+            if section == 1:
+                return "Attributes"
+
+            if section == 2:
+                return "Value"
+
+        return None
 
     def index(self, row, column, parent):
         if not self.hasIndex(row, column, parent):
@@ -157,11 +166,9 @@ class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self.fileMenu = self.menuBar().addMenu(self.tr("&File"))
-        self.fileMenu.addAction(self.tr("&Open..."), self.openFile,
-                QtGui.QKeySequence(self.tr("Ctrl+O")))
-        self.fileMenu.addAction(self.tr("E&xit"), self.close,
-                QtGui.QKeySequence(self.tr("Ctrl+Q")))
+        self.fileMenu = self.menuBar().addMenu("&File")
+        self.fileMenu.addAction("&Open...", self.openFile, "Ctrl+O")
+        self.fileMenu.addAction("E&xit", self.close, "Ctrl+Q")
 
         self.xmlPath = ""
         self.model = DomModel(QtXml.QDomDocument(), self)
@@ -169,15 +176,14 @@ class MainWindow(QtGui.QMainWindow):
         self.view.setModel(self.model)
 
         self.setCentralWidget(self.view)
-        self.setWindowTitle(self.tr("Simple DOM Model"))
+        self.setWindowTitle("Simple DOM Model")
 
     def openFile(self):
-        filePath = QtGui.QFileDialog.getOpenFileName(self,
-                self.tr("Open File"), self.xmlPath,
-                self.tr("XML files (*.xml);;HTML files (*.html);;"
-                        "SVG files (*.svg);;User Interface files (*.ui)"))
+        filePath = QtGui.QFileDialog.getOpenFileName(self, "Open File",
+                self.xmlPath, "XML files (*.xml);;HTML files (*.html);;"
+                "SVG files (*.svg);;User Interface files (*.ui)")
 
-        if not filePath.isEmpty():
+        if filePath:
             f = QtCore.QFile(filePath)
             if f.open(QtCore.QIODevice.ReadOnly):
                 document = QtXml.QDomDocument()

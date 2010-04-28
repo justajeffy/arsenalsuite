@@ -1,6 +1,6 @@
 // This contains the definition of the PyQtProcy class.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -80,6 +80,7 @@ public:
 
     void unislot(void **qargs);
     static PyObject *invokeSlot(const qpycore_slot &slot, void **qargs);
+    void disable();
 
     int getReceivers(const char *signal) const {return receivers(signal);}
 

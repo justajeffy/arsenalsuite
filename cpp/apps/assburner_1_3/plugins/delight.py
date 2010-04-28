@@ -33,6 +33,7 @@ class DelightBurner(JobBurner):
         self.errors.append(QRegExp("^renderdl: cannot open input file"))
         self.errors.append(QRegExp("^3DL INFO L2374: no license available"))
         self.errors.append(QRegExp("Could not find file:"))
+        self.errors.append(QRegExp("Received signal"))
         #self.errors.append(QRegExp("^3DL SEVERE ERROR"))
 
     def __del__(self):
@@ -131,10 +132,10 @@ class DelightBurner(JobBurner):
         JobBurner.slotProcessOutputLine(self,line,channel)
 
         # Frame status
-        if self.frameDone.indexIn(line) >= 0:
-            frame = int(self.frameDone.cap(1))
-            self.taskDone(frame)
-        elif self.frameStart.indexIn(line) >= 0:
+        #if self.frameDone.indexIn(line) >= 0:
+        #    frame = int(self.frameDone.cap(1))
+        #    self.taskDone(frame)
+        if self.frameStart.indexIn(line) >= 0:
             #if self.burnFile().endsWith("..rib"):
             #	frame = int(self.frameStart.cap(1))
 

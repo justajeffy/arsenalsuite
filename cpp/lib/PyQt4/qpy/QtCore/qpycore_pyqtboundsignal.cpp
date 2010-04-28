@@ -1,6 +1,6 @@
 // This contains the implementation of the pyqtBoundSignal type.
 //
-// Copyright (c) 2009 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -48,6 +48,8 @@ extern "C" {
 static PyObject *pyqtBoundSignal_call(PyObject *self, PyObject *args,
         PyObject *kw);
 static void pyqtBoundSignal_dealloc(PyObject *self);
+static PyObject *pyqtBoundSignal_repr(PyObject *self);
+static PyObject *pyqtBoundSignal_get_doc(PyObject *self, void *);
 static PyObject *pyqtBoundSignal_connect(PyObject *self, PyObject *args,
         PyObject *kwd_args);
 static PyObject *pyqtBoundSignal_disconnect(PyObject *self, PyObject *args);
@@ -66,10 +68,10 @@ static QObject *get_receiver(Chimera::Signature *overload, PyObject *slot_obj,
 
 // Doc-strings.
 PyDoc_STRVAR(pyqtBoundSignal_connect_doc,
-"connect(slot[, type=PyQt4.QtCore.Qt.AutoConnection])\n"
+"connect(slot[, type=Qt.AutoConnection])\n"
 "\n"
 "slot is either a Python callable or another signal.\n"
-"type is a PyQt4.QtCore.Qt.ConnectionType");
+"type is a Qt.ConnectionType");
 
 PyDoc_STRVAR(pyqtBoundSignal_disconnect_doc,
 "disconnect([slot])\n"
@@ -105,6 +107,13 @@ static PyMappingMethods pyqtBoundSignal_as_mapping = {
 };
 
 
+// The getters/setters.
+static PyGetSetDef pyqtBoundSignal_getsets[] = {
+    {(char *)"__doc__", pyqtBoundSignal_get_doc, NULL, NULL, NULL},
+    {NULL, NULL, NULL, NULL, NULL}
+};
+
+
 // The pyqtBoundSignal type object.
 PyTypeObject qpycore_pyqtBoundSignal_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -116,7 +125,7 @@ PyTypeObject qpycore_pyqtBoundSignal_Type = {
     0,                      /* tp_getattr */
     0,                      /* tp_setattr */
     0,                      /* tp_compare */
-    0,                      /* tp_repr */
+    pyqtBoundSignal_repr,   /* tp_repr */
     0,                      /* tp_as_number */
     0,                      /* tp_as_sequence */
     &pyqtBoundSignal_as_mapping,    /* tp_as_mapping */
@@ -136,7 +145,7 @@ PyTypeObject qpycore_pyqtBoundSignal_Type = {
     0,                      /* tp_iternext */
     pyqtBoundSignal_methods,    /* tp_methods */
     0,                      /* tp_members */
-    0,                      /* tp_getset */
+    pyqtBoundSignal_getsets,    /* tp_getset */
     0,                      /* tp_base */
     0,                      /* tp_dict */
     0,                      /* tp_descr_get */
@@ -157,6 +166,34 @@ PyTypeObject qpycore_pyqtBoundSignal_Type = {
     0,                      /* tp_version_tag */
 #endif
 };
+
+
+// The __doc__ getter.
+static PyObject *pyqtBoundSignal_get_doc(PyObject *self, void *)
+{
+    qpycore_pyqtBoundSignal *bs = (qpycore_pyqtBoundSignal *)self;
+
+    return qpycore_get_signal_doc(bs->unbound_signal);
+}
+
+
+// The type repr slot.
+static PyObject *pyqtBoundSignal_repr(PyObject *self)
+{
+    qpycore_pyqtBoundSignal *bs = (qpycore_pyqtBoundSignal *)self;
+    qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)bs->unbound_signal;
+
+    QByteArray name = Chimera::Signature::name(ps->overloads->first()->signature);
+
+    return
+#if PY_MAJOR_VERSION >= 3
+        PyUnicode_FromFormat
+#else
+        PyString_FromFormat
+#endif
+            ("<bound signal %s of %s object at %p>", name.constData() + 1,
+                    bs->bound_pyobject->ob_type->tp_name, bs->bound_pyobject);
+}
 
 
 // The type call slot.
@@ -297,7 +334,7 @@ static PyObject *pyqtBoundSignal_connect(PyObject *self, PyObject *args,
         if (!sipCanConvertToEnum(type_obj, sipType_Qt_ConnectionType))
         {
             PyErr_Format(PyExc_TypeError,
-                    "connect() type argument should be PyQt4.QtCore.Qt.ConnectionType, not '%s'",
+                    "connect() type argument should be Qt.ConnectionType, not '%s'",
                     Py_TYPE(slot_obj)->tp_name);
 
             return 0;
@@ -455,7 +492,7 @@ static PyObject *pyqtBoundSignal_disconnect(PyObject *self, PyObject *args)
 
     res_obj = disconnect(bs, proxy, member);
 
-    delete proxy;
+    proxy->disable();
 
     return res_obj;
 }
@@ -579,4 +616,23 @@ static QObject *get_receiver(Chimera::Signature *overload, PyObject *slot_obj,
     }
 
     return rx_qobj;
+}
+
+
+// Check that an object is a bound signal and return the bound QObject and the
+// signal signature.
+bool qpycore_pyqtsignal_get_parts(PyObject *sig_obj, QObject **qtx,
+        const char **sig)
+{
+    qpycore_pyqtBoundSignal *bs;
+
+    if (!PyObject_TypeCheck(sig_obj, &qpycore_pyqtBoundSignal_Type))
+        return false;
+
+    bs = (qpycore_pyqtBoundSignal *)sig_obj;
+
+    *qtx = bs->bound_qobject;
+    *sig = bs->bound_overload->signature.constData();
+
+    return true;
 }

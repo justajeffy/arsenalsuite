@@ -124,7 +124,8 @@ INCLUDEPATH += ../classesui/include ../classesui/.out/
 INCLUDEPATH += ../absubmit/include ../absubmit/.out
 
 win32 {
-	#INCLUDEPATH+=c:/source/sip/siplib
+	LIBS+=-L../absubmit/sipAbsubmit -lpyAbsubmit
+
 	PY_PATH=$$system("python -c \"from distutils.sysconfig import get_config_vars; print get_config_vars()['prefix']\"")
 	INCLUDEPATH+=$$system("python -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
 	PY_VERSION=$$system("python -c \"from distutils.sysconfig import get_python_version; print get_python_version().replace('.','')\"")
@@ -132,40 +133,9 @@ win32 {
 	LIBS+=-L$${PY_PATH}\libs -lpython$${PY_VERSION}
 	LIBS += -lpsapi -lMpr -lws2_32 -lgdi32
 }
-    LIBS+=-LsipAssfreezer -lAssfreezer
-    win32 {
-	LIBS+=-L../../lib/classes/sipClasses -lpyClasses
-	LIBS+=-L../../lib/stone/sipStone -lpyStone
-	LIBS+=-L../../lib/sip/siplib -lsip
-    }
-
-
-
-# Linux out of tree include paths
-unix {
-	INCLUDEPATH += /usr/include/stone /usr/include/stonegui /usr/include/classes /usr/include/classesui /usr/include/absubmit
-}
-
-# Python modules
-debug:win32 {
-    LIBS+=-L../../lib/assfreezer/sipAssfreezer -lAssfreezer_d
-    LIBS+=-L../../lib/classes/sipClasses -lpyClasses_d
-    LIBS+=-L../../lib/stone/sipStone -lpyStone_d
-    LIBS+=-L../../lib/sip/siplib -lsip_d
-} else {
-    LIBS+=-LsipAssfreezer -lAssfreezer
-	win32 {
-	    LIBS+=-L../../lib/classes/sipClasses -lpyClasses
-		LIBS+=-L../../lib/stone/sipStone -lpyStone
-		LIBS+=-L../../lib/sip/siplib -lsip
-	}
-}
 
 win32{
-#	INCLUDEPATH+=c:\nvidia\cg\include
-#	LIBS+=-Lc:\nvidia\cg\lib -lcgGL -lcg
 	LIBS+=-lPsapi
-#	LIBS+=-Lc:\IntelLib
 
 	INCLUDEPATH+=c:/source/sip/siplib
 	PY_PATH=$$system("python -c \"from distutils.sysconfig import get_config_vars; print get_config_vars()['prefix']\"")
@@ -173,18 +143,19 @@ win32{
 	PY_VERSION=$$system("python -c \"from distutils.sysconfig import get_python_version; print get_python_version().replace('.','')\"")
 	message(Python Version is $$PY_VERSION Python lib path is $$PY_LIB_PATH)
 	LIBS+=-L$${PY_PATH}\libs -lpython$${PY_VERSION}
-
 }
 
 macx{
   INCLUDEPATH+=/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include/
 }
 
-unix{
-#	LIBS+=-lCgGL
+isEmpty( PYTHON ) {
+    PYTHON="python"
+}
 
-	PY_VERSION = $$system("python -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'")
-
+unix {
+    PY_CMD =  $$PYTHON " -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'"
+    PY_VERSION = $$system($$PY_CMD)
 	message(Python Version is $$PY_VERSION)
 	INCLUDEPATH += /usr/include/python$${PY_VERSION}/
 	LIBS+=-lpython$${PY_VERSION}
@@ -199,6 +170,10 @@ contains( DEFINES, USE_IMAGE_MAGICK ) {
 	unix:LIBS+=-lMagick++
 	macx:INCLUDEPATH+=/usr/local/include
 	macx:LIBS+=-lMagick++ -lMagick
+
+	win32:LIBS+=-lMagick++
+	win32:LIBS+=-L/ImageMagick/lib
+	win32:INCLUDEPATH+=/ImageMagick/include
 }
 
 TEMPLATE=lib
@@ -206,7 +181,14 @@ TEMPLATE=lib
 CONFIG += qt thread opengl
 QT+=xml sql opengl network
 TARGET=assfreezer
-target.path=/usr/local/lib
+
+unix {
+	target.path=$$(DESTDIR)/usr/local/lib
+}
+win32 {
+	target.path=$$(DESTDIR)/blur/common/
+}
+
 INSTALLS += target
 
 DESTDIR=./

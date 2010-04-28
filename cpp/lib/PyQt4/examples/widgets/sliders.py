@@ -90,15 +90,14 @@ class Window(QtGui.QWidget):
         super(Window, self).__init__()
 
         self.horizontalSliders = SlidersGroup(QtCore.Qt.Horizontal,
-                self.tr("Horizontal"))
-        self.verticalSliders = SlidersGroup(QtCore.Qt.Vertical,
-                self.tr("Vertical"))
+                "Horizontal")
+        self.verticalSliders = SlidersGroup(QtCore.Qt.Vertical, "Vertical")
 
         self.stackedWidget = QtGui.QStackedWidget()
         self.stackedWidget.addWidget(self.horizontalSliders)
         self.stackedWidget.addWidget(self.verticalSliders)
 
-        self.createControls(self.tr("Controls"))
+        self.createControls("Controls")
 
         self.horizontalSliders.valueChanged.connect(self.verticalSliders.setValue)
         self.verticalSliders.valueChanged.connect(self.valueSpinBox.setValue)
@@ -113,17 +112,17 @@ class Window(QtGui.QWidget):
         self.maximumSpinBox.setValue(20)
         self.valueSpinBox.setValue(5)
 
-        self.setWindowTitle(self.tr("Sliders"))
+        self.setWindowTitle("Sliders")
 
     def createControls(self, title):
         self.controlsGroup = QtGui.QGroupBox(title)
 
-        minimumLabel = QtGui.QLabel(self.tr("Minimum value:"))
-        maximumLabel = QtGui.QLabel(self.tr("Maximum value:"))
-        valueLabel = QtGui.QLabel(self.tr("Current value:"))
+        minimumLabel = QtGui.QLabel("Minimum value:")
+        maximumLabel = QtGui.QLabel("Maximum value:")
+        valueLabel = QtGui.QLabel("Current value:")
 
-        invertedAppearance = QtGui.QCheckBox(self.tr("Inverted appearance"))
-        invertedKeyBindings = QtGui.QCheckBox(self.tr("Inverted key bindings"))
+        invertedAppearance = QtGui.QCheckBox("Inverted appearance")
+        invertedKeyBindings = QtGui.QCheckBox("Inverted key bindings")
 
         self.minimumSpinBox = QtGui.QSpinBox()
         self.minimumSpinBox.setRange(-100, 100)
@@ -138,8 +137,8 @@ class Window(QtGui.QWidget):
         self.valueSpinBox.setSingleStep(1)
 
         orientationCombo = QtGui.QComboBox()
-        orientationCombo.addItem(self.tr("Horizontal slider-like widgets"))
-        orientationCombo.addItem(self.tr("Vertical slider-like widgets"))
+        orientationCombo.addItem("Horizontal slider-like widgets")
+        orientationCombo.addItem("Vertical slider-like widgets")
 
         orientationCombo.activated.connect(self.stackedWidget.setCurrentIndex)
         self.minimumSpinBox.valueChanged.connect(self.horizontalSliders.setMinimum)
@@ -164,7 +163,7 @@ class Window(QtGui.QWidget):
         self.controlsGroup.setLayout(controlsLayout)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

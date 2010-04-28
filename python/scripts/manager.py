@@ -35,12 +35,12 @@ config().readFromFile( dbConfig, False )
 
 initStone(sys.argv)
 
-#blur.RedirectOutputToLog()
+blur.RedirectOutputToLog()
 
 # Load all the database tables
 classes_loader()
 
-VERBOSE_DEBUG = False
+VERBOSE_DEBUG = True
 
 if VERBOSE_DEBUG:
 	Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete ) #| Database.EchoSelect )
@@ -255,7 +255,7 @@ class JobAssign:
         hasHost = 0
         if self.JobStatus.hostsOnJob() > 0: hasHost = 1
         sortKey = '%01d-%03d-%04d-%04d-%10d' % (hasHost,self.Job.priority(), self.JobStatus.hostsOnJob(), self.JobStatus.errorCount(), self.Job.submittedts().toTime_t())
-        #if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
+        if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
         return sortKey
 
     def mapServerWeight( self ):
@@ -345,27 +345,26 @@ class JobAssign:
         return JobTask.select( "jobtask IN (%s) AND fkeyjob=%i AND status='new' LIMIT %i" % ( numberListToString(tasks), self.Job.key(), limit ) )
 
     def assignHost( self, hostStatus, totalHosts, totalTasks ):
-        tasks = None
         packetSize = self.Job.packetSize()
 
         self.logString = ' PT: '
         if packetSize < 1:
             packetSize = self.calculateAutoPacketSize( totalHosts, totalTasks )
         packetType = self.Job.packetType()
-        if VERBOSE_DEBUG: print "Finding Tasks For PacketType:", packetType, " packetSize: ", packetSize
+        if VERBOSE_DEBUG: print "Assigning Tasks For PacketType:", packetType, " packetSize: ", packetSize
 
         taskCount = 0
         q = Database.current().exec_( "SELECT * FROM assign_single_host(%s, %s, %s)" % (self.Job.key(), hostStatus.host().key(), packetSize ) )
         if q.next():
-            taskCount = q.value(0).toInt()[0]
+            taskCount = q.value(0).toInt()
 
         # Increment hosts on job count,  this is taken care of by a trigger at the database level
         # but we increment here to get more accurate calculated priority until the next refresh of
         # the job list
         self.JobStatus.setHostsOnJob( self.JobStatus.hostsOnJob() + 1 )
 
-        Log( "Assigned tasks " + str(taskCount) + " from job " + str(self.Job.key()) + " to host " + hostStatus.host().name() + self.logString )
-        return taskCount
+        Log( "Assigned tasks " + numberListToString(taskCount) + " from job " + str(self.Job.key()) + " to host " + hostStatus.host().name() + self.logString )
+        return tasks.size()
 
 def updateProjectTempo():
 	Database.current().exec_( "SELECT * from update_project_tempo()" )
@@ -841,7 +840,7 @@ class FarmResourceSnapshot(object):
 			# Return so that we can recalculate assignment priorities
 			if tasksAssigned > 0:
 				assignSuccess = True
-				break 
+				break
 			
 			# This shouldn't get hit, because there should be tasks available if we
 			# Are assigning, and we should already break above if they get assigned
@@ -931,9 +930,8 @@ class FarmResourceSnapshot(object):
 			
 			if len(jobAssignList) == 0:
 				raise AllJobsAssignedException()
-	
+			
 			jobAssignList.sort()
-
 			for jobAssign in jobAssignList:
 				try:
 					# Recalc priority and resort job list after every assignment

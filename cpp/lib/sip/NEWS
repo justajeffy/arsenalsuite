@@ -1,3 +1,34 @@
+v4.10.2 16th April 2010
+  - A bug fix release.
+
+v4.10.1 17th March 2010
+  - Added the /NoCopy/ function and argument annotations.
+
+v4.10 14th January 2010
+  - Added the sip.voidptr.ascapsule() method.
+  - Added the -P command line option to build modules with "protected"
+    redefined to "public" if supported by the platform.  This can result in
+    significantly smaller modules.
+  - Added the -o command line option to automatically generate docstrings.
+  - Added the -k command line option and /KeywordArgs/ and /NoKeywordArgs/
+    function annotations to support keyword arguments.
+  - Added the /Default/ exception annotation.
+  - Added the /DocType/ argument, function, mapped type and variable
+    annotation.
+  - Added the /DocValue/ argument annotation.
+  - Added the %Docstring directive to specify explicit docstrings for classes,
+    functions and methods.
+  - Added sipError to %MethodCode to allow user errors to be distinguished from
+    interpreter errors.
+  - Added sipBadCallableArg() to the C API.
+  - Added support for configuring and building outside of the source tree.
+
+v4.9.3 23rd November 2009
+  - A bug fix release.
+
+v4.9.2 20th November 2009
+  - A bug fix release.
+
 v4.9.1 23rd October 2009
   - A bug fix release.
 
@@ -16,6 +47,9 @@ v4.9 26th September 2009
   - Added the --arch flag to configure.py to specify which MacOS/X
     architectures are built.
   - SIP is now also licensed under the GPL v2 and v3.
+
+v4.8.2 27th July 2009
+  - Added the /AllowNone/ class annotation.
 
 v4.8.1 16th June 2009
   - Added support for defining a private assignment operator to suppress the

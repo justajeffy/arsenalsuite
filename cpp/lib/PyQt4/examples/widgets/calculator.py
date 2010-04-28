@@ -49,15 +49,15 @@ class Calculator(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Calculator, self).__init__(parent)
 
-        self.pendingAdditiveOperator = QtCore.QString()
-        self.pendingMultiplicativeOperator = QtCore.QString()
+        self.pendingAdditiveOperator = ''
+        self.pendingMultiplicativeOperator = ''
 
         self.sumInMemory = 0.0
         self.sumSoFar = 0.0
         self.factorSoFar = 0.0
         self.waitingForOperand = True
 
-        self.display = QtGui.QLineEdit("0")
+        self.display = QtGui.QLineEdit('0')
         self.display.setReadOnly(True)
         self.display.setAlignment(QtCore.Qt.AlignRight)
         self.display.setMaxLength(15)
@@ -69,43 +69,37 @@ class Calculator(QtGui.QDialog):
         self.digitButtons = []
         
         for i in range(Calculator.NumDigitButtons):
-            self.digitButtons.append(self.createButton(QtCore.QString.number(i),
+            self.digitButtons.append(self.createButton(str(i),
                     self.digitClicked))
 
-        self.pointButton = self.createButton(self.tr("."), self.pointClicked)
-        self.changeSignButton = self.createButton(self.tr("\261"),
+        self.pointButton = self.createButton(".", self.pointClicked)
+        self.changeSignButton = self.createButton("\261",
                 self.changeSignClicked)
 
-        self.backspaceButton = self.createButton(self.tr("Backspace"),
+        self.backspaceButton = self.createButton("Backspace",
                 self.backspaceClicked)
-        self.clearButton = self.createButton(self.tr("Clear"), self.clear)
-        self.clearAllButton = self.createButton(self.tr("Clear All"),
-                self.clearAll)
+        self.clearButton = self.createButton("Clear", self.clear)
+        self.clearAllButton = self.createButton("Clear All", self.clearAll)
 
-        self.clearMemoryButton = self.createButton(self.tr("MC"),
-                self.clearMemory)
-        self.readMemoryButton = self.createButton(self.tr("MR"),
-                self.readMemory)
-        self.setMemoryButton = self.createButton(self.tr("MS"), self.setMemory)
-        self.addToMemoryButton = self.createButton(self.tr("M+"),
-                self.addToMemory)
+        self.clearMemoryButton = self.createButton("MC", self.clearMemory)
+        self.readMemoryButton = self.createButton("MR", self.readMemory)
+        self.setMemoryButton = self.createButton("MS", self.setMemory)
+        self.addToMemoryButton = self.createButton("M+", self.addToMemory)
 
-        self.divisionButton = self.createButton(self.tr("\367"),
+        self.divisionButton = self.createButton("\367",
                 self.multiplicativeOperatorClicked)
-        self.timesButton = self.createButton(self.tr("\327"),
+        self.timesButton = self.createButton("\327",
                 self.multiplicativeOperatorClicked)
-        self.minusButton = self.createButton(self.tr("-"),
-                self.additiveOperatorClicked)
-        self.plusButton = self.createButton(self.tr("+"),
-                self.additiveOperatorClicked)
+        self.minusButton = self.createButton("-", self.additiveOperatorClicked)
+        self.plusButton = self.createButton("+", self.additiveOperatorClicked)
 
-        self.squareRootButton = self.createButton(self.tr("Sqrt"),
+        self.squareRootButton = self.createButton("Sqrt",
                 self.unaryOperatorClicked)
-        self.powerButton = self.createButton(self.tr("x\262"),
+        self.powerButton = self.createButton("x\262",
                 self.unaryOperatorClicked)
-        self.reciprocalButton = self.createButton(self.tr("1/x"),
+        self.reciprocalButton = self.createButton("1/x",
                 self.unaryOperatorClicked)
-        self.equalButton = self.createButton(self.tr("="), self.equalClicked)
+        self.equalButton = self.createButton("=", self.equalClicked)
 
         mainLayout = QtGui.QGridLayout()
         mainLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
@@ -140,65 +134,65 @@ class Calculator(QtGui.QDialog):
         mainLayout.addWidget(self.equalButton, 5, 5)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Calculator"))
+        self.setWindowTitle("Calculator")
 
     def digitClicked(self):
         clickedButton = self.sender()
-        digitValue, _ = clickedButton.text().toInt()
+        digitValue = int(clickedButton.text())
 
-        if self.display.text() == "0" and digitValue == 0.0:
+        if self.display.text() == '0' and digitValue == 0.0:
             return
 
         if self.waitingForOperand:
             self.display.clear()
             self.waitingForOperand = False
 
-        self.display.setText(self.display.text() + QtCore.QString.number(digitValue))
+        self.display.setText(self.display.text() + str(digitValue))
 
     def unaryOperatorClicked(self):
         clickedButton = self.sender()
         clickedOperator = clickedButton.text()
-        operand, _ = self.display.text().toDouble()
+        operand = float(self.display.text())
 
-        if clickedOperator == self.tr("Sqrt"):
+        if clickedOperator == "Sqrt":
             if operand < 0.0:
                 self.abortOperation()
                 return
 
             result = math.sqrt(operand)
-        elif clickedOperator == self.tr("x\262"):
+        elif clickedOperator == "x\262":
             result = math.pow(operand, 2.0)
-        elif clickedOperator == self.tr("1/x"):
+        elif clickedOperator == "1/x":
             if operand == 0.0:
                 self.abortOperation()
                 return
 
             result = 1.0 / operand
 
-        self.display.setText(QtCore.QString.number(result))
+        self.display.setText(str(result))
         self.waitingForOperand = True
 
     def additiveOperatorClicked(self):
         clickedButton = self.sender()
         clickedOperator = clickedButton.text()
-        operand, _ = self.display.text().toDouble()
+        operand = float(self.display.text())
 
-        if not self.pendingMultiplicativeOperator.isEmpty():
+        if self.pendingMultiplicativeOperator:
             if not self.calculate(operand, self.pendingMultiplicativeOperator):
                 self.abortOperation()
                 return
 
-            self.display.setText(QtCore.QString.number(self.factorSoFar))
+            self.display.setText(str(self.factorSoFar))
             operand = self.factorSoFar
             self.factorSoFar = 0.0
-            self.pendingMultiplicativeOperator.clear()
+            self.pendingMultiplicativeOperator = ''
 
-        if not self.pendingAdditiveOperator.isEmpty():
+        if self.pendingAdditiveOperator:
             if not self.calculate(operand, self.pendingAdditiveOperator):
                 self.abortOperation()
                 return
 
-            self.display.setText(QtCore.QString.number(self.sumSoFar))
+            self.display.setText(str(self.sumSoFar))
         else:
             self.sumSoFar = operand
 
@@ -208,14 +202,14 @@ class Calculator(QtGui.QDialog):
     def multiplicativeOperatorClicked(self):
         clickedButton = self.sender()
         clickedOperator = clickedButton.text()
-        operand, success = self.display.text().toDouble()
+        operand = float(self.display.text())
 
-        if not self.pendingMultiplicativeOperator.isEmpty():
+        if self.pendingMultiplicativeOperator:
             if not self.calculate(operand, self.pendingMultiplicativeOperator):
                 self.abortOperation()
                 return
 
-            self.display.setText(QtCore.QString.number(self.factorSoFar))
+            self.display.setText(str(self.factorSoFar))
         else:
             self.factorSoFar = operand
 
@@ -223,47 +217,47 @@ class Calculator(QtGui.QDialog):
         self.waitingForOperand = True
 
     def equalClicked(self):
-        operand, _ = self.display.text().toDouble()
+        operand = float(self.display.text())
 
-        if not self.pendingMultiplicativeOperator.isEmpty():
+        if self.pendingMultiplicativeOperator:
             if not self.calculate(operand, self.pendingMultiplicativeOperator):
                 self.abortOperation()
                 return
 
             operand = self.factorSoFar
             self.factorSoFar = 0.0
-            self.pendingMultiplicativeOperator.clear()
+            self.pendingMultiplicativeOperator = ''
 
-        if not self.pendingAdditiveOperator.isEmpty():
+        if self.pendingAdditiveOperator:
             if not self.calculate(operand, self.pendingAdditiveOperator):
                 self.abortOperation()
                 return
 
-            self.pendingAdditiveOperator.clear()
+            self.pendingAdditiveOperator = ''
         else:
             self.sumSoFar = operand
 
-        self.display.setText(QtCore.QString.number(self.sumSoFar))
+        self.display.setText(str(self.sumSoFar))
         self.sumSoFar = 0.0
         self.waitingForOperand = True
 
     def pointClicked(self):
         if self.waitingForOperand:
-            self.display.setText("0")
+            self.display.setText('0')
 
-        if not self.display.text().contains("."):
-            self.display.setText(self.display.text() + self.tr("."))
+        if "." not in self.display.text():
+            self.display.setText(self.display.text() + ".")
 
         self.waitingForOperand = False
 
     def changeSignClicked(self):
         text = self.display.text()
-        value, _ = text.toDouble()
+        value = float(text)
 
         if value > 0.0:
-            text.prepend(self.tr("-"))
+            text = "-" + text
         elif value < 0.0:
-            text.remove(0, 1)
+            text = text[1:]
 
         self.display.setText(text)
 
@@ -271,10 +265,9 @@ class Calculator(QtGui.QDialog):
         if self.waitingForOperand:
             return
 
-        text = self.display.text()
-        text.chop(1)
-        if text.isEmpty():
-            text = "0"
+        text = self.display.text()[:-1]
+        if not text:
+            text = '0'
             self.waitingForOperand = True
 
         self.display.setText(text)
@@ -283,32 +276,31 @@ class Calculator(QtGui.QDialog):
         if self.waitingForOperand:
             return
 
-        self.display.setText("0")
+        self.display.setText('0')
         self.waitingForOperand = True
 
     def clearAll(self):
         self.sumSoFar = 0.0
         self.factorSoFar = 0.0
-        self.pendingAdditiveOperator.clear()
-        self.pendingMultiplicativeOperator.clear()
-        self.display.setText("0")
+        self.pendingAdditiveOperator = ''
+        self.pendingMultiplicativeOperator = ''
+        self.display.setText('0')
         self.waitingForOperand = True
 
     def clearMemory(self):
         self.sumInMemory = 0.0
 
     def readMemory(self):
-        self.display.setText(QtCore.QString.number(self.sumInMemory))
+        self.display.setText(str(self.sumInMemory))
         self.waitingForOperand = True
 
     def setMemory(self):
         self.equalClicked()
-        self.sumInMemory, _ = self.display.text().toDouble()
+        self.sumInMemory = float(self.display.text())
 
     def addToMemory(self):
         self.equalClicked()
-        value, _ = self.display.text().toDouble()
-        self.sumInMemory += value
+        self.sumInMemory += float(self.display.text())
 
     def createButton(self, text, member):
         button = Button(text)
@@ -317,16 +309,16 @@ class Calculator(QtGui.QDialog):
 
     def abortOperation(self):
         self.clearAll()
-        self.display.setText(self.tr("####"))
+        self.display.setText("####")
 
     def calculate(self, rightOperand, pendingOperator):
-        if pendingOperator == self.tr("+"):
+        if pendingOperator == "+":
             self.sumSoFar += rightOperand
-        elif pendingOperator == self.tr("-"):
+        elif pendingOperator == "-":
             self.sumSoFar -= rightOperand
-        elif pendingOperator == self.tr("\327"):
+        elif pendingOperator == "\327":
             self.factorSoFar *= rightOperand
-        elif pendingOperator == self.tr("\367"):
+        elif pendingOperator == "\367":
             if rightOperand == 0.0:
                 return False
 
@@ -335,7 +327,7 @@ class Calculator(QtGui.QDialog):
         return True
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     import sys
 

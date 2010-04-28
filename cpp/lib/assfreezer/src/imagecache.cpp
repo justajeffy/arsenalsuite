@@ -21,7 +21,7 @@
  *
  */
 
-/* $Author: brobison $
+/* $Author$
  * $LastChangedDate: 2007-06-19 04:27:47 +1000 (Tue, 19 Jun 2007) $
  * $Rev: 4632 $
  * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/imagecache.cpp $

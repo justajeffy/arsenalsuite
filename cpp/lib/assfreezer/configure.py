@@ -21,6 +21,11 @@ class AssfreezerModuleMakefile(pyqtconfig.QtCoreModuleMakefile):
 
         apply(pyqtconfig.QtCoreModuleMakefile.__init__, (self, ) + args, kw)
 
+    def finalise(self):
+        pyqtconfig.QtCoreModuleMakefile.finalise(self)
+        if self.static:
+            self._target = 'py' + self._target
+
 def doit():
 	global opt_static
 	global opt_debug
@@ -47,7 +52,13 @@ def doit():
 	print config.default_sip_dir
 	qt_sip_flags = config.pyqt_sip_flags
 	if opt_generate_code:
-		ret = os.system(" ".join([config.sip_bin, "-c", "sipAssfreezer", "-b", "sipAssfreezer/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, config.pyqt_sip_flags, "sip/assfreezer.sip"]))
+		if sys.platform=="win32":
+			sip_bin = "..\\sip\\sipgen\\sip.exe"
+		else:
+			sip_bin = config.sip_bin
+		if not os.path.exists("sipAssfreezer"):
+			os.mkdir("sipAssfreezer")
+		ret = os.system(" ".join([sip_bin, "-c", "sipAssfreezer", "-b", "sipAssfreezer/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, config.pyqt_sip_flags, "sip/assfreezer.sip"]))
 		if ret:
 			sys.exit(ret%255)
 	
@@ -93,7 +104,6 @@ def doit():
 	makefile.extra_lib_dirs.append( ".." );
 	makefile.extra_lib_dirs.append( "../../stone" );
 	makefile.extra_lib_dirs.append( "../../classes" );
-	
 
 	# Generate the Makefile itself.
 	makefile.generate()
