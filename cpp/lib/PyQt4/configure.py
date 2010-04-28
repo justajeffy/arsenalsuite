@@ -1511,7 +1511,11 @@ def generate_code(mname, extra_include_dirs=None, extra_lib_dirs=None, extra_lib
             needed_qt_libs(mname, qt_libs)
 
     # Build the SIP command line.  Keyword argument support is enabled.
-    argv = ['"' + sipcfg.sip_bin + '"', '-k']
+    if sys.platform=="win32":
+        sip_bin = "..\\sip\\sipgen\\sip.exe"
+    else:
+        sip_bin = sipcfg.sip_bin
+    argv = ['"' + sip_bin + '"', '-k']
 
     if not opts.no_docstrings:
         argv.append("-o");
