@@ -479,7 +479,7 @@ RecordList HashIndex::records( QList<QVariant> vars, int & status )
 
 	mTable->preload();
 	
-	AutoTime at( *this );
+	//AutoTime at( *this );
 
 	VarHash * node = (VarHash*)mRoot;
 	void * next=0;
@@ -511,7 +511,7 @@ RecordList HashIndex::records( QList<QVariant> vars, int & status )
 			ret += (RecordImp*)next;
 	}
 	mMutex.unlock();
-	return ret;
+	return ret; //.unique();
 }
 
 static QString emptyString("");
@@ -562,7 +562,8 @@ void HashIndex::recordIncomingNode( VarHash * node, int fieldIndex, RecordImp * 
 //				printf( "Inserting list %p under node %p with value %s\n", list, node, v.toString().toLatin1().constData() );
 				node->insert( v, list );
 			}
-			if( list && !list->contains( valRecord ) ){
+			//if( list && !list->contains( valRecord ) ) {
+			if( list ) {
 				(*list) += valRecord;
 //				printf( "Adding %p to list %p under node %p with value %s\n", valRecord, list, node, v.toString().toLatin1().constData() );
 			}
@@ -693,7 +694,7 @@ void KeyIndex::recordsIncoming( const RecordList & records, bool )
 
 Record KeyIndex::record( uint key, bool * found )
 {
-	AutoTime t( *this );
+	//AutoTime t( *this );
 	//LOG_5( "Checking " + mTable->tableName() + " KeyIndex for record: " + QString::number(key) + " index id: " + QString::number( (int)this ) );
 
 	QMutexLocker locker( &mMutex );
