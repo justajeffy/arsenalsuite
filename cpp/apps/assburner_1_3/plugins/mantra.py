@@ -61,8 +61,7 @@ class MantraBurner(JobBurner):
         args << "-V"
         args << "2a"
         args << "-j"
-        args << "4"
-        #args << str(self.Job.threads())
+        args << str(self.Job.threads())
         if self.Job.outputPath().isEmpty():
             args << "-F"
             #args << self.burnFile().replace("..ifd", (".%s.ifd" % self.frameList[0]))
