@@ -43,12 +43,12 @@ def buildSubmitArgs():
 	argMap['environment'] = QProcess.systemEnvironment().join("\n")
 	argMap['notifyOnError'] = argMap['user']+":j"
 	argMap['notifyOnComplete'] = argMap['user']+":j"
-	argMap['projectName'] = "hf2"
+	if os.environ.has_key("DRD_JOB"):
+		argMap['projectName'] = os.environ["DRD_JOB"]
 	argMap['packetSize'] = str(9999)
-	argMap['minMemory'] = str(4096 * 1024)
-	argMap['maxMemory'] = str(8192 * 1024)
 	argMap['runasSubmitter'] = "true"
 	argMap['maxTaskTime'] = "18000"
+	argMap['assignmentSlots'] = "4"
 	# Log("Applying Absubmit args: %s" % str(argMap))
 	return argMap
 
@@ -61,6 +61,12 @@ def submitError():
 def farmSubmit(userArgs):
     jobArgs = buildSubmitArgs()
     jobArgs.update( userArgs )
+ 
+    if not jobArgs.has_key("minMemory"):
+        jobArgs['minMemory'] = str(int(jobArgs["assignmentSlots"]) * 1024 * 512)
+    if not jobArgs.has_key("maxMemory"):
+        jobArgs['maxMemory'] = str(int(jobArgs["assignmentSlots"]) * 1024 * 2048)
+
     # edit per job
     # argMap['fileName'] = "/tmp/myFile.sh"
     #argMap["outputPath"] = "/tmp/outputFoo..exr"
