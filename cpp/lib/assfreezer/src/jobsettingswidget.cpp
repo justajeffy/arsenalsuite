@@ -1,0 +1,503 @@
+
+/* $Author$
+ * $LastChangedDate: 2010-02-18 14:36:10 +1100 (Thu, 18 Feb 2010) $
+ * $Rev: 9369 $
+ * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/jobsettingswidget.cpp $
+ */
+
+#include "database.h"
+
+#include "jobhistory.h"
+#include "jobhistorytype.h"
+#include "jobservice.h"
+#include "user.h"
+
+#include "hostselector.h"
+
+#include "jobsettingswidget.h"
+#include "jobsettingswidgetplugin.h"
+#include "jobenvironmentwindow.h"
+
+JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
+: QWidget( parent )
+, mMode( mode )
+, mChanges( false )
+, mIgnoreChanges( false )
+, mSelectedJobsProxy( 0 )
+{
+	setupUi(this);
+
+	/* Instant Settings connections */
+        connect( mResetInstantSettings, SIGNAL( clicked() ), SLOT( resetSettings() ) );
+        connect( mApplyInstantSettings, SIGNAL( clicked() ), SLOT( applySettings() ) );
+	connect( mPrioritySpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
+	connect( mPersonalPrioritySpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
+	connect( mDeleteOnCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+
+	connect( mPacketCombo, SIGNAL( currentIndexChanged(int) ), SLOT( settingsChange() ) );
+
+	connect( mPacketSizeSpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
+	connect( mEmailErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+	connect( mEmailCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+	connect( mJabberErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+	connect( mJabberCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+	connect( mUseAutoCheck, SIGNAL( stateChanged(int) ), SLOT( setAutoPacketSize(int) ) );
+	connect( mAllHostsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+	connect( mHostListButton, SIGNAL( clicked() ), SLOT( showHostSelector() ) );
+	connect( mMaxTaskTimeSpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
+	connect( mMaxLoadTimeSpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
+	connect( mMinMemorySpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
+	connect( mMaxMemorySpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
+	connect( mPrioritizeOuterTasksCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+	connect( mEnvironmentButton, SIGNAL( clicked() ), SLOT( showEnvironmentWindow() ) );
+
+	mSelectedJobsProxy = new RecordProxy( this );
+	mPrioritySpin->setProxy( mSelectedJobsProxy );
+	mPersonalPrioritySpin->setProxy( mSelectedJobsProxy );
+	mDeleteOnCompleteCheck->setProxy( mSelectedJobsProxy );
+	mPrioritizeOuterTasksCheck->setProxy( mSelectedJobsProxy );
+
+	mPacketSizeSpin->setMinimum( 1 );
+
+	registerBuiltinCustomJobSettingsWidgets();
+	updateCustomJobSettingsWidget();
+
+	setEnabled( false );
+
+	if( mMode == SubmitJobs ) {
+		mApplyInstantSettings->hide();
+		mResetInstantSettings->hide();
+	}
+}
+
+JobSettingsWidget::~JobSettingsWidget()
+{
+}
+
+void JobSettingsWidget::setSelectedJobs( JobList selected )
+{
+	if( selected != mSelectedJobs ) {
+		mSelectedJobs = selected;
+		updateCustomJobSettingsWidget();
+		resetSettings();
+		setEnabled( !mSelectedJobs.isEmpty() );
+	}
+}
+
+CustomJobSettingsWidget * JobSettingsWidget::currentCustomWidget()
+{
+	if( mCustomJobSettingsStack->isHidden() ) return 0;
+	return qobject_cast<CustomJobSettingsWidget*>(mCustomJobSettingsStack->currentWidget());
+}
+
+void JobSettingsWidget::updateCustomJobSettingsWidget()
+{
+	JobTypeList jtl = mSelectedJobs.jobTypes().unique();
+	CustomJobSettingsWidget * w = 0;
+	if( jtl.size() == 1 ) {
+		JobType jobType = jtl[0];
+		QMap<QString,CustomJobSettingsWidget*>::iterator it = mCustomJobSettingsWidgetMap.find( jobType.name() );
+		if( it != mCustomJobSettingsWidgetMap.end() )
+			w = *it;
+		else {
+			if( CustomJobSettingsWidgetsFactory::supportsJobType( jobType.name() ) ) {
+				w = CustomJobSettingsWidgetsFactory::createCustomJobSettingsWidget( jobType.name(), mCustomJobSettingsStack, mMode );
+				if( w ) {
+					foreach( QString jt, w->supportedJobTypes() )
+						mCustomJobSettingsWidgetMap[jt] = w;
+					mCustomJobSettingsStack->addWidget( w );
+					emit customJobSettingsWidgetCreated( w );
+				}
+			}
+		}
+	}
+	if( w ) {
+		w->setSelectedJobs( mSelectedJobs );
+		if( w != mCustomJobSettingsStack->currentWidget() )
+			mCustomJobSettingsStack->setCurrentWidget( w );
+	} else
+		mCustomJobSettingsStack->setCurrentWidget( mEmptyPage );
+}
+
+void JobSettingsWidget::showHostSelector()
+{
+	HostSelector hs(this);
+	if( mSelectedJobs.jobTypes().unique().size() == 1 )
+		hs.setServiceFilter( mSelectedJobs.jobServices().services().unique() );
+	hs.setHostList( mUpdatedHostList );
+	if( hs.exec() == QDialog::Accepted ){
+		mUpdatedHostList = hs.hostStringList();
+		settingsChange();
+	}
+}
+
+template<class T> static QList<T> unique( QList<T> list )
+{
+	return list.toSet().toList();
+}
+
+template<class T> static Qt::CheckState listToCheckState( QList<T> list )
+{
+	list = unique(list);
+	return list.size() == 1 ? (list[0] ? Qt::Checked : Qt::Unchecked) : Qt::PartiallyChecked;
+}
+
+template<class C,class T> static QList<T> castList( QList<C> list )
+{
+	QList<T> ret;
+	foreach( C v, list )
+		ret.append( (T)v );
+	return ret;
+}
+
+template<class T> static void checkBoxApplyMultiple( QCheckBox * cb, QList<T> values )
+{
+	Qt::CheckState state = listToCheckState(values);
+	cb->setTristate( state == Qt::PartiallyChecked );
+	cb->setCheckState( state );
+}
+
+void getOwnerNotifyMethods( QString original, User u, bool & jabber, bool & email )
+{
+	jabber = email = false;
+	QStringList parts = original.split(',');
+	QRegExp userGrep( "^" + u.name() + ":.+" );
+	int i = parts.indexOf( userGrep );
+	if( i >= 0 ) {
+		LOG_5( "getOwnerNotifyMethods: Found owner entry" );
+		QString notifyString = parts[i];
+		QStringList notifyParts = notifyString.split(":");
+		if( notifyParts.size() == 2 ) {
+			LOG_5( "getOwnerNotifyMethods: Parsed methods: " + notifyParts[1] );
+			if( notifyParts[1].contains("e") )
+				email = true;
+			if( notifyParts[1].contains("j") )
+				jabber = true;
+		}
+	}
+}
+
+void JobSettingsWidget::resetSettings()
+{
+	mIgnoreChanges = true;
+	LOG_5( mSelectedJobs.keyString() );
+
+	mSelectedJobsProxy->setRecordList( mSelectedJobs, false, false );
+
+	QList<int> maxTaskMinutes;
+	foreach( int seconds, mSelectedJobs.maxTaskTimes() ) {
+		maxTaskMinutes.append( seconds / 60 );
+	}
+	mMaxTaskTimeSpin->setValues( maxTaskMinutes );
+
+	QList<int> maxLoadMinutes;
+	foreach( int seconds, mSelectedJobs.maxLoadTimes() ) {
+		maxLoadMinutes.append( seconds / 60 );
+	}
+	mMaxLoadTimeSpin->setValues( maxLoadMinutes );
+
+	QList<int> minMemories;
+	foreach( int mbs, mSelectedJobs.minMemories() ) {
+		minMemories.append( mbs / 1024 );
+	}
+	mMinMemorySpin->setValues( minMemories );
+
+	QList<int> maxMemories;
+	foreach( int mbs, mSelectedJobs.maxMemories() ) {
+		maxMemories.append( mbs / 1024 );
+	}
+	mMaxMemorySpin->setValues( maxMemories );
+
+	QList<int> packetSize = unique( castList<unsigned int,int>(mSelectedJobs.packetSizes()) );
+	bool containsAuto = packetSize.contains(0);
+	packetSize.removeAll(0);
+	bool containsValue = !packetSize.isEmpty();
+	mUseAutoCheck->setTristate( containsAuto && containsValue );
+	mUseAutoCheck->setCheckState( (containsAuto && containsValue) ? Qt::PartiallyChecked : (containsAuto ? Qt::Checked : Qt::Unchecked) );
+	mPacketSizeSpin->setValues( QList<int>() << (packetSize.isEmpty() ? 10 : packetSize[0]) );
+	mPacketSizeSpin->setEnabled(!containsAuto);
+
+	QStringList packetTypes( unique( mSelectedJobs.packetTypes() ) );
+	bool containsFixedPacketType = packetTypes.contains( "preassigned" ) || packetTypes.contains( "continuous" );
+	if( mMode == ModifyJobs ) {
+		mPacketCombo->setEnabled( !containsFixedPacketType && packetTypes.size() == 1 );
+		mPacketCombo->clear();
+		if ( !containsFixedPacketType )
+			mPacketCombo->addItems( QStringList() << "Random" << "Sequential" );
+		mPacketGroup->setEnabled( !packetTypes.contains("preassigned") );
+	} else {
+		mPacketCombo->clear();
+		mPacketCombo->addItems( QStringList() << "Random" << "Sequential" << "Continuous" << "Preassigned" );
+	}
+	if( packetTypes.size() == 1 ) {
+		QString pt = packetTypes[0];
+		pt[0] = pt[0].toUpper();
+		if( containsFixedPacketType )
+			mPacketCombo->addItem( pt );
+		mPacketCombo->setCurrentIndex( mPacketCombo->findText( pt ) );
+	} else
+		mPacketCombo->setCurrentIndex( -1 );
+
+	QList<bool> errorEmail, errorJabber, completeEmail, completeJabber;
+	foreach( Job j, mSelectedJobs ) {
+		bool ee, ej, ce, cj;
+		getOwnerNotifyMethods( j.notifyOnError(), j.user(), ej, ee );
+		getOwnerNotifyMethods( j.notifyOnComplete(), j.user(), cj, ce );
+		errorEmail += ee;
+		errorJabber += ej;
+		completeEmail += ce;
+		completeJabber += cj;
+	}
+
+	checkBoxApplyMultiple( mJabberErrorsCheck, errorJabber );
+	checkBoxApplyMultiple( mEmailErrorsCheck, errorEmail );
+	checkBoxApplyMultiple( mJabberCompleteCheck, completeJabber );
+	checkBoxApplyMultiple( mEmailCompleteCheck, completeEmail );
+
+	QStringList hostLists = mSelectedJobs.hostLists();
+	QList<bool> emptyLists;
+	foreach( QString s, hostLists ) {
+		emptyLists.append( s.isEmpty() );
+	}
+
+	Qt::CheckState allHosts = listToCheckState( emptyLists );
+	mAllHostsCheck->setTristate( allHosts == Qt::PartiallyChecked );
+	mAllHostsCheck->setCheckState( allHosts );
+	mHostListButton->setEnabled( allHosts == Qt::Unchecked );
+
+	mUpdatedHostList = mSelectedJobs[0].hostList();
+	mUpdatedEnvironment = mSelectedJobs[0].environment();
+	mChanges = false;
+
+	mApplyInstantSettings->setEnabled(false);
+	mResetInstantSettings->setEnabled(false);
+
+	mIgnoreChanges = false;
+}
+
+QString updateNotifyMethod( const QString & original, Qt::CheckState jabber, Qt::CheckState email )
+{
+	QStringList parts = original.split(":");
+	QString methods;
+	if( email == Qt::Checked || (parts[1].contains("e") && email == Qt::PartiallyChecked) )
+		methods += "e";
+	if( jabber == Qt::Checked || (parts[1].contains("j") && jabber == Qt::PartiallyChecked) )
+		methods += "j";
+	if( methods.isEmpty() )
+		return "";
+	return parts[0] + ":" + methods;
+}
+
+QString updateOwnerNotifyString( const QString & original, User u, Qt::CheckState jabber, Qt::CheckState email )
+{
+	QStringList parts = original.split(',').filter(".+");
+	QRegExp userGrep( "^" + u.name() + ":.*" );
+	int i = parts.indexOf( userGrep );
+	if( i >= 0 ) {
+		QString newMethod = updateNotifyMethod(parts[i],jabber,email);
+		if( newMethod.isEmpty() )
+			parts.removeAt(i);
+		else
+			parts[i] = newMethod;
+	} else {
+		QString newMethod = updateNotifyMethod(u.name()+":",jabber,email);
+		if( !newMethod.isEmpty() )
+			parts += newMethod;
+	}
+	QString ret = parts.join(",");
+	LOG_5( "Updated notify string: " + ret );
+	return ret.isEmpty() ? QString::null : ret;
+}
+
+void JobSettingsWidget::setAutoPacketSize(int checkState)
+{
+	Qt::CheckState cs = (Qt::CheckState)checkState;
+	mPacketSizeSpin->setEnabled( cs == Qt::Unchecked );
+	settingsChange();
+}
+
+void JobSettingsWidget::applySettings()
+{
+	mIgnoreChanges = true;
+
+	/* want to make it so only Admins or the owner can change a job...
+	 * in progress
+	foreach( Job j, mSelectedJobs ) {
+		if(!mAdminEnabled || j.user() != User::currentUser()) {
+			mInstantChanges = false;
+			mApplyInstantSettings->setEnabled(false);
+			mResetInstantSettings->setEnabled(false);
+			resetInstantSettings();
+			return;
+		}
+	}
+	*/
+
+	mSelectedJobsProxy->applyChanges();
+	mSelectedJobs = mSelectedJobsProxy->records();
+
+	if( mMaxTaskTimeSpin->changed() )
+		mSelectedJobs.setMaxTaskTimes( mMaxTaskTimeSpin->value() * 60 );
+	if( mMaxLoadTimeSpin->changed() )
+		mSelectedJobs.setMaxLoadTimes( mMaxLoadTimeSpin->value() * 60 );
+	if( mMinMemorySpin->changed() )
+		mSelectedJobs.setMinMemories( mMinMemorySpin->value() * 1024 );
+	if( mMaxMemorySpin->changed() )
+		mSelectedJobs.setMaxMemories( mMaxMemorySpin->value() * 1024 );
+	if( mUseAutoCheck->checkState() != Qt::PartiallyChecked )
+		mSelectedJobs.setPacketSizes( mUseAutoCheck->isChecked() ? 0 : mPacketSizeSpin->value() );
+
+	// Dont change preassigned jobs packet type
+	if( mPacketGroup->isEnabled() ) {
+		QString pt = mPacketCombo->currentText();
+		pt[0] = pt[0].toLower();
+		mSelectedJobs.setPacketTypes( pt );
+	}
+
+	if( mAllHostsCheck->checkState() != Qt::PartiallyChecked )
+		mSelectedJobs.setHostLists( mAllHostsCheck->checkState() == Qt::Checked ? "" : mUpdatedHostList );
+
+	foreach( Job j, mSelectedJobs ) {
+		j.setNotifyOnError( updateOwnerNotifyString( j.notifyOnError(), j.user(), mJabberErrorsCheck->checkState(), mEmailErrorsCheck->checkState() ) );
+		j.setNotifyOnComplete( updateOwnerNotifyString( j.notifyOnComplete(), j.user(), mJabberCompleteCheck->checkState(), mEmailCompleteCheck->checkState() ) );
+		mSelectedJobs.update(j);
+	}
+
+	if( mPrioritySpin->changed() )
+		mSelectedJobs.setPriorities( mPrioritySpin->value() );
+
+	if( mPersonalPrioritySpin->changed() )
+		mSelectedJobs.setPersonalPriorities( mPersonalPrioritySpin->value() );
+
+	if( mMode == ModifyJobs ) {
+		Database::current()->beginTransaction();
+		mSelectedJobs.commit();
+		Database::current()->commitTransaction();
+	}
+
+	mChanges = false;
+	mApplyInstantSettings->setEnabled(false);
+	mResetInstantSettings->setEnabled(false);
+
+	mIgnoreChanges = false;
+
+	resetSettings();
+}
+
+void JobSettingsWidget::settingsChange()
+{
+	if( !mIgnoreChanges ) {
+		if( mMode == SubmitJobs ) {
+			applySettings();
+			return;
+		}
+		mChanges = true;
+		mApplyInstantSettings->setEnabled(true);
+		mResetInstantSettings->setEnabled(true);
+		mPacketSizeSpin->setEnabled( !mUseAutoCheck->isChecked() );
+		mHostListButton->setEnabled( !mAllHostsCheck->isChecked() );
+	}
+}
+
+void JobSettingsWidget::showEnvironmentWindow()
+{
+    JobEnvironmentWindow jew(this);
+    jew.setEnvironment( mUpdatedEnvironment );
+    if( jew.exec() == QDialog::Accepted ){
+        mUpdatedEnvironment = jew.environment();
+        settingsChange();
+    }
+}
+
+
+CustomJobSettingsWidget::CustomJobSettingsWidget( QWidget * parent, JobSettingsWidget::Mode mode )
+: QGroupBox( parent )
+, mJobServiceBridge( 0 )
+, mApplyResetLayout( 0 )
+, mApplySettingsButton( 0 )
+, mResetSettingsButton( 0 )
+, mMode( mode )
+, mChanges( false )
+{
+	if( mode == JobSettingsWidget::ModifyJobs ) {
+		mApplyResetLayout = new QHBoxLayout();
+		mApplySettingsButton = new QPushButton( "Apply", this );
+		mResetSettingsButton = new QPushButton( "Reset", this );
+	
+		connect( mApplySettingsButton, SIGNAL( clicked() ), SLOT( applySettings() ) );
+		connect( mResetSettingsButton, SIGNAL( clicked() ), SLOT( resetSettings() ) );
+	
+		mApplyResetLayout->addStretch();
+		mApplyResetLayout->addWidget( mApplySettingsButton );
+		mApplyResetLayout->addWidget( mResetSettingsButton );
+	}
+}
+
+CustomJobSettingsWidget::~CustomJobSettingsWidget()
+{
+	delete mJobServiceBridge;
+}
+
+void CustomJobSettingsWidget::setSelectedJobs( JobList selected )
+{
+	mSelectedJobs = selected;
+	resetSettings();
+}
+
+void CustomJobSettingsWidget::resetSettings()
+{
+	mChanges = false;
+	if( mMode == JobSettingsWidget::ModifyJobs ) {
+		mApplySettingsButton->setEnabled( false );
+		mResetSettingsButton->setEnabled( false );
+	}
+}
+
+void CustomJobSettingsWidget::applySettings()
+{
+	mChanges = false;
+	if( mMode == JobSettingsWidget::ModifyJobs ) {
+		mApplySettingsButton->setEnabled( false );
+		mResetSettingsButton->setEnabled( false );
+	}
+}
+
+void CustomJobSettingsWidget::settingsChange()
+{
+	if( mMode == JobSettingsWidget::SubmitJobs )
+		applySettings();
+	else {
+		mChanges = true;
+		mApplySettingsButton->setEnabled( true );
+		mResetSettingsButton->setEnabled( true );
+	}
+}
+
+void CustomJobSettingsWidget::setJobServiceBridge( JobServiceBridge * jobServiceBridge )
+{
+	mJobServiceBridge = jobServiceBridge;
+}
+
+JobServiceList CustomJobSettingsWidget::getJobServices( const Job & job )
+{
+	if( mJobServiceBridge )
+		return mJobServiceBridge->getJobServices(job);
+	return job.jobServices();
+}
+
+void CustomJobSettingsWidget::removeJobServices( const Job & job, JobServiceList jobServices )
+{
+	if( mJobServiceBridge )
+		mJobServiceBridge->removeJobServices( job, jobServices );
+	else
+		jobServices.remove();
+}
+
+void CustomJobSettingsWidget::applyJobServices( const Job & job, JobServiceList jobServices )
+{
+	if( mJobServiceBridge )
+		mJobServiceBridge->applyJobServices( job, jobServices );
+	else
+		jobServices.commit();
+}
+

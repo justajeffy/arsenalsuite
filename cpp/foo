@@ -1,0 +1,15 @@
+./apps/absubmit/src/main.cpp
+./apps/activex/resininterface.cpp
+./apps/annotateserver/src/main.cpp
+./apps/annotate/src/main.cpp
+./apps/assburner_1_3/src/main.cpp
+./apps/assburner/abgui/src/main.cpp
+./apps/assburner/abslave/src/main.cpp
+./apps/assfreezer/src/main.cpp
+./apps/bach/bach.cpp
+./apps/bach/core/main.cpp
+./apps/bach/loader.cpp
+./apps/rfm/main.cpp
+./apps/snafu/src/main.cpp
+./lib/brainiac/brainiac.cpp
+./lib/perlqt/PerlQt/Qt.cpp
