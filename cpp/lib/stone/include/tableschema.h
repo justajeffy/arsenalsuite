@@ -92,7 +92,7 @@ public:
 	void setTableName(const QString &);
 	/// Returns the name of this table, this must match the name
 	/// in the database.
-	QString tableName();
+	QString tableName() const;
 	
 	/// This doesn't have to be set unless
 	/// it is different from the table name
@@ -100,7 +100,7 @@ public:
 	void setClassName( const QString & );
 	/// Returns the class name of this table, this
 	/// is used for generated c++ classes.
-	QString className();
+	QString className() const;
 
 	/// Documentation string in doxygen format
 	/// Inserted into generated code
@@ -116,23 +116,23 @@ public:
 
 	/// Returns the number of fields in this table, including
 	/// fields that inherit from the parent table.
-	uint fieldCount();
+	uint fieldCount() const;
 
 	/// Convencience function returns a list of the names of each field in the table
-	QStringList fieldDisplayNames();
-	QStringList fieldNames();
+	QStringList fieldDisplayNames() const;
+	QStringList fieldNames() const;
 
 	/// Returns a list of all the fields in this table.
-	FieldList fields();
+	FieldList fields() const;
 
 	/// Returns a list of all the fields in this table that
 	/// are not inherited by the parent table.
-	FieldList ownedFields();
-	
+	FieldList ownedFields() const;
+
 	/// All the columns in the table( including inherited columns )
 	/// Returns a list of all the fields, and the local data columns
 	/// that are not stored in the database.
-	FieldList columns();
+	FieldList columns() const;
 
 	/// Returns all of the non-inherited columns
 	FieldList ownedColumns();
@@ -147,12 +147,12 @@ public:
 	/// matching field in this table.  This function is
 	/// case-insensitive.
 	/// If silent is false a warning is printed if the field is not found
-	Field * field( const QString & fieldName, bool silent=false );
+	Field * field( const QString & fieldName, bool silent=false ) const;
 
 	/// Returns a field by its position in the field list,
 	/// returns 0 if \param pos is out of range.
-	Field * field( int pos );
-	
+	Field * field( int pos ) const;
+
 	/// Adds a field to this table, takes ownership of the Field
 	/// object.
 	bool addField( Field * field );
@@ -167,7 +167,7 @@ public:
 
 	/// Returns the total number of columns, including local data members
 	/// that are not stored in the database.
-	uint columnCount();
+	uint columnCount() const;
 
 	void setPreloadEnabled( bool );
 	bool isPreloadEnabled() const;
@@ -217,7 +217,6 @@ protected:
 
 	IndexSchemaList mIndexes;
 
-	uint mColumnCount;
 	uint mPrimaryKeyIndex;
 	uint mFirstColumnIndex;
 	QString mTableName, mClassName, mDocs;
@@ -229,6 +228,8 @@ protected:
 
 	bool mUseCodeGen;
 	bool mExpireKeyCache;
+
+    uint mColumnCount;
 
 	friend class Stone::Table;
 };

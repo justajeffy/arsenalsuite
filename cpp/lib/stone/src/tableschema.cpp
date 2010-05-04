@@ -34,13 +34,13 @@ namespace Stone {
 TableSchema::TableSchema( Schema * schema )
 : mSchema( schema )
 , mParent( 0 )
-, mColumnCount( 0 )
 , mPrimaryKeyIndex( 0 )
 , mFirstColumnIndex( 0 )
 , mPreload( false )
 , mBaseOnly( false )
 , mUseCodeGen( false )
 , mExpireKeyCache( true )
+, mColumnCount(0)
 {
 	if( schema )
 		schema->addTable( this );
@@ -144,7 +144,7 @@ void TableSchema::removeChild( TableSchema * TableSchema )
 	mChildren.removeAll( TableSchema );
 }
 
-QString TableSchema::tableName()
+QString TableSchema::tableName() const
 {
 	return mTableName;
 }
@@ -157,7 +157,7 @@ void TableSchema::setTableName(const QString & tn)
 		mSchema->tableRenamed( this, on );
 }
 
-QString TableSchema::className()
+QString TableSchema::className() const
 {
 	return mClassName;
 }
@@ -193,18 +193,19 @@ bool TableSchema::addField( Field * field )
 			if( f->flag( Field::PrimaryKey ) )
 				return false;
 	}
-	
+
 	int pos = fields().size();
 	mFields += field;
 	mAllFieldsCache += field;
 	if( !field->flag(Field::LocalVariable) )
 		mAllColumnsCache += field;
 	field->setPos( pos );
-	
+
 	// All the children TableSchemas need to recalc, but this TableSchema
 	// is fine
 	recalcFieldPositions( pos + 1, true );
 
+    mColumnCount = mAllColumnsCache.size();
 	return true;
 }
 
@@ -226,6 +227,7 @@ void TableSchema::recalcFieldPositions( int start, bool skipSelf )
 		mAllFieldsCache = mParent ? mParent->fields() + mFields : mFields;
 		mAllColumnsCache = filterFields( mFields, false );
 		if( mParent ) mAllColumnsCache = mParent->columns() + mAllColumnsCache;
+        mColumnCount = mAllColumnsCache.size();
 	}
 
 	for( TableSchemaIter it = mChildren.begin(); it != mChildren.end(); ++it )
@@ -248,12 +250,12 @@ void TableSchema::removeField( Field * f )
 	recalcFieldPositions( parent() ? parent()->columns().size() : 0 );
 }
 
-uint TableSchema::columnCount()
+uint TableSchema::columnCount() const
 {
-	return columns().size();
+	return mColumnCount;
 }
 
-FieldList TableSchema::columns()
+FieldList TableSchema::columns() const
 {
 	return mAllColumnsCache;
 }
@@ -263,12 +265,12 @@ FieldList TableSchema::ownedColumns()
 	return filterFields( ownedFields(), false );
 }
 
-uint TableSchema::fieldCount()
+uint TableSchema::fieldCount() const
 {
-	return fields().size();
+    return fields().size();
 }
 
-QStringList TableSchema::fieldDisplayNames()
+QStringList TableSchema::fieldDisplayNames() const
 {
 	QStringList ret;
 	foreach( Field * field, mAllFieldsCache )
@@ -276,7 +278,7 @@ QStringList TableSchema::fieldDisplayNames()
 	return ret;
 }
 
-QStringList TableSchema::fieldNames()
+QStringList TableSchema::fieldNames() const
 {
 	QStringList ret;
 	foreach( Field * field, mAllFieldsCache )
@@ -284,17 +286,17 @@ QStringList TableSchema::fieldNames()
 	return ret;
 }
 
-FieldList TableSchema::fields()
+FieldList TableSchema::fields() const
 {
 	return mAllFieldsCache;
 }
 
-FieldList TableSchema::ownedFields()
+FieldList TableSchema::ownedFields() const
 {
 	return mFields;
 }
 
-Field * TableSchema::field( const QString & fieldName, bool silent )
+Field * TableSchema::field( const QString & fieldName, bool silent ) const
 {
 	QString fnl = fieldName.toLower();
 	FieldList fl = fields();
@@ -306,7 +308,7 @@ Field * TableSchema::field( const QString & fieldName, bool silent )
 	return 0;
 }
 
-Field * TableSchema::field( int pos )
+Field * TableSchema::field( int pos ) const
 {
 	FieldList cl = fields();
 	if( pos >=0 && pos < (int)cl.size() )
