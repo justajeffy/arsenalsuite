@@ -15,14 +15,14 @@ fi
 echo '***' release stone libs
 STONEDIR=/drd/software/ext/stone/$ARCH/$V
 mkdir $STONEDIR
-rsync -ac /usr/local/lib/libass* $STONEDIR/
-rsync -ac /usr/local/lib/libabsubmit* $STONEDIR/
-rsync -ac /usr/local/lib/libstone* $STONEDIR/
-rsync -ac /usr/local/lib/libclasses* $STONEDIR/
-rsync -ac /usr/local/lib/libbrainiac* $STONEDIR/
+rsync -ac $DESTDIR/usr/local/lib/libass* $STONEDIR/
+rsync -ac $DESTDIR/usr/local/lib/libabsubmit* $STONEDIR/
+rsync -ac $DESTDIR/usr/local/lib/libstone* $STONEDIR/
+rsync -ac $DESTDIR/usr/local/lib/libclasses* $STONEDIR/
+rsync -ac $DESTDIR/usr/local/lib/libbrainiac* $STONEDIR/
 rsync -rtvc --exclude=.svn cpp/lib/stone/include $STONEDIR/
 rsync -rtvc --exclude=.svn cpp/lib/stone/.out/*.h $STONEDIR/include/
-rsync -rtvc /usr/bin/sip $STONEDIR/sip
+rsync -rtvc $DESTDIR/usr/bin/sip $STONEDIR/sip
 rsync -rtvc --exclude=.svn $SIPPATH/ $STONEDIR/sip.include/
 rsync -rtvc --exclude=.svn cpp/lib/stonegui/include $STONEDIR/
 rsync -rtvc --exclude=.svn cpp/lib/stonegui/.out/*.h $STONEDIR/include/
@@ -46,7 +46,7 @@ rsync -c cpp/apps/assburner_1_3/ab-offline.py $DIR/
 rsync -ac --exclude=.svn cpp/apps/assburner_1_3/plugins/ $DIR/plugins/
 rsync -c cpp/apps/assfreezer/assfreezer $DIR/af
 rsync -c cpp/apps/assfreezer/assfreezer.ini $DIR/assfreezer.ini
-rsync -ac --exclude=.svn cpp/apps/assfreezer/plugins/ $DIR/plugins/
+rsync -ac --exclude=.svn cpp/apps/assfreezer/afplugins/ $DIR/afplugins/
 
 rsync -c cpp/apps/absubmit/absubmit $DIR/
 rsync -c cpp/apps/absubmit/py2ab.py $DIR/
