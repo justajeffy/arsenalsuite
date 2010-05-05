@@ -369,6 +369,8 @@ void JobSettingsWidget::applySettings()
 	if( mPersonalPrioritySpin->changed() )
 		mSelectedJobs.setPersonalPriorities( mPersonalPrioritySpin->value() );
 
+    mSelectedJobs.setEnvironments( mUpdatedEnvironment );
+
 	if( mMode == ModifyJobs ) {
 		Database::current()->beginTransaction();
 		mSelectedJobs.commit();
