@@ -184,6 +184,10 @@ class NukeRenderDialog(QDialog):
             for i in allOutputs:
                 jobArgs["outputPath"+str(index)] = i.text(1)
                 jobArgs["outputPath"] = i.text(1)
+                if self.mAllFramesAsSingleTaskCheck.isChecked():
+                    jobArgs['frameList'+str(index)] = str('1')
+                else:
+                    jobArgs['frameList'+str(index)] = str(self.mFrameStartEdit.text() + "-" + self.mFrameEndEdit.text())
                 index = index + 1
                 outputDir = QFileInfo( jobArgs["outputPath"] ).absolutePath()
                 if not os.path.exists( outputDir ):
@@ -200,6 +204,10 @@ class NukeRenderDialog(QDialog):
             for i in selectedItems:
                 jobArgs = self.buildSubmitArgs()
                 jobArgs["outputPath"+str(index)] = i.text(1)
+                if self.mAllFramesAsSingleTaskCheck.isChecked():
+                    jobArgs['frameList'+str(index)] = str('1')
+                else:
+                    jobArgs['frameList'+str(index)] = str(self.mFrameStartEdit.text() + "-" + self.mFrameEndEdit.text())
                 outputDir = QFileInfo( jobArgs["outputPath"+str(index)] ).absolutePath()
                 if not os.path.exists( outputDir ):
                     QDir().mkpath( outputDir )
