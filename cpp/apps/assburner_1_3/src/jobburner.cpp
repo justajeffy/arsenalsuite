@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: jobburner.cpp 9644 2010-04-07 00:35:40Z brobison $
+ * $Id$
  */
 
 #include <qapplication.h>
@@ -74,8 +74,6 @@ JobBurner::JobBurner( const JobAssignment & jobAssignment, Slave * slave, int op
 , mLogFilesReady( false )
 , mLogFile( 0 )
 , mLogStream( 0 )
-, mAccountingFinished( false )
-, mAccountingGracePeriodIsOver( false )
 , mCmdPid( 0 )
 {
 	mOutputTimer = new QTimer( this );
@@ -220,10 +218,6 @@ void JobBurner::startProcess()
 		mCmd->start( cmd, args );
 
     mCmdPid = qprocessId(mCmd);
-
-#ifdef USE_ACCOUNTING_INTERFACE
-    //registerChildPid( mCmd->pid() );
-#endif
 }
 
 void JobBurner::start()
@@ -410,7 +404,7 @@ QDateTime JobBurner::taskStartTime() const
 bool JobBurner::exceededMaxTime() const
 {
 	if( mLoaded )
-		return mJob.maxTaskTime() > 0 && mTaskStart.secsTo( QDateTime::currentDateTime() ) > int(mJob.maxTaskTime());
+		return (mJob.maxTaskTime() > 0 && mTaskStart.secsTo( QDateTime::currentDateTime() ) > int(mJob.maxTaskTime()));
 	return mJob.maxLoadTime() > 0 && mStart.secsTo( QDateTime::currentDateTime() ) > mJob.maxLoadTime();
 }
 
@@ -510,13 +504,7 @@ void JobBurner::jobFinished()
 	if( mMemTimer )
 		mMemTimer->stop();
 
-    if( !accountingFinished() && !mAccountingGracePeriodIsOver ) {
-        tryToFinishLater();
-        return;
-    }
-
     mJobAssignment.setJobAssignmentStatus( JobAssignmentStatus::recordByName( "done" ) );
-    //mJobAssignment.setColumnLiteral( "ended", "now()" );
     mJobAssignment.commit();
 
 	cleanup();
@@ -553,20 +541,7 @@ void JobBurner::cleanup()
 
 	updateOutput();
 
-#ifdef USE_ACCOUNTING_INTERFACE
-    // update the database with accounting info
-    logMessage("updating accounting info with:");
-
-    //mJobAssignment.setRealtime( mAccountingData.realTime );
-    //mJobAssignment.setUsertime( mAccountingData.cpuTime );
-    mJobAssignment.setBytesRead( mAccountingData.bytesRead );
-    mJobAssignment.setBytesWrite( mAccountingData.bytesWrite );
-    mJobAssignment.setOpsRead( mAccountingData.opsRead );
-    mJobAssignment.setOpsWrite( mAccountingData.opsWrite );
-    mJobAssignment.setIowait( mAccountingData.ioWait );
-
 	mJobAssignment.commit();
-#endif
 
 	if( mOutputTimer )
 		mOutputTimer->stop();
@@ -615,6 +590,7 @@ void JobBurner::checkMemory()
 			mem = pmi.currentSize;
 		maxMem = qMax(maxMem,mem);
 		maxMem = qMax(maxMem,mJobAssignment.maxMemory());
+
 		LOG_3("process is using memory: "+QString::number(maxMem) + "Kb");
 		mJobAssignment.setMaxMemory(maxMem);
 		if( !mCurrentTaskAssignments.isEmpty() ) {
@@ -631,6 +607,7 @@ void JobBurner::checkMemory()
 				return;
 			}
 		}
+
 #ifdef USE_ACCOUNTING_INTERFACE
         updateAssignmentAccountingInfo();
 #endif
@@ -871,49 +848,6 @@ void JobBurner::setProgress(int progress)
 	}
 }
 
-void JobBurner::registerChildPid( uint pid )
-{
-#ifdef USE_ACCOUNTING_INTERFACE
-    mPidsWeCareAbout[pid] = true;
-#endif
-}
-
-bool JobBurner::caresAboutPid( uint pid, uint ppid )
-{
-#ifdef USE_ACCOUNTING_INTERFACE
-    // do we care about any ancestor of this process?
-    // if so we need to include it
-
-    if( mPidsWeCareAbout.contains( pid ) )
-        return true;
-
-    // first get the parent id of the process
-    //uint ppid = processParentId( pid );
-    LOG_5("do we care about pid: " + QString::number(pid) + " with parent: "+QString::number(ppid));
-
-    // we got all the way up exec and don't care about it
-    if( ppid < 10 )
-        return false;
-
-    if( pid == mCmdPid ) {
-        mAccountingFinished = true;
-        return true;
-    }
-
-    if( pid == QCoreApplication::applicationPid() ) {
-        return false;
-    }
-
-    if( mPidsWeCareAbout.contains(ppid) )
-        return true;
-
-    uint gpid = processParentId(ppid);
-    if( ppid == gpid ) return false;
-    return caresAboutPid(ppid, gpid);
-#endif
-    return false;
-}
-
 void JobBurner::addAccountingData( const AccountingInfo & info )
 {
 #ifdef USE_ACCOUNTING_INTERFACE
@@ -978,22 +912,5 @@ void JobBurner::updateAssignmentAccountingInfo()
     mJobAssignment.setEfficiency(info.cpuTime / (info.realTime > 0 ? info.realTime : 1));
     mJobAssignment.commit();
 #endif
-}
-
-bool JobBurner::accountingFinished()
-{
-    return mAccountingFinished;
-}
-
-void JobBurner::tryToFinishLater()
-{
-    LOG_3("lets wait a bit then try to finish again");
-    QTimer::singleShot( 2000, this, SLOT(jobFinished()) );
-    QTimer::singleShot( 10000, this, SLOT(accountingGracePeriodIsOver()) );
-}
-
-void JobBurner::accountingGracePeriodIsOver()
-{
-    mAccountingGracePeriodIsOver = true;
 }
 
