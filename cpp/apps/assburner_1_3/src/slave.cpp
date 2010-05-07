@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: slave.cpp 9641 2010-04-06 06:27:06Z brobison $
+ * $Id$
  */
 
 #include "Python.h"
@@ -206,10 +206,6 @@ void Slave::startup()
 		connect( mIdle, SIGNAL( secondsIdle( int ) ), SLOT( slotSecondsIdle( int ) ) );
 		mIdle->start();
 	}
-
-#ifdef USE_ACCOUNTING_INTERFACE
-    startAccountingReader();
-#endif
 
 	if( mHostStatus.slaveStatus() == "client-update-offline" )
 		offline();
@@ -1108,18 +1104,6 @@ int Slave::memCheckPeriod() const
     return mMemCheckPeriod;
 }
 
-
-void Slave::startAccountingReader()
-{
-#ifdef USE_ACCOUNTING_INTERFACE
-    LOG_5(" starting accounting reader");
-    mAccountingReader = new QProcess( this );
-    mAccountingReader->setReadChannel( QProcess::StandardOutput );
-    mAccountingReader->start("tail -F " + Config::getString("abTaskLogDir", "/var/log/tasklogger/current"));
-    connect( mAccountingReader, SIGNAL( readyReadStandardOutput() ), SLOT( accountingDataReady() ) );
-#endif
-}
-
 AccountingInfo Slave::parseTaskLoggerOutput( const QString & line )
 {
     AccountingInfo info;
@@ -1143,38 +1127,4 @@ AccountingInfo Slave::parseTaskLoggerOutput( const QString & line )
 
     return info;
 }
-
-void Slave::accountingDataReady()
-{
-#ifdef USE_ACCOUNTING_INTERFACE
-    // accounting data is logged in tab delimted format with
-    // the following fields:
-    // pid, ppid, exitcode
-    // real time, user time, sys time
-    // rss (memory), vm (memory)
-    // bytes read, bytes write, read syscalls, write syscalls
-    // block io count, block io delay total
-
-    // this data is gathered from the Linux kernel taskacct interface
-    LOG_5("accounting reader has data");
-
-    while( mAccountingReader->canReadLine() ) {
-        QString line = mAccountingReader->readLine();
-
-        AccountingInfo info = parseTaskLoggerOutput(line);
-        LOG_5("got accounting data for: " + QString::number( info.pid ));
-
-        // if this is a new child process then we now care about it
-        foreach( JobBurner * burner, mActiveBurners ) {
-            if( burner->caresAboutPid( info.pid, info.ppid ) ) {
-                // this process is interesting to us, so we'll remember it
-                burner->registerChildPid( info.pid );
-                burner->addAccountingData( info );
-                LOG_5("processed accounting data for: " + QString::number( info.pid ));
-            }
-        }
-    }
-#endif
-}
-
 

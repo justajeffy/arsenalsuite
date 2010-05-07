@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: jobburner.h 9644 2010-04-07 00:35:40Z brobison $
+ * $Id$
  */
 
 #ifndef JOB_BURNER_H
@@ -192,11 +192,7 @@ public slots:
 	/// Override to do other cleanup, or prevent mCmd from being killed
 	virtual void cleanup();
 
-    void registerChildPid( uint );
-    bool caresAboutPid( uint pid, uint ppid );
     void addAccountingData( const AccountingInfo & );
-    bool accountingFinished();
-    void tryToFinishLater();
 
 signals:
 	/// emited so the Slave knows the Burn is done
@@ -246,8 +242,6 @@ protected slots:
     /// called by a timer to flush log output to disk
     void slotFlushOutput();
 
-    void accountingGracePeriodIsOver();
-
 protected:
 	void deliverOutput( QProcess::ProcessChannel );
 	bool checkIgnoreLine( const QString & );
@@ -282,13 +276,10 @@ protected:
 	QRegExp mProgressRE;
 	QDateTime mProgressUpdate;
 
-    QMap<uint, bool> mPidsWeCareAbout;
     AccountingInfo mAccountingData;
     AccountingInfo sumAccountingData( const AccountingInfo & left, const AccountingInfo & right ) const;
     AccountingInfo checkResourceUsage();
     void updateAssignmentAccountingInfo();
-    bool mAccountingFinished;
-    bool mAccountingGracePeriodIsOver;
 };
 
 /// @}

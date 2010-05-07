@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: slave.h 9610 2010-03-29 22:42:27Z brobison $
+ * $Id$
  */
 
 
@@ -221,9 +221,6 @@ protected slots:
 	void execPriorityMode();
 	void restoreDefaultMappings();
 
-    void startAccountingReader();
-    void accountingDataReady();
-
 protected:
 	void handleStatusChange( const QString & status, const QString & oldStatus );
 
@@ -308,8 +305,6 @@ protected:
 	void updatePriorityMode( int );
 	bool mBackgroundMode;
 	bool mBackgroundModeEnabled;
-
-    QProcess * mAccountingReader;
 };
 
 /// @}
