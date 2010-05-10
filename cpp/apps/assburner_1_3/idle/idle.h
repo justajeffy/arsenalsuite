@@ -21,7 +21,7 @@
 #ifndef IDLE_H
 #define IDLE_H
 
-#include<qobject.h>
+#include <qobject.h>
 
 class IdlePlatform;
 
@@ -29,7 +29,7 @@ class Idle : public QObject
 {
 	Q_OBJECT
 public:
-	Idle(QObject * parent=0);
+	Idle();
 	~Idle();
 
 	bool isActive() const;
