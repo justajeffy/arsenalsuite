@@ -18,7 +18,7 @@
  *
  */
 
-#include"idle.h"
+#include "idle.h"
 #include <Carbon/Carbon.h>
 
 
@@ -110,7 +110,7 @@ IdlePlatform::IdlePlatform() {
 }
 
 IdlePlatform::~IdlePlatform() {
-	RemoveEventLoopTimer(d->mTimerRef);
+	//RemoveEventLoopTimer(d->mTimerRef);
 	delete d;
 }
 
@@ -125,6 +125,7 @@ typedef OSStatus (*InstallEventLoopIdleTimerPtr)(EventLoopRef inEventLoop,
 
 
 bool IdlePlatform::init() {
+/*
 	// May already be init'ed.
 	if (d->mTimerRef) {
 		return true;
@@ -150,6 +151,7 @@ bool IdlePlatform::init() {
 	if ((*myInstallEventLoopIdleTimer)(GetMainEventLoop(), kEventDurationSecond, kEventDurationSecond, timerUPP, 0, &d->mTimerRef)) {
 		return true;
 	}
+*/
 
 	return false;
 }
