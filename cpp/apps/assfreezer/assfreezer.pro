@@ -51,8 +51,11 @@ unix{
 	LIBS+=-L../../lib/classes -lclasses
 	LIBS+=-L../../lib/stone -lstone
 	LIBS+=-L../../lib/absubmit -labsubmit
-	LIBS+=-L/drd/software/ext/imageMagick/lin64/current/lib
-    LIBS+=-Wl,-rpath .
+
+	unix!macx: LIBS+=-L/drd/software/ext/imageMagick/lin64/current/lib
+	macx: LIBS+=-L/drd/software/ext/imageMagick/osx/current/lib
+
+    #LIBS+=-Wl,-rpath .
     LIBS+=-lMagick++
 
     PY_CMD =  $$PYTHON " -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'"

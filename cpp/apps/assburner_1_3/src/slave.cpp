@@ -202,7 +202,7 @@ void Slave::startup()
 	connect( qApp, SIGNAL( aboutToQuit() ), SLOT( offlineFromAboutToQuit() ) );
 
 	if( mUseGui ) {
-		mIdle = new Idle( this );
+		mIdle = new Idle();
 		connect( mIdle, SIGNAL( secondsIdle( int ) ), SLOT( slotSecondsIdle( int ) ) );
 		mIdle->start();
 	}

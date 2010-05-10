@@ -165,11 +165,15 @@ DEFINES+=ASSFREEZER_MAKE_DLL
 
 DEFINES+=USE_IMAGE_MAGICK
 contains( DEFINES, USE_IMAGE_MAGICK ) {
-	unix:LIBS+=-L/drd/software/ext/imageMagick/lin64/current/lib
-	unix:INCLUDEPATH+=/drd/software/ext/imageMagick/lin64/current/include/ImageMagick
+	unix!macx:LIBS+=-L/drd/software/ext/imageMagick/lin64/current/lib
+	unix!macx:INCLUDEPATH+=/drd/software/ext/imageMagick/lin64/current/include/ImageMagick
+
+	macx:LIBS+=-L/drd/software/ext/imageMagick/osx/current/lib
+	macx:INCLUDEPATH+=/drd/software/ext/imageMagick/osx/current/include/ImageMagick
+
 	unix:LIBS+=-lMagick++
 	macx:INCLUDEPATH+=/usr/local/include
-	macx:LIBS+=-lMagick++ -lMagick
+	#macx:LIBS+=-lMagick++
 
 	win32:LIBS+=-lMagick++
 	win32:LIBS+=-L/ImageMagick/lib
