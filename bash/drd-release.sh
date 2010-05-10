@@ -33,9 +33,9 @@ mkdir $STONEDIR/templates
 rsync -ac cpp/apps/classmaker/templates/* $STONEDIR/templates/
 
 echo '***' release python libs
-rsync -acv --exclude=wx* $PYPATH/blur /drd/software/ext/python/$ARCH/2.5/stone/$V/
-rsync -acv $PYPATH/sipconfig.py /drd/software/ext/python/$ARCH/2.5/stone/$V/
-rsync -acv $PYPATH/stoneconfig.py /drd/software/ext/python/$ARCH/2.5/stone/$V/
+rsync -acv --exclude=wx* $DESTDIR/$PYPATH/blur /drd/software/ext/python/$ARCH/2.5/stone/$V/
+rsync -acv $DESTDIR/$PYPATH/sipconfig.py /drd/software/ext/python/$ARCH/2.5/stone/$V/
+rsync -acv $DESTDIR/$PYPATH/stoneconfig.py /drd/software/ext/python/$ARCH/2.5/stone/$V/
 
 echo '***' release applications
 DIR=/drd/software/ext/ab/$ARCH/$V
