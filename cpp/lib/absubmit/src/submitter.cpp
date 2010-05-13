@@ -116,7 +116,6 @@ void Submitter::newJobOfType( const JobType & jobType )
         mJob.setJobType( jobType );
         mJob.setStatus( "submit" );
         mJob.setColumnLiteral( "submittedts", "now()" );
-        mJob.commit();
     }
 }
 
