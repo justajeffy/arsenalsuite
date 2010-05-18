@@ -89,6 +89,7 @@ signals:
 
 protected:
 	void customEvent( QEvent * );
+    bool event( QEvent * );
 	void showImage();
 	virtual void paintEvent(QPaintEvent *);
 	virtual void mousePressEvent(QMouseEvent *);

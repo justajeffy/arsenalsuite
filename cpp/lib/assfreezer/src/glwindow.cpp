@@ -28,6 +28,11 @@
 
 #include <qimage.h>
 #include <qgl.h>
+#include <qtimer.h>
+
+#ifndef GL_CLAMP_TO_EDGE
+#define GL_CLAMP_TO_EDGE 0x812F
+#endif // GL_CLAMP_TO_EDGE
 
 #include "glwindow.h"
 #include "afcommon.h"
@@ -57,14 +62,47 @@ void cgErrorCallback(void){
 #endif
 }
 
+// must have a context
 bool isExtensionSupported( const QString & extension )
 {
 	return QString((char*)glGetString( GL_EXTENSIONS )).split(" ").contains( extension );
 }
- 
+
+// Must have a context
+void glVersion( int & major, int & minor )
+{
+    static int _major = -1, _minor = -1;
+    if( major == -1 ) {
+        QStringList glVersionStrings = QString( (const char *)glGetString(GL_VERSION) ).split('.');
+        bool okMajor = false, okMinor = false;
+        if( glVersionStrings.size() >= 2 ) {
+            _major = glVersionStrings[0].toInt(&okMajor);
+            _minor = glVersionStrings[1].left(1).toInt(&okMinor);
+        }
+        if( !okMajor || !okMinor )
+            LOG_1( "Error Getting OpenGL Version, GL_VERSION string was: " + QString( (const char *)glGetString(GL_VERSION) ) );
+        else
+            LOG_3( "Got OpenGL Version: " + QString::number(_major) + "." + QString::number(_minor) );
+    }
+    major = _major;
+    minor = _minor;
+}
+
+static bool checkGLError()
+{
+    GLenum errorCode = glGetError();
+    if( errorCode != GL_NO_ERROR ) {
+        const GLubyte * errorString = gluErrorString(errorCode);
+        LOG_1( "Got OpenGL error: " + QString::fromLatin1( (const char *)errorString ) );
+        return true;
+    }
+    return false;
+}
+
 GLWindow::GLWindow( QWidget * parent )
 : QGLWidget(parent)
 , mTextureMode( 0 )
+, mInitialized( false )
 , mUseCG( false )
 , mTextureValid(false)
 , mColorMode(AllChannel)
@@ -72,7 +110,6 @@ GLWindow::GLWindow( QWidget * parent )
 , mScaleFactor(1.0)
 , mUseGL_NV_texture_rectangle( false )
 {
-	setupTextureMode();
 }
 
 GLWindow::~GLWindow(){
@@ -84,10 +121,48 @@ GLWindow::~GLWindow(){
 	}
 }
 
-void GLWindow::setupTextureMode()
+void GLWindow::ensureInitialized()
 {
-	glInit();
-	makeCurrent();
+       if( !mInitialized )
+               glInit();
+       else if( QGLContext::currentContext() != context() )
+               makeCurrent();
+}
+
+void GLWindow::initializeGL()
+{
+       mInitialized = true;
+
+       if( checkGLError() ) LOG_TRACE
+       // Set up the rendering context, define display lists etc.:
+       glClearColor( 8/256.0, 5/256.0, 76/256.0, 0.0 );
+       glDisable(GL_DEPTH_TEST);
+
+       if( checkGLError() ) LOG_TRACE
+
+#ifdef COMPILE_CG
+       if( mUseCG && cgGLIsProfileSupported( CG_PROFILE_FP20 ) ){
+               LOG_3("Using Cg");
+               // This is the most basic fragment profile, should run on quite a few cards
+               cgFragmentProfile = CG_PROFILE_FP20;
+               cgSetErrorCallback(cgErrorCallback);
+               cgContext = cgCreateContext();
+               // TODO: Include the shader source in the executable
+               cgProgram = cgCreateProgram( cgContext, CG_SOURCE, FRAGMENT_SHADER, cgFragmentProfile, 0, 0);
+               cgGLLoadProgram( cgProgram );
+               cgImageParam = cgGetNamedParameter( cgProgram, "image" );
+               cgColorClampParam = cgGetNamedParameter( cgProgram, "colorClamp" );
+               cgGLBindProgram( cgProgram );
+       }else
+#endif
+       {
+               LOG_3("Using stock OpenGL");
+               mUseCG = false;
+       }
+
+// GL_TEXTURE_ENV_MODE defaults to GL_MODULATE
+       // GL_TEXTURE_ENV_COLOR defaults to (0,0,0,0)
+
 #ifdef GL_NV_texture_rectangle
 	mUseGL_NV_texture_rectangle = isExtensionSupported( "GL_NV_texture_rectangle" );
 #endif // GL_NV_texture_rectangle
@@ -103,54 +178,36 @@ void GLWindow::setupTextureMode()
 	{
 		qWarning("NOT USING GL_TEXTURE_RECTANGLE_NV");
 		mTextureMode = GL_TEXTURE_2D;
-	
+
 		// Set up the texturing params
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP);
-	
+        GLint wrapMode = GL_CLAMP;
+        int glMajor, glMinor;
+        glVersion(glMajor,glMinor);
+        if( glMajor >= 1 && glMinor >=2 )
+            wrapMode = GL_CLAMP_TO_EDGE;
+
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, wrapMode);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, wrapMode);
+
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	}
 }
 
-void GLWindow::initializeGL()
-{
-	// Set up the rendering context, define display lists etc.:
-	glClearColor( 8/256.0, 5/256.0, 76/256.0, 0.0 );
-	glDisable(GL_DEPTH_TEST);
-	
-#ifdef COMPILE_CG
-	if( mUseCG && cgGLIsProfileSupported( CG_PROFILE_FP20 ) ){
-		qWarning("Using Cg");
-		// This is the most basic fragment profile, should run on quite a few cards
-		cgFragmentProfile = CG_PROFILE_FP20;
-		cgSetErrorCallback(cgErrorCallback);
-		cgContext = cgCreateContext();
-		// TODO: Include the shader source in the executable
-		cgProgram = cgCreateProgram( cgContext, CG_SOURCE, FRAGMENT_SHADER, cgFragmentProfile, 0, 0);
-		cgGLLoadProgram( cgProgram );
-		cgImageParam = cgGetNamedParameter( cgProgram, "image" );
-		cgColorClampParam = cgGetNamedParameter( cgProgram, "colorClamp" );
-		cgGLBindProgram( cgProgram );
-	}else
-#endif
-	{
-		qWarning("Using stock OpenGL");
-		mUseCG = false;
-	}
-	// GL_TEXTURE_ENV_MODE defaults to GL_MODULATE
-	// GL_TEXTURE_ENV_COLOR defaults to (0,0,0,0)
-}
-
 TexInfo GLWindow::loadImage( QImage * imgPtr )
 {
+    makeCurrent();
 	QImage image = convertToGLFormat( *imgPtr );
 	return loadImage( image.width(), image.height(), image.bits(), GL_RGBA );
 }
 
 TexInfo GLWindow::loadImage( int w, int h, uchar * bits, GLenum format )
 {
-	makeCurrent();
+    ensureInitialized();
+
+    // We get an opengl error here, must be from qt as i'm checking after
+    // any opengl calls that have been made before this first happens
+    checkGLError();
 
 	// Return value
 	TexInfo texInfo;
@@ -179,6 +236,12 @@ TexInfo GLWindow::loadImage( int w, int h, uchar * bits, GLenum format )
 		texInfo.vmax = h;
 
 		glTexImage2D( GL_TEXTURE_RECTANGLE_NV, 0, 4, w, h, 0, format, GL_UNSIGNED_BYTE, bits );
+
+        if( checkGLError() ) {
+            glDeleteTextures( 1, &texInfo.handle );
+            texInfo.handle = 0;
+            return texInfo;
+        }
 #ifdef COMPILE_CG
 		// Set the texture to be used by the shader program
 		if( mUseCG )
@@ -196,20 +259,38 @@ TexInfo GLWindow::loadImage( int w, int h, uchar * bits, GLenum format )
 		int tw = 2, th = 2;
 		while( tw < w ) tw*=2;
 		while( th < h ) th*=2;
-	
+
 		// Get the portion of the texture that the image will fill
 		// the -1.0/(2*tw) keeps the OpenGL blending from blending with
 		// part of the texture that doesn't contain the image
 		texInfo.umax = w/(float)tw - 1.0/(2*tw);
 		texInfo.vmax = h/(float)th - 1.0/(2*th);
-	
+
 		// Create the texture, but pass 0 as the image data
 		glTexImage2D( GL_TEXTURE_2D, 0, 4, tw, th, 0, format, GL_UNSIGNED_BYTE, 0 );
+
+        if( checkGLError() ) {
+            glDeleteTextures( 1, &texInfo.handle );
+            texInfo.handle = 0;
+            return texInfo;
+        }
+
 		// Now fill in the part of the texture that we are going to use
 		glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, w, h, format, GL_UNSIGNED_BYTE, bits );
-	
+
+        if( checkGLError() ) {
+            glDeleteTextures( 1, &texInfo.handle );
+            texInfo.handle = 0;
+            return texInfo;
+        }
 	}
 	return texInfo;
+}
+
+void GLWindow::deleteImage( const TexInfo & texInfo )
+{
+    makeCurrent();
+    glDeleteTextures( 1, &texInfo.handle );
 }
 
 void GLWindow::showImage( TexInfo texInfo )
@@ -351,8 +432,6 @@ void GLWindow::paintGL()
 	glTexCoord2f( 0.0, mCurrentTexture.vmax );
 	glVertex2f( tex_x, tex_y + tex_h );
 	glEnd();
-
-	glFinish();
 }
 
 void GLWindow::setColorMode( int colorMode )

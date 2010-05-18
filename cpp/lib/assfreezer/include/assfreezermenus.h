@@ -12,6 +12,7 @@
 class QAction;
 class JobListWidget;
 class HostListWidget;
+class AssfreezerView;
 class JobViewerPlugin;
 class HostViewerPlugin;
 
@@ -22,6 +23,7 @@ public:
 	AssfreezerMenu( QWidget * parent, const QString & title = QString() );
 
 public slots:
+    virtual void slotCurrentViewChanged( AssfreezerView * );
 	virtual void slotAboutToShow() = 0;
 	virtual void slotActionTriggered( QAction * ) {}
 };
@@ -31,6 +33,7 @@ class ASSFREEZER_EXPORT JobListMenu : public AssfreezerMenu
 public:
 	JobListMenu(JobListWidget *, const QString & title = QString());
 protected:
+    void slotCurrentViewChanged( AssfreezerView * );
 	JobListWidget * mJobList;
 };
 
@@ -39,6 +42,7 @@ class ASSFREEZER_EXPORT HostListMenu : public AssfreezerMenu
 public:
 	HostListMenu(HostListWidget *, const QString & title = QString());
 protected:
+    void slotCurrentViewChanged( AssfreezerView * );
 	HostListWidget * mHostList;
 };
 
@@ -49,6 +53,7 @@ public:
 
 	void slotAboutToShow();
 	void slotActionTriggered(QAction*);
+    void updateActionStates();
 
 protected:
 	bool mStatusActionsCreated;
@@ -58,11 +63,13 @@ protected:
 
 class ASSFREEZER_EXPORT ProjectFilterMenu : public JobListMenu
 {
+Q_OBJECT
 public:
 	ProjectFilterMenu(JobListWidget *);
 
 	void slotAboutToShow();
 	void slotActionTriggered(QAction*);
+    void updateActionStates();
 
 protected:
 	QAction * mProjectShowAll, * mProjectShowNone, * mProjectShowNonProject;
@@ -77,9 +84,11 @@ public:
 
 	void slotAboutToShow();
 	void slotActionTriggered(QAction*);
+    void updateActionStates();
 
 protected:
 	bool mJobTypeActionsCreated;
+    QAction * mJobTypeShowAll, * mJobTypeShowNone;
 	QList<QAction*> mJobTypeActions;
 };
 
@@ -90,6 +99,7 @@ public:
 
 	void slotAboutToShow();
 	void slotActionTriggered( QAction * );
+    void updateActionStates();
 
 protected:
     void modifyFrameRange( Job );
@@ -108,10 +118,13 @@ public:
 
 	void slotAboutToShow();
 	void slotActionTriggered(QAction*);
+    void updateActionStates();
 
 protected:
 	bool mActionsCreated;
 	QList<QAction*> mHostServiceJobTypeActions;
+    QAction * mHostServiceShowAll, * mHostServiceShowNone;
+    QList<QAction*> mHostServiceActions;
 };
 
 class ASSFREEZER_EXPORT CannedBatchJobMenu : public HostListMenu

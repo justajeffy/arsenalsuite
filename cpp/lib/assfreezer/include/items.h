@@ -167,6 +167,9 @@ public slots:
 	void depsAdded(RecordList);
 	void depsRemoved(RecordList);
 
+signals:
+    void dependencyAdded( const QModelIndex & parent );
+
 protected:
 	void addRemoveWorker( JobDepList, bool remove );
 

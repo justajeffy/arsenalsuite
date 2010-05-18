@@ -104,10 +104,15 @@ public slots:
 
 	void setCurrentView( AssfreezerView * );
 
+signals:
+    void currentViewChanged( AssfreezerView * );
+
 protected slots:
 	void currentTabChanged( int );
 	void populateViewMenu();
 	void populateRestoreViewMenu();
+    void populateToolsMenu();
+
 	void restoreViewActionTriggered(QAction*);
 	bool checkViewModeChange();
 

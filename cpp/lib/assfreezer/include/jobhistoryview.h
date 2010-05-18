@@ -27,6 +27,9 @@ public slots:
 	void applyOptions();
 
 protected:
+    void setupModel();
+    bool event( QEvent * event );
+
 	JobList mJobs;
 	RecordSuperModel * mModel;
 };

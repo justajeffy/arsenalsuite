@@ -661,6 +661,7 @@ void JobModel::addRemoveWorker( JobDepList deps, bool removeDeps )
 {
 	JobList jobs = removeDeps ? deps.deps() : deps.jobs();
 	QList<QPersistentModelIndex> toRemove;
+	QList<QPersistentModelIndex> toSignalAdded;
 	for( ModelIter it(this,ModelIter::Filter(ModelIter::Recursive | ModelIter::DescendLoadedOnly)); it.isValid(); ++it ) {
 		QModelIndex i(*it);
 		if( removeDeps ) {
@@ -673,6 +674,7 @@ void JobModel::addRemoveWorker( JobDepList deps, bool removeDeps )
 				if( childrenLoaded(i) ) {
 					JobDep dep = deps[index];
 					append( dep.dep(), i );
+                    toSignalAdded += i;
 				} else
 					// This will cause a redraw, so that hasChildren will be called again and the + sign shown
 					dataChanged( i, i );
@@ -682,6 +684,17 @@ void JobModel::addRemoveWorker( JobDepList deps, bool removeDeps )
 	foreach(QPersistentModelIndex pi, toRemove)
 		if( pi.isValid() )
 			remove( pi );
+    foreach( JobDep jd, deps ) {
+        // See if there's a top level item for this, if there isn't, add it
+        QModelIndex topLevel = findIndex(jd.dep(),false);
+        if( removeDeps && !topLevel.isValid() )
+            append( jd.dep() );
+        if( !removeDeps && topLevel.isValid() )
+            remove( topLevel );
+    }
+    foreach(QPersistentModelIndex pi, toSignalAdded)
+        if( pi.isValid() )
+            emit dependencyAdded( pi );
 }
 
 QPixmap JobModel::jobTypeIcon( const JobType & jt )
@@ -704,6 +717,12 @@ void JobModel::depsAdded( RecordList rdeps )
 void JobModel::depsRemoved( RecordList rdeps )
 {
 	addRemoveWorker( rdeps, true );
+    foreach( JobDep jd, rdeps ) {
+        // See if there's a top level item for this, if there isn't, add it
+        QModelIndex topLevel = findIndex(jd.dep(),false);
+        if( !topLevel.isValid() )
+            append( jd.dep() );
+    }
 }
 
 void JobModel::setDependencyTreeEnabled( bool dte )
