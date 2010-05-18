@@ -61,7 +61,6 @@ public:
 	GLWindow(QWidget * parent=0);
 	~GLWindow();
 
-	void setupTextureMode();
 	void initializeGL();
 
 	TexInfo loadImage( QImage * imgPtr );
@@ -103,7 +102,11 @@ public:
 signals:
 	void scaleFactorChange( float );
 
+public slots:
+    void deleteImage( const TexInfo & );
+
 protected:
+    void ensureInitialized();
 
 	float tex_x, tex_y, tex_w, tex_h;
 	GLuint mTextureMode;
@@ -118,6 +121,7 @@ protected:
 	CGparameter cgImageParam, cgColorClampParam;
 #endif
 
+    bool mInitialized;
 	bool mUseCG;
 	bool mTextureValid;
 	int mColorMode, mScaleMode;

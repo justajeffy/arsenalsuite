@@ -125,10 +125,7 @@ MainWindow::MainWindow( QWidget * parent )
 	mFileMenu->addAction( FileExitAction );
 
 	mToolsMenu = mb->addMenu( "&Tools" );
-	if( User::hasPerms( "HostService", true ) )
-		mToolsMenu->addAction( HostServiceMatrixAction );
-
-	mToolsMenu->addAction( "Project Weighting...", this, SLOT( showProjectWeightDialog() ) );
+    connect( mToolsMenu, SIGNAL( aboutToShow() ), SLOT( populateToolsMenu() ) );
 
 	mOptionsMenu = mb->addMenu( "&Options" );
 	connect( mOptionsMenu, SIGNAL( aboutToShow() ), SLOT( populateViewMenu() ) );
@@ -523,6 +520,8 @@ void MainWindow::setCurrentView( AssfreezerView * view )
 			ViewHostsAction->setChecked(isHostView);
 		}
 
+        emit currentViewChanged( mCurrentView );
+
 		// Always refresh the first time a view is shown.
 		if( options.mRefreshOnViewChange || mCurrentView->refreshCount() == 0 )
 			mCurrentView->refresh();
@@ -739,6 +738,17 @@ void MainWindow::moveCurrentViewLeft()
 void MainWindow::moveCurrentViewRight()
 {
 	moveViewRight( mCurrentView );
+}
+
+void MainWindow::populateToolsMenu()
+{
+    if( User::hasPerms( "HostService", true ) )
+        mToolsMenu->addAction( HostServiceMatrixAction );
+
+    mToolsMenu->addAction( "Project Weighting...", this, SLOT( showProjectWeightDialog() ) );
+
+    // We only need to populate this menu once
+    mToolsMenu->disconnect( this, SIGNAL( aboutToShow() ) );
 }
 
 void MainWindow::populateViewMenu()

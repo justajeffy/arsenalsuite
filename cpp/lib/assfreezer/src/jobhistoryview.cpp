@@ -23,17 +23,11 @@ JobHistoryView::JobHistoryView( QWidget * parent )
 : RecordTreeView ( parent )
 , mModel( 0 )
 {
-	mModel = new RecordSuperModel(this);
-	RecordDataTranslator * rdt = new RecordDataTranslator(mModel->treeBuilder());
-	rdt->setRecordColumnList(QStringList() << "key" << "fkeyjob" << "fkeyhost" << "message" << "fkeyuser" << "created");
-	setModel( mModel );
-	IniConfig & ini = userConfig();
-	ini.pushSection( "JobHistoryView" );
-	setupTreeView( ini, job_history_columns );
-	ini.popSection();
 	setAlternatingRowColors(false);
+    setVerticalScrollMode( ScrollPerPixel );
+    setHorizontalScrollMode( ScrollPerPixel );
 
-	options.mErrorColors->apply(this);
+	//options.mErrorColors->apply(this);
 }
 
 JobHistoryView::~JobHistoryView()
@@ -44,8 +38,30 @@ JobHistoryView::~JobHistoryView()
 	ini.popSection();
 }
 
+bool JobHistoryView::event ( QEvent * event )
+{
+    if( event->type() == QEvent::PolishRequest )
+        setupModel();
+    return RecordTreeView::event(event);
+}
+
+void JobHistoryView::setupModel()
+{
+    if( !mModel ) {
+        mModel = new RecordSuperModel(this);
+        RecordDataTranslator * rdt = new RecordDataTranslator(mModel->treeBuilder());
+        rdt->setRecordColumnList(QStringList() << "key" << "fkeyjob" << "fkeyhost" << "message" << "fkeyuser" << "created");
+        setModel( mModel );
+        IniConfig & ini = userConfig();
+        ini.pushSection( "JobHistoryView" );
+        setupTreeView( ini, job_history_columns );
+        ini.popSection();
+    }
+}
+
 void JobHistoryView::setHistory( JobHistoryList history )
 {
+    setupModel();
 	mJobs = JobList();
 	mModel->setRootList(history);
 }

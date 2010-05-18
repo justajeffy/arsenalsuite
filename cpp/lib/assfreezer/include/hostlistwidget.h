@@ -89,14 +89,15 @@ protected:
 
 	QString mServiceFilter;
 
-	// Static so that multiple instances of this view type can share this data
-	static bool mStaticDataRetrieved;
-	static ServiceList mServiceList;
+    bool mServiceDataRetrieved;
+    ServiceList mServiceList;
 
 	bool mHostTaskRunning;
 	bool mQueuedHostRefresh;
 
 	QToolBar * mToolBar;
+
+    HostList mHostsToSelect;
 
 public:
 	QMenu * mHostMenu,

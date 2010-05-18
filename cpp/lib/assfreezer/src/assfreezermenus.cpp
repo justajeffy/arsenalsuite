@@ -43,6 +43,18 @@ AssfreezerMenu::AssfreezerMenu( QWidget * parent, const QString & title)
 {
 	connect( this, SIGNAL( aboutToShow() ), SLOT( slotAboutToShow() ) );
 	connect( this, SIGNAL( triggered( QAction * ) ), SLOT( slotActionTriggered( QAction * ) ) );
+    MainWindow * mw = qobject_cast<MainWindow*>(parent->window());
+    if( mw ) {
+        connect( mw, SIGNAL( currentViewChanged( AssfreezerView * ) ), SLOT( slotCurrentViewChanged( AssfreezerView * ) ) );
+    } else
+        LOG_1( "Unable to cast window to MainWindow pointer, window is of type: " + QString(parent->window()->metaObject()->className()) );
+}
+
+void AssfreezerMenu::slotCurrentViewChanged( AssfreezerView * view )
+{
+    if( view && isTearOffMenuVisible() )
+        slotAboutToShow();
+    setEnabled( view );
 }
 
 JobListMenu::JobListMenu(JobListWidget * jobList, const QString & title )
@@ -50,10 +62,27 @@ JobListMenu::JobListMenu(JobListWidget * jobList, const QString & title )
 , mJobList(jobList)
 {}
 
+void JobListMenu::slotCurrentViewChanged( AssfreezerView * view )
+{
+    JobListWidget * jobList = qobject_cast<JobListWidget*>(view);
+    if( view )
+        mJobList = jobList;
+    AssfreezerMenu::slotCurrentViewChanged( jobList );
+}
+
+
 HostListMenu::HostListMenu(HostListWidget * hostList, const QString & title)
 : AssfreezerMenu(hostList, title)
 , mHostList(hostList)
 {}
+
+void HostListMenu::slotCurrentViewChanged( AssfreezerView * view )
+{
+    HostListWidget * hostList = qobject_cast<HostListWidget*>(view);
+    if( view )
+        mHostList = hostList;
+    AssfreezerMenu::slotCurrentViewChanged( hostList );
+}
 
 ProjectFilterMenu::ProjectFilterMenu(JobListWidget * jobList)
 : JobListMenu( jobList, "Project Filter" )
@@ -79,7 +108,7 @@ void ProjectFilterMenu::slotAboutToShow()
 		foreach( Project p, projectList ) {
 			QAction * act = new QAction( p.name(), this );
 			act->setCheckable( true );
-			act->setChecked( !mJobList->mJobFilter.hiddenProjects.contains( QString::number( p.key() ) ) );
+            act->setProperty( "projectkey", QVariant(p.key()) );
 			mProjectActions.append( act );
 		}
 
@@ -89,44 +118,50 @@ void ProjectFilterMenu::slotAboutToShow()
 		addAction( mProjectShowNonProject );
 		addActions( mProjectActions );
 	}
+    updateActionStates();
 }
 
 void ProjectFilterMenu::slotActionTriggered( QAction * act )
 {
-	bool refresh = false, updateActions = false, all = false;
 	if( act == mProjectShowAll ) {
 		mJobList->mJobFilter.hiddenProjects.clear();
 		mJobList->mJobFilter.showNonProjectJobs = true;
-		refresh = updateActions = all = true;
 	} else if( act == mProjectShowNone ) {
 		mJobList->mJobFilter.hiddenProjects.clear();
 		ProjectList projectList = mJobList->activeProjects();
 		foreach( Project p, projectList )
 			mJobList->mJobFilter.hiddenProjects += QString::number(p.key());
 		mJobList->mJobFilter.showNonProjectJobs = false;
-		refresh = updateActions = true;
 	} else if( act == mProjectShowNonProject ) {
 		mJobList->mJobFilter.showNonProjectJobs = act->isChecked();
-		refresh = true;
 	} else {
-		Project p = Project::recordByName( act->text() );
-		if( p.isRecord() ) {
-			QString project= QString::number(p.key());
-			int i = mJobList->mJobFilter.hiddenProjects.indexOf( project );
-			if( i < 0 )
-				mJobList->mJobFilter.hiddenProjects += project;
-			else
-				mJobList->mJobFilter.hiddenProjects.removeAt(i);
-			refresh = true;
-		}
+        bool show = act->isChecked();
+        if( !show && mJobList->mJobFilter.allProjectsShown ) {
+            mJobList->mJobFilter.allProjectsShown = false;
+            mJobList->mJobFilter.visibleProjects = mJobList->activeProjects().keyString().split(',');
+        }
+        QString project = QString::number(act->property("projectkey").toInt());
+        int i = mJobList->mJobFilter.visibleProjects.indexOf( project );
+        if( i < 0 )
+            mJobList->mJobFilter.visibleProjects += project;
+        else
+            mJobList->mJobFilter.visibleProjects.removeAt(i);
+        if( mJobList->mJobFilter.visibleProjects.size() == mJobList->activeProjects().size() )
+            mJobList->mJobFilter.allProjectsShown = true;
 	}
-	if( updateActions ) {
-		foreach( QAction * act, mProjectActions )
-			act->setChecked( all );
-		mProjectShowNonProject->setChecked( all );
-	}
-	if( refresh )
-		mJobList->refresh();
+    updateActionStates();
+    mJobList->refresh();
+}
+
+void ProjectFilterMenu::updateActionStates()
+{
+    mProjectShowAll->setChecked( mJobList->mJobFilter.allProjectsShown && mJobList->mJobFilter.showNonProjectJobs );
+    mProjectShowAll->setEnabled( !mProjectShowAll->isChecked() );
+    mProjectShowNone->setChecked( !mJobList->mJobFilter.allProjectsShown && !mJobList->mJobFilter.showNonProjectJobs && mJobList->mJobFilter.visibleProjects.isEmpty() );
+    mProjectShowNone->setCheckable( !mProjectShowNone->isChecked() );
+    mProjectShowNonProject->setChecked( mJobList->mJobFilter.showNonProjectJobs );
+    foreach( QAction * act, mProjectActions )
+        act->setChecked( mJobList->mJobFilter.allProjectsShown || mJobList->mJobFilter.visibleProjects.contains( QString::number( act->property("projectkey").toInt() ) ) );
 }
 
 StatusFilterMenu::StatusFilterMenu(JobListWidget * jobList)
@@ -147,7 +182,9 @@ void StatusFilterMenu::slotAboutToShow()
 	{
 		mStatusActionsCreated = true;
 		mStatusShowAll = new QAction( "Show All", this );
+        mStatusShowAll->setCheckable( true );
 		mStatusShowNone = new QAction( "Show None", this );
+        mStatusShowNone->setCheckable( true );
 		for(int i=0;stats[i]; i++){
 			QString stat(stats[i]);
 			QAction * act = new QAction( stat, this );
@@ -161,24 +198,31 @@ void StatusFilterMenu::slotAboutToShow()
 		addSeparator();
 		addActions( mStatusActions );
 	}
+    updateActionStates();
+}
+
+void StatusFilterMenu::updateActionStates()
+{
+    mStatusShowAll->setChecked( mJobList->mJobFilter.statusToShow.size() == mStatusActions.size() );
+    mStatusShowAll->setEnabled( !mStatusShowAll->isChecked() );
+    mStatusShowNone->setChecked( mJobList->mJobFilter.statusToShow.size() == 0 );
+    mStatusShowNone->setEnabled( !mStatusShowNone->isChecked() );
+    foreach( QAction * act, mStatusActions )
+        act->setChecked( mJobList->mJobFilter.statusToShow.contains( act->text().toLower() ) );
 }
 
 void StatusFilterMenu::slotActionTriggered( QAction * act )
 {
-	QString txt = act->text();
-	bool refresh = false, all = false, updateActions = false;
-	if( txt == "Show All" ) {
+    if( act == mStatusShowAll ) {
 		mJobList->mJobFilter.statusToShow.clear();
 		for( int i=0; stats[i]; i++ )
 			mJobList->mJobFilter.statusToShow += QString(stats[i]).toLower();
-		refresh = all = updateActions = true;
-	} else if( txt == "Show None" ) {
+	} else if( act == mStatusShowNone ) {
 		mJobList->mJobFilter.statusToShow.clear();
-		refresh = updateActions = true;
 	} else {
 		int i = 0;
 		for( ; stats[i]; i++ )
-			if( stats[i] == txt )
+			if( stats[i] == act->text() )
 				break;
 		if( stats[i] ) {
 			QString stat = QString( stats[i] ).toLower();
@@ -188,20 +232,17 @@ void StatusFilterMenu::slotActionTriggered( QAction * act )
 				mJobList->mJobFilter.statusToShow.removeAt( i );
 			else
 				mJobList->mJobFilter.statusToShow += stat;
-			refresh = true;
 		}
 	}
-	if( updateActions ) {
-		foreach( QAction * act, mStatusActions )
-			act->setChecked( all );
-	}
-	if( refresh )
-		mJobList->refresh();
+    updateActionStates();
+    mJobList->refresh();
 }
 
 JobTypeFilterMenu::JobTypeFilterMenu(JobListWidget * jobList)
 : JobListMenu( jobList, "Job Type Filter" )
 , mJobTypeActionsCreated( false )
+, mJobTypeShowAll( 0 )
+, mJobTypeShowNone( 0 )
 {
 	setTearOffEnabled( true );
 }
@@ -211,55 +252,57 @@ void JobTypeFilterMenu::slotAboutToShow()
 	if( !mJobTypeActionsCreated ) {
 		mJobTypeActionsCreated = true;
 
-		QAction * jobTypeShowAll = new QAction( "Show All", this );
-		QAction * jobTypeShowNone = new QAction( "Show None", this );
+		mJobTypeShowAll = new QAction( "Show All", this );
+        mJobTypeShowAll->setCheckable( true );
+		mJobTypeShowNone = new QAction( "Show None", this );
+        mJobTypeShowNone->setCheckable( true );
 		JobTypeList jtl = mJobList->mJobTypeList.sorted( "jobType" );
 		foreach( JobType jt, jtl )
 		{
 			QImage img = jt.icon();
 			QAction * act = new QAction( img.isNull() ? QIcon() : QPixmap::fromImage(jt.icon()), jt.name(), this );
 			act->setCheckable( true );
-			if( mJobList->mJobFilter.typeToShow.contains(QString::number(jt.key())) )
-				act->setChecked( true );
+            act->setProperty( "jobtypekey", QVariant(jt.key()) );
 			mJobTypeActions.append( act );
 		}
 
-		addAction( jobTypeShowAll );
-		addAction( jobTypeShowNone );
+		addAction( mJobTypeShowAll );
+		addAction( mJobTypeShowNone );
 		addSeparator();
 		addActions( mJobTypeActions );
 	}
+    updateActionStates();
+}
+
+void JobTypeFilterMenu::updateActionStates()
+{
+    mJobTypeShowAll->setChecked( mJobList->mJobFilter.typeToShow.size() == mJobList->mJobTypeList.size() );
+    mJobTypeShowAll->setEnabled( !mJobTypeShowAll->isChecked() );
+    mJobTypeShowNone->setChecked( mJobList->mJobFilter.typeToShow.size() == 0 );
+    mJobTypeShowNone->setEnabled( !mJobTypeShowNone->isChecked() );
+    foreach( QAction * act, mJobTypeActions ) {
+        act->setChecked( mJobList->mJobFilter.typeToShow.contains(QString::number(act->property("jobtypekey").toInt())) );
+    }
 }
 
 void JobTypeFilterMenu::slotActionTriggered( QAction * act )
 {
-	QString txt = act->text();
-	bool refresh = false, updateActions = false, all = false;
-	if( txt == "Show All" ) {
+	if( act == mJobTypeShowAll ) {
 		mJobList->mJobFilter.typeToShow.clear();
 		foreach( JobType jt, mJobList->mJobTypeList )
 			mJobList->mJobFilter.typeToShow += QString::number( jt.key() );
-		refresh = updateActions = all = true;
-	} else if( txt == "Show None" ) {
+	} else if( act == mJobTypeShowNone ) {
 		mJobList->mJobFilter.typeToShow.clear();
-		refresh = updateActions = true;
 	} else {
-		JobType jt = JobType::recordByName( txt );
-		if( jt.isRecord() ) {
-			QString jtk= QString::number(jt.key());
-			int i = mJobList->mJobFilter.typeToShow.indexOf( jtk );
-			if( i < 0 )
-				mJobList->mJobFilter.typeToShow += jtk;
-			else
-				mJobList->mJobFilter.typeToShow.removeAt(i);
-			refresh = true;
-		}
-	}
-	if( updateActions )
-		foreach( QAction * act, mJobTypeActions )
-			act->setChecked( all );
-	if( refresh )
-		mJobList->refresh();
+        QString jtk = QString::number(act->property("jobtypekey").toInt());
+        int i = mJobList->mJobFilter.typeToShow.indexOf( jtk );
+        if( i < 0 )
+            mJobList->mJobFilter.typeToShow += jtk;
+        else
+            mJobList->mJobFilter.typeToShow.removeAt(i);
+    }
+    updateActionStates();
+    mJobList->refresh();
 }
 
 AssfreezerJobMenu::AssfreezerJobMenu(JobListWidget * jobList)
@@ -448,6 +491,8 @@ void AssfreezerJobMenu::modifyFrameRange( Job j )
 HostServiceFilterMenu::HostServiceFilterMenu(HostListWidget * hostList)
 : HostListMenu(hostList, "Host Service Filter")
 , mActionsCreated( false )
+, mHostServiceShowAll( 0 )
+, mHostServiceShowNone( 0 )
 {
 	setTearOffEnabled( true );
 }
@@ -457,76 +502,65 @@ void HostServiceFilterMenu::slotAboutToShow()
 	if( !mActionsCreated ) {
 		mActionsCreated = true;
 
-		bool checkServices = true;
 		ServiceList sl = mHostList->mServiceList.sorted( "service" );
 		QStringList serviceList = mHostList->mServiceFilter.split(',');
 
-		QAction * act = addAction( "Show All" );
-		act->setCheckable( true );
-		if( serviceList.size() == (int)sl.size() ) {
-			act->setChecked( true );
-			checkServices = false;
-		}
+		mHostServiceShowAll = addAction( "Show All" );
+		mHostServiceShowAll->setCheckable( true );
 
-		act = addAction( "Show None" );
-		act->setCheckable( true );
-		if( serviceList.isEmpty() ) {
-			act->setChecked( true );
-			checkServices = false;
-		}
+		mHostServiceShowNone = addAction( "Show None" );
+		mHostServiceShowNone->setCheckable( true );
 
 		addSeparator();
 
 		foreach( Service service, sl ) {
-			act = addAction( service.service() );
+			QAction * act = addAction( service.service() );
 			act->setCheckable( true );
-			if( (!checkServices && !serviceList.isEmpty())
-				|| (checkServices && serviceList.contains( QString::number( service.key() ) ) ) )
-				act->setChecked( true );
+            act->setProperty( "servicekey", QVariant( service.key() ) );
+            mHostServiceActions.append( act );
 		}
 	}
+
+    updateActionStates();
+}
+
+void HostServiceFilterMenu::updateActionStates()
+{
+    LOG_TRACE
+    QStringList serviceList = mHostList->mServiceFilter.split(',',QString::SkipEmptyParts);
+    mHostServiceShowAll->setChecked( mHostList->mServiceList.size() == serviceList.size() );
+    mHostServiceShowNone->setChecked( serviceList.size() == 0 );
+    foreach( QAction * act, mHostServiceActions )
+        act->setChecked( serviceList.contains( QString::number( act->property( "servicekey" ).toInt() ) ) );
 }
 
 void HostServiceFilterMenu::slotActionTriggered( QAction * act )
 {
 	bool resetServiceList = false, resetHostList = false;
-	bool showAll = false, showNone = false;
 	ServiceList sl = mHostList->mServiceList.sorted( "service" );
 	QString serviceList = mHostList->mServiceFilter;
-	QString txt = act->text();
-	if( txt == "Show All" ) {
+	if( act == mHostServiceShowAll ) {
 		serviceList = sl.keyString();
-		resetServiceList = resetHostList = showAll = true;
-	} else if( txt == "Show None" ) {
+		resetServiceList = resetHostList = true;
+	} else if( act == mHostServiceShowNone ) {
 		serviceList.clear();
-		resetServiceList = resetHostList = showNone = true;
+		resetServiceList = resetHostList = true;
 	} else {
-		Service s = Service::recordByName( txt );
-		if( s.isRecord() ) {
-			QString ks = QString::number( s.key() );
-			QStringList ssl = serviceList.split(",");
-			if( ssl.contains( ks ) )
-				ssl.removeAll( ks );
-			else
-				ssl += ks;
-			serviceList = ssl.join(",");
-			resetServiceList = resetHostList = true;
-		}
+        QString ks = QString::number( act->property("servicekey").toInt() );
+        QStringList ssl = serviceList.split(",");
+        if( ssl.contains( ks ) )
+            ssl.removeAll( ks );
+        else
+            ssl += ks;
+        serviceList = ssl.join(",");
+        resetServiceList = resetHostList = true;
 	}
 	if( resetServiceList )
 		mHostList->mServiceFilter = verifyKeyList( serviceList, Service::table() );
 	if( resetHostList )
 		mHostList->refresh();
 
-	foreach( QAction * action, actions() ) {
-		QString text = action->text();
-		if( text == "Show All" )
-			action->setChecked( serviceList.split(",").size() == (int)sl.size() );
-		else if( text == "Show None" )
-			action->setChecked( serviceList.isEmpty() );
-		else if( showAll || showNone )
-			action->setChecked( showAll );
-	}
+    updateActionStates();
 }
 
 CannedBatchJobMenu::CannedBatchJobMenu(HostListWidget * hostList)

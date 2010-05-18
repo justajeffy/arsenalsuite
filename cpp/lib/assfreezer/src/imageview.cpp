@@ -164,10 +164,22 @@ void LoadImageTask::run()
 	LOG_5( "Image Loaded: " + mPath + " in " + QString::number( mTimer.elapsed() ) + "ms" );
 }
 
+static bool hasOpenGL()
+{
+    static bool _hasOpenGL = false, _checked = false;
+    if( !_checked ) {
+        _checked = true;
+        _hasOpenGL = QGLFormat::hasOpenGL();
+        if( _hasOpenGL )
+            LOG_5( "Using OpenGL" );
+    }
+    return _hasOpenGL;
+}
+
 ImageView::ImageView( QWidget * parent )
 : QWidget( parent )
 , mShown(-1)
-, mToShow(-1)
+, mToShow(-2)
 , mPlaying(false)
 , mAllFramesLoaded(false)
 , mGLWindow( 0 )
@@ -175,27 +187,33 @@ ImageView::ImageView( QWidget * parent )
 , mMaxFrame( 0 )
 , mLooping( true )
 {
-
-	if( QGLFormat::hasOpenGL() ){
-		LOG_5( "ImageView::ImageView: Using OpenGL" );
+    if( hasOpenGL() ) {
 		QHBoxLayout * hbox = new QHBoxLayout(this);
 		hbox->setMargin( 0 );
 		mGLWindow = new GLWindow( this );
 		//mGLWindow->setColorMode( GLWindow::AlphaChannel );
 		hbox->addWidget( mGLWindow );
-		connect( &mImageCache, SIGNAL( destroyTexInfo( const TexInfo & ) ), SLOT( destroyTexInfo( const TexInfo & ) ) );
+		connect( &mImageCache, SIGNAL( destroyTexInfo( const TexInfo & ) ), mGLWindow, SLOT( deleteImage( const TexInfo & ) ) );
 		connect( mGLWindow, SIGNAL( scaleFactorChange( float ) ), SIGNAL( scaleFactorChange( float ) ) );
 	}
 	connect( &mImageCache, SIGNAL( frameStatusChange(int,int) ), SIGNAL( frameStatusChange(int,int) ) );
 
 	setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
-	//QTimer::singleShot( 10, this, SLOT( setImageNumber() ) );
-	setImageNumber();
 }
 
 ImageView::~ImageView()
 {
 	mImageCache.clear();
+}
+
+bool ImageView::event( QEvent * event )
+{
+    // Show the logo on the first show event, after that
+    // the current image will already be shown
+    if( event->type() == QEvent::Show && mToShow == -2 ) {
+        setImageNumber();
+    }
+    return QWidget::event( event );
 }
 
 void ImageView::setFrameRange(const QString & bp, int start, int end)
@@ -241,7 +259,7 @@ void ImageView::customEvent( QEvent * evt )
 				}else {
 					mImageCache.addImage( lit->mFrame, lit->mImg );
 				}
-                mImageCache.setStatus( lit->mFrame, ImageCache::ImageLoaded );
+                //mImageCache.setStatus( lit->mFrame, ImageCache::ImageLoaded );
 			}
 			if( mToShow==lit->mFrame ){
 				LOG_5( "ImageView::customEvent: Showing image" );

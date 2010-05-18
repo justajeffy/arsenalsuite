@@ -10,8 +10,12 @@
 
 #include "database.h"
 
+
+#include "employee.h"
+#include "group.h"
 #include "hostservice.h"
-#include "user.h"
+#include "permission.h"
+#include "usergroup.h"
 #include "jobstatus.h"
 
 #include "threadtasks.h"
@@ -35,6 +39,12 @@ void StaticJobListDataTask::run()
 		// Ensure host table is preloaded
 		Host::select();
 		mHasData = staticJobListDataRetrieved = true;
+        // Cache information needed for permission checks
+        // Permission checks will happen when building menus
+        Employee::select();
+        Group::select();
+        Permission::select();
+        UserGroup::recordsByUser( User::currentUser() );
 	}
 }
 
@@ -61,16 +71,13 @@ void JobListTask::run()
 	User::select(); // Make sure usr is loaded
 	CHECK_CANCEL
 
+    bool projectFilterShowingNone = (!mJobFilter.allProjectsShown && mJobFilter.visibleProjects.isEmpty() && !mJobFilter.showNonProjectJobs);
+
 	if( mJobList.size() ) {
 		mReturn = mJobList.reloaded();
 	} else
-	
-	
 	// If we have a project list, and all projects are hidden, then there will be no items, so just clear the list
-	if( (mJobFilter.hiddenProjects.size() < (int)mProjects.size() || mJobFilter.showNonProjectJobs)
-			&& !mJobFilter.typeToShow.isEmpty()
-			&& !mJobFilter.statusToShow.isEmpty()
-		)
+    if( !(projectFilterShowingNone || mJobFilter.typeToShow.isEmpty() || mJobFilter.statusToShow.isEmpty()) )
 	{
 		QStringList filters;
 		

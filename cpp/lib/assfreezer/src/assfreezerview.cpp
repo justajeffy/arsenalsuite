@@ -39,6 +39,13 @@ void AssfreezerView::doRefresh()
 	mRefreshScheduled = false;
 }
 
+IniConfig & AssfreezerView::viewConfig()
+{
+    IniConfig & config = userConfig();
+    config.setSection( "View_" + mViewName );
+    return config;
+}
+
 void AssfreezerView::restorePopup( QWidget * w )
 {
 #ifndef Q_OS_WIN

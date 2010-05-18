@@ -24,6 +24,8 @@ public:
 	QString viewName() const;
 	void setViewName( const QString & );
 
+    IniConfig & viewConfig();
+
 	void restorePopup( QWidget * );
 
 	virtual QToolBar * toolBar( QMainWindow * ) { return 0; }

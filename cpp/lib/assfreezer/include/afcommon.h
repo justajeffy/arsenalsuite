@@ -82,9 +82,12 @@ struct ASSFREEZER_EXPORT JobFilter {
 	// List of users to show, empty list shows all
 	QStringList userList;
 
+    // List of projects to hide, comma separated keys
+    QStringList visibleProjects;
+    bool showNonProjectJobs, allProjectsShown;
+
 	// List of projects to hide, comma separated keys
 	QStringList hiddenProjects;
-	bool showNonProjectJobs;
 
 	// List of job types to show
 	QStringList typeToShow;

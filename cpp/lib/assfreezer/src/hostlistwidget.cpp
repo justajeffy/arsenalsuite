@@ -21,12 +21,10 @@
 #include "remotetailwidget.h"
 #include "threadtasks.h"
 
-bool HostListWidget::mStaticDataRetrieved = false;
-ServiceList HostListWidget::mServiceList;
-
 HostListWidget::HostListWidget( QWidget * parent )
 : AssfreezerView( parent )
 , mHostTree(0)
+, mServiceDataRetrieved( false )
 , mHostTaskRunning( false )
 , mQueuedHostRefresh( false )
 , mToolBar( 0 )
@@ -141,6 +139,12 @@ void HostListWidget::customEvent( QEvent * evt )
 
 			LOG_5( "Enabling updates took " + QString::number( t.elapsed() ) + " ms" );
 
+            if( mHostsToSelect.size() ) {
+                mHostTree->setSelection( mHostsToSelect );
+                mHostTree->scrollTo( mHostsToSelect );
+                mHostsToSelect = HostList();
+            }
+
 			mHostTaskRunning = false;
 			if( mQueuedHostRefresh ) {
 				mQueuedHostRefresh = false;
@@ -151,7 +155,7 @@ void HostListWidget::customEvent( QEvent * evt )
 		}
 		case STATIC_HOST_LIST_DATA:
 		{
-			mStaticDataRetrieved = true;
+			mServiceDataRetrieved = true;
 			StaticHostListDataTask * sdt = (StaticHostListDataTask*)evt;
 			mServiceList = sdt->mServices;
 			IniConfig & ini = userConfig();
@@ -182,7 +186,7 @@ void HostListWidget::doRefresh()
 	AssfreezerView::doRefresh();
 	bool needStatusBarMsg = false, needHostListTask = false;
 
-	if( !mStaticDataRetrieved )
+	if( !mServiceDataRetrieved )
 		needStatusBarMsg = mQueuedHostRefresh = true;
 	else if( mHostTaskRunning )
 		mQueuedHostRefresh = true;
@@ -214,6 +218,8 @@ void HostListWidget::selectHosts( HostList hosts )
 {
 	mHostTree->setSelection( hosts );
 	mHostTree->scrollTo( hosts );
+    if( mHostTaskRunning || mQueuedHostRefresh || refreshCount() == 0 )
+        mHostsToSelect = hosts;
 }
 
 QToolBar * HostListWidget::toolBar( QMainWindow * mw )

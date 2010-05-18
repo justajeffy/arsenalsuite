@@ -54,6 +54,7 @@ JobListWidget::JobListWidget( QWidget * parent )
 : AssfreezerView( parent )
 , mJobFilterEdit( 0 )
 , mToolBar( 0 )
+, mViewsInitialized( false )
 , mJobTaskRunning( false )
 , mQueuedJobRefresh( false )
 , mFrameTask( 0 )
@@ -67,102 +68,6 @@ JobListWidget::JobListWidget( QWidget * parent )
 , mErrorMenu( 0 )
 {
 	setupUi(this);
-
-	mTabToolBar = new TabToolBar( mJobTabWidget, mImageView );
-
-	RefreshAction = new QAction( "Refresh Job(s)", this );
-	RefreshAction->setIcon( QIcon( ":/images/refresh" ) );
-
-	KillAction = new QAction( "Remove Selected Jobs", this );
-	KillAction->setIcon( QIcon( ":/images/kill" ) );
-	PauseAction = new QAction( "Pause Selected Jobs", this );
-	PauseAction->setIcon( QIcon( ":/images/pause" ) );
-	ResumeAction = new QAction( "Resume Selected Jobs", this );
-	ResumeAction->setIcon( QIcon( ":/images/resume" ) );
-	RestartAction = new QAction( "Restart Job(s)", this );
-	RestartAction->setIcon( QIcon( ":/images/restart" ) );
-	ShowOutputAction = new QAction( "Show Output Directory", this );
-	ShowOutputAction->setIcon( QIcon( ":/images/explorer" ) );
-	ShowMineAction = new QAction( "View My Jobs", this );
-	ShowMineAction->setCheckable( TRUE );
-	ShowMineAction->setIcon( QIcon( ":/images/show_mine" ) );
-	ClearErrorsAction = new QAction( "Clear Job Errors", this );
-	
-	DependencyTreeEnabledAction = new QAction( "Show Dependency Tree", this );
-	DependencyTreeEnabledAction->setCheckable( true );
-	connect( DependencyTreeEnabledAction, SIGNAL( toggled( bool ) ), SLOT( setDependencyTreeEnabled( bool ) ) );
-
-	NewViewFromSelectionAction = new QAction( "New View From Selection", this );
-	connect( NewViewFromSelectionAction, SIGNAL( triggered(bool) ), SLOT( createNewViewFromSelection() ) );
-
-	mJobFilterEdit = new JobFilterEdit( this );
-	connect( mJobFilterEdit, SIGNAL( filterChanged( const QString & ) ), SLOT( jobFilterChanged( const QString & ) ) );
-
-	connect( RefreshAction, SIGNAL( triggered(bool) ), SLOT( refresh() ) );
-
-	connect( RestartAction, SIGNAL( triggered(bool) ), SLOT( restartJobs() ) );
-	connect( ResumeAction, SIGNAL( triggered(bool) ), SLOT( resumeJobs() ) );
-	connect( PauseAction, SIGNAL( triggered(bool) ), SLOT( pauseJobs() ) );
-	connect( KillAction, SIGNAL( triggered(bool) ), SLOT( deleteJobs() ) );
-	connect( ShowMineAction, SIGNAL( toggled(bool) ), SLOT( showMine(bool) ) );
-	connect( ShowOutputAction, SIGNAL( triggered(bool) ), SLOT( outputPathExplorer() ) );
-	connect( ClearErrorsAction, SIGNAL( triggered(bool) ), SLOT( clearErrors() ) );
-
-	connect( mJobTree, SIGNAL( selectionChanged(RecordList) ), SLOT( jobListSelectionChanged() ) );
-	connect( mJobTree, SIGNAL( currentChanged( const Record & ) ), SLOT( currentJobChanged() ) );
-	connect( mFrameTree, SIGNAL( currentChanged( const Record & ) ), SLOT( frameSelected(const Record &) ) );
-	connect( mFrameTree,  SIGNAL( selectionChanged(RecordList) ), SLOT( frameListSelectionChanged() ) );
-	connect( mImageView, SIGNAL( frameStatusChange(int,int) ), SLOT( setFrameCacheStatus(int,int) ) );
-
-	mJobTree->setContextMenuPolicy( Qt::CustomContextMenu );
-	mFrameTree->setContextMenuPolicy( Qt::CustomContextMenu );
-	mErrorTree->setContextMenuPolicy( Qt::CustomContextMenu );
-
-	connect( mJobTree, SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( showJobPopup( const QPoint & ) ) );
-	connect( mFrameTree, SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( showFramePopup( const QPoint & ) ) );
-	connect( mErrorTree,  SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( showErrorPopup( const QPoint & ) ) );
-
-	connect( mJobTabWidget, SIGNAL( currentChanged( int ) ), SLOT( currentTabChanged() ) );
-
-
-	{
-		JobModel * jm = new JobModel( mJobTree );
-		jm->setAutoSort( true );
-		mJobTree->setModel( jm );
-		mJobTree->setItemDelegate( new ProgressDelegate( mJobTree ) );
-		mJobTree->setDragEnabled( true );
-		mJobTree->setAcceptDrops( true );
-		mJobTree->setDropIndicatorShown(true);
-	}
-
-	{
-		//mErrorTree->setItemDelegate( new MultiLineDelegate( mErrorTree ) );
-		mErrorTree->setUniformRowHeights( false );
-		ErrorModel * em = new ErrorModel( mErrorTree );
-		em->setAutoSort( true );
-		mErrorTree->setModel( em );
-		for( int i=0; i<7; i++ )
-			mErrorTree->setColumnAutoResize(i,true);
-	}
-
-	{
-		RecordSuperModel * fm = new RecordSuperModel( mFrameTree );
-		new FrameTranslator( fm->treeBuilder() );
-		fm->setAutoSort( true );
-		mFrameTree->setModel( fm );
-		mFrameTree->setItemDelegate( new LoadedDelegate( mJobTree ) );
-	}
-
-	mStatusFilterMenu = new StatusFilterMenu( this );
-	mProjectFilterMenu = new ProjectFilterMenu( this );
-	mJobTypeFilterMenu = new JobTypeFilterMenu( this );
-
-	// Give default settings
-	IniConfig empty;
-	restore(empty);
-
-	jobListSelectionChanged();
-	FreezerCore::addTask( new StaticJobListDataTask( this ) );
 }
 
 JobListWidget::~JobListWidget()
@@ -171,70 +76,193 @@ JobListWidget::~JobListWidget()
 
 QString JobListWidget::viewType() const
 {
-	return "JobList";
+       return "JobList";
+}
+
+void JobListWidget::initializeViews()
+{
+    if( !mViewsInitialized ) {
+        mViewsInitialized = true;
+
+        mTabToolBar = new TabToolBar( mJobTabWidget, mImageView );
+
+        RefreshAction = new QAction( "Refresh Job(s)", this );
+        RefreshAction->setIcon( QIcon( ":/images/refresh" ) );
+
+        KillAction = new QAction( "Remove Selected Jobs", this );
+        KillAction->setIcon( QIcon( ":/images/kill" ) );
+        PauseAction = new QAction( "Pause Selected Jobs", this );
+        PauseAction->setIcon( QIcon( ":/images/pause" ) );
+        ResumeAction = new QAction( "Resume Selected Jobs", this );
+        ResumeAction->setIcon( QIcon( ":/images/resume" ) );
+        RestartAction = new QAction( "Restart Job(s)", this );
+        RestartAction->setIcon( QIcon( ":/images/restart" ) );
+        ShowOutputAction = new QAction( "Show Output Directory", this );
+        ShowOutputAction->setIcon( QIcon( ":/images/explorer" ) );
+        ShowMineAction = new QAction( "View My Jobs", this );
+        ShowMineAction->setCheckable( TRUE );
+        ShowMineAction->setIcon( QIcon( ":/images/show_mine" ) );
+        ClearErrorsAction = new QAction( "Clear Job Errors", this );
+        
+        DependencyTreeEnabledAction = new QAction( "Show Dependency Tree", this );
+        DependencyTreeEnabledAction->setCheckable( true );
+        connect( DependencyTreeEnabledAction, SIGNAL( toggled( bool ) ), SLOT( setDependencyTreeEnabled( bool ) ) );
+
+        NewViewFromSelectionAction = new QAction( "New View From Selection", this );
+        connect( NewViewFromSelectionAction, SIGNAL( triggered(bool) ), SLOT( createNewViewFromSelection() ) );
+
+        mJobFilterEdit = new JobFilterEdit( this );
+        connect( mJobFilterEdit, SIGNAL( filterChanged( const QString & ) ), SLOT( jobFilterChanged( const QString & ) ) );
+
+        connect( RefreshAction, SIGNAL( triggered(bool) ), SLOT( refresh() ) );
+
+        connect( RestartAction, SIGNAL( triggered(bool) ), SLOT( restartJobs() ) );
+        connect( ResumeAction, SIGNAL( triggered(bool) ), SLOT( resumeJobs() ) );
+        connect( PauseAction, SIGNAL( triggered(bool) ), SLOT( pauseJobs() ) );
+        connect( KillAction, SIGNAL( triggered(bool) ), SLOT( deleteJobs() ) );
+        connect( ShowMineAction, SIGNAL( toggled(bool) ), SLOT( showMine(bool) ) );
+        connect( ShowOutputAction, SIGNAL( triggered(bool) ), SLOT( outputPathExplorer() ) );
+        connect( ClearErrorsAction, SIGNAL( triggered(bool) ), SLOT( clearErrors() ) );
+
+        connect( mJobTree, SIGNAL( selectionChanged(RecordList) ), SLOT( jobListSelectionChanged() ) );
+        connect( mJobTree, SIGNAL( currentChanged( const Record & ) ), SLOT( currentJobChanged() ) );
+        connect( mFrameTree, SIGNAL( currentChanged( const Record & ) ), SLOT( frameSelected(const Record &) ) );
+        connect( mFrameTree,  SIGNAL( selectionChanged(RecordList) ), SLOT( frameListSelectionChanged() ) );
+        connect( mImageView, SIGNAL( frameStatusChange(int,int) ), SLOT( setFrameCacheStatus(int,int) ) );
+
+        mJobTree->setContextMenuPolicy( Qt::CustomContextMenu );
+        mFrameTree->setContextMenuPolicy( Qt::CustomContextMenu );
+        mErrorTree->setContextMenuPolicy( Qt::CustomContextMenu );
+
+        connect( mJobTree, SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( showJobPopup( const QPoint & ) ) );
+        connect( mFrameTree, SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( showFramePopup( const QPoint & ) ) );
+        connect( mErrorTree,  SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( showErrorPopup( const QPoint & ) ) );
+
+        connect( mJobTabWidget, SIGNAL( currentChanged( int ) ), SLOT( currentTabChanged() ) );
+
+
+        {
+            JobModel * jm = new JobModel( mJobTree );
+            jm->setAutoSort( true );
+            mJobTree->setModel( jm );
+            mJobTree->setItemDelegate( new ProgressDelegate( mJobTree ) );
+            mJobTree->setDragEnabled( true );
+            mJobTree->setAcceptDrops( true );
+            mJobTree->setDropIndicatorShown(true);
+            connect( jm, SIGNAL( dependencyAdded( const QModelIndex & ) ), mJobTree, SLOT( expand( const QModelIndex & ) ) );
+        }
+
+        {
+            //mErrorTree->setItemDelegate( new MultiLineDelegate( mErrorTree ) );
+            mErrorTree->setUniformRowHeights( false );
+            ErrorModel * em = new ErrorModel( mErrorTree );
+            em->setAutoSort( true );
+            mErrorTree->setModel( em );
+            for( int i=0; i<7; i++ )
+                mErrorTree->setColumnAutoResize(i,true);
+        }
+
+        {
+            RecordSuperModel * fm = new RecordSuperModel( mFrameTree );
+            new FrameTranslator( fm->treeBuilder() );
+            fm->setAutoSort( true );
+            mFrameTree->setModel( fm );
+            mFrameTree->setItemDelegate( new LoadedDelegate( mJobTree ) );
+            mFrameTree->setColumnAutoResize( 0, true );
+        }
+
+        mStatusFilterMenu = new StatusFilterMenu( this );
+        mProjectFilterMenu = new ProjectFilterMenu( this );
+        mJobTypeFilterMenu = new JobTypeFilterMenu( this );
+
+        // Give default settings
+        IniConfig empty;
+        restore(empty);
+
+        jobListSelectionChanged();
+        FreezerCore::addTask( new StaticJobListDataTask( this ) );
+
+        IniConfig & ini = viewConfig();
+        setupJobView(mJobTree, ini);
+        setupErrorView(mErrorTree, ini);
+        setupFrameView(mFrameTree, ini);
+
+        setDependencyTreeEnabled( ini.readBool( "DependencyTreeEnabled", false ), /* allowRefresh= */ false );
+
+        QStringList sl = ini.readString( "JobSplitterPos" ).split(',');
+        QList<int> vl;
+        for( QStringList::Iterator it=sl.begin(); it!=sl.end(); ++it )
+            vl += (*it).toInt();
+        if( vl.size()!=2 ) {
+            vl.clear();
+            int h = height();
+            if( h < 300 )
+                vl << h << 0;
+            else
+                vl << (int)(h * .6) << (int)(h * .4);
+        }
+
+        mJobSplitter->setSizes( vl );
+
+        ShowMineAction->blockSignals(true);
+        ShowMineAction->setChecked( !ini.readString( "UserList", "" ).isEmpty() );
+        ShowMineAction->blockSignals(false);
+ 
+        // Filter any empty entries.  And empty string split with ',' returns a string list with one empty entry
+        mJobFilter.typeToShow = ini.readString( "TypeToShow" ).split(',',QString::SkipEmptyParts);
+        mJobFilter.statusToShow =   ini.readString( "StatusToShow", "submit,verify,ready,holding,started,suspended,done" ).split(',',QString::SkipEmptyParts);
+        mJobFilter.userList =       ini.readString( "UserList", "" ).split(',',QString::SkipEmptyParts);
+        mJobFilter.allProjectsShown = ini.readBool( "AllProjectsShown", false );
+        if( ini.keys().contains( "VisibleProjects" ) ) {
+            mJobFilter.visibleProjects = mProjectList.keyString().split(',',QString::SkipEmptyParts);
+        } else {
+            mJobFilter.hiddenProjects = ini.readString( "HiddenProjects", "" ).split(',',QString::SkipEmptyParts);
+            if( mJobFilter.hiddenProjects.isEmpty() )
+                mJobFilter.allProjectsShown = true;
+        }
+        mJobFilter.showNonProjectJobs = ini.readBool( "ShowNonProjectJobs", true );
+        mJobFilterEdit->lineEdit()->setText(ini.readString( "ExtraFilterText", "" ));
+        mJobFilter.mExtraFilters = mJobFilterEdit->sqlFilter();
+        mJobFilter.mLimit = options.mLimit;
+        applyOptions();
+    }
 }
 
 void JobListWidget::save( IniConfig & ini )
 {
-	ini.writeString("ViewType","JobList");
-	saveJobView(mJobTree,ini);
-	saveErrorView(mErrorTree,ini);
-	saveFrameView(mFrameTree,ini);
-	ini.writeString( "StatusToShow", mJobFilter.statusToShow.join(",") );
-	ini.writeString( "UserList", mJobFilter.userList.join(",") );
-	ini.writeString( "HiddenProjects", mJobFilter.hiddenProjects.join(",") );
-	ini.writeBool( "ShowNonProjectJobs", mJobFilter.showNonProjectJobs );
-	ini.writeString( "ExtraFilters", mJobFilterEdit->lineEdit()->text() );
-	ini.writeString( "TypeToShow", mJobFilter.typeToShow.join(",") );
-	ini.writeBool( "DependencyTreeEnabled", isDependencyTreeEnabled() );
-	// Save the splitter position by making a string of ints separated by commas
-	// Output string
-	QString jsps;
-	// Use comma
-	QList<int> list = mJobSplitter->sizes();
-	QStringList sizes;
-	foreach( int i, list ) sizes += QString::number(i);
-	ini.writeString( "JobSplitterPos", sizes.join(",") );
-	AssfreezerView::save(ini);
+    if( mViewsInitialized ) {
+        ini.writeString("ViewType","JobList");
+        saveJobView(mJobTree,ini);
+        saveErrorView(mErrorTree,ini);
+        saveFrameView(mFrameTree,ini);
+        ini.writeString( "StatusToShow", mJobFilter.statusToShow.join(",") );
+        ini.writeString( "UserList", mJobFilter.userList.join(",") );
+        ini.writeString( "VisibleProjects", mJobFilter.visibleProjects.join(",") );
+        ini.removeKey( "HiddenProjects" );
+        ini.writeBool( "AllProjectsShown", mJobFilter.allProjectsShown );
+        ini.writeBool( "ShowNonProjectJobs", mJobFilter.showNonProjectJobs );
+        ini.writeString( "ExtraFilters", mJobFilterEdit->lineEdit()->text() );
+        ini.writeString( "TypeToShow", mJobFilter.typeToShow.join(",") );
+        ini.writeBool( "DependencyTreeEnabled", isDependencyTreeEnabled() );
+        // Save the splitter position by making a string of ints separated by commas
+        // Output string
+        QString jsps;
+        // Use comma
+        QList<int> list = mJobSplitter->sizes();
+        // Stupid qsplitter doesn't return proper sizes if this tab hasn't been shown
+        // It returns 12/12 or 13/13 in that case so we won't save
+        if( list.size() == 2 && !(list[0] == list[1] && list[0] < 20)) {
+            QStringList sizes;
+            foreach( int i, list ) sizes += QString::number(i);
+            ini.writeString( "JobSplitterPos", sizes.join(",") );
+        }
+    }
+    AssfreezerView::save(ini);
 }
 
 void JobListWidget::restore( IniConfig & ini )
 {
-	setupJobView(mJobTree, ini);
-	setupErrorView(mErrorTree, ini);
-	setupFrameView(mFrameTree, ini);
-
-	setDependencyTreeEnabled( ini.readBool( "DependencyTreeEnabled", false ), /* allowRefresh= */ false );
-
-	QStringList sl = ini.readString( "JobSplitterPos" ).split(',');
-	QList<int> vl;
-	for( QStringList::Iterator it=sl.begin(); it!=sl.end(); ++it )
-		vl += (*it).toInt();
-	if( vl.size()!=2 ) {
-		vl.clear();
-		int h = height();
-		if( h < 300 )
-			vl << h << 0;
-		else
-			vl << (int)(h * .6) << (int)(h * .4);
-	}
-
-	mJobSplitter->setSizes( vl );
-
-	ShowMineAction->setChecked( !ini.readString( "UserList", "" ).isEmpty() );
-	// Filter any empty entries.  And empty string split with ',' returns a string list with one empty entry
-	mJobFilter.typeToShow = ini.readString( "TypeToShow" ).split(',').filter(QRegExp("^.+$"));
-	mJobFilter.statusToShow = 	ini.readString( "StatusToShow", "submit,verify,ready,holding,started,suspended,done" ).split(',').filter(QRegExp("^.+$"));
-	mJobFilter.statusToShow.removeAll( QString() );
-	mJobFilter.userList = 		ini.readString( "UserList", "" ).split(',').filter(QRegExp("^.+$"));
-	mJobFilter.userList.removeAll( QString() );
-	mJobFilter.hiddenProjects = ini.readString( "HiddenProjects", "" ).split(',').filter(QRegExp("^.+$"));
-	mJobFilter.hiddenProjects.removeAll( QString() );
-	mJobFilter.showNonProjectJobs = ini.readBool( "ShowNonProjectJobs", true );
-	mJobFilterEdit->lineEdit()->setText(ini.readString( "ExtraFilterText", "" ));
-	mJobFilter.mExtraFilters = mJobFilterEdit->sqlFilter();
-	mJobFilter.mLimit = options.mLimit;
-	AssfreezerView::restore(ini);
+    AssfreezerView::restore(ini);
 }
 
 ProjectList JobListWidget::activeProjects()
@@ -257,6 +285,14 @@ void JobListWidget::setDependencyTreeEnabled( bool dte, bool allowRefresh )
 	}
 }
 
+bool JobListWidget::event( QEvent * event )
+{
+    if( event->type() == QEvent::Show ) {
+        initializeViews();
+    }
+    return QWidget::event(event);
+}
+
 void JobListWidget::customEvent( QEvent * evt )
 {
 	switch( evt->type() ) {
@@ -275,7 +311,7 @@ void JobListWidget::customEvent( QEvent * evt )
 					JobItem & ji = JobTranslator::data(*it);
 					if( jobServicesByJob.contains( ji.job ) ) {
 						ji.services = jobServicesByJob[ji.job].services().services().join(",");
-						LOG_5( "Set Job " + ji.job.name() + " services to " + ji.services );
+						//LOG_5( "Set Job " + ji.job.name() + " services to " + ji.services );
 					} else
 						LOG_5( "No services found for " + ji.job.name() );
 				}
@@ -350,9 +386,9 @@ void JobListWidget::customEvent( QEvent * evt )
 
 			// Default to showing all of the services and job types
 			if( mJobFilter.typeToShow.isEmpty() )
-				mJobFilter.typeToShow = mJobTypeList.keyString().split(',');
+                mJobFilter.typeToShow = mJobTypeList.filter( "fkeyparentjobtype", QVariant() ).keyString().split(',',QString::SkipEmptyParts);
 			else
-				mJobFilter.typeToShow = verifyKeyList( mJobFilter.typeToShow.join(","), JobType::table() ).split(",");
+                mJobFilter.typeToShow = verifyKeyList( mJobFilter.typeToShow.join(","), JobType::table() ).split(',',QString::SkipEmptyParts);
 			// If we haven't retrieved the static data, then mJobTaskRunning indicates
 			// that we need to refresh the job list.
 			if( mJobTaskRunning ) {
@@ -379,6 +415,7 @@ void JobListWidget::customEvent( QEvent * evt )
 QToolBar * JobListWidget::toolBar( QMainWindow * mw )
 {
 	if( !mToolBar ) {
+        initializeViews();
 		mToolBar = new QToolBar( mw );
 		mToolBar->addAction( RefreshAction );
 		mToolBar->addSeparator();
@@ -396,6 +433,7 @@ QToolBar * JobListWidget::toolBar( QMainWindow * mw )
 
 void JobListWidget::populateViewMenu( QMenu * viewMenu )
 {
+    initializeViews();
 	viewMenu->addAction( DependencyTreeEnabledAction );
 	viewMenu->addAction( NewViewFromSelectionAction );
 	viewMenu->addSeparator();
@@ -421,24 +459,26 @@ void JobListWidget::setLimit()
 
 void JobListWidget::applyOptions()
 {
-	mJobFilter.mLimit = options.mLimit;
-	mJobTree->setFont( options.jobFont );
-	mFrameTree->setFont( options.frameFont );
-	mErrorTree->setFont( options.frameFont );
-	mSummaryTab->setFont( options.summaryFont );
-	options.mJobColors->apply(mJobTree);
-	options.mFrameColors->apply(mFrameTree);
-	options.mErrorColors->apply(mErrorTree);
+    if( mViewsInitialized ) {
+        mJobFilter.mLimit = options.mLimit;
+        mJobTree->setFont( options.jobFont );
+        mFrameTree->setFont( options.frameFont );
+        mErrorTree->setFont( options.frameFont );
+        mSummaryTab->setFont( options.summaryFont );
+        options.mJobColors->apply(mJobTree);
+        options.mFrameColors->apply(mFrameTree);
+        options.mErrorColors->apply(mErrorTree);
 
-    QPalette p = mJobTree->palette();
-	ColorOption * co = options.mJobColors->getColorOption("Default");
-	p.setColor(QPalette::Active, QPalette::AlternateBase, co->bg.darker(120));
-	p.setColor(QPalette::Inactive, QPalette::AlternateBase, co->bg.darker(120));
-	mJobTree->setPalette( p );
+        QPalette p = mJobTree->palette();
+        ColorOption * co = options.mJobColors->getColorOption("Default");
+        p.setColor(QPalette::Active, QPalette::AlternateBase, co->bg.darker(120));
+        p.setColor(QPalette::Inactive, QPalette::AlternateBase, co->bg.darker(120));
+        mJobTree->setPalette( p );
 
-	mJobTree->update();
-	mFrameTree->update();
-	mErrorTree->update();
+        mJobTree->update();
+        mFrameTree->update();
+        mErrorTree->update();
+    }
 }
 
 void JobListWidget::setJobFilter( const JobFilter & jf )

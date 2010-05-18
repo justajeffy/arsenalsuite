@@ -156,10 +156,14 @@ protected:
 	void restore( IniConfig & ini );
 
 	void customEvent( QEvent * evt );
+	bool event( QEvent * evt );
+
+    void initializeViews();
 
 	QToolBar * mToolBar;
 	TabToolBar * mTabToolBar;
 
+    bool mViewsInitialized;
 	bool mJobTaskRunning;
 	bool mQueuedJobRefresh;
 
