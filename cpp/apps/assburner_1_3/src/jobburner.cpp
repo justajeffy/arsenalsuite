@@ -756,13 +756,30 @@ void JobBurner::slotProcessOutput( const QByteArray & output, QProcess::ProcessC
 
 void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessChannel )
 {
-	if( mProgressRE.indexIn(line) >= 0 )
+    // if the job supports progress messages, see if there's an update
+	if( mJob.hasTaskProgress() && mProgressRE.indexIn(line) >= 0 )
 		setProgress( mProgressRE.cap(0).toInt() );
-	foreach( QRegExp re, mErrorREs )
+
+#ifdef USE_TIME_WRAP
+	// # baztime:real:%e:user:%U:sys:%S:iowait:%w
+	if( line.startsWith("baztime:") ) {
+		QStringList jobStats = line.split(":");
+        // time reports things in decimal seconds, but we want to store
+        // them in msecs
+		mJobAssignment.setRealtime( jobStats[2].toUInt() * 1000 );
+		mJobAssignment.setUsertime( jobStats[4].toUInt() * 1000 );
+		mJobAssignment.setSystime( jobStats[6].toUInt() * 1000 );
+		mJobAssignment.commit();
+	}
+#endif
+
+    // check all error messages against current line
+	foreach( QRegExp re, mErrorREs ) {
 		if( line.contains( re ) ) {
 			jobErrored( line );
 			return;
 		}
+    }
 }
 
 void JobBurner::slotProcessExited()

@@ -64,7 +64,7 @@ struct AccountingInfo {
         opsWrite(0),
         ioWait(0) {}
 
-    int pid,
+    uint pid,
         ppid,
         realTime,
         cpuTime,

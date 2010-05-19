@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: batchburner.cpp 9610 2010-03-29 22:42:27Z brobison $
+ * $Id$
   */
 
 #ifdef COMPILE_BATCH_BURNER
@@ -160,17 +160,6 @@ void BatchBurner::slotProcessExited()
 void BatchBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessChannel channel )
 {
 	JobBurner::slotProcessOutputLine( line, channel );
-#ifdef USE_TIME_WRAP
-	// # baztime:real:%e:user:%U:sys:%S:iowait:%w
-	if( line.startsWith("baztime:") ) {
-		QStringList jobStats = line.split(":");
-		mJobAssignment.setRealtime( jobStats[2].toFloat() );
-		mJobAssignment.setUsertime( jobStats[4].toFloat() );
-		mJobAssignment.setSystime( jobStats[6].toFloat() );
-		//mJobAssignment.setIowait( jobStats[8].toInt() );
-		mJobAssignment.commit();
-	}
-#endif
 }
 
 #endif
