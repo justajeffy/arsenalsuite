@@ -52,8 +52,7 @@ unix{
 	LIBS+=-L../../lib/stone -lstone
 	LIBS+=-L../../lib/absubmit -labsubmit
 
-	unix!macx: LIBS+=-L/drd/software/ext/imageMagick/lin64/current/lib
-	macx: LIBS+=-L/drd/software/ext/imageMagick/osx/current/lib
+	unix: LIBS+=-L$$(MAGICK_ROOT)/lib
 
     #LIBS+=-Wl,-rpath .
     LIBS+=-lMagick++

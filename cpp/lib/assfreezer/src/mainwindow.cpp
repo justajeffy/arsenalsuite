@@ -748,7 +748,7 @@ void MainWindow::populateToolsMenu()
     mToolsMenu->addAction( "Project Weighting...", this, SLOT( showProjectWeightDialog() ) );
 
     // We only need to populate this menu once
-    mToolsMenu->disconnect( this, SIGNAL( aboutToShow() ) );
+    mToolsMenu->disconnect( this, SLOT( populateToolsMenu() ) );
 }
 
 void MainWindow::populateViewMenu()
