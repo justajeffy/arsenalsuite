@@ -742,9 +742,9 @@
   <column reverseAccess="true" type="uint" methodName="JobError" name="fkeyJobError" >
    <fkey indexDeleteMode="DoNothingOnDelete" indexName="JobError" indexUseCache="false" table="JobError" type="single" hasIndex="true" />
   </column>
-  <column type="float" methodName="realtime" name="realtime" />
-  <column type="float" methodName="usertime" name="usertime" />
-  <column type="float" methodName="systime" name="systime" />
+  <column type="uint" methodName="realtime" name="realtime" />
+  <column type="uint" methodName="usertime" name="usertime" />
+  <column type="uint" methodName="systime" name="systime" />
   <column type="uint" methodName="iowait" name="iowait" />
   <column pluralMethodName="bytesRead" type="uint" methodName="bytesRead" name="bytesRead" />
   <column pluralMethodName="bytesWrite" type="uint" methodName="bytesWrite" name="bytesWrite" />
@@ -1770,7 +1770,7 @@
   <column type="uint" methodName="group" name="fkeygrp" >
    <fkey indexDeleteMode="DoNothingOnDelete" indexName="Group" indexUseCache="true" table="Group" type="multi" hasIndex="true" />
   </column>
-  <index useCache="false" type="single" name="UserAndGroup" >
+  <index useCache="true" type="single" name="UserAndGroup" >
    <column name="fkeyusr" />
    <column name="fkeygrp" />
   </index>
