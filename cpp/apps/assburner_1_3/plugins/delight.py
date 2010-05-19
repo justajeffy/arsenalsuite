@@ -132,13 +132,7 @@ class DelightBurner(JobBurner):
         JobBurner.slotProcessOutputLine(self,line,channel)
 
         # Frame status
-        #if self.frameDone.indexIn(line) >= 0:
-        #    frame = int(self.frameDone.cap(1))
-        #    self.taskDone(frame)
         if self.frameStart.indexIn(line) >= 0:
-            #if self.burnFile().endsWith("..rib"):
-            #	frame = int(self.frameStart.cap(1))
-
             if self.CurrentFrame is None:
                 self.CurrentFrame = self.StartFrame
             else:
@@ -148,14 +142,6 @@ class DelightBurner(JobBurner):
             if self.CurrentFrame <= self.EndFrame:
                 self.taskStart(self.CurrentFrame)
         elif line.contains(self.jobDone):
-            #jobStats = line.split(":")
-          # baztime:real:%e:user:%U:sys:%S:iowait:%w
-            #jch = self.jobCommandHistory()
-            #jch.setRealtime( jobStats[2] )
-            #jch.setUsertime( jobStats[4] )
-            #jch.setSystime( jobStats[6] )
-            #jch.setIowait( jobStats[8] )
-            #jch.commit()
             self.taskDone(self.CurrentFrame)
             self.jobFinished()
         else:

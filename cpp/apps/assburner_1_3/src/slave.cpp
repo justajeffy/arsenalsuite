@@ -1115,8 +1115,12 @@ AccountingInfo Slave::parseTaskLoggerOutput( const QString & line )
 
     info.pid = parts[0].toInt();
     info.ppid = parts[1].toInt();
-    info.realTime = parts[3].toInt();
-    info.cpuTime = parts[4].toInt() + parts[5].toInt();
+
+    // times are reported in usecs, but we want to store them as msecs
+    // which is what we record from baztime too
+    info.realTime = int(parts[3].toInt()/1000);
+    info.cpuTime = int((parts[4].toInt() + parts[5].toInt()) / 1000);
+
     info.memory = parts[6].toInt();
     info.bytesRead = parts[8].toInt();
     info.bytesWrite = parts[9].toInt();
