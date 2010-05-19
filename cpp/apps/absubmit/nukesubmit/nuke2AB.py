@@ -135,7 +135,12 @@ class NukeRenderDialog(QDialog):
         sl['packetSize'] = str(self.packetSize())
         sl['fileName'] = str(self.mFileNameEdit.text())
         sl['append'] = str(self.mAppendEdit.text())
-        sl['environment'] = subprocess.Popen(["/drd/software/int/bin/launcher.sh","-p", "hf2", "-d", "visdev", "-e", "nuke"], stdout=subprocess.PIPE).communicate()[0]
+        launcherPreset = "nuke"
+        if self.mOculaCheck.isChecked():
+            launcherPreset = "ext/nuke/nuke_ocula"
+            self.Services.append("Nuke")
+            self.Services.append("ocula")
+        sl['environment'] = subprocess.Popen(["/drd/software/int/bin/launcher.sh","-p", os.environ["DRD_JOB"], "-d", os.environ["DRD_DEPT"], "-e", launcherPreset], stdout=subprocess.PIPE).communicate()[0]
 
         sl['minMemory'] = "1388608"
         sl['maxMemory'] = "8388608"
