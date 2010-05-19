@@ -8,7 +8,7 @@ import nuke
 
 def launchSubmit():
 	print("nukeStub(): launch submitter dialog")
-	submitCmd = "/drd/software/int/bin/launcher.sh -p hf2 -d visdev --launchBlocking farm -o EPA_CMDLINE python2.5 --arg '$ABSUBMIT/nukesubmit/nuke2AB.py'"
+	submitCmd = "/drd/software/int/bin/launcher.sh -p %s -d %s --launchBlocking farm -o EPA_CMDLINE python2.5 --arg '$ABSUBMIT/nukesubmit/nuke2AB.py'" % (os.environ['DRD_JOB'], os.environ['DRD_DEPT'])
 	# root.name holds the path to the nuke script
 	submitCmd += " %s" % nuke.value("root.name")
 	submitCmd += " %s" % nuke.Root.firstFrame(nuke.root())

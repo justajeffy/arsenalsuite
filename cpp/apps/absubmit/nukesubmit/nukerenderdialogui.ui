@@ -237,6 +237,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="mOculaCheck">
+        <property name="text">
+         <string>Use Ocula License</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="mSubmitSuspendedCheck">
         <property name="text">
          <string>Suspend Job When Submission Finishes</string>
