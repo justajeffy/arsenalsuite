@@ -108,6 +108,7 @@ protected:
 	JobOutputList mOutputs;
 	JobDepList mJobDeps;
 	JobTaskList mTasks;
+    JobServiceList mServices;
 
 	QFtp * mFtp;
 	QFile * mFile;

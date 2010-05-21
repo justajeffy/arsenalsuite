@@ -116,6 +116,7 @@ void Submitter::newJobOfType( const JobType & jobType )
         mJob.setJobType( jobType );
         mJob.setStatus( "submit" );
         mJob.setColumnLiteral( "submittedts", "now()" );
+        mJob.commit();
     }
 }
 
@@ -159,7 +160,7 @@ void Submitter::addJobOutput( const QString & outputPath, const QString & output
 {
 	JobOutput jo;
 	jo.setName( outputName.isEmpty() ? "Output " + QString::number(mOutputs.size()) : outputName );
-	jo.setFileTracker( getOutputFileTracker( outputPath ) );
+	//jo.setFileTracker( getOutputFileTracker( outputPath ) );
 	jo.setJob( mJob );
 	jo.commit();
 	mOutputs += jo;
@@ -190,7 +191,7 @@ void Submitter::addDependencies( JobList deps, uint depType )
 	}
 	jdl.setJobs( mJob );
 	jdl.commit();
-	mJobDeps += jdl;
+	//mJobDeps += jdl;
 }
 
 void Submitter::applyArgs( const QMap<QString,QString> & args )
@@ -376,8 +377,8 @@ void Submitter::submit()
 		preCopy();
 		startCopy();
 	} else {
-		if( jobHasFile )
-			checkMd5();
+		//if( jobHasFile )
+		//	checkMd5();
 		mJob.setStatus( mSubmitSuspended ? "verify-suspended" : "verify" );
 		mJob.commit();
 		printJobInfo();
