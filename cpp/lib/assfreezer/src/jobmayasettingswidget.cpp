@@ -80,7 +80,7 @@ QStringList JobMayaSettingsWidget::supportedJobTypes()
 
 QStringList JobMayaSettingsWidget::jobTypes()
 {
-	return (QStringList() << "Maya7" << "Maya8" << "Maya85" << "Maya2008" << "Maya2009" << "MentalRay85" );
+	return (QStringList() << "Maya7" << "Maya8" << "Maya85" << "Maya2008" << "Maya2009" << "Maya2011" << "MentalRay85" << "MentalRay2009" << "MentalRay2011" );
 }
 
 template<class T> static QList<T> unique( QList<T> list )

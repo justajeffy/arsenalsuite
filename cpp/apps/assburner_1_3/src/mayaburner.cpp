@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: mayaburner.cpp 9052 2009-11-23 00:20:40Z brobison $
+ * $Id$
  */
 
 #ifdef COMPILE_MAYA_BURNER
@@ -174,7 +174,7 @@ QString MayaBurner::executable() const
 		ret = "su - "+mJob.user().name()+" -c \"/usr/aw/maya8.5/bin/Render ";
 	else if ( jt == "Maya2008" )
 		ret = "su - "+mJob.user().name()+" -c \"/usr/autodesk/maya2008-x64/bin/Render ";
-	else if ( jt == "Maya2009" )
+	else
 		ret = "su "+mJob.user().name()+" -c \"Render ";
 	return ret;
 }
@@ -204,13 +204,18 @@ void MayaBurner::startProcess()
 		mCmdString += "\"";
 	}
 
+#ifdef USE_TIME_WRAP
+	QString timeCmd = "/usr/bin/time --format=baztime:real:%e:user:%U:sys:%S:iowait:%w ";
+	mCmdString = timeCmd + mCmdString;
+#endif
+
 	mCmd = new QProcess( this );
 	connectProcess( mCmd );
 
 	mJobAssignment.setCommand(mCmdString);
 
-  logMessage( "Environment: " + env.join("\n") );
-	logMessage( "M7B: Starting Cmd: " + mCmdString );
+    logMessage( "Environment: " + env.join("\n") );
+	logMessage( "MB: Starting Cmd: " + mCmdString );
 	mCmd->setEnvironment(env);
 	mCmd->start( mCmdString );
 

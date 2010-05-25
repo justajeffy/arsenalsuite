@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordtreeview.h 6486 2008-05-02 01:34:01Z newellm $
+ * $Id$
  */
 
 #ifndef RECORD_TREE_VIEW_H

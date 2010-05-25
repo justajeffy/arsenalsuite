@@ -478,6 +478,8 @@ void JobBurner::jobErrored( const QString & msg, bool timeout )
 	mCurrentTaskAssignments.commit();
 
 	// This will reset jobtasks and cancel the jobtaskassignments
+    // is this really required with the database triggers that happen when the
+    // JA status changes?
 	Database::current()->exec("SELECT cancel_job_assignment(?)", VarList() << mJobAssignment.key() );
 
 	emit errored( msg );
@@ -763,6 +765,7 @@ void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessCh
 #ifdef USE_TIME_WRAP
 	// # baztime:real:%e:user:%U:sys:%S:iowait:%w
 	if( line.startsWith("baztime:") ) {
+        LOG_3("found baztime line, updating accounting info");
 		QStringList jobStats = line.split(":");
         // time reports things in decimal seconds, but we want to store
         // them in msecs
@@ -824,10 +827,8 @@ QString JobBurner::burnDir() const
 
 void JobBurner::slotFlushOutput()
 {
-	LOG_3("flushing log stream: ");
     mLogStream->flush();
 }
-
 
 void JobBurner::openLogFiles()
 {

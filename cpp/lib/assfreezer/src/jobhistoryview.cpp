@@ -27,7 +27,7 @@ JobHistoryView::JobHistoryView( QWidget * parent )
     setVerticalScrollMode( ScrollPerPixel );
     setHorizontalScrollMode( ScrollPerPixel );
 
-	//options.mErrorColors->apply(this);
+	options.mErrorColors->apply(this);
 }
 
 JobHistoryView::~JobHistoryView()

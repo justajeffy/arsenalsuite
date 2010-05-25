@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: batchburner.h 9229 2010-01-15 00:29:14Z brobison $
+ * $Id$
  */
 
 #ifdef COMPILE_BATCH_BURNER
@@ -53,7 +53,6 @@ public slots:
 	void startProcess();
 	void slotProcessStarted();
 	void slotProcessExited();
-	void slotProcessOutputLine( const QString &, QProcess::ProcessChannel );
 	
 };
 

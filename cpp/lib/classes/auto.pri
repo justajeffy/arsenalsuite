@@ -257,6 +257,9 @@ loader.cpp\
 	autocore/jobmaya2009.cpp \
 	autocore/jobmaya2009list.cpp \
 	autocore/jobmaya2009table.cpp \
+	autocore/jobmaya2011.cpp \
+	autocore/jobmaya2011list.cpp \
+	autocore/jobmaya2011table.cpp \
 	autocore/jobmaya7.cpp \
 	autocore/jobmaya7list.cpp \
 	autocore/jobmaya7table.cpp \
@@ -266,6 +269,12 @@ loader.cpp\
 	autocore/jobmaya85.cpp \
 	autocore/jobmaya85list.cpp \
 	autocore/jobmaya85table.cpp \
+	autocore/jobmentalray2009.cpp \
+	autocore/jobmentalray2009list.cpp \
+	autocore/jobmentalray2009table.cpp \
+	autocore/jobmentalray2011.cpp \
+	autocore/jobmentalray2011list.cpp \
+	autocore/jobmentalray2011table.cpp \
 	autocore/jobmentalray7.cpp \
 	autocore/jobmentalray7list.cpp \
 	autocore/jobmentalray7table.cpp \
@@ -708,6 +717,9 @@ HEADERS += \
 	autocore/jobmaya2009.h \
 	autocore/jobmaya2009list.h \
 	autocore/jobmaya2009table.h \
+	autocore/jobmaya2011.h \
+	autocore/jobmaya2011list.h \
+	autocore/jobmaya2011table.h \
 	autocore/jobmaya7.h \
 	autocore/jobmaya7list.h \
 	autocore/jobmaya7table.h \
@@ -717,6 +729,12 @@ HEADERS += \
 	autocore/jobmaya85.h \
 	autocore/jobmaya85list.h \
 	autocore/jobmaya85table.h \
+	autocore/jobmentalray2009.h \
+	autocore/jobmentalray2009list.h \
+	autocore/jobmentalray2009table.h \
+	autocore/jobmentalray2011.h \
+	autocore/jobmentalray2011list.h \
+	autocore/jobmentalray2011table.h \
 	autocore/jobmentalray7.h \
 	autocore/jobmentalray7list.h \
 	autocore/jobmentalray7table.h \

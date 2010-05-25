@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: record.cpp 9370 2010-02-18 06:08:26Z brobison $
+ * $Id$
  */
 
 #include "connection.h"
@@ -327,7 +327,7 @@ QString Record::changeString() const
 			if( mImp->isColumnModified(f->pos()) ) {
 				if( !orig.isRecord() ) {
 					orig = t->record( key() );
-					if( !orig.isRecord() ) break;
+					if( !orig.isRecord() ) continue;
 				}
 				if( !changeString.isEmpty() )
 					changeString += "\n";

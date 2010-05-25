@@ -16,7 +16,7 @@ Enabled=true
 File=absubmit.log
 MaxFiles=10
 MaxSeverity=5
-MaxSize=1048576
+MaxSize=104857600
 
 [Update Server]
 Enabled=false
