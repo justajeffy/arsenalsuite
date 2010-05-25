@@ -134,6 +134,8 @@ void Job::changePreassignedTaskList( HostList hosts, bool changeCancelledToNew )
 
 void Job::addHistory( const QString & message )
 {
+    if( message.isEmpty() )
+        return;
 	JobHistory jh;
 	jh.setJob( *this );
 	jh.setMessage( message );

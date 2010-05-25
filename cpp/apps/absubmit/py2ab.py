@@ -5,7 +5,7 @@ from PyQt4.QtGui import *
 from blur.Stone import *
 from blur.Classes import *
 from blur.absubmit import Submitter
-from blur import RedirectOutputToLog
+#from blur import RedirectOutputToLog
 import os
 import sys
 import time

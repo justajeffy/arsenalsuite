@@ -1006,12 +1006,15 @@
  </table>
  <table useCodeGen="true" parent="JobMaya" name="JobMaya2008" expireKeyCache="true" className="JobMaya2008" />
  <table useCodeGen="true" parent="JobMaya" name="JobMaya2009" expireKeyCache="true" className="JobMaya2009" />
+ <table useCodeGen="true" parent="JobMaya" name="JobMaya2011" expireKeyCache="true" className="JobMaya2011" />
  <table useCodeGen="true" parent="JobMaya" name="JobMaya7" expireKeyCache="true" className="JobMaya7" />
  <table useCodeGen="true" parent="JobMaya" name="JobMaya8" expireKeyCache="true" className="JobMaya8" />
  <table useCodeGen="true" parent="JobMaya" name="JobMaya85" expireKeyCache="true" className="JobMaya85" />
  <table useCodeGen="true" parent="JobMaya" name="JobMentalRay7" expireKeyCache="true" className="JobMentalRay7" />
  <table useCodeGen="true" parent="JobMaya" name="JobMentalRay8" expireKeyCache="true" className="JobMentalRay8" />
  <table useCodeGen="true" parent="JobMaya" name="JobMentalRay85" expireKeyCache="true" className="JobMentalRay85" />
+ <table useCodeGen="true" parent="JobMaya" name="JobMentalRay2009" expireKeyCache="true" className="JobMentalRay2009" />
+ <table useCodeGen="true" parent="JobMaya" name="JobMentalRay2011" expireKeyCache="true" className="JobMentalRay2011" />
  <table useCodeGen="true" parent="Job" name="JobNuke51" expireKeyCache="true" className="JobNuke51" >
   <column type="uint" methodName="frameStart" name="frameStart" />
   <column type="uint" methodName="frameEnd" name="frameEnd" />

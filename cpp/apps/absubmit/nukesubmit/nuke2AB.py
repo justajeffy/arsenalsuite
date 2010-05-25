@@ -23,7 +23,7 @@ class NukeRenderDialog(QDialog):
         self.connect( self.mHostListButton, SIGNAL('clicked()'), self.showHostSelector )
         self.layout().setSizeConstraint(QLayout.SetFixedSize);
         self.mProjectCombo.setSpecialItemText( 'None' )
-        self.mProjectCombo.setStatusFilters( ProjectStatusList(ProjectStatus.recordByName( 'Production' )) )
+        #self.mProjectCombo.setStatusFilters( ProjectStatusList(ProjectStatus.recordByName( 'Production' )) )
         self.OutputPath = None
         self.HostList = ''
         self.Services = []

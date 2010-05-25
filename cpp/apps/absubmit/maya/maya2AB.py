@@ -5,7 +5,7 @@ from PyQt4.QtGui import *
 from PyQt4.uic import *
 from blur.Stone import *
 from blur.Classes import *
-from blur.Classesui import HostSelector
+from blur.Classesui import *
 from blur.absubmit import Submitter
 import pumpThread as pt
 import sys
@@ -30,21 +30,18 @@ def imageNameParts():
 	if ret[1] == "":
 		ret[1] = "v000"
 
-	ret[2] = parts[2];
+	ret[2] = parts[2]
 
 	r = maya.mel.eval("currentRenderer()")
-	if( ret[2] == "sgi" and r == "mentalRay" and int(cmds.about(version=True)) == 8 ):
+	if( ret[2] == "sgi" and r == "mentalRay" ): # and int(cmds.about(version=True)) == 8 ):
 		ret[2] = "rgb"
 
 	return ret
 
 def version():
-	v = cmds.about(version=True);
-	v = v.replace(".0", "")
-	v = v.replace(".", "")
-	v = v.replace("Service Pack 1", "")
-	v = v.replace(" x64", "")
-	return v;
+    v = os.environ["MAYA_VER"]
+    v = v.replace(".SP1", "")
+    return v
 
 class MayaRenderDialog(QDialog):
 	def __init__(self,parent=None):
@@ -54,15 +51,16 @@ class MayaRenderDialog(QDialog):
 		self.connect( self.mChooseFileNameButton, SIGNAL('clicked()'), self.chooseFileName )
 		self.connect( self.mAllHostsCheck, SIGNAL('toggled(bool)'), self.allHostsToggled )
 		self.connect( self.mHostListButton, SIGNAL('clicked()'), self.showHostSelector )
-		self.layout().setSizeConstraint(QLayout.SetFixedSize);
+		self.layout().setSizeConstraint(QLayout.SetFixedSize)
 		self.mProjectCombo.setSpecialItemText( 'None' )
-		self.mProjectCombo.setStatusFilters( ProjectStatusList(ProjectStatus.recordByName( 'Production' )) )
+		#self.mProjectCombo.setStatusFilters( ProjectStatusList(ProjectStatus.recordByName( 'Production' )) )
 		self.OutputPath = None
 		self.HostList = ''
 		self.Services = []
 		#self.loadSettings()
 
 	def initFields(self):
+		global saveNeeded
 		scenePath = cmds.file(query=True, sceneName=True)
 		sceneName = cmds.file(query=True, shortName=True, sceneName=True)
 		renderableCameras = 0
@@ -82,19 +80,35 @@ class MayaRenderDialog(QDialog):
 				if( lName != "defaultRenderLayer" ):
 					filePrefix = "%/l%s%_l%.4n%.e"
 
-		saveNeeded = False;
+		saveNeeded = False
 		if filePrefix != prevFilePrefix:
 			saveNeeded = True
 
 		cmds.setAttr("defaultRenderGlobals.imageFilePrefix", filePrefix, type="string")
 		cmds.setAttr("defaultRenderGlobals.extensionPadding", 4)
-		cmds.setAttr("defaultRenderGlobals.imageFormat", 5)
+		#cmds.setAttr("defaultRenderGlobals.imageFormat", 5)
 		maya.mel.eval('setMayaSoftwareFrameExt(3,0)')
-		renderDir = cmds.workspace(q=True, dir=True)
-		renderDir += "images/"
-		self.mOutputDirEdit.setText(renderDir)
+		#renderDir = cmds.workspace(q=True, dir=True)
+		#renderDir += "images/"
 		self.mFileNameEdit.setText(scenePath)
 		self.mJobNameEdit.setText(sceneName)
+
+		renderDir = os.environ["DRD_FARM_PIC"] + "/" + sceneName;
+		self.mOutputDirEdit.setText(renderDir)
+
+		if self.mTimelineRadio.isChecked():
+			start = int(maya.mel.eval('playbackOptions -q -min'))
+			end = int(maya.mel.eval('playbackOptions -q -max'))
+		else:
+			start = int(maya.mel.eval('getAttr "defaultRenderGlobals.startFrame"'))
+			end = int(maya.mel.eval('getAttr "defaultRenderGlobals.endFrame"'))
+		self.mFrameStartEdit.setText(QString.number(start))
+		self.mFrameEndEdit.setText(QString.number(end))
+
+		project = Project.recordByName( os.environ["DRD_JOB"] )
+		if project.isRecord():
+			index = self.mProjectCombo.findText( project.name() )
+			self.mProjectCombo.setCurrentIndex( index )
 
 	def loadSettings(self):
 		c = userConfig()
@@ -188,31 +202,41 @@ class MayaRenderDialog(QDialog):
 		sl['packetSize'] = str(self.packetSize())
 		sl['fileName'] = self.mFileNameEdit.text()
 		sl['append'] = self.mAppendEdit.text()
-		#sl['projectPath'] = self.mProjectPathEdit.text()
-		sl['width'] = cmds.getAttr("defaultResolution.width")
-		sl['height'] = cmds.getAttr("defaultResolution.height")
+		if os.environ.has_key("DRD_FARM_TEMP"):
+			sl['projectPath'] = os.environ["DRD_FARM_TEMP"]
+		sl['width'] = str(cmds.getAttr("defaultResolution.width"))
+		sl['height'] = str(cmds.getAttr("defaultResolution.height"))
 		if self.mAllFramesAsSingleTaskCheck.isChecked():
 			sl['allframesassingletask'] = 'true'
 			sl['frameList'] = str('1')
 		else:
-			sl['frameList'] = self.mFrameStartEdit.text()
+			sl['frameList'] = self.mFrameStartEdit.text() + "-" + self.mFrameEndEdit.text()
 		notifyError, notifyComplete = self.buildNotifyStrings()
 		sl['notifyOnError'] = notifyError
 		sl['notifyOnComplete'] = notifyComplete
 		sl['deleteOnComplete'] = str(int(self.mDeleteOnCompleteCheck.isChecked()))
-		if self.mProjectCombo.project().isRecord():
-			sl['projectName'] = self.mProjectCombo.project().name()
+		sl['projectName'] = self.mProjectCombo.currentText()
 		if not self.mAllHostsCheck.isChecked() and len(self.HostList):
 			sl['hostList'] = str(self.HostList)
+
+		sl['environment'] = QProcess.systemEnvironment().join("\n")
+		if os.environ.has_key("DRD_JOB"):
+			sl['projectName'] = os.environ["DRD_JOB"]
+
+		sl['maxTaskTime'] = "18000"
+		sl['assignmentSlots'] = "4"
+		sl['minMemory'] = str(int(sl["assignmentSlots"]) * 1024 * 512)
+		sl['maxMemory'] = str(int(sl["assignmentSlots"]) * 1024 * 2048)
 
 		if len(self.Services):
 			sl['services'] = ','.join(self.Services)
 		if self.mSubmitSuspendedCheck.isChecked():
-			sl['submitSuspended'] = '1'
+			sl['submitSuspended'] = str('1')
 		Log("Applying Absubmit args: %s" % str(sl))
 		return sl
 
 	def accept(self):
+		global saveNeeded
 		if self.mJobNameEdit.text().isEmpty():
 			QMessageBox.critical(self, 'Missing Job Name', 'You must choose a name for this job' )
 			return
@@ -253,6 +277,7 @@ class MayaRenderDialog(QDialog):
 				cmds.editRenderLayerGlobals( currentRenderLayer=lName )
 
 				jobArgs = self.buildSubmitArgs()
+				jobArgs.update({})
 
 				if( maya.mel.eval("currentRenderer()") == "mentalRay" ):
 					#setCurrentRenderer mentalRay;
@@ -261,10 +286,10 @@ class MayaRenderDialog(QDialog):
 					jobArgs['jobType'] = "MentalRay"+version()
 					jobArgs['renderer'] = "MentalRay"
 				else:
-					jobArgs['jobType'] = "Maya"+version();
+					jobArgs['jobType'] = "Maya"+version()
 					jobArgs['renderer'] = "Maya"
 
-				parts = imageNameParts();
+				parts = imageNameParts()
 				jobArgs["outputPath"] = self.mOutputDirEdit.text() + "/" + parts[0]+".."+parts[2]
 				if( lName == "defaultRenderLayer" ):
 					jobArgs['job'] = self.mJobNameEdit.text()
@@ -272,7 +297,7 @@ class MayaRenderDialog(QDialog):
 					jobArgs['job'] = self.mJobNameEdit.text() +"_"+lName
 				jobArgs["append"] += " -rl "+lName
 
-				submitter = Submitter(self)
+				submitter = Submitter()
 				#self.connect( submitter, SIGNAL( 'submitSuccess()' ), self.submitSuccess )
 				#self.connect( submitter, SIGNAL( 'submitError( const QString & )' ), self.submitError )
 				submitter.applyArgs( jobArgs )
@@ -290,34 +315,13 @@ class MayaRenderDialog(QDialog):
 def maya2ABSubmit():
 	global app
 	global dialog
+	global saveNeeded
 	pt.initializePumpThread()
 	app=qApp
 	initConfig(os.environ["ABSUBMIT"]+"/ab.ini","/tmp/mayasubmit.log")
 	classes_loader()
 	dialog = MayaRenderDialog()
 	dialog.initFields()
-	Log( "Parsing args: " + ','.join(sys.argv) )
-	"""
-	for i, key in enumerate(sys.argv[1::2]):
-		val = sys.argv[(i+1)*2]
-		if key == 'fileName':
-			dialog.mFileNameEdit.setText(val)
-			dialog.mJobNameEdit.setText(QFileInfo(val).completeBaseName())
-			path = Path(val)
-			if path.level() >= 1:
-				p = Project.recordByName( path[1] )
-				if p.isRecord():
-					dialog.mProjectCombo.setProject( p )
-		elif key == 'frameList':
-			dialog.mFrameStartEdit.setText(val)
-		elif key == 'services':
-			dialog.Services += val.split(',')
-		elif key == 'version':
-			dialog.Version = val
-		elif key == 'platform':
-			dialog.Platform = val
-	"""
-
 	dialog.show()
 	#shutdown()
 

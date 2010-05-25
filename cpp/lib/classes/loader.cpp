@@ -82,9 +82,12 @@
 #include "jobmayatable.h"
 #include "jobmaya2008table.h"
 #include "jobmaya2009table.h"
+#include "jobmaya2011table.h"
 #include "jobmaya7table.h"
 #include "jobmaya8table.h"
 #include "jobmaya85table.h"
+#include "jobmentalray2009table.h"
+#include "jobmentalray2011table.h"
 #include "jobmentalray7table.h"
 #include "jobmentalray8table.h"
 #include "jobmentalray85table.h"
@@ -232,9 +235,12 @@ CLASSES_EXPORT void classes_loader() {
 	JobMayaSchema::instance();
 	JobMaya2008Schema::instance();
 	JobMaya2009Schema::instance();
+	JobMaya2011Schema::instance();
 	JobMaya7Schema::instance();
 	JobMaya8Schema::instance();
 	JobMaya85Schema::instance();
+	JobMentalRay2009Schema::instance();
+	JobMentalRay2011Schema::instance();
 	JobMentalRay7Schema::instance();
 	JobMentalRay8Schema::instance();
 	JobMentalRay85Schema::instance();

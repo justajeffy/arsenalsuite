@@ -157,9 +157,4 @@ void BatchBurner::slotProcessExited()
 	JobBurner::slotProcessExited();
 }
 
-void BatchBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessChannel channel )
-{
-	JobBurner::slotProcessOutputLine( line, channel );
-}
-
 #endif

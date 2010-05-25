@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: builtinburnerplugin.cpp 8233 2009-05-13 06:26:17Z newellm $
+ * $Id$
  */
 
 #include "job.h"
@@ -50,19 +50,19 @@ QStringList BuiltinBurnerPlugin::jobTypes()
 	<< "MaxScript"
 #endif
 #ifdef COMPILE_MAYA_BURNER
-	<< "Maya7" << "Maya8" << "Maya85" << "Maya2008" << "Maya2009"
+	<< "Maya7" << "Maya8" << "Maya85" << "Maya2008" << "Maya2009" << "Maya2011"
 #endif
 #ifdef COMPILE_MENTALRAY_BURNER
-	<< "MentalRay7" << "MentalRay8" << "MentalRay85" 
+	<< "MentalRay7" << "MentalRay8" << "MentalRay85"  << "MentalRay2009" << "MentalRay2011"
 #endif
 #ifdef COMPILE_BATCH_BURNER
 	<< "Batch"
 #endif
 #ifdef COMPILE_SHAKE_BURNER
-	<< "Shake" 
+	<< "Shake"
 #endif
 #ifdef COMPILE_AFTER_EFFECTS_BURNER
-	<< "AfterEffects" << "AfterEffects7" << "AfterEffects8" 
+	<< "AfterEffects" << "AfterEffects7" << "AfterEffects8"
 #endif
 #ifdef COMPILE_SYNC_BURNER
 	<< "Sync"
