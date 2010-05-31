@@ -102,6 +102,10 @@ QString BatchBurner::workingDirectory()
 
 void BatchBurner::slotProcessStarted()
 {
+	mLoaded = true;
+	mState = StateStarted;
+	mTaskStart = QDateTime::currentDateTime();
+
 	mTasks.setStatuses( "busy" );
 	mCurrentTaskAssignments = mTasks.jobTaskAssignments();
 	mCurrentTaskAssignments.setJobAssignmentStatuses( JobAssignmentStatus::recordByName("busy") );
@@ -134,7 +138,7 @@ void BatchBurner::startProcess()
 	if( disableWow64Redirect )
 		getWow64RevertWow64FsRedirection()( oldVal );
 #endif
-	mCheckupTimer->start( 15 * 1000 );
+	mCheckupTimer->start( 30 * 1000 );
 }
 
 void BatchBurner::slotProcessExited()
