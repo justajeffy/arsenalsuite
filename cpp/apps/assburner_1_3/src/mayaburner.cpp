@@ -129,6 +129,7 @@ QString MayaBurner::buildCmdMaya() const
 	else 
 		cmd += " -e " + frameEnd;
 
+    cmd += " -rt " + QString::number( mJob.assignmentSlots() );
 	if( jm.width() > 0 )
 		cmd += " -x " + QString::number(jm.width());
 	if( jm.height() > 0 )
@@ -215,7 +216,7 @@ void MayaBurner::startProcess()
 
 	mJobAssignment.setCommand(mCmdString);
 
-    logMessage( "Environment: " + env.join("\n") );
+    //logMessage( "Environment: " + env.join("\n") );
 	logMessage( "MB: Starting Cmd: " + mCmdString );
 	mCmd->setEnvironment(env);
 	mCmd->start( mCmdString );
