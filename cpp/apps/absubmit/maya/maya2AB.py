@@ -219,7 +219,7 @@ class MayaRenderDialog(QDialog):
 		if not self.mAllHostsCheck.isChecked() and len(self.HostList):
 			sl['hostList'] = str(self.HostList)
 
-		sl['environment'] = QProcess.systemEnvironment().replaceInStrings( QRegExp("^MAYA_LICENSE"), "MAYA_LICENSE=render" ).join("\n")
+		sl['environment'] = QProcess.systemEnvironment().replaceInStrings( QRegExp("^MAYA_LICENSE.*"), "MAYA_LICENSE=render" ).join("\n")
 		if os.environ.has_key("DRD_JOB"):
 			sl['projectName'] = os.environ["DRD_JOB"]
 
