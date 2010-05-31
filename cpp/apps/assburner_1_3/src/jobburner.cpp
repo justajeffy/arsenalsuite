@@ -325,7 +325,7 @@ bool JobBurner::taskStart( int task, const QString & outputName, int secondsSinc
 		LOG_1( QString("JobBurner::slotTaskStart: Couldn't find jobtask record where fkeyjob=%1 and frame=%2").arg(mJob.key()).arg(task) );
 		return false;
 	}
-	
+
 	mCurrentTaskAssignments = mCurrentTasks.jobTaskAssignments();
 	foreach( JobTaskAssignment jta, mCurrentTaskAssignments ) {
 		JobTask jt = jta.jobTask();
@@ -340,7 +340,7 @@ bool JobBurner::taskStart( int task, const QString & outputName, int secondsSinc
 			return false;
 		}
 	}
-	
+
 	LOG_3( "Starting task " + QString::number(task) + " task ids: " + mCurrentTasks.keyString() );
 	mCurrentTasks.setStatuses( "busy" );
 	mCurrentTaskAssignments.setJobAssignmentStatuses( JobAssignmentStatus::recordByName("busy") );
@@ -510,7 +510,10 @@ void JobBurner::jobFinished()
     mJobAssignment.commit();
 
 	cleanup();
+	slotReadStdOut();
+	slotReadStdError();
 	updateOutput();
+
 	emit finished();
 }
 
