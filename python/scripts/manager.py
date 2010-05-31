@@ -190,6 +190,10 @@ class JobAssign:
     def hostOk( self, hostStatus, snapshot ):
         host = hostStatus.host()
 
+        if hostStatus.activeAssignmentCount() + self.Job.assignmentSlots() > host.maxAssignments():
+            if VERBOSE_DEBUG: Log( 'Job requires more slots than host has available' )
+            return False
+
         if hostStatus.activeAssignmentCount() > 0:
             # Check exclusive bit
             if self.Job.exclusiveAssignment():
