@@ -95,9 +95,10 @@ QString MayaBurner::buildCmdMaya7()
 	QString frameEnd = assignedTasks().section("-",1,1);
 	if( frameEnd.isEmpty() )
 		cmd += " -e " + QString::number(mFrame);
-	else 
+	else
 		cmd += " -e " + frameEnd;
 
+    cmd += " -n " + QString::number( mJob.assignmentSlots() );
 	if( jm.width() > 0 )
 		cmd += " -x " + QString::number(jm.width());
 	if( jm.height() > 0 )
