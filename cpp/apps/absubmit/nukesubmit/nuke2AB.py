@@ -43,7 +43,7 @@ class NukeRenderDialog(QDialog):
         self.mFrameStartEdit.setText(startFrame)
         self.mFrameEndEdit.setText(endFrame)
 	oculaparts=['O_Solver', 'O_DisparityGenerator', 'O_InteraxialShifter', 'O_VerticalAligner', 'O_ColourMatcher', 'O_NewView', 'O_DepthToDisparity', 'O_DisparityToDepth']
-	nukefile = open(str(self.mFileNameEdit))
+	nukefile = open(str(self.mFileNameEdit.text()))
 	nkfiletext= nukefile.read()
 	if any(oculafunction in nkfiletext for oculafunction in oculaparts):
 		self.mOculaCheck.setChecked(TRUE)
