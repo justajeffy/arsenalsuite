@@ -1083,6 +1083,7 @@
   <column type="int" methodName="taskTime" name="tasktime" />
   <column type="QDateTime" methodName="started" name="started" />
   <column type="QDateTime" methodName="ended" name="ended" />
+  <column type="QDateTime" methodName="submitted" name="submitted" />
   <column type="uint" methodName="user" name="fkeyusr" >
    <fkey indexDeleteMode="DoNothingOnDelete" table="User" type="multi" hasIndex="false" />
   </column>
@@ -1095,22 +1096,16 @@
   <column type="Interval" methodName="minTaskTime" name="mintasktime" />
   <column type="Interval" methodName="maxTaskTime" name="maxtasktime" />
   <column type="Interval" methodName="avgTaskTime" name="avgtasktime" />
+
   <column type="Interval" methodName="totalErrorTime" name="totalerrortime" />
-  <column type="Interval" methodName="minErrorTime" name="minerrortime" />
-  <column type="Interval" methodName="maxErrorTime" name="maxerrortime" />
-  <column type="Interval" methodName="avgErrorTime" name="avgerrorTime" />
+  <column type="Interval" methodName="totalCancelTime" name="totalcanceltime" />
   <column type="Interval" methodName="totalLoadTime" name="totalloadtime" />
-  <column type="Interval" methodName="minLoadTime" name="minloadtime" />
-  <column type="Interval" methodName="maxLoadTime" name="maxloadtime" />
-  <column type="Interval" methodName="avgLoadTime" name="avgloadTime" />
   <column type="Interval" methodName="totalCopyTime" name="totalcopytime" />
-  <column type="Interval" methodName="minCopyTime" name="mincopytime" />
-  <column type="Interval" methodName="maxCopyTime" name="maxcopytime" />
-  <column type="Interval" methodName="avgCopyTime" name="avgcopyTime" />
-  <column type="uint" methodName="totalCpuTime" name="totalcputime" />
-  <column type="uint" methodName="minCpuTime" name="mincputime" />
-  <column type="uint" methodName="maxCpuTime" name="maxcputime" />
-  <column type="uint" methodName="avgCpuTime" name="avgcputime" />
+  <column type="Interval" methodName="totalCpuTime" name="totalcputime" />
+  <column type="Interval" methodName="minCpuTime" name="mincputime" />
+  <column type="Interval" methodName="maxCpuTime" name="maxcputime" />
+  <column type="Interval" methodName="avgCpuTime" name="avgcputime" />
+
   <column type="uint" methodName="minMemory" name="minmemory" />
   <column type="uint" methodName="maxMemory" name="maxmemory" />
   <column type="uint" methodName="avgMemory" name="avgmemory" />
@@ -1137,6 +1132,9 @@
   <column type="uint" methodName="minIoWait" name="miniowait" />
   <column type="uint" methodName="maxIoWait" name="maxiowait" />
   <column type="uint" methodName="avgIoWait" name="avgiowait" />
+  <column type="uint" methodName="JobType" name="fkeyJobType" >
+   <fkey indexDeleteMode="DoNothingOnDelete" table="JobType" type="single" hasIndex="false" />
+  </column>
  </table>
  <table useCodeGen="true" name="JobStatus" expireKeyCache="true" className="JobStatus" >
   <column type="uint" methodName="keyJobStatus" name="keyJobStatus" pkey="true" />
