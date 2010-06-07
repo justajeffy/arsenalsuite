@@ -46,7 +46,7 @@ class NukeRenderDialog(QDialog):
 	nukefile = open(str(self.mFileNameEdit.text()))
 	nkfiletext= nukefile.read()
 	if any(oculafunction in nkfiletext for oculafunction in oculaparts):
-		self.mOculaCheck.setChecked(TRUE)
+		self.mOculaCheck.setChecked(True)
 
     def loadSettings(self):
         c = userConfig()
