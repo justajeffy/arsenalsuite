@@ -45,6 +45,8 @@ def buildSubmitArgs():
 	argMap['notifyOnComplete'] = argMap['user']+":j"
 	if os.environ.has_key("DRD_JOB"):
 		argMap['projectName'] = os.environ["DRD_JOB"]
+	if os.environ.has_key("DRD_JOB") and os.environ.has_key("DRD_DEPT"):
+		argMap['projectName'] = os.environ["DRD_JOB"] + "-" + os.environ["DRD_DEPT"]
 	argMap['packetSize'] = str(9999)
 	argMap['runasSubmitter'] = "true"
 	argMap['maxTaskTime'] = "18000"
