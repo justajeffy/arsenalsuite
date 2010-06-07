@@ -135,7 +135,7 @@ class NukeRenderDialog(QDialog):
         sl['packetSize'] = str(self.packetSize())
         sl['fileName'] = str(self.mFileNameEdit.text())
         sl['append'] = str(self.mAppendEdit.text())
-        launcherPreset = "nuke"
+        launcherPreset = "ext/nuke/nuke"
         if self.mOculaCheck.isChecked():
             launcherPreset = "ext/nuke/nuke_ocula"
             self.Services.append("Nuke")
