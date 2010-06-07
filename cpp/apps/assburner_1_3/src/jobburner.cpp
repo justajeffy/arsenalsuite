@@ -772,9 +772,9 @@ void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessCh
 		QStringList jobStats = line.split(":");
         // time reports things in decimal seconds, but we want to store
         // them in msecs
-		mJobAssignment.setRealtime( jobStats[2].toUInt() * 1000 );
-		mJobAssignment.setUsertime( jobStats[4].toUInt() * 1000 );
-		mJobAssignment.setSystime( jobStats[6].toUInt() * 1000 );
+		mJobAssignment.setRealtime( int(jobStats[2].toFloat() * 1000) );
+		mJobAssignment.setUsertime( int(jobStats[4].toFloat() * 1000) );
+		mJobAssignment.setSystime( int(jobStats[6].toFloat() * 1000) );
 		mJobAssignment.commit();
 	}
 #endif
