@@ -53,6 +53,7 @@ unix{
 	LIBS+=-L../../lib/absubmit -labsubmit
 
 	unix: LIBS+=-L$$(MAGICK_ROOT)/lib
+	unix: LIBS+=-Wl,-rpath,$$(MAGICK_ROOT)/lib
 
     #LIBS+=-Wl,-rpath .
     LIBS+=-lMagick++
