@@ -3,16 +3,14 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.uic import *
-from blur.Stone import *
-from blur.Classes import *
-from blur.Classesui import *
-from blur.absubmit import Submitter
 import pumpThread as pt
 import sys
 import os
 import time
 import maya.cmds as cmds
 import maya.mel
+
+from farmsubmit import *
 
 dialog = None
 
@@ -297,11 +295,7 @@ class MayaRenderDialog(QDialog):
 					jobArgs['job'] = self.mJobNameEdit.text() +"_"+lName
 				jobArgs["append"] += " -rl "+lName
 
-				submitter = Submitter()
-				#self.connect( submitter, SIGNAL( 'submitSuccess()' ), self.submitSuccess )
-				#self.connect( submitter, SIGNAL( 'submitError( const QString & )' ), self.submitError )
-				submitter.applyArgs( jobArgs )
-				submitter.submit()
+				FarmJob( jobArgs ).submit()
 
 	def submitSuccess(self):
 		Log( 'Submission Finished Successfully' )
