@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: maindialog.h 9644 2010-04-07 00:35:40Z brobison $
+ * $Id$
  */
 
 #include <qtextstream.h>
@@ -40,7 +40,7 @@ class QFile;
 class QMenu;
 class QCloseEvent;
 
-const QString VERSION("1.3.5");
+const QString VERSION("1.3.7");
 
 /* Note:
  * init() must be called after construction
