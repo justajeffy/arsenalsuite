@@ -24,13 +24,21 @@ def pumpQt():
         time.sleep(0.01)
         app.processEvents()
 
-def initializePumpThread():
-	global pumpedThread
-	global app
-	if pumpedThread == None:
-		app = QApplication(sys.argv, False)
-		pumpedThread = threading.Thread( target = pumpQt, args = () )
-		pumpedThread.start()
+def initializePumpThread(useGUI=False):
+    global pumpedThread
+    global app
+
+    if pumpedThread == None:
+        app = QCoreApplication.instance()
+        if app is None:
+            try:
+                args = sys.argv
+            except:
+                args = []
+            app = QApplication(args, useGUI)
+
+        pumpedThread = threading.Thread( target = pumpQt, args = () )
+        pumpedThread.start()
 
 def buildSubmitArgs():
 	argMap = {}
@@ -55,10 +63,11 @@ def buildSubmitArgs():
 	return argMap
 
 def submitSuccess():
-	sys.exit(0)
+    sys.exit(0)
 
-def submitError():
-	raise "Oh no"
+def submitError(errorString):
+    stop()
+    raise str(errorString)
 
 def farmSubmit(userArgs):
     jobArgs = buildSubmitArgs()
