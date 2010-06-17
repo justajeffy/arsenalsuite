@@ -259,7 +259,7 @@ void ImageView::customEvent( QEvent * evt )
 				}else {
 					mImageCache.addImage( lit->mFrame, lit->mImg );
 				}
-                //mImageCache.setStatus( lit->mFrame, ImageCache::ImageLoaded );
+                mImageCache.setStatus( lit->mFrame, ImageCache::ImageLoaded );
 			}
 			if( mToShow==lit->mFrame ){
 				LOG_5( "ImageView::customEvent: Showing image" );
@@ -352,7 +352,7 @@ void ImageView::setImageNumber(int num)
 			LOG_5( "ImageView::setImageNumber: Image Loaded, showing now" );
 			mToShow = num;
 			showImage();
-			preloadImages();
+			//preloadImages();
 			break;
 		}
 	}
