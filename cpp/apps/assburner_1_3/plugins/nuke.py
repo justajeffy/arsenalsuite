@@ -28,6 +28,7 @@ class NukeBurner(JobBurner):
         self.errors = []
         self.errors.append(QRegExp("^Error:"))
         self.errors.append(QRegExp("Read-only file system"))
+        self.errors.append(QRegExp("FOUNDRY LICENSE ERROR"))
         self.errors.append(QRegExp("Command exited with non-zero status"))
 
     def __del__(self):
@@ -37,6 +38,8 @@ class NukeBurner(JobBurner):
 
     def cleanup(self):
         Log( "NukeBurner::cleanup() called" )
+        if not self.process(): return
+
         mProcessId = self.process().pid()
         Log( "NukeBurner::cleanup() Getting pid: %s" % mProcessId )
 
