@@ -334,7 +334,6 @@ def checkNewJob(job):
 	if job.status() == 'verify-suspended':
 		status = 'suspended'
 	job.setStatus(status)
-	print "creating job stat"
 	createJobStat(job)
 	job.commit()
 
