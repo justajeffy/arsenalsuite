@@ -168,7 +168,9 @@ contains( DEFINES, USE_IMAGE_MAGICK ) {
 	unix:LIBS+=-L$$(MAGICK_ROOT)/lib
 	unix:INCLUDEPATH+=$$(MAGICK_ROOT)/include/ImageMagick
 
-	unix:LIBS+=-lMagick++ -lMagick
+	unix:LIBS+=-Wl,-rpath,$$(MAGICK_ROOT)/lib
+
+	unix:LIBS+=-lMagick++
 
 	#macx:INCLUDEPATH+=/usr/local/include
 	#macx:LIBS+=-lMagick++
