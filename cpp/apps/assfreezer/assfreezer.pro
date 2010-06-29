@@ -42,9 +42,6 @@ isEmpty( PYTHON ) {
 }
 
 unix{
-#	Link libassfreezer and libblurqt statically
-#	Link them dynamically
-#	LIBS+=-lCgGL -Wl,-rpath . -L../libassfreezer -L../libblurqt -lassfreezer -lblurqt
 	LIBS+=-L../../lib/assfreezer -lassfreezer
 	LIBS+=-L../../lib/classesui -lclassesui
 	LIBS+=-L../../lib/stonegui -lstonegui
@@ -55,7 +52,6 @@ unix{
 	unix: LIBS+=-L$$(MAGICK_ROOT)/lib
 	unix: LIBS+=-Wl,-rpath,$$(MAGICK_ROOT)/lib
 
-    #LIBS+=-Wl,-rpath .
     LIBS+=-lMagick++
 
     PY_CMD =  $$PYTHON " -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'"
@@ -75,6 +71,7 @@ win32 {
 }
 
 macx: CONFIG-=app_bundle
+QMAKE_MACOSX_DEPLOYMENT_TARGET=10.5
 
 RESOURCES+=assfreezer.qrc
 
