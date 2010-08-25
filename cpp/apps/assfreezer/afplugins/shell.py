@@ -14,7 +14,7 @@ class ShellViewerPlugin(JobViewerPlugin):
         return QString("shell")
 
     def icon(self):
-        return QString("images/framecycler.png")
+        return QString("images/Terminal.png")
 
     def view(self, jobList):
         cmdArgs = QStringList()
