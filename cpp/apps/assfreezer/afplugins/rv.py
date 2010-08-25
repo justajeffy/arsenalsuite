@@ -5,6 +5,7 @@ from blur.Assfreezer import *
 from PyQt4.QtCore import *
 from PyQt4.QtSql import *
 import traceback, os
+import subprocess
 
 class RvViewerPlugin(JobViewerPlugin):
     def __init__(self):
@@ -14,10 +15,12 @@ class RvViewerPlugin(JobViewerPlugin):
         return QString("rv")
 
     def icon(self):
-        return QString("images/framecycler.png")
+        return QString("images/rv2.png")
 
     def view(self, jobList):
-        print "open with rv ftw!"
+        for job in jobList:
+            print "rv -l %s" % job.outputPath().replace("..",".#.")
+            subprocess.Popen(["rv", "-l", job.outputPath().replace("..",".#.")])
 
 JobViewerFactory.registerPlugin( RvViewerPlugin() )
 
