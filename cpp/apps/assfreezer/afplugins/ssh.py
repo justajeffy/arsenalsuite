@@ -14,7 +14,7 @@ class SshViewerPlugin(HostViewerPlugin):
         return QString("ssh")
 
     def icon(self):
-        return QString("images/framecycler.png")
+        return QString("images/Terminal.png")
 
     def view(self, hostList):
         for host in hostList:
