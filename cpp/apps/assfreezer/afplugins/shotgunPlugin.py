@@ -31,9 +31,9 @@ class ShotgunPlugin(JobViewerPlugin):
         return QString("images/shotgun.png")
 
     def view(self, jobList):
-	output = subprocess.Popen(SHOTGUN_SUBMITTER, stderr=subprocess.PIPE, stdout=subprocess.PIPE).communicate()
-	submitShotgunTicket(str(output[0]), jobList)
-	
+        output = subprocess.Popen(SHOTGUN_SUBMITTER, stderr=subprocess.PIPE, stdout=subprocess.PIPE).communicate()
+        if not output[0].strip() == "CANCEL":
+            submitShotgunTicket(str(output[0]), jobList)
 
 def submitShotgunTicket(output, jobList):
 
