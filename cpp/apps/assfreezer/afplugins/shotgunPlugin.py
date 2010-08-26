@@ -41,8 +41,6 @@ def submitShotgunTicket(output, jobList):
 	title = "Arsenal Support Request - Initiated by %s"%currentuser
 
 	desc = []
-        desc.append("\nRequestor: %s\n"%currentuser)
-	desc.append("PROBLEM DESCRIPTION:")
 	desc.append(output+"\n")
 	desc.append("JOBLIST:") 
 
