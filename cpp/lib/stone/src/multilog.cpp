@@ -21,7 +21,7 @@
  */
 
 /*
- * $Id: multilog.cpp 9590 2010-03-25 01:19:50Z brobison $
+ * $Id$
  */
 
 #include <qdatetime.h>
@@ -41,9 +41,12 @@ Multilog::Multilog( const QString & logfile, bool stdout_option, int severity, i
 , mMaxSize( maxsize)
 , mLogFile( 0 )
 , mLogStream( 0 )
+, mLogFileSize( 0 )
 {
 	mLogFileInfo.setCaching( false );
 	mLogFileInfo.setFile( mLogFileName );
+	mLogFileInfo.refresh();
+    mLogFileSize = mLogFileInfo.size();
 	mLogFileDir = mLogFileInfo.dir(); //abs path of dir
 
 	rotate( qMin(2000,(int)mMaxSize) );
@@ -59,53 +62,68 @@ Multilog::~Multilog()
 	delete mLogStream;
 }
 
+void Multilog::renameCurrentLog()
+{
+    //close logfile, rename with date-timestamp in filename
+
+    QString oldFileStr = mLogFileName;
+    QString newFileStr = mLogFileInfo.path() + "/" + mLogFileInfo.completeBaseName()
+            + QDateTime::currentDateTime().toString( ".yyyy-MM-ddThh.mm.ss.log" );
+
+    delete mLogStream;
+    mLogStream = 0;
+
+    delete mLogFile;
+    mLogFile = 0;
+
+    qWarning("Multilog::rotate: trying to rename %s to %s", qPrintable(oldFileStr), qPrintable(newFileStr));
+
+    if ( !QDir::current().rename( oldFileStr, newFileStr ) )
+        qWarning("Multilog::rotate renaming failed! Giving up." );
+    else
+        qWarning("Multilog::rotate rename successful.");
+}
+
+void Multilog::removeOldLogs()
+{
+    QString logFileDirFilter = mLogFileInfo.completeBaseName() + ".*.log";
+    //scan mLogFileDir, sort by datestr in filenames, nuke any old logfiles over maxfiles limit
+    QFileInfoList fil = mLogFileDir.entryInfoList( QStringList() << logFileDirFilter, QDir::Files, QDir::Name | QDir::Reversed );
+
+    int currentFile = 0;
+    foreach( QFileInfo fi, fil ) {
+        QString tempLogFileStr = fi.filePath();
+        currentFile++;
+        if (currentFile > (mMaxFiles - 1)) { // 1st logfile is always current logfile.
+            QFile tempFile(tempLogFileStr);
+            if( tempFile.remove() )
+                qWarning( "Multilog::rotate delete logfile (# %s, over MaxFiles limit): %s", qPrintable( QString::number(currentFile)), qPrintable(tempLogFileStr) );
+            else
+                qWarning( "Multilog::rotate delete logfile (# %s) failed! -- %s",  qPrintable(QString::number(currentFile)),  qPrintable(tempFile.errorString()) );
+        }
+    }
+}
+
 bool Multilog::rotate( int buffer )
 {
-	mLogFileInfo.setFile( mLogFileName );
-	mLogFileInfo.refresh();
+    mLogFileSize += buffer;
+    if ( mLogFileSize > mMaxSize) {
+        renameCurrentLog();
+        removeOldLogs();
+    }
 
-	if ( mLogFileInfo.size()+buffer > mMaxSize) {
-		//close logfile, rename with date-timestamp in filename
-		
-		QString oldFileStr = mLogFileName;
-		QString newFileStr = mLogFileInfo.path() + "/" + mLogFileInfo.completeBaseName() 
-				+ QDateTime::currentDateTime().toString( ".yyyy-MM-ddThh.mm.ss.log" );
-		QString logFileDirFilter = mLogFileInfo.completeBaseName() + ".*.log";
+    //open logfile if not already open
+    return openNewLog();
+}
 
-		delete mLogStream;
-		mLogStream = 0;
-		
-		delete mLogFile;
-		mLogFile = 0;
-
-		qWarning("Multilog::rotate: trying to rename %s to %s", qPrintable(oldFileStr), qPrintable(newFileStr));
-
-		if ( !QDir::current().rename( oldFileStr, newFileStr ) )
-			qWarning("Multilog::rotate renaming failed! Giving up." );
-		else
-			qWarning("Multilog::rotate rename successful.");
-			
-		//scan mLogFileDir, sort by datestr in filenames, nuke any old logfiles over maxfiles limit
-		QFileInfoList fil = mLogFileDir.entryInfoList( QStringList() << logFileDirFilter, QDir::Files, QDir::Name | QDir::Reversed );
-		
-		int currentFile = 0;
-		foreach( QFileInfo fi, fil ) {
-			QString tempLogFileStr = fi.filePath();
-			currentFile++;
-			if (currentFile > (mMaxFiles - 1)) { // 1st logfile is always current logfile.
-				QFile tempFile(tempLogFileStr);
-				if( tempFile.remove() )
-					qWarning( "Multilog::rotate delete logfile (# %s, over MaxFiles limit): %s", qPrintable( QString::number(currentFile)), qPrintable(tempLogFileStr) );
-				else
-					qWarning( "Multilog::rotate delete logfile (# %s) failed! -- %s",  qPrintable(QString::number(currentFile)),  qPrintable(tempFile.errorString()) );
-			}
-		}
-	}
-
-	//open logfile if not already open
-	if ( !mLogFile ) {
-		mLogFile = new QFile(mLogFileName);
-	}
+bool Multilog::openNewLog()
+{
+    if ( !mLogFile ) {
+        mLogFile = new QFile(mLogFileName);
+        mLogFileInfo.setFile( mLogFileName );
+        mLogFileInfo.refresh();
+        mLogFileSize = 0;
+    }
 
 	if( !mLogFile->isOpen() ) {
 		if ( !mLogFile->open(QIODevice::Append) ) {
