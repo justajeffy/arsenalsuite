@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: multilog.h 9590 2010-03-25 01:19:50Z brobison $
+ * $Id$
  */
 
 #ifndef MULTILOG_H
@@ -95,6 +95,9 @@ signals:
 
 protected:
 	bool rotate( int buffer );
+    void renameCurrentLog();
+    void removeOldLogs();
+    bool openNewLog();
 
 	bool copy_logfile( QString inFileStr, QString outFileStr );
 
@@ -104,6 +107,7 @@ protected:
 	unsigned int mMaxSize;
 	QFileInfo mLogFileInfo;
 	QDir mLogFileDir;
+    int mLogFileSize;
 
 	QFile * mLogFile;
 	QTextStream * mLogStream;
