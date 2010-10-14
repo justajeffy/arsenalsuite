@@ -31,6 +31,8 @@ Makefile.Debug
 *.dll
 w_qpy*.pro
 Qtmod.sip
+auto.pri
+loader.cpp
 
 # switch to regexp syntax.
 syntax: regexp
@@ -47,6 +49,7 @@ syntax: regexp
 .*/assfreezer/assfreezer.dll$
 .*/assfreezer/assfreezer.lib$
 .*/classes/Makefile$
+.*/classes/sip/*.sip
 .*/classesui/Makefile$
 .*/classmaker/Makefile$
 .*/classmaker/classmaker$
