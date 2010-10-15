@@ -1730,6 +1730,11 @@
   <column reverseAccess="true" type="uint" methodName="service" name="service" >
    <fkey indexDeleteMode="DoNothingOnDelete" indexName="Service" indexUseCache="true" table="Service" type="multi" hasIndex="true" />
   </column>
+  <column type="uint" methodName="limit" name="limit" />
+  <index useCache="false" type="single" name="UserAndService" >
+   <column name="user" />
+   <column name="service" />
+  </index>
  </table>
  <table preload="true" useCodeGen="true" parent="Element" name="Usr" expireKeyCache="true" className="User" >
   <column type="QDate" methodName="dateoflastlogon" name="dateoflastlogon" />
