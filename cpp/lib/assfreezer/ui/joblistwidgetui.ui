@@ -65,7 +65,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>400</width>
+             <width>800</width>
              <height>16777215</height>
             </size>
            </property>
@@ -125,6 +125,9 @@
        </layout>
       </widget>
       <widget class="QWidget" name="mNotesTab">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <attribute name="title">
         <string>Notes</string>
        </attribute>

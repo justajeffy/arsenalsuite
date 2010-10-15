@@ -40,6 +40,7 @@
 #include "displayprefsdialog.h"
 #include "hostlistwidget.h"
 #include "hostservicematrix.h"
+#include "userservicematrix.h"
 #include "joblistwidget.h"
 #include "jobfilteredit.h"
 #include "projectweightdialog.h"
@@ -65,6 +66,7 @@ MainWindow::MainWindow( QWidget * parent )
 	FileExitAction = new QAction( "E&xit", this );
 	HelpAboutAction = new QAction( "About...", this );
 	HostServiceMatrixAction = new QAction( "Host Service Matrix...", this );
+	UserServiceMatrixAction = new QAction( "User Service Matrix...", this );
 
 	ViewHostsAction = new QAction( "View Hosts", this );
 	ViewHostsAction->setCheckable( TRUE );
@@ -93,6 +95,7 @@ MainWindow::MainWindow( QWidget * parent )
 	connect( mAutoRefreshTimer, SIGNAL( timeout() ), SLOT( autoRefresh() ) );
 
 	connect( HostServiceMatrixAction, SIGNAL( triggered(bool) ), SLOT( openHostServiceMatrixWindow() ) );
+	connect( UserServiceMatrixAction, SIGNAL( triggered(bool) ), SLOT( openUserServiceMatrixWindow() ) );
 	connect( HelpAboutAction, SIGNAL( triggered(bool) ), SLOT( showAbout() ) );
 	connect( FileExitAction, SIGNAL( triggered(bool) ), qApp, SLOT( quit() ) );
 	connect( SettingsAction, SIGNAL( triggered(bool) ), SLOT( showSettings() ) );
@@ -744,6 +747,8 @@ void MainWindow::populateToolsMenu()
 {
     if( User::hasPerms( "HostService", true ) )
         mToolsMenu->addAction( HostServiceMatrixAction );
+    if( User::hasPerms( "UserService", true ) )
+        mToolsMenu->addAction( UserServiceMatrixAction );
 
     mToolsMenu->addAction( "Project Weighting...", this, SLOT( showProjectWeightDialog() ) );
 
@@ -847,6 +852,11 @@ void MainWindow::autoRefresh()
 void MainWindow::openHostServiceMatrixWindow()
 {
 	(new HostServiceMatrixWindow(this))->show();
+}
+
+void MainWindow::openUserServiceMatrixWindow()
+{
+	(new UserServiceMatrixWindow(this))->show();
 }
 
 // Turns the update counter on or off
