@@ -63,6 +63,7 @@ public slots:
 	void setAutoRefreshOnWindowActivation( bool );
 
 	void openHostServiceMatrixWindow();
+	void openUserServiceMatrixWindow();
 
 	void enableAdmin();
 	void applyOptions();
@@ -164,6 +165,7 @@ private:
 	QAction* SettingsAction;
 	QAction* AdminAction;
 	QAction* HostServiceMatrixAction;
+	QAction* UserServiceMatrixAction;
 	QAction* AutoRefreshAction;
 
 	QAction * mNewJobViewAction;

@@ -16,6 +16,7 @@ SOURCES+= \
 	src/hosterrorwindow.cpp \
 	src/hostlistwidget.cpp \
 	src/hostservicematrix.cpp \
+	src/userservicematrix.cpp \
 	src/hostviewerplugin.cpp \
 	src/imagecache.cpp \
 	src/imageview.cpp \
@@ -56,6 +57,7 @@ HEADERS+= \
 	include/hosterrorwindow.h \
 	include/hostlistwidget.h \
 	include/hostservicematrix.h \
+	include/userservicematrix.h \
 	include/hostviewerplugin.h \
 	include/hostviewerfactory.h \
 	include/imagecache.h \
@@ -92,6 +94,7 @@ INTERFACES+= \
 	ui/batchsubmitdialogui.ui \
 	ui/displayprefsdialogui.ui \
 	ui/hostservicematrixwindowui.ui \
+	ui/userservicematrixwindowui.ui \
 	ui/framenthdialogui.ui \
 	ui/jobaftereffectssettingswidgetui.ui \
 	ui/jobbatchsettingswidgetui.ui \
