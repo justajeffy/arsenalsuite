@@ -34,6 +34,7 @@ class DelightBurner(JobBurner):
         self.errors.append(QRegExp("^3DL INFO L2374: no license available"))
         self.errors.append(QRegExp("Could not find file:"))
         self.errors.append(QRegExp("Received signal"))
+        self.errors.append(QRegExp("3DL ERROR R5030:"))
         #self.errors.append(QRegExp("^3DL SEVERE ERROR"))
 
     def __del__(self):
@@ -82,7 +83,8 @@ class DelightBurner(JobBurner):
         self.EndFrame = self.frameList[-1]
 
         timeCmd = "/usr/bin/time --format=baztime:real:%e:user:%U:sys:%S:iowait:%w ";
-        cmd = timeCmd + "/bin/su %s -c \"renderdl " % self.Job.user().name()
+        renderdl = os.getenv("RENDERDL","renderdl")
+        cmd = timeCmd + "/bin/su %s -c \"%s " % (self.Job.user().name(), renderdl)
 
         args = QStringList()
         args << "-nd"
