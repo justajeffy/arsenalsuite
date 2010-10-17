@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: connection.cpp 9590 2010-03-25 01:19:50Z brobison $
+ * $Id$
  */
 
 #include <qdatetime.h>
@@ -267,7 +267,7 @@ bool QSqlDbConnection::reconnect()
 	mDb.setUserName( mUserName );
 	mDb.setPassword( mPassword );
 	mDb.setConnectOptions( mExtraConnectOptions );
-	LOG_3( "Connecting... " + connectString() );
+	LOG_5( "Connecting... " + connectString() );
 	if( !mDb.open() ){
 		mLastErrorText = mDb.lastError().driverText();
 		LOG_3( "Could not reconnect to database: " + mLastErrorText );
