@@ -586,6 +586,7 @@ void MainWindow::repopulateToolBar()
 void MainWindow::createJobView()
 {
 	AssfreezerView * view = new JobListWidget(this);
+    renameView(view);
 	insertView(view);
 }
 

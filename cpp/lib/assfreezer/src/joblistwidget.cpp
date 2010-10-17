@@ -204,14 +204,21 @@ void JobListWidget::initializeViews()
 
         mJobSplitter->setSizes( vl );
 
-        ShowMineAction->blockSignals(true);
-        ShowMineAction->setChecked( !ini.readString( "UserList", "" ).isEmpty() );
-        ShowMineAction->blockSignals(false);
- 
+        QStringList frameSplitterSizes = ini.readString( "FrameSplitterPos","750,1100" ).split(',');
+        QList<int> frameSplitterInts;
+        for( QStringList::Iterator it=frameSplitterSizes.begin(); it!=frameSplitterSizes.end(); ++it )
+            frameSplitterInts += (*it).toInt();
+        mFrameSplitter->setSizes( frameSplitterInts );
+
         // Filter any empty entries.  And empty string split with ',' returns a string list with one empty entry
         mJobFilter.typeToShow = ini.readString( "TypeToShow" ).split(',',QString::SkipEmptyParts);
         mJobFilter.statusToShow =   ini.readString( "StatusToShow", "submit,verify,ready,holding,started,suspended,done" ).split(',',QString::SkipEmptyParts);
+
         mJobFilter.userList =       ini.readString( "UserList", "" ).split(',',QString::SkipEmptyParts);
+        ShowMineAction->blockSignals(true);
+        ShowMineAction->setChecked( !mJobFilter.userList.isEmpty() );
+        ShowMineAction->blockSignals(false);
+
         mJobFilter.allProjectsShown = ini.readBool( "AllProjectsShown", false );
         if( ini.keys().contains( "VisibleProjects" ) ) {
             mJobFilter.visibleProjects = mProjectList.keyString().split(',',QString::SkipEmptyParts);
@@ -256,6 +263,9 @@ void JobListWidget::save( IniConfig & ini )
             foreach( int i, list ) sizes += QString::number(i);
             ini.writeString( "JobSplitterPos", sizes.join(",") );
         }
+        QStringList sizes;
+        foreach( int i, mFrameSplitter->sizes() ) sizes += QString::number(i);
+        ini.writeString( "FrameSplitterPos", sizes.join(",") );
     }
     AssfreezerView::save(ini);
 }
