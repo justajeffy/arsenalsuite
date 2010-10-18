@@ -58,7 +58,9 @@ void KillDialog::refresh()
 	}
 	if( mPidMap.keys().size() == 0 ) {
 		mRefreshTimer->stop();
-		accept();
+        // Use a timer in case this is getting called from the ctor because the code creating
+        // this dialog will not have been able to connect to its signals yet.
+        QTimer::singleShot( 0, this, SLOT( accept() ) );
 		return;
 	}
 	foreach( QString procName, mPidMap.keys() )
