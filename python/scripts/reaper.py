@@ -379,8 +379,7 @@ def getAvgTaskTime(job):
                                     FROM JobTaskAssignment 
                                     INNER JOIN JobTask ON JobTask.fkeyjobtaskassignment=jobtaskassignment.keyjobtaskassignment 
                                     WHERE fkeyjob=%i 
-                                      AND jobtaskassignment.started IS NOT NULL 
-                                      AND jobtaskassignment.ended IS NOT NULL""" % (job.key()))
+                                      AND jobtaskassignment.started IS NOT NULL""" % (job.key()))
 	if q.next():
 		return q.value(0).toInt()[0]
 	return 0
