@@ -3,20 +3,20 @@
  *
  * Copyright 2003 Blur Studio Inc.
  *
- * This file is part of RenderLine.
+ * This file is part of Arsenal.
  *
- * RenderLine is free software; you can redistribute it and/or modify
+ * Arsenal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * RenderLine is distributed in the hope that it will be useful,
+ * Arsenal is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with RenderLine; if not, write to the Free Software
+ * along with Arsenal; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
@@ -81,6 +81,38 @@ extern "C" void initClasses(void);
 extern "C" void initAssfreezer(void);
 #endif
 
+// Return the named attribute object from the named module.
+PyObject * getModuleAttr(const char *module, const char *attr)
+{
+#if PY_VERSION_HEX >= 0x02050000
+    PyObject *mod = PyImport_ImportModule(module);
+#else
+    PyObject *mod = PyImport_ImportModule(const_cast<char *>(module));
+#endif
+
+    if (!mod)
+    {
+        PyErr_Print();
+        return 0;
+    }
+
+#if PY_VERSION_HEX >= 0x02050000
+    PyObject *obj = PyObject_GetAttrString(mod, attr);
+#else
+    PyObject *obj = PyObject_GetAttrString(mod, const_cast<char *>(attr));
+#endif
+
+    Py_DECREF(mod);
+
+    if (!obj)
+    {
+        PyErr_Print();
+        return 0;
+    }
+
+    return obj;
+}
+
 void loadPythonPlugins()
 {
 	LOG_5( "Loading Python" );
@@ -127,22 +159,64 @@ void loadPythonPlugins()
 #endif
 	PyRun_SimpleString(builtinModuleImportStr);
 
-	LOG_5( "Loading python plugins" );
-	
-	QDir plugin_dir( "afplugins" );
-	QStringList el = plugin_dir.entryList(QStringList() << "*.py" << "*.pys" << "*.pyw", QDir::Files);
-	foreach( QString plug, el ) {
-		QString name("afplugins/" + plug);
-		LOG_5( "Loading plugin: " + name );
-		bool error = false;
-		QString contents = readFullFile( name, &error );
-		if( error ) {
-			LOG_3( "Unable to open " + name + " for reading" );
-			continue;
-		}
-		contents.replace("\r","");
-		PyRun_SimpleString(contents.toLatin1());
-	}
+	LOG_5( "Loading python afplugins" );
+
+    PyObject * sys_path = getModuleAttr("sys", "path");
+
+    if (!sys_path)
+        return;
+
+    QString dir = QDir::currentPath();
+
+    // Convert the directory to a Python object with native separators.
+#if QT_VERSION >= 0x040200
+    dir = QDir::toNativeSeparators(dir);
+#else
+    dir = QDir::convertSeparators(dir);
+#endif
+
+#if PY_MAJOR_VERSION >= 3
+    // This is a copy of qpycore_PyObject_FromQString().
+
+    PyObject *dobj = PyUnicode_FromUnicode(0, dir.length());
+
+    if (!dobj)
+    {
+        PyErr_Print();
+        return;
+    }
+
+    Py_UNICODE *pyu = PyUnicode_AS_UNICODE(dobj);
+
+    for (int i = 0; i < dir.length(); ++i)
+        *pyu++ = dir.at(i).unicode();
+#else
+        PyObject *dobj = PyString_FromString(dir.toAscii().constData());
+
+        if (!dobj)
+        {
+            PyErr_Print();
+            return;
+        }
+#endif
+
+    // Add the directory to sys.path.
+    int rc = PyList_Append(sys_path, dobj);
+    Py_DECREF(dobj);
+
+    if (rc < 0)
+    {
+        PyErr_Print();
+        return;
+    }
+
+    PyObject *plug_mod = PyImport_ImportModule("afplugins");
+    if (!plug_mod)
+    {
+        PyErr_Print();
+        return;
+    }
+    Py_DECREF(plug_mod);
 }
 
 int main( int argc, char * argv[] )
