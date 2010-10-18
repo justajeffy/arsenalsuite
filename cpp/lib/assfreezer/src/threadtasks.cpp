@@ -190,25 +190,17 @@ HostListTask::HostListTask( QObject * rec, const QString & serviceFilter, bool l
 void HostListTask::run()
 {
 	if( !mServiceFilter.isEmpty() ) {
-		QTime t;
-		t.start();
 		mReturn = Host::select(
 			"WHERE keyhost IN ( SELECT hostservice.fkeyhost FROM HostService WHERE fkeyservice IN (" + mServiceFilter + ") ) AND online=1" );
-		LOG_5( "Selecting hosts took " + QString::number( t.elapsed() ) + " ms " );
-		CHECK_CANCEL
-		t.start();
-		mHostStatuses = HostStatus::select( "fkeyhost in (" + mReturn.keyString() + ")" );
-		LOG_5( "Selecting host statuses took " + QString::number( t.elapsed() ) + " ms " );
-		CHECK_CANCEL
-		t.start();
-		mHostAssignments = JobAssignment::select( "WHERE fkeyhost IN (" + mReturn.keyString() +") AND fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus FROM jobassignmentstatus WHERE status IN ('ready','copy','busy'))" );
-		LOG_5( "Selecting job assignments took " + QString::number( t.elapsed() ) + " ms " );
-		CHECK_CANCEL
-		t.start();
-		mHostJobs = mHostAssignments.jobs();
-		LOG_5( "Selecting jobs took " + QString::number( t.elapsed() ) + " ms " );
+        if( mReturn.size() ) {
+            CHECK_CANCEL
+            mHostStatuses = HostStatus::select( "fkeyhost in (" + mReturn.keyString() + ")" );
+            //CHECK_CANCEL
+            //mHostAssignments = JobAssignment::select( "WHERE fkeyhost IN (" + mReturn.keyString() +") AND fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus FROM jobassignmentstatus WHERE status IN ('ready','copy','busy'))" );
+            CHECK_CANCEL
+            mHostJobs = mHostAssignments.jobs();
+        }
 	}
-	CHECK_CANCEL
 	if( mLoadHostServices )
 		HostService::select();
 }
