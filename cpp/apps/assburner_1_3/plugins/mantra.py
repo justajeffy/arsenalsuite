@@ -22,10 +22,6 @@ class MantraBurner(JobBurner):
         self.jobDone = QRegExp("^Render Time:")
         self.jobProgress = QRegExp("^ALF_PROGRESS (\\d+)")
 
-        self.errors = []
-        self.errors.append(QRegExp("^Error:"))
-        self.errors.append(QRegExp("^Unable to access file"))
-
         self.progress = 0
 
     def __del__(self):
@@ -128,10 +124,6 @@ class MantraBurner(JobBurner):
                 Log("MantraBurner: updating outputPath based on IFD info to %s" % outputPath)
                 self.Job.setOutputPath(outputPath)
                 self.Job.commit()
-        else:
-            for e in self.errors:
-                if line.contains(e):
-                    self.jobErrored( line )
 
 class MantraBurnerPlugin(JobBurnerPlugin):
     def __init__(self):

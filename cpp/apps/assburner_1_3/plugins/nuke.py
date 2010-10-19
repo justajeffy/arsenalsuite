@@ -25,11 +25,6 @@ class NukeBurner(JobBurner):
         self.frameDone = QRegExp("^Writing .*\.(\d\d\d\d\d?)\.\w+ took")
         self.frameStart = QRegExp("^Writing .*\.(\d\d\d\d\d?)\.\w+")
         self.jobDone = QRegExp("^Total render time:")
-        self.errors = []
-        self.errors.append(QRegExp("^Error:"))
-        self.errors.append(QRegExp("Read-only file system"))
-        self.errors.append(QRegExp("FOUNDRY LICENSE ERROR"))
-        self.errors.append(QRegExp("Command exited with non-zero status"))
 
     def __del__(self):
         # Nothing is required
@@ -134,10 +129,6 @@ class NukeBurner(JobBurner):
 
                 # reset to zero for next task
                 self.OutputsReported = 0
-        else:
-            for e in self.errors:
-                if line.contains(e):
-                    self.jobErrored( line )
 
 class NukeBurnerPlugin(JobBurnerPlugin):
     def __init__(self):
