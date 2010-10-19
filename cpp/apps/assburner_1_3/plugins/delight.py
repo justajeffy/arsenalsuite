@@ -26,17 +26,6 @@ class DelightBurner(JobBurner):
 
         self.jobDone = QRegExp("^baztime:")
 
-        self.errors = []
-        self.errors.append(QRegExp("cannot open output file"))
-        self.errors.append(QRegExp("3DL SEVERE ERROR L2033"))
-        self.errors.append(QRegExp("Command exited with non-zero status"))
-        self.errors.append(QRegExp("^renderdl: cannot open input file"))
-        self.errors.append(QRegExp("^3DL INFO L2374: no license available"))
-        self.errors.append(QRegExp("Could not find file:"))
-        self.errors.append(QRegExp("Received signal"))
-        self.errors.append(QRegExp("3DL ERROR R5030:"))
-        #self.errors.append(QRegExp("^3DL SEVERE ERROR"))
-
     def __del__(self):
         # Nothing is required
         # self.cleanup() is explicitly called by the slave
@@ -146,10 +135,6 @@ class DelightBurner(JobBurner):
         elif line.contains(self.jobDone):
             self.taskDone(self.CurrentFrame)
             self.jobFinished()
-        else:
-            for e in self.errors:
-                if line.contains(e):
-                    self.jobErrored( line )
 
 class DelightBurnerPlugin(JobBurnerPlugin):
     def __init__(self):
