@@ -48,6 +48,7 @@
 #include "project.h"
 #include "service.h"
 #include "syslog.h"
+#include "jobfilterset.h"
 
 #include "jobburner.h"
 #include "slave.h"
@@ -127,6 +128,10 @@ JobBurner::JobBurner( const JobAssignment & jobAssignment, Slave * slave, int op
 
 	mProgressRE = QRegExp("\\(?\\d+\\%\\)?$");
 	mProgressUpdate = QDateTime::currentDateTime();
+
+    mJobFilterMessages = mJob.filterSet().jobFilterMessages();
+    foreach( JobFilterMessage jfm, mJobFilterMessages )
+        jfm.qregex = QRegExp(jfm.regex());
 }
 
 JobBurner::~JobBurner()
@@ -785,6 +790,12 @@ void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessCh
 			jobErrored( line );
 			return;
 		}
+    }
+    foreach( JobFilterMessage jfm, mJobFilterMessages ) {
+        if( line.contains( jfm.qregex ) ) {
+            jobErrored( line );
+            return;
+        }
     }
 }
 

@@ -42,6 +42,7 @@
 #include "jobtaskassignment.h"
 #include "joberror.h"
 #include "jobtask.h"
+#include "jobfiltermessage.h"
 
 #include "spooler.h"
 #include "slave.h"
@@ -280,6 +281,8 @@ protected:
     AccountingInfo sumAccountingData( const AccountingInfo & left, const AccountingInfo & right ) const;
     AccountingInfo checkResourceUsage();
     void updateAssignmentAccountingInfo();
+
+    JobFilterMessageList mJobFilterMessages;
 };
 
 /// @}
