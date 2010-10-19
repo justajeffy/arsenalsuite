@@ -671,6 +671,9 @@
   <column type="QString" methodName="shotName" name="shotName" />
   <column type="QString" methodName="sceneName" name="sceneName" />
   <column type="uint" methodName="assignmentSlots" name="slots" />
+  <column type="uint" methodName="filterSet" name="fkeyJobFilterSet" >
+   <fkey indexDeleteMode="DoNothingOnDelete" table="JobFilterSet" type="single" hasIndex="false" />
+  </column>
  </table>
  <table useCodeGen="true" parent="Job" name="Job3Delight" expireKeyCache="true" className="Job3Delight" >
   <column type="uint" methodName="width" name="width" />
@@ -1501,9 +1504,6 @@
   <column type="QString" methodName="description" name="description" />
   <column pluralMethodName="Software" type="uint" methodName="Software" name="fkeySoftware" >
    <fkey indexDeleteMode="DoNothingOnDelete" table="Software" type="multi" hasIndex="false" />
-  </column>
-  <column type="uint" methodName="JobFilterSet" name="fkeyJobFilterSet" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="JobFilterSet" type="multi" hasIndex="false" />
   </column>
   <index useCache="false" type="single" name="Name" >
    <column name="service" />
