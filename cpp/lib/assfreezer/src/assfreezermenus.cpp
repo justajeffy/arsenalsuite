@@ -11,7 +11,6 @@
 
 #include "host.h"
 #include "hostlistwidget.h"
-#include "hosthistory.h"
 #include "hostservice.h"
 #include "jobassignment.h"
 #include "jobcannedbatch.h"
