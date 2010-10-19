@@ -517,37 +517,6 @@
    <fkey indexDeleteMode="CascadeOnDelete" indexName="Host" indexUseCache="false" table="Host" type="multi" hasIndex="true" />
   </column>
  </table>
- <table useCodeGen="true" name="HostHistory" expireKeyCache="true" className="HostHistory" >
-  <column type="uint" methodName="keyHostHistory" name="keyHostHistory" pkey="true" />
-  <column type="uint" methodName="Host" name="fkeyHost" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="Host" type="multi" hasIndex="false" />
-  </column>
-  <column type="uint" methodName="Job" name="fkeyJob" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="Job" type="multi" hasIndex="false" />
-  </column>
-  <column type="uint" methodName="jobstat" name="fkeyjobstat" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="JobStat" type="multi" hasIndex="false" />
-  </column>
-  <column type="QString" methodName="status" name="status" />
-  <column type="QString" methodName="laststatus" name="laststatus" />
-  <column type="QDateTime" methodName="dateTime" name="datetime" />
-  <column displayName="Jobtask" type="uint" methodName="jobTask" name="fkeyjobtask" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="JobTask" type="multi" hasIndex="false" />
-  </column>
-  <column type="QString" methodName="change_from_ip" name="change_from_ip" />
-  <column type="QString" methodName="nextStatus" name="nextstatus" />
-  <column type="uint" methodName="jobType" name="fkeyjobtype" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="JobType" type="multi" hasIndex="false" />
-  </column>
-  <column type="uint" methodName="JobCommandHistory" name="fkeyJobCommandHistory" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="JobCommandHistory" type="multi" hasIndex="false" />
-  </column>
-  <column reverseAccess="true" type="uint" methodName="JobError" name="fkeyJobError" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="JobError" type="multi" hasIndex="false" />
-  </column>
-  <column type="bool" methodName="success" name="success" />
-  <column type="Interval" methodName="duration" name="duration" />
- </table>
  <table useCodeGen="true" name="HostInterface" expireKeyCache="true" className="HostInterface" >
   <column type="uint" methodName="key" name="keyHostInterface" pkey="true" />
   <column reverseAccess="true" type="uint" methodName="Host" name="fkeyHost" >
@@ -801,9 +770,6 @@
   <column type="uint" methodName="Host" name="fkeyHost" >
    <fkey indexDeleteMode="DoNothingOnDelete" table="Host" type="multi" hasIndex="false" />
   </column>
-  <column type="uint" methodName="hostHistory" name="fkeyhosthistory" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="HostHistory" type="multi" hasIndex="false" />
-  </column>
   <column displayName="Real" type="float" methodName="realtime" name="realtime" />
   <column displayName="User" type="float" methodName="usertime" name="usertime" />
   <column displayName="Sys" type="float" methodName="systime" name="systime" />
@@ -843,19 +809,31 @@
    <column name="fkeyHost" />
   </index>
  </table>
- <table useCodeGen="true" name="JobErrorHandler" expireKeyCache="true" className="JobErrorHandler" >
-  <column type="uint" methodName="keyJobErrorHandler" name="keyJobErrorHandler" pkey="true" />
-  <column reverseAccess="true" type="uint" methodName="JobType" name="fkeyJobType" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="JobType" type="multi" hasIndex="false" />
+ <table docs="JobFilterMessage stores a list of regexes that are matched against the stdout/stdout of a Job. If one is matched an action is triggered based on the JobFilterType." useCodeGen="true" name="JobFilterMessage" expireKeyCache="true" className="JobFilterMessage" >
+  <column type="uint" methodName="keyJobFilterMessage" name="keyJobFilterMessage" pkey="true" />
+  <column type="uint" methodName="JobFilterType" name="fkeyJobFilterType" >
+   <fkey indexDeleteMode="DoNothingOnDelete" table="JobFilterType" type="multi" hasIndex="false" />
   </column>
-  <column type="QString" methodName="errorRegEx" name="errorRegEx" />
-  <column type="uint" methodName="JobErrorHandlerScript" name="fkeyJobErrorHandlerScript" >
-   <fkey indexDeleteMode="DoNothingOnDelete" table="JobErrorHandlerScript" type="multi" hasIndex="false" />
+  <column reverseAccess="true" type="uint" methodName="JobFilterSet" name="fkeyJobFilterSet" >
+   <fkey indexDeleteMode="DoNothingOnDelete" indexName="JobFilterSet" indexUseCache="true" table="JobFilterSet" type="multi" hasIndex="true" />
   </column>
+  <column type="QString" methodName="regex" name="regex" />
+  <column type="QString" methodName="comment" name="comment" />
+  <column type="bool" methodName="enabled" name="enabled" />
  </table>
- <table useCodeGen="true" name="JobErrorHandlerScript" expireKeyCache="true" className="JobErrorHandlerScript" >
-  <column type="uint" methodName="keyJobErrorHandlerScript" name="keyJobErrorHandlerScript" pkey="true" />
-  <column type="QString" methodName="script" name="script" />
+ <table docs="JobFilterSet stores a list of possible filters for a job. A jobType will have a default filter set that the user can override at submission time." useCodeGen="true" name="JobFilterSet" expireKeyCache="false" className="JobFilterSet" >
+  <column type="uint" methodName="keyJobFilterSet" name="keyJobFilterSet" pkey="true" />
+  <column type="QString" methodName="name" name="name" />
+  <index useCache="true" type="single" name="Name" >
+   <column name="name" />
+  </index>
+ </table>
+ <table docs="JobFilterType stores a list of possible things that can happen when a particular regex is matched in the sdtout/stderr of a job. This list includes&#xa;&#xa;Error-TaskCancel&#xa;Error-TaskRetry&#xa;Error-JobSuspend" useCodeGen="true" name="JobFilterType" expireKeyCache="false" className="JobFilterType" >
+  <column type="uint" methodName="keyJobFilterType" name="keyJobFilterType" pkey="true" />
+  <column type="QString" methodName="name" name="name" />
+  <index useCache="true" type="multi" name="Name" >
+   <column name="name" />
+  </index>
  </table>
  <table useCodeGen="true" parent="Job" name="JobFusion" expireKeyCache="true" className="JobFusion" >
   <column type="QString" methodName="frameList" name="frameList" />
@@ -1523,6 +1501,9 @@
   <column type="QString" methodName="description" name="description" />
   <column pluralMethodName="Software" type="uint" methodName="Software" name="fkeySoftware" >
    <fkey indexDeleteMode="DoNothingOnDelete" table="Software" type="multi" hasIndex="false" />
+  </column>
+  <column type="uint" methodName="JobFilterSet" name="fkeyJobFilterSet" >
+   <fkey indexDeleteMode="DoNothingOnDelete" table="JobFilterSet" type="multi" hasIndex="false" />
   </column>
   <index useCache="false" type="single" name="Name" >
    <column name="service" />
