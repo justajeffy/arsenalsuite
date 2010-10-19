@@ -14,7 +14,7 @@
 #include "jobservice.h"
 #include "rangefiletracker.h"
 #include "service.h"
-
+#include "jobfilterset.h"
 
 #include "submitter.h"
 #include "path.h"
@@ -210,6 +210,22 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
         LOG_5( "Finished setting jobtype" );
     }
 
+    /// filterSet determines which message filters
+    /// are used to check for Errors.
+    if( args.contains("filterSet") ) {
+        JobFilterSet jfs = JobFilterSet::recordByName( args["filterSet"] );
+        if( jfs.isRecord() ) {
+            mJob.setFilterSet( jfs );
+        }
+    } else {
+        /// look for a filterSet named the jobType
+        JobFilterSet jfs = JobFilterSet::recordByName( mJob.jobType().name() );
+        if( jfs.isRecord() ) {
+            mJob.setFilterSet( jfs );
+        }
+    }
+    LOG_5( "Finished setting filterSet" );
+
 	if( args.contains("noCopy") ) {
 		mUploadEnabled = false;
 		mJob.setUploadedFile( false );
@@ -257,9 +273,6 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
 
 	if( mJob.jobType().name().contains("Max") && !args.contains( "flag_xo" ) )
 		mJob.setValue( "flag_xo", QVariant(0) );
-
-	//if( !args.contains( "priority" ) )
-	//	mJob.setPriority( 50 );
 
     if( args.contains("deps" ) ) {
         JobList jobs;
