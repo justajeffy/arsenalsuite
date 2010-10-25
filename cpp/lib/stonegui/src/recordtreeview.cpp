@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id$
+ * $Id: recordtreeview.cpp,v ac2dea0cb393 2010/10/25 02:41:56 barry $
  */
 
 #include <qapplication.h>
@@ -50,7 +50,7 @@
 RecordFilterWidget::RecordFilterWidget(QWidget * parent)
 : QScrollArea(parent)
 {
-    setFixedHeight(20);
+    setMaximumHeight(24);
 
     widget = new QWidget(this);
     layout = new QGridLayout(widget);
@@ -71,7 +71,10 @@ void RecordFilterWidget::setupFilters(QTreeView * tree, const ColumnStruct colum
     for( cnt=0; columns[cnt].name; ++cnt );
     for( int i=0; i<cnt; i++ ) {
         if( columns[i].filterEnabled ) {
-            mFilterMap[i] = new QLineEdit(columns[i].name);
+            QLineEdit * edit = new QLineEdit();
+            edit->setFrame(false);
+            edit->setToolTip(QString("Filter by: %1").arg(columns[i].name));
+            mFilterMap[i] = edit;
             //LOG_1(columns[i].name);
         } else {
             mFilterMap[i] = new QWidget();
@@ -154,8 +157,6 @@ ExtTreeView::ExtTreeView( QWidget * parent, ExtDelegate * delegate )
 	if( !mDelegate )
 		mDelegate = new ExtDelegate(this);
 	setItemDelegate(mDelegate);
-
-    //setContentsMargins(0, 40, 0, 0);
 }
 
 void ExtTreeView::addFilterLayout()
@@ -168,6 +169,10 @@ void ExtTreeView::addFilterLayout()
     QVBoxLayout * fooLay = new QVBoxLayout(parentWidget);
     fooLay->setContentsMargins(0,0,0,0);
     fooLay->setSpacing(0);
+    fooLay->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mRecordFilterWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     fooLay->addWidget(mRecordFilterWidget);
     fooLay->addWidget(this);
@@ -616,7 +621,6 @@ void ExtTreeView::setupTreeView( IniConfig & ini, const ColumnStruct columns [] 
         addFilterLayout();
     }
     mRecordFilterWidget->setupFilters( this, columns );
-    //QTimer::singleShot( 0, this, SLOT( addFilterLayout() ) );
 }
 
 void ExtTreeView::setupTreeView( const QString & group, const QString & key, const ColumnStruct columns [] )
