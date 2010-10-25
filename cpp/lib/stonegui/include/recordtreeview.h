@@ -30,10 +30,14 @@
 
 #include <qtreeview.h>
 #include <qbitarray.h>
+#include <qscrollarea.h>
 
 #include "recorddelegate.h"
 #include "recordsupermodel.h"
 #include "stonegui.h"
+
+class QWidget;
+class QGridLayout;
 
 struct ColumnStruct {
 	const char * name;
@@ -41,6 +45,26 @@ struct ColumnStruct {
 	int defaultSize;
 	int defaultPos;
 	bool defaultHidden;
+    bool filterEnabled;
+};
+
+class STONE_EXPORT RecordFilterWidget : public QScrollArea
+{
+Q_OBJECT
+
+public:
+    RecordFilterWidget(QWidget * parent=0);
+    void setupFilters(QTreeView * mTree, const ColumnStruct columns []);
+
+public slots:
+    void resizeColumn(int, int, int);
+    void moveColumn(int, int, int);
+
+private:
+    QTreeView * mTree;
+    QGridLayout *layout;
+    QWidget     *widget;
+    QMap<uint, QWidget *> mFilterMap;
 };
 
 class STONEGUI_EXPORT ExtTreeView : public QTreeView
@@ -52,7 +76,7 @@ public:
 	void setModel( QAbstractItemModel * model );
 
 	QModelIndexList selectedRows();
-	
+
 	bool columnAutoResize( int col ) const;
 
 	/// If col is -1, then all columns are set to autoResize
@@ -77,8 +101,11 @@ public:
 	void setupTreeView( const QString & group, const QString & key, const ColumnStruct columns [] );
 	void saveTreeView( const QString & group, const QString & key, const ColumnStruct columns [] );
 
+    void enableFilterWidget(bool);
+
 public slots:
 	void expandRecursive( const QModelIndex & index = QModelIndex(), int levels = -1 );
+    void addFilterLayout();
 
 signals:
 	void showMenu( const QPoint & pos, const QModelIndex & underMouse );
@@ -107,6 +134,11 @@ protected:
 	QBitArray mAutoResizeColumns;
 	bool mShowGrid;
 	QColor mGridColor, mGridColorHighlight;
+
+    RecordFilterWidget * mRecordFilterWidget;
+
+    void resizeEvent(QResizeEvent *event);
+
 };
 
 class STONEGUI_EXPORT RecordTreeView : public ExtTreeView
@@ -149,6 +181,7 @@ protected slots:
 protected:
 	void slotCustomContextMenuRequested( const QPoint & );
 };
+
 
 #endif // RECORD_TREE_VIEW_H
 
