@@ -56,41 +56,41 @@
 #include "items.h"
 
 // ColumnStruct declared in recordtreeview.h
-// DisplayName, IniName, DefaultSize, DefaultPos, Hidden
+// DisplayName, IniName, DefaultSize, DefaultPos, Hidden, Filter Enabled
 static const ColumnStruct job_columns [] =
 {
-	{ "Job Name", 			"JobName", 			220, 	1, 	false },	//0
-	{ "Status", 			"Status", 			80, 	3, 	false },	//1
-	{ "Progress", 			"Progress", 		100, 	5, 	false },	//2
-	{ "Done,Total", 		"ETA", 				60, 	6, 	false },	//3
-	{ "Owner", 				"Owner", 			100, 	8, 	false },	//4
-	{ "Slots", 				"Slots", 			50, 	4, 	false },	//5
-	{ "Priority", 			"Priority", 		60, 	10,	false },	//6
-	{ "Project", 			"Project", 			40, 	9, 	false },	//7
-	{ "Submitted", 			"Submitted", 		140, 	14,	false },	//8
-	{ "Errors", 			"Errors", 			50, 	11,	false },	//9
-	{ "Output Path",		"OutputPath", 		200, 	17,	true },		//10
-	{ "Avg. Time", 			"AverageTime", 		80, 	7,	false },	//11
-	{ "Job Type", 			"JobType", 			50, 	2,	false },	//12
-	{ "Key", 				"Key", 				60,		0,	false },	//13
-	{ "Stats", 				"Stats", 			0, 		19,	true },		//14
-	{ "Map Server Weight", 	"MapServerWeight", 	0, 		20,	true },		//15
-	{ "Health", 			"Health", 			20, 	18,	true }, 	//16
-	{ "Ended", 				"Ended", 			140, 	15,	false },	//17
-	{ "Time in Queue", 		"TimeInQueue",		80, 	13,	false },	//18
-	{ "Services", 			"Services", 		80, 	16,	false }, 	//19
-	{ "Avg. Memory", 		"AverageMemory", 	80, 	12,	false },	//20
-	{ 0, 					0, 					0, 		0, 	false }
+	{ "Job Name", 			"JobName", 			220, 	1, 	false, true },	//0
+	{ "Status", 			"Status", 			80, 	3, 	false, false },	//1
+	{ "Progress", 			"Progress", 		100, 	5, 	false, false },	//2
+	{ "Done,Total", 		"ETA", 				60, 	6, 	false, false },	//3
+	{ "Owner", 				"Owner", 			100, 	8, 	false, true },	//4
+	{ "Slots", 				"Slots", 			50, 	4, 	false, false },	//5
+	{ "Priority", 			"Priority", 		60, 	10,	false, true },	//6
+	{ "Project", 			"Project", 			40, 	9, 	false, true },	//7
+	{ "Submitted", 			"Submitted", 		140, 	14,	false, false },	//8
+	{ "Errors", 			"Errors", 			50, 	11,	false, false },	//9
+	{ "Output Path",		"OutputPath", 		200, 	17,	true, false },	//10
+	{ "Avg. Time", 			"AverageTime", 		80, 	7,	false, false },	//11
+	{ "Job Type", 			"JobType", 			50, 	2,	false, true },	//12
+	{ "Key", 				"Key", 				60,		0,	false, true },	//13
+	{ "Stats", 				"Stats", 			0, 		19,	true, false },	//14
+	{ "Map Server Weight", 	"MapServerWeight", 	0, 		20,	true, false },	//15
+	{ "Health", 			"Health", 			20, 	18,	true, false }, 	//16
+	{ "Ended", 				"Ended", 			140, 	15,	false, false },	//17
+	{ "Time in Queue", 		"TimeInQueue",		80, 	13,	false, false },	//18
+	{ "Services", 			"Services", 		80, 	16,	false, false }, //19
+	{ "Avg. Memory", 		"AverageMemory", 	80, 	12,	false, false },	//20
+	{ 0, 					0, 					0, 		0, 	false, false }
 };
 
 static const ColumnStruct error_columns [] =
 {
-	{ "Host", 				"HostColumn", 		90, 	3, false },
-	{ "Time", 				"TimeColumn", 		180, 	4, false },
-	{ "Frames", 			"FrameColumn", 		130, 	5, false },
-	{ "Error Message", 		"MessageColumn", 	3000, 	6, false },
-	{ "Count", 				"CountColumn", 		50, 	7, false },
-	{ 0, 0, 0, 0, false }
+	{ "Host", 				"HostColumn", 		90, 	3, false, true },
+	{ "Time", 				"TimeColumn", 		180, 	4, false, false },
+	{ "Frames", 			"FrameColumn", 		130, 	5, false, false },
+	{ "Error Message", 		"MessageColumn", 	3000, 	6, false, true },
+	{ "Count", 				"CountColumn", 		50, 	7, false, false },
+	{ 0, 0, 0, 0, false, false }
 };
 
 static const ColumnStruct host_error_columns [] =
@@ -109,8 +109,8 @@ static const ColumnStruct host_error_columns [] =
 static const ColumnStruct frame_columns [] =
 {
 	{ "Frame", 				"FrameColumn", 		50, 	0, false},
-	{ "Status", 			"StatusColumn", 	60, 	1, false},
-	{ "Host", 				"HostColumn", 		100, 	2, false},
+	{ "Status", 			"StatusColumn", 	60, 	1, false, true},
+	{ "Host", 				"HostColumn", 		100, 	2, false, true},
 	{ "Time", 				"TimeColumn", 		60, 	3, false},
 	{ "Loaded", 			"LoadedColumn", 	20, 	4, false},
 	{ "Memory", 			"Memory", 			30, 	5, false},
