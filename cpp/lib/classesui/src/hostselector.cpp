@@ -21,7 +21,7 @@
  *
  */
 
-/* $Author: brobison $
+/* $Author$
  * $LastChangedDate: 2010-03-08 17:38:00 +1100 (Mon, 08 Mar 2010) $
  * $Rev: 9421 $
  * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/classesui/src/hostselector.cpp $
@@ -57,21 +57,21 @@
 
 const ColumnStruct HostItem::host_columns [] =
 {
-	{ "Host", "HostColumn", 100, 0, false },
+	{ "Host", "HostColumn", 100, 0, false, true },
 	{ "Current Jobs", "CurrentJobColumn", 200, 1, false },
-	{ "Status", "StatusColumn", 50, 2, false },
+	{ "Status", "StatusColumn", 50, 2, false, true },
 	{ "Frames", "FramesColumn", 50, 3, false },
-	{ "OS", "OSColumn", 40, 4, false },
-	{ "Memory", "MemoryColumn", 30, 5, false },
-	{ "Mhz", "MhzColumn", 30, 6, false },
-	{ "User", "UserColumn", 60, 7, false },
+	{ "OS", "OSColumn", 40, 4, false, true },
+	{ "Memory", "MemoryColumn", 30, 5, false, true },
+	{ "Mhz", "MhzColumn", 30, 6, false, true },
+	{ "User", "UserColumn", 60, 7, false, true },
 	{ "Packet Weight", "PacketWeightColumn", 40, 8, true },
-	{ "Description", "DescriptionColumn", 200, 9, false },
+	{ "Description", "DescriptionColumn", 200, 9, false, true },
 	{ "Pulse", "PulseColumn", 50, 10, false },
-	{ "Key", "KeyColumn", 0, 11, true },
-	{ "OS Version", "OsVersionColumn", 40, 12, false },
-	{ "CPU Name", "CpuNameColumn", 40, 13, false },
-	{ "Arch", "ArchColumn", 40, 14, false },
+	{ "Key", "KeyColumn", 0, 11, true, true },
+	{ "OS Version", "OsVersionColumn", 40, 12, false, true },
+	{ "CPU Name", "CpuNameColumn", 40, 13, false, true },
+	{ "Arch", "ArchColumn", 40, 14, false, true },
 	{ "Services", "ServicesColumn", 100, 15, true },
 	{ "Avail. Mem", "AvailMemColumn", 40, 16, false },
 	{ "Puppet Pulse", "PuppetPulseColumn", 50, 17, false },
