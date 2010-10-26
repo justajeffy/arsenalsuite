@@ -25,6 +25,8 @@
  * $Id$
  */
 
+#include <qdebug.h>
+
 #include <qapplication.h>
 #include <qevent.h>
 #include <qheaderview.h>
@@ -40,6 +42,7 @@
 #include <qscrollarea.h>
 #include <qscrollbar.h>
 #include <qlineedit.h>
+#include <qregexp.h>
 
 #include "iniconfig.h"
 
@@ -50,7 +53,7 @@
 RecordFilterWidget::RecordFilterWidget(QWidget * parent)
 : QScrollArea(parent)
 {
-    setFixedHeight(20);
+    setFixedHeight(25);
 
     widget = new QWidget(this);
     layout = new QGridLayout(widget);
@@ -71,28 +74,28 @@ void RecordFilterWidget::setupFilters(QTreeView * tree, const ColumnStruct colum
     for( cnt=0; columns[cnt].name; ++cnt );
     for( int i=0; i<cnt; i++ ) {
         if( columns[i].filterEnabled ) {
-            mFilterMap[i] = new QLineEdit(columns[i].name);
-            //LOG_1(columns[i].name);
+            mFilterMap[i] = new QLineEdit();
+
+			connect(mFilterMap[i], SIGNAL(textChanged(const QString)), this, SLOT(textFilterChanged()));
         } else {
             mFilterMap[i] = new QWidget();
         }
     }
     int i = 0;
     for (i = 0; i < mTree->header()->count(); i++) {
-        //qDebug() << "Filter: " << filters[i] << ", Pos: " << header->visualIndex(i) << endl;
-
         if( !mTree->header()->isSectionHidden(i) ) {
-            //mFilterMap[i]->setFixedWidth( mTree->columnWidth( mTree->header()->visualIndex(i) ) );
             mFilterMap[i]->setFixedWidth( mTree->columnWidth( i ) );
             layout->addWidget(mFilterMap[i], 0, mTree->header()->visualIndex(i));
+
+			mFilterIndexMap[mFilterMap[i]] = i;
         }
     }
 
     layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 1, i);
 
-    QObject::connect(mTree->header(), SIGNAL(sectionResized(int, int, int)), this, SLOT(resizeColumn(int, int, int)));
-    QObject::connect(mTree->header(), SIGNAL(sectionMoved(int, int, int)), this, SLOT(moveColumn(int, int, int)));
-    QObject::connect(mTree->horizontalScrollBar(), SIGNAL(valueChanged(int)), horizontalScrollBar(), SLOT(setValue(int)));
+    connect(mTree->header(), SIGNAL(sectionResized(int, int, int)), this, SLOT(resizeColumn(int, int, int)));
+    connect(mTree->header(), SIGNAL(sectionMoved(int, int, int)), this, SLOT(moveColumn(int, int, int)));
+    connect(mTree->horizontalScrollBar(), SIGNAL(valueChanged(int)), horizontalScrollBar(), SLOT(setValue(int)));
 }
 
 void RecordFilterWidget::resizeColumn(int column, int oldValue, int newValue)
@@ -105,10 +108,38 @@ void RecordFilterWidget::resizeColumn(int column, int oldValue, int newValue)
 void RecordFilterWidget::moveColumn(int, int, int)
 {
 	for (int i = 0; i < mTree->header()->count(); i++) {
-		//qDebug() << "Filter: " << filters[i] << ", Pos: " << header->visualIndex(i) << endl;
 		layout->removeWidget(mFilterMap[i]);
-        if( !mTree->header()->isSectionHidden(i) )
+        if( !mTree->header()->isSectionHidden(i) ) {
             layout->addWidget(mFilterMap[i], 0, mTree->header()->visualIndex(i));
+			
+			mFilterIndexMap[mFilterMap[i]] = i;
+		}
+	}
+}
+
+void RecordFilterWidget::textFilterChanged()
+{
+	QTimer::singleShot(500, this, SLOT(filterRows()));
+}
+
+void RecordFilterWidget::filterRows()
+{
+	int numRows = mTree->model()->rowCount();
+	for ( int row = 0; row < numRows; row++ ) {
+	
+		mTree->setRowHidden(row, mTree->rootIndex(), false);
+
+		int mapSize = mFilterMap.size();
+		for ( int col = 0; col < mapSize; col++ ) {
+
+			QLineEdit *le = qobject_cast<QLineEdit*> (mFilterMap.value(col));
+			if ( le && !le->text().isEmpty() ) {
+
+				QString filter = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap.value(mFilterMap.value(col)))).toString();
+				if ( ! filter.toLower().contains( le->text().toLower() ) )
+					mTree->setRowHidden(row, mTree->rootIndex(), true);
+			}
+		}
 	}
 }
 

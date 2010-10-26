@@ -59,12 +59,15 @@ public:
 public slots:
     void resizeColumn(int, int, int);
     void moveColumn(int, int, int);
+    void textFilterChanged();
+	void filterRows();
 
 private:
     QTreeView * mTree;
     QGridLayout *layout;
     QWidget     *widget;
     QMap<uint, QWidget *> mFilterMap;
+    QMap<QWidget *, uint> mFilterIndexMap;
 };
 
 class STONEGUI_EXPORT ExtTreeView : public QTreeView
