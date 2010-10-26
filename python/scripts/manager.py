@@ -99,7 +99,7 @@ class ManagerConfig:
         # assignment loop.
         # so priorities may not be targeted correctly for up to this % of total slots on
         # the farm
-        self._ASSIGN_SLOPPINESS = Config.getFloat( 'arsenalAssignSloppiness', 5 )
+        self._ASSIGN_SLOPPINESS = Config.getFloat( 'arsenalAssignSloppiness', 2.0 )
 
 # Single Instance
 config = ManagerConfig()
@@ -543,6 +543,7 @@ class FarmResourceSnapshot(object):
         self.nearlyFreeHosts = []
         self.licCountByService = {}
         self.slotsByUserAndService = {}
+        self.potentialSlotsAvailable = 0
 
     def reset(self):
         # Project Weighted Assigning
@@ -731,6 +732,9 @@ SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
                     self.hostIsFree( nfh.host )
         self.availableNearlyFreeHosts = self.nearlyFreeHosts
         self.reservedNearlyFreeHosts = []
+
+        for host in hosts:
+            self.potentialSlotsAvailable =  self.potentialSlotsAvailable + host.maxAssignments()
 
         if VERBOSE_DEBUG:
             for service in self.servicesNeeded:
@@ -954,7 +958,7 @@ SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
         # Its possible to have free hosts that can't provide a service
         # for our current jobs
         while True:
-            assignCount = 0
+            slotAssignCount = 0
             if len(self.hostsUnused) < 1:
                 raise AllHostsAssignedException()
 
@@ -972,11 +976,12 @@ SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
                 try:
                     # Recalc priority and resort job list after every assignment
                     if self.assignSingleJob(jobAssign):
-                        assignCount += 1
-                        break
+                        slotAssignCount = slotAssignCount + jobAssign.Job.assignmentSlots()
+                        if ((float(slotAssignCount) / self.potentialSlotsAvailable)*100) > config._ASSIGN_SLOPPINESS:
+                            break
                 except NonCriticalAssignmentError:
                     if VERBOSE_DEBUG: traceback.print_exc()
-            if assignCount == 0:
+            if slotAssignCount == 0:
                 break
 
     def performProjectWeightedAssignments(self):
@@ -992,7 +997,7 @@ SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
                     jobAssignList.append(ja)
             jobAssignList.sort()
 
-            assignCount = 0
+            slotAssignCount = 0
             for jobAssign in jobAssignList:
                 try:
                     # Make sure that this project deserves more hosts
@@ -1002,12 +1007,13 @@ SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
 
                     # Resort list after each successful assignment
                     if self.assignSingleJob( jobAssign ):
-                        assignCount += 1
+                        slotAssignCount = slotAssignCount + jobAssign.Job.assignmentSlots()
                         self.projectWeights[fkeyproject] -= 1
-                        break
+                        if ((float(slotAssignCount) / self.potentialSlotsAvailable)*100) > config._ASSIGN_SLOPPINESS:
+                            break
                 except NonCriticalAssignmentError:
                     if VERBOSE_DEBUG: traceback.print_exc()
-            if assignCount == 0:
+            if slotAssignCount == 0:
                 break
 
     def performNormalAssignments(self):
@@ -1015,7 +1021,7 @@ SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
         # Its possible to have free hosts that can't provide a service
         # for our current jobs
         while True:
-            assignCount = 0
+            slotAssignCount = 0
             if len(self.hostsUnused) < 1:
                 raise AllHostsAssignedException()
 
@@ -1031,13 +1037,16 @@ SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
             jobAssignList.sort()
             for jobAssign in jobAssignList:
                 try:
-                    # Recalc priority and resort job list after every assignment
+                    # Recalc priority and resort job list after assignments.
+                    # Use the "sloppiness" attribute to determine how many slots
+                    # to assign in a single loop.
                     if self.assignSingleJob(jobAssign):
-                        assignCount += 1
-                        break
+                        slotAssignCount = slotAssignCount + jobAssign.Job.assignmentSlots()
+                        if ((float(slotAssignCount) / self.potentialSlotsAvailable)*100) > config._ASSIGN_SLOPPINESS:
+                            break
                 except NonCriticalAssignmentError:
                     if VERBOSE_DEBUG: traceback.print_exc()
-            if assignCount == 0:
+            if slotAssignCount == 0:
                 break
 
     def performAssignments(self):
