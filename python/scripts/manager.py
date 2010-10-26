@@ -542,8 +542,12 @@ class FarmResourceSnapshot(object):
         self.reset()
         self.nearlyFreeHosts = []
         self.licCountByService = {}
+        self.slotsByProject = {}
         self.slotsByUserAndService = {}
+        self.slotsByUser = {}
+        self.limitsByProject = {}
         self.limitsByUserAndService = {}
+        self.limitsByUser = {}
         self.potentialSlotsAvailable = 0
 
     def reset(self):
@@ -572,6 +576,9 @@ class FarmResourceSnapshot(object):
 
         # User Info
         self.refreshUserUsage()
+
+        # project Info
+        self.refreshProjectUsage()
 
         # Used to keep track of whether or not assignments have been
         # completed or were halted for some reason(throttling).
@@ -630,6 +637,47 @@ FROM usr
             key = q2.value(0).toString()[0] +"-"+ q2.value(1).toString[0]
             value = q2.value(2).toInt()[0]
             self.limitsByUserAndService[key] = value
+
+        q3 = Database.current().exec_("""
+SELECT usr.name, SUM(jobstatus.hostsonjob) FROM usr
+    JOIN job ON keyelement = fkeyusr AND  job.status = 'started'
+    JOIN jobstatus ON keyjob = jobstatus.fkeyjob
+    GROUP BY usr.name
+                                    """)
+        while q3.next():
+            key = q3.value(0).toString()[0]
+            value = q3.value(1).toInt()[0]
+            self.slotsByUser[key] = value
+
+        q4 = Database.current().exec_("""
+SELECT usr.name, arsenalSlotLimit
+FROM usr
+                                    """)
+        while q4.next():
+            key = q4.value(0).toString()[0]
+            value = q4.value(1).toInt()[0]
+            self.limitsByUser[key] = value
+
+    def refreshProjectUsage(self):
+        q = Database.current().exec_("""
+SELECT project.name, SUM(jobstatus.hostsonjob) FROM project
+    JOIN job ON keyelement = job.fkeyproject AND job.status = 'started'
+    JOIN jobstatus ON keyjob = jobstatus.fkeyjob
+    GROUP BY project.name
+                                    """)
+        while q.next():
+            key = q.value(0).toString()[0]
+            value = q.value(1).toInt()[0]
+            self.slotsByProject[key] = value
+
+        q4 = Database.current().exec_("""
+SELECT project.name, arsenalSlotLimit
+FROM project
+                                    """)
+        while q2.next():
+            key = q2.value(0).toString()[0]
+            value = q2.value(1).toInt()[0]
+            self.limitsByProject[key] = value
 
     def scaleProjectWeights(self, hostsActive):
         # If there is more than 1.0(100%) projectweight, than
@@ -902,11 +950,29 @@ FROM usr
         # Account for licenses used by each service
         # This is just a temporary local count to avoid checking the
         # database every assignment.
-
         if not self.canReserveLicenses(jobAssign.servicesRequired):
             raise NonCriticalAssignmentError("Service %s out of licenses" % "something")
         self.reserveLicenses(jobAssign.servicesRequired)
 
+        # check for project limits on total slot use
+        key = job.project().name()
+        if self.slotsByProject.has_key(key):
+                self.slotsByProject[key] = self.slotsByProject[key] + job.assignmentSlots()
+            else
+                self.slotsByProject[key] = job.assignmentSlots()
+        if self.limitsByProject.has_key(key) and self.slotsByProject[key] > self.limitsByProject[key]:
+            raise NonCriticalAssignmentError("Project %s slot limit of %s reached" % (key, self.limitsByProject[key]))
+
+        # check for per user limits on total slot use
+        key = job.user().name()
+        if self.slotsByUser.has_key(key):
+                self.slotsByUser[key] = self.slotsByUser[key] + job.assignmentSlots()
+            else
+                self.slotsByUser[key] = job.assignmentSlots()
+        if self.limitsByUser.has_key(key) and self.slotsByUser[key] > self.limitsByUser[key]:
+            raise NonCriticalAssignmentError("User %s slot limit of %s reached" % (key, self.limitsByUser[key]))
+
+        # check for per user limits on slot use per service
         for service in jobAssign.servicesRequired:
             key = job.user().name() +"-"+ service.service()
 
