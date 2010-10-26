@@ -90,6 +90,7 @@ void RecordFilterWidget::setupFilters(QTreeView * tree, const ColumnStruct colum
         if( !mTree->header()->isSectionHidden(i) ) {
             mFilterMap[i]->setFixedWidth( mTree->columnWidth( i ) );
             layout->addWidget(mFilterMap[i], 0, mTree->header()->visualIndex(i));
+            mFilterIndexMap[mFilterMap[i]] = i;
         }
         if(i>0)
             QWidget::setTabOrder(mFilterMap[mTree->header()->visualIndex(i-1)], mFilterMap[mTree->header()->visualIndex(i)]);
