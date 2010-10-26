@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordtreeview.cpp,v ac2dea0cb393 2010/10/25 02:41:56 barry $
+ * $Id$
  */
 
 #include <qapplication.h>
@@ -85,11 +85,14 @@ void RecordFilterWidget::setupFilters(QTreeView * tree, const ColumnStruct colum
         //qDebug() << "Filter: " << filters[i] << ", Pos: " << header->visualIndex(i) << endl;
 
         if( !mTree->header()->isSectionHidden(i) ) {
-            //mFilterMap[i]->setFixedWidth( mTree->columnWidth( mTree->header()->visualIndex(i) ) );
             mFilterMap[i]->setFixedWidth( mTree->columnWidth( i ) );
             layout->addWidget(mFilterMap[i], 0, mTree->header()->visualIndex(i));
         }
+        if(i>0)
+            QWidget::setTabOrder(mFilterMap[mTree->header()->visualIndex(i-1)], mFilterMap[mTree->header()->visualIndex(i)]);
     }
+    if(i>0)
+        QWidget::setTabOrder(mFilterMap[mTree->header()->visualIndex(i-1)], mFilterMap[mTree->header()->visualIndex(i)]);
 
     layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 1, i);
 
@@ -100,9 +103,7 @@ void RecordFilterWidget::setupFilters(QTreeView * tree, const ColumnStruct colum
 
 void RecordFilterWidget::resizeColumn(int column, int oldValue, int newValue)
 {
-    //mFilterMap[column]->setFixedSize(newValue, mFilterMap[column]->height());
     mFilterMap[column]->setMinimumWidth(newValue);
-    layout->update();
 }
 
 void RecordFilterWidget::moveColumn(int, int, int)
