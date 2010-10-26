@@ -204,6 +204,7 @@
   <column type="uint" methodName="AssetTemplate" name="fkeyAssetTemplate" >
    <fkey indexDeleteMode="DoNothingOnDelete" indexName="AssetTemplate" indexUseCache="false" table="AssetTemplate" type="multi" hasIndex="true" />
   </column>
+  <column type="uint" methodName="arsenalSlotLimit" name="arsenalSlotLimit" />
   <variable type="float" name="mDaysEstimatedCache" />
   <variable type="float" name="mDaysScheduledCache" />
   <variable type="float" name="mDaysSpentCache" />
