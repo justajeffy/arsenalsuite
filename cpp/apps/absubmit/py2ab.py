@@ -72,7 +72,10 @@ def submitError(errorString):
 def farmSubmit(userArgs):
     jobArgs = buildSubmitArgs()
     jobArgs.update( userArgs )
- 
+
+    # this is overridden as a "security measure"
+    jobArgs['runasSubmitter'] = "true"
+
     if not jobArgs.has_key("minMemory"):
         jobArgs['minMemory'] = str(int(jobArgs["assignmentSlots"]) * 1024 * 512)
     if not jobArgs.has_key("maxMemory"):
