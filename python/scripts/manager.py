@@ -909,7 +909,13 @@ FROM usr
 
         for service in jobAssign.servicesRequired:
             key = job.user().name() +"-"+ service.service()
-            if self.limitsByUserAndService.has_key(key) and self.slotsByUserAndService[key] + job.assignmentSlots() > self.limitsByUserAndService[key]:
+
+            if self.slotsByUserAndService.has_key(key):
+                self.slotsByUserAndService[key] = self.slotsByUserAndService[key] + job.assignmentSlots()
+            else
+                self.slotsByUserAndService[key] = job.assignmentSlots()
+
+            if self.limitsByUserAndService.has_key(key) and self.slotsByUserAndService[key] > self.limitsByUserAndService[key]:
                 raise NonCriticalAssignmentError("Service %s exceeds user limit" % service.service())
 
         # If the host_assign fails, then skip this job
