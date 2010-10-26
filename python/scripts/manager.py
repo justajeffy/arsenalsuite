@@ -543,6 +543,7 @@ class FarmResourceSnapshot(object):
         self.nearlyFreeHosts = []
         self.licCountByService = {}
         self.slotsByUserAndService = {}
+        self.limitsByUserAndService = {}
         self.potentialSlotsAvailable = 0
 
     def reset(self):
@@ -617,6 +618,18 @@ SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
             key = q.value(0).toString()[0] +"-"+ q.value(1).toString[0]
             value = q.value(2).toInt()[0]
             self.slotsByUserAndService[key] = value
+
+        q2 = Database.current().exec_("""
+SELECT usr.name, service.service, SUM("limit") nottoexceed
+FROM usr
+    JOIN userservice us on keyelement = us.user
+    JOIN service ON keyservice = us.service
+    GROUP BY usr.name, service.service
+                                    """)
+        while q2.next():
+            key = q2.value(0).toString()[0] +"-"+ q2.value(1).toString[0]
+            value = q2.value(2).toInt()[0]
+            self.limitsByUserAndService[key] = value
 
     def scaleProjectWeights(self, hostsActive):
         # If there is more than 1.0(100%) projectweight, than
@@ -893,6 +906,11 @@ SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
         if not self.canReserveLicenses(jobAssign.servicesRequired):
             raise NonCriticalAssignmentError("Service %s out of licenses" % "something")
         self.reserveLicenses(jobAssign.servicesRequired)
+
+        for service in jobAssign.servicesRequired:
+            key = job.user().name() +"-"+ service.service()
+            if self.limitsByUserAndService.has_key(key) and self.slotsByUserAndService[key] + job.assignmentSlots() > self.limitsByUserAndService[key]:
+                raise NonCriticalAssignmentError("Service %s exceeds user limit" % service.service())
 
         # If the host_assign fails, then skip this job
         # There are valid reasons for this to fail, such as the host going offline
