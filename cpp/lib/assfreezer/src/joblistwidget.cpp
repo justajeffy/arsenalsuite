@@ -52,7 +52,7 @@ ProjectList JobListWidget::mProjectList;
 
 JobListWidget::JobListWidget( QWidget * parent )
 : AssfreezerView( parent )
-, mJobFilterEdit( 0 )
+//, mJobFilterEdit( 0 )
 , mToolBar( 0 )
 , mViewsInitialized( false )
 , mJobTaskRunning( false )
@@ -111,8 +111,8 @@ void JobListWidget::initializeViews()
         NewViewFromSelectionAction = new QAction( "New View From Selection", this );
         connect( NewViewFromSelectionAction, SIGNAL( triggered(bool) ), SLOT( createNewViewFromSelection() ) );
 
-        mJobFilterEdit = new JobFilterEdit( this );
-        connect( mJobFilterEdit, SIGNAL( filterChanged( const QString & ) ), SLOT( jobFilterChanged( const QString & ) ) );
+        //mJobFilterEdit = new JobFilterEdit( this );
+        //connect( mJobFilterEdit, SIGNAL( filterChanged( const QString & ) ), SLOT( jobFilterChanged( const QString & ) ) );
 
         connect( RefreshAction, SIGNAL( triggered(bool) ), SLOT( refresh() ) );
 
@@ -228,8 +228,8 @@ void JobListWidget::initializeViews()
                 mJobFilter.allProjectsShown = true;
         }
         mJobFilter.showNonProjectJobs = ini.readBool( "ShowNonProjectJobs", true );
-        mJobFilterEdit->lineEdit()->setText(ini.readString( "ExtraFilterText", "" ));
-        mJobFilter.mExtraFilters = mJobFilterEdit->sqlFilter();
+        //mJobFilterEdit->lineEdit()->setText(ini.readString( "ExtraFilterText", "" ));
+        //mJobFilter.mExtraFilters = mJobFilterEdit->sqlFilter();
         mJobFilter.mLimit = options.mLimit;
         applyOptions();
     }
@@ -248,7 +248,7 @@ void JobListWidget::save( IniConfig & ini )
         ini.removeKey( "HiddenProjects" );
         ini.writeBool( "AllProjectsShown", mJobFilter.allProjectsShown );
         ini.writeBool( "ShowNonProjectJobs", mJobFilter.showNonProjectJobs );
-        ini.writeString( "ExtraFilters", mJobFilterEdit->lineEdit()->text() );
+        //ini.writeString( "ExtraFilters", mJobFilterEdit->lineEdit()->text() );
         ini.writeString( "TypeToShow", mJobFilter.typeToShow.join(",") );
         ini.writeBool( "DependencyTreeEnabled", isDependencyTreeEnabled() );
         // Save the splitter position by making a string of ints separated by commas
@@ -436,7 +436,7 @@ QToolBar * JobListWidget::toolBar( QMainWindow * mw )
 		mToolBar->addSeparator();
 		mToolBar->addAction( ShowMineAction );
 		mToolBar->addSeparator();
-		mToolBar->addWidget( mJobFilterEdit );
+		//mToolBar->addWidget( mJobFilterEdit );
 	}
 	return mToolBar;
 }
