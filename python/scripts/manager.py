@@ -95,6 +95,12 @@ class ManagerConfig:
 		self._AUTOPACKET_TARGET = Config.getFloat( 'assburnerAutoPacketTarget', 600 )
 		self._AUTOPACKET_DEFAULT = Config.getFloat( 'assburnerAutoPacketDefault', 60 )
 
+        # this is the max percentage of slots that will get assigned in a single
+        # assignment loop.
+        # so priorities may not be targeted correctly for up to this % of total slots on
+        # the farm
+        self._ASSIGN_SLOPPINESS = Config.getFloat( 'arsenalAssignSloppiness', 5 )
+
 # Single Instance
 config = ManagerConfig()
 
@@ -259,6 +265,13 @@ class JobAssign:
         hasHost = 0
         if self.JobStatus.hostsOnJob() > 0: hasHost = 1
         sortKey = '%01d-%03d-%04d-%04d-%10d' % (hasHost,self.Job.priority(), self.JobStatus.hostsOnJob(), self.JobStatus.errorCount(), self.Job.submittedts().toTime_t())
+        if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
+        return sortKey
+
+    def key_project_soft_reserves( self ):
+        licensesUnder = 0
+        slotsUnder = 0
+        sortKey = '%01d-%03d-%04d-%04d-%10d' % (licensesUnder,slotsUnder, self.Job.priority())
         if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
         return sortKey
 
@@ -437,7 +450,7 @@ def updateProjectTempo():
 
 # Returns [hostsTotal int, hostsActive int, hostsReady int, jobsTotal int, jobsActive int, jobsDone int]
 def getCounter():
-	q = Database.current().exec_( "SELECT * FROM getcounterstate()" )
+	q = Database.current().exec_( "SELECT hostsTotal, hostsActive, hostsReady FROM getcounterstate()" )
 	if not q.next(): return map(lambda x:0,range(0,5))
 	return map(lambda x: q.value(x).toInt()[0], range(0,5))
 
@@ -529,7 +542,8 @@ class FarmResourceSnapshot(object):
 		self.reset()
 		self.nearlyFreeHosts = []
 		self.licCountByService = {}
-	
+        self.slotsByUserAndService = {}
+
 	def reset(self):
 		# Project Weighted Assigning
 		self.projectWeights = {}
@@ -553,6 +567,9 @@ class FarmResourceSnapshot(object):
 		self.nearlyFreeAvailableHosts = {}
 		self.nearlyFreeReservedHosts = {}
 		self.hostHasExclusiveAssignmentCache = {}
+
+        # User Info
+        self.refreshUserUsage()
 		
 		# Used to keep track of whether or not assignments have been
 		# completed or were halted for some reason(throttling).
@@ -585,6 +602,20 @@ class FarmResourceSnapshot(object):
 			weight = q.value(1).toDouble()[0]
 			self.projectWeights[fkeyproject] = weight
 			self.projectWeightTotal += weight
+
+    def refreshUserUsage(self):
+        q = Database.current().exec_("""
+SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
+    JOIN job ON keyelement = fkeyusr AND  job.status = 'started'
+    JOIN jobstatus ON keyjob = jobstatus.fkeyjob
+    JOIN jobservice js ON keyjob = js.fkeyjob
+    JOIN service ON keyservice = fkeyservice
+    GROUP BY usr.name, service.service
+                                    """)
+        while q.next():
+            key = q.value(0).toString()[0] +"-"+ q.value(1).toString[0]
+            value = q.value(2).toInt()[0]
+            self.slotsByUserAndService[key] = value
 
 	def scaleProjectWeights(self, hostsActive):
 		# If there is more than 1.0(100%) projectweight, than
