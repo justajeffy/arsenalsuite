@@ -22,7 +22,7 @@ class AssfreezerJobMenu;
 class AssfreezerErrorMenu;
 class FrameListTask;
 class ImageView;
-class JobFilterEdit;
+//class JobFilterEdit;
 class PartialFrameListTask;
 class TabToolBar;
 
@@ -68,7 +68,7 @@ public:
 	QAction* DependencyTreeEnabledAction;
 	QAction* NewViewFromSelectionAction;
 
-	JobFilterEdit * mJobFilterEdit;
+	//JobFilterEdit * mJobFilterEdit;
 
 	ProjectList activeProjects();
 
