@@ -73,9 +73,10 @@ HostListWidget::HostListWidget( QWidget * parent )
 	connect( ShowJobsAction, SIGNAL(triggered(bool)), SLOT( showAssignedJobs() ) );
 
 	mHostTree = new RecordTreeView(this);
-	QLayout * hbox = new QHBoxLayout(this);
-	hbox->setMargin(0);
-	hbox->addWidget(mHostTree);
+	QLayout * vbox = new QVBoxLayout(this);
+	vbox->setMargin(0);
+	vbox->setSpacing(0);
+	vbox->addWidget(mHostTree);
 
 	/* ListView connections */
 	connect( mHostTree, SIGNAL( selectionChanged(RecordList) ), SLOT( hostListSelectionChanged() ) );
