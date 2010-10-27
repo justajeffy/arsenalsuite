@@ -38,6 +38,7 @@
 
 class QWidget;
 class QGridLayout;
+class RecordFilterWidget;
 
 struct ColumnStruct {
 	const char * name;
@@ -46,28 +47,6 @@ struct ColumnStruct {
 	int defaultPos;
 	bool defaultHidden;
     bool filterEnabled;
-};
-
-class STONE_EXPORT RecordFilterWidget : public QScrollArea
-{
-Q_OBJECT
-
-public:
-    RecordFilterWidget(QWidget * parent=0);
-    void setupFilters(QTreeView * mTree, const ColumnStruct columns []);
-
-public slots:
-    void resizeColumn(int, int, int);
-    void moveColumn(int, int, int);
-    void textFilterChanged();
-	void filterRows();
-
-private:
-    QTreeView * mTree;
-    QGridLayout *layout;
-    QWidget     *widget;
-    QMap<uint, QWidget *> mFilterMap;
-    QMap<QWidget *, uint> mFilterIndexMap;
 };
 
 class STONEGUI_EXPORT ExtTreeView : public QTreeView
@@ -138,6 +117,7 @@ protected:
 	bool mShowGrid;
 	QColor mGridColor, mGridColorHighlight;
 
+    friend class RecordFilterWidget;
     RecordFilterWidget * mRecordFilterWidget;
 
     void resizeEvent(QResizeEvent *event);

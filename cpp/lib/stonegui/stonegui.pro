@@ -30,6 +30,7 @@ SOURCES += \
 	src/recordlistview.cpp \
 #	src/tardstyle.cpp \
 	src/recentvaluesui.cpp \
+	src/recordfilterwidget.cpp \
 	src/recordpropvalmodel.cpp \
 	src/recordpropvaltree.cpp \
 	src/recordsupermodel.cpp \
@@ -61,6 +62,7 @@ HEADERS += \
 	include/recordcombo.h \
 	include/recorddelegate.h \
 	include/recorddrag.h \
+	include/recordfilterwidget.h \
 	include/recordlistmodel.h \
 	include/recordlistview.h \
 	include/recordpropvalmodel.h \
