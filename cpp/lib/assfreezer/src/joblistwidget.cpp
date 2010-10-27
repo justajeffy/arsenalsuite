@@ -158,7 +158,7 @@ void JobListWidget::initializeViews()
             ErrorModel * em = new ErrorModel( mErrorTree );
             em->setAutoSort( true );
             mErrorTree->setModel( em );
-            for( int i=0; i<7; i++ )
+            for( int i=0; i < em->columnCount(); i++ )
                 mErrorTree->setColumnAutoResize(i,true);
         }
 
@@ -168,7 +168,8 @@ void JobListWidget::initializeViews()
             fm->setAutoSort( true );
             mFrameTree->setModel( fm );
             mFrameTree->setItemDelegate( new LoadedDelegate( mJobTree ) );
-            mFrameTree->setColumnAutoResize( 0, true );
+            for(int i=0; i < fm->columnCount(); i++)
+                mFrameTree->setColumnAutoResize( i, true );
         }
 
         mStatusFilterMenu = new StatusFilterMenu( this );
