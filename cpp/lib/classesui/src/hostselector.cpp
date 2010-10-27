@@ -58,24 +58,24 @@
 const ColumnStruct HostItem::host_columns [] =
 {
 	{ "Host", "HostColumn", 100, 0, false, true },
-	{ "Current Jobs", "CurrentJobColumn", 200, 1, false },
+	{ "Current Jobs", "CurrentJobColumn", 200, 1, false, false },
 	{ "Status", "StatusColumn", 50, 2, false, true },
-	{ "Frames", "FramesColumn", 50, 3, false },
+	{ "Frames", "FramesColumn", 50, 3, false, false },
 	{ "OS", "OSColumn", 40, 4, false, true },
 	{ "Memory", "MemoryColumn", 30, 5, false, true },
 	{ "Mhz", "MhzColumn", 30, 6, false, true },
 	{ "User", "UserColumn", 60, 7, false, true },
-	{ "Packet Weight", "PacketWeightColumn", 40, 8, true },
+	{ "Packet Weight", "PacketWeightColumn", 40, 8, true, false },
 	{ "Description", "DescriptionColumn", 200, 9, false, true },
-	{ "Pulse", "PulseColumn", 50, 10, false },
+	{ "Pulse", "PulseColumn", 50, 10, false, false },
 	{ "Key", "KeyColumn", 0, 11, true, true },
 	{ "OS Version", "OsVersionColumn", 40, 12, false, true },
 	{ "CPU Name", "CpuNameColumn", 40, 13, false, true },
 	{ "Arch", "ArchColumn", 40, 14, false, true },
-	{ "Services", "ServicesColumn", 100, 15, true },
-	{ "Avail. Mem", "AvailMemColumn", 40, 16, false },
-	{ "Puppet Pulse", "PuppetPulseColumn", 50, 17, false },
-	{ 0, 0, 0, 0, false }
+	{ "Services", "ServicesColumn", 100, 15, true, false },
+	{ "Avail. Mem", "AvailMemColumn", 40, 16, false, false },
+	{ "Puppet Pulse", "PuppetPulseColumn", 50, 17, false, false },
+	{ 0, 0, 0, 0, false, false }
 };
 
 ViewColors * HostItem::HostColors = 0;
@@ -305,6 +305,8 @@ HostSelector::HostSelector( QWidget * parent )
 	mHostTree->setModel( mModel );
 	mModel->setHeaderLabels( QStringList() << "Host" << "Status" << "Version" << "Memory" << "Mhz" << "User" << "Description" );
 
+    for( int i=0; i < mModel->columnCount(); i++ )
+        mHostTree->setColumnAutoResize(i,true);
 
 	mModel->setAutoSort(true);
 	mModel->sort(0,Qt::DescendingOrder);
