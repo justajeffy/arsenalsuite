@@ -105,6 +105,10 @@ public slots:
 
 	void setCurrentView( AssfreezerView * );
 
+	void saveCurrentViewToFile();
+    void saveViewToFile( AssfreezerView * );
+    void loadViewFromFile();
+
 signals:
     void currentViewChanged( AssfreezerView * );
 
@@ -175,6 +179,9 @@ private:
 	QAction * mCloseViewAction;
 	QAction * mMoveViewLeftAction;
 	QAction * mMoveViewRightAction;
+
+	QAction * mSaveViewToFileAction;
+	QAction * mLoadViewFromFileAction;
 
 	QMenu * mFileMenu, * mToolsMenu, * mOptionsMenu, * mViewMenu, * mRestoreViewMenu, * mHelpMenu;
 	QToolBar *Toolbar;

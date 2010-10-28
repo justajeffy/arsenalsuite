@@ -32,6 +32,7 @@
 #include <qtimer.h>
 #include <qtooltip.h>
 #include <qstackedwidget.h>
+#include <qfiledialog.h>
 
 #include <stdlib.h>
 
@@ -116,7 +117,7 @@ MainWindow::MainWindow( QWidget * parent )
 	IniConfig & c( config() );
 	c.pushSection( "Assfreezer" );
 	QString cAppName = c.readString("ApplicationName", "AssFreezer");
-	setWindowTitle(cAppName+" - Version " + VERSION + ", build " + QString("$Date$").remove(QRegExp("[^\\d]")));
+	setWindowTitle(cAppName+" - Version " + VERSION + ", build " + QString("$Date: 2010/10/17 22:50:11 $").remove(QRegExp("[^\\d]")));
 	setWindowIcon( QIcon(":/images/"+cAppName+"Icon.png" ) );
 
 	Toolbar = new QToolBar( this );
@@ -158,6 +159,11 @@ MainWindow::MainWindow( QWidget * parent )
 	mMoveViewRightAction = mViewMenu->addAction( "Move Current View &Right" );
 	mMoveViewRightAction->setShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Right ) );
 
+	QAction * mSaveViewToFileAction = mViewMenu->addAction( "Save View To &File" );
+	mSaveViewToFileAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
+
+	QAction * mLoadViewFromFileAction = mViewMenu->addAction( "Load View fr&om File" );
+
 	connect( mNewJobViewAction, SIGNAL( triggered(bool) ), SLOT( createJobView() ) );
 	connect( mNewHostViewAction, SIGNAL( triggered(bool) ), SLOT( createHostView() ) );
 	connect( mCloneViewAction, SIGNAL( triggered(bool) ), SLOT( cloneCurrentView() ) );
@@ -166,6 +172,9 @@ MainWindow::MainWindow( QWidget * parent )
 	connect( mMoveViewLeftAction, SIGNAL( triggered(bool) ), SLOT( moveCurrentViewLeft() ) );
 	connect( mMoveViewRightAction, SIGNAL( triggered(bool) ), SLOT( moveCurrentViewRight() ) );
 	connect( renameViewAction, SIGNAL( triggered(bool) ), SLOT( renameCurrentView() ) );
+
+	connect( mSaveViewToFileAction, SIGNAL( triggered(bool) ), SLOT( saveCurrentViewToFile() ) );
+	connect( mLoadViewFromFileAction, SIGNAL( triggered(bool) ), SLOT( loadViewFromFile() ) );
 
 	mHelpMenu = mb->addMenu( "&Help" );
 	mHelpMenu->addAction( HelpAboutAction );
@@ -398,6 +407,7 @@ AssfreezerView * MainWindow::restoreView( IniConfig & viewDesc, const QString & 
 	else if( type == "JobList" )
 		view = new JobListWidget(this);
 	if( view ) {
+        view->setViewConfig( viewDesc );
 		view->setViewName( viewName );
 		view->restore(viewDesc);
 		insertView(view,updateWindow);
@@ -600,6 +610,35 @@ void MainWindow::closeCurrentView()
 {
 	if( mCurrentView )
 		removeView( mCurrentView );
+}
+
+void MainWindow::saveViewToFile( AssfreezerView * view )
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save View to File"),
+                                                    "",
+                                                    tr("ViewConfig (*.ini)"));
+    IniConfig newConfig = IniConfig(fileName);
+    newConfig.pushSection("View_SavedToFile");
+    view->save(newConfig);
+    newConfig.popSection();
+    newConfig.writeToFile();
+}
+
+void MainWindow::saveCurrentViewToFile()
+{
+    if( mCurrentView )
+        saveViewToFile( mCurrentView );
+}
+
+void MainWindow::loadViewFromFile()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load View From"),
+                                                    "",
+                                                    tr("ViewConfig (*.ini)"));
+    IniConfig newConfig(fileName);
+    newConfig.pushSection("View_SavedToFile");
+    QString viewName = newConfig.readString( "ViewName" );
+    restoreView(newConfig, viewName);
 }
 
 void MainWindow::renameCurrentView()

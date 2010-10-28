@@ -25,6 +25,7 @@ public:
 	void setViewName( const QString & );
 
     IniConfig & viewConfig();
+    void setViewConfig( IniConfig );
 
 	void restorePopup( QWidget * );
 
@@ -63,6 +64,7 @@ protected:
 	QString mViewName, mStatusBarMessage;
 	bool mRefreshScheduled;
 	int mRefreshCount;
+    IniConfig mIniConfig;
 };
 
 #endif // ASSFREEZER_VIEW_H
