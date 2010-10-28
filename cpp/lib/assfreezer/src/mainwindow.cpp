@@ -117,7 +117,7 @@ MainWindow::MainWindow( QWidget * parent )
 	IniConfig & c( config() );
 	c.pushSection( "Assfreezer" );
 	QString cAppName = c.readString("ApplicationName", "AssFreezer");
-	setWindowTitle(cAppName+" - Version " + VERSION + ", build " + QString("$Date: 2010/10/17 22:50:11 $").remove(QRegExp("[^\\d]")));
+	setWindowTitle(cAppName+" - Version " + VERSION + ", build " + QString("$Date$").remove(QRegExp("[^\\d]")));
 	setWindowIcon( QIcon(":/images/"+cAppName+"Icon.png" ) );
 
 	Toolbar = new QToolBar( this );
@@ -969,6 +969,7 @@ void MainWindow::showTabMenu( const QPoint & pos, AssfreezerView * view )
 	QAction * moveRight = menu->addAction( "Move View &Right" );
 	QAction * rename = menu->addAction( "Re&name View" );
 	QAction * clone = menu->addAction( "Clon&e View" );
+	QAction * save = menu->addAction( "&Save View" );
 	QAction * result = menu->exec(pos);
 	if( result == close ) {
 		removeView(view);
@@ -980,6 +981,8 @@ void MainWindow::showTabMenu( const QPoint & pos, AssfreezerView * view )
 		renameView( view );
 	} else if( result == clone ) {
 		cloneView(view);
+	} else if( result == save ) {
+		saveViewToFile(view);
 	}
 }
 
