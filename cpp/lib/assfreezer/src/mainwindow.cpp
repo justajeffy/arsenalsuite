@@ -34,6 +34,7 @@
 #include <qtimer.h>
 #include <qtooltip.h>
 #include <qstackedwidget.h>
+#include <qfiledialog.h>
 
 #include <stdlib.h>
 
@@ -160,6 +161,11 @@ MainWindow::MainWindow( QWidget * parent )
 	mMoveViewRightAction = mViewMenu->addAction( "Move Current View &Right" );
 	mMoveViewRightAction->setShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Right ) );
 
+    QAction * mSaveViewToFileAction = mViewMenu->addAction( "Save View To &File" );
+    mSaveViewToFileAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
+
+    QAction * mLoadViewFromFileAction = mViewMenu->addAction( "Load View fr&om File" );
+
 	connect( mNewJobViewAction, SIGNAL( triggered(bool) ), SLOT( createJobView() ) );
 	connect( mNewHostViewAction, SIGNAL( triggered(bool) ), SLOT( createHostView() ) );
 	connect( mCloneViewAction, SIGNAL( triggered(bool) ), SLOT( cloneCurrentView() ) );
@@ -169,8 +175,11 @@ MainWindow::MainWindow( QWidget * parent )
 	connect( mMoveViewRightAction, SIGNAL( triggered(bool) ), SLOT( moveCurrentViewRight() ) );
 	connect( renameViewAction, SIGNAL( triggered(bool) ), SLOT( renameCurrentView() ) );
 
-	mViewMenu->addSeparator();
-	mFilterViewAction = mViewMenu->addAction( "Show &Filter" );
+	connect( mSaveViewToFileAction, SIGNAL( triggered(bool) ), SLOT( saveCurrentViewToFile() ) );
+	connect( mLoadViewFromFileAction, SIGNAL( triggered(bool) ), SLOT( loadViewFromFile() ) );
+
+    mViewMenu->addSeparator();
+    mFilterViewAction = mViewMenu->addAction( "Show &Filter" );
 	mFilterViewAction->setCheckable( true );
 	mFilterViewAction->setChecked( true );
 	//mFilterViewAction->setChecked( ini.readBool( "FilterEnabled", false ) );
@@ -410,6 +419,7 @@ AssfreezerView * MainWindow::restoreView( IniConfig & viewDesc, const QString & 
 	else if( type == "JobList" )
 		view = new JobListWidget(this);
 	if( view ) {
+        view->setViewConfig( viewDesc );
 		view->setViewName( viewName );
 		view->restore(viewDesc);
 		insertView(view,updateWindow);
@@ -614,9 +624,22 @@ void MainWindow::closeCurrentView()
 		removeView( mCurrentView );
 }
 
-void MainWindow::renameCurrentView()
+void MainWindow::saveViewToFile( AssfreezerView * view )
 {
-	if( mCurrentView ) renameView( mCurrentView );
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save View to File"),
+                                                    "",
+                                                    tr("ViewConfig (*.ini)"));
+    IniConfig newConfig = IniConfig(fileName);
+    newConfig.pushSection("View_SavedToFile");
+    view->save(newConfig);
+    newConfig.popSection();
+    newConfig.writeToFile();
+}
+
+void MainWindow::saveCurrentViewToFile()
+{
+    if( mCurrentView )
+        saveViewToFile( mCurrentView );
 }
 
 void MainWindow::toggleFilter(bool enable) {
@@ -625,12 +648,28 @@ void MainWindow::toggleFilter(bool enable) {
 		jlw->mJobTree->enableFilterWidget(enable);
 		jlw->mFrameTree->enableFilterWidget(enable);
 		jlw->mErrorTree->enableFilterWidget(enable);
-	} 
-	
+	}
+
 	if ( mCurrentView && mCurrentView->inherits( "HostListWidget" ) ) {
 		HostListWidget * hlw = qobject_cast<HostListWidget*>(mCurrentView);
 		hlw->mHostTree->enableFilterWidget(enable);
 	}
+}
+
+void MainWindow::loadViewFromFile()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load View From"),
+                                                    "",
+                                                    tr("ViewConfig (*.ini)"));
+    IniConfig newConfig(fileName);
+    newConfig.pushSection("View_SavedToFile");
+    QString viewName = newConfig.readString( "ViewName" );
+    restoreView(newConfig, viewName);
+}
+
+void MainWindow::renameCurrentView()
+{
+	if( mCurrentView ) renameView( mCurrentView );
 }
 
 // Pops up dialog to prompt user
@@ -957,6 +996,8 @@ void MainWindow::showTabMenu( const QPoint & pos, AssfreezerView * view )
 	QAction * rename = menu->addAction( "Re&name View" );
 	QAction * clone = menu->addAction( "Clon&e View" );
 	QAction * result = menu->exec(pos);
+    QAction * save = menu->addAction( "&Save View" );
+
 	if( result == close ) {
 		removeView(view);
 	} else if( result == moveLeft ) {
@@ -967,6 +1008,8 @@ void MainWindow::showTabMenu( const QPoint & pos, AssfreezerView * view )
 		renameView( view );
 	} else if( result == clone ) {
 		cloneView(view);
+    } else if( result == save ) {
+        saveViewToFile(view);
 	}
 }
 

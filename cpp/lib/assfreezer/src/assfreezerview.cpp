@@ -13,7 +13,10 @@ AssfreezerView::AssfreezerView( QWidget * parent )
 : QWidget( parent )
 , mRefreshScheduled( false )
 , mRefreshCount( 0 )
-{}
+, mIniConfig()
+{
+    mIniConfig = userConfig();
+}
 
 AssfreezerView::~AssfreezerView()
 {
@@ -41,9 +44,13 @@ void AssfreezerView::doRefresh()
 
 IniConfig & AssfreezerView::viewConfig()
 {
-    IniConfig & config = userConfig();
-    config.setSection( "View_" + mViewName );
-    return config;
+    //mIniConfig.setSection( "View_" + mViewName );
+    return mIniConfig;
+}
+
+void AssfreezerView::setViewConfig(IniConfig config)
+{
+    mIniConfig = config;
 }
 
 void AssfreezerView::restorePopup( QWidget * w )
