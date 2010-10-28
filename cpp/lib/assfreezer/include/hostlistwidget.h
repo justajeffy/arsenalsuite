@@ -45,6 +45,8 @@ public:
 	QAction* ShowHostErrorsAction;
 	QAction* ShowJobsAction;
 
+	RecordTreeView * mHostTree;
+
 	virtual QToolBar * toolBar( QMainWindow * );
 	virtual void populateViewMenu( QMenu * );
 
@@ -85,7 +87,7 @@ protected:
 
 	void customEvent( QEvent * evt );
 
-	RecordTreeView * mHostTree;
+	//RecordTreeView * mHostTree;
 
 	QString mServiceFilter;
 

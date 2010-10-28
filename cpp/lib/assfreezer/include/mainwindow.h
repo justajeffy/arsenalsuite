@@ -105,6 +105,8 @@ public slots:
 
 	void setCurrentView( AssfreezerView * );
 
+	void toggleFilter(bool);
+
 signals:
     void currentViewChanged( AssfreezerView * );
 
@@ -175,6 +177,8 @@ private:
 	QAction * mCloseViewAction;
 	QAction * mMoveViewLeftAction;
 	QAction * mMoveViewRightAction;
+
+	QAction * mFilterViewAction;
 
 	QMenu * mFileMenu, * mToolsMenu, * mOptionsMenu, * mViewMenu, * mRestoreViewMenu, * mHelpMenu;
 	QToolBar *Toolbar;

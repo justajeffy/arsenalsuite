@@ -21,6 +21,8 @@
  *
  */
 
+#include <qdebug.h>
+
 #include <qapplication.h>
 #include <qaction.h>
 #include <qinputdialog.h>
@@ -167,13 +169,22 @@ MainWindow::MainWindow( QWidget * parent )
 	connect( mMoveViewRightAction, SIGNAL( triggered(bool) ), SLOT( moveCurrentViewRight() ) );
 	connect( renameViewAction, SIGNAL( triggered(bool) ), SLOT( renameCurrentView() ) );
 
+	mViewMenu->addSeparator();
+	mFilterViewAction = mViewMenu->addAction( "Show &Filter" );
+	mFilterViewAction->setCheckable( true );
+	mFilterViewAction->setChecked( true );
+	//mFilterViewAction->setChecked( ini.readBool( "FilterEnabled", false ) );
+	mFilterViewAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
+
+	connect( mFilterViewAction, SIGNAL( triggered(bool) ), SLOT( toggleFilter(bool) ) );
+
 	mHelpMenu = mb->addMenu( "&Help" );
 	mHelpMenu->addAction( HelpAboutAction );
 
-	IniConfig & ini = ::userConfig();
-
 	QPalette p = palette();
 	QColor fg(155,207,226), bg(8,5,76);
+
+	IniConfig & ini = ::userConfig();
 
 	ini.pushSection("Assfreezer_Preferences");
 
@@ -237,6 +248,7 @@ MainWindow::MainWindow( QWidget * parent )
 	restoreViews();
 
 	setCounterState(true);
+
 }
 
 MainWindow::~MainWindow()
@@ -605,6 +617,20 @@ void MainWindow::closeCurrentView()
 void MainWindow::renameCurrentView()
 {
 	if( mCurrentView ) renameView( mCurrentView );
+}
+
+void MainWindow::toggleFilter(bool enable) {
+	if ( mCurrentView && mCurrentView->inherits( "JobListWidget" ) ) {
+		JobListWidget * jlw = qobject_cast<JobListWidget*>(mCurrentView);
+		jlw->mJobTree->enableFilterWidget(enable);
+		jlw->mFrameTree->enableFilterWidget(enable);
+		jlw->mErrorTree->enableFilterWidget(enable);
+	} 
+	
+	if ( mCurrentView && mCurrentView->inherits( "HostListWidget" ) ) {
+		HostListWidget * hlw = qobject_cast<HostListWidget*>(mCurrentView);
+		hlw->mHostTree->enableFilterWidget(enable);
+	}
 }
 
 // Pops up dialog to prompt user

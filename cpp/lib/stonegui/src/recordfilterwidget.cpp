@@ -42,7 +42,7 @@
 RecordFilterWidget::RecordFilterWidget(QWidget * parent)
 : QScrollArea(parent)
 {
-    setMaximumHeight(24);
+    setMaximumHeight(20);
 
     widget = new QWidget(this);
     layout = new QGridLayout(widget);
@@ -64,7 +64,7 @@ void RecordFilterWidget::setupFilters(QTreeView * tree, const ColumnStruct colum
     for( int i=0; i<cnt; i++ ) {
         if( columns[i].filterEnabled ) {
             QLineEdit * edit = new QLineEdit();
-            edit->setFrame(false);
+            edit->setMaximumHeight(18);
             edit->setToolTip(QString("Filter by: %1").arg(columns[i].name));
 
             QString filterText = ini.readString( columns[i].iniName + QString("ColumnFilter"), "" );
@@ -134,7 +134,7 @@ void RecordFilterWidget::filterRows()
         int mapSize = mFilterMap.size();
         for ( int col = 0; col < mapSize; col++ ) {
             QLineEdit *le = qobject_cast<QLineEdit*> (mFilterMap.value(col));
-            if ( le && !le->text().isEmpty() ) {
+            if ( le && le->isVisible() && !le->text().isEmpty() ) {
                 QString filter = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap.value(mFilterMap.value(col)))).toString();
                 if( !filter.contains( le->text(), Qt::CaseInsensitive ) )
                     mTree->setRowHidden(row, mTree->rootIndex(), true);

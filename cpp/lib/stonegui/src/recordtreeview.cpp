@@ -25,6 +25,8 @@
  * $Id$
  */
 
+#include <qdebug.h>
+
 #include <qapplication.h>
 #include <qevent.h>
 #include <qheaderview.h>
@@ -553,9 +555,10 @@ void ExtTreeView::setupTreeView( IniConfig & ini, const ColumnStruct columns [] 
 	model()->sort(sc,order);
 
     if( !mRecordFilterWidget ) {
-        mRecordFilterWidget = new RecordFilterWidget();
-        addFilterLayout();
+   	    mRecordFilterWidget = new RecordFilterWidget();
+       	addFilterLayout();
     }
+
     mRecordFilterWidget->setupFilters( this, columns, ini );
 }
 
@@ -598,8 +601,10 @@ void ExtTreeView::resizeEvent(QResizeEvent *event)
 
 void ExtTreeView::enableFilterWidget(bool enable)
 {
-    if(mRecordFilterWidget)
+    if(mRecordFilterWidget) {
         mRecordFilterWidget->setVisible(enable);
+        mRecordFilterWidget->filterRows();
+    }
 }
 
 RecordTreeView::RecordTreeView( QWidget * parent )
