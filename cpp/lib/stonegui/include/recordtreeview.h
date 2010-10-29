@@ -85,6 +85,8 @@ public:
 
     void enableFilterWidget(bool);
 
+    RecordFilterWidget * mRecordFilterWidget;
+
 public slots:
 	void expandRecursive( const QModelIndex & index = QModelIndex(), int levels = -1 );
     void addFilterLayout();
@@ -118,7 +120,6 @@ protected:
 	QColor mGridColor, mGridColorHighlight;
 
     friend class RecordFilterWidget;
-    RecordFilterWidget * mRecordFilterWidget;
 
     void resizeEvent(QResizeEvent *event);
 
