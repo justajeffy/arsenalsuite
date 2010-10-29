@@ -29,6 +29,7 @@
 #include "user.h"
 
 #include "recordtreeview.h"
+#include "recordfilterwidget.h"
 #include "recordpropvaltree.h"
 
 #include "assfreezermenus.h"
@@ -346,6 +347,9 @@ void JobListWidget::customEvent( QEvent * evt )
 				mQueuedJobRefresh = false;
 				refresh();
 			}
+
+            mJobTree->mRecordFilterWidget->filterRows();
+
 			break;
 		}
 		case FRAME_LIST:
@@ -364,6 +368,9 @@ void JobListWidget::customEvent( QEvent * evt )
 			mTabToolBar->slotPause();
 			mImageView->setFrameRange( mCurrentJob.outputPath(), minFrame, maxFrame );
 			mFrameTask = 0;
+
+            mFrameTree->mRecordFilterWidget->filterRows();
+
 			break;
 		}
 		case PARTIAL_FRAME_LIST:
@@ -374,6 +381,9 @@ void JobListWidget::customEvent( QEvent * evt )
 			mFrameTree->model()->updated( jtl );
 			mTabToolBar->slotPause();
 			mPartialFrameTask = 0;
+
+            mFrameTree->mRecordFilterWidget->filterRows();
+
 			break;
 		}
 		case ERROR_LIST:
@@ -381,6 +391,9 @@ void JobListWidget::customEvent( QEvent * evt )
 			JobErrorList jer = ((ErrorListTask*)evt)->mReturn;
 			//((ErrorModel*)mErrorTree->model())->updateRecords( jer );
 			mErrorTree->model()->updateRecords(jer);
+
+            mErrorTree->mRecordFilterWidget->filterRows();
+
 			break;
 		}
 		case STATIC_JOB_LIST_DATA:
@@ -406,6 +419,9 @@ void JobListWidget::customEvent( QEvent * evt )
 				mJobTaskRunning = false;
 				refresh();
 			}
+
+            mJobTree->mRecordFilterWidget->filterRows();
+
 			break;
 		}
 		case JOB_HISTORY_LIST:
@@ -416,6 +432,9 @@ void JobListWidget::customEvent( QEvent * evt )
 		{
 			JobList jl = ((UpdateJobListTask*)evt)->mReturn;
 			mJobTree->model()->updated(jl);
+
+            mJobTree->mRecordFilterWidget->filterRows();
+
 			break;
 		}
 		default:
@@ -714,6 +733,8 @@ void JobListWidget::showMine(bool sm)
 
 	/* Refresh the list */
 	refresh();
+
+	//refreshFilters();
 }
 
 void JobListWidget::jobFilterChanged( const QString & jobFilter )

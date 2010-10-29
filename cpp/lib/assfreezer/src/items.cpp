@@ -60,7 +60,7 @@
 static const ColumnStruct job_columns [] =
 {
 	{ "Job Name", 			"JobName", 			220, 	1, 	false, true },	//0
-	{ "Status", 			"Status", 			80, 	3, 	false, false },	//1
+	{ "Status", 			"Status", 			80, 	3, 	false, true },	//1
 	{ "Progress", 			"Progress", 		100, 	5, 	false, false },	//2
 	{ "Done,Total", 		"ETA", 				60, 	6, 	false, false },	//3
 	{ "Owner", 				"Owner", 			100, 	8, 	false, true },	//4

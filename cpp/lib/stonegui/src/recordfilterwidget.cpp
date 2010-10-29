@@ -98,8 +98,6 @@ void RecordFilterWidget::setupFilters(QTreeView * tree, const ColumnStruct colum
     connect(mTree->header(), SIGNAL(sectionResized(int, int, int)), this, SLOT(resizeColumn(int, int, int)));
     connect(mTree->header(), SIGNAL(sectionMoved(int, int, int)), this, SLOT(moveColumn(int, int, int)));
     connect(mTree->horizontalScrollBar(), SIGNAL(valueChanged(int)), horizontalScrollBar(), SLOT(setValue(int)));
-
-    QTimer::singleShot(900, this, SLOT(filterRows()));
 }
 
 void RecordFilterWidget::resizeColumn(int column, int oldValue, int newValue)
@@ -110,7 +108,6 @@ void RecordFilterWidget::resizeColumn(int column, int oldValue, int newValue)
 void RecordFilterWidget::moveColumn(int, int, int)
 {
     for (int i = 0; i < mTree->header()->count(); i++) {
-        //qDebug() << "Filter: " << filters[i] << ", Pos: " << header->visualIndex(i) << endl;
         layout->removeWidget(mFilterMap[i]);
         if( !mTree->header()->isSectionHidden(i) ) {
             layout->addWidget(mFilterMap[i], 0, mTree->header()->visualIndex(i));
@@ -133,10 +130,10 @@ void RecordFilterWidget::filterRows()
 
         int mapSize = mFilterMap.size();
         for ( int col = 0; col < mapSize; col++ ) {
-            QLineEdit *le = qobject_cast<QLineEdit*> (mFilterMap.value(col));
-            if ( le && le->isVisible() && !le->text().isEmpty() ) {
-                QString filter = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap.value(mFilterMap.value(col)))).toString();
-                if( !filter.contains( le->text(), Qt::CaseInsensitive ) )
+            QLineEdit *filter = qobject_cast<QLineEdit*> (mFilterMap.value(col));
+            if ( filter && filter->isVisible() && !filter->text().isEmpty() ) {
+                QString cell = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap.value(mFilterMap.value(col)))).toString();
+                if( ! cell.contains( filter->text(), Qt::CaseInsensitive ) )
                     mTree->setRowHidden(row, mTree->rootIndex(), true);
             }
         }
