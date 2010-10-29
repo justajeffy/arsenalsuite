@@ -151,8 +151,7 @@ MainWindow::MainWindow( QWidget * parent )
 	connect( mRestoreViewMenu, SIGNAL( triggered( QAction * ) ), SLOT( restoreViewActionTriggered( QAction * ) ) );
 
 	mViewMenu->addSeparator();
-	mCloneViewAction = mViewMenu->addAction( "Clon&e Current View" );
-	mSaveViewAsAction = mViewMenu->addAction( "&Save Current View As..." );
+	mSaveViewAsAction = mViewMenu->addAction( "Clone Current View As..." );
 	mCloseViewAction = mViewMenu->addAction( "&Close Current View" );
 	mCloseViewAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_C ) );
 	QAction * renameViewAction = mViewMenu->addAction( "Re&name Current View" );
@@ -162,13 +161,13 @@ MainWindow::MainWindow( QWidget * parent )
 	mMoveViewRightAction->setShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Right ) );
 
     QAction * mSaveViewToFileAction = mViewMenu->addAction( "Save View To &File" );
-    mSaveViewToFileAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
+    mSaveViewToFileAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_S ) );
 
     QAction * mLoadViewFromFileAction = mViewMenu->addAction( "Load View fr&om File" );
+    mLoadViewFromFileAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_O ) );
 
 	connect( mNewJobViewAction, SIGNAL( triggered(bool) ), SLOT( createJobView() ) );
 	connect( mNewHostViewAction, SIGNAL( triggered(bool) ), SLOT( createHostView() ) );
-	connect( mCloneViewAction, SIGNAL( triggered(bool) ), SLOT( cloneCurrentView() ) );
 	connect( mSaveViewAsAction, SIGNAL( triggered(bool) ), SLOT( saveCurrentViewAs() ) );
 	connect( mCloseViewAction, SIGNAL( triggered(bool) ), SLOT( closeCurrentView() ) );
 	connect( mMoveViewLeftAction, SIGNAL( triggered(bool) ), SLOT( moveCurrentViewLeft() ) );
@@ -994,7 +993,6 @@ void MainWindow::showTabMenu( const QPoint & pos, AssfreezerView * view )
 	QAction * moveLeft = menu->addAction( "Move View &Left" );
 	QAction * moveRight = menu->addAction( "Move View &Right" );
 	QAction * rename = menu->addAction( "Re&name View" );
-	QAction * clone = menu->addAction( "Clon&e View" );
 	QAction * result = menu->exec(pos);
     QAction * save = menu->addAction( "&Save View" );
 
@@ -1006,8 +1004,6 @@ void MainWindow::showTabMenu( const QPoint & pos, AssfreezerView * view )
 		moveViewRight( view );
 	} else if( result == rename ) {
 		renameView( view );
-	} else if( result == clone ) {
-		cloneView(view);
     } else if( result == save ) {
         saveViewToFile(view);
 	}

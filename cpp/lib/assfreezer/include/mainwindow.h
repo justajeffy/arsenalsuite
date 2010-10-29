@@ -176,7 +176,6 @@ private:
 
 	QAction * mNewJobViewAction;
 	QAction * mNewHostViewAction;
-	QAction * mCloneViewAction;
 	QAction * mSaveViewAsAction;
 	QAction * mCloseViewAction;
 	QAction * mMoveViewLeftAction;
