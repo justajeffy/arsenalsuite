@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recorddelegate.cpp 5411 2007-12-18 01:03:08Z brobison $
+ * $Id: recorddelegate.cpp,v f2b22db27d0d 2010/04/12 23:28:39 barry $
  */
 
 #include <qabstractitemmodel.h>
@@ -37,13 +37,13 @@
 #include "recordtreeview.h"
 
 ExtDelegate::ExtDelegate( QObject * parent )
-: QItemDelegate(parent)
+: QStyledItemDelegate(parent)
 {}
 
 QWidget * ExtDelegate::createEditor ( QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
 	if( !index.isValid() ) return 0;
-	return QItemDelegate::createEditor(parent,option,index);
+	return QStyledItemDelegate::createEditor(parent,option,index);
 }
 
 bool ExtDelegate::editorEvent ( QEvent * event, QAbstractItemModel * model, const QStyleOptionViewItem & option, const QModelIndex & index )
@@ -58,22 +58,22 @@ bool ExtDelegate::editorEvent ( QEvent * event, QAbstractItemModel * model, cons
 			return true;
 		}
 	}
-	return QItemDelegate::editorEvent(event,model,option,index);
+	return QStyledItemDelegate::editorEvent(event,model,option,index);
 }
 
 void ExtDelegate::setModelData ( QWidget * editor, QAbstractItemModel * model, const QModelIndex & index ) const
 {
-	QItemDelegate::setModelData(editor,model,index);
+	QStyledItemDelegate::setModelData(editor,model,index);
 }
 
 void ExtDelegate::setEditorData ( QWidget * editor, const QModelIndex & index ) const
 {
-	QItemDelegate::setEditorData(editor,index);
+	QStyledItemDelegate::setEditorData(editor,index);
 }
 
 void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-	QItemDelegate::paint(painter,option,index);
+	QStyledItemDelegate::paint(painter,option,index);
 	const QAbstractItemModel * model = index.model();
 	QVariant val = model->data(index, Qt::DisplayRole);
 	if( val.isValid() && val.type() == QVariant::Color && qvariant_cast<QColor>(val).isValid()  ) {
