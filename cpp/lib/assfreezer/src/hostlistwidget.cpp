@@ -7,6 +7,7 @@
 #include "process.h"
 
 #include "recordtreeview.h"
+#include "recordfilterwidget.h"
 #include "viewcolors.h"
 
 #include "afcommon.h"
@@ -152,6 +153,9 @@ void HostListWidget::customEvent( QEvent * evt )
 				refresh();
 			} else
 				clearStatusBar();
+
+			mHostTree->mRecordFilterWidget->filterRows();
+
 			break;
 		}
 		case STATIC_HOST_LIST_DATA:
@@ -168,6 +172,7 @@ void HostListWidget::customEvent( QEvent * evt )
 				mQueuedHostRefresh = false;
 				doRefresh();
 			}
+			mHostTree->mRecordFilterWidget->filterRows();
 			break;
 		}
 		case UPDATE_HOST_LIST:
@@ -175,6 +180,7 @@ void HostListWidget::customEvent( QEvent * evt )
 			HostList hl = ((UpdateHostListTask*)evt)->mReturn;
 			mHostTree->model()->updated(hl);
             refresh();
+			mHostTree->mRecordFilterWidget->filterRows();
 			break;
 		}
 		default:
