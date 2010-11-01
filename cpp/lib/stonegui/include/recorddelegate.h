@@ -22,17 +22,17 @@
  */
 
 /*
- * $Id: recorddelegate.h,v f2b22db27d0d 2010/04/12 23:28:39 barry $
+ * $Id$
  */
 
 #ifndef RECORD_DELEGATE_H
 #define RECORD_DELEGATE_H
 
-#include <qstyleditemdelegate.h>
+#include <qitemdelegate.h>
 
 #include "stonegui.h"
 
-class STONEGUI_EXPORT ExtDelegate : public QStyledItemDelegate
+class STONEGUI_EXPORT ExtDelegate : public QItemDelegate
 {
 Q_OBJECT
 public:

@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recorddelegate.cpp,v f2b22db27d0d 2010/04/12 23:28:39 barry $
+ * $Id$
  */
 
 #include <qabstractitemmodel.h>
@@ -37,13 +37,15 @@
 #include "recordtreeview.h"
 
 ExtDelegate::ExtDelegate( QObject * parent )
-: QStyledItemDelegate(parent)
-{}
+: QItemDelegate(parent)
+{
+    setClipping(true);
+}
 
 QWidget * ExtDelegate::createEditor ( QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
 	if( !index.isValid() ) return 0;
-	return QStyledItemDelegate::createEditor(parent,option,index);
+	return QItemDelegate::createEditor(parent,option,index);
 }
 
 bool ExtDelegate::editorEvent ( QEvent * event, QAbstractItemModel * model, const QStyleOptionViewItem & option, const QModelIndex & index )
@@ -58,24 +60,67 @@ bool ExtDelegate::editorEvent ( QEvent * event, QAbstractItemModel * model, cons
 			return true;
 		}
 	}
-	return QStyledItemDelegate::editorEvent(event,model,option,index);
+	return QItemDelegate::editorEvent(event,model,option,index);
 }
 
 void ExtDelegate::setModelData ( QWidget * editor, QAbstractItemModel * model, const QModelIndex & index ) const
 {
-	QStyledItemDelegate::setModelData(editor,model,index);
+	QItemDelegate::setModelData(editor,model,index);
 }
 
 void ExtDelegate::setEditorData ( QWidget * editor, const QModelIndex & index ) const
 {
-	QStyledItemDelegate::setEditorData(editor,index);
+	QItemDelegate::setEditorData(editor,index);
 }
 
 void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-	QStyledItemDelegate::paint(painter,option,index);
-	const QAbstractItemModel * model = index.model();
-	QVariant val = model->data(index, Qt::DisplayRole);
+    const QAbstractItemModel * model = index.model();
+    QVariant val = model->data(index, Qt::DisplayRole);
+    SuperModel * sm = (SuperModel *)model;
+
+    if( !sm->mColumnFilterMap.value( index.column() ).isEmpty() ) {
+        QItemDelegate::drawBackground( painter, option, index );
+
+        QString filterText = sm->mColumnFilterMap.value(index.column());
+        //LOG_1(QString("column %1 has a filter %2").arg(QString::number(index.column())).arg(filterText));
+        QStringList nonMatchingBits = val.toString().split(filterText, QString::KeepEmptyParts, Qt::CaseInsensitive);
+        QFontMetrics fm = painter->fontMetrics();
+        painter->setClipRect(option.rect);
+
+        int x = option.rect.x();
+        int y = option.rect.y();
+        //LOG_1(QString("column original max width is %1").arg(QString::number(maxWidth)));
+
+        QTextOption TO(Qt::AlignLeft);
+        for( int i = 0; i< nonMatchingBits.size(); i++ ) {
+            QString bit = nonMatchingBits[i];
+
+            // If the model provides its own foreground color/brush for this item
+            const QVariant value = index.data(Qt::ForegroundRole);
+            if (value.isValid())
+                painter->setPen( (qvariant_cast<QBrush>(value)).color() );
+            else
+                painter->setPen( option.palette.text().color() );
+
+            if( option.state & QStyle::State_Selected )
+                painter->setPen( option.palette.highlightedText().color() );
+
+            QRect bitRect = fm.boundingRect( bit );
+            painter->drawText( x, y, bitRect.width()+1, bitRect.height(), TO.flags(), bit);
+            x = x + bitRect.width();
+
+            if( i == nonMatchingBits.size()-1 ) continue;
+
+            QRect filterRect = fm.boundingRect( filterText );
+            painter->setPen( QColor(Qt::yellow) );
+            painter->drawText( x, y, filterRect.width()+1, filterRect.height(), TO.flags(), filterText);
+            x = x + filterRect.width();
+        }
+    } else {
+        QItemDelegate::paint(painter,option,index);
+    }
+
 	if( val.isValid() && val.type() == QVariant::Color && qvariant_cast<QColor>(val).isValid()  ) {
 		painter->setPen( Qt::white );
 		painter->setBrush( qvariant_cast<QColor>(val) );
