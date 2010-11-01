@@ -59,41 +59,39 @@ RecordFilterWidget::RecordFilterWidget(QWidget * parent)
 void RecordFilterWidget::setupFilters(QTreeView * tree, const ColumnStruct columns [], IniConfig & ini)
 {
     mTree = tree;
-    int cnt = 0;
-    for( cnt=0; columns[cnt].name; ++cnt );
-    for( int i=0; i<cnt; i++ ) {
-        if( columns[i].filterEnabled ) {
-            QLineEdit * edit = new QLineEdit();
-            edit->setMaximumHeight(18);
-            edit->setToolTip(QString("Filter by: %1").arg(columns[i].name));
 
-            QString filterText = ini.readString( columns[i].iniName + QString("ColumnFilter"), "" );
-            if( !filterText.isEmpty() )
-                edit->setText( filterText );
+	int i;
+	for (i = 0; i < mTree->header()->count(); i++) {
 
-            mFilterMap[i] = edit;
-            connect(mFilterMap[i], SIGNAL(textChanged(const QString)), this, SLOT(textFilterChanged()));
-            //LOG_1(columns[i].name);
-        } else {
-            mFilterMap[i] = new QWidget();
-        }
-    }
-    int i = 0;
-    for (i = 0; i < mTree->header()->count(); i++) {
-        //qDebug() << "Filter: " << filters[i] << ", Pos: " << header->visualIndex(i) << endl;
+		int visIndex = mTree->header()->visualIndex(i);
 
-        if( !mTree->header()->isSectionHidden(i) ) {
-            mFilterMap[i]->setFixedWidth( mTree->columnWidth( i ) );
-            layout->addWidget(mFilterMap[i], 0, mTree->header()->visualIndex(i));
-            mFilterIndexMap[mFilterMap[i]] = i;
-        }
-        if(i>0)
-            QWidget::setTabOrder(mFilterMap[mTree->header()->visualIndex(i-1)], mFilterMap[mTree->header()->visualIndex(i)]);
-    }
-    if(i>0)
-        QWidget::setTabOrder(mFilterMap[mTree->header()->visualIndex(i-1)], mFilterMap[mTree->header()->visualIndex(i)]);
+		if (columns[i].filterEnabled) {
 
-    layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 1, i);
+			QLineEdit * edit = new QLineEdit(this);
+			edit->setMaximumHeight(18);
+			edit->setToolTip(QString("Filter by: %1").arg(columns[i].name));
+
+			QString filterText = ini.readString( columns[i].iniName + QString("ColumnFilter"), "" );
+			if( !filterText.isEmpty() )
+				edit->setText( filterText );
+
+			mFilterMap[i] = edit;
+
+			connect(mFilterMap[i], SIGNAL(textChanged(const QString)), this, SLOT(textFilterChanged()));
+		} else {
+			mFilterMap[i] = new QWidget();
+		}
+
+		mFilterMap[i]->setFixedWidth( mTree->columnWidth( i ) );
+		layout->addWidget(mFilterMap[i], 0, visIndex);
+
+		mFilterIndexMap[mFilterMap[i]] = i;
+		mTabIndexMap[visIndex]         = mFilterMap[i];
+	}
+
+	layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 1, i);
+
+	setTabOrder();
 
     connect(mTree->header(), SIGNAL(sectionResized(int, int, int)), this, SLOT(resizeColumn(int, int, int)));
     connect(mTree->header(), SIGNAL(sectionMoved(int, int, int)), this, SLOT(moveColumn(int, int, int)));
@@ -108,13 +106,18 @@ void RecordFilterWidget::resizeColumn(int column, int oldValue, int newValue)
 void RecordFilterWidget::moveColumn(int, int, int)
 {
     for (int i = 0; i < mTree->header()->count(); i++) {
+		int visIndex = mTree->header()->visualIndex(i);
+
         layout->removeWidget(mFilterMap[i]);
         if( !mTree->header()->isSectionHidden(i) ) {
-            layout->addWidget(mFilterMap[i], 0, mTree->header()->visualIndex(i));
+            layout->addWidget(mFilterMap[i], 0, visIndex);
 
             mFilterIndexMap[mFilterMap[i]] = i;
+			mTabIndexMap[visIndex]         = mFilterMap[i];
         }
     }
+
+	setTabOrder();
 }
 
 void RecordFilterWidget::textFilterChanged()
@@ -133,12 +136,11 @@ void RecordFilterWidget::filterRows()
     int numRows = mTree->model()->rowCount();
     for ( int row = 0; row < numRows; row++ ) {
         mTree->setRowHidden(row, mTree->rootIndex(), false);
-
         int mapSize = mFilterMap.size();
         for ( int col = 0; col < mapSize; col++ ) {
-            QLineEdit *filter = qobject_cast<QLineEdit*> (mFilterMap.value(col));
+            QLineEdit *filter = qobject_cast<QLineEdit*> (mFilterMap[col]);
             if ( filter && filter->isVisible() && !filter->text().isEmpty() ) {
-                QString cell = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap.value(mFilterMap.value(col)))).toString();
+                QString cell = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap[mFilterMap[col]])).toString();
                 if( ! cell.contains( filter->text(), Qt::CaseInsensitive ) )
                     mTree->setRowHidden(row, mTree->rootIndex(), true);
             }
@@ -146,3 +148,23 @@ void RecordFilterWidget::filterRows()
     }
 }
 
+void RecordFilterWidget::setTabOrder()
+{
+    QLineEdit *prev = NULL;
+    QLineEdit *cur  = NULL;
+    for (int i = 0; i < mTabIndexMap.size(); i++) {
+        if (i > 0) {
+
+            QLineEdit *filter1 = qobject_cast<QLineEdit*> (mTabIndexMap[i-1]);
+            QLineEdit *filter2 = qobject_cast<QLineEdit*> (mTabIndexMap[i]);
+
+            if (filter1)
+                prev = filter1;
+            if (filter2)
+                cur = filter2;
+
+            if (prev && cur && prev != cur)
+                QWidget::setTabOrder(prev, cur);
+        }
+    }
+}
