@@ -146,7 +146,7 @@ void JobListWidget::initializeViews()
             JobModel * jm = new JobModel( mJobTree );
             jm->setAutoSort( true );
             mJobTree->setModel( jm );
-            mJobTree->setItemDelegate( new ProgressDelegate( mJobTree ) );
+            mJobTree->setItemDelegateForColumn( 2, new ProgressDelegate( mJobTree ) );
             mJobTree->setDragEnabled( true );
             mJobTree->setAcceptDrops( true );
             mJobTree->setDropIndicatorShown(true);
@@ -168,7 +168,8 @@ void JobListWidget::initializeViews()
             new FrameTranslator( fm->treeBuilder() );
             fm->setAutoSort( true );
             mFrameTree->setModel( fm );
-            mFrameTree->setItemDelegate( new LoadedDelegate( mJobTree ) );
+            mFrameTree->setItemDelegateForColumn( 3, new LoadedDelegate( mJobTree ) );
+            mFrameTree->setItemDelegateForColumn( 4, new LoadedDelegate( mJobTree ) );
             for(int i=0; i < fm->columnCount(); i++)
                 mFrameTree->setColumnAutoResize( i, true );
         }
