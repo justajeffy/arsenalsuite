@@ -348,6 +348,9 @@ public:
 		SuperModel * mModel;
 	};
 
+    void setColumnFilter( uint column, const QString & filterString );
+    QMap<uint, QString> mColumnFilterMap;
+
 protected:
 	/// O(1) - Constant Runtime
 	static inline ModelNode * indexToNode( const QModelIndex & idx )
@@ -385,6 +388,7 @@ protected:
 	bool mAutoSort, mAssumeChildren, mDisableChildLoading;
 	friend class ModelDataTranslator;
 	friend class ModelNode;
+
 };
 
 template<class TYPE, class BASE> int TemplateDataTranslator<TYPE,BASE>::dataSize()
