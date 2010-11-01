@@ -72,8 +72,11 @@ void RecordFilterWidget::setupFilters(QTreeView * tree, const ColumnStruct colum
 			edit->setToolTip(QString("Filter by: %1").arg(columns[i].name));
 
 			QString filterText = ini.readString( columns[i].iniName + QString("ColumnFilter"), "" );
-			if( !filterText.isEmpty() )
+			if( !filterText.isEmpty() ) {
 				edit->setText( filterText );
+				SuperModel * sm = (SuperModel *)(tree->model());
+				sm->setColumnFilter( i, filterText );
+			}
 
 			mFilterMap[i] = edit;
 
