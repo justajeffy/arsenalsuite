@@ -42,7 +42,6 @@ Q_OBJECT
 public:
     RecordFilterWidget(QWidget * parent=0);
     void setupFilters(QTreeView * mTree, const ColumnStruct columns [], IniConfig & ini);
-    void filterRows();
 
     QMap<uint, QWidget *> mFilterMap;
     QMap<QWidget *, uint> mFilterIndexMap;
@@ -52,6 +51,7 @@ public slots:
     void resizeColumn(int, int, int);
     void moveColumn(int, int, int);
     void textFilterChanged();
+    void filterRows();
 
 private:
 	void setTabOrder();
