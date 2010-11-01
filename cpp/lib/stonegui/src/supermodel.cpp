@@ -505,6 +505,7 @@ SuperModel::SuperModel( QObject * parent )
 , mAutoSort( false )
 , mAssumeChildren( false )
 , mDisableChildLoading( false )
+, mColumnFilterMap()
 {
 	
 }
@@ -885,5 +886,11 @@ void SuperModel::closeInsertClosure()
 			delete node;
 		}
 	}
+}
+
+void SuperModel::setColumnFilter( uint column, const QString & filterString )
+{
+    //LOG_1(QString("setting filter for column %1 to %2").arg(QString::number(column)).arg(filterString));
+    mColumnFilterMap[column] = filterString;
 }
 

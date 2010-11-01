@@ -119,6 +119,12 @@ void RecordFilterWidget::moveColumn(int, int, int)
 
 void RecordFilterWidget::textFilterChanged()
 {
+    QLineEdit *filter = qobject_cast<QLineEdit*> (sender());
+    if( mFilterIndexMap.contains(filter) ) {
+        int column = mFilterIndexMap.value(filter);
+        SuperModel * sm = (SuperModel *)(mTree->model());
+        sm->setColumnFilter( column, filter->text() );
+    }
     QTimer::singleShot(300, this, SLOT(filterRows()));
 }
 
