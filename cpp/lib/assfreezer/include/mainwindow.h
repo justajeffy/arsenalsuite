@@ -29,7 +29,7 @@
 
 #include "afcommon.h"
 
-const QString VERSION("1.0");
+const QString VERSION("1.1");
 
 class QLabel;
 class QTimer;
