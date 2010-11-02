@@ -119,7 +119,7 @@ MainWindow::MainWindow( QWidget * parent )
 	IniConfig & c( config() );
 	c.pushSection( "Assfreezer" );
 	QString cAppName = c.readString("ApplicationName", "AssFreezer");
-	setWindowTitle(cAppName+" - Version " + VERSION + ", build " + QString("$Date$").remove(QRegExp("[^\\d]")));
+	setWindowTitle(cAppName+" - Version " + VERSION);
 	setWindowIcon( QIcon(":/images/"+cAppName+"Icon.png" ) );
 
 	Toolbar = new QToolBar( this );
