@@ -75,6 +75,8 @@ void ExtDelegate::setEditorData ( QWidget * editor, const QModelIndex & index ) 
 
 void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
+	painter->save();
+
     const QAbstractItemModel * model = index.model();
     QVariant val = model->data(index, Qt::DisplayRole);
     SuperModel * sm = (SuperModel *)model;
@@ -136,6 +138,8 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
 		}
 		painter->drawLine( index.column() == 0 ? 0 : option.rect.x(), option.rect.bottom(), option.rect.right(), option.rect.bottom() );
 	}
+
+	painter->restore();
 }
 
 RecordDelegate::RecordDelegate ( QObject * parent )
