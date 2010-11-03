@@ -40,7 +40,7 @@ blur.RedirectOutputToLog()
 # Load all the database tables
 classes_loader()
 
-VERBOSE_DEBUG = True
+VERBOSE_DEBUG = False
 
 if VERBOSE_DEBUG:
     Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete ) #| Database.EchoSelect )
@@ -613,6 +613,11 @@ class FarmResourceSnapshot(object):
             self.projectWeightTotal += weight
 
     def refreshUserUsage(self):
+        self.slotsByUserAndService = {}
+        self.slotsByUser = {}
+        self.limitsByUserAndService = {}
+        self.limitsByUser = {}
+
         q = Database.current().exec_("""
 SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
     JOIN job ON keyelement = fkeyusr AND  job.status = 'started'
@@ -622,7 +627,7 @@ SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
     GROUP BY usr.name, service.service
                                     """)
         while q.next():
-            key = q.value(0).toString()[0] +"-"+ q.value(1).toString[0]
+            key = q.value(0).toString() +"-"+ q.value(1).toString()
             value = q.value(2).toInt()[0]
             self.slotsByUserAndService[key] = value
 
@@ -634,9 +639,10 @@ FROM usr
     GROUP BY usr.name, service.service
                                     """)
         while q2.next():
-            key = q2.value(0).toString()[0] +"-"+ q2.value(1).toString[0]
+            key = q2.value(0).toString() +"-"+ q2.value(1).toString()
             value = q2.value(2).toInt()[0]
             self.limitsByUserAndService[key] = value
+            #Log( "limitsByUserAndService(db): key %s, value %s" % (key,  value))
 
         q3 = Database.current().exec_("""
 SELECT usr.name, SUM(jobstatus.hostsonjob) FROM usr
@@ -645,7 +651,7 @@ SELECT usr.name, SUM(jobstatus.hostsonjob) FROM usr
     GROUP BY usr.name
                                     """)
         while q3.next():
-            key = q3.value(0).toString()[0]
+            key = q3.value(0).toString()
             value = q3.value(1).toInt()[0]
             self.slotsByUser[key] = value
 
@@ -654,11 +660,14 @@ SELECT usr.name, arsenalSlotLimit
 FROM usr
                                     """)
         while q4.next():
-            key = q4.value(0).toString()[0]
+            key = q4.value(0).toString()
             value = q4.value(1).toInt()[0]
-            self.limitsByUser[key] = value
+            if value > -1:
+                self.limitsByUser[key] = value
 
     def refreshProjectUsage(self):
+        self.slotsByProject = {}
+        self.limitsByProject = {}
         q = Database.current().exec_("""
 SELECT project.name, SUM(jobstatus.hostsonjob) FROM project
     JOIN job ON keyelement = job.fkeyproject AND job.status = 'started'
@@ -666,18 +675,19 @@ SELECT project.name, SUM(jobstatus.hostsonjob) FROM project
     GROUP BY project.name
                                     """)
         while q.next():
-            key = q.value(0).toString()[0]
+            key = q.value(0).toString()
             value = q.value(1).toInt()[0]
             self.slotsByProject[key] = value
 
-        q4 = Database.current().exec_("""
+        q2 = Database.current().exec_("""
 SELECT project.name, arsenalSlotLimit
 FROM project
                                     """)
         while q2.next():
-            key = q2.value(0).toString()[0]
+            key = q2.value(0).toString()
             value = q2.value(1).toInt()[0]
-            self.limitsByProject[key] = value
+            if value > -1:
+                self.limitsByProject[key] = value
 
     def scaleProjectWeights(self, hostsActive):
         # If there is more than 1.0(100%) projectweight, than
@@ -830,7 +840,7 @@ FROM project
         for service in requiredServices:
             # Check if there are licenses available for the service
             if service in self.licCountByService:
-                print ("%i licenses available for service %s" % (self.licCountByService[service], service.service()))
+                if VERBOSE_DEBUG: print ("%i licenses available for service %s" % (self.licCountByService[service], service.service()))
                 if self.licCountByService[service] <= 0:
                     return HostStatusList()
             hostStatuses &= self.availableHostsByService(service)
@@ -957,18 +967,18 @@ FROM project
         # check for project limits on total slot use
         key = job.project().name()
         if self.slotsByProject.has_key(key):
-                self.slotsByProject[key] = self.slotsByProject[key] + job.assignmentSlots()
-            else
-                self.slotsByProject[key] = job.assignmentSlots()
+            self.slotsByProject[key] = self.slotsByProject[key] + job.assignmentSlots()
+        else:
+            self.slotsByProject[key] = job.assignmentSlots()
         if self.limitsByProject.has_key(key) and self.slotsByProject[key] > self.limitsByProject[key]:
             raise NonCriticalAssignmentError("Project %s slot limit of %s reached" % (key, self.limitsByProject[key]))
 
         # check for per user limits on total slot use
         key = job.user().name()
         if self.slotsByUser.has_key(key):
-                self.slotsByUser[key] = self.slotsByUser[key] + job.assignmentSlots()
-            else
-                self.slotsByUser[key] = job.assignmentSlots()
+            self.slotsByUser[key] = self.slotsByUser[key] + job.assignmentSlots()
+        else:
+            self.slotsByUser[key] = job.assignmentSlots()
         if self.limitsByUser.has_key(key) and self.slotsByUser[key] > self.limitsByUser[key]:
             raise NonCriticalAssignmentError("User %s slot limit of %s reached" % (key, self.limitsByUser[key]))
 
@@ -978,8 +988,12 @@ FROM project
 
             if self.slotsByUserAndService.has_key(key):
                 self.slotsByUserAndService[key] = self.slotsByUserAndService[key] + job.assignmentSlots()
-            else
+            else:
                 self.slotsByUserAndService[key] = job.assignmentSlots()
+
+            Log( "slotsByUserAndService: key %s, value %s" % (key,  self.slotsByUserAndService[key]))
+            if self.limitsByUserAndService.has_key(key):
+                Log( "limitsByUserAndService: key %s, value %s" % (key,  self.limitsByUserAndService[key]))
 
             if self.limitsByUserAndService.has_key(key) and self.slotsByUserAndService[key] > self.limitsByUserAndService[key]:
                 raise NonCriticalAssignmentError("Service %s exceeds user limit" % service.service())
