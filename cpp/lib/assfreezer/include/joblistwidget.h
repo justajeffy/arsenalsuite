@@ -22,9 +22,9 @@ class AssfreezerJobMenu;
 class AssfreezerErrorMenu;
 class FrameListTask;
 class ImageView;
-//class JobFilterEdit;
 class PartialFrameListTask;
 class TabToolBar;
+class BusyWidget;
 
 class ASSFREEZER_EXPORT JobListWidget : public AssfreezerView, public Ui::JobListWidgetUI
 {
@@ -181,6 +181,8 @@ protected:
 	// Static so that multiple instances of this view type can share this data
 	static JobTypeList mJobTypeList;
 	static ProjectList mProjectList;
+
+    BusyWidget * mTaskListBusyWidget;
 
 public:
 	QMenu * mJobMenu,

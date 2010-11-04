@@ -43,6 +43,7 @@ class QImage;
 class GLWindow;
 class LTGA;
 class LoadImageTask;
+class BusyWidget;
 
 class ASSFREEZER_EXPORT ImageView : public QWidget
 {
@@ -126,6 +127,8 @@ private:
 	int mMoveStartPos;
 
 	QList<LoadImageTask*> mTasks;
+
+    BusyWidget * mBusyWidget;
 };
 
 
