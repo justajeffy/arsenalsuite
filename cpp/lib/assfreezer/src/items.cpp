@@ -556,10 +556,14 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			return ret;
 		} else
 			return co ? civ(co->bg) : QVariant();
-	} else if( role == Qt::ToolTipRole && col == 16 && !healthIsNull )
+	} else if( role == Qt::ToolTipRole && col == 16 && !healthIsNull ) {
 		return QString( "%1% Healthy" ).arg(int(jobStatus.health() * 100));
-	else if( role == Qt::DecorationRole && col == 0 )
+	} else if( role == Qt::ToolTipRole && col == 4 ) {
+        if( toolTip.isEmpty() ) return QVariant();
+		return userName + "\n" + toolTip;
+    } else if( role == Qt::DecorationRole && col == 0 ) {
 		return icon;
+    }
 	return QVariant();
 }
 

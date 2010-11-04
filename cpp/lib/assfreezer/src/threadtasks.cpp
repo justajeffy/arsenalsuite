@@ -64,6 +64,7 @@ JobListTask::JobListTask( QObject * rec, const JobFilter & jf, const JobList & j
 , mProjects( projects )
 , mFetchJobServices( fetchJobServices )
 , mFetchJobDeps( needDeps )
+, mFetchUserServices( true )
 {}
 
 void JobListTask::run()
@@ -177,6 +178,21 @@ void JobListTask::run()
 
 		if( mFetchJobServices )
 			mJobServices = JobService::select( "fkeyjob in (" + allJobs.keyString() + ")" );
+
+        if( mFetchUserServices ) {
+            QSqlQuery q = Database::current()->exec( "SELECT * FROM user_service_current" );
+            while( q.next() ) {
+                QString key = q.value( 0 ).toString();
+                int value = q.value( 1 ).toInt();
+                mUserServiceCurrent[key] = value;
+            }
+            QSqlQuery q2 = Database::current()->exec( "SELECT * FROM user_service_limits" );
+            while( q2.next() ) {
+                QString key = q2.value( 0 ).toString();
+                int value = q2.value( 1 ).toInt();
+                mUserServiceLimits[key] = value;
+            }
+        }
 	}
 }
 
