@@ -792,7 +792,8 @@ void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessCh
 		}
     }
     foreach( JobFilterMessage jfm, mJobFilterMessages ) {
-        if( line.contains( jfm.qregex ) ) {
+        if( line.contains( QRegExp(jfm.regex()) ) ) {
+            logMessage( QString("JobBurner: JFM id: %1 produced an error with regex %2 ").arg(QString::number(jfm.key())).arg(jfm.regex()));
             jobErrored( line );
             return;
         }
