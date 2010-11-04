@@ -619,36 +619,23 @@ class FarmResourceSnapshot(object):
         self.limitsByUser = {}
 
         q = Database.current().exec_("""
-SELECT usr.name, service.service, SUM(jobstatus.hostsonjob) FROM usr
-    JOIN job ON keyelement = fkeyusr AND  job.status = 'started'
-    JOIN jobstatus ON keyjob = jobstatus.fkeyjob
-    JOIN jobservice js ON keyjob = js.fkeyjob
-    JOIN service ON keyservice = fkeyservice
-    GROUP BY usr.name, service.service
+SELECT * from user_service_current
                                     """)
         while q.next():
-            key = q.value(0).toString() +"-"+ q.value(1).toString()
-            value = q.value(2).toInt()[0]
+            key = q.value(0).toString()
+            value = q.value(1).toInt()[0]
             self.slotsByUserAndService[key] = value
 
         q2 = Database.current().exec_("""
-SELECT usr.name, service.service, SUM("limit") nottoexceed
-FROM usr
-    JOIN userservice us on keyelement = us.user
-    JOIN service ON keyservice = us.service
-    GROUP BY usr.name, service.service
+SELECT * from user_service_limits
                                     """)
         while q2.next():
-            key = q2.value(0).toString() +"-"+ q2.value(1).toString()
-            value = q2.value(2).toInt()[0]
+            key = q2.value(0).toString()
+            value = q2.value(1).toInt()[0]
             self.limitsByUserAndService[key] = value
-            #Log( "limitsByUserAndService(db): key %s, value %s" % (key,  value))
 
         q3 = Database.current().exec_("""
-SELECT usr.name, SUM(jobstatus.hostsonjob) FROM usr
-    JOIN job ON keyelement = fkeyusr AND  job.status = 'started'
-    JOIN jobstatus ON keyjob = jobstatus.fkeyjob
-    GROUP BY usr.name
+SELECT * from user_slots_current
                                     """)
         while q3.next():
             key = q3.value(0).toString()
@@ -656,23 +643,17 @@ SELECT usr.name, SUM(jobstatus.hostsonjob) FROM usr
             self.slotsByUser[key] = value
 
         q4 = Database.current().exec_("""
-SELECT usr.name, arsenalSlotLimit
-FROM usr
+SELECT * from user_slots_limits
                                     """)
         while q4.next():
             key = q4.value(0).toString()
             value = q4.value(1).toInt()[0]
-            if value > -1:
-                self.limitsByUser[key] = value
 
     def refreshProjectUsage(self):
         self.slotsByProject = {}
         self.limitsByProject = {}
         q = Database.current().exec_("""
-SELECT project.name, SUM(jobstatus.hostsonjob) FROM project
-    JOIN job ON keyelement = job.fkeyproject AND job.status = 'started'
-    JOIN jobstatus ON keyjob = jobstatus.fkeyjob
-    GROUP BY project.name
+SELECT * from project_slots_current
                                     """)
         while q.next():
             key = q.value(0).toString()
@@ -680,14 +661,11 @@ SELECT project.name, SUM(jobstatus.hostsonjob) FROM project
             self.slotsByProject[key] = value
 
         q2 = Database.current().exec_("""
-SELECT project.name, arsenalSlotLimit
-FROM project
+SELECT * from project_slots_limits
                                     """)
         while q2.next():
             key = q2.value(0).toString()
             value = q2.value(1).toInt()[0]
-            if value > -1:
-                self.limitsByProject[key] = value
 
     def scaleProjectWeights(self, hostsActive):
         # If there is more than 1.0(100%) projectweight, than
