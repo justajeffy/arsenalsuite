@@ -7,6 +7,7 @@
 
 %DefaultSupertype sip.wrapper
 
+%Include busywidget.sip
 %Include configdbdialog.sip
 %Include fieldcheckbox.sip
 %Include fieldlineedit.sip
