@@ -42,6 +42,7 @@
 
 #include "blurqt.h"
 #include "afcommon.h"
+#include "busywidget.h"
 #include "freezercore.h"
 #include "glwindow.h"
 #include "imageview.h"
@@ -186,6 +187,7 @@ ImageView::ImageView( QWidget * parent )
 , mMinFrame( 0 )
 , mMaxFrame( 0 )
 , mLooping( true )
+, mBusyWidget( 0 )
 {
     if( hasOpenGL() ) {
 		QHBoxLayout * hbox = new QHBoxLayout(this);
@@ -199,6 +201,10 @@ ImageView::ImageView( QWidget * parent )
 	connect( &mImageCache, SIGNAL( frameStatusChange(int,int) ), SIGNAL( frameStatusChange(int,int) ) );
 
 	setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
+
+    mBusyWidget = new BusyWidget( this, QPixmap( "images/rotating_head.png" ) );
+    mBusyWidget->move(5,5);
+    mBusyWidget->hide();
 }
 
 ImageView::~ImageView()
@@ -271,6 +277,10 @@ void ImageView::customEvent( QEvent * evt )
 			mImageCache.setStatus( lit->mFrame, ImageCache::ImageNotFound );
 		}
 		mTasks.removeAll( lit );
+        if( lit->mFrame == mToShow ) {
+            mBusyWidget->stop();
+            mBusyWidget->hide();
+        }
 	}
 }
 
@@ -332,6 +342,10 @@ void ImageView::setImageNumber(int num)
 			LOG_5( "ImageView::setImageNumber: No Info, fetching " + path );
 			mToShow = num;
 			loadImage( path, num );
+            if( !mPlaying ) {
+                mBusyWidget->show();
+                mBusyWidget->start();
+            }
 			break;
 		}
 		case ImageCache::ImageNotFound:
@@ -345,6 +359,10 @@ void ImageView::setImageNumber(int num)
 		{
 			LOG_5( "ImageView::setImageNumber: Waiting for image to load" );
 			mToShow = num;
+            if( !mPlaying ) {
+                mBusyWidget->show();
+                mBusyWidget->start();
+            }
 			break;
 		}
 		case ImageCache::ImageLoaded:

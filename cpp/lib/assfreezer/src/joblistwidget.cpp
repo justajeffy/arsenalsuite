@@ -28,6 +28,7 @@
 #include "service.h"
 #include "user.h"
 
+#include "busywidget.h"
 #include "recordtreeview.h"
 #include "recordfilterwidget.h"
 #include "recordpropvaltree.h"
@@ -61,6 +62,7 @@ JobListWidget::JobListWidget( QWidget * parent )
 , mFrameTask( 0 )
 , mPartialFrameTask( 0 )
 , mStaticDataRetrieved( false )
+, mTaskListBusyWidget( 0 )
 , mJobMenu( 0 )
 , mStatusFilterMenu( 0 )
 , mProjectFilterMenu( 0 )
@@ -172,6 +174,9 @@ void JobListWidget::initializeViews()
             mFrameTree->setItemDelegateForColumn( 4, new LoadedDelegate( mJobTree ) );
             for(int i=0; i < fm->columnCount(); i++)
                 mFrameTree->setColumnAutoResize( i, true );
+            mTaskListBusyWidget = new BusyWidget( mFrameTree, QPixmap( "images/rotating_head.png" ) );
+            mTaskListBusyWidget->move(0,mFrameTree->header()->height()-5);
+            mTaskListBusyWidget->hide();
         }
 
         mStatusFilterMenu = new StatusFilterMenu( this );
@@ -404,6 +409,8 @@ void JobListWidget::customEvent( QEvent * evt )
 			mFrameTree->model()->updateRecords( jtl );
 			mTabToolBar->slotPause();
 			mImageView->setFrameRange( mCurrentJob.outputPath(), minFrame, maxFrame );
+            mTaskListBusyWidget->hide();
+            mTaskListBusyWidget->stop();
 			mFrameTask = 0;
 
             mFrameTree->mRecordFilterWidget->filterRows();
@@ -636,6 +643,8 @@ void JobListWidget::refreshFrameList( bool jobChange )
 	if( mCurrentJob.isRecord() ) {
 		if( jobChange || mCurrentJob.jobStatus().tasksCount() < 2000 ) {
 			mFrameTask = new FrameListTask( this, mCurrentJob );
+            mTaskListBusyWidget->show();
+            mTaskListBusyWidget->start();
 			FreezerCore::addTask( mFrameTask );
 			FreezerCore::wakeup();
 		} else {
