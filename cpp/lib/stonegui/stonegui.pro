@@ -10,6 +10,7 @@ FORMS+=ui/lostconnectiondialogui.ui \
 
 SOURCES += \
 	src/actions.cpp \
+	src/busywidget.cpp \
 	src/configdbdialog.cpp \
 	src/ffimagesequenceprovider.cpp \
 #	src/phononimagesequenceprovider.cpp \
@@ -45,6 +46,7 @@ SOURCES += \
 
 HEADERS += \
 	include/actions.h \
+	include/busywidget.h \
 	include/configdbdialog.h \
 	include/ffimagesequenceprovider.h \
 #	include/phononimagesequenceprovider.h \
