@@ -337,7 +337,43 @@ void JobListWidget::customEvent( QEvent * evt )
 				JobDepList deps = jobDepsByJob[j.key()];
 				jm->updateRecords( deps.deps(), *it, false );
 			}
-			
+
+            // clear out existing toolTip info first
+            int numRows = jm->rowCount();
+            for ( int row = 0; row < numRows; row++ ) {
+                QModelIndex qmi = jm->index(row, 4);
+                JobItem & ji = JobTranslator::data(qmi);
+                ji.toolTip.clear();
+            }
+
+            // Update slot use data for tooltips
+            if( jlt->mFetchUserServices ) {
+                // we store the pre-formatted tooltip in the model so
+                // need to do that now..
+                foreach( QString key, jlt->mUserServiceCurrent.keys() ) {
+                    QString keyUser = key.section(":",0,0);
+                    QString keyService = key.section(":",1,1);
+                    QString toolTip = QString("%1 : %2").arg(keyService).arg(QString::number(jlt->mUserServiceCurrent[key]));
+                    if( jlt->mUserServiceLimits.contains(key) )
+                        toolTip += " / " + QString::number(jlt->mUserServiceLimits[key]);
+
+                    toolTip += "\n";
+                    //LOG_1( QString("append tooltip for %1 to %2").arg(keyUser).arg(toolTip) );
+
+                    // iterate through the model and set as tooltip for all rows belonging to
+                    // the user
+                    int numRows = jm->rowCount();
+                    for ( int row = 0; row < numRows; row++ ) {
+                        QModelIndex qmi = jm->index(row, 4);
+                        QString cell = jm->data( qmi ).toString();
+                        //LOG_1( QString("row %1 has data %2").arg(QString::number(row)).arg(cell) );
+                        if( keyUser == cell ) {
+                            JobItem & ji = JobTranslator::data(qmi);
+                            ji.toolTip += toolTip;
+                        }
+                    }
+                }
+            }
 
 			mJobTaskRunning = false;
 			// This will update the status bar and action states

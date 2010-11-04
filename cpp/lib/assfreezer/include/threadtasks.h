@@ -51,8 +51,10 @@ public:
 	JobFilter mJobFilter;
 	JobList mJobList, mJobsNeedingDeps, mDependentJobs;
 	ProjectList mProjects;
-	bool mFetchJobServices, mFetchJobDeps;
+	bool mFetchJobServices, mFetchJobDeps, mFetchUserServices;
 	JobServiceList mJobServices;
+    QMap<QString, int> mUserServiceCurrent;
+    QMap<QString, int> mUserServiceLimits;
 };
 
 class UpdateJobListTask : public ThreadTask
