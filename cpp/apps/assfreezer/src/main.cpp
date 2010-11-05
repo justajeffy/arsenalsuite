@@ -78,6 +78,8 @@ HANDLE hMutex;
 extern "C" void initsip(void);
 extern "C" void initStone(void);
 extern "C" void initClasses(void);
+extern "C" void initStonegui(void);
+extern "C" void initClassesui(void);
 extern "C" void initAssfreezer(void);
 #endif
 
@@ -126,6 +128,8 @@ void loadPythonPlugins()
 		{"sip", initsip},
 		{"blur.Stone",initStone},
 		{"blur.Classes",initClasses},
+		{"blur.Stonegui",initStonegui},
+		{"blur.Classesui",initClassesui},
 		{"blur.Assfreezer", initAssfreezer},
 		{NULL, NULL}
 	};
@@ -144,8 +148,9 @@ void loadPythonPlugins()
 
 		"\t\tself.modules['blur.Stone'] = imp.load_module('blur.Stone',None,'',('','',imp.C_BUILTIN))\n"
 		"\t\tself.modules['blur.Classes'] = imp.load_module('blur.Classes',None,'',('','',imp.C_BUILTIN))\n"
+		"\t\tself.modules['blur.Stonegui'] = imp.load_module('blur.Stonegui',None,'',('','',imp.C_BUILTIN))\n"
+		"\t\tself.modules['blur.Classesui'] = imp.load_module('blur.Classesui',None,'',('','',imp.C_BUILTIN))\n"
 		"\t\tself.modules['blur.Absubmit'] = imp.load_module('blur.Absubmit',None,'',('','',imp.C_BUILTIN))\n"
-
 		"\t\tself.modules['blur.Assfreezer'] = imp.load_module('blur.Assfreezer',None,'',('','',imp.C_BUILTIN))\n"
 		"\tdef find_module(self,fullname,path=None):\n"
 		"\t\tif fullname in self.modules:\n"

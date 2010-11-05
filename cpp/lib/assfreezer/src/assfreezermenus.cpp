@@ -37,6 +37,32 @@
 #include "joblistwidget.h"
 #include "mainwindow.h"
 
+static AssfreezerMenuFactory * sMenuFactory = 0;
+
+AssfreezerMenuFactory * AssfreezerMenuFactory::instance()
+{
+	if( !sMenuFactory )
+		sMenuFactory = new AssfreezerMenuFactory();
+	return sMenuFactory;
+}
+	
+void AssfreezerMenuFactory::registerMenuPlugin( AssfreezerMenuPlugin * plugin, const QString & menuName )
+{
+	mPlugins[menuName].append(plugin);
+}
+
+QList<QAction*> AssfreezerMenuFactory::aboutToShow( QMenu * menu, bool addPreSep, bool addPostSep )
+{
+	QList<QAction*> before = menu->actions(), ret;
+	if( mPlugins.contains( menu->objectName() ) )
+		foreach( AssfreezerMenuPlugin * plugin, mPlugins[menu->objectName()] )
+			plugin->executeMenuPlugin( menu );
+	foreach( QAction * action, menu->actions() )
+		if( !before.contains( action ) )
+			ret.append(action);
+	return ret;
+}
+
 AssfreezerMenu::AssfreezerMenu( QWidget * parent, const QString & title)
 : QMenu( title, parent )
 {

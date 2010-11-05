@@ -16,6 +16,23 @@ class AssfreezerView;
 class JobViewerPlugin;
 class HostViewerPlugin;
 
+class ASSFREEZER_EXPORT AssfreezerMenuPlugin
+{
+public:
+	virtual void executeMenuPlugin( QMenu * )=0;
+};
+
+class ASSFREEZER_EXPORT AssfreezerMenuFactory
+{
+public:
+	static AssfreezerMenuFactory * instance();
+	
+	void registerMenuPlugin( AssfreezerMenuPlugin * plugin, const QString & menuName );
+	QList<QAction*> aboutToShow( QMenu * menu, bool addPreSep = false, bool addPostSep = false );
+	
+	QMap<QString,QList<AssfreezerMenuPlugin*> > mPlugins;
+};
+
 class ASSFREEZER_EXPORT AssfreezerMenu : public QMenu
 {
 Q_OBJECT

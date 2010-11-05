@@ -11,9 +11,9 @@ nsi = NSISTarget("assfreezer_installer",path,"assfreezer.nsi")
 # Use Static python modules on windows
 deps = None
 if sys.platform == 'win32':
-	deps = ["sipstatic","pystonestatic","pyclassesstatic","classes","libassfreezer","pyassfreezerstatic",ini]
+	deps = ["sipstatic","pystonestatic","pystoneguistatic","pyclassesstatic","pyclassesuistatic","classes","libassfreezer","pyassfreezerstatic",ini]
 else:
-	deps = ["sipstatic","pystone","pyclasses","classes","libassfreezer","pyassfreezer",ini]
+	deps = ["sipstatic","pystone","pystonegui","pyclasses","pyclassesui","classes","libassfreezer","pyassfreezer",ini]
 
 QMakeTarget("assfreezer",path,"assfreezer.pro",deps,[nsi])
 
