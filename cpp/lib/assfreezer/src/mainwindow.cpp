@@ -40,6 +40,7 @@
 
 #include "blurqt.h"
 
+#include "assfreezermenus.h"
 #include "displayprefsdialog.h"
 #include "hostlistwidget.h"
 #include "hostservicematrix.h"
@@ -131,6 +132,7 @@ MainWindow::MainWindow( QWidget * parent )
 	mFileMenu->addAction( FileExitAction );
 
 	mToolsMenu = mb->addMenu( "&Tools" );
+    mToolsMenu->setObjectName( "Assfreezer_Tools_Menu" );
     connect( mToolsMenu, SIGNAL( aboutToShow() ), SLOT( populateToolsMenu() ) );
 
 	mOptionsMenu = mb->addMenu( "&Options" );
@@ -558,6 +560,14 @@ void MainWindow::setCurrentView( AssfreezerView * view )
 	setUpdatesEnabled( true );
 }
 
+void MainWindow::showNextView()
+{
+    if( mTabWidget && mTabWidget->count() > 1 ) {
+        int index = (mTabWidget->currentIndex() + 1) % mTabWidget->count();
+        setCurrentView( qobject_cast<AssfreezerView*>(mTabWidget->widget(index)) );
+   }
+}
+
 void MainWindow::setupStackedView()
 {
 	mStackedWidget = new QStackedWidget(this);
@@ -816,6 +826,8 @@ void MainWindow::populateToolsMenu()
         mToolsMenu->addAction( UserServiceMatrixAction );
 
     mToolsMenu->addAction( "Project Weighting...", this, SLOT( showProjectWeightDialog() ) );
+
+    AssfreezerMenuFactory::instance()->aboutToShow(mToolsMenu);
 
     // We only need to populate this menu once
     mToolsMenu->disconnect( this, SLOT( populateToolsMenu() ) );

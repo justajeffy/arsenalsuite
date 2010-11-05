@@ -105,6 +105,8 @@ public slots:
 
 	void setCurrentView( AssfreezerView * );
 
+    void showNextView();
+
     void toggleFilter(bool);
 
 	void saveCurrentViewToFile();

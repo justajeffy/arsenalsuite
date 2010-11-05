@@ -469,7 +469,10 @@ void ImageView::pause()
 
 void ImageView::paintEvent(QPaintEvent * pe)
 {
-	if( mScaled.isNull() ) return;
+    if( mScaled.isNull() ) {
+        QWidget::paintEvent(pe);
+        return;
+    }
 	QPainter p(this);
 
 	int x = (width() - mScaled.width())/2;
