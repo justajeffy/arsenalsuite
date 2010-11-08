@@ -8,6 +8,8 @@ import blur.email, blur.jabber
 import sys, time, re, os
 from math import ceil
 import traceback
+from reaper_plugin_factory import *
+import reaper_plugins
 
 try:
 	import popen2
@@ -62,9 +64,6 @@ class ReaperConfig:
 		self.jabberSystemPassword = Config.getString('jabberSystemPassword','farm')
 		self.jabberSystemResource = Config.getString('jabberSystemResource','Reaper')
 
-config = ReaperConfig()
-config.update()
-
 def execReturnStdout(cmd):
 	p = popen2.Popen3(cmd)
 	while True:
@@ -84,13 +83,13 @@ def getLocalFilePath(job):
 		filePath = userDir + baseName
 		return str(filePath)
 	else: return str(job.fileName())
-	
+
 def cleanupJob(job):
 	print "cleanupJob called on %s jobID: %i" % (job.name(), job.key())
 	if not job.user().isRecord():
 		print "Job::cleanup cannot clean up a job that isn't assigned a user!\n"
 		return
-	
+
 	if job.uploadedFile():
 		filePath = getLocalFilePath(job)
 		filePathExtra = re.sub('(\.zip|\.max)','.txt',filePath)
@@ -163,182 +162,48 @@ def ensureSpoolSpace(requiredPercent):
 	return True
 
 def checkNewJob(job):
-	# make sure the job file exists
-	print 'Checking new job %i, %s' % ( job.key(), job.name() )
-	
-	if not job.user().isRecord():
-		print "Job missing fkeyUsr"
-		return False
+    # make sure the job file exists
+    print 'Checking new job %i, %s' % ( job.key(), job.name() )
 
-	fileName = str(job.fileName())
-	if fileName and len(fileName):
-		filePathExtra = ''
-			
-		if config.spoolDir != "":
-			if job.uploadedFile() and not config.managerDriveLetter in fileName.lower():
-				print "Job submission not finished, still has local fileName %s" % (job.fileName())
-				return False
+    if not job.user().isRecord():
+        print "Job missing fkeyUsr"
+        return False
 
-		if job.checkFileMd5():
-			filePath = getLocalFilePath(job)
-			filePathExtra = re.sub('(\.zip|\.max)','.txt',filePath)
-		
-			if not QFile.exists( filePath ):
-				print "Job file not found:", filePath
-				return False
-		
-			if filePath in execReturnStdout( 'lsof %s 2>&1' % (filePath) ):
-				print "Job file still open:", filePath
-				return False
-		
-			if config.spoolDir != "":
-				if not str(job.key()) in filePath:
-					print "Job file without job key:", filePath
-					return False
+    fileName = str(job.fileName())
+    if fileName and len(fileName):
+        filePathExtra = ''
 
-			md5sum = execReturnStdout('md5sum ' + filePath)[:32].lower()
-	
-			if md5sum != str(job.fileMd5sum()).lower():
-				print "Job file %s md5sum doesnt match the database local md5sum: %s db md5sum: %s" % (filePath, md5sum, job.fileMd5sum())
-				job.setStatus( 'corrupt' )
-				cleanupJob(job)
-				job.setCleaned(True)
-				job.commit()
-				host = job.host()
-				notifylist = "it:e"
-				notifySend( notifyList = notifylist, subject = 'Corrupt jobfile from host ' + host.name(),
-							body = "The following host just uploaded a corrupt job file to the Assburner spool.\n"
-								+ "Host: %s\nJob: %s\nJobID: %i\n\n" % (host.name(), job.name(), job.key()) )
-				return False
-		
-			job.setFileSize( QFileInfo( filePath ).size() )
-	
-		# automatically suspend job if assets use UNC paths or if there are 
-		# any mapped drives used besides G:\ (ie, job uses assets from K: or S:)
-		badpaths, badpaths2 = [], []
-		if QFile.exists(filePathExtra):
-			file = open(filePathExtra,'r')
-			
-			try:
-				# BLUR SPECIFIC HACK
-				# Get mappings for G, should be 0 or 1
-				gMappings = job.jobType().jobTypeMappings().mappings().filter( "mount", QRegExp("g",Qt.CaseInsensitive) )
-				# If we have a G mapping and it's a mirror(uses hostmapping instead of fkeyhost for multiple mirrors)
-				usingGMirror = (gMappings.size() == 1 and not gMappings[0].host().isRecord())
-				validGPathRegs = []
-				if usingGMirror:
-					validGPathRegs.append( QRegExp( "/_master/", Qt.CaseInsensitive ) )
-					validGPathRegs.append( QRegExp( "/maps/", Qt.CaseInsensitive ) )
-					validGPathRegs.append( QRegExp( "/(?:050_)maps/", Qt.CaseInsensitive ) )
-					validGPathRegs.append( QRegExp( "/Texture/" ) )
-					validGPathRegs.append( QRegExp( "/(?:050_)maps/", Qt.CaseInsensitive ) )
-					validGPathRegs.append( QRegExp( "/read/" ) )
-			
-								#rsync -W --numeric-ids -av --progress --stats --timeout=900 --delete 
-								#--dry-run --include '*/' --exclude '*.[Pp][Ss][Dd]' --exclude 'temp/' 
-								#--include '*.rps' --include '*_MASTER.max' --include '*.flw' --include 
-								#'**/_MASTER/**' --include' **/_Master/**' --include 
-								#'**/[Mm][Aa][Pp][Ss]/**' --include '**/050_maps/ **' --include 
-								#'**/Texture/**' --include '**/read/*pc2' --include '**/read/*tmc' 
-								#--include '**/read/*mdd' --include '**/Mesh*bin' --exclude '*' 
-			except:
-				print "Exception while setting up regexs for valid g maps mirror path tests"
-				traceback.print_exc()
-			
-			for line in file:
-				line = line.strip()
-				if re.match('\#',line): continue
-				if re.match('mem',line): continue
-				if re.match('(map|pc|file)',line):
-					try:
-						# Format per line is
-						# filetype,refcount,size,path
-						# Because path can contain commas, we set maxsplit to 3, to avoid splitting path
-						filetype, refcount, size, path = line.split(',',3)
-						if re.match('(\\\\|\/\/)',path,re.I):
-							badpaths.append(path)
-						# Create a RE from the paths, in the format (G:|V:)
-						mapDriveRe = '(%s)' % ('|'.join( [str(s) for s in config.permissableMapDrives.split(',') ] ) )
-						if re.match('([a-z]\:)',path,re.I) and not re.match(mapDriveRe,path,re.I):
-							badpaths.append(path)
-							
-						# BLUR SPECIFIC HACK
-						# If we are using a G: mirror, check if maps are in proper directories
-						try:
-							if usingGMirror:
-								valid = False
-								for re_ in validGPathRegs:
-									if path.contains( re_ ):
-										valid = True
-										break
-								if not valid:
-									badpaths2.append(path)
-						except:
-							print "Exception while testing for valid g mirror paths"
-							traceback.print_exc()
-					except:
-						print "Invalid Line Format in Stats File:", line
-		
-		if badpaths2:
-			subject = 'Job contains bad maps, pc2 or xref paths'
-			print subject, job.key(), job.name()
-			body = "Job: %s\n" % job.name()
-			body += "Job ID: %i\n" % job.key()
-			body += "User: %s\n" % job.user().displayName()
-			body += "This job contains maps, pointcache or xrefs that\n"
-			body += "point to locations that can not be reached by render nodes. Please\n"
-			body += "make sure your maps are stored with the project on %s.\n"
-			body += "Jobs that use maps via UNC paths such as \\\\thor or \\\\snake,"
-			body += "or through drive letters other than %s will NOT render on the farm.\n\n"
-			body += "List of invalid paths:\n"
-			body = body % (config.permissableMapDrives, config.permissableMapDrives)
-			for path in badpaths:
-				body += path + "\n"
-				print path
-			notifySend( notifyList = "newellm:j", subject = subject, body = body )
-			
-		if badpaths:
-			subject = 'Job contains bad maps, pc2 or xref paths'
-			print subject, job.key(), job.name()
-			body = "Job: %s\n" % job.name()
-			body += "Job ID: %i\n" % job.key()
-			body += "User: %s\n" % job.user().displayName()
-			body += "This job contains maps, pointcache or xrefs that\n"
-			body += "point to locations that can not be reached by render nodes. Please\n"
-			body += "make sure your maps are stored with the project on %s.\n"
-			body += "Jobs that use maps via UNC paths such as \\\\thor or \\\\snake,"
-			body += "or through drive letters other than %s will NOT render on the farm.\n\n"
-			body += "List of invalid paths:\n"
-			body = body % (config.permissableMapDrives, config.permissableMapDrives)
-			for path in badpaths:
-				body += path + "\n"
-				print path
-			
-			job.setStatus('suspended')
-			job.commit()
-			notifylist = "it:e,%s:je" % (job.user().name())
-			notifySend( notifyList = notifylist, subject = subject, body = body )
-			return False
-	
-	if job.table().schema().field( 'frameStart' ) and job.table().schema().field( 'frameEnd' ):
-		minMaxFrames = Database.current().exec_('SELECT min(jobtask), max(jobtask) from JobTask WHERE fkeyjob=%i' % job.key())
-		if minMaxFrames.next():
-			job.setValue( 'frameStart', minMaxFrames.value(0) )
-			job.setValue( 'frameEnd', minMaxFrames.value(1) )
+        if config.spoolDir != "":
+            if job.uploadedFile() and not config.managerDriveLetter in fileName.lower():
+                print "Job submission not finished, still has local fileName %s" % (job.fileName())
+                return False
 
-	print "checking job dependencies"
-	status = 'ready'
-	for jobDep in JobDep.recordsByJob( job ):
-		if jobDep.depType() == 1 and jobDep.dep().status() != 'done' and jobDep.dep().status() != 'deleted':
-			status = 'holding'
-	if job.status() == 'verify-suspended':
-		status = 'suspended'
-	job.setStatus(status)
-	createJobStat(job)
-	job.commit()
+    if job.table().schema().field( 'frameStart' ) and job.table().schema().field( 'frameEnd' ):
+        minMaxFrames = Database.current().exec_('SELECT min(jobtask), max(jobtask) from JobTask WHERE fkeyjob=%i' % job.key())
+        if minMaxFrames.next():
+            job.setValue( 'frameStart', minMaxFrames.value(0) )
+            job.setValue( 'frameEnd', minMaxFrames.value(1) )
 
-	print "New Job %s is ready" % ( job.name() )
-	return True
+    print "checking job dependencies"
+    status = 'ready'
+    for jobDep in JobDep.recordsByJob( job ):
+        if jobDep.depType() == 1 and jobDep.dep().status() != 'done' and jobDep.dep().status() != 'deleted':
+            status = 'holding'
+    if job.status() == 'verify-suspended':
+        status = 'suspended'
+    job.setStatus(status)
+
+    print "New Job %s appears ready, running through plug-ins" % ( job.name() )
+    for key in ReaperPluginFactory().sReaperPlugins.keys():
+        function = ReaperPluginFactory().sReaperPlugins[key]
+        result = False
+        try: result = function(job)
+        except: result = True
+        if not result: return False
+
+    createJobStat(job)
+    job.commit()
+    return True
 
 def getSlotCount(job):
 	q = Database.current().exec_("""
@@ -399,11 +264,6 @@ def retrieveReapable():
 def retrieveCleanable():
 	return Job.select("status IN ('deleted') AND (cleaned IS NULL OR cleaned=0)")
 
-service = Service.ensureServiceExists('AB_Reaper')
-
-# Holds PID of checker:Job
-newJobCheckers = {}
-
 def reaper():
     #	Config: managerDriveLetter, managerSpoolDir, assburnerErrorStep
     print "Reaper is starting up"
@@ -414,8 +274,13 @@ def reaper():
     # Make sure that people get notified at most once per error
     if not errorStep or errorStep < 1:
         errorStep = 1
-        
+
     while True:
+        # plug-ins can be hot-loaded
+        try:
+            reload(reaper_plugins)
+        except: traceback.print_exc()
+
         # Remove checker from dict if the process has exited, so
         # we can recheck the job if it failed
         try:
@@ -589,5 +454,14 @@ def createJobStat( mJob ):
 	stat.commit()
 	mJob.setJobStat( stat )
 	mJob.commit()
+
+
+config = ReaperConfig()
+config.update()
+
+service = Service.ensureServiceExists('AB_Reaper')
+
+# Holds PID of checker:Job
+newJobCheckers = {}
 
 reaper()
