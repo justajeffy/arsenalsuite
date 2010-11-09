@@ -57,8 +57,8 @@ public:
 
 	JobListWidget * jobPage() const { return mJobPage; }
 	HostListWidget * hostPage() const { return mHostPage; }
-public slots:
 
+public slots:
 	void setAutoRefreshEnabled( bool );
 	void setAutoRefreshOnWindowActivation( bool );
 
@@ -103,15 +103,17 @@ public slots:
 	void insertView( AssfreezerView * view, bool checkViewModeCheckCurrent=true );
 	void removeView( AssfreezerView * view );
 
+	void setCurrentView( const QString & );
 	void setCurrentView( AssfreezerView * );
 
     void showNextView();
 
     void toggleFilter(bool);
 
-	void saveCurrentViewToFile();
+    void saveCurrentViewToFile();
     void saveViewToFile( AssfreezerView * );
-    void loadViewFromFile();
+    void loadViewFromFile(bool notUsed=true);
+    void loadViewFromFile(const QString &);
 
 signals:
     void currentViewChanged( AssfreezerView * );
