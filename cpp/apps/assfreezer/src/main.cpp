@@ -271,40 +271,52 @@ int main( int argc, char * argv[] )
 	initUserConfig( QDir::homePath() + "/.assfreezer" );
 #endif
 
-	initStone( argc, argv );
- 	classes_loader();
-	initStoneGui();
+    initStone( argc, argv );
+    classes_loader();
+    initStoneGui();
 	{
 		JobList showJobs;
 		bool showTime = false;
-	
+        QString currentView;
+        QStringList loadViewFiles;
+
 		for( int i = 1; i<argc; i++ ){
 			QString arg( argv[i] );
 			if( arg == "-h" || arg == "--help" )
 			{
-				LOG_5( QString("AssFreezer v") + VERSION );
-				LOG_5( "Options:" );
-				LOG_5( "-current-render" );
-				LOG_5( "\tShow the current job that is rendering on this machine\n" );
-				LOG_5( "-show-time" );
-				LOG_5( "\tOutputs summary of time executed for all sql statement at program close\n" );
-				LOG_5( "-user USER" );
-				LOG_5( "\tSet the logged in user to USER: Requires Admin Privs" );
-				LOG_5( stoneOptionsHelp() );
+				LOG_1( QString("AssFreezer v") + VERSION );
+				LOG_1( "Options:" );
+				LOG_1( "-current-render" );
+				LOG_1( "\tShow the current job that is rendering on this machine\n" );
+				LOG_1( "-show-time" );
+				LOG_1( "\tOutputs summary of time executed for all sql statement at program close\n" );
+				LOG_1( "-user USER" );
+				LOG_1( "\tSet the logged in user to USER: Requires Admin Privs" );
+				LOG_1( "-current-view VIEWNAME" );
+				LOG_1( "\tMake VIEWNAME the active view, once they are all loaded" );
+				LOG_1( "-load-view FILE" );
+				LOG_1( "\tRead a saved view config from FILE" );
+				LOG_1( stoneOptionsHelp() );
 				return 0;
 			}
-			else if( arg == "-show-time" )
+			else if( arg.endsWith("-show-time") )
 				showTime = true;
-			else if( arg == "-current-render" ) {
+			else if( arg.endsWith( "-current-render" ) ) {
 				showJobs = Host::currentHost().activeAssignments().jobs();
 			}
-			else if( arg == "-user" && (i+1 < argc) ) {
+			else if( arg.endsWith("-user") && (i+1 < argc) ) {
 				QString impersonate( argv[++i] );
 				if( User::hasPerms( "User", true ) ) // If you can edit users, you can login as anyone
 					User::setCurrentUser( impersonate );
 			}
+            else if( arg.endsWith("-current-view") && (i+1 < argc) ) {
+				currentView = QString( argv[++i] );
+            }
+            else if( arg.endsWith("-load-view") && (i+1 < argc) ) {
+                loadViewFiles << QString(argv[++i]);
+            }
 		}
-		
+
 		// Share the database across threads, each with their own connection
 		FreezerCore::setDatabaseForThread( classesDb(), Connection::createFromIni( config(), "Database" ) );
 		
@@ -320,6 +332,10 @@ int main( int argc, char * argv[] )
 			}
 			if( showJobs.size() )
 				m.jobPage()->setJobList( showJobs );
+            foreach( QString viewFile, loadViewFiles )
+                m.loadViewFromFile( viewFile );
+            if( !currentView.isEmpty() )
+                m.setCurrentView( currentView );
 			m.show();
 			loadPythonPlugins();
 			result = a.exec();

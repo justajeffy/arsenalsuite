@@ -177,7 +177,7 @@ MainWindow::MainWindow( QWidget * parent )
 	connect( renameViewAction, SIGNAL( triggered(bool) ), SLOT( renameCurrentView() ) );
 
 	connect( mSaveViewToFileAction, SIGNAL( triggered(bool) ), SLOT( saveCurrentViewToFile() ) );
-	connect( mLoadViewFromFileAction, SIGNAL( triggered(bool) ), SLOT( loadViewFromFile() ) );
+	connect( mLoadViewFromFileAction, SIGNAL( triggered(bool) ), SLOT( loadViewFromFile(bool) ) );
 
     mViewMenu->addSeparator();
     mFilterViewAction = mViewMenu->addAction( "Show &Filter" );
@@ -511,6 +511,17 @@ void MainWindow::currentTabChanged( int index )
 	setCurrentView( qobject_cast<AssfreezerView*>(mTabWidget->widget(index)) );
 }
 
+void MainWindow::setCurrentView( const QString & viewName )
+{
+    if( mTabWidget ) {
+        for( int i = 0; i<mTabWidget->count(); i++ ) {
+            AssfreezerView * view = qobject_cast<AssfreezerView*>(mTabWidget->widget(i));
+            if( view->viewName() == viewName )
+                setCurrentView( view );
+        }
+   }
+}
+
 void MainWindow::setCurrentView( AssfreezerView * view )
 {
 	if( view == mCurrentView ) return;
@@ -665,11 +676,19 @@ void MainWindow::toggleFilter(bool enable) {
 	}
 }
 
-void MainWindow::loadViewFromFile()
+void MainWindow::loadViewFromFile(bool)
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load View From"),
                                                     "",
                                                     tr("ViewConfig (*.ini)"));
+    IniConfig newConfig(fileName);
+    newConfig.pushSection("View_SavedToFile");
+    QString viewName = newConfig.readString( "ViewName" );
+    restoreView(newConfig, viewName);
+}
+
+void MainWindow::loadViewFromFile(const QString & fileName)
+{
     IniConfig newConfig(fileName);
     newConfig.pushSection("View_SavedToFile");
     QString viewName = newConfig.readString( "ViewName" );
