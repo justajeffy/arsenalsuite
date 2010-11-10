@@ -106,12 +106,20 @@ void JobListWidget::initializeViews()
         ShowMineAction->setCheckable( TRUE );
         ShowMineAction->setIcon( QIcon( ":/images/show_mine" ) );
         ClearErrorsAction = new QAction( "Clear Job Errors", this );
-        
+
         DependencyTreeEnabledAction = new QAction( "Show Dependency Tree", this );
         DependencyTreeEnabledAction->setCheckable( true );
+		DependencyTreeEnabledAction->setIcon( QIcon(":/images/dependencytree") );
         connect( DependencyTreeEnabledAction, SIGNAL( toggled( bool ) ), SLOT( setDependencyTreeEnabled( bool ) ) );
 
+        FilterAction = new QAction( "&Filter", this );
+        FilterAction->setCheckable( TRUE );
+		FilterAction->setIcon( QIcon( ":images/filter" ) );
+		FilterAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
+		connect( FilterAction, SIGNAL( triggered(bool) ), SLOT( toggleFilter(bool) ) );
+
         NewViewFromSelectionAction = new QAction( "New View From Selection", this );
+		NewViewFromSelectionAction->setIcon( QIcon( ":/images/newview" ) );
         connect( NewViewFromSelectionAction, SIGNAL( triggered(bool) ), SLOT( createNewViewFromSelection() ) );
 
         //mJobFilterEdit = new JobFilterEdit( this );
@@ -197,6 +205,9 @@ void JobListWidget::initializeViews()
 
         setDependencyTreeEnabled( ini.readBool( "DependencyTreeEnabled", false ), /* allowRefresh= */ false );
 
+		FilterAction->setChecked( ini.readBool( "Filter", true ) );
+		toggleFilter( FilterAction->isChecked() );
+
         QStringList sl = ini.readString( "JobSplitterPos" ).split(',');
         QList<int> vl;
         for( QStringList::Iterator it=sl.begin(); it!=sl.end(); ++it )
@@ -259,6 +270,7 @@ void JobListWidget::save( IniConfig & ini )
         //ini.writeString( "ExtraFilters", mJobFilterEdit->lineEdit()->text() );
         ini.writeString( "TypeToShow", mJobFilter.typeToShow.join(",") );
         ini.writeBool( "DependencyTreeEnabled", isDependencyTreeEnabled() );
+        ini.writeBool( "Filter", FilterAction->isChecked() );
         // Save the splitter position by making a string of ints separated by commas
         // Output string
         QString jsps;
@@ -297,6 +309,7 @@ void JobListWidget::setDependencyTreeEnabled( bool dte, bool allowRefresh )
 {
 	if( dte != isDependencyTreeEnabled() ) {
 		((JobModel*)mJobTree->model())->setDependencyTreeEnabled( dte );
+
 		DependencyTreeEnabledAction->setChecked( dte );
 		mJobTree->setRootIsDecorated( dte );
 		if( allowRefresh && dte ) refresh();
@@ -498,8 +511,10 @@ QToolBar * JobListWidget::toolBar( QMainWindow * mw )
 		mToolBar->addAction( KillAction );
 		mToolBar->addAction( RestartAction );
 		mToolBar->addSeparator();
+		mToolBar->addAction( FilterAction );
 		mToolBar->addAction( ShowMineAction );
 		mToolBar->addSeparator();
+		mToolBar->addAction( DependencyTreeEnabledAction );
 		//mToolBar->addWidget( mJobFilterEdit );
 	}
 	return mToolBar;
@@ -512,6 +527,7 @@ void JobListWidget::populateViewMenu( QMenu * viewMenu )
 	viewMenu->addAction( NewViewFromSelectionAction );
 	viewMenu->addSeparator();
 	viewMenu->addAction( ShowMineAction );
+	viewMenu->addAction( FilterAction );
 	{
 		QMenu * filterMenu = viewMenu->addMenu( "Job Filters" );
 		filterMenu->addMenu( mProjectFilterMenu );
@@ -958,4 +974,11 @@ void JobListWidget::createNewViewFromSelection()
 		mw->insertView( jobListView );
 		mw->setCurrentView( jobListView );
 	}
+}
+
+void JobListWidget::toggleFilter(bool enable)
+{
+    mJobTree->enableFilterWidget(enable);
+    mFrameTree->enableFilterWidget(enable);
+    mErrorTree->enableFilterWidget(enable);
 }

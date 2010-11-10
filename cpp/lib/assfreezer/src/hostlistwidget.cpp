@@ -55,6 +55,11 @@ HostListWidget::HostListWidget( QWidget * parent )
 	ClientUpdateAction = new QAction( "Client Update", this );
 	ClientUpdateAction->setIcon( QIcon( ":/images/client_update.png" ) );
 
+    FilterAction = new QAction( "&Filter", this );
+	FilterAction->setIcon( QIcon( ":/images/filter" ) );
+    FilterAction->setCheckable( TRUE );
+    FilterAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
+
 	SubmitBatchJobAction = new QAction( "Assign Batch Job", this );
 	ShowHostInfoAction = new QAction( "Host Info...", this );
 	ClearHostErrorsSetOfflineAction = new QAction( "Clear All Errors From Host and Set It Offline", this );
@@ -72,6 +77,7 @@ HostListWidget::HostListWidget( QWidget * parent )
 	connect( ClientUpdateAction, SIGNAL( triggered(bool) ), SLOT( setHostsClientUpdate() ) );
 	connect( VNCHostsAction, SIGNAL( triggered(bool) ), SLOT( vncHosts() ) );
 	connect( ShowJobsAction, SIGNAL(triggered(bool)), SLOT( showAssignedJobs() ) );
+    connect( FilterAction, SIGNAL( triggered(bool) ), SLOT( toggleFilter(bool) ) );
 
 	mHostTree = new RecordTreeView(this);
 	QLayout * vbox = new QVBoxLayout(this);
@@ -95,8 +101,12 @@ HostListWidget::HostListWidget( QWidget * parent )
 	mHostServiceFilterMenu = new HostServiceFilterMenu( this );
 	mCannedBatchJobMenu = new CannedBatchJobMenu( this );
 
+	// Set defaults
 	IniConfig temp;
 	restore(temp);
+
+	IniConfig & ini = viewConfig();
+    FilterAction->setChecked( ini.readBool( "Filter", true ) );
 
 	FreezerCore::addTask( new StaticHostListDataTask( this ) );
 }
@@ -114,6 +124,7 @@ void HostListWidget::save( IniConfig & ini )
 {
 	ini.writeString("ViewType","HostList");
 	ini.writeString("ServiceFilter", mServiceFilter);
+	ini.writeBool( "Filter", FilterAction->isChecked() );
 	saveHostView(mHostTree,ini);
 	AssfreezerView::save(ini);
 }
@@ -154,7 +165,7 @@ void HostListWidget::customEvent( QEvent * evt )
 			} else
 				clearStatusBar();
 
-			mHostTree->mRecordFilterWidget->filterRows();
+			//mHostTree->mRecordFilterWidget->filterRows();
 
 			break;
 		}
@@ -172,7 +183,7 @@ void HostListWidget::customEvent( QEvent * evt )
 				mQueuedHostRefresh = false;
 				doRefresh();
 			}
-			mHostTree->mRecordFilterWidget->filterRows();
+			//mHostTree->mRecordFilterWidget->filterRows();
 			break;
 		}
 		case UPDATE_HOST_LIST:
@@ -180,7 +191,7 @@ void HostListWidget::customEvent( QEvent * evt )
 			HostList hl = ((UpdateHostListTask*)evt)->mReturn;
 			mHostTree->model()->updated(hl);
             refresh();
-			mHostTree->mRecordFilterWidget->filterRows();
+			//mHostTree->mRecordFilterWidget->filterRows();
 			break;
 		}
 		default:
@@ -208,6 +219,8 @@ void HostListWidget::doRefresh()
 		FreezerCore::addTask( new HostListTask( this, mServiceFilter, !mHostTree->isColumnHidden(15) /*Services Column*/ ) );
 		FreezerCore::wakeup();
 	}
+
+	toggleFilter( FilterAction->isChecked() );
 }
 
 void HostListWidget::hostListSelectionChanged()
@@ -239,6 +252,8 @@ QToolBar * HostListWidget::toolBar( QMainWindow * mw )
 		mToolBar->addAction( HostOfflineAction );
 		mToolBar->addAction( HostRestartAction );
 		mToolBar->addAction( VNCHostsAction );
+		mToolBar->addSeparator();
+		mToolBar->addAction( FilterAction );
 	}
 	return mToolBar;
 }
@@ -246,6 +261,8 @@ QToolBar * HostListWidget::toolBar( QMainWindow * mw )
 void HostListWidget::populateViewMenu( QMenu * viewMenu )
 {
 	viewMenu->addMenu( mHostServiceFilterMenu );
+	viewMenu->addSeparator();
+	viewMenu->addAction( FilterAction );
 }
 
 void HostListWidget::setHostsStatus(const QString & status)
@@ -388,3 +405,7 @@ void HostListWidget::showHostPopup(const QPoint & point)
 	mHostMenu->popup( mHostTree->mapToGlobal(point) );
 }
 
+void HostListWidget::toggleFilter(bool enable)
+{
+    mHostTree->enableFilterWidget(enable);
+}
