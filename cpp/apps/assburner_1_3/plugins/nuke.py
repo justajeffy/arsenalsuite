@@ -81,10 +81,10 @@ class NukeBurner(JobBurner):
         args << "-f"
         # cache limit
         args << "-c"
-        args << "6G"
+        args << str(int(self.Job.maxMemory() / 1024 / 1024))+"G"
         # # of threads
         args << "-m"
-        args << "4"
+        args << str(self.Job.assignmentSlots())
         # frame range
         args << "-F"
         args << self.assignedTasks()
