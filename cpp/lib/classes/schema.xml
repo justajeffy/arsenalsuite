@@ -675,6 +675,7 @@
   <column type="uint" methodName="filterSet" name="fkeyJobFilterSet" >
    <fkey indexDeleteMode="DoNothingOnDelete" table="JobFilterSet" type="single" hasIndex="false" />
   </column>
+  <column pluralMethodName="maxErrors" type="uint" methodName="maxErrors" name="maxErrors" />
  </table>
  <table useCodeGen="true" parent="Job" name="Job3Delight" expireKeyCache="true" className="Job3Delight" >
   <column type="uint" methodName="width" name="width" />
