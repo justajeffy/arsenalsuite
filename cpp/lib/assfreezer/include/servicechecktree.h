@@ -63,11 +63,6 @@ public:
 
 	void setReadOnly( bool );
 	
-public slots:
-	void slotElementsAdded( RecordList );
-	void slotElementsRemoved( RecordList );
-	void slotElementUpdated( Record, Record );
-
 protected:
 	ServiceList elementsByState( Qt::CheckState );
 

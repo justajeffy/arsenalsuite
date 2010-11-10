@@ -32,5 +32,14 @@
 		<file>images/AssFreezerLogo.jpg</file>
 		<file>images/AssFreezerIcon.png</file>
 		<file>images/ArsenalFreezerLogo.jpg</file>
+		<file>images/dependencytree.png</file>
+		<file>images/filter.png</file>
+		<file>images/projectweighting.png</file>
+		<file>images/displaypreferences.png</file>
+		<file>images/settings.png</file>
+		<file>images/newview.png</file>
+		<file>images/copy.png</file>
+		<file>images/saveview.png</file>
+		<file>images/loadview.png</file>
     </qresource>
 </RCC>

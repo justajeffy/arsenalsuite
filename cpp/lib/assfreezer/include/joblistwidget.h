@@ -63,6 +63,7 @@ public:
 	QAction* PauseAction;
 	QAction* ResumeAction;
 	QAction* ShowOutputAction;
+	QAction* FilterAction;
 	QAction* ShowMineAction;
 	QAction* ClearErrorsAction;
 	QAction* DependencyTreeEnabledAction;
@@ -141,6 +142,8 @@ public slots:
 	void saveCannedBatchJob();
 
 	void createNewViewFromSelection();
+
+    void toggleFilter(bool);
 
 	void setFrameCacheStatus(int,int);
 

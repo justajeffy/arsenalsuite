@@ -37,6 +37,7 @@ public:
 	QAction* RestartAction;
 	QAction* VNCHostsAction;
 	QAction* ClientUpdateAction;
+	QAction* FilterAction;
 
 	QAction* SubmitBatchJobAction;
 	QAction* ShowHostInfoAction;
@@ -66,6 +67,9 @@ public slots:
 	void setHostsRebootWhenDone();
 	/// selected hosts are told to update to the latest Assburner client
 	void setHostsClientUpdate();
+
+    void toggleFilter(bool);
+
 	/// opens vncviewer sessions to selected hosts
 	void vncHosts();
 
