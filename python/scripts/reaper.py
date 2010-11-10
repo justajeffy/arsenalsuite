@@ -267,7 +267,7 @@ def retrieveCleanable():
 def reaper():
     #	Config: managerDriveLetter, managerSpoolDir, assburnerErrorStep
     print "Reaper is starting up"
-    notifySend( notifyList = 'newellm:j', subject = 'Reaper Starting', body = "Reaper is (re)starting" )
+    #notifySend( notifyList = 'newellm:j', subject = 'Reaper Starting', body = "Reaper is (re)starting" )
 
     errorStep = Config.getInt('assburnerErrorStep')
 
@@ -353,10 +353,10 @@ def reaper():
 
             js.setAverageMemory(getAvgMemory(job))
 
-            # If job is erroring with no success, suspend it
-            if done == 0 and errorCount > config.totalFailureThreshold:
+            # If job is erroring check job and global error thresholds
+            if errorCount > job.maxErrors() or errorCount > config.totalFailureThreshold:
                 suspend = True
-                suspendMsg = 'Job %s has been suspended.  The job has produced %i errors with no tasks completing.' % (job.name(),errorCount)
+                suspendMsg = 'Job %s has been suspended.  The job has produced %i errors.' % (job.name(),errorCount)
                 suspendTitle = 'Job %s suspended.' % job.name()
 
             if suspend:
@@ -367,8 +367,6 @@ def reaper():
                 # notify them via email and jabber
                 if len(notifyList) == 0:
                     notifyList = job.user().name() + ':je'
-                # Notify me for now.
-                # notifyList += ',newellm:j'
                 notifySend(notifyList, suspendMsg, suspendTitle )
                 continue
 
