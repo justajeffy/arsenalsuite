@@ -108,8 +108,6 @@ public slots:
 
     void showNextView();
 
-    void toggleFilter(bool);
-
     void saveCurrentViewToFile();
     void saveViewToFile( AssfreezerView * );
     void loadViewFromFile(bool notUsed=true);
@@ -176,6 +174,7 @@ private:
 	QAction* AdminAction;
 	QAction* HostServiceMatrixAction;
 	QAction* UserServiceMatrixAction;
+	QAction* ProjectWeightingAction;
 	QAction* AutoRefreshAction;
 
 	QAction * mNewJobViewAction;
@@ -184,8 +183,6 @@ private:
 	QAction * mCloseViewAction;
 	QAction * mMoveViewLeftAction;
 	QAction * mMoveViewRightAction;
-
-    QAction * mFilterViewAction;
 
 	QAction * mSaveViewToFileAction;
 	QAction * mLoadViewFromFileAction;
