@@ -28,8 +28,8 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 	setupUi(this);
 
 	/* Instant Settings connections */
-        connect( mResetInstantSettings, SIGNAL( clicked() ), SLOT( resetSettings() ) );
-        connect( mApplyInstantSettings, SIGNAL( clicked() ), SLOT( applySettings() ) );
+    connect( mResetInstantSettings, SIGNAL( clicked() ), SLOT( resetSettings() ) );
+    connect( mApplyInstantSettings, SIGNAL( clicked() ), SLOT( applySettings() ) );
 	connect( mPrioritySpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
 	connect( mPersonalPrioritySpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
 	connect( mDeleteOnCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
@@ -50,6 +50,7 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 	connect( mMaxMemorySpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
 	connect( mPrioritizeOuterTasksCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
 	connect( mEnvironmentButton, SIGNAL( clicked() ), SLOT( showEnvironmentWindow() ) );
+	connect( mServiceTree->model(), SIGNAL( dataChanged(const QModelIndex &, const QModelIndex &) ), SLOT( settingsChange() ) );
 
 	mSelectedJobsProxy = new RecordProxy( this );
 	mPrioritySpin->setProxy( mSelectedJobsProxy );
@@ -267,6 +268,7 @@ void JobSettingsWidget::resetSettings()
 
 	mUpdatedHostList = mSelectedJobs[0].hostList();
 	mUpdatedEnvironment = mSelectedJobs[0].environment();
+    buildServiceTree();
 	mChanges = false;
 
 	mApplyInstantSettings->setEnabled(false);
@@ -371,6 +373,8 @@ void JobSettingsWidget::applySettings()
 
     mSelectedJobs.setEnvironments( mUpdatedEnvironment );
 
+    saveServiceTree();
+
 	if( mMode == ModifyJobs ) {
 		Database::current()->beginTransaction();
 		mSelectedJobs.commit();
@@ -409,6 +413,66 @@ void JobSettingsWidget::showEnvironmentWindow()
         mUpdatedEnvironment = jew.environment();
         settingsChange();
     }
+}
+
+void JobSettingsWidget::buildServiceTree()
+{
+    mServiceTree->setRootElement();
+
+    QMap<uint, uint> depMap;
+    foreach( Job job, mSelectedJobs )
+    {
+        ServiceList installed = job.jobServices().services();
+        foreach( Service s, installed )
+        {
+            uint key = s.key();
+            if( !depMap.contains( key ) )
+                depMap[key] = 1;
+              else
+                depMap[key]++;
+        }
+    }
+
+    ServiceList checked, tri;
+    for( QMap<uint, uint>::Iterator it = depMap.begin(); it != depMap.end(); ++it ){
+        if( it.value() == mSelectedJobs.size() )
+            checked += Service( it.key() );
+        else
+            tri += Service( it.key() );
+    }
+
+    mServiceTree->setChecked( checked );
+    mServiceTree->setNoChange( tri );
+
+    mServiceTree->resizeColumnToContents(0);
+    mServiceTree->resizeColumnToContents(1);
+    mServiceTree->resizeColumnToContents(2);
+}
+
+void JobSettingsWidget::saveServiceTree()
+{
+	//qWarning("saving service tree\n");
+	ServiceList on = mServiceTree->checkedElements(); 
+	ServiceList nc = mServiceTree->noChangeElements();
+	foreach( Job job, mSelectedJobs )
+	{
+		//qWarning("checking "+job.name().toAscii());
+		JobServiceList installed = job.jobServices();
+		JobServiceList toRemove;
+		foreach( JobService js, installed )
+			if( !on.contains( js.service() ) && !nc.contains( js.service() ) )
+				toRemove += js;
+		toRemove.remove();
+
+		foreach( Service s, on ) {
+			if( !installed.services().contains( s ) ) {
+				JobService js = JobService();
+				js.setJob(job);
+				js.setService(s);
+				js.commit();
+			}
+		}
+	}
 }
 
 
