@@ -56,6 +56,9 @@ public slots:
 	void showHostSelector();
 	void showEnvironmentWindow();
 
+    void buildServiceTree();
+    void saveServiceTree();
+
 signals:
 	void customJobSettingsWidgetCreated( CustomJobSettingsWidget * );
 

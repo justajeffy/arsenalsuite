@@ -78,7 +78,7 @@ static const ColumnStruct job_columns [] =
 	{ "Health", 			"Health", 			20, 	18,	true, false }, 	//16
 	{ "Ended", 				"Ended", 			140, 	15,	false, false },	//17
 	{ "Time in Queue", 		"TimeInQueue",		80, 	13,	false, false },	//18
-	{ "Services", 			"Services", 		80, 	16,	false, false }, //19
+	{ "Services", 			"Services", 		80, 	16,	false, true }, //19
 	{ "Avg. Memory", 		"AverageMemory", 	80, 	12,	false, false },	//20
 	{ 0, 					0, 					0, 		0, 	false, false }
 };

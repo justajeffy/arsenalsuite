@@ -41,6 +41,7 @@ SOURCES+= \
 	src/mainwindow.cpp \
 	src/projectweightdialog.cpp \
 	src/projectweightview.cpp \
+	src/servicechecktree.cpp \
 	src/settingsdialog.cpp \
 	src/tabtoolbar.cpp \
 	src/threadtasks.cpp \
@@ -84,6 +85,7 @@ HEADERS+= \
 	include/mainwindow.h \
 	include/projectweightdialog.h \
 	include/projectweightview.h \
+	include/servicechecktree.h \
 	include/settingsdialog.h \
 	include/tabtoolbar.h \
 	include/threadtasks.h \
