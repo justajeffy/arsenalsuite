@@ -67,10 +67,19 @@ MainWindow::MainWindow( QWidget * parent )
 , mCounterActive( false )
 , mAutoRefreshTimer( 0 )
 {
-	FileExitAction = new QAction( "E&xit", this );
+	FileExitAction = new QAction( "&Quit", this );
+	FileExitAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_Q ) );
+	FileExitAction->setIcon( QIcon( "images/quit.png" ) );
 	HelpAboutAction = new QAction( "About...", this );
+
 	HostServiceMatrixAction = new QAction( "Host Service Matrix...", this );
+	HostServiceMatrixAction->setIcon( QIcon( "images/hosts.png" ) );
+
 	UserServiceMatrixAction = new QAction( "User Service Matrix...", this );
+	UserServiceMatrixAction->setIcon( QIcon( "images/users.png" ) );
+
+    ProjectWeightingAction = new QAction( "Project Weighting", this );
+	ProjectWeightingAction->setIcon( QIcon( ":/images/projectweighting" ) );
 
 	ViewHostsAction = new QAction( "View Hosts", this );
 	ViewHostsAction->setCheckable( TRUE );
@@ -87,12 +96,15 @@ MainWindow::MainWindow( QWidget * parent )
 	viewAG->addAction( ViewHostsAction );
 	viewAG->addAction( ViewJobsAction );
 
-	DisplayPrefsAction = new QAction( "Display Preferences...", this );
-	SettingsAction = new QAction( "Settings...", this );
+	DisplayPrefsAction = new QAction( "Display Preferences", this );
+	DisplayPrefsAction->setIcon( QIcon( ":/images/displaypreferences" ) );
+	SettingsAction = new QAction( "Settings", this );
+    SettingsAction->setIcon( QIcon( ":/images/settings" ) );
+
 	AdminAction = new QAction( "Admin", this );
 	
 	AutoRefreshAction = new QAction( "Auto Refresh", this );
-	AutoRefreshAction->setIcon( QIcon( ":/images/auto_refresh.png" ) );
+	AutoRefreshAction->setIcon( QIcon( "images/auto_refresh.png" ) );
 	AutoRefreshAction->setCheckable( true );
 	connect( AutoRefreshAction, SIGNAL( toggled( bool ) ), SLOT( setAutoRefreshEnabled( bool ) ) );
 	mAutoRefreshTimer = new QTimer(this);
@@ -100,6 +112,7 @@ MainWindow::MainWindow( QWidget * parent )
 
 	connect( HostServiceMatrixAction, SIGNAL( triggered(bool) ), SLOT( openHostServiceMatrixWindow() ) );
 	connect( UserServiceMatrixAction, SIGNAL( triggered(bool) ), SLOT( openUserServiceMatrixWindow() ) );
+	connect( ProjectWeightingAction, SIGNAL( triggered(bool) ), SLOT( showProjectWeightDialog() ) );
 	connect( HelpAboutAction, SIGNAL( triggered(bool) ), SLOT( showAbout() ) );
 	connect( FileExitAction, SIGNAL( triggered(bool) ), qApp, SLOT( quit() ) );
 	connect( SettingsAction, SIGNAL( triggered(bool) ), SLOT( showSettings() ) );
@@ -144,8 +157,10 @@ MainWindow::MainWindow( QWidget * parent )
 	mViewMenu->addAction( ViewHostsAction );
 	mViewMenu->addSeparator();
 	mNewJobViewAction = mViewMenu->addAction( "New &Job View" );
-	mNewJobViewAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_T ) );
+	mNewJobViewAction->setIcon( QIcon( ":/images/newview" ) );
+	mNewJobViewAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_J ) );
 	mNewHostViewAction = mViewMenu->addAction( "New &Host View" );
+	mNewHostViewAction->setIcon( QIcon( ":/images/newview" ) );
 	mNewHostViewAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_H ) );
 	mRestoreViewMenu = mViewMenu->addMenu( "Rest&ore View" );
 
@@ -154,8 +169,9 @@ MainWindow::MainWindow( QWidget * parent )
 
 	mViewMenu->addSeparator();
 	mSaveViewAsAction = mViewMenu->addAction( "Clone Current View As..." );
+	mSaveViewAsAction->setIcon( QIcon( ":/images/copy" ) );
 	mCloseViewAction = mViewMenu->addAction( "&Close Current View" );
-	mCloseViewAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_C ) );
+	mCloseViewAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_W ) );
 	QAction * renameViewAction = mViewMenu->addAction( "Re&name Current View" );
 	mMoveViewLeftAction = mViewMenu->addAction( "Move Current View &Left" );
 	mMoveViewLeftAction->setShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Left ) );
@@ -163,10 +179,14 @@ MainWindow::MainWindow( QWidget * parent )
 	mMoveViewRightAction->setShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Right ) );
 
     QAction * mSaveViewToFileAction = mViewMenu->addAction( "Save View To &File" );
+	mSaveViewToFileAction->setIcon( QIcon( ":/images/saveview" ) );
     mSaveViewToFileAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_S ) );
 
     QAction * mLoadViewFromFileAction = mViewMenu->addAction( "Load View fr&om File" );
+	mLoadViewFromFileAction->setIcon( QIcon( ":/images/loadview" ) );
     mLoadViewFromFileAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_O ) );
+
+	mViewMenu->addSeparator();
 
 	connect( mNewJobViewAction, SIGNAL( triggered(bool) ), SLOT( createJobView() ) );
 	connect( mNewHostViewAction, SIGNAL( triggered(bool) ), SLOT( createHostView() ) );
@@ -178,15 +198,6 @@ MainWindow::MainWindow( QWidget * parent )
 
 	connect( mSaveViewToFileAction, SIGNAL( triggered(bool) ), SLOT( saveCurrentViewToFile() ) );
 	connect( mLoadViewFromFileAction, SIGNAL( triggered(bool) ), SLOT( loadViewFromFile(bool) ) );
-
-    mViewMenu->addSeparator();
-    mFilterViewAction = mViewMenu->addAction( "Show &Filter" );
-	mFilterViewAction->setCheckable( true );
-	mFilterViewAction->setChecked( true );
-	//mFilterViewAction->setChecked( ini.readBool( "FilterEnabled", false ) );
-	mFilterViewAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
-
-	connect( mFilterViewAction, SIGNAL( triggered(bool) ), SLOT( toggleFilter(bool) ) );
 
 	mHelpMenu = mb->addMenu( "&Help" );
 	mHelpMenu->addAction( HelpAboutAction );
@@ -662,20 +673,6 @@ void MainWindow::saveCurrentViewToFile()
         saveViewToFile( mCurrentView );
 }
 
-void MainWindow::toggleFilter(bool enable) {
-	if ( mCurrentView && mCurrentView->inherits( "JobListWidget" ) ) {
-		JobListWidget * jlw = qobject_cast<JobListWidget*>(mCurrentView);
-		jlw->mJobTree->enableFilterWidget(enable);
-		jlw->mFrameTree->enableFilterWidget(enable);
-		jlw->mErrorTree->enableFilterWidget(enable);
-	}
-
-	if ( mCurrentView && mCurrentView->inherits( "HostListWidget" ) ) {
-		HostListWidget * hlw = qobject_cast<HostListWidget*>(mCurrentView);
-		hlw->mHostTree->enableFilterWidget(enable);
-	}
-}
-
 void MainWindow::loadViewFromFile(bool)
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load View From"),
@@ -844,7 +841,7 @@ void MainWindow::populateToolsMenu()
     if( User::hasPerms( "UserService", true ) )
         mToolsMenu->addAction( UserServiceMatrixAction );
 
-    mToolsMenu->addAction( "Project Weighting...", this, SLOT( showProjectWeightDialog() ) );
+    mToolsMenu->addAction( ProjectWeightingAction );
 
     AssfreezerMenuFactory::instance()->aboutToShow(mToolsMenu);
 
