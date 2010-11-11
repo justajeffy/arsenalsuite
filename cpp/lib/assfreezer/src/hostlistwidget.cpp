@@ -333,7 +333,7 @@ void HostListWidget::showAssignedJobs()
 		JobListWidget * jobList = new JobListWidget(mw);
 		jobList->setJobList( Host::activeAssignments(mHostTree->selection()).jobs() );
 		mw->insertView(jobList);
-		mw->setCurrentView(jobList);
+		//mw->setCurrentView(jobList);
 	}
 }
 

@@ -41,5 +41,9 @@
 		<file>images/copy.png</file>
 		<file>images/saveview.png</file>
 		<file>images/loadview.png</file>
+		<file>images/close.png</file>
+		<file>images/moveleft.png</file>
+		<file>images/moveright.png</file>
+		<file>images/rename.png</file>
     </qresource>
 </RCC>
