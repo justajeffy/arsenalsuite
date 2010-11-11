@@ -1018,9 +1018,13 @@ void MainWindow::showTabMenu( const QPoint & pos, AssfreezerView * view )
 {
 	QMenu * menu = new QMenu(this);
 	QAction * close = menu->addAction( "&Close View" );
+	close->setIcon( QIcon( ":/images/close" ) );
 	QAction * moveLeft = menu->addAction( "Move View &Left" );
+	moveLeft->setIcon( QIcon( ":/images/moveleft" ) );
 	QAction * moveRight = menu->addAction( "Move View &Right" );
+	moveRight->setIcon( QIcon( ":/images/moveright" ) );
 	QAction * rename = menu->addAction( "Re&name View" );
+	rename->setIcon( QIcon( ":/images/rename" ) );
 	QAction * result = menu->exec(pos);
     QAction * save = menu->addAction( "&Save View" );
 
