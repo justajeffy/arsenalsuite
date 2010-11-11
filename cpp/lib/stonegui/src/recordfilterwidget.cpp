@@ -136,6 +136,8 @@ void RecordFilterWidget::textFilterChanged()
 
 void RecordFilterWidget::filterRows()
 {
+    SuperModel * sm = (SuperModel *)(mTree->model());
+
     int numRows = mTree->model()->rowCount();
     for ( int row = 0; row < numRows; row++ ) {
         mTree->setRowHidden(row, mTree->rootIndex(), false);
@@ -146,7 +148,13 @@ void RecordFilterWidget::filterRows()
                 QString cell = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap[mFilterMap[col]])).toString();
                 if( ! cell.contains( filter->text(), Qt::CaseInsensitive ) )
                     mTree->setRowHidden(row, mTree->rootIndex(), true);
-            }
+
+                sm->setColumnFilter( col, filter->text() );
+            } else {
+
+			    // Set the filter to empty so that the highlighted text gets un-highlighted in recorddelegate
+                sm->setColumnFilter( col, "" );
+			}
         }
     }
 }

@@ -165,7 +165,7 @@ void HostListWidget::customEvent( QEvent * evt )
 			} else
 				clearStatusBar();
 
-			//mHostTree->mRecordFilterWidget->filterRows();
+			mHostTree->mRecordFilterWidget->filterRows();
 
 			break;
 		}
@@ -183,7 +183,7 @@ void HostListWidget::customEvent( QEvent * evt )
 				mQueuedHostRefresh = false;
 				doRefresh();
 			}
-			//mHostTree->mRecordFilterWidget->filterRows();
+			mHostTree->mRecordFilterWidget->filterRows();
 			break;
 		}
 		case UPDATE_HOST_LIST:
@@ -191,7 +191,7 @@ void HostListWidget::customEvent( QEvent * evt )
 			HostList hl = ((UpdateHostListTask*)evt)->mReturn;
 			mHostTree->model()->updated(hl);
             refresh();
-			//mHostTree->mRecordFilterWidget->filterRows();
+			mHostTree->mRecordFilterWidget->filterRows();
 			break;
 		}
 		default:
