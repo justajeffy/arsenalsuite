@@ -23,6 +23,25 @@ AssfreezerView::~AssfreezerView()
 	FreezerCore::instance()->cancelObjectTasks(this);
 }
 
+QString AssfreezerView::generateViewCode()
+{
+    static int viewNum = 0;
+    QDateTime ctd = QDateTime::currentDateTime();
+    return QString::number( ctd.toTime_t() ) + QString::number( ctd.time().msec() ) + QString::number( viewNum++ );
+}
+
+QString AssfreezerView::viewCode() const
+{
+    if( mViewCode.isEmpty() )
+        mViewCode = generateViewCode();
+    return mViewCode;
+}
+
+void AssfreezerView::setViewCode( const QString & viewCode )
+{
+    mViewCode = viewCode;
+}
+
 void AssfreezerView::refresh()
 {
 	if( !mRefreshScheduled ) {

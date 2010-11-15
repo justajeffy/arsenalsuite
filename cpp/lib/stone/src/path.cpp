@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: path.cpp 9590 2010-03-25 01:19:50Z brobison $
+ * $Id$
  */
 
 #include <limits.h>
@@ -69,7 +69,7 @@ QString makeFramePath( const QString & basePath, uint frame, uint padWidth )
 		return QString::null;
 	QString tail = path.mid( loc );
 	int remNums=0;
-	while( loc > 0 && remNums < 4 && QChar(path[loc-1]).isNumber() ){
+	while( loc > 0 && remNums < num.size() && QChar(path[loc-1]).isNumber() ){
 		remNums++;
 		loc--;
 	}

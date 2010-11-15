@@ -158,7 +158,7 @@ void Slave::startup()
 	}
 
 	// Set host version string.
-	mHost.setAbVersion( "v" + QString(VERSION) + " r" + QString("$Date$").remove(QRegExp("[^\\d]")));
+	mHost.setAbVersion( "v" + QString(VERSION));
 	mHost.commit();
 
 	// Reset any frame assignments and set our host status
@@ -318,7 +318,7 @@ void Slave::loadEmbeddedPython()
 
 void Slave::pulse()
 {
-	// Assburner pulse
+	// Burner pulse
 	QDateTime cdt( QDateTime::currentDateTime() );
 	if( !mLastPulse.isValid() || mLastPulse.secsTo(cdt) >= mPulsePeriod ) {
 		LOG_3( "Slave::pulse(): Emitting pulse at " + cdt.toString(Qt::ISODate) );
@@ -410,7 +410,7 @@ void Slave::loop()
 
 		JobAssignmentList assignments = JobAssignment::select( "fkeyhost=? AND (fkeyjobassignmentstatus=? " + assignmentsByKey + ")",
 			VarList() << mHost.key() << JobAssignmentStatus::recordByName("ready").key() );
-		
+
 		foreach( JobAssignment ja, assignments )
 			handleJobAssignmentChange( ja );
 	}
@@ -433,6 +433,7 @@ void Slave::handleStatusChange( const QString & status, const QString & oldStatu
 	// Return if nothing has changed
 	if( oldStatus == status ) {
 		LOG_6("oldStatus same as mHost.slaveStatus, returning");
+        // why was this getting set here?
 		mInsideLoop = false;
 		return;
 	}
@@ -455,14 +456,16 @@ void Slave::handleStatusChange( const QString & status, const QString & oldStatu
 	} else if( status == "restart" ) {
 		restart();
 	} else if( status == "restart-when-done" ) {
-		if( oldStatus == "ready" )
+        mHostStatus.reload();
+		if( mHostStatus.activeAssignmentCount() == 0 )
 			restart();
 		else
 			return;
 	} else if( status == "reboot" ) {
 		reboot();
 	} else if( status == "reboot-when-done" ) {
-		if( oldStatus == "ready" )
+        mHostStatus.reload();
+		if( mHostStatus.activeAssignmentCount() == 0 )
 			reboot();
 		else
 			return;
@@ -679,7 +682,7 @@ void Slave::handleJobAssignmentChange( const JobAssignment & ja )
 			}
 		}
 	}
-		
+
 	/*
 	if( (status == "assigned" || status == "copy" || status == "busy") && checkFusionRunning() ) {
 		offline();
@@ -722,12 +725,32 @@ void Slave::slotBurnFinished()
 {
 	JobBurner * burner = qobject_cast<JobBurner*>(sender());
 	if( burner ) cleanupJobBurner(burner);
+
+	mHostStatus.reload();
+	if( status() == "restart-when-done" ) {
+		if( mHostStatus.activeAssignmentCount() == 0 )
+            restart();
+	}
+	if( status() == "reboot-when-done" ) {
+		if( mHostStatus.activeAssignmentCount() == 0 )
+            reboot();
+	}
 }
 
 void Slave::slotError( const QString & /*msg*/ )
 {
 	JobBurner * burner = qobject_cast<JobBurner*>(sender());
 	if( burner ) cleanupJobBurner(burner);
+
+	mHostStatus.reload();
+	if( status() == "restart-when-done" ) {
+		if( mHostStatus.activeAssignmentCount() == 0 )
+            restart();
+	}
+	if( status() == "reboot-when-done" ) {
+		if( mHostStatus.activeAssignmentCount() == 0 )
+            reboot();
+	}
 }
 
 bool Slave::checkForbiddenProcesses()
