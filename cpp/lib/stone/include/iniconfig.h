@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: iniconfig.h 6950 2008-07-30 21:02:49Z newellm $
+ * $Id$
  */
 
 #ifndef LIB_BLUR_QT_INI_CONFIG_H
@@ -118,7 +118,11 @@ public:
 
 	/// Removes the entire section named \param group from this file.
 	void removeSection( const QString & group );
-	void renameSection( const QString & before, const QString & after );
+
+    /// Removes any existing entries from \param dest and renames \param source to \param dest
+    void renameSection( const QString & source, const QString & dest );
+    /// Copies all entries from \param source to \param dest, removes any existing entries in \param dest if \param clearExisting is true
+    void copySection( const QString & source, const QString & dest, bool clearExisting = true );
 
 private:
 	// Prepares multiline strings to be properly stored in an ini file

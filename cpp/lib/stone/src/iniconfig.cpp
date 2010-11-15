@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: iniconfig.cpp 6950 2008-07-30 21:02:49Z newellm $
+ * $Id$
  */
 
 #include <qfile.h>
@@ -30,6 +30,7 @@
 #include <qstringlist.h>
 #include <qlist.h>
 
+#include "blurqt.h"
 #include "iniconfig.h"
 
 IniConfig::IniConfig(QString configFile)
@@ -67,11 +68,15 @@ void IniConfig::readFromFile( const QString & fileName, bool overwriteExisting )
 	if( file.isEmpty() )
 		file = mFile;
 
-	if( !QFile::exists(file) )
+	if( !QFile::exists(file) ) {
+        LOG_5( "Config file doesn't exist at: " + fileName );
 		return;
+    }
 	QFile cfgFile(file);
-	if( !cfgFile.open(QIODevice::ReadOnly) )
+	if( !cfgFile.open(QIODevice::ReadOnly) ) {
+        LOG_5( "Unable to open config file for reading at: " + fileName );
 		return;
+    }
 
 	QTextStream in(&cfgFile);
 	while(!in.atEnd()){
@@ -89,8 +94,9 @@ void IniConfig::readFromFile( const QString & fileName, bool overwriteExisting )
 		QString val = l.mid(equalsPos+1);
 		if( key.isEmpty() )
 			continue;
-		if( overwriteExisting || !mValMap[mSection].contains( key ) )
+		if( overwriteExisting || !mValMap[mSection].contains( key ) ) {
 			mValMap[mSection][key] = val;
+        }
 	}
 	cfgFile.close();
 }
@@ -102,8 +108,10 @@ bool IniConfig::writeToFile( const QString & fileName )
 		filePath = mFile;
 
 	QFile file(filePath);
-	if( !file.open(QIODevice::WriteOnly) )
+	if( !file.open(QIODevice::WriteOnly) ) {
+        LOG_1( "Unable to open config file for writing at: " + filePath );
 		return false;
+    }
 	QTextStream out(&file);
 	QMap<QString, QMap<QString,QString> >::Iterator it;
 	for(it = mValMap.begin(); it != mValMap.end(); ++it)
@@ -115,6 +123,7 @@ bool IniConfig::writeToFile( const QString & fileName )
 			out << "\n";
 		}
 	}
+    LOG_3( "Wrote config file to: " + filePath );
 	return true;
 }
 
@@ -339,6 +348,18 @@ void IniConfig::renameSection( const QString & before, const QString & after )
 		removeSection(before);
 		mValMap[after] = section;
 	}
+}
+
+void IniConfig::copySection( const QString & sectionFrom, const QString & sectionTo, bool clearExisting )
+{
+    QMap<QString,QString> section;
+    if( mValMap.contains( sectionFrom ) ) {
+        section = mValMap[sectionFrom];
+        if( clearExisting )
+            removeSection( sectionTo );
+        foreach( QString key, section.keys() )
+            mValMap[sectionTo][key] = section[key];
+    }
 }
 
 void IniConfig::removeKey( const QString & key )

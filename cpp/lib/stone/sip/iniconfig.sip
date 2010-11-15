@@ -50,5 +50,6 @@ public:
 	void removeKey( const QString & key );
 	void removeSection( const QString & group );
 	void renameSection( const QString & before, const QString & after );
+    void copySection( const QString & source, const QString & dest, bool clearExisting = true );
 };
 
