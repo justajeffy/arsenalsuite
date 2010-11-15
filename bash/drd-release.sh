@@ -20,22 +20,22 @@ rsync -avc $DESTDIR/usr/local/lib/libabsubmit* $STONEDIR/
 rsync -avc $DESTDIR/usr/local/lib/libstone* $STONEDIR/
 rsync -avc $DESTDIR/usr/local/lib/libclasses* $STONEDIR/
 rsync -avc $DESTDIR/usr/local/lib/libbrainiac* $STONEDIR/
-rsync -rtvc --exclude=.svn cpp/lib/stone/include $STONEDIR/
-rsync -rtvc --exclude=.svn cpp/lib/stone/.out/*.h $STONEDIR/include/
-rsync -rtvc $DESTDIR/usr/bin/sip $STONEDIR/sip
-rsync -rtvc --exclude=.svn $SIPPATH/ $STONEDIR/sip.include/
-rsync -rtvc --exclude=.svn cpp/lib/stonegui/include $STONEDIR/
-rsync -rtvc --exclude=.svn cpp/lib/stonegui/.out/*.h $STONEDIR/include/
+rsync -rvc --exclude=.svn cpp/lib/stone/include $STONEDIR/
+rsync -rvc --exclude=.svn cpp/lib/stone/.out/*.h $STONEDIR/include/
+rsync -rvc $DESTDIR/usr/bin/sip $STONEDIR/sip
+rsync -rvc --exclude=.svn $SIPPATH/ $STONEDIR/sip.include/
+rsync -rvc --exclude=.svn cpp/lib/stonegui/include $STONEDIR/
+rsync -rvc --exclude=.svn cpp/lib/stonegui/.out/*.h $STONEDIR/include/
 
-rsync -avc cpp/apps/classmaker/classmaker $STONEDIR/
-rsync -avc cpp/apps/classmaker/classmaker.ini $STONEDIR/
+rsync -vc cpp/apps/classmaker/classmaker $STONEDIR/
+rsync -vc cpp/apps/classmaker/classmaker.ini $STONEDIR/
 mkdir $STONEDIR/templates
-rsync -avc cpp/apps/classmaker/templates/* $STONEDIR/templates/
+rsync -rvc cpp/apps/classmaker/templates/* $STONEDIR/templates/
 
 echo '***' release python libs
-rsync -acv --exclude=wx* $DESTDIR/$PYPATH/blur /drd/software/ext/python/$ARCH/2.5/stone/$V/
-rsync -acv $DESTDIR/$PYPATH/sipconfig.py /drd/software/ext/python/$ARCH/2.5/stone/$V/
-rsync -acv $DESTDIR/$PYPATH/stoneconfig.py /drd/software/ext/python/$ARCH/2.5/stone/$V/
+rsync -rcv --exclude=wx* $DESTDIR/$PYPATH/blur /drd/software/ext/python/$ARCH/2.5/stone/$V/
+rsync -rcv $DESTDIR/$PYPATH/sipconfig.py /drd/software/ext/python/$ARCH/2.5/stone/$V/
+rsync -rcv $DESTDIR/$PYPATH/stoneconfig.py /drd/software/ext/python/$ARCH/2.5/stone/$V/
 
 echo '***' release applications
 DIR=/drd/software/ext/ab/$ARCH/$V
@@ -43,10 +43,10 @@ mkdir $DIR
 rsync -cv cpp/apps/assburner_1_3/assburner $DIR/ab
 rsync -cv cpp/apps/assburner_1_3/assburner.ini $DIR/ab.ini
 rsync -cv cpp/apps/assburner_1_3/ab-offline.py $DIR/
-rsync -avc --exclude=.svn cpp/apps/assburner_1_3/plugins/ $DIR/plugins/
+rsync -rvc --exclude=.svn cpp/apps/assburner_1_3/plugins/ $DIR/plugins/
 rsync -cv cpp/apps/assfreezer/assfreezer $DIR/af
 rsync -cv cpp/apps/assfreezer/assfreezer.ini $DIR/assfreezer.ini
-rsync -avc --exclude=.svn cpp/apps/assfreezer/afplugins/ $DIR/afplugins/
+rsync -rvc --exclude=.svn cpp/apps/assfreezer/afplugins/ $DIR/afplugins/
 
 rsync -cv cpp/apps/absubmit/absubmit $DIR/
 rsync -cv cpp/apps/absubmit/py2ab.py $DIR/
@@ -57,6 +57,8 @@ rsync -cv cpp/apps/absubmit/nukesubmit/*ui $DIR/nukesubmit/
 
 rsync -cv python/scripts/manager.py $DIR/
 rsync -cv python/scripts/reaper.py $DIR/
+rsync -cv python/scripts/reaper_plugin_factory.py $DIR/
+rsync -rcv python/scripts/reaper_plugins/ $DIR/reaper_plugins/
 rsync -cv python/scripts/reclaim_tasks.py $DIR/
 rsync -cv python/scripts/initab.py $DIR/
 
