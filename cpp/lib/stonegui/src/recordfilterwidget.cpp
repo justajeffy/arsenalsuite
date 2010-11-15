@@ -159,6 +159,17 @@ void RecordFilterWidget::filterRows()
     }
 }
 
+void RecordFilterWidget::clearFilters()
+{
+	int mapSize = mFilterMap.size();
+	for ( int col = 0; col < mapSize; col++ ) {
+		QLineEdit *filter = qobject_cast<QLineEdit*> (mFilterMap[col]);
+
+		if ( filter ) 
+			filter->clear();
+	}
+}
+
 void RecordFilterWidget::setTabOrder()
 {
     QLineEdit *prev = NULL;

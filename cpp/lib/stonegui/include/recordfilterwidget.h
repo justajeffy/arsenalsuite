@@ -52,6 +52,7 @@ public slots:
     void moveColumn(int, int, int);
     void textFilterChanged();
     void filterRows();
+    void clearFilters();
 
 private:
 	void setTabOrder();

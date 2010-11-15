@@ -38,6 +38,7 @@ public:
 	QAction* VNCHostsAction;
 	QAction* ClientUpdateAction;
 	QAction* FilterAction;
+	QAction* FilterClearAction;
 
 	QAction* SubmitBatchJobAction;
 	QAction* ShowHostInfoAction;
@@ -69,6 +70,7 @@ public slots:
 	void setHostsClientUpdate();
 
     void toggleFilter(bool);
+    void clearFilters();
 
 	/// opens vncviewer sessions to selected hosts
 	void vncHosts();

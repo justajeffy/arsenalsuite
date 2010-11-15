@@ -118,6 +118,10 @@ void JobListWidget::initializeViews()
 		FilterAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
 		connect( FilterAction, SIGNAL( triggered(bool) ), SLOT( toggleFilter(bool) ) );
 
+        FilterClearAction = new QAction( "Clear Filters", this );
+		FilterClearAction->setShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_F ) );
+		connect( FilterClearAction, SIGNAL( triggered(bool) ), SLOT( clearFilters() ) );
+
         NewViewFromSelectionAction = new QAction( "New View From Selection", this );
 		NewViewFromSelectionAction->setIcon( QIcon( ":/images/newview" ) );
         connect( NewViewFromSelectionAction, SIGNAL( triggered(bool) ), SLOT( createNewViewFromSelection() ) );
@@ -312,6 +316,7 @@ void JobListWidget::setDependencyTreeEnabled( bool dte, bool allowRefresh )
 
 		DependencyTreeEnabledAction->setChecked( dte );
 		mJobTree->setRootIsDecorated( dte );
+
 		if( allowRefresh && dte ) refresh();
 	}
 }
@@ -528,6 +533,7 @@ void JobListWidget::populateViewMenu( QMenu * viewMenu )
 	viewMenu->addSeparator();
 	viewMenu->addAction( ShowMineAction );
 	viewMenu->addAction( FilterAction );
+	viewMenu->addAction( FilterClearAction );
 	{
 		QMenu * filterMenu = viewMenu->addMenu( "Job Filters" );
 		filterMenu->addMenu( mProjectFilterMenu );
@@ -981,4 +987,11 @@ void JobListWidget::toggleFilter(bool enable)
     mJobTree->enableFilterWidget(enable);
     mFrameTree->enableFilterWidget(enable);
     mErrorTree->enableFilterWidget(enable);
+}
+
+void JobListWidget::clearFilters()
+{
+	mJobTree->mRecordFilterWidget->clearFilters();
+	mFrameTree->mRecordFilterWidget->clearFilters();
+	mErrorTree->mRecordFilterWidget->clearFilters();
 }

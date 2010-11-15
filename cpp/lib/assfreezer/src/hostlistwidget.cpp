@@ -60,6 +60,9 @@ HostListWidget::HostListWidget( QWidget * parent )
     FilterAction->setCheckable( TRUE );
     FilterAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
 
+    FilterClearAction = new QAction( "Clear Filter", this );
+    FilterClearAction->setShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_F ) );
+
 	SubmitBatchJobAction = new QAction( "Assign Batch Job", this );
 	ShowHostInfoAction = new QAction( "Host Info...", this );
 	ClearHostErrorsSetOfflineAction = new QAction( "Clear All Errors From Host and Set It Offline", this );
@@ -78,6 +81,7 @@ HostListWidget::HostListWidget( QWidget * parent )
 	connect( VNCHostsAction, SIGNAL( triggered(bool) ), SLOT( vncHosts() ) );
 	connect( ShowJobsAction, SIGNAL(triggered(bool)), SLOT( showAssignedJobs() ) );
     connect( FilterAction, SIGNAL( triggered(bool) ), SLOT( toggleFilter(bool) ) );
+    connect( FilterClearAction, SIGNAL( triggered(bool) ), SLOT( clearFilters() ) );
 
 	mHostTree = new RecordTreeView(this);
 	QLayout * vbox = new QVBoxLayout(this);
@@ -263,6 +267,7 @@ void HostListWidget::populateViewMenu( QMenu * viewMenu )
 	viewMenu->addMenu( mHostServiceFilterMenu );
 	viewMenu->addSeparator();
 	viewMenu->addAction( FilterAction );
+	viewMenu->addAction( FilterClearAction );
 }
 
 void HostListWidget::setHostsStatus(const QString & status)
@@ -408,4 +413,9 @@ void HostListWidget::showHostPopup(const QPoint & point)
 void HostListWidget::toggleFilter(bool enable)
 {
     mHostTree->enableFilterWidget(enable);
+}
+
+void HostListWidget::clearFilters()
+{
+    mHostTree->mRecordFilterWidget->clearFilters();
 }

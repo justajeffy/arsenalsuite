@@ -64,6 +64,7 @@ public:
 	QAction* ResumeAction;
 	QAction* ShowOutputAction;
 	QAction* FilterAction;
+	QAction* FilterClearAction;
 	QAction* ShowMineAction;
 	QAction* ClearErrorsAction;
 	QAction* DependencyTreeEnabledAction;
@@ -144,6 +145,7 @@ public slots:
 	void createNewViewFromSelection();
 
     void toggleFilter(bool);
+    void clearFilters();
 
 	void setFrameCacheStatus(int,int);
 
