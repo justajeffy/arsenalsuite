@@ -249,7 +249,7 @@ class MayaRenderDialog(QDialog):
 			QMessageBox.critical(self, 'Invalid Frame List', 'Frame Lists are comma separated lists of either "XXX", or "XXX-YYY"' )
 			return
 
-		self.saveSettings()
+		#self.saveSettings()
 
 		melString = str(cmds.getAttr("defaultRenderGlobals.preRenderMel"))
 		if melString.find("M2AB") == -1:

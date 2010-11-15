@@ -102,7 +102,9 @@ void HostItem::setup( const Record & r, const QModelIndex &, bool loadJob ) {
 QString HostItem::jobName() const
 {
 	if( !jobsLoaded ) {
-        _jobName = host.activeAssignments().jobs().unique().names().join(", ");
+        // why is this so slow?
+        _jobName = host.hostStatus().activeAssignmentCount() > 0 ? QString::number( host.hostStatus().activeAssignmentCount() ) : "";
+        //host.activeAssignments().jobs().unique().names().join(", ");
 		jobsLoaded = true;
 	}
 	return _jobName;

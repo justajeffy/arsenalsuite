@@ -306,8 +306,9 @@ void MainWindow::closeEvent( QCloseEvent * ce )
 	ini.popSection();
 
 	ini.pushSection("Assfreezer");
+    ini.writeString("Version","10546");
 	ini.popSection();
-	
+
 	saveViews();
 }
 
@@ -350,31 +351,61 @@ void MainWindow::keyPressEvent( QKeyEvent * event )
 void MainWindow::saveViews()
 {
 	IniConfig & ini = userConfig();
+
+    // Remove the entire section to remove old entries that are above our current view count
+    ini.removeSection( "Assfreezer_Open_Views" );
+
 	ini.pushSection("Assfreezer_Open_Views");
 	ini.writeInt("ViewCount",mViews.size());
-	ini.writeString("CurrentView",mCurrentView ? mCurrentView->viewName() : QString());
+    if( mCurrentView )
+        ini.writeString("CurrentView", mCurrentView->viewCode());
 	LOG_5( "Saving " + QString::number( mViews.size() ) + " views" );
 	int i = 0;
 	foreach( AssfreezerView * view, mViews ) {
 		++i;
-		LOG_5( "Saving View " + view->viewName() );
-		ini.writeString( QString("ViewName%1").arg(i), view->viewName() );
-		ini.pushSection("View_" + view->viewName());
+        LOG_5( "Saving View " + view->viewName() + " Code: " + view->viewCode() );
+        ini.writeString( QString("ViewCode%1").arg(i), view->viewCode() );
+        ini.pushSection("View_" + view->viewCode());
 		view->save(ini);
 		ini.popSection();
 	}
 	ini.popSection();
 
+    ini.removeSection("Assfreezer_Saved_Views");
 	ini.pushSection("Assfreezer_Saved_Views");
 	ViewManager::instance()->writeSavedViews(ini);
 	ini.popSection();
+
+    foreach( QString section, ini.sections() ) {
+        if( !section.startsWith( "View_" ) ) continue;
+
+        QString code = section.mid(5);
+        if( code.contains( ":" ) )
+            code = code.left( code.indexOf(":") );
+
+        if( ViewManager::instance()->hasSavedView(code) )
+            continue;
+
+        bool isOpenView = false;
+        foreach( AssfreezerView * view, mViews ) {
+            if( view->viewCode() == code ) {
+                isOpenView = true;
+                break;
+            }
+        }
+
+        if( isOpenView ) continue;
+
+        // Not an open or saved view, so remove it
+        ini.removeSection( section );
+        }
 }
 
 void MainWindow::saveView( AssfreezerView * view )
 {
 	LOG_5( "Saving View " + view->viewName() );
 	IniConfig & ini = userConfig();
-	ini.pushSection("View_" + view->viewName());
+	ini.pushSection("View_" + view->viewCode());
 	view->save(ini);
 	ini.popSection();
 }
@@ -383,21 +414,38 @@ void MainWindow::restoreViews()
 {
 	IniConfig & ini = userConfig();
 
+    ini.pushSection("Assfreezer");
+    bool upgradeMode = ini.readInt( "Version" ) < 10545;
+    ini.popSection();
+
 	ini.pushSection("Assfreezer_Saved_Views");
 	ViewManager::instance()->readSavedViews(ini);
 	ini.popSection();
 
 	AssfreezerView * currentView = 0;
 	ini.pushSection("Assfreezer_Open_Views");
-	QString currentViewName = ini.readString("CurrentView");
-	int viewCount = ini.readInt("ViewCount");
-	for( int i = 1; i <= viewCount; ++i ) {
-		QString viewName = ini.readString(QString("ViewName%1").arg(i));
-		if( viewName.isEmpty() ) continue;
-		AssfreezerView * view = restoreSavedView( viewName, false );
-		if( !currentView || viewName == currentViewName )
-			currentView = view;
-	}
+    if( upgradeMode ) {
+        QString currentViewName = ini.readString("CurrentView");
+        int viewCount = ini.readInt("ViewCount");
+        for( int i = 1; i <= viewCount; ++i ) {
+            QString viewName = ini.readString(QString("ViewName%1").arg(i));
+            if( viewName.isEmpty() ) continue;
+            AssfreezerView * view = restoreSavedView( viewName, false );
+            view->setViewCode( AssfreezerView::generateViewCode() );
+            if( !currentView || viewName == currentViewName )
+                currentView = view;
+       }
+    } else {
+        QString currentViewCode = ini.readString("CurrentView");
+        int viewCount = ini.readInt("ViewCount");
+        for( int i = 1; i <= viewCount; ++i ) {
+            QString viewCode = ini.readString(QString("ViewCode%1").arg(i));
+            if( viewCode.isEmpty() ) continue;
+            AssfreezerView * view = restoreSavedView( viewCode, false );
+            if( !currentView || viewCode == currentViewCode )
+                currentView = view;
+        }
+    }
 
 	ini.popSection();
 
@@ -406,25 +454,26 @@ void MainWindow::restoreViews()
 		insertView(new JobListWidget(this));
 		insertView(new HostListWidget(this));
 	}
-	
+
 	if( currentView )
 		setCurrentView(currentView);
 	checkViewModeChange();
 }
 
-AssfreezerView * MainWindow::restoreSavedView( const QString & viewName, bool updateWindow )
+AssfreezerView * MainWindow::restoreSavedView( const QString & viewCode, bool updateWindow )
 {
 	IniConfig & ini = userConfig();
-	ini.pushSection("View_" + viewName);
-	AssfreezerView * view = restoreView( ini, viewName, updateWindow );
+	ini.pushSection("View_" + viewCode);
+	AssfreezerView * view = restoreView( ini, viewCode, updateWindow );
 	ini.popSection();
 	return view;
 }
 
-AssfreezerView * MainWindow::restoreView( IniConfig & viewDesc, const QString & viewName, bool updateWindow )
+AssfreezerView * MainWindow::restoreView( IniConfig & viewDesc, const QString & viewCode, bool updateWindow )
 {
 	QString type = viewDesc.readString( "ViewType" );
-	LOG_5( "Restoring View " + viewName + " type: " + type );
+    QString name = viewDesc.readString( "ViewName" );
+    LOG_5( "Restoring View " + name + " code: " + viewCode + " type: " + type );
 	AssfreezerView * view = 0;
 	if( type == "HostList" )
 		view = new HostListWidget(this);
@@ -432,7 +481,8 @@ AssfreezerView * MainWindow::restoreView( IniConfig & viewDesc, const QString & 
 		view = new JobListWidget(this);
 	if( view ) {
         view->setViewConfig( viewDesc );
-		view->setViewName( viewName );
+		view->setViewName( name );
+		view->setViewCode( viewCode );
 		view->restore(viewDesc);
 		insertView(view,updateWindow);
 	} else
@@ -450,7 +500,9 @@ void MainWindow::cloneView( AssfreezerView * view )
 {
 	IniConfig empty;
 	view->save(empty);
-	restoreView(empty, view->viewName());
+    view = restoreView(empty, view->viewCode());
+    // Give it a unique code
+    view->setViewCode( AssfreezerView::generateViewCode() );
 }
 
 void MainWindow::insertView( AssfreezerView * view, bool checkViewModeCheckCurrent )
@@ -493,12 +545,6 @@ bool MainWindow::checkViewModeChange()
 void MainWindow::removeView( AssfreezerView * view )
 {
 	mViews.removeAll( view );
-	// Remove the view settings from the ini file if it's not a saved view
-	// since all open views will be resaved on close
-	if( !ViewManager::instance()->savedViews().contains( view->viewName() ) ) {
-		IniConfig & ini = userConfig();
-		ini.removeSection( "View_" + view->viewName() );
-	}
 	if( view == mCurrentView )
 		setCurrentView( mViews.size() ? mViews[0] : 0 );
 	if( mStackedWidget )
@@ -709,18 +755,6 @@ void MainWindow::renameView( AssfreezerView * view )
 				continue;
 			}
 
-			bool viewOpen = false;
-			foreach( AssfreezerView * v, mViews )
-				if( v != view && v->viewName() == newViewName ) {
-					viewOpen = true;
-					break;
-				}
-
-			if( viewOpen ) {
-				QMessageBox::warning( this, "Invalid View Name", "There is already an open view named '" + newViewName + "'" );
-				continue;
-			}
-
 			view->setViewName( newViewName );
 
 			if( mTabWidget ) {
@@ -748,25 +782,15 @@ void MainWindow::saveViewAs( AssfreezerView * view )
 				continue;
 			}
 
-			bool viewOpen = false;
-			foreach( AssfreezerView * v, mViews )
-				if( v != view && v->viewName() == newViewName ) {
-					viewOpen = true;
-					break;
-				}
-
-			if( viewOpen ) {
-				QMessageBox::warning( this, "Invalid View Name", "There is already an open view named '" + newViewName + "'" );
-				continue;
-			}
-
-			if( ViewManager::instance()->savedViews().contains( newViewName ) ) {
+			if( ViewManager::instance()->savedViewNames().contains( newViewName ) ) {
 				QMessageBox::StandardButton result = QMessageBox::question( this, "Overwrite '" + newViewName + "'?", "There is already a saved view named '" + newViewName + "'.  Do you wish to overwrite it?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel );
 				if( result == QMessageBox::Cancel )
 					return;
 
 				if( result == QMessageBox::No )
 					continue;
+
+                ViewManager::instance()->removeSavedView( newViewName );
 			}
 			view->setViewName( newViewName );
 
@@ -774,9 +798,9 @@ void MainWindow::saveViewAs( AssfreezerView * view )
 				int idx = mTabWidget->indexOf(view);
 				mTabWidget->setTabText(idx,newViewName);
 			}
-		
+
 			saveView( view );
-			ViewManager::instance()->addSavedView( newViewName );
+			ViewManager::instance()->addSavedView( newViewName, view->viewCode() );
 		}
 		break;
 	}
@@ -867,10 +891,10 @@ void MainWindow::populateViewMenu()
 void MainWindow::populateRestoreViewMenu()
 {
 	mRestoreViewMenu->clear();
-	QStringList views = ViewManager::instance()->savedViews();
+	QStringList views = ViewManager::instance()->savedViewNames();
 	views.sort();
 	foreach( QString viewName, views )
-		mRestoreViewMenu->addAction( viewName );	
+		mRestoreViewMenu->addAction( viewName );
 }
 
 void MainWindow::restoreViewActionTriggered(QAction * action)

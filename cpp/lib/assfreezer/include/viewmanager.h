@@ -18,15 +18,22 @@ public:
 	
 	void writeSavedViews( IniConfig & );
 
-	void addSavedView( const QString & viewName );
+	void addSavedView( const QString & viewName, const QString & viewCode );
+	void removeSavedViewByCode( const QString & viewCode );
 	void removeSavedView( const QString & viewName );
 
 	QString generateViewName( const QString & suggestion );
 
-	QStringList savedViews();
+	QList< QPair< QString, QString > > savedViews();
 
+	QStringList savedViewNames();
+	
+	bool hasSavedView( const QString & viewCode );
+	
 protected:
-	QStringList mSavedViews;
+
+	typedef QPair<QString,QString> StringPair;
+	QList<StringPair> mSavedViews;
 
 	static ViewManager * mInstance;
 };
