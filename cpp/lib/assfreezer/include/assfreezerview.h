@@ -21,6 +21,10 @@ public:
 
 	virtual QString viewType() const = 0;
 
+    static QString generateViewCode();
+    QString viewCode() const;
+    void setViewCode( const QString & viewCode );
+
 	QString viewName() const;
 	void setViewName( const QString & );
 
@@ -62,6 +66,7 @@ protected:
 	int mNextPopupNumber;
 
 	QString mViewName, mStatusBarMessage;
+    mutable QString mViewCode;
 	bool mRefreshScheduled;
 	int mRefreshCount;
     IniConfig mIniConfig;

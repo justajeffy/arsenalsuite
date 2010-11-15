@@ -833,8 +833,8 @@ void AssfreezerTaskMenu::slotActionTriggered( QAction * action )
 
         JobList jobs = mTasks.jobs().unique();
         foreach( Job j, jobs ) {
-            if( j.status() == "done" ) {
-                j.setStatus( "started" );
+            if( j.status() == "done" || j.status() == "deleted" ) {
+                j.setStatus( "verify" );
                 j.commit();
             }
             JobHistory jh;
