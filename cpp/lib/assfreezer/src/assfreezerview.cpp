@@ -63,7 +63,7 @@ void AssfreezerView::doRefresh()
 
 IniConfig & AssfreezerView::viewConfig()
 {
-    //mIniConfig.setSection( "View_" + mViewName );
+    //mIniConfig.setSection( "View_" + viewCode() );
     return mIniConfig;
 }
 

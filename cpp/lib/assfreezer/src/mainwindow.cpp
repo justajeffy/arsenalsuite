@@ -430,8 +430,13 @@ void MainWindow::restoreViews()
         for( int i = 1; i <= viewCount; ++i ) {
             QString viewName = ini.readString(QString("ViewName%1").arg(i));
             if( viewName.isEmpty() ) continue;
-            AssfreezerView * view = restoreSavedView( viewName, false );
-            view->setViewCode( AssfreezerView::generateViewCode() );
+            QString newViewCode = AssfreezerView::generateViewCode();
+            foreach( QString section, ini.sections() ) {
+                QString subSection = "View_" + viewName;
+                if( section.startsWith( subSection + ":") || section == subSection )
+                    ini.copySection( section, "View_" + newViewCode + section.mid(subSection.size()) );
+            }
+            AssfreezerView * view = restoreSavedView( newViewCode, false );
             if( !currentView || viewName == currentViewName )
                 currentView = view;
        }
