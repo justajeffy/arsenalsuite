@@ -178,8 +178,7 @@ void HostListWidget::customEvent( QEvent * evt )
 			mServiceDataRetrieved = true;
 			StaticHostListDataTask * sdt = (StaticHostListDataTask*)evt;
 			mServiceList = sdt->mServices;
-			IniConfig & ini = userConfig();
-			ini.pushSection( "View_" + viewName() );
+            IniConfig & ini = viewConfig();
 			// Show All Services by default
 			mServiceFilter = verifyKeyList( ini.readString( "ServiceFilter", mServiceList.keyString() ), Service::table() );
 			ini.popSection();
