@@ -40,7 +40,7 @@ class QFile;
 class QMenu;
 class QCloseEvent;
 
-const QString VERSION("1.4.1");
+const QString VERSION("1.4.3");
 
 /* Note:
  * init() must be called after construction
