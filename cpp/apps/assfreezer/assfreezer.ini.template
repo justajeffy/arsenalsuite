@@ -10,6 +10,9 @@ Password=yourdbpasswd
 Port=5432
 Timeout=2
 User=yourdbuser
+ReconnectDelay=30
+SqlErrorEmailList=barry.robison@drdstudios.com
+
 
 [Display Prefs]
 Icon Size=16,16
@@ -20,7 +23,7 @@ Enabled=true
 File=/tmp/assfreezer.log
 MaxFiles=10
 MaxSeverity=3
-MaxSize=10485760
+MaxSize=104857600
 
 [Update Server]
 Enabled=false
