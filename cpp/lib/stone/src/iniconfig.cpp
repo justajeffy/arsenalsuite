@@ -150,8 +150,10 @@ QString IniConfig::currentSection() const
 
 void IniConfig::popSection()
 {
-	mSection = mSectionStack.back();
-	mSectionStack.pop_back();
+    if( mSectionStack.size() ) {
+        mSection = mSectionStack.back();
+        mSectionStack.pop_back();
+    }
 }
 
 QStringList IniConfig::sections() const
