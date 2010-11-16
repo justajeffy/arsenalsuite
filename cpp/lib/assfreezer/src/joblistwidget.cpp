@@ -120,6 +120,7 @@ void JobListWidget::initializeViews()
 
         FilterClearAction = new QAction( "Clear Filters", this );
 		FilterClearAction->setShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_F ) );
+		FilterClearAction->setIcon( QIcon( ":images/filterclear" ) );
 		connect( FilterClearAction, SIGNAL( triggered(bool) ), SLOT( clearFilters() ) );
 
         NewViewFromSelectionAction = new QAction( "New View From Selection", this );
@@ -517,6 +518,7 @@ QToolBar * JobListWidget::toolBar( QMainWindow * mw )
 		mToolBar->addAction( RestartAction );
 		mToolBar->addSeparator();
 		mToolBar->addAction( FilterAction );
+		mToolBar->addAction( FilterClearAction );
 		mToolBar->addAction( ShowMineAction );
 		mToolBar->addSeparator();
 		mToolBar->addAction( DependencyTreeEnabledAction );
