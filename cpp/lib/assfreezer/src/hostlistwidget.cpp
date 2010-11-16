@@ -60,7 +60,8 @@ HostListWidget::HostListWidget( QWidget * parent )
     FilterAction->setCheckable( TRUE );
     FilterAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_F ) );
 
-    FilterClearAction = new QAction( "Clear Filter", this );
+    FilterClearAction = new QAction( "Clear Filters", this );
+	FilterClearAction->setIcon( QIcon( ":/images/filterclear" ) );
     FilterClearAction->setShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_F ) );
 
 	SubmitBatchJobAction = new QAction( "Assign Batch Job", this );
@@ -257,6 +258,7 @@ QToolBar * HostListWidget::toolBar( QMainWindow * mw )
 		mToolBar->addAction( VNCHostsAction );
 		mToolBar->addSeparator();
 		mToolBar->addAction( FilterAction );
+		mToolBar->addAction( FilterClearAction );
 	}
 	return mToolBar;
 }
