@@ -1,6 +1,6 @@
 from blur.Stone import *
 from blur.Classes import *
-from blur.Assburner import *
+from blur.Burner import *
 from PyQt4.QtCore import *
 from PyQt4.QtSql import *
 from PyQt4.QtGui import QApplication

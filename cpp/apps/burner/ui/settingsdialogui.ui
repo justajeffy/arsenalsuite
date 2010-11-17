@@ -27,7 +27,7 @@
    </size>
   </property>
   <property name="windowTitle" >
-   <string>Assburner Client Settings</string>
+   <string>Burner Client Settings</string>
   </property>
   <property name="windowIcon" >
    <iconset/>
@@ -60,7 +60,7 @@
      <item row="2" column="0" >
       <widget class="QLabel" name="textLabel1_4" >
        <property name="text" >
-        <string>Assfreezer Path:</string>
+        <string>Freezer Path:</string>
        </property>
       </widget>
      </item>

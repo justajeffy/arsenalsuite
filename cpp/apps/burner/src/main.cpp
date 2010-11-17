@@ -83,12 +83,12 @@ const char * ABPSMON = "abpsmon";
 #endif
 
 
-// Returns true if there isn't another assburner.exe running
+// Returns true if there isn't another burner.exe running
 bool startup( bool usePsmon, bool daemonize, bool useSingleProcessMutex )
 {
 #ifdef Q_OS_WIN
 	if( useSingleProcessMutex ) {
-		hMutex = CreateMutex( NULL, true, L"AssFreezerSingleProcess");
+		hMutex = CreateMutex( NULL, true, L"FreezerSingleProcess");
 		if (hMutex == NULL) {
 			LOG_3( "Error: Couldn't create mutex, exiting" );
 			return false;
@@ -104,7 +104,7 @@ bool startup( bool usePsmon, bool daemonize, bool useSingleProcessMutex )
 		LOG_1( "Error Loading exchndl.dll(Crash Handler) Error Was: " + excdll.errorString() );
 	}
 #endif
-	disableWindowsErrorReporting( "assburner.exe" );
+	disableWindowsErrorReporting( "burner.exe" );
 	//signal(SIGABRT,abrt_handler);
 #endif
 	if( !daemonize && usePsmon && pidsByName( ABPSMON ) == 0 )
@@ -154,9 +154,9 @@ int main(int argc, char * argv[])
 	// Burn Only param
 	int jobAssignmentKey = 0;
 #ifdef Q_OS_WIN
-	QString configFile = "assburner.ini";
+	QString configFile = "burner.ini";
 #else
-	QString configFile = "/etc/assburner.ini";
+	QString configFile = "/etc/burner.ini";
 #endif
 	for( int i = 1; i<argc; i++ ){
 		QString arg( argv[i] );
@@ -194,9 +194,9 @@ int main(int argc, char * argv[])
 		else if( arg == "-output-schema" && (i+1 < argc) )
 			return 0;
 		else if( arg == "-nogui" )
-			gui = false;	
+			gui = false;
 		else if( arg == "-auto-register" )
-			autoRegister = true;	
+			autoRegister = true;
 		else if( arg == "-no-psmon" )
 			usePsmon = false;
 		else if( arg == "-daemonize" ) {
@@ -227,7 +227,7 @@ int main(int argc, char * argv[])
 	// Use default log file from config file unless we are in burn only mode
 	QString logFile;
 	if( burnOnlyMode )
-		logFile = "assburner_burn_" + QString::number( jobAssignmentKey ) + ".log";
+		logFile = "burner_burn_" + QString::number( jobAssignmentKey ) + ".log";
 
 #ifdef Q_OS_WIN
 	initConfig( configFile, logFile );
@@ -249,13 +249,13 @@ int main(int argc, char * argv[])
 			proc->setLogonFlag( Win32Process::LogonWithProfile );
 			QString user = ini.readString( "Username" ), domain = ini.readString( "Domain" );
 			proc->setLogon( user, ini.readString( "Password" ), domain );
-			proc->start( "c:\\blur\\assburner\\assburner.exe", QStringList() << "-in-new-logon-session" );
+			proc->start( "c:\\blur\\burner\\burner.exe", QStringList() << "-in-new-logon-session" );
 			if( proc->isRunning() ) {
 				if( !domain.isEmpty() ) user += "/" + domain;
-				LOG_1( "Assburner started in new logon session as user " + user + ", pid is " + QString::number( proc->pid()->dwProcessId ) );
+				LOG_1( "Burner started in new logon session as user " + user + ", pid is " + QString::number( proc->pid()->dwProcessId ) );
 				return 0;
 			}
-			LOG_5( "Unable to start assburner in new logon session" );
+			LOG_5( "Unable to start burner in new logon session" );
 			return 1;
 		}
 		ini.popSection();

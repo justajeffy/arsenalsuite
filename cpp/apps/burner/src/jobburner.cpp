@@ -780,7 +780,7 @@ void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessCh
 		mJobAssignment.setRealtime( int(jobStats[2].toFloat() * 1000) );
 		mJobAssignment.setUsertime( int(jobStats[4].toFloat() * 1000) );
 		mJobAssignment.setSystime( int(jobStats[6].toFloat() * 1000) );
-        mJobAssignment.setEfficiency( (mJobAssignment.userTime() + mJobAssignment.systime()) / (mJobAssignment.realTime() > 0 ? mJobAssignment.realTime() : 1) );
+        mJobAssignment.setEfficiency( (mJobAssignment.usertime() + mJobAssignment.systime()) / (mJobAssignment.realtime() > 0 ? mJobAssignment.realtime() : 1) );
 		mJobAssignment.commit();
 	}
 #endif
