@@ -1,5 +1,5 @@
 
-%Module blur.Assburner 0
+%Module blur.Burner 0
 
 %Import QtCore/QtCoremod.sip
 %Import QtGui/QtGuimod.sip

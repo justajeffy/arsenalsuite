@@ -240,7 +240,7 @@ extern "C" void initsip(void);
 extern "C" void initStone(void);
 extern "C" void initClasses(void);
 #endif
-extern "C" void initAssburner(void);
+extern "C" void initBurner(void);
 
 void Slave::loadEmbeddedPython()
 {
@@ -255,7 +255,7 @@ void Slave::loadEmbeddedPython()
 		{"blur.Stone",initStone},
 		{"blur.Classes",initClasses},
 #endif
-		{"blur.Assburner", initAssburner},
+		{"blur.Burner", initBurner},
 		{NULL, NULL}
 	};
 
@@ -273,7 +273,7 @@ void Slave::loadEmbeddedPython()
 		"\t\tself.modules['blur.Stone'] = imp.load_module('blur.Stone',None,'',('','',imp.C_BUILTIN))\n"
 		"\t\tself.modules['blur.Classes'] = imp.load_module('blur.Classes',None,'',('','',imp.C_BUILTIN))\n"
 
-		"\t\tself.modules['blur.Assburner'] = imp.load_module('blur.Assburner',None,'',('','',imp.C_BUILTIN))\n"
+		"\t\tself.modules['blur.Burner'] = imp.load_module('blur.Burner',None,'',('','',imp.C_BUILTIN))\n"
 		"\tdef find_module(self,fullname,path=None):\n"
 //		"\t\tprint 'MetaLoader.find_module: ', fullname, path\n"
 		"\t\tif fullname in self.modules:\n"
@@ -288,7 +288,7 @@ void Slave::loadEmbeddedPython()
 		"\tdef __init__(self):\n"
 		"\t\tself.modules = {}\n"
 //  blur.Stone and blur.Classes dynamically loaded
-		"\t\tself.modules['blur.Assburner'] = imp.load_module('blur.Assburner',None,'',('','',imp.C_BUILTIN))\n"
+		"\t\tself.modules['blur.Burner'] = imp.load_module('blur.Burner',None,'',('','',imp.C_BUILTIN))\n"
 		"\tdef find_module(self,fullname,path=None):\n"
 //		"\t\tprint 'MetaLoader.find_module: ', fullname, path\n"
 		"\t\tif fullname in self.modules:\n"

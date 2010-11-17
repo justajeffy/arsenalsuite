@@ -31,7 +31,6 @@ sipgencmd = " ".join([sip_bin, "-c", "sipBurner", "-b", "sipBurner/" + build_fil
 #print sipgencmd
 ret = os.system(sipgencmd)
 if ret:
-	
 	sys.exit(ret%255)
 
 # We are going to install the SIP specification file for this module and
