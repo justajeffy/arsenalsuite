@@ -1,6 +1,6 @@
 from blur.Stone import *
 from blur.Classes import *
-from blur.Assfreezer import *
+from blur.Freezer import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import re, traceback

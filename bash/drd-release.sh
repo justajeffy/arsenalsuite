@@ -44,7 +44,7 @@ rsync -cv cpp/apps/burner/burner $DIR/ab
 rsync -cv cpp/apps/burner/burner.ini $DIR/ab.ini
 rsync -cv cpp/apps/burner/ab-offline.py $DIR/
 rsync -rvc --exclude=.svn cpp/apps/burner/plugins/ $DIR/plugins/
-rsync -cv cpp/apps/freezer/freezer $DIR/af
+rsync -cv cpp/apps/freezer/af $DIR/af
 rsync -cv cpp/apps/freezer/freezer.ini $DIR/freezer.ini
 rsync -rvc --exclude=.svn cpp/apps/freezer/afplugins/ $DIR/afplugins/
 

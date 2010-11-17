@@ -1,10 +1,10 @@
 # This script lives in
 # ab working version /drd/software/ext/ab/lin64/201006291443/afplugins/
-# local copy ~/arsenalsuite/cpp/apps/assfreezer/afplugins/ 
+# local copy ~/arsenalsuite/cpp/apps/freezer/afplugins/ 
 
 from blur.Stone import *
 from blur.Classes import *
-from blur.Assfreezer import *
+from blur.Freezer import *
 from PyQt4.QtCore import *
 from PyQt4.QtSql import *
 import traceback, os, sys

@@ -45,7 +45,7 @@ syntax: regexp
 .*/absubmit/absubmit.dll$
 .*/absubmit/absubmit.lib$
 .*/freezer/Makefile$
-.*/freezer/freezer$
+.*/freezer/af$
 .*/freezer/freezer.dll$
 .*/freezer/freezer.lib$
 .*/classes/Makefile$
