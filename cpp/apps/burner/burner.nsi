@@ -1,7 +1,7 @@
-; DESCRIPTION: Assburner installer script
+; DESCRIPTION: Burner installer script
 ; (C) Blur Studio 2005
 
-!define MUI_PRODUCT "Assburner"
+!define MUI_PRODUCT "Burner"
 !define MUI_VERSION "v1.3.X"
 
 !define QTDIR "C:\Qt\4.1.0\"
@@ -13,7 +13,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 
 ; Name of resulting executable installer
 OutFile "ab_install_${PLATFORM}.exe"
-InstallDir "C:\blur\assburner\"
+InstallDir "C:\blur\burner\"
 
 Page directory
 Page instfiles
@@ -22,31 +22,31 @@ Page instfiles
 
 Section "install"
     Processes::KillProcess "abpsmon.exe"
-	Processes::KillProcess "assburner.exe"
+	Processes::KillProcess "burner.exe"
 	StrCmp $R0 "0" skipsleep
 	Sleep 3000
 	skipsleep:
     Delete $INSTDIR\*.dll
     SetOutPath $INSTDIR
-	File assburner.exe
+	File burner.exe
 	File psmon\abpsmon.exe
-	File assburner.ini
+	File burner.ini
 	File runScriptJob.ms
     File ..\..\lib\stone\stone.dll
     File ..\..\lib\stonegui\stonegui.dll
     File ..\..\lib\classes\classes.dll
-	CreateShortCut "$DESKTOP\Assburner.lnk" "$INSTDIR\assburner.exe" ""
-	CreateShortCut "$QUICKLAUNCH\Assburner.lnk" "$INSTDIR\assburner.exe" ""
+	CreateShortCut "$DESKTOP\Burner.lnk" "$INSTDIR\burner.exe" ""
+	CreateShortCut "$QUICKLAUNCH\Burner.lnk" "$INSTDIR\burner.exe" ""
     SetOutPath $INSTDIR\plugins
     File /r "plugins\*.*"
-	; delete old assburner3 dir!!!
-	RMDir /r "c:\max5\assburner3"
+	; delete old burner3 dir!!!
+	RMDir /r "c:\max5\burner3"
 	; Delete everything from spool directory, then re-create it
 	RMDir /r "$INSTDIR\spool"
 	CreateDirectory "$INSTDIR\spool"
-	; Disable windows error reporting for assburner
-	DeleteRegKey HKLM "SOFTWARE\Microsoft\PCHealth\ErrorReporting\ExclusionList\assburner.exe"
-	WriteRegDWORD HKLM "SOFTWARE\Microsoft\PCHealth\ErrorReporting\ExclusionList" "assburner.exe" 1
+	; Disable windows error reporting for burner
+	DeleteRegKey HKLM "SOFTWARE\Microsoft\PCHealth\ErrorReporting\ExclusionList\burner.exe"
+	WriteRegDWORD HKLM "SOFTWARE\Microsoft\PCHealth\ErrorReporting\ExclusionList" "burner.exe" 1
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "DisplayName" "${MUI_PRODUCT} (remove only)"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "UninstallString" "$INSTDIR\uninstall.exe"
 	WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -57,8 +57,8 @@ Section "Uninstall"
 	RMDir /r "$INSTDIR\*.*"
 	RMDir "$INSTDIR"
 	
-	Delete "$DESKTOP\Assburner.lnk"
-	Delete "$QUICKLAUNCH\Assburner.lnk"
+	Delete "$DESKTOP\Burner.lnk"
+	Delete "$QUICKLAUNCH\Burner.lnk"
 	
 	;Delete Uninstaller And Unistall Registry Entries
 	DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\${MUI_PRODUCT}"
@@ -67,5 +67,5 @@ SectionEnd
 
 Section
 	SetOutPath $INSTDIR
-	ExecShell "" "$INSTDIR\assburner.exe"	
+	ExecShell "" "$INSTDIR\burner.exe"	
 SectionEnd

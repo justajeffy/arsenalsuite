@@ -20,7 +20,7 @@ Icon Size=16,16
 [Logging]
 EchoStdOut=true
 Enabled=true
-File=/tmp/assfreezer.log
+File=/tmp/freezer.log
 MaxFiles=10
 MaxSeverity=3
 MaxSize=104857600

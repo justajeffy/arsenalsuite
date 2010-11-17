@@ -1,6 +1,6 @@
 
-import assburner_1_3
+import burner
 import classmaker
-import assfreezer
+import freezer
 import absubmit
 import rum

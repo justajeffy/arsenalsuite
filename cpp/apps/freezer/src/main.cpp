@@ -237,7 +237,7 @@ int main( int argc, char * argv[] )
 	if( GetLastError() == ERROR_ALREADY_EXISTS ) {
 		LOG_5( "Error: Another process owns the mutex, exiting" );
 		QList<int> pids;
-		if( pidsByName( "assfreezer.exe", &pids ) ) {
+		if( pidsByName( "freezer.exe", &pids ) ) {
 			int otherProcessId = pids[0];
 			if( otherProcessId == processID() ) {
 				if( pids.size() < 2 )
@@ -260,15 +260,15 @@ int main( int argc, char * argv[] )
 
 	QApplication a(argc, argv);
 
-	initConfig( "assfreezer.ini" );
+	initConfig( "freezer.ini" );
 
 #ifdef Q_OS_WIN
 	QString cp = "h:/public/" + getUserName() + "/Blur";
 	if( !QDir( cp ).exists() )
 		cp = "C:/Documents and Settings/" + getUserName();
-	initUserConfig( cp + "/assfreezer.ini" );
+	initUserConfig( cp + "/freezer.ini" );
 #else
-	initUserConfig( QDir::homePath() + "/.assfreezer" );
+	initUserConfig( QDir::homePath() + "/.freezer" );
 #endif
 
     initStone( argc, argv );

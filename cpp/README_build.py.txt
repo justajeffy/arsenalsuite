@@ -59,7 +59,7 @@ blur/build/Target class ctor called on  sip
 blur/build/Target class ctor called on  sipstatic
 blur/build/Target class ctor called on  stonegui
 blur/build/Target class ctor called on  stoneguistatic
-blur/build/Target class ctor called on  libassfreezer
+blur/build/Target class ctor called on  libfreezer
 blur/build/Target class ctor called on  classesui
 blur/build/Target class ctor called on  classesuistatic
 blur/build/Target class ctor called on  assburnersvnrev
@@ -86,8 +86,8 @@ blur/build/Target class ctor called on  resinaxsvnrevnsi
 blur/build/Target class ctor called on  resinaxsvnrevpri
 blur/build/Target class ctor called on  resinax_installer
 blur/build/Target class ctor called on  resinax
-blur/build/Target class ctor called on  assfreezersvnrev
-blur/build/Target class ctor called on  assfreezersvnrevnsi
+blur/build/Target class ctor called on  freezersvnrev
+blur/build/Target class ctor called on  freezersvnrevnsi
 blur/build/Target class ctor called on  assfreezer_installer
 blur/build/Target class ctor called on  assfreezer
 blur/build/Target class ctor called on  resinsvnrev

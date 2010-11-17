@@ -2,13 +2,13 @@
 #
 # based off of -- http://www.linux.com/article.pl?sid=05/08/02/1821218
 #
-#       /etc/rc.d/init.d/assburner
-# This shell script takes care of starting and stopping assburner process
+#       /etc/rc.d/init.d/burner
+# This shell script takes care of starting and stopping burner process
 #
 # Author: Matt Newell <newellm@blur.com>
 #
 # chkconfig: 2345 20 80
-# description: Assburner - Daemon that executes assigned jobs
+# description: Burner - Daemon that executes assigned jobs
 
 # Source function library.
 . /etc/init.d/functions
@@ -20,26 +20,26 @@
 [ ${NETWORKING} = "no" ] && exit 0
 
 usage() {
-	echo "Used to start and stop Assburner"
+	echo "Used to start and stop Burner"
 	echo "Usage:"
-	echo "    service assburner (stop|start|status|restart)"
+	echo "    service burner (stop|start|status|restart)"
 	echo
 	exit 2;
 }
 
 
 start() {
-	echo -n $"Starting Assburner"
-	/usr/local/bin/assburner -daemonize
+	echo -n $"Starting Burner"
+	/usr/local/bin/burner -daemonize
 	RETVAL=$?
 	echo
-	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/assburner
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/burner
 	return $RETVAL
 }
 
 stop() {
-	echo -n $"Shutting down Assburner"
-	pid=`ps auxw |grep assburner |grep -v grep | awk '{ print $2 }'`
+	echo -n $"Shutting down Burner"
+	pid=`ps auxw |grep burner |grep -v grep | awk '{ print $2 }'`
 	if [ -n "$pid" ]; then
 		if checkpid $pid 2>&1; then
 			# term first, then kill if not dead
@@ -53,28 +53,28 @@ stop() {
 		fi
 		checkpid $pid
 		RC=$?
-		[ "$RC" -eq 0 ] && failure $"assburner shutdown" || success $"assburner shutdown"
+		[ "$RC" -eq 0 ] && failure $"burner shutdown" || success $"burner shutdown"
 		RC=$((! $RC))	
 	fi
     echo
-    rm -f /var/lock/subsys/assburner
+    rm -f /var/lock/subsys/burner
     return $RC
 }
 
 status() {
 	# first see if in process list
-	pid=`ps auxw |grep assburner |grep -v grep  | awk '{ print $2 }'`
+	pid=`ps auxw |grep burner |grep -v grep  | awk '{ print $2 }'`
 	if [ -n "$pid" ]; then
-		echo "assburner (pid $pid) is running..."
+		echo "burner (pid $pid) is running..."
 		return 0
 	fi
 
 	# See if /var/lock/subsys/manager exists
-	if [ -f /var/lock/subsys/assburner ]; then
-		echo "assburner dead but subsys locked"
+	if [ -f /var/lock/subsys/burner ]; then
+		echo "burner dead but subsys locked"
 		return 2
 	fi
-	echo "assburner is stopped"
+	echo "burner is stopped"
 	return 3
 }
 
