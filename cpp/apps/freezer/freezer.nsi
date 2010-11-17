@@ -1,9 +1,9 @@
 
 
-; DESCRIPTION: AssFreezer installer script
+; DESCRIPTION: Freezer installer script
 ; (C) Blur Studio 2005
 
-!define MUI_PRODUCT "AssFreezer"
+!define MUI_PRODUCT "Freezer"
 !define MUI_VERSION "v1.0.X"
 
 !define QTDIR "C:\Qt\4.1.0\"
@@ -14,11 +14,11 @@ Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 
 ; Name of resulting executable installer
 OutFile "af_install_${PLATFORM}.exe"
-InstallDir "C:\\blur\\assfreezer\\"
+InstallDir "C:\\blur\\freezer\\"
 
 !define MUI_FINISHPAGE
 !define MUI_FINISHPAGE_NOREBOOTSUPPORT
-!define MUI_HEADERBITMAP "assfreezer.bmp"
+!define MUI_HEADERBITMAP "freezer.bmp"
 
 ; The icon for the installer title bar and .exe file
 ;!define MUI_ICON "myapp.ico"
@@ -31,7 +31,7 @@ InstallDir "C:\\blur\\assfreezer\\"
 ; I've written a function that I want to be called when the user cancels the installation
 ;!define MUI_CUSTOMFUNCTION_ABORT myOnAbort
 ; Override the text on the Finish Page
-!define MUI_FINISHPAGE_TITLE "AssFreezer Installation Complete"
+!define MUI_FINISHPAGE_TITLE "Freezer Installation Complete"
 !define MUI_FINISHPAGE_TEXT "\n\r\nClick Finish now to close the installation program."
 
 #SilentInstall silent
@@ -39,21 +39,21 @@ InstallDir "C:\\blur\\assfreezer\\"
 !insertmacro MUI_PAGE_INSTFILES ; File installation page
 
 Section "install"
-	Processes::KillProcess "assfreezer.exe"
-	# nuke old assfreezer installs, if any
-	RMDir /r "C:\assfreezer\*.*"
-	RMDIR /r "C:\assfreezer"
-	Delete "$DESKTOP\short*assfreezer*lnk"
-	Delete "$QUICKLAUNCH\short*assfreezer*lnk"
+	Processes::KillProcess "freezer.exe"
+	# nuke old freezer installs, if any
+	RMDir /r "C:\freezer\*.*"
+	RMDIR /r "C:\freezer"
+	Delete "$DESKTOP\short*freezer*lnk"
+	Delete "$QUICKLAUNCH\short*freezer*lnk"
 	SetOutPath $INSTDIR
-	File assfreezer.exe
-  	CreateShortCut "$DESKTOP\AssFreezer 1.0.lnk" "$INSTDIR\assfreezer.exe" ""
-	CreateShortcut "$QUICKLAUNCH\AssFreezer 1.0.lnk" "$INSTDIR\assfreezer.exe" ""
-	File assfreezer.ini
+	File freezer.exe
+  	CreateShortCut "$DESKTOP\Freezer 1.0.lnk" "$INSTDIR\freezer.exe" ""
+	CreateShortcut "$QUICKLAUNCH\Freezer 1.0.lnk" "$INSTDIR\freezer.exe" ""
+	File freezer.ini
     File ..\..\lib\stone\stone.dll
     File ..\..\lib\stonegui\stonegui.dll
     File ..\..\lib\classes\classes.dll
-    File ..\..\lib\assfreezer\assfreezer.dll
+    File ..\..\lib\freezer\freezer.dll
 	File ..\..\lib\classesui\classesui.dll
 	File ..\..\lib\absubmit\absubmit.dll
 	SetOutPath $INSTDIR\images
@@ -69,8 +69,8 @@ Section "Uninstall"
 	;Delete Files and directory
 	RMDir /r "$INSTDIR\*.*"
 	RMDir "$INSTDIR"
-	Delete "$DESKTOP\AssFreezer 1.0.lnk"
-	Delete "$QUICKLAUNCH\AssFreezer 1.0.lnk"
+	Delete "$DESKTOP\Freezer 1.0.lnk"
+	Delete "$QUICKLAUNCH\Freezer 1.0.lnk"
 
 	;Delete Uninstaller And Unistall Registry Entries
 	DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\${MUI_PRODUCT}"

@@ -8,7 +8,7 @@ import PyQt4.build
 import qt_installer
 import sip
 import stonegui
-import assfreezer
+import freezer
 import classesui
 import guiplugin
 import qimageio

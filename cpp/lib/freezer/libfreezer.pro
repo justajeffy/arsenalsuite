@@ -191,7 +191,7 @@ TEMPLATE=lib
 
 CONFIG += qt thread opengl
 QT+=xml sql opengl network
-TARGET=assfreezer
+TARGET=freezer
 
 unix {
 	target.path=$$(DESTDIR)/usr/local/lib

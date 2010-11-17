@@ -1,8 +1,8 @@
-; DESCRIPTION: Assburner installer script
+; DESCRIPTION: Burner installer script
 ; (C) Blur Studion 2005
 
-!include assburner-svnrev.nsi
-!define MUI_PRODUCT "Assburner"
+!include burner-svnrev.nsi
+!define MUI_PRODUCT "Burner"
 !define MUI_VERSION "v1.3.X"
 
 !define QTDIR "C:\Qt\4.0.1c\"
@@ -13,11 +13,11 @@ Name "${MUI_PRODUCT} ${MUI_VERSION}"
 
 ; Name of resulting executable installer
 OutFile "ab_install_${MUI_SVNREV}d.exe"
-InstallDir "C:\\max5\\assburner3\\"
+InstallDir "C:\\max5\\burner3\\"
 
 #!define MUI_FINISHPAGE
 #!define MUI_FINISHPAGE_NOREBOOTSUPPORT
-#!define MUI_HEADERBITMAP "assburner.bmp"
+#!define MUI_HEADERBITMAP "burner.bmp"
 
 ; The icon for the installer title bar and .exe file
 ;!define MUI_ICON "myapp.ico"
@@ -30,23 +30,23 @@ InstallDir "C:\\max5\\assburner3\\"
 ; I've written a function that I want to be called when the user cancels the installation
 ;!define MUI_CUSTOMFUNCTION_ABORT myOnAbort
 ; Override the text on the Finish Page
-#!define MUI_FINISHPAGE_TITLE "Assburner Installation Complete"
+#!define MUI_FINISHPAGE_TITLE "Burner Installation Complete"
 #!define MUI_FINISHPAGE_TEXT "\n\r\nClick Finish now to close the installation program."
-#!define MUI_FINISHPAGE_RUN "$INSTDIR\assburner.exe"
+#!define MUI_FINISHPAGE_RUN "$INSTDIR\burner.exe"
 #!insertmacro MUI_PAGE_INSTFILES ; File installation page
 #!insertmacro MUI_PAGE_FINISH
 SilentInstall silent
 
 
 Section "install"
-	#Processes::KillProcess "assburner.exe"
+	#Processes::KillProcess "burner.exe"
 	#Processes::KillProcess "perl.exe"
 	#Sleep 3000
 	SetOutPath $INSTDIR
-	File assburner.exe
-	File assburner.ini
-	CreateShortCut "$DESKTOP\Assburner.lnk" "$INSTDIR\assburner.exe" ""
-	CreateShortCut "$QUICKLAUNCH\Assburner.lnk" "$INSTDIR\assburner.exe" ""
+	File burner.exe
+	File burner.ini
+	CreateShortCut "$DESKTOP\Burner.lnk" "$INSTDIR\burner.exe" ""
+	CreateShortCut "$QUICKLAUNCH\Burner.lnk" "$INSTDIR\burner.exe" ""
 	File "${QTDIR}\lib\QtGuid4.dll"
 	File "${QTDIR}\lib\QtNetworkd4.dll"
 	File "${QTDIR}\lib\QtSqld4.dll"
@@ -65,7 +65,7 @@ Section "install"
 	File ..\..\..\binaries\Qt\plugins\sqldrivers\qsqlpsql.dll
 
 	SetOutPath $INSTDIR\images
-	File images\assburner.png
+	File images\burner.png
 
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "DisplayName" "${MUI_PRODUCT} (remove only)"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "UninstallString" "$INSTDIR\uninstall.exe"
@@ -78,8 +78,8 @@ Section "Uninstall"
 	RMDir "$INSTDIR"
 	SetAutoClose true
 
-	Delete "$DESKTOP\Assburner.lnk"
-	Delete "$QUICKLAUNCH\Assburner.lnk"	
+	Delete "$DESKTOP\Burner.lnk"
+	Delete "$QUICKLAUNCH\Burner.lnk"
 
 	;Delete Uninstaller And Unistall Registry Entries
 	DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\${MUI_PRODUCT}"
@@ -88,5 +88,5 @@ SectionEnd
 
 Section
 	SetOutPath $INSTDIR
-	ExecShell "" "$INSTDIR\assburner.exe"	
+	ExecShell "" "$INSTDIR\burner.exe"
 SectionEnd

@@ -13,8 +13,8 @@ sipStonegui
 sipClasses
 sipClassesui
 sipBach
-sipAssburner
-sipAssfreezer
+sipBurner
+sipFreezer
 sipAbsubmit
 autocore
 svnrev.h
@@ -38,16 +38,16 @@ loader.cpp
 syntax: regexp
 
 .*/psmon/Makefile$
-.*/assburner_1_3/Makefile$
-.*/assburner_1_3/assburner$
+.*/burner/Makefile$
+.*/burner/burner$
 .*/absubmit/Makefile$
 .*/absubmit/absubmit$
 .*/absubmit/absubmit.dll$
 .*/absubmit/absubmit.lib$
-.*/assfreezer/Makefile$
-.*/assfreezer/assfreezer$
-.*/assfreezer/assfreezer.dll$
-.*/assfreezer/assfreezer.lib$
+.*/freezer/Makefile$
+.*/freezer/freezer$
+.*/freezer/freezer.dll$
+.*/freezer/freezer.lib$
 .*/classes/Makefile$
 .*/classes/sip/.*?\.sip
 .*/classesui/Makefile$

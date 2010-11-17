@@ -15,7 +15,7 @@ fi
 echo '***' release stone libs
 STONEDIR=/drd/software/ext/stone/$ARCH/$V
 mkdir $STONEDIR
-rsync -avc $DESTDIR/usr/local/lib/libass* $STONEDIR/
+rsync -avc $DESTDIR/usr/local/lib/libfreezer* $STONEDIR/
 rsync -avc $DESTDIR/usr/local/lib/libabsubmit* $STONEDIR/
 rsync -avc $DESTDIR/usr/local/lib/libstone* $STONEDIR/
 rsync -avc $DESTDIR/usr/local/lib/libclasses* $STONEDIR/
@@ -40,13 +40,13 @@ rsync -rcv $DESTDIR/$PYPATH/stoneconfig.py /drd/software/ext/python/$ARCH/2.5/st
 echo '***' release applications
 DIR=/drd/software/ext/ab/$ARCH/$V
 mkdir $DIR
-rsync -cv cpp/apps/assburner_1_3/assburner $DIR/ab
-rsync -cv cpp/apps/assburner_1_3/assburner.ini $DIR/ab.ini
-rsync -cv cpp/apps/assburner_1_3/ab-offline.py $DIR/
-rsync -rvc --exclude=.svn cpp/apps/assburner_1_3/plugins/ $DIR/plugins/
-rsync -cv cpp/apps/assfreezer/assfreezer $DIR/af
-rsync -cv cpp/apps/assfreezer/assfreezer.ini $DIR/assfreezer.ini
-rsync -rvc --exclude=.svn cpp/apps/assfreezer/afplugins/ $DIR/afplugins/
+rsync -cv cpp/apps/burner/burner $DIR/ab
+rsync -cv cpp/apps/burner/burner.ini $DIR/ab.ini
+rsync -cv cpp/apps/burner/ab-offline.py $DIR/
+rsync -rvc --exclude=.svn cpp/apps/burner/plugins/ $DIR/plugins/
+rsync -cv cpp/apps/freezer/freezer $DIR/af
+rsync -cv cpp/apps/freezer/freezer.ini $DIR/freezer.ini
+rsync -rvc --exclude=.svn cpp/apps/freezer/afplugins/ $DIR/afplugins/
 
 rsync -cv cpp/apps/absubmit/absubmit $DIR/
 rsync -cv cpp/apps/absubmit/py2ab.py $DIR/

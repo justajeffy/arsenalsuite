@@ -41,7 +41,7 @@ TARGETS ->
 	resin
 	resinax
 	absubmit
-	assfreezer
+	freezer
 	pyqt
 	pyqt_modules
 	qt_installer

@@ -107,19 +107,19 @@ INTERFACES += \
 
 DEPENDPATH+=src include ui
 
-RESOURCES += assburner.qrc
+RESOURCES += burner.qrc
 
 # Idle - taken from Psi
 include( "idle/idle.pri" )
 
 # Python modules
 debug:win32 {
-    LIBS+=-LsipAssburner -lAssburner
+    LIBS+=-LsipBurner -lBurner
     LIBS+=-L../../lib/classes/sipClasses -lpyClasses
     LIBS+=-L../../lib/stone/sipStone -lpyStone
     LIBS+=-L../../lib/sip/siplib -lsip
 } else {
-    LIBS+=-LsipAssburner -lAssburner
+    LIBS+=-LsipBurner -lBurner
     win32 {
 	LIBS+=-L../../lib/classes/sipClasses -lpyClasses
 	LIBS+=-L../../lib/stone/sipStone -lpyStone
@@ -129,8 +129,8 @@ debug:win32 {
 
  # Stone and classes
 LIBS+=-L../../lib/stonegui -lstonegui
-LIBS+=-L../../lib/classes -lclasses 
-LIBS+=-L../../lib/stone -lstone 
+LIBS+=-L../../lib/classes -lclasses
+LIBS+=-L../../lib/stone -lstone
 
 
 win32 {
@@ -148,9 +148,9 @@ unix:!macx {
 
 CONFIG += qt thread warn_on rtti exceptions
 QT+=network sql xml
-RC_FILE = assburner.rc
+RC_FILE = burner.rc
 
-TARGET=assburner
+TARGET=burner
 
 win32 {
 	debug {

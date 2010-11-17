@@ -9,9 +9,9 @@ INCLUDEPATH += ../../lib/stonegui/include ../../lib/stonegui/.out/
 INCLUDEPATH += ../../lib/classes/autocore ../../lib/classes/autoimp ../../lib/classes
 INCLUDEPATH += ../../lib/classesui/include ../../lib/classesui/.out/
 INCLUDEPATH += ../../lib/absubmit/include ../../lib/absubmit/.out
-INCLUDEPATH += ../../lib/assfreezer/include ../../lib/assfreezer/.out
+INCLUDEPATH += ../../lib/freezer/include ../../lib/freezer/.out
 
-INCLUDEPATH += /usr/include/stone /usr/include/stonegui /usr/include/classes /usr/include/classesui /usr/include/assfreezer
+INCLUDEPATH += /usr/include/stone /usr/include/stonegui /usr/include/classes /usr/include/classesui /usr/include/freezer
 
 SOURCES+= \
 	src/main.cpp
@@ -25,7 +25,7 @@ win32{
 	LIBS+=-L$${PY_PATH}\libs -lpython$${PY_VERSION}
 	LIBS += -lpsapi -lMpr -lws2_32 -lgdi32
 
-	LIBS+=-L..\..\lib\assfreezer -lassfreezer
+	LIBS+=-L..\..\lib\freezer -lfreezer
 	LIBS+=-L..\..\lib\classesui -lclassesui
 	LIBS+=-L..\..\lib\stonegui -lstonegui
 	LIBS+=-L..\..\lib\classes -lclasses
@@ -42,7 +42,7 @@ isEmpty( PYTHON ) {
 }
 
 unix{
-	LIBS+=-L../../lib/assfreezer -lassfreezer
+	LIBS+=-L../../lib/freezer -lfreezer
 	LIBS+=-L../../lib/classesui -lclassesui
 	LIBS+=-L../../lib/stonegui -lstonegui
 	LIBS+=-L../../lib/classes -lclasses
@@ -63,7 +63,7 @@ unix{
 
 # Python modules
 win32 {
-	LIBS+=-L../../lib/assfreezer/sipAssfreezer -lpyAssfreezer
+	LIBS+=-L../../lib/freezer/sipFreezer -lpyFreezer
 	LIBS+=-L../../lib/classes/sipClasses -lpyClasses
 	LIBS+=-L../../lib/classes/sipClassesui -lpyClassesui
 	LIBS+=-L../../lib/stone/sipStone -lpyStone
@@ -75,13 +75,13 @@ win32 {
 macx: CONFIG-=app_bundle
 QMAKE_MACOSX_DEPLOYMENT_TARGET=10.5
 
-RESOURCES+=assfreezer.qrc
+RESOURCES+=freezer.qrc
 
 CONFIG += qt thread warn_on opengl
 QT+=opengl xml sql network
 DESTDIR=./
-RC_FILE = assfreezer.rc
-TARGET = assfreezer
+RC_FILE = freezer.rc
+TARGET=af
 
 unix {
 	target.path=$$(DESTDIR)/usr/local/bin
