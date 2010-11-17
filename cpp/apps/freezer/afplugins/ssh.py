@@ -1,7 +1,7 @@
 
 from blur.Stone import *
 from blur.Classes import *
-from blur.Assfreezer import *
+from blur.Freezer import *
 from PyQt4.QtCore import *
 from PyQt4.QtSql import *
 import traceback, os

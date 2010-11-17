@@ -80,7 +80,7 @@ extern "C" void initStone(void);
 extern "C" void initClasses(void);
 extern "C" void initStonegui(void);
 extern "C" void initClassesui(void);
-extern "C" void initAssfreezer(void);
+extern "C" void initFreezer(void);
 #endif
 
 // Return the named attribute object from the named module.
@@ -130,7 +130,7 @@ void loadPythonPlugins()
 		{"blur.Classes",initClasses},
 		{"blur.Stonegui",initStonegui},
 		{"blur.Classesui",initClassesui},
-		{"blur.Assfreezer", initAssfreezer},
+		{"blur.Freezer", initFreezer},
 		{NULL, NULL}
 	};
 
@@ -151,7 +151,7 @@ void loadPythonPlugins()
 		"\t\tself.modules['blur.Stonegui'] = imp.load_module('blur.Stonegui',None,'',('','',imp.C_BUILTIN))\n"
 		"\t\tself.modules['blur.Classesui'] = imp.load_module('blur.Classesui',None,'',('','',imp.C_BUILTIN))\n"
 		"\t\tself.modules['blur.Absubmit'] = imp.load_module('blur.Absubmit',None,'',('','',imp.C_BUILTIN))\n"
-		"\t\tself.modules['blur.Assfreezer'] = imp.load_module('blur.Assfreezer',None,'',('','',imp.C_BUILTIN))\n"
+		"\t\tself.modules['blur.Freezer'] = imp.load_module('blur.Freezer',None,'',('','',imp.C_BUILTIN))\n"
 		"\tdef find_module(self,fullname,path=None):\n"
 		"\t\tif fullname in self.modules:\n"
 		"\t\t\treturn self.modules[fullname]\n"
@@ -229,7 +229,7 @@ int main( int argc, char * argv[] )
 	int result=0;
 
 #ifdef Q_OS_WIN
-	hMutex = CreateMutex( NULL, true, L"AssFreezerSingleProcessMutex");
+	hMutex = CreateMutex( NULL, true, L"FreezerSingleProcessMutex");
 	if (hMutex == NULL) {
 		LOG_5( "Error: Couldn't create mutex, exiting" );
 		return false;
@@ -284,7 +284,7 @@ int main( int argc, char * argv[] )
 			QString arg( argv[i] );
 			if( arg == "-h" || arg == "--help" )
 			{
-				LOG_1( QString("AssFreezer v") + VERSION );
+				LOG_1( QString("Freezer v") + VERSION );
 				LOG_1( "Options:" );
 				LOG_1( "-current-render" );
 				LOG_1( "\tShow the current job that is rendering on this machine\n" );
