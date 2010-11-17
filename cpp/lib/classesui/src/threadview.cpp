@@ -473,9 +473,12 @@ void ThreadViewInternal::slotEditNote( const Thread & t )
 void ThreadViewInternal::slotAddNote( const Record & record, const Thread & replyTo )
 {
 	Element el( record );
-	Job j( record );
 	if( !el.isRecord() && !mElements.isEmpty() )
 		el = mElements[0];
+
+    Job j( record );
+    if( !j.isRecord() && !mJobs.isEmpty() )
+        j = mJobs[0];
 
 	AddNoteDialog * d = new AddNoteDialog( this );
 	d->setElement( el );

@@ -204,9 +204,6 @@
           </layout>
          </widget>
          <widget class="QWidget" name="mNotesTab">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <attribute name="title">
            <string>Notes</string>
           </attribute>
@@ -215,7 +212,8 @@
             <number>1</number>
            </property>
            <item>
-            <widget class="ThreadView" name="mThreadView" native="true"/>
+            <widget class="ThreadView" name="mThreadView" native="true">
+            </widget>
            </item>
           </layout>
          </widget>
