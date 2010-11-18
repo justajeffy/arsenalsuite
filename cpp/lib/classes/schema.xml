@@ -1136,6 +1136,13 @@
   <column type="uint" methodName="errorCount" name="errorCount" />
   <column type="uint" methodName="lastNotifiedErrorCount" name="lastNotifiedErrorCount" />
   <column docs="Average memory used per task in kilobytes." type="uint" methodName="averageMemory" name="averageMemory" />
+  <column type="float" methodName="efficiency" name="efficiency" />
+  <column type="uint" methodName="cputime" name="cputime" />
+  <column type="uint" methodName="bytesWrite" name="bytesWrite" />
+  <column type="uint" methodName="bytesRead" name="bytesRead" />
+  <column type="uint" methodName="opsWrite" name="opsWrite" />
+  <column type="uint" methodName="opsRead" name="opsRead" />
+  <column type="uint" methodName="totaltime" name="totaltime" />
  </table>
  <table useCodeGen="true" parent="Job" name="JobSync" expireKeyCache="true" className="JobSync" >
   <column type="QString" methodName="direction" name="direction" />

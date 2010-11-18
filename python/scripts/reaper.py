@@ -250,7 +250,12 @@ def getAvgTaskTime(job):
 	return 0
 
 def getAvgMemory(job):
-	q = Database.current().exec_("SELECT AVG( jobtaskassignment.memory )::int FROM JobTaskAssignment INNER JOIN JobTask ON JobTask.fkeyjobtaskassignment=jobtaskassignment.keyjobtaskassignment WHERE jobtask.fkeyjob=%i AND jobtaskassignment.memory IS NOT NULL AND jobtaskassignment.memory > 0" % (job.key()))
+	q = Database.current().exec_("""SELECT AVG( jobtaskassignment.memory )::int 
+                                    FROM JobTaskAssignment 
+                                    INNER JOIN JobTask ON JobTask.fkeyjobtaskassignment=jobtaskassignment.keyjobtaskassignment 
+                                    WHERE jobtask.fkeyjob=%i 
+                                    AND jobtaskassignment.memory IS NOT NULL 
+                                    AND jobtaskassignment.memory > 0""" % (job.key()))
 	if q.next():
 		return q.value(0).toInt()[0]
 	return 0
@@ -346,12 +351,7 @@ def reaper():
                     suspendMsg = 'Job %s has been suspended.  The job has timed out on %i hosts.' % (job.name(),timeoutCount)
                     suspendTitle = 'Job %s has been suspended(Timeout limit reached).' % job.name()
 
-            #timeoutCount = getTimeoutCount(job)
-
-            avgTaskTime = getAvgTaskTime(job)
-            js.setTasksAverageTime(avgTaskTime)
-
-            js.setAverageMemory(getAvgMemory(job))
+            q = Database.current().exec_('SELECT update_job_stats(%i)' % job.key())
 
             # If job is erroring check job and global error thresholds
             if errorCount > job.maxErrors() or errorCount > config.totalFailureThreshold:

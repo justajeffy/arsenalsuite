@@ -80,6 +80,11 @@ static const ColumnStruct job_columns [] =
 	{ "Time in Queue", 		"TimeInQueue",		80, 	13,	false, false },	//18
 	{ "Services", 			"Services", 		80, 	16,	false, true }, //19
 	{ "Avg. Memory", 		"AverageMemory", 	80, 	12,	false, false },	//20
+	{ "Efficiency", 		"Efficiency", 	40, 	21,	false, false },	//21
+	{ "Disk Write", 		"DiskWrite", 	40, 	22,	false, false },	//22
+	{ "Disk Read", 		"DiskRead", 	40, 	23,	false, false },	//23
+	{ "Disk Ops", 		"DiskOps", 	40, 	24,	false, false },	//24
+	{ "CPU Time", 		"CPUTime", 	60, 	25,	false, false },	//25
 	{ 0, 					0, 					0, 		0, 	false, false }
 };
 
@@ -519,6 +524,15 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
 	icon = ((JobModel*)idx.model())->jobTypeIcon(job.jobType());
 	co = options.mJobColors->getColorOption(status);
 	avgMemory = memoryString(jobStatus.averageMemory());
+
+	uint ct = jobStatus.cputime() / 1000;
+	cpuTime.sprintf("%02i:%02i:%02i", (ct/3600)%60, (ct/60)%60, ct%60 );
+
+    bytesWrite = memoryString( jobStatus.bytesWrite()/1024 );
+    bytesRead = memoryString( jobStatus.bytesRead()/1024 );
+    diskOps = QString::number( jobStatus.opsWrite() + jobStatus.opsRead() );
+    //efficiency.sprintf("%3.2f %", (((jobStatus.cputime()/( jobStatus.totaltime() > 0 ? jobStatus.totaltime() : 1 ) )/(job.assignmentSlots() > 0 ? job.assignmentSlots() : 1) )*100));
+    efficiency.sprintf("%3.2f %", (jobStatus.efficiency()/job.assignmentSlots())*100.00);
 }
 
 QVariant JobItem::modelData( const QModelIndex & i, int role ) const
@@ -546,6 +560,11 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			case 18: return timeInQueue;
 			case 19: return services;
 			case 20: return avgMemory;
+			case 21: return efficiency;
+			case 22: return bytesWrite;
+			case 23: return bytesRead;
+			case 24: return diskOps;
+			case 25: return cpuTime;
 		}
 	} else if (role == Qt::TextColorRole )
 		return co ? civ(co->fg) : QVariant();
