@@ -138,6 +138,8 @@ struct ASSFREEZER_EXPORT JobItem : public RecordItemBase
 	Qt::ItemFlags modelFlags( const QModelIndex & );
 	Record getRecord();
     QString toolTip;
+
+    QString efficiency, bytesRead, bytesWrite, diskOps, cpuTime;
 };
 
 typedef TemplateRecordDataTranslator<JobItem> JobTranslator;
