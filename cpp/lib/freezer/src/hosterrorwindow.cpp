@@ -79,7 +79,7 @@ void HostErrorWindow::doRefresh()
 void HostErrorWindow::showMenu( const QPoint & pos, const Record & underMouse, RecordList selected )
 {
 	Q_UNUSED(underMouse);
-	AssfreezerErrorMenu * menu = new AssfreezerErrorMenu( this, selected, mErrorTree->model()->rootList() );
+	FreezerErrorMenu * menu = new FreezerErrorMenu( this, selected, mErrorTree->model()->rootList() );
 	menu->exec( pos );
 	delete menu;
 }

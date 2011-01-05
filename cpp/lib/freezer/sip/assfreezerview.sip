@@ -1,12 +1,12 @@
 
-class AssfreezerView : QWidget
+class FreezerView : QWidget
 {
 %TypeHeaderCode
 #include <assfreezerview.h>
 %End
 public:
-	AssfreezerView( QWidget * parent );
-	~AssfreezerView();
+	FreezerView( QWidget * parent );
+	~FreezerView();
 
 	virtual QString viewType() const = 0;
 

@@ -145,7 +145,7 @@ MainWindow::MainWindow( QWidget * parent )
 	mFileMenu->addAction( FileExitAction );
 
 	mToolsMenu = mb->addMenu( "&Tools" );
-    mToolsMenu->setObjectName( "Assfreezer_Tools_Menu" );
+    mToolsMenu->setObjectName( "Freezer_Tools_Menu" );
     connect( mToolsMenu, SIGNAL( aboutToShow() ), SLOT( populateToolsMenu() ) );
 
 	mOptionsMenu = mb->addMenu( "&Options" );
@@ -361,7 +361,7 @@ void MainWindow::saveViews()
         ini.writeString("CurrentView", mCurrentView->viewCode());
 	LOG_5( "Saving " + QString::number( mViews.size() ) + " views" );
 	int i = 0;
-	foreach( AssfreezerView * view, mViews ) {
+	foreach( FreezerView * view, mViews ) {
 		++i;
         LOG_5( "Saving View " + view->viewName() + " Code: " + view->viewCode() );
         ini.writeString( QString("ViewCode%1").arg(i), view->viewCode() );
@@ -387,7 +387,7 @@ void MainWindow::saveViews()
             continue;
 
         bool isOpenView = false;
-        foreach( AssfreezerView * view, mViews ) {
+        foreach( FreezerView * view, mViews ) {
             if( view->viewCode() == code ) {
                 isOpenView = true;
                 break;
@@ -401,7 +401,7 @@ void MainWindow::saveViews()
         }
 }
 
-void MainWindow::saveView( AssfreezerView * view )
+void MainWindow::saveView( FreezerView * view )
 {
 	LOG_5( "Saving View " + view->viewName() );
 	IniConfig & ini = userConfig();
@@ -422,7 +422,7 @@ void MainWindow::restoreViews()
 	ViewManager::instance()->readSavedViews(ini);
 	ini.popSection();
 
-	AssfreezerView * currentView = 0;
+	FreezerView * currentView = 0;
 	ini.pushSection("Assfreezer_Open_Views");
     if( upgradeMode ) {
         QString currentViewName = ini.readString("CurrentView");
@@ -430,13 +430,13 @@ void MainWindow::restoreViews()
         for( int i = 1; i <= viewCount; ++i ) {
             QString viewName = ini.readString(QString("ViewName%1").arg(i));
             if( viewName.isEmpty() ) continue;
-            QString newViewCode = AssfreezerView::generateViewCode();
+            QString newViewCode = FreezerView::generateViewCode();
             foreach( QString section, ini.sections() ) {
                 QString subSection = "View_" + viewName;
                 if( section.startsWith( subSection + ":") || section == subSection )
                     ini.copySection( section, "View_" + newViewCode + section.mid(subSection.size()) );
             }
-            AssfreezerView * view = restoreSavedView( newViewCode, false );
+            FreezerView * view = restoreSavedView( newViewCode, false );
             if( !currentView || viewName == currentViewName )
                 currentView = view;
        }
@@ -446,7 +446,7 @@ void MainWindow::restoreViews()
         for( int i = 1; i <= viewCount; ++i ) {
             QString viewCode = ini.readString(QString("ViewCode%1").arg(i));
             if( viewCode.isEmpty() ) continue;
-            AssfreezerView * view = restoreSavedView( viewCode, false );
+            FreezerView * view = restoreSavedView( viewCode, false );
             if( !currentView || viewCode == currentViewCode )
                 currentView = view;
         }
@@ -465,21 +465,21 @@ void MainWindow::restoreViews()
 	checkViewModeChange();
 }
 
-AssfreezerView * MainWindow::restoreSavedView( const QString & viewCode, bool updateWindow )
+FreezerView * MainWindow::restoreSavedView( const QString & viewCode, bool updateWindow )
 {
 	IniConfig & ini = userConfig();
 	ini.pushSection("View_" + viewCode);
-	AssfreezerView * view = restoreView( ini, viewCode, updateWindow );
+	FreezerView * view = restoreView( ini, viewCode, updateWindow );
 	ini.popSection();
 	return view;
 }
 
-AssfreezerView * MainWindow::restoreView( IniConfig & viewDesc, const QString & viewCode, bool updateWindow )
+FreezerView * MainWindow::restoreView( IniConfig & viewDesc, const QString & viewCode, bool updateWindow )
 {
 	QString type = viewDesc.readString( "ViewType" );
     QString name = viewDesc.readString( "ViewName" );
     LOG_5( "Restoring View " + name + " code: " + viewCode + " type: " + type );
-	AssfreezerView * view = 0;
+	FreezerView * view = 0;
 	if( type == "HostList" )
 		view = new HostListWidget(this);
 	else if( type == "JobList" )
@@ -501,16 +501,16 @@ void MainWindow::cloneCurrentView()
 		cloneView(mCurrentView);
 }
 
-void MainWindow::cloneView( AssfreezerView * view )
+void MainWindow::cloneView( FreezerView * view )
 {
 	IniConfig empty;
 	view->save(empty);
     view = restoreView(empty, view->viewCode());
     // Give it a unique code
-    view->setViewCode( AssfreezerView::generateViewCode() );
+    view->setViewCode( FreezerView::generateViewCode() );
 }
 
-void MainWindow::insertView( AssfreezerView * view, bool checkViewModeCheckCurrent )
+void MainWindow::insertView( FreezerView * view, bool checkViewModeCheckCurrent )
 {
 	mViews += view;
 
@@ -547,7 +547,7 @@ bool MainWindow::checkViewModeChange()
 	return true;
 }
 
-void MainWindow::removeView( AssfreezerView * view )
+void MainWindow::removeView( FreezerView * view )
 {
 	mViews.removeAll( view );
 	if( view == mCurrentView )
@@ -559,7 +559,7 @@ void MainWindow::removeView( AssfreezerView * view )
 	if( view == mJobPage || view == mHostPage ) {
 		if( mJobPage == view ) mJobPage = 0;
 		if( mHostPage == view ) mHostPage = 0;
-		foreach( AssfreezerView * view, mViews ) {
+		foreach( FreezerView * view, mViews ) {
 			if( !mJobPage && view->inherits( "JobListWidget" ) ) mJobPage = qobject_cast<JobListWidget*>(view);
 			if( !mHostPage && view->inherits( "HostListWidget" ) ) mHostPage = qobject_cast<HostListWidget*>(view);
 		}
@@ -570,21 +570,21 @@ void MainWindow::removeView( AssfreezerView * view )
 
 void MainWindow::currentTabChanged( int index )
 {
-	setCurrentView( qobject_cast<AssfreezerView*>(mTabWidget->widget(index)) );
+	setCurrentView( qobject_cast<FreezerView*>(mTabWidget->widget(index)) );
 }
 
 void MainWindow::setCurrentView( const QString & viewName )
 {
     if( mTabWidget ) {
         for( int i = 0; i<mTabWidget->count(); i++ ) {
-            AssfreezerView * view = qobject_cast<AssfreezerView*>(mTabWidget->widget(i));
+            FreezerView * view = qobject_cast<FreezerView*>(mTabWidget->widget(i));
             if( view->viewName() == viewName )
                 setCurrentView( view );
         }
    }
 }
 
-void MainWindow::setCurrentView( AssfreezerView * view )
+void MainWindow::setCurrentView( FreezerView * view )
 {
 	if( view == mCurrentView ) return;
 	
@@ -637,7 +637,7 @@ void MainWindow::showNextView()
 {
     if( mTabWidget && mTabWidget->count() > 1 ) {
         int index = (mTabWidget->currentIndex() + 1) % mTabWidget->count();
-        setCurrentView( qobject_cast<AssfreezerView*>(mTabWidget->widget(index)) );
+        setCurrentView( qobject_cast<FreezerView*>(mTabWidget->widget(index)) );
    }
 }
 
@@ -645,7 +645,7 @@ void MainWindow::setupStackedView()
 {
 	mStackedWidget = new QStackedWidget(this);
 	disconnect( mTabWidget, SIGNAL( currentChanged(int) ), this, 0 );
-	foreach( AssfreezerView * view, mViews ) {
+	foreach( FreezerView * view, mViews ) {
 		if( mTabWidget ) mTabWidget->removeTab(mTabWidget->indexOf(view));
 		mStackedWidget->addWidget(view);
 	}
@@ -659,7 +659,7 @@ void MainWindow::setupTabbedView()
 {
 	mTabWidget = new QTabWidget(this);
 	mTabWidget->installEventFilter(this);
-	foreach( AssfreezerView * view, mViews ) {
+	foreach( FreezerView * view, mViews ) {
 		if( mStackedWidget )
 			mStackedWidget->removeWidget(view);
 		mTabWidget->addTab( view, view->viewName() );
@@ -689,14 +689,14 @@ void MainWindow::repopulateToolBar()
 
 void MainWindow::createJobView()
 {
-	AssfreezerView * view = new JobListWidget(this);
+	FreezerView * view = new JobListWidget(this);
     renameView(view);
 	insertView(view);
 }
 
 void MainWindow::createHostView()
 {
-	AssfreezerView * view = new HostListWidget(this);
+	FreezerView * view = new HostListWidget(this);
 	insertView(view);
 }
 
@@ -706,7 +706,7 @@ void MainWindow::closeCurrentView()
 		removeView( mCurrentView );
 }
 
-void MainWindow::saveViewToFile( AssfreezerView * view )
+void MainWindow::saveViewToFile( FreezerView * view )
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save View to File"),
                                                     "",
@@ -749,7 +749,7 @@ void MainWindow::renameCurrentView()
 }
 
 // Pops up dialog to prompt user
-void MainWindow::renameView( AssfreezerView * view )
+void MainWindow::renameView( FreezerView * view )
 {
 	while( 1 ) {
 		bool okay;
@@ -776,7 +776,7 @@ void MainWindow::saveCurrentViewAs()
 	saveViewAs( mCurrentView );
 }
 
-void MainWindow::saveViewAs( AssfreezerView * view )
+void MainWindow::saveViewAs( FreezerView * view )
 {
 	while( 1 ) {
 		bool okay;
@@ -812,7 +812,7 @@ void MainWindow::saveViewAs( AssfreezerView * view )
 	
 }
 
-void MainWindow::moveViewLeft( AssfreezerView * view )
+void MainWindow::moveViewLeft( FreezerView * view )
 {
 	if( view ) {
 		int idx = mViews.indexOf( view );
@@ -833,7 +833,7 @@ void MainWindow::moveViewLeft( AssfreezerView * view )
 
 }
 
-void MainWindow::moveViewRight( AssfreezerView * view )
+void MainWindow::moveViewRight( FreezerView * view )
 {
 	if( view ) {
 		int idx = mViews.indexOf( view );
@@ -872,7 +872,7 @@ void MainWindow::populateToolsMenu()
 
     mToolsMenu->addAction( ProjectWeightingAction );
 
-    AssfreezerMenuFactory::instance()->aboutToShow(mToolsMenu);
+    FreezerMenuFactory::instance()->aboutToShow(mToolsMenu);
 
     // We only need to populate this menu once
     mToolsMenu->disconnect( this, SLOT( populateToolsMenu() ) );
@@ -1012,7 +1012,7 @@ void MainWindow::applyOptions()
 	setUpdatesEnabled(false);
 	QApplication * app = (QApplication*)QApplication::instance();
 	app->setFont( options.appFont );
-	foreach( AssfreezerView * view, mViews )
+	foreach( FreezerView * view, mViews )
 		view->applyOptions();
 
 	// Reset the interval
@@ -1043,7 +1043,7 @@ void MainWindow::updateCounter()
 	}
 }
 
-void MainWindow::showTabMenu( const QPoint & pos, AssfreezerView * view )
+void MainWindow::showTabMenu( const QPoint & pos, FreezerView * view )
 {
 	QMenu * menu = new QMenu(this);
 	QAction * close = menu->addAction( "&Close View" );
@@ -1081,7 +1081,7 @@ bool MainWindow::eventFilter( QObject * o, QEvent * event )
 			for( int i = tb->count()-1; i >= 0; --i ) {
 				QPoint tabBarPos = tb->mapFromParent(mouseEvent->pos());
 				if( tb->tabRect(i).contains( tabBarPos ) ) {
-					showTabMenu( mouseEvent->globalPos(), qobject_cast<AssfreezerView*>(mTabWidget->widget(i)) );
+					showTabMenu( mouseEvent->globalPos(), qobject_cast<FreezerView*>(mTabWidget->widget(i)) );
 					break;
 				}
 			}

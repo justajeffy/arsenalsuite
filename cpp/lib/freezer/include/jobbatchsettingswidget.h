@@ -16,7 +16,7 @@
 class Stone::RecordProxy;
 using namespace Stone;
 
-class ASSFREEZER_EXPORT JobBatchSettingsWidget : public CustomJobSettingsWidget, public Ui::JobBatchSettingsWidgetUI
+class FREEZER_EXPORT JobBatchSettingsWidget : public CustomJobSettingsWidget, public Ui::JobBatchSettingsWidgetUI
 {
 Q_OBJECT
 public:

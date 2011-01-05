@@ -1,5 +1,5 @@
 
-class AssfreezerMenuPlugin
+class FreezerMenuPlugin
 {
 %TypeHeaderCode
 #include <assfreezermenus.h>
@@ -8,14 +8,14 @@ public:
 	virtual void executeMenuPlugin( QMenu * )=0;
 };
 
-class AssfreezerMenuFactory
+class FreezerMenuFactory
 {
 %TypeHeaderCode
 #include <assfreezermenus.h>
 %End
 public:
-	static AssfreezerMenuFactory * instance();
+	static FreezerMenuFactory * instance();
 	
-	void registerMenuPlugin( AssfreezerMenuPlugin * plugin /Transfer/, const QString & menuName );
+	void registerMenuPlugin( FreezerMenuPlugin * plugin /Transfer/, const QString & menuName );
 	QList<QAction*> aboutToShow( QMenu * menu, bool addPreSep = false, bool addPostSep = false );
 };
