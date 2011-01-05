@@ -16,7 +16,7 @@
 
 class HostServiceModel;
 
-class ASSFREEZER_EXPORT HostServiceModel : public RecordSuperModel
+class FREEZER_EXPORT HostServiceModel : public RecordSuperModel
 {
 Q_OBJECT
 public:
@@ -36,7 +36,7 @@ protected:
 	ServiceList mServices;
 };
 
-class ASSFREEZER_EXPORT HostServiceMatrix : public RecordTreeView
+class FREEZER_EXPORT HostServiceMatrix : public RecordTreeView
 {
 Q_OBJECT
 public:
@@ -55,7 +55,7 @@ protected:
 	HostServiceModel * mModel;
 };
 
-class ASSFREEZER_EXPORT HostServiceMatrixWindow : public QMainWindow, public Ui::HostServiceMatrixWindowUi
+class FREEZER_EXPORT HostServiceMatrixWindow : public QMainWindow, public Ui::HostServiceMatrixWindowUi
 {
 Q_OBJECT
 public:

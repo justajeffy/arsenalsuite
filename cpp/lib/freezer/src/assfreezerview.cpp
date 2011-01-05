@@ -9,7 +9,7 @@
 #include "assfreezerview.h"
 #include "viewmanager.h"
 
-AssfreezerView::AssfreezerView( QWidget * parent )
+FreezerView::FreezerView( QWidget * parent )
 : QWidget( parent )
 , mRefreshScheduled( false )
 , mRefreshCount( 0 )
@@ -18,31 +18,31 @@ AssfreezerView::AssfreezerView( QWidget * parent )
     mIniConfig = userConfig();
 }
 
-AssfreezerView::~AssfreezerView()
+FreezerView::~FreezerView()
 {
 	FreezerCore::instance()->cancelObjectTasks(this);
 }
 
-QString AssfreezerView::generateViewCode()
+QString FreezerView::generateViewCode()
 {
     static int viewNum = 0;
     QDateTime ctd = QDateTime::currentDateTime();
     return QString::number( ctd.toTime_t() ) + QString::number( ctd.time().msec() ) + QString::number( viewNum++ );
 }
 
-QString AssfreezerView::viewCode() const
+QString FreezerView::viewCode() const
 {
     if( mViewCode.isEmpty() )
         mViewCode = generateViewCode();
     return mViewCode;
 }
 
-void AssfreezerView::setViewCode( const QString & viewCode )
+void FreezerView::setViewCode( const QString & viewCode )
 {
     mViewCode = viewCode;
 }
 
-void AssfreezerView::refresh()
+void FreezerView::refresh()
 {
 	if( !mRefreshScheduled ) {
 		mRefreshScheduled = true;
@@ -51,28 +51,28 @@ void AssfreezerView::refresh()
 	}
 }
 
-int AssfreezerView::refreshCount() const
+int FreezerView::refreshCount() const
 {
 	return mRefreshCount;
 }
 
-void AssfreezerView::doRefresh()
+void FreezerView::doRefresh()
 {
 	mRefreshScheduled = false;
 }
 
-IniConfig & AssfreezerView::viewConfig()
+IniConfig & FreezerView::viewConfig()
 {
     //mIniConfig.setSection( "View_" + viewCode() );
     return mIniConfig;
 }
 
-void AssfreezerView::setViewConfig(IniConfig config)
+void FreezerView::setViewConfig(IniConfig config)
 {
     mIniConfig = config;
 }
 
-void AssfreezerView::restorePopup( QWidget * w )
+void FreezerView::restorePopup( QWidget * w )
 {
 #ifndef Q_OS_WIN
 	w->hide();
@@ -93,7 +93,7 @@ void AssfreezerView::restorePopup( QWidget * w )
 	while( values.contains( mNextPopupNumber ) ) mNextPopupNumber++;
 }
 
-bool AssfreezerView::eventFilter( QObject * o, QEvent * e )
+bool FreezerView::eventFilter( QObject * o, QEvent * e )
 {
 	QWidget * w = qobject_cast<QWidget*>(o);
 	if( w && mPopupList.contains( w ) ) {
@@ -112,40 +112,40 @@ bool AssfreezerView::eventFilter( QObject * o, QEvent * e )
 	return QWidget::eventFilter( o, e );
 }
 
-QString AssfreezerView::statusBarMessage() const
+QString FreezerView::statusBarMessage() const
 {
 	return mStatusBarMessage;
 }
 
-void AssfreezerView::setStatusBarMessage( const QString & sbm )
+void FreezerView::setStatusBarMessage( const QString & sbm )
 {
 	mStatusBarMessage = sbm;
 	emit statusBarMessageChanged( mStatusBarMessage );
 }
 
-void AssfreezerView::clearStatusBar()
+void FreezerView::clearStatusBar()
 {
 	setStatusBarMessage(QString());
 }
 
-QString AssfreezerView::viewName() const
+QString FreezerView::viewName() const
 {
 	if( mViewName.isEmpty() )
-		const_cast<AssfreezerView*>(this)->setViewName( ViewManager::instance()->generateViewName( viewType() ) );
+		const_cast<FreezerView*>(this)->setViewName( ViewManager::instance()->generateViewName( viewType() ) );
 	return mViewName;
 }
 
-void AssfreezerView::setViewName( const QString & viewName )
+void FreezerView::setViewName( const QString & viewName )
 {
 	mViewName = viewName;
 }
 
-void AssfreezerView::save( IniConfig & ini )
+void FreezerView::save( IniConfig & ini )
 {
 	ini.writeString("ViewName",mViewName);
 }
 
-void AssfreezerView::restore( IniConfig & )
+void FreezerView::restore( IniConfig & )
 {
 	applyOptions();
 }

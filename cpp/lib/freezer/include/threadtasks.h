@@ -166,7 +166,7 @@ public:
     }
 }; 
 
-class ASSFREEZER_EXPORT CounterTask : public ThreadTask
+class FREEZER_EXPORT CounterTask : public ThreadTask
 {
 public:
 	CounterTask( QObject * rec );

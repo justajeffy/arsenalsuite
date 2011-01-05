@@ -23,7 +23,7 @@
 #include "threadtasks.h"
 
 HostListWidget::HostListWidget( QWidget * parent )
-: AssfreezerView( parent )
+: FreezerView( parent )
 , mHostTree(0)
 , mServiceDataRetrieved( false )
 , mHostTaskRunning( false )
@@ -131,13 +131,13 @@ void HostListWidget::save( IniConfig & ini )
 	ini.writeString("ServiceFilter", mServiceFilter);
 	ini.writeBool( "Filter", FilterAction->isChecked() );
 	saveHostView(mHostTree,ini);
-	AssfreezerView::save(ini);
+	FreezerView::save(ini);
 }
 
 void HostListWidget::restore( IniConfig & ini )
 {
 	setupHostView(mHostTree,ini);
-	AssfreezerView::restore(ini);
+	FreezerView::restore(ini);
 }
 
 void HostListWidget::customEvent( QEvent * evt )
@@ -205,7 +205,7 @@ void HostListWidget::customEvent( QEvent * evt )
 
 void HostListWidget::doRefresh()
 {
-	AssfreezerView::doRefresh();
+	FreezerView::doRefresh();
 	bool needStatusBarMsg = false, needHostListTask = false;
 
 	if( !mServiceDataRetrieved )
@@ -407,7 +407,7 @@ void clearHostErrorsAndSetOffline( HostList hosts, bool offline)
 
 void HostListWidget::showHostPopup(const QPoint & point)
 {
-	if( !mHostMenu ) mHostMenu = new AssfreezerHostMenu( this );
+	if( !mHostMenu ) mHostMenu = new FreezerHostMenu( this );
 	mHostMenu->popup( mHostTree->mapToGlobal(point) );
 }
 

@@ -2,14 +2,14 @@
  *
  * Copyright 2003 Blur Studio Inc.
  *
- * This file is part of Assburner.
+ * This file is part of Arsenal.
  *
- * Assburner is free software; you can redistribute it and/or modify
+ * Arsenal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Assburner is distributed in the hope that it will be useful,
+ * Arsenal is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -29,19 +29,19 @@
 
 #include "afcommon.h"
 
-const QString VERSION("1.1.2");
+const QString VERSION("1.1.4");
 
 class QLabel;
 class QTimer;
 class QTabWidget;
 class QStackedWidget;
 
-class AssfreezerView;
+class FreezerView;
 class JobListWidget;
 class HostListWidget;
 class Service;
 
-class ASSFREEZER_EXPORT MainWindow : public QMainWindow
+class FREEZER_EXPORT MainWindow : public QMainWindow
 {
 Q_OBJECT
 public:
@@ -85,36 +85,36 @@ public slots:
 	void createHostView();
 	void closeCurrentView();
 
-	void cloneView( AssfreezerView * view );
+	void cloneView( FreezerView * view );
 	void cloneCurrentView();
 	void saveCurrentViewAs();
-	void saveViewAs( AssfreezerView * );
-	void moveViewLeft( AssfreezerView * );
-	void moveViewRight( AssfreezerView * );
+	void saveViewAs( FreezerView * );
+	void moveViewLeft( FreezerView * );
+	void moveViewRight( FreezerView * );
 	void moveCurrentViewLeft();
 	void moveCurrentViewRight();
 
 	// Pops up dialog to prompt user
-	void renameView( AssfreezerView * view );
+	void renameView( FreezerView * view );
 	void renameCurrentView();
 
-	AssfreezerView * currentView() const { return mCurrentView; }
+	FreezerView * currentView() const { return mCurrentView; }
 
-	void insertView( AssfreezerView * view, bool checkViewModeCheckCurrent=true );
-	void removeView( AssfreezerView * view );
+	void insertView( FreezerView * view, bool checkViewModeCheckCurrent=true );
+	void removeView( FreezerView * view );
 
 	void setCurrentView( const QString & );
-	void setCurrentView( AssfreezerView * );
+	void setCurrentView( FreezerView * );
 
     void showNextView();
 
     void saveCurrentViewToFile();
-    void saveViewToFile( AssfreezerView * );
+    void saveViewToFile( FreezerView * );
     void loadViewFromFile(bool notUsed=true);
     void loadViewFromFile(const QString &);
 
 signals:
-    void currentViewChanged( AssfreezerView * );
+    void currentViewChanged( FreezerView * );
 
 protected slots:
 	void currentTabChanged( int );
@@ -131,13 +131,13 @@ private:
 	virtual bool eventFilter( QObject *, QEvent * );
 	virtual void keyPressEvent( QKeyEvent * event );
 
-	void showTabMenu( const QPoint & pos, AssfreezerView * view );
+	void showTabMenu( const QPoint & pos, FreezerView * view );
 
 	void saveViews();
-	void saveView( AssfreezerView * );
+	void saveView( FreezerView * );
 	void restoreViews();
-	AssfreezerView * restoreSavedView( const QString & viewName, bool updateWindow = true );
-	AssfreezerView * restoreView( IniConfig &, const QString & viewName, bool updateWindow = true );
+	FreezerView * restoreSavedView( const QString & viewName, bool updateWindow = true );
+	FreezerView * restoreView( IniConfig &, const QString & viewName, bool updateWindow = true );
 
 	void repopulateToolBar();
 
@@ -150,8 +150,8 @@ private:
 	QTabWidget * mTabWidget;
 	QStackedWidget * mStackedWidget;
 
-	QList<AssfreezerView*> mViews;
-	AssfreezerView * mCurrentView;
+	QList<FreezerView*> mViews;
+	FreezerView * mCurrentView;
 	
 	JobListWidget * mJobPage;
 	HostListWidget * mHostPage;

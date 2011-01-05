@@ -17,16 +17,16 @@
 
 class QAction;
 
-class AssFreezerWidget;
-class AssfreezerJobMenu;
-class AssfreezerErrorMenu;
+class FreezerWidget;
+class FreezerJobMenu;
+class FreezerErrorMenu;
 class FrameListTask;
 class ImageView;
 class PartialFrameListTask;
 class TabToolBar;
 class BusyWidget;
 
-class ASSFREEZER_EXPORT JobListWidget : public AssfreezerView, public Ui::JobListWidgetUI
+class FREEZER_EXPORT JobListWidget : public FreezerView, public Ui::JobListWidgetUI
 {
 Q_OBJECT
 public:
@@ -195,10 +195,10 @@ public:
 	 * mProjectFilterMenu,
 	 * mJobTypeFilterMenu,
 	 * mTaskMenu;
-	AssfreezerErrorMenu * mErrorMenu;
+	FreezerErrorMenu * mErrorMenu;
 
-	friend class AssfreezerJobMenu;
-	friend class AssFreezerWidget;
+	friend class FreezerJobMenu;
+	friend class FreezerWidget;
 	friend class JobTypeFilterMenu;
 	friend class ProjectFilterMenu;
 	friend class StatusFilterMenu;

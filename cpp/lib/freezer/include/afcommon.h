@@ -3,14 +3,14 @@
  *
  * Copyright 2003 Blur Studio Inc.
  *
- * This file is part of Assburner.
+ * This file is part of Arsenal.
  *
- * Assburner is free software; you can redistribute it and/or modify
+ * Arsenal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Assburner is distributed in the hope that it will be useful,
+ * Arsenal is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -29,10 +29,10 @@
 
 #include <qobject.h>
 
-#ifdef ASSFREEZER_MAKE_DLL
-#define ASSFREEZER_EXPORT Q_DECL_EXPORT
+#ifdef FREEZER_MAKE_DLL
+#define FREEZER_EXPORT Q_DECL_EXPORT
 #else
-#define ASSFREEZER_EXPORT Q_DECL_IMPORT
+#define FREEZER_EXPORT Q_DECL_IMPORT
 #endif
 
 #include "iniconfig.h"
@@ -40,16 +40,16 @@
 
 struct ViewColors;
 
-extern ASSFREEZER_EXPORT const char 	* LOGO_PATH,
+extern FREEZER_EXPORT const char 	* LOGO_PATH,
 					* CONFIG_PATH,
 					* FRAGMENT_SHADER_PATH,
 					* ICON_PATH;
 
 #ifdef Q_OS_WIN
-ASSFREEZER_EXPORT extern const char * VNC_LINK;
+FREEZER_EXPORT extern const char * VNC_LINK;
 #endif
 
-struct ASSFREEZER_EXPORT Options
+struct FREEZER_EXPORT Options
 {
 	Options() : mJobColors(0), mFrameColors(0), mErrorColors(0), mHostColors(0) {}
 	ViewColors * mJobColors, * mFrameColors, * mErrorColors, * mHostColors;
@@ -65,17 +65,17 @@ struct ASSFREEZER_EXPORT Options
 	bool mAutoRefreshOnWindowActivation, mRefreshOnViewChange;
 };
 
-ASSFREEZER_EXPORT extern Options options;
+FREEZER_EXPORT extern Options options;
 
 // This structure holds all of the job settings
 // that we can edit
 
-struct ASSFREEZER_EXPORT CounterState {
+struct FREEZER_EXPORT CounterState {
 	int hostsTotal, hostsActive, hostsReady;
 	int jobsTotal, jobsActive, jobsDone;
 };
 
-struct ASSFREEZER_EXPORT JobFilter {
+struct FREEZER_EXPORT JobFilter {
 	// status filters
 	QStringList statusToShow;
 
