@@ -16,7 +16,7 @@
 #include "afcommon.h"
 #include "host.h"
 
-class ASSFREEZER_EXPORT BatchSubmitDialog : public QDialog, public Ui::BatchSubmitDialogUI
+class FREEZER_EXPORT BatchSubmitDialog : public QDialog, public Ui::BatchSubmitDialogUI
 {
 Q_OBJECT
 public:

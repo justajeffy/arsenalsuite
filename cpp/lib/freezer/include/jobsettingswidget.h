@@ -28,7 +28,7 @@ class CustomJobSettingsWidget;
  * Also handles showing the correct CustomJobSettingsWidget for
  * the selected jobs.
  **/
-class ASSFREEZER_EXPORT JobSettingsWidget : public QWidget, public Ui::JobSettingsWidgetUI
+class FREEZER_EXPORT JobSettingsWidget : public QWidget, public Ui::JobSettingsWidgetUI
 {
 Q_OBJECT
 public:
@@ -78,7 +78,7 @@ protected:
 	QMap<QString, CustomJobSettingsWidget*> mCustomJobSettingsWidgetMap;
 };
 
-class ASSFREEZER_EXPORT JobServiceBridge
+class FREEZER_EXPORT JobServiceBridge
 {
 public:
 	virtual ~JobServiceBridge(){}
@@ -91,7 +91,7 @@ public:
  *  To be implemented for each job type's own settings
  *  Sits to the right of the JobSettingsWidget
  */
-class ASSFREEZER_EXPORT CustomJobSettingsWidget : public QGroupBox
+class FREEZER_EXPORT CustomJobSettingsWidget : public QGroupBox
 {
 Q_OBJECT
 public:

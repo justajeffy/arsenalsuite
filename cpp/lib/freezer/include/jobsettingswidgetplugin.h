@@ -17,7 +17,7 @@
 class QWidget;
 class CustomJobSettingsWidget;
 
-class ASSFREEZER_EXPORT CustomJobSettingsWidgetPlugin
+class FREEZER_EXPORT CustomJobSettingsWidgetPlugin
 {
 public:
 	virtual ~CustomJobSettingsWidgetPlugin(){}
@@ -25,9 +25,9 @@ public:
 	virtual CustomJobSettingsWidget * createCustomJobSettingsWidget( const QString & jobType, QWidget * parent, JobSettingsWidget::Mode )=0;
 };
 
-ASSFREEZER_EXPORT void registerBuiltinCustomJobSettingsWidgets();
+FREEZER_EXPORT void registerBuiltinCustomJobSettingsWidgets();
 
-class ASSFREEZER_EXPORT CustomJobSettingsWidgetsFactory
+class FREEZER_EXPORT CustomJobSettingsWidgetsFactory
 {
 public:
 	static bool supportsJobType( const QString & );

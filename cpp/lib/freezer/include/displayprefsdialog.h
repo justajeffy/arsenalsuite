@@ -3,14 +3,14 @@
  *
  * Copyright 2003 Blur Studio Inc.
  *
- * This file is part of Assburner.
+ * This file is part of Arsenal.
  *
- * Assburner is free software; you can redistribute it and/or modify
+ * Arsenal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Assburner is distributed in the hope that it will be useful,
+ * Arsenal is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -40,7 +40,7 @@
 #include "blurqt.h"
 #include "viewcolors.h"
 
-class ASSFREEZER_EXPORT DisplayPrefsDialog : public QDialog, public Ui::DisplayPrefsDialogUI
+class FREEZER_EXPORT DisplayPrefsDialog : public QDialog, public Ui::DisplayPrefsDialogUI
 {
 Q_OBJECT
 public:

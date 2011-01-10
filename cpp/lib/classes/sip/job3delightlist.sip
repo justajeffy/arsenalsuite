@@ -77,6 +77,8 @@ public:
 	MappedJob3DelightList & setJobscripts( const QString & );
 	QStringList jobscriptparams() const;
 	MappedJob3DelightList & setJobscriptparams( const QString & );
+	QStringList renderdlCmds() const;
+	MappedJob3DelightList & setRenderdlCmds( const QString & );
 
 
 };

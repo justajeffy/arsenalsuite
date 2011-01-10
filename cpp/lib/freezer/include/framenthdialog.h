@@ -8,7 +8,7 @@
 
 #include "ui_framenthdialogui.h"
 
-class ASSFREEZER_EXPORT FrameNthDialog : public QDialog, Ui::FrameNthDialogUI
+class FREEZER_EXPORT FrameNthDialog : public QDialog, Ui::FrameNthDialogUI
 {
 public:
 	FrameNthDialog( QWidget * parent, int startFrame, int endFrame, int frameNth, int copyMode);

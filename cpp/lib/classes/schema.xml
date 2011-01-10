@@ -686,6 +686,7 @@
   <column pluralMethodName="processes" docs="launch the render using 'n' processes" type="uint" methodName="processes" name="processes" />
   <column docs="use 'script' to start renders" type="QString" methodName="jobscript" name="jobscript" />
   <column docs="passes 'p' as the first parameter of script" type="QString" methodName="jobscriptparam" name="jobscriptparam" />
+  <column docs="Override the default call to &quot;renderdl&quot; binary." type="QString" methodName="renderdlCmd" name="renderdlCmd" />
  </table>
  <table useCodeGen="true" parent="Job" name="JobAfterEffects" expireKeyCache="true" className="JobAfterEffects" >
   <column type="uint" methodName="frameStart" name="frameStart" />
@@ -998,6 +999,13 @@
  <table useCodeGen="true" parent="JobMaya" name="JobMentalRay7" expireKeyCache="true" className="JobMentalRay7" />
  <table useCodeGen="true" parent="JobMaya" name="JobMentalRay8" expireKeyCache="true" className="JobMentalRay8" />
  <table useCodeGen="true" parent="JobMaya" name="JobMentalRay85" expireKeyCache="true" className="JobMentalRay85" />
+ <table docs="Job type for Naiad dynamic simulations." useCodeGen="true" parent="Job" name="JobNaiad" expireKeyCache="true" className="JobNaiad" >
+  <column type="uint" methodName="frameStart" name="frameStart" />
+  <column type="uint" methodName="frameEnd" name="frameEnd" />
+  <column pluralMethodName="threads" type="uint" methodName="threads" name="threads" />
+  <column docs="Append an arbitrary string to the command line, useful for &quot;--[global var] n&quot; flags." type="QString" methodName="append" name="append" />
+  <column docs="File path to a cache file used to restart sims part way through a render." type="QString" methodName="restartCache" name="restartCache" />
+ </table>
  <table useCodeGen="true" parent="Job" name="JobNuke51" expireKeyCache="true" className="JobNuke51" >
   <column type="uint" methodName="frameStart" name="frameStart" />
   <column type="uint" methodName="frameEnd" name="frameEnd" />

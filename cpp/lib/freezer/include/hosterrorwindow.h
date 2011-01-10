@@ -14,7 +14,7 @@ class HostErrorModel;
 class HostErrorListTask;
 class QEvent;
 
-class ASSFREEZER_EXPORT HostErrorWindow : public QMainWindow
+class FREEZER_EXPORT HostErrorWindow : public QMainWindow
 {
 Q_OBJECT
 public:

@@ -3,14 +3,14 @@
  *
  * Copyright 2003 Blur Studio Inc.
  *
- * This file is part of Assburner.
+ * This file is part of Arsenal.
  *
- * Assburner is free software; you can redistribute it and/or modify
+ * Arsenal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Assburner is distributed in the hope that it will be useful,
+ * Arsenal is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -62,7 +62,7 @@ class JobDepList;
 // color if valid
 QVariant civ( const QColor & c );
 
-struct ASSFREEZER_EXPORT FrameItem : public RecordItemBase
+struct FREEZER_EXPORT FrameItem : public RecordItemBase
 {
 	static QDateTime CurTime;
 	JobTask task;
@@ -80,7 +80,7 @@ struct ASSFREEZER_EXPORT FrameItem : public RecordItemBase
 
 typedef TemplateRecordDataTranslator<FrameItem> FrameTranslator;
 
-struct ASSFREEZER_EXPORT ErrorItem : public RecordItemBase
+struct FREEZER_EXPORT ErrorItem : public RecordItemBase
 {
 	JobError error;
 	QString hostName, cnt, when, msg;
@@ -92,7 +92,7 @@ struct ASSFREEZER_EXPORT ErrorItem : public RecordItemBase
 	Record getRecord();
 };
 
-struct ASSFREEZER_EXPORT HostErrorItem : public ErrorItem
+struct FREEZER_EXPORT HostErrorItem : public ErrorItem
 {
 	Job job;
 	JobType jobType;
@@ -105,14 +105,14 @@ typedef TemplateRecordDataTranslator<ErrorItem> ErrorTranslator;
 typedef TemplateRecordDataTranslator<HostErrorItem> HostErrorTranslator;
 //typedef RecordModelImp<TreeNodeT<ErrorCache> > ErrorModel;
 
-class ASSFREEZER_EXPORT ErrorModel : public RecordSuperModel
+class FREEZER_EXPORT ErrorModel : public RecordSuperModel
 {
 Q_OBJECT
 public:
 	ErrorModel( QObject * parent );
 };
 
-class ASSFREEZER_EXPORT HostErrorModel : public RecordSuperModel
+class FREEZER_EXPORT HostErrorModel : public RecordSuperModel
 {
 Q_OBJECT
 public:
@@ -124,7 +124,7 @@ public:
 	QMap<Job,JobServiceList> mJobServicesByJob;
 };
 
-struct ASSFREEZER_EXPORT JobItem : public RecordItemBase
+struct FREEZER_EXPORT JobItem : public RecordItemBase
 {
 	Job job;
 	JobStatus jobStatus;
@@ -144,7 +144,7 @@ struct ASSFREEZER_EXPORT JobItem : public RecordItemBase
 
 typedef TemplateRecordDataTranslator<JobItem> JobTranslator;
 
-class ASSFREEZER_EXPORT JobTreeBuilder : public ModelTreeBuilder
+class FREEZER_EXPORT JobTreeBuilder : public ModelTreeBuilder
 {
 public:
 	JobTreeBuilder( SuperModel * parent );
@@ -154,7 +154,7 @@ protected:
 	JobTranslator * mJobTranslator;
 };
 
-class ASSFREEZER_EXPORT JobModel : public RecordSuperModel
+class FREEZER_EXPORT JobModel : public RecordSuperModel
 {
 Q_OBJECT
 public:
@@ -180,18 +180,18 @@ protected:
 	QMap<JobType,QPixmap> mJobTypeIconMap;
 };
 
-ASSFREEZER_EXPORT void setupJobView( RecordTreeView *, IniConfig & );
-ASSFREEZER_EXPORT void saveJobView( RecordTreeView *, IniConfig & );
-ASSFREEZER_EXPORT void setupHostView( RecordTreeView *, IniConfig & );
-ASSFREEZER_EXPORT void saveHostView( RecordTreeView *, IniConfig & );
-ASSFREEZER_EXPORT void setupHostErrorView( RecordTreeView *, IniConfig & );
-ASSFREEZER_EXPORT void saveHostErrorView( RecordTreeView *, IniConfig & );
-ASSFREEZER_EXPORT void setupErrorView( RecordTreeView *, IniConfig & );
-ASSFREEZER_EXPORT void saveErrorView( RecordTreeView *, IniConfig & );
-ASSFREEZER_EXPORT void setupFrameView( RecordTreeView *, IniConfig & );
-ASSFREEZER_EXPORT void saveFrameView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void setupJobView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void saveJobView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void setupHostView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void saveHostView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void setupHostErrorView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void saveHostErrorView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void setupErrorView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void saveErrorView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void setupFrameView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void saveFrameView( RecordTreeView *, IniConfig & );
 
-class ASSFREEZER_EXPORT ProgressDelegate : public QItemDelegate
+class FREEZER_EXPORT ProgressDelegate : public QItemDelegate
 {
 Q_OBJECT
 public:
@@ -203,7 +203,7 @@ protected:
 	ColorOption * mStartedColor, * mReadyColor, * mDoneColor;
 };
 
-class ASSFREEZER_EXPORT LoadedDelegate : public QItemDelegate
+class FREEZER_EXPORT LoadedDelegate : public QItemDelegate
 {
 Q_OBJECT
 public:
@@ -213,7 +213,7 @@ public:
 	virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 };
 
-class ASSFREEZER_EXPORT MultiLineDelegate : public QItemDelegate
+class FREEZER_EXPORT MultiLineDelegate : public QItemDelegate
 {
 Q_OBJECT
 public:

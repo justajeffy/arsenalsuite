@@ -11,13 +11,13 @@
 class QAction;
 class QMenu;
 
-class AssFreezerWidget;
+class FreezerWidget;
 class RecordTreeView;
 
 void clearHostErrorsAndSetOffline( HostList hosts, bool offline);
 QString verifyKeyList( const QString & list, Table * table );
 
-class ASSFREEZER_EXPORT HostListWidget : public AssfreezerView
+class FREEZER_EXPORT HostListWidget : public FreezerView
 {
 Q_OBJECT
 public:
@@ -61,12 +61,12 @@ public slots:
 	void setHostsOnline();
 	/// selected hosts are told to stop burning
 	void setHostsOffline();
-	/// selected hosts are told to exit, and the process monitor is responsible for restarting Assburner
+	/// selected hosts are told to exit, and the process monitor is responsible for restarting Burner
 	void setHostsRestart();
 	void setHostsRestartWhenDone();
 	void setHostsReboot();
 	void setHostsRebootWhenDone();
-	/// selected hosts are told to update to the latest Assburner client
+	/// selected hosts are told to update to the latest Burner client
 	void setHostsClientUpdate();
 
     void toggleFilter(bool);
@@ -113,8 +113,8 @@ public:
 	 * mHostServiceFilterMenu,
 	 * mCannedBatchJobMenu;
 
-	friend class AssfreezerHostMenu;
-	friend class AssFreezerWidget;
+	friend class FreezerHostMenu;
+	friend class FreezerWidget;
 	friend class HostServiceFilterMenu;
 	friend class CannedBatchJobMenu;
 	friend class TailServiceLogMenu;

@@ -21,7 +21,7 @@
  */
 
 /*
- * $Id: tailwindow.cpp 5411 2007-12-18 01:03:08Z brobison $
+ * $Id$
  */
 
 #include <QtGui>
@@ -172,9 +172,7 @@ void TailWindow::updateText(const QString & text)
 		}
 	}
 
-		tempcursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor, 1);
-		tempcursor.insertText( text );
-	}
-
+    tempcursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor, 1);
+    tempcursor.insertText( text );
 }
 

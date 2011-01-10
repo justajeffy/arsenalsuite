@@ -36,7 +36,10 @@ class DelightBurner(JobBurner):
         if not self.process():
             Log( "DelightBurner::cleanup() process doesn't even exist" )
             return
-        mProcessId = self.process().pid()
+        try:
+            mProcessId = self.process().pid()
+        except:
+            Log( "DelightBurner::cleanup() Exception! process doesn't even exist" )
         Log( "DelightBurner::cleanup() Getting pid: %s" % mProcessId )
 
         # Need to find the correct PID space ..
@@ -72,12 +75,21 @@ class DelightBurner(JobBurner):
         self.EndFrame = self.frameList[-1]
 
         timeCmd = "/usr/bin/time --format=baztime:real:%e:user:%U:sys:%S:iowait:%w ";
-        renderdl = os.getenv("RENDERDL","renderdl")
-        cmd = timeCmd + "/bin/su %s -c \"%s " % (self.Job.user().name(), renderdl)
+        renderdl_cmd = "renderdl"
+        if( not self.Job.renderdlCmd().isEmpty() ):
+            renderdl_cmd = self.Job.renderdlCmd()
+        cmd = timeCmd + "/bin/su %s -c \"%s " % (self.Job.user().name(), renderdl_cmd)
 
         args = QStringList()
         args << "-nd"
         args << "-Progress"
+        #processes = 1
+        #threads = 
+        #if( threads > 2 ):
+        #    threads = int(threads / 2)
+        #    processes = 2
+        #args << "-P"
+        #args << str(processes)
         args << "-t"
         args << str(self.Job.threads())
         args << "-stats2"
@@ -133,7 +145,8 @@ class DelightBurner(JobBurner):
             if self.CurrentFrame <= self.EndFrame:
                 self.taskStart(self.CurrentFrame)
         elif line.contains(self.jobDone):
-            self.taskDone(self.CurrentFrame)
+            if self.CurrentFrame:
+                self.taskDone(self.CurrentFrame)
             self.jobFinished()
 
 class DelightBurnerPlugin(JobBurnerPlugin):

@@ -5,7 +5,7 @@
 #include "afcommon.h"
 #include "ui_projectweightdialogui.h"
 
-class ASSFREEZER_EXPORT ProjectWeightDialog : public QDialog, public Ui::ProjectWeightDialogUI
+class FREEZER_EXPORT ProjectWeightDialog : public QDialog, public Ui::ProjectWeightDialogUI
 {
 Q_OBJECT
 public:
