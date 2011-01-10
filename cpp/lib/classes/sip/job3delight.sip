@@ -81,6 +81,11 @@ public:
 	  **/
 	QString jobscriptparam() const;
 	MappedJob3Delight & setJobscriptparam( const QString & );
+	/**
+	  * Override the default call to "renderdl" binary.
+	  **/
+	QString renderdlCmd() const;
+	MappedJob3Delight & setRenderdlCmd( const QString & );
 
 
 	static MappedJob3DelightList select( const QString & where = QString::null, const QList<QVariant> & args = QList<QVariant>() );
