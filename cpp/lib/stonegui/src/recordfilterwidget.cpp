@@ -139,17 +139,34 @@ void RecordFilterWidget::filterRows()
     SuperModel * sm = (SuperModel *)(mTree->model());
 
     int numRows = mTree->model()->rowCount();
+    int mapSize = mFilterMap.size();
+	QStringList strs;
     for ( int row = 0; row < numRows; row++ ) {
         mTree->setRowHidden(row, mTree->rootIndex(), false);
-        int mapSize = mFilterMap.size();
         for ( int col = 0; col < mapSize; col++ ) {
             QLineEdit *filter = qobject_cast<QLineEdit*> (mFilterMap[col]);
-            if ( filter && filter->isVisible() && !filter->text().isEmpty() ) {
-                QString cell = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap[mFilterMap[col]])).toString();
-                if( ! cell.contains( filter->text(), Qt::CaseInsensitive ) )
-                    mTree->setRowHidden(row, mTree->rootIndex(), true);
 
-                sm->setColumnFilter( col, filter->text() );
+            if ( filter && filter->isVisible() && !filter->text().isEmpty() ) {
+                QString cell       = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap[mFilterMap[col]])).toString();
+                QString filterText = filter->text();
+
+/*
+                if( filterText.startsWith("~") ) {
+                    QRegExp rx(filterText.remove(0, 1), Qt::CaseInsensitive);
+                    if( rx.isValid() && rx.indexIn(cell, 0) != -1 ) {
+						sm->setColumnFilter( col, filterText );
+                    } else
+                        mTree->setRowHidden(row, mTree->rootIndex(), true);
+                } else {
+                    if( ! cell.contains( filter->text(), Qt::CaseInsensitive ) )
+                        mTree->setRowHidden(row, mTree->rootIndex(), true);
+                    sm->setColumnFilter( col, filter->text() );
+                }
+*/
+				if ( ! cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) )
+					mTree->setRowHidden(row, mTree->rootIndex(), true);
+				
+                sm->setColumnFilter( col, filterText );
             } else {
 
 			    // Set the filter to empty so that the highlighted text gets un-highlighted in recorddelegate

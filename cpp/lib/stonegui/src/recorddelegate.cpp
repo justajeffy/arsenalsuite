@@ -81,22 +81,68 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
     QVariant val = model->data(index, Qt::DisplayRole);
     SuperModel * sm = (SuperModel *)model;
 
-    if( !sm->mColumnFilterMap.value( index.column() ).isEmpty() ) {
-        QItemDelegate::drawBackground( painter, option, index );
+	QString cell   = val.toString();
+	QString filter = sm->mColumnFilterMap.value( index.column() );
 
-        QString filterText = sm->mColumnFilterMap.value(index.column());
-        //LOG_1(QString("column %1 has a filter %2").arg(QString::number(index.column())).arg(filterText));
-        QStringList nonMatchingBits = val.toString().split(filterText, QString::KeepEmptyParts, Qt::CaseInsensitive);
-        QFontMetrics fm = painter->fontMetrics();
-        painter->setClipRect(option.rect);
+/*
+	// Find all positions that contain the regexp
+	QRegExp rx(filter, Qt::CaseInsensitive);
+	QList<int> positions;
+	int position = 0;
+	while ( (position = rx.indexIn(cell, position)) != -1 ) {
+		QString str = rx.cap(0);
 
-        int x = option.rect.x();
-        int y = option.rect.y();
-        //LOG_1(QString("column original max width is %1").arg(QString::number(maxWidth)));
+		if ( str.isEmpty() ) break; 
 
-        QTextOption TO(Qt::AlignLeft);
-        for( int i = 0; i< nonMatchingBits.size(); i++ ) {
-            QString bit = nonMatchingBits[i];
+		for (int i=position; i < position+str.size(); i++) 
+			if ( !positions.contains(i) )
+				positions.append(i);
+
+		position += rx.matchedLength();
+	}
+*/
+
+	// Paint the actual text
+	if( !filter.isEmpty() ) {
+
+		// Find all positions that contain the regexp
+		QRegExp rx(filter, Qt::CaseInsensitive);
+		QList<int> positions;
+		int position = 0;
+		while ( (position = rx.indexIn(cell, position)) != -1 ) {
+			QString str = rx.cap(0);
+
+			if ( str.isEmpty() ) break;
+
+			for (int i=position; i < position+str.size(); i++)
+				if ( !positions.contains(i) )
+					positions.append(i);
+
+			position += rx.matchedLength();
+		}
+
+		// Now paint the text
+		QItemDelegate::drawBackground( painter, option, index );		
+
+		QFontMetrics fm = painter->fontMetrics();
+		painter->setClipRect(option.rect);
+
+		int x = option.rect.x();
+		int y = option.rect.y();
+
+		QTextOption TO(Qt::AlignLeft);
+
+		QString space = "";
+		int     pos   = -1;
+		foreach (QString character, cell) {
+
+			++pos;
+
+			// QFontMetrics::boundingRect() does not consider whitespaces, so need to take care of 'em ..
+			if ( character == " " ) {
+				space.append(" ");
+				continue;
+			}
 
             // If the model provides its own foreground color/brush for this item
             const QVariant value = index.data(Qt::ForegroundRole);
@@ -108,20 +154,19 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
             if( option.state & QStyle::State_Selected )
                 painter->setPen( option.palette.highlightedText().color() );
 
-            QRect bitRect = fm.boundingRect( bit );
-            painter->drawText( x, y, bitRect.width()+1, bitRect.height(), TO.flags(), bit);
-            x = x + bitRect.width();
+			if ( positions.contains(pos) )
+				painter->setPen( QColor(Qt::yellow) );
 
-            if( i == nonMatchingBits.size()-1 ) continue;
+			// If there were any whitespaces found before expand the boundingRect
+			QRect filterRect = ( space.size() > 0 ) ? fm.boundingRect( character.prepend(space) ) : fm.boundingRect( character );
+			space.clear();
 
-            QRect filterRect = fm.boundingRect( filterText );
-            painter->setPen( QColor(Qt::yellow) );
-            painter->drawText( x, y, filterRect.width()+1, filterRect.height(), TO.flags(), filterText);
-            x = x + filterRect.width();
-        }
-    } else {
-        QItemDelegate::paint(painter,option,index);
-    }
+			painter->drawText( x, y, filterRect.width()+1, filterRect.height(), TO.flags(), character );
+			x = x + filterRect.width();
+		}
+	} else {
+		QItemDelegate::paint(painter,option,index);
+	}
 
 	if( val.isValid() && val.type() == QVariant::Color && qvariant_cast<QColor>(val).isValid()  ) {
 		painter->setPen( Qt::white );

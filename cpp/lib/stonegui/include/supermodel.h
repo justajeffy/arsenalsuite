@@ -348,7 +348,7 @@ public:
 		SuperModel * mModel;
 	};
 
-    void setColumnFilter( uint column, const QString & filterString );
+    void setColumnFilter( uint column, const QString & filter );
     QMap<uint, QString> mColumnFilterMap;
 
 protected:

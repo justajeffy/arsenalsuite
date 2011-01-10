@@ -888,9 +888,9 @@ void SuperModel::closeInsertClosure()
 	}
 }
 
-void SuperModel::setColumnFilter( uint column, const QString & filterString )
+void SuperModel::setColumnFilter( uint column, const QString & filter )
 {
     //LOG_1(QString("setting filter for column %1 to %2").arg(QString::number(column)).arg(filterString));
-    mColumnFilterMap[column] = filterString;
+    mColumnFilterMap[column] = filter;
 }
 
