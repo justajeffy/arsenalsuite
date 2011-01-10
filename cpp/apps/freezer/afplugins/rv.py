@@ -19,8 +19,13 @@ class RvViewerPlugin(JobViewerPlugin):
 
     def view(self, jobList):
         for job in jobList:
+            envdict = {}
+            env_lines = str(job.environment()).splitlines()
+            for line in env_lines:
+                values = line.split('=', 1)
+                if len(values) >= 2:
+                    envdict[values[0]] = values[1]
             print "rv -l %s" % job.outputPath().replace("..",".#.")
-            subprocess.Popen(["rv", "-l", job.outputPath().replace("..",".#.")])
+            subprocess.Popen(["rv", "-l", job.outputPath().replace("..",".#.")], env=envdict)
 
 JobViewerFactory.registerPlugin( RvViewerPlugin() )
-
