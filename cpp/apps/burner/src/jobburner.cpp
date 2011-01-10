@@ -126,7 +126,7 @@ JobBurner::JobBurner( const JobAssignment & jobAssignment, Slave * slave, int op
 	mTaskList = compactNumberList( mTasks.frameNumbers() );
 	//connect( this, SIGNAL( fileGenerated(const QString &) ), SLOT( syncFile(const QString &) ) );
 
-	mProgressRE = QRegExp("\\(?\\d+\\%\\)?$");
+	mProgressRE = QRegExp("\\(?(\\d+)\\%\\)?$");
 	mProgressUpdate = QDateTime::currentDateTime();
 
     mJobFilterMessages = mJob.filterSet().jobFilterMessages();
@@ -768,19 +768,19 @@ void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessCh
 {
     // if the job supports progress messages, see if there's an update
 	if( mJob.hasTaskProgress() && mProgressRE.indexIn(line) >= 0 )
-		setProgress( mProgressRE.cap(0).toInt() );
+		setProgress( mProgressRE.cap(1).toInt() );
 
 #ifdef USE_TIME_WRAP
 	// # baztime:real:%e:user:%U:sys:%S:iowait:%w
 	if( line.startsWith("baztime:") ) {
-        LOG_3("found baztime line, updating accounting info");
+        logMessage("found baztime line, updating accounting info");
 		QStringList jobStats = line.split(":");
         // time reports things in decimal seconds, but we want to store
         // them in msecs
 		mJobAssignment.setRealtime( int(jobStats[2].toFloat() * 1000) );
 		mJobAssignment.setUsertime( int(jobStats[4].toFloat() * 1000) );
 		mJobAssignment.setSystime( int(jobStats[6].toFloat() * 1000) );
-        mJobAssignment.setEfficiency( (mJobAssignment.usertime() + mJobAssignment.systime()) / (mJobAssignment.realtime() > 0 ? mJobAssignment.realtime() : 1) );
+        //mJobAssignment.setEfficiency( (mJobAssignment.usertime() + mJobAssignment.systime()) / (mJobAssignment.realtime() > 0 ? mJobAssignment.realtime() : 1) );
 		mJobAssignment.commit();
 	}
 #endif
@@ -943,7 +943,7 @@ void JobBurner::updateAssignmentAccountingInfo()
     mJobAssignment.setBytesWrite(info.bytesWrite);
     mJobAssignment.setOpsRead(info.opsRead);
     mJobAssignment.setOpsWrite(info.opsWrite);
-    mJobAssignment.setEfficiency(info.cpuTime / (info.realTime > 0 ? info.realTime : 1));
+    //mJobAssignment.setEfficiency(info.cpuTime / (info.realTime > 0 ? info.realTime : 1));
     mJobAssignment.commit();
 #endif
 }
