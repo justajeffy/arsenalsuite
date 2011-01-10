@@ -1,6 +1,6 @@
 
-#ifndef ASSFREEZER_MENUS_H
-#define ASSFREEZER_MENUS_H
+#ifndef FREEZER_MENUS_H
+#define FREEZER_MENUS_H
 
 #include <qmenu.h>
 
@@ -12,58 +12,58 @@
 class QAction;
 class JobListWidget;
 class HostListWidget;
-class AssfreezerView;
+class FreezerView;
 class JobViewerPlugin;
 class HostViewerPlugin;
 
-class ASSFREEZER_EXPORT AssfreezerMenuPlugin
+class FREEZER_EXPORT FreezerMenuPlugin
 {
 public:
 	virtual void executeMenuPlugin( QMenu * )=0;
 };
 
-class ASSFREEZER_EXPORT AssfreezerMenuFactory
+class FREEZER_EXPORT FreezerMenuFactory
 {
 public:
-	static AssfreezerMenuFactory * instance();
+	static FreezerMenuFactory * instance();
 
-	void registerMenuPlugin( AssfreezerMenuPlugin * plugin, const QString & menuName );
+	void registerMenuPlugin( FreezerMenuPlugin * plugin, const QString & menuName );
 	QList<QAction*> aboutToShow( QMenu * menu, bool addPreSep = false, bool addPostSep = false );
 
-	QMap<QString,QList<AssfreezerMenuPlugin*> > mPlugins;
+	QMap<QString,QList<FreezerMenuPlugin*> > mPlugins;
 };
 
-class ASSFREEZER_EXPORT AssfreezerMenu : public QMenu
+class FREEZER_EXPORT FreezerMenu : public QMenu
 {
 Q_OBJECT
 public:
-	AssfreezerMenu( QWidget * parent, const QString & title = QString() );
+	FreezerMenu( QWidget * parent, const QString & title = QString() );
 
 public slots:
-    virtual void slotCurrentViewChanged( AssfreezerView * );
+    virtual void slotCurrentViewChanged( FreezerView * );
 	virtual void slotAboutToShow() = 0;
 	virtual void slotActionTriggered( QAction * ) {}
 };
 
-class ASSFREEZER_EXPORT JobListMenu : public AssfreezerMenu
+class FREEZER_EXPORT JobListMenu : public FreezerMenu
 {
 public:
 	JobListMenu(JobListWidget *, const QString & title = QString());
 protected:
-    void slotCurrentViewChanged( AssfreezerView * );
+    void slotCurrentViewChanged( FreezerView * );
 	JobListWidget * mJobList;
 };
 
-class ASSFREEZER_EXPORT HostListMenu : public AssfreezerMenu
+class FREEZER_EXPORT HostListMenu : public FreezerMenu
 {
 public:
 	HostListMenu(HostListWidget *, const QString & title = QString());
 protected:
-    void slotCurrentViewChanged( AssfreezerView * );
+    void slotCurrentViewChanged( FreezerView * );
 	HostListWidget * mHostList;
 };
 
-class ASSFREEZER_EXPORT StatusFilterMenu : public JobListMenu
+class FREEZER_EXPORT StatusFilterMenu : public JobListMenu
 {
 public:
 	StatusFilterMenu(JobListWidget *);
@@ -78,7 +78,7 @@ protected:
 	QList<QAction*> mStatusActions;
 };
 
-class ASSFREEZER_EXPORT ProjectFilterMenu : public JobListMenu
+class FREEZER_EXPORT ProjectFilterMenu : public JobListMenu
 {
 Q_OBJECT
 public:
@@ -94,7 +94,7 @@ protected:
 	bool mProjectActionsCreated;
 };
 
-class ASSFREEZER_EXPORT JobTypeFilterMenu : public JobListMenu
+class FREEZER_EXPORT JobTypeFilterMenu : public JobListMenu
 {
 public:
 	JobTypeFilterMenu(JobListWidget *);
@@ -109,10 +109,10 @@ protected:
 	QList<QAction*> mJobTypeActions;
 };
 
-class ASSFREEZER_EXPORT AssfreezerJobMenu : public JobListMenu
+class FREEZER_EXPORT FreezerJobMenu : public JobListMenu
 {
 public:
-	AssfreezerJobMenu(JobListWidget *);
+	FreezerJobMenu(JobListWidget *);
 
 	void slotAboutToShow();
 	void slotActionTriggered( QAction * );
@@ -128,7 +128,7 @@ protected:
     QMap<QAction *, JobViewerPlugin *> mJobViewerActions;
 };
 
-class ASSFREEZER_EXPORT HostServiceFilterMenu : public HostListMenu
+class FREEZER_EXPORT HostServiceFilterMenu : public HostListMenu
 {
 public:
 	HostServiceFilterMenu(HostListWidget * hostList);
@@ -144,7 +144,7 @@ protected:
     QList<QAction*> mHostServiceActions;
 };
 
-class ASSFREEZER_EXPORT CannedBatchJobMenu : public HostListMenu
+class FREEZER_EXPORT CannedBatchJobMenu : public HostListMenu
 {
 public:
 	CannedBatchJobMenu(HostListWidget * hostList);
@@ -153,7 +153,7 @@ public:
 	void slotActionTriggered(QAction*);
 };
 
-class ASSFREEZER_EXPORT TailServiceLogMenu : public HostListMenu
+class FREEZER_EXPORT TailServiceLogMenu : public HostListMenu
 {
 public:
 	TailServiceLogMenu(HostListWidget * hostList);
@@ -164,10 +164,10 @@ public:
 protected:
 };
 
-class ASSFREEZER_EXPORT AssfreezerHostMenu : public HostListMenu
+class FREEZER_EXPORT FreezerHostMenu : public HostListMenu
 {
 public:
-	AssfreezerHostMenu(HostListWidget * hostList);
+	FreezerHostMenu(HostListWidget * hostList);
 
 	void slotAboutToShow();
 	void slotActionTriggered(QAction*);
@@ -176,10 +176,10 @@ protected:
     QMap<QAction *, HostViewerPlugin *> mHostViewerActions;
 };
 
-class ASSFREEZER_EXPORT AssfreezerTaskMenu : public JobListMenu
+class FREEZER_EXPORT FreezerTaskMenu : public JobListMenu
 {
 public:
-	AssfreezerTaskMenu(JobListWidget *);
+	FreezerTaskMenu(JobListWidget *);
 
 	void slotAboutToShow();
 	void slotActionTriggered(QAction*);
@@ -192,11 +192,11 @@ protected:
     QMap<QAction *, HostViewerPlugin *> mHostViewerActions;
 };
 
-class ASSFREEZER_EXPORT AssfreezerErrorMenu : public AssfreezerMenu
+class FREEZER_EXPORT FreezerErrorMenu : public FreezerMenu
 {
 Q_OBJECT
 public:
-	AssfreezerErrorMenu(QWidget *, JobErrorList selection, JobErrorList all);
+	FreezerErrorMenu(QWidget *, JobErrorList selection, JobErrorList all);
 
 	void setErrors( JobErrorList selection, JobErrorList allErrors );	
 	void slotAboutToShow();
@@ -217,4 +217,4 @@ protected:
     QMap<QAction *, HostViewerPlugin *> mHostViewerActions;
 };
 
-#endif // ASSFREEZER_MENUS_H
+#endif // FREEZER_MENUS_H

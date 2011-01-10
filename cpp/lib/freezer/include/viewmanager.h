@@ -5,7 +5,7 @@
 #include <qstringlist.h>
 
 class IniConfig;
-class AssfreezerView;
+class FreezerView;
 
 class ViewManager
 {

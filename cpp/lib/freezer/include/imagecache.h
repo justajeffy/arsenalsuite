@@ -4,14 +4,14 @@
  *
  * Copyright 2003 Blur Studio Inc.
  *
- * This file is part of Assburner.
+ * This file is part of Arsenal.
  *
- * Assburner is free software; you can redistribute it and/or modify
+ * Arsenal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Assburner is distributed in the hope that it will be useful,
+ * Arsenal is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -41,7 +41,7 @@
 
 class QImage;
 
-struct ASSFREEZER_EXPORT CacheInfo
+struct FREEZER_EXPORT CacheInfo
 {
 	TexInfo texInfo; // Struct that holds info for OpenGL textures
 	QImage image;
@@ -53,7 +53,7 @@ struct ASSFREEZER_EXPORT CacheInfo
  * also stores the status of an image.  The imagenumber
  * is used a the key to look up a particular image's
  * status, or data. */
-class ASSFREEZER_EXPORT ImageCache : public QObject
+class FREEZER_EXPORT ImageCache : public QObject
 {
 Q_OBJECT
 public:

@@ -17,7 +17,7 @@
 class Stone::RecordProxy;
 using namespace Stone;
 
-class ASSFREEZER_EXPORT JobMaxScriptSettingsWidget : public CustomJobSettingsWidget, public Ui::JobMaxScriptSettingsWidgetUI, public JobMaxUtils
+class FREEZER_EXPORT JobMaxScriptSettingsWidget : public CustomJobSettingsWidget, public Ui::JobMaxScriptSettingsWidgetUI, public JobMaxUtils
 {
 Q_OBJECT
 public:

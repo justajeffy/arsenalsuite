@@ -53,7 +53,7 @@ JobTypeList JobListWidget::mJobTypeList;
 ProjectList JobListWidget::mProjectList;
 
 JobListWidget::JobListWidget( QWidget * parent )
-: AssfreezerView( parent )
+: FreezerView( parent )
 //, mJobFilterEdit( 0 )
 , mToolBar( 0 )
 , mViewsInitialized( false )
@@ -292,12 +292,12 @@ void JobListWidget::save( IniConfig & ini )
         foreach( int i, mFrameSplitter->sizes() ) sizes += QString::number(i);
         ini.writeString( "FrameSplitterPos", sizes.join(",") );
     }
-    AssfreezerView::save(ini);
+    FreezerView::save(ini);
 }
 
 void JobListWidget::restore( IniConfig & ini )
 {
-    AssfreezerView::restore(ini);
+    FreezerView::restore(ini);
 }
 
 ProjectList JobListWidget::activeProjects()
@@ -338,29 +338,32 @@ void JobListWidget::customEvent( QEvent * evt )
 			JobListTask * jlt = ((JobListTask*)evt);
 			JobModel * jm = (JobModel*)mJobTree->model();
 
-			jm->updateRecords( jlt->mReturn - jlt->mDependentJobs, QModelIndex(), /* updateRecursive */ true, /* loadChildren */ false );
+			jm->updateRecords( jlt->mReturn - jlt->mDependentJobs, QModelIndex(), /* updateRecursive */ false, /* loadChildren */ false );
 
-			// Update services
+            QMap<Record, JobServiceList> jobServicesByJob;
 			if( jlt->mFetchJobServices ) {
-				QMap<Record, JobServiceList> jobServicesByJob = jlt->mJobServices.groupedBy<Record,JobServiceList,uint,Job>( "fkeyjob" );
-				LOG_5( QString("Got %1 services for %2 jobs").arg(jlt->mJobServices.size()).arg(jobServicesByJob.size()) );
-				for( ModelIter it(jm, ModelIter::Filter(ModelIter::Recursive | ModelIter::DescendLoadedOnly)); it.isValid(); ++it ) {
-					JobItem & ji = JobTranslator::data(*it);
-					if( jobServicesByJob.contains( ji.job ) ) {
-						ji.services = jobServicesByJob[ji.job].services().services().join(",");
-						//LOG_5( "Set Job " + ji.job.name() + " services to " + ji.services );
-					} else
-						LOG_5( "No services found for " + ji.job.name() );
-				}
+                jobServicesByJob = jlt->mJobServices.groupedBy<Record,JobServiceList,uint,Job>( "fkeyjob" );
 			}
 
 			QMap<uint,JobDepList> jobDepsByJob = jlt->mJobDeps.groupedBy<uint,JobDepList>("fkeyjob");
 			RecordSuperModel * model = mJobTree->model();
+
 			for( ModelIter it(model,ModelIter::Filter(ModelIter::Recursive|ModelIter::DescendLoadedOnly)); it.isValid(); ++it ) {
 				Job j = model->getRecord(*it);
 				JobDepList deps = jobDepsByJob[j.key()];
-				jm->updateRecords( deps.deps(), *it, false );
-			}
+                if( deps.size() )
+                    jm->updateRecords( deps.deps(), *it, false );
+                if( jlt->mFetchJobServices ) {
+                    // Update services
+                    JobItem & ji = JobTranslator::data(*it);
+                    if( jobServicesByJob.contains( ji.job ) ) {
+                        ji.services = jobServicesByJob[j].services().services().join(",");
+                        LOG_5( "Set Job " + j.name() + " services to " + ji.services );
+                    } else {
+                        LOG_5( "No services found for " + j.name() );
+                    }
+                }
+            }
 
             // clear out existing toolTip info first
             int numRows = jm->rowCount();
@@ -603,7 +606,7 @@ void JobListWidget::setStatusToShow( QStringList statii )
 
 void JobListWidget::doRefresh()
 {
-	AssfreezerView::doRefresh();
+	FreezerView::doRefresh();
 	bool needJobListTask = false;
 	bool needStatusBarMsg = false;
 
@@ -876,7 +879,7 @@ void JobListWidget::changeFrameSelection(int /*frameNumber*/)
 
 void JobListWidget::showJobPopup( const QPoint & point )
 {
-	if( !mJobMenu ) mJobMenu = new AssfreezerJobMenu(this);
+	if( !mJobMenu ) mJobMenu = new FreezerJobMenu(this);
 	mJobMenu->popup( mJobTree->mapToGlobal( point ) );
 }
 
@@ -944,14 +947,14 @@ void JobListWidget::setJobPriority()
 
 void JobListWidget::showFramePopup(const QPoint & point)
 {
-	if( !mTaskMenu ) mTaskMenu = new AssfreezerTaskMenu(this);
+	if( !mTaskMenu ) mTaskMenu = new FreezerTaskMenu(this);
 	mTaskMenu->popup( mErrorTree->mapToGlobal(point) );
 }
 
 void JobListWidget::showErrorPopup(const QPoint & point)
 {
 	if( !mErrorMenu )
-		mErrorMenu = new AssfreezerErrorMenu( this, mErrorTree->selection(), mErrorTree->model()->rootList() );
+		mErrorMenu = new FreezerErrorMenu( this, mErrorTree->selection(), mErrorTree->model()->rootList() );
 	else
 		mErrorMenu->setErrors( mErrorTree->selection(), mErrorTree->model()->rootList() );
 	mErrorMenu->popup( mErrorTree->mapToGlobal(point) );

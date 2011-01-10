@@ -37,25 +37,25 @@
 #include "joblistwidget.h"
 #include "mainwindow.h"
 
-static AssfreezerMenuFactory * sMenuFactory = 0;
+static FreezerMenuFactory * sMenuFactory = 0;
 
-AssfreezerMenuFactory * AssfreezerMenuFactory::instance()
+FreezerMenuFactory * FreezerMenuFactory::instance()
 {
 	if( !sMenuFactory )
-		sMenuFactory = new AssfreezerMenuFactory();
+		sMenuFactory = new FreezerMenuFactory();
 	return sMenuFactory;
 }
 	
-void AssfreezerMenuFactory::registerMenuPlugin( AssfreezerMenuPlugin * plugin, const QString & menuName )
+void FreezerMenuFactory::registerMenuPlugin( FreezerMenuPlugin * plugin, const QString & menuName )
 {
 	mPlugins[menuName].append(plugin);
 }
 
-QList<QAction*> AssfreezerMenuFactory::aboutToShow( QMenu * menu, bool addPreSep, bool addPostSep )
+QList<QAction*> FreezerMenuFactory::aboutToShow( QMenu * menu, bool addPreSep, bool addPostSep )
 {
 	QList<QAction*> before = menu->actions(), ret;
 	if( mPlugins.contains( menu->objectName() ) )
-		foreach( AssfreezerMenuPlugin * plugin, mPlugins[menu->objectName()] )
+		foreach( FreezerMenuPlugin * plugin, mPlugins[menu->objectName()] )
 			plugin->executeMenuPlugin( menu );
 	foreach( QAction * action, menu->actions() )
 		if( !before.contains( action ) )
@@ -63,19 +63,19 @@ QList<QAction*> AssfreezerMenuFactory::aboutToShow( QMenu * menu, bool addPreSep
 	return ret;
 }
 
-AssfreezerMenu::AssfreezerMenu( QWidget * parent, const QString & title)
+FreezerMenu::FreezerMenu( QWidget * parent, const QString & title)
 : QMenu( title, parent )
 {
 	connect( this, SIGNAL( aboutToShow() ), SLOT( slotAboutToShow() ) );
 	connect( this, SIGNAL( triggered( QAction * ) ), SLOT( slotActionTriggered( QAction * ) ) );
     MainWindow * mw = qobject_cast<MainWindow*>(parent->window());
     if( mw ) {
-        connect( mw, SIGNAL( currentViewChanged( AssfreezerView * ) ), SLOT( slotCurrentViewChanged( AssfreezerView * ) ) );
+        connect( mw, SIGNAL( currentViewChanged( FreezerView * ) ), SLOT( slotCurrentViewChanged( FreezerView * ) ) );
     } else
         LOG_1( "Unable to cast window to MainWindow pointer, window is of type: " + QString(parent->window()->metaObject()->className()) );
 }
 
-void AssfreezerMenu::slotCurrentViewChanged( AssfreezerView * view )
+void FreezerMenu::slotCurrentViewChanged( FreezerView * view )
 {
     if( view && isTearOffMenuVisible() )
         slotAboutToShow();
@@ -83,30 +83,30 @@ void AssfreezerMenu::slotCurrentViewChanged( AssfreezerView * view )
 }
 
 JobListMenu::JobListMenu(JobListWidget * jobList, const QString & title )
-: AssfreezerMenu(jobList, title)
+: FreezerMenu(jobList, title)
 , mJobList(jobList)
 {}
 
-void JobListMenu::slotCurrentViewChanged( AssfreezerView * view )
+void JobListMenu::slotCurrentViewChanged( FreezerView * view )
 {
     JobListWidget * jobList = qobject_cast<JobListWidget*>(view);
     if( view )
         mJobList = jobList;
-    AssfreezerMenu::slotCurrentViewChanged( jobList );
+    FreezerMenu::slotCurrentViewChanged( jobList );
 }
 
 
 HostListMenu::HostListMenu(HostListWidget * hostList, const QString & title)
-: AssfreezerMenu(hostList, title)
+: FreezerMenu(hostList, title)
 , mHostList(hostList)
 {}
 
-void HostListMenu::slotCurrentViewChanged( AssfreezerView * view )
+void HostListMenu::slotCurrentViewChanged( FreezerView * view )
 {
     HostListWidget * hostList = qobject_cast<HostListWidget*>(view);
     if( view )
         mHostList = hostList;
-    AssfreezerMenu::slotCurrentViewChanged( hostList );
+    FreezerMenu::slotCurrentViewChanged( hostList );
 }
 
 ProjectFilterMenu::ProjectFilterMenu(JobListWidget * jobList)
@@ -330,7 +330,7 @@ void JobTypeFilterMenu::slotActionTriggered( QAction * act )
     mJobList->refresh();
 }
 
-AssfreezerJobMenu::AssfreezerJobMenu(JobListWidget * jobList)
+FreezerJobMenu::FreezerJobMenu(JobListWidget * jobList)
 : JobListMenu( jobList )
 , mRemoveDependencyAction( 0 )
 , mShowHistoryAction( 0 )
@@ -338,7 +338,7 @@ AssfreezerJobMenu::AssfreezerJobMenu(JobListWidget * jobList)
 {
 }
 
-void AssfreezerJobMenu::slotAboutToShow()
+void FreezerJobMenu::slotAboutToShow()
 {
 	clear();
 
@@ -425,7 +425,7 @@ void AssfreezerJobMenu::slotAboutToShow()
 		addAction( "Save As Canned Batch Job...", mJobList, SLOT(saveCannedBatchJob()) );
 }
 
-void AssfreezerJobMenu::slotActionTriggered( QAction * action )
+void FreezerJobMenu::slotActionTriggered( QAction * action )
 {
     if( !action ) return;
 	if( action == mRemoveDependencyAction ) {
@@ -482,7 +482,7 @@ void AssfreezerJobMenu::slotActionTriggered( QAction * action )
 	}
 }
 
-void AssfreezerJobMenu::modifyFrameRange( Job j )
+void FreezerJobMenu::modifyFrameRange( Job j )
 {
     JobTaskList tasks = j.jobTasks();
     if( j.packetType() == "preassigned" ) {
@@ -652,12 +652,12 @@ void TailServiceLogMenu::slotActionTriggered( QAction * action )
 	}
 }
 
-AssfreezerHostMenu::AssfreezerHostMenu(HostListWidget * hostList)
+FreezerHostMenu::FreezerHostMenu(HostListWidget * hostList)
 : HostListMenu( hostList )
 , mShowHistoryAction( 0 )
 {}
 
-void AssfreezerHostMenu::slotAboutToShow()
+void FreezerHostMenu::slotAboutToShow()
 {
 	clear();
 	addAction( mHostList->RefreshHostsAction );
@@ -706,7 +706,7 @@ void AssfreezerHostMenu::slotAboutToShow()
 	addMenu( mHostList->mHostServiceFilterMenu );
 }
 
-void AssfreezerHostMenu::slotActionTriggered( QAction * action )
+void FreezerHostMenu::slotActionTriggered( QAction * action )
 {
     if( !action ) return;
 
@@ -748,7 +748,7 @@ static void createHostViewWithSelection(QWidget * widget, HostList hosts )
 	}
 }
 
-AssfreezerTaskMenu::AssfreezerTaskMenu(JobListWidget * jobList)
+FreezerTaskMenu::FreezerTaskMenu(JobListWidget * jobList)
 : JobListMenu(jobList)
 , mInfoAction( 0 )
 , mRerenderFramesAction( 0 )
@@ -761,7 +761,7 @@ AssfreezerTaskMenu::AssfreezerTaskMenu(JobListWidget * jobList)
 {
 }
 
-void AssfreezerTaskMenu::slotAboutToShow()
+void FreezerTaskMenu::slotAboutToShow()
 {
 	clear();
 	mTasks = mJobList->mFrameTree->selection();
@@ -811,7 +811,7 @@ void AssfreezerTaskMenu::slotAboutToShow()
 	}
 }
 
-void AssfreezerTaskMenu::slotActionTriggered( QAction * action )
+void FreezerTaskMenu::slotActionTriggered( QAction * action )
 {
     if( !action ) return;
 
@@ -902,8 +902,8 @@ void AssfreezerTaskMenu::slotActionTriggered( QAction * action )
     }
 }
 
-AssfreezerErrorMenu::AssfreezerErrorMenu(QWidget * parent, JobErrorList selection, JobErrorList all)
-: AssfreezerMenu(parent)
+FreezerErrorMenu::FreezerErrorMenu(QWidget * parent, JobErrorList selection, JobErrorList all)
+: FreezerMenu(parent)
 , mSelection( selection )
 , mAll( all )
 , mClearSelected( 0 )
@@ -918,13 +918,13 @@ AssfreezerErrorMenu::AssfreezerErrorMenu(QWidget * parent, JobErrorList selectio
 {
 }
 
-void AssfreezerErrorMenu::setErrors( JobErrorList selection, JobErrorList allErrors )
+void FreezerErrorMenu::setErrors( JobErrorList selection, JobErrorList allErrors )
 {
 	mSelection = selection;
 	mAll = allErrors;
 }
 
-void AssfreezerErrorMenu::slotAboutToShow()
+void FreezerErrorMenu::slotAboutToShow()
 {
 	clear();
 
@@ -969,7 +969,7 @@ void AssfreezerErrorMenu::slotAboutToShow()
 	}
 }
 
-void AssfreezerErrorMenu::slotActionTriggered( QAction * action )
+void FreezerErrorMenu::slotActionTriggered( QAction * action )
 {
 	if( !action ) return;
 

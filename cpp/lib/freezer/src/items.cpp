@@ -3,14 +3,14 @@
  *
  * Copyright 2003 Blur Studio Inc.
  *
- * This file is part of Assburner.
+ * This file is part of Arsenal.
  *
- * Assburner is free software; you can redistribute it and/or modify
+ * Arsenal is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * Assburner is distributed in the hope that it will be useful,
+ * Arsenal is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -80,11 +80,11 @@ static const ColumnStruct job_columns [] =
 	{ "Time in Queue", 		"TimeInQueue",		80, 	13,	false, false },	//18
 	{ "Services", 			"Services", 		80, 	16,	false, true }, //19
 	{ "Avg. Memory", 		"AverageMemory", 	80, 	12,	false, false },	//20
-	{ "Efficiency", 		"Efficiency", 	40, 	21,	false, false },	//21
+	{ "Efficiency", 		"Efficiency", 	40, 	21,	false, true },	//21
 	{ "Disk Write", 		"DiskWrite", 	40, 	22,	false, false },	//22
 	{ "Disk Read", 		"DiskRead", 	40, 	23,	false, false },	//23
 	{ "Disk Ops", 		"DiskOps", 	40, 	24,	false, false },	//24
-	{ "CPU Time", 		"CPUTime", 	60, 	25,	false, false },	//25
+	{ "CPU Time", 		"CPUTime", 	60, 	25,	false, true },	//25
 	{ 0, 					0, 					0, 		0, 	false, false }
 };
 
@@ -793,7 +793,7 @@ bool JobModel::dropMimeData ( const QMimeData * data, Qt::DropAction action, int
 				LOG_5( "Job " + target.name() + " " + QString::number(target.key()) + " already depends on job " + pdep.name() + " " + QString::number(pdep.key()) );
 				continue;
 			}
-			if ( QMessageBox::warning( QApplication::activeWindow(), "Assfreezer: Confirm Dependency Creation",
+			if ( QMessageBox::warning( QApplication::activeWindow(), "Freezer: Confirm Dependency Creation",
 				QString("You have requested to have job %1 depend on job %2.\n  The former will have status \"holding\" until the latter is done.\n  Are you sure you want this dependency?").arg(target.name()).arg(pdep.name()), QMessageBox::Yes | QMessageBox::No, QMessageBox::No ) != QMessageBox::Yes )
 				continue;
 

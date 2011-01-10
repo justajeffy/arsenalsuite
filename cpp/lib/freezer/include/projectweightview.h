@@ -5,7 +5,7 @@
 #include "afcommon.h"
 #include "recordtreeview.h"
 
-class ASSFREEZER_EXPORT ProjectWeightView : public RecordTreeView
+class FREEZER_EXPORT ProjectWeightView : public RecordTreeView
 {
 Q_OBJECT
 public:

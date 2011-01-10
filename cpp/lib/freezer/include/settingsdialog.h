@@ -38,7 +38,7 @@
 #include "items.h"
 #include "blurqt.h"
 
-class ASSFREEZER_EXPORT SettingsDialog : public QDialog, public Ui::SettingsDialogUI
+class FREEZER_EXPORT SettingsDialog : public QDialog, public Ui::SettingsDialogUI
 {
 Q_OBJECT
 public:

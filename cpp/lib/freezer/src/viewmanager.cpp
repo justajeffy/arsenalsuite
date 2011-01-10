@@ -24,7 +24,7 @@ void ViewManager::readSavedViews( IniConfig & ini )
 		QString savedViewCode = ini.readString( QString("ViewCode%1").arg(i) );
 		// Backward compat, need to give views a view code if they don't have one
 		if( savedViewCode.isEmpty() ) {
-			savedViewCode = AssfreezerView::generateViewCode();
+			savedViewCode = FreezerView::generateViewCode();
 			QString viewSectionName = "View_" + savedViewName;
 			foreach( QString section, ini.sections() ) {
 				// Section matches exactly or is a sub section

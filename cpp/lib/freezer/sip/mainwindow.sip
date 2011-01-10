@@ -53,28 +53,28 @@ public slots:
 	
 	void closeCurrentView();
 
-	void cloneView( AssfreezerView * view );
+	void cloneView( FreezerView * view );
 	void cloneCurrentView();
 	void saveCurrentViewAs();
-	void saveViewAs( AssfreezerView * );
-	void moveViewLeft( AssfreezerView * );
-	void moveViewRight( AssfreezerView * );
+	void saveViewAs( FreezerView * );
+	void moveViewLeft( FreezerView * );
+	void moveViewRight( FreezerView * );
 	void moveCurrentViewLeft();
 	void moveCurrentViewRight();
 
 	// Pops up dialog to prompt user
-	void renameView( AssfreezerView * view );
+	void renameView( FreezerView * view );
 	void renameCurrentView();
 
-	AssfreezerView * currentView() const;
+	FreezerView * currentView() const;
 
-	void insertView( AssfreezerView * view, bool checkViewModeCheckCurrent=true );
-	void removeView( AssfreezerView * view );
+	void insertView( FreezerView * view, bool checkViewModeCheckCurrent=true );
+	void removeView( FreezerView * view );
 
-	void setCurrentView( AssfreezerView * );
+	void setCurrentView( FreezerView * );
 	void showNextView();
 
 signals:
-	void currentViewChanged( AssfreezerView * );
+	void currentViewChanged( FreezerView * );
 
 };

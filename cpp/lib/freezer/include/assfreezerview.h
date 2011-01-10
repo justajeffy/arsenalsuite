@@ -1,7 +1,7 @@
 
 
-#ifndef ASSFREEZER_VIEW_H
-#define ASSFREEZER_VIEW_H
+#ifndef FREEZER_VIEW_H
+#define FREEZER_VIEW_H
 
 #include <qwidget.h>
 #include <qmap.h>
@@ -12,12 +12,12 @@ class QMainWindow;
 class QToolBar;
 class QMenu;
 
-class ASSFREEZER_EXPORT AssfreezerView : public QWidget
+class FREEZER_EXPORT FreezerView : public QWidget
 {
 Q_OBJECT
 public:
-	AssfreezerView( QWidget * parent );
-	~AssfreezerView();
+	FreezerView( QWidget * parent );
+	~FreezerView();
 
 	virtual QString viewType() const = 0;
 
@@ -72,4 +72,4 @@ protected:
     IniConfig mIniConfig;
 };
 
-#endif // ASSFREEZER_VIEW_H
+#endif // FREEZER_VIEW_H

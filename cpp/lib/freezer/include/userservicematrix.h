@@ -15,7 +15,7 @@
 
 class UserServiceModel;
 
-class ASSFREEZER_EXPORT UserServiceModel : public RecordSuperModel
+class FREEZER_EXPORT UserServiceModel : public RecordSuperModel
 {
 Q_OBJECT
 public:
@@ -35,7 +35,7 @@ protected:
 	ServiceList mServices;
 };
 
-class ASSFREEZER_EXPORT UserServiceMatrix : public RecordTreeView
+class FREEZER_EXPORT UserServiceMatrix : public RecordTreeView
 {
 Q_OBJECT
 public:
@@ -54,7 +54,7 @@ protected:
 	UserServiceModel * mModel;
 };
 
-class ASSFREEZER_EXPORT UserServiceMatrixWindow : public QMainWindow, public Ui::UserServiceMatrixWindowUi
+class FREEZER_EXPORT UserServiceMatrixWindow : public QMainWindow, public Ui::UserServiceMatrixWindowUi
 {
 Q_OBJECT
 public:

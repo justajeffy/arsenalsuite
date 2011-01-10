@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: transactionmgr.cpp 8497 2009-06-24 06:49:01Z brobison $
+ * $Id$
  */
 
 #include <stdlib.h>
@@ -128,7 +128,8 @@ void TransactionMgr::writeTransaction( uint transaction, const QByteArray & data
 		char * tmp = (char*)malloc( indexPos - indexSize );
 		mIndexFile->seek( indexSize );
 		mIndexFile->write( tmp, indexPos - indexSize );
-		delete tmp;
+        free((char*)tmp);
+		//delete tmp;
 	}
 	
 	// Write the index data
