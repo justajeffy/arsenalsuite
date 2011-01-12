@@ -14,7 +14,7 @@
 #include "jobmayasettingswidget.h"
 #include "jobmaxscriptsettingswidget.h"
 #include "jobshakesettingswidget.h"
-#include "jobxsisettingswidget.h"
+//#include "jobxsisettingswidget.h"
 
 class BuiltinCustomJobSettingsWidgetsPlugin : public CustomJobSettingsWidgetPlugin
 {
@@ -31,7 +31,7 @@ QStringList BuiltinCustomJobSettingsWidgetsPlugin::jobTypes()
 		 + JobShakeSettingsWidget::jobTypes()
 		 + JobBatchSettingsWidget::jobTypes()
 		 + JobMaxScriptSettingsWidget::jobTypes()
-		 + JobXSISettingsWidget::jobTypes()
+		 //+ JobXSISettingsWidget::jobTypes()
 		 + JobFusionSettingsWidget::jobTypes()
 		 + JobFusionVideoMakerSettingsWidget::jobTypes();
 }
@@ -50,8 +50,8 @@ CustomJobSettingsWidget * BuiltinCustomJobSettingsWidgetsPlugin::createCustomJob
 		return new JobBatchSettingsWidget( parent, mode );
 	else if( JobMaxScriptSettingsWidget::jobTypes().contains( jobType ) )
 		return new JobMaxScriptSettingsWidget( parent, mode );
-	else if( JobXSISettingsWidget::jobTypes().contains( jobType ) )
-		return new JobXSISettingsWidget( parent, mode );
+	//else if( JobXSISettingsWidget::jobTypes().contains( jobType ) )
+	//	return new JobXSISettingsWidget( parent, mode );
 	else if( JobFusionSettingsWidget::jobTypes().contains( jobType ) )
 		return new JobFusionSettingsWidget( parent, mode );
 	else if( JobFusionVideoMakerSettingsWidget::jobTypes().contains( jobType ) )

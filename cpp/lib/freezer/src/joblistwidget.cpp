@@ -706,9 +706,10 @@ void JobListWidget::jobListSelectionChanged()
 		mJobSettingsWidget->setSelectedJobs( selection );
 	} else if( curTab == mHistoryTab ) {
 		// Clear the view
-		mHistoryView->setHistory( JobHistoryList() );
-		FreezerCore::addTask( new JobHistoryListTask( this, selection ) );
-		FreezerCore::wakeup();
+		//mHistoryView->setHistory( JobHistoryList() );
+		//FreezerCore::addTask( new JobHistoryListTask( this, selection ) );
+		//FreezerCore::wakeup();
+        mHistoryView->setJobs( selection );
 	} else if( curTab == mNotesTab ) {
 		mThreadView->setJobList( selection );
     }
@@ -765,7 +766,16 @@ void JobListWidget::currentTabChanged()
 
 void JobListWidget::clearErrors()
 {
-	Database::current()->exec("UPDATE JobError SET cleared=true WHERE fkeyJob IN(" + mJobTree->selection().keyString() + ")");
+    Database::current()->exec("UPDATE JobError SET cleared=true WHERE fkeyJob IN(" + mJobTree->selection().keyString() + ")");
+    foreach( Job job, mJobTree->selection() ) {
+        JobHistory jh;
+        jh.setMessage( "All errors cleared" );
+        jh.setUser( User::currentUser() );
+        jh.setHost( Host::currentHost() );
+        jh.setJob( job );
+        jh.setType( JobHistoryType::recordByName( "info" ) );
+        jh.commit();
+    }
 }
 
 void JobListWidget::restartJobs()
@@ -927,21 +937,8 @@ void JobListWidget::setJobPriority()
 	bool ok;
 	int priority = QInputDialog::getInteger(this,"Set Job(s) Priority","Set Job(s) Priority", total / count, 1, 99, 1, &ok);
 	if( ok ) {
-		Database::current()->beginTransaction();
-        foreach( Job job, jl ) {
-            JobHistory jh;
-            jh.setMessage( QString("Priority changed to %1").arg(priority) );
-            jh.setUser( User::currentUser() );
-            jh.setHost( Host::currentHost() );
-            jh.setColumnLiteral( "created", "NOW()" );
-            jh.setJob( job );
-            jh.setType( JobHistoryType::recordByName( "info" ) );
-            jh.commit();
-        }
-
 		jl.setPriorities( priority );
 		jl.commit();
-		Database::current()->commitTransaction();
 	}
 }
 

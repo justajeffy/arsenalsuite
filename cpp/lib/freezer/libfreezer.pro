@@ -36,7 +36,7 @@ SOURCES+= \
 	src/jobsettingswidget.cpp \
 	src/jobstatwidget.cpp \
 	src/jobsettingswidgetplugin.cpp \
-	src/jobxsisettingswidget.cpp \
+#	src/jobxsisettingswidget.cpp \
 	src/jobviewerplugin.cpp \
 	src/mainwindow.cpp \
 	src/projectweightdialog.cpp \
@@ -79,7 +79,7 @@ HEADERS+= \
 	include/jobstatwidget.h \
 	include/jobsettingswidget.h \
 	include/jobsettingswidgetplugin.h \
-	include/jobxsisettingswidget.h \
+#	include/jobxsisettingswidget.h \
 	include/jobviewerfactory.h \
 	include/jobviewerplugin.h \
 	include/mainwindow.h \
@@ -110,7 +110,7 @@ INTERFACES+= \
 	ui/jobrealflowsettingswidgetui.ui \
 	ui/jobsettingswidgetui.ui \
 	ui/jobshakesettingswidgetui.ui \
-	ui/jobxsisettingswidgetui.ui \
+#	ui/jobxsisettingswidgetui.ui \
 	ui/projectweightdialogui.ui \
 	ui/settingsdialogui.ui
 
