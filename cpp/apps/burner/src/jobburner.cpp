@@ -130,8 +130,7 @@ JobBurner::JobBurner( const JobAssignment & jobAssignment, Slave * slave, int op
 	mProgressUpdate = QDateTime::currentDateTime();
 
     mJobFilterMessages = mJob.filterSet().jobFilterMessages();
-    foreach( JobFilterMessage jfm, mJobFilterMessages )
-        jfm.qregex = QRegExp(jfm.regex());
+    //mJobFilterMessages.reload();
 }
 
 JobBurner::~JobBurner()
@@ -793,7 +792,7 @@ void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessCh
 		}
     }
     foreach( JobFilterMessage jfm, mJobFilterMessages ) {
-        if( line.contains( QRegExp(jfm.regex()) ) ) {
+        if( jfm.enabled() && line.contains( QRegExp(jfm.regex()) ) ) {
             logMessage( QString("JobBurner: JFM id: %1 produced an error with regex %2 ").arg(QString::number(jfm.key())).arg(jfm.regex()));
             jobErrored( line );
             return;
