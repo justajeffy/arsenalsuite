@@ -331,7 +331,8 @@ QString Record::changeString() const
 				}
 				if( !changeString.isEmpty() )
 					changeString += "\n";
-				changeString += fieldName + " changed: " + f->dbPrepare(orig.getValue(f->pos())).toString() + "  to  " + f->dbPrepare(getValue(f->pos())).toString();
+                if( f->dbPrepare(orig.getValue(f->pos())).toString() != f->dbPrepare(getValue(f->pos())).toString() )
+                    changeString += fieldName + " changed: " + f->dbPrepare(orig.getValue(f->pos())).toString() + "  to  " + f->dbPrepare(getValue(f->pos())).toString();
 			}
 		}
 	}
