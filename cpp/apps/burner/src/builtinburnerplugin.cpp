@@ -32,19 +32,17 @@
 #include "jobburnerfactory.h"
 
 #include "aftereffectsburner.h"
-#include "autodeskburnburner.h"
 #include "batchburner.h"
 #include "mayaburner.h"
 #include "max7burner.h"
 #include "maxscriptburner.h"
 #include "shakeburner.h"
-#include "syncburner.h"
 
 QStringList BuiltinBurnerPlugin::jobTypes()
 {
 	return QStringList() 
 #ifdef COMPILE_MAX7_BURNER
-	<< "Max7" << "Max8" << "Max9" << "Max10" << "Max2009"
+	<< "Max9" << "Max10" << "Max2009"
 #endif
 #ifdef COMPILE_MAXSCRIPT_BURNER
 	<< "MaxScript"
@@ -67,9 +65,6 @@ QStringList BuiltinBurnerPlugin::jobTypes()
 #ifdef COMPILE_SYNC_BURNER
 	<< "Sync"
 #endif
-#ifdef COMPILE_AUTODESK_BURNER
-	<< "AutodeskBurn"
-#endif
 	;
 }
 
@@ -77,7 +72,7 @@ JobBurner * BuiltinBurnerPlugin::createBurner( const JobAssignment & jobAssignme
 {
 	QString jt = jobAssignment.job().jobType().name();
 #ifdef COMPILE_MAX7_BURNER
-	if( jt == "Max7" || jt == "Max8" || jt == "Max9" || jt == "Max10" || jt == "Max2009" )
+	if( jt == "Max9" || jt == "Max10" || jt == "Max2009" )
 		return new Max7Burner( jobAssignment, slave );
 #endif
 #ifdef COMPILE_MAXSCRIPT_BURNER
@@ -99,14 +94,6 @@ JobBurner * BuiltinBurnerPlugin::createBurner( const JobAssignment & jobAssignme
 #ifdef COMPILE_AFTER_EFFECTS_BURNER
 	if( jt.contains("AfterEffects") )
 		return new AfterEffectsBurner( jobAssignment, slave );
-#endif
-#ifdef COMPILE_SYNC_BURNER
-	if( jt == "Sync" )
-		return new SyncBurner( jobAssignment, slave );
-#endif
-#ifdef COMPILE_AUTODESK_BURNER
-	if( jt == "AutodeskBurn" )
-		return new AutodeskBurnBurner( jobAssignment, slave );
 #endif
 	return 0;
 }
