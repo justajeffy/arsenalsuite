@@ -12,7 +12,7 @@ DEFINES += COMPILE_MENTALRAY_BURNER
 #DEFINES += COMPILE_RENDERMAN_BURNER
 #DEFINES += COMPILE_RIBGEN_BURNER
 DEFINES += COMPILE_SHAKE_BURNER
-DEFINES += COMPILE_SYNC_BURNER
+#DEFINES += COMPILE_SYNC_BURNER
 #DEFINES += COMPILE_AUTODESK_BURNER
 
 unix:DEFINES += USE_TIME_WRAP
@@ -53,14 +53,10 @@ SOURCES += \
 	src/main.cpp \
 	src/mapwarningdialog.cpp \
 	src/aftereffectsburner.cpp \
-	src/autodeskburnburner.cpp \
 	src/max7burner.cpp \
 	src/maxscriptburner.cpp \
 	src/mayaburner.cpp \
-	src/rendermanburner.cpp \
-	src/ribgenburner.cpp \
 	src/shakeburner.cpp \
-	src/syncburner.cpp \
 	src/settingsdialog.cpp \
 	src/slave.cpp \
 	src/spooler.cpp \
@@ -77,14 +73,10 @@ HEADERS += \
 	include/jobburner.h \
 	include/mapwarningdialog.h \
 	include/aftereffectsburner.h \
-	include/autodeskburnburner.h \
 	include/max7burner.h \
 	include/maxscriptburner.h \
 	include/mayaburner.h \
-	include/rendermanburner.h \
-	include/ribgenburner.h \
 	include/shakeburner.h \
-	include/syncburner.h \
 	include/killdialog.h \
 	include/maindialog.h \
 	include/settingsdialog.h \
