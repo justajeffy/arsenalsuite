@@ -274,7 +274,7 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
 	if( mJob.jobType().name().contains("Max") && !args.contains( "flag_xo" ) )
 		mJob.setValue( "flag_xo", QVariant(0) );
 
-    if( args.contains("deps" ) ) {
+    if( args.contains("deps") ) {
         JobList jobs;
         foreach( QString id, args["deps"].split(",") ) {
             Job d = Job(id.toUInt());
@@ -286,11 +286,11 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
         addDependencies( jobs );
     }
 
-    if( args.contains("linked" ) ) {
+    if( args.contains("linked") ) {
         JobList jobs;
         foreach( QString id, args["linked"].split(",") ) {
             Job d = Job(id.toUInt());
-            if( d.isRecord() ) { //&& d.jobTasks().size() == mTasks.size() ) {
+            if( d.isRecord() ) {
                 jobs += d;
                 /// if there are linked parent jobs, then any tasks for this job start
                 /// out "holding" for the parent tasks to complete
@@ -300,6 +300,32 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
             }
         }
         addDependencies( jobs, 2 /* depType */ );
+    }
+
+    if( args.contains("suspendDeps") ) {
+        JobList jobs;
+        foreach( QString id, args["suspendDeps"].split(",") ) {
+            Job d = Job(id.toUInt());
+            if( d.isRecord() ) {
+                jobs += d;
+            } else {
+                LOG_1( "SuspendDep Job with same task count not found: " + id );
+            }
+        }
+        addDependencies( jobs, 3 /* depType */ );
+    }
+
+    if( args.contains("deleteDeps") ) {
+        JobList jobs;
+        foreach( QString id, args["deleteDeps"].split(",") ) {
+            Job d = Job(id.toUInt());
+            if( d.isRecord() ) {
+                jobs += d;
+            } else {
+                LOG_1( "deleteDep Job with same task count not found: " + id );
+            }
+        }
+        addDependencies( jobs, 4 /* depType */ );
     }
 
 	if( args.contains("startupScript") ) {
