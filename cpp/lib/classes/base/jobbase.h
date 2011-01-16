@@ -37,6 +37,6 @@
 #endif
 
 #ifdef TABLE_FUNCTIONS
+	virtual void preUpdate( const Record &, const Record & );
 	virtual void postUpdate( const Record & updated, const Record & old );
-
 #endif
