@@ -264,7 +264,7 @@ class JobAssign:
     def key_even_by_priority( self ):
         hasHost = 0
         if self.JobStatus.hostsOnJob() > 0: hasHost = 1
-        sortKey = '%01d-%03d-%04d-%04d-%10d' % (hasHost,self.Job.priority(), self.JobStatus.hostsOnJob(), self.JobStatus.errorCount(), self.Job.submittedts().toTime_t())
+        sortKey = '%01d-%03d-%04d-%04d-%10d' % (self.Job.priority(), hasHost, int(self.JobStatus.errorCount()/5.0), self.JobStatus.hostsOnJob(), self.Job.submittedts().toTime_t())
         if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
         return sortKey
 
@@ -1333,7 +1333,7 @@ def run_loop():
     throttler.update()
     print "Manager: Beginning Loop.  Assign Rate: %g Assign Period: %g Assign Left: %g" % ( float(throttler.assignRate), float(throttler.assignPeriod), float(throttler.assignLeft) )
 
-    updateProjectTempo()
+    #updateProjectTempo()
 
     # Basic Farm Counter
     hostsTotal, hostsActive, hostsReady = getCounter()[:3]
