@@ -354,7 +354,7 @@ def reaper():
             q = Database.current().exec_('SELECT update_job_stats(%i)' % job.key())
 
             # If job is erroring check job and global error thresholds
-            if errorCount > job.maxErrors() or errorCount > config.totalFailureThreshold:
+            if errorCount > job.maxErrors() or (done == 0 and errorCount > config.totalFailureThreshold):
                 suspend = True
                 suspendMsg = 'Job %s has been suspended.  The job has produced %i errors.' % (job.name(),errorCount)
                 suspendTitle = 'Job %s suspended.' % job.name()
