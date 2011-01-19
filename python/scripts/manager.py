@@ -962,7 +962,7 @@ SELECT * from project_slots_limits
 
         # check for per user limits on slot use per service
         for service in jobAssign.servicesRequired:
-            key = job.user().name() +"-"+ service.service()
+            key = job.user().name() +":"+ service.service()
 
             if self.slotsByUserAndService.has_key(key):
                 self.slotsByUserAndService[key] = self.slotsByUserAndService[key] + job.assignmentSlots()
