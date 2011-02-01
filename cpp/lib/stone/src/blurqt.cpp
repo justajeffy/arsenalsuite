@@ -155,9 +155,11 @@ void initConfig( const QString & configName, const QString & logfile )
 		int argc = 0;
 		new QCoreApplication(argc, (char**)0);
 	}
+#ifdef Q_OS_WIN
 	// Used for 64 bit dlls, won't show up under syswow64
 	QCoreApplication::addLibraryPath("c:/windows/system32/blur64/");
 	QCoreApplication::addLibraryPath("c:/blur/common/");
+#endif
 	sConfigName = configName;
 	sConfig.setFileName( configName );
 	sConfig.readFromFile();
