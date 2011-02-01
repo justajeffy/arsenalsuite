@@ -406,11 +406,7 @@ void FreezerJobMenu::slotAboutToShow()
 		}
 	}
 
-	if( allDeps ) {
-		mRemoveDependencyAction = addAction( "Remove Dependency" );
-		addSeparator();
-	} else
-		mRemoveDependencyAction = 0;
+	mRemoveDependencyAction = addAction( "Remove Dependency" );
 
     // job control
 	addSeparator();

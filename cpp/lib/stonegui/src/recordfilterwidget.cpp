@@ -150,19 +150,13 @@ void RecordFilterWidget::filterRows()
                 QString cell       = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap[mFilterMap[col]])).toString();
                 QString filterText = filter->text();
 
-/*
-                if( filterText.startsWith("~") ) {
-                    QRegExp rx(filterText.remove(0, 1), Qt::CaseInsensitive);
+                if( filterText.startsWith("<") ) {
                     if( rx.isValid() && rx.indexIn(cell, 0) != -1 ) {
 						sm->setColumnFilter( col, filterText );
                     } else
                         mTree->setRowHidden(row, mTree->rootIndex(), true);
-                } else {
-                    if( ! cell.contains( filter->text(), Qt::CaseInsensitive ) )
-                        mTree->setRowHidden(row, mTree->rootIndex(), true);
-                    sm->setColumnFilter( col, filter->text() );
                 }
-*/
+
 				if ( ! cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) )
 					mTree->setRowHidden(row, mTree->rootIndex(), true);
 				
