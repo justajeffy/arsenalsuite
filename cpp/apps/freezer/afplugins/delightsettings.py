@@ -20,8 +20,7 @@ class DelightSettingsWidgetPlugin(CustomJobSettingsWidgetPlugin):
 	def jobTypes(self):
 		return QStringList('3Delight')
 
-	def createCustomJobSettingsWidget(self,jobType,parent):
-		Log( "DelightSettingsWidgetPlugin::createCustomJobSettingsWidget() called, Creating DelightSettingsWidget" )
+	def createCustomJobSettingsWidget(self,jobType,parent,foo):
 		return DelightSettingsWidget(parent)
 
 CustomJobSettingsWidgetsFactory.registerPlugin( DelightSettingsWidgetPlugin() )
