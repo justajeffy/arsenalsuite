@@ -84,24 +84,6 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
 	QString cell   = val.toString();
 	QString filter = sm->mColumnFilterMap.value( index.column() );
 
-/*
-	// Find all positions that contain the regexp
-	QRegExp rx(filter, Qt::CaseInsensitive);
-	QList<int> positions;
-	int position = 0;
-	while ( (position = rx.indexIn(cell, position)) != -1 ) {
-		QString str = rx.cap(0);
-
-		if ( str.isEmpty() ) break; 
-
-		for (int i=position; i < position+str.size(); i++) 
-			if ( !positions.contains(i) )
-				positions.append(i);
-
-		position += rx.matchedLength();
-	}
-*/
-
 	// Paint the actual text
 	if( !filter.isEmpty() ) {
 
