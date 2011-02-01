@@ -78,7 +78,9 @@ class NaiadBurner(JobBurner):
             args << self.Job.append()
 
         if not self.Job.restartCache().isEmpty:
-            args << self.Job.restartCache()
+            restartParam = self.Job.restartCache()
+            restartParam.sub("####", QString(self.StartFrame))
+            args << restartParam
 
         args << self.burnFile()
 
