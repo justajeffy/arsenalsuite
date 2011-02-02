@@ -150,12 +150,14 @@ void RecordFilterWidget::filterRows()
                 QString cell       = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap[mFilterMap[col]])).toString();
                 QString filterText = filter->text();
 
+		/*
                 if( filterText.startsWith("<") ) {
                     if( rx.isValid() && rx.indexIn(cell, 0) != -1 ) {
 						sm->setColumnFilter( col, filterText );
                     } else
                         mTree->setRowHidden(row, mTree->rootIndex(), true);
                 }
+		*/
 
 				if ( ! cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) )
 					mTree->setRowHidden(row, mTree->rootIndex(), true);
