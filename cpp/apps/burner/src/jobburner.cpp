@@ -211,6 +211,7 @@ void JobBurner::startProcess()
 	QStringList env = environment();
 	if( !isActive() ) return;
 	LOG_3( "Starting command: " + wholeCmd + (wd.isEmpty() ? QString() : QString(" in directory " + wd)) );
+    env << "ARSENAL_JOBKEY=" + QString::number(mJob.key());
 	if( !env.isEmpty() ) {
 		mCmd->setEnvironment( env );
 		LOG_5( "Environment: " + env.join("\n") );
