@@ -13,6 +13,7 @@
 %Include jobsettingswidgetplugin.sip
 %Include jobviewerplugin.sip
 %Include hostviewerplugin.sip
+%Include frameviewerplugin.sip
 %Include framenthdialog.sip
 %Include mainwindow.sip
 
