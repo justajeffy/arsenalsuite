@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: tableschema.cpp 9098 2009-11-27 00:38:55Z brobison $
+ * $Id$
  */
 
 #include "database.h"
@@ -407,10 +407,10 @@ IndexSchema * TableSchema::index( const QString & name ) const
 	return 0;
 }
 
-void TableSchema::preUpdate( const Record & u, const Record & r )
+void TableSchema::preUpdate( const Record & updated, const Record & old )
 {
 	if( mParent )
-		mParent->preUpdate( u, r );
+		mParent->preUpdate( updated, old );
 }
 
 void TableSchema::preInsert( RecordList rl )
