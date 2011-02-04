@@ -129,7 +129,6 @@ class JobAssign:
         self.tasksUnassigned = self.JobStatus.tasksUnassigned()
         self.servicesRequired = ServiceList()
         self.preassignedHosts = None
-        self._mapServerWeight = None
         self.logString = ''
 
     def loadHosts( self ):
@@ -248,11 +247,11 @@ class JobAssign:
 
     def __cmp__( self, other ):
         if id(self) == id(other): 			return 0
-        if self.Job.user() == other.Job.user():
-            if self.Job.priority() == other.Job.priority():
-                diff = self.Job.personalPriority() - other.Job.personalPriority()
-                if diff > 0: return 1
-                elif diff < 0: return -1
+        #if self.Job.user() == other.Job.user():
+        #    if self.Job.priority() == other.Job.priority():
+        #        diff = self.Job.personalPriority() - other.Job.personalPriority()
+        #        if diff > 0: return 1
+        #        elif diff < 0: return -1
         if JobAssign.SortMethod(self) > JobAssign.SortMethod(other):	return 1
         return -1
 
@@ -264,40 +263,17 @@ class JobAssign:
     def key_even_by_priority( self ):
         hasHost = 0
         if self.JobStatus.hostsOnJob() > 0: hasHost = 1
-        sortKey = '%01d-%03d-%04d-%04d-%10d' % (self.Job.priority(), hasHost, int(self.JobStatus.errorCount()/5.0), self.JobStatus.hostsOnJob(), self.Job.submittedts().toTime_t())
-        if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
+        sortKey = '%03d-%01d-%04d-%04d-%10d' % (self.Job.priority(), hasHost, int(self.JobStatus.errorCount()/5.0), self.JobStatus.hostsOnJob(), self.Job.submittedts().toTime_t())
+        #if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
         return sortKey
 
-    def key_project_soft_reserves( self ):
-        licensesUnder = 0
-        slotsUnder = 0
-        sortKey = '%01d-%03d-%04d-%04d-%10d' % (licensesUnder,slotsUnder, self.Job.priority())
-        if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
-        return sortKey
+    def key_user_project_soft_reserves( self ):
+        user_deficit = min(0, self.reservesByUser[self.Job.user().name()] - self.slotsByUser[self.Job.user().name()])
+        project_deficit = min(0, self.reservesByProject[self.Job.project().name()] - self.slotsByProject[self.Job.project().name()])
+        sortKey = '%04d-%04d-%03d-%04d-%04d' % (user_deficit, project_deficit, self.Job.priority(), int(self.JobStatus.errorCount()/5.0), self.JobStatus.hostsOnJob())
 
-    def mapServerWeight( self ):
-        if self._mapServerWeight == None:
-            ret = 0
-            if not self.Job.stats().isEmpty():
-                stats = str.split( str(self.Job.stats()), ';' )
-                for s in stats:
-                    pieces = str.split(s,"=")
-                    if len(pieces) == 2:
-                        (key,val) = pieces
-                        val = float(val) * 1024 * 1024
-                        if key == 'totalMapSize':
-                            ret += val * config._MAPS_WEIGHT_MUL
-                        elif key == 'totalXrefSize':
-                            ret += val * config._XREF_WEIGHT_MUL
-                        elif key == 'totalPointCacheSize':
-                            ret += val * config._PC_WEIGHT_MUL
-            ret = ret / config._WEIGHT_DIVIDER
-            if ret <= 0:
-                ret = max(1,min(config._ASSIGN_RATE / 2.0,self.JobStatus.tasksAverageTime() / 120.0) )
-                #if VERBOSE_DEBUG: print "Job %s has weight(calculated from average task time, no stats available): %g" % (self.Job.name(), ret)
-            ret = min( 20, ret )
-            self._mapServerWeight = ret
-        return self._mapServerWeight
+        #if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
+        return sortKey
 
     def calculateAutoPacketSize( self, totalHosts, totalTasks ):
         return self.calculateAutoPacketSizeByAvgTime( totalHosts, totalTasks )
@@ -492,46 +468,6 @@ class FreeHost(object):
     def handlesJob(self,jobAssign):
         return handlesServiceList(jobAssign.servicesRequired)
 
-# This stores information about a host that all assigned tasks have
-# been cleared and should become 'ready' soon, just has to finish
-# it's current task
-class NearlyFreeHost:
-    def __init__(self,host,assignment):
-        self.host = host
-        self.serviceList = host.hostServices().services()
-        self.assignment = assignment
-        # Used to know if a license is going to be freed up when this host becomes available
-        self.activeServices = self.assignment.job().jobServices().services()
-        # If this job hasn't rendered any frames, estimate a 2 minutes task time
-        self.tasktime = activeJob.jobStatus().tasksAverageTime()
-        if self.tasktime == 0:
-            self.tasktime = 120
-
-def unassign_host_busy(fkeyhost,fkeyjob,job_reason):
-    Database.current().exec_( "INSERT INTO PreemptionWaste (fkeyuser, fkeyjob, fkeyjobreason, timewasted, created) SELECT ?, ?, ?, SUM(NOW()-startedts), now() FROM JobTask WHERE fkeyjob=? AND fkeyhost=? AND startedts IS NOT NULL AND status='busy'", [QVariant(job_reason.user().key()),QVariant(fkeyjob),QVariant(job_reason.key()),QVariant(fkeyjob), QVariant(fkeyhost)] )
-    assignments = JobAssignment.select( "fkeyhost=? AND fkeyjob=?", VarList() << fkeyhost << fkeyjob )
-
-    # Cancel the assignments
-    cancelledStatus = JobAssignmentStatus.recordByName( 'cancelled' )
-    assignments.setStatuses( cancelledStatus )
-    assignments.commit()
-
-    # Cancel the tasks
-    Database.current().exec_( "UPDATE jobtaskassignment SET fkeyjobassignmentstatus=? WHERE fkeyjobassignmentstatus IN (SELECT jobassignmentstatus from jobassignmentstatus WHERE status IN ('assigned','busy') AND fkeyjobassignment IN (?)", [QVariant(cancelledStatus), QVariant(assignments.keyString())] )
-    q = Database.current().exec_( "UPDATE JobTask SET status='new' WHERE status IN ('assigned','busy') AND fkeyjob=? AND fkeyhost=?", [QVariant(fkeyjob),QVariant(fkeyhost)] )
-
-    return q.numRowsAffected()
-
-def unassign_host(fkeyhost,fkeyjob):
-    cancelledStatus = JobAssignmentStatus.recordByName( 'cancelled' )
-    Database.current().exec_( "UPDATE jobtaskassignment SET fkeyjobassignmentstatus=? WHERE fkeyjobassignment IN (SELECT keyjobassignment FROM jobassignment WHERE fkyjob=? AND fkeyhost=? AND fkeyjobassignmentstatus=?", [QVariant(JobAssignmentStatus.recordByName( 'cancelled' )),QVariant(fkeyjob),QVariant(fkeyhost),QVariant(JobAssignmentStatus.recordByName( 'assigned' ))] )
-    sql = "UPDATE JobTask SET status='new'"
-    if Job(fkeyjob).packetType() != 'preassigned':
-        sql += ", fkeyhost=NULL"
-    sql += " WHERE status='assigned' AND fkeyhost=%i AND fkeyjob=%i"
-    q = Database.current().exec_( sql % (fkeyhost,fkeyjob) )
-    return q.numRowsAffected()
-
 class ThrottleLimitException(Exception): pass
 class AllHostsAssignedException(Exception): pass
 class AllJobsAssignedException(Exception): pass
@@ -540,15 +476,6 @@ class NonCriticalAssignmentError(Exception): pass
 class FarmResourceSnapshot(object):
     def __init__(self):
         self.reset()
-        self.nearlyFreeHosts = []
-        self.licCountByService = {}
-        self.slotsByProject = {}
-        self.slotsByUserAndService = {}
-        self.slotsByUser = {}
-        self.limitsByProject = {}
-        self.limitsByUserAndService = {}
-        self.limitsByUser = {}
-        self.potentialSlotsAvailable = 0
 
     def reset(self):
         # Project Weighted Assigning
@@ -570,26 +497,22 @@ class FarmResourceSnapshot(object):
         self.hostStatuses = HostStatusList()
         self.hostStatusesByService = DefaultDict(HostStatusList)
         self.hostsUnused = {}
-        self.nearlyFreeAvailableHosts = {}
-        self.nearlyFreeReservedHosts = {}
         self.hostHasExclusiveAssignmentCache = {}
+
+        self.licCountByService = {}
+        self.slotsByProject = {}
+        self.slotsByUserAndService = {}
+        self.slotsByUser = {}
+        self.limitsByProject = {}
+        self.limitsByUserAndService = {}
+        self.limitsByUser = {}
+        self.potentialSlotsAvailable = 0
 
         # User Info
         self.refreshUserUsage()
 
         # project Info
         self.refreshProjectUsage()
-
-        # Used to keep track of whether or not assignments have been
-        # completed or were halted for some reason(throttling).
-        # If we have throttled assignments, then we wont do unassignments
-        # in order to free up tasks for idle hosts
-        self.currentAssignmentsCompleted = False
-
-    def hostIsFree(self,host):
-        for nfh in self.nearlyFreeHosts[:]:
-            if nfh.host == host:
-                self.nearlyFreeHosts.remove(nfh)
 
     def hostHasExclusiveAssignment(self,host):
         return host.key() in self.hostHasExclusiveAssignmentCache
@@ -770,18 +693,6 @@ SELECT * from project_slots_limits
             self.hostsUnused[hostStatus] = True
             self.hostIsFree(host)
 
-        # Refresh nearly free hosts to see if they are still assigned the same job
-        if self.nearlyFreeHosts:
-            nearlyFreeHosts = HostList()
-            for nfh in self.nearlyFreeHosts:
-                nearlyFreeHosts += nfh.host
-            Host.select( 'keyhost in (%s)' % nearlyFreeHosts.keyString() )
-            for nfh in self.nearlyFreeHosts:
-                if nfh.assignment.jobAssignmentStatus().status() != 'assigned':
-                    self.hostIsFree( nfh.host )
-        self.availableNearlyFreeHosts = self.nearlyFreeHosts
-        self.reservedNearlyFreeHosts = []
-
         for host in hosts:
             self.potentialSlotsAvailable =  self.potentialSlotsAvailable + host.maxAssignments()
 
@@ -849,35 +760,6 @@ SELECT * from project_slots_limits
             if self.licCountByService.has_key(service) and self.licCountByService[service] <= 0:
                 return False
         return True
-
-    def reserveNearlyFreeHosts(self,jobAssign,needed):
-        services = jobAssign.servicesRequired
-        activeServices = ServiceList()
-        for service in services:
-            if service.license().isRecord():
-                activeServices += service
-        reserved = 0
-        for nfh in self.availableNearlyFreeHosts:
-            if ((nfh.services & services) == services):
-                if not (activeServices.isEmpty() or (nfh.activeServices & activeServices) == activeServices):
-                    if not self.canReserveLicenses(activeServices):
-                        continue
-                    self.reserveLicenses(activeServices)
-                self.reservedNearlyFreeHosts.append( nfh )
-                self.availableNearyFreeHosts.remove( nfh )
-                reserved += 1
-                if reserved >= needed:
-                    break
-        return reserved
-
-    def addNearlyFreeHost(self,host,activeJob=None):
-        self.nearlyFreeHosts.append( NearlyFreeHost(host,activeJob) )
-
-    def isHostNearlyFree(self,fkeyhost):
-        for nfh in self.nearlyFreeHosts:
-            if nfh.host.key()==fkeyhost:
-                return True
-        return False
 
     def jobListByServiceList( self, serviceList ):
         jobs = JobList()
@@ -984,7 +866,7 @@ SELECT * from project_slots_limits
             return (0,jobAssign.tasksUnassigned)
 
         jobAssign.tasksUnassigned -= tasksAssigned
-        throttler.assignLeft -= weight
+        #throttler.assignLeft -= weight
 
         # Remove the job from the list if there are no tasks left to assign
         #if jobAssign.tasksUnassigned <= 0:
@@ -1003,11 +885,6 @@ SELECT * from project_slots_limits
         if jobAssign.Job.maxHosts() > 0 and jobAssign.JobStatus.hostsOnJob() >= jobAssign.Job.maxHosts():
             self.removeJob(jobAssign.Job)
             return False
-
-        # Check assignment throttling
-        weight = jobAssign.mapServerWeight()
-        if weight > throttler.assignLeft:
-            raise ThrottleLimitException()
 
         # Gather available hosts for this job
         if VERBOSE_DEBUG: print "Finding Hosts to Assign to %i tasks to Job %s with weight: %g" % (jobAssign.JobStatus.tasksUnassigned(), jobAssign.Job.name(),weight)
@@ -1132,207 +1009,28 @@ SELECT * from project_slots_limits
                 break
 
     def performAssignments(self):
-        assignMethods = {
-            self.performHighPriorityAssignments : "high priority",
-            self.performProjectWeightedAssignments : "project weighted",
-            self.performNormalAssignments : "normal priority" }
         try:
-            for assignMethod, methodName in assignMethods.iteritems():
-                try:
-                    timer.start()
-                    assignMethod()
-                finally:
-                    print "Finished assigning %s jobs, took %i" % (methodName, timer.elapsed())
-            self.currentAssignmentsCompleted = True
-
+            timer.start()
+            self.performNormalAssignments()
         except ThrottleLimitException, e:
             print "Assignment has been throttled."
         except AllHostsAssignedException:
             if VERBOSE_DEBUG: print "All relevant 'ready' hosts have been assigned"
-            self.currentAssignmentsCompleted = True
         except AllJobsAssignedException:
             # Catch this exception, no need to print the time if this is the case
             if VERBOSE_DEBUG: print "All jobs have been assigned"
-            self.currentAssignmentsCompleted = True
         except Exception, e:
             # Print the time but let the exception pass through
             if VERBOSE_DEBUG: print "Unknown error while assigning"
             traceback.print_exc()
             raise e
-
-    # Clears assigned tasks from existing jobs that have a lower priority(higher number) than priority,
-    # and are currently assigned to hosts that can handle jobType
-    def unassign_hosts_by_services(self,jobAssign,ignoreProjectWeighting):
-        job = jobAssign.Job
-        priority = job.priority()
-        unassignBusy = (priority < 5)
-        hostWhiteList = jobAssign.hostWhiteList()
-        hostBlackList = jobAssign.hostBlackList()
-        hostsNeeded = jobAssign.calculateNeededHosts()
-        serviceList = jobAssign.servicesRequired
-        activeServices = ServiceList()
-        for service in serviceList:
-            if service.license().isRecord():
-                activeServices += service
-        if not len(serviceList):
-            return 0
-        hostsNeeded -= self.reserveNearlyFreeHosts(jobAssign,hostsNeeded)
-        if hostsNeeded == 0:
-            return 0
-        job_fkeyproject = jobAssign.Job.getValue("fkeyproject").toInt()[0]
-        hostsUnassigned = 0
-        hostKeyListClauses=[]
-        if hostWhiteList is not None and len(hostWhiteList):
-            hostKeyListClauses.append( 'fkeyhost IN (%s)' % hostWhiteList.keyString() )
-        if hostBlackList is not None and len(hostBlackList):
-            hostKeyListClauses.append( ' fkeyhost NOT IN (%s)' % hostBlackList.keyString() )
-        hostKeyListClause = ''
-        if len(hostKeyListClauses):
-            hostKeyListClause = ' AND ' + ' AND '.join(hostKeyListClauses)
-        tasksClause = '(jobstatus.tasksAssigned'
-        if unassignBusy:
-            tasksClause += ' + jobstatus.tasksBusy'
-        tasksClause += ') > 0'
-        query = ("SELECT hoststatus.fkeyhost, hoststatus.fkeyjob, job.priority, job.fkeyproject, jobstatus.tasksaveragetime FROM job INNER JOIN jobstatus ON keyjob=jobstatus.fkeyjob "
-            + "INNER JOIN hoststatus ON hoststatus.fkeyjob=job.keyjob "
-            + "WHERE job.priority > %i AND %s AND hoststatus.slavestatus IN ('assigned','copy','busy') "
-            + "AND hoststatus.fkeyhost in (SELECT fkeyhost FROM "
-            + "(SELECT COUNT(*) AS service_count, fkeyhost FROM HostService WHERE enabled=true AND fkeyService IN (%s) %s GROUP BY fkeyhost) AS iq "
-            + "WHERE iq.service_count=%i) ORDER BY priority DESC, tasksaveragetime ASC;") % (priority, tasksClause, serviceList.keyString(), hostKeyListClause, serviceList.size())
-
-        hosts_to_unassign = Database.current().exec_(query)
-
-        while hosts_to_unassign.next() and hostsUnassigned < hostsNeeded:
-            # We dont really need fkeyjob to do this, but we'll use it anyway just in case the host has
-            # already been reassigned to a different job, to prevent changing it then.
-            fkeyhost = hosts_to_unassign.value(0).toInt()[0]
-            if not self.isHostNearlyFree(fkeyhost):
-                fkeyjob = hosts_to_unassign.value(1).toInt()[0]
-                priority = hosts_to_unassign.value(2).toInt()[0]
-                fkeyproject = hosts_to_unassign.value(3).toInt()[0]
-                averageTaskTime = hosts_to_unassign.value(4).toInt()[0]
-                # Check project weighting
-                if not ignoreProjectWeighting and fkeyproject != job_fkeyproject and fkeyproject in self.projectWeights and self.projectWeights[fkeyproject] > -1:
-                    continue;
-                # We need licenses, so check to see if the job is using the license we need
-                if activeServices:
-                    un_job = Job(fkeyjob)
-                    if not ((un_job.jobServices().services() & activeServices) == activeServices):
-                        if not self.canReserveLicenses(activeServices):
-                            continue
-                        self.reserveLicenses(activeServices)
-                if unassignBusy:
-                    unassignedCount = unassign_host_busy(fkeyhost,fkeyjob,job)
-                else:
-                    unassignedCount = unassign_host(fkeyhost,fkeyjob)
-                if unassignedCount >= 1:
-                    print "Unassigned %i assigned tasks from host %i job %i, priority %i average task time %i seconds" % (unassignedCount, fkeyhost, fkeyjob, priority, averageTaskTime)
-                    self.addNearlyFreeHost( Host(fkeyhost), Job(fkeyjob) )
-                    if fkeyproject in self.projectWeights:
-                        self.projectWeights[fkeyproject] += 1
-                    hostsUnassigned += 1
-        if hostsUnassigned > 0:
-            print "Free'd up %i hosts for service list %s for job %s" % (hostsUnassigned, serviceList.services().join(','), job.name())
-        return hostsUnassigned
-
-
-    def unassign_tasks_from_job(self,job,surplusHosts):
-        # Used to store how many assigned tasks each host has for this job
-        class HostInfo(object):
-            def __init__(self,host,hostStatus,assigned):
-                self.host = host
-                self.hostStatus = hostStatus
-                self.assignedFrames = assigned
-
-        # Get the hosts, and the number of still assigned frames
-        q_hosts = Database.current().exec_("SELECT fkeyhost, count(*) as asscnt FROM JobTask WHERE status='assigned' AND fkeyjob=" + QString.number(job.key()) + " group by fkeyhost")
-
-        # Put the assigned count into the host record, and get the total
-        # assigned count, and also the maximum assigned per single host
-        hostInfoList = []
-        total_ass = 0
-        max_frames = 0
-        while q_hosts.next():
-            h = Host(q_hosts.value(0).toInt()[0])
-            hs = h.hostStatus()
-            hs.reload()
-            cnt = q_hosts.value(1).toInt()[0]
-            if h.isRecord():
-                print "Host %s has %i assigned frames" % (h.name(),cnt)
-                total_ass += cnt
-                if cnt > max_frames:
-                    max_frames = cnt
-                hostInfoList.append( HostInfo( h, hs, cnt ) )
-
-        # If we get to a point where none are reassigned, then we can break out of the loop
-        reass = True
-
-        used_hosts = len(hostInfoList)
-
-        # Here how many more hosts this job can use total
-        max_hosts_to_use = total_ass - used_hosts
-        if max_hosts_to_use > surplusHosts:
-            max_hosts_to_use = surplusHosts
-
-        if max_hosts_to_use <= 0:
-            return 0
-
-        to_reassign = (total_ass / (used_hosts + max_hosts_to_use)) * max_hosts_to_use
-        to_reassign = min(max_hosts_to_use,to_reassign)
-
-        to_reassign_orig = to_reassign
-
-        # If this job doesn't qualify, go to the next
-        if to_reassign == 0:
-            return 0
-
-        print "Reassigning %i Frames out of %i assigned from %i hosts" % (to_reassign,total_ass,used_hosts)
-
-        # Each time through the loop, we reassign only the hosts with max_assigned frames
-        # that was we don't reassign from a host that only has 1 task left, when there another with 10
-        while reass and to_reassign > 0 and max_frames > 1:
-            reass = False
-            resetFrames = JobTaskList()
-            for hostInfo in hostInfoList:
-                frameList = hostInfo.hostStatus.slaveFrames()
-                #print "Parsing frameList %s" % (frameList)
-                frames = expandNumberList(frameList)[0]
-                #print "Max Frame == %i, assigned frames == %i" % (max_frames, h.errorTempo())
-                if hostInfo.assignedFrames == max_frames:
-                    foundReassign = False
-                    while not foundReassign and len(frames):
-                        frame = frames.pop()
-                        #print "Setting frameList %s" % (frameList)
-                        jtl = JobTask.select( "fkeyjob=? and jobtask=?", [QVariant(job.key()),QVariant(frame)] )
-                        frameList = numberListToString(frames)
-                        hostInfo.hostStatus.setSlaveFrames(frameList)
-                        if jtl.size() == 1:
-                            jt = jtl[0]
-                #			print "JobTask host %s, Host %s" % (h.name(), jt.host().name())
-                            if jt.host().key() == hostInfo.host.key() and jt.status() == 'assigned':
-                                print "Reassigning Frame %i of job %s from host %s" % (frame, job.name(), hostInfo.host.name())
-                                jt.setStatus('new')
-                                jt.setHost( Host() )
-                                hostInfo.assignedFrames -= 1
-                                resetFrames += jt
-                                to_reassign -= 1
-                                reass = True
-                                foundReassign = True
-
-                # If we've already 
-                if to_reassign == 0:
-                    break
-
-            # Commit the reassigned frames, lower max_frames
-            resetFrames.commit()
-            max_frames -= 1
-        return to_reassign_orig - to_reassign
+        finally:
+            print "Finished assigning %s jobs, took %i" % (methodName, timer.elapsed())
 
 def run_loop():
     config.update()
-    throttler.update()
-    print "Manager: Beginning Loop.  Assign Rate: %g Assign Period: %g Assign Left: %g" % ( float(throttler.assignRate), float(throttler.assignPeriod), float(throttler.assignLeft) )
-
+    #throttler.update()
+    print "Manager: Beginning Loop." #  Assign Rate: %g Assign Period: %g Assign Left: %g" % ( float(throttler.assignRate), float(throttler.assignPeriod), float(throttler.assignLeft) )
     #updateProjectTempo()
 
     # Basic Farm Counter
@@ -1341,7 +1039,7 @@ def run_loop():
     # Complete Job / Host snapshot
     snapshot = FarmResourceSnapshot()
     snapshot.refresh()
-    snapshot.scaleProjectWeights(hostsActive + hostsReady)
+    #snapshot.scaleProjectWeights(hostsActive + hostsReady)
     snapshot.performAssignments()
 
 def manager2():
