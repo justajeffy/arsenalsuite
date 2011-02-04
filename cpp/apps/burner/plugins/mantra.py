@@ -80,6 +80,9 @@ class MantraBurner(JobBurner):
 
     def cleanup(self):
         Log( "MantraBurner::cleanup() called" )
+        if not self.process():
+            Log( "MantraBurner::cleanup() no process, uh oh" )
+            return
         mProcessId = self.process().pid()
         Log( "MantraBurner::cleanup() Getting pid: %s" % mProcessId )
 
