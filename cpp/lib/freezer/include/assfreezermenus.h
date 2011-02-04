@@ -15,6 +15,7 @@ class HostListWidget;
 class FreezerView;
 class JobViewerPlugin;
 class HostViewerPlugin;
+class FrameViewerPlugin;
 
 class FREEZER_EXPORT FreezerMenuPlugin
 {
@@ -190,6 +191,7 @@ protected:
 	JobTaskList mTasks;
     QMap<QAction *, JobViewerPlugin *> mJobViewerActions;
     QMap<QAction *, HostViewerPlugin *> mHostViewerActions;
+    QMap<QAction *, FrameViewerPlugin *> mFrameViewerActions;
 };
 
 class FREEZER_EXPORT FreezerErrorMenu : public FreezerMenu
@@ -215,6 +217,7 @@ protected:
 	 * mClearHostErrors,
 	 * mShowErrorInfo;
     QMap<QAction *, HostViewerPlugin *> mHostViewerActions;
+    QMap<QAction *, FrameViewerPlugin *> mFrameViewerActions;
 };
 
 #endif // FREEZER_MENUS_H
