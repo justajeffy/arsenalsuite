@@ -8,5 +8,6 @@ import rv
 import shell
 import shotgunPlugin
 import ssh
+import firefox
 #import tabrotation
 

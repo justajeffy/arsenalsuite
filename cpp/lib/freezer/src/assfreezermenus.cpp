@@ -25,6 +25,8 @@
 #include "jobviewerplugin.h"
 #include "hostviewerfactory.h"
 #include "hostviewerplugin.h"
+#include "frameviewerfactory.h"
+#include "frameviewerplugin.h"
 
 #include "recordpropvaltree.h"
 #include "remotetailwindow.h"
@@ -783,7 +785,17 @@ void FreezerTaskMenu::slotAboutToShow()
 	if( ( User::hasPerms( "JobTask", false ) || mJobList->currentJob().user() == User::currentUser() )
 		&& mTasks.size() == 1 ) {
 		mInfoAction = addAction( "Task Info..." );
+
 		mShowLogAction = addAction( "Show Log..." );
+
+		QMenu * logMenu = addMenu("Show Log With...");
+		foreach( FrameViewerPlugin * fvp, FrameViewerFactory::mFrameViewerPlugins.values() ) {
+			QAction * action = new QAction( fvp->name(), this );
+			action->setIcon( QIcon(fvp->icon()) );
+			logMenu->addAction( action );
+			mFrameViewerActions[action] = fvp;
+		}
+
 		mShowHistoryAction = addAction( "Show History..." );
 		mCopyCommandAction = addAction( "Copy command" );
 	}
@@ -895,7 +907,10 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
         mJobViewerActions[action]->view(mJobList->mJobTree->selection());
     } else if( mHostViewerActions.contains(action) ) {
         mHostViewerActions[action]->view( JobTaskList(mJobList->mFrameTree->selection()).hosts() );
-    }
+    } else if( mFrameViewerActions.contains(action) ) {
+        JobTaskList jtl = mJobList->mFrameTree->selection();
+	    mFrameViewerActions[action]->view( jtl[0].jobTaskAssignment().jobAssignment() );
+	}
 }
 
 FreezerErrorMenu::FreezerErrorMenu(QWidget * parent, JobErrorList selection, JobErrorList all)
@@ -941,6 +956,14 @@ void FreezerErrorMenu::slotAboutToShow()
 
 	mShowLog = addAction("Show Log...");
 	mShowLog->setEnabled( mSelection.size() == 1 );
+
+    QMenu * logMenu = addMenu("Show Log With...");
+    foreach( FrameViewerPlugin * fvp, FrameViewerFactory::mFrameViewerPlugins.values() ) {
+        QAction * action = new QAction( fvp->name(), this );
+        action->setIcon( QIcon(fvp->icon()) );
+        logMenu->addAction( action );
+        mFrameViewerActions[action] = fvp;
+    }
 
 	mShowErrorInfo = addAction("Error Info...");
 	mShowErrorInfo->setEnabled( mSelection.size() == 1 );
@@ -1026,6 +1049,10 @@ void FreezerErrorMenu::slotActionTriggered( QAction * action )
 		JobListWidget * jlw = qobject_cast<JobListWidget*>(parent());
 		if( jlw )
 			jlw->restorePopup( RecordPropValTree::showRecords( mSelection[0], this, User::hasPerms( "JobError", true ) ) );
-	}
+	} else if( mSelection.size() > 0 && mFrameViewerActions.contains(action) ) {
+	    JobError je(mSelection[0]);
+        mFrameViewerActions[action]->view( je.jobAssignment() );
+    }
+
 }
 

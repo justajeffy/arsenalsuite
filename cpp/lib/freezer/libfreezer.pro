@@ -17,6 +17,7 @@ SOURCES+= \
 	src/hostlistwidget.cpp \
 	src/hostservicematrix.cpp \
 	src/userservicematrix.cpp \
+	src/frameviewerplugin.cpp \
 	src/hostviewerplugin.cpp \
 	src/imagecache.cpp \
 	src/imageview.cpp \
@@ -59,6 +60,8 @@ HEADERS+= \
 	include/hostlistwidget.h \
 	include/hostservicematrix.h \
 	include/userservicematrix.h \
+	include/frameviewerplugin.h \
+	include/frameviewerfactory.h \
 	include/hostviewerplugin.h \
 	include/hostviewerfactory.h \
 	include/imagecache.h \
