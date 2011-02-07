@@ -270,7 +270,7 @@ class JobAssign:
     def key_user_project_soft_reserves( self ):
         user_deficit = min(0, self.reservesByUser[self.Job.user().name()] - self.slotsByUser[self.Job.user().name()])
         project_deficit = min(0, self.reservesByProject[self.Job.project().name()] - self.slotsByProject[self.Job.project().name()])
-        sortKey = '%04d-%04d-%03d-%04d-%04d' % (user_deficit, project_deficit, self.Job.priority(), int(self.JobStatus.errorCount()/5.0), self.JobStatus.hostsOnJob())
+        sortKey = '%04d-%04d-%03d-%04d' % (9999-user_deficit, 9999-project_deficit, self.Job.priority(), int(self.JobStatus.errorCount()/5.0))
 
         #if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
         return sortKey
