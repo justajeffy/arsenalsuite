@@ -205,6 +205,7 @@
    <fkey indexDeleteMode="DoNothingOnDelete" indexName="AssetTemplate" indexUseCache="false" table="AssetTemplate" type="multi" hasIndex="true" />
   </column>
   <column type="uint" methodName="arsenalSlotLimit" name="arsenalSlotLimit" />
+  <column type="int" methodName="arsenalSlotReserve" name="arsenalslotreserve" />
   <variable type="float" name="mDaysEstimatedCache" />
   <variable type="float" name="mDaysScheduledCache" />
   <variable type="float" name="mDaysSpentCache" />
@@ -676,6 +677,8 @@
    <fkey indexDeleteMode="DoNothingOnDelete" table="JobFilterSet" type="single" hasIndex="false" />
   </column>
   <column pluralMethodName="maxErrors" type="uint" methodName="maxErrors" name="maxErrors" />
+  <column type="QString" methodName="notifyErrorMessage" name="notifyerrormessage" />
+  <column type="QString" methodName="notifyCompleteMessage" name="notifycompletemessage" />
  </table>
  <table useCodeGen="true" parent="Job" name="Job3Delight" expireKeyCache="true" className="Job3Delight" >
   <column type="uint" methodName="width" name="width" />
