@@ -20,8 +20,6 @@ class FireFoxViewerPlugin(FrameViewerPlugin):
         cmdArgs = QStringList()
         if sys.platform=="darwin":
             cmdString = QString("/Applications/Firfox.app/Contents/MacOS/firefox-bin")
-        elif sys.platform=="win32":
-            cmdString = QString("C:/windows/system32/cmd.exe /C \"start c:\\windows\\system32\\cmd.exe\"")
         else:
             cmdString = QString("/usr/bin/firefox")
 

@@ -52,9 +52,9 @@ QVariant UserServiceItem::modelData( const QModelIndex & idx, int role ) const
 		if( role == Qt::EditRole )
 			return qVariantFromValue<Record>(m->findUserService( mUser, idx.column() ));
 		QVariant d = m->serviceData( mUser, idx.column(), role );
+
 		if( role == Qt::ForegroundRole ) {
-            uint limitValue = d.toInt();
-			return (limitValue > 0 ? Qt::green : Qt::black);
+			return (d.toInt() > 0 ? Qt::darkGreen : Qt::darkRed);
 		}
 		return d;
 	}
@@ -136,7 +136,8 @@ QVariant UserServiceModel::serviceData ( const User & user, int column, int ) co
 	UserService us = findUserService( user, column );
 	if( us.isRecord() )
 		return us.limit();
-	return 0;
+
+	return "unltd";
 }
 
 void UserServiceModel::setUserFilter( const QString & filter )
