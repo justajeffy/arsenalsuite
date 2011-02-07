@@ -52,9 +52,9 @@ QVariant UserServiceItem::modelData( const QModelIndex & idx, int role ) const
 		if( role == Qt::EditRole )
 			return qVariantFromValue<Record>(m->findUserService( mUser, idx.column() ));
 		QVariant d = m->serviceData( mUser, idx.column(), role );
+
 		if( role == Qt::ForegroundRole ) {
-            uint limitValue = d.toInt();
-			return (limitValue > 0 ? Qt::green : Qt::black);
+			return (d.toInt() > 0 ? Qt::darkGreen : Qt::darkRed);
 		}
 		return d;
 	}
@@ -136,7 +136,8 @@ QVariant UserServiceModel::serviceData ( const User & user, int column, int ) co
 	UserService us = findUserService( user, column );
 	if( us.isRecord() )
 		return us.limit();
-	return 0;
+
+	return "unltd";
 }
 
 void UserServiceModel::setUserFilter( const QString & filter )
@@ -194,6 +195,9 @@ UserServiceMatrix::UserServiceMatrix( QWidget * parent )
 	setItemDelegate( new UserServiceDelegate(this) );
 	connect( this, SIGNAL( showMenu( const QPoint &, const QModelIndex & ) ), SLOT( slotShowMenu( const QPoint &, const QModelIndex & ) ) );
 	setSelectionBehavior( QAbstractItemView::SelectItems );
+
+	// Turn of double-click editing
+	setEditTriggers(QAbstractItemView::NoEditTriggers);
 	header()->setStretchLastSection( false );
 
 	connect( Service::table(), SIGNAL( added(RecordList) ), SLOT( updateServices() ) );
@@ -227,28 +231,30 @@ void UserServiceMatrix::slotShowMenu( const QPoint & pos, const QModelIndex & /*
 	QItemSelection sel = selectionModel()->selection();
 	if( !sel.isEmpty() ) {
 		QMenu * menu = new QMenu( this );
-		QAction * lim = menu->addAction( "Set Limit" );
-		menu->addAction( "Set Disabled" );
-		QAction * result = menu->exec(pos);
+		QAction * limit   = menu->addAction( "Set Limit" );
+		QAction * disable = menu->addAction( "Set Unlimited" );
+		QAction * result  = menu->exec(pos);
+
+		UserServiceList toUpdate;
 		if( result ) {
             uint limitValue = 0;
-            if( result == lim ) {
-                // get the limit value
-                bool ok;
-                int i = QInputDialog::getInt(this, tr("Set Slot Limit"),
+			bool ok;
+            if( result == limit )
+                limitValue = QInputDialog::getInt(this, tr("Set Slot Limit"),
                                              tr("Slots:"), 100, 0, 99999, 1, &ok);
-                if (ok)
-                    limitValue = i;
-            }
-			UserServiceList toUpdate;
+
 			foreach( QModelIndex idx, sel.indexes() ) {
 				UserService us = mModel->findUserService( idx );
-				us.setLimit( limitValue );
+
+				if (ok)
+					us.setLimit( limitValue );
+
 				toUpdate += us;
 			}
-			if( result == lim )
+
+			if ( result == limit && ok )
 				toUpdate.commit();
-			else
+			else if ( result == disable )
 				toUpdate.remove();
 		}
 		delete menu;
