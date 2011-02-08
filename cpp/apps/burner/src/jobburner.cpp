@@ -363,8 +363,8 @@ void JobBurner::taskDone( int task )
 //		return;
 //	}
 	bool needMemoryCheck = false;
-	foreach( JobTaskAssignment jat, mCurrentTaskAssignments )
-		if( jat.memory() == 0 ) needMemoryCheck = true;
+	foreach( JobTaskAssignment jta, mCurrentTaskAssignments )
+		if( jta.memory() == 0 ) needMemoryCheck = true;
 	if( needMemoryCheck )
 		checkMemory();
 
@@ -470,6 +470,10 @@ void JobBurner::jobErrored( const QString & msg, bool timeout )
 {
 	LOG_3( "JobBurner: Got Error: " + msg );
 	logMessage( "JobBurner: Got Error: " + msg );
+    if( mState == StateError ) {
+        LOG_3( "JobBurner: ERROR an error has already occurred" );
+        return;
+    }
 	mState = StateError;
 	// error will be logged by the slave that is monitoring this jobburner
 	JobError je = logError( mJob, msg, mCurrentTasks, timeout );
@@ -485,7 +489,7 @@ void JobBurner::jobErrored( const QString & msg, bool timeout )
 	// This will reset jobtasks and cancel the jobtaskassignments
     // is this really required with the database triggers that happen when the
     // JA status changes?
-	Database::current()->exec("SELECT cancel_job_assignment(?)", VarList() << mJobAssignment.key() );
+	//Database::current()->exec("SELECT cancel_job_assignment(?)", VarList() << mJobAssignment.key() );
 
 	emit errored( msg );
 	cleanup();
