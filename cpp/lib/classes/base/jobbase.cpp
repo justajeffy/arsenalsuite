@@ -18,14 +18,16 @@ bool Job::updateJobStatuses( JobList jobs, const QString & jobStatus, bool reset
 	Database::current()->beginTransaction();
 
     if( resetTasks ) {
+        /*** Let triggers handle this now!
         foreach( Job j, jobs ) {
-            JobTaskList jtl = j.jobTasks().filter("status", "cancelled", /* keepMatches */ false);
+            JobTaskList jtl = j.jobTasks().filter("status", "cancelled",  keepMatches false);
             jtl.setStatuses("new");
             jtl.setColumnLiteral("fkeyjoboutput","NULL");
             if( j.packetType() != "preassigned" )
                 jtl.setHosts(Host());
             jtl.commit();
         }
+        ***/
     }
 
 	if( !jobStatus.isEmpty() ){
@@ -154,7 +156,7 @@ void JobSchema::preUpdate( const Record & updated, const Record & old )
     // if the priority is being lowered, check to make sure they're allowed to do so
     if( newJob.priority() < oldJob.priority() ) {
         if( !User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) ) {
-            newJob.setPriority(oldJob.priority()+1);
+            newJob.setPriority(oldJob.priority());
         }
     }
     TableSchema::preUpdate(updated,old);
