@@ -590,26 +590,10 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 	return QVariant();
 }
 
-static int statusSortKey( const QString & status )
-{
-	int order = 6;
-	if( status=="submit" ) order = 2;
-	else if( status=="verify" ) order = 2;
-	else if( status=="ready" ) order = 1;
-	else if( status=="started" ) order = 0;
-	else if( status=="suspended" ) order = 3;
-	else if( status=="holding" ) order = 3;
-	else if( status=="done" ) order = 4;
-	else if( status=="deleted" ) order = 5;
-	return order;
-}
-
 int JobItem::compare( const QModelIndex & a, const QModelIndex & b, int col, bool asc )
 {
 	JobItem & other = JobTranslator::data(b);
-	if( col == 1 ) {
-		return compareRetI( statusSortKey( job.status() ), statusSortKey( other.job.status() ) );
-	} else if( col == 2 ) {
+	if( col == 2 ) {
 		float other_done = other.jobStatus.tasksCount() ? other.jobStatus.tasksDone() / float(other.jobStatus.tasksCount()) : 0;
 		float done = jobStatus.tasksCount() ? jobStatus.tasksDone() / float(jobStatus.tasksCount()) : 0;
 		// If the number of done frames are the same, then sort by assigned frames
