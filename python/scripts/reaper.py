@@ -414,16 +414,20 @@ def reaper():
         time.sleep(3)
 
 def notifyOnCompleteSend(job):
-	if VERBOSE_DEBUG:
-		print 'notifyOnCompleteSend(): Job %s is complete.' % (job.name())
-	msg = 'Job %s is complete.' % (job.name())
-	notifySend( notifyList = job.notifyOnComplete(), subject = msg, body = msg )
+    if VERBOSE_DEBUG:
+        print 'notifyOnCompleteSend(): Job %s is complete.' % (job.name())
+    msg = 'Job %s is complete.' % (job.name())
+    if not job.notifyCompleteMessage().isEmpty():
+        msg = job.notifyCompleteMessage()
+    notifySend( notifyList = job.notifyOnComplete(), subject = msg, body = msg )
 
 def notifyOnErrorSend(job,errorCount):
-	if VERBOSE_DEBUG:
-		print 'notifyOnErrorSend(): Job %s has errors.' % (job.name())
-	msg = 'Job %s has %i errors.' % (job.name(),errorCount)
-	notifySend( notifyList = job.notifyOnError(), body = msg, subject = msg, noEmail = True )
+    if VERBOSE_DEBUG:
+        print 'notifyOnErrorSend(): Job %s has errors.' % (job.name())
+    msg = 'Job %s has %i errors.' % (job.name(),errorCount)
+    if not job.notifyErrorMessage().isEmpty():
+        msg = job.notifyErrorMessage()
+    notifySend( notifyList = job.notifyOnError(), body = msg, subject = msg, noEmail = True )
 
 def notifySend( notifyList, body, subject, noEmail = False ):
 	for notify in str(notifyList).split(','):
@@ -437,7 +441,6 @@ def notifySend( notifyList, body, subject, noEmail = False ):
 				if VERBOSE_DEBUG:
 					print 'JABBER: %s %s %s %s\n' % (sender, config.jabberSystemPassword, recipient, body) 
 				blur.jabber.send(str(sender), str(config.jabberSystemPassword), str(recipient), str(body) )
-
 		except:
 			if VERBOSE_DEBUG:
 				print 'bad formatting in notifyList %s\n' % (notifyList)
@@ -452,7 +455,6 @@ def createJobStat( mJob ):
 	stat.commit()
 	mJob.setJobStat( stat )
 	mJob.commit()
-
 
 config = ReaperConfig()
 config.update()
