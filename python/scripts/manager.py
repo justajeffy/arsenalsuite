@@ -40,7 +40,7 @@ blur.RedirectOutputToLog()
 # Load all the database tables
 classes_loader()
 
-VERBOSE_DEBUG = False
+VERBOSE_DEBUG = True
 
 if VERBOSE_DEBUG:
     Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete ) #| Database.EchoSelect )
@@ -59,10 +59,11 @@ hostService.enableUnique()
 class ManagerConfig:
     def update(self):
         # Sort parameters
-        self._SORT_METHOD = Config.getString( 'assburnerSortMethod', 'key_default' )
+        #self._SORT_METHOD = Config.getString( 'assburnerSortMethod', 'key_default' )
+        self._SORT_METHOD = 'key_user_project_soft_reserves'
         try:
             JobAssign.SortMethod = getattr(JobAssign, str(self._SORT_METHOD))
-            print ("Using %s job sort method" % self._SORT_METHOD)
+            #print ("Using %s job sort method" % self._SORT_METHOD)
         except:
             print "Config sort method %s not found, using key_default" % self._SORT_METHOD
             JobAssign.SortMethod = JobAssign.key_default
@@ -268,11 +269,11 @@ class JobAssign:
         return sortKey
 
     def key_user_project_soft_reserves( self ):
-        user_deficit = min(0, self.reservesByUser[self.Job.user().name()] - self.slotsByUser[self.Job.user().name()])
-        project_deficit = min(0, self.reservesByProject[self.Job.project().name()] - self.slotsByProject[self.Job.project().name()])
+        user_deficit = min(0, FarmResourceSnapshot.limitsByUser.get(self.Job.user().name(), [0,0])[1] - FarmResourceSnapshot.slotsByUser.get(self.Job.user().name(),0))
+        project_deficit = min(0, FarmResourceSnapshot.limitsByProject.get(self.Job.project().name(), [0,0])[1] - FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0))
         sortKey = '%04d-%04d-%03d-%04d' % (9999-user_deficit, 9999-project_deficit, self.Job.priority(), int(self.JobStatus.errorCount()/5.0))
 
-        #if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
+        if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
         return sortKey
 
     def calculateAutoPacketSize( self, totalHosts, totalTasks ):
@@ -337,6 +338,10 @@ class JobAssign:
             limit = 3
         return JobTask.select( "jobtask IN (%s) AND fkeyjob=%i AND status='new' LIMIT %i" % ( numberListToString(tasks), self.Job.key(), limit ) )
 
+    def retrieveIterativeTasks(self, limit, stripe):
+        self.logString += 'Iterative [limit=%i,stripe=%i] ' % (limit, stripe)
+        return JobTask.select("keyjobtask IN (SELECT * FROM get_iterative_tasks(%i,%i,%i))" % (self.Job.key(),limit,stripe))
+
     def assignHost( self, hostStatus, totalHosts, totalTasks ):
         tasks = None
         packetSize = self.Job.packetSize()
@@ -357,6 +362,8 @@ class JobAssign:
                 tasks = self.retrievePreassignedTasks(hostStatus)
             elif packetType == 'continuous':
                 tasks = self.retrieveContinuousTasks(limit=packetSize)
+            elif packetType == 'iterative':
+                tasks = self.retrieveIterativeTasks(limit=packetSize,stripe=10)
             else: # sequential
                 tasks = self.retrieveSequentialTasks(limit=packetSize)
 
@@ -427,8 +434,8 @@ def updateProjectTempo():
 # Returns [hostsTotal int, hostsActive int, hostsReady int, jobsTotal int, jobsActive int, jobsDone int]
 def getCounter():
     q = Database.current().exec_( "SELECT hostsTotal, hostsActive, hostsReady FROM getcounterstate()" )
-    if not q.next(): return map(lambda x:0,range(0,5))
-    return map(lambda x: q.value(x).toInt()[0], range(0,5))
+    if not q.next(): return map(lambda x:0,range(0,3))
+    return map(lambda x: q.value(x).toInt()[0], range(0,3))
 
 class AssignRateThrottler(object):
     def __init__(self):
@@ -474,16 +481,17 @@ class AllJobsAssignedException(Exception): pass
 class NonCriticalAssignmentError(Exception): pass
 
 class FarmResourceSnapshot(object):
+    slotsByUserAndService = {}
+    limitsByUserAndService = {}
+    slotsByUser = {}
+    limitsByUser = {}
+    slotsByProject = {}
+    limitsByProject = {}
+
     def __init__(self):
         self.reset()
 
     def reset(self):
-        # Project Weighted Assigning
-        self.projectWeights = {}
-        self.projectWeightTotal = 0
-        self.projectsWithJobs = {}
-        self.jobsWithWeight = JobList()
-
         # Regular Job/Task Info
         self.jobList = JobList()
         self.jobAssignByJob = {}
@@ -500,12 +508,6 @@ class FarmResourceSnapshot(object):
         self.hostHasExclusiveAssignmentCache = {}
 
         self.licCountByService = {}
-        self.slotsByProject = {}
-        self.slotsByUserAndService = {}
-        self.slotsByUser = {}
-        self.limitsByProject = {}
-        self.limitsByUserAndService = {}
-        self.limitsByUser = {}
         self.potentialSlotsAvailable = 0
 
         # User Info
@@ -519,27 +521,17 @@ class FarmResourceSnapshot(object):
 
     def refresh(self):
         self.reset()
-        self.refreshProjectWeights()
         self.refreshJobList()
         if self.jobList.isEmpty():
             return
         self.refreshServiceData()
         self.refreshHostData()
 
-    def refreshProjectWeights(self):
-        # Gather current project tempo(percentage of queue the project has)
-        q = Database.current().exec_( "SELECT project.keyelement as fkeyproject, assburnerweight-coalesce(tempo,0) as weight FROM projecttempo RIGHT JOIN project ON keyelement=projecttempo.fkeyproject WHERE project.assburnerweight > 0" )
-        while q.next():
-            fkeyproject = q.value(0).toInt()[0]
-            weight = q.value(1).toDouble()[0]
-            self.projectWeights[fkeyproject] = weight
-            self.projectWeightTotal += weight
-
     def refreshUserUsage(self):
-        self.slotsByUserAndService = {}
-        self.slotsByUser = {}
-        self.limitsByUserAndService = {}
-        self.limitsByUser = {}
+        self.slotsByUserAndService.clear()
+        self.slotsByUser.clear()
+        self.limitsByUserAndService.clear()
+        self.limitsByUser.clear()
 
         q = Database.current().exec_("""
 SELECT * from user_service_current
@@ -570,11 +562,14 @@ SELECT * from user_slots_limits
                                     """)
         while q4.next():
             key = q4.value(0).toString()
-            value = q4.value(1).toInt()[0]
+            limit = q4.value(1).toInt()[0]
+            reserve = q4.value(2).toInt()[0]
+            self.limitsByUser[key] = [limit, reserve]
 
     def refreshProjectUsage(self):
-        self.slotsByProject = {}
-        self.limitsByProject = {}
+        self.slotsByProject.clear()
+        self.limitsByProject.clear()
+
         q = Database.current().exec_("""
 SELECT * from project_slots_current
                                     """)
@@ -588,21 +583,9 @@ SELECT * from project_slots_limits
                                     """)
         while q2.next():
             key = q2.value(0).toString()
-            value = q2.value(1).toInt()[0]
-
-    def scaleProjectWeights(self, hostsActive):
-        # If there is more than 1.0(100%) projectweight, than
-        # we will scale down the project weights so that they
-        # add up to 1.0
-        # Multiply by available hosts
-        if self.projectWeightTotal > 1.0:
-            self.projectWeightTotal = hostsActive / self.projectWeightTotal
-        else:
-            self.projectWeightTotal = hostsActive
-        
-        # Here is where the weights go from a percentage to a host count
-        for fkeyproject in self.projectWeights:
-            self.projectWeights[fkeyproject] *= self.projectWeightTotal
+            limit = q2.value(1).toInt()[0]
+            reserve = q2.value(2).toInt()[0]
+            self.limitsByProject[key] = [limit, reserve]
 
     def refreshJobList(self):
         # Gather the jobs
@@ -617,20 +600,6 @@ SELECT * from project_slots_limits
             # Create Job Assign class
             jobAssign = JobAssign(job)
             self.jobAssignByJob[job] = jobAssign
-
-            # Update project weights
-            fkeyproject = job.getValue("fkeyproject").toInt()[0]
-            if fkeyproject in self.projectWeights and self.projectWeights[fkeyproject] > 0:
-                print "Job %s has available project weight" % job.name()
-                self.jobsWithWeight += job
-            self.projectsWithJobs[fkeyproject] = 1
-
-        # Delete projects with weight but no jobs, sum the total competing weight
-        for k in self.projectWeights.keys():
-            if not k in self.projectsWithJobs:
-                del self.projectWeights[k]
-                continue
-            self.projectWeightTotal += self.projectWeights[k]
 
         if VERBOSE_DEBUG: Log( "Found %i jobs to assign" % len(self.jobList) )
 
@@ -691,7 +660,6 @@ SELECT * from project_slots_limits
             self.freeHosts[hostStatus].addService(hostService)
             self.hostStatusesByService[service] += hostStatus
             self.hostsUnused[hostStatus] = True
-            self.hostIsFree(host)
 
         for host in hosts:
             self.potentialSlotsAvailable =  self.potentialSlotsAvailable + host.maxAssignments()
@@ -777,7 +745,6 @@ SELECT * from project_slots_limits
 
     # Remove the job as a job that needs more hosts assigned
     def removeJob( self, job ):
-        self.jobsWithWeight.remove( job )
         self.jobList.remove( job )
         if job in self.jobAssignByJob:
             del self.jobAssignByJob[job]
@@ -805,7 +772,7 @@ SELECT * from project_slots_limits
         self.servicesNeeded.remove( service )
 
     # Returns (assignedCount, tasksUnassigned)
-    def assignSingleHost(self, jobAssign, hostStatus, weight):
+    def assignSingleHost(self, jobAssign, hostStatus):
         job = jobAssign.Job
 
         # Make sure this host hasn't been used yet
@@ -830,8 +797,9 @@ SELECT * from project_slots_limits
             self.slotsByProject[key] = self.slotsByProject[key] + job.assignmentSlots()
         else:
             self.slotsByProject[key] = job.assignmentSlots()
-        if self.limitsByProject.has_key(key) and self.slotsByProject[key] > self.limitsByProject[key]:
-            raise NonCriticalAssignmentError("Project %s slot limit of %s reached" % (key, self.limitsByProject[key]))
+        if self.limitsByProject.has_key(key):
+            if self.limitsByProject[key][0] > -1 and self.slotsByProject[key] > self.limitsByProject[key][0]:
+                raise NonCriticalAssignmentError("Project %s slot limit of %s reached" % (key, self.limitsByProject[key][0]))
 
         # check for per user limits on total slot use
         key = job.user().name()
@@ -839,8 +807,9 @@ SELECT * from project_slots_limits
             self.slotsByUser[key] = self.slotsByUser[key] + job.assignmentSlots()
         else:
             self.slotsByUser[key] = job.assignmentSlots()
-        if self.limitsByUser.has_key(key) and self.slotsByUser[key] > self.limitsByUser[key]:
-            raise NonCriticalAssignmentError("User %s slot limit of %s reached" % (key, self.limitsByUser[key]))
+        if self.limitsByUser.has_key(key):
+            if self.limitsByUser[key][0] > -1 and self.slotsByUser[key] > self.limitsByUser[key][0]:
+                raise NonCriticalAssignmentError("User %s slot limit of %s reached" % (key, self.limitsByUser[key][0]))
 
         # check for per user limits on slot use per service
         for service in jobAssign.servicesRequired:
@@ -866,7 +835,6 @@ SELECT * from project_slots_limits
             return (0,jobAssign.tasksUnassigned)
 
         jobAssign.tasksUnassigned -= tasksAssigned
-        #throttler.assignLeft -= weight
 
         # Remove the job from the list if there are no tasks left to assign
         #if jobAssign.tasksUnassigned <= 0:
@@ -887,7 +855,7 @@ SELECT * from project_slots_limits
             return False
 
         # Gather available hosts for this job
-        if VERBOSE_DEBUG: print "Finding Hosts to Assign to %i tasks to Job %s with weight: %g" % (jobAssign.JobStatus.tasksUnassigned(), jobAssign.Job.name(),weight)
+        if VERBOSE_DEBUG: print "Finding Hosts to Assign to %i tasks to Job %s" % (jobAssign.JobStatus.tasksUnassigned(), jobAssign.Job.name())
 
         hostStatuses = self.availableHosts( jobAssign )
         if hostStatuses.isEmpty():
@@ -895,7 +863,7 @@ SELECT * from project_slots_limits
 
         assignSuccess = False
         for hostStatus in hostStatuses:
-            tasksAssigned, tasksLeft = self.assignSingleHost( jobAssign, hostStatus, weight )
+            tasksAssigned, tasksLeft = self.assignSingleHost( jobAssign, hostStatus )
 
             # Return so that we can recalculate assignment priorities
             if tasksAssigned > 0:
@@ -911,69 +879,6 @@ SELECT * from project_slots_limits
             # If we get to here there's no hosts to assign to this job, so ignore it
             self.removeJob( jobAssign.Job )
         return assignSuccess
-
-    def performHighPriorityAssignments(self):
-        # We loop while there are hosts, and we are assigning hosts
-        # Its possible to have free hosts that can't provide a service
-        # for our current jobs
-        while True:
-            slotAssignCount = 0
-            if len(self.hostsUnused) < 1:
-                raise AllHostsAssignedException()
-
-            jobAssignList = []
-            # Assign from all ready jobs
-            for jobAssign in self.jobAssignByJob.values():
-                if jobAssign.Job.priority() <= 20 and jobAssign.tasksUnassigned > 0:
-                    jobAssignList.append( jobAssign )
-
-            if len(jobAssignList) == 0:
-                break
-
-            jobAssignList.sort()
-            for jobAssign in jobAssignList:
-                try:
-                    # Recalc priority and resort job list after every assignment
-                    if self.assignSingleJob(jobAssign):
-                        slotAssignCount = slotAssignCount + jobAssign.Job.assignmentSlots()
-                        if ((float(slotAssignCount) / self.potentialSlotsAvailable)*100) > config._ASSIGN_SLOPPINESS:
-                            break
-                except NonCriticalAssignmentError:
-                    if VERBOSE_DEBUG: traceback.print_exc()
-            if slotAssignCount == 0:
-                break
-
-    def performProjectWeightedAssignments(self):
-        while True:
-            if len(self.hostsUnused) <= 0:
-                raise AllHostsAssignedException()
-
-            # Gather and sort the jobs that have project weighting
-            jobAssignList = []
-            for job in self.jobsWithWeight:
-                ja = self.jobAssignByJob[job]
-                if ja.tasksUnassigned > 0:
-                    jobAssignList.append(ja)
-            jobAssignList.sort()
-
-            slotAssignCount = 0
-            for jobAssign in jobAssignList:
-                try:
-                    # Make sure that this project deserves more hosts
-                    fkeyproject = jobAssign.Job.getValue("fkeyproject").toInt()[0]
-                    if self.projectWeights[fkeyproject] <= 0:
-                        continue
-
-                    # Resort list after each successful assignment
-                    if self.assignSingleJob( jobAssign ):
-                        slotAssignCount = slotAssignCount + jobAssign.Job.assignmentSlots()
-                        self.projectWeights[fkeyproject] -= 1
-                        if ((float(slotAssignCount) / self.potentialSlotsAvailable)*100) > config._ASSIGN_SLOPPINESS:
-                            break
-                except NonCriticalAssignmentError:
-                    if VERBOSE_DEBUG: traceback.print_exc()
-            if slotAssignCount == 0:
-                break
 
     def performNormalAssignments(self):
         # We loop while there are hosts, and we are assigning hosts
@@ -1025,7 +930,7 @@ SELECT * from project_slots_limits
             traceback.print_exc()
             raise e
         finally:
-            print "Finished assigning %s jobs, took %i" % (methodName, timer.elapsed())
+            print "Finished assigning jobs, took %i" % (timer.elapsed())
 
 def run_loop():
     config.update()
@@ -1039,7 +944,6 @@ def run_loop():
     # Complete Job / Host snapshot
     snapshot = FarmResourceSnapshot()
     snapshot.refresh()
-    #snapshot.scaleProjectWeights(hostsActive + hostsReady)
     snapshot.performAssignments()
 
 def manager2():
