@@ -42,21 +42,16 @@ field_name_map name_map [] =
 	{ "avgtasktime", "Average", true },
 	{ "maxtasktime", "Maximum", true },
 	{ "taskcount", "Tasks Finished", true },
-	{ "totalloadtime", "Successful Load Time", false },
-	{ "minloadtime", "Minimum", true },
-	{ "avgloadtime", "Average", true },
-	{ "maxloadtime", "Maximum", true },
-	{ "loadcount", "Load Count", true },
 	{ "totalerrortime", "Error Time", false },
-	{ "minerrortime", "Minimum", true },
 	{ "avgerrortime", "Average", true },
-	{ "maxerrortime", "Maximum", true },
 	{ "errorcount", "Error Count", true },
+	{ "totalcanceltime", "Cancel Time", false },
+	{ "avgcanceltime", "Average", true },
+	{ "cancelcount", "Cancel Count", true },
 	{ "totalcopytime", "Copy Time", false },
-	{ "mincopytime", "Minimum", true },
 	{ "avgcopytime", "Average", true },
-	{ "maxcopytime", "Maximum", true },
-	{ "copycount", "Copy Count", true },
+	{ "totalloadtime", "Successful Load Time", false },
+	{ "avgloadtime", "Average", true },
 	{ 0, 0, false }
 };
 
@@ -71,7 +66,7 @@ void JobStatWidget::refresh()
 
 	foreach( Job j, mJobs ) {
 		headers << j.name();
-		QSqlQuery q = Database::current()->exec( "SELECT * FROM Job_GatherStats(" + QString::number(j.key()) + ");" );
+		QSqlQuery q = Database::current()->exec( "SELECT * FROM Job_GatherStats_2(" + QString::number(j.key()) + ");" );
 		int row = 0;
 		if( q.next() ) {
 			QSqlRecord r = q.record();
