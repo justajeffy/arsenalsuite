@@ -347,12 +347,14 @@ bool JobBurner::taskStart( int task, const QString & outputName, int secondsSinc
 	}
 
 	LOG_3( "Starting task " + QString::number(task) + " task ids: " + mCurrentTasks.keyString() );
+    Database::current()->beginTransaction();
 	mCurrentTasks.setStatuses( "busy" );
 	mCurrentTaskAssignments.setJobAssignmentStatuses( JobAssignmentStatus::recordByName("busy") );
 	mCurrentTaskAssignments.setColumnLiteral( "started", "now()" + QString(secondsSinceStarted > 0 ? " - '" + QString::number(secondsSinceStarted) + " seconds'::interval" : "") );
 	updateOutput();
 	mCurrentTaskAssignments.commit();
 	mCurrentTasks.commit();
+    Database::current()->commitTransaction();
 	return true;
 }
 
@@ -372,8 +374,10 @@ void JobBurner::taskDone( int task )
 	mCurrentTasks.setStatuses( "done" );
 	mCurrentTaskAssignments.setJobAssignmentStatuses( JobAssignmentStatus::recordByName("done") );
 	mCurrentTaskAssignments.setColumnLiteral( "ended", "now()" );
+    Database::current()->beginTransaction();
 	mCurrentTaskAssignments.commit();
 	mCurrentTasks.commit();
+    Database::current()->commitTransaction();
 
 	mCurrentTaskAssignments = mCurrentTasks = RecordList();
 	
@@ -430,15 +434,6 @@ bool JobBurner::checkup()
 
 JobError JobBurner::logError( const Job & j, const QString & msg, const JobTaskList & tasks, bool timeout )
 {
-/*	JobHistory jh;
-	jh.setJob( mJob );
-	jh.setMessage( msg );
-	jh.setColumnLiteral( "created", "NOW()" );
-	if( mCurrentTask.isRecord() )
-		jh.setJobTask( mCurrentTask );
-	jh.setHost( mHost );
-	jh.commit(); */
-
 	JobError je;
 	Host host( Host::currentHost() );
 	// Try to find an existing job error record for this error and host
@@ -477,24 +472,16 @@ void JobBurner::jobErrored( const QString & msg, bool timeout )
 	mState = StateError;
 	// error will be logged by the slave that is monitoring this jobburner
 	JobError je = logError( mJob, msg, mCurrentTasks, timeout );
-	mJobAssignment.setJobError( je );
-	mJobAssignment.setJobAssignmentStatus( JobAssignmentStatus::recordByName( "error" ) );
-	//mJobAssignment.setColumnLiteral( "ended", "now()" );
-	mJobAssignment.commit();
 
-	mCurrentTaskAssignments.setJobErrors( je );
-	mCurrentTaskAssignments.setJobAssignmentStatuses( JobAssignmentStatus::recordByName( "error" ) );
-	mCurrentTaskAssignments.commit();
-
-	// This will reset jobtasks and cancel the jobtaskassignments
-    // is this really required with the database triggers that happen when the
-    // JA status changes?
-	//Database::current()->exec("SELECT cancel_job_assignment(?)", VarList() << mJobAssignment.key() );
+    // an update trigger on JobAssignment will update all JTAs which in turn will
+    // reset their respective JobTasks
+    mJobAssignment.setJobError( je );
+    mJobAssignment.setJobAssignmentStatus( JobAssignmentStatus::recordByName( "error" ) );
+    mJobAssignment.commit();
 
 	emit errored( msg );
 	cleanup();
 	updateOutput();
-	mCurrentTasks.commit();
 }
 
 void JobBurner::cancel()
@@ -854,26 +841,30 @@ void JobBurner::openLogFiles()
 {
     // log file path is:
     // logRootDir / right three digits of job id / job id _ hostname _ unique assignment id . out
-	QString stdOutPath = mSlave->logRootDir() + "/" + QString::number(mJob.key()).right(3) + "/" + QString::number(mJob.key())+"_"+Host::currentHost().name()+"_"+QString::number(mJobAssignment.key()) + ".out";
-	LOG_3("opening log file: "+stdOutPath);
-	mLogFile = new QFile(stdOutPath);
-	if(!mLogFile->open( QIODevice::Append | QIODevice::Text )) {
-		LOG_1("error opening log file: "+stdOutPath + " error: "+QString::number(mLogFile->error()));
+    QString logDir = mSlave->logRootDir() + "/" + QString::number(mJob.key()).right(3) + "/" + QString::number(mJob.key());
+    QDir dir().mkdir(logDir);
+
+    QString stdOutPath = logDir + "/" + QString::number(mJob.key())+"_"+Host::currentHost().name()+"_"+QString::number(mJobAssignment.key()) + ".out";
+
+    LOG_3("opening log file: "+stdOutPath);
+    mLogFile = new QFile(stdOutPath);
+    if(!mLogFile->open( QIODevice::Append | QIODevice::Text )) {
+        LOG_1("error opening log file: "+stdOutPath + " error: "+QString::number(mLogFile->error()));
         return;
     }
 
     mLogStream = new QTextStream(mLogFile);
 
-	mJobAssignment.setStdOut( stdOutPath );
+    mJobAssignment.setStdOut( stdOutPath );
 
     // the log files should be flushed to disk every N seconds
-	mLogFlushTimer = new QTimer( this );
-	connect( mLogFlushTimer, SIGNAL( timeout() ), SLOT( slotFlushOutput() ) );
+    mLogFlushTimer = new QTimer( this );
+    connect( mLogFlushTimer, SIGNAL( timeout() ), SLOT( slotFlushOutput() ) );
 
     mLogFlushTimer->setInterval(30000);
     mLogFlushTimer->start();
 
-	mLogFilesReady = true;
+    mLogFilesReady = true;
 }
 
 void JobBurner::setProgress(int progress)
