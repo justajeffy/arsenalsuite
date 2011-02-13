@@ -146,13 +146,16 @@ void BatchBurner::slotProcessExited()
 	if( mCmd ) {
 		if( mCmd->exitCode() == 0 ) {
 			LOG_5("BB:slotBatchExited() setting task status done");
+            Database::current()->beginTransaction();
 			mTasks.setStatuses( "done" );
 			mCurrentTaskAssignments = mTasks.jobTaskAssignments();
 			mCurrentTaskAssignments.setJobAssignmentStatuses( JobAssignmentStatus::recordByName("done") );
 			mCurrentTaskAssignments.setColumnLiteral( "ended", "now()" );
-			updateOutput();
 			mCurrentTaskAssignments.commit();
 			mTasks.commit();
+            Database::current()->commitTransaction();
+
+			updateOutput();
 			jobFinished();
 		} else
 			jobErrored( "Batch script exited with result: " + QString::number( mCmd->exitCode() ) );
