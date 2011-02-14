@@ -842,7 +842,8 @@ void JobBurner::openLogFiles()
     // log file path is:
     // logRootDir / right three digits of job id / job id _ hostname _ unique assignment id . out
     QString logDir = mSlave->logRootDir() + "/" + QString::number(mJob.key()).right(3) + "/" + QString::number(mJob.key());
-    QDir dir().mkdir(logDir);
+    QDir dir;
+    dir.mkdir(logDir);
 
     QString stdOutPath = logDir + "/" + QString::number(mJob.key())+"_"+Host::currentHost().name()+"_"+QString::number(mJobAssignment.key()) + ".out";
 
