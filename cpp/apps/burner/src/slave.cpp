@@ -35,6 +35,9 @@
 #include <qregexp.h>
 #include <qtcpserver.h>
 #include <qtimer.h>
+#include <qsocketnotifier.h>
+
+#include <sys/socket.h>
 
 #include "common.h"
 #include "idle.h"
@@ -81,6 +84,8 @@
 #include "reason.h"
 #endif // Q_OS_WIN
 
+int Slave::sigintFd[2];
+int Slave::sigtermFd[2];
 
 Slave::Slave( bool gui, bool autoRegister, int jobAssignmentKey, QObject * parent )
 : QObject( parent )
@@ -99,6 +104,54 @@ Slave::Slave( bool gui, bool autoRegister, int jobAssignmentKey, QObject * paren
 , mBurnOnlyJobAssignmentKey( jobAssignmentKey )
 {
 	QTimer::singleShot( 10, this, SLOT( startup() ) );
+
+	if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigintFd))
+	    qFatal("Couldn't create TERM socketpair");
+
+	if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigtermFd))
+	    qFatal("Couldn't create TERM socketpair");
+
+    snTerm = new QSocketNotifier(sigtermFd[1], QSocketNotifier::Read, this);
+    connect(snTerm, SIGNAL(activated(int)), this, SLOT(handleSigTerm()));
+
+    snInt = new QSocketNotifier(sigintFd[1], QSocketNotifier::Read, this);
+    connect(snInt, SIGNAL(activated(int)), this, SLOT(handleSigInt()));
+}
+
+void Slave::intSignalHandler(int)
+{
+    char a = '2';
+    ::write(sigintFd[0], &a, sizeof(a));
+}
+
+void Slave::termSignalHandler(int)
+{
+    char a = '2';
+    ::write(sigtermFd[0], &a, sizeof(a));
+}
+
+void Slave::handleSigInt()
+{
+    snInt->setEnabled(false);
+    char tmp;
+    ::read(sigintFd[1], &tmp, sizeof(tmp));
+ 
+	setStatus("stopping", true);
+	exit(0);
+ 
+    snInt->setEnabled(true);
+}
+
+void Slave::handleSigTerm()
+{
+    snTerm->setEnabled(false);
+    char tmp;
+    ::read(sigtermFd[1], &tmp, sizeof(tmp));
+ 
+	setStatus("stopping", true);
+	exit(0);
+ 
+    snTerm->setEnabled(true);
 }
 
 void Slave::startup()
