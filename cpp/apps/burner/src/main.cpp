@@ -139,6 +139,26 @@ static bool winEventFilter( void * message, long * result )
 }
 #endif // Q_OS_WIN
 
+static int setup_unix_signal_handlers()
+{
+    struct sigaction sigint, sigterm;
+ 
+    sigint.sa_handler = Slave::termSignalHandler;
+    sigemptyset(&sigint.sa_mask);
+    sigint.sa_flags |= SA_RESTART;
+ 
+    if (sigaction(SIGINT, &sigint, 0) > 0)
+        return 1;
+
+    sigterm.sa_handler = Slave::termSignalHandler;
+    sigemptyset(&sigterm.sa_mask);
+    sigterm.sa_flags |= SA_RESTART;
+ 
+    if (sigaction(SIGTERM, &sigterm, 0) > 0)
+        return 2;
+ 
+    return 0;
+}
 
 int main(int argc, char * argv[])
 {
@@ -325,6 +345,7 @@ int main(int argc, char * argv[])
 		delete md;
 	} else {
 		LOG_3( "starting event loop" );
+		setup_unix_signal_handlers();
 		res = a->exec();
 		LOG_5( "::main: a->exec() returned " + QString(res) );
 	}

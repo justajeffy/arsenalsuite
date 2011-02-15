@@ -553,10 +553,13 @@ void ExtTreeView::setupTreeView( IniConfig & ini, const ColumnStruct columns [] 
 	Qt::SortOrder order(Qt::SortOrder(ini.readInt("SortOrder",Qt::AscendingOrder)));
 	header()->setSortIndicator(sc,order);
 	model()->sort(sc,order);
+}
 
+void ExtTreeView::setupRecordFilterWidget( IniConfig & ini, const ColumnStruct columns [] )
+{
     if( !mRecordFilterWidget ) {
-   	    mRecordFilterWidget = new RecordFilterWidget();
-       	addFilterLayout();
+        mRecordFilterWidget = new RecordFilterWidget();
+        addFilterLayout();
     }
 
     mRecordFilterWidget->setupFilters( this, columns, ini );

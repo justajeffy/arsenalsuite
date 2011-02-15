@@ -34,6 +34,7 @@
 #include <qstringlist.h>
 #include <qtimer.h>
 #include <qpointer.h>
+#include <qsocketnotifier.h>
 
 #include "host.h"
 #include "hoststatus.h"
@@ -134,6 +135,10 @@ public:
 
     AccountingInfo parseTaskLoggerOutput( const QString & );
 
+    // Unix signal handlers.
+    static void intSignalHandler(int unused);
+    static void termSignalHandler(int unused);
+
 public slots:
 	/// Updates the status in the database to status
 	/// If force is true, any status change that happens before
@@ -164,6 +169,10 @@ public slots:
     // windows drive mapping support
 	void showRemapWarning(const QString & drive);
 	void setIsMapped( bool );
+
+    // Qt signal handlers
+	void handleSigInt();
+	void handleSigTerm();
 
 signals:
 	/// For the gui to show status.
@@ -305,6 +314,13 @@ protected:
 	void updatePriorityMode( int );
 	bool mBackgroundMode;
 	bool mBackgroundModeEnabled;
+
+private:
+    static int sigintFd[2];
+    static int sigtermFd[2];
+ 
+    QSocketNotifier *snInt;
+    QSocketNotifier *snTerm;
 };
 
 /// @}
