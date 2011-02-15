@@ -78,6 +78,7 @@ public:
 	static int State_ShowGrid;
 
 	void setupTreeView( IniConfig & ini, const ColumnStruct columns [] );
+	void setupRecordFilterWidget( IniConfig & ini, const ColumnStruct columns [] );
 	void saveTreeView( IniConfig & ini, const ColumnStruct columns [] );
 
 	void setupTreeView( const QString & group, const QString & key, const ColumnStruct columns [] );
