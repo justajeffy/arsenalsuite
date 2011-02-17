@@ -5,6 +5,7 @@
 #import cinema4d
 
 import rv
+import wrangle
 import shell
 import shotgunPlugin
 import ssh
