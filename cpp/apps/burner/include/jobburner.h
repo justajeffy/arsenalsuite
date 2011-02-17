@@ -98,6 +98,7 @@ public:
 	bool taskStarted() const;
 	/// Returns true if a task has taken longer then it's allowed
 	bool exceededMaxTime() const;
+	bool exceededQuietTime() const;
 
 	/// what time was the burn started
 	QDateTime startTime() const;
@@ -283,6 +284,8 @@ protected:
     void updateAssignmentAccountingInfo();
 
     JobFilterMessageList mJobFilterMessages;
+
+	QDateTime mLastOutputTime;
 };
 
 /// @}

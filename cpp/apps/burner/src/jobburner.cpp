@@ -286,6 +286,7 @@ void JobBurner::startBurn()
 	}
 
 	mStart = QDateTime::currentDateTime();
+	mLastOutputTime = QDateTime::currentDateTime();
 
 	mJobAssignment.setJobAssignmentStatus( JobAssignmentStatus::recordByName( "busy" ) );
 	mJobAssignment.setStarted( mStart );
@@ -417,6 +418,11 @@ bool JobBurner::exceededMaxTime() const
 	return mJob.maxLoadTime() > 0 && mStart.secsTo( QDateTime::currentDateTime() ) > mJob.maxLoadTime();
 }
 
+bool JobBurner::exceededQuietTime() const
+{
+    return (mJob.maxQuietTime() > 0 && mLastOutputTime.secsTo( QDateTime::currentDateTime() ) > int(mJob.maxQuietTime()));
+}
+
 bool JobBurner::checkup()
 {
 	if( exceededMaxTime() ) {
@@ -425,6 +431,15 @@ bool JobBurner::checkup()
 		if( exceededMaxTime() ) {
 			QString action( taskStarted() ? "Task" : "Load" );
 			QString msg = action + " exceeded max " + action + " time of " + Interval( mLoaded ? mJob.maxTaskTime() : mJob.maxLoadTime() ).toDisplayString();
+			jobErrored( msg, /*timeout=*/ true );
+			return false;
+		}
+	}
+	if( exceededQuietTime() ) {
+		// reload and check again in case they changed it
+		mJob.reload();
+		if( exceededQuietTime() ) {
+			QString msg = "Task exceeded max quiet time of " + Interval( mJob.maxQuietTime() ).toDisplayString();
 			jobErrored( msg, /*timeout=*/ true );
 			return false;
 		}
@@ -757,6 +772,8 @@ void JobBurner::slotProcessOutput( const QByteArray & output, QProcess::ProcessC
 
 void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessChannel )
 {
+    mLastOutputTime = QDateTime::currentDateTime();
+
     // if the job supports progress messages, see if there's an update
 	if( mJob.hasTaskProgress() && mProgressRE.indexIn(line) >= 0 )
 		setProgress( mProgressRE.cap(1).toInt() );
