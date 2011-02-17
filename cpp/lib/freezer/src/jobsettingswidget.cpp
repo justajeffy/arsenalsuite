@@ -46,8 +46,10 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 	connect( mHostListButton, SIGNAL( clicked() ), SLOT( showHostSelector() ) );
 	connect( mMaxTaskTimeSpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
 	connect( mMaxLoadTimeSpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
+	connect( mMaxQuietTimeSpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
 	connect( mMinMemorySpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
 	connect( mMaxMemorySpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
+	connect( mMaxErrorsSpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
 	connect( mPrioritizeOuterTasksCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
 	connect( mEnvironmentButton, SIGNAL( clicked() ), SLOT( showEnvironmentWindow() ) );
 	connect( mServiceTree->model(), SIGNAL( dataChanged(const QModelIndex &, const QModelIndex &) ), SLOT( settingsChange() ) );
@@ -197,6 +199,12 @@ void JobSettingsWidget::resetSettings()
 	}
 	mMaxLoadTimeSpin->setValues( maxLoadMinutes );
 
+	QList<int> maxQuietMinutes;
+	foreach( int seconds, mSelectedJobs.maxQuietTimes() ) {
+		maxQuietMinutes.append( seconds / 60 );
+	}
+	mMaxQuietTimeSpin->setValues( maxQuietMinutes );
+
 	QList<int> minMemories;
 	foreach( int mbs, mSelectedJobs.minMemories() ) {
 		minMemories.append( mbs / 1024 );
@@ -208,6 +216,12 @@ void JobSettingsWidget::resetSettings()
 		maxMemories.append( mbs / 1024 );
 	}
 	mMaxMemorySpin->setValues( maxMemories );
+
+	QList<int> maxErrors;
+	foreach( int errors, mSelectedJobs.maxErrors() ) {
+		maxErrors.append( errors );
+	}
+	mMaxErrorsSpin->setValues( maxErrors );
 
 	QList<int> packetSize = unique( castList<unsigned int,int>(mSelectedJobs.packetSizes()) );
 	bool containsAuto = packetSize.contains(0);
@@ -342,10 +356,14 @@ void JobSettingsWidget::applySettings()
 		mSelectedJobs.setMaxTaskTimes( mMaxTaskTimeSpin->value() * 60 );
 	if( mMaxLoadTimeSpin->changed() )
 		mSelectedJobs.setMaxLoadTimes( mMaxLoadTimeSpin->value() * 60 );
+	if( mMaxQuietTimeSpin->changed() )
+		mSelectedJobs.setMaxQuietTimes( mMaxQuietTimeSpin->value() * 60 );
 	if( mMinMemorySpin->changed() )
 		mSelectedJobs.setMinMemories( mMinMemorySpin->value() * 1024 );
 	if( mMaxMemorySpin->changed() )
 		mSelectedJobs.setMaxMemories( mMaxMemorySpin->value() * 1024 );
+	if( mMaxErrorsSpin->changed() )
+		mSelectedJobs.setMaxErrors( mMaxErrorsSpin->value() );
 	if( mUseAutoCheck->checkState() != Qt::PartiallyChecked )
 		mSelectedJobs.setPacketSizes( mUseAutoCheck->isChecked() ? 0 : mPacketSizeSpin->value() );
 
