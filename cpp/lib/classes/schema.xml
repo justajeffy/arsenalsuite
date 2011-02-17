@@ -679,6 +679,10 @@
   <column pluralMethodName="maxErrors" type="uint" methodName="maxErrors" name="maxErrors" />
   <column type="QString" methodName="notifyErrorMessage" name="notifyerrormessage" />
   <column type="QString" methodName="notifyCompleteMessage" name="notifycompletemessage" />
+  <column docs="Holds the record of the wrangler actively looking at this job." type="uint" methodName="wrangler" name="fkeyWrangler" >
+   <fkey indexDeleteMode="DoNothingOnDelete" table="User" type="multi" hasIndex="false" />
+  </column>
+  <column docs="A health check on the job. Defines how much times can pass without output to stdout / stderr before the burner raises an error." type="uint" methodName="maxQuietTime" name="maxquiettime" />
  </table>
  <table useCodeGen="true" parent="Job" name="Job3Delight" expireKeyCache="true" className="Job3Delight" >
   <column type="uint" methodName="width" name="width" />
