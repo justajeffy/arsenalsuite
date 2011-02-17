@@ -526,6 +526,9 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
 
 	type = job.jobType().name();
 	icon = ((JobModel*)idx.model())->jobTypeIcon(job.jobType());
+    if( job.wrangler().isRecord() ) {
+        icon = QPixmap("images/wrangled.png");
+    }
 	co = options.mJobColors->getColorOption(status);
 	avgMemory = memoryString(jobStatus.averageMemory());
 
@@ -581,13 +584,18 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			return co ? civ(co->bg) : QVariant();
 	} else if( role == Qt::ToolTipRole && col == 16 && !healthIsNull ) {
 		return QString( "%1% Healthy" ).arg(int(jobStatus.health() * 100));
-	} else if( role == Qt::ToolTipRole && col == 4 ) {
-        if( toolTip.isEmpty() ) return QVariant();
-		return userName + "\n" + toolTip;
+	} else if( role == Qt::ToolTipRole ) {
+        if( col == 0 ) {
+            if( job.wrangler().isRecord() )
+                return "Job is currently being wrangled by: " + job.wrangler().name();
+        } else if ( col == 4 ) {
+            if( toolTip.isEmpty() ) return QVariant();
+                return userName + "\n" + toolTip;
+        }
     } else if( role == Qt::DecorationRole && col == 0 ) {
-		return icon;
+        return icon;
     }
-	return QVariant();
+    return QVariant();
 }
 
 int JobItem::compare( const QModelIndex & a, const QModelIndex & b, int col, bool asc )
