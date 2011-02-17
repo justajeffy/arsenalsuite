@@ -81,6 +81,7 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
     QVariant val = model->data(index, Qt::DisplayRole);
     SuperModel * sm = (SuperModel *)model;
 
+	QIcon icon     = QIcon(qvariant_cast<QPixmap>(index.data(Qt::DecorationRole)));
 	QString cell   = val.toString();
 	QString filter = sm->mColumnFilterMap.value( index.column() );
 
@@ -103,13 +104,18 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
 			position += rx.matchedLength();
 		}
 
+		// Paint the icon
+		icon.paint(painter, option.rect, Qt::AlignLeft);
+
 		// Now paint the text
 		QItemDelegate::drawBackground( painter, option, index );		
 
 		QFontMetrics fm = painter->fontMetrics();
 		painter->setClipRect(option.rect);
 
-		int x = option.rect.x();
+		int spacing = icon.isNull() ? 3 : 22;
+
+		int x = option.rect.x()+spacing;
 		int y = option.rect.y();
 
 		QTextOption TO(Qt::AlignLeft);
@@ -143,8 +149,8 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
 			QRect filterRect = ( space.size() > 0 ) ? fm.boundingRect( character.prepend(space) ) : fm.boundingRect( character );
 			space.clear();
 
-			painter->drawText( x, y, filterRect.width()+1, filterRect.height(), TO.flags(), character );
-			x = x + filterRect.width();
+			painter->drawText( x, y, filterRect.width(), filterRect.height(), TO.flags(), character );
+			x = x + filterRect.width()+1;
 		}
 	} else {
 		QItemDelegate::paint(painter,option,index);
