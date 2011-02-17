@@ -81,7 +81,8 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
     QVariant val = model->data(index, Qt::DisplayRole);
     SuperModel * sm = (SuperModel *)model;
 
-	QIcon icon     = QIcon(qvariant_cast<QPixmap>(index.data(Qt::DecorationRole)));
+	QPixmap pixmap = qvariant_cast<QPixmap>(index.data(Qt::DecorationRole));
+	QIcon icon     = QIcon(pixmap);
 	QString cell   = val.toString();
 	QString filter = sm->mColumnFilterMap.value( index.column() );
 
@@ -104,18 +105,17 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
 			position += rx.matchedLength();
 		}
 
-		// Paint the icon
-		icon.paint(painter, option.rect, Qt::AlignLeft);
-
-		// Now paint the text
+		// Now paint the row
 		QItemDelegate::drawBackground( painter, option, index );		
 
 		QFontMetrics fm = painter->fontMetrics();
 		painter->setClipRect(option.rect);
 
-		int spacing = icon.isNull() ? 3 : 22;
+		// Paint the icon
+		icon.paint(painter, option.rect, Qt::AlignLeft);
 
-		int x = option.rect.x()+spacing;
+		// If an icon exists take it's width as the left spacing
+		int x = option.rect.x() + pixmap.width() + 3;
 		int y = option.rect.y();
 
 		QTextOption TO(Qt::AlignLeft);
@@ -139,7 +139,7 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
             else
                 painter->setPen( option.palette.text().color() );
 
-            if( option.state & QStyle::State_Selected )
+            if( option.state & QStyle::State_Selected ) 
                 painter->setPen( option.palette.highlightedText().color() );
 
 			if ( positions.contains(pos) )
