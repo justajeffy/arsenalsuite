@@ -77,9 +77,10 @@ class NaiadBurner(JobBurner):
         if not self.Job.append().isEmpty:
             args << self.Job.append()
 
-        if not self.Job.restartCache().isEmpty:
+        if not self.Job.restartCache().isEmpty():
+            self.logMessage("using restartCache %s" % self.Job.restartCache())
             restartParam = self.Job.restartCache()
-            restartParam.sub("####", QString(self.StartFrame))
+            restartParam.replace("####", "%04d" % int(int(self.StartFrame)-1))
             args << restartParam
 
         args << self.burnFile()
