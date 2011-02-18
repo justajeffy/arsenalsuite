@@ -5,10 +5,8 @@
 
 #include "employee.h"
 #include "host.h"
+#include "job.h"
 #include "jobdep.h"
-#include "jobmax7.h"
-#include "jobmax8.h"
-#include "jobmaxscript.h"
 #include "joboutput.h"
 #include "jobstat.h"
 #include "jobservice.h"
