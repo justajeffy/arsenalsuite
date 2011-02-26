@@ -3,7 +3,7 @@ from PyQt4.QtSql import *
 from blur.Stone import *
 from blur.Classes import *
 
-from reaper_plugin_factory import *
+from verifier_plugin_factory import *
 
 def doThis(job):
     if job.checkFileMd5():
@@ -41,4 +41,4 @@ def doThis(job):
         job.setFileSize( QFileInfo( filePath ).size() )
     return True
 
-ReaperPluginFactory().registerPlugin("check_md5", doThis)
+VerifierPluginFactory().registerPlugin("check_md5", doThis)

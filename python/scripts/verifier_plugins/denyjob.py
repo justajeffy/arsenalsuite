@@ -4,7 +4,7 @@ from PyQt4.QtSql import *
 from blur.Stone import *
 from blur.Classes import *
 
-from reaper_plugin_factory import *
+from verifier_plugin_factory import *
 
 def doThis(job):
     if( job.name().contains( "denyMePlease" ) ):
@@ -13,5 +13,5 @@ def doThis(job):
         return False
     return True
 
-ReaperPluginFactory().registerPlugin("denyJob", doThis)
+VerifierPluginFactory().registerPlugin("denyJob", doThis)
 
