@@ -8,8 +8,6 @@ import blur.email, blur.jabber
 import sys, time, re, os
 from math import ceil
 import traceback
-from reaper_plugin_factory import *
-import reaper_plugins
 
 try:
 	import popen2
@@ -161,50 +159,6 @@ def ensureSpoolSpace(requiredPercent):
 			return False
 	return True
 
-def checkNewJob(job):
-    # make sure the job file exists
-    print 'Checking new job %i, %s' % ( job.key(), job.name() )
-
-    if not job.user().isRecord():
-        print "Job missing fkeyUsr"
-        return False
-
-    fileName = str(job.fileName())
-    if fileName and len(fileName):
-        filePathExtra = ''
-
-        if config.spoolDir != "":
-            if job.uploadedFile() and not config.managerDriveLetter in fileName.lower():
-                print "Job submission not finished, still has local fileName %s" % (job.fileName())
-                return False
-
-    if job.table().schema().field( 'frameStart' ) and job.table().schema().field( 'frameEnd' ):
-        minMaxFrames = Database.current().exec_('SELECT min(jobtask), max(jobtask) from JobTask WHERE fkeyjob=%i' % job.key())
-        if minMaxFrames.next():
-            job.setValue( 'frameStart', minMaxFrames.value(0) )
-            job.setValue( 'frameEnd', minMaxFrames.value(1) )
-
-    print "checking job dependencies"
-    status = 'ready'
-    for jobDep in JobDep.recordsByJob( job ):
-        if jobDep.depType() == 1 and jobDep.dep().status() != 'done' and jobDep.dep().status() != 'deleted':
-            status = 'holding'
-    if job.status() == 'verify-suspended':
-        status = 'suspended'
-    job.setStatus(status)
-
-    print "New Job %s appears ready, running through plug-ins" % ( job.name() )
-    for key in ReaperPluginFactory().sReaperPlugins.keys():
-        function = ReaperPluginFactory().sReaperPlugins[key]
-        result = False
-        try: result = function(job)
-        except: result = True
-        if not result: return False
-
-    createJobStat(job)
-    job.commit()
-    return True
-
 def getSlotCount(job):
 	q = Database.current().exec_("""
      SELECT fkeyjob, sum(slots) 
@@ -261,7 +215,7 @@ def getAvgMemory(job):
 	return 0
 	
 def retrieveReapable():
-	jobList = Job.select("status IN ('verify','verify-suspended','ready','started')")
+	jobList = Job.select("status IN ('ready','started')")
 	if not jobList.isEmpty():
 		JobStatus.select("fkeyjob IN ("+jobList.keyString()+")")
 	return jobList
@@ -272,7 +226,6 @@ def retrieveCleanable():
 def reaper():
     #	Config: managerDriveLetter, managerSpoolDir, assburnerErrorStep
     print "Reaper is starting up"
-    #notifySend( notifyList = 'newellm:j', subject = 'Reaper Starting', body = "Reaper is (re)starting" )
 
     errorStep = Config.getInt('assburnerErrorStep')
 
@@ -281,23 +234,6 @@ def reaper():
         errorStep = 1
 
     while True:
-        # plug-ins can be hot-loaded
-        try:
-            reload(reaper_plugins)
-        except: traceback.print_exc()
-
-        # Remove checker from dict if the process has exited, so
-        # we can recheck the job if it failed
-        try:
-            for pid in newJobCheckers.keys():
-                result = os.waitpid(pid,os.WNOHANG)
-                if result and result[0] == pid:
-                    del newJobCheckers[pid]
-                    print 'Job Checker Child Process: %i Exited with code: %i' % result
-        except:
-            print "Exception During newJobCheckers waitpid checking."
-            traceback.print_exc()
-
         service.pulse()
         config.update()
         if config.spoolDir != "":
@@ -306,21 +242,6 @@ def reaper():
         for job in retrieveReapable():
             if VERBOSE_DEBUG: print "Checking Job %i %s" % (job.key(), job.name())
             status = str(job.status())
-
-            if status.startswith('verify'):
-                if config.assburnerForkJobVerify:
-                    if VERBOSE_DEBUG: print "Forking verify thread for %s" % (job.name())
-                    if not job in newJobCheckers.values():
-                        pid = os.fork()
-                        Database.current().connection().reconnect()
-                        if pid == 0:
-                            checkNewJob(job)
-                            os._exit(0)
-                        else:
-                            newJobCheckers[pid] = job
-                else:
-                    checkNewJob(job)
-                continue
 
             Database.current().exec_('SELECT update_job_links(%i)' % job.key())
 
@@ -445,16 +366,6 @@ def notifySend( notifyList, body, subject, noEmail = False ):
 			if VERBOSE_DEBUG:
 				print 'bad formatting in notifyList %s\n' % (notifyList)
 			pass
-
-def createJobStat( mJob ):
-	stat = JobStat()
-	stat.setName( mJob.name() )
-	stat.setElement( mJob.element() )
-	stat.setProject( mJob.project() )
-	stat.setUser( mJob.user() )
-	stat.commit()
-	mJob.setJobStat( stat )
-	mJob.commit()
 
 config = ReaperConfig()
 config.update()

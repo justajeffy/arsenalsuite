@@ -3,7 +3,7 @@ from PyQt4.QtSql import *
 from blur.Stone import *
 from blur.Classes import *
 
-from reaper_plugin_factory import *
+from verifier_plugin_factory import *
 
 import ConfigParser
 import os, sys
@@ -67,7 +67,7 @@ def adjustPriority(job):
 			if exc[3] == "ignore":
 				return True
 
-			print "Reaper - Set overriden priority %s to %s's %s job %d - %s" % (exc[3], job.user().name(), job.jobType().name(), job.key(), job.name())
+			print "Verifier - Set overriden priority %s to %s's %s job %d - %s" % (exc[3], job.user().name(), job.jobType().name(), job.key(), job.name())
 			job.setPriority(int(exc[3]))
 			job.commit()
 			return True
@@ -83,22 +83,22 @@ def adjustPriority(job):
 	if foundRule:
 		if len(job.jobTasks().statuses()) == 1:
 			if "single_priority_frame_priority" in extra_args:
-				print "Reaper - Set priority %s to %s's single frame priority %s job %d - %s" % (extra_args["single_priority_frame_priority"], job.user().name(), job.jobType().name(), job.key(), job.name())
+				print "Verfifier - Set priority %s to %s's single frame priority %s job %d - %s" % (extra_args["single_priority_frame_priority"], job.user().name(), job.jobType().name(), job.key(), job.name())
 				job.setPriority(int(extra_args["single_priority_frame_priority"]))
 				job.commit()
 				return True
 
-		print "Reaper - Set priority %s to %s's %s job %d - %s" % (lowestPrio, job.user().name(), job.jobType().name(), job.key(), job.name())
+		print "Verfifier - Set priority %s to %s's %s job %d - %s" % (lowestPrio, job.user().name(), job.jobType().name(), job.key(), job.name())
 		job.setPriority(lowestPrio)
 		job.commit()
 		return True
 
 	if len(job.jobTasks().statuses()) == 1:
 		if "single_frame_priority" in extra_args:
-			print "Reaper - Set priority %s to %s's single frame %s job %d - %s" % (extra_args["single_frame_priority"], job.user().name(), job.jobType().name(), job.key(), job.name())
+			print "Verfifier - Set priority %s to %s's single frame %s job %d - %s" % (extra_args["single_frame_priority"], job.user().name(), job.jobType().name(), job.key(), job.name())
 			job.setPriority(int(extra_args["single_frame_priority"]))
 			job.commit()
 	
 	return True
 
-ReaperPluginFactory().registerPlugin("adjustPriority", adjustPriority)
+VerifierPluginFactory().registerPlugin("adjustPriority", adjustPriority)

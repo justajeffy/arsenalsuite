@@ -5,7 +5,7 @@ from PyQt4.QtSql import *
 from blur.Stone import *
 from blur.Classes import *
 
-from reaper_plugin_factory import *
+from verifier_plugin_factory import *
 
 import ConfigParser
 import sys
@@ -56,11 +56,11 @@ def addCustomServicePlugin(job):
 					newService.setJob(job)
 					newService.setService(wantedService)
 					newService.commit()
-					print  "Reaper - added %s service to %s's %s job %d - %s" % (serv, job.user().name(), job.jobType().name(), job.key(), job.name())
+					print  "Verifier - added %s service to %s's %s job %d - %s" % (serv, job.user().name(), job.jobType().name(), job.key(), job.name())
 				except IndexError:
-					print "Reaper - could not add %s service to %s's %s job %d - %s" % (serv, job.user().name(), job.jobType().name(), job.key(), job.name())
+					print "Verifier - could not add %s service to %s's %s job %d - %s" % (serv, job.user().name(), job.jobType().name(), job.key(), job.name())
 
 	return True
 
-ReaperPluginFactory().registerPlugin("addCustomService", addCustomServicePlugin)
+VerifierPluginFactory().registerPlugin("addCustomService", addCustomServicePlugin)
 

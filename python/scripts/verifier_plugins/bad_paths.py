@@ -3,7 +3,7 @@ from PyQt4.QtSql import *
 from blur.Stone import *
 from blur.Classes import *
 
-from reaper_plugin_factory import *
+from verifier_plugin_factory import *
 
 def doThis(job):
     # automatically suspend job if assets use UNC paths or if there are 
@@ -114,4 +114,4 @@ def doThis(job):
         return False
     return True
 
-ReaperPluginFactory().registerPlugin("bad-paths", doThis)
+VerifierPluginFactory().registerPlugin("bad-paths", doThis)

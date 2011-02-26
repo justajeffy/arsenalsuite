@@ -5,7 +5,7 @@ from PyQt4.QtSql import *
 from blur.Stone import *
 from blur.Classes import *
 
-from reaper_plugin_factory import *
+from verifier_plugin_factory import *
 
 def addFastLanePlugin(job):
 	if job.name().contains("_fastlane"):
@@ -19,8 +19,8 @@ def addFastLanePlugin(job):
 		serv.commit()
 		job.commit()
 
-		print "Reaper - Placed job %d %s %s %s on the fast lane" % (job.key(), job.user().name(), job.jobType().name(), job.name())
+		print "Verifier - Placed job %d %s %s %s on the fast lane" % (job.key(), job.user().name(), job.jobType().name(), job.name())
 
 	return True
 
-ReaperPluginFactory().registerPlugin("addFastLane", addFastLanePlugin)
+VerifierPluginFactory().registerPlugin("addFastLane", addFastLanePlugin)
