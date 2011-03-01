@@ -129,7 +129,7 @@ public:
 	static JobError logError( const Job & j, const QString & msg, const JobTaskList & jtl = JobTaskList(), bool timeout=false );
 
 	/// to be called by a burner if an error is raised
-	void jobErrored( const QString &, bool timeout=false );
+	void jobErrored( const QString &, bool timeout=false, const QString & nextstate="new" );
 
 	void cancel();
 

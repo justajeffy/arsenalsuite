@@ -476,7 +476,7 @@ JobError JobBurner::logError( const Job & j, const QString & msg, const JobTaskL
 	return je;
 }
 
-void JobBurner::jobErrored( const QString & msg, bool timeout )
+void JobBurner::jobErrored( const QString & msg, bool timeout, const QString & nextstate )
 {
 	LOG_3( "JobBurner: Got Error: " + msg );
 	logMessage( "JobBurner: Got Error: " + msg );
@@ -484,6 +484,7 @@ void JobBurner::jobErrored( const QString & msg, bool timeout )
         LOG_3( "JobBurner: ERROR an error has already occurred" );
         return;
     }
+
 	mState = StateError;
 	// error will be logged by the slave that is monitoring this jobburner
 	JobError je = logError( mJob, msg, mCurrentTasks, timeout );
@@ -491,8 +492,9 @@ void JobBurner::jobErrored( const QString & msg, bool timeout )
     // an update trigger on JobAssignment will update all JTAs which in turn will
     // reset their respective JobTasks
     mJobAssignment.setJobError( je );
-    mJobAssignment.setJobAssignmentStatus( JobAssignmentStatus::recordByName( "error" ) );
+    //mJobAssignment.setJobAssignmentStatus( JobAssignmentStatus::recordByName( "error" ) );
     mJobAssignment.commit();
+	Database::current()->exec("SELECT cancel_job_assignment(?,?,?)", VarList() << mJobAssignment.key() << "error" << nextstate );
 
 	emit errored( msg );
 	cleanup();
@@ -803,7 +805,21 @@ void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessCh
     foreach( JobFilterMessage jfm, mJobFilterMessages ) {
         if( jfm.enabled() && line.contains( QRegExp(jfm.regex()) ) ) {
             logMessage( QString("JobBurner: JFM id: %1 produced an error with regex %2 ").arg(QString::number(jfm.key())).arg(jfm.regex()));
-            jobErrored( line );
+            if( jfm.jobFilterType().name() == "Error-TaskCancel" )
+                jobErrored( line, false, "cancelled" );
+            else if( jfm.jobFilterType().name() == "Error-TaskRetry" )
+                jobErrored( line, false, "new" );
+            else if( jfm.jobFilterType().name() == "Error-JobSuspend" ) {
+                jobErrored( line, false, "suspended" );
+                //suspend the job itself
+            }
+            else if( jfm.jobFilterType().name() == "Error-HostOffline" ) {
+                jobErrored( line, false, "new" );
+                // set host offline
+            }
+            else if( jfm.jobFilterType().name() == "Notify-Message" ) {
+                // is notifying from within a CPP burner possible?
+            }
             return;
         }
     }
