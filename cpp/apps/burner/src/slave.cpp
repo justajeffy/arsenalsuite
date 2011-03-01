@@ -63,7 +63,6 @@
 #include "hoststatus.h"
 #include "job.h"
 #include "jobassignmentstatus.h"
-#include "jobmax5.h"
 #include "jobburner.h"
 #include "jobburnerfactory.h"
 #include "jobtype.h"
