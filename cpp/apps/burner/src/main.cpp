@@ -43,13 +43,8 @@
 #include "slave.h"
 #include "process.h"
 
-#include "jobmax7.h"
-#include "jobmax8.h"
 #include "jobmaxscript.h"
 #include "jobbatch.h"
-#include "jobmaya7.h"
-#include "jobmaya8.h"
-#include "jobsync.h"
 #include "host.h"
 #include "hoststatus.h"
 
