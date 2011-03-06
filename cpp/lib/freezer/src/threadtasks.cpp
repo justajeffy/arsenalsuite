@@ -340,8 +340,17 @@ UpdateHostListTask::UpdateHostListTask( QObject * rec, const HostList & hosts, c
 
 void UpdateHostListTask::run()
 {
+    Database::current()->beginTransaction();
+
     HostStatusList hsl = mReturn.hostStatuses();
     hsl.setSlaveStatuses(mStatus);
     hsl.commit();
+
+    QStringList returnTasksSql;
+    foreach( Host h, mReturn )
+        returnTasksSql += "return_slave_tasks_3(" + QString::number( h.key() ) + ")";
+
+    Database::current()->exec("SELECT " + returnTasksSql.join(",") + ";");
+    Database::current()->commitTransaction();
 }
 
