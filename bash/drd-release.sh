@@ -58,8 +58,10 @@ rsync -cv cpp/apps/absubmit/nukesubmit/*ui $DIR/nukesubmit/
 rsync -cv python/scripts/manager.py $DIR/
 rsync -cv python/scripts/manager.ini $DIR/
 rsync -cv python/scripts/reaper.py $DIR/
-rsync -cv python/scripts/reaper_plugin_factory.py $DIR/
-rsync -rcv python/scripts/reaper_plugins/ $DIR/reaper_plugins/
+rsync -cv python/scripts/verifier.py $DIR/
+rsync -cv python/scripts/verifier.ini $DIR/
+rsync -cv python/scripts/verifier_plugin_factory.py $DIR/
+rsync -rcv python/scripts/verifier_plugins/ $DIR/verifier_plugins/
 rsync -cv python/scripts/reclaim_tasks.py $DIR/
 rsync -cv python/scripts/initab.py $DIR/
 
