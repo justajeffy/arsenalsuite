@@ -49,6 +49,7 @@
 #include "service.h"
 #include "syslog.h"
 #include "jobfilterset.h"
+#include "jobfiltertype.h"
 
 #include "jobburner.h"
 #include "slave.h"
@@ -130,7 +131,7 @@ JobBurner::JobBurner( const JobAssignment & jobAssignment, Slave * slave, int op
 	mProgressUpdate = QDateTime::currentDateTime();
 
     mJobFilterMessages = mJob.filterSet().jobFilterMessages();
-    //mJobFilterMessages.reload();
+    mJobFilterMessages.reload();
 }
 
 JobBurner::~JobBurner()
@@ -507,7 +508,7 @@ void JobBurner::cancel()
 	cleanup();
 	updateOutput();
 	// This will reset jobtasks and cancel the jobtaskassignments
-	Database::current()->exec("SELECT cancel_job_assignment(?)", VarList() << mJobAssignment.key() );
+	Database::current()->exec("SELECT cancel_job_assignment(?,?,?)", VarList() << mJobAssignment.key() << "cancelled" << "new" );
 	emit finished();
 }
 
@@ -804,7 +805,7 @@ void JobBurner::slotProcessOutputLine( const QString & line, QProcess::ProcessCh
     }
     foreach( JobFilterMessage jfm, mJobFilterMessages ) {
         if( jfm.enabled() && line.contains( QRegExp(jfm.regex()) ) ) {
-            logMessage( QString("JobBurner: JFM id: %1 produced an error with regex %2 ").arg(QString::number(jfm.key())).arg(jfm.regex()));
+            logMessage( QString("JobBurner: JFM id: %1, type: %2 produced an error with regex %2 ").arg(jfm.key()).arg(jfm.jobFilterType().name()).arg(jfm.regex()));
             if( jfm.jobFilterType().name() == "Error-TaskCancel" )
                 jobErrored( line, false, "cancelled" );
             else if( jfm.jobFilterType().name() == "Error-TaskRetry" )
