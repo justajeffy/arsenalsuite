@@ -153,7 +153,7 @@ protected:
 
 	bool taskStart( int frame, const QString & outputName = QString(), int secondsSinceStarted = 0 );
 	void taskDone( int frame );
-	void jobErrored( const QString & );
+    void jobErrored( const QString &, bool timeout=false, const QString & nextstate="new" );
 
 	QTimer * checkupTimer();
 
