@@ -136,9 +136,8 @@ void Slave::handleSigInt()
     ::read(sigintFd[1], &tmp, sizeof(tmp));
  
 	setStatus("stopping", true);
-	exit(0);
- 
-    snInt->setEnabled(true);
+    handleStatusChange( "offline", "stopping" );
+    exit(0);
 }
 
 void Slave::handleSigTerm()
@@ -148,9 +147,8 @@ void Slave::handleSigTerm()
     ::read(sigtermFd[1], &tmp, sizeof(tmp));
  
 	setStatus("stopping", true);
+    handleStatusChange( "offline", "stopping" );
 	exit(0);
- 
-    snTerm->setEnabled(true);
 }
 
 void Slave::startup()
