@@ -324,7 +324,7 @@ def reaper():
                 # go through every job that is waiting on this one to finish
                 # then if that job has other dependencies, make sure they are complete
                 # too. If so then it is good to go.
-                Database.current().exec_('SELECT update_job_deps(%i)' % job.key())
+                Database.current().exec_('SELECT update_job_hard_deps(%i)' % job.key())
 
             job.commit()
             js.commit()
@@ -345,7 +345,7 @@ def notifyOnCompleteSend(job):
 def notifyOnErrorSend(job,errorCount):
     if VERBOSE_DEBUG:
         print 'notifyOnErrorSend(): Job %s has errors.' % (job.name())
-    msg = 'Job %s has %i errors.' % (job.name(),errorCount)
+    msg = 'Job %s (%i) for user %s has %i errors.' % (job.name(), job.key(), job.user().name(), errorCount)
     if not job.notifyErrorMessage().isEmpty():
         msg = job.notifyErrorMessage()
     notifySend( notifyList = job.notifyOnError(), body = msg, subject = msg, noEmail = True )
