@@ -6,6 +6,9 @@
 #include <qmenu.h>
 
 #include "userservicematrix.h"
+#include "syslog.h"
+#include "syslogseverity.h"
+#include "syslogrealm.h"
 #include "qvariantcmp.h"
 
 struct UserServiceItem : public RecordItem
@@ -252,10 +255,30 @@ void UserServiceMatrix::slotShowMenu( const QPoint & pos, const QModelIndex & /*
 				toUpdate += us;
 			}
 
-			if ( result == limit && ok )
+			if ( result == limit && ok ) {
 				toUpdate.commit();
-			else if ( result == disable )
+                SysLog log;
+                log.setSysLogRealm( SysLogRealm::recordByName("Farm") );
+                log.setSysLogSeverity( SysLogSeverity::recordByName("Warning") );
+                log.setMessage( QString("%1 services set to %2").arg(toUpdate.size()).arg(limitValue) );
+                log.set_class("UserServiceMatrix");
+                log.setMethod("slotShowMenu");
+                log.setUserName( User::currentUser().name() );
+                log.setHostName( Host::currentHost().name() );
+                log.commit();
+            }
+			else if ( result == disable ) {
 				toUpdate.remove();
+                SysLog log;
+                log.setSysLogRealm( SysLogRealm::recordByName("Farm") );
+                log.setSysLogSeverity( SysLogSeverity::recordByName("Warning") );
+                log.setMessage( QString("%1 services set to unlimited").arg(toUpdate.size()) );
+                log.set_class("UserServiceMatrix");
+                log.setMethod("slotShowMenu");
+                log.setUserName( User::currentUser().name() );
+                log.setHostName( Host::currentHost().name() );
+                log.commit();
+            }
 		}
 		delete menu;
 	}
