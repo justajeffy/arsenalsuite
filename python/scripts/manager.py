@@ -820,9 +820,9 @@ SELECT * from project_slots_limits
             else:
                 self.slotsByUserAndService[key] = job.assignmentSlots()
 
-            Log( "slotsByUserAndService: key %s, value %s" % (key,  self.slotsByUserAndService[key]))
-            if self.limitsByUserAndService.has_key(key):
-                Log( "limitsByUserAndService: key %s, value %s" % (key,  self.limitsByUserAndService[key]))
+            #Log( "slotsByUserAndService: key %s, value %s" % (key,  self.slotsByUserAndService[key]))
+            #if self.limitsByUserAndService.has_key(key):
+            #    Log( "limitsByUserAndService: key %s, value %s" % (key,  self.limitsByUserAndService[key]))
 
             if self.limitsByUserAndService.has_key(key) and self.slotsByUserAndService[key] > self.limitsByUserAndService[key]:
                 raise NonCriticalAssignmentError("Service %s exceeds user limit" % service.service())
