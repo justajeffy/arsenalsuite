@@ -1499,11 +1499,17 @@
  <table preload="true" useCodeGen="true" name="SysLogRealm" expireKeyCache="true" className="SysLogRealm" >
   <column type="uint" methodName="keySysLogRealm" name="keySysLogRealm" pkey="true" />
   <column type="QString" methodName="realm" name="SysLogRealm" />
+  <index useCache="false" type="single" name="Name" >
+   <column name="SysLogRealm" />
+  </index>
  </table>
  <table preload="true" useCodeGen="true" name="SysLogSeverity" expireKeyCache="true" className="SysLogSeverity" >
   <column type="uint" methodName="keySysLogSeverity" name="keySysLogSeverity" pkey="true" />
   <column type="QString" methodName="SysLogSeverity" name="SysLogSeverity" />
   <column type="int" methodName="severity" name="severity" />
+  <index useCache="true" type="single" name="Name" >
+   <column name="SysLogSeverity" />
+  </index>
  </table>
  <table useCodeGen="true" parent="Element" name="Task" expireKeyCache="true" className="Task" >
   <column type="uint" methodName="shotGroup" name="shotGroup" />
