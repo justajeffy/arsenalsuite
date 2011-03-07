@@ -4,9 +4,9 @@ $BODY$
 DECLARE
 BEGIN
     -- Update Job Counters when a tasks status changes
-    --IF (NEW.status != coalesce(OLD.status,'')) THEN
-    --    PERFORM update_job_task_counts(NEW.fkeyjob);
-    --END IF;
+    IF (NEW.status != coalesce(OLD.status,'')) THEN
+        PERFORM update_job_task_counts(NEW.fkeyjob);
+    END IF;
 RETURN new;
 END;
 $BODY$
