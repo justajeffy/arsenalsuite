@@ -269,9 +269,11 @@ class JobAssign:
         return sortKey
 
     def key_user_project_soft_reserves( self ):
-        user_deficit = min(0, FarmResourceSnapshot.limitsByUser.get(self.Job.user().name(), [0,0])[1] - FarmResourceSnapshot.slotsByUser.get(self.Job.user().name(),0))
-        project_deficit = min(0, FarmResourceSnapshot.limitsByProject.get(self.Job.project().name(), [0,0])[1] - FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0))
-        sortKey = '%04d-%04d-%03d-%04d' % (9999-user_deficit, 9999-project_deficit, self.Job.priority(), int(self.JobStatus.errorCount()/5.0))
+        user_deficit = self.Job.user().arsenalSlotReserve() - FarmResourceSnapshot.slotsByUser.get(self.Job.user().name(),0)
+        if( user_deficit < 0): user_deficit = 0
+        project_deficit = self.Job.project().arsenalSlotReserve() - FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)
+        if( project_deficit < 0): project_deficit = 0
+        sortKey = '%05d-%05d-%03d-%04d' % (int(99999-user_deficit), int(99999-project_deficit), self.Job.priority(), int(self.JobStatus.errorCount()/5.0))
 
         if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
         return sortKey
@@ -879,6 +881,7 @@ SELECT * from project_slots_limits
 
             jobAssignList.sort()
             for jobAssign in jobAssignList:
+                #print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.key_user_project_soft_reserves() )
                 try:
                     # Recalc priority and resort job list after assignments.
                     # Use the "sloppiness" attribute to determine how many slots
