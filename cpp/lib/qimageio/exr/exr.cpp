@@ -167,7 +167,17 @@ bool EXRHandler::read( QImage *outImage )
 
 		K_IStream istr( device(), QByteArray() );
 		Imf::RgbaInputFile file( istr );
-		Imath::Box2i dw = file.dataWindow();
+		Imath::Box2i dw = file.displayWindow();
+		Imath::Box2i dataWindow = file.dataWindow();
+
+        /*
+        QString msg = QString("display is %1 %2 - %3 %4, data is %5 %6 - %7 %8")
+            .arg(dw.min.x).arg(dw.min.y)
+            .arg(dw.max.x).arg(dw.max.y)
+            .arg(dataWindow.min.x).arg(dataWindow.min.y)
+            .arg(dataWindow.max.x).arg(dataWindow.max.y);
+        qWarning(msg.toUtf8());
+        */
 
         width  = dw.max.x - dw.min.x + 1;
         height = dw.max.y - dw.min.y + 1;
@@ -176,17 +186,20 @@ bool EXRHandler::read( QImage *outImage )
 		pixels.resizeErase (height, width);
 
         file.setFrameBuffer (&pixels[0][0] - dw.min.x - dw.min.y * width, 1, width);
-        file.readPixels (dw.min.y, dw.max.y);
+        file.readPixels (dataWindow.min.y, dataWindow.max.y);
 
 		QImage image(width, height, QImage::Format_ARGB32);
 		if( image.isNull())
 			return false;
 
+        image.fill(0);
+
 		// somehow copy pixels into image
 		for ( int y=0; y < height; y++ ) {
+            if( y < dataWindow.min.y || y > dataWindow.max.y ) continue;
 			for ( int x=0; x < width; x++ ) {
-				// copy pixels(x,y) into image(x,y)
-				image.setPixel( x, y, RgbaToQrgba( pixels[y][x] ) );
+                if( x < dataWindow.min.x || x > dataWindow.max.x ) continue;
+                image.setPixel( x, y, RgbaToQrgba( pixels[y][x] ) );
 			}
 		}
 
