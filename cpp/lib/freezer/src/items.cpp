@@ -153,7 +153,7 @@ void setupHostView( RecordTreeView * lv, IniConfig & ini  )
 	ini.pushSubSection("HostList");
 	HostItem::HostColors = options.mHostColors;
 	lv->setupTreeView(ini,HostItem::host_columns);
-	lv->setupRecordFilterWidget(ini,job_columns);
+	lv->setupRecordFilterWidget(ini,HostItem::host_columns);
 	lv->setAlternatingRowColors( true );
 	ini.popSection();
 }
@@ -169,7 +169,7 @@ void setupErrorView( RecordTreeView * lv, IniConfig & ini  )
 {
 	ini.pushSubSection("ErrorList");
 	lv->setupTreeView(ini,error_columns);
-	lv->setupRecordFilterWidget(ini,job_columns);
+	lv->setupRecordFilterWidget(ini,error_columns);
 	lv->setAlternatingRowColors( false );
 	ini.popSection();
 }
@@ -199,7 +199,7 @@ void setupFrameView( RecordTreeView * lv, IniConfig & ini  )
 {
 	ini.pushSubSection("FrameList");
 	lv->setupTreeView(ini,frame_columns);
-	lv->setupRecordFilterWidget(ini,job_columns);
+	lv->setupRecordFilterWidget(ini,frame_columns);
 	lv->setAlternatingRowColors( false );
 	ini.popSection();
 }
