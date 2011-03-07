@@ -149,7 +149,7 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
 			QRect filterRect = ( space.size() > 0 ) ? fm.boundingRect( character.prepend(space) ) : fm.boundingRect( character );
 			space.clear();
 
-			painter->drawText( x, y, filterRect.width(), filterRect.height(), TO.flags(), character );
+			painter->drawText( x, y, filterRect.width()+1, filterRect.height(), TO.flags(), character );
 			x = x + filterRect.width()+1;
 		}
 	} else {
