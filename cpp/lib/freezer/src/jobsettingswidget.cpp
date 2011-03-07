@@ -233,22 +233,21 @@ void JobSettingsWidget::resetSettings()
 	mPacketSizeSpin->setEnabled(!containsAuto);
 
 	QStringList packetTypes( unique( mSelectedJobs.packetTypes() ) );
-	bool containsFixedPacketType = packetTypes.contains( "preassigned" ) || packetTypes.contains( "continuous" );
+	bool containsFixedPacketType = packetTypes.contains( "preassigned" );
 	if( mMode == ModifyJobs ) {
 		mPacketCombo->setEnabled( !containsFixedPacketType && packetTypes.size() == 1 );
 		mPacketCombo->clear();
 		if ( !containsFixedPacketType )
-			mPacketCombo->addItems( QStringList() << "Random" << "Sequential" );
+			mPacketCombo->addItems( QStringList() << "Random" << "Sequential" << "Iterative" << "Continuous" );
 		mPacketGroup->setEnabled( !packetTypes.contains("preassigned") );
 	} else {
 		mPacketCombo->clear();
-		mPacketCombo->addItems( QStringList() << "Random" << "Sequential" << "Continuous" << "Preassigned" );
+		mPacketCombo->addItems( QStringList() << "Random" << "Sequential" << "Continuous" << "Iterative" << "Preassigned" );
 	}
 	if( packetTypes.size() == 1 ) {
 		QString pt = packetTypes[0];
 		pt[0] = pt[0].toUpper();
-		if( containsFixedPacketType )
-			mPacketCombo->addItem( pt );
+        //mPacketCombo->addItem( pt );
 		mPacketCombo->setCurrentIndex( mPacketCombo->findText( pt ) );
 	} else
 		mPacketCombo->setCurrentIndex( -1 );
