@@ -34,7 +34,7 @@ JobHistoryView::~JobHistoryView()
 {
 	IniConfig & ini = userConfig();
 	ini.pushSection( "JobHistoryView" );
-	saveTreeView( ini, job_history_columns );
+	//saveTreeView( ini, job_history_columns );
 	ini.popSection();
 }
 
