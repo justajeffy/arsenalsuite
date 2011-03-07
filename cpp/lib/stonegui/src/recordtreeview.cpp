@@ -526,13 +526,14 @@ void ExtTreeView::setupColumns( IniConfig & ini, const ColumnStruct columns [] )
 void ExtTreeView::saveColumns( IniConfig & ini, const ColumnStruct columns [] )
 {
 	QHeaderView * hdr = header();
-	for( int i=0; columns[i].name; i++ )
+
+	for( int i=0; columns[i].name; i++ ) {
 		ini.writeInt( columns[i].iniName + QString("Size"), hdr->sectionSize( i ) );
-	for( int i=0; columns[i].name; i++ )
 		ini.writeInt( columns[i].iniName + QString("Index"), hdr->visualIndex( i ) );
-	for( int i=0; columns[i].name; i++ )
 		ini.writeBool( columns[i].iniName + QString("Hidden"), hdr->isSectionHidden( i ) );
-    for( int i=0; columns[i].name; i++ ) {
+
+        qDebug() << "Trying to save filter text." << endl;
+
         QLineEdit *le = qobject_cast<QLineEdit*> (mRecordFilterWidget->mFilterMap[i]);
         if ( le )
             ini.writeString( columns[i].iniName + QString("ColumnFilter"), le->text() );
