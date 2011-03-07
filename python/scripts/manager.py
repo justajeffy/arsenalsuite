@@ -40,7 +40,7 @@ blur.RedirectOutputToLog()
 # Load all the database tables
 classes_loader()
 
-VERBOSE_DEBUG = True
+VERBOSE_DEBUG = False
 
 if VERBOSE_DEBUG:
     Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete ) #| Database.EchoSelect )
@@ -293,17 +293,6 @@ class JobAssign:
             return self.JobStatus.tasksAverageTime()
         return config._AUTOPACKET_DEFAULT
 
-    def calculateNeededHosts( self ):
-        self.loadHosts()
-        packetSize = self.Job.packetSize()
-        if packetSize < 1:
-            packetSize = self.calculateAutoPacketSize( 1, self.tasksUnassigned )
-        maxHosts = int( self.tasksUnassigned / float(packetSize) + 0.9 )
-        # Can't assign more hosts than what in our host list
-        if self._hostOk:
-            maxHosts = min( len(self._hostOk) - self.JobStatus.hostsOnJob(), maxHosts )
-        return maxHosts
-
     def retrieveRandomTasks(self, limit):
         self.logString += 'Random [limit=%i] ' % limit
         return JobTask.select("fkeyjob=%i AND status='new' ORDER BY random() ASC LIMIT %i" % (self.Job.key(),limit))
@@ -437,22 +426,6 @@ def getCounter():
     if not q.next(): return map(lambda x:0,range(0,3))
     return map(lambda x: q.value(x).toInt()[0], range(0,3))
 
-class AssignRateThrottler(object):
-    def __init__(self):
-        self.assignLeft = 1
-        self.lastAssignTime = QDateTime.currentDateTime()
-
-    def update(self):
-        # Number of hosts to assign per period(seconds) * weight of job assigned
-        self.assignRate = config._ASSIGN_RATE
-        self.assignPeriod = config._ASSIGN_PERIOD
-        now = QDateTime.currentDateTime()
-        self.assignLeft = self.assignLeft + self.assignRate * (self.lastAssignTime.secsTo(now)) / self.assignPeriod
-        if self.assignLeft > self.assignRate:
-            self.assignLeft = self.assignRate
-        self.lastAssignTime = now
-
-throttler = AssignRateThrottler()
 timer = QTime()
 
 class FreeHost(object):
@@ -781,8 +754,8 @@ SELECT * from project_slots_limits
             raise NonCriticalAssignmentError("Host %s missing from self.hostsUnused" % hostStatus.host().name())
 
         # This should already be checked, but should be free from selects, so do it again here
-        if not jobAssign.hostOk( hostStatus, self ):
-            raise NonCriticalAssignmentError("Host %s failed redundant jobAssign.hostOk check" % hostStatus.host().name())
+        #if not jobAssign.hostOk( hostStatus, self ):
+        #    raise NonCriticalAssignmentError("Host %s failed redundant jobAssign.hostOk check" % hostStatus.host().name())
 
         # Account for licenses used by each service
         # This is just a temporary local count to avoid checking the
@@ -793,21 +766,23 @@ SELECT * from project_slots_limits
 
         # check for project limits on total slot use
         key = job.project().name()
-        if self.slotsByProject.has_key(key):
-            self.slotsByProject[key] = self.slotsByProject[key] + job.assignmentSlots()
-        else:
-            self.slotsByProject[key] = job.assignmentSlots()
         if self.limitsByProject.has_key(key):
+            if self.slotsByProject.has_key(key):
+                self.slotsByProject[key] = self.slotsByProject[key] + job.assignmentSlots()
+            else:
+                self.slotsByProject[key] = job.assignmentSlots()
+
             if self.limitsByProject[key][0] > -1 and self.slotsByProject[key] > self.limitsByProject[key][0]:
                 raise NonCriticalAssignmentError("Project %s slot limit of %s reached" % (key, self.limitsByProject[key][0]))
 
         # check for per user limits on total slot use
         key = job.user().name()
-        if self.slotsByUser.has_key(key):
-            self.slotsByUser[key] = self.slotsByUser[key] + job.assignmentSlots()
-        else:
-            self.slotsByUser[key] = job.assignmentSlots()
         if self.limitsByUser.has_key(key):
+            if self.slotsByUser.has_key(key):
+                self.slotsByUser[key] = self.slotsByUser[key] + job.assignmentSlots()
+            else:
+                self.slotsByUser[key] = job.assignmentSlots()
+
             if self.limitsByUser[key][0] > -1 and self.slotsByUser[key] > self.limitsByUser[key][0]:
                 raise NonCriticalAssignmentError("User %s slot limit of %s reached" % (key, self.limitsByUser[key][0]))
 
@@ -815,17 +790,18 @@ SELECT * from project_slots_limits
         for service in jobAssign.servicesRequired:
             key = job.user().name() +":"+ service.service()
 
-            if self.slotsByUserAndService.has_key(key):
-                self.slotsByUserAndService[key] = self.slotsByUserAndService[key] + job.assignmentSlots()
-            else:
-                self.slotsByUserAndService[key] = job.assignmentSlots()
+            if self.limitsByUserAndService.has_key(key):
+                if self.slotsByUserAndService.has_key(key):
+                    self.slotsByUserAndService[key] = self.slotsByUserAndService[key] + job.assignmentSlots()
+                else:
+                    self.slotsByUserAndService[key] = job.assignmentSlots()
 
-            #Log( "slotsByUserAndService: key %s, value %s" % (key,  self.slotsByUserAndService[key]))
-            #if self.limitsByUserAndService.has_key(key):
-            #    Log( "limitsByUserAndService: key %s, value %s" % (key,  self.limitsByUserAndService[key]))
+                #Log( "slotsByUserAndService: key %s, value %s" % (key,  self.slotsByUserAndService[key]))
+                #if self.limitsByUserAndService.has_key(key):
+                #    Log( "limitsByUserAndService: key %s, value %s" % (key,  self.limitsByUserAndService[key]))
 
-            if self.limitsByUserAndService.has_key(key) and self.slotsByUserAndService[key] > self.limitsByUserAndService[key]:
-                raise NonCriticalAssignmentError("Service %s exceeds user limit" % service.service())
+                if self.slotsByUserAndService[key] > self.limitsByUserAndService[key]:
+                    raise NonCriticalAssignmentError("Service %s exceeds user limit" % service.service())
 
         # If the host_assign fails, then skip this job
         # There are valid reasons for this to fail, such as the host going offline
@@ -868,7 +844,10 @@ SELECT * from project_slots_limits
             # Return so that we can recalculate assignment priorities
             if tasksAssigned > 0:
                 assignSuccess = True
-                break
+                self.slotAssignCount = self.slotAssignCount + jobAssign.Job.assignmentSlots()
+                if ((float(self.slotAssignCount) / self.potentialSlotsAvailable)*100) > config._ASSIGN_SLOPPINESS:
+                    print "enough hostStatuses assigned, resort job list"
+                    break
 
             # This shouldn't get hit, because there should be tasks available if we
             # Are assigning, and we should already break above if they get assigned
@@ -885,7 +864,7 @@ SELECT * from project_slots_limits
         # Its possible to have free hosts that can't provide a service
         # for our current jobs
         while True:
-            slotAssignCount = 0
+            self.slotAssignCount = 0
             if len(self.hostsUnused) < 1:
                 raise AllHostsAssignedException()
 
@@ -905,12 +884,10 @@ SELECT * from project_slots_limits
                     # Use the "sloppiness" attribute to determine how many slots
                     # to assign in a single loop.
                     if self.assignSingleJob(jobAssign):
-                        slotAssignCount = slotAssignCount + jobAssign.Job.assignmentSlots()
-                        if ((float(slotAssignCount) / self.potentialSlotsAvailable)*100) > config._ASSIGN_SLOPPINESS:
-                            break
+                        break
                 except NonCriticalAssignmentError:
                     if VERBOSE_DEBUG: traceback.print_exc()
-            if slotAssignCount == 0:
+            if self.slotAssignCount == 0:
                 break
 
     def performAssignments(self):
@@ -934,12 +911,7 @@ SELECT * from project_slots_limits
 
 def run_loop():
     config.update()
-    #throttler.update()
-    print "Manager: Beginning Loop." #  Assign Rate: %g Assign Period: %g Assign Left: %g" % ( float(throttler.assignRate), float(throttler.assignPeriod), float(throttler.assignLeft) )
-    #updateProjectTempo()
-
-    # Basic Farm Counter
-    hostsTotal, hostsActive, hostsReady = getCounter()[:3]
+    print "Manager: Beginning Loop."
 
     # Complete Job / Host snapshot
     snapshot = FarmResourceSnapshot()
@@ -954,7 +926,7 @@ def manager2():
         if service.enabled() and hostService.enabled():
             run_loop()
             if VERBOSE_DEBUG: print "Loop Assigning Jobs, took: %i, Waiting 1 second" % (timer.elapsed())
-            time.sleep( 1 )
+            #time.sleep( 1 )
 
 if __name__=="__main__":
     manager2()
