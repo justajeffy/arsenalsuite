@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordimp.cpp 8503 2009-06-24 07:48:50Z brobison $
+ * $Id$
  */
 
 #include <stdio.h>
@@ -83,11 +83,12 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q )
 		int size = allFields.size();
 		mValues = new VariantVector( size );
 		int pos = 0;
-		foreach( Field * f, allFields )
+        foreach( Field * f, allFields ) {
 			if( f->flag(Field::LocalVariable) )
 				(*mValues)[f->pos()] = f->defaultValue();
 			else
 				(*mValues)[f->pos()] = f->coerce(q.value(pos++));
+        }
 		mState = COMMITTED;
 //		printf( "NEW RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
 	}
@@ -124,6 +125,7 @@ RecordImp::~RecordImp()
 		mTable->mImpCount--;
 		//printf( "DELETE RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
 	}
+    mValues->clear();
 	delete mValues;
 	mValues = 0;
 	delete [] mStates;
