@@ -891,6 +891,7 @@ void JobBurner::openLogFiles()
     mLogStream = new QTextStream(mLogFile);
 
     mJobAssignment.setStdOut( stdOutPath );
+    mJobAssignment.commit();
 
     // the log files should be flushed to disk every N seconds
     mLogFlushTimer = new QTimer( this );
@@ -974,7 +975,6 @@ void JobBurner::updateAssignmentAccountingInfo()
     mJobAssignment.setOpsRead(info.opsRead);
     mJobAssignment.setOpsWrite(info.opsWrite);
     //mJobAssignment.setEfficiency(info.cpuTime / (info.realTime > 0 ? info.realTime : 1));
-    mJobAssignment.commit();
 #endif
 }
 
