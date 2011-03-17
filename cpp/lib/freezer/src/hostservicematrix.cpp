@@ -7,6 +7,10 @@
 
 #include "hostservicematrix.h"
 #include "qvariantcmp.h"
+#include "syslog.h"
+#include "syslogrealm.h"
+#include "syslogseverity.h"
+#include "user.h"
 
 struct HostServiceItem : public RecordItem
 {
@@ -250,10 +254,29 @@ void HostServiceMatrix::slotShowMenu( const QPoint & pos, const QModelIndex & /*
 				hs.setEnabled( result == en );
 				toUpdate += hs;
 			}
-			if( result == en || result == dis )
+			if( result == en || result == dis ) {
 				toUpdate.commit();
-			else
+                SysLog log;
+                log.setSysLogRealm( SysLogRealm::recordByName("Farm") );
+                log.setSysLogSeverity( SysLogSeverity::recordByName("Warning") );
+                log.setMessage( QString("%1 host services modified").arg(toUpdate.size()) );
+                log.set_class("UserServiceMatrix");
+                log.setMethod("slotShowMenu");
+                log.setUserName( User::currentUser().name() );
+                log.setHostName( Host::currentHost().name() );
+                log.commit();
+			} else {
 				toUpdate.remove();
+                SysLog log;
+                log.setSysLogRealm( SysLogRealm::recordByName("Farm") );
+                log.setSysLogSeverity( SysLogSeverity::recordByName("Warning") );
+                log.setMessage( QString("%1 host services removed").arg(toUpdate.size()) );
+                log.set_class("HostServiceMatrix");
+                log.setMethod("slotShowMenu");
+                log.setUserName( User::currentUser().name() );
+                log.setHostName( Host::currentHost().name() );
+                log.commit();
+            }
 		}
 		delete menu;
 	}
