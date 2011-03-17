@@ -532,7 +532,7 @@ void ExtTreeView::saveColumns( IniConfig & ini, const ColumnStruct columns [] )
 		ini.writeInt( columns[i].iniName + QString("Index"), hdr->visualIndex( i ) );
 		ini.writeBool( columns[i].iniName + QString("Hidden"), hdr->isSectionHidden( i ) );
 
-        qDebug() << "Trying to save filter text." << endl;
+        //qDebug() << "Trying to save filter text." << endl;
 
         QLineEdit *le = qobject_cast<QLineEdit*> (mRecordFilterWidget->mFilterMap[i]);
         if ( le )
