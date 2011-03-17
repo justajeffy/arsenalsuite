@@ -18,23 +18,17 @@ bool Job::updateJobStatuses( JobList jobs, const QString & jobStatus, bool reset
 	Database::current()->beginTransaction();
 
     if( resetTasks ) {
-        /*** Let triggers handle this now!
         foreach( Job j, jobs ) {
-            JobTaskList jtl = j.jobTasks().filter("status", "cancelled",  keepMatches false);
+            JobTaskList jtl = j.jobTasks().filter("status", "cancelled",  /*keepMatches*/ false);
             jtl.setStatuses("new");
             jtl.setColumnLiteral("fkeyjoboutput","NULL");
             if( j.packetType() != "preassigned" )
                 jtl.setHosts(Host());
             jtl.commit();
         }
-        ***/
     }
 
 	if( !jobStatus.isEmpty() ){
-		foreach( Job j, jobs )
-			if( j.status() != jobStatus )
-				j.addHistory( "Status change from" + j.status() + " to " + jobStatus );
-
 		// Update each of the Job records
         jobs.setStatuses(jobStatus);
         jobs.commit();
