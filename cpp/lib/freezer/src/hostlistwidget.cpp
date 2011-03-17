@@ -5,6 +5,9 @@
 #include "database.h"
 #include "freezercore.h"
 #include "process.h"
+#include "syslog.h"
+#include "syslogrealm.h"
+#include "syslogseverity.h"
 
 #include "recordtreeview.h"
 #include "recordfilterwidget.h"
@@ -281,6 +284,16 @@ void HostListWidget::setHostsStatus(const QString & status)
 
     HostStatusList hsl = hosts.hostStatuses();
     hsl.setSlaveStatuses(status);
+
+    SysLog log;
+    log.setSysLogRealm( SysLogRealm::recordByName("Farm") );
+    log.setSysLogSeverity( SysLogSeverity::recordByName("Warning") );
+    log.setMessage( QString("%1 hosts set to %2").arg(hosts.size()).arg(status) );
+    log.set_class("HostListWidget");
+    log.setMethod("setHostsStatus");
+    log.setUserName( User::currentUser().name() );
+    log.setHostName( Host::currentHost().name() );
+    log.commit();
 }
 
 void HostListWidget::setHostsOnline()
