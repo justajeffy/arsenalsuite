@@ -22,6 +22,7 @@
  */
 
 #include "Python.h"
+#include "signal.h"
 
 #include <qapplication.h>
 #include <qdir.h>
@@ -224,6 +225,13 @@ void loadPythonPlugins()
     Py_DECREF(plug_mod);
 }
 
+void oops_handler(int )
+{
+	printf("abort handler\n");
+    printBackTrace();
+    exit(1);
+}
+
 int main( int argc, char * argv[] )
 {
 	int result=0;
@@ -258,6 +266,8 @@ int main( int argc, char * argv[] )
 
 #endif
 
+    signal(SIGSEGV, oops_handler);
+    signal(SIGABRT, oops_handler);
 	QApplication a(argc, argv);
 
 	initConfig( "freezer.ini" );
