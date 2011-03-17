@@ -16,9 +16,11 @@ class DelightBurner(JobBurner):
         self.EndFrame = None
 
         # Rendering /drd/jobs/hf2/global/rnd/surfdev/artur.vill/empland/houdini/ribs/empland.1191.rib
-        if self.burnFile().endsWith("..rib"):
+        if self.Job.fileName().endsWith("..rib"):
+            Log( "%s ends with ..rib so we have a RIB per frame" %self.Job.fileName() )
             self.frameStart = QRegExp("^# Rendering.*\.(\d+)\.rib")
         else:
+            Log( "%s - we have a RIB with multiple frames" %self.Job.fileName() )
             self.frameStart = QRegExp("^# Rendering.*\.rib")
 
         # Statistics for frame 1049
@@ -78,6 +80,12 @@ class DelightBurner(JobBurner):
         renderdl_cmd = "renderdl"
         if( not self.Job.renderdlCmd().isEmpty() ):
             renderdl_cmd = self.Job.renderdlCmd()
+
+        straceLog = self.Job.fileName().replace("..rib", (".%04d.strace" % self.frameList[0]))
+        straceCmd = "strace -tt -F -e trace=file,read,write -o %s" % straceLog
+        if self.Job.name().contains("strace"):
+            renderdl_cmd = straceCmd + " " + renderdl_cmd
+
         cmd = timeCmd + "/bin/su %s -c \"%s " % (self.Job.user().name(), renderdl_cmd)
 
         args = QStringList()
@@ -94,19 +102,21 @@ class DelightBurner(JobBurner):
         args << str(self.Job.threads())
         args << "-stats2"
         args << "-init"
+        if self.Job.name().contains("netcache"):
+            args << "/drd/software/ext/delight/netcache.rib"
 
-        if self.burnFile().endsWith("..rib"):
+        if self.Job.fileName().endsWith("..rib"):
             for n in self.frameList:
-                rib = self.burnFile().replace("..rib", (".%04d.rib" % n))
+                rib = self.Job.fileName().replace("..rib", (".%04d.rib" % n))
                 if( self.Job.outputPath().isEmpty() ):
                     self.guessOutputPath(rib)
                 args << rib
         else:
             args << "-frames"
             args << str(self.StartFrame) << str(self.EndFrame)
-            args << self.burnFile()
+            args << self.Job.fileName()
             if( self.Job.outputPath().isEmpty() ):
-                self.guessOutputPath(self.burnFile())
+                self.guessOutputPath(self.Job.fileName())
 
         cmd = cmd + args.join(" ") + "\""
 
@@ -136,9 +146,11 @@ class DelightBurner(JobBurner):
 
         # Frame status
         if self.frameStart.indexIn(line) >= 0:
+            Log( "Delight: found frameStart" )
             if self.CurrentFrame is None:
                 self.CurrentFrame = self.StartFrame
             else:
+                Log( "Delight: taskDone %s" % self.CurrentFrame )
                 self.taskDone(self.CurrentFrame)
                 self.CurrentFrame = self.CurrentFrame + 1
 
