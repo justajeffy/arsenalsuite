@@ -600,6 +600,9 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 
 int JobItem::compare( const QModelIndex & a, const QModelIndex & b, int col, bool asc )
 {
+    if( !a.isValid() || !b.isValid() )
+        return -1;
+
 	JobItem & other = JobTranslator::data(b);
 	if( col == 2 ) {
 		float other_done = other.jobStatus.tasksCount() ? other.jobStatus.tasksDone() / float(other.jobStatus.tasksCount()) : 0;
