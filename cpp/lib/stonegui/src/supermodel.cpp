@@ -362,6 +362,7 @@ inline void * ModelNode::_itemData( int dataOffset )
 }
 
 QVariant ModelNode::data( const QModelIndex & idx, int role ) {
+	if( !idx.isValid() ) return QVariant();
 	ItemInfo ii = rowToItemInfo(idx.row());
 	return _translator(ii.translatorIndex)->modelData( _itemData(ii.dataOffset), idx, role );
 }
