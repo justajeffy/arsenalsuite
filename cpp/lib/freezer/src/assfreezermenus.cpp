@@ -439,14 +439,7 @@ void FreezerJobMenu::slotActionTriggered( QAction * action )
 					toRemove += JobDep::recordByJobAndDep(job,dep);
 
 					LOG_5( "Job " + job.name() + " remove dependency on " + dep.name() );
-                    JobHistory jh;
-                    jh.setMessage( QString("Remove dependency on %1 key %2").arg(dep.name()).arg(dep.key()) );
-                    jh.setUser( User::currentUser() );
-                    jh.setHost( Host::currentHost() );
-                    jh.setColumnLiteral( "created", "NOW()" );
-                    jh.setJob( job );
-                    jh.setType( JobHistoryType::recordByName( "info" ) );
-                    jh.commit();
+                    job.addHistory( QString("Remove dependency on %1 key %2").arg(dep.name()).arg(dep.key()) );
 
 					i = i.sibling( i.row() + 1, 0 );
 				} while( sr.contains(i) );
@@ -845,14 +838,7 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
                 j.setStatus( "verify" );
                 j.commit();
             }
-            JobHistory jh;
-            jh.setMessage( "Rerender Frames: " + frameList.join(",") );
-            jh.setUser( User::currentUser() );
-            jh.setHost( Host::currentHost() );
-            jh.setColumnLiteral( "created", "NOW()" );
-            jh.setJob( j );
-            jh.setType( JobHistoryType::recordByName( "info" ) );
-            jh.commit();
+            j.addHistory(  "Rerender Frames: " + frameList.join(",") );
         }
 
         mJobList->refreshFrameList(false);
@@ -872,6 +858,8 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
         mTasks.setStatuses( "cancelled" );
         mTasks.commit();
 
+        mJobList->currentJob().addHistory(  "Cancel Frames: " + frameList.join(",") );
+
         mJobList->refreshCurrentTab();
         mJobList->setStatusBarMessage( "Frames marked as 'cancelled'" );
     }
@@ -880,6 +868,7 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
             mTasks.setHosts( Host() );
         mTasks.setStatuses( "suspended" );
         mTasks.commit();
+        mJobList->currentJob().addHistory(  "Suspend Frames: " + frameList.join(",") );
         mJobList->setStatusBarMessage( QString::number( mTasks.size() ) + " frame" + QString(mTasks.size() > 1 ? "s" : "") + " suspended" );
     }
     else if( action == mShowLogAction && mTasks.size() == 1 ) {
@@ -993,10 +982,15 @@ void FreezerErrorMenu::slotActionTriggered( QAction * action )
 	if( !action ) return;
 
 	if( (action==mClearAll) || ( action == mClearSelected ) ){
-		if( action == mClearAll )
+		if( action == mClearAll ) {
 			mAll.setCleared( true ).commit();
-		else
+            foreach( Job j, mAll.jobs() )
+                j.addHistory( "All errors cleared" );
+		} else {
 			mSelection.setCleared( true ).commit();
+            foreach( Job j, mSelection.jobs() )
+                j.addHistory( "Selected errors cleared" );
+        }
 		JobListWidget * jlw = qobject_cast<JobListWidget*>(parent());
 		if( jlw )
 			jlw->refreshCurrentTab();
@@ -1030,6 +1024,7 @@ void FreezerErrorMenu::slotActionTriggered( QAction * action )
 
 			job.setHostList( hl.names().join(",") );
 			job.commit();
+            job.addHistory("Host(s) excluded from job");
 		}
 	} else if( action == mClearHostErrorsAndOffline ) {
 		clearHostErrorsAndSetOffline( mSelection.hosts(), true);
