@@ -370,7 +370,8 @@ void JobListWidget::customEvent( QEvent * evt )
             for ( int row = 0; row < numRows; row++ ) {
                 QModelIndex qmi = jm->index(row, 4);
                 JobItem & ji = JobTranslator::data(qmi);
-                ji.toolTip.clear();
+                ji.userToolTip.clear();
+                ji.projectToolTip.clear();
             }
 
             // Update slot use data for tooltips
@@ -396,7 +397,37 @@ void JobListWidget::customEvent( QEvent * evt )
                         //LOG_1( QString("row %1 has data %2").arg(QString::number(row)).arg(cell) );
                         if( keyUser == cell ) {
                             JobItem & ji = JobTranslator::data(qmi);
-                            ji.toolTip += toolTip;
+                            ji.userToolTip += toolTip;
+                        }
+                    }
+                }
+            }
+
+            // Update slot use data for Project tooltips
+            if( jlt->mFetchProjectSlots ) {
+                // we store the pre-formatted tooltip in the model so
+                // need to do that now..
+                foreach( QString keyProject, jlt->mProjectSlots.keys() ) {
+                    QString value = jlt->mProjectSlots[keyProject];
+                    int projectCurrent = value.section(":",0,0).toInt();
+                    int projectReserve = value.section(":",1,1).toInt();
+                    int projectLimit = value.section(":",2,2).toInt();
+                    QString toolTip = QString("(%1)\n%2").arg(projectReserve).arg(projectCurrent);
+                    if( projectLimit > -1 )
+                        toolTip += " / " + QString::number(projectLimit);
+                    //toolTip += "\n";
+                    //LOG_1( QString("append tooltip for %1 to %2").arg(keyUser).arg(toolTip) );
+
+                    // iterate through the model and set as tooltip for all rows belonging to
+                    // the user
+                    int numRows = jm->rowCount();
+                    for ( int row = 0; row < numRows; row++ ) {
+                        QModelIndex qmi = jm->index(row, 7);
+                        QString cell = jm->data( qmi ).toString();
+                        //LOG_1( QString("row %1 has data %2").arg(QString::number(row)).arg(cell) );
+                        if( keyProject == cell ) {
+                            JobItem & ji = JobTranslator::data(qmi);
+                            ji.projectToolTip += toolTip;
                         }
                     }
                 }

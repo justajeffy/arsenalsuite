@@ -137,7 +137,8 @@ struct FREEZER_EXPORT JobItem : public RecordItemBase
 	int compare( const QModelIndex & a, const QModelIndex & b, int, bool );
 	Qt::ItemFlags modelFlags( const QModelIndex & );
 	Record getRecord();
-    QString toolTip;
+    QString userToolTip;
+    QString projectToolTip;
 
     QString efficiency, bytesRead, bytesWrite, diskOps, cpuTime;
 };
