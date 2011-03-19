@@ -45,16 +45,17 @@ class JobListTask : public ThreadTask
 public:
 	JobListTask( QObject * rec, const JobFilter & jf, const JobList & jobList, ProjectList, bool fetchJobServices = false, bool needDeps = false );
 	void run();
-	
+
 	JobList mReturn;
 	JobDepList mJobDeps;
 	JobFilter mJobFilter;
 	JobList mJobList, mJobsNeedingDeps, mDependentJobs;
 	ProjectList mProjects;
-	bool mFetchJobServices, mFetchJobDeps, mFetchUserServices;
+	bool mFetchJobServices, mFetchJobDeps, mFetchUserServices, mFetchProjectSlots;
 	JobServiceList mJobServices;
     QMap<QString, int> mUserServiceCurrent;
     QMap<QString, int> mUserServiceLimits;
+    QMap<QString, QString> mProjectSlots;
 };
 
 class UpdateJobListTask : public ThreadTask

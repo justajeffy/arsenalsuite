@@ -589,8 +589,11 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
             if( job.wrangler().isRecord() )
                 return "Job is currently being wrangled by: " + job.wrangler().name();
         } else if ( col == 4 ) {
-            if( toolTip.isEmpty() ) return QVariant();
-                return userName + "\n" + toolTip;
+            if( userToolTip.isEmpty() ) return QVariant();
+                return userName + "\n" + userToolTip;
+        } else if ( col == 7 ) {
+            if( projectToolTip.isEmpty() ) return QVariant();
+                return project + "\n" + projectToolTip;
         }
     } else if( role == Qt::DecorationRole && col == 0 ) {
         return icon;

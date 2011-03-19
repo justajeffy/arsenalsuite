@@ -65,6 +65,7 @@ JobListTask::JobListTask( QObject * rec, const JobFilter & jf, const JobList & j
 , mFetchJobServices( fetchJobServices )
 , mFetchJobDeps( needDeps )
 , mFetchUserServices( true )
+, mFetchProjectSlots( true )
 {}
 
 void JobListTask::run()
@@ -193,7 +194,18 @@ void JobListTask::run()
                 mUserServiceLimits[key] = value;
             }
         }
-	}
+
+        if( mFetchProjectSlots ) {
+            QSqlQuery q = Database::current()->exec( "SELECT * FROM project_slots_current" );
+            while( q.next() ) {
+                QString key = q.value( 0 ).toString();
+                int projectSlots = q.value( 1 ).toInt();
+                int reserve = q.value( 2 ).toInt();
+                int limit = q.value( 3 ).toInt();
+                mProjectSlots[key] = QString("%1:%2:%3").arg(projectSlots).arg(reserve).arg(limit);
+            }
+        }
+    }
 }
 
 HostListTask::HostListTask( QObject * rec, const QString & serviceFilter, bool loadHostServices )
