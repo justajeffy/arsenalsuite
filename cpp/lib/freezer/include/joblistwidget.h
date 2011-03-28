@@ -69,8 +69,7 @@ public:
 	QAction* ClearErrorsAction;
 	QAction* DependencyTreeEnabledAction;
 	QAction* NewViewFromSelectionAction;
-
-	//JobFilterEdit * mJobFilterEdit;
+	QAction* ShowClearedErrorsAction;
 
 	ProjectList activeProjects();
 
