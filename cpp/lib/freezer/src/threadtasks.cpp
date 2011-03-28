@@ -272,15 +272,19 @@ void PartialFrameListTask::run()
 		mCurTime = q.value( 0 ).toDateTime();
 }
 
-ErrorListTask::ErrorListTask( QObject * rec, const Job & job )
+ErrorListTask::ErrorListTask( QObject * rec, const Job & job, bool showCleared )
 : ThreadTask( ERROR_LIST, rec )
 , mJob( job )
+, mShowCleared( showCleared )
 {}
 	
 void ErrorListTask::run()
 {
 //	mReturn = JobHistory::recordsByJob( mJob );
-	mReturn = JobError::select( "fkeyJob=? AND cleared=false", VarList() << mJob.key() );
+    QString sql = "fkeyjob=?";
+    if(!mShowCleared)
+        sql += " AND cleared=false";
+	mReturn = JobError::select( sql, VarList() << mJob.key() );
 	LOG_5( "Error select finished" );
 }
 

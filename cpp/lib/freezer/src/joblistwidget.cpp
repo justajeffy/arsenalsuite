@@ -106,6 +106,10 @@ void JobListWidget::initializeViews()
         ShowMineAction->setCheckable( TRUE );
         ShowMineAction->setIcon( QIcon( ":/images/show_mine" ) );
         ClearErrorsAction = new QAction( "Clear Job Errors", this );
+        ShowClearedErrorsAction = new QAction( "Show Cleared Errors", this );
+        ShowClearedErrorsAction->setCheckable(true);
+        ShowClearedErrorsAction->setChecked(false);
+        connect( ShowClearedErrorsAction, SIGNAL( toggled( bool ) ), SLOT( refresh() ) );
 
         DependencyTreeEnabledAction = new QAction( "Show Dependency Tree", this );
         DependencyTreeEnabledAction->setCheckable( true );
@@ -683,10 +687,10 @@ void JobListWidget::currentJobChanged()
 	QWidget * curTab = mJobTabWidget->currentWidget();
 	if( curTab==mFrameTab )
 		refreshFrameList(jobChange);
-	else if( curTab == mErrorsTab ) {
-		FreezerCore::addTask( new ErrorListTask( this, mCurrentJob ) );
-		FreezerCore::wakeup();
- 	}
+    else if( curTab == mErrorsTab ) {
+        FreezerCore::addTask( new ErrorListTask( this, mCurrentJob, ShowClearedErrorsAction->isChecked() ) );
+        FreezerCore::wakeup();
+    }
 }
 
 void JobListWidget::refreshFrameList( bool jobChange )
@@ -728,7 +732,7 @@ void JobListWidget::jobListSelectionChanged()
 		setStatusBarMessage( QString::number( selection.size() ) + " Jobs Selected" );
 	else
 		clearStatusBar();
-	
+
 	mSelectedJobs = selection;
 	LOG_5( "JobListWidget::jobListSelectionChanged: " + mSelectedJobs.keyString() + " -- Current: " + QString::number( mCurrentJob.key() ) );
 
@@ -737,9 +741,6 @@ void JobListWidget::jobListSelectionChanged()
 		mJobSettingsWidget->setSelectedJobs( selection );
 	} else if( curTab == mHistoryTab ) {
 		// Clear the view
-		//mHistoryView->setHistory( JobHistoryList() );
-		//FreezerCore::addTask( new JobHistoryListTask( this, selection ) );
-		//FreezerCore::wakeup();
         mHistoryView->setJobs( selection );
 	} else if( curTab == mNotesTab ) {
 		mThreadView->setJobList( selection );

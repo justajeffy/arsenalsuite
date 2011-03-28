@@ -931,18 +931,6 @@ void FreezerErrorMenu::slotAboutToShow()
 	bool isJobListChild = parent()->inherits( "JobListWidget" );
 	bool hasSelection = mSelection.size(), hasErrors = mAll.size();
 
-	if( isJobListChild ) {
-		mClearSelected = addAction("Clear Selected Errors");
-		mClearSelected->setEnabled( hasSelection );
-
-		mClearAll = addAction( "Clear All Errors" );
-		mClearAll->setEnabled( hasErrors );
-		addSeparator();
-	}
-
-	mCopyText = addAction("Copy Text of Selected Errors");
-	mCopyText->setEnabled( hasSelection );
-
 	mShowLog = addAction("Show Log...");
 	mShowLog->setEnabled( mSelection.size() == 1 );
 
@@ -953,6 +941,23 @@ void FreezerErrorMenu::slotAboutToShow()
         logMenu->addAction( action );
         mFrameViewerActions[action] = fvp;
     }
+
+	mCopyText = addAction("Copy Text of Selected Errors");
+	mCopyText->setEnabled( hasSelection );
+
+    addSeparator();
+
+	if( isJobListChild ) {
+		JobListWidget * jlw = qobject_cast<JobListWidget*>(parent());
+		if( jlw )
+            addAction(jlw->ShowClearedErrorsAction);
+		mClearSelected = addAction("Clear Selected Errors");
+		mClearSelected->setEnabled( hasSelection );
+
+		mClearAll = addAction( "Clear All Errors" );
+		mClearAll->setEnabled( hasErrors );
+		addSeparator();
+	}
 
 	mShowErrorInfo = addAction("Error Info...");
 	mShowErrorInfo->setEnabled( mSelection.size() == 1 );
@@ -979,15 +984,18 @@ void FreezerErrorMenu::slotAboutToShow()
 
 void FreezerErrorMenu::slotActionTriggered( QAction * action )
 {
-	if( !action ) return;
+    if( !action ) return;
 
-	if( (action==mClearAll) || ( action == mClearSelected ) ){
-		if( action == mClearAll ) {
-			mAll.setCleared( true ).commit();
+    if( (action==mClearAll) || ( action == mClearSelected ) ){
+        if( action == mClearAll ) {
+            if( QMessageBox::warning( this, "Clear All Errors", "Are you sure that you want to clear all errors for selected jobs",
+                QMessageBox::Yes, QMessageBox::Cancel ) != QMessageBox::Yes )
+                return;
+            mAll.setCleared( true ).commit();
             foreach( Job j, mAll.jobs() )
                 j.addHistory( "All errors cleared" );
-		} else {
-			mSelection.setCleared( true ).commit();
+        } else {
+            mSelection.setCleared( true ).commit();
             foreach( Job j, mSelection.jobs() )
                 j.addHistory( "Selected errors cleared" );
         }
@@ -1048,6 +1056,5 @@ void FreezerErrorMenu::slotActionTriggered( QAction * action )
 	    JobError je(mSelection[0]);
         mFrameViewerActions[action]->view( je.jobAssignment() );
     }
-
 }
 
