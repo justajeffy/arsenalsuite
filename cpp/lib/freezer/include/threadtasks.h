@@ -117,10 +117,11 @@ public:
 class ErrorListTask : public ThreadTask
 {
 public:
-	ErrorListTask( QObject * rec, const Job & );
+	ErrorListTask( QObject * rec, const Job &, bool showCleared=false );
 	void run();
 	Job mJob;
 	JobErrorList mReturn;
+    bool mShowCleared;
 };
 
 class HostErrorListTask : public ThreadTask
