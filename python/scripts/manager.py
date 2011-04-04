@@ -11,6 +11,10 @@ from blur.defaultdict import DefaultDict
 from exceptions import Exception
 import traceback
 
+import signal
+import cProfile
+import lsprofcalltree
+
 if sys.argv.count('-daemonize'):
     from blur.daemonize import createDaemon
     createDaemon()
@@ -270,9 +274,9 @@ class JobAssign:
 
     def key_user_project_soft_reserves( self ):
         user_deficit = self.Job.user().arsenalSlotReserve() - FarmResourceSnapshot.slotsByUser.get(self.Job.user().name(),0)
-        if( user_deficit < 0): user_deficit = 0
+        if(user_deficit < 0): user_deficit = 0
         project_deficit = self.Job.project().arsenalSlotReserve() - FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)
-        if( project_deficit < 0): project_deficit = 0
+        if(project_deficit < 0): project_deficit = 0
         sortKey = '%05d-%05d-%03d-%04d' % (int(99999-user_deficit), int(99999-project_deficit), self.Job.priority(), int(self.JobStatus.errorCount()/5.0))
 
         if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
@@ -593,10 +597,13 @@ SELECT * from project_slots_limits
         # Filter out services that have no available licenses
         self.licCountByService = {}
 
-        for service in self.servicesNeeded:
-            lic = service.license().reload()
-            if lic.isRecord():
-                self.licCountByService[service] = lic.total() - lic.inUse() - lic.reserved()
+        q = Database.current().exec_("""SELECT * from license_usage_2""")
+        while q.next():
+            key = str(q.value(0).toString())
+            limit = q.value(1).toInt()[0]
+            current = q.value(2).toInt()[0]
+            self.licCountByService[key] = int(limit - current)
+            Log( "Service %s has limit: %s, current: %s" % (key, limit, current) )
 
     def refreshHostData(self):
         hostServices = HostServiceList()
@@ -688,19 +695,22 @@ SELECT * from project_slots_limits
                 ret += hostStatus
 
         # Assign hosts with 0 jobs first
-        ret = ret.sorted( "activeassignmentcount" )
+        ret = ret.sorted( "activeassignmentcount" ).reversed()
 
         return ret
 
     # Always call canReserveLicenses first
     def reserveLicenses(self,services):
         for service in services:
-            if self.licCountByService.has_key(service) and self.licCountByService[service] > 0:
-                self.licCountByService[service] -= 1
+            serviceName = str(service.service())
+            if self.licCountByService.has_key(serviceName) and self.licCountByService[serviceName] > 0:
+                self.licCountByService[serviceName] -= 1
 
     def canReserveLicenses(self,services):
         for service in services:
-            if self.licCountByService.has_key(service) and self.licCountByService[service] <= 0:
+            serviceName = str(service.service())
+            #Log( "canReserveLicense for %s? %s left" % ( serviceName, self.licCountByService.get(serviceName, 9999) ) )
+            if self.licCountByService.has_key(serviceName) and (self.licCountByService[serviceName]) <= 0:
                 return False
         return True
 
@@ -912,6 +922,7 @@ SELECT * from project_slots_limits
         finally:
             print "Finished assigning jobs, took %i" % (timer.elapsed())
 
+
 def run_loop():
     config.update()
     print "Manager: Beginning Loop."
@@ -931,6 +942,21 @@ def manager2():
             if VERBOSE_DEBUG: print "Loop Assigning Jobs, took: %i, Waiting 1 second" % (timer.elapsed())
             #time.sleep( 1 )
 
+if VERBOSE_DEBUG:
+    profile = cProfile.Profile()
+
+def handler(signum, frame):
+    print 'Signal handler called with signal', signum
+    profileName = "/tmp/manager.profile"
+    kProfile = lsprofcalltree.KCacheGrind(profile)
+    kFile = open(profileName, 'w+')
+    kProfile.output(kFile)
+    kFile.close()
+
 if __name__=="__main__":
-    manager2()
+    if VERBOSE_DEBUG:
+        signal.signal(signal.SIGHUP, handler)
+        profile.runctx('manager2()', globals(), locals())
+    else:
+        manager2()
 
