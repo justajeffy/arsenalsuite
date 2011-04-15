@@ -41,7 +41,7 @@ initStone( sys.argv )
 
 classes_loader()
 
-VERBOSE_DEBUG = False
+VERBOSE_DEBUG = True
 
 if VERBOSE_DEBUG:
 	Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete | Database.EchoSelect )
@@ -269,16 +269,16 @@ def reaper():
                 timeoutCount = getTimeoutCount(job)
                 if timeoutCount > 3:
                     suspend = True
-                    suspendMsg = 'Job %s has been suspended.  The job has timed out on %i hosts.' % (job.name(),timeoutCount)
-                    suspendTitle = 'Job %s has been suspended(Timeout limit reached).' % job.name()
+                    suspendMsg = 'Job %s (%i) has been suspended.  The job has timed out on %i hosts.' % (job.name(), job.key(), timeoutCount)
+                    suspendTitle = 'Job %s (%i) has been suspended(Timeout limit reached).' % (job.name(), job.key())
 
             q = Database.current().exec_('SELECT update_job_stats(%i)' % job.key())
 
             # If job is erroring check job and global error thresholds
             if errorCount > job.maxErrors() or (done == 0 and errorCount > config.totalFailureThreshold):
                 suspend = True
-                suspendMsg = 'Job %s has been suspended.  The job has produced %i errors.' % (job.name(),errorCount)
-                suspendTitle = 'Job %s suspended.' % job.name()
+                suspendMsg = 'Job %s (%i) has been suspended.  The job has produced %i errors.' % (job.name(), job.key(), errorCount)
+                suspendTitle = 'Job %s (%i) suspended.' % (job.name(), job.key())
 
             if suspend:
                 # Return tasks and hosts
@@ -329,7 +329,7 @@ def reaper():
             job.commit()
             js.commit()
 
-        cleanupJobs()
+        #cleanupJobs()
 
         if VERBOSE_DEBUG: print "Sleeping for 3 seconds"
         time.sleep(3)
@@ -337,7 +337,7 @@ def reaper():
 def notifyOnCompleteSend(job):
     if VERBOSE_DEBUG:
         print 'notifyOnCompleteSend(): Job %s is complete.' % (job.name())
-    msg = 'Job %s is complete.' % (job.name())
+    msg = 'Job %s (%i) is complete.' % (job.name(), job.key())
     if not job.notifyCompleteMessage().isEmpty():
         msg = job.notifyCompleteMessage()
     notifySend( notifyList = job.notifyOnComplete(), subject = msg, body = msg )
