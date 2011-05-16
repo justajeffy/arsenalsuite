@@ -8,6 +8,9 @@
 
 #include "assfreezerview.h"
 #include "viewmanager.h"
+#include "group.h"
+#include "user.h"
+#include "usergroup.h"
 
 FreezerView::FreezerView( QWidget * parent )
 : QWidget( parent )
@@ -44,11 +47,19 @@ void FreezerView::setViewCode( const QString & viewCode )
 
 void FreezerView::refresh()
 {
-	if( !mRefreshScheduled ) {
-		mRefreshScheduled = true;
-		mRefreshCount++;
-		QTimer::singleShot( 0, this, SLOT( doRefresh() ) );
-	}
+    if( !mRefreshScheduled ) {
+        mRefreshScheduled = true;
+        mRefreshCount++;
+        uint timeToRefresh = 1;
+        if( User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) )
+        if( mRefreshLast.secsTo(QDateTime::currentDateTime()) < 60 )
+            timeToRefresh = 60 - mRefreshLast.secsTo(QDateTime::currentDateTime());
+        if( User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) )
+            timeToRefresh = 1;
+
+        QTimer::singleShot( 1000*timeToRefresh, this, SLOT( doRefresh() ) );
+        mRefreshLast = QDateTime::currentDateTime();
+    }
 }
 
 int FreezerView::refreshCount() const

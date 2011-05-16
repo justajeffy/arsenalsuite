@@ -69,6 +69,7 @@ protected:
     mutable QString mViewCode;
 	bool mRefreshScheduled;
 	int mRefreshCount;
+    QDateTime mRefreshLast;
     IniConfig mIniConfig;
 };
 
