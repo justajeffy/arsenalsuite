@@ -339,6 +339,20 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QLabel" name="textLabel_slots">
+                 <property name="text">
+                  <string>Slots:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="FieldSpinBox" name="mSlotsSpin">
+                 <property name="maximum">
+                  <number>12</number>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
             </layout>
