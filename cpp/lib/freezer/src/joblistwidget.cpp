@@ -158,6 +158,10 @@ void JobListWidget::initializeViews()
         connect( mFrameTree, SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( showFramePopup( const QPoint & ) ) );
         connect( mErrorTree,  SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( showErrorPopup( const QPoint & ) ) );
 
+        mJobTabWidget->setTabText(0, "&Frames");
+        mJobTabWidget->setTabText(1, "&Errors");
+        mJobTabWidget->setTabText(2, "&History");
+        mJobTabWidget->setTabText(4, "Job &Settings");
         connect( mJobTabWidget, SIGNAL( currentChanged( int ) ), SLOT( currentTabChanged() ) );
 
 
