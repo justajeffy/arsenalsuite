@@ -22,18 +22,18 @@ SOURCES+= \
 	src/imagecache.cpp \
 	src/imageview.cpp \
 	src/items.cpp \
-	src/jobaftereffectssettingswidget.cpp \
+#	src/jobaftereffectssettingswidget.cpp \
 	src/jobbatchsettingswidget.cpp \
 	src/jobenvironmentwindow.cpp \
 	src/jobfilteredit.cpp \
-	src/jobfusionsettingswidget.cpp \
+#	src/jobfusionsettingswidget.cpp \
 	src/jobhistoryview.cpp \
 	src/joblistwidget.cpp \
-	src/jobmaxsettingswidget.cpp \
-	src/jobmaxscriptsettingswidget.cpp \
+#	src/jobmaxsettingswidget.cpp \
+#	src/jobmaxscriptsettingswidget.cpp \
 	src/jobmayasettingswidget.cpp \
-	src/jobrealflowsettingswidget.cpp \
-	src/jobshakesettingswidget.cpp \
+#	src/jobrealflowsettingswidget.cpp \
+#	src/jobshakesettingswidget.cpp \
 	src/jobsettingswidget.cpp \
 	src/jobstatwidget.cpp \
 	src/jobsettingswidgetplugin.cpp \
@@ -67,18 +67,18 @@ HEADERS+= \
 	include/imagecache.h \
 	include/imageview.h \
 	include/items.h \
-	include/jobaftereffectssettingswidget.h \
+#	include/jobaftereffectssettingswidget.h \
 	include/jobbatchsettingswidget.h \
 	include/jobenvironmentwindow.h \
 	include/jobfilteredit.h \
-	include/jobfusionsettingswidget.h \
+#	include/jobfusionsettingswidget.h \
 	include/jobhistoryview.h \
 	include/joblistwidget.h \
-	include/jobmaxsettingswidget.h \
-	include/jobmaxscriptsettingswidget.h \
+#	include/jobmaxsettingswidget.h \
+#	include/jobmaxscriptsettingswidget.h \
 	include/jobmayasettingswidget.h \
-	include/jobrealflowsettingswidget.h \
-	include/jobshakesettingswidget.h \
+#	include/jobrealflowsettingswidget.h \
+#	include/jobshakesettingswidget.h \
 	include/jobstatwidget.h \
 	include/jobsettingswidget.h \
 	include/jobsettingswidgetplugin.h \
@@ -101,18 +101,18 @@ INTERFACES+= \
 	ui/hostservicematrixwindowui.ui \
 	ui/userservicematrixwindowui.ui \
 	ui/framenthdialogui.ui \
-	ui/jobaftereffectssettingswidgetui.ui \
+#	ui/jobaftereffectssettingswidgetui.ui \
 	ui/jobbatchsettingswidgetui.ui \
 	ui/jobenvironmentwindowui.ui \
-	ui/jobfusionsettingswidgetui.ui \
-	ui/jobfusionvideomakersettingswidgetui.ui \
+#	ui/jobfusionsettingswidgetui.ui \
+#	ui/jobfusionvideomakersettingswidgetui.ui \
 	ui/joblistwidgetui.ui \
-	ui/jobmaxscriptsettingswidgetui.ui \
-	ui/jobmaxsettingswidgetui.ui \
+#	ui/jobmaxscriptsettingswidgetui.ui \
+#	ui/jobmaxsettingswidgetui.ui \
 	ui/jobmayasettingswidgetui.ui \
-	ui/jobrealflowsettingswidgetui.ui \
+#	ui/jobrealflowsettingswidgetui.ui \
 	ui/jobsettingswidgetui.ui \
-	ui/jobshakesettingswidgetui.ui \
+#	ui/jobshakesettingswidgetui.ui \
 #	ui/jobxsisettingswidgetui.ui \
 	ui/projectweightdialogui.ui \
 	ui/settingsdialogui.ui

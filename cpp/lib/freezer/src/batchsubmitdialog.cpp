@@ -220,8 +220,8 @@ void BatchSubmitDialog::accept()
 	jb.setProject( mProjectCombo->project() );
 	if( mRunAsUserGroup->isChecked() ) {
 		jb.setUserName( mUserName->text() );
-		jb.setDomain( mDomain->text() );
-		jb.setPassword( mPassword->text() );
+		//jb.setDomain( mDomain->text() );
+		//jb.setPassword( mPassword->text() );
 	}
     jb.commit();
 
