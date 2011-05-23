@@ -37,7 +37,6 @@
 #include "process.h"
 
 #include "jobmaya.h"
-#include "jobmaya7.h"
 #include "jobtype.h"
 #include "user.h"
 
@@ -87,7 +86,7 @@ MayaBurner::~MayaBurner()
 
 QString MayaBurner::buildCmdMaya7()
 {
-	JobMaya7 jm( mJob );
+	JobMaya jm( mJob );
 	QString cmd;
 	mFrame = assignedTasks().section("-",0,0).toInt();
 	cmd += " -s " + QString::number(mFrame);
