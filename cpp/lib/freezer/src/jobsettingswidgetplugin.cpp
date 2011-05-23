@@ -25,37 +25,38 @@ public:
 
 QStringList BuiltinCustomJobSettingsWidgetsPlugin::jobTypes()
 {
-	return JobMaxSettingsWidget::jobTypes()
-		 + JobMayaSettingsWidget::jobTypes()
-		 + JobAfterEffectsSettingsWidget::jobTypes()
-		 + JobShakeSettingsWidget::jobTypes()
+	return //JobMaxSettingsWidget::jobTypes()
+		 JobMayaSettingsWidget::jobTypes()
+		 //+ JobAfterEffectsSettingsWidget::jobTypes()
+		 //+ JobShakeSettingsWidget::jobTypes()
 		 + JobBatchSettingsWidget::jobTypes()
-		 + JobMaxScriptSettingsWidget::jobTypes()
+		 //+ JobMaxScriptSettingsWidget::jobTypes()
 		 //+ JobXSISettingsWidget::jobTypes()
-		 + JobFusionSettingsWidget::jobTypes()
-		 + JobFusionVideoMakerSettingsWidget::jobTypes();
+		 //+ JobFusionSettingsWidget::jobTypes()
+		 //+ JobFusionVideoMakerSettingsWidget::jobTypes()
+         ;
 }
 
 CustomJobSettingsWidget * BuiltinCustomJobSettingsWidgetsPlugin::createCustomJobSettingsWidget( const QString & jobType, QWidget * parent, JobSettingsWidget::Mode mode )
 {
-	if( JobMaxSettingsWidget::jobTypes().contains( jobType ) )
-		return new JobMaxSettingsWidget( parent, mode );
-	else if( JobMayaSettingsWidget::jobTypes().contains( jobType ) )
+	//if( JobMaxSettingsWidget::jobTypes().contains( jobType ) )
+	//	return new JobMaxSettingsWidget( parent, mode );
+	if( JobMayaSettingsWidget::jobTypes().contains( jobType ) )
 		return new JobMayaSettingsWidget( parent, mode );
-	else if( JobAfterEffectsSettingsWidget::jobTypes().contains( jobType ) )
-		return new JobAfterEffectsSettingsWidget( parent, mode );
-	else if( JobShakeSettingsWidget::jobTypes().contains( jobType ) )
-		return new JobShakeSettingsWidget( parent, mode );
+	//else if( JobAfterEffectsSettingsWidget::jobTypes().contains( jobType ) )
+	//	return new JobAfterEffectsSettingsWidget( parent, mode );
+	//else if( JobShakeSettingsWidget::jobTypes().contains( jobType ) )
+	//	return new JobShakeSettingsWidget( parent, mode );
 	else if( JobBatchSettingsWidget::jobTypes().contains( jobType ) )
 		return new JobBatchSettingsWidget( parent, mode );
-	else if( JobMaxScriptSettingsWidget::jobTypes().contains( jobType ) )
-		return new JobMaxScriptSettingsWidget( parent, mode );
+	//else if( JobMaxScriptSettingsWidget::jobTypes().contains( jobType ) )
+	//	return new JobMaxScriptSettingsWidget( parent, mode );
 	//else if( JobXSISettingsWidget::jobTypes().contains( jobType ) )
 	//	return new JobXSISettingsWidget( parent, mode );
-	else if( JobFusionSettingsWidget::jobTypes().contains( jobType ) )
-		return new JobFusionSettingsWidget( parent, mode );
-	else if( JobFusionVideoMakerSettingsWidget::jobTypes().contains( jobType ) )
-		return new JobFusionVideoMakerSettingsWidget( parent, mode );
+	//else if( JobFusionSettingsWidget::jobTypes().contains( jobType ) )
+    //	return new JobFusionSettingsWidget( parent, mode );
+	//else if( JobFusionVideoMakerSettingsWidget::jobTypes().contains( jobType ) )
+	//	return new JobFusionVideoMakerSettingsWidget( parent, mode );
 	return 0;
 }
 
