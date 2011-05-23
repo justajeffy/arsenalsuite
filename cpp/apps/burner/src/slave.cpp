@@ -234,7 +234,7 @@ void Slave::startup()
 	mQuickLoopTime = qMax( 100, qMin( mLoopTime, Config::getInt( "assburnerQuickLoopTime", mLoopTime / 2 ) ) );
 
 	// Default 60 seconds, min 10 seconds.
-	mPulsePeriod = qMax( 10, Config::getInt( "assburnerPulsePeriod", 60 ) );
+	mPulsePeriod = qMax( 10, Config::getInt( "arsenalPulsePeriod", 600 ) );
 
 	// Default 60 seconds, min 10 seconds.
 	mMemCheckPeriod = qMax( 10, Config::getInt( "abMemCheckPeriod", 60 ) );
@@ -372,7 +372,9 @@ void Slave::pulse()
 	QDateTime cdt( QDateTime::currentDateTime() );
 	if( !mLastPulse.isValid() || mLastPulse.secsTo(cdt) >= mPulsePeriod ) {
 		LOG_3( "Slave::pulse(): Emitting pulse at " + cdt.toString(Qt::ISODate) );
-		mService.pulse();
+		//mService.pulse();
+        mHostStatus.setColumnLiteral("slavePulse", "now()");
+        mHostStatus.commit();
 		mLastPulse = cdt;
 	}
 }
