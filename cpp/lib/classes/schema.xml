@@ -637,15 +637,12 @@
   <column type="uint" methodName="maxTaskTime" name="maxTaskTime" />
   <column type="uint" methodName="cleaned" name="cleaned" />
   <column type="uint" methodName="fileSize" name="fileSize" />
-  <column type="QString" methodName="btInfoHash" name="btInfoHash" />
   <column type="QString" methodName="fileName" name="fileName" />
   <column type="QString" methodName="fileMd5sum" name="fileMd5sum" />
   <column reverseAccess="true" type="uint" methodName="JobStat" name="fkeyJobStat" >
    <fkey indexDeleteMode="DoNothingOnDelete" table="JobStat" type="single" hasIndex="false" />
   </column>
   <column type="QString" methodName="userName" name="userName" />
-  <column type="QString" methodName="domain" name="domain" />
-  <column type="QString" methodName="password" name="password" />
   <column type="QString" methodName="stats" name="stats" />
   <column type="float" methodName="currentMapServerWeight" name="currentMapServerWeight" />
   <column type="bool" methodName="prioritizeOuterTasks" name="prioritizeOuterTasks" />
@@ -672,7 +669,7 @@
   <column docs="In kilobytes." type="uint" methodName="minMemory" name="minMemory" />
   <column type="QString" methodName="shotName" name="shotName" />
   <column type="QString" methodName="sceneName" name="sceneName" />
-  <column type="uint" methodName="assignmentSlots" name="slots" />
+  <column pluralMethodName="assignmentSlots" type="uint" methodName="assignmentSlots" name="slots" />
   <column type="uint" methodName="filterSet" name="fkeyJobFilterSet" >
    <fkey indexDeleteMode="DoNothingOnDelete" table="JobFilterSet" type="single" hasIndex="false" />
   </column>
@@ -683,6 +680,7 @@
    <fkey indexDeleteMode="DoNothingOnDelete" table="User" type="multi" hasIndex="false" />
   </column>
   <column docs="A health check on the job. Defines how much times can pass without output to stdout / stderr before the burner raises an error." type="uint" methodName="maxQuietTime" name="maxquiettime" />
+  <column pluralMethodName="queueOrder" type="uint" methodName="queueOrder" name="queueorder" />
  </table>
  <table useCodeGen="true" parent="Job" name="Job3Delight" expireKeyCache="true" className="Job3Delight" >
   <column type="uint" methodName="width" name="width" />
@@ -875,25 +873,21 @@
  <table useCodeGen="true" parent="JobMaya" name="JobMaya2008" expireKeyCache="true" className="JobMaya2008" />
  <table useCodeGen="true" parent="JobMaya" name="JobMaya2009" expireKeyCache="true" className="JobMaya2009" />
  <table useCodeGen="true" parent="JobMaya" name="JobMaya2011" expireKeyCache="true" className="JobMaya2011" />
- <table useCodeGen="true" parent="JobMaya" name="JobMaya7" expireKeyCache="true" className="JobMaya7" />
- <table useCodeGen="true" parent="JobMaya" name="JobMaya8" expireKeyCache="true" className="JobMaya8" />
- <table useCodeGen="true" parent="JobMaya" name="JobMaya85" expireKeyCache="true" className="JobMaya85" />
  <table useCodeGen="true" parent="JobMaya" name="JobMentalRay2009" expireKeyCache="true" className="JobMentalRay2009" />
  <table useCodeGen="true" parent="JobMaya" name="JobMentalRay2011" expireKeyCache="true" className="JobMentalRay2011" />
- <table useCodeGen="true" parent="JobMaya" name="JobMentalRay7" expireKeyCache="true" className="JobMentalRay7" />
- <table useCodeGen="true" parent="JobMaya" name="JobMentalRay8" expireKeyCache="true" className="JobMentalRay8" />
- <table useCodeGen="true" parent="JobMaya" name="JobMentalRay85" expireKeyCache="true" className="JobMentalRay85" />
  <table docs="Job type for Naiad dynamic simulations." useCodeGen="true" parent="Job" name="JobNaiad" expireKeyCache="true" className="JobNaiad" >
   <column type="uint" methodName="frameStart" name="frameStart" />
   <column type="uint" methodName="frameEnd" name="frameEnd" />
   <column pluralMethodName="threads" type="uint" methodName="threads" name="threads" />
   <column docs="Append an arbitrary string to the command line, useful for &quot;--[global var] n&quot; flags." type="QString" methodName="append" name="append" />
   <column docs="File path to a cache file used to restart sims part way through a render." type="QString" methodName="restartCache" name="restartCache" />
+  <column type="uint" methodName="fullFrame" name="fullFrame" />
  </table>
  <table useCodeGen="true" parent="Job" name="JobNuke" expireKeyCache="true" className="JobNuke" >
   <column type="uint" methodName="frameStart" name="frameStart" />
   <column type="uint" methodName="frameEnd" name="frameEnd" />
   <column type="uint" methodName="outputCount" name="outputCount" />
+  <column type="QString" methodName="viewName" name="viewName" />
  </table>
  <table useCodeGen="true" name="JobOutput" expireKeyCache="true" className="JobOutput" >
   <column type="uint" methodName="keyJobOutput" name="keyJobOutput" pkey="true" />
@@ -979,6 +973,15 @@
   <column type="uint" methodName="JobType" name="fkeyJobType" >
    <fkey indexDeleteMode="DoNothingOnDelete" table="JobType" type="single" hasIndex="false" />
   </column>
+ </table>
+ <table useCodeGen="true" name="JobStateAction" expireKeyCache="true" className="JobStateAction" >
+  <column type="uint" methodName="keyJobStateAction" name="keyJobStateAction" pkey="true" />
+  <column type="uint" methodName="Job" name="fkeyJob" >
+   <fkey indexDeleteMode="DoNothingOnDelete" table="Job" type="multi" hasIndex="false" />
+  </column>
+  <column type="QString" methodName="oldStatus" name="oldStatus" />
+  <column type="QString" methodName="newStatus" name="newStatus" />
+  <column type="QDateTime" methodName="modified" name="modified" />
  </table>
  <table useCodeGen="true" name="JobStatus" expireKeyCache="true" className="JobStatus" >
   <column type="uint" methodName="keyJobStatus" name="keyJobStatus" pkey="true" />
