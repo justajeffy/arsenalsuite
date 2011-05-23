@@ -43,7 +43,6 @@
 #include "slave.h"
 #include "process.h"
 
-#include "jobmaxscript.h"
 #include "jobbatch.h"
 #include "host.h"
 #include "hoststatus.h"
