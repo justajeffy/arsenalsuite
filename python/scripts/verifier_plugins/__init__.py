@@ -5,22 +5,34 @@ import traceback
 #    reload(denyjob)
 #except: traceback.print_exc()
 
-try:
-    import adjustPriority
-    reload(adjustPriority)
-except: traceback.print_exc()
+#Temporarily re-enabled for week 05/10/11 - Finalling
+#try:
+#    import adjustPriority
+#    reload(adjustPriority)
+#except: traceback.print_exc()
 
 #try:
 #    import addServices
 #    reload(addServices)
 #except: traceback.print_exc()
 
-try:
-    import addFastLane
-    reload(addFastLane)
-except: traceback.print_exc()
+#try:
+#    import addFastLane
+#    reload(addFastLane)
+#except: traceback.print_exc()
 
 try:
     import maxTaskTime
     reload(maxTaskTime)
 except: traceback.print_exc()
+
+try:
+    import setShotName
+    reload(setShotName)
+except: traceback.print_exc()
+
+try:
+    import urgentPrios
+    reload(urgentPrios)
+except: traceback.print_exc()
+
