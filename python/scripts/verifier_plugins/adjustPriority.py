@@ -6,19 +6,20 @@ from blur.Classes import *
 from verifier_plugin_factory import *
 
 import ConfigParser
-import os, sys
+import os, sys, re
 
 sys.path.append("/drd/software/int/sys/renderops")
 
 from wrapi import wrasql_client_api
-from wrapi import wenv
+#from wrapi import wenv
 
 def jobMatchesRule(job, rule, hosts):
-	if job.name().toLower().contains(rule[0]) or rule[0] == "%":
+	if job.name().toLower().contains(rule[0]) or re.search(rule[0], str(job.name().toLower())) or rule[0] == "%":
                         if job.user().name().toLower().contains(rule[1]) or rule[1] == "%":
                                 if job.jobType().name().toLower().contains(rule[2]) or rule[2] == "%":
-					if not hosts or len(hosts) == 0:
-						return True
+					if job.project().shortName().toLower().contains(rule[4]) or rule[4] == "%":
+						if not hosts or len(hosts) == 0:
+							return True
 
 	return False
 '''
@@ -49,8 +50,8 @@ def adjustPriority(job):
 	exceptions = []
 
 	wmap = {}
-	wclient = wrasql_client_api.wrasql_client(wenv.wsql_master_server, wmap)
-	wclient.query("SELECT shot, user_name, type, priority_level FROM priority_rules")
+	wclient = wrasql_client_api.wrasql_client("drops01", wmap)
+	wclient.query("SELECT shot, user_name, type, priority_level, project FROM priority_rules")
 	curShotPrios = wclient.poll_for_query_results()
 
 	wclient.query("SELECT override, val FROM priority_overrides")
