@@ -8,7 +8,7 @@ from blur.Classes import *
 from verifier_plugin_factory import *
 
 def addFastLanePlugin(job):
-	if job.name().contains("_fastlane"):
+	if job.name().toLower().contains("fastlane"):
 
 		job.setPriority(22)
 		job.setMaxTaskTime(600)
