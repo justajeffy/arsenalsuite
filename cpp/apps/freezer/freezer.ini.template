@@ -3,16 +3,15 @@ ApplicationName=ArsenalFreezer
 
 [Database]
 DatabaseDriver=QPSQL7
-DatabaseName=blur
-Host=pgsql
 Options=
-Password=yourdbpasswd
-Port=6432
 Timeout=2
-User=yourdbuser
 ReconnectDelay=30
 SqlErrorEmailList=barry.robison@drdstudios.com
-
+Host=farmdb
+Port=6432
+DatabaseName=freezer
+User=freezer
+Password=cold
 
 [Display Prefs]
 Icon Size=16,16

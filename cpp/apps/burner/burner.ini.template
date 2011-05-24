@@ -18,12 +18,12 @@ Domain=bsi
 
 [Database]
 DatabaseDriver=QPSQL7
-DatabaseName=blur
-Host=pgsql
-Password=yourdbpasswd
-Port=5432
+Host=farmdb
+Port=6432
+DatabaseName=burner
+User=burner
+Password=hot
 Timeout=10
-User=yourdbuser
 SqlErrorEmailList=your.name@example.org
 
 [Display Prefs]
