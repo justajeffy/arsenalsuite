@@ -21,7 +21,7 @@
  *
  */
 
-/* $Author$
+/* $Author: barry $
  * $LastChangedDate: 2010-02-10 15:06:55 +1100 (Wed, 10 Feb 2010) $
  * $Rev: 9329 $
  * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/items.cpp $
@@ -539,7 +539,7 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
     bytesRead = memoryString( jobStatus.bytesRead()/1024 );
     diskOps = QString::number( jobStatus.opsWrite() + jobStatus.opsRead() );
     //efficiency.sprintf("%3.2f %", (((jobStatus.cputime()/( jobStatus.totaltime() > 0 ? jobStatus.totaltime() : 1 ) )/(job.assignmentSlots() > 0 ? job.assignmentSlots() : 1) )*100));
-    efficiency.sprintf("%3.2f %", (jobStatus.efficiency()/job.assignmentSlots())*100.00);
+    efficiency.sprintf("%3.2f %", jobStatus.efficiency()*100.00);
 }
 
 QVariant JobItem::modelData( const QModelIndex & i, int role ) const
