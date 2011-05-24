@@ -681,6 +681,7 @@
   </column>
   <column docs="A health check on the job. Defines how much times can pass without output to stdout / stderr before the burner raises an error." type="uint" methodName="maxQuietTime" name="maxquiettime" />
   <column pluralMethodName="queueOrder" type="uint" methodName="queueOrder" name="queueorder" />
+  <column pluralMethodName="autoAdaptSlots" type="uint" methodName="autoAdaptSlots" name="autoadaptslots" />
  </table>
  <table useCodeGen="true" parent="Job" name="Job3Delight" expireKeyCache="true" className="Job3Delight" >
   <column type="uint" methodName="width" name="width" />
