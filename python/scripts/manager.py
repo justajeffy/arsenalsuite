@@ -107,7 +107,7 @@ class ManagerConfig:
         # the farm
         self._ASSIGN_SLOPPINESS = Config.getFloat( 'arsenalAssignSloppiness', 2.0 )
 
-        self._ASSIGN_MAXHOSTS = Config.getFloat( 'arsenalAssignMaxHosts', 20 )
+        self._ASSIGN_MAXHOSTS = Config.getFloat( 'arsenalAssignMaxHosts', 10 ) # 10 percent default
 
 # Single Instance
 config = ManagerConfig()
@@ -923,6 +923,7 @@ SELECT * from running_shots_averagetime
             return False
 
         assignedHosts = 0
+        maxAssignedHosts = jobAssign.JobStatus.tasksCount() / config._ASSIGN_MAXHOSTS
 
         # Gather available hosts for this job
         if VERBOSE_DEBUG: print "Finding Hosts to Assign to %i tasks to Job %s, possible: %s" % (jobAssign.JobStatus.tasksUnassigned(), jobAssign.Job.name(), hostStatuses.size())
@@ -945,7 +946,8 @@ SELECT * from running_shots_averagetime
                     Database.current().commitTransaction()
                     return True
 
-                if (assignedHosts > config._ASSIGN_MAXHOSTS):
+                if (assignedHosts > maxAssignedHosts):
+                    Database.current().exec_("SELECT update_job_task_counts(%i)" % jobAssign.Job.key())
                     Database.current().commitTransaction()
                     return True
             else:
