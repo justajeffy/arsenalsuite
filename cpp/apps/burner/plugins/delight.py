@@ -11,7 +11,6 @@ class DelightBurner(JobBurner):
         JobBurner.__init__(self,jobAss,slave)
         self.Job = jobAss.job()
         self.CurrentFrame = None
-        self.CurrentIndex = None
         self.frameList = []
         self.StartFrame = None
         self.EndFrame = None
@@ -103,7 +102,7 @@ class DelightBurner(JobBurner):
         args << str(self.Job.threads())
         args << "-stats2"
         args << "-init"
-        if self.Job.name().contains("netcache"):
+        if not self.Job.name().contains("_nonetcache"):
             args << "/drd/software/ext/delight/netcache.rib"
         if self.Job.name().contains("clustercache"):
             args << "/drd/software/ext/delight/clustercache.rib"
@@ -151,13 +150,11 @@ class DelightBurner(JobBurner):
         if self.frameStart.indexIn(line) >= 0:
             Log( "Delight: found frameStart" )
             if self.CurrentFrame is None:
-                self.CurrentIndex = 0
-                self.CurrentFrame = self.frameList[self.CurrentIndex]
+                self.CurrentFrame = self.StartFrame
             else:
                 Log( "Delight: taskDone %s" % self.CurrentFrame )
                 self.taskDone(self.CurrentFrame)
-                self.CurrentIndex = self.CurrentIndex + 1
-                self.CurrentFrame = self.frameList[self.CurrentIndex]
+                self.CurrentFrame = self.CurrentFrame + 1
 
             if self.CurrentFrame <= self.EndFrame:
                 self.taskStart(self.CurrentFrame)
