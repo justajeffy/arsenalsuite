@@ -297,14 +297,15 @@ class JobAssign:
         urgent = 99
         if(self.Job.priority() <= 20): urgent = self.Job.priority()
 
-        project_deficit = self.Job.project().arsenalSlotReserve() - FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)
-        if(project_deficit < 0): project_deficit = 0
+        #project_deficit = self.Job.project().arsenalSlotReserve() - FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)
+        reserve_used = min(100, int(float(FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)) / float(max(1,self.Job.project().arsenalSlotReserve())) * 100))
 
         # important things will take precedence within a department, but not over everything
         important = 99
         if(self.Job.priority() <= 30): important = self.Job.priority()
 
-        avgTime = FarmResourceSnapshot.shotTimes.get(self.Job.shotName(), 99999)
+        shotTimeKey = "%s-%s" % (self.Job.shotName(),  self.Job.project().name())
+        avgTime = FarmResourceSnapshot.shotTimes.get(shotTimeKey, 99999999)
 
         hasTensRunning = 0
         tensRunning = self.JobStatus.tasksDone() + self.JobStatus.tasksAssigned() + self.JobStatus.tasksBusy()
@@ -320,7 +321,7 @@ class JobAssign:
         shotAvgTime = 0
         if(hasTensComplete == 1): shotAvgTime = self.JobStatus.tasksAverageTime() * 60
 
-        sortKey = '%02d-%05d-%02d-%01d-%01d-%05d-%05d' % ( urgent, int(99999-project_deficit), important, hasTensRunning, hasTensComplete, avgTime, shotAvgTime )
+        sortKey = '%02d-%03d-%02d-%01d-%01d-%08d-%05d' % ( urgent, reserve_used, important, hasTensRunning, hasTensComplete, avgTime, shotAvgTime )
         self.sortKey = sortKey
         return sortKey
 
@@ -425,15 +426,6 @@ class JobAssign:
             jtal += jta
         jtal.setJobAssignmentStatuses( JobAssignmentStatus.recordByName( 'ready' ) )
 
-        #Database.current().beginTransaction()
-
-        # Lock the row(reloads host)
-        #hostStatus.reload()
-        #if hostStatus.slaveStatus() != 'ready':
-        #    Database.current().rollbackTransaction();
-        #    print "Host %s is no longer ready for frames(status is %s) returning" % (hostStatus.host().name(),hostStatus.slaveStatus())
-        #    return 0
-
         ja = JobAssignment()
         ja.setJob( self.Job )
         ja.setJobAssignmentStatus( JobAssignmentStatus.recordByName( 'ready' ) )
@@ -466,7 +458,6 @@ class JobAssign:
         # Keep hostsOnJob up to date while assigning.  It is accurately updated periodically by the reaper
         if self.Job.maxHosts() > 0:
             Database.current().exec_("UPDATE jobstatus SET hostsOnJob=hostsOnJob+1 WHERE fkeyjob=%i" % self.Job.key())
-        #Database.current().commitTransaction();
 
         # Increment hosts on job count,  this is taken care of by a trigger at the database level
         # but we increment here to get more accurate calculated priority until the next refresh of
@@ -627,11 +618,13 @@ SELECT * from project_slots_limits
         self.shotTimes.clear()
 
         q = Database.current().exec_("""
-SELECT * from running_shots_averagetime
+SELECT * from running_shots_averagetime_2
                                     """)
         while q.next():
-            key = q.value(0).toString()
-            value = q.value(1).toDouble()[0]
+            shot = q.value(0).toString()
+            project = q.value(1).toString()
+            value = q.value(2).toDouble()[0]
+            key = "%s-%s" % (shot, project)
             self.shotTimes[key] = int(value)
 
     def refreshJobList(self):
@@ -927,7 +920,7 @@ SELECT * from running_shots_averagetime
 
         # Gather available hosts for this job
         if VERBOSE_DEBUG: print "Finding Hosts to Assign to %i tasks to Job %s, possible: %s" % (jobAssign.JobStatus.tasksUnassigned(), jobAssign.Job.name(), hostStatuses.size())
-        print "Finding Hosts to Assign to %i tasks to Job %s, possible: %s" % (jobAssign.tasksUnassigned, jobAssign.Job.name(), hostStatuses.size())
+        print "Finding Hosts to Assign to %i out of %i tasks to Job %s, possible: %s" % (maxAssignedHosts, jobAssign.tasksUnassigned, jobAssign.Job.name(), hostStatuses.size())
 
         assignSuccess = False
         Database.current().beginTransaction()
