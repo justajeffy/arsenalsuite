@@ -107,7 +107,7 @@ class ManagerConfig:
         # the farm
         self._ASSIGN_SLOPPINESS = Config.getFloat( 'arsenalAssignSloppiness', 2.0 )
 
-        self._ASSIGN_MAXHOSTS = Config.getFloat( 'arsenalAssignMaxHosts', 10 ) # 10 percent default
+        self._ASSIGN_MAXHOSTS = Config.getFloat( 'arsenalAssignMaxHosts', 0.1 ) # 10 percent default
 
 # Single Instance
 config = ManagerConfig()
@@ -671,7 +671,7 @@ SELECT * from running_shots_averagetime_2
     def refreshHostData(self):
         hostServices = HostServiceList()
         if VERBOSE_DEBUG: Log( "Fetching Hosts for required services, %s" % self.servicesNeeded.services().join(',') )
-        if VERBOSE_DEBUG: Log( "Fetching Hosts for required services, %s" % self.servicesNeeded.keyString() )
+        #if VERBOSE_DEBUG: Log( "Fetching Hosts for required services, %s" % self.servicesNeeded.keyString() )
         if not self.servicesNeeded.isEmpty():
             hostServices = HostService.select( """INNER JOIN HostStatus ON HostStatus.fkeyHost=HostService.fkeyHost 
                                                   INNER JOIN Host ON HostStatus.fkeyhost=Host.keyhost 
@@ -705,7 +705,7 @@ SELECT * from running_shots_averagetime_2
                 self.freeHosts[hostStatus] = FreeHost(hostStatus)
             self.freeHosts[hostStatus].addService(hostService)
             self.hostStatusesByService[service] += hostStatus
-            self.hostsUnused[hostStatus] = True
+            self.hostsUnused[hostStatus] = host.maxAssignments() - hostStatus.activeAssignmentCount()
 
         for host in hosts:
             self.potentialSlotsAvailable =  self.potentialSlotsAvailable + host.maxAssignments()
@@ -801,15 +801,18 @@ SELECT * from running_shots_averagetime_2
 
     # Removes the host from available hosts to assign to
     # Removes all services that have no remaining hosts
-    def removeHostStatus( self, hostStatus ):
-        if hostStatus in self.freeHosts:
-            for service in self.freeHosts[hostStatus].services:
-                self.hostStatusesByService[service].remove(HostStatus(hostStatus.key()))
-                if len(self.hostStatusesByService[service]) == 0:
-                    self.removeService(service)
-            del self.freeHosts[hostStatus]
+    def removeHostStatus( self, hostStatus, slots ):
         if hostStatus in self.hostsUnused:
-            del self.hostsUnused[hostStatus]
+            self.hostsUnused[hostStatus] = self.hostsUnused[hostStatus] - slots
+            if self.hostsUnused[hostStatus] <= 0:
+                # host has no slots left so remove it
+                del self.hostsUnused[hostStatus]
+                if hostStatus in self.freeHosts:
+                    for service in self.freeHosts[hostStatus].services:
+                        self.hostStatusesByService[service].remove(HostStatus(hostStatus.key()))
+                        if len(self.hostStatusesByService[service]) == 0:
+                            self.removeService(service)
+                    del self.freeHosts[hostStatus]
 
     # Called to remove the service and all jobs that require it
     def removeService( self, service ):
@@ -897,7 +900,7 @@ SELECT * from running_shots_averagetime_2
             self.removeJob( job )
 
         # Host no longer ready
-        self.removeHostStatus(hostStatus)
+        self.removeHostStatus(hostStatus, job.assignmentSlots())
 
         return (tasksAssigned,jobAssign.tasksUnassigned)
 
@@ -916,7 +919,12 @@ SELECT * from running_shots_averagetime_2
             return False
 
         assignedHosts = 0
-        maxAssignedHosts = jobAssign.JobStatus.tasksCount() / config._ASSIGN_MAXHOSTS
+        maxAssignedHosts = int(jobAssign.JobStatus.tasksCount() * config._ASSIGN_MAXHOSTS)
+
+        # if less than 10% of a job is started, don't overrun 10%, for Darwin purposes
+        tenPercentComplete = float(jobAssign.JobStatus.tasksCount()-jobAssign.JobStatus.tasksUnassigned()) / float(jobAssign.JobStatus.tasksCount())
+        if tenPercentComplete < 0.1:
+            maxAssignedHosts = int(jobAssign.JobStatus.tasksCount() * 0.1) - (jobAssign.JobStatus.tasksCount()-jobAssign.JobStatus.tasksUnassigned())
 
         # Gather available hosts for this job
         if VERBOSE_DEBUG: print "Finding Hosts to Assign to %i tasks to Job %s, possible: %s" % (jobAssign.JobStatus.tasksUnassigned(), jobAssign.Job.name(), hostStatuses.size())
