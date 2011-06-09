@@ -165,6 +165,7 @@ void JobListTask::run()
 			jobsNeedingDeps = dependentJobs - mReturn - mDependentJobs;
 			mJobDeps += jobDeps;
 			mDependentJobs += dependentJobs;
+			dependentJobs.clear();
 		}
 		jobsNeedingRefresh = (mDependentJobs - mReturn);
 		if( jobsNeedingRefresh.size() )
@@ -206,6 +207,8 @@ void JobListTask::run()
             }
         }
     }
+	jobsNeedingRefresh.clear();
+	allJobs.clear();
 }
 
 HostListTask::HostListTask( QObject * rec, const QString & serviceFilter, bool loadHostServices )
