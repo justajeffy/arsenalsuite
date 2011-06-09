@@ -223,6 +223,8 @@ void loadPythonPlugins()
         return;
     }
     Py_DECREF(plug_mod);
+
+    PyEval_SaveThread();
 }
 
 void oops_handler(int )
