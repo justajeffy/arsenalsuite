@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: field.h 9256 2010-01-27 04:38:24Z brobison $
+ * $Id$
  */
 
 #ifndef FIELD_H
@@ -78,8 +78,9 @@ public:
 		NotNull = 4,
 		Unique = 8,
 		LocalVariable = 16,
-		ReverseAccess = 32
-	};	
+		ReverseAccess = 32,
+		Compress = 64
+	};
 
 	/** 
 	 *  Constructs a new field that is not a foreign key.
