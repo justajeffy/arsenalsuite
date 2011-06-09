@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: pgconnection.cpp 9590 2010-03-25 01:19:50Z brobison $
+ * $Id$
  */
 
 #include <qsqlerror.h>
