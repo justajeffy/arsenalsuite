@@ -5,9 +5,10 @@ class Interval
 #include <interval.h>
 %End
 public:
+    Interval();
 	Interval( const QDateTime &, const QDateTime & );
 	Interval( const QDate &, const QDate & );
-	Interval( int seconds = 0, int microseconds = 0 );
+	Interval( int seconds, int microseconds );
 	Interval( int months, int days, int seconds, int microseconds = 0 );
 
 	Interval operator+( const Interval & other ) const;

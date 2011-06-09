@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: pyembed.cpp 8108 2009-04-22 17:22:46Z newellm $
+ * $Id$
  */
 
 #include "pyembed.h"
@@ -563,7 +563,7 @@ PyObject * wrapQVariant( const QVariant & var, bool stringAsPyString, bool noneO
 	ensurePythonInitialized();
 	PyObject * ret = 0;
 	SIP_BLOCK_THREADS
-	int qvt = var.type();
+	int qvt = var.userType();
 	if( qvt == QVariant::Invalid )
 		qvt = qvariantType;
 	switch( qvt ) {
@@ -630,14 +630,14 @@ PyObject * wrapQVariant( const QVariant & var, bool stringAsPyString, bool noneO
 					PyList_Append(ret, getSipAPI()->api_convert_from_new_type(new QString(s),sipStringType(),0));
 		}
 		default:
-			if( qvt == qMetaTypeId<Interval>() )
-				ret = getSipAPI()->api_convert_from_new_type(new Interval(qvariant_cast<Interval>(var)),sipIntervalType(),0);
 			break;
 	}
-	if( var.userType() == qMetaTypeId<Record>() ) {
+	if( qvt == qMetaTypeId<Record>() ) {
 		Record r = qvariant_cast<Record>(var);
 		ret = sipWrapRecord( &r );
 	}
+    if( qvt == qMetaTypeId<Interval>() )
+        ret = getSipAPI()->api_convert_from_new_type(new Interval(qvariant_cast<Interval>(var)),sipIntervalType(),0);
 	if( !ret && noneOnFailure ) {
 		ret = Py_None;
 		Py_INCREF(ret);
