@@ -203,7 +203,8 @@ class JobAssign:
     def hostOk( self, hostStatus, snapshot ):
         host = hostStatus.host()
 
-        if hostStatus.activeAssignmentCount() + self.Job.assignmentSlots() > host.maxAssignments():
+        #if hostStatus.activeAssignmentCount() + self.Job.assignmentSlots() > host.maxAssignments():
+        if FarmResourceSnapshot.hostsUnused.get(hostStatus, 0) - self.Job.assignmentSlots() < 0:
             if VERBOSE_DEBUG: Log( 'Job requires more slots (%s) than host (%s) has available (%s)' % (self.Job.assignmentSlots(), host.name(), host.maxAssignments()-hostStatus.activeAssignmentCount() ) )
             return False
 
@@ -511,6 +512,7 @@ class FarmResourceSnapshot(object):
     slotsByProject = {}
     limitsByProject = {}
     shotTimes = {}
+    hostsUnused = {}
 
     def __init__(self):
         self.reset()
@@ -528,7 +530,7 @@ class FarmResourceSnapshot(object):
         self.freeHosts = {}
         self.hostStatuses = HostStatusList()
         self.hostStatusesByService = DefaultDict(HostStatusList)
-        self.hostsUnused = {}
+        #self.hostsUnused = {}
         self.hostHasExclusiveAssignmentCache = {}
 
         self.licCountByService = {}
@@ -802,6 +804,8 @@ SELECT * from running_shots_averagetime_2
     # Removes the host from available hosts to assign to
     # Removes all services that have no remaining hosts
     def removeHostStatus( self, hostStatus, slots ):
+        hostStatus.setActiveAssignmentCount( hostStatus.activeAssignmentCount() + slots )
+
         if hostStatus in self.hostsUnused:
             self.hostsUnused[hostStatus] = self.hostsUnused[hostStatus] - slots
             if self.hostsUnused[hostStatus] <= 0:
