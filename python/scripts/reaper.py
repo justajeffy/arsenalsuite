@@ -41,9 +41,9 @@ initStone( sys.argv )
 
 classes_loader()
 
-VERBOSE_DEBUG = False
+VERBOSE_DEBUG = True
 
-if VERBOSE_DEBUG:
+if False and VERBOSE_DEBUG:
 	Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete | Database.EchoSelect )
 
 Database.current().connection().reconnect()
@@ -165,8 +165,7 @@ def getSlotCount(job):
      FROM JobAssignment ja
      JOIN job ON ja.fkeyjob = job.keyjob
      WHERE fkeyjob = %i
-     AND fkeyjobassignmentstatus 
-         IN (SELECT keyjobassignmentstatus FROM jobassignmentstatus WHERE status IN ('ready','copy','busy'))
+     AND fkeyjobassignmentstatus < 4
      GROUP BY fkeyjob""" % job.key())
 
 	if q.next():
@@ -185,35 +184,6 @@ def getTimeoutCount(job):
 		return q.value(0).toInt()[0]
 	return 0
 
-def getAvgTaskTime(job):
-	q = Database.current().exec_("""SELECT GREATEST(0, 
-                                                    AVG( GREATEST(0, 
-                                                                  EXTRACT(epoch FROM (coalesce(jobtaskassignment.ended, 
-                                                                                               now()
-                                                                                     ) - jobtaskassignment.started)
-                                                                  ) 
-                                                         ) 
-                                                    )
-                                           )::int 
-                                    FROM JobTaskAssignment 
-                                    INNER JOIN JobTask ON JobTask.fkeyjobtaskassignment=jobtaskassignment.keyjobtaskassignment 
-                                    WHERE fkeyjob=%i 
-                                      AND jobtaskassignment.started IS NOT NULL""" % (job.key()))
-	if q.next():
-		return q.value(0).toInt()[0]
-	return 0
-
-def getAvgMemory(job):
-	q = Database.current().exec_("""SELECT AVG( jobtaskassignment.memory )::int 
-                                    FROM JobTaskAssignment 
-                                    INNER JOIN JobTask ON JobTask.fkeyjobtaskassignment=jobtaskassignment.keyjobtaskassignment 
-                                    WHERE jobtask.fkeyjob=%i 
-                                    AND jobtaskassignment.memory IS NOT NULL 
-                                    AND jobtaskassignment.memory > 0""" % (job.key()))
-	if q.next():
-		return q.value(0).toInt()[0]
-	return 0
-	
 def retrieveReapable():
 	jobList = Job.select("status IN ('ready','started')")
 	if not jobList.isEmpty():
@@ -240,12 +210,14 @@ def reaper():
             ensureSpoolSpace(config.requiredSpoolSpacePercent)
 
         for job in retrieveReapable():
-            if VERBOSE_DEBUG: print "Checking Job %i %s" % (job.key(), job.name())
+            #if VERBOSE_DEBUG: print "Checking Job %i %s" % (job.key(), job.name())
             status = str(job.status())
 
-            Database.current().exec_('SELECT update_job_links(%i)' % job.key())
+            Database.current().exec_('SELECT update_job_soft_deps(%i)' % job.key())
 
             Database.current().exec_("SELECT update_job_task_counts(%i)" % job.key())
+            Database.current().exec_('SELECT update_job_stats(%i)' % job.key())
+
             js = JobStatus.recordByJob(job)
             unassigned  = js.tasksUnassigned()
             done        = js.tasksDone()
@@ -269,16 +241,15 @@ def reaper():
                 timeoutCount = getTimeoutCount(job)
                 if timeoutCount > 3:
                     suspend = True
-                    suspendMsg = 'Job %s has been suspended.  The job has timed out on %i hosts.' % (job.name(),timeoutCount)
-                    suspendTitle = 'Job %s has been suspended(Timeout limit reached).' % job.name()
+                    suspendMsg = 'Job %s (%i) has been suspended.  The job has timed out on %i hosts.' % (job.name(), job.key(), timeoutCount)
+                    suspendTitle = 'Job %s (%i) has been suspended(Timeout limit reached).' % (job.name(), job.key())
 
-            q = Database.current().exec_('SELECT update_job_stats(%i)' % job.key())
 
             # If job is erroring check job and global error thresholds
             if errorCount > job.maxErrors() or (done == 0 and errorCount > config.totalFailureThreshold):
                 suspend = True
-                suspendMsg = 'Job %s has been suspended.  The job has produced %i errors.' % (job.name(),errorCount)
-                suspendTitle = 'Job %s suspended.' % job.name()
+                suspendMsg = 'Job %s (%i) has been suspended.  The job has produced %i errors.' % (job.name(), job.key(), errorCount)
+                suspendTitle = 'Job %s (%i) suspended.' % (job.name(), job.key())
 
             if suspend:
                 # Return tasks and hosts
@@ -326,18 +297,35 @@ def reaper():
                 # too. If so then it is good to go.
                 Database.current().exec_('SELECT update_job_hard_deps(%i)' % job.key())
 
+            if (float(done) / float(tasks) > 0.15) and job.autoAdaptSlots() == 0:
+                # 20% of tasks complete and never auto-adjusted
+                if (js.efficiency() <= 0.6) and (js.averageMemory() < (job.maxMemory() / 4)):
+                    print "job %s has bad efficiency %s" % ( job.name(), js.efficiency() )
+                    job.setAssignmentSlots( int(job.assignmentSlots() / 2) )
+                    job.setAutoAdaptSlots( job.autoAdaptSlots() + 1 )
+                    job.setMaxMemory( int(job.maxMemory()/2) )
+                    job.commit()
+                    job.addHistory( "Assignment slots auto-adapted in half due to poor efficiency %s" % js.efficiency() )
+
+            if (float(done) / float(tasks) > 0.40) and job.autoAdaptSlots() == 0:
+                if (js.efficiency() <= 0.75) and (js.averageMemory() < (job.maxMemory() / 4)):
+                    print "job %s has not great efficiency %s" % ( job.name(), js.efficiency() )
+                    job.setAssignmentSlots( int(job.assignmentSlots() / 2) )
+                    job.setAutoAdaptSlots( job.autoAdaptSlots() + 1 )
+                    job.setMaxMemory( int(job.maxMemory()/2) )
+                    job.commit()
+                    job.addHistory( "Assignment slots auto-adapted in half due to poor efficiency %s" % js.efficiency() )
+
             job.commit()
             js.commit()
 
-        cleanupJobs()
-
         if VERBOSE_DEBUG: print "Sleeping for 3 seconds"
-        time.sleep(3)
+        time.sleep(2)
 
 def notifyOnCompleteSend(job):
     if VERBOSE_DEBUG:
         print 'notifyOnCompleteSend(): Job %s is complete.' % (job.name())
-    msg = 'Job %s is complete.' % (job.name())
+    msg = 'Job %s (%i) is complete.' % (job.name(), job.key())
     if not job.notifyCompleteMessage().isEmpty():
         msg = job.notifyCompleteMessage()
     notifySend( notifyList = job.notifyOnComplete(), subject = msg, body = msg )
