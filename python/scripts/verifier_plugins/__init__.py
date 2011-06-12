@@ -31,8 +31,13 @@ try:
     reload(setShotName)
 except: traceback.print_exc()
 
+#try:
+#    import urgentPrios
+#    reload(urgentPrios)
+#except: traceback.print_exc()
+
 try:
-    import urgentPrios
-    reload(urgentPrios)
+    import checkOnTens
+    reload(checkOnTens)
 except: traceback.print_exc()
 
