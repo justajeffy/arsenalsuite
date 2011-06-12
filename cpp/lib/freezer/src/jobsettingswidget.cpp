@@ -16,6 +16,7 @@
 
 #include "jobsettingswidget.h"
 #include "jobsettingswidgetplugin.h"
+#include "jobenvironment.h"
 #include "jobenvironmentwindow.h"
 
 JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
@@ -397,7 +398,7 @@ void JobSettingsWidget::applySettings()
 		mSelectedJobs.setPersonalPriorities( mPersonalPrioritySpin->value() );
 
     if( !mUpdatedEnvironment.isEmpty() )
-        mSelectedJobs.setEnvironments( mUpdatedEnvironment );
+        mSelectedJobs.environments().setEnvironments( mUpdatedEnvironment );
 
     saveServiceTree();
 
@@ -434,7 +435,7 @@ void JobSettingsWidget::settingsChange()
 void JobSettingsWidget::showEnvironmentWindow()
 {
     JobEnvironmentWindow jew(this);
-    jew.setEnvironment( mSelectedJobs[0].environment() );
+    jew.setEnvironment( mSelectedJobs[0].environment().environment() );
     if( jew.exec() == QDialog::Accepted ) {
         mUpdatedEnvironment = jew.environment();
         settingsChange();
