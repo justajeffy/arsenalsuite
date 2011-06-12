@@ -50,6 +50,7 @@
 #include "syslog.h"
 #include "jobfilterset.h"
 #include "jobfiltertype.h"
+#include "jobenvironment.h"
 
 #include "jobburner.h"
 #include "slave.h"

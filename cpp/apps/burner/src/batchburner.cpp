@@ -32,6 +32,7 @@
 #include <qlibrary.h>
 
 #include "jobassignmentstatus.h"
+#include "jobenvironment.h"
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -89,10 +90,10 @@ QString BatchBurner::executable()
 
 QStringList BatchBurner::environment()
 {
-	if( mJob.environment().isEmpty() )
+	if( mJob.environment().environment().isEmpty() )
 		return QStringList();
 	else
-		return mJob.environment().split("\n");
+		return mJob.environment().environment().split("\n");
 }
 
 QString BatchBurner::workingDirectory()
@@ -147,11 +148,11 @@ void BatchBurner::slotProcessExited()
 		if( mCmd->exitCode() == 0 ) {
 			LOG_5("BB:slotBatchExited() setting task status done");
             Database::current()->beginTransaction();
-			mTasks.setStatuses( "done" );
 			mCurrentTaskAssignments = mTasks.jobTaskAssignments();
 			mCurrentTaskAssignments.setJobAssignmentStatuses( JobAssignmentStatus::recordByName("done") );
 			mCurrentTaskAssignments.setColumnLiteral( "ended", "now()" );
 			mCurrentTaskAssignments.commit();
+			mTasks.setStatuses( "done" );
 			mTasks.commit();
             Database::current()->commitTransaction();
 
