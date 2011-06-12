@@ -988,9 +988,14 @@ SELECT * from running_shots_averagetime_2
             
             Log("re-sorting job priorities, %s jobs to consider" % len(jobAssignList))
             jobAssignList.sort()
+            Log("clearing queueOrder")
+            Database.current().exec_("UPDATE jobstatus SET queueorder = 9999")
+            queueOrder = 1
             for jobAssign in jobAssignList:
                 print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.sortKey )
                 try:
+                    Database.current().exec_("UPDATE jobstatus SET queueorder = %s WHERE fkeyjob = %s" % (queueOrder, jobAssign.Job.key()))
+                    queueOrder = queueOrder + 1
                     self.assignSingleJob(jobAssign)
                     # Recalc priority and resort job list after assignments.
                     # Use the "sloppiness" attribute to determine how many slots
