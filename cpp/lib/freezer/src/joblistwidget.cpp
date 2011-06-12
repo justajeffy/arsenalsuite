@@ -448,7 +448,7 @@ void JobListWidget::customEvent( QEvent * evt )
 
 			if( mQueuedJobRefresh ) {
 				mQueuedJobRefresh = false;
-				refresh();
+				//refresh();
 			}
 
             mJobTree->mRecordFilterWidget->filterRows();
