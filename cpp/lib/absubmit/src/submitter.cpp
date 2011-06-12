@@ -5,6 +5,7 @@
 #include <QFile>
 #include <qtextstream.h>
 #include <qtimer.h>
+#include <QSqlDatabase>
 
 #include "iniconfig.h"
 
@@ -15,6 +16,7 @@
 #include "rangefiletracker.h"
 #include "service.h"
 #include "jobfilterset.h"
+#include "jobenvironment.h"
 
 #include "submitter.h"
 #include "path.h"
@@ -388,6 +390,14 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
 			addServices( jts );
 	}
 
+    // create a JobEnvironment record if required
+    if( args.contains("environment") ) {
+        JobEnvironment jenv;
+        jenv.setEnvironment( args["environment"] );
+        jenv.commit();
+        mJob.setEnvironment( jenv );
+    }
+
     /// now we set any other argument assuming there is a database field with the arg name
 	Table * t = mJob.imp()->table();
 	for( QMap<QString,QString>::const_iterator it = args.begin(); it != args.end(); ++it )
@@ -422,8 +432,11 @@ void Submitter::submit()
 		mJob.commit();
 		printJobInfo();
 		emit submitSuccess();
-		if( mExitAppOnFinish )
+		if( mExitAppOnFinish ) {
+            foreach( QString dbName, QSqlDatabase::connectionNames() )
+                QSqlDatabase::database( dbName, false ).close();
 			qApp->exit(0);
+        }
 	}
 }
 
@@ -741,11 +754,13 @@ void Submitter::ftpCleanup()
 
 void Submitter::exitWithError( const QString & error )
 {
-	//int number = writeErrorFile( error );
 	emit submitError( error );
 	LOG_1("ERROR: "+error);
-	if( mExitAppOnFinish )
+	if( mExitAppOnFinish ) {
+        foreach( QString dbName, QSqlDatabase::connectionNames() )
+            QSqlDatabase::database( dbName, false ).close();
 		qApp->exit( 1 );
+    }
 }
 
 static int getNextErrorNumber( const QString & directory )
