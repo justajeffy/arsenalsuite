@@ -99,7 +99,7 @@ class DelightBurner(JobBurner):
         #args << "-P"
         #args << str(processes)
         args << "-t"
-        args << str(self.Job.threads())
+        args << str(self.Job.assignmentSlots())
         args << "-stats2"
         args << "-init"
         if not self.Job.name().contains("_nonetcache"):
