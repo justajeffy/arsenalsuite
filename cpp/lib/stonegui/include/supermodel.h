@@ -202,13 +202,12 @@ protected:
 	//ModelNode * childNode(int dataIndex, bool allowLoad);
 
 	// Currently no entries are ever removed, they are just
-	// no longer used due to having no entry in mRowDataIndexVector
+	// no longer used due to having no entry in mItemIndexVector
 	// pointing to them
 	// TODO: Add empty entry reuse, and possible defrag when wasted space gets high
 	QBitArray mNoChildrenArray;
-	
-	// Since 
-	QVector<ModelNode *> mChildren;
+    QVector<ModelNode *> mChildren;
+    QList<int> mChildrenFreeIndexList;
 
 	struct ItemInfo {
 		// Offset into the mItemData bytearray
@@ -237,7 +236,9 @@ protected:
 
 	ModelNode * mParent;
 	int mParentRow;
-	
+
+    QMap<int,QList<int> > mFreeSpaceMap;
+
 	struct NodeSorter;
 	friend class SuperModel;
 	friend class ModelDataTranslator;
