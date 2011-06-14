@@ -167,6 +167,8 @@ void ModelNode::clear()
 
 	mRowCount = 0;
 	mItemData.clear();
+    mFreeSpaceMap.clear();
+    mChildrenFreeIndexList.clear();
 }
 
 void ModelNode::setTranslator( ModelDataTranslator * translator )
@@ -196,22 +198,35 @@ bool ModelNode::insertChildren( int index, int count, ModelDataTranslator * tran
 	}
 		
 	int dataSize = translator->dataSize();
+    QList<int> & freeSlots = mFreeSpaceMap[dataSize];
+    int reusedSlots = qMin(freeSlots.size(), count);
+    int newSlots = count - reusedSlots;
+    int reusedIndexes = qMin(mChildrenFreeIndexList.size(), count);
+    int newIndexes = count - reusedIndexes;
+
 
 	// Extend item data
-	// TODO: Reuse storage from deleted items
 	// TODO: We may want to keep things aligned if size >= 4 bytes
 	int startDataOffset = mItemData.size(), startIndex = mNoChildrenArray.size();
-	mItemData.resize( mItemData.size() + count * dataSize );
 
-	QVector<int> dataOffsets(count), indexes(count);
-
+    mItemData.resize( mItemData.size() + newSlots * dataSize );
 	mItemInfoVector.insert( index, count, ItemInfo() );
-	mNoChildrenArray.resize( startIndex + count );
+	mNoChildrenArray.resize( startIndex + newIndexes );
 
 	for( int i = count-1; i >= 0; --i ) {
 		ItemInfo & ii = mItemInfoVector[index+i];
-		ii.index = startIndex + i;
-		ii.dataOffset = startDataOffset + i * dataSize;
+        if( i >= newIndexes ) {
+            ii.index = mChildrenFreeIndexList.front();
+            mChildrenFreeIndexList.pop_front();
+        } else
+            ii.index = startIndex + i;
+
+        if( i >= newSlots ) {
+            ii.dataOffset = freeSlots.front();
+            freeSlots.pop_front();
+        } else
+            ii.dataOffset = startDataOffset + i * dataSize;
+
 		ii.translatorIndex = translatorIdx;
 		translator->constructData( _itemData(ii.dataOffset) );
 	}
@@ -220,16 +235,20 @@ bool ModelNode::insertChildren( int index, int count, ModelDataTranslator * tran
 	return true;
 }
 
-// Tree Builder is responsible for clearing the data
-// before calling removeChildren
 bool ModelNode::removeChildren( int index, int count )
 {
 	if( count < 0 || index < 0 || index + count > mRowCount ) return false;
 
 	for( int i = index + count - 1; i >= index; --i ) {
 		ItemInfo ii = rowToItemInfo(i);
+        void * data = _itemData( ii.dataOffset );
+
+        // Store the free space entry
+        mFreeSpaceMap[mTranslator->dataSize()] += ii.dataOffset;
+        mChildrenFreeIndexList.append( ii.index );
+
 		// Destruct the data
-		mTranslator->deleteData( _itemData( ii.dataOffset ) );
+		mTranslator->deleteData( data );
 		if( ii.index < (uint)mChildren.size() ) {
 			ModelNode * children = mChildren[ii.index];
 			if( children && children != (ModelNode*)1 )
@@ -318,6 +337,11 @@ void ModelNode::clearChildren( const QModelIndex & idx ) {
 void ModelNode::swap( const QModelIndex & a, const QModelIndex & b )
 {
 	ItemInfo & info_a = rowToItemInfo(a.row()), & info_b = rowToItemInfo(b.row());
+    ModelNode * child_a = mChildren.size() > info_a.index ? mChildren[info_a.index] : 0;
+    ModelNode * child_b = mChildren.size() > info_b.index ? mChildren[info_b.index] : 0;
+    if( child_a && child_a != (ModelNode*)1 ) child_a->mParentRow = b.row();
+    if( child_b && child_b != (ModelNode*)1 ) child_b->mParentRow = a.row();
+
 	ItemInfo copy = info_a;
 	info_a = info_b;
 	info_b = copy;
