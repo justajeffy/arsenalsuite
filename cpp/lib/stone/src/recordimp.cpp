@@ -172,8 +172,17 @@ void RecordImp::set( QVariant * v )
 {
 	if( !mTable ) return;
 	int fc = mTable->schema()->fieldCount();
-	for( int i=0; i<fc; i++ )
-		(*mValues)[i] = v[i];
+    for( int i=0; i<fc; i++ )
+        (*mValues)[i] = v[i];
+/*
+	FieldList fields = mTable->schema()->fields();
+	for( int i=0; i<fc; i++ ) {
+        if(fields[i]->flag(Field::Compress))
+            (*mValues)[i] = qCompress(v[i].toString().toUtf8());
+        else
+            (*mValues)[i] = v[i];
+    }
+*/
 }
 
 void RecordImp::get( QVariant * v )
@@ -210,8 +219,20 @@ RecordImp * RecordImp::setColumn( int col, const QVariant & v )
 	}
 	Field * f = fields[col];
 	QVariant vnew(f->coerce(v));
-	
-	QVariant & vr = (*mValues)[col];
+    QVariant & vr = (*mValues)[col];
+/*
+    if(f->flag(Field::Compress)) {
+        vnew = qCompress(vnew.toString().toUtf8());
+    }
+    //LOG_3( "RecordImp::setColumn: vnew value is " + vnew.toString() );
+
+    QVariant & vr = (*mValues)[col];
+    if(f->flag(Field::Compress)) {
+        vr = qCompress(vr.toString().toUtf8());
+    }
+    //LOG_3( "RecordImp::setColumn: vr value is " + vr.toString() );
+*/
+
 	if( (vr.isNull() != vnew.isNull()) || (vr != vnew) ) {
 		bool isVar = f->flag( Field::LocalVariable );
 
