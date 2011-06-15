@@ -402,6 +402,8 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
 	Table * t = mJob.imp()->table();
 	for( QMap<QString,QString>::const_iterator it = args.begin(); it != args.end(); ++it )
 	{
+        if( it.key() == "environment" ) continue;
+
 		Field * f = t->schema()->field( it.key() );
 		if( f && !f->flag(Field::ForeignKey) ) {
 			LOG_5( "Setting " + it.key() + " to value " + it.value() );
