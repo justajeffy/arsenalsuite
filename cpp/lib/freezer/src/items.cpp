@@ -562,7 +562,7 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			case 11: return avgTime;
 			case 12: return type;
 			case 13: return job.key();
-			case 14: return job.stats();
+			//case 14: return job.stats();
 			case 15: return job.currentMapServerWeight();
 			case 17: return ended;
 			case 18: return timeInQueue;
