@@ -86,8 +86,12 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q )
         foreach( Field * f, allFields ) {
 			if( f->flag(Field::LocalVariable) )
 				(*mValues)[f->pos()] = f->defaultValue();
-			else
-				(*mValues)[f->pos()] = f->coerce(q.value(pos++));
+			else {
+                if(f->flag(Field::Compress))
+                    (*mValues)[f->pos()] = qCompress(f->coerce(q.value(pos++)).toString().toUtf8());
+                else
+                    (*mValues)[f->pos()] = f->coerce(q.value(pos++));
+            }
         }
 		mState = COMMITTED;
 //		printf( "NEW RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
@@ -111,8 +115,12 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int * queryColPos )
 		foreach( Field * f, allFields )
 			if( f->flag(Field::LocalVariable) )
 				(*mValues)[f->pos()] = f->defaultValue();
-			else
-				(*mValues)[f->pos()] = f->coerce(q.value(queryColPos[pos++]));
+			else {
+                if(f->flag(Field::Compress))
+                    (*mValues)[f->pos()] = qCompress(f->coerce(q.value(pos++)).toString().toUtf8());
+                else
+                    (*mValues)[f->pos()] = f->coerce(q.value(queryColPos[pos++]));
+            }
 		mState = COMMITTED;
 		//printf( "NEW RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
 	}
@@ -172,15 +180,25 @@ void RecordImp::get( QVariant * v )
 {
 	if( !mTable ) return;
 	int fc = mTable->schema()->fieldCount();
-	for( int i=0; i<fc; i++ )
-		v[i] = mValues->at( i );
+	FieldList fields = mTable->schema()->fields();
+	for( int i=0; i<fc; i++ ) {
+        if(fields[i]->flag(Field::Compress))
+            v[i] = QString::fromUtf8(qUncompress(mValues->at( i ).toByteArray()));
+        else
+            v[i] = mValues->at( i );
+    }
 }
 
 QVariant RecordImp::getColumn( int col ) const
 {
 	if( !mTable || !mValues || col >= (int)mTable->schema()->fieldCount() || col < 0 )
 		return QVariant();
-	return mValues->at(col);
+
+    FieldList fields = mTable->schema()->fields();
+    if(fields[col]->flag(Field::Compress))
+        return QString::fromUtf8(qUncompress(mValues->at( col ).toByteArray()));
+    else
+        return mValues->at(col);
 }
 
 RecordImp * RecordImp::setColumn( int col, const QVariant & v )

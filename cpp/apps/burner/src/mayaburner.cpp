@@ -38,6 +38,7 @@
 
 #include "jobmaya.h"
 #include "jobtype.h"
+#include "jobenvironment.h"
 #include "user.h"
 
 #include "config.h"
@@ -279,10 +280,10 @@ void MayaBurner::cleanup()
 
 QStringList MayaBurner::environment()
 {
-	if( mJob.environment().isEmpty() )
+	if( mJob.environment().environment().isEmpty() )
 		return QStringList();
 	else
-		return mJob.environment().split("\n");
+		return mJob.environment().environment().split("\n");
 }
 
 #endif

@@ -21,7 +21,7 @@
  *
  */
 
-/* $Author: barry $
+/* $Author$
  * $LastChangedDate: 2010-02-10 15:06:55 +1100 (Wed, 10 Feb 2010) $
  * $Rev: 9329 $
  * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/items.cpp $
@@ -85,6 +85,7 @@ static const ColumnStruct job_columns [] =
 	{ "Disk Read", 		"DiskRead", 	40, 	23,	false, false },	//23
 	{ "Disk Ops", 		"DiskOps", 	40, 	24,	false, false },	//24
 	{ "CPU Time", 		"CPUTime", 	60, 	25,	false, true },	//25
+	{ "Queue Order", 		"QueueOrder", 	40, 	26,	false, false },	//26
 	{ 0, 					0, 					0, 		0, 	false, false }
 };
 
@@ -113,7 +114,7 @@ static const ColumnStruct host_error_columns [] =
 
 static const ColumnStruct frame_columns [] =
 {
-	{ "Frame", 				"FrameColumn", 		50, 	0, false},
+	{ "Frame", 				"FrameColumn", 		50, 	0, false, true},
 	{ "Status", 			"StatusColumn", 	60, 	1, false, true},
 	{ "Host", 				"HostColumn", 		100, 	2, false, true},
 	{ "Time", 				"TimeColumn", 		60, 	3, false},
@@ -572,6 +573,7 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			case 23: return bytesRead;
 			case 24: return diskOps;
 			case 25: return cpuTime;
+			case 26: return jobStatus.queueOrder();
 		}
 	} else if (role == Qt::TextColorRole )
 		return co ? civ(co->fg) : QVariant();

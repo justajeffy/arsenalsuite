@@ -107,8 +107,8 @@ void LoadImageThread::run()
 			continue;
 		}
 		task->run();
-		if( task->mReciever )
-			QCoreApplication::postEvent( task->mReciever, task );
+		if( task->mReceiver )
+			QCoreApplication::postEvent( task->mReceiver, task );
 		else
 			delete task;
 	}
@@ -591,9 +591,12 @@ QImage ImageView::loadImageMagick( const QString & path )
 			pixels = img.getConstPixels(0, y, ret.width(), 1);
 			for (int x = 0; x < ret.width(); x++) {
 				rgb = (*(pixels + x));
-				ret.setPixel(x, y, QColor((int) (255 * rgb.red())
-					, (int) (255 * rgb.green())
-					, (int) (255 * rgb.blue())).rgb());
+				ret.setPixel(x, y, QColor(
+                      qMax(0, qMin(255, (int)(255 * rgb.red())))
+					, qMax(0, qMin(255, (int)(255 * rgb.green())))
+					, qMax(0, qMin(255, (int)(255 * rgb.blue())))
+                    ).rgb()
+                );
 			}
 		}
 	} catch(...) {

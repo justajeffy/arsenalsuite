@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: freezercore.h 8506 2009-06-24 08:01:33Z brobison $
+ * $Id$
  */
 
 #ifndef FREEZER_CORE_H
@@ -64,10 +64,10 @@ class Connection;
 class STONE_EXPORT ThreadTask : public QEvent
 {
 public:
-	ThreadTask( int type = 0, QObject * reciever = 0 );
+	ThreadTask( int type = 0, QObject * receiver = 0 );
 	
 	virtual void run();
-	QObject * mReciever;
+	QObject * mReceiver;
 	bool mCancel;
 };
 

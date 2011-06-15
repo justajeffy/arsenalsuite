@@ -1,6 +1,8 @@
 
 SIP_PYOBJECT wrapQVariant( const QVariant & var, bool stringAsPyString = false, bool noneOnFailure = true, int qvariantType = 0 ) /HoldGIL/;
 
+QVariant unwrapQVariant( SIP_PYOBJECT pyObject ) /HoldGIL/;
+
 SIP_PYOBJECT variantListToTuple( const QList<QVariant> & args, int qvariantType = 0  ) /HoldGIL/;
 
 SIP_PYOBJECT variantListToPyList( const QList<QVariant> & args, int qvariantType = 0  ) /HoldGIL/;
