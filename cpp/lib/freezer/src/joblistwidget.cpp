@@ -448,7 +448,7 @@ void JobListWidget::customEvent( QEvent * evt )
 
 			if( mQueuedJobRefresh ) {
 				mQueuedJobRefresh = false;
-				refresh();
+				//refresh();
 			}
 
             mJobTree->mRecordFilterWidget->filterRows();
@@ -662,6 +662,7 @@ void JobListWidget::doRefresh()
 	if( needJobListTask ) {
 		mJobTaskRunning = true;
 		LOG_5( "Statuses to show: " + mJobFilter.statusToShow.join(",") );
+        mJobList.clear();
 		FreezerCore::addTask( new JobListTask( this, mJobFilter, mJobList, activeProjects(), !mJobTree->isColumnHidden(19) /*Service column*/, isDependencyTreeEnabled()) );
 		FreezerCore::wakeup();
 		// Refresh frame or error list too

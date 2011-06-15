@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: freezercore.cpp 8506 2009-06-24 08:01:33Z brobison $
+ * $Id$
  */
 
 #include <qsqldatabase.h>
@@ -36,9 +36,9 @@
 
 namespace Stone {
 
-ThreadTask::ThreadTask( int type, QObject * reciever )
+ThreadTask::ThreadTask( int type, QObject * receiver )
 : QEvent( QEvent::Type(type) )
-, mReciever( reciever )
+, mReceiver( receiver )
 , mCancel( false )
 {}
 
@@ -168,12 +168,12 @@ void FreezerCore::deliver( BackgroundThread * thread )
 {
 	mTaskMutex.lock();
 	ThreadTask * task = thread->mTask;
-	if( task && !task->mCancel && task->mReciever ) {
-	//	printf( "Delivering task to object %p\n", task->mReciever );
-		QCoreApplication::postEvent( task->mReciever, task );
+	if( task && !task->mCancel && task->mReceiver ) {
+	//	printf( "Delivering task to object %p\n", task->mReceiver );
+		QCoreApplication::postEvent( task->mReceiver, task );
 	} else {
-	//	if( task->mReciever && task->mCancel )
-	//		printf( "Delivery canceled for task to object %p\n", task->mReciever );
+	//	if( task->mReceiver && task->mCancel )
+	//		printf( "Delivery canceled for task to object %p\n", task->mReceiver );
 		delete task;
 	}
 	thread->mTask = 0;
@@ -185,13 +185,13 @@ void FreezerCore::cancelObjectTasks( QObject * object )
 	mTaskMutex.lock();
 	printf( "Cancelling tasks for object %p\n", object );
 	foreach( ThreadTask * task, mTasks ) {
-		if( task->mReciever == object ) {
+		if( task->mReceiver == object ) {
 			mTasks.removeAll(task);
 			delete task;
 		}
 	}
 	foreach( BackgroundThread * thread, mThreads )
-		if( thread->mTask && thread->mTask->mReciever == object )
+		if( thread->mTask && thread->mTask->mReceiver == object )
 			thread->mTask->mCancel = true;
 	mTaskMutex.unlock();
 }

@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: field.cpp 9256 2010-01-27 04:38:24Z brobison $
+ * $Id$
  */
 
 #include <qbuffer.h>
@@ -207,6 +207,7 @@ struct FlagMap { Field::Flags f; const char * s; };
 
 static FlagMap sFlagMap [] = 
 {
+	{ Field::Compress, "Compress" },
 	{ Field::PrimaryKey, "PrimaryKey" },
 	{ Field::ForeignKey, "ForeignKey" },
 	{ Field::NotNull, "NotNull" },

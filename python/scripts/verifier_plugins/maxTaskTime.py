@@ -9,6 +9,8 @@ from verifier_plugin_factory import *
 def doThis(job):
     print "maxTaskTime - checking %s" % job.name()
 
+    if job.user().name() == "dan.bethell": return True
+
     if( job.jobType().name().contains("Mantra") ):
         job.setMaxTaskTime(2 * 60 * 60)
         job.setMaxQuietTime(2 * 60 * 60)
@@ -18,9 +20,10 @@ def doThis(job):
         job.setMaxMemory(8000000)
         job.setPacketType('iterative')
     if( job.jobType().name() == "3Delight" ):
-        job.setName( job.name() + "_netcache" )
         job.setPacketSize(1)
-        job.setPacketType('iterative')
+        job.setAutoAdaptSlots(0)
+        if not job.priority() == 29:
+            job.setPacketType('iterative')
         if (job.name().contains("BIGMEM")):
             job.setMaxTaskTime(4 * 60 * 60)
             job.setThreads(8)
@@ -41,6 +44,9 @@ def doThis(job):
         job.setMinMemory(6000000)
         job.setMinMemory(8000000)
     if( job.jobType().name().contains( "Batch" ) ):
+        if (job.name().contains("Export Role Performance Package")):
+            job.setAssignmentSlots(4)
+
         if (job.name().contains("_rib")):
             if (job.name().contains("BIGMEM")):
                 job.setMinMemory(12000000)
@@ -49,7 +55,7 @@ def doThis(job):
                 job.setMinMemory(6000000)
                 job.setMaxMemory(8000000)
 
-            job.setAssignmentSlots(2)
+            job.setAssignmentSlots(1)
             job.setPacketSize(20)
 
     job.commit()
