@@ -473,6 +473,7 @@
   <column type="uint" methodName="User" name="fkeyUser">
    <fkey indexDeleteMode="DoNothingOnDelete" table="User" type="multi" hasIndex="false"/>
   </column>
+  <column type="uint" methodName="maxMemory" name="maxMemory"/>
   <index useCache="true" type="single" name="Name">
    <column name="host"/>
   </index>
@@ -719,6 +720,7 @@
   <column type="float" methodName="efficiency" name="efficiency"/>
   <column pluralMethodName="opsRead" type="uint" methodName="opsRead" name="opsRead"/>
   <column pluralMethodName="opsWrite" type="uint" methodName="opsWrite" name="opsWrite"/>
+  <column pluralMethodName="assignSlots" type="uint" methodName="assignSlots" name="assignslots"/>
  </table>
  <table preload="true" useCodeGen="true" name="JobAssignmentStatus" expireKeyCache="true" className="JobAssignmentStatus">
   <column type="uint" methodName="keyJobAssignmentStatus" name="keyJobAssignmentStatus" pkey="true"/>
