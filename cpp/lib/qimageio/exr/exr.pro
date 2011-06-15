@@ -8,11 +8,13 @@ DEFINES+=HAVE_EXR
 TARGET=exr
 
 unix {
-    #INCLUDEPATH+=/drd/software/ext/openexr/lin64/20100218/include/OpenEXR
-    #LIBS+=-Wl,-rpath,/drd/software/ext/openexr/lin64/20100218/lib
+    INCLUDEPATH+=/drd/software/ext/openexr/lin64/v1_7_0_fPIC/include/OpenEXR/
+    INCLUDEPATH+=/drd/software/ext/ilmbase/lin64/v1_0_2_fPIC/include/OpenEXR/
+    LIBS+=-Wl,-rpath,/drd/software/ext/openexr/lin64/v1_7_0_fPIC/lib
+    LIBS+=-Wl,-rpath,/drd/software/ext/ilmbase/lin64/v1_0_2_fPIC/lib
     #LIBS+=-L/drd/software/ext/openexr/lin64/20100218/lib
 
-    INCLUDEPATH+=/usr/include/OpenEXR
+    #INCLUDEPATH+=/usr/include/OpenEXR
 	LIBS+=-lIex -lImath -lHalf -lIlmImf
 } else {
 	#DEFINES+=OPENEXR_DLL
