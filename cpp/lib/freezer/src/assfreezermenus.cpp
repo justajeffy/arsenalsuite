@@ -775,8 +775,7 @@ void FreezerTaskMenu::slotAboutToShow()
 
 	addSeparator();
 
-	if( ( User::hasPerms( "JobTask", false ) || mJobList->currentJob().user() == User::currentUser() )
-		&& mTasks.size() == 1 ) {
+	if( mTasks.size() == 1 ) {
 		mInfoAction = addAction( "Task Info..." );
 
 		mShowLogAction = addAction( "Show Log..." );
@@ -800,8 +799,8 @@ void FreezerTaskMenu::slotAboutToShow()
 
 	bool enabled = !mTasks.isEmpty();
 
-	if( (QStringList() << "ready" << "started" << "done" << "suspended").contains(mJobList->currentJob().status())
-		&& (User::currentUser() ==  mJobList->currentJob().user() || User::hasPerms( "JobTask", true ) ) )
+		//&& (User::currentUser() ==  mJobList->currentJob().user() || User::hasPerms( "JobTask", true ) ) )
+	if( (QStringList() << "ready" << "started" << "done" << "suspended").contains(mJobList->currentJob().status()))
 	{
 		mRerenderFramesAction = addAction( "Rerender Frame" + QString(mTasks.size()>1 ? "s" : "") );
 		mRerenderFramesAction->setEnabled( enabled );

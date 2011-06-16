@@ -84,7 +84,13 @@ QString BatchBurner::executable()
 	cmd = timeCmd + cmd;
 #endif
 
-#endif
+#endif  // Q_OS_LINUX
+
+#ifdef Q_OS_MAC
+	if( jb.runasSubmitter() )
+		cmd = "su " + mJob.user().name() + " -c \""+cmd+"\"";
+#endif // Q_OS_MAC
+
 	return cmd;
 }
 
