@@ -135,10 +135,12 @@ class NukeBurnerPlugin(JobBurnerPlugin):
         JobBurnerPlugin.__init__(self)
 
     def jobTypes(self):
-        return QStringList('Nuke51') << 'Nuke52'
+        return QStringList('Nuke51') << 'Nuke52' << 'Nuke'
 
     def createBurner(self,jobAss,slave):
         Log( "NukeBurnerPlugin::createBurner() called, Creating NukeBurner" )
+        if jobAss.job().jobType().name() == 'Nuke':
+            return NukeBurner(jobAss,slave)
         if jobAss.job().jobType().name() == 'Nuke51':
             return NukeBurner(jobAss,slave)
         if jobAss.job().jobType().name() == 'Nuke52':

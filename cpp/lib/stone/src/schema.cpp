@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: schema.cpp 9060 2009-11-23 00:52:42Z brobison $
+ * $Id$
  */
 
 #include <qdatetime.h>
@@ -155,8 +155,12 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 								f->index()->setUseCache( fkey.attribute( "indexUseCache" ) != "false" );
 							}
 						} else {
-							if( ct >= 0 )
-								f = new Field( ret, name, ct );
+							if( ct >= 0 ) {
+                                if( el.attribute("compress") == "true" )
+                                    f = new Field( ret, name, ct, Field::Flags( Field::Compress ) );
+                                else
+                                    f = new Field( ret, name, ct );
+                            }
 							else
 								LOG_1( "Couldn't find the correct type for field: " + name );
 						}

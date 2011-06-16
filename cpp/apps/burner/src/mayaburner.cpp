@@ -37,8 +37,8 @@
 #include "process.h"
 
 #include "jobmaya.h"
-#include "jobmaya7.h"
 #include "jobtype.h"
+#include "jobenvironment.h"
 #include "user.h"
 
 #include "config.h"
@@ -87,7 +87,7 @@ MayaBurner::~MayaBurner()
 
 QString MayaBurner::buildCmdMaya7()
 {
-	JobMaya7 jm( mJob );
+	JobMaya jm( mJob );
 	QString cmd;
 	mFrame = assignedTasks().section("-",0,0).toInt();
 	cmd += " -s " + QString::number(mFrame);
@@ -280,10 +280,10 @@ void MayaBurner::cleanup()
 
 QStringList MayaBurner::environment()
 {
-	if( mJob.environment().isEmpty() )
+	if( mJob.environment().environment().isEmpty() )
 		return QStringList();
 	else
-		return mJob.environment().split("\n");
+		return mJob.environment().environment().split("\n");
 }
 
 #endif

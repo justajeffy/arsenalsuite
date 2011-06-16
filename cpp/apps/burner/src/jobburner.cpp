@@ -50,6 +50,7 @@
 #include "syslog.h"
 #include "jobfilterset.h"
 #include "jobfiltertype.h"
+#include "jobenvironment.h"
 
 #include "jobburner.h"
 #include "slave.h"
@@ -373,11 +374,11 @@ void JobBurner::taskDone( int task )
 		checkMemory();
 
 	LOG_3( "Task Done " + QString::number(task) + " task ids: " + mCurrentTasks.keyString() );
-	mCurrentTasks.setStatuses( "done" );
+    Database::current()->beginTransaction();
 	mCurrentTaskAssignments.setJobAssignmentStatuses( JobAssignmentStatus::recordByName("done") );
 	mCurrentTaskAssignments.setColumnLiteral( "ended", "now()" );
-    Database::current()->beginTransaction();
 	mCurrentTaskAssignments.commit();
+	mCurrentTasks.setStatuses( "done" );
 	mCurrentTasks.commit();
     Database::current()->commitTransaction();
 

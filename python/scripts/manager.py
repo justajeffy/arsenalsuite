@@ -11,6 +11,10 @@ from blur.defaultdict import DefaultDict
 from exceptions import Exception
 import traceback
 
+import signal
+import cProfile
+import lsprofcalltree
+
 if sys.argv.count('-daemonize'):
     from blur.daemonize import createDaemon
     createDaemon()
@@ -43,7 +47,7 @@ classes_loader()
 VERBOSE_DEBUG = False
 
 if VERBOSE_DEBUG:
-    Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete ) #| Database.EchoSelect )
+    Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete | Database.EchoInsert ) #| Database.EchoSelect )
 
 # Connect to the database
 Database.current().connection().reconnect()
@@ -60,7 +64,8 @@ class ManagerConfig:
     def update(self):
         # Sort parameters
         #self._SORT_METHOD = Config.getString( 'assburnerSortMethod', 'key_default' )
-        self._SORT_METHOD = 'key_user_project_soft_reserves'
+        #self._SORT_METHOD = 'key_user_project_soft_reserves'
+        self._SORT_METHOD = 'key_darwin'
         try:
             JobAssign.SortMethod = getattr(JobAssign, str(self._SORT_METHOD))
             #print ("Using %s job sort method" % self._SORT_METHOD)
@@ -101,6 +106,8 @@ class ManagerConfig:
         # so priorities may not be targeted correctly for up to this % of total slots on
         # the farm
         self._ASSIGN_SLOPPINESS = Config.getFloat( 'arsenalAssignSloppiness', 2.0 )
+
+        self._ASSIGN_MAXHOSTS = Config.getFloat( 'arsenalAssignMaxHosts', 0.1 ) # 10 percent default
 
 # Single Instance
 config = ManagerConfig()
@@ -196,8 +203,9 @@ class JobAssign:
     def hostOk( self, hostStatus, snapshot ):
         host = hostStatus.host()
 
-        if hostStatus.activeAssignmentCount() + self.Job.assignmentSlots() > host.maxAssignments():
-            if VERBOSE_DEBUG: Log( 'Job requires more slots than host has available' )
+        #if hostStatus.activeAssignmentCount() + self.Job.assignmentSlots() > host.maxAssignments():
+        if FarmResourceSnapshot.hostsUnused.get(hostStatus, 0) - self.Job.assignmentSlots() < 0:
+            if VERBOSE_DEBUG: Log( 'Job requires more slots (%s) than host (%s) has available (%s)' % (self.Job.assignmentSlots(), host.name(), host.maxAssignments()-hostStatus.activeAssignmentCount() ) )
             return False
 
         if hostStatus.activeAssignmentCount() > 0:
@@ -210,7 +218,7 @@ class JobAssign:
                 if VERBOSE_DEBUG: Log( 'Host already has exclusive assignment' )
                 return False
 
-        if not self.hostMemoryOk( hostStatus ):
+        if not self.hostMemoryOk( hostStatus ) and host.os().startsWith("Linux"):
             return False
 
         # Check for preassigned job list
@@ -247,13 +255,18 @@ class JobAssign:
         return self._priority
 
     def __cmp__( self, other ):
-        if id(self) == id(other): 			return 0
+        if id(self) == id(other): return 0
         #if self.Job.user() == other.Job.user():
         #    if self.Job.priority() == other.Job.priority():
         #        diff = self.Job.personalPriority() - other.Job.personalPriority()
         #        if diff > 0: return 1
         #        elif diff < 0: return -1
-        if JobAssign.SortMethod(self) > JobAssign.SortMethod(other):	return 1
+        # bone sez... if the sort key is == then the sort will never stabalize
+        #             so we must check for equivalence
+        my_key    = JobAssign.SortMethod(self)
+        other_key = JobAssign.SortMethod(other)
+        if my_key == other_key: return 0
+        if my_key  > other_key: return 1
         return -1
 
     def key_default( self ):
@@ -265,17 +278,52 @@ class JobAssign:
         hasHost = 0
         if self.JobStatus.hostsOnJob() > 0: hasHost = 1
         sortKey = '%03d-%01d-%04d-%04d-%10d' % (self.Job.priority(), hasHost, int(self.JobStatus.errorCount()/5.0), self.JobStatus.hostsOnJob(), self.Job.submittedts().toTime_t())
-        #if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
+        self.sortKey = sortKey
         return sortKey
 
     def key_user_project_soft_reserves( self ):
         user_deficit = self.Job.user().arsenalSlotReserve() - FarmResourceSnapshot.slotsByUser.get(self.Job.user().name(),0)
-        if( user_deficit < 0): user_deficit = 0
+        if(user_deficit < 0): user_deficit = 0
         project_deficit = self.Job.project().arsenalSlotReserve() - FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)
-        if( project_deficit < 0): project_deficit = 0
-        sortKey = '%05d-%05d-%03d-%04d' % (int(99999-user_deficit), int(99999-project_deficit), self.Job.priority(), int(self.JobStatus.errorCount()/5.0))
+        if(project_deficit < 0): project_deficit = 0
+        urgent = 99
+        if(self.Job.priority() <= 20): urgent = self.Job.priority()
+        sortKey = '%02d-%05d-%05d-%03d-%04d-%04d' % (urgent, int(99999-user_deficit), int(99999-project_deficit), self.Job.priority(), int(self.JobStatus.errorCount()/5.0), self.JobStatus.hostsOnJob())
 
-        if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (self.Job.name(), sortKey)
+        self.sortKey = sortKey
+        return sortKey
+
+    def key_darwin( self ):
+        # bone sez... priority should still be taken into account so that the wranglers still have a way to push something important to the front
+        urgent = 99
+        if(self.Job.priority() <= 20): urgent = self.Job.priority()
+
+        #project_deficit = self.Job.project().arsenalSlotReserve() - FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)
+        reserve_used = min(100, int(float(FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)) / float(max(1,self.Job.project().arsenalSlotReserve())) * 100))
+
+        # important things will take precedence within a department, but not over everything
+        important = 99
+        if(self.Job.priority() <= 30): important = self.Job.priority()
+
+        shotTimeKey = "%s-%s" % (self.Job.shotName(),  self.Job.project().name())
+        avgTime = FarmResourceSnapshot.shotTimes.get(shotTimeKey, 99999999)
+
+        hasTensRunning = 0
+        tensRunning = self.JobStatus.tasksDone() + self.JobStatus.tasksAssigned() + self.JobStatus.tasksBusy()
+        if( float(tensRunning) / float(self.JobStatus.tasksCount()) > 0.1 ):
+            hasTensRunning = 1
+
+        hasTensComplete = 1
+        tensComplete = self.JobStatus.tasksDone()
+        if( float(tensComplete) / float(self.JobStatus.tasksCount()) > 0.1 ):
+            hasTensComplete = 0
+
+        # bone sez... within a particular shot, prefer slower passes first
+        shotAvgTime = 0
+        if(hasTensComplete == 1): shotAvgTime = self.JobStatus.tasksAverageTime() * 60
+
+        sortKey = '%02d-%03d-%02d-%01d-%01d-%08d-%05d' % ( urgent, reserve_used, important, hasTensRunning, hasTensComplete, avgTime, shotAvgTime )
+        self.sortKey = sortKey
         return sortKey
 
     def calculateAutoPacketSize( self, totalHosts, totalTasks ):
@@ -333,6 +381,16 @@ class JobAssign:
         self.logString += 'Iterative [limit=%i,stripe=%i] ' % (limit, stripe)
         return JobTask.select("keyjobtask IN (SELECT * FROM get_iterative_tasks(%i,%i,%i))" % (self.Job.key(),limit,stripe))
 
+    def assignHostFunc( self, hostStatus, totalHosts, totalTasks ):
+        q = Database.current().exec_('SELECT * FROM assign_single_host_2(%s,%s,%s)' % (self.Job.key(), hostStatus.host().key(), self.Job.packetSize()))
+        tasks = []
+        while q.next():
+            tasks.append(q.value(0).toInt()[0])
+
+        Log( "Assigned tasks " + numberListToString(tasks) + " from job " + str(self.Job.key()) + " to host " + hostStatus.host().name() )
+        #time.sleep(10)
+        return len(tasks)
+
     def assignHost( self, hostStatus, totalHosts, totalTasks ):
         tasks = None
         packetSize = self.Job.packetSize()
@@ -364,19 +422,10 @@ class JobAssign:
 
         jtal = JobTaskAssignmentList()
         for jt in tasks:
-            jat = JobTaskAssignment()
-            jat.setJobTask( jt )
-            jtal += jat
+            jta = JobTaskAssignment()
+            jta.setJobTask( jt )
+            jtal += jta
         jtal.setJobAssignmentStatuses( JobAssignmentStatus.recordByName( 'ready' ) )
-
-        Database.current().beginTransaction()
-
-        # Lock the row(reloads host)
-        hostStatus.reload()
-        if hostStatus.slaveStatus() != 'ready':
-            Database.current().rollbackTransaction();
-            print "Host %s is no longer ready for frames(status is %s) returning" % (hostStatus.host().name(),hostStatus.slaveStatus())
-            return 0
 
         ja = JobAssignment()
         ja.setJob( self.Job )
@@ -388,14 +437,15 @@ class JobAssign:
         jtal.commit()
 
         # deduct memory requirement from available so we don't over allocate the host
-        min = self.Job.minMemory()
-        if( min == 0 ): min = self.Job.jobStatus().averageMemory()
-        hostStatus.setAvailableMemory( (hostStatus.availableMemory()*1024 - min) / 1024 )
-        if( hostStatus.activeAssignmentCount() > 0 and hostStatus.availableMemory() <= 0 ):
-            Database.current().rollbackTransaction();
-            print "Host %s does not have the memory required returning" % (hostStatus.host().name())
-            return 0
-        hostStatus.commit()
+        if( hostStatus.host().os().startsWith("Linux") ):
+            min = self.Job.minMemory()
+            if( min == 0 ): min = self.Job.jobStatus().averageMemory()
+            hostStatus.setAvailableMemory( (hostStatus.availableMemory()*1024 - min) / 1024 )
+            if( hostStatus.activeAssignmentCount() > 0 and hostStatus.availableMemory() <= 0 ):
+                Database.current().rollbackTransaction();
+                print "Host %s does not have the memory required returning" % (hostStatus.host().name())
+                return 0
+            hostStatus.commit()
 
         tasks = JobTaskList()
         for jta in jtal:
@@ -409,7 +459,6 @@ class JobAssign:
         # Keep hostsOnJob up to date while assigning.  It is accurately updated periodically by the reaper
         if self.Job.maxHosts() > 0:
             Database.current().exec_("UPDATE jobstatus SET hostsOnJob=hostsOnJob+1 WHERE fkeyjob=%i" % self.Job.key())
-        Database.current().commitTransaction();
 
         # Increment hosts on job count,  this is taken care of by a trigger at the database level
         # but we increment here to get more accurate calculated priority until the next refresh of
@@ -462,6 +511,8 @@ class FarmResourceSnapshot(object):
     limitsByUser = {}
     slotsByProject = {}
     limitsByProject = {}
+    shotTimes = {}
+    hostsUnused = {}
 
     def __init__(self):
         self.reset()
@@ -479,7 +530,7 @@ class FarmResourceSnapshot(object):
         self.freeHosts = {}
         self.hostStatuses = HostStatusList()
         self.hostStatusesByService = DefaultDict(HostStatusList)
-        self.hostsUnused = {}
+        #self.hostsUnused = {}
         self.hostHasExclusiveAssignmentCache = {}
 
         self.licCountByService = {}
@@ -488,8 +539,11 @@ class FarmResourceSnapshot(object):
         # User Info
         self.refreshUserUsage()
 
-        # project Info
+        # Project Info
         self.refreshProjectUsage()
+
+        # Shot Info
+        self.refreshShotTimes()
 
     def hostHasExclusiveAssignment(self,host):
         return host.key() in self.hostHasExclusiveAssignmentCache
@@ -562,12 +616,27 @@ SELECT * from project_slots_limits
             reserve = q2.value(2).toInt()[0]
             self.limitsByProject[key] = [limit, reserve]
 
+    def refreshShotTimes(self):
+        self.shotTimes.clear()
+
+        q = Database.current().exec_("""
+SELECT * from running_shots_averagetime_2
+                                    """)
+        while q.next():
+            shot = q.value(0).toString()
+            project = q.value(1).toString()
+            value = q.value(2).toDouble()[0]
+            key = "%s-%s" % (shot, project)
+            self.shotTimes[key] = int(value)
+
     def refreshJobList(self):
-        # Gather the jobs
-        self.jobList = Job.select( """JOIN jobstatus ON (keyjob=fkeyjob) 
-                                      WHERE status IN ('ready','started') 
-                                        AND (jobstatus.tasksUnassigned + jobstatus.tasksassigned) > 0 
-                                        AND (coalesce(job.maxhosts,0) <= 0 OR jobstatus.hostsOnJob < job.maxHosts)""" )
+        # Gather the jobs 
+        #self.jobList = Job.select( """JOIN jobstatus ON (keyjob=fkeyjob) 
+        #                              WHERE status IN ('ready','started') 
+        #                                AND (jobstatus.tasksUnassigned + jobstatus.tasksassigned) > 0 
+        #                                AND (coalesce(job.maxhosts,0) <= 0 OR jobstatus.hostsOnJob < job.maxHosts)""" )
+        self.jobList = Job.select( """WHERE status IN ('ready','started') 
+                                        AND ((SELECT count(*) FROM jobtask WHERE fkeyjob = keyjob AND status = 'new') > 0)""")
         statuses = JobStatusList()
         if self.jobList.size() > 0:
             statuses = JobStatus.select("fkeyjob IN("+self.jobList.keyString()+")")
@@ -593,14 +662,18 @@ SELECT * from project_slots_limits
         # Filter out services that have no available licenses
         self.licCountByService = {}
 
-        for service in self.servicesNeeded:
-            lic = service.license().reload()
-            if lic.isRecord():
-                self.licCountByService[service] = lic.total() - lic.inUse() - lic.reserved()
+        q = Database.current().exec_("""SELECT * from license_usage_2""")
+        while q.next():
+            key = str(q.value(0).toString())
+            limit = q.value(1).toInt()[0]
+            current = q.value(2).toInt()[0]
+            self.licCountByService[key] = int(limit - current)
+            #Log( "Service %s has limit: %s, current: %s" % (key, limit, current) )
 
     def refreshHostData(self):
         hostServices = HostServiceList()
         if VERBOSE_DEBUG: Log( "Fetching Hosts for required services, %s" % self.servicesNeeded.services().join(',') )
+        #if VERBOSE_DEBUG: Log( "Fetching Hosts for required services, %s" % self.servicesNeeded.keyString() )
         if not self.servicesNeeded.isEmpty():
             hostServices = HostService.select( """INNER JOIN HostStatus ON HostStatus.fkeyHost=HostService.fkeyHost 
                                                   INNER JOIN Host ON HostStatus.fkeyhost=Host.keyhost 
@@ -610,17 +683,17 @@ SELECT * from project_slots_limits
         hosts = hostServices.hosts().unique()
 
         # Mark which hosts already have an exclusive assignment
-        q = Database.current().exec_( """SELECT ja.fkeyhost 
-                                         FROM JobAssignment ja
-                                         INNER JOIN Job ON ja.fkeyjob=keyjob 
-                                         WHERE job.exclusiveAssignment=true
-                                           AND ja.fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus 
-                                                                                         FROM jobassignmentstatus 
-                                                                                         WHERE status IN ('ready','copy','busy')
-                                                                                        ) 
-                                           GROUP BY ja.fkeyhost""" )
-        while q.next():
-            self.hostHasExclusiveAssignmentCache[q.value(0).toInt()[0]] = True
+        #q = Database.current().exec_( """SELECT ja.fkeyhost 
+        #                                 FROM JobAssignment ja
+        #                                 INNER JOIN Job ON ja.fkeyjob=keyjob 
+        #                                 WHERE job.exclusiveAssignment=true
+        #                                   AND ja.fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus 
+        #                                                                                 FROM jobassignmentstatus 
+        #                                                                                 WHERE status IN ('ready','copy','busy')
+        #                                                                                ) 
+        #                                   GROUP BY ja.fkeyhost""" )
+        #while q.next():
+        #    self.hostHasExclusiveAssignmentCache[q.value(0).toInt()[0]] = True
 
         if len(hosts):
             self.hostStatuses = HostStatus.select("fkeyhost IN (" + hosts.keyString() + ")")
@@ -634,7 +707,7 @@ SELECT * from project_slots_limits
                 self.freeHosts[hostStatus] = FreeHost(hostStatus)
             self.freeHosts[hostStatus].addService(hostService)
             self.hostStatusesByService[service] += hostStatus
-            self.hostsUnused[hostStatus] = True
+            self.hostsUnused[hostStatus] = host.maxAssignments() - hostStatus.activeAssignmentCount()
 
         for host in hosts:
             self.potentialSlotsAvailable =  self.potentialSlotsAvailable + host.maxAssignments()
@@ -662,7 +735,7 @@ SELECT * from project_slots_limits
 
         # Services are always required
         if requiredServices.isEmpty():
-            if VERBOSE_DEBUG: print "Job has no service requirements, skipping"
+            if VERBOSE_DEBUG: print "*** Job has no service requirements, skipping"
             return hostStatuses
 
         # Start the list off with the first service
@@ -677,7 +750,7 @@ SELECT * from project_slots_limits
                     return HostStatusList()
             hostStatuses &= self.availableHostsByService(service)
             if hostStatuses.isEmpty():
-                if VERBOSE_DEBUG: print "No hosts available with required services"
+                if VERBOSE_DEBUG: print "** No hosts available with required services"
                 break
 
         # We have the hosts that match the service requirements, now
@@ -686,21 +759,25 @@ SELECT * from project_slots_limits
         for hostStatus in hostStatuses:
             if jobAssign.hostOk(hostStatus,self):
                 ret += hostStatus
+            else:
+                if VERBOSE_DEBUG: print "** hostOk is NOT ok!"
 
         # Assign hosts with 0 jobs first
-        ret = ret.sorted( "activeassignmentcount" )
-
+        #ret = ret.sorted( "activeassignmentcount" )
         return ret
 
     # Always call canReserveLicenses first
     def reserveLicenses(self,services):
         for service in services:
-            if self.licCountByService.has_key(service) and self.licCountByService[service] > 0:
-                self.licCountByService[service] -= 1
+            serviceName = str(service.service())
+            if self.licCountByService.has_key(serviceName) and self.licCountByService[serviceName] > 0:
+                self.licCountByService[serviceName] -= 1
 
     def canReserveLicenses(self,services):
         for service in services:
-            if self.licCountByService.has_key(service) and self.licCountByService[service] <= 0:
+            serviceName = str(service.service())
+            #Log( "canReserveLicense for %s? %s left" % ( serviceName, self.licCountByService.get(serviceName, 9999) ) )
+            if self.licCountByService.has_key(serviceName) and (self.licCountByService[serviceName]) <= 0:
                 return False
         return True
 
@@ -726,15 +803,20 @@ SELECT * from project_slots_limits
 
     # Removes the host from available hosts to assign to
     # Removes all services that have no remaining hosts
-    def removeHostStatus( self, hostStatus ):
-        if hostStatus in self.freeHosts:
-            for service in self.freeHosts[hostStatus].services:
-                self.hostStatusesByService[service].remove(HostStatus(hostStatus.key()))
-                if len(self.hostStatusesByService[service]) == 0:
-                    self.removeService(service)
-            del self.freeHosts[hostStatus]
+    def removeHostStatus( self, hostStatus, slots ):
+        hostStatus.setActiveAssignmentCount( hostStatus.activeAssignmentCount() + slots )
+
         if hostStatus in self.hostsUnused:
-            del self.hostsUnused[hostStatus]
+            self.hostsUnused[hostStatus] = self.hostsUnused[hostStatus] - slots
+            if self.hostsUnused[hostStatus] <= 0:
+                # host has no slots left so remove it
+                del self.hostsUnused[hostStatus]
+                if hostStatus in self.freeHosts:
+                    for service in self.freeHosts[hostStatus].services:
+                        self.hostStatusesByService[service].remove(HostStatus(hostStatus.key()))
+                        if len(self.hostStatusesByService[service]) == 0:
+                            self.removeService(service)
+                    del self.freeHosts[hostStatus]
 
     # Called to remove the service and all jobs that require it
     def removeService( self, service ):
@@ -809,22 +891,25 @@ SELECT * from project_slots_limits
         # There are valid reasons for this to fail, such as the host going offline
         tasksAssigned = jobAssign.assignHost(hostStatus, len(self.hostsUnused), self.taskCountByServices(jobAssign.servicesRequired))
         if tasksAssigned < 1:
-            if VERBOSE_DEBUG: print "JobAssign.assignHost failed"
+            #if VERBOSE_DEBUG: print "JobAssign.assignHost failed"
+            Log( "JobAssign.assignHost failed" )
+            raise NonCriticalAssignmentError("Job out of tasks")
             return (0,jobAssign.tasksUnassigned)
 
         jobAssign.tasksUnassigned -= tasksAssigned
 
         # Remove the job from the list if there are no tasks left to assign
-        #if jobAssign.tasksUnassigned <= 0:
-        #	if VERBOSE_DEBUG: print "Removing job from list, all tasks are assigned"
-        #	self.removeJob( job )
+        if jobAssign.tasksUnassigned <= 0:
+            if VERBOSE_DEBUG: print "Removing job from list, all tasks are assigned"
+            self.removeJob( job )
 
         # Host no longer ready
-        self.removeHostStatus(hostStatus)
+        self.removeHostStatus(hostStatus, job.assignmentSlots())
 
         return (tasksAssigned,jobAssign.tasksUnassigned)
 
     def assignSingleJob(self,jobAssign):
+        #print 'job %s has sortKey %s' % (jobAssign.Job.name(), jobAssign.key_even_by_priority())
         #if VERBOSE_DEBUG: print 'job %s has sortKey %s' % (jobAssign.Job.name(), jobAssign.key_even_by_priority())
 
         # Check maxhosts
@@ -832,33 +917,55 @@ SELECT * from project_slots_limits
             self.removeJob(jobAssign.Job)
             return False
 
-        # Gather available hosts for this job
-        if VERBOSE_DEBUG: print "Finding Hosts to Assign to %i tasks to Job %s" % (jobAssign.JobStatus.tasksUnassigned(), jobAssign.Job.name())
-
         hostStatuses = self.availableHosts( jobAssign )
         if hostStatuses.isEmpty():
+            if VERBOSE_DEBUG: print "*** No hosts available for this job - returning"
             return False
 
+        assignedHosts = 0
+        maxAssignedHosts = int(jobAssign.JobStatus.tasksCount() * config._ASSIGN_MAXHOSTS)
+
+        # if less than 10% of a job is started, don't overrun 10%, for Darwin purposes
+        tenPercentComplete = float(jobAssign.JobStatus.tasksCount()-jobAssign.JobStatus.tasksUnassigned()) / float(jobAssign.JobStatus.tasksCount())
+        if tenPercentComplete < 0.1:
+            maxAssignedHosts = int(jobAssign.JobStatus.tasksCount() * 0.1) - (jobAssign.JobStatus.tasksCount()-jobAssign.JobStatus.tasksUnassigned())
+
+        # Gather available hosts for this job
+        if VERBOSE_DEBUG: print "Finding Hosts to Assign to %i tasks to Job %s, possible: %s" % (jobAssign.JobStatus.tasksUnassigned(), jobAssign.Job.name(), hostStatuses.size())
+        print "Finding Hosts to Assign to %i out of %i tasks to Job %s, possible: %s" % (maxAssignedHosts, jobAssign.tasksUnassigned, jobAssign.Job.name(), hostStatuses.size())
+
         assignSuccess = False
+        Database.current().beginTransaction()
         for hostStatus in hostStatuses:
             tasksAssigned, tasksLeft = self.assignSingleHost( jobAssign, hostStatus )
 
             # Return so that we can recalculate assignment priorities
             if tasksAssigned > 0:
                 assignSuccess = True
+                assignedHosts = assignedHosts + 1
                 self.slotAssignCount = self.slotAssignCount + jobAssign.Job.assignmentSlots()
+
                 if ((float(self.slotAssignCount) / self.potentialSlotsAvailable)*100) > config._ASSIGN_SLOPPINESS:
-                    print "enough hostStatuses assigned, resort job list"
-                    break
+                    Database.current().exec_("SELECT update_job_task_counts(%i)" % jobAssign.Job.key())
+                    print "enough hostStatuses assigned, resort job list and also update_job_task_counts(%i)" % jobAssign.Job.key()
+                    Database.current().commitTransaction()
+                    return True
+
+                if (assignedHosts > maxAssignedHosts):
+                    Database.current().exec_("SELECT update_job_task_counts(%i)" % jobAssign.Job.key())
+                    Database.current().commitTransaction()
+                    return True
+            else:
+                # If we get to here there's no hosts to assign to this job, so ignore it
+                self.removeJob( jobAssign.Job )
 
             # This shouldn't get hit, because there should be tasks available if we
-            # Are assigning, and we should already break above if they get assigned
+            # are assigning, and we should already break above if they get assigned
             if tasksLeft <= 0:
+                Database.current().commitTransaction()
                 raise NonCriticalAssignmentError("Job %s has tasksLeft <= 0 before any assignments made" % jobAssign.Job.name())
 
-        if not assignSuccess:
-            # If we get to here there's no hosts to assign to this job, so ignore it
-            self.removeJob( jobAssign.Job )
+        Database.current().commitTransaction()
         return assignSuccess
 
     def performNormalAssignments(self):
@@ -878,18 +985,28 @@ SELECT * from project_slots_limits
 
             if len(jobAssignList) == 0:
                 raise AllJobsAssignedException()
-
+            
+            Log("re-sorting job priorities, %s jobs to consider" % len(jobAssignList))
             jobAssignList.sort()
+            Log("clearing queueOrder")
+            Database.current().exec_("UPDATE jobstatus SET queueorder = 9999")
+            queueOrder = 1
             for jobAssign in jobAssignList:
-                #print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.key_user_project_soft_reserves() )
+                print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.sortKey )
                 try:
+                    Database.current().exec_("UPDATE jobstatus SET queueorder = %s WHERE fkeyjob = %s" % (queueOrder, jobAssign.Job.key()))
+                    queueOrder = queueOrder + 1
+                    self.assignSingleJob(jobAssign)
                     # Recalc priority and resort job list after assignments.
                     # Use the "sloppiness" attribute to determine how many slots
                     # to assign in a single loop.
-                    if self.assignSingleJob(jobAssign):
-                        break
+                    if ((float(self.slotAssignCount) / self.potentialSlotsAvailable)*100) > config._ASSIGN_SLOPPINESS:
+                        Log( "%s hostStatuses out of %s assigned, resort job list" % (self.slotAssignCount, self.potentialSlotsAvailable) )
+                        return
                 except NonCriticalAssignmentError:
+                    Database.current().commitTransaction()
                     if VERBOSE_DEBUG: traceback.print_exc()
+
             if self.slotAssignCount == 0:
                 break
 
@@ -911,6 +1028,8 @@ SELECT * from project_slots_limits
             raise e
         finally:
             print "Finished assigning jobs, took %i" % (timer.elapsed())
+            if( timer.elapsed() < 10 ): time.sleep(1)
+
 
 def run_loop():
     config.update()
@@ -931,6 +1050,28 @@ def manager2():
             if VERBOSE_DEBUG: print "Loop Assigning Jobs, took: %i, Waiting 1 second" % (timer.elapsed())
             #time.sleep( 1 )
 
+def manager3():
+    print "Manager: Starting up"
+    while True:
+        run_loop()
+        sys.exit(0)
+
+if VERBOSE_DEBUG:
+    profile = cProfile.Profile()
+
+def handler(signum, frame):
+    print 'Signal handler called with signal', signum
+    profileName = "/tmp/manager.profile"
+    kProfile = lsprofcalltree.KCacheGrind(profile)
+    kFile = open(profileName, 'w+')
+    kProfile.output(kFile)
+    kFile.close()
+
 if __name__=="__main__":
-    manager2()
+    if VERBOSE_DEBUG:
+        #signal.signal(signal.SIGHUP, handler)
+        #profile.runctx('manager3()', globals(), locals())
+        manager3()
+    else:
+        manager3()
 

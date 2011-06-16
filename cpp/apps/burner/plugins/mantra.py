@@ -105,6 +105,8 @@ class MantraBurner(JobBurner):
             self.jobErrored("process exited before frame was complete")
         
     def slotProcessOutputLine(self,line,channel):
+        JobBurner.slotProcessOutputLine(self,line,channel)
+
         # Frame status
         if self.jobProgress.indexIn(line) >= 0:
             if self.CurrentFrame == None:

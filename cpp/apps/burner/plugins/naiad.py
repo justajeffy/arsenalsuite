@@ -77,6 +77,8 @@ class NaiadBurner(JobBurner):
         if not self.Job.append().isEmpty:
             args << self.Job.append()
 
+        # FIX FIX
+        # if the frame is the first frame in the job, do NOT use the restartCache!
         if not self.Job.restartCache().isEmpty():
             self.logMessage("using restartCache %s" % self.Job.restartCache())
             restartParam = self.Job.restartCache()

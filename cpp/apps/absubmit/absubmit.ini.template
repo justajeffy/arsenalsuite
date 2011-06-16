@@ -1,14 +1,14 @@
 [Database]
 DatabaseDriver=QPSQL7
-DatabaseName=blur
 EchoMode=EchoSelect,EchoInsert,EchoUpdate,EchoDelete
 Options=
-Port=5432
 ReconnectDelay=30
 Timeout=0
-Host=pgsql
-User=yourdbuser
-Password=yourdbpasswd
+Host=farmdb
+Port=6432
+DatabaseName=submitter
+User=submitter
+Password=submit
 
 [Logging]
 EchoStdOut=true

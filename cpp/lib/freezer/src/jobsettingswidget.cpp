@@ -16,6 +16,7 @@
 
 #include "jobsettingswidget.h"
 #include "jobsettingswidgetplugin.h"
+#include "jobenvironment.h"
 #include "jobenvironmentwindow.h"
 
 JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
@@ -37,6 +38,7 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 	connect( mPacketCombo, SIGNAL( currentIndexChanged(int) ), SLOT( settingsChange() ) );
 
 	connect( mPacketSizeSpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
+	connect( mSlotsSpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
 	connect( mEmailErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
 	connect( mEmailCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
 	connect( mJabberErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
@@ -61,6 +63,7 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 	mPrioritizeOuterTasksCheck->setProxy( mSelectedJobsProxy );
 
 	mPacketSizeSpin->setMinimum( 1 );
+	mSlotsSpin->setMinimum( 1 );
 
 	registerBuiltinCustomJobSettingsWidgets();
 	updateCustomJobSettingsWidget();
@@ -127,7 +130,8 @@ void JobSettingsWidget::showHostSelector()
 	HostSelector hs(this);
 	if( mSelectedJobs.jobTypes().unique().size() == 1 )
 		hs.setServiceFilter( mSelectedJobs.jobServices().services().unique() );
-	hs.setHostList( mUpdatedHostList );
+	hs.setHostList( mSelectedJobs[0].hostList() );
+
 	if( hs.exec() == QDialog::Accepted ){
 		mUpdatedHostList = hs.hostStringList();
 		settingsChange();
@@ -232,6 +236,8 @@ void JobSettingsWidget::resetSettings()
 	mPacketSizeSpin->setValues( QList<int>() << (packetSize.isEmpty() ? 10 : packetSize[0]) );
 	mPacketSizeSpin->setEnabled(!containsAuto);
 
+	mSlotsSpin->setValues( castList<unsigned int, int>(mSelectedJobs.assignmentSlots()) );
+
 	QStringList packetTypes( unique( mSelectedJobs.packetTypes() ) );
 	bool containsFixedPacketType = packetTypes.contains( "preassigned" );
 	if( mMode == ModifyJobs ) {
@@ -279,8 +285,8 @@ void JobSettingsWidget::resetSettings()
 	mAllHostsCheck->setCheckState( allHosts );
 	mHostListButton->setEnabled( allHosts == Qt::Unchecked );
 
-	mUpdatedHostList = mSelectedJobs[0].hostList();
-	mUpdatedEnvironment = mSelectedJobs[0].environment();
+	mUpdatedHostList = QString();
+	mUpdatedEnvironment = QString();
     buildServiceTree();
 	mChanges = false;
 
@@ -364,7 +370,10 @@ void JobSettingsWidget::applySettings()
 	if( mMaxErrorsSpin->changed() )
 		mSelectedJobs.setMaxErrors( mMaxErrorsSpin->value() );
 	if( mUseAutoCheck->checkState() != Qt::PartiallyChecked )
-		mSelectedJobs.setPacketSizes( mUseAutoCheck->isChecked() ? 0 : mPacketSizeSpin->value() );
+        if( mPacketSizeSpin->changed() )
+            mSelectedJobs.setPacketSizes( mUseAutoCheck->isChecked() ? 0 : mPacketSizeSpin->value() );
+    if( mSlotsSpin->changed() )
+        mSelectedJobs.setAssignmentSlots( mSlotsSpin->value() );
 
 	// Dont change preassigned jobs packet type
 	if( mPacketGroup->isEnabled() ) {
@@ -373,7 +382,7 @@ void JobSettingsWidget::applySettings()
 		mSelectedJobs.setPacketTypes( pt );
 	}
 
-	if( mAllHostsCheck->checkState() != Qt::PartiallyChecked )
+	if( mAllHostsCheck->checkState() != Qt::PartiallyChecked && !mUpdatedHostList.isEmpty() )
 		mSelectedJobs.setHostLists( mAllHostsCheck->checkState() == Qt::Checked ? "" : mUpdatedHostList );
 
 	foreach( Job j, mSelectedJobs ) {
@@ -388,7 +397,8 @@ void JobSettingsWidget::applySettings()
 	if( mPersonalPrioritySpin->changed() )
 		mSelectedJobs.setPersonalPriorities( mPersonalPrioritySpin->value() );
 
-    mSelectedJobs.setEnvironments( mUpdatedEnvironment );
+    if( !mUpdatedEnvironment.isEmpty() )
+        mSelectedJobs.environments().setEnvironments( mUpdatedEnvironment );
 
     saveServiceTree();
 
@@ -425,8 +435,8 @@ void JobSettingsWidget::settingsChange()
 void JobSettingsWidget::showEnvironmentWindow()
 {
     JobEnvironmentWindow jew(this);
-    jew.setEnvironment( mUpdatedEnvironment );
-    if( jew.exec() == QDialog::Accepted ){
+    jew.setEnvironment( mSelectedJobs[0].environment().environment() );
+    if( jew.exec() == QDialog::Accepted ) {
         mUpdatedEnvironment = jew.environment();
         settingsChange();
     }
