@@ -14,6 +14,8 @@
 #include <ImfStandardAttributes.h>
 #include <ImathBox.h>
 #include <ImfInputFile.h>
+#include <ImfTestFile.h>
+#include <ImfTiledInputFile.h>
 #include <ImfBoxAttribute.h>
 #include <ImfChannelListAttribute.h>
 #include <ImfCompressionAttribute.h>
@@ -138,10 +140,16 @@ QRgb RgbaToQrgba(struct Imf::Rgba imagePixel)
 //     the display's maximum intensity).
 //
 //  7) Clamp the values to [0, 255].
+/*
 	return qRgba( char (Imath::clamp ( r * 84.66f, 0.f, 255.f ) ),
 				  char (Imath::clamp ( g * 84.66f, 0.f, 255.f ) ),
 				  char (Imath::clamp ( b * 84.66f, 0.f, 255.f ) ),
 				  char (Imath::clamp ( a * 84.66f, 0.f, 255.f ) ) );
+                  */
+	return qRgba( qMax(0, qMin(255, (int)(r * 84.66))),
+                  qMax(0, qMin(255, (int)(g * 84.66))),
+                  qMax(0, qMin(255, (int)(b * 84.66))),
+                  qMax(0, qMin(255, (int)(a * 84.66))) );
 }
 
 EXRHandler::EXRHandler()
@@ -159,25 +167,49 @@ QByteArray EXRHandler::name() const
 	return QByteArray("exr");
 }
 
+/*
 bool EXRHandler::read( QImage *outImage )
 {
+    QImage image(1, 1, QImage::Format_ARGB32);
+    if( image.isNull())
+        return false;
+
+    image.fill(0);
+    *outImage = image;
+    qWarning("EXRHandler::read()");
+
+    return true;
+}
+*/
+
+bool EXRHandler::read( QImage *outImage )
+{
+        return false;
+    K_IStream istr( device(), QByteArray() );
+
+    bool tiled;
+    if (! Imf::isOpenExrFile( istr, tiled ) )
+        return false;
+
+    if( tiled ) {
+        qWarning("exr is tiled!");
+        QImage image(1, 1, QImage::Format_ARGB32);
+        image.fill(0);
+        *outImage = image;
+        return true;
+    }
+    qWarning("exr is not tiled, proceeding with scanline");
+
     try
     {
 		int width, height;
 
-		K_IStream istr( device(), QByteArray() );
-		Imf::RgbaInputFile file( istr );
-		Imath::Box2i dw = file.displayWindow();
-		Imath::Box2i dataWindow = file.dataWindow();
+	//	K_IStream istr( device(), QByteArray() );
+		Imf::RgbaInputFile input_scanline( istr );
+        const Imf::Header *m_header = &(input_scanline.header());
 
-        /*
-        QString msg = QString("display is %1 %2 - %3 %4, data is %5 %6 - %7 %8")
-            .arg(dw.min.x).arg(dw.min.y)
-            .arg(dw.max.x).arg(dw.max.y)
-            .arg(dataWindow.min.x).arg(dataWindow.min.y)
-            .arg(dataWindow.max.x).arg(dataWindow.max.y);
-        qWarning(msg.toUtf8());
-        */
+		Imath::Box2i dw = m_header->displayWindow();
+		Imath::Box2i dataWindow = m_header->dataWindow();
 
         width  = dw.max.x - dw.min.x + 1;
         height = dw.max.y - dw.min.y + 1;
@@ -185,8 +217,8 @@ bool EXRHandler::read( QImage *outImage )
 		Imf::Array2D<Imf::Rgba> pixels;
 		pixels.resizeErase (height, width);
 
-        file.setFrameBuffer (&pixels[0][0] - dw.min.x - dw.min.y * width, 1, width);
-        file.readPixels (dataWindow.min.y, dataWindow.max.y);
+        input_scanline.setFrameBuffer (&pixels[0][0] - dw.min.x - dw.min.y * width, 1, width);
+        input_scanline.readPixels (dataWindow.min.y, dataWindow.max.y);
 
 		QImage image(width, height, QImage::Format_ARGB32);
 		if( image.isNull())
@@ -213,7 +245,6 @@ bool EXRHandler::read( QImage *outImage )
         return false;
     }
 }
-
 
 bool EXRHandler::write( const QImage &image )
 {
