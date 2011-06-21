@@ -72,10 +72,7 @@ class TableModel(QAbstractTableModel):
         for assignment in assignments:
 
             # Get the number of slots in use
-            query = Database.current().exec_('SELECT assignslots FROM jobassignment WHERE fkeyjob=%s' % (assignment.job().key()))
-            if query.next():
-                jobslots = query.value(0).toInt()[0]
-            self.slots += jobslots
+            self.slots += assignment.assignSlots()
 
             # Get the memory for the assignment
             taskassignment = JobTaskAssignment.select("fkeyjobassignment=%s" % assignment.key())[0]
@@ -86,13 +83,13 @@ class TableModel(QAbstractTableModel):
             jobStatus        = JobStatus.select("fkeyjob=%s" % assignment.job().key())[0]
             running          = int(time.time()) - assignment.started().toTime_t()
             tasksAverageTime = jobStatus.tasksAverageTime()
-            tasksAverageTime = tasksAverageTime/jobslots
+            tasksAverageTime = tasksAverageTime/assignment.assignSlots()
             remaining        = tasksAverageTime - running
             eta              = "%s" % datetime.timedelta(seconds=remaining) if remaining > 0 else "N/A"
 
             self.arraydata.append((
                 assignment.key(),
-                "%s/%s" % (jobslots, hostslots),
+                "%s/%s" % (assignment.assignSlots(), hostslots),
                 "%s MB" % str(int(taskassignment.memory()) / 1024),
                 "%s" % datetime.timedelta(seconds=running),
                 eta,
@@ -172,10 +169,10 @@ class Afterburner(QMainWindow, Ui_Afterburner):
         traySignal = "activated(QSystemTrayIcon::ActivationReason)"
         self.trayIcon.connect(self.trayIcon, SIGNAL(traySignal), self.iconActivated)
 
-        self.menu = QMenu()
-        self.exitAction = self.menu.addAction(QIcon("icons/door_out.png"), "Exit")
-        self.exitAction.connect(self.exitAction, SIGNAL('triggered()'), self.exitEvent)
-        self.trayIcon.setContextMenu(self.menu)
+        #self.menu = QMenu()
+        #self.exitAction = self.menu.addAction(QIcon("icons/door_out.png"), "Exit")
+        #self.exitAction.connect(self.exitAction, SIGNAL('triggered()'), self.exitEvent)
+        #self.trayIcon.setContextMenu(self.menu)
 
         # Create the jobTable
         self.createJobTable()

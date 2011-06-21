@@ -197,6 +197,12 @@ class JobAssign:
             if VERBOSE_DEBUG: Log( 'Not enough memory, %i required, %i available' % (memoryRequired, hostStatus.availableMemory() * 1024) )
             return False
 
+        # Check if workstation and it's maxmemory settinga
+        host = hostStatus.host()
+        if host.name().startsWith("om0") and host.maxMemory() < self.Job.maxMemory():
+            if VERBOSE_DEBUG: Log( 'Not enough memory on workstation, %i required, %i available' % (self.Job.maxMemory(), hostStatus.host().maxMemory()) )
+            return False
+
         # memory is ok to assign
         return True
 
@@ -220,7 +226,7 @@ class JobAssign:
 
         if not self.hostMemoryOk( hostStatus ) and host.os().startsWith("Linux"):
             return False
-
+        
         # Check for preassigned job list
         if self.Job.packetType() == 'preassigned':
             self.loadPreassignedHosts()
