@@ -47,7 +47,7 @@ classes_loader()
 VERBOSE_DEBUG = False
 
 if VERBOSE_DEBUG:
-    Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete | Database.EchoInsert ) #| Database.EchoSelect )
+    Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete | Database.EchoInsert | Database.EchoSelect )
 
 # Connect to the database
 Database.current().connection().reconnect()
@@ -193,17 +193,29 @@ class JobAssign:
             if VERBOSE_DEBUG: Log( 'Job has unknown memory requirements, not assigning.' )
             return False
 
-        if memoryRequired > (hostStatus.availableMemory() * 1024):
-            if VERBOSE_DEBUG: Log( 'Not enough memory, %i required, %i available' % (memoryRequired, hostStatus.availableMemory() * 1024) )
+        # job memory 16GB  = 16000000
+        # host memory 24GB =    24147
+        #if memoryRequired > (hostStatus.availableMemory() * 1000):
+        if memoryRequired > (hostStatus.availableMemory() * 1000):
+            if VERBOSE_DEBUG: Log( 'Not enough memory, %i required, %i available on %s' % (memoryRequired, hostStatus.availableMemory() * 1000, hostStatus.host().name()) )
             return False
+        if self.Job.maxMemory() > (hostStatus.host().memory()*1024):
+            Log( 'Not enough memory, %i maximum, %i physical on %s' % (self.Job.maxMemory(), hostStatus.host().memory() * 1024, hostStatus.host().name()) )
+            return False
+
+        # Only if workstation - to be save for now
+        if hostStatus.host().name().startsWith("om"):
+            if self.Job.maxMemory() > (hostStatus.availableMemory() * 1000):
+                Log( 'Not enough memory on workstation.' )
+                #return False
 
         # memory is ok to assign
         return True
 
+
     def hostOk( self, hostStatus, snapshot ):
         host = hostStatus.host()
 
-        #if hostStatus.activeAssignmentCount() + self.Job.assignmentSlots() > host.maxAssignments():
         if FarmResourceSnapshot.hostsUnused.get(hostStatus, 0) - self.Job.assignmentSlots() < 0:
             if VERBOSE_DEBUG: Log( 'Job requires more slots (%s) than host (%s) has available (%s)' % (self.Job.assignmentSlots(), host.name(), host.maxAssignments()-hostStatus.activeAssignmentCount() ) )
             return False
@@ -218,7 +230,7 @@ class JobAssign:
                 if VERBOSE_DEBUG: Log( 'Host already has exclusive assignment' )
                 return False
 
-        if not self.hostMemoryOk( hostStatus ) and host.os().startsWith("Linux"):
+        if not self.hostMemoryOk( hostStatus ):
             return False
 
         # Check for preassigned job list
@@ -986,10 +998,11 @@ SELECT * from running_shots_averagetime_2
             if len(jobAssignList) == 0:
                 raise AllJobsAssignedException()
             
+            Project().select()
             Log("re-sorting job priorities, %s jobs to consider" % len(jobAssignList))
             jobAssignList.sort()
             Log("clearing queueOrder")
-            Database.current().exec_("UPDATE jobstatus SET queueorder = 9999")
+            Database.current().exec_("UPDATE jobstatus SET queueorder = 9999 WHERE queueorder < 9999")
             queueOrder = 1
             for jobAssign in jobAssignList:
                 print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.sortKey )
