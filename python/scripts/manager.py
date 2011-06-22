@@ -222,9 +222,9 @@ class JobAssign:
             return False
 
         # Only if workstation - to be save for now
-        if hostStatus.host().name().startsWith("om"):
-            if self.Job.maxMemory() > (hostStatus.availableMemory() * 1000):
-                Log( 'Not enough memory on workstation.' )
+        #if hostStatus.host().name().startsWith("om"):
+        #    if self.Job.maxMemory() > (hostStatus.availableMemory() * 1024):
+        #        Log( 'Not enough memory on workstation.' )
                 #return False
 
         # memory is ok to assign
@@ -538,6 +538,7 @@ class FarmResourceSnapshot(object):
     limitsByProject = {}
     shotTimes = {}
     hostsUnused = {}
+    iteration = 10
 
     def __init__(self):
         # Regular Job/Task Info
@@ -1017,13 +1018,17 @@ SELECT * from running_shots_averagetime_2
             Project().select()
             Log("re-sorting job priorities, %s jobs to consider" % len(jobAssignList))
             jobAssignList.sort()
-            Log("clearing queueOrder")
-            Database.current().exec_("UPDATE jobstatus SET queueorder = 9999 WHERE queueorder < 9999")
+
+            if( FarmResourceSnapshot.iteration == 10 ):
+                Log("clearing queueOrder")
+                Database.current().exec_("UPDATE jobstatus SET queueorder = 9999 WHERE queueorder < 9999")
+
             queueOrder = 1
             for jobAssign in jobAssignList:
-                print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.sortKey )
+                #print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.sortKey )
                 try:
-                    Database.current().exec_("UPDATE jobstatus SET queueorder = %s WHERE fkeyjob = %s" % (queueOrder, jobAssign.Job.key()))
+                    if( FarmResourceSnapshot.iteration == 10 ):
+                        Database.current().exec_("UPDATE jobstatus SET queueorder = %s WHERE fkeyjob = %s" % (queueOrder, jobAssign.Job.key()))
                     queueOrder = queueOrder + 1
                     self.assignSingleJob(jobAssign)
                     # Recalc priority and resort job list after assignments.
@@ -1059,15 +1064,17 @@ SELECT * from running_shots_averagetime_2
             print "Finished assigning jobs, took %i" % (timer.elapsed())
             if( timer.elapsed() < 10 ): time.sleep(1)
 
-
 def run_loop():
     config.update()
-    print "Manager: Beginning Loop."
 
     # Complete Job / Host snapshot
     snapshot = FarmResourceSnapshot()
+    print "Manager: Beginning Loop. (%i)" % snapshot.iteration
     snapshot.refresh()
     snapshot.performAssignments()
+    FarmResourceSnapshot.iteration += 1
+    if FarmResourceSnapshot.iteration > 10:
+        FarmResourceSnapshot.iteration = 1
 
 def manager2():
     print "Manager: Starting up"
@@ -1083,7 +1090,6 @@ def manager3():
     print "Manager: Starting up"
     while True:
         run_loop()
-        #sys.exit(0)
 
 if VERBOSE_DEBUG:
     profile = cProfile.Profile()
