@@ -29,6 +29,24 @@ try:
     pos = sys.argv.index('-dbconfig')
     dbConfig = sys.argv[pos+1]
 except: pass
+scheduler = None
+try:
+    pos = sys.argv.index('-scheduler')
+    if pos > 0:
+        scheduler = sys.argv[pos+1]
+except: pass
+servicesInclude = None
+try:
+    pos = sys.argv.index('-servicesinclude')
+    if pos > 0:
+        servicesInclude = str.split(sys.argv[pos+1],",")
+except: pass
+servicesExclude = None
+try:
+    pos = sys.argv.index('-servicesexclude')
+    if pos > 0:
+        servicesExclude = str.split(sys.argv[pos+1],",")
+except: pass
 
 app = QCoreApplication(sys.argv)
 
@@ -63,9 +81,10 @@ hostService.enableUnique()
 class ManagerConfig:
     def update(self):
         # Sort parameters
-        #self._SORT_METHOD = Config.getString( 'assburnerSortMethod', 'key_default' )
-        #self._SORT_METHOD = 'key_user_project_soft_reserves'
-        self._SORT_METHOD = 'key_darwin'
+        if scheduler:
+            self._SORT_METHOD = 'key_'+scheduler
+        else:
+            self._SORT_METHOD = Config.getString( 'arsenalSortMethod', 'key_default' )
         try:
             JobAssign.SortMethod = getattr(JobAssign, str(self._SORT_METHOD))
             #print ("Using %s job sort method" % self._SORT_METHOD)
@@ -195,12 +214,11 @@ class JobAssign:
 
         # job memory 16GB  = 16000000
         # host memory 24GB =    24147
-        #if memoryRequired > (hostStatus.availableMemory() * 1000):
         if memoryRequired > (hostStatus.availableMemory() * 1000):
             if VERBOSE_DEBUG: Log( 'Not enough memory, %i required, %i available on %s' % (memoryRequired, hostStatus.availableMemory() * 1000, hostStatus.host().name()) )
             return False
         if self.Job.maxMemory() > (hostStatus.host().memory()*1024):
-            Log( 'Not enough memory, %i maximum, %i physical on %s' % (self.Job.maxMemory(), hostStatus.host().memory() * 1024, hostStatus.host().name()) )
+            if VERBOSE_DEBUG: Log( 'Not enough memory, %i maximum, %i physical on %s' % (self.Job.maxMemory(), hostStatus.host().memory() * 1024, hostStatus.host().name()) )
             return False
 
         # Only if workstation - to be save for now
@@ -211,7 +229,6 @@ class JobAssign:
 
         # memory is ok to assign
         return True
-
 
     def hostOk( self, hostStatus, snapshot ):
         host = hostStatus.host()
@@ -224,10 +241,6 @@ class JobAssign:
             # Check exclusive bit
             if self.Job.exclusiveAssignment():
                 if VERBOSE_DEBUG: Log( 'Cant assign exclusive job to a host that has an assignment' )
-                return False
-
-            if snapshot.hostHasExclusiveAssignment( host ):
-                if VERBOSE_DEBUG: Log( 'Host already has exclusive assignment' )
                 return False
 
         if not self.hostMemoryOk( hostStatus ):
@@ -527,9 +540,6 @@ class FarmResourceSnapshot(object):
     hostsUnused = {}
 
     def __init__(self):
-        self.reset()
-
-    def reset(self):
         # Regular Job/Task Info
         self.jobList = JobList()
         self.jobAssignByJob = {}
@@ -542,14 +552,30 @@ class FarmResourceSnapshot(object):
         self.freeHosts = {}
         self.hostStatuses = HostStatusList()
         self.hostStatusesByService = DefaultDict(HostStatusList)
-        #self.hostsUnused = {}
-        self.hostHasExclusiveAssignmentCache = {}
 
         self.licCountByService = {}
         self.potentialSlotsAvailable = 0
 
-        # User Info
-        self.refreshUserUsage()
+    def reset(self):
+        # Regular Job/Task Info
+        self.jobList.clear()
+        self.jobAssignByJob.clear()
+
+        # Service info
+        self.servicesNeeded.clear()
+        self.jobsByService.clear()
+
+        # Host Info
+        self.freeHosts.clear()
+        self.hostStatuses.clear()
+        self.hostStatusesByService.clear()
+        self.hostsUnused.clear()
+
+        self.licCountByService.clear()
+        self.potentialSlotsAvailable = 0
+
+    def refresh(self):
+        self.reset()
 
         # Project Info
         self.refreshProjectUsage()
@@ -557,11 +583,10 @@ class FarmResourceSnapshot(object):
         # Shot Info
         self.refreshShotTimes()
 
-    def hostHasExclusiveAssignment(self,host):
-        return host.key() in self.hostHasExclusiveAssignmentCache
+        # User Info
+        # no point refresh User usage if not using that scheduler..
+        #self.refreshUserUsage()
 
-    def refresh(self):
-        self.reset()
         self.refreshJobList()
         if self.jobList.isEmpty():
             return
@@ -643,15 +668,12 @@ SELECT * from running_shots_averagetime_2
 
     def refreshJobList(self):
         # Gather the jobs 
-        #self.jobList = Job.select( """JOIN jobstatus ON (keyjob=fkeyjob) 
-        #                              WHERE status IN ('ready','started') 
-        #                                AND (jobstatus.tasksUnassigned + jobstatus.tasksassigned) > 0 
-        #                                AND (coalesce(job.maxhosts,0) <= 0 OR jobstatus.hostsOnJob < job.maxHosts)""" )
         self.jobList = Job.select( """WHERE status IN ('ready','started') 
                                         AND ((SELECT count(*) FROM jobtask WHERE fkeyjob = keyjob AND status = 'new') > 0)""")
         statuses = JobStatusList()
         if self.jobList.size() > 0:
-            statuses = JobStatus.select("fkeyjob IN("+self.jobList.keyString()+")")
+            #statuses = JobStatus.select("fkeyjob IN("+self.jobList.keyString()+")")
+            statuses = self.jobList.jobStatuses()
         for job in self.jobList:
             # Create Job Assign class
             jobAssign = JobAssign(job)
@@ -669,10 +691,17 @@ SELECT * from running_shots_averagetime_2
     def refreshServiceData(self):
         # Gather required services
         for jobService in JobService.select( "JobService.fkeyJob IN (" + self.jobList.keyString() + ")" ):
-            self.addJobService(jobService.job(), jobService.service())
+            if servicesInclude:
+                if jobService.service().service() in servicesInclude:
+                    self.addJobService(jobService.job(), jobService.service())
+            elif servicesExclude:
+                if not jobService.service().service() in servicesExclude:
+                    self.addJobService(jobService.job(), jobService.service())
+            else:
+                self.addJobService(jobService.job(), jobService.service())
 
         # Filter out services that have no available licenses
-        self.licCountByService = {}
+        self.licCountByService.clear()
 
         q = Database.current().exec_("""SELECT * from license_usage_2""")
         while q.next():
@@ -693,19 +722,6 @@ SELECT * from running_shots_averagetime_2
                                                     AND HostStatus.activeAssignmentCount < coalesce(Host.maxAssignments,8)
                                                     AND HostService.enabled=true AND HostService.fkeyService IN (%s)""" % self.servicesNeeded.keyString()  )
         hosts = hostServices.hosts().unique()
-
-        # Mark which hosts already have an exclusive assignment
-        #q = Database.current().exec_( """SELECT ja.fkeyhost 
-        #                                 FROM JobAssignment ja
-        #                                 INNER JOIN Job ON ja.fkeyjob=keyjob 
-        #                                 WHERE job.exclusiveAssignment=true
-        #                                   AND ja.fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus 
-        #                                                                                 FROM jobassignmentstatus 
-        #                                                                                 WHERE status IN ('ready','copy','busy')
-        #                                                                                ) 
-        #                                   GROUP BY ja.fkeyhost""" )
-        #while q.next():
-        #    self.hostHasExclusiveAssignmentCache[q.value(0).toInt()[0]] = True
 
         if len(hosts):
             self.hostStatuses = HostStatus.select("fkeyhost IN (" + hosts.keyString() + ")")
@@ -997,7 +1013,7 @@ SELECT * from running_shots_averagetime_2
 
             if len(jobAssignList) == 0:
                 raise AllJobsAssignedException()
-            
+
             Project().select()
             Log("re-sorting job priorities, %s jobs to consider" % len(jobAssignList))
             jobAssignList.sort()
@@ -1067,7 +1083,7 @@ def manager3():
     print "Manager: Starting up"
     while True:
         run_loop()
-        sys.exit(0)
+        #sys.exit(0)
 
 if VERBOSE_DEBUG:
     profile = cProfile.Profile()
