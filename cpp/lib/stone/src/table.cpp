@@ -598,6 +598,7 @@ RecordList Table::selectMulti( TableList tables, const QString & innerWhere, con
 
 void Table::selectFields( RecordList records, FieldList fields )
 {
+    if( fields.isEmpty() || records.isEmpty() ) return;
     RecordList validRecords;
     foreach( Record r, records )
         if( r.table() == this )

@@ -273,7 +273,8 @@ protected:
 typedef QList<Field *> FieldList;
 typedef QList<Field *>::Iterator FieldIter;
 
-inline FieldList operator|(FieldList & fl, Field * f) { fl << f; return fl; }
+FieldList operator|(const FieldList & one, const FieldList & two);
+FieldList operator&(const FieldList & one, const FieldList & two);
 
 } //namespace
 

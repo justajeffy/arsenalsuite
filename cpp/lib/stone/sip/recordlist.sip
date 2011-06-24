@@ -145,6 +145,8 @@ public:
 		sipRes = new Record((*sipCpp)[a0]);
 %End
 
+    void selectFields( QList<Field*> fields = QList<Field*>(), bool refreshExisting = false );
+
 	void commit( bool newPrimaryKeys = true, bool sync = true );
 	int remove();
 

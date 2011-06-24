@@ -433,22 +433,36 @@ void RecordList::clear()
 	}
 }
 
-void RecordList::selectFields( FieldList fields )
+void RecordList::selectFields( FieldList fields, bool refreshExisting )
 {
+    //LOG_5( "size: " + QString::number(size()) );
+    bool selectAllNeeded = fields.isEmpty() && !refreshExisting;
+    if( fields.isEmpty() && refreshExisting ) return;
+
     typedef QMap<Table*,QPair<RecordList,FieldList> > TableRecordFieldMap;
     TableRecordFieldMap byTable;
     for( RecordIter it = begin(); it != end(); ++it ) {
         Record r(*it);
         Table * table = r.table();
+        FieldList fieldsByTable;
         if( byTable.contains( table ) ) {
-            byTable[table].first += r;
-            continue;
+            fieldsByTable = byTable[table].second;
+            if( selectAllNeeded )
+                fieldsByTable = fieldsByTable | r.imp()->notSelectedColumns();
+            else if( !refreshExisting )
+                fieldsByTable = fieldsByTable | (r.imp()->notSelectedColumns() & fields);
+        } else {
+            if( selectAllNeeded )
+                fieldsByTable = r.imp()->notSelectedColumns();
+            else {
+                fieldsByTable = fields & table->schema()->fields();
+                if( !refreshExisting )
+                    fieldsByTable = fieldsByTable & r.imp()->notSelectedColumns();
+            }
         }
-        FieldList fl;
-        foreach( Field * f, fields )
-            if( table->schema()->fields().contains( f ) )
-                fl += f;
-        byTable[table] = qMakePair<RecordList,FieldList>( RecordList() += r, fl );
+        //LOG_5( "fieldsByTable.size(): " + QString::number(fieldsByTable.size()) );
+        byTable[table].first += r;
+        byTable[table].second = fieldsByTable;
     }
     for( TableRecordFieldMap::Iterator it = byTable.begin(); it != byTable.end(); ++it )
         it.key()->selectFields( it.value().first, it.value().second );

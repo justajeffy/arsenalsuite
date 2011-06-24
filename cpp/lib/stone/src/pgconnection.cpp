@@ -29,6 +29,7 @@
 #include <qsqlquery.h>
 #include <qregexp.h>
 
+#include "iniconfig.h"
 #include "pgconnection.h"
 #include "table.h"
 #include "tableschema.h"
@@ -37,12 +38,19 @@ PGConnection::PGConnection()
 : QSqlDbConnection( "QPSQL7" )
 , mVersionMajor( 0 )
 , mVersionMinor( 0 )
+, mUseMultiTableSelect( false )
 {
+}
+
+void PGConnection::setOptionsFromIni( const IniConfig & ini )
+{
+    QSqlDbConnection::setOptionsFromIni( ini );
+    mUseMultiTableSelect = ini.readBool( "UseMultiTableSelect", false );
 }
 
 Connection::Capabilities PGConnection::capabilities() const
 {
-	Connection::Capabilities ret = static_cast<Connection::Capabilities>(QSqlDbConnection::capabilities() | Cap_Inheritance | Cap_MultipleInsert);// | Cap_MultiTableSelect);
+    Connection::Capabilities ret = static_cast<Connection::Capabilities>(QSqlDbConnection::capabilities() | Cap_Inheritance | Cap_MultipleInsert | (mUseMultiTableSelect ? Cap_MultiTableSelect : 0));
 	if( checkVersion( 8, 2 ) )
 		ret = static_cast<Connection::Capabilities>(ret | Cap_Returning);
 	return ret;
