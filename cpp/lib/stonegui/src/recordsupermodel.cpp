@@ -249,14 +249,14 @@ void RecordSuperModel::setupChildren( const QModelIndex & parent, const RecordLi
 	Database::current()->pushQueueRecordSignals( true );
 
 	clearChildren(parent);
-	
+
 	ModelDataTranslator * trans = translator(parent);
 	if( !trans ) trans = treeBuilder()->defaultTranslator();
 
 	const RecordDataTranslatorInterface * rdt = RecordDataTranslatorInterface::cast(trans);
 	if( rdt )
 		const_cast<RecordDataTranslatorInterface*>(rdt)->appendRecordList( rl, parent );
-	
+
 	Database::current()->popQueueRecordSignals();
 }
 

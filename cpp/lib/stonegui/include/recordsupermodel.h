@@ -51,7 +51,7 @@ class STONEGUI_EXPORT RecordDataTranslatorBase : public RecordDataTranslatorInte
 public:
 	RecordDataTranslatorBase(ModelTreeBuilder * builder) : RecordDataTranslatorInterface(builder){}
 	~RecordDataTranslatorBase() {}
-	
+
 	virtual QVariant recordData(const Record &, const QModelIndex &, int role) const;
 	virtual bool setRecordData(Record, const QModelIndex &, const QVariant &, int role);
 	virtual Qt::ItemFlags recordFlags(const Record &, const QModelIndex &) const;
@@ -64,7 +64,7 @@ public:
 	int recordColumnPos( int column, const Record & ) const;
 	bool columnIsEditable( int column ) const;
 	TableSchema * columnForeignKeyTable( int column ) const;
-	
+
 protected:
 	virtual void _virt(){}
 
@@ -90,8 +90,8 @@ template<class TYPE, class ROOT_BASE = RecordDataTranslatorBase> class TemplateR
 public:
 	typedef TemplateDataTranslator<TYPE,ROOT_BASE> BASE;
 	TemplateRecordDataTranslator(ModelTreeBuilder * builder) : BASE(builder) {}
-	
- 	QVariant modelData( void * dataPtr, const QModelIndex & idx, int role ) const {
+
+	QVariant modelData( void * dataPtr, const QModelIndex & idx, int role ) const {
 		QVariant ret = BASE::modelData(dataPtr,idx,role);
 		if( !ret.isValid() )
 			return recordData(getRecord(idx),idx,role);
@@ -209,7 +209,7 @@ public:
 	QMimeData * mimeData(const QModelIndexList &indexes) const;
 	QStringList mimeTypes() const;
 	virtual bool dropMimeData ( const QMimeData * data, Qt::DropAction action, int row, int column, const QModelIndex & parent );
-	
+
 	virtual void setupChildren( const QModelIndex & parent, const RecordList & rl );
 
 	void listen( Table * t );
@@ -219,8 +219,8 @@ public:
 	using SuperModel::insert;
 	using SuperModel::append;
 	using SuperModel::remove;
-public slots:
 
+public slots:
 	virtual QModelIndexList insert( RecordList rl, int row = 0, const QModelIndex & parent = QModelIndex(), RecordDataTranslatorInterface * trans = 0 );
 	virtual QModelIndex append( const Record &, const QModelIndex & parent = QModelIndex(), RecordDataTranslatorInterface * trans = 0 );
 	virtual QModelIndexList append( RecordList rl, const QModelIndex & parent = QModelIndex(), RecordDataTranslatorInterface * trans = 0 );
@@ -234,6 +234,10 @@ public slots:
 
 protected:
 	QModelIndexList findIndexesHelper( RecordList rl, bool recursive, const QModelIndex & index, bool retAfterOne = false, bool loadChildren = true );
+
+    int mGroupByColumn;
+    QRegExp mGroupByFilter;
+    QMap<QString, RecordList> mRecordsByGroup;
 };
 
 #endif // RECORD_SUPER_MODEL_H
