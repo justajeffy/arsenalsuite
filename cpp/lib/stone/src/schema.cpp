@@ -203,6 +203,8 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 								LOG_5( QString("Changing %1.%2 default value from %3 to %4").arg(ret->tableName()).arg(f->name()).arg(f->defaultValue().toString()).arg(defVal.toString()) );
 							f->setDefaultValue( defVal );
 						}
+                        f->setFlag( Field::DisplayName, el.attribute("displayName") == "true" );
+                        f->setFlag( Field::NoDefaultSelect, el.attribute("noDefaultSelect") == "true" );
 					}
 				}
 			}

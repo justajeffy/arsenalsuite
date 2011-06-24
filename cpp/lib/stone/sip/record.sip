@@ -116,17 +116,23 @@ public:
 	MappedRecord & setColumnLiteral( const QString & column, const QString & literal );
 	
 	MappedRecord & setForeignKey( const QString & column, const Record & other );
+    MappedRecord & setForeignKey( Field * field, const Record & other );
 	MappedRecord foreignKey( const QString & column ) const;
 	MappedRecord foreignKey( int column ) const;
+    MappedRecord foreignKey( Field * field ) const;
 
 	QString columnLiteral( const QString & column ) const;
 	
 	QVariant getValue( int column ) const;
+    QVariant getValue( Field * field ) const;
 
 	MappedRecord & setValue( int column, const QVariant & value );
+    MappedRecord & setValue( Field * field, const QVariant & value );
 
 	QString stateString() const;
 	QString dump() const;
+
+    void selectFields( QList<Field*> fields );
 
 	int remove();
 

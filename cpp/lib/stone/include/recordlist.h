@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordlist.h 9359 2010-02-16 06:20:33Z brobison $
+ * $Id$
  */
 
 #ifndef RECORD_LIST_H
@@ -186,6 +186,8 @@ public:
 	/// Returns the number of records in the list
 	uint count() const;
 
+    void selectFields( FieldList fields );
+
 	/// Calls Record::commit() on each record in this list.
 	void commit( bool newPrimaryKeys = true, bool sync = true );
 
@@ -198,10 +200,12 @@ public:
 	/// the returned value after calling getValue( \param column )
 	/// on each value in this list.
 	QList<QVariant> getValue( const QString & column ) const;
+    QList<QVariant> getValue( Field * f ) const;
 
 	/// Calls Record::setValue( \param column, \param value ) on
 	/// each record in this list.
 	void setValue( const QString & column, const QVariant & value );
+    void setValue( Field * f, const QVariant & value );
 
 	/// Returns a QList<QVariant> list of values, filled with
 	/// the returned value after calling getValue( \param column )
@@ -215,9 +219,11 @@ public:
 	/// Returns the return values of Record::foreignKey for each record.
 	RecordList foreignKey( int column ) const;
 	RecordList foreignKey( const QString & column ) const;
+    RecordList foreignKey( Field * f ) const;
 
 	RecordList & setForeignKey( int column, const Record & fkey );
 	RecordList & setForeignKey( const QString & column, const Record & fkey );
+    RecordList & setForeignKey( Field * f, const Record & fkey );
 
 	/// Calls Record::setColumnLiteral(\param column,\param value) on
 	/// each record in this list.

@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: table.cpp 9368 2010-02-18 00:37:39Z brobison $
+ * $Id$
  */
 
 #include <qapplication.h>
@@ -594,6 +594,19 @@ RecordList Table::selectMulti( TableList tables, const QString & innerWhere, con
 	}
 
 	return ret;
+}
+
+void Table::selectFields( RecordList records, FieldList fields )
+{
+    RecordList validRecords;
+    foreach( Record r, records )
+        if( r.table() == this )
+            validRecords += r;
+    FieldList validFields, myFields( schema()->columns() );
+    foreach( Field * f, fields )
+        if( myFields.contains( f ) )
+            validFields += f;
+    connection()->selectFields( this, validRecords, validFields );
 }
 
 bool Table::insert( const RecordList & rl, bool newPrimaryKey )
