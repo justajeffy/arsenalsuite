@@ -186,7 +186,7 @@ public:
 	/// Returns the number of records in the list
 	uint count() const;
 
-    void selectFields( FieldList fields );
+    void selectFields( FieldList fields = FieldList(), bool refreshExisting = false );
 
 	/// Calls Record::commit() on each record in this list.
 	void commit( bool newPrimaryKeys = true, bool sync = true );
@@ -237,7 +237,7 @@ public:
 	QList<uint> keys( int idx=-1 ) const;
 
 	/// Returns a comma separated list of primary keys
-	QString	keyString() const;
+	QString keyString() const;
 
 	/// Returns a RecordIter object that points to the
 	/// first record in this list.

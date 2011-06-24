@@ -386,9 +386,18 @@ bool Record::isUpdated() const
 	return (mImp && (mImp->mState & RecordImp::MODIFIED));
 }
 
-void Record::selectFields( FieldList fields )
+void Record::selectFields( FieldList fields, bool refreshExisting )
 {
-    table()->selectFields( RecordList(*this), fields );
+    if( isRecord() ) {
+        if( !refreshExisting ) {
+            if( fields.size() )
+                fields = fields & mImp->notSelectedColumns();
+            else
+                fields = mImp->notSelectedColumns();
+        }
+        if( fields.size() )
+            table()->selectFields( RecordList(*this), fields );
+    }
 }
 
 Record & Record::reload( bool lockForUpdate )

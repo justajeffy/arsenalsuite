@@ -40,7 +40,9 @@ class STONE_EXPORT PGConnection : public QSqlDbConnection
 {
 public:
 	PGConnection();
-	
+
+    virtual void setOptionsFromIni( const IniConfig & );
+
 	virtual Capabilities capabilities() const;
 
 	virtual bool reconnect();
@@ -85,6 +87,7 @@ protected:
 
 	QHash<TableSchema*,QString> mSqlFields;
 	int mVersionMajor, mVersionMinor;
+    bool mUseMultiTableSelect;
 };
 
 #endif // PG_CONNECTION_H

@@ -374,6 +374,23 @@ void RecordImp::clearModifiedBits()
     clearBitArray( mModifiedBits, mTable->schema()->fieldCount() );
 }
 
+bool RecordImp::isColumnSelected( uint col )
+{
+       return !getBit( mNotSelectedBits, col );
+}
+
+FieldList RecordImp::notSelectedColumns()
+{
+    FieldList ret;
+    if( mTable && mNotSelectedBits ) {
+        FieldList fields = mTable->schema()->fields();
+        for( int i = 0; i < fields.size(); ++i )
+            if( getBit( mNotSelectedBits, i ) )
+                ret += fields[i];
+    }
+    return ret;
+}
+
 RecordImp * RecordImp::setColumnLiteral( uint col, bool literal )
 {
 	if( !literal && !mLiterals )

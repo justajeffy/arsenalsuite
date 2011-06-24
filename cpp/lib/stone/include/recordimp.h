@@ -142,11 +142,14 @@ public:
 	void setColumnModified( uint col, bool modified );
 	bool isColumnModified( uint col ) const;
 	void clearModifiedBits();
-	
+
+    bool isColumnSelected( uint col );
+    FieldList notSelectedColumns();
+
 	RecordImp * setColumnLiteral( uint col, bool modified );
 	bool isColumnLiteral( uint col ) const;
 	void clearColumnLiterals();
-	
+
 	enum {
 		NEWRECORD = 0,
 		COMMITTED = 1,

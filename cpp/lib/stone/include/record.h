@@ -137,7 +137,11 @@ public:
 	QString dump() const;
 	QString changeString() const;
 
-    void selectFields( FieldList fields );
+    // If refreshExisting is false, only fields in the list are selected that
+    // have not previously been selected, otherwise all fields in the list are
+    // selected.  If fields is empty and refreshExisting is false, all unselected
+    // fields are selected.
+    void selectFields( FieldList fields = FieldList(), bool refreshExisting = false );
 
 	/// Removes this record from the database and indexes
 	/// return value of -1 indicates error. 0 indicates that
