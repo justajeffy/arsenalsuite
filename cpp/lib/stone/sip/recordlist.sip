@@ -149,7 +149,9 @@ public:
 	int remove();
 
 	QList<QVariant> getValue( const QString & column );
+    QList<QVariant> getValue( Field * f ) const;
 	void setValue( const QString & column, const QVariant & value );
+    void setValue( Field * f, const QVariant & value );
 
 	QList<QVariant> getValue( int column );
 	void setValue( int column, const QVariant & value );
@@ -158,6 +160,11 @@ public:
 
 	MappedRecordList foreignKey( int column ) const;
 	MappedRecordList foreignKey( const QString & column ) const;
+    MappedRecordList foreignKey( Field * f ) const;
+ 
+    MappedRecordList setForeignKey( int column, const Record & fkey );
+    MappedRecordList setForeignKey( const QString & column, const Record & fkey );
+    MappedRecordList setForeignKey( Field * f, const Record & fkey );
 
 	void setColumnLiteral( const QString & column, const QString & value );
 

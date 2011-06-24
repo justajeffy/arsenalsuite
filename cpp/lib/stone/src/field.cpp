@@ -214,6 +214,9 @@ static FlagMap sFlagMap [] =
 	{ Field::Unique, "Unique" },
 	{ Field::LocalVariable, "LocalVariable" },
 	{ Field::ReverseAccess, "ReverseAccess" },
+    { Field::DisplayName, "DisplayName" },
+    { Field::NoDefaultSelect, "NoDefaultSelect" },
+    { Field::Compress, "Compress" },
 	{ Field::None, 0 }
 };
 

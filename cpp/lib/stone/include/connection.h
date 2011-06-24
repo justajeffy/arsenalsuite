@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: connection.h 8509 2009-06-24 08:33:50Z brobison $
+ * $Id$
  */
 
 #ifndef CONNECTION_H
@@ -161,6 +161,8 @@ public:
 		const QString & /*innerWhere*/ = QString::null, const QList<QVariant> & /*innerArgs*/ = QList<QVariant>(),
 		const QString & /*outerWhere*/ = QString::null, const QList<QVariant> & /*outerArgs*/ = QList<QVariant>() )
 	{ return QMap<Table*,RecordList>(); }
+
+    virtual void selectFields( Table * table, RecordList, FieldList ) = 0;
 
 	/// inserts a RecordList into the database, by default use the sequence to 
 	/// generate a new primary key

@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: record.h 9359 2010-02-16 06:20:33Z brobison $
+ * $Id$
  */
 
 #ifndef RECORD_H
@@ -107,30 +107,37 @@ public:
 
 	Record & setForeignKey( const QString & column, const Record & other );
 	Record & setForeignKey( int column, const Record & other );
+    Record & setForeignKey( Field * field, const Record & other );
+
 	Record foreignKey( const QString & column ) const;
 	Record foreignKey( int column ) const;
+    Record foreignKey( Field * field ) const;
 
 	/// Sets the column to a literal SQL value that will be used for
 	/// the next update/commit.  A null QString will clear the literal
 	/// for this column.
 	Record & setColumnLiteral( const QString & column, const QString & literal );
-	
+
 	/// Returns the literal value assigned to this column.
 	/// Returns QString::null if there is none.
 	QString columnLiteral( const QString & column ) const;
-	
+
 	/// Gets or sets the value in the column at position 'column'
 	/// Column positions are not guaranteed to be in any
 	/// particular order
 	QVariant getValue( int column ) const;
+    QVariant getValue( Field * field ) const;
 
 	Record & setValue( int column, const QVariant & value );
+    Record & setValue( Field * field, const QVariant & value );
 
 	QString stateString() const;
 
 	// human readable output
 	QString dump() const;
 	QString changeString() const;
+
+    void selectFields( FieldList fields );
 
 	/// Removes this record from the database and indexes
 	/// return value of -1 indicates error. 0 indicates that

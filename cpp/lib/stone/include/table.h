@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: table.h 8589 2009-07-16 00:09:30Z brobison $
+ * $Id$
  */
 
 #ifndef TABLE_H
@@ -158,6 +158,8 @@ public:
 	RecordList selectOnly( const QString & where, const VarList & args = VarList(), bool needResults = true, bool cacheIncoming = false );
 	RecordList selectMulti( TableList tables, const QString & innerWhere, const VarList & innerArgs = VarList(),
 			const QString & outerWhere = QString(), const VarList & outerArgs = VarList(), bool needResults = true, bool cacheIncoming = false );
+
+    void selectFields( RecordList, FieldList );
 
 	/**
 	 * Inserts the record into the database
