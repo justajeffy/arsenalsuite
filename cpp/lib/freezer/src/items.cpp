@@ -642,6 +642,8 @@ int JobItem::compare( const QModelIndex & a, const QModelIndex & b, int col, boo
 		Interval otiq( other.job.submittedts(), other.job.endedts().isNull() ? QDateTime::currentDateTime() : other.job.endedts() );
 		return compareRetI( tiq, otiq );
 	}
+    else if( col == 20 )
+		return compareRetI( jobStatus.averageMemory(), other.jobStatus.averageMemory() );
 	return ItemBase::compare( a, b, col, asc );
 }
 
@@ -663,8 +665,7 @@ JobTreeBuilder::JobTreeBuilder( SuperModel * parent )
 bool JobTreeBuilder::hasChildren( const QModelIndex & parentIndex, SuperModel * model )
 {
 	if( JobTranslator::isType(parentIndex) ) {
-		JobModel * jmodel = (JobModel*)model;
-		return jmodel->isDependencyTreeEnabled() && JobDep::recordsByJob( jmodel->getRecord(parentIndex) ).size() > 0;
+		return ((JobModel*)model)->isDependencyTreeEnabled() && JobDep::recordsByJob( ((JobModel*)model)->getRecord(parentIndex) ).size() > 0;
 	}
 	return false;
 }
