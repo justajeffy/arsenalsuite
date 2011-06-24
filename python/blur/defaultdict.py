@@ -34,4 +34,4 @@ if __name__ == "__main__":
 
 	test4 = DefaultDict( int, True )
 	print test4[1]
-	
+
