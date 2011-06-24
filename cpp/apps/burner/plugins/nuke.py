@@ -61,7 +61,7 @@ class NukeBurner(JobBurner):
             self.jobErrored("process exited before frame was complete")
 
     def environment(self):
-        env = self.Job.environment()
+        env = self.Job.environment().environment()
         Log( "NukeBurner::environment(): %s" % env )
         return env.split("\n")
 
