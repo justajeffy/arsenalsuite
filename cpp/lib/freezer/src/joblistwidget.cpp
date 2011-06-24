@@ -515,7 +515,7 @@ void JobListWidget::customEvent( QEvent * evt )
 
 			// Default to showing all of the services and job types
 			if( mJobFilter.typeToShow.isEmpty() )
-                mJobFilter.typeToShow = mJobTypeList.filter( "fkeyparentjobtype", QVariant() ).keyString().split(',',QString::SkipEmptyParts);
+                mJobFilter.typeToShow = mJobTypeList.filter( "fkeyparentjobtype", QVariant(), false ).keyString().split(',',QString::SkipEmptyParts);
 			else
                 mJobFilter.typeToShow = verifyKeyList( mJobFilter.typeToShow.join(","), JobType::table() ).split(',',QString::SkipEmptyParts);
 			// If we haven't retrieved the static data, then mJobTaskRunning indicates
