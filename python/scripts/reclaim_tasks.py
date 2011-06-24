@@ -50,7 +50,7 @@ class RTConfig:
 def ping(hostName):
 	pingcmd = "ping -c 3 %s 2>&1 > /dev/null" % hostName
 	return os.system(pingcmd) == 0
-	
+
 # check for dead pulse/hung status
 # 	any host that hasn't given pulse or changed status in 10 minutes, 
 # 	reset host and reclaim job frames and send note to it@
@@ -71,121 +71,128 @@ def dbTime():
 	q = Database.current().exec_("SELECT now();")
 	if q.next():
 		return q.value(0).toDateTime()
-	LOG_5( "Database Time select failed" )
+	Log( "Database Time select failed" )
 	return QDateTime.currentDateTime()
 
 while True:
-	hostService.pulse()
-	service.reload()
-	if True: #service.enabled() and hostService.enabled():
-		config.update()
-		
-		waywardAssignments = JobAssignment.select( "WHERE fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus from jobassignmentstatus WHERE status in ('ready','copy','busy')) AND (fkeyjob NOT IN (SELECT keyjob from job where status IN ('ready','started')) OR fkeyhost NOT IN (SELECT fkeyhost from hoststatus WHERE slavestatus IN ('ready')))" )
-		
-		for ass in waywardAssignments:
-			job = ass.job()
-			host = ass.host()
-			print ("Assignment is wayward, %i:%s for job %i:%s assigned to host %i:%s" % ( ass.key(), ass.jobAssignmentStatus().status(), job.key(), job.status(), host.key(), host.hostStatus().slaveStatus() ) )
-			Database.current().exec_( "SELECT cancel_job_assignment(%i)" % ass.key() )
-		
-		waywardTaskAssignments = JobTaskAssignment.select( "WHERE fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus from jobassignmentstatus WHERE status in ('ready','copy','busy')) AND fkeyjobassignment NOT IN (SELECT keyjobassignment FROM jobassignment WHERE fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus from jobassignmentstatus WHERE status in ('ready','copy','busy')))")
-		for taskAss in waywardTaskAssignments:
-			ass = taskAss.jobAssignment()
-			job = ass.job()
-			host = ass.host()
-			print ("Task Assignment is wayward, %i:%s for job %i:%s assigned to host %i:%s" % ( taskAss.key(), taskAss.jobAssignmentStatus().status(), job.key(), job.status(), host.key(), host.hostStatus().slaveStatus() ) )
-			taskAss.setJobAssignmentStatus( JobAssignmentStatus.recordByName( 'cancelled' ) )
+    hostService.pulse()
+    service.reload()
+    config.update()
 
-		waywardTasks = JobTask.select( """
-        JOIN jobtaskassignment ON keyjobtaskassignment = fkeyjobtaskassignment 
-        WHERE status IN ('assigned','busy') 
-        AND fkeyjobtaskassignment NOT IN (SELECT keyjobtaskassignment 
-                                          FROM jobtaskassignment 
-                                          WHERE fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus 
-                                          FROM jobassignmentstatus 
-                                          WHERE status in ('ready','copy','busy')))""" )
+    Log( "=== retrieving wayward assignments ===" )
+    waywardAssignments = JobAssignment.select( "WHERE fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus from jobassignmentstatus WHERE status in ('ready','copy','busy')) AND (fkeyjob NOT IN (SELECT keyjob from job where status IN ('ready','started')) OR fkeyhost NOT IN (SELECT fkeyhost from hoststatus WHERE slavestatus IN ('ready')))" )
 
-		waywardTasksByJob = waywardTasks.groupedBy("fkeyjob")
-		for jobKey, tasks in waywardTasksByJob.iteritems():
-			job = Job(int(jobKey))
-			tasks = JobTaskList(tasks)
-			msg = "Returning %i tasks from job %s" % (tasks.size(),job.name())
-			print msg
-			Notification.create('reclaim_tasks','hung frames', ('Job %s has %i hung frames' % (job.name(), tasks.size())), msg)
-			tasks.setStatuses('new')
-			if job.packetType() != 'preassigned':
-				tasks.setHosts( Host() )
-			tasks.commit()
-		
-		selectStartTime = dbTime()
-		q = Database.current().exec_("SELECT * FROM get_wayward_hosts_2('%s'::interval,'%s'::interval)" % (Interval(config.pulse_period).toString(), Interval(config.loop_time).toString()))
-		while q.next():
-			fkeyhost = q.value(0).toInt()[0]
-			reason = q.value(1).toInt()[0] # 1 - Stale status, 2 - Stale pulse
-			
-			host = Host(fkeyhost)
-			status = host.hostStatus().reload()
-			
-			# Double check to see if the problem host is already up-to-date
-			if reason == 1:
-				if status.lastStatusChange() > selectStartTime:
-					continue
-			else:
-				if status.slavePulse() > selectStartTime:
-					continue
-			
-			print "host %s looks fucked, returning tasks" % (host.name())
-			
-			lastPulseInterval = Interval(status.slavePulse(),selectStartTime)
-			msg = QStringList()
-			msg << ("Host: " + host.name())
-			msg << ("Assburner Version:" + host.abVersion())
-			msg << ("keyHost: " + str(host.key()))
-			msg << ("Status: " + status.slaveStatus())
-			msg << ("Time since status change: " + Interval(status.lastStatusChange(),selectStartTime).toString())
-			msg << ("Time since pulse: " + lastPulseInterval.toString())
-			alive = ping(host.name())
-			pingText = "Yes"
-			if not alive: pingText = "No"
-			msg << ("Ping Response: " + pingText)
-			
-			assignments = host.activeAssignments()
-			for ja in assignments:
-				job = ja.job()
-				msg << ("Job: " + str(job.key()) + ", " + job.name())
-				msg << ("Job Type: " + job.jobType().name())
-			status.returnSlaveFrames(True)
-			
-			nextStatus = 'no-ping'
-			if alive:
-				nextStatus = 'no-pulse'
-			
-			msg << ""
-			msg << ("Setting status: " + nextStatus)
-			
-			n = Notification.create( 'reclaim_tasks', 'wayward host', '%s is wayward' % host.name(), msg.join("\n") )
-				
-			status.setSlaveStatus(nextStatus).commit()
-			
-			total_hosts += 1
-		
-		Log("total_hosts: %i" % total_hosts)
-	
-		cdt = QDateTime.currentDateTime()
-		if lastPingSweepTime.daysTo( cdt ) > 0:
-			lastPingSweepTime = cdt
-			
-			for hs in HostStatus.select( "slavestatus in ('no-pulse','no-ping') or slavestatus IS NULL" ):
-				hostName = hs.host().name()
-				alive = ping(hostName)
-				nextStatus = 'no-ping'
-				if alive:
-					nextStatus = 'no-pulse'
-				# Ensure it's status hasn't already changed
-				if nextStatus != hs.slaveStatus() and str(hs.reload().slaveStatus()) in ('no-pulse','no-ping',''):
-					print "Updating %s slave status from %s to %s" % (hostName, hs.slaveStatus(), nextStatus)
-					hs.setSlaveStatus(nextStatus).commit()
-	
-	# Run every 15 min
-	time.sleep(60 * 10)
+    for ass in waywardAssignments:
+        job = ass.job()
+        host = ass.host()
+        print ("Assignment is wayward, %i:%s for job %i:%s assigned to host %i:%s" % ( ass.key(), ass.jobAssignmentStatus().status(), job.key(), job.status(), host.key(), host.hostStatus().slaveStatus() ) )
+        Database.current().exec_( "SELECT cancel_job_assignment(%i)" % ass.key() )
+
+    Log( "=== retrieving wayward task assignments ===" )
+    waywardTaskAssignments = JobTaskAssignment.select( """
+    JOIN jobassignment ON fkeyjobassignment=keyjobassignment AND jobassignment.fkeyjobassignmentstatus > 3 
+    WHERE jobtaskassignment.fkeyjobassignmentstatus < 4""")
+
+    for taskAss in waywardTaskAssignments:
+        ass = taskAss.jobAssignment()
+        job = ass.job()
+        host = ass.host()
+        print ("Task Assignment is wayward, %i:%s for job %i:%s assigned to host %i:%s" % ( taskAss.key(), taskAss.jobAssignmentStatus().status(), job.key(), job.status(), host.key(), host.hostStatus().slaveStatus() ) )
+        taskAss.setJobAssignmentStatus( JobAssignmentStatus.recordByName( 'cancelled' ) )
+
+    Log( "=== retrieving wayward tasks ===" )
+    waywardTasks = JobTask.select( """
+    JOIN jobtaskassignment ON keyjobtaskassignment = fkeyjobtaskassignment 
+    WHERE status IN ('assigned','busy') 
+    AND fkeyjobtaskassignment NOT IN (SELECT keyjobtaskassignment 
+                                      FROM jobtaskassignment 
+                                      WHERE fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus 
+                                      FROM jobassignmentstatus 
+                                      WHERE status in ('ready','copy','busy')))""" )
+
+    waywardTasksByJob = waywardTasks.groupedBy("fkeyjob")
+    for jobKey, tasks in waywardTasksByJob.iteritems():
+        job = Job(int(jobKey))
+        tasks = JobTaskList(tasks)
+        msg = "Returning %i tasks from job %s" % (tasks.size(),job.name())
+        print msg
+        Notification.create('reclaim_tasks','hung frames', ('Job %s has %i hung frames' % (job.name(), tasks.size())), msg)
+        tasks.setStatuses('new')
+        if job.packetType() != 'preassigned':
+            tasks.setHosts( Host() )
+        tasks.commit()
+
+    Log( "=== retrieving wayward hosts ===" )
+    selectStartTime = dbTime()
+    q = Database.current().exec_("SELECT * FROM get_wayward_hosts_2('%ss'::interval,'%ss'::interval)" % (config.pulse_period, config.loop_time))
+    while q.next():
+        fkeyhost = q.value(0).toInt()[0]
+        reason = q.value(1).toInt()[0] # 1 - Stale status, 2 - Stale pulse
+
+        host = Host(fkeyhost)
+        status = host.hostStatus().reload()
+
+        # Double check to see if the problem host is already up-to-date
+        if reason == 1:
+            if status.lastStatusChange() > selectStartTime:
+                continue
+        else:
+            if status.slavePulse() > selectStartTime:
+                continue
+
+        print "host %s looks fucked, returning tasks - slave last pulsed at %s" % (host.name(), status.slavePulse().toString())
+        continue
+
+        lastPulseInterval = Interval(status.slavePulse(),selectStartTime)
+        msg = QStringList()
+        msg << ("Host: " + host.name())
+        msg << ("Assburner Version:" + host.abVersion())
+        msg << ("keyHost: " + str(host.key()))
+        msg << ("Status: " + status.slaveStatus())
+        msg << ("Time since status change: " + Interval(status.lastStatusChange(),selectStartTime).toString())
+        msg << ("Time since pulse: " + lastPulseInterval.toString())
+        alive = ping(host.name())
+        pingText = "Yes"
+        if not alive: pingText = "No"
+        msg << ("Ping Response: " + pingText)
+
+        assignments = host.activeAssignments()
+        for ja in assignments:
+            job = ja.job()
+            msg << ("Job: " + str(job.key()) + ", " + job.name())
+            msg << ("Job Type: " + job.jobType().name())
+        status.returnSlaveFrames(True)
+
+        nextStatus = 'no-ping'
+        if alive:
+            nextStatus = 'no-pulse'
+
+        msg << ""
+        msg << ("Setting status: " + nextStatus)
+
+        n = Notification.create( 'reclaim_tasks', 'wayward host', '%s is wayward' % host.name(), msg.join("\n") )
+
+        status.setSlaveStatus(nextStatus).commit()
+
+        total_hosts += 1
+
+    Log("total_hosts: %i" % total_hosts)
+
+    cdt = QDateTime.currentDateTime()
+    if lastPingSweepTime.daysTo( cdt ) > 0:
+        lastPingSweepTime = cdt
+
+        for hs in HostStatus.select( "slavestatus in ('no-pulse','no-ping') or slavestatus IS NULL" ):
+            hostName = hs.host().name()
+            alive = ping(hostName)
+            nextStatus = 'no-ping'
+            if alive:
+                nextStatus = 'no-pulse'
+            # Ensure it's status hasn't already changed
+            if nextStatus != hs.slaveStatus() and str(hs.reload().slaveStatus()) in ('no-pulse','no-ping',''):
+                print "Updating %s slave status from %s to %s" % (hostName, hs.slaveStatus(), nextStatus)
+                hs.setSlaveStatus(nextStatus).commit()
+
+    # Run every 15 min
+    time.sleep(60 * 10)
 
