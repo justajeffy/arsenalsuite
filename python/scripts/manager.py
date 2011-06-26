@@ -327,20 +327,22 @@ class JobAssign:
         reserve_used = min(100, int(float(FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)) / float(max(1,self.Job.project().arsenalSlotReserve())) * 100))
 
         # important things will take precedence within a department, but not over everything
-        important = 99
+        important = 55
         if(self.Job.priority() <= 30): important = self.Job.priority()
+        if(self.Job.priority() >= 60): important = self.Job.priority()
 
         shotTimeKey = "%s-%s" % (self.Job.shotName(),  self.Job.project().name())
+        #avgTime = min(1, int(self.JobStatus.errorCount()/5.0)) * FarmResourceSnapshot.shotTimes.get(shotTimeKey, 99999999)
         avgTime = FarmResourceSnapshot.shotTimes.get(shotTimeKey, 99999999)
 
         hasTensRunning = 0
         tensRunning = self.JobStatus.tasksDone() + self.JobStatus.tasksAssigned() + self.JobStatus.tasksBusy()
-        if( float(tensRunning) / float(self.JobStatus.tasksCount()) > 0.1 ):
+        if( float(tensRunning) / float(self.JobStatus.tasksCount()) >= 0.1 ):
             hasTensRunning = 1
 
         hasTensComplete = 1
         tensComplete = self.JobStatus.tasksDone()
-        if( float(tensComplete) / float(self.JobStatus.tasksCount()) > 0.1 ):
+        if( float(tensComplete) / float(self.JobStatus.tasksCount()) >= 0.1 ):
             hasTensComplete = 0
 
         # bone sez... within a particular shot, prefer slower passes first
@@ -642,28 +644,22 @@ SELECT * from project_slots_current
                                     """)
         while q.next():
             key = q.value(0).toString()
-            value = q.value(1).toInt()[0]
-            self.slotsByProject[key] = value
-
-        q2 = Database.current().exec_("""
-SELECT * from project_slots_limits
-                                    """)
-        while q2.next():
-            key = q2.value(0).toString()
-            limit = q2.value(1).toInt()[0]
-            reserve = q2.value(2).toInt()[0]
+            current = q.value(1).toInt()[0]
+            reserve = q.value(2).toInt()[0]
+            limit = q.value(3).toInt()[0]
+            self.slotsByProject[key] = current
             self.limitsByProject[key] = [limit, reserve]
 
     def refreshShotTimes(self):
         self.shotTimes.clear()
 
         q = Database.current().exec_("""
-SELECT * from running_shots_averagetime_2
+SELECT * from running_shots_averagetime_3
                                     """)
         while q.next():
             shot = q.value(0).toString()
             project = q.value(1).toString()
-            value = q.value(2).toDouble()[0]
+            value = q.value(2).toInt()[0]
             key = "%s-%s" % (shot, project)
             self.shotTimes[key] = int(value)
 
@@ -1019,15 +1015,15 @@ SELECT * from running_shots_averagetime_2
             Log("re-sorting job priorities, %s jobs to consider" % len(jobAssignList))
             jobAssignList.sort()
 
-            if( FarmResourceSnapshot.iteration == 10 ):
+            if( FarmResourceSnapshot.iteration % 10 == 0 ):
                 Log("clearing queueOrder")
                 Database.current().exec_("UPDATE jobstatus SET queueorder = 9999 WHERE queueorder < 9999")
 
             queueOrder = 1
             for jobAssign in jobAssignList:
-                #print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.sortKey )
+                print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.sortKey )
                 try:
-                    if( FarmResourceSnapshot.iteration == 10 ):
+                    if( FarmResourceSnapshot.iteration % 10 == 0 ):
                         Database.current().exec_("UPDATE jobstatus SET queueorder = %s WHERE fkeyjob = %s" % (queueOrder, jobAssign.Job.key()))
                     queueOrder = queueOrder + 1
                     self.assignSingleJob(jobAssign)
@@ -1073,8 +1069,8 @@ def run_loop():
     snapshot.refresh()
     snapshot.performAssignments()
     FarmResourceSnapshot.iteration += 1
-    if FarmResourceSnapshot.iteration > 10:
-        FarmResourceSnapshot.iteration = 1
+    if FarmResourceSnapshot.iteration > 110:
+        sys.exit(0)
 
 def manager2():
     print "Manager: Starting up"
