@@ -54,7 +54,6 @@ ProjectList JobListWidget::mProjectList;
 
 JobListWidget::JobListWidget( QWidget * parent )
 : FreezerView( parent )
-//, mJobFilterEdit( 0 )
 , mToolBar( 0 )
 , mViewsInitialized( false )
 , mJobTaskRunning( false )
@@ -130,9 +129,6 @@ void JobListWidget::initializeViews()
         NewViewFromSelectionAction = new QAction( "New View From Selection", this );
 		NewViewFromSelectionAction->setIcon( QIcon( ":/images/newview" ) );
         connect( NewViewFromSelectionAction, SIGNAL( triggered(bool) ), SLOT( createNewViewFromSelection() ) );
-
-        //mJobFilterEdit = new JobFilterEdit( this );
-        //connect( mJobFilterEdit, SIGNAL( filterChanged( const QString & ) ), SLOT( jobFilterChanged( const QString & ) ) );
 
         connect( RefreshAction, SIGNAL( triggered(bool) ), SLOT( refresh() ) );
 
@@ -260,8 +256,6 @@ void JobListWidget::initializeViews()
                 mJobFilter.allProjectsShown = true;
         }
         mJobFilter.showNonProjectJobs = ini.readBool( "ShowNonProjectJobs", true );
-        //mJobFilterEdit->lineEdit()->setText(ini.readString( "ExtraFilterText", "" ));
-        //mJobFilter.mExtraFilters = mJobFilterEdit->sqlFilter();
         mJobFilter.mLimit = options.mLimit;
         applyOptions();
     }
@@ -280,7 +274,6 @@ void JobListWidget::save( IniConfig & ini )
         ini.removeKey( "HiddenProjects" );
         ini.writeBool( "AllProjectsShown", mJobFilter.allProjectsShown );
         ini.writeBool( "ShowNonProjectJobs", mJobFilter.showNonProjectJobs );
-        //ini.writeString( "ExtraFilters", mJobFilterEdit->lineEdit()->text() );
         ini.writeString( "TypeToShow", mJobFilter.typeToShow.join(",") );
         ini.writeBool( "DependencyTreeEnabled", isDependencyTreeEnabled() );
         ini.writeBool( "Filter", FilterAction->isChecked() );
@@ -564,7 +557,6 @@ QToolBar * JobListWidget::toolBar( QMainWindow * mw )
 		mToolBar->addAction( ShowMineAction );
 		mToolBar->addSeparator();
 		mToolBar->addAction( DependencyTreeEnabledAction );
-		//mToolBar->addWidget( mJobFilterEdit );
 	}
 	return mToolBar;
 }
@@ -804,20 +796,15 @@ void JobListWidget::currentTabChanged()
 void JobListWidget::clearErrors()
 {
     Database::current()->exec("UPDATE JobError SET cleared=true WHERE fkeyJob IN(" + mJobTree->selection().keyString() + ")");
-    foreach( Job job, mJobTree->selection() ) {
-        JobHistory jh;
-        jh.setMessage( "All errors cleared" );
-        jh.setUser( User::currentUser() );
-        jh.setHost( Host::currentHost() );
-        jh.setJob( job );
-        jh.setType( JobHistoryType::recordByName( "info" ) );
-        jh.commit();
-    }
+    foreach( Job job, mJobTree->selection() )
+        job.addHistory( "All errors cleared" );
 }
 
 void JobListWidget::restartJobs()
 {
-	Job::updateJobStatuses( mJobTree->selection(), "verify", true );
+    Job::updateJobStatuses( mJobTree->selection(), "verify", true );
+    foreach( Job job, mJobTree->selection() )
+        job.addHistory( "Job Restarted" );
 }
 
 void JobListWidget::resumeJobs()
@@ -853,8 +840,6 @@ void JobListWidget::showMine(bool sm)
 
 	/* Refresh the list */
 	refresh();
-
-	//refreshFilters();
 }
 
 void JobListWidget::jobFilterChanged( const QString & jobFilter )
@@ -871,6 +856,7 @@ void JobListWidget::frameSelected( const Record & frameRecord )
 		mImageView->setImageNumber( frameNumber );
 	}
 }
+
 void JobListWidget::frameListSelectionChanged()
 {
 	JobTaskList jtl = mFrameTree->selection();
