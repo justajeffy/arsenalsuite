@@ -136,22 +136,51 @@ HostServiceModel::HostServiceModel( QObject * parent )
 {
 	new HostServiceTranslator(treeBuilder());
 
+    connect( HostService::table(), SIGNAL( added(RecordList) ), SLOT( hostServicesAdded(RecordList) ) );
+    connect( HostService::table(), SIGNAL( removed(RecordList) ), SLOT( hostServicesRemoved(RecordList) ) );
+    connect( HostService::table(), SIGNAL( updated(Record,Record) ), SLOT( hostServiceUpdated(Record,Record) ) );
+
 	// Set HostService index to cache
 	updateServices();
 }
+
+void HostServiceModel::hostServicesAdded(RecordList rl)
+{
+    HostServiceList hsl(rl);
+    HostList hosts = hsl.hosts();
+    mHostServices += hsl;
+    mHostServicesByHost = mHostServices.groupedByForeignKey<Host,HostServiceList>("fkeyhost");
+    updateHosts(hosts);
+    }
+
+void HostServiceModel::hostServicesRemoved(RecordList rl)
+{
+    HostServiceList hsl(rl);
+    HostList hosts = hsl.hosts();
+    mHostServices -= hsl;
+    mHostServicesByHost = mHostServices.groupedByForeignKey<Host,HostServiceList>("fkeyhost");
+    updateHosts(hosts);
+}
+
+void HostServiceModel::hostServiceUpdated(Record up, Record)
+{
+    QModelIndex idx = findIndex(up);
+    dataChanged( idx.sibling( idx.row(), 0 ), idx.sibling( idx.row(), columnCount() - 1 ) );
+}
+
 
 void HostServiceModel::updateServices()
 {
 	//Index * i = HostService::table()->index( "HostAndService" );
 	//if( i ) i->setCacheEnabled( true );
 	//HostService::schema()->setPreloadEnabled( true );
-    HostServiceList hsl = HostService::select();
+    mHostServices = HostService::select();
+    mHostServicesByHost = mHostServices.groupedByForeignKey<Host,HostServiceList>("fkeyhost");
 	mServices = Service::select().sorted( "service" );
 	LOG_5( mServices.services().join(",") );
 	setHeaderLabels( QStringList() << "Host" << mServices.services() );
 	// Keep the list in memory until the items can store each hoststatus record
     mStatuses = HostStatus::select();
-    mHostServicesByHost = hsl.groupedByForeignKey<Host,HostServiceList>("fkeyhost");
 
     setHostList( Host::select() );
 }
@@ -193,6 +222,22 @@ HostService HostServiceModel::findHostService( const QModelIndex & idx )
         }
     }
     return hs;
+}
+
+void HostServiceModel::updateHosts( HostList hosts )
+{
+    refreshIndexes( findIndexes( hosts ) );
+}
+
+void HostServiceModel::refreshIndexes( QModelIndexList indexes )
+{
+    HostServiceTranslator * hst = (HostServiceTranslator*)treeBuilder()->defaultTranslator();
+    for( int i=0; i < indexes.size(); ++i ) {
+        QModelIndex idx = indexes[i];
+        HostServiceItem & item = hst->data(idx);
+        item = HostServiceItem( item.mHost, mHostServicesByHost[item.mHost], mServices );
+        dataChange( idx.sibling( idx.row(), 0 ), idx.sibling( idx.row(), columnCount()-1 ) );
+    }
 }
 
 class HostServiceDelegate : public RecordDelegate
