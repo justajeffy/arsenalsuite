@@ -29,11 +29,19 @@ public:
 
     void setHostFilter( const QString &, bool cs );
 
+    void updateHosts( HostList hosts );
+    void refreshIndexes( QModelIndexList indexes );
+
 public slots:
 	void updateServices();
 
+    void hostServicesAdded(RecordList);
+    void hostServicesRemoved(RecordList);
+    void hostServiceUpdated(Record up, Record);
+
 protected:
     HostStatusList mStatuses;
+    HostServiceList mHostServices;
     QMap<Host,HostServiceList> mHostServicesByHost;
 	ServiceList mServices;
 };
