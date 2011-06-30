@@ -101,6 +101,9 @@ HostListWidget::HostListWidget( QWidget * parent )
 	//connect( mHostTree, SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ), SLOT( vncHosts() ) );
 
 	RecordSuperModel * hm = new RecordSuperModel(mHostTree);
+    //hm->setGroupByColumn("Host");
+    //hm->setGroupByFilter(QRegExp("^(c0\\d\\d|om)"));
+
 	new HostTranslator( hm->treeBuilder() );
 	hm->setAutoSort( true );
 	mHostTree->setModel( hm );
