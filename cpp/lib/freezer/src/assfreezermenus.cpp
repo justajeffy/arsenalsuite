@@ -962,7 +962,7 @@ void FreezerErrorMenu::slotAboutToShow()
 	mShowErrorInfo->setEnabled( mSelection.size() == 1 );
 
 	if( isJobListChild ) {
-		mSelectHosts = addAction("Select Hosts(s)");
+		mSelectHosts = addAction("Select Host(s)");
 		mSelectHosts->setEnabled( hasSelection );
 	}
 
