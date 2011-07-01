@@ -86,7 +86,7 @@ void RecordItem::setup( const Record & r, const QModelIndex & )
 
 QVariant RecordDataTranslatorBase::recordData(const Record & record, const QModelIndex & idx, int role) const
 {
-	if( role == Qt::DisplayRole || columnIsEditable(idx.column()) )
+	if( role == Qt::DisplayRole || ( role == Qt::EditRole && columnIsEditable(idx.column())) )
 	{
 		QVariant v = record.getValue( recordColumnPos( idx.column(), record ) );
 		TableSchema * fkt = columnForeignKeyTable( idx.column() );
@@ -145,10 +145,129 @@ void RecordTreeBuilder::loadChildren( const QModelIndex & parentIndex, SuperMode
 	}
 }
 
+GroupingTreeBuilder::GroupingTreeBuilder( SuperModel * model )
+: RecordTreeBuilder( model )
+, mStandardTranslator( new StandardTranslator(this) )
+, mGroupColumn( 0 )
+, mIsGrouped( false )
+{
+	connect( model, SIGNAL( rowsInserted(const QModelIndex &, int, int) ), SLOT( slotRowsInserted( const QModelIndex &, int, int) ) );
+}
+
+void GroupingTreeBuilder::groupByColumn( int column ) {
+	// Single level grouping for now
+	if( mIsGrouped ) ungroup();
+	
+	mGroupColumn = column;
+	int count = model()->rowCount();
+	if( count > 0 )
+		groupRowsByColumn( mGroupColumn, 0, count - 1 );
+	
+	mIsGrouped = true;
+}
+
+QModelIndexList fromPersist( QList<QPersistentModelIndex> persist)
+{
+	QModelIndexList ret;
+	foreach( QModelIndex idx, persist ) ret.append(idx);
+	return ret;
+}
+
+void GroupingTreeBuilder::groupRowsByColumn( int column, int start, int end )
+{
+	// First group the top level indexes by the desired column
+	typedef QMap<QString,QList<QPersistentModelIndex> > GroupMap;
+	GroupMap grouped;
+	QModelIndexList topLevel;
+	for( int i = start; i <= end; ++i ) {
+		QModelIndex idx = model()->index( i, column );
+		// Double check that this isn't a group item, even though it shouldn't be
+		if( model()->translator(idx) != mStandardTranslator ) {
+			topLevel += idx;
+			grouped[model()->data( idx, Qt::DisplayRole ).toString()] += idx;
+		}
+	}
+	
+	// If we are already grouped, we need to insert items into existing groups before creating new ones
+	if( mIsGrouped ) {
+		for( ModelIter it(model()); it.isValid(); ++it ) {
+			// Found a group item
+			if( model()->translator(*it) == mStandardTranslator ) {
+				QModelIndex groupIdx = model()->index( (*it).row(), column );
+				QString groupVal = groupIdx.data( Qt::DisplayRole ).toString();
+				GroupMap::Iterator mapIt = grouped.find( groupVal );
+				if( mapIt != grouped.end() ) {
+					model()->move( fromPersist(mapIt.value()), *it );
+					grouped.erase( mapIt );
+				}
+			}
+		}
+	}
+	
+	if( grouped.size() ) {
+		
+		QList<QPersistentModelIndex> persistentGroupIndexes;
+		// Append the group items, yet to be filled with data and have the children copied
+		{
+			QModelIndexList groupIndexes = model()->append( QModelIndex(), grouped.size(), mStandardTranslator );
+			foreach( QModelIndex idx, groupIndexes ) persistentGroupIndexes.append(idx);
+		}
+		
+		// Set the group column data, and copy the children
+		int i = 0;
+		for( QMap<QString, QList<QPersistentModelIndex> >::Iterator it = grouped.begin(); it != grouped.end(); ++it ) {
+			QModelIndex groupIndex = persistentGroupIndexes[i++];
+			mStandardTranslator->data(groupIndex).setModelData( groupIndex.sibling(groupIndex.row(), column), QVariant( it.key() ), Qt::DisplayRole );
+			model()->move( fromPersist(it.value()), groupIndex );
+		}
+	}
+}
+
+void GroupingTreeBuilder::ungroup()
+{
+	// If we disable auto sort, we can ensure that the group indexes wont change
+	// because the new indexes will be appended
+	bool autoSort = model()->autoSort();
+	model()->setAutoSort( false );
+
+	// Clear this here so that when we start moving the items back to root level
+	// the slotRowsInserted doesn't try to regroup them
+	mIsGrouped = false;
+	
+	// Collect a list the top level(group) items, and the second level items
+	QModelIndexList topLevel;
+	QModelIndexList children;
+	for( ModelIter it(model()); it.isValid(); ++it ) {
+		if( model()->translator(*it) == mStandardTranslator ) {
+			topLevel += *it;
+			children += ModelIter::collect( (*it).child(0,0) );
+		}
+	}
+	// Copy the second level items to root level
+	model()->move( children, QModelIndex() );
+	
+	// Remove the group items
+	model()->remove( topLevel );
+
+	if( autoSort ) {
+		model()->setAutoSort( true );
+		model()->resort();
+	}
+
+	mGroupColumn = 0;
+}
+
+void GroupingTreeBuilder::slotRowsInserted( const QModelIndex & parent, int start, int end )
+{
+	// Move any new rows into their proper groups
+	if( mIsGrouped && !parent.isValid() )
+		groupRowsByColumn( mGroupColumn, start, end );
+}
+
 RecordSuperModel::RecordSuperModel( QObject * parent )
 : SuperModel(parent)
 {
-	setTreeBuilder( new RecordTreeBuilder(this) );
+	setTreeBuilder( new GroupingTreeBuilder(this) );
 }
 
 bool RecordSuperModel::setupIndex( const QModelIndex & i, const Record & r )
@@ -173,16 +292,21 @@ Record RecordSuperModel::getRecord(const QModelIndex & i) const
 	RecordDataTranslatorInterface * rdt = recordDataTranslator(i);
 	if( rdt )
 		return rdt->getRecord(i);
-	LOG_1( "No RecordDataTranslator found for index" );
+	//LOG_1( "No RecordDataTranslator found for index" );
 	return Record();
 }
 
 RecordList RecordSuperModel::listFromIS( const QItemSelection & is )
 {
 	RecordList ret;
-    foreach( QModelIndex index, is.indexes() )
-        ret += getRecord(index);
-	return ret.unique();
+	foreach( QItemSelectionRange sr, is ) {
+		QModelIndex i = sr.topLeft();
+		do {
+			ret += getRecord(i);
+			i = i.sibling( i.row() + 1, 0 );
+		} while( sr.contains(i) );
+	}
+	return ret;
 }
 
 void RecordSuperModel::listen( Table * t )
@@ -249,14 +373,14 @@ void RecordSuperModel::setupChildren( const QModelIndex & parent, const RecordLi
 	Database::current()->pushQueueRecordSignals( true );
 
 	clearChildren(parent);
-
+	
 	ModelDataTranslator * trans = translator(parent);
 	if( !trans ) trans = treeBuilder()->defaultTranslator();
 
 	const RecordDataTranslatorInterface * rdt = RecordDataTranslatorInterface::cast(trans);
 	if( rdt )
 		const_cast<RecordDataTranslatorInterface*>(rdt)->appendRecordList( rl, parent );
-
+	
 	Database::current()->popQueueRecordSignals();
 }
 
@@ -293,17 +417,55 @@ bool RecordSuperModel::dropMimeData ( const QMimeData * data, Qt::DropAction act
 		}
 		return true;
 	}
-	return RecordSuperModel::dropMimeData(data,action,row,column,parent);
+	return SuperModel::dropMimeData(data,action,row,column,parent);
 }
 
+// This function should be O(n * log n)
 void RecordSuperModel::updateRecords( RecordList newRecords, const QModelIndex & parent, bool updateRecursive, bool loadChildren )
 {
+	typedef QMap<Record, QModelIndexList> RecordIndexListMap;
+	RecordIndexListMap existingMap;
 	QModelIndex startIndex = parent.isValid() ? parent.child(0,0) : index(0,0);
-	RecordList cur = getRecords( ModelIter::collect( startIndex ) );
-	RecordList rem(cur - newRecords), app( newRecords - cur );
-	updated( newRecords, updateRecursive, parent, loadChildren );
-	remove( rem, false, parent );
-	append( app, parent );
+	// O(n) iteration with O(log n) per loop give O(n log n )
+	for( ModelIter it( startIndex, updateRecursive ? ModelIter::Recursive : ModelIter::Filter() ); it.isValid(); ++it ) {
+		// Constant time
+		Record r = getRecord(*it);
+		if( r.isRecord() )
+			// O(log n)
+			existingMap[r] += *it;
+	}
+	
+	QModelIndexList toUpdate;
+	RecordList toAdd;
+	// O(n) iteration
+	foreach( Record n, newRecords ) {
+		// O(log n)
+		RecordIndexListMap::Iterator it = existingMap.find( n );
+		// Constant + allocs
+		if( it == existingMap.end() )
+			toAdd += n;
+		else {
+			toUpdate += it.value();
+			it.value().clear();
+		}
+	}
+	
+	// O(n)
+	QModelIndexList toRemove;
+	for( RecordIndexListMap::Iterator it = existingMap.begin(); it != existingMap.end(); ++it ) {
+		if( it.value().isEmpty() )
+			continue;
+		// Constant + alloc
+		toRemove += it.value();
+	}
+	
+	// O(n)
+	foreach( QModelIndex i, toUpdate )
+		// Constant
+		updateIndex(i);
+	
+	remove( toRemove );
+	append( toAdd, parent );
 }
 
 void RecordSuperModel::remove( RecordList rl, bool recursive, const QModelIndex & parent )
