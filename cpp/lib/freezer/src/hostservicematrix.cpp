@@ -24,6 +24,7 @@ struct HostServiceItem : public RecordItem
     : mHostServiceByColumn(services.size())
     {
         mHost = h;
+        mHostStatus = mHost.hostStatus();
         mHostServices = hsl;
         foreach( HostService hs, hsl ) {
             int col = services.findIndex( hs.service() );
@@ -205,11 +206,6 @@ void HostServiceModel::setHostList( HostList hosts )
     }
 }
 
-void HostServiceModel::setHostFilter( const QString & filter, bool cs )
-{
-    setHostList( Host::select().filter( "name", QRegExp( filter, cs ? Qt::CaseSensitive : Qt::CaseInsensitive ) ) );
-}
-
 HostService HostServiceModel::findHostService( const QModelIndex & idx )
 {
     HostService hs;
@@ -304,7 +300,10 @@ HostServiceMatrix::HostServiceMatrix( QWidget * parent )
 void HostServiceMatrix::setHostFilter( const QString & filter )
 {
 	mHostFilter = filter;
-	mModel->setHostFilter( filter, mHostFilterCS );
+    QRegExp re( filter, mHostFilterCS ? Qt::CaseSensitive : Qt::CaseInsensitive );
+    for( ModelIter it(mModel); it.isValid(); ++it )
+        setRowHidden( (*it).row(), QModelIndex(), !Host(mModel->getRecord(*it)).name().contains( re ) );
+
 }
 
 void HostServiceMatrix::setServiceFilter( const QString & filter )
