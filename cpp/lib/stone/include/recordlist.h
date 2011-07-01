@@ -271,6 +271,8 @@ public:
 	template<class KEY,class LIST,class VARIANT_TYPE,class KEY_CAST_TYPE> QMap<KEY,LIST> groupedBy( const QString & column ) const;
 	template<class KEY> QMap<KEY,RecordList> groupedBy( const QString & column ) const { return groupedBy<KEY,RecordList>(column); }
 
+    template<class KEY,class LIST> QMap<KEY,LIST> groupedByForeignKey( const QString & column );
+
 	/// Sorts the list according the the value in column.
 	RecordList sorted( const QString & column, bool asc = true ) const;
 
@@ -279,7 +281,7 @@ public:
 
 	/// Returns a new list with the same contents as this, in reversed order.
 	RecordList reversed() const;
-	
+
 	RecordList copy( bool updateCopiedRelations = false );
 
 	/// Calls Record::reload() on each record in this list.
@@ -357,6 +359,15 @@ template<class KEY,class LIST,class VARIANT_TYPE,class KEY_CAST_TYPE> QMap<KEY,L
 		ret[KEY_CAST_TYPE(qVariantValue<VARIANT_TYPE>(v))] += r;
 	}
 	return ret;
+}
+
+template<class KEY,class LIST> QMap<KEY,LIST> RecordList::groupedByForeignKey( const QString & column )
+{
+    QMap<KEY,LIST> ret;
+    foreach( Record r, (*this) ) {
+        ret[KEY(r.foreignKey(column))] += r;
+    }
+    return ret;
 }
 
 ///@}
