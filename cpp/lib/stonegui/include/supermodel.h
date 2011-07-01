@@ -56,6 +56,7 @@ public:
 	SuperModel * model() { return mModel; }
 
 	ModelDataTranslator * defaultTranslator();
+    void setDefaultTranslator( ModelDataTranslator * trans );
 
 protected:
 	void _loadChildren( const QModelIndex & parentIndex, SuperModel * model, ModelNode * node );
@@ -204,6 +205,8 @@ public:
 	ModelDataTranslator * translator(const QModelIndex & idx);
 	
 protected:
+    void fixupChildParentRows( int startIndex );
+
 	void * itemData( const QModelIndex & );
 	void * _itemData( int dataIndex );
 	ModelDataTranslator * _translator(int translatorIndex) const;
@@ -305,7 +308,11 @@ public:
 
 	QModelIndex insert( const QModelIndex & par, int row, ModelDataTranslator * = 0 );
 
-	QModelIndexList insert( const QModelIndex & par, int rowStart, int cnt, ModelDataTranslator * = 0 );
+    // If skipDataConstruction is true, it is up to the caller to properly initialize the data represented by each returned index
+    // Generally trans->construct( trans->dataPtr( idx ) ) is the proper method. To be safe it should be done before any other
+    // changes to the model, or any other code that is allowed to request data from the model be called.  Auto sorting will not be done
+    // if skipDataConstruction is true
+    QModelIndexList insert( const QModelIndex & par, int rowStart, int cnt, ModelDataTranslator * = 0, bool skipDataConstruction = false );
 
 	QModelIndexList move( QModelIndexList items, const QModelIndex & newParent = QModelIndex(), const QModelIndex & after = QModelIndex() );
 	
