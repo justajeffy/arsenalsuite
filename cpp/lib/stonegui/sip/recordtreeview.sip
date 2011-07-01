@@ -37,6 +37,9 @@ public:
 	void setupTreeView( const QString & group, const QString & key, const ColumnStruct columns [] );
 	void saveTreeView( const QString & group, const QString & key, const ColumnStruct columns [] );
 */
+
+    BusyWidget * busyWidget( bool autoCreate = true );
+
 public slots:
 	void expandRecursive( const QModelIndex & index = QModelIndex(), int levels = -1 );
 
@@ -53,7 +56,7 @@ class RecordTreeView : ExtTreeView
 %End
 public:
 	RecordTreeView( QWidget * parent /TransferThis/ );
-	void setModel( RecordSuperModel * model /Transfer/ );
+	void setModel( QAbstractItemModel * model /Transfer/ );
 
 	RecordSuperModel * model() const;
 
