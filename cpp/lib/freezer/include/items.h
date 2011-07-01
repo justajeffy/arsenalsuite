@@ -145,7 +145,7 @@ struct FREEZER_EXPORT JobItem : public RecordItemBase
 
 typedef TemplateRecordDataTranslator<JobItem> JobTranslator;
 
-class FREEZER_EXPORT JobTreeBuilder : public ModelTreeBuilder
+class FREEZER_EXPORT JobTreeBuilder : public GroupingTreeBuilder
 {
 public:
 	JobTreeBuilder( SuperModel * parent );

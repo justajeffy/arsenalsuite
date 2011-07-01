@@ -233,7 +233,7 @@ ProgressDelegate::ProgressDelegate( QObject * parent )
 
 void ProgressDelegate::paint( QPainter * p, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-	if( index.isValid() && index.column() == 2 ) {
+	if( index.isValid() && index.column() == 2 && JobTranslator::isType(index) ) {
 		Job j = JobTranslator::data(index).getRecord();
 		JobStatus js = JobStatus::recordByJob(j);
 		uint tasksTotal = js.tasksCount();
@@ -658,7 +658,7 @@ Qt::ItemFlags JobItem::modelFlags( const QModelIndex & idx )
 Record JobItem::getRecord() { return job; }
 
 JobTreeBuilder::JobTreeBuilder( SuperModel * parent )
-: ModelTreeBuilder( parent )
+: GroupingTreeBuilder( parent )
 , mJobTranslator( new JobTranslator(this) )
 {}
 

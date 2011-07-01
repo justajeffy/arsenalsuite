@@ -339,29 +339,55 @@ void JobListWidget::customEvent( QEvent * evt )
 			JobListTask * jlt = ((JobListTask*)evt);
 			JobModel * jm = (JobModel*)mJobTree->model();
 
-			jm->updateRecords( jlt->mReturn - jlt->mDependentJobs, QModelIndex(), /* updateRecursive */ false, /* loadChildren */ false );
+            JobList topLevelJobs = jlt->mReturn - jlt->mDependentJobs;
+            JobList existing;
+            QModelIndexList toRemove;
+
+            GroupingTreeBuilder * gtb = qobject_cast<GroupingTreeBuilder*>(jm->treeBuilder());
+            int topLevelDepth = 0;
+            if( gtb && gtb->isGrouped() )
+                topLevelDepth = 1;
+
+            for( ModelIter it(jm,ModelIter::Filter(ModelIter::Recursive|ModelIter::DescendLoadedOnly)); it.isValid(); ++it ) {
+                QModelIndex idx = *it;
+                if( topLevelDepth == it.depth() ) {
+                    Job j = jm->getRecord(idx);
+                    if( !topLevelJobs.contains(j) )
+                        toRemove += QPersistentModelIndex(idx);
+                    else {
+                        existing += j;
+                        jm->updateIndex(idx);
+                    }
+                }
+            }
+
+            jm->remove(toRemove);
+            JobList jobsToAdd = topLevelJobs - existing;
+            LOG_5( "Appending " + QString::number(jobsToAdd.size()) + " jobs to the list" );
+            jm->append( jobsToAdd );
 
             QMap<Record, JobServiceList> jobServicesByJob;
-			if( jlt->mFetchJobServices ) {
+            if( jlt->mFetchJobServices ) {
                 jobServicesByJob = jlt->mJobServices.groupedBy<Record,JobServiceList,uint,Job>( "fkeyjob" );
+                LOG_5( QString("Got %1 services for %2 jobs").arg(jlt->mJobServices.size()).arg(jobServicesByJob.size()) );
 			}
 
 			QMap<uint,JobDepList> jobDepsByJob = jlt->mJobDeps.groupedBy<uint,JobDepList>("fkeyjob");
-			RecordSuperModel * model = mJobTree->model();
 
-			for( ModelIter it(model,ModelIter::Filter(ModelIter::Recursive|ModelIter::DescendLoadedOnly)); it.isValid(); ++it ) {
-				Job j = model->getRecord(*it);
-				JobDepList deps = jobDepsByJob[j.key()];
-                if( deps.size() )
-                    jm->updateRecords( deps.deps(), *it, false );
-                if( jlt->mFetchJobServices ) {
-                    // Update services
-                    JobItem & ji = JobTranslator::data(*it);
-                    if( jobServicesByJob.contains( ji.job ) ) {
-                        ji.services = jobServicesByJob[j].services().services().join(",");
-                        LOG_5( "Set Job " + j.name() + " services to " + ji.services );
-                    } else {
-                        LOG_5( "No services found for " + j.name() );
+            for( ModelIter it(jm,ModelIter::Filter(ModelIter::Recursive|ModelIter::DescendLoadedOnly)); it.isValid(); ++it ) {
+                Job j = jm->getRecord(*it);
+                if( j.isRecord() ) {
+                    JobDepList deps = jobDepsByJob[j.key()];
+                    if( deps.size() )
+                        jm->updateRecords( deps.deps(), *it, false );
+                    if( jlt->mFetchJobServices ) {
+                        // Update services
+                        JobItem & ji = JobTranslator::data(*it);
+                        if( jobServicesByJob.contains( ji.job ) ) {
+                            ji.services = jobServicesByJob[j].services().services().join(",");
+                            LOG_5( "Set Job " + j.name() + " services to " + ji.services );
+                        } else
+                            LOG_5( "No services found for " + j.name() );
                     }
                 }
             }
@@ -370,6 +396,9 @@ void JobListWidget::customEvent( QEvent * evt )
             int numRows = jm->rowCount();
             for ( int row = 0; row < numRows; row++ ) {
                 QModelIndex qmi = jm->index(row, 4);
+                Job j = jm->getRecord(qmi);
+                if( !j.isRecord() )
+                    continue;
                 JobItem & ji = JobTranslator::data(qmi);
                 ji.userToolTip.clear();
                 ji.projectToolTip.clear();
@@ -434,6 +463,7 @@ void JobListWidget::customEvent( QEvent * evt )
                 }
             }
 
+            mJobTree->busyWidget()->stop();
 			mJobTaskRunning = false;
 			// This will update the status bar and action states
 			// since they selected jobs may have changed
@@ -441,7 +471,7 @@ void JobListWidget::customEvent( QEvent * evt )
 
 			if( mQueuedJobRefresh ) {
 				mQueuedJobRefresh = false;
-				//refresh();
+				refresh();
 			}
 
             mJobTree->mRecordFilterWidget->filterRows();
@@ -463,11 +493,10 @@ void JobListWidget::customEvent( QEvent * evt )
 			mFrameTree->model()->updateRecords( jtl );
 			mTabToolBar->slotPause();
 			mImageView->setFrameRange( mCurrentJob.outputPath(), minFrame, maxFrame );
-            mTaskListBusyWidget->hide();
-            mTaskListBusyWidget->stop();
 			mFrameTask = 0;
 
             mFrameTree->mRecordFilterWidget->filterRows();
+            mFrameTree->busyWidget()->stop();
 
 			break;
 		}
@@ -481,13 +510,14 @@ void JobListWidget::customEvent( QEvent * evt )
 			mPartialFrameTask = 0;
 
             mFrameTree->mRecordFilterWidget->filterRows();
+            mFrameTree->busyWidget()->stop();
 
 			break;
 		}
 		case ERROR_LIST:
 		{
 			JobErrorList jer = ((ErrorListTask*)evt)->mReturn;
-			//((ErrorModel*)mErrorTree->model())->updateRecords( jer );
+            mErrorTree->busyWidget()->stop();
 			mErrorTree->model()->updateRecords(jer);
 
             mErrorTree->mRecordFilterWidget->filterRows();
@@ -525,6 +555,7 @@ void JobListWidget::customEvent( QEvent * evt )
 		case JOB_HISTORY_LIST:
 		{
 			mHistoryView->setHistory( ((JobHistoryListTask*)evt)->mReturn );
+            mHistoryView->busyWidget()->stop();
 		}
 		case UPDATE_JOB_LIST:
 		{
@@ -654,7 +685,7 @@ void JobListWidget::doRefresh()
 	if( needJobListTask ) {
 		mJobTaskRunning = true;
 		LOG_5( "Statuses to show: " + mJobFilter.statusToShow.join(",") );
-        mJobList.clear();
+        mJobTree->busyWidget()->start();
 		FreezerCore::addTask( new JobListTask( this, mJobFilter, mJobList, activeProjects(), !mJobTree->isColumnHidden(19) /*Service column*/, isDependencyTreeEnabled()) );
 		FreezerCore::wakeup();
 		// Refresh frame or error list too
@@ -675,6 +706,13 @@ void JobListWidget::setJobList( JobList jobList )
 	refresh();
 }
 
+void JobListWidget::refreshErrorList()
+{
+       mErrorTree->busyWidget()->start();
+       FreezerCore::addTask( new ErrorListTask( this, mCurrentJob, mShowClearedErrors ) );
+       FreezerCore::wakeup();
+}
+
 void JobListWidget::currentJobChanged()
 {
 	bool jobChange = mCurrentJob != mJobTree->current();
@@ -684,10 +722,8 @@ void JobListWidget::currentJobChanged()
 	QWidget * curTab = mJobTabWidget->currentWidget();
 	if( curTab==mFrameTab )
 		refreshFrameList(jobChange);
-    else if( curTab == mErrorsTab ) {
-        FreezerCore::addTask( new ErrorListTask( this, mCurrentJob, ShowClearedErrorsAction->isChecked() ) );
-        FreezerCore::wakeup();
-    }
+    else if( curTab == mErrorsTab )
+        refreshErrorList();
 }
 
 void JobListWidget::refreshFrameList( bool jobChange )
@@ -738,7 +774,10 @@ void JobListWidget::jobListSelectionChanged()
 		mJobSettingsWidget->setSelectedJobs( selection );
 	} else if( curTab == mHistoryTab ) {
 		// Clear the view
-        mHistoryView->setJobs( selection );
+        mHistoryView->setHistory( JobHistoryList() );
+        mHistoryView->busyWidget()->start();
+        FreezerCore::addTask( new JobHistoryListTask( this, selection ) );
+        FreezerCore::wakeup();
 	} else if( curTab == mNotesTab ) {
 		mThreadView->setJobList( selection );
     }
@@ -764,7 +803,7 @@ void JobListWidget::jobListSelectionChanged()
 void JobListWidget::refreshCurrentTab()
 {
 	QWidget * curTab = mJobTabWidget->currentWidget();
-	if( curTab==mSummaryTab )
+	if( curTab==mSummaryTab || curTab == mHistoryTab )
 		jobListSelectionChanged();
 	else if( curTab==mFrameTab )
 		refreshFrameList(true);
@@ -795,38 +834,59 @@ void JobListWidget::currentTabChanged()
 
 void JobListWidget::clearErrors()
 {
-    Database::current()->exec("UPDATE JobError SET cleared=true WHERE fkeyJob IN(" + mJobTree->selection().keyString() + ")");
-    foreach( Job job, mJobTree->selection() )
-        job.addHistory( "All errors cleared" );
+    JobList jobs = mJobTree->selection();
+    if( jobs.size() ) {
+        QString history = " Errors cleared";
+        QSqlQuery q = Database::current()->exec("SELECT fkeyjob, sum(count) FROM JobError WHERE (cleared=false OR cleared IS NULL) AND fkeyjob IN (" + jobs.keyString() + ") GROUP BY fkeyjob");
+
+        while( q.next() ) {
+            Job j( q.value(0).toInt() );
+            j.addHistory( QString::number(q.value(1).toInt()) + history );
+        }
+        Database::current()->exec("UPDATE JobError SET cleared=true WHERE fkeyJob IN(" + jobs.keyString() + ")");
+    }
 }
 
 void JobListWidget::restartJobs()
 {
-    Job::updateJobStatuses( mJobTree->selection(), "verify", true );
+    if( !(qApp->keyboardModifiers() & (Qt::ControlModifier|Qt::AltModifier)) && (QMessageBox::warning( this, "Restart Job Confirmation", "Are you sure that you want to restart the selected jobs?\n  All tasks will be set to 'new'.", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) ) != QMessageBox::Yes )
+        return;
+    updateSelectedJobs("verify", true);
+
     foreach( Job job, mJobTree->selection() )
         job.addHistory( "Job Restarted" );
 }
 
 void JobListWidget::resumeJobs()
 {
-	updateSelectedJobs("started");
+    updateSelectedJobs("started", false);
+    refresh();
 }
 
 void JobListWidget::pauseJobs()
 {
-	updateSelectedJobs("suspended");
+    updateSelectedJobs("suspended", false);
+    refresh();
 }
 
 void JobListWidget::deleteJobs()
 {
-	updateSelectedJobs("deleted");
+    if( !(qApp->keyboardModifiers() & (Qt::ControlModifier|Qt::AltModifier)) && (QMessageBox::warning( this, "Delete Job Confirmation", "Are you sure that you want to delete the selected jobs?\n  Once deleted a job cannot be restarted.", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) ) != QMessageBox::Yes )
+        return;
+    updateSelectedJobs("deleted", false);
+    refresh();
 }
 
-void JobListWidget::updateSelectedJobs(const QString & jobStatus)
+void JobListWidget::updateSelectedJobs(const QString & jobStatus, bool resetTasks)
 {
-    foreach( Job j, mJobTree->selection() )
-        FreezerCore::addTask( new UpdateJobListTask( this, JobList(j), jobStatus ) );
-    FreezerCore::wakeup();
+    JobList jl = mJobTree->selection(), checked;
+
+    foreach( Job j, jl ) {
+        if( jobStatus!="started" || j.status()=="suspended" )
+            checked += j;
+    }
+
+    Job::updateJobStatuses( checked, jobStatus, resetTasks);
 }
 
 void JobListWidget::showMine(bool sm)
