@@ -159,7 +159,8 @@ void HostListWidget::customEvent( QEvent * evt )
 			t.start();
 			HostList updated = ((HostListTask*)evt)->mReturn;
 			LOG_5( "updated "+ QString::number(updated.size()) + " hosts from db" );
-			mHostTree->model()->updateRecords( updated );
+            // Recursive so the update works with grouping
+            mHostTree->model()->updateRecords( updated, QModelIndex(), /*recursive=*/true );
 
 			LOG_5( "Enabling updates took " + QString::number( t.elapsed() ) + " ms" );
 

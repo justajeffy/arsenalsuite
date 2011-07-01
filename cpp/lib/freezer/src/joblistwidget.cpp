@@ -423,6 +423,9 @@ void JobListWidget::customEvent( QEvent * evt )
                     int numRows = jm->rowCount();
                     for ( int row = 0; row < numRows; row++ ) {
                         QModelIndex qmi = jm->index(row, 4);
+                        Job j = jm->getRecord(qmi);
+                        if( !j.isRecord() )
+                            continue;
                         QString cell = jm->data( qmi ).toString();
                         //LOG_1( QString("row %1 has data %2").arg(QString::number(row)).arg(cell) );
                         if( keyUser == cell ) {
@@ -453,6 +456,9 @@ void JobListWidget::customEvent( QEvent * evt )
                     int numRows = jm->rowCount();
                     for ( int row = 0; row < numRows; row++ ) {
                         QModelIndex qmi = jm->index(row, 7);
+                        Job j = jm->getRecord(qmi);
+                        if( !j.isRecord() )
+                            continue;
                         QString cell = jm->data( qmi ).toString();
                         //LOG_1( QString("row %1 has data %2").arg(QString::number(row)).arg(cell) );
                         if( keyProject == cell ) {
