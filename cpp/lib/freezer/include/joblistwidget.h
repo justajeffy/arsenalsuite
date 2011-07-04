@@ -94,6 +94,7 @@ public slots:
 	/// refreshes the frame list from the database
 	/// @param jobChange - set to true to clear the ImageView's cache
 	void refreshFrameList( bool jobChange = true );
+    void refreshErrorList();
 
 	void currentJobChanged();
 	void jobListSelectionChanged();
@@ -112,7 +113,7 @@ public slots:
 
 	/// selected jobs are told to stop burning, all running tasks stop immediately, job is deleted
 	void deleteJobs();
-	void updateSelectedJobs(const QString & jobStatus);
+    void updateSelectedJobs(const QString & jobStatus, bool resetTasks);
 
 	/// toggles whether to only show jobs owned by current user
 	void showMine(bool);
@@ -170,6 +171,7 @@ protected:
     bool mViewsInitialized;
 	bool mJobTaskRunning;
 	bool mQueuedJobRefresh;
+    bool mShowClearedErrors;
 
 	FrameListTask * mFrameTask;
 	PartialFrameListTask * mPartialFrameTask;

@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordlist.cpp 9368 2010-02-18 00:37:39Z brobison $
+ * $Id$
  */
 
 #include <qregexp.h>
@@ -433,6 +433,41 @@ void RecordList::clear()
 	}
 }
 
+void RecordList::selectFields( FieldList fields, bool refreshExisting )
+{
+    //LOG_5( "size: " + QString::number(size()) );
+    bool selectAllNeeded = fields.isEmpty() && !refreshExisting;
+    if( fields.isEmpty() && refreshExisting ) return;
+
+    typedef QMap<Table*,QPair<RecordList,FieldList> > TableRecordFieldMap;
+    TableRecordFieldMap byTable;
+    for( RecordIter it = begin(); it != end(); ++it ) {
+        Record r(*it);
+        Table * table = r.table();
+        FieldList fieldsByTable;
+        if( byTable.contains( table ) ) {
+            fieldsByTable = byTable[table].second;
+            if( selectAllNeeded )
+                fieldsByTable = fieldsByTable | r.imp()->notSelectedColumns();
+            else if( !refreshExisting )
+                fieldsByTable = fieldsByTable | (r.imp()->notSelectedColumns() & fields);
+        } else {
+            if( selectAllNeeded )
+                fieldsByTable = r.imp()->notSelectedColumns();
+            else {
+                fieldsByTable = fields & table->schema()->fields();
+                if( !refreshExisting )
+                    fieldsByTable = fieldsByTable & r.imp()->notSelectedColumns();
+            }
+        }
+        //LOG_5( "fieldsByTable.size(): " + QString::number(fieldsByTable.size()) );
+        byTable[table].first += r;
+        byTable[table].second = fieldsByTable;
+    }
+    for( TableRecordFieldMap::Iterator it = byTable.begin(); it != byTable.end(); ++it )
+        it.key()->selectFields( it.value().first, it.value().second );
+}
+
 void RecordList::commit(bool newPrimaryKey, bool sync)
 {
 	QMap<Table*,QList<RecordImp*> > byTable;
@@ -544,6 +579,15 @@ QList<QVariant> RecordList::getValue( int column ) const
 	return ret;
 }
 
+QList<QVariant> RecordList::getValue( Field * f ) const
+{
+    QList<QVariant> ret;
+    if( d )
+        for( QList<RecordImp*>::Iterator it = d->mList.begin(); it != d->mList.end(); ++it )
+            ret += Record( *it, false ).getValue( f );
+    return ret;
+}
+
 void RecordList::setValue( int column, const QVariant & value )
 {
 	if( d ) {
@@ -558,6 +602,22 @@ void RecordList::setValue( int column, const QVariant & value )
 			}
 		}
 	}
+}
+
+void RecordList::setValue( Field * f, const QVariant & value )
+{
+    if( d ) {
+        detach();
+        for( QList<RecordImp*>::Iterator it = d->mList.begin(); it != d->mList.end(); ++it ){
+            Record r( *it, false );
+            r.setValue( f, value );
+            if( *it != r.imp() ) {
+                (*it)->deref();
+                *it = r.imp();
+                (*it)->ref();
+            }
+        }
+    }
 }
 
 RecordList RecordList::foreignKey( int column ) const
@@ -577,6 +637,25 @@ RecordList RecordList::foreignKey( int column ) const
 		ret += it.key()->table()->records( it.value() );
 	}
 	return ret;
+}
+
+RecordList RecordList::foreignKey( Field * f ) const
+{
+    QMap<TableSchema *, QList<uint> > fkeysByTable;
+    RecordList ret;
+    st_foreach( RecordIter, it, (*this) ) {
+        QVariant val = (*it).getValue( f );
+        if( val.userType() == qMetaTypeId<Record>() )
+            ret += qvariant_cast<Record>(val);
+        else if( val.toUInt() > 0 ) {
+            TableSchema * ts = f->foreignKeyTable();
+            fkeysByTable[ts] += val.toUInt();
+        }
+    }
+    for( QMap<TableSchema *, QList<uint> >::iterator it = fkeysByTable.begin(); it != fkeysByTable.end(); ++it ) {
+        ret += it.key()->table()->records( it.value() );
+    }
+    return ret;
 }
 
 RecordList RecordList::foreignKey( const QString & column ) const
@@ -613,6 +692,23 @@ RecordList & RecordList::setForeignKey( int column, const Record & fkey )
 		}
 	}
 	return *this;
+}
+
+RecordList & RecordList::setForeignKey( Field * f, const Record & fkey )
+{
+    if( d ) {
+        detach();
+        for( QList<RecordImp*>::Iterator it = d->mList.begin(); it != d->mList.end(); ++it ){
+            Record r( *it, false );
+            r.setForeignKey( f, fkey );
+            if( *it != r.imp() ) {
+                (*it)->deref();
+                *it = r.imp();
+                (*it)->ref();
+            }
+        }
+    }
+    return *this;
 }
 
 RecordList & RecordList::setForeignKey( const QString & column, const Record & fkey )

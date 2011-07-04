@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: modeliter.h 6486 2008-05-02 01:34:01Z newellm $
+ * $Id$
  */
 
 #ifndef MODEL_ITER_H
@@ -78,7 +78,7 @@ public:
 		NotHidden = 1 << 22,
 
 		StartAtEnd = 1 << 23,
-		// Requires passing FastModel
+		// Requires passing SuperModel
 		DescendLoadedOnly = 1 << 24
 	};
 

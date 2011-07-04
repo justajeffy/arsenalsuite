@@ -397,8 +397,11 @@ void JobSettingsWidget::applySettings()
 	if( mPersonalPrioritySpin->changed() )
 		mSelectedJobs.setPersonalPriorities( mPersonalPrioritySpin->value() );
 
-    if( !mUpdatedEnvironment.isEmpty() )
-        mSelectedJobs.environments().setEnvironments( mUpdatedEnvironment );
+    if( !mUpdatedEnvironment.isEmpty() ) {
+        JobEnvironmentList jel = mSelectedJobs.environments();
+        jel.setEnvironments( mUpdatedEnvironment );
+        jel.commit();
+    }
 
     saveServiceTree();
 

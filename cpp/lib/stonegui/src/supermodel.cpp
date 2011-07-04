@@ -38,11 +38,10 @@ void ModelTreeBuilder::loadChildren( const QModelIndex & parentIndex, SuperModel
 	Q_UNUSED(model);
 }
 
-int ModelTreeBuilder::compare( const QModelIndex & a, const QModelIndex & b, QList<int> columns, bool asc )
+int ModelTreeBuilder::compare( const QModelIndex & a, const QModelIndex & b, QList<SortColumnPair> columns )
 {
-	Q_UNUSED(asc);
-	foreach( int col, columns ) {
-		int result = qVariantCmp( a.sibling(a.row(),col).data(Qt::DisplayRole), b.sibling(b.row(),col).data(Qt::DisplayRole) );
+	foreach( SortColumnPair sc, columns ) {
+		int result = qVariantCmp( a.sibling(a.row(),sc.first).data(Qt::DisplayRole), b.sibling(b.row(),sc.first).data(Qt::DisplayRole) );
 		if( result != 0 ) return result;
 	}
 	return 0;
@@ -53,13 +52,22 @@ void ModelTreeBuilder::_loadChildren( const QModelIndex & parentIndex, SuperMode
 	ModelNode * previousLoadingNode = mLoadingNode;
 	mLoadingNode = node;
 	node->setTranslator(defaultTranslator());
-	loadChildren(parentIndex,model);
+	loadChildren(parentIndex,model);	
 	mLoadingNode = previousLoadingNode;
 }
 
 void ModelTreeBuilder::setTranslator( ModelDataTranslator * trans )
 {
 	if( mLoadingNode && !mLoadingNode->translator() ) mLoadingNode->setTranslator(trans);
+}
+
+void ModelTreeBuilder::setDefaultTranslator( ModelDataTranslator * trans )
+{
+       int idx = mTranslators.indexOf(trans);
+       if( idx >= 0 ) {
+               mTranslators.removeAt(idx);
+               mTranslators.push_front(trans);
+       }
 }
 
 ModelDataTranslator * ModelTreeBuilder::defaultTranslator()
@@ -70,7 +78,7 @@ ModelDataTranslator * ModelTreeBuilder::defaultTranslator()
 
 void ModelTreeBuilder::addTranslator(ModelDataTranslator * trans)
 {
-	mTranslators += trans;
+	mTranslators.append(trans);
 }
 
 // builder takes ownership of this
@@ -110,11 +118,13 @@ int StandardItem::findItem(int column, int role ) const {
 	}
 	return -1;
 }
+
 QVariant StandardItem::modelData( const QModelIndex & idx, int role ) const
 {
 	int i = findItem(idx.column(),role);
 	return i>=0 ? mData[i].data : QVariant();
 }
+
 bool StandardItem::setModelData( const QModelIndex & idx, const QVariant & value, int role )
 {
 	int i = findItem(idx.column(),role);
@@ -153,7 +163,7 @@ void ModelNode::clear()
 {
 	for( int i=rowCount()-1; i>=0; i-- ) {
 		ItemInfo ii = rowToItemInfo(i);
-		mTranslator->deleteData( _itemData(ii.dataOffset) );
+        _translator(ii.translatorIndex)->deleteData( _itemData(ii.dataOffset) );
 		if( ii.index < (uint)mChildren.size() ) {
 			ModelNode * child = mChildren[ii.index];
 			if( child && child != (ModelNode*)1 )
@@ -167,8 +177,8 @@ void ModelNode::clear()
 
 	mRowCount = 0;
 	mItemData.clear();
-    mFreeSpaceMap.clear();
-    mChildrenFreeIndexList.clear();
+	mFreeSpaceMap.clear();
+	mChildrenFreeIndexList.clear();
 }
 
 void ModelNode::setTranslator( ModelDataTranslator * translator )
@@ -176,7 +186,7 @@ void ModelNode::setTranslator( ModelDataTranslator * translator )
 	mTranslator = translator;
 }
 
-bool ModelNode::insertChildren( int index, int count, ModelDataTranslator * translator )
+bool ModelNode::insertChildren( int index, int count, ModelDataTranslator * translator, bool skipConstruction )
 {
 	if( index > mRowCount || index < 0 ) return false;
 
@@ -198,57 +208,61 @@ bool ModelNode::insertChildren( int index, int count, ModelDataTranslator * tran
 	}
 		
 	int dataSize = translator->dataSize();
-    QList<int> & freeSlots = mFreeSpaceMap[dataSize];
-    int reusedSlots = qMin(freeSlots.size(), count);
-    int newSlots = count - reusedSlots;
-    int reusedIndexes = qMin(mChildrenFreeIndexList.size(), count);
-    int newIndexes = count - reusedIndexes;
 
-
+	QList<int> & freeSlots = mFreeSpaceMap[dataSize];
+	int reusedSlots = qMin(freeSlots.size(), count);
+	int newSlots = count - reusedSlots;
+	int reusedIndexes = qMin(mChildrenFreeIndexList.size(), count);
+	int newIndexes = count - reusedIndexes;
+	
 	// Extend item data
 	// TODO: We may want to keep things aligned if size >= 4 bytes
 	int startDataOffset = mItemData.size(), startIndex = mNoChildrenArray.size();
-
-    mItemData.resize( mItemData.size() + newSlots * dataSize );
+	mItemData.resize( mItemData.size() + newSlots * dataSize );
 	mItemInfoVector.insert( index, count, ItemInfo() );
 	mNoChildrenArray.resize( startIndex + newIndexes );
 
 	for( int i = count-1; i >= 0; --i ) {
 		ItemInfo & ii = mItemInfoVector[index+i];
-        if( i >= newIndexes ) {
-            ii.index = mChildrenFreeIndexList.front();
-            mChildrenFreeIndexList.pop_front();
-        } else
-            ii.index = startIndex + i;
-
-        if( i >= newSlots ) {
-            ii.dataOffset = freeSlots.front();
-            freeSlots.pop_front();
-        } else
-            ii.dataOffset = startDataOffset + i * dataSize;
-
+		if( i >= newIndexes ) {
+			ii.index = mChildrenFreeIndexList.front();
+			mChildrenFreeIndexList.pop_front();
+		} else
+			ii.index = startIndex + i;
+		if( i >= newSlots ) {
+			ii.dataOffset = freeSlots.front();
+			freeSlots.pop_front();
+		} else
+			ii.dataOffset = startDataOffset + i * dataSize;
 		ii.translatorIndex = translatorIdx;
-		translator->constructData( _itemData(ii.dataOffset) );
+		if( !skipConstruction )
+			translator->constructData( _itemData(ii.dataOffset) );
 	}
 
 	mRowCount += count;
+
+    fixupChildParentRows( index + count );
+
 	return true;
 }
 
-bool ModelNode::removeChildren( int index, int count )
+bool ModelNode::removeChildren( int index, int count, bool stealObject )
 {
 	if( count < 0 || index < 0 || index + count > mRowCount ) return false;
 
 	for( int i = index + count - 1; i >= index; --i ) {
 		ItemInfo ii = rowToItemInfo(i);
-        void * data = _itemData( ii.dataOffset );
-
-        // Store the free space entry
-        mFreeSpaceMap[mTranslator->dataSize()] += ii.dataOffset;
-        mChildrenFreeIndexList.append( ii.index );
-
+		void * data = _itemData( ii.dataOffset );
+		ModelDataTranslator * trans = _translator(ii.translatorIndex);
+		
+		// Store the free space entry
+		mFreeSpaceMap[trans->dataSize()] += ii.dataOffset;
+		mChildrenFreeIndexList.append( ii.index );
+		
 		// Destruct the data
-		mTranslator->deleteData( data );
+		if( !stealObject )
+			trans->deleteData( data );
+		
 		if( ii.index < (uint)mChildren.size() ) {
 			ModelNode * children = mChildren[ii.index];
 			if( children && children != (ModelNode*)1 )
@@ -258,7 +272,21 @@ bool ModelNode::removeChildren( int index, int count )
 	}
 	mItemInfoVector.remove(index,count);
 	mRowCount -= count;
+    fixupChildParentRows( index );
 	return true;
+}
+
+void ModelNode::fixupChildParentRows( int startIndex )
+{
+       if( startIndex < 0 || startIndex >= mRowCount ) return;
+
+       for( int i = startIndex; i < mRowCount; ++i ) {
+               int index = rowToItemInfo(i).index;
+               if( mChildren.size() <= index ) continue;
+               ModelNode * mn = mChildren[index];
+               if( mn && mn != (ModelNode*)1 )
+                       mn->mParentRow = i;
+       }
 }
 
 bool ModelNode::hasChildren( const QModelIndex & idx, bool insert ) {
@@ -289,7 +317,19 @@ bool ModelNode::hasChildren( const QModelIndex & idx, bool insert ) {
 	return true;
 }
 
-ModelNode * ModelNode::child( const QModelIndex & idx, bool insert )
+void ModelNode::setChild( const QModelIndex & idx, ModelNode * childNode )
+{
+	if( !childNode ) return;
+	// Ensure a spot in the array
+	ModelNode * current = child(idx,true);
+	if( current && current != (ModelNode*)1 )
+		delete current;
+	mChildren[rowToItemInfo(idx.row()).index] = childNode;
+    childNode->mParent = this;
+    childNode->mParentRow = idx.row();
+}
+
+ModelNode * ModelNode::child( const QModelIndex & idx, bool insert, bool steal )
 {
 	if( !hasChildren(idx,insert) ) return 0;
 	// If hasChildren returns true, then we at least have a spot in mChildren
@@ -307,6 +347,8 @@ ModelNode * ModelNode::child( const QModelIndex & idx, bool insert )
 			model(idx)->treeBuilder()->_loadChildren(idx,model(idx),node);
 		return node;
 	}
+	if( steal )
+		mChildren[index] = 0;
 	return node;
 }
 
@@ -337,11 +379,10 @@ void ModelNode::clearChildren( const QModelIndex & idx ) {
 void ModelNode::swap( const QModelIndex & a, const QModelIndex & b )
 {
 	ItemInfo & info_a = rowToItemInfo(a.row()), & info_b = rowToItemInfo(b.row());
-    ModelNode * child_a = mChildren.size() > info_a.index ? mChildren[info_a.index] : 0;
-    ModelNode * child_b = mChildren.size() > info_b.index ? mChildren[info_b.index] : 0;
-    if( child_a && child_a != (ModelNode*)1 ) child_a->mParentRow = b.row();
-    if( child_b && child_b != (ModelNode*)1 ) child_b->mParentRow = a.row();
-
+	ModelNode * child_a = mChildren.size() > info_a.index ? mChildren[info_a.index] : 0;
+	ModelNode * child_b = mChildren.size() > info_b.index ? mChildren[info_b.index] : 0;
+	if( child_a && child_a != (ModelNode*)1 ) child_a->mParentRow = b.row();
+	if( child_b && child_b != (ModelNode*)1 ) child_b->mParentRow = a.row();
 	ItemInfo copy = info_a;
 	info_a = info_b;
 	info_b = copy;
@@ -357,7 +398,7 @@ void ModelNode::swap( const QModelIndex & a, const QModelIndex & b )
 	sm->changePersistentIndexList(from,to);
 }
 
-int ModelNode::rowCount()
+inline int ModelNode::rowCount()
 {
 	return mRowCount;
 }
@@ -385,7 +426,7 @@ inline void * ModelNode::_itemData( int dataOffset )
 	return &mItemData.data()[dataOffset];
 }
 
-QVariant ModelNode::data( const QModelIndex & idx, int role ) {
+inline QVariant ModelNode::data( const QModelIndex & idx, int role ) {
 	ItemInfo ii = rowToItemInfo(idx.row());
 	return _translator(ii.translatorIndex)->modelData( _itemData(ii.dataOffset), idx, role );
 }
@@ -395,7 +436,7 @@ bool ModelNode::setData( const QModelIndex & idx, const QVariant & value, int ro
 	return _translator(ii.translatorIndex)->setModelData( _itemData(ii.dataOffset), idx, value, role );
 }
 
-Qt::ItemFlags ModelNode::flags( const QModelIndex & idx ) {
+inline Qt::ItemFlags ModelNode::flags( const QModelIndex & idx ) {
 	ItemInfo ii = rowToItemInfo(idx.row());
 	return _translator(ii.translatorIndex)->modelFlags( _itemData(ii.dataOffset), idx );
 }
@@ -405,49 +446,49 @@ SuperModel * ModelNode::model(const QModelIndex &idx)
 	return const_cast<SuperModel*>(reinterpret_cast<const SuperModel*>(idx.model()));
 }
 
-void * ModelNode::itemData( const QModelIndex & idx )
+inline void * ModelNode::itemData( const QModelIndex & idx )
 {
 	if( idx.internalPointer() == this ) return _itemData(rowToItemInfo(idx.row()).dataOffset);
 	return 0;
 }
 
-int ModelNode::compare( const QModelIndex & idx1, const QModelIndex & idx2, const QList<int> & columns, bool asc )
+int ModelNode::compare( const QModelIndex & idx1, const QModelIndex & idx2, const QList<SortColumnPair> & columns )
 {
 	ItemInfo ii1 = rowToItemInfo(idx1.row()), ii2 = rowToItemInfo(idx2.row());
 	// To compare 2 rows of the same type, we use the translator to compare
 	if( ii1.translatorIndex == ii2.translatorIndex ) {
 		void * ptr1 = _itemData(ii1.dataOffset), * ptr2 = _itemData(ii2.dataOffset);
 		ModelDataTranslator * trans = _translator(ii1.translatorIndex);
-		foreach( int column, columns ) {
-			int result = trans->compare( ptr1, ptr2, idx1.sibling(idx1.row(),column), idx2.sibling(idx2.row(),column), column, asc );
-			// Compare pointers if the items are equal in other respects
+		foreach( SortColumnPair sc, columns ) {
+			int result = trans->compare( ptr1, ptr2, idx1.sibling(idx1.row(),sc.first), idx2.sibling(idx2.row(),sc.first), sc.first, sc.second == Qt::AscendingOrder );
 			if( result != 0 )
-				return result;
+				return (result > 0) ^ (sc.second == Qt::DescendingOrder) ? -1 : 1;
 		}
-		return (ptr1 > ptr2 ? 1 : -1);
+		// Compare pointers if the items are equal in other respects
+		bool asc = columns[0].second == Qt::AscendingOrder;
+		return ((ptr1 > ptr2) ^ asc) ? -1 : 1;
 	}
 	// Two rows of different types are compared through the tree builder
 	else {
 		SuperModel * mdl = model(idx1);
-		return mdl->treeBuilder()->compare( idx1, idx2, columns, asc );
+		return mdl->treeBuilder()->compare( idx1, idx2, columns );
 	}
 	return 0;
 }
 
 struct ModelNode::NodeSorter
 {
-	NodeSorter( ModelNode * node, const QList<int> & columns, bool asc, const QModelIndex & parent ) : mNode(node), mColumns(columns), mAsc( asc ), mParent(parent) {}
+	NodeSorter( ModelNode * node, const QList<SortColumnPair> & columns, const QModelIndex & parent ) : mNode(node), mColumns(columns), mParent(parent) {}
 	bool operator()( int row1, int row2 ) {
-		int result = mNode->compare( mParent.child( row1, 0 ), mParent.child( row2, 0 ), mColumns, mAsc );
-		return (result > 0) == mAsc;
+		int result = mNode->compare( mParent.child( row1, 0 ), mParent.child( row2, 0 ), mColumns );
+		return (result > 0);
 	}
 	ModelNode * mNode;
-	const QList<int> & mColumns;
-	bool mAsc;
+	const QList<SortColumnPair> & mColumns;
 	QModelIndex mParent;
 };
 
-void ModelNode::sort ( const QList<int> & columns, bool asc, bool recursive, const QModelIndex & parent, int start, int end )
+void ModelNode::sort ( const QList<SortColumnPair> & columns, bool recursive, const QModelIndex & parent, int start, int end )
 {
 	if( rowCount() <= 0 ) return;
 
@@ -465,12 +506,48 @@ void ModelNode::sort ( const QList<int> & columns, bool asc, bool recursive, con
 	std::stable_sort( 
 		&sortVector[start],
 		&sortVector[end] + 1,
-		NodeSorter( this, columns, asc, parent )
+		NodeSorter( this, columns, parent )
 	);
 
+	rearrange( sortVector, parent );
+	
+	if( recursive ) {
+		for( int i=start; i<=end; i++ ) {
+			QModelIndex idx = parent.child(i,0);
+			if( idx.isValid() && childrenLoaded(idx) ) {
+				ModelNode * _child = child(idx);
+				if( _child )
+					_child->sort( columns, true, idx, 0, -1 );
+			}
+		}
+	}
+}
+
+void ModelNode::rearrange( QVector<int> newRowPositions, QModelIndex parent )
+{
+	if( newRowPositions.size() != rowCount() )
+		return;
+
+	/* Double check the integrity of the new positions.  The newRowPositions vector
+		must contain each row as a source.
+	*/
+	{
+		QVector<bool> sourceCheckVector(rowCount());
+		for( int i = rowCount() - 1; i >= 0; i-- )
+			sourceCheckVector[i] = false;
+		for( int i = rowCount() - 1; i >= 0; i-- ) {
+			int source = newRowPositions[i];
+			if( sourceCheckVector[source] ) {
+				LOG_1( "ERROR! invalid newRowPositions vector!" );
+				return;
+			}
+			sourceCheckVector[source] = true;
+		}
+	}
+
+	SuperModel * sm = model(parent);
 	QVector<ItemInfo> newItemInfoVector(mItemInfoVector.size());
 	QModelIndexList from, to;
-	SuperModel * sm = model(parent);
 	QModelIndexList persist = sm->persistentIndexList();
 	// Marks which columns we need to report persistent index changes
 	int cc = sm->columnCount(sm->index(0,0,parent));
@@ -487,7 +564,7 @@ void ModelNode::sort ( const QList<int> & columns, bool asc, bool recursive, con
 		}
 	}
 	for( int i = rowCount() - 1; i>=0; --i ) {
-		int fromIndex = sortVector[i];
+		int fromIndex = newRowPositions[i];
 		if( fromIndex != i ) {
 			for( int c = 0; c < pic_last; ++c ) {
 				if( needColumnPIC[c] ) {
@@ -506,18 +583,8 @@ void ModelNode::sort ( const QList<int> & columns, bool asc, bool recursive, con
 	sm->changePersistentIndexList(from,to);
 
 	mItemInfoVector = newItemInfoVector;
-
-	if( recursive ) {
-		for( int i=start; i<=end; i++ ) {
-			QModelIndex idx = parent.child(i,0);
-			if( idx.isValid() && childrenLoaded(idx) ) {
-				ModelNode * _child = child(idx);
-				if( _child )
-					_child->sort( columns, asc, true, idx, 0, -1 );
-			}
-		}
-	}
 }
+
 
 SuperModel::SuperModel( QObject * parent )
 : QAbstractItemModel( parent )
@@ -525,7 +592,6 @@ SuperModel::SuperModel( QObject * parent )
 , mTreeBuilder( 0 )
 , mInsertClosureNode( 0 )
 , mBlockInsertNots( false )
-, mSortOrder( Qt::DescendingOrder )
 , mAutoSort( false )
 , mAssumeChildren( false )
 , mDisableChildLoading( false )
@@ -567,7 +633,7 @@ QModelIndex SuperModel::parent( const QModelIndex & idx ) const
 	return QModelIndex();
 }
 
-QModelIndex SuperModel::sibling( int row, int column, const QModelIndex & idx ) const
+QModelIndex SuperModel::sibling( int row, int column, const QModelIndex & idx )
 {
 	if( !idx.isValid() || row < 0 ) return QModelIndex();
 	ModelNode * node = indexToNode(idx);
@@ -660,7 +726,7 @@ QModelIndex SuperModel::insert( const QModelIndex & par, int row, ModelDataTrans
 	return ret.isEmpty() ? QModelIndex() : ret[0];
 }
 
-QModelIndexList SuperModel::insert( const QModelIndex & par, int row, int count, ModelDataTranslator * trans )
+QModelIndexList SuperModel::insert( const QModelIndex & par, int row, int count, ModelDataTranslator * trans, bool skipConstruction )
 {
 	QModelIndexList ret;
 	if( count < 1 || row > rowCount(par) || row < 0 ) {
@@ -673,7 +739,7 @@ QModelIndexList SuperModel::insert( const QModelIndex & par, int row, int count,
 		if( !mBlockInsertNots )
 			beginInsertRows( par, row, row + count - 1 );
 
-		if( node->insertChildren( row, count, trans ) ) {
+        if( node->insertChildren( row, count, trans, skipConstruction ) ) {
 			for( int i = row; i < row + count; i++ )
 				ret += createIndex( i, 0, node );
 		}
@@ -681,13 +747,146 @@ QModelIndexList SuperModel::insert( const QModelIndex & par, int row, int count,
 			mInsertClosureNode->state = mBlockInsertNots ? 2 : 1;
 			mInsertClosureNode->parent = par;
 		} else {
-			checkAutoSort(par,true);
 			if( !mBlockInsertNots )
 				endInsertRows();
+            if( mAutoSort && !skipConstruction ) {
+                QList<QPersistentModelIndex> persist;
+                foreach( QModelIndex idx, ret ) persist.append( QPersistentModelIndex(idx) );
+                ret.clear();
+                checkAutoSort(par,true);
+                foreach( QPersistentModelIndex p, persist ) ret.append( p );
+            }
 		}
 	}
 	return ret;
 }
+
+struct RowSpan {
+	RowSpan( const QModelIndex & p, int s, int c ) : parent(p), start(s), count(c) {}
+	QPersistentModelIndex parent;
+	int start, count;
+};
+
+typedef QMap<ModelDataTranslator*,QList<RowSpan> > TransRowSpanMap;
+
+TransRowSpanMap continuousByParentAndTrans( QModelIndexList indexes, SuperModel * sm )
+{
+	TransRowSpanMap ret;
+	typedef QMap<QPair<QModelIndex,ModelDataTranslator*>,QList<int> > BPMap;
+	BPMap byParent;
+	foreach( QModelIndex idx, indexes )
+		byParent[qMakePair(idx.parent(),sm->translator(idx))].append(idx.row());
+	for( BPMap::Iterator it = byParent.begin(); it != byParent.end(); ++it ) {
+		QList<int> & rows = it.value();
+		qSort(rows);
+		int lastRow = 0;
+		int cnt = 0;
+		QModelIndex parent = it.key().first;
+		ModelDataTranslator * trans = it.key().second;
+		for( int i = rows.size() - 1; i >= 0; --i ) {
+			int row = rows[i];
+			if( cnt > 0 && row + 1 != lastRow ) {
+				ret[trans].append( RowSpan( parent, lastRow, cnt ) );
+				cnt = 0;
+			}
+			lastRow = row;
+			cnt++;
+		}
+		ret[trans].append( RowSpan( parent, lastRow, cnt ) );
+	}
+	return ret;
+}
+
+// Define this to 1 for broken qt beginMoveRows
+#define USE_SLOW_PATH 0
+
+QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & destParent, const QModelIndex & insertAt )
+{
+	ModelNode * destNode = destParent.isValid() ? indexToNode(destParent)->child(destParent,true) : rootNode();
+	int insertPos = insertAt.isValid() ? insertAt.row() : rowCount(destParent);
+	TransRowSpanMap spansByTrans = continuousByParentAndTrans( indexes, this );
+	QModelIndexList ret;
+    bool stealObjects = !bool(USE_SLOW_PATH);
+	for( TransRowSpanMap::Iterator it = spansByTrans.begin(); it != spansByTrans.end(); ++it ) {
+		int toInsert = 0;
+		ModelDataTranslator * trans = it.key();
+		QList<RowSpan> & spanList = it.value();
+		foreach( const RowSpan & rs, spanList )
+			toInsert += rs.count;
+		LOG_5( "Inserting " + QString::number( toInsert ) + " children" );
+#if USE_SLOW_PATH
+		beginInsertRows( destParent, insertPos, insertPos + toInsert - 1 );
+#endif
+        if( destNode->insertChildren( insertPos, toInsert, trans, /*skipConstruction=*/stealObjects ) ) {
+
+#if USE_SLOW_PATH
+			endInsertRows();
+#endif
+			int currentDestRow = insertPos;
+			foreach( const RowSpan & rs, spanList ) {
+				ModelNode * sourceNode = rs.parent.isValid() ? indexToNode(rs.parent)->child(rs.parent,true) : rootNode();
+				LOG_5( "Trying beginMoveRows for " + QString::number( rs.count ) + " rows" );
+#if USE_SLOW_PATH
+				{
+					emit layoutAboutToBeChanged();
+#else
+				if( beginMoveRows( rs.parent, rs.start, rs.start + rs.count - 1, destParent, currentDestRow ) ) {
+#endif
+					int start = rs.start;
+					// If we are moving items without changing parent, we have to adjust the start position if it falls
+					// after the insert position
+					if( destParent == rs.parent && insertPos < rs.start )
+						start += toInsert;
+					LOG_5( "Moving " + QString::number( rs.count ) + " rows starting at " + QString::number(start) );
+					// Do the actual copies, we have to do this one at a time because there's no guarantee contiguous
+					// items occupy contiguous memory
+					for( int i = start + rs.count - 1; i >= start; --i ) {
+						QModelIndex destIdx( createIndex( currentDestRow++, 0, destNode ) ), srcIdx( createIndex( i, 0, sourceNode ) );
+                        if( stealObjects )
+                            trans->rawCopy( destNode->itemData(destIdx), sourceNode->itemData(srcIdx) );
+                        else
+                            trans->copyData( destNode->itemData(destIdx), sourceNode->itemData(srcIdx) );
+						// Move the child node pointer, no copying or index updates needed
+						destNode->setChild( destIdx, sourceNode->child( srcIdx, /*create=*/false, /*steal=*/true ) );
+#if USE_SLOW_PATH
+						for( int c = 0; c < columnCount(); c++ )
+							changePersistentIndex( srcIdx.sibling( srcIdx.row(), c ), destIdx.sibling( destIdx.row(), c ) );
+#endif
+					}
+#if USE_SLOW_PATH
+					beginRemoveRows( rs.parent, start, start + rs.count - 1 );
+#endif
+					sourceNode->removeChildren( start, rs.count, /*stealObject =*/ stealObjects );
+#if USE_SLOW_PATH
+					endRemoveRows();
+#endif
+					if( destParent == rs.parent && insertPos > rs.start ) {
+						insertPos -= rs.count;
+						currentDestRow -= rs.count;
+					}
+#if USE_SLOW_PATH
+					emit layoutChanged();
+				}
+#else
+					endMoveRows();
+				} else
+					LOG_1( QString("beginMoveRows failed for source rows %1-%2 moving to %3").arg(rs.start).arg(rs.start+rs.count-1).arg(currentDestRow) );
+#endif
+			}
+			
+			// Since it's possible beginMoveRows failed due to moving onto child or moving onto self
+			// we have to reclaim any extra children that weren't used
+			if( currentDestRow - insertPos < indexes.size() )
+				destNode->removeChildren( currentDestRow, indexes.size() - (currentDestRow - insertPos), /*stealObject =*/ true  );
+			
+			for( int i = insertPos; i < currentDestRow; i++ )
+				ret += createIndex( i, 0, destNode );
+		} else
+			endInsertRows();
+	}
+	return ret;
+}
+#undef USE_SLOW_PATH
 
 bool SuperModel::removeRows( int start, int count, const QModelIndex & parent )
 {
@@ -808,12 +1007,12 @@ void SuperModel::setAutoSort( bool as )
 void SuperModel::checkAutoSort( const QModelIndex & parent, bool quiet )
 {
 	if( mAutoSort )
-		_sort( -1, mSortOrder, true, parent, 0, -1, quiet );
+		_sort( -1, sortOrder(), true, parent, 0, -1, quiet );
 }
 
 void SuperModel::resort()
 {
-	_sort( -1, mSortOrder, true, QModelIndex(), 0, -1, false );
+	_sort( -1, sortOrder(), true, QModelIndex(), 0, -1, false );
 }
 
 void SuperModel::clearChildren( const QModelIndex & i )
@@ -839,33 +1038,104 @@ void SuperModel::sort ( int column, Qt::SortOrder order, bool recursive, const Q
 
 void SuperModel::_sort ( int column, Qt::SortOrder order, bool recursive, const QModelIndex & parentIn, int startRow, int endRow, bool quiet )
 {
+	if( column < 0 )
+		column = mSortColumns.isEmpty() ? 0 : mSortColumns[0].first;
+	SortColumnPair sc(column,order);
+	
+	/* Save sort settings for future sorting(resort and auto sort) */
+	for( QList<SortColumnPair>::iterator it = mSortColumns.begin(); it != mSortColumns.end(); )
+		if( (*it).first == column )
+			it = mSortColumns.erase( it );
+		else
+			++it;
+	mSortColumns.prepend(sc);
+//	LOG_1( "Sorting with order " + QString( (order == Qt::AscendingOrder) ? "Ascending" : "Descending" ) );
+	
+	/* Do actual sorting if node is available */
 	ModelNode * node = parentIn.isValid() ? indexToNode(parentIn)->child(parentIn) : rootNode();
 	if( node ) {
 		QModelIndex parent = parentIn.isValid() ? parentIn : createIndex(-1,-1,0);
-		if( column >= 0 ) {
-			mSortColumnOrder.removeAll(column);
-			mSortColumnOrder.prepend(column);
-		}
-		if( mSortColumnOrder.isEmpty() )
-			mSortColumnOrder.prepend(0);
-		mSortOrder = order;
 		if( !quiet )
 			emit layoutAboutToBeChanged();
-		node->sort(mSortColumnOrder,order == Qt::AscendingOrder,recursive,parent,startRow,endRow);
+		node->sort(mSortColumns,recursive,parent,startRow,endRow);
 		if( !quiet )
 			emit layoutChanged();
 	}
 }
 
+void SuperModel::moveToTop( QModelIndexList _indexes )
+{
+	emit layoutAboutToBeChanged();
+	QMap< QModelIndex, QModelIndexList > indexesByParent;
+	foreach( QModelIndex idx, _indexes )
+		if( idx.isValid() )
+			indexesByParent[idx.parent()].append(idx);
+	for( QMap< QModelIndex, QModelIndexList >::iterator it = indexesByParent.begin(); it != indexesByParent.end(); ++it )
+	{
+		QModelIndex parent = it.key();
+		QModelIndexList indexes = it.value();
+		ModelNode * node = parent.isValid() ? indexToNode(parent) : rootNode();
+		QVector<int> newPositions(node->rowCount());
+		QVector<bool> moved(node->rowCount(),false);
+		int pos = 0, lastToCheck = 0;
+		foreach( QModelIndex idx, indexes ) {
+			if( !moved[idx.row()] ) {
+				newPositions[pos++] = idx.row();
+				lastToCheck = qMax(lastToCheck, idx.row());
+				moved[idx.row()] = true;
+			}
+		}
+		for( int i = 0; i < lastToCheck; ++i )
+			if( !moved[i] ) newPositions[pos++] = i;
+		for( int i=node->rowCount()-1; i > lastToCheck; i-- )
+			newPositions[i] = i;
+		node->rearrange( newPositions, parent.isValid() ? parent : createIndex(-1,-1,0) );
+	}
+	emit layoutChanged();
+}
+
 void SuperModel::setSortColumns( const QList<int> & sortColumns, bool forceResort )
 {
-	if( mSortColumnOrder != sortColumns ) {
-		mSortColumnOrder= sortColumns;
-		if( forceResort )
-			resort();
-		else
-			checkAutoSort();
+	mSortColumns.clear();
+	foreach( int i, sortColumns )
+		mSortColumns.append( SortColumnPair( i, Qt::AscendingOrder ) );
+	if( forceResort )
+		resort();
+	else
+		checkAutoSort();
+}
+
+void SuperModel::setSortColumns( const QList<SortColumnPair> & sortColumns, bool forceResort )
+{
+	QList<int> usedColumns;
+	mSortColumns = sortColumns;
+	for( QList<SortColumnPair>::iterator it = mSortColumns.begin(); it != mSortColumns.end(); ) {
+		int col = (*it).first;
+		if( col < 0 || col >= columnCount() || usedColumns.contains( col ) ) {
+			it = mSortColumns.erase( it );
+			continue;
+		}
+		usedColumns += col;
+		++it;
 	}
+	if( forceResort )
+		resort();
+	else
+		checkAutoSort();
+}
+
+Qt::SortOrder SuperModel::sortOrder( int column ) const
+{
+	if( column < 0 )
+		return mSortColumns.isEmpty() ? Qt::DescendingOrder : mSortColumns[0].second;
+	return mSortColumns.size() > column ? mSortColumns[column].second : Qt::DescendingOrder;
+}
+
+void SuperModel::setSortOrder( Qt::SortOrder order, int column )
+{
+	if( column < 0 ) column = 0;
+	if( column >= mSortColumns.size() ) return;
+	mSortColumns[column].second = order;
 }
 
 ModelDataTranslator * SuperModel::translator( const QModelIndex & idx ) const

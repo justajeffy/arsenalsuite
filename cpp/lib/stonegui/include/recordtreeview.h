@@ -49,6 +49,8 @@ struct ColumnStruct {
     bool filterEnabled;
 };
 
+class BusyWidget;
+
 class STONEGUI_EXPORT ExtTreeView : public QTreeView
 {
 Q_OBJECT
@@ -67,7 +69,9 @@ public:
 	bool showBranches() const;
 	void setShowBranches( bool showBranches );
 
-	int sizeHintForColumn( int column ) const;
+    int sizeHintForColumn( int column, int * height ) const;
+    int sizeHintForColumn ( int column ) const;
+    QSize allContentsSizeHint();
 
 	void setShowGrid( bool showGrid );
 	bool showGrid() const;
@@ -88,11 +92,15 @@ public:
 
     RecordFilterWidget * mRecordFilterWidget;
 
+    BusyWidget * busyWidget( bool autoCreate = true );
+
 public slots:
 	void expandRecursive( const QModelIndex & index = QModelIndex(), int levels = -1 );
     void addFilterLayout();
+    void sortBySelection();
 
 signals:
+    void aboutToShowHeaderMenu( QMenu * );
 	void showMenu( const QPoint & pos, const QModelIndex & underMouse );
 	void columnVisibilityChanged( int column, bool visible );
 
@@ -101,6 +109,7 @@ protected slots:
 	void resizeAutoColumns();
 	virtual void slotCustomContextMenuRequested( const QPoint & );
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void slotSectionResized();
 
 protected:
 	void saveColumns( IniConfig & ini, const ColumnStruct columns [] );
@@ -110,7 +119,7 @@ protected:
 	void drawBranches ( QPainter * painter, const QRect & rect, const QModelIndex & index ) const;
 	QStyleOptionViewItem viewOptions() const;
 
-	void showHeaderMenu( const QPoint & );
+	void showHeaderMenu( const QPoint &, int section = -1 );
 	void doAutoColumnConnections();
 	bool eventFilter( QObject *, QEvent * );
 
@@ -122,8 +131,10 @@ protected:
 
     friend class RecordFilterWidget;
 
-    void resizeEvent(QResizeEvent *event);
+    //void resizeEvent(QResizeEvent *event);
 
+    BusyWidget * mBusyWidget;
+    bool mHeaderClickIsResize;
 };
 
 class STONEGUI_EXPORT RecordTreeView : public ExtTreeView

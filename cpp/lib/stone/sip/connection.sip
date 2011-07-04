@@ -78,6 +78,8 @@ public:
 
 	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() ) = 0;
 
+    virtual void selectFields( Table * table, RecordList, QList<Field*> ) = 0;
+
 	virtual bool insert( Table *, const RecordList & rl, bool newPrimaryKey = true ) = 0;
 
 	virtual bool update( Table *, RecordImp * imp, Record * returnValues = 0 ) = 0;

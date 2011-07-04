@@ -152,10 +152,9 @@ void RecordFilterWidget::filterRows()
 
 				if ( ! cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) )
 					mTree->setRowHidden(row, mTree->rootIndex(), true);
-				
+
                 sm->setColumnFilter( col, filterText );
             } else {
-
 			    // Set the filter to empty so that the highlighted text gets un-highlighted in recorddelegate
                 sm->setColumnFilter( col, "" );
 			}

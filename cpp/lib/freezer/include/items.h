@@ -145,7 +145,19 @@ struct FREEZER_EXPORT JobItem : public RecordItemBase
 
 typedef TemplateRecordDataTranslator<JobItem> JobTranslator;
 
-class FREEZER_EXPORT JobTreeBuilder : public ModelTreeBuilder
+struct FREEZER_EXPORT GroupedJobItem : public ItemBase
+{
+       QString avgTime, groupValue, slotsOnGroup;
+       int groupColumn;
+       void init( const QModelIndex & idx );
+       QVariant modelData( const QModelIndex & i, int role ) const;
+       Qt::ItemFlags modelFlags( const QModelIndex & );
+       bool setModelData( const QModelIndex & i, const QVariant & value, int role );
+};
+
+typedef TemplateDataTranslator<GroupedJobItem> GroupedJobTranslator;
+
+class FREEZER_EXPORT JobTreeBuilder : public GroupingTreeBuilder
 {
 public:
 	JobTreeBuilder( SuperModel * parent );

@@ -34,7 +34,7 @@ class MantraBurner(JobBurner):
         return QStringList()
 
     def environment(self):
-        env = self.Job.environment()
+        env = self.Job.environment().environment()
         try:
             self.cmdline = env.split("\n").filter(QRegExp("^EPA_CMDLINE=")).replaceInStrings("EPA_CMDLINE=","")[0]
         except:

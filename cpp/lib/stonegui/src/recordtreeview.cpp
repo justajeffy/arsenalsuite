@@ -25,8 +25,6 @@
  * $Id$
  */
 
-#include <qdebug.h>
-
 #include <qapplication.h>
 #include <qevent.h>
 #include <qheaderview.h>
@@ -45,6 +43,7 @@
 
 #include "iniconfig.h"
 
+#include "busywidget.h"
 #include "recordtreeview.h"
 #include "recordfilterwidget.h"
 #include "modeliter.h"
@@ -58,8 +57,9 @@ ExtTreeView::ExtTreeView( QWidget * parent, ExtDelegate * delegate )
 , mColumnAutoResize( false )
 , mShowBranches( true )
 , mShowGrid( false )
-, mAutoResizeScheduled( false )
 , mRecordFilterWidget( 0 )
+, mBusyWidget( 0 )
+, mHeaderClickIsResize( false )
 {
 	header()->setClickable( true );
 	header()->setSortIndicatorShown( true );
@@ -111,6 +111,11 @@ void ExtTreeView::addFilterLayout()
     fooLay->addWidget(this);
 }
 
+void ExtTreeView::slotSectionResized()
+{
+    mHeaderClickIsResize = true;
+}
+
 bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 {
 	bool headerChild = false;
@@ -131,6 +136,8 @@ bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 			{
 				QChildEvent * ce = (QChildEvent*)event;
 				ce->child()->installEventFilter(this);
+				if( object == header() )
+					connect( header(), SIGNAL( sectionResized( int, int, int ) ), SLOT( slotSectionResized() ) );
 				break;
 			}
 			default: break;
@@ -141,33 +148,56 @@ bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 	{
 		QMouseEvent * mouseEvent = (QMouseEvent*)event;
 		if( mouseEvent->button() == Qt::RightButton && event->type() == QEvent::MouseButtonPress ) {
-			showHeaderMenu( ((QMouseEvent*)event)->globalPos() );
+			int section = header()->logicalIndexAt(mouseEvent->pos());
+			showHeaderMenu( ((QMouseEvent*)event)->globalPos(), section );
 			return true;
 		}
 		// Control-click on a header column moves it to the second place in the sort order list
 		// Eat the press event to keep the QHeaderView from starting a move operation
-		if( mouseEvent->button() == Qt::LeftButton && event->type() == QEvent::MouseButtonPress && (mouseEvent->modifiers() & Qt::ControlModifier) )
-			return true;
-		if( mouseEvent->button() == Qt::LeftButton && event->type() == QEvent::MouseButtonRelease && (mouseEvent->modifiers() & Qt::ControlModifier) ) {
+		if( mouseEvent->button() == Qt::LeftButton && event->type() == QEvent::MouseButtonPress ) {
+			mHeaderClickIsResize = false;
+			if(mouseEvent->modifiers() & Qt::ControlModifier)
+				return true;
+		}
+		if( mouseEvent->button() == Qt::LeftButton && event->type() == QEvent::MouseButtonRelease && !mHeaderClickIsResize ) {
 			SuperModel * sm = dynamic_cast<SuperModel*>(model());
 			if( sm ) {
 				int section = header()->logicalIndexAt(mouseEvent->pos());
-				QList<int> sortColumns = sm->sortColumns();
-				sortColumns.removeAll( section );
-				if( sortColumns.size() >= 1 )
-					sortColumns.insert(1,section);
-				else
-					sortColumns.append(section);
-				sm->setSortColumns(sortColumns, /*forceResort = */ true );
-				return true;
+				QList<SortColumnPair> sortColumns = sm->sortColumns();
+				Qt::SortOrder so = Qt::DescendingOrder;
+				
+				bool secondColumnSort = (mouseEvent->modifiers() & Qt::ControlModifier);
+				int checkExistingColumn = secondColumnSort ? 1 : 0;
+				// Toggle the direction if this column is already in the second place
+				bool toggleOrder = sortColumns.size() > checkExistingColumn && sortColumns[checkExistingColumn].first == section;
+				for( QList<SortColumnPair>::iterator it = sortColumns.begin(); it != sortColumns.end(); ) {
+					if( (*it).first == section ) {
+						so = (*it).second;
+						it = sortColumns.erase( it );
+					} else
+						++it;
+				}
+				if( toggleOrder )
+					so = (so == Qt::DescendingOrder) ? Qt::AscendingOrder : Qt::DescendingOrder;
+				
+				sortColumns.insert( (secondColumnSort && sortColumns.size() >= 1) ? 1 : 0,SortColumnPair(section,so));
+				sm->setSortColumns(sortColumns, /*forceResort = */ secondColumnSort );
+				// We have to trick the damn QHeaderView into getting our sort direction correct, we make it think
+				// it's already sorted on that column in the opposite order, so when the mouseRelease event is processed
+				// it will reverse the order, send the correct order to the QTreeView, and call sort with the correct column and direction
+				if( !secondColumnSort ) {
+					header()->blockSignals(true);
+					header()->setSortIndicator( section, so == Qt::AscendingOrder ? Qt::DescendingOrder : Qt::AscendingOrder );
+					header()->blockSignals(false);
+				}
+				return secondColumnSort;
 			}
 		}
 	}
 	return false;
 }
 
-
-void ExtTreeView::showHeaderMenu( const QPoint & pos )
+void ExtTreeView::showHeaderMenu( const QPoint & pos, int section )
 {
 	SuperModel * sm = dynamic_cast<SuperModel*>(model());
 
@@ -178,6 +208,13 @@ void ExtTreeView::showHeaderMenu( const QPoint & pos )
 
 	/* Column Visibility */
 	QMap<QAction*,int> visibilityColumnMap, sortOrderColumnMap;
+	QAction * sortBySelectionAction = 0;
+
+	if( sm ) {
+		sortBySelectionAction = sortOrderMenu->addAction( "Sort By Selection" );
+		sortOrderMenu->addSeparator();
+	}
+
 	QStringList hls;// = mModel->headerLabels();
 	QAbstractItemModel * mdl = model();
 	for( int i = 0; i < mdl->columnCount(); ++i )
@@ -193,13 +230,29 @@ void ExtTreeView::showHeaderMenu( const QPoint & pos )
 
 	/* Sort order */
 	if( sortOrderMenu && sm ) {
-		QList<int> sortOrder = sm->sortColumns();
-		foreach( int column, sortOrder ) {
-			QAction * act = sortOrderMenu->addAction( hls[column] );
-			sortOrderColumnMap[act] = column;
+		QList<SortColumnPair> sortOrder = sm->sortColumns();
+		foreach( SortColumnPair sc, sortOrder ) {
+			QAction * act = sortOrderMenu->addAction( hls[sc.first] );
+			sortOrderColumnMap[act] = sc.first;
 		}
 	}
-	
+
+	QAction * groupAction = 0, * ungroupAction = 0;
+	GroupingTreeBuilder * gtb = 0;
+	if( sm && sm->treeBuilder()->inherits( "GroupingTreeBuilder" ) ) {
+		gtb = qobject_cast<GroupingTreeBuilder*>(sm->treeBuilder());
+		if( gtb->isGrouped() ) {
+			int groupColumn = gtb->groupColumn();
+			ungroupAction = menu->addAction( "Ungroup " + hls[groupColumn] );
+		} else if( section >= 0 ) {
+			groupAction = menu->addAction( "Group rows by " + hls[section] );
+		} else 
+			LOG_1( "Not a valid section" );
+	} else
+		LOG_1( "Not a grouping tree builder" );
+
+	emit aboutToShowHeaderMenu( menu );
+
 	QAction * ret = menu->exec( pos );
 	delete menu;
 
@@ -213,10 +266,25 @@ void ExtTreeView::showHeaderMenu( const QPoint & pos )
 	}
 	else if( sortOrderColumnMap.contains( ret ) ) {
 		int column = sortOrderColumnMap[ret];
-		QList<int> sortOrder = sm->sortColumns();
-		sortOrder.removeAll( column );
-		sortOrder.push_front( column );
-		sm->setSortColumns( sortOrder, /* forceResort = */ true );
+		QList<SortColumnPair> sortColumns = sm->sortColumns();
+		Qt::SortOrder so = Qt::DescendingOrder;
+		// Toggle the direction if this column is already in the second place
+		bool toggleOrder = sortColumns.size() >= 1 && sortColumns[0].first == column;
+		for( QList<SortColumnPair>::iterator it = sortColumns.begin(); it != sortColumns.end(); ++it )
+			if( (*it).first == column ) {
+				so = (*it).second;
+				it = sortColumns.erase( it );
+			}
+		if( toggleOrder )
+			so = (so == Qt::DescendingOrder) ? Qt::AscendingOrder : Qt::DescendingOrder;
+		sortColumns.push_front(SortColumnPair(column,so));
+		sm->setSortColumns(sortColumns, /*forceResort = */ true );
+	} else if( ret && ret == sortBySelectionAction ) {
+		sortBySelection();
+	} else if( ret && ret == groupAction ) {
+		gtb->groupByColumn( section );
+	} else if( ret && ret == ungroupAction ) {
+		gtb->ungroup();
 	}
 }
 
@@ -300,6 +368,11 @@ void ExtTreeView::selectionChanged(const QItemSelection &selected, const QItemSe
 
 void ExtTreeView::setModel( QAbstractItemModel * model )
 {
+    SuperModel * sm = dynamic_cast<SuperModel*>(model);
+    if( sm ) {
+        QList<SortColumnPair> sortColumns = sm->sortColumns();
+        header()->setSortIndicator( sortColumns.size() ? sortColumns[0].first : 0, sm->sortOrder() );
+    }
 	QTreeView::setModel( model );
 	if( mColumnAutoResize )
 		doAutoColumnConnections();
@@ -346,7 +419,21 @@ void ExtTreeView::expandRecursive( const QModelIndex & index, int levels )
 	}
 }
 
-int ExtTreeView::sizeHintForColumn( int column ) const
+static bool modelIndexRowCmp( const QModelIndex & i1, const QModelIndex & i2 )
+{
+    return i1.row() < i2.row();
+}
+
+void ExtTreeView::sortBySelection()
+{
+    SuperModel * sm = dynamic_cast<SuperModel*>(model());
+    QModelIndexList selected = selectedRows();
+    qSort( selected.begin(), selected.end(), modelIndexRowCmp );
+    if( sm )
+        sm->moveToTop( selected );
+}
+
+int ExtTreeView::sizeHintForColumn( int column, int * height ) const
 {
 	QStyleOptionViewItem option = viewOptions();
 	QAbstractItemDelegate *delegate = itemDelegate();
@@ -354,14 +441,32 @@ int ExtTreeView::sizeHintForColumn( int column ) const
 	QSize size;
 	int w = 0;
 
+    if( height ) *height = 0;
 	ModelIter it( model(), ModelIter::Filter(ModelIter::Recursive | ModelIter::DescendOpenOnly), 0, const_cast<ExtTreeView*>(this) );
 	for( ; it.isValid(); ++it ) {
 		index = (*it).sibling((*it).row(), column);
 		size = delegate->sizeHint(option, index);
 		w = qMax(w, size.width() + (column == 0 ? indentation() * it.depth() : 0));
+        if( height ) *height += size.height();
 	}
-	
+
 	return w;
+}
+
+int ExtTreeView::sizeHintForColumn ( int column ) const
+{
+    return sizeHintForColumn( column, 0 );
+}
+
+QSize ExtTreeView::allContentsSizeHint()
+{
+    int width = 0, height = 0;
+    // Get height
+    sizeHintForColumn(0,&height);
+    height += header()->height();
+    for( int i=0; i < model()->columnCount(); i++ )
+        width += columnWidth(i);
+    return QSize(width,height);
 }
 
 bool ExtTreeView::showBranches() const
@@ -532,8 +637,6 @@ void ExtTreeView::saveColumns( IniConfig & ini, const ColumnStruct columns [] )
 		ini.writeInt( columns[i].iniName + QString("Index"), hdr->visualIndex( i ) );
 		ini.writeBool( columns[i].iniName + QString("Hidden"), hdr->isSectionHidden( i ) );
 
-        //qDebug() << "Trying to save filter text." << endl;
-
         QLineEdit *le = qobject_cast<QLineEdit*> (mRecordFilterWidget->mFilterMap[i]);
         if ( le )
             ini.writeString( columns[i].iniName + QString("ColumnFilter"), le->text() );
@@ -546,8 +649,12 @@ void ExtTreeView::setupTreeView( IniConfig & ini, const ColumnStruct columns [] 
 	SuperModel * sm = dynamic_cast<SuperModel*>(model());
 	int sc = -1;
 	if( sm ) {
+        QList<SortColumnPair> sortColumns;
 		QList<int> scl = ini.readIntList( "SortColumnOrder" );
-		sm->setSortColumns( scl );
+        QStringList sortDirections= ini.readString( "SortColumnDirection" ).split( ',' );
+        for( int i = 0; i < scl.size(); ++i )
+            sortColumns.append( SortColumnPair( scl[i], (i < sortDirections.size()) && (sortDirections[i] == "Ascending") ? Qt::AscendingOrder : Qt::DescendingOrder ) );
+        sm->setSortColumns( sortColumns );
 		sc = scl.isEmpty() ? 0 : scl[0];
 	} else
 		sc = ini.readInt("SortColumn", 0);
@@ -580,9 +687,16 @@ void ExtTreeView::saveTreeView( IniConfig & ini, const ColumnStruct columns [] )
 {
 	saveColumns( ini, columns );
 	SuperModel * sm = dynamic_cast<SuperModel*>(model());
-	if( sm )
-		ini.writeIntList( "SortColumnOrder", sm->sortColumns() );
-	else
+    if( sm ) {
+        QList<int> sortColumns;
+        QStringList sortDirections;
+        foreach( SortColumnPair sc, sm->sortColumns() ) {
+            sortColumns.append( sc.first );
+            sortDirections.append( sc.second == Qt::DescendingOrder ? "Descending" : "Ascending" );
+        }
+        ini.writeIntList( "SortColumnOrder", sortColumns );
+        ini.writeString( "SortColumnDirection", sortDirections.join(",") );
+    } else
 		ini.writeInt( "SortColumn", header()->sortIndicatorSection() );
 	ini.writeInt( "SortOrder", header()->sortIndicatorOrder() );
 }
@@ -596,12 +710,24 @@ void ExtTreeView::saveTreeView( const QString & group, const QString & key, cons
 	cfg.popSection();
 }
 
+BusyWidget * ExtTreeView::busyWidget( bool autoCreate )
+{
+    if( !mBusyWidget && autoCreate ) {
+        mBusyWidget = new BusyWidget( this, QPixmap( "images/rotating_head.png" ) );
+        mBusyWidget->move(0,header()->height());
+    }
+
+    return mBusyWidget;
+}
+
+/*
 void ExtTreeView::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     if( mRecordFilterWidget )
         mRecordFilterWidget->resize( width(), 20 );
 }
+*/
 
 void ExtTreeView::enableFilterWidget(bool enable)
 {

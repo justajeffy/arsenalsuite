@@ -214,6 +214,9 @@ static FlagMap sFlagMap [] =
 	{ Field::Unique, "Unique" },
 	{ Field::LocalVariable, "LocalVariable" },
 	{ Field::ReverseAccess, "ReverseAccess" },
+    { Field::DisplayName, "DisplayName" },
+    { Field::NoDefaultSelect, "NoDefaultSelect" },
+    { Field::Compress, "Compress" },
 	{ Field::None, 0 }
 };
 
@@ -678,6 +681,40 @@ int Field::qvariantType(Field::Type type)
 			ret = qMetaTypeId< ::Interval>();
 	}
 	return ret;
+}
+
+// Optmized to not copy(because of implicit sharing) if one already contains all of two
+FieldList operator|(const FieldList & one, const FieldList & two)
+{
+    bool firstComplete = two.size() <= one.size();
+    FieldList ret;
+    foreach( Field * f, two )
+        if( !one.contains(f) ) {
+            if( firstComplete ) {
+                firstComplete = false;
+                ret = one;
+            }
+            ret += f;
+        }
+    return firstComplete ? one : ret;
+}
+
+FieldList operator&(const FieldList & one, const FieldList & two)
+{
+    if( one.size() == two.size() ) {
+        bool same = true;
+        foreach( Field * f, one )
+            if( !two.contains(f) ) {
+                same = false;
+                break;
+            }
+        if( same ) return one;
+    }
+    FieldList ret;
+    foreach( Field * f, one )
+        if( two.contains(f) )
+            ret += f;
+    return ret;
 }
 
 } //namespace

@@ -29,6 +29,7 @@
 #include <qsqlquery.h>
 #include <qregexp.h>
 
+#include "iniconfig.h"
 #include "pgconnection.h"
 #include "table.h"
 #include "tableschema.h"
@@ -37,12 +38,19 @@ PGConnection::PGConnection()
 : QSqlDbConnection( "QPSQL7" )
 , mVersionMajor( 0 )
 , mVersionMinor( 0 )
+, mUseMultiTableSelect( false )
 {
+}
+
+void PGConnection::setOptionsFromIni( const IniConfig & ini )
+{
+    QSqlDbConnection::setOptionsFromIni( ini );
+    mUseMultiTableSelect = ini.readBool( "UseMultiTableSelect", false );
 }
 
 Connection::Capabilities PGConnection::capabilities() const
 {
-	Connection::Capabilities ret = static_cast<Connection::Capabilities>(QSqlDbConnection::capabilities() | Cap_Inheritance | Cap_MultipleInsert);// | Cap_MultiTableSelect);
+    Connection::Capabilities ret = static_cast<Connection::Capabilities>(QSqlDbConnection::capabilities() | Cap_Inheritance | Cap_MultipleInsert | (mUseMultiTableSelect ? Cap_MultiTableSelect : 0));
 	if( checkVersion( 8, 2 ) )
 		ret = static_cast<Connection::Capabilities>(ret | Cap_Returning);
 	return ret;
@@ -317,7 +325,8 @@ QString PGConnection::getSqlFields( TableSchema * schema )
 	if( it == mSqlFields.end() ) {
 		QStringList fields;
 		foreach( Field * f, schema->columns() )
-			fields += f->name().toLower();
+            if( !f->flag( Field::NoDefaultSelect ) )
+                fields += f->name().toLower();
 		QString tableName = tableQuoted(schema->tableName());
 		QString sql = tableName + ".\"" + fields.join( "\", " + tableName + ".\"" ) + "\"";
 		mSqlFields.insert( schema, sql );
@@ -385,6 +394,7 @@ QMap<Table *, RecordList> PGConnection::selectMulti( QList<Table*> tables,
 		QString tableName = schema->tableName();
 		sql << QString::number(tablePos);
 		foreach( Field * f, fields ) {
+            if( f->flag( Field::NoDefaultSelect ) ) continue;
 			while( pos < typesByPosition.size() && typesByPosition[pos] != f->type() ) {
 				if( tablePos == 0 )
 					sql << "NULL::" + Field::dbTypeString(Field::Type(typesByPosition[pos]));
@@ -434,6 +444,30 @@ QMap<Table *, RecordList> PGConnection::selectMulti( QList<Table*> tables,
 		ret[t] += Record( new RecordImp( t, sq, positionsByTable[t].data() ), false );
 	}
 	return ret;
+}
+
+void PGConnection::selectFields( Table * table, RecordList records, FieldList fields )
+{
+    TableSchema * schema = table->schema();
+    RecordList ret;
+
+    QStringList fieldNames;
+    foreach( Field * f, fields )
+        if( !f->flag( Field::LocalVariable ) )
+            fieldNames += f->name().toLower();
+
+    QString tableName = tableQuoted(schema->tableName());
+    QString sql = "SELECT " + tableName + ".\"" + fieldNames.join( "\", " + tableName + ".\"" ) + "\"" + " FROM ONLY " + tableName + " WHERE " + schema->primaryKey() + " IN (" + records.keyString() + ");";
+
+    QSqlQuery sq = exec( sql, VarList(), true /*retry*/, table );
+    RecordIter it = records.begin();
+    while( sq.next() ) {
+        if( it == records.end() ) break;
+        int i = 0;
+        Record r(*it);
+        foreach( Field * f, fields )
+            r.imp()->fillColumn( f->pos(), sq.value(i++) );
+    }
 }
 
 bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimaryKey )

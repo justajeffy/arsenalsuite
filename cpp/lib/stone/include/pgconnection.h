@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: pgconnection.h 8509 2009-06-24 08:33:50Z brobison $
+ * $Id$
  */
 
 #ifndef PG_CONNECTION_H
@@ -40,7 +40,9 @@ class STONE_EXPORT PGConnection : public QSqlDbConnection
 {
 public:
 	PGConnection();
-	
+
+    virtual void setOptionsFromIni( const IniConfig & );
+
 	virtual Capabilities capabilities() const;
 
 	virtual bool reconnect();
@@ -64,6 +66,8 @@ public:
 	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() );
 	virtual QMap<Table *, RecordList> selectMulti( QList<Table*>, const QString & innerWhere = QString::null, const QList<QVariant> & innerArgs = QList<QVariant>(), const QString & outerWhere = QString::null, const QList<QVariant> & outerArgs = QList<QVariant>() );
 
+    virtual void selectFields( Table * table, RecordList, FieldList );
+
 	virtual bool insert( Table *, const RecordList & rl, bool newPrimaryKey = true );
 
 	/**
@@ -83,6 +87,7 @@ protected:
 
 	QHash<TableSchema*,QString> mSqlFields;
 	int mVersionMajor, mVersionMinor;
+    bool mUseMultiTableSelect;
 };
 
 #endif // PG_CONNECTION_H

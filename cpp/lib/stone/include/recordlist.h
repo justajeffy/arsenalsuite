@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordlist.h 9359 2010-02-16 06:20:33Z brobison $
+ * $Id$
  */
 
 #ifndef RECORD_LIST_H
@@ -186,6 +186,8 @@ public:
 	/// Returns the number of records in the list
 	uint count() const;
 
+    void selectFields( FieldList fields = FieldList(), bool refreshExisting = false );
+
 	/// Calls Record::commit() on each record in this list.
 	void commit( bool newPrimaryKeys = true, bool sync = true );
 
@@ -198,10 +200,12 @@ public:
 	/// the returned value after calling getValue( \param column )
 	/// on each value in this list.
 	QList<QVariant> getValue( const QString & column ) const;
+    QList<QVariant> getValue( Field * f ) const;
 
 	/// Calls Record::setValue( \param column, \param value ) on
 	/// each record in this list.
 	void setValue( const QString & column, const QVariant & value );
+    void setValue( Field * f, const QVariant & value );
 
 	/// Returns a QList<QVariant> list of values, filled with
 	/// the returned value after calling getValue( \param column )
@@ -215,9 +219,11 @@ public:
 	/// Returns the return values of Record::foreignKey for each record.
 	RecordList foreignKey( int column ) const;
 	RecordList foreignKey( const QString & column ) const;
+    RecordList foreignKey( Field * f ) const;
 
 	RecordList & setForeignKey( int column, const Record & fkey );
 	RecordList & setForeignKey( const QString & column, const Record & fkey );
+    RecordList & setForeignKey( Field * f, const Record & fkey );
 
 	/// Calls Record::setColumnLiteral(\param column,\param value) on
 	/// each record in this list.
@@ -231,7 +237,7 @@ public:
 	QList<uint> keys( int idx=-1 ) const;
 
 	/// Returns a comma separated list of primary keys
-	QString	keyString() const;
+	QString keyString() const;
 
 	/// Returns a RecordIter object that points to the
 	/// first record in this list.
@@ -265,6 +271,8 @@ public:
 	template<class KEY,class LIST,class VARIANT_TYPE,class KEY_CAST_TYPE> QMap<KEY,LIST> groupedBy( const QString & column ) const;
 	template<class KEY> QMap<KEY,RecordList> groupedBy( const QString & column ) const { return groupedBy<KEY,RecordList>(column); }
 
+    template<class KEY,class LIST> QMap<KEY,LIST> groupedByForeignKey( const QString & column );
+
 	/// Sorts the list according the the value in column.
 	RecordList sorted( const QString & column, bool asc = true ) const;
 
@@ -273,7 +281,7 @@ public:
 
 	/// Returns a new list with the same contents as this, in reversed order.
 	RecordList reversed() const;
-	
+
 	RecordList copy( bool updateCopiedRelations = false );
 
 	/// Calls Record::reload() on each record in this list.
@@ -351,6 +359,15 @@ template<class KEY,class LIST,class VARIANT_TYPE,class KEY_CAST_TYPE> QMap<KEY,L
 		ret[KEY_CAST_TYPE(qVariantValue<VARIANT_TYPE>(v))] += r;
 	}
 	return ret;
+}
+
+template<class KEY,class LIST> QMap<KEY,LIST> RecordList::groupedByForeignKey( const QString & column )
+{
+    QMap<KEY,LIST> ret;
+    foreach( Record r, (*this) ) {
+        ret[KEY(r.foreignKey(column))] += r;
+    }
+    return ret;
 }
 
 ///@}
