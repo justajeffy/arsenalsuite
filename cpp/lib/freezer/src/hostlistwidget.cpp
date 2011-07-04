@@ -105,6 +105,8 @@ HostListWidget::HostListWidget( QWidget * parent )
     //hm->setGroupByFilter(QRegExp("^(c0\\d\\d|om)"));
 
 	new HostTranslator( hm->treeBuilder() );
+    // Enable grouping
+    hm->grouper();
 	hm->setAutoSort( true );
 	mHostTree->setModel( hm );
 
