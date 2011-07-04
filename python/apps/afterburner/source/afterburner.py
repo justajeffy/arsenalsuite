@@ -275,8 +275,8 @@ class Afterburner(QMainWindow, Ui_Afterburner):
     def checkUtilization(self):
 
         # Get the possible render seconds for 7 days
-        # Take quarter of that to be more realistic ...
-        possibleRenderSeconds = (self.hostData.host.cpus() * 60 * 60 * 24 * 7) / 4
+        # Take half of that to be more realistic ...
+        possibleRenderSeconds = (self.hostData.host.cpus() * 60 * 60 * 24 * 7) / 2
 
         # Get number of seconds since last Monday
         tdate        = datetime.date.today()
@@ -306,7 +306,7 @@ class Afterburner(QMainWindow, Ui_Afterburner):
 
         self.score.setText("<img src=\"icons/award_%s.png\" /> " % award)
         #self.score.setToolTip("Current Utilization: " + str(utilization) + "/" + str(possibleRenderSeconds))
-        self.score.setToolTip("Current Utilization: " + str(utilization) + "/" + str(possibleRenderSeconds) + " ( " + str(percent) + "% )")
+        self.score.setToolTip("Utilization since Monday: " + str(utilization / 60 / 60) + " / " + str(possibleRenderSeconds / 60 / 60) + " Render Hours ( " + str(percent) + "% )")
 
     def setStatus(self):
         status = "Status: " + self.hostData.host.hostStatus().reload().slaveStatus()
