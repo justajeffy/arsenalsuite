@@ -29,6 +29,7 @@
 #include "user.h"
 
 #include "busywidget.h"
+#include "modelgrouper.h"
 #include "recordtreeview.h"
 #include "recordfilterwidget.h"
 #include "recordpropvaltree.h"
@@ -343,9 +344,9 @@ void JobListWidget::customEvent( QEvent * evt )
             JobList existing;
             QModelIndexList toRemove;
 
-            GroupingTreeBuilder * gtb = qobject_cast<GroupingTreeBuilder*>(jm->treeBuilder());
+            ModelGrouper * grouper = jm->grouper();
             int topLevelDepth = 0;
-            if( gtb && gtb->isGrouped() )
+            if( grouper && grouper->isGrouped() )
                 topLevelDepth = 1;
 
             for( ModelIter it(jm,ModelIter::Filter(ModelIter::Recursive|ModelIter::DescendLoadedOnly)); it.isValid(); ++it ) {

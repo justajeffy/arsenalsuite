@@ -149,6 +149,7 @@ struct FREEZER_EXPORT GroupedJobItem : public ItemBase
 {
        QString avgTime, groupValue, slotsOnGroup;
        int groupColumn;
+    ColorOption * colorOption;
        void init( const QModelIndex & idx );
        QVariant modelData( const QModelIndex & i, int role ) const;
        Qt::ItemFlags modelFlags( const QModelIndex & );
@@ -157,7 +158,7 @@ struct FREEZER_EXPORT GroupedJobItem : public ItemBase
 
 typedef TemplateDataTranslator<GroupedJobItem> GroupedJobTranslator;
 
-class FREEZER_EXPORT JobTreeBuilder : public GroupingTreeBuilder
+class FREEZER_EXPORT JobTreeBuilder : public RecordTreeBuilder
 {
 public:
 	JobTreeBuilder( SuperModel * parent );
@@ -213,7 +214,8 @@ public:
 
 	virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 protected:
-	ColorOption * mStartedColor, * mReadyColor, * mDoneColor;
+	ColorOption * mBusyColor, * mNewColor, * mDoneColor, * mSuspendedColor, * mCancelledColor, * mHoldingColor;
+    QPixmap taskProgressBar( int, const QString & ) const;
 };
 
 class FREEZER_EXPORT LoadedDelegate : public QItemDelegate

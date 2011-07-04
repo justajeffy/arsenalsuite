@@ -22,6 +22,7 @@ SOURCES += \
 	src/iconserver.cpp \
 	src/imagesequenceprovider.cpp \
 	src/lostconnectiondialog.cpp \
+	src/modelgrouper.cpp \
 	src/modeliter.cpp \
 	src/qvariantcmp.cpp \
 	src/recordcombo.cpp \
@@ -58,6 +59,7 @@ HEADERS += \
 	include/iconserver.h \
 	include/imagesequenceprovider.h \
 	include/lostconnectiondialog.h \
+	include/modelgrouper.h \
 	include/modeliter.h \
 	include/qvariantcmp.h \
 	include/recentvaluesui.h \

@@ -38,6 +38,7 @@
 #include "iniconfig.h"
 #include "interval.h"
 #include "imagecache.h"
+#include "modelgrouper.h"
 #include "qvariantcmp.h"
 #include "recorddrag.h"
 
@@ -106,10 +107,10 @@ static const ColumnStruct host_error_columns [] =
 	error_columns[2],
 	error_columns[3],
 	error_columns[4],
-	{ "Job",				"JobColumn",	100,	0, true },
-	{ "JobType",	"JobTypeColumn", 		60,		1, true },
-	{ "Services",	"ServicesTypeColumn", 	60,		2, true },
-	{ 0, 0, 0, 0, false }
+	{ "Job",				"JobColumn",	100,	0, true, false },
+	{ "JobType",	"JobTypeColumn", 		60,		1, true, false },
+	{ "Services",	"ServicesTypeColumn", 	60,		2, true, false },
+	{ 0, 0, 0, 0, false, false }
 };
 
 static const ColumnStruct frame_columns [] =
@@ -117,20 +118,20 @@ static const ColumnStruct frame_columns [] =
 	{ "Frame", 				"FrameColumn", 		50, 	0, false, true},
 	{ "Status", 			"StatusColumn", 	60, 	1, false, true},
 	{ "Host", 				"HostColumn", 		100, 	2, false, true},
-	{ "Time", 				"TimeColumn", 		60, 	3, false},
-	{ "Loaded", 			"LoadedColumn", 	20, 	4, false},
-	{ "Memory", 			"Memory", 			30, 	5, false},
-	{ "Pass", 				"PassColumn", 		50, 	6, true},
-	{ 0, 0, 0, 0, false }
+	{ "Time", 				"TimeColumn", 		60, 	3, false, false},
+	{ "Loaded", 			"LoadedColumn", 	20, 	4, false, false},
+	{ "Memory", 			"Memory", 			30, 	5, false, false},
+	{ "Pass", 				"PassColumn", 		50, 	6, true, false},
+	{ 0, 0, 0, 0, false, false }
 };
 
 static const ColumnStruct job_history_columns [] =
 {
-	{ "Message", 			"MessageColumn", 	90, 	0, false },
-	{ "User", 				"UserColumn", 		90, 	1, false },
-	{ "Host", 				"HostColumn", 		90, 	2, false },
-	{ "When", 				"WhenColumn", 		90, 	3, false },
-	{ 0, 0, 0, 0, false }
+	{ "Message", 			"MessageColumn", 	90, 	0, false, true },
+	{ "User", 				"UserColumn", 		90, 	1, false, true },
+	{ "Host", 				"HostColumn", 		90, 	2, false, true },
+	{ "When", 				"WhenColumn", 		90, 	3, false, false },
+	{ 0, 0, 0, 0, false, false }
 };
 
 void setupJobView( RecordTreeView * lv, IniConfig & ini )
@@ -226,39 +227,57 @@ void drawGrad( QPainter * p, QColor c, int x, int y, int w, int h )
 
 ProgressDelegate::ProgressDelegate( QObject * parent )
 : QItemDelegate( parent )
-, mStartedColor( options.mJobColors->getColorOption("started") )
-, mReadyColor( options.mJobColors->getColorOption("ready") )
+, mBusyColor( options.mJobColors->getColorOption("started") )
+, mNewColor( options.mJobColors->getColorOption("ready") )
 , mDoneColor( options.mJobColors->getColorOption("done") )
+, mSuspendedColor( options.mJobColors->getColorOption("suspended") )
+, mCancelledColor( options.mJobColors->getColorOption("suspended") )
+, mHoldingColor( options.mJobColors->getColorOption("holding") )
 {}
+
+QPixmap ProgressDelegate::taskProgressBar(int height, const QString & taskBitmap) const
+{
+    QPixmap progressBar(qMax(1, taskBitmap.size()), height);
+    progressBar.fill(mNewColor->fg);
+    QPainter progressPainter;
+    progressPainter.begin( &progressBar );
+
+    for (int x = 0; x < taskBitmap.size(); ++x) {
+        QColor c;
+        if (taskBitmap.at(x) == QChar('a'))
+            c = mNewColor->fg;
+        else if (taskBitmap.at(x) == QChar('b'))
+            c = mBusyColor->fg;
+        else if (taskBitmap.at(x) == QChar('d'))
+            c = mDoneColor->fg;
+        else if (taskBitmap.at(x) == QChar('s'))
+            c = mSuspendedColor->fg;
+        else if (taskBitmap.at(x) == QChar('c'))
+            c = mCancelledColor->fg;
+        else if (taskBitmap.at(x) == QChar('h'))
+            c = mHoldingColor->fg;
+        else
+            c = mNewColor->fg;
+
+        drawGrad( &progressPainter, c, x, 0, 1 /*width*/, height );
+    }
+    return progressBar;
+}
 
 void ProgressDelegate::paint( QPainter * p, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
 	if( index.isValid() && index.column() == 2 && JobTranslator::isType(index) ) {
 		Job j = JobTranslator::data(index).getRecord();
 		JobStatus js = JobStatus::recordByJob(j);
-		uint tasksTotal = js.tasksCount();
-		uint tasksAssigned = js.tasksAssigned();
-		uint tasksBusy = js.tasksBusy();
-		uint tasksDone = js.tasksDone();
-		QString status = j.status();
-
-		if( tasksTotal > 0 ){
-			int doneWidth = (int)((option.rect.width()-4)*(tasksDone)/tasksTotal);
-			if( status!="done" && status!="deleted" ) {
-				int assignedWidth = (int)((option.rect.width()-4)*(tasksAssigned)/tasksTotal);
-				drawGrad( p, mReadyColor->fg, option.rect.x() + 2 + doneWidth, option.rect.y() + 2, assignedWidth, option.rect.height()-3 );
-				drawGrad( p, mStartedColor->fg, option.rect.x() + 2 + doneWidth + assignedWidth, option.rect.y() + 2, (int)((option.rect.width()-4)*(tasksBusy)/tasksTotal), option.rect.height()-3 );
-			}
-			if( tasksDone > 0 )
-				drawGrad( p, mDoneColor->fg, option.rect.x() + 2, option.rect.y() + 2, doneWidth, option.rect.height()-3 );
-		}
+        QString taskBitmap = js.taskBitmap();
+        //p->drawPixmap( option.rect.x()+2, option.rect.y()+2, taskProgressBar(option.rect.height()-4, taskBitmap).scaledToWidth( option.rect.width()-3 ) );
+        p->drawPixmap( option.rect.x()+2, option.rect.y()+2, taskProgressBar(10, taskBitmap).scaled( option.rect.width()-2, 12 ) );
 
 		p->setPen(QColor(180,180,180));
 		p->drawRect(option.rect.x() + 1, option.rect.y() + 1,option.rect.width()-2,option.rect.height()-2);
 
-	  JobItem & jobItem = JobTranslator::data(index);
-		p->setPen(QColor(232,232,232));
-		p->drawText( option.rect, Qt::AlignRight | Qt::AlignVCenter, JobTranslator::data(index).done );
+		//p->setPen(QColor(232,232,232));
+		//p->drawText( option.rect, Qt::AlignRight | Qt::AlignVCenter, JobTranslator::data(index).done );
 		return;
 	}
 	return QItemDelegate::paint( p, option, index );
@@ -672,16 +691,26 @@ void GroupedJobItem::init( const QModelIndex & idx )
        }
        avgTime = (avgTimeInterval/qMax(1,jobs)).toDisplayString();
        slotsOnGroup = QString::number(slotCount);
+    colorOption = options.mJobColors->getColorOption("ready");
 }
 
 QVariant GroupedJobItem::modelData( const QModelIndex & i, int role ) const
 {
+       if( role == Qt::DisplayRole && i.column() == 0 )
+               return groupValue + " Jobs";
        if( role == Qt::DisplayRole && i.column() == 5 )
                return slotsOnGroup;
        if( role == Qt::DisplayRole && i.column() == 11 )
                return avgTime;
        if( role == Qt::DisplayRole && i.column() == groupColumn )
                return groupValue;
+       if( role == Qt::DecorationRole && groupColumn == 12 && i.column() == 0 )
+           return ((JobModel*)i.model())->jobTypeIcon(JobType::recordByName(groupValue));
+       if ( role == Qt::TextColorRole )
+           return colorOption ? civ(colorOption->fg) : QVariant();
+       if( role == Qt::BackgroundColorRole )
+           return colorOption ? civ(colorOption->bg) : QVariant();
+
        return ItemBase::modelData(i,role);
 }
 
@@ -692,12 +721,15 @@ Qt::ItemFlags GroupedJobItem::modelFlags( const QModelIndex & )
 
 bool GroupedJobItem::setModelData( const QModelIndex & i, const QVariant & value, int role )
 {
-       if( role == GroupingTreeBuilder::GroupingColumn ) {
-               init( i );
+       if( role == ModelGrouper::GroupingUpdate ) {
+               init(i);
+               return true;
+       }
+       if( role == ModelGrouper::GroupingColumn ) {
                groupColumn = value.toInt();
                return true;
        }
-       if( role == GroupingTreeBuilder::GroupingValue ) {
+       if( role == ModelGrouper::GroupingValue ) {
                groupValue = value.toString();
                return true;
        }
@@ -705,10 +737,10 @@ bool GroupedJobItem::setModelData( const QModelIndex & i, const QVariant & value
 }
 
 JobTreeBuilder::JobTreeBuilder( SuperModel * parent )
-: GroupingTreeBuilder( parent )
+: RecordTreeBuilder( parent )
 , mJobTranslator( new JobTranslator(this) )
 {
-       setGroupedItemTranslator( new GroupedJobTranslator(this) );
+       parent->grouper()->setGroupedItemTranslator( new GroupedJobTranslator(this) );
        setDefaultTranslator( mJobTranslator );
 }
 
