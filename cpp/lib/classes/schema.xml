@@ -1015,6 +1015,7 @@
   <column type="uint" methodName="opsRead" name="opsRead"/>
   <column type="uint" methodName="totaltime" name="totaltime"/>
   <column pluralMethodName="queueOrder" type="uint" methodName="queueOrder" name="queueorder"/>
+  <column type="QString" methodName="taskBitmap" name="taskbitmap"/>
  </table>
  <table useCodeGen="true" name="JobTask" expireKeyCache="true" className="JobTask">
   <column type="uint" methodName="Host" name="fkeyHost">

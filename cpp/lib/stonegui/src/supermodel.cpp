@@ -8,6 +8,7 @@
 #include "interval.h"
 #include "qvariantcmp.h"
 
+#include "modelgrouper.h"
 #include "supermodel.h"
 
 #include <stdio.h>
@@ -595,6 +596,7 @@ SuperModel::SuperModel( QObject * parent )
 , mAutoSort( false )
 , mAssumeChildren( false )
 , mDisableChildLoading( false )
+, mGrouper( 0 )
 , mColumnFilterMap()
 {
 	
@@ -603,6 +605,23 @@ SuperModel::SuperModel( QObject * parent )
 SuperModel::~SuperModel()
 {
 	delete mRootNode;
+}
+
+ModelGrouper * SuperModel::grouper( bool autoCreate )
+{
+       if( !mGrouper && autoCreate )
+               mGrouper = new ModelGrouper(this);
+       return mGrouper;
+}
+
+void SuperModel::setGrouper( ModelGrouper * grouper )
+{
+       if( mGrouper && mGrouper != grouper ) {
+               if( mGrouper->isGrouped() )
+                       mGrouper->ungroup();
+               delete mGrouper;
+       }
+       mGrouper = grouper;
 }
 
 ModelTreeBuilder * SuperModel::treeBuilder()

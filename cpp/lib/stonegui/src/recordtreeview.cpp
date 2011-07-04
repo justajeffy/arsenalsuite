@@ -45,6 +45,7 @@
 
 #include "busywidget.h"
 #include "recordtreeview.h"
+#include "modelgrouper.h"
 #include "recordfilterwidget.h"
 #include "modeliter.h"
 #include "supermodel.h"
@@ -238,15 +239,14 @@ void ExtTreeView::showHeaderMenu( const QPoint & pos, int section )
 	}
 
 	QAction * groupAction = 0, * ungroupAction = 0;
-	GroupingTreeBuilder * gtb = 0;
-	if( sm && sm->treeBuilder()->inherits( "GroupingTreeBuilder" ) ) {
-		gtb = qobject_cast<GroupingTreeBuilder*>(sm->treeBuilder());
-		if( gtb->isGrouped() ) {
-			int groupColumn = gtb->groupColumn();
+    if( sm && sm->grouper(false) ) {
+        ModelGrouper * grouper = sm->grouper();;
+        if( grouper->isGrouped() ) {
+            int groupColumn = grouper->groupColumn();
 			ungroupAction = menu->addAction( "Ungroup " + hls[groupColumn] );
 		} else if( section >= 0 ) {
 			groupAction = menu->addAction( "Group rows by " + hls[section] );
-		} else 
+		} else
 			LOG_1( "Not a valid section" );
 	} else
 		LOG_1( "Not a grouping tree builder" );
@@ -282,9 +282,9 @@ void ExtTreeView::showHeaderMenu( const QPoint & pos, int section )
 	} else if( ret && ret == sortBySelectionAction ) {
 		sortBySelection();
 	} else if( ret && ret == groupAction ) {
-		gtb->groupByColumn( section );
+        sm->grouper()->groupByColumn( section );
 	} else if( ret && ret == ungroupAction ) {
-		gtb->ungroup();
+        sm->grouper()->ungroup();
 	}
 }
 

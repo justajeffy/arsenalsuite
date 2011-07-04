@@ -20,6 +20,7 @@ class QVariant;
 class ModelDataTranslator;
 class ModelNode;
 class SuperModel;
+class ModelGrouper;
 
 // Sort column, sort direction
 typedef QPair<int,Qt::SortOrder> SortColumnPair;
@@ -159,6 +160,8 @@ struct STONEGUI_EXPORT StandardItem : public ItemBase
 		QVariant data;
 	};
 	QList<DataItem> mData;
+    int mFlags;
+    Qt::ItemFlags modelFlags( const QModelIndex & ) { return Qt::ItemFlags(mFlags); }
 	int findItem(int column, int role) const;
 	QVariant modelData( const QModelIndex & idx, int role ) const;
 	bool setModelData( const QModelIndex &, const QVariant &, int );
@@ -262,6 +265,9 @@ class STONEGUI_EXPORT SuperModel : public QAbstractItemModel
 public:
 	SuperModel( QObject * parent );
 	~SuperModel();
+
+    ModelGrouper * grouper( bool autoCreate = true );
+    void setGrouper( ModelGrouper * grouper );
 
 	void setTreeBuilder( ModelTreeBuilder * treeBuilder );
 /*
@@ -411,6 +417,8 @@ protected:
 	QStringList mHeaderData;
 	QList<SortColumnPair> mSortColumns;
 	bool mAutoSort, mAssumeChildren, mDisableChildLoading;
+    ModelGrouper * mGrouper;
+
 	friend class ModelDataTranslator;
 	friend class ModelNode;
 };
