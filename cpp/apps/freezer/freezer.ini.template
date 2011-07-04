@@ -12,6 +12,7 @@ Port=6432
 DatabaseName=freezer
 User=freezer
 Password=cold
+UseMultiTableSelect=true
 
 [Display Prefs]
 Icon Size=16,16

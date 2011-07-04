@@ -210,11 +210,10 @@ def reaper():
             ensureSpoolSpace(config.requiredSpoolSpacePercent)
 
         for job in retrieveReapable():
-            #if VERBOSE_DEBUG: print "Checking Job %i %s" % (job.key(), job.name())
+            #if VERBOSE_DEBUG: Log( "Checking Job %i %s" % (job.key(), job.name()) )
             status = str(job.status())
 
             Database.current().exec_('SELECT update_job_soft_deps(%i)' % job.key())
-
             Database.current().exec_("SELECT update_job_task_counts(%i)" % job.key())
             Database.current().exec_('SELECT update_job_stats(%i)' % job.key())
 
@@ -297,7 +296,17 @@ def reaper():
                 # too. If so then it is good to go.
                 Database.current().exec_('SELECT update_job_hard_deps(%i)' % job.key())
 
-            if (float(done) / float(tasks) > 0.15) and job.autoAdaptSlots() == 0:
+            if (float(done) / float(tasks) >= 0.10) and job.autoAdaptSlots() == 0 and job.assignmentSlots() == 8:
+                if js.averageMemory() < (job.maxMemory() / 8):
+                    print "job %s has poor memory utilisation %s" % ( job.name(), js.averageMemory() )
+                    job.setAssignmentSlots( int(job.assignmentSlots() / 2) )
+                    job.setAutoAdaptSlots( job.autoAdaptSlots() + 1 )
+                    job.setMinMemory( int(job.minMemory()/2) )
+                    job.setMaxMemory( int(job.maxMemory()/2) )
+                    job.commit()
+                    job.addHistory( "Assignment slots auto-adapted in half due to low memory %s" % js.averageMemory() )
+
+            if (float(done) / float(tasks) >= 0.15) and job.autoAdaptSlots() == 0 and job.assignmentSlots() == 8:
                 # 20% of tasks complete and never auto-adjusted
                 if (js.efficiency() <= 0.6) and (js.averageMemory() < (job.maxMemory() / 4)):
                     print "job %s has bad efficiency %s" % ( job.name(), js.efficiency() )
@@ -307,7 +316,7 @@ def reaper():
                     job.commit()
                     job.addHistory( "Assignment slots auto-adapted in half due to poor efficiency %s" % js.efficiency() )
 
-            if (float(done) / float(tasks) > 0.40) and job.autoAdaptSlots() == 0:
+            if (float(done) / float(tasks) >= 0.40) and job.autoAdaptSlots() == 0 and job.assignmentSlots() == 8:
                 if (js.efficiency() <= 0.75) and (js.averageMemory() < (job.maxMemory() / 4)):
                     print "job %s has not great efficiency %s" % ( job.name(), js.efficiency() )
                     job.setAssignmentSlots( int(job.assignmentSlots() / 2) )
@@ -319,8 +328,8 @@ def reaper():
             job.commit()
             js.commit()
 
-        if VERBOSE_DEBUG: print "Sleeping for 3 seconds"
-        time.sleep(2)
+        if VERBOSE_DEBUG: Log( "*** Reaping complete in (time)" )
+        time.sleep(1)
 
 def notifyOnCompleteSend(job):
     if VERBOSE_DEBUG:

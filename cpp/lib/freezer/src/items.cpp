@@ -233,7 +233,7 @@ ProgressDelegate::ProgressDelegate( QObject * parent )
 
 void ProgressDelegate::paint( QPainter * p, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-	if( index.isValid() && index.column() == 2 ) {
+	if( index.isValid() && index.column() == 2 && JobTranslator::isType(index) ) {
 		Job j = JobTranslator::data(index).getRecord();
 		JobStatus js = JobStatus::recordByJob(j);
 		uint tasksTotal = js.tasksCount();
@@ -642,6 +642,8 @@ int JobItem::compare( const QModelIndex & a, const QModelIndex & b, int col, boo
 		Interval otiq( other.job.submittedts(), other.job.endedts().isNull() ? QDateTime::currentDateTime() : other.job.endedts() );
 		return compareRetI( tiq, otiq );
 	}
+    else if( col == 20 )
+		return compareRetI( jobStatus.averageMemory(), other.jobStatus.averageMemory() );
 	return ItemBase::compare( a, b, col, asc );
 }
 
@@ -655,16 +657,65 @@ Qt::ItemFlags JobItem::modelFlags( const QModelIndex & idx )
 
 Record JobItem::getRecord() { return job; }
 
+void GroupedJobItem::init( const QModelIndex & idx )
+{
+       Interval avgTimeInterval;
+       int jobs=0;
+       int slotCount=0;
+       foreach( QModelIndex i, ModelIter::collect( idx.child(0,0) ) ) {
+               if( JobTranslator::isType(i) ) {
+                       JobItem & ji = JobTranslator::data(i);
+                       avgTimeInterval += Interval( ji.jobStatus.tasksAverageTime() );
+                       slotCount += adjustedHostsOnJob(ji.job.status(),ji.jobStatus);
+                       jobs++;
+               }
+       }
+       avgTime = (avgTimeInterval/qMax(1,jobs)).toDisplayString();
+       slotsOnGroup = QString::number(slotCount);
+}
+
+QVariant GroupedJobItem::modelData( const QModelIndex & i, int role ) const
+{
+       if( role == Qt::DisplayRole && i.column() == 5 )
+               return slotsOnGroup;
+       if( role == Qt::DisplayRole && i.column() == 11 )
+               return avgTime;
+       if( role == Qt::DisplayRole && i.column() == groupColumn )
+               return groupValue;
+       return ItemBase::modelData(i,role);
+}
+
+Qt::ItemFlags GroupedJobItem::modelFlags( const QModelIndex & )
+{
+       return Qt::ItemFlags(0);
+}
+
+bool GroupedJobItem::setModelData( const QModelIndex & i, const QVariant & value, int role )
+{
+       if( role == GroupingTreeBuilder::GroupingColumn ) {
+               init( i );
+               groupColumn = value.toInt();
+               return true;
+       }
+       if( role == GroupingTreeBuilder::GroupingValue ) {
+               groupValue = value.toString();
+               return true;
+       }
+       return false;
+}
+
 JobTreeBuilder::JobTreeBuilder( SuperModel * parent )
-: ModelTreeBuilder( parent )
+: GroupingTreeBuilder( parent )
 , mJobTranslator( new JobTranslator(this) )
-{}
+{
+       setGroupedItemTranslator( new GroupedJobTranslator(this) );
+       setDefaultTranslator( mJobTranslator );
+}
 
 bool JobTreeBuilder::hasChildren( const QModelIndex & parentIndex, SuperModel * model )
 {
 	if( JobTranslator::isType(parentIndex) ) {
-		JobModel * jmodel = (JobModel*)model;
-		return jmodel->isDependencyTreeEnabled() && JobDep::recordsByJob( jmodel->getRecord(parentIndex) ).size() > 0;
+		return ((JobModel*)model)->isDependencyTreeEnabled() && JobDep::recordsByJob( ((JobModel*)model)->getRecord(parentIndex) ).size() > 0;
 	}
 	return false;
 }

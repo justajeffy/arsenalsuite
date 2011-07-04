@@ -10,10 +10,11 @@ def doThis(job):
     print "maxTaskTime - checking %s" % job.name()
 
     if job.user().name() == "dan.bethell": return True
+    if job.user().name() == "alexander.samsonov": return True
 
     if( job.jobType().name().contains("Mantra") ):
         job.setMaxTaskTime(2 * 60 * 60)
-        job.setMaxQuietTime(2 * 60 * 60)
+        job.setMaxQuietTime(1 * 60 * 60)
         job.setThreads(4)
         job.setAssignmentSlots(4)
         job.setMinMemory(4000000)
@@ -40,13 +41,12 @@ def doThis(job):
 
     if( job.jobType().name().contains( "Nuke" ) ):
         job.setMaxTaskTime(1800)
-        job.setPacketSize(10)
         job.setMinMemory(6000000)
-        job.setMinMemory(8000000)
+        job.setMaxMemory(8000000)
+    if( job.jobType().name().contains( "Naiad" ) ):
+        job.setMinMemory(20000000)
+        job.setMaxMemory(24000000)
     if( job.jobType().name().contains( "Batch" ) ):
-        if (job.name().contains("Export Role Performance Package")):
-            job.setAssignmentSlots(4)
-
         if (job.name().contains("_rib")):
             if (job.name().contains("BIGMEM")):
                 job.setMinMemory(12000000)

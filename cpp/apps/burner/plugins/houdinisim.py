@@ -32,7 +32,7 @@ class HoudiniSimBurner(JobBurner):
 		return QStringList()
 
 	def environment(self):
-		env = self.Job.environment()
+		env = self.Job.environment().environment()
 		Log( "HoudiniSimBurner::environment(): %s" % env )
 		return env.split("\n")
 

@@ -79,7 +79,10 @@ public:
 		Unique = 8,
 		LocalVariable = 16,
 		ReverseAccess = 32,
-		Compress = 64
+        DisplayName = 64, // Used to indicate that a field is the primary name for a record, useful for generic debugging information, etc
+        NoDefaultSelect = 128, // Indicates a column is not selected by default, it will be selected when accessed or when manually specified
+        Compress = 256, // use qCompress to internally compress contents of this field - BUG FIXME
+        LastFlag = 512
 	};
 
 	/** 
@@ -269,6 +272,9 @@ protected:
 
 typedef QList<Field *> FieldList;
 typedef QList<Field *>::Iterator FieldIter;
+
+FieldList operator|(const FieldList & one, const FieldList & two);
+FieldList operator&(const FieldList & one, const FieldList & two);
 
 } //namespace
 

@@ -133,6 +133,10 @@ JobBurner::JobBurner( const JobAssignment & jobAssignment, Slave * slave, int op
 
     mJobFilterMessages = mJob.filterSet().jobFilterMessages();
     mJobFilterMessages.reload();
+
+    foreach( JobFilterMessage jfm, mJobFilterMessages )
+        if( jfm.jobFilterType().name() == "Ignore" )
+            mIgnoreREs += QRegExp(jfm.regex());
 }
 
 JobBurner::~JobBurner()

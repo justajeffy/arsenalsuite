@@ -5,6 +5,7 @@
 #include <qabstractitemmodel.h>
 #include <qbitarray.h>
 #include <qlist.h>
+#include <qpair.h>
 #include <qstringlist.h>
 #include <qvector.h>
 
@@ -19,6 +20,10 @@ class QVariant;
 class ModelDataTranslator;
 class ModelNode;
 class SuperModel;
+
+// Sort column, sort direction
+typedef QPair<int,Qt::SortOrder> SortColumnPair;
+
 
 /**
  * This class is used to dynamically build the tree hierarchy of the model
@@ -35,6 +40,7 @@ class SuperModel;
  */
 class STONEGUI_EXPORT ModelTreeBuilder : public QObject
 {
+Q_OBJECT
 public:
 	ModelTreeBuilder( SuperModel * parent );
 	~ModelTreeBuilder();
@@ -46,10 +52,11 @@ public:
 	virtual void loadChildren( const QModelIndex & parentIndex, SuperModel * model );
 	/// This is used to compare to rows of different types
 	/// Rows of the same type are compared through the translator
-	virtual int compare( const QModelIndex & a, const QModelIndex & b, QList<int> columns, bool asc );
+	virtual int compare( const QModelIndex & a, const QModelIndex & b, QList<SortColumnPair> columns );
 	SuperModel * model() { return mModel; }
 
 	ModelDataTranslator * defaultTranslator();
+    void setDefaultTranslator( ModelDataTranslator * trans );
 
 protected:
 	void _loadChildren( const QModelIndex & parentIndex, SuperModel * model, ModelNode * node );
@@ -83,8 +90,9 @@ public:
 	virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const = 0;
 	virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const = 0;
 	virtual void deleteData( void * dataPtr ) = 0;
-	virtual void constructData( void * dataPtr, void * copy = 0 ) = 0;
-	virtual void copyData( void * dataPtr, void * copy ) = 0;
+	virtual void constructData( void * dataPtr, void * copySource = 0 ) = 0;
+	virtual void copyData( void * dataPtr, void * copySource ) = 0;
+	void rawCopy( void * dataPtr, void * copySource ) { memcpy( dataPtr, copySource, dataSize() ); }
 	virtual const void * iface( const char * ) const { return 0; }
 	QModelIndex insert( int row, const QModelIndex & parent = QModelIndex() );
 	QModelIndex append( const QModelIndex & parent = QModelIndex() );
@@ -130,10 +138,10 @@ public:
 /// It provides qVariantCmp based sorting, and defaults to enabled and selectable items
 struct STONEGUI_EXPORT ItemBase {
 	bool operator==(const ItemBase & other) const { return &other == this; }
-	QVariant modelData( const QModelIndex & idx, int role ) const { 
+	QVariant modelData( const QModelIndex & idx, int role ) const {
 		Q_UNUSED(idx);
 		Q_UNUSED(role);
-		return QVariant(); 
+		return QVariant();
 	}
 	bool setModelData( const QModelIndex &, const QVariant &, int ) { return false; }
 	Qt::ItemFlags modelFlags( const QModelIndex & ) { return Qt::ItemFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable); }
@@ -169,16 +177,17 @@ public:
 
 	// Tree Builder is responsible for initializing the
 	// data after calling insertChildren
-	bool insertChildren( int index, int count, ModelDataTranslator * trans = 0 );
+	bool insertChildren( int index, int count, ModelDataTranslator * trans = 0, bool skipConstruction = false );
 
 	// Tree Builder is responsible for clearing the data
 	// before calling removeChildren
-	bool removeChildren( int index, int count );
+	bool removeChildren( int index, int count, bool stealObject = false );
 	void clearChildren( const QModelIndex & idx );
 	void clear();
 
 	void swap( const QModelIndex & a, const QModelIndex & b );
-
+	void rearrange( QVector<int> newRowPositions, QModelIndex parent );
+	
 	int rowCount();
 
 	bool hasChildren( const QModelIndex & idx, bool insert = false );
@@ -186,14 +195,18 @@ public:
 	bool setData( const QModelIndex & idx, const QVariant & value, int role );
 	Qt::ItemFlags flags( const QModelIndex & idx );
 	bool childrenLoaded( const QModelIndex & idx );
-	int compare( const QModelIndex & idx1, const QModelIndex & idx2, const QList<int> & columns, bool asc );
+	int compare( const QModelIndex & idx1, const QModelIndex & idx2, const QList<SortColumnPair> & columns );
 
-	ModelNode * child( const QModelIndex & idx, bool insert = false );
+	ModelNode * child( const QModelIndex & idx, bool insert = false, bool steal = false );
+	void setChild( const QModelIndex & idx, ModelNode * childNode );
 
-	void sort ( const QList<int> & columns, bool asc, bool recursive, const QModelIndex & parent, int startRow, int endRow );
+	void sort ( const QList<SortColumnPair> & columns, bool recursive, const QModelIndex & parent, int startRow, int endRow );
 
 	ModelDataTranslator * translator(const QModelIndex & idx);
+	
 protected:
+    void fixupChildParentRows( int startIndex );
+
 	void * itemData( const QModelIndex & );
 	void * _itemData( int dataIndex );
 	ModelDataTranslator * _translator(int translatorIndex) const;
@@ -206,9 +219,9 @@ protected:
 	// pointing to them
 	// TODO: Add empty entry reuse, and possible defrag when wasted space gets high
 	QBitArray mNoChildrenArray;
-    QVector<ModelNode *> mChildren;
-    QList<int> mChildrenFreeIndexList;
-
+	QVector<ModelNode *> mChildren;
+	QList<int> mChildrenFreeIndexList;
+	
 	struct ItemInfo {
 		// Offset into the mItemData bytearray
 		int dataOffset;
@@ -229,7 +242,7 @@ protected:
 
 	// Since majority of uses only have 1 translator, keeping
 	// it directly in a variable will allow us to avoid allocating
-	// any memory for the list	
+	// any memory for the list
 	ModelDataTranslator * mTranslator;
 
 	QList<ModelDataTranslator*> mTranslatorList;
@@ -237,8 +250,8 @@ protected:
 	ModelNode * mParent;
 	int mParentRow;
 
-    QMap<int,QList<int> > mFreeSpaceMap;
-
+	QMap<int,QList<int> > mFreeSpaceMap;
+	
 	struct NodeSorter;
 	friend class SuperModel;
 	friend class ModelDataTranslator;
@@ -251,54 +264,42 @@ public:
 	~SuperModel();
 
 	void setTreeBuilder( ModelTreeBuilder * treeBuilder );
+/*
+ * BEGIN AbstractItemModel functions
+ */	
 	/// O(1) - Constant Runtime
 	QModelIndex parent( const QModelIndex & idx ) const;
 
 	/// O(1) - Constant Runtime
-    /// this is not virtual from QAbstractItemModel for some reason..
-	QModelIndex sibling( int row, int column, const QModelIndex & idx ) const;
-
-/*
- * BEGIN AbstractItemModel functions
- */	
-
+	QModelIndex sibling( int row, int column, const QModelIndex & idx );
+	
 	/// O(1) - Constant Runtime
 	/// Runtime dependent on node->child call, which could 
 	/// be loading the data on demand
-	virtual QModelIndex index( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
+	QModelIndex index( int row, int column, const QModelIndex & parent = QModelIndex() ) const;
 
 	/// O(1) - Constant Runtime
 	/// Runtime dependent on childNode->rowCount call, which could 
 	/// be loading the data on demand
-	virtual int rowCount( const QModelIndex & parent = QModelIndex() ) const;
+	int rowCount( const QModelIndex & parent = QModelIndex() ) const;
 
 	/// O(1) - Constant Runtime
 	/// Runtime dependent on node->hasChildren call, which could 
 	/// be loading the data on demand
-	virtual bool hasChildren( const QModelIndex & parent ) const;
+	bool hasChildren( const QModelIndex & parent ) const;
 
-	virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
+	int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
+	
+	QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
 
-	virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
+	bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
 
-	virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+	bool dropMimeData ( const QMimeData * data, Qt::DropAction action, int row, int column, const QModelIndex & parent );
 
-	virtual bool dropMimeData ( const QMimeData * data, Qt::DropAction action, int row, int column, const QModelIndex & parent );
+	Qt::ItemFlags flags ( const QModelIndex & index ) const;
 
-	virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
+	QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 
-	virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
-
-	virtual bool removeRows( int start, int count, const QModelIndex & parent = QModelIndex() );
-
-	virtual void sort ( int column, Qt::SortOrder order = Qt::DescendingOrder)
-	{ sort( column, order, true ); }
-
-/*
- * END AbstractItemModel functions
- */
-
-    // convenience function to append rows
 	QModelIndex append( const QModelIndex & par = QModelIndex(), ModelDataTranslator * trans = 0 )
 	{ return insert( par, rowCount(par), trans ); }
 
@@ -307,18 +308,36 @@ public:
 
 	QModelIndex insert( const QModelIndex & par, int row, ModelDataTranslator * = 0 );
 
-	QModelIndexList insert( const QModelIndex & par, int rowStart, int cnt, ModelDataTranslator * = 0 );
+    // If skipDataConstruction is true, it is up to the caller to properly initialize the data represented by each returned index
+    // Generally trans->construct( trans->dataPtr( idx ) ) is the proper method. To be safe it should be done before any other
+    // changes to the model, or any other code that is allowed to request data from the model be called.  Auto sorting will not be done
+    // if skipDataConstruction is true
+    QModelIndexList insert( const QModelIndex & par, int rowStart, int cnt, ModelDataTranslator * = 0, bool skipDataConstruction = false );
 
+	QModelIndexList move( QModelIndexList items, const QModelIndex & newParent = QModelIndex(), const QModelIndex & after = QModelIndex() );
+	
 	void remove( const QModelIndex & i );
 	void remove( QModelIndexList );
+	bool removeRows( int start, int count, const QModelIndex & parent = QModelIndex() );
 	void clear();
 
 	void swap( const QModelIndex & a, const QModelIndex & b );
+
+	void sort ( int column, Qt::SortOrder order = Qt::DescendingOrder)
+	{ sort( column, order, true ); }
 
 	void sort ( int column, Qt::SortOrder order, bool recursive, int startRow=0, int endRow=-1 )
 	{ sort( column, order, recursive, QModelIndex(), startRow, endRow ); }
 
 	void sort ( int column, Qt::SortOrder order, bool recursive, const QModelIndex & parent, int startRow=0, int endRow=-1 );
+
+	/// Moves each of the indes to the top rows, according to the order of the indexes list.
+	/// The order of the remaining items are not changed
+	/// The indexes can be from any branch in the tree, they do not need to belong to the same branch(same parent()).
+	void moveToTop( QModelIndexList indexes );
+/*
+ * END AbstractItemModel functions
+ */
 
 	bool childrenLoaded( const QModelIndex & );
 
@@ -336,9 +355,15 @@ public:
 	void setHeaderLabels( const QStringList & labels );
 	QStringList headerLabels() const;
 
-	QList<int> sortColumns() const { return mSortColumnOrder; }
+	// Backward compat, depreciated
 	void setSortColumns( const QList<int> & sortColumns, bool forceResort = false );
 
+	QList<SortColumnPair> sortColumns() const { return mSortColumns; }
+	void setSortColumns( const QList<SortColumnPair> & sortColumns, bool forceResort = false );
+
+	Qt::SortOrder sortOrder( int column = -1 ) const;
+	void setSortOrder( Qt::SortOrder order, int column = -1 );
+	
 	ModelTreeBuilder * treeBuilder();
 
 	ModelDataTranslator * translator( const QModelIndex & ) const;
@@ -364,10 +389,10 @@ protected:
 	using QAbstractItemModel::persistentIndexList;
 
 	void _sort ( int column, Qt::SortOrder order, bool recursive, const QModelIndex & parent, int startRow, int endRow, bool quiet );
-
+	
 	void openInsertClosure();
 	void closeInsertClosure();
-
+	
 	void checkAutoSort(const QModelIndex & parent = QModelIndex(), bool quiet=false);
 
 	ModelNode * rootNode() const;
@@ -384,12 +409,10 @@ protected:
 	mutable bool mBlockInsertNots;
 
 	QStringList mHeaderData;
-	QList<int> mSortColumnOrder;
-	Qt::SortOrder mSortOrder;
+	QList<SortColumnPair> mSortColumns;
 	bool mAutoSort, mAssumeChildren, mDisableChildLoading;
 	friend class ModelDataTranslator;
 	friend class ModelNode;
-
 };
 
 template<class TYPE, class BASE> int TemplateDataTranslator<TYPE,BASE>::dataSize()

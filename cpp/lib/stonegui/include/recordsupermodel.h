@@ -147,6 +147,7 @@ class STONEGUI_EXPORT RecordItemBase : public ItemBase
 {
 public:
 	RecordList children( const QModelIndex & ) { return RecordList(); }
+	Qt::ItemFlags modelFlags( const QModelIndex & ) { return Qt::ItemFlags(0); }
 };
 
 /**
@@ -178,6 +179,37 @@ public:
 
 	virtual bool hasChildren( const QModelIndex & parentIndex, SuperModel * model );
 	virtual void loadChildren( const QModelIndex & parentIndex, SuperModel * model );
+};
+
+class STONEGUI_EXPORT GroupingTreeBuilder : public RecordTreeBuilder
+{
+Q_OBJECT
+public:
+	GroupingTreeBuilder( SuperModel * model );
+    enum GroupItemRoles {
+        GroupingColumn = Qt::UserRole + 1,
+        GroupingValue = Qt::UserRole + 2
+    };
+
+    ModelDataTranslator * groupedItemTranslator() const;
+    void setGroupedItemTranslator( ModelDataTranslator * trans );
+
+	bool isGrouped() const { return mIsGrouped; }
+	int groupColumn() const { return mGroupColumn; }
+
+	void groupByColumn( int column );
+	void ungroup();
+
+protected slots:
+	void slotRowsInserted( const QModelIndex & parent, int start, int end );
+	
+protected:
+	void groupRowsByColumn( int column, int start, int end );
+
+	StandardTranslator * mStandardTranslator;
+    ModelDataTranslator * mCustomTranslator;
+	int mGroupColumn;
+	bool mIsGrouped, mInsertingGroupItems;
 };
 
 /**

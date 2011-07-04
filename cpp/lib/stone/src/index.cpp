@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: index.cpp 9256 2010-01-27 04:38:24Z brobison $
+ * $Id$
  */
 
 #include <qatomic.h>
@@ -165,26 +165,43 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 		}
 	}
 
-	// Setup sql
-	QStringList entryFilters;
-	QList<QVariant> mod_args(args);
-	for( int entry = 0; entry < entryCount; entry++ ) {
-		QStringList ss;
-		int column=0;
-		foreach( Field * f, mSchema->columns() ) {
-			QString check = "(" + f->name();
-			if( f->flag( Field::ForeignKey ) && args[entry * entrySize + column].toInt() == 0 ) {
-				check += " is NULL)";
-				//mod_args[entry * entrySize + column] = QVariant(QVariant::Int);
-			} else
-				check += "=?)";
-			ss += check;
-			++column;
-		}
-		entryFilters += ss.join( " AND " );
-	}
-	
-	QString sel( entryFilters.join( " OR " ) );
+    QString sel;
+    QList<QVariant> mod_args;
+    if( entrySize == 1 && mSchema->columns()[0]->flag( Field::ForeignKey ) ) {
+        bool hasNull = false;
+        Field * f = mSchema->columns()[0];
+        QStringList ss;
+        for( int entry = 0; entry < entryCount; entry++ ) {
+            if( args[entry].isNull() )
+                hasNull = true;
+            else
+                ss += args[entry].toString();
+        }
+        sel = f->name() + " IN (" + ss.join(",") + ")";
+        if( hasNull )
+            sel += " OR " + f->name() + " IS NULL";
+    } else {
+        // Setup sql
+        QStringList entryFilters;
+        for( int entry = 0; entry < entryCount; entry++ ) {
+            QStringList ss;
+            int column=0;
+            foreach( Field * f, mSchema->columns() ) {
+                QString check = "(" + f->name();
+                QVariant arg = args[entry * entrySize + column];
+                if( f->flag( Field::ForeignKey ) && arg.toInt() == 0 ) {
+                    check += " is NULL)";
+                } else {
+                    check += "=?)";
+                    mod_args += args;
+                }
+                ss += check;
+                ++column;
+            }
+            entryFilters += ss.join( " AND " );
+        }
+        sel = entryFilters.join( " OR " );
+    }
 
 	bool ciRestore = false;
 	if( mUseCache ) {

@@ -20,7 +20,7 @@ class RvViewerPlugin(JobViewerPlugin):
     def view(self, jobList):
         for job in jobList:
             envdict = {}
-            env_lines = str(job.environment()).splitlines()
+            env_lines = str(job.environment().environment()).splitlines()
             for line in env_lines:
                 values = line.split('=', 1)
                 if len(values) >= 2:
