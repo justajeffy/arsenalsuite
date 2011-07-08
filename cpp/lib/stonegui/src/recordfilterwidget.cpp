@@ -134,32 +134,89 @@ void RecordFilterWidget::textFilterChanged()
     QTimer::singleShot(300, this, SLOT(filterRows()));
 }
 
+/*
+void RecordFilterWidget::filterRows()
+{
+    filterChildren( mTree->rootIndex() );
+}
+*/
+
 void RecordFilterWidget::filterRows()
 {
     SuperModel * sm = (SuperModel *)(mTree->model());
-
-    int numRows = mTree->model()->rowCount();
     int mapSize = mFilterMap.size();
-	QStringList strs;
+    QMap<int, QModelIndex> rowsToHide;
+
+    QModelIndexList indexes = ModelIter::collect(sm, ModelIter::Filter(ModelIter::Recursive));
+    //LOG_3( "View has "+QString::number(indexes.size())+" indexes" );
+    foreach( QModelIndex index, indexes ) {
+        // reset everything to visible
+        mTree->setRowHidden(index.row(), index.parent(), false);
+
+        for ( int col = 0; col < mapSize; col++ ) {
+
+            QLineEdit *filter = qobject_cast<QLineEdit*> (mFilterMap[col]);
+
+            QModelIndex index2 = sm->index(index.row(), mFilterIndexMap[mFilterMap[col]], index.parent());
+            QString cell = sm->data(index2).toString();
+
+            if ( filter && filter->isVisible() && !filter->text().isEmpty() ) {
+                QString filterText = filter->text();
+                //LOG_3( "filter for col: "+QString::number(col)+ " is "+filterText+"; row: "+QString::number(index.row())+" value is "+cell );
+                if ( !cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) )
+                    rowsToHide[ index.row() ] = index.parent();
+                sm->setColumnFilter( col, filterText );
+            } else
+                sm->setColumnFilter( col, "" );
+        }
+
+    }
+
+    foreach( int row, rowsToHide.keys() ) {
+        mTree->setRowHidden(row, rowsToHide[row], true);
+        QString cell = sm->data(rowsToHide[row]).toString();
+        LOG_3("hiding row: "+QString::number(row)+" parent value is: "+cell);
+    }
+}
+
+int RecordFilterWidget::filterChildren(const QModelIndex & parent)
+{
+    SuperModel * sm = (SuperModel *)(mTree->model());
+    int numRows = sm->rowCount(parent);
+    int visibleRows = numRows;
+    int mapSize = mFilterMap.size();
+    LOG_3( "parent has "+QString::number(numRows)+" children" );
     for ( int row = 0; row < numRows; row++ ) {
-        mTree->setRowHidden(row, mTree->rootIndex(), false);
+        mTree->setRowHidden(row, parent, false);
+
         for ( int col = 0; col < mapSize; col++ ) {
             QLineEdit *filter = qobject_cast<QLineEdit*> (mFilterMap[col]);
 
             if ( filter && filter->isVisible() && !filter->text().isEmpty() ) {
-                QString cell       = mTree->model()->data(mTree->model()->index(row, mFilterIndexMap[mFilterMap[col]])).toString();
+                QModelIndex index = sm->index(row, mFilterIndexMap[mFilterMap[col]], parent);
+                QString cell = sm->data(index).toString();
                 QString filterText = filter->text();
 
-				if ( ! cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) )
-					mTree->setRowHidden(row, mTree->rootIndex(), true);
+                int visibleChildren = 0;
+                if ( sm->hasChildren(index) ) {
+                    visibleChildren = filterChildren(index);
+                    LOG_3( "child "+cell+" has children, filtering - "+QString::number(visibleChildren)+ " of its children are visible" );
+                }
+                if ( visibleChildren == 0 && !cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) ) {
+                    mTree->setRowHidden(row, parent, true);
+                    visibleRows--;
+                }
 
                 sm->setColumnFilter( col, filterText );
             } else {
-			    // Set the filter to empty so that the highlighted text gets un-highlighted in recorddelegate
+                // Set the filter to empty so that the highlighted text gets un-highlighted in recorddelegate
                 sm->setColumnFilter( col, "" );
-			}
+            }
+
         }
+
     }
+    return visibleRows;
 }
 
 void RecordFilterWidget::clearFilters()
@@ -168,7 +225,7 @@ void RecordFilterWidget::clearFilters()
 	for ( int col = 0; col < mapSize; col++ ) {
 		QLineEdit *filter = qobject_cast<QLineEdit*> (mFilterMap[col]);
 
-		if ( filter ) 
+		if ( filter )
 			filter->clear();
 	}
 }
