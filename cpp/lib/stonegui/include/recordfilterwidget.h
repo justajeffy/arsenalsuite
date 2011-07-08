@@ -52,6 +52,7 @@ public slots:
     void moveColumn(int, int, int);
     void textFilterChanged();
     void filterRows();
+    int filterChildren(const QModelIndex &);
     void clearFilters();
 
 private:
