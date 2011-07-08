@@ -290,13 +290,15 @@ void ModelNode::fixupChildParentRows( int startIndex )
        }
 }
 
-bool ModelNode::hasChildren( const QModelIndex & idx, bool insert ) {
+bool ModelNode::hasChildren( const QModelIndex & idx, bool insert, bool skipTreeBuilderCheck ) {
 	int index = rowToItemInfo(idx.row()).index;
 	if( mNoChildrenArray.at(index) ) {
 		if( insert ) mNoChildrenArray.clearBit(index);
 		else return false;
 	}
 	if( insert || mChildren.size() <= index || mChildren.at(index) == 0 ) {
+        if( skipTreeBuilderCheck )
+            return false;
 		if( !insert ) {
 			bool hasChildren = model(idx)->treeBuilder()->hasChildren(idx,model(idx)); // TODO Fetch From Tree Builder
 			if( !hasChildren ) {
@@ -332,7 +334,7 @@ void ModelNode::setChild( const QModelIndex & idx, ModelNode * childNode )
 
 ModelNode * ModelNode::child( const QModelIndex & idx, bool insert, bool steal )
 {
-	if( !hasChildren(idx,insert) ) return 0;
+	if( !hasChildren(idx,insert,steal) ) return 0;
 	// If hasChildren returns true, then we at least have a spot in mChildren
 	int index = rowToItemInfo(idx.row()).index;
 	ModelNode * node = mChildren[index];
@@ -344,7 +346,7 @@ ModelNode * ModelNode::child( const QModelIndex & idx, bool insert, bool steal )
 		// asked for, therefore never given a chance to be loaded
 		// by treeBuilder?  That at least means the caller of insert
 		// has not even called rowCount, so they are inserting at row 0
-		if( !insert )
+		if( !insert && !steal )
 			model(idx)->treeBuilder()->_loadChildren(idx,model(idx),node);
 		return node;
 	}
@@ -819,13 +821,15 @@ TransRowSpanMap continuousByParentAndTrans( QModelIndexList indexes, SuperModel 
 // Define this to 1 for broken qt beginMoveRows
 #define USE_SLOW_PATH 0
 
+#if USE_SLOW_PATH
+
 QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & destParent, const QModelIndex & insertAt )
 {
 	ModelNode * destNode = destParent.isValid() ? indexToNode(destParent)->child(destParent,true) : rootNode();
 	int insertPos = insertAt.isValid() ? insertAt.row() : rowCount(destParent);
 	TransRowSpanMap spansByTrans = continuousByParentAndTrans( indexes, this );
 	QModelIndexList ret;
-    bool stealObjects = !bool(USE_SLOW_PATH);
+	bool stealObjects = false;
 	for( TransRowSpanMap::Iterator it = spansByTrans.begin(); it != spansByTrans.end(); ++it ) {
 		int toInsert = 0;
 		ModelDataTranslator * trans = it.key();
@@ -833,24 +837,15 @@ QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & d
 		foreach( const RowSpan & rs, spanList )
 			toInsert += rs.count;
 		LOG_5( "Inserting " + QString::number( toInsert ) + " children" );
-#if USE_SLOW_PATH
 		beginInsertRows( destParent, insertPos, insertPos + toInsert - 1 );
-#endif
-        if( destNode->insertChildren( insertPos, toInsert, trans, /*skipConstruction=*/stealObjects ) ) {
-
-#if USE_SLOW_PATH
+		if( destNode->insertChildren( insertPos, toInsert, trans, /*skipConstruction=*/false ) ) {
 			endInsertRows();
-#endif
 			int currentDestRow = insertPos;
 			foreach( const RowSpan & rs, spanList ) {
 				ModelNode * sourceNode = rs.parent.isValid() ? indexToNode(rs.parent)->child(rs.parent,true) : rootNode();
 				LOG_5( "Trying beginMoveRows for " + QString::number( rs.count ) + " rows" );
-#if USE_SLOW_PATH
 				{
 					emit layoutAboutToBeChanged();
-#else
-				if( beginMoveRows( rs.parent, rs.start, rs.start + rs.count - 1, destParent, currentDestRow ) ) {
-#endif
 					int start = rs.start;
 					// If we are moving items without changing parent, we have to adjust the start position if it falls
 					// after the insert position
@@ -861,36 +856,24 @@ QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & d
 					// items occupy contiguous memory
 					for( int i = start + rs.count - 1; i >= start; --i ) {
 						QModelIndex destIdx( createIndex( currentDestRow++, 0, destNode ) ), srcIdx( createIndex( i, 0, sourceNode ) );
-                        if( stealObjects )
-                            trans->rawCopy( destNode->itemData(destIdx), sourceNode->itemData(srcIdx) );
-                        else
-                            trans->copyData( destNode->itemData(destIdx), sourceNode->itemData(srcIdx) );
+						if( stealObjects )
+							trans->rawCopy( destNode->itemData(destIdx), sourceNode->itemData(srcIdx) );
+						else
+							trans->copyData( destNode->itemData(destIdx), sourceNode->itemData(srcIdx) );
 						// Move the child node pointer, no copying or index updates needed
 						destNode->setChild( destIdx, sourceNode->child( srcIdx, /*create=*/false, /*steal=*/true ) );
-#if USE_SLOW_PATH
 						for( int c = 0; c < columnCount(); c++ )
 							changePersistentIndex( srcIdx.sibling( srcIdx.row(), c ), destIdx.sibling( destIdx.row(), c ) );
-#endif
 					}
-#if USE_SLOW_PATH
 					beginRemoveRows( rs.parent, start, start + rs.count - 1 );
-#endif
 					sourceNode->removeChildren( start, rs.count, /*stealObject =*/ stealObjects );
-#if USE_SLOW_PATH
 					endRemoveRows();
-#endif
 					if( destParent == rs.parent && insertPos > rs.start ) {
 						insertPos -= rs.count;
 						currentDestRow -= rs.count;
 					}
-#if USE_SLOW_PATH
 					emit layoutChanged();
 				}
-#else
-					endMoveRows();
-				} else
-					LOG_1( QString("beginMoveRows failed for source rows %1-%2 moving to %3").arg(rs.start).arg(rs.start+rs.count-1).arg(currentDestRow) );
-#endif
 			}
 			
 			// Since it's possible beginMoveRows failed due to moving onto child or moving onto self
@@ -905,6 +888,71 @@ QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & d
 	}
 	return ret;
 }
+
+#else
+
+QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & destParent, const QModelIndex & insertAt )
+{
+	ModelNode * destNode = destParent.isValid() ? indexToNode(destParent)->child(destParent,true) : rootNode();
+	int insertPos = insertAt.isValid() ? insertAt.row() : rowCount(destParent);
+	TransRowSpanMap spansByTrans = continuousByParentAndTrans( indexes, this );
+	QModelIndexList ret;
+	bool stealObjects = true;
+	for( TransRowSpanMap::Iterator it = spansByTrans.begin(); it != spansByTrans.end(); ++it ) {
+		int toInsert = 0;
+		ModelDataTranslator * trans = it.key();
+		QList<RowSpan> & spanList = it.value();
+		foreach( const RowSpan & rs, spanList )
+			toInsert += rs.count;
+		LOG_5( "Inserting " + QString::number( toInsert ) + " children" );
+		if( destNode->insertChildren( insertPos, toInsert, trans, /*skipConstruction=*/stealObjects ) ) {
+			int currentDestRow = insertPos;
+			foreach( const RowSpan & rs, spanList ) {
+				ModelNode * sourceNode = rs.parent.isValid() ? indexToNode(rs.parent)->child(rs.parent,true) : rootNode();
+				LOG_5( "Trying beginMoveRows for " + QString::number( rs.count ) + " rows" );
+				if( beginMoveRows( rs.parent, rs.start, rs.start + rs.count - 1, destParent, currentDestRow ) ) {
+					int start = rs.start;
+					// If we are moving items without changing parent, we have to adjust the start position if it falls
+					// after the insert position
+					if( destParent == rs.parent && insertPos < rs.start )
+						start += toInsert;
+					LOG_5( "Moving " + QString::number( rs.count ) + " rows starting at " + QString::number(start) );
+					// Do the actual copies, we have to do this one at a time because there's no guarantee contiguous
+					// items occupy contiguous memory
+					for( int i = start + rs.count - 1; i >= start; --i ) {
+						QModelIndex destIdx( createIndex( currentDestRow++, 0, destNode ) ), srcIdx( createIndex( i, 0, sourceNode ) );
+						if( stealObjects )
+							trans->rawCopy( destNode->itemData(destIdx), sourceNode->itemData(srcIdx) );
+						else
+							trans->copyData( destNode->itemData(destIdx), sourceNode->itemData(srcIdx) );
+						// Move the child node pointer, no copying or index updates needed
+						destNode->setChild( destIdx, sourceNode->child( srcIdx, /*create=*/false, /*steal=*/true ) );
+					}
+					sourceNode->removeChildren( start, rs.count, /*stealObject =*/ stealObjects );
+					if( destParent == rs.parent && insertPos > rs.start ) {
+						insertPos -= rs.count;
+						currentDestRow -= rs.count;
+					}
+					endMoveRows();
+				} else
+					LOG_1( QString("beginMoveRows failed for source rows %1-%2 moving to %3").arg(rs.start).arg(rs.start+rs.count-1).arg(currentDestRow) );
+			}
+			
+			// Since it's possible beginMoveRows failed due to moving onto child or moving onto self
+			// we have to reclaim any extra children that weren't used
+			if( currentDestRow - insertPos < indexes.size() )
+				destNode->removeChildren( currentDestRow, indexes.size() - (currentDestRow - insertPos), /*stealObject =*/ true  );
+			
+			for( int i = insertPos; i < currentDestRow; i++ )
+				ret += createIndex( i, 0, destNode );
+		} else
+			endInsertRows();
+	}
+	return ret;
+}
+
+#endif
+
 #undef USE_SLOW_PATH
 
 bool SuperModel::removeRows( int start, int count, const QModelIndex & parent )
@@ -1191,9 +1239,9 @@ void SuperModel::closeInsertClosure()
 	if( mInsertClosureNode ) {
 		mInsertClosureNode->count--;
 		if( mInsertClosureNode->count == 0 ) {
-			checkAutoSort(mInsertClosureNode->parent,true);
 			if( mInsertClosureNode->state == 1 )
 				endInsertRows();
+			checkAutoSort(mInsertClosureNode->parent,true);
 			InsertClosureNode * node = mInsertClosureNode;
 			mInsertClosureNode = node->next;
 			delete node;

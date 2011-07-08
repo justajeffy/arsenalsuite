@@ -193,7 +193,7 @@ public:
 	
 	int rowCount();
 
-	bool hasChildren( const QModelIndex & idx, bool insert = false );
+    bool hasChildren( const QModelIndex & idx, bool insert = false, bool skipTreeBuilderCheck = false );
 	QVariant data( const QModelIndex & idx, int role );
 	bool setData( const QModelIndex & idx, const QVariant & value, int role );
 	Qt::ItemFlags flags( const QModelIndex & idx );
