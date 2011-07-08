@@ -62,6 +62,7 @@ class NukeBurner(JobBurner):
 
     def environment(self):
         env = self.Job.environment().environment()
+
         Log( "NukeBurner::environment(): %s" % env )
         return env.split("\n")
 
@@ -85,6 +86,14 @@ class NukeBurner(JobBurner):
         # # of threads
         args << "-m"
         args << str(self.Job.assignmentSlots())
+        # view?
+        if not self.Job.viewName().isEmpty():
+            args << "-view"
+            args << self.Job.viewName()
+        # limit nodes to execute
+        if not self.Job.viewName().isEmpty():
+            args << "-X"
+            args << self.Job.nodes()
         # frame range
         args << "-F"
         args << self.assignedTasks()
@@ -108,6 +117,7 @@ class NukeBurner(JobBurner):
         Log( "NukeBurner::startBurn() done" )
 
     def slotProcessOutputLine(self,line,channel):
+        JobBurner.slotProcessOutputLine(self,line,channel)
         #Log( "NukeBurner::slotReadOutput() called, ready to read output" )
         # Frame status
         if self.frameDone.indexIn(line) >= 0: pass
@@ -139,11 +149,11 @@ class NukeBurnerPlugin(JobBurnerPlugin):
 
     def createBurner(self,jobAss,slave):
         Log( "NukeBurnerPlugin::createBurner() called, Creating NukeBurner" )
-        if jobAss.job().jobType().name() == 'Nuke':
-            return NukeBurner(jobAss,slave)
         if jobAss.job().jobType().name() == 'Nuke51':
             return NukeBurner(jobAss,slave)
         if jobAss.job().jobType().name() == 'Nuke52':
+            return NukeBurner(jobAss,slave)
+        if jobAss.job().jobType().name() == 'Nuke':
             return NukeBurner(jobAss,slave)
 
 JobBurnerFactory.registerPlugin( NukeBurnerPlugin() )
