@@ -46,5 +46,8 @@
 		<file>images/moveleft.png</file>
 		<file>images/moveright.png</file>
 		<file>images/rename.png</file>
+		<file>images/image.png</file>
+		<file>images/chart_line.png</file>
+		<file>resources/graph/index.html</file>
     </qresource>
 </RCC>

@@ -1,0 +1,123 @@
+<html> 
+    <head> 
+        <script language='javascript' type='text/javascript' src='js/jquery.min.js'></script> 
+        <script language='javascript' type='text/javascript' src='js/jquery.flot.js'></script> 
+        <script type='text/javascript'>
+            function plot(timeDone, timeBusy, timeSuspended, timeCancelled, memory) {
+                $.plot($('#time'), [ 
+                    { data: timeDone, label: "Done", bars: { show: true, lineWidth: 1 } },
+                    { data: timeBusy, label: "Busy", bars: { show: true, lineWidth: 1 } },
+                    { data: timeSuspended, label: "Suspended", bars: { show: true, lineWidth: 1 } },
+                    { data: timeCancelled, label: "Cancelled", bars: { show: true, lineWidth: 1 } },
+                ], {
+                    grid: {
+                        hoverable: true
+                    },
+                    legend: {
+                        show: false
+                    }, 
+                    yaxis: { 
+                        labelWidth: 40,
+                        min: 0
+                    } 
+                } );
+
+                $.plot($('#memory'), [ 
+                    { data: memory, bars: { show: true } } 
+                ], {
+                    grid: {
+                        hoverable: true
+                    }, 
+                    yaxis: {
+                        labelWidth: 40,
+                        min: 0
+                    }
+                });
+
+                var previousPoint = null;
+                $("#time").bind("plothover", function (event, pos, item) {
+
+                    if (item) {
+                        if (previousPoint != item.dataIndex) {
+                            previousPoint = item.dataIndex;
+                            
+                            $("#tooltip").remove();
+                            var x = item.datapoint[0],
+                                y = item.datapoint[1];
+                            
+                            showTooltip(item.pageX, item.pageY, x + ": " + y + " min, " + item.series.label);
+                        }
+                    }
+                    else {
+                        $("#tooltip").remove();
+                        previousPoint = null;            
+                    }
+                });
+
+                var previousPoint = null;
+                $("#memory").bind("plothover", function (event, pos, item) {
+
+                    if (item) {
+                        if (previousPoint != item.dataIndex) {
+                            previousPoint = item.dataIndex;
+                            
+                            $("#tooltip").remove();
+                            var x = item.datapoint[0],
+                                y = item.datapoint[1];
+                            
+                            showTooltip(item.pageX, item.pageY, x + ": " + y + " MB");
+                        }
+                    }
+                    else {
+                        $("#tooltip").remove();
+                        previousPoint = null;            
+                    }
+                });
+            }
+
+            function showTooltip(x, y, contents) {
+                $('<div id="tooltip">' + contents + '</div>').css( {
+                    position: 'absolute',
+                    display: 'none',
+                    top: y + 5,
+                    left: x + 5,
+                    border: '1px solid #fdd',
+                    padding: '2px',
+                    'background-color': '#fee',
+                    opacity: 0.80
+                }).appendTo("body").fadeIn(50);
+            }
+
+        </script>
+    </head> 
+    <body> 
+        <table width="100%" height="100%">
+            <tr>
+                <td align="center" valign="middle">
+                    <table width="100%" height="100%">
+                        <tr>
+                            <td>
+                                <h5>Frame Times (minutes)</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center">
+                                <div id='time' style='width:90%;height:100px;'>...</div> 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h5>Frame Memory (MB)</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center">
+                                <div id='memory' style='width:90%;height:100px;'>...</div> 
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body> 
+</html>

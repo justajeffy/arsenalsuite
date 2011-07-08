@@ -64,21 +64,32 @@ TabToolBar::TabToolBar(QTabWidget * parent, ImageView * iv )
 	mAlpha = new QPushButton( QIcon( ":/images/show_alpha.png" ),"", this );
 	mAlpha->setCheckable( true );
 	mAlpha->setToolTip( "Show Alpha Channel" );
+    mAlpha->setMaximumSize(22, 22);
 
 	mPlay = new QPushButton( QIcon( ":/images/run.png" ), "", this );
 	mPlay->setToolTip( "Play Frames" );
+    mPlay->setMaximumSize(22, 22);
 
 	mPause = new QPushButton( QIcon( ":/images/pause.png" ), "", this );
 	mPause->setEnabled( false );
 	mPause->setToolTip( "Pause Frames" );
+    mPause->setMaximumSize(22, 22);
+
+    QWidget * spacer = new QWidget();
+    spacer->setMaximumWidth(10);
+
+    QWidget * spacer2 = new QWidget();
+    spacer2->setMaximumWidth(10);
 
 	QLabel * scaleLabel = new QLabel( "Scale:", this );
+    scaleLabel->setMaximumWidth(50);
 
 	mScaleCombo = new QComboBox( this );
 	mScaleCombo->setEditable( true );
 //	mScaleCombo->setInsertionPolicy( QComboBox::NoInsertion );
 	mScaleCombo->installEventFilter( this );
 	mScaleCombo->lineEdit()->installEventFilter( this );
+    mScaleCombo->setMaximumWidth(60);
 
 	mScaleCombo->addItem( "0.5" );
 	mScaleCombo->addItem( "1.0" );
@@ -100,8 +111,10 @@ TabToolBar::TabToolBar(QTabWidget * parent, ImageView * iv )
 	controlsLayout->addWidget(mAlpha);
 	controlsLayout->addWidget(mPlay);
 	controlsLayout->addWidget(mPause);
+	controlsLayout->addWidget(spacer);
 	controlsLayout->addWidget(scaleLabel);
 	controlsLayout->addWidget(mScaleCombo);
+	controlsLayout->addWidget(spacer2);
 	controlsLayout->addWidget(mFreeScaleCheck);
 
 	connect( mImageView, SIGNAL( scaleFactorChange( float ) ), SLOT( slotSetScaleFactor( float ) ) );
