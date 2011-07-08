@@ -2,13 +2,15 @@
     <head> 
         <script language='javascript' type='text/javascript' src='js/jquery.min.js'></script> 
         <script language='javascript' type='text/javascript' src='js/jquery.flot.js'></script> 
+        <script language='javascript' type='text/javascript' src='js/jquery.flot.stack.js'></script> 
         <script type='text/javascript'>
-            function plot(timeDone, timeBusy, timeSuspended, timeCancelled, memory) {
+            function plot(time, timeDone, timeBusy, timeSuspended, timeCancelled, memory, opsRead, opsWrite, diskRead, diskWrite) {
                 $.plot($('#time'), [ 
+                    { data: time, label: "CPU Time", bars: { show: true, lineWidth: 1 } },
                     { data: timeDone, label: "Done", bars: { show: true, lineWidth: 1 } },
-                    { data: timeBusy, label: "Busy", bars: { show: true, lineWidth: 1 } },
                     { data: timeSuspended, label: "Suspended", bars: { show: true, lineWidth: 1 } },
-                    { data: timeCancelled, label: "Cancelled", bars: { show: true, lineWidth: 1 } },
+                    { data: timeBusy, label: "Busy", bars: { show: true, lineWidth: 1 } },
+                    { data: timeCancelled, label: "Cancelled", bars: { show: true, lineWidth: 1 } }
                 ], {
                     grid: {
                         hoverable: true
@@ -23,13 +25,51 @@
                 } );
 
                 $.plot($('#memory'), [ 
-                    { data: memory, bars: { show: true } } 
+                    { data: memory, bars: { show: true, lineWidth: 1 } } 
                 ], {
                     grid: {
                         hoverable: true
                     }, 
                     yaxis: {
                         labelWidth: 40,
+                        min: 0
+                    }
+                });
+
+                $.plot($('#ops'), [ 
+                    { data: opsRead, label: "Read", bars: { show: true, lineWidth: 1 } },
+                    { data: opsWrite, label: "Write", bars: { show: true, lineWidth: 1 } } 
+                ], {
+                    grid: {
+                        hoverable: true
+                    },
+                    series: {
+                        stack: 0
+                    },
+                    legend: {
+                        show: false
+                    }, 
+                    yaxis: {
+                        labelWidth: 70,
+                        min: 0
+                    }
+                });
+
+                $.plot($('#disk'), [ 
+                    { data: diskRead, label: "Read", bars: { show: true, lineWidth: 1 } },
+                    { data: diskWrite, label: "Write", bars: { show: true, lineWidth: 1 } } 
+                ], {
+                    grid: {
+                        hoverable: true
+                    },
+                    series: {
+                        stack: 0
+                    },
+                    legend: {
+                        show: false
+                    }, 
+                    yaxis: {
+                        labelWidth: 70,
                         min: 0
                     }
                 });
@@ -73,6 +113,46 @@
                         previousPoint = null;            
                     }
                 });
+
+                var previousPoint = null;
+                $("#ops").bind("plothover", function (event, pos, item) {
+
+                    if (item) {
+                        if (previousPoint != item.dataIndex) {
+                            previousPoint = item.dataIndex;
+                            
+                            $("#tooltip").remove();
+                            var x = item.datapoint[0],
+                                y = item.datapoint[1];
+                            
+                            showTooltip(item.pageX, item.pageY, x + " " + item.series.label + ": " + y + " ops");
+                        }
+                    }
+                    else {
+                        $("#tooltip").remove();
+                        previousPoint = null;            
+                    }
+                });
+
+                var previousPoint = null;
+                $("#disk").bind("plothover", function (event, pos, item) {
+
+                    if (item) {
+                        if (previousPoint != item.dataIndex) {
+                            previousPoint = item.dataIndex;
+                            
+                            $("#tooltip").remove();
+                            var x = item.datapoint[0],
+                                y = item.datapoint[1];
+                            
+                            showTooltip(item.pageX, item.pageY, x + " " + item.series.label + ": " + y + " MB");
+                        }
+                    }
+                    else {
+                        $("#tooltip").remove();
+                        previousPoint = null;            
+                    }
+                });
             }
 
             function showTooltip(x, y, contents) {
@@ -93,7 +173,7 @@
     <body> 
         <table width="100%" height="100%">
             <tr>
-                <td align="center" valign="middle">
+                <td width="50% "align="center" valign="middle">
                     <table width="100%" height="100%">
                         <tr>
                             <td>
@@ -102,7 +182,7 @@
                         </tr>
                         <tr>
                             <td align="center">
-                                <div id='time' style='width:90%;height:100px;'>...</div> 
+                                <div id='time' style='width:90%;height:150px;'>...</div> 
                             </td>
                         </tr>
                         <tr>
@@ -112,7 +192,31 @@
                         </tr>
                         <tr>
                             <td align="center">
-                                <div id='memory' style='width:90%;height:100px;'>...</div> 
+                                <div id='memory' style='width:90%;height:150px;'>...</div> 
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="50%" align="center" valign="middle">
+                    <table width="100%" height="100%">
+                        <tr>
+                            <td>
+                                <h5>Disk Read/Write (Ops)</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center">
+                                <div id='ops' style='width:90%;height:150px;'>...</div> 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h5>Disk Read/Write (MB)</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center">
+                                <div id='disk' style='width:90%;height:150px;'>...</div> 
                             </td>
                         </tr>
                     </table>
