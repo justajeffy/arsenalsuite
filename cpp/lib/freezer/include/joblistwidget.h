@@ -16,6 +16,7 @@
 #include "assfreezerview.h"
 
 class QAction;
+class QWebView;
 
 class FreezerWidget;
 class FreezerJobMenu;
@@ -56,6 +57,8 @@ public:
 	
 	/// show jobs with status in the list
 	void setStatusToShow( QStringList );
+
+    QWebView* mGraphs;
 
 	QAction* RefreshAction;
 	QAction* RestartAction;
