@@ -11,6 +11,9 @@
 #include <qtoolbar.h>
 #include <qclipboard.h>
 
+#include <qwebview.h>
+#include <qwebframe.h>
+
 #include <stdlib.h>
 
 #include "blurqt.h"
@@ -88,6 +91,17 @@ void JobListWidget::initializeViews()
         mViewsInitialized = true;
 
         mTabToolBar = new TabToolBar( mJobTabWidget, mImageView );
+        mTabToolBar->setMaximumHeight(22);
+
+
+        // Add the tabToolBar to the Image Viewer tab
+        mImageViewerLayout->addWidget(mTabToolBar);
+
+        mGraphs = new QWebView(this);
+        QUrl startURL = QUrl("resources/graph/index.html");
+        mGraphs->load(startURL);
+        mGraphLayout->addWidget(mGraphs);
+
 
         RefreshAction = new QAction( "Refresh Job(s)", this );
         RefreshAction->setIcon( QIcon( ":/images/refresh" ) );
@@ -490,15 +504,43 @@ void JobListWidget::customEvent( QEvent * evt )
 			int minFrame = -1, maxFrame = -1;
 			JobTaskList jtl = ((FrameListTask*)evt)->mReturn;
 			FrameItem::CurTime = ((FrameListTask*)evt)->mCurTime;
+
+            QString timeDone = "";
+            QString timeBusy = "";
+            QString timeSuspended = "";
+            QString timeCancelled = "";
+            QString memory = "";
 			foreach( JobTask jt, jtl )
 			{
 				if( minFrame==-1 || (int)jt.frameNumber() < minFrame )
 					minFrame = jt.frameNumber();
 				if( maxFrame==-1 || (int)jt.frameNumber() > maxFrame )
 					maxFrame = jt.frameNumber();
+
+                // Store memory/frame number for the graph
+                memory += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( jt.jobTaskAssignment().memory() / 1024 ) + "],"; // Use MB
+
+                // If the is no end time use now
+                QDateTime end = jt.jobTaskAssignment().ended().isNull() ? QDateTime::currentDateTime() : jt.jobTaskAssignment().ended();
+
+                // Store the frame time if the task has started
+                int time = jt.jobTaskAssignment().started().isNull() ? 0 : jt.jobTaskAssignment().started().secsTo(end);
+
+                if( jt.status() == "done" )
+                    timeDone += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( time / 60 ) + "],"; // Use minutes
+                if( jt.status() == "busy" )
+                    timeBusy += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( time / 60 ) + "],";
+                if( jt.status() == "suspended" )
+                    timeSuspended += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( time / 60 ) + "],"; 
+                if( jt.status() == "cancelled" )
+                    timeCancelled += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( time / 60 ) + "],"; 
 			}
+
+            // Plot the memory/time graphs
+            mGraphs->page()->mainFrame()->evaluateJavaScript(QString("plot([" + timeDone + "], [" + timeBusy + "], [" + timeSuspended + "], [" + timeCancelled + "], [" + memory + "]);"));
+
 			mFrameTree->model()->updateRecords( jtl );
-			mTabToolBar->slotPause();
+			//mTabToolBar->slotPause();
 			mImageView->setFrameRange( mCurrentJob.outputPath(), minFrame, maxFrame );
 			mFrameTask = 0;
 
@@ -513,7 +555,7 @@ void JobListWidget::customEvent( QEvent * evt )
 			LOG_3("got partial frame list back:"+QString::number(jtl.size()));
 			FrameItem::CurTime = ((PartialFrameListTask*)evt)->mCurTime;
 			mFrameTree->model()->updated( jtl );
-			mTabToolBar->slotPause();
+			//mTabToolBar->slotPause();
 			mPartialFrameTask = 0;
 
             mFrameTree->mRecordFilterWidget->filterRows();
@@ -831,10 +873,10 @@ void JobListWidget::currentTabChanged()
 	else
 		mJobTabWidget->setSizePolicy( QSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored ) );
 
-	if( curTab==mFrameTab )
-		mTabToolBar->show();
-	else
-		mTabToolBar->hide();
+	//if( curTab==mFrameTab )
+	//	mTabToolBar->show();
+	//else
+	//	mTabToolBar->hide();
 
 	refreshCurrentTab();
 }
