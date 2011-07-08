@@ -193,7 +193,7 @@ contains( DEFINES, USE_IMAGE_MAGICK ) {
 TEMPLATE=lib
 
 CONFIG += qt thread opengl
-QT+=xml sql opengl network
+QT+=xml sql opengl network webkit
 TARGET=freezer
 
 unix {
