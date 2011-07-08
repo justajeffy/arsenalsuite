@@ -509,7 +509,12 @@ void JobListWidget::customEvent( QEvent * evt )
             QString timeBusy = "";
             QString timeSuspended = "";
             QString timeCancelled = "";
+            QString cputime = "";
             QString memory = "";
+            QString opsRead = "";
+            QString opsWrite = "";
+            QString diskRead = "";
+            QString diskWrite = "";
 			foreach( JobTask jt, jtl )
 			{
 				if( minFrame==-1 || (int)jt.frameNumber() < minFrame )
@@ -526,6 +531,9 @@ void JobListWidget::customEvent( QEvent * evt )
                 // Store the frame time if the task has started
                 int time = jt.jobTaskAssignment().started().isNull() ? 0 : jt.jobTaskAssignment().started().secsTo(end);
 
+                // Store cputime/frame number for the graph
+                cputime += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( time * jt.jobTaskAssignment().jobAssignment().assignSlots() / 60 ) + "],"; // Use minutes
+
                 if( jt.status() == "done" )
                     timeDone += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( time / 60 ) + "],"; // Use minutes
                 if( jt.status() == "busy" )
@@ -534,10 +542,18 @@ void JobListWidget::customEvent( QEvent * evt )
                     timeSuspended += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( time / 60 ) + "],"; 
                 if( jt.status() == "cancelled" )
                     timeCancelled += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( time / 60 ) + "],"; 
+
+                // Store ops read/write
+                opsRead  += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( jt.jobTaskAssignment().jobAssignment().opsRead() ) + "],";
+                opsWrite += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( jt.jobTaskAssignment().jobAssignment().opsWrite() ) + "],";
+
+                // Store disk read/write
+                diskRead  += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( jt.jobTaskAssignment().jobAssignment().bytesRead() / 1024 / 1024 ) + "],"; // Use MB
+                diskWrite += "[" + QString::number((int)jt.frameNumber()) + "," + QString::number( jt.jobTaskAssignment().jobAssignment().bytesWrite() / 1024 / 1024 ) + "],";
 			}
 
             // Plot the memory/time graphs
-            mGraphs->page()->mainFrame()->evaluateJavaScript(QString("plot([" + timeDone + "], [" + timeBusy + "], [" + timeSuspended + "], [" + timeCancelled + "], [" + memory + "]);"));
+            mGraphs->page()->mainFrame()->evaluateJavaScript(QString("plot([" + cputime + "], [" + timeDone + "], [" + timeBusy + "], [" + timeSuspended + "], [" + timeCancelled + "], [" + memory + "], [" + opsRead + "], [" + opsWrite + "], [" + diskRead + "], [" + diskWrite + "]);"));
 
 			mFrameTree->model()->updateRecords( jtl );
 			//mTabToolBar->slotPause();
