@@ -656,6 +656,11 @@ void ExtTreeView::setupTreeView( IniConfig & ini, const ColumnStruct columns [] 
             sortColumns.append( SortColumnPair( scl[i], (i < sortDirections.size()) && (sortDirections[i] == "Ascending") ? Qt::AscendingOrder : Qt::DescendingOrder ) );
         sm->setSortColumns( sortColumns );
 		sc = scl.isEmpty() ? 0 : scl[0];
+        int groupColumn = ini.readInt( "GroupedByColumn", -1 );
+        if( groupColumn >= 0 ) {
+            ModelGrouper * grouper = sm->grouper();
+            grouper->groupByColumn( groupColumn );
+        }
 	} else
 		sc = ini.readInt("SortColumn", 0);
 	Qt::SortOrder order(Qt::SortOrder(ini.readInt("SortOrder",Qt::AscendingOrder)));
@@ -696,6 +701,8 @@ void ExtTreeView::saveTreeView( IniConfig & ini, const ColumnStruct columns [] )
         }
         ini.writeIntList( "SortColumnOrder", sortColumns );
         ini.writeString( "SortColumnDirection", sortDirections.join(",") );
+        if( sm->grouper(false) && sm->grouper()->isGrouped() )
+            ini.writeInt( "GroupedByColumn", sm->grouper()->groupColumn() );
     } else
 		ini.writeInt( "SortColumn", header()->sortIndicatorSection() );
 	ini.writeInt( "SortOrder", header()->sortIndicatorOrder() );
