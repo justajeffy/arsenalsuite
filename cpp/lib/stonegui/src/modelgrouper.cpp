@@ -2,6 +2,7 @@
 #include <qtimer.h>
 #include <qregexp.h>
 
+#include "blurqt.h"
 #include "modelgrouper.h"
 #include "supermodel.h"
 
@@ -12,6 +13,7 @@ ModelGrouper::ModelGrouper( SuperModel * model )
 , mCustomTranslator( 0 )
 , mGroupColumn( 0 )
 , mIsGrouped( false )
+, mInsertingGroupItems( false )
 {
 	model->setGrouper(this);
 	connect( model, SIGNAL( rowsInserted(const QModelIndex &, int, int) ), SLOT( slotRowsInserted( const QModelIndex &, int, int) ) );
@@ -77,6 +79,16 @@ QModelIndexList fromPersist( QList<QPersistentModelIndex> persist)
 	return ret;
 }
 
+QString indexToStr( const QModelIndex & idx )
+{ return QString("(%1,%2,%3)").arg(idx.row()).arg(idx.column()).arg((qulonglong)idx.internalPointer(),0,16); }
+
+QString indexListToStr( QModelIndexList list )
+{
+	QStringList rows;
+	foreach( QModelIndex idx, list ) rows += indexToStr(idx);
+	return rows.join(",");
+}
+
 void ModelGrouper::groupRowsByColumn( int column, int start, int end )
 {
 	// First group the top level indexes by the desired column
@@ -86,41 +98,48 @@ void ModelGrouper::groupRowsByColumn( int column, int start, int end )
 	for( int i = start; i <= end; ++i ) {
 		QModelIndex idx = model()->index( i, column );
 		// Double check that this isn't a group item, even though it shouldn't be
-		if( model()->translator(idx) != mStandardTranslator ) {
+		if( model()->translator(idx) != groupedItemTranslator() ) {
 			topLevel += idx;
 			QRegExp regEx = columnGroupRegex(column);
 			QString strValue = model()->data( idx, Qt::DisplayRole ).toString();
 			if( !regEx.isEmpty() && regEx.isValid() && strValue.contains(regEx) )
 				strValue = regEx.cap(regEx.captureCount() > 1 ? 1 : 0);
 			grouped[strValue] += idx;
+			LOG_5( QString("Index %1 grouped with value %2").arg(indexToStr(idx)).arg(strValue) );
 		}
 	}
+		
+	QList<QPersistentModelIndex> persistentGroupIndexes;
 	
 	// If we are already grouped, we need to insert items into existing groups before creating new ones
 	if( mIsGrouped ) {
-		for( ModelIter it(model()); it.isValid(); ++it ) {
-			// Found a group item
-			if( model()->translator(*it) == groupedItemTranslator() ) {
-				QModelIndex groupIdx = model()->index( (*it).row(), column );
-				QString groupVal = groupIdx.data( Qt::DisplayRole ).toString();
+		// Get persistent indexes for each group item, because regular ones may be invalidated by 
+		// the move call in the loop
+		for( ModelIter it(model()); it.isValid(); ++it )
+			persistentGroupIndexes.append( *it );
+		foreach( QPersistentModelIndex idx, persistentGroupIndexes ) {
+			if( model()->translator(idx) == groupedItemTranslator() ) {
+				QString groupVal = idx.sibling( idx.row(), column ).data( Qt::DisplayRole ).toString();
 				GroupMap::Iterator mapIt = grouped.find( groupVal );
 				if( mapIt != grouped.end() ) {
-					model()->move( fromPersist(mapIt.value()), *it );
+					QModelIndexList toMove(fromPersist(mapIt.value()));
+					LOG_5( QString("Moving indexes %1 to existing group item at index %2").arg(indexListToStr(toMove)).arg(indexToStr(idx)) );
+					model()->move( toMove, idx );
 					// Tell the group item to update itself based on the added children
-					model()->setData( *it, QVariant(), GroupingUpdate );
+					model()->setData( idx, QVariant(), GroupingUpdate );
 					grouped.erase( mapIt );
 				}
 			}
 		}
+		persistentGroupIndexes.clear();
 	}
 	
 	if( grouped.size() ) {
-		
-		QList<QPersistentModelIndex> persistentGroupIndexes;
 		// Append the group items, yet to be filled with data and have the children copied
 		{
 			mInsertingGroupItems = true;
 			QModelIndexList groupIndexes = model()->insert( QModelIndex(), model()->rowCount(), grouped.size(), groupedItemTranslator() );
+			LOG_5( QString("Created %1 new group items at indexes %2").arg(grouped.size()).arg(indexListToStr(groupIndexes)) );
 			mInsertingGroupItems = false;
 			foreach( QModelIndex idx, groupIndexes ) persistentGroupIndexes.append(idx);
 		}
@@ -129,7 +148,9 @@ void ModelGrouper::groupRowsByColumn( int column, int start, int end )
 		int i = 0;
 		for( QMap<QString, QList<QPersistentModelIndex> >::Iterator it = grouped.begin(); it != grouped.end(); ++it, ++i ) {
 			QModelIndex groupIndex = persistentGroupIndexes[i];
-			model()->move( fromPersist(it.value()), groupIndex );
+			QModelIndexList toMove(fromPersist(it.value()));
+			LOG_5( QString("Moving indexes %1 to existing group item at index %2").arg(indexListToStr(toMove)).arg(indexToStr(groupIndex)) );
+			model()->move( toMove, groupIndex );
 		}
 		
 		i = 0;
