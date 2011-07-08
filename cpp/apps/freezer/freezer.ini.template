@@ -1,0 +1,37 @@
+[Assfreezer]
+ApplicationName=ArsenalFreezer
+
+[Database]
+DatabaseDriver=QPSQL7
+Options=
+Timeout=2
+ReconnectDelay=30
+SqlErrorEmailList=barry.robison@drdstudios.com
+Host=farmdb
+Port=6432
+DatabaseName=freezer
+User=freezer
+Password=cold
+UseMultiTableSelect=true
+
+[Display Prefs]
+Icon Size=16,16
+
+[Logging]
+EchoStdOut=true
+Enabled=true
+File=/tmp/freezer.log
+MaxFiles=10
+MaxSeverity=3
+MaxSize=104857600
+
+[Update Server]
+Enabled=false
+ExecOfflineCommands=false
+Host=war.x
+LastTransactionFile=update_manager_transaction.last
+MaxAttempts=-1
+Port=25565
+RetryRate=1000
+UserList=
+
