@@ -87,6 +87,7 @@ static const ColumnStruct job_columns [] =
 	{ "Disk Ops", 		"DiskOps", 	40, 	24,	false, false },	//24
 	{ "CPU Time", 		"CPUTime", 	60, 	25,	false, true },	//25
 	{ "Queue Order", 		"QueueOrder", 	40, 	26,	false, false },	//26
+	{ "Shot Name", 		"ShotName", 	60, 	27,	false, true },	//27
 	{ 0, 					0, 					0, 		0, 	false, false }
 };
 
@@ -593,6 +594,7 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			case 24: return diskOps;
 			case 25: return cpuTime;
 			case 26: return jobStatus.queueOrder();
+			case 27: return job.shotName();
 		}
 	} else if (role == Qt::TextColorRole )
 		return co ? civ(co->fg) : QVariant();
