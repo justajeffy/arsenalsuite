@@ -84,6 +84,8 @@ public slots:
 
 	void applyOptions();
 
+    void slotGroupingChanged(bool);
+
 protected:
 	/// refreshes the host list from the database
 	void doRefresh();

@@ -10,9 +10,9 @@
 #include "syslogrealm.h"
 #include "syslogseverity.h"
 
+#include "modelgrouper.h"
 #include "recordtreeview.h"
 #include "recordfilterwidget.h"
-#include "modelgrouper.h"
 #include "viewcolors.h"
 
 #include "afcommon.h"
@@ -107,9 +107,9 @@ HostListWidget::HostListWidget( QWidget * parent )
 
 	new HostTranslator( hm->treeBuilder() );
     // Enable grouping
-    hm->grouper();
     hm->grouper()->setColumnGroupRegex(0,QRegExp("^(c0\\d\\d|om)"));
-    //hm->grouper()->setGroupedItemTranslator( new GroupedHostTranslator(this) );
+    connect( hm->grouper(), SIGNAL( groupingChanged(bool) ), SLOT( slotGroupingChanged(bool) ) );
+
 	hm->setAutoSort( true );
 	mHostTree->setModel( hm );
 
@@ -377,6 +377,11 @@ void HostListWidget::applyOptions()
 	mHostTree->setPalette( p );
 
 	mHostTree->update();
+}
+
+void HostListWidget::slotGroupingChanged(bool grouped)
+{
+       mHostTree->setRootIsDecorated(grouped);
 }
 
 QString jobErrorAsString( const JobError & je )
