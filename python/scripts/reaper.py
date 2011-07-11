@@ -214,7 +214,7 @@ def reaper():
             status = str(job.status())
 
             Database.current().exec_('SELECT update_job_soft_deps(%i)' % job.key())
-            Database.current().exec_("SELECT update_job_task_counts(%i)" % job.key())
+            Database.current().exec_("SELECT update_job_task_counts_2(%i)" % job.key())
             Database.current().exec_('SELECT update_job_stats(%i)' % job.key())
 
             js = JobStatus.recordByJob(job)
@@ -297,7 +297,7 @@ def reaper():
                 Database.current().exec_('SELECT update_job_hard_deps(%i)' % job.key())
 
             if (float(done) / float(tasks) >= 0.10) and job.autoAdaptSlots() == 0 and job.assignmentSlots() == 8:
-                if js.averageMemory() < (job.maxMemory() / 8):
+                if js.averageMemory() < (job.maxMemory() / 6):
                     print "job %s has poor memory utilisation %s" % ( job.name(), js.averageMemory() )
                     job.setAssignmentSlots( int(job.assignmentSlots() / 2) )
                     job.setAutoAdaptSlots( job.autoAdaptSlots() + 1 )
@@ -352,7 +352,7 @@ def notifySend( notifyList, body, subject, noEmail = False ):
 		try:  # Incorrectly formatted notify entries are skipped
 			recipient, method = notify.split(':')
 			if 'e' in method and not noEmail:
-				blur.email.send(sender = 'thePipe@blur.com', recipients = [recipient], subject = subject, body = body )
+				blur.email.send(sender = 'no-reply@drdstudios.com', recipients = [recipient], subject = subject, body = body )
 			if 'j' in method:
 				sender = config.jabberSystemUser +'@'+ config.jabberDomain +'/'+config.jabberSystemResource
 				recipient += '@'+config.jabberDomain

@@ -12,7 +12,7 @@ def doThis(job):
     if( job.shotName().isEmpty() ):
         # try to suss shot name from the environment
         rx = QRegExp("DRD_SHOT=(\w+)")
-        if rx.indexIn(job.environment()) >= 0:
+        if rx.indexIn(job.environment().environment()) >= 0:
             shotName = rx.cap(1)
             job.setShotName(shotName)
             job.commit()

@@ -13,6 +13,12 @@ def doThis(job):
         prevFrame = False
         numbers = job.jobTasks().frameNumbers()
         numbers.sort()
+        if len(numbers) == 1:
+            print "checkOnTens - single frame detected!"
+            job.setPriority(18)
+            job.setPacketType('continuous')
+            job.commit()
+            return True
         for frameNumber in numbers:
             if prevFrame and frameNumber - prevFrame > 9:
                 print "checkOnTens - tens detected!"
