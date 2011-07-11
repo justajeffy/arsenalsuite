@@ -21,7 +21,7 @@
  *
  */
 
-/* $Author: brobison $
+/* $Author$
  * $LastChangedDate: 2010-02-10 15:06:55 +1100 (Wed, 10 Feb 2010) $
  * $Rev: 9329 $
  * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/classesui/include/hostselector.h $
@@ -38,6 +38,7 @@
 #include "service.h"
 
 #include "classesui.h"
+#include "supermodel.h"
 #include "recordsupermodel.h"
 #include "ui_hostselectorbase.h"
 
@@ -47,6 +48,20 @@ class RecordModel;
 class ColorOption;
 
 CLASSESUI_EXPORT HostList hostListFromString( const QString & );
+
+struct CLASSESUI_EXPORT GroupedHostItem : public ItemBase
+{
+    QString groupValue, slotsOnGroup;
+    int groupColumn;
+    ColorOption * colorOption;
+    void init( const QModelIndex & idx );
+    QVariant modelData( const QModelIndex & i, int role ) const;
+    Qt::ItemFlags modelFlags( const QModelIndex & );
+    bool setModelData( const QModelIndex & i, const QVariant & value, int role );
+};
+
+typedef TemplateDataTranslator<GroupedHostItem> GroupedHostTranslator;
+
 
 class CLASSESUI_EXPORT HostItem : public RecordItemBase
 {
