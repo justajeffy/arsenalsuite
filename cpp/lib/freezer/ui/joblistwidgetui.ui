@@ -134,10 +134,9 @@
                  </widget>
                 </item>
                </layout>
-               <zorder>mFrameTree</zorder>
               </widget>
              </widget>
-             <widget class="QTabWidget" name="tabWidget" >
+             <widget class="QTabWidget" name="mFrameTabs" >
               <property name="maximumSize" >
                <size>
                 <width>16777215</width>
