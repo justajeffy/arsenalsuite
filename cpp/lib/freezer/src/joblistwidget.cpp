@@ -529,7 +529,7 @@ void JobListWidget::customEvent( QEvent * evt )
                 QString frameOpsRead    = QString::number( jt.jobTaskAssignment().jobAssignment().opsRead() );
                 QString frameOpsWrite   = QString::number( jt.jobTaskAssignment().jobAssignment().opsWrite() );
                 QString frameBytesRead  = QString::number( jt.jobTaskAssignment().jobAssignment().bytesRead() / 1024 ); // MB
-                QString frameBytesWrite = QString::number( jt.jobTaskAssignment().jobAssignment().bytesRead() / 1024 );
+                QString frameBytesWrite = QString::number( jt.jobTaskAssignment().jobAssignment().bytesWrite() / 1024 );
 
                 // Fill the stats map
                 stats["memory_"     + jt.status()] += "[" + frameNumber + ","  + frameMemory     + "],";
