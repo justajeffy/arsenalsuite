@@ -227,12 +227,6 @@ class JobAssign:
         #        Log( 'Not enough memory on workstation.' )
                 #return False
 
-        # Check if workstation and it's maxmemory settinga
-        host = hostStatus.host()
-        if host.name().startsWith("om0") and host.maxMemory() < self.Job.maxMemory():
-            if VERBOSE_DEBUG: Log( 'Not enough memory on workstation, %i required, %i available' % (self.Job.maxMemory(), hostStatus.host().maxMemory()) )
-            return False
-
         # memory is ok to assign
         return True
 
@@ -240,7 +234,7 @@ class JobAssign:
         host = hostStatus.host()
 
         if FarmResourceSnapshot.hostsUnused.get(hostStatus, 0) - self.Job.assignmentSlots() < 0:
-            if VERBOSE_DEBUG: Log( 'Job requires more slots (%s) than host (%s) has available (%s)' % (self.Job.assignmentSlots(), host.name(), host.maxAssignments()-hostStatus.activeAssignmentCount() ) )
+            if VERBOSE_DEBUG: Log( 'Job requires more slots (%s) than host (%s) has available (%s)' % (self.Job.assignmentSlots(), host.name(), FarmResourceSnapshot.hostsUnused.get(hostStatus, 0) - self.Job.assignmentSlots() ) )
             return False
 
         if hostStatus.activeAssignmentCount() > 0:
@@ -251,7 +245,7 @@ class JobAssign:
 
         if not self.hostMemoryOk( hostStatus ):
             return False
-        
+
         # Check for preassigned job list
         if self.Job.packetType() == 'preassigned':
             self.loadPreassignedHosts()
@@ -352,10 +346,10 @@ class JobAssign:
             hasTensComplete = 0
 
         # bone sez... within a particular shot, prefer slower passes first
-        shotAvgTime = 0
-        if(hasTensComplete == 1): shotAvgTime = self.JobStatus.tasksAverageTime() * 60
+        shotAvgTime = 999999
+        if(hasTensComplete == 1): shotAvgTime = 999999 - self.JobStatus.tasksAverageTime()
 
-        sortKey = '%02d-%03d-%02d-%01d-%01d-%08d-%05d' % ( urgent, reserve_used, important, hasTensRunning, hasTensComplete, avgTime, shotAvgTime )
+        sortKey = '%02d-%03d-%02d-%01d-%01d-%08d-%06d' % ( urgent, reserve_used, important, hasTensRunning, hasTensComplete, avgTime, shotAvgTime )
         self.sortKey = sortKey
         return sortKey
 
@@ -410,9 +404,10 @@ class JobAssign:
             limit = 3
         return JobTask.select( "jobtask IN (%s) AND fkeyjob=%i AND status='new' LIMIT %i" % ( numberListToString(tasks), self.Job.key(), limit ) )
 
-    def retrieveIterativeTasks(self, limit, stripe):
-        self.logString += 'Iterative [limit=%i,stripe=%i] ' % (limit, stripe)
-        return JobTask.select("keyjobtask IN (SELECT * FROM get_iterative_tasks(%i,%i,%i))" % (self.Job.key(),limit,stripe))
+    def retrieveIterativeTasks(self, limit, stripe, strictOnTens):
+        self.logString += 'Iterative [limit=%i,stripe=%i,strict=%s] ' % (limit, stripe,strictOnTens)
+        #return JobTask.select("keyjobtask IN (SELECT * FROM get_iterative_tasks(%i,%i,%i))" % (self.Job.key(),limit,stripe))
+        return JobTask.select("keyjobtask IN (SELECT * FROM get_iterative_tasks_2(%i,%i,%i,%s))" % (self.Job.key(),limit,stripe,strictOnTens))
 
     def assignHostFunc( self, hostStatus, totalHosts, totalTasks ):
         q = Database.current().exec_('SELECT * FROM assign_single_host_2(%s,%s,%s)' % (self.Job.key(), hostStatus.host().key(), self.Job.packetSize()))
@@ -445,7 +440,20 @@ class JobAssign:
             elif packetType == 'continuous':
                 tasks = self.retrieveContinuousTasks(limit=packetSize)
             elif packetType == 'iterative':
-                tasks = self.retrieveIterativeTasks(limit=packetSize,stripe=10)
+                strictOnTens = 'true'
+                # shouldn't this also include tasksSuspended()/tasksCancelled()?
+                tensRunning = self.JobStatus.tasksDone() + self.JobStatus.tasksAssigned() + self.JobStatus.tasksBusy()
+                if( float(tensRunning) / float(self.JobStatus.tasksCount()) >= 0.1 ):
+                    strictOnTens = 'false'
+                tasks = self.retrieveIterativeTasks(limit=packetSize,stripe=10,strictOnTens=strictOnTens)
+                # if tasks is null or empty and strictOnTens was on then perhaps as a fallback we should try with it
+                # off just to cover any possible glitches with the query
+                if not tasks or tasks.isEmpty():
+                    if strictOnTens == 'true':
+                        strictOnTens = 'false'
+                        tasks = self.retrieveIterativeTasks(limit=packetSize,stripe=10,strictOnTens=strictOnTens)
+                        if tasks and not tasks.isEmpty():
+                            print "strictOnTens returned nothing but without returned something?"
             else: # sequential
                 tasks = self.retrieveSequentialTasks(limit=packetSize)
 
@@ -983,7 +991,7 @@ SELECT * from running_shots_averagetime_3
                     return True
 
                 if (assignedHosts > maxAssignedHosts):
-                    Database.current().exec_("SELECT update_job_task_counts(%i)" % jobAssign.Job.key())
+                    #Database.current().exec_("SELECT update_job_task_counts(%i)" % jobAssign.Job.key())
                     Database.current().commitTransaction()
                     return True
             else:

@@ -37,6 +37,11 @@ except: traceback.print_exc()
 #except: traceback.print_exc()
 
 try:
+    import trailerPrios
+    reload(trailerPrios)
+except: traceback.print_exc()
+
+try:
     import checkOnTens
     reload(checkOnTens)
 except: traceback.print_exc()
