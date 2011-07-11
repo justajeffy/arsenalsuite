@@ -103,9 +103,10 @@ class DelightBurner(JobBurner):
         args << "-stats2"
         args << "-init"
         if not self.Job.name().contains("_nonetcache"):
-            args << "/drd/software/ext/delight/netcache.rib"
-        if self.Job.name().contains("clustercache"):
-            args << "/drd/software/ext/delight/clustercache.rib"
+            if Host.currentHost().name().startsWith("om"):
+                args << "/drd/software/ext/delight/workstationcache.rib"
+            else:
+                args << "/drd/software/ext/delight/netcache.rib"
 
         if self.Job.fileName().endsWith("..rib"):
             for n in self.frameList:
