@@ -37,6 +37,7 @@
 #include <qtreewidget.h>
 
 #include "iniconfig.h"
+#include "modelgrouper.h"
 
 #include "dynamichostgroup.h"
 #include "employee.h"
@@ -79,6 +80,53 @@ const ColumnStruct HostItem::host_columns [] =
 };
 
 ViewColors * HostItem::HostColors = 0;
+
+void GroupedHostItem::init( const QModelIndex & idx )
+{
+       int slotCount=0;
+       foreach( QModelIndex i, ModelIter::collect( idx.child(0,0) ) ) {
+               if( HostTranslator::isType(i) ) {
+                       HostItem & hi = HostTranslator::data(i);
+                       slotCount += hi._jobName.toInt();
+               }
+       }
+       slotsOnGroup = QString::number(slotCount);
+    //colorOption = options.mJobColors->getColorOption("ready");
+}
+
+QVariant GroupedHostItem::modelData( const QModelIndex & i, int role ) const
+{
+       if( role == Qt::DisplayRole && i.column() == 0 )
+               return groupValue + " Hosts";
+       if( role == Qt::DisplayRole && i.column() == 1 )
+               return slotsOnGroup;
+       if( role == Qt::DisplayRole && i.column() == groupColumn )
+               return groupValue;
+
+       return ItemBase::modelData(i,role);
+}
+
+Qt::ItemFlags GroupedHostItem::modelFlags( const QModelIndex & )
+{
+       return Qt::ItemFlags(0);
+}
+
+bool GroupedHostItem::setModelData( const QModelIndex & i, const QVariant & value, int role )
+{
+       if( role == ModelGrouper::GroupingUpdate ) {
+               init(i);
+               return true;
+       }
+       if( role == ModelGrouper::GroupingColumn ) {
+               groupColumn = value.toInt();
+               return true;
+       }
+       if( role == ModelGrouper::GroupingValue ) {
+               groupValue = value.toString();
+               return true;
+       }
+       return false;
+}
 
 void HostItem::setup( const Record & r, const QModelIndex &, bool loadJob ) {
 	host = r;
@@ -311,6 +359,7 @@ HostSelector::HostSelector( QWidget * parent )
         mHostTree->setColumnAutoResize(i,true);
 
 	mModel->setAutoSort(true);
+    //mModel->grouper()->setGroupedItemTranslator( new GroupedHostTranslator(this) );
 	mModel->sort(0,Qt::DescendingOrder);
 	connect( SelectAll, SIGNAL( clicked() ), SLOT( selectAll() ) );
 	connect( CheckSelected, SIGNAL( clicked() ), SLOT( checkSelected() ) );
