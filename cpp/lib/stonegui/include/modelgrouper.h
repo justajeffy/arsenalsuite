@@ -46,22 +46,32 @@ public:
 	void setColumnGroupRegex( int column, const QRegExp & = QRegExp() );
 	QRegExp columnGroupRegex( int column ) const;
 	
+	QString groupValue( const QModelIndex & idx );
+
+signals:
+	void groupingChanged( bool grouped );
+	void grouped();
+	void ungrouped();
+	
 protected slots:
 	void slotRowsInserted( const QModelIndex & parent, int start, int end );
 	void slotRowsRemoved( const QModelIndex & parent, int start, int end );
 	void slotDataChanged( const QModelIndex & topLeft, const QModelIndex & bottomRight );
-	void slotUpdateGroupItems();
+	void slotUpdate();
 	
 protected:
-	void groupRowsByColumn( int column, int start, int end );
-	void scheduleUpdate( const QModelIndex & i );
+	void groupRows( int start, int end );
+	void scheduleUpdate();
+
+	typedef QMap<QString,QList<QPersistentModelIndex> > GroupMap;
+	void group( GroupMap & gm );
 	
 	SuperModel * mModel;
 	StandardTranslator * mStandardTranslator;
 	ModelDataTranslator * mCustomTranslator;
 	int mGroupColumn;
 	bool mIsGrouped, mInsertingGroupItems, mUpdateScheduled;
-	QList<QPersistentModelIndex> mGroupItemsToUpdate;
+	QList<QPersistentModelIndex> mGroupItemsToUpdate, mItemsToRegroup;
 	typedef QMap<int,QRegExp> ColumnRegexMap;
 	ColumnRegexMap mColumnRegexMap;
 };

@@ -773,7 +773,7 @@ void JobListWidget::setJobList( JobList jobList )
 void JobListWidget::refreshErrorList()
 {
        mErrorTree->busyWidget()->start();
-       FreezerCore::addTask( new ErrorListTask( this, mCurrentJob, mShowClearedErrors ) );
+       FreezerCore::addTask( new ErrorListTask( this, mCurrentJob, ShowClearedErrorsAction->isChecked() ) );
        FreezerCore::wakeup();
 }
 

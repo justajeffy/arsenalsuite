@@ -164,7 +164,7 @@ bool RecordSuperModel::setupIndex( const QModelIndex & i, const Record & r )
 void RecordSuperModel::updateIndex( const QModelIndex & i )
 {
 	if( setupIndex(i,getRecord(i)) )
-		dataChanged(i,i);
+        dataChanged(i,i.sibling(i.row(),columnCount()-1));
 }
 
 Record RecordSuperModel::getRecord(const QModelIndex & i) const
