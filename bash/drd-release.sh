@@ -33,7 +33,7 @@ mkdir $STONEDIR/templates
 rsync -rvc cpp/apps/classmaker/templates/* $STONEDIR/templates/
 
 echo '***' release python libs
-rsync -rcv --exclude=wx* $DESTDIR/$PYPATH/blur /drd/software/ext/python/$ARCH/2.5/stone/$V/
+rsync -rcv --exclude=wx* python/blur/ /drd/software/ext/python/$ARCH/2.5/stone/$V/blur/
 rsync -rcv $DESTDIR/$PYPATH/sipconfig.py /drd/software/ext/python/$ARCH/2.5/stone/$V/
 rsync -rcv $DESTDIR/$PYPATH/stoneconfig.py /drd/software/ext/python/$ARCH/2.5/stone/$V/
 
@@ -47,6 +47,7 @@ rsync -rvc --exclude=.svn cpp/apps/burner/plugins/ $DIR/plugins/
 rsync -cv cpp/apps/freezer/af $DIR/af
 rsync -cv cpp/apps/freezer/freezer.ini $DIR/freezer.ini
 rsync -rvc --exclude=.svn cpp/apps/freezer/afplugins/ $DIR/afplugins/
+rsync -rvc --exclude=.svn cpp/apps/freezer/resources $DIR/
 
 rsync -cv cpp/apps/absubmit/absubmit $DIR/
 rsync -cv cpp/apps/absubmit/py2ab.py $DIR/
