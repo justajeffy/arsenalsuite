@@ -727,8 +727,8 @@ BusyWidget * ExtTreeView::busyWidget( bool autoCreate )
 
 void ExtTreeView::resizeEvent(QResizeEvent *event)
 {
-    LOG_3("resizeEvent");
-    mHeaderClickIsResize = true; 
+    //LOG_3("resizeEvent");
+    mHeaderClickIsResize = true;
     QWidget::resizeEvent(event);
     //if( mRecordFilterWidget )
     //    mRecordFilterWidget->resize( width(), 20 );
