@@ -131,7 +131,7 @@ protected:
 
     friend class RecordFilterWidget;
 
-    //void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
     BusyWidget * mBusyWidget;
     bool mHeaderClickIsResize;

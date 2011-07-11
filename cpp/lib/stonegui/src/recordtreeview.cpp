@@ -67,6 +67,7 @@ ExtTreeView::ExtTreeView( QWidget * parent, ExtDelegate * delegate )
 
 	setContextMenuPolicy( Qt::CustomContextMenu );
 	connect( this, SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( slotCustomContextMenuRequested( const QPoint & ) ) );
+    connect( header(), SIGNAL( sectionResized( int, int, int ) ), SLOT( slotSectionResized() ) );
 
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 
@@ -114,20 +115,16 @@ void ExtTreeView::addFilterLayout()
 
 void ExtTreeView::slotSectionResized()
 {
+    //LOG_3(" header click is for resizing, not sorting ");
     mHeaderClickIsResize = true;
 }
 
 bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 {
-	bool headerChild = false;
-	QObject * ob = object;
-	while( ob ) {
-		if( ob == header() ) {
-			headerChild = true;
-			break;
-		}
-		ob = ob->parent();
-	}
+    bool headerChild = false;
+    if( header()->children().contains(object) ) {
+        headerChild = true;
+    }
 
 	if( headerChild )
 	{
@@ -135,6 +132,7 @@ bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 			case QEvent::ChildAdded:
 			case QEvent::ChildPolished:
 			{
+                //LOG_3( "headerChild connect sectionResized" );
 				QChildEvent * ce = (QChildEvent*)event;
 				ce->child()->installEventFilter(this);
 				if( object == header() )
@@ -166,7 +164,7 @@ bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 				int section = header()->logicalIndexAt(mouseEvent->pos());
 				QList<SortColumnPair> sortColumns = sm->sortColumns();
 				Qt::SortOrder so = Qt::DescendingOrder;
-				
+
 				bool secondColumnSort = (mouseEvent->modifiers() & Qt::ControlModifier);
 				int checkExistingColumn = secondColumnSort ? 1 : 0;
 				// Toggle the direction if this column is already in the second place
@@ -180,7 +178,7 @@ bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 				}
 				if( toggleOrder )
 					so = (so == Qt::DescendingOrder) ? Qt::AscendingOrder : Qt::DescendingOrder;
-				
+
 				sortColumns.insert( (secondColumnSort && sortColumns.size() >= 1) ? 1 : 0,SortColumnPair(section,so));
 				sm->setSortColumns(sortColumns, /*forceResort = */ secondColumnSort );
 				// We have to trick the damn QHeaderView into getting our sort direction correct, we make it think
@@ -727,14 +725,14 @@ BusyWidget * ExtTreeView::busyWidget( bool autoCreate )
     return mBusyWidget;
 }
 
-/*
 void ExtTreeView::resizeEvent(QResizeEvent *event)
 {
+    LOG_3("resizeEvent");
+    mHeaderClickIsResize = true; 
     QWidget::resizeEvent(event);
-    if( mRecordFilterWidget )
-        mRecordFilterWidget->resize( width(), 20 );
+    //if( mRecordFilterWidget )
+    //    mRecordFilterWidget->resize( width(), 20 );
 }
-*/
 
 void ExtTreeView::enableFilterWidget(bool enable)
 {
