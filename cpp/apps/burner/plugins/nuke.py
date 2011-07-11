@@ -91,7 +91,7 @@ class NukeBurner(JobBurner):
             args << "-view"
             args << self.Job.viewName()
         # limit nodes to execute
-        if not self.Job.viewName().isEmpty():
+        if not self.Job.nodes().isEmpty():
             args << "-X"
             args << self.Job.nodes()
         # frame range
