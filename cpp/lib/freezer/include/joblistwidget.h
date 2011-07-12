@@ -191,8 +191,6 @@ protected:
 	static JobTypeList mJobTypeList;
 	static ProjectList mProjectList;
 
-    BusyWidget * mTaskListBusyWidget;
-
 public:
 	QMenu * mJobMenu,
 	 * mStatusFilterMenu,
