@@ -65,7 +65,6 @@ JobListWidget::JobListWidget( QWidget * parent )
 , mFrameTask( 0 )
 , mPartialFrameTask( 0 )
 , mStaticDataRetrieved( false )
-, mTaskListBusyWidget( 0 )
 , mJobMenu( 0 )
 , mStatusFilterMenu( 0 )
 , mProjectFilterMenu( 0 )
@@ -204,9 +203,6 @@ void JobListWidget::initializeViews()
             mFrameTree->setItemDelegateForColumn( 4, new LoadedDelegate( mJobTree ) );
             for(int i=0; i < fm->columnCount(); i++)
                 mFrameTree->setColumnAutoResize( i, true );
-            mTaskListBusyWidget = new BusyWidget( mFrameTree, QPixmap( "images/rotating_head.png" ) );
-            mTaskListBusyWidget->move(0,mFrameTree->header()->height()-5);
-            mTaskListBusyWidget->hide();
         }
 
         mStatusFilterMenu = new StatusFilterMenu( this );
@@ -802,8 +798,7 @@ void JobListWidget::refreshFrameList( bool jobChange )
 	if( mCurrentJob.isRecord() ) {
 		if( jobChange || mCurrentJob.jobStatus().tasksCount() < 2000 ) {
 			mFrameTask = new FrameListTask( this, mCurrentJob );
-            mTaskListBusyWidget->show();
-            mTaskListBusyWidget->start();
+            mFrameTree->busyWidget()->start();
 			FreezerCore::addTask( mFrameTask );
 			FreezerCore::wakeup();
 		} else {
@@ -814,6 +809,7 @@ void JobListWidget::refreshFrameList( bool jobChange )
 			for(ModelIter it(start); *it != end; ++it)
 				jtl += FrameTranslator::getRecordStatic(*it);
 			mPartialFrameTask = new PartialFrameListTask( this, jtl );
+            mFrameTree->busyWidget()->start();
 			FreezerCore::addTask( mPartialFrameTask );
 			FreezerCore::wakeup();
 		}
