@@ -188,7 +188,7 @@ def checkNewJob(job):
     job.setStatus(status)
 
     print "New Job %s appears ready, running through plug-ins" % ( job.name() )
-    for key in VerifierPluginFactory().sVerifierPlugins.keys():
+    for key in sorted(VerifierPluginFactory().sVerifierPlugins.keys()):
         function = VerifierPluginFactory().sVerifierPlugins[key]
         result = False
         try: result = function(job)
