@@ -8,21 +8,7 @@ MIMEMultipart = __import__('email.MIMEMultipart').MIMEMultipart.MIMEMultipart
 MIMEBase = __import__('email.MIMEBase').MIMEBase.MIMEBase
 Encoders = __import__('email.Encoders').Encoders
 import sys
-from blur.Stone import *
-from blur.Classes import *
-from PyQt4.QtCore import *
 import quopri
-
-# We have to initialize qt and stone before accessing the db
-def ensure_qapp():
-	if not QCoreApplication.instance():
-		# First Create a Qt Application
-		app = QCoreApplication(sys.argv)
-		# Load database config
-		if sys.platform=='win32':
-			initConfig("c:\\blur\\resin\\resin.ini")
-		else:
-			initConfig("/etc/db.ini")
 
 def send( sender, recipients, subject, body, attachments=[] ):
 	#Ensure python strings
@@ -35,24 +21,11 @@ def send( sender, recipients, subject, body, attachments=[] ):
 		return
 	
 	# Read from config file first
-	cfg = config()
-	cfg.pushSection("Email")
-	domain = cfg.readString("Domain")
-	server = cfg.readString("Server")
-	cfg.popSection()
+	domain = "@drdstudios.com"
+	server = "smtp.drd.roam"
 	
-	# Check database if not found in config and we have a connection
-	if len(domain) == 0 and Database.current().connection().isConnected():
-		domain = Config.getString("emailDomain")
-	if len(server) == 0 and Database.current().connection().isConnected():
-		server = Config.getString("emailServer")
-		
 	for (i,v) in enumerate(recipients):
 		if not v.count('@'):
-			ensure_qapp()
-			emp = Employee.recordByUserName( v )
-			if emp.isRecord() and not emp.email().isEmpty():
-				recipients[i] = emp.email()
 			if not v.count('@'):
 				recipients[i] = v + str(domain)
 	
@@ -60,7 +33,7 @@ def send( sender, recipients, subject, body, attachments=[] ):
 	email['Subject'] = subject
 	email['From'] = sender
 	email['To'] = ', '.join(recipients)
-	email['Date'] = str(QDateTime.currentDateTime().toString('ddd, d MMM yyyy hh:mm:ss'))
+	#email['Date'] = str(QDateTime.currentDateTime().toString('ddd, d MMM yyyy hh:mm:ss'))
 	email['Content-type']="Multipart/mixed"
 	email.preamble = 'This is a multi-part message in MIME format.'
 	email.epilogue = ''
