@@ -268,6 +268,7 @@ void JobListWidget::initializeViews()
         }
         mJobFilter.showNonProjectJobs = ini.readBool( "ShowNonProjectJobs", true );
         mJobFilter.mLimit = options.mLimit;
+        mJobFilter.mDaysLimit = options.mDaysLimit;
         applyOptions();
     }
 }
@@ -672,7 +673,7 @@ void JobListWidget::populateViewMenu( QMenu * viewMenu )
 void JobListWidget::setLimit()
 {
 	bool ok;
-	int limit = QInputDialog::getInteger( this, "Set Job Limit", "Enter Maximum number of jobs to display", options.mLimit, 1, 100000, 1, &ok );
+	int limit = QInputDialog::getInteger( this, "Set Job Limit", "Enter Maximum number of jobs to display", options.mLimit, 0, 100000, 1, &ok );
 	if( ok ) {
 		options.mLimit = limit;
 		applyOptions();
@@ -684,6 +685,7 @@ void JobListWidget::applyOptions()
 {
     if( mViewsInitialized ) {
         mJobFilter.mLimit = options.mLimit;
+        mJobFilter.mDaysLimit = options.mDaysLimit;
         mJobTree->setFont( options.jobFont );
         mFrameTree->setFont( options.frameFont );
         mErrorTree->setFont( options.frameFont );
