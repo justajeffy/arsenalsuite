@@ -134,13 +134,13 @@ void RecordFilterWidget::textFilterChanged()
     QTimer::singleShot(300, this, SLOT(filterRows()));
 }
 
-/*
 void RecordFilterWidget::filterRows()
 {
+    mRowChildrenVisited.clear();
     filterChildren( mTree->rootIndex() );
 }
-*/
 
+/*
 void RecordFilterWidget::filterRows()
 {
     SuperModel * sm = (SuperModel *)(mTree->model());
@@ -148,7 +148,7 @@ void RecordFilterWidget::filterRows()
     QMap<int, QModelIndex> rowsToHide;
 
     QModelIndexList indexes = ModelIter::collect(sm, ModelIter::Filter(ModelIter::Recursive));
-    //LOG_3( "View has "+QString::number(indexes.size())+" indexes" );
+    LOG_3( "View has "+QString::number(indexes.size())+" indexes" );
     foreach( QModelIndex index, indexes ) {
         // reset everything to visible
         mTree->setRowHidden(index.row(), index.parent(), false);
@@ -162,7 +162,7 @@ void RecordFilterWidget::filterRows()
 
             if ( filter && filter->isVisible() && !filter->text().isEmpty() ) {
                 QString filterText = filter->text();
-                //LOG_3( "filter for col: "+QString::number(col)+ " is "+filterText+"; row: "+QString::number(index.row())+" value is "+cell );
+                LOG_3( "filter for col: "+QString::number(col)+ " is "+filterText+"; row: "+QString::number(index.row())+" value is "+cell );
                 if ( !cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) )
                     rowsToHide[ index.row() ] = index.parent();
                 sm->setColumnFilter( col, filterText );
@@ -178,6 +178,7 @@ void RecordFilterWidget::filterRows()
         //LOG_4("hiding row: "+QString::number(row)+" parent value is: "+cell);
     }
 }
+*/
 
 int RecordFilterWidget::filterChildren(const QModelIndex & parent)
 {
@@ -185,7 +186,7 @@ int RecordFilterWidget::filterChildren(const QModelIndex & parent)
     int numRows = sm->rowCount(parent);
     int visibleRows = numRows;
     int mapSize = mFilterMap.size();
-    //LOG_3( "parent has "+QString::number(numRows)+" children" );
+    LOG_3( "parent has "+QString::number(numRows)+" children" );
     for ( int row = 0; row < numRows; row++ ) {
         mTree->setRowHidden(row, parent, false);
 
@@ -198,9 +199,10 @@ int RecordFilterWidget::filterChildren(const QModelIndex & parent)
                 QString filterText = filter->text();
 
                 int visibleChildren = 0;
-                if ( sm->hasChildren(index) ) {
+                if ( !mRowChildrenVisited.contains(index) && sm->hasChildren(index) ) {
                     visibleChildren = filterChildren(index);
-                    //LOG_3( "child "+cell+" has children, filtering - "+QString::number(visibleChildren)+ " of its children are visible" );
+                    mRowChildrenVisited[index] = true;
+                    LOG_3( "child "+cell+" has children, filtering - "+QString::number(visibleChildren)+ " of its children are visible" );
                 }
                 if ( visibleChildren == 0 && !cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) ) {
                     mTree->setRowHidden(row, parent, true);
