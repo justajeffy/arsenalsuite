@@ -7,14 +7,8 @@
 
 #include "jobsettingswidgetplugin.h"
 
-#include "jobaftereffectssettingswidget.h"
 #include "jobbatchsettingswidget.h"
-#include "jobfusionsettingswidget.h"
-#include "jobmaxsettingswidget.h"
 #include "jobmayasettingswidget.h"
-#include "jobmaxscriptsettingswidget.h"
-#include "jobshakesettingswidget.h"
-//#include "jobxsisettingswidget.h"
 
 class BuiltinCustomJobSettingsWidgetsPlugin : public CustomJobSettingsWidgetPlugin
 {
