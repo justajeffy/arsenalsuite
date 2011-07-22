@@ -13,7 +13,7 @@ pre_deps = ["stone"]
 post_deps = []
 
 # Here is the static command for running classmaker to generate the classes
-classmakercmd = 'classmaker'
+classmakercmd = 'cd ../../apps/classmaker && ./classmaker'
 if sys.platform == 'win32':
 	classmakercmd = 'classmaker.exe'
 
