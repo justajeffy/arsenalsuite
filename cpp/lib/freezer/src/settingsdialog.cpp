@@ -47,11 +47,13 @@ SettingsDialog::SettingsDialog( QWidget * parent )
 	opts = options;
 
 	mJobLimitSpin->setValue( opts.mLimit );
+	mDaysLimitSpin->setValue( opts.mDaysLimit );
 	mRefreshIntervalSpin->setValue( opts.mRefreshInterval );
 	mAutoRefreshOnWindowActivationCheck->setChecked( opts.mAutoRefreshOnWindowActivation );
 	mRefreshOnViewChangeCheck->setChecked( opts.mRefreshOnViewChange );
 
 	connect( mJobLimitSpin, SIGNAL( valueChanged( int ) ), SLOT( changes() ) );
+	connect( mDaysLimitSpin, SIGNAL( valueChanged( int ) ), SLOT( changes() ) );
 	connect( mRefreshIntervalSpin, SIGNAL( valueChanged( int ) ), SLOT( changes() ) );
 	connect( mAutoRefreshOnWindowActivationCheck, SIGNAL( toggled(bool) ), SLOT( changes() ) );
 	connect( mRefreshOnViewChangeCheck, SIGNAL( toggled(bool) ), SLOT( changes() ) );
@@ -63,6 +65,7 @@ void SettingsDialog::slotApply()
 {
 	if( mChanges ){
 		opts.mLimit = mJobLimitSpin->value();
+		opts.mDaysLimit = mDaysLimitSpin->value();
 		opts.mRefreshInterval = mRefreshIntervalSpin->value();
 		opts.mAutoRefreshOnWindowActivation = mAutoRefreshOnWindowActivationCheck->isChecked();
 		opts.mRefreshOnViewChange = mRefreshOnViewChangeCheck->isChecked();
