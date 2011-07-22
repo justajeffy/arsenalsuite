@@ -253,15 +253,14 @@ MainWindow::MainWindow( QWidget * parent )
 	options.jobFont = ini.readFont( "JobFont" );
 	options.frameFont = ini.readFont( "FrameFont" );
 	options.summaryFont = ini.readFont( "SummaryFont" );
-	options.frameCyclerPath = ini.readString( "FrameCyclerPath" );
-	options.frameCyclerArgs = ini.readString( "FrameCyclerArgs" );
 
 	options.mRefreshInterval = ini.readInt( "AutoRefreshIntervalMinutes", 5 );
 	options.mAutoRefreshOnWindowActivation = ini.readBool( "AutoRefreshOnWindowActivation", true );
 	options.mRefreshOnViewChange = ini.readBool( "RefreshOnViewChange", options.mAutoRefreshOnWindowActivation );
 	setAutoRefreshEnabled( ini.readBool( "AutoRefreshEnabled", false ) );
 	options.mCounterRefreshInterval = ini.readInt( "CounterRefreshIntervalSeconds", 30 );
-	options.mLimit = ini.readInt( "QueryLimit", 1000 );
+	options.mLimit = ini.readInt( "QueryLimit", 4000 );
+	options.mDaysLimit = ini.readInt( "DaysLimit", 3 );
 	ini.popSection();
 
 	applyOptions();
@@ -295,14 +294,13 @@ void MainWindow::closeEvent( QCloseEvent * ce )
 	ini.writeFont( "JobFont", options.jobFont );
 	ini.writeFont( "FrameFont", options.frameFont );
 	ini.writeFont( "SummaryFont", options.summaryFont );
-	ini.writeString( "FrameCyclerPath", options.frameCyclerPath );
-	ini.writeString( "FrameCyclerArgs", options.frameCyclerArgs );
 	ini.writeBool( "AutoRefreshEnabled", AutoRefreshAction->isChecked() );
 	ini.writeInt( "AutoRefreshIntervalMinutes", options.mRefreshInterval );
 	ini.writeBool( "AutoRefreshOnWindowActivation", options.mAutoRefreshOnWindowActivation );
 	ini.writeBool( "RefreshOnViewChange", options.mRefreshOnViewChange );
 	ini.writeInt( "CounterRefreshIntervalSeconds", options.mCounterRefreshInterval );
 	ini.writeInt( "QueryLimit", options.mLimit );
+	ini.writeInt( "DaysLimit", options.mDaysLimit );
 	ini.popSection();
 
 	ini.pushSection("Assfreezer");

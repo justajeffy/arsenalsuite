@@ -60,6 +60,7 @@ struct FREEZER_EXPORT Options
 	QString frameCyclerPath;
 	QString frameCyclerArgs;
 	int mLimit;
+	int mDaysLimit;
 	int mRefreshInterval; // Minutes
 	int mCounterRefreshInterval; // seconds
 	bool mAutoRefreshOnWindowActivation, mRefreshOnViewChange;
@@ -94,8 +95,9 @@ struct FREEZER_EXPORT JobFilter {
 
 	// Elements ( shots ) to show
 	ElementList elementList;
-	
+
 	uint mLimit;
+	uint mDaysLimit;
 
 	QString mExtraFilters;
 };

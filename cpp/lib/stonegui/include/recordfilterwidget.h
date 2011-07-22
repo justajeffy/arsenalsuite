@@ -61,6 +61,8 @@ private:
     QTreeView * mTree;
     QGridLayout *layout;
     QWidget     *widget;
+
+    QMap<QModelIndex, bool> mRowChildrenVisited;
 };
 
 #endif // RECORD_FILTER_WIDGET_H

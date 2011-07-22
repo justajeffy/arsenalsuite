@@ -120,7 +120,11 @@ void JobListTask::run()
 			filters << mJobFilter.mExtraFilters;
 
 		QString where = filters.isEmpty() ? "TRUE" : filters.join( " AND " );
-		where += " ORDER BY keyJob DESC LIMIT " + QString::number(mJobFilter.mLimit);
+        QString limitWhere;
+        if( mJobFilter.mDaysLimit > 0 )
+            limitWhere += QString(" AND submittedts > now()-'%1 days'::interval").arg(QString::number(mJobFilter.mDaysLimit));
+        if( mJobFilter.mLimit > 0 )
+            limitWhere += " ORDER BY keyJob DESC LIMIT " + QString::number(mJobFilter.mLimit);
 
 		bool supportsMultiSelect = Database::current()->connection()->capabilities() & Connection::Cap_MultiTableSelect;
 		TableList tables;
@@ -140,11 +144,11 @@ void JobListTask::run()
 			if( supportsMultiSelect )
 				tables += tbl;
 			else
-				mReturn += tbl->selectOnly( where );
+				mReturn += tbl->selectOnly( where+limitWhere );
 			CHECK_CANCEL
 		}
 		if( supportsMultiSelect )
-			mReturn = Database::current()->tableByName( "job" )->selectMulti( tables, where, VarList(), "WHERE TRUE ORDER BY keyJob DESC LIMIT " + QString::number(mJobFilter.mLimit) );
+			mReturn = Database::current()->tableByName( "job" )->selectMulti( tables, where, VarList(), "WHERE TRUE"+limitWhere);
 		CHECK_CANCEL
 	}
 
