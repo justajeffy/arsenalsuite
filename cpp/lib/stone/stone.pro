@@ -100,10 +100,9 @@ isEmpty( PYTHON ) {
 }
 
 unix {
-    PY_CMD =  $$PYTHON " -V 2>&1 | perl -e '$s=<STDIN>; $s =~ s/Python (\d\.\d)\.\d/$1/; print $s'"
-    PY_VERSION = $$system($$PY_CMD)
+	PY_VERSION=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_version; print get_python_version()\"")
 	message(Python Version is $$PY_VERSION)
-	INCLUDEPATH += /usr/include/python$${PY_VERSION}/
+	INCLUDEPATH+=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
 	INCLUDEPATH += ../sip/siplib/
 	LIBS+=-lpython$${PY_VERSION}
 }
