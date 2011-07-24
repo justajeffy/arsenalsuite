@@ -136,6 +136,7 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int queryPosOffset, FieldLis
 , mModifiedBits( 0 )
 , mLiterals( 0 )
 , mNotSelectedBits( 0 )
+, mKeyValue( -1 )
 {
 	sRecordImpCount++;
 	if( table ) {
@@ -168,6 +169,7 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int * queryColPos, FieldList
 , mModifiedBits( 0 )
 , mLiterals( 0 )
 , mNotSelectedBits( 0 )
+, mKeyValue( -1 )
 {
 	sRecordImpCount++;
 	if( table ) {
@@ -273,14 +275,9 @@ QVariant RecordImp::getColumn( int col ) const
 	if( !mTable || !mValues || col >= (int)mTable->schema()->fieldCount() || col < 0 )
 		return QVariant();
 
-    FieldList fields = mTable->schema()->fields();
-    if(fields[col]->flag(Field::Compress))
-        return QString::fromUtf8(qUncompress(mValues->at( col ).toByteArray()));
-    else {
-        if( getBit( mNotSelectedBits, col ) )
-            mTable->selectFields( RecordList() += Record(const_cast<RecordImp*>(this)), FieldList() += mTable->schema()->field(col) );
-        return mValues->at(col);
-    }
+    if( getBit( mNotSelectedBits, col ) )
+        mTable->selectFields( RecordList() += Record(const_cast<RecordImp*>(this)), FieldList() += mTable->schema()->field(col) );
+    return mValues->at(col);
 }
 
 QVariant RecordImp::getColumn( Field * f ) const
@@ -431,9 +428,11 @@ RecordImp * RecordImp::setValue( const QString & column, const QVariant & var )
 	return this;
 }
 
-uint RecordImp::key() const
+uint RecordImp::key()
 {
-	return mTable ? getColumn( mTable->schema()->primaryKeyIndex() ).toUInt() : 0;
+    if( mKeyValue > -1 ) return mKeyValue;
+	mKeyValue = mTable ? getColumn( mTable->schema()->primaryKeyIndex() ).toUInt() : 0;
+    return mKeyValue;
 }
 
 RecordImp * RecordImp::copy()

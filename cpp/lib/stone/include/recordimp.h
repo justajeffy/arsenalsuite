@@ -125,8 +125,9 @@ public:
 	RecordImp * copy();
 
 	/// Returns the primary key for this record
-	uint key() const;
-	
+	uint key();
+    uint mKeyValue;
+
 	/// Commits this record to the database.
 	/// If \param newPrimaryKey is true, a new primary key
 	/// is generated, else the existing key is used.
