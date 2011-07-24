@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: tableschema.h 9098 2009-11-27 00:38:55Z brobison $
+ * $Id$
  */
 
 #ifndef TABLE_SCHEMA_H
@@ -217,7 +217,7 @@ protected:
 
 	IndexSchemaList mIndexes;
 
-	uint mPrimaryKeyIndex;
+	int mPrimaryKeyIndex;
 	uint mFirstColumnIndex;
 	QString mTableName, mClassName, mDocs;
 	FieldList mFields, mAllFieldsCache, mAllColumnsCache;

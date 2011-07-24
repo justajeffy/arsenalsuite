@@ -34,7 +34,7 @@ namespace Stone {
 TableSchema::TableSchema( Schema * schema )
 : mSchema( schema )
 , mParent( 0 )
-, mPrimaryKeyIndex( 0 )
+, mPrimaryKeyIndex( -1 )
 , mFirstColumnIndex( 0 )
 , mPreload( false )
 , mBaseOnly( false )
@@ -267,7 +267,7 @@ FieldList TableSchema::ownedColumns()
 
 uint TableSchema::fieldCount() const
 {
-    return fields().size();
+    return mAllFieldsCache.size();
 }
 
 QStringList TableSchema::fieldDisplayNames() const
@@ -291,6 +291,13 @@ FieldList TableSchema::fields() const
 	return mAllFieldsCache;
 }
 
+/*
+bool TableSchema::fieldContains(Field * field) const
+{
+	return mAllFieldsCache.contains(field);
+}
+*/
+
 FieldList TableSchema::ownedFields() const
 {
 	return mFields;
@@ -301,7 +308,7 @@ Field * TableSchema::field( const QString & fieldName, bool silent ) const
 	QString fnl = fieldName.toLower();
 	FieldList fl = fields();
 	foreach( Field * f, fl )
-		if( f->methodName().toLower() == fnl || f->name().toLower() == fnl )
+		if( f->mMethodNameLower == fnl || f->mNameLower == fnl )
 			return f;
 	if( !silent )
 		LOG_5( "TableSchema " + tableName() + " Couldn't find field: " + fieldName );
@@ -325,11 +332,18 @@ int TableSchema::fieldPos( const QString & column )
 
 uint TableSchema::primaryKeyIndex()
 {
+    if( mPrimaryKeyIndex > -1 ) return mPrimaryKeyIndex;
+
 	FieldList fields = columns();
-	foreach( Field * f, fields )
-		if( f->flag( Field::PrimaryKey ) )
-			return f->pos();
-	return fields.size();
+	foreach( Field * f, fields ) {
+		if( f->flag( Field::PrimaryKey ) ) {
+			mPrimaryKeyIndex = f->pos();
+            break;
+        }
+    }
+	if( mPrimaryKeyIndex ==  -1 ) mPrimaryKeyIndex = fields.size();
+
+    return mPrimaryKeyIndex;
 }
 
 QString TableSchema::primaryKey()
