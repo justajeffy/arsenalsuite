@@ -695,7 +695,7 @@ void JobListWidget::applyOptions()
         options.mErrorColors->apply(mErrorTree);
 
         QPalette p = mJobTree->palette();
-        ColorOption * co = options.mJobColors->getColorOption("Default");
+        ColorOption * co = options.mJobColors->getColorOption("default");
         p.setColor(QPalette::Active, QPalette::AlternateBase, co->bg.darker(120));
         p.setColor(QPalette::Inactive, QPalette::AlternateBase, co->bg.darker(120));
         mJobTree->setPalette( p );
