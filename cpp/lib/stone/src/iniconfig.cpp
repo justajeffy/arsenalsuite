@@ -96,6 +96,7 @@ void IniConfig::readFromFile( const QString & fileName, bool overwriteExisting )
 			continue;
 		if( overwriteExisting || !mValMap[mSection].contains( key ) ) {
 			mValMap[mSection][key] = val;
+			mValMap[mSection][key.toLower()] = val;
         }
 	}
 	cfgFile.close();
