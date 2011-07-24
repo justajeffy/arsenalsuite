@@ -211,39 +211,39 @@ MainWindow::MainWindow( QWidget * parent )
 
 	options.mHostColors = new ViewColors("HostView");
 	options.mHostColors->mColors
-		<< ColorOption( "Default", fg, bg )
-		<< ColorOption( "Ready" )
-		<< ColorOption( "Assigned", QColor(47,191,255) )
-		<< ColorOption( "Busy", QColor(47,191,255) )
-		<< ColorOption( "Copy", QColor(47,191,255) )
-		<< ColorOption( "Restart" )
-		<< ColorOption( "Client-Update" )
-		<< ColorOption( "Offline", QColor(125,122,156) );
+		<< ColorOption( "default", fg, bg )
+		<< ColorOption( "ready" )
+		<< ColorOption( "assigned", QColor(47,191,255) )
+		<< ColorOption( "busy", QColor(47,191,255) )
+		<< ColorOption( "copy", QColor(47,191,255) )
+		<< ColorOption( "restart" )
+		<< ColorOption( "client-update" )
+		<< ColorOption( "offline", QColor(125,122,156) );
 
 	options.mHostColors->readColors();
 
 	options.mJobColors = new ViewColors("JobView");
 	options.mJobColors->mColors
-		<< ColorOption( "Default", fg, bg )
-		<< ColorOption( "Submit", QColor(51,49,91) )
-		<< ColorOption( "Verify", QColor(51,49,91) )
-		<< ColorOption( "Ready", fg )
-		<< ColorOption( "Started", QColor(47,191,255) )
-		<< ColorOption( "Suspended", QColor(164,141,199) )
-		<< ColorOption( "Holding", QColor(164,141,199) )
-		<< ColorOption( "Done", QColor(125,122,156) );
+		<< ColorOption( "default", fg, bg )
+		<< ColorOption( "submit", QColor(51,49,91) )
+		<< ColorOption( "verify", QColor(51,49,91) )
+		<< ColorOption( "ready", fg )
+		<< ColorOption( "started", QColor(47,191,255) )
+		<< ColorOption( "suspended", QColor(164,141,199) )
+		<< ColorOption( "holding", QColor(164,141,199) )
+		<< ColorOption( "done", QColor(125,122,156) );
 	
 	options.mFrameColors = new ViewColors("FrameView");
 	options.mFrameColors->mColors
-		<< ColorOption( "Default", fg, bg )
-		<< ColorOption( "New" )
-		<< ColorOption( "Assigned", fg )
-		<< ColorOption( "Busy", QColor(47,191,255) )
-		<< ColorOption( "Done", QColor(125,122,156) );
+		<< ColorOption( "default", fg, bg )
+		<< ColorOption( "new" )
+		<< ColorOption( "assigned", fg )
+		<< ColorOption( "busy", QColor(47,191,255) )
+		<< ColorOption( "done", QColor(125,122,156) );
 	
 	options.mErrorColors = new ViewColors("ErrorView");
 	options.mErrorColors->mColors
-		<< ColorOption( "Default", fg, bg );
+		<< ColorOption( "default", fg, bg );
 
 	options.mJobColors->readColors();
 	options.mFrameColors->readColors();

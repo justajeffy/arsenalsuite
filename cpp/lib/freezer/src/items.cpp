@@ -428,7 +428,7 @@ void ErrorItem::setup( const JobError & err, const QModelIndex & ) {
 		when = dt.toString();
 	}
 	msg = error.message().replace("\r","").trimmed();
-	co = options.mErrorColors->getColorOption("Error");
+	co = options.mErrorColors->getColorOption("error");
 }
 
 QVariant ErrorItem::modelData( const QModelIndex & i, int role ) const {

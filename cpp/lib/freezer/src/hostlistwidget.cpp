@@ -371,7 +371,7 @@ void HostListWidget::applyOptions()
 	mHostTree->setFont( options.jobFont );
 
 	QPalette p = mHostTree->palette();
-	ColorOption * co = options.mHostColors->getColorOption("Default");
+	ColorOption * co = options.mHostColors->getColorOption("default");
 	p.setColor(QPalette::Active, QPalette::AlternateBase, co->bg.darker(120));
 	p.setColor(QPalette::Inactive, QPalette::AlternateBase, co->bg.darker(120));
 	mHostTree->setPalette( p );
