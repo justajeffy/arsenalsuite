@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: viewcolors.cpp 5993 2008-03-27 22:30:35Z newellm $
+ * $Id$
  */
 
 #include <qpalette.h>
@@ -60,7 +60,7 @@ void ViewColors::writeColors()
 
 void ViewColors::apply( QTreeView * treeView )
 {
-	ColorOption * c = getColorOption("Default");
+	ColorOption * c = getColorOption("default");
 	if( c ) {
 		QPalette p = treeView->palette();
 		p.setColor( QPalette::Base, c->bg );
@@ -71,11 +71,11 @@ void ViewColors::apply( QTreeView * treeView )
 
 void ViewColors::setupView( QTreeWidget * view )
 {
-	ColorItem * p = new ColorItem( getColorOption("Default"), this, view );
+	ColorItem * p = new ColorItem( getColorOption("default"), this, view );
 	p->setText( 0, mViewName );
 	for( int i=0; i<mColors.size(); i++ )
 	{
-		if( mColors[i].role == "Default" ) continue;
+		if( mColors[i].role == "default" ) continue;
 		new ColorItem( &mColors[i], this, p );
 	}
 	view->setItemExpanded(p,true);
@@ -83,18 +83,16 @@ void ViewColors::setupView( QTreeWidget * view )
 
 ColorOption * ViewColors::getColorOption( const QString & name )
 {
-	QString n = name.toLower();
 	for( int i=0; i<mColors.size(); i++ )
-		if( mColors[i].role.toLower() == n )
+		if( mColors[i].role == name )
 			return &mColors[i];
 	return 0;
 }
 
 void ViewColors::getColors( const QString & name, QColor & fg, QColor & bg )
 {
-	QString n = name.toLower();
 	for( int i=0; i<mColors.size(); i++ )
-		if( mColors[i].role.toLower() == n ) {
+		if( mColors[i].role == name ) {
 			fg = mColors[i].fg;
 			bg = mColors[i].bg;
 			return;
