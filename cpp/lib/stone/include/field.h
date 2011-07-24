@@ -102,6 +102,7 @@ public:
 
 	/** Returns the name of this field, as used by the database */
 	QString name() const;
+	QString mName, mNameLower;
 
 	/** Sets the name of this field, this must match the underlying database */
 	void setName( const QString & );
@@ -126,6 +127,7 @@ public:
 	 *  for the method name for generate classes.
 	 */
 	QString methodName() const;
+	QString mMethodName, mMethodNameLower;
 
 	/** Sets the method name for this field */
 	void setMethodName( const QString & );
@@ -259,7 +261,6 @@ private:
 protected:
 	struct ForeignKeyPrivate;
 	TableSchema * mTable;
-	QString mName, mMethodName;
 	mutable QString mDisplayName, mPluralMethodName;
 	Type mType;
 	Flags mFlags;

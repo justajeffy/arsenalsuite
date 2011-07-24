@@ -81,6 +81,9 @@ Field::Field( TableSchema * table, const QString & name, Field::Type type, Field
 		mIndex->setField( this );
 		mIndex->addField( this );
 	}
+
+    mNameLower = mName.toLower();
+    mMethodNameLower = mMethodName.toLower();
 }
 
 Field::Field( TableSchema * table, const QString & name, const QString & fkeyTable, Field::Flags flags, bool index, int indexDeleteMode )
@@ -98,6 +101,9 @@ Field::Field( TableSchema * table, const QString & name, const QString & fkeyTab
 		mTable = 0;
 	if( index && mTable )
 		setHasIndex( true, indexDeleteMode );
+
+    mNameLower = mName.toLower();
+    mMethodNameLower = mMethodName.toLower();
 }
 
 Field::~Field()
@@ -125,16 +131,17 @@ void Field::setName( const QString & name )
 {
 	if( mMethodName.isEmpty() || mMethodName == mName || (flag( ForeignKey ) && mName.mid(4) == mMethodName) ) {
 		if( flag( ForeignKey ) && mName.left(4)=="fkey" )
-			mMethodName = name.mid(4);
+            setMethodName(name.mid(4));
 		else
-			mMethodName = name;
+            setMethodName(name);
 	}
 	mName = name;
+	mNameLower = name.toLower();
 }
 
 QString Field::placeholder() const
 {
-	return ":" + mName.toLower();
+	return ":" + mNameLower;
 }
 
 QString pluralizeName( const QString & name )
@@ -237,8 +244,10 @@ QString Field::methodName() const
 
 void Field::setMethodName( const QString & mn )
 {
-	if( !mn.isEmpty() )
+	if( !mn.isEmpty() ) {
 		mMethodName = mn;
+		mMethodNameLower = mn.toLower();
+    }
 }
 
 QString fieldToDisplayName( const QString & name )
