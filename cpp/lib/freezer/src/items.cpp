@@ -32,6 +32,7 @@
 #include <qdatetime.h>
 #include <qheaderview.h>
 #include <qmessagebox.h>
+#include <QPixmapCache>
 
 #include "blurqt.h"
 #include "database.h"
@@ -236,6 +237,38 @@ ProgressDelegate::ProgressDelegate( QObject * parent )
 , mHoldingColor( options.mJobColors->getColorOption("holding") )
 {}
 
+QPixmap ProgressDelegate::gradientCache(int height, const QChar & status) const
+{
+    QPixmap gradLine(1, height);
+    if( QPixmapCache::find(QString("progress-gradient-%1").arg(status), &gradLine) )
+        return gradLine;
+
+    gradLine.fill(mNewColor->fg);
+    QPainter gradPainter;
+    gradPainter.begin( &gradLine );
+
+    QColor c;
+    if (status == QChar('a'))
+        c = mNewColor->fg;
+    else if (status == QChar('b'))
+        c = mBusyColor->fg;
+    else if (status == QChar('d'))
+        c = mDoneColor->fg;
+    else if (status == QChar('s'))
+        c = mSuspendedColor->fg;
+    else if (status == QChar('c'))
+        c = mCancelledColor->fg;
+    else if (status == QChar('h'))
+        c = mHoldingColor->fg;
+    else
+        c = mNewColor->fg;
+
+    drawGrad( &gradPainter, c, 0, 0, 1 /*width*/, height );
+
+    QPixmapCache::insert(QString("progress-gradient-%1").arg(status), gradLine);
+    return gradLine;
+}
+
 QPixmap ProgressDelegate::taskProgressBar(int height, const QString & taskBitmap) const
 {
     QPixmap progressBar(qMax(1, taskBitmap.size()), height);
@@ -244,23 +277,7 @@ QPixmap ProgressDelegate::taskProgressBar(int height, const QString & taskBitmap
     progressPainter.begin( &progressBar );
 
     for (int x = 0; x < taskBitmap.size(); ++x) {
-        QColor c;
-        if (taskBitmap.at(x) == QChar('a'))
-            c = mNewColor->fg;
-        else if (taskBitmap.at(x) == QChar('b'))
-            c = mBusyColor->fg;
-        else if (taskBitmap.at(x) == QChar('d'))
-            c = mDoneColor->fg;
-        else if (taskBitmap.at(x) == QChar('s'))
-            c = mSuspendedColor->fg;
-        else if (taskBitmap.at(x) == QChar('c'))
-            c = mCancelledColor->fg;
-        else if (taskBitmap.at(x) == QChar('h'))
-            c = mHoldingColor->fg;
-        else
-            c = mNewColor->fg;
-
-        drawGrad( &progressPainter, c, x, 0, 1 /*width*/, height );
+        progressPainter.drawPixmap( x, 0, gradientCache(height, taskBitmap.at(x) ));
     }
     return progressBar;
 }
@@ -363,7 +380,7 @@ void FrameItem::setup( const Record & r, const QModelIndex & ) {
 	time = dur.toString( Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
 	co = options.mFrameColors->getColorOption(stat);
 	if( currentAssignment.memory() > 0 )
-		memory.sprintf("%4i MB", currentAssignment.memory()/1024);
+        memory = QString("%1 MB").arg(currentAssignment.memory()/1024);
 	else
 		memory = "";
 }
@@ -523,19 +540,21 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
 	job = r;
 	jobStatus = JobStatus::recordByJob(job);
 	healthIsNull = jobStatus.getValue( "health" ).isNull();
-	done.sprintf("%i / %i", jobStatus.tasksDone(), jobStatus.tasksCount());
+    done = QString("%1 / %2").arg(jobStatus.tasksDone()).arg(jobStatus.tasksCount());
 	userName = job.user().name();
 	QString status = job.status();
 	hostsOnJob = QString::number( adjustedHostsOnJob(status,jobStatus) );
 	priority = QString::number( job.priority() );
 	project = job.project().name();
 
-	submitted = job.submittedts().toString();
+	//submitted = job.submittedts().toString();
 
+    /*
 	if( !job.endedts().isNull() ) {
 		ended = job.endedts().toString();
 	} else
 		ended = "---";
+    */
 
 	errorCnt = QString::number(jobStatus.errorCount());
 
@@ -576,7 +595,7 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			case 5: return hostsOnJob;
 			case 6: return priority;
 			case 7: return project;
-			case 8: return submitted;
+			case 8: return job.submittedts().toString();
 			case 9: return errorCnt;
 			case 10: return job.outputPath();
 			case 11: return avgTime;
@@ -584,7 +603,7 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			case 13: return job.key();
 			//case 14: return job.stats();
 			case 15: return job.currentMapServerWeight();
-			case 17: return ended;
+			case 17: return job.endedts().toString();
 			case 18: return timeInQueue;
 			case 19: return services;
 			case 20: return avgMemory;

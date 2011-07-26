@@ -216,6 +216,7 @@ public:
 protected:
 	ColorOption * mBusyColor, * mNewColor, * mDoneColor, * mSuspendedColor, * mCancelledColor, * mHoldingColor;
     QPixmap taskProgressBar( int, const QString & ) const;
+    QPixmap gradientCache( int, const QChar & ) const;
 };
 
 class FREEZER_EXPORT LoadedDelegate : public QItemDelegate
