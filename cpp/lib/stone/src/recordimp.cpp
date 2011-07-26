@@ -431,7 +431,7 @@ RecordImp * RecordImp::setValue( const QString & column, const QVariant & var )
 uint RecordImp::key()
 {
     if( mKeyValue > -1 ) return mKeyValue;
-	mKeyValue = mTable ? getColumn( mTable->schema()->primaryKeyIndex() ).toUInt() : 0;
+	mKeyValue = mTable ? getColumn( mTable->schema()->primaryKeyIndex() ).toInt() : 0;
     return mKeyValue;
 }
 
