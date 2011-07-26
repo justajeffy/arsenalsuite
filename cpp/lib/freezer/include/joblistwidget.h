@@ -22,6 +22,7 @@ class FreezerWidget;
 class FreezerJobMenu;
 class FreezerErrorMenu;
 class FrameListTask;
+class JobListTask;
 class ImageView;
 class PartialFrameListTask;
 class TabToolBar;
@@ -156,6 +157,8 @@ public slots:
 
 	void applyOptions();
 
+    void setToolTips();
+
 protected:
 	/// refreshes the job list from the database
 	void doRefresh();
@@ -163,8 +166,12 @@ protected:
 	void save( IniConfig & ini );
 	void restore( IniConfig & ini );
 
+
 	void customEvent( QEvent * evt );
 	bool event( QEvent * evt );
+
+    QMap<QString,QString> userToolTipMap() const;
+    QMap<QString,QString> projectToolTipMap() const;
 
     void clearChildrenToolTip( const QModelIndex & parent );
     void setChildrenToolTip( const QModelIndex & parent, const QMap<QString,QString> & userToolTips, const QMap<QString,QString> & projectToolTips );
@@ -182,6 +189,7 @@ protected:
 	FrameListTask * mFrameTask;
 	PartialFrameListTask * mPartialFrameTask;
 
+    JobListTask * mJobTask;
 	JobList mSelectedJobs;
 	Job mCurrentJob;
 
