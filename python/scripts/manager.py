@@ -325,6 +325,7 @@ class JobAssign:
 
         #project_deficit = self.Job.project().arsenalSlotReserve() - FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)
         reserve_used = min(100, int(float(FarmResourceSnapshot.slotsByProject.get(self.Job.project().name(),0)) / float(max(1,self.Job.project().arsenalSlotReserve())) * 100))
+        if not self.Job.project().isRecord(): reserve_used = 999
 
         # important things will take precedence within a department, but not over everything
         important = 55
@@ -337,17 +338,26 @@ class JobAssign:
 
         hasTensRunning = 0
         tensRunning = self.JobStatus.tasksDone() + self.JobStatus.tasksAssigned() + self.JobStatus.tasksBusy()
+        # if we have some done then include the cancelled ones in this sum as the job is at least partially good
+        # and therefore should not get stuck trying to reach the 10% mark
+        if( self.JobStatus.tasksDone() > 0):
+            tensRunning += self.JobStatus.tasksCancelled()
         if( float(tensRunning) / float(self.JobStatus.tasksCount()) >= 0.1 ):
             hasTensRunning = 1
 
         hasTensComplete = 1
         tensComplete = self.JobStatus.tasksDone()
+        # if we have some done then include the cancelled ones in this sum as the job is at least partially good
+        # and therefore should not get stuck trying to reach the 10% mark
+        if( self.JobStatus.tasksDone() > 0):
+            tensComplete += self.JobStatus.tasksCancelled()
         if( float(tensComplete) / float(self.JobStatus.tasksCount()) >= 0.1 ):
             hasTensComplete = 0
 
         # bone sez... within a particular shot, prefer slower passes first
-        shotAvgTime = 999999
-        if(hasTensComplete == 1): shotAvgTime = 999999 - self.JobStatus.tasksAverageTime()
+        # ideally this would also include the time from jobs that this job blocks so
+        # that we favour doing stuff deep in the chain
+        shotAvgTime = 999999 - self.JobStatus.tasksAverageTime()
 
         sortKey = '%02d-%03d-%02d-%01d-%01d-%08d-%06d' % ( urgent, reserve_used, important, hasTensRunning, hasTensComplete, avgTime, shotAvgTime )
         self.sortKey = sortKey
@@ -441,19 +451,11 @@ class JobAssign:
                 tasks = self.retrieveContinuousTasks(limit=packetSize)
             elif packetType == 'iterative':
                 strictOnTens = 'true'
-                # shouldn't this also include tasksSuspended()/tasksCancelled()?
-                tensRunning = self.JobStatus.tasksDone() + self.JobStatus.tasksAssigned() + self.JobStatus.tasksBusy()
+                # shouldn't this also include tasksSuspended()?
+                tensRunning = self.JobStatus.tasksDone() + self.JobStatus.tasksAssigned() + self.JobStatus.tasksBusy() + self.JobStatus.tasksCancelled()
                 if( float(tensRunning) / float(self.JobStatus.tasksCount()) >= 0.1 ):
                     strictOnTens = 'false'
                 tasks = self.retrieveIterativeTasks(limit=packetSize,stripe=10,strictOnTens=strictOnTens)
-                # if tasks is null or empty and strictOnTens was on then perhaps as a fallback we should try with it
-                # off just to cover any possible glitches with the query
-                if not tasks or tasks.isEmpty():
-                    if strictOnTens == 'true':
-                        strictOnTens = 'false'
-                        tasks = self.retrieveIterativeTasks(limit=packetSize,stripe=10,strictOnTens=strictOnTens)
-                        if tasks and not tasks.isEmpty():
-                            print "strictOnTens returned nothing but without returned something?"
             else: # sequential
                 tasks = self.retrieveSequentialTasks(limit=packetSize)
 
@@ -668,7 +670,7 @@ SELECT * from project_slots_current
         self.shotTimes.clear()
 
         q = Database.current().exec_("""
-SELECT * from running_shots_averagetime_3
+SELECT * from running_shots_averagetime_4
                                     """)
         while q.next():
             shot = q.value(0).toString()
@@ -1035,7 +1037,7 @@ SELECT * from running_shots_averagetime_3
 
             queueOrder = 1
             for jobAssign in jobAssignList:
-                print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.sortKey )
+                #print "job %s has key %s" % ( jobAssign.Job.name(), jobAssign.sortKey )
                 try:
                     if( FarmResourceSnapshot.iteration % 10 == 0 ):
                         Database.current().exec_("UPDATE jobstatus SET queueorder = %s WHERE fkeyjob = %s" % (queueOrder, jobAssign.Job.key()))
