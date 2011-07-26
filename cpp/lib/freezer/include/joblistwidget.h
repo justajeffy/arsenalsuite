@@ -166,6 +166,9 @@ protected:
 	void customEvent( QEvent * evt );
 	bool event( QEvent * evt );
 
+    void clearChildrenToolTip( const QModelIndex & parent );
+    void setChildrenToolTip( const QModelIndex & parent, const QMap<QString,QString> & userToolTips, const QMap<QString,QString> & projectToolTips );
+
     void initializeViews();
 
 	QToolBar * mToolBar;

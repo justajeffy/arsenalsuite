@@ -347,6 +347,7 @@ bool JobListWidget::event( QEvent * event )
 
 void JobListWidget::customEvent( QEvent * evt )
 {
+
 	switch( evt->type() ) {
 		case JOB_LIST:
 		{
@@ -354,8 +355,9 @@ void JobListWidget::customEvent( QEvent * evt )
 			JobModel * jm = (JobModel*)mJobTree->model();
 
             JobList topLevelJobs = jlt->mReturn - jlt->mDependentJobs;
-            JobList existing;
+            JobList existing, toAdd;
             QModelIndexList toRemove;
+            QMap<Job,QModelIndex> existingMap;
 
             ModelGrouper * grouper = jm->grouper();
             int topLevelDepth = 0;
@@ -366,25 +368,33 @@ void JobListWidget::customEvent( QEvent * evt )
                 QModelIndex idx = *it;
                 if( topLevelDepth == it.depth() ) {
                     Job j = jm->getRecord(idx);
-                    if( !topLevelJobs.contains(j) )
-                        toRemove += QPersistentModelIndex(idx);
-                    else {
-                        existing += j;
-                        jm->updateIndex(idx);
-                    }
+                    existingMap[j] = idx;
                 }
             }
 
+            foreach( Job j, topLevelJobs ) {
+                QMap<Job,QModelIndex>::Iterator it = existingMap.find(j);
+                if( it != existingMap.end() ) {
+                    existing += it.key();
+                    jm->updateIndex(it.value());
+                    existingMap.erase(it);
+                } else
+                    toAdd += j;
+            }
+
+            for( QMap<Job,QModelIndex>::Iterator it = existingMap.begin(); it != existingMap.end(); ++it )
+                toRemove += it.value();
+
             jm->remove(toRemove);
-            JobList jobsToAdd = topLevelJobs - existing;
-            LOG_5( "Appending " + QString::number(jobsToAdd.size()) + " jobs to the list" );
-            jm->append( jobsToAdd );
+
+            LOG_5( "Appending " + QString::number(toAdd.size()) + " jobs to the list" );
+            jm->append( toAdd );
 
             QMap<Record, JobServiceList> jobServicesByJob;
             if( jlt->mFetchJobServices ) {
                 jobServicesByJob = jlt->mJobServices.groupedBy<Record,JobServiceList,uint,Job>( "fkeyjob" );
                 LOG_5( QString("Got %1 services for %2 jobs").arg(jlt->mJobServices.size()).arg(jobServicesByJob.size()) );
-			}
+            }
 
 			QMap<uint,JobDepList> jobDepsByJob = jlt->mJobDeps.groupedBy<uint,JobDepList>("fkeyjob");
 
@@ -407,18 +417,11 @@ void JobListWidget::customEvent( QEvent * evt )
             }
 
             // clear out existing toolTip info first
-            int numRows = jm->rowCount();
-            for ( int row = 0; row < numRows; row++ ) {
-                QModelIndex qmi = jm->index(row, 4);
-                Job j = jm->getRecord(qmi);
-                if( !j.isRecord() )
-                    continue;
-                JobItem & ji = JobTranslator::data(qmi);
-                ji.userToolTip.clear();
-                ji.projectToolTip.clear();
-            }
+            clearChildrenToolTip(mJobTree->rootIndex());
 
-            // Update slot use data for tooltips
+            // build maps of possible tooltips to set
+            QMap<QString,QString> userToolTips;
+            // Update slot use data for User tooltips
             if( jlt->mFetchUserServices ) {
                 // we store the pre-formatted tooltip in the model so
                 // need to do that now..
@@ -430,26 +433,11 @@ void JobListWidget::customEvent( QEvent * evt )
                         toolTip += " / " + QString::number(jlt->mUserServiceLimits[key]);
 
                     toolTip += "\n";
-                    //LOG_1( QString("append tooltip for %1 to %2").arg(keyUser).arg(toolTip) );
-
-                    // iterate through the model and set as tooltip for all rows belonging to
-                    // the user
-                    int numRows = jm->rowCount();
-                    for ( int row = 0; row < numRows; row++ ) {
-                        QModelIndex qmi = jm->index(row, 4);
-                        Job j = jm->getRecord(qmi);
-                        if( !j.isRecord() )
-                            continue;
-                        QString cell = jm->data( qmi ).toString();
-                        //LOG_1( QString("row %1 has data %2").arg(QString::number(row)).arg(cell) );
-                        if( keyUser == cell ) {
-                            JobItem & ji = JobTranslator::data(qmi);
-                            ji.userToolTip += toolTip;
-                        }
-                    }
+                    userToolTips[keyUser] += toolTip;
                 }
             }
 
+            QMap<QString,QString> projectToolTips;
             // Update slot use data for Project tooltips
             if( jlt->mFetchProjectSlots ) {
                 // we store the pre-formatted tooltip in the model so
@@ -462,26 +450,12 @@ void JobListWidget::customEvent( QEvent * evt )
                     QString toolTip = QString("(%1)\n%2").arg(projectReserve).arg(projectCurrent);
                     if( projectLimit > -1 )
                         toolTip += " / " + QString::number(projectLimit);
-                    //toolTip += "\n";
-                    //LOG_1( QString("append tooltip for %1 to %2").arg(keyUser).arg(toolTip) );
-
-                    // iterate through the model and set as tooltip for all rows belonging to
-                    // the user
-                    int numRows = jm->rowCount();
-                    for ( int row = 0; row < numRows; row++ ) {
-                        QModelIndex qmi = jm->index(row, 7);
-                        Job j = jm->getRecord(qmi);
-                        if( !j.isRecord() )
-                            continue;
-                        QString cell = jm->data( qmi ).toString();
-                        //LOG_1( QString("row %1 has data %2").arg(QString::number(row)).arg(cell) );
-                        if( keyProject == cell ) {
-                            JobItem & ji = JobTranslator::data(qmi);
-                            ji.projectToolTip += toolTip;
-                        }
-                    }
+                    projectToolTips[keyProject] = toolTip;
                 }
             }
+
+            // recursively set all rows
+            setChildrenToolTip( mJobTree->rootIndex(), userToolTips, projectToolTips );
 
             mJobTree->busyWidget()->stop();
 			mJobTaskRunning = false;
@@ -630,6 +604,57 @@ void JobListWidget::customEvent( QEvent * evt )
 		default:
 			break;
 	}
+}
+
+void JobListWidget::clearChildrenToolTip( const QModelIndex & parent )
+{
+    JobModel * jm = (JobModel *)(mJobTree->model());
+    int numRows = jm->rowCount(parent);
+    for ( int row = 0; row < numRows; row++ ) {
+        QModelIndex qmi = jm->index(row, 0, parent);
+        Job j = jm->getRecord(qmi);
+        if( !j.isRecord() )
+            continue;
+        JobItem & ji = JobTranslator::data(qmi);
+        ji.userToolTip.clear();
+        ji.projectToolTip.clear();
+
+        if( jm->hasChildren(qmi) )
+            clearChildrenToolTip(qmi);
+    }
+}
+
+void JobListWidget::setChildrenToolTip( const QModelIndex & parent, const QMap<QString,QString> & userToolTips, const QMap<QString,QString> & projectToolTips )
+{
+    JobModel * jm = (JobModel *)(mJobTree->model());
+    int numRows = jm->rowCount(parent);
+    for ( int row = 0; row < numRows; row++ ) {
+        QModelIndex qmi = jm->index(row, 0, parent);
+        Job j = jm->getRecord(qmi);
+        if( !j.isRecord() )
+            continue;
+
+        // set user tool tip
+        QModelIndex userIndex = jm->index(row, 4, parent);
+        QString userCell = jm->data( userIndex ).toString();
+        //LOG_3( QString("row %1 has data %2").arg(QString::number(qmi.row())).arg(cell) );
+        if( userToolTips.contains(userCell) ) {
+            JobItem & ji = JobTranslator::data(userIndex);
+            ji.userToolTip += userToolTips[userCell];
+        }
+
+        //set project tooltip
+        QModelIndex projectIndex = jm->index(row, 7);
+        QString projectCell = jm->data( projectIndex ).toString();
+        //LOG_3( QString("row %1 has data %2").arg(QString::number(qmi.row())).arg(cell) );
+        if( projectToolTips.contains(projectCell) ) {
+            JobItem & ji = JobTranslator::data(projectIndex);
+            ji.projectToolTip += projectToolTips[projectCell];
+        }
+
+        if( jm->hasChildren(qmi) )
+            setChildrenToolTip(qmi, userToolTips, projectToolTips);
+    }
 }
 
 QToolBar * JobListWidget::toolBar( QMainWindow * mw )
