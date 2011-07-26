@@ -701,6 +701,8 @@ void ExtTreeView::saveTreeView( IniConfig & ini, const ColumnStruct columns [] )
         ini.writeString( "SortColumnDirection", sortDirections.join(",") );
         if( sm->grouper(false) && sm->grouper()->isGrouped() )
             ini.writeInt( "GroupedByColumn", sm->grouper()->groupColumn() );
+        else
+            ini.removeKey( "GroupedByColumn" );
     } else
 		ini.writeInt( "SortColumn", header()->sortIndicatorSection() );
 	ini.writeInt( "SortOrder", header()->sortIndicatorOrder() );
