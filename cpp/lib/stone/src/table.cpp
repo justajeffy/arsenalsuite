@@ -652,6 +652,9 @@ Record Table::checkForUpdate( Record rec )
 		bool needsUpdateSignal = false;
 		FieldList fl = mSchema->fields();
 		foreach( Field * f, fl ) {
+            // Don't do a comparison if the before-update record didn't have this column selected
+            if( f->flag( Field::NoDefaultSelect ) && !bu.imp()->isColumnSelected( f->pos() ) )
+                continue;
 			QVariant v1 = bu.getValue( f->pos() );
 			QVariant v2 = old.getValue( f->pos() );
 			if( (v1.isNull() != v2.isNull()) || (v1 != v2) ) {

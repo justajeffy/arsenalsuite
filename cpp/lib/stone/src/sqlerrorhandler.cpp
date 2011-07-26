@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: sqlerrorhandler.cpp 8323 2009-05-22 19:55:04Z newellm $
+ * $Id$
  */
 
 #include <qhostinfo.h>
@@ -32,14 +32,21 @@
 #include "iniconfig.h"
 #include "sqlerrorhandler.h"
 
+static bool inHandler = false;
+
 void SqlErrorHandler::handleError(const QString & error)
 {
+    if( inHandler ) {
+        LOG_1( "Recursive Sql Error Detected; ignoring error: " + error );
+        return;
+    }
+    inHandler = true;
 	QString hostName = QHostInfo::localHostName();
 	IniConfig & ini = config();
 	ini.pushSection("Database");
 	QStringList dests = ini.readString("SqlErrorEmailList","newellm@blur.com").split(",");
 	if( !dests.isEmpty() ) {
-		sendEmail( dests, "Sql Error: " + hostName, 
+		sendEmail( dests, "Sql Error: " + hostName,
 			"Host: " + hostName + "\n" +
 			"User: " + getUserName() + "\n" +
 			"Application Name: " + QCoreApplication::instance()->applicationName() + "\n" +
@@ -47,6 +54,7 @@ void SqlErrorHandler::handleError(const QString & error)
 			ini.readString("SqlErrorSender","thePipe@blur.com") );
 	}
 	ini.popSection();
+    inHandler = false;
 }
 
 static SqlErrorHandler * sSqlErrorHandler = 0;
