@@ -63,6 +63,7 @@ JobListWidget::JobListWidget( QWidget * parent )
 , mJobTaskRunning( false )
 , mQueuedJobRefresh( false )
 , mFrameTask( 0 )
+, mJobTask( 0 )
 , mPartialFrameTask( 0 )
 , mStaticDataRetrieved( false )
 , mJobMenu( 0 )
@@ -351,10 +352,10 @@ void JobListWidget::customEvent( QEvent * evt )
 	switch( evt->type() ) {
 		case JOB_LIST:
 		{
-			JobListTask * jlt = ((JobListTask*)evt);
+			mJobTask = ((JobListTask*)evt);
 			JobModel * jm = (JobModel*)mJobTree->model();
 
-            JobList topLevelJobs = jlt->mReturn - jlt->mDependentJobs;
+            JobList topLevelJobs = mJobTask->mReturn - mJobTask->mDependentJobs;
             JobList existing, toAdd;
             QModelIndexList toRemove;
             QMap<Job,QModelIndex> existingMap;
@@ -391,12 +392,12 @@ void JobListWidget::customEvent( QEvent * evt )
             jm->append( toAdd );
 
             QMap<Record, JobServiceList> jobServicesByJob;
-            if( jlt->mFetchJobServices ) {
-                jobServicesByJob = jlt->mJobServices.groupedBy<Record,JobServiceList,uint,Job>( "fkeyjob" );
-                LOG_5( QString("Got %1 services for %2 jobs").arg(jlt->mJobServices.size()).arg(jobServicesByJob.size()) );
+            if( mJobTask->mFetchJobServices ) {
+                jobServicesByJob = mJobTask->mJobServices.groupedBy<Record,JobServiceList,uint,Job>( "fkeyjob" );
+                LOG_5( QString("Got %1 services for %2 jobs").arg(mJobTask->mJobServices.size()).arg(jobServicesByJob.size()) );
             }
 
-			QMap<uint,JobDepList> jobDepsByJob = jlt->mJobDeps.groupedBy<uint,JobDepList>("fkeyjob");
+			QMap<uint,JobDepList> jobDepsByJob = mJobTask->mJobDeps.groupedBy<uint,JobDepList>("fkeyjob");
 
             for( ModelIter it(jm,ModelIter::Filter(ModelIter::Recursive|ModelIter::DescendLoadedOnly)); it.isValid(); ++it ) {
                 Job j = jm->getRecord(*it);
@@ -404,7 +405,7 @@ void JobListWidget::customEvent( QEvent * evt )
                     JobDepList deps = jobDepsByJob[j.key()];
                     if( deps.size() )
                         jm->updateRecords( deps.deps(), *it, false );
-                    if( jlt->mFetchJobServices ) {
+                    if( mJobTask->mFetchJobServices ) {
                         // Update services
                         JobItem & ji = JobTranslator::data(*it);
                         if( jobServicesByJob.contains( ji.job ) ) {
@@ -419,43 +420,9 @@ void JobListWidget::customEvent( QEvent * evt )
             // clear out existing toolTip info first
             clearChildrenToolTip(mJobTree->rootIndex());
 
-            // build maps of possible tooltips to set
-            QMap<QString,QString> userToolTips;
-            // Update slot use data for User tooltips
-            if( jlt->mFetchUserServices ) {
-                // we store the pre-formatted tooltip in the model so
-                // need to do that now..
-                foreach( QString key, jlt->mUserServiceCurrent.keys() ) {
-                    QString keyUser = key.section(":",0,0);
-                    QString keyService = key.section(":",1,1);
-                    QString toolTip = QString("%1 : %2").arg(keyService).arg(QString::number(jlt->mUserServiceCurrent[key]));
-                    if( jlt->mUserServiceLimits.contains(key) )
-                        toolTip += " / " + QString::number(jlt->mUserServiceLimits[key]);
-
-                    toolTip += "\n";
-                    userToolTips[keyUser] += toolTip;
-                }
-            }
-
-            QMap<QString,QString> projectToolTips;
-            // Update slot use data for Project tooltips
-            if( jlt->mFetchProjectSlots ) {
-                // we store the pre-formatted tooltip in the model so
-                // need to do that now..
-                foreach( QString keyProject, jlt->mProjectSlots.keys() ) {
-                    QString value = jlt->mProjectSlots[keyProject];
-                    int projectCurrent = value.section(":",0,0).toInt();
-                    int projectReserve = value.section(":",1,1).toInt();
-                    int projectLimit = value.section(":",2,2).toInt();
-                    QString toolTip = QString("(%1)\n%2").arg(projectReserve).arg(projectCurrent);
-                    if( projectLimit > -1 )
-                        toolTip += " / " + QString::number(projectLimit);
-                    projectToolTips[keyProject] = toolTip;
-                }
-            }
-
             // recursively set all rows
-            setChildrenToolTip( mJobTree->rootIndex(), userToolTips, projectToolTips );
+            //QTimer::singleShot(20, this, SLOT(setToolTips()));
+            setToolTips();
 
             mJobTree->busyWidget()->stop();
 			mJobTaskRunning = false;
@@ -606,6 +573,48 @@ void JobListWidget::customEvent( QEvent * evt )
 	}
 }
 
+QMap<QString,QString> JobListWidget::userToolTipMap() const
+{
+    QMap<QString,QString> userToolTips;
+    // Update slot use data for User tooltips
+    if( mJobTask->mFetchUserServices ) {
+        // we store the pre-formatted tooltip in the model so
+        // need to do that now..
+        foreach( QString key, mJobTask->mUserServiceCurrent.keys() ) {
+            QString keyUser = key.section(":",0,0);
+            QString keyService = key.section(":",1,1);
+            QString toolTip = QString("%1 : %2").arg(keyService).arg(QString::number(mJobTask->mUserServiceCurrent[key]));
+            if( mJobTask->mUserServiceLimits.contains(key) )
+                toolTip += " / " + QString::number(mJobTask->mUserServiceLimits[key]);
+
+            toolTip += "\n";
+            userToolTips[keyUser] += toolTip;
+        }
+    }
+    return userToolTips;
+}
+
+QMap<QString,QString> JobListWidget::projectToolTipMap() const
+{
+    QMap<QString,QString> projectToolTips;
+    // Update slot use data for Project tooltips
+    if( mJobTask->mFetchProjectSlots ) {
+        // we store the pre-formatted tooltip in the model so
+        // need to do that now..
+        foreach( QString keyProject, mJobTask->mProjectSlots.keys() ) {
+            QString value = mJobTask->mProjectSlots[keyProject];
+            int projectCurrent = value.section(":",0,0).toInt();
+            int projectReserve = value.section(":",1,1).toInt();
+            int projectLimit = value.section(":",2,2).toInt();
+            QString toolTip = QString("(%1)\n%2").arg(projectReserve).arg(projectCurrent);
+            if( projectLimit > -1 )
+                toolTip += " / " + QString::number(projectLimit);
+            projectToolTips[keyProject] = toolTip;
+        }
+    }
+    return projectToolTips;
+}
+
 void JobListWidget::clearChildrenToolTip( const QModelIndex & parent )
 {
     JobModel * jm = (JobModel *)(mJobTree->model());
@@ -622,6 +631,13 @@ void JobListWidget::clearChildrenToolTip( const QModelIndex & parent )
         if( jm->hasChildren(qmi) )
             clearChildrenToolTip(qmi);
     }
+}
+
+void JobListWidget::setToolTips()
+{
+    QMap<QString,QString> userTips = userToolTipMap();
+    QMap<QString,QString> projectTips = projectToolTipMap();
+    setChildrenToolTip( mJobTree->rootIndex(), userTips, projectTips );
 }
 
 void JobListWidget::setChildrenToolTip( const QModelIndex & parent, const QMap<QString,QString> & userToolTips, const QMap<QString,QString> & projectToolTips )
