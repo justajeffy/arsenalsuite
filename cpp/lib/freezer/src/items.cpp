@@ -375,14 +375,16 @@ void FrameItem::setup( const Record & r, const QModelIndex & ) {
 	if( label.isEmpty() )
 		label = QString::number(task.frameNumber());
 	Interval dur;
-	if( stat == "done" || stat == "busy" )
-		dur = Interval( currentAssignment.started(), (stat == "done") ? currentAssignment.ended() : CurTime );
-	time = dur.toString( Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
+	//if( stat == "done" || stat == "busy" )
+	//	dur = Interval( currentAssignment.started(), (stat == "done") ? currentAssignment.ended() : CurTime );
+	//time = dur.toString( Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
 	co = options.mFrameColors->getColorOption(stat);
+    /*
 	if( currentAssignment.memory() > 0 )
         memory = QString("%1 MB").arg(currentAssignment.memory()/1024);
 	else
 		memory = "";
+    */
 }
 QVariant FrameItem::modelData( const QModelIndex & i, int role ) const {
 	int col = i.column();
@@ -391,9 +393,9 @@ QVariant FrameItem::modelData( const QModelIndex & i, int role ) const {
 			case 0: return label;
 			case 1: return stat;
 			case 2: return hostName;
-			case 3: return time;
+			case 3: return ( stat == "done" || stat == "busy" ) ? Interval( currentAssignment.started(), (stat == "done") ? currentAssignment.ended() : CurTime ).toString( Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours ) : "";
 			case 4: return loadedStatus;
-			case 5: return memory;
+			case 5: return currentAssignment.memory() > 0 ?  QString("%1 MB").arg(currentAssignment.memory()/1024) : "";
 			case 6: return task.jobOutput().name();
 		}
 	} else if ( role == Qt::TextColorRole )
