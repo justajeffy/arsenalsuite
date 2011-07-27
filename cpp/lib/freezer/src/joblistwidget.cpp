@@ -388,13 +388,13 @@ void JobListWidget::customEvent( QEvent * evt )
 
             jm->remove(toRemove);
 
-            LOG_5( "Appending " + QString::number(toAdd.size()) + " jobs to the list" );
+            //LOG_5( "Appending " + QString::number(toAdd.size()) + " jobs to the list" );
             jm->append( toAdd );
 
             QMap<Record, JobServiceList> jobServicesByJob;
             if( mJobTask->mFetchJobServices ) {
                 jobServicesByJob = mJobTask->mJobServices.groupedBy<Record,JobServiceList,uint,Job>( "fkeyjob" );
-                LOG_5( QString("Got %1 services for %2 jobs").arg(mJobTask->mJobServices.size()).arg(jobServicesByJob.size()) );
+                //LOG_5( QString("Got %1 services for %2 jobs").arg(mJobTask->mJobServices.size()).arg(jobServicesByJob.size()) );
             }
 
 			QMap<uint,JobDepList> jobDepsByJob = mJobTask->mJobDeps.groupedBy<uint,JobDepList>("fkeyjob");
@@ -410,7 +410,7 @@ void JobListWidget::customEvent( QEvent * evt )
                         JobItem & ji = JobTranslator::data(*it);
                         if( jobServicesByJob.contains( ji.job ) ) {
                             ji.services = jobServicesByJob[j].services().services().join(",");
-                            LOG_5( "Set Job " + j.name() + " services to " + ji.services );
+                            //LOG_5( "Set Job " + j.name() + " services to " + ji.services );
                         } else
                             LOG_5( "No services found for " + j.name() );
                     }
@@ -505,7 +505,7 @@ void JobListWidget::customEvent( QEvent * evt )
 		case PARTIAL_FRAME_LIST:
 		{
 			JobTaskList jtl = ((PartialFrameListTask*)evt)->mReturn;
-			LOG_3("got partial frame list back:"+QString::number(jtl.size()));
+			//LOG_3("got partial frame list back:"+QString::number(jtl.size()));
 			FrameItem::CurTime = ((PartialFrameListTask*)evt)->mCurTime;
 			mFrameTree->model()->updated( jtl );
 			//mTabToolBar->slotPause();
