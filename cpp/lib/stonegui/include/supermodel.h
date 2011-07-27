@@ -8,6 +8,7 @@
 #include <qpair.h>
 #include <qstringlist.h>
 #include <qvector.h>
+#include <QTime>
 
 #include <stdio.h>
 #include <typeinfo>
@@ -15,12 +16,15 @@
 #include "stonegui.h"
 
 #include "modeliter.h"
+
 class QVariant;
+class QTime;
 
 class ModelDataTranslator;
 class ModelNode;
 class SuperModel;
 class ModelGrouper;
+
 
 // Sort column, sort direction
 typedef QPair<int,Qt::SortOrder> SortColumnPair;
@@ -161,6 +165,7 @@ struct STONEGUI_EXPORT StandardItem : public ItemBase
 	};
 	QList<DataItem> mData;
     int mFlags;
+    StandardItem();
     Qt::ItemFlags modelFlags( const QModelIndex & ) { return Qt::ItemFlags(mFlags); }
 	int findItem(int column, int role) const;
 	QVariant modelData( const QModelIndex & idx, int role ) const;
@@ -262,6 +267,7 @@ protected:
 
 class STONEGUI_EXPORT SuperModel : public QAbstractItemModel
 {
+Q_OBJECT
 public:
 	SuperModel( QObject * parent );
 	~SuperModel();
@@ -289,10 +295,16 @@ public:
 	/// be loading the data on demand
 	int rowCount( const QModelIndex & parent = QModelIndex() ) const;
 
+    /// Same as above but will not load the children using the treeBuilder
+    int rowCountWithoutLoad( const QModelIndex & parent = QModelIndex() ) const;
+
 	/// O(1) - Constant Runtime
 	/// Runtime dependent on node->hasChildren call, which could 
 	/// be loading the data on demand
 	bool hasChildren( const QModelIndex & parent ) const;
+
+    /// Same as above but will not load the children using the treeBuilder
+    bool hasChildrenWithoutLoad( const QModelIndex & ) const;
 
 	int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
 	
@@ -383,6 +395,9 @@ public:
     void setColumnFilter( uint column, const QString & filter );
     QMap<uint, QString> mColumnFilterMap;
 
+signals:
+    void grouperChanged( ModelGrouper * grouper );
+
 protected:
 	/// O(1) - Constant Runtime
 	static inline ModelNode * indexToNode( const QModelIndex & idx )
@@ -417,6 +432,7 @@ protected:
 	QStringList mHeaderData;
 	QList<SortColumnPair> mSortColumns;
 	bool mAutoSort, mAssumeChildren, mDisableChildLoading;
+    QTime mLastSort;
     ModelGrouper * mGrouper;
 
 	friend class ModelDataTranslator;
