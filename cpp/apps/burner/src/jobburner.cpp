@@ -367,7 +367,7 @@ bool JobBurner::taskStart( int task, const QString & outputName, int secondsSinc
 
 void JobBurner::taskDone( int task )
 {
-    if( mState == StateError ) {
+    if( mState == StateError || mState == StateCancelled ) {
         LOG_3( "JobBurner: ERROR an error has occurred, can't be done" );
         return;
     }
@@ -506,6 +506,8 @@ void JobBurner::jobErrored( const QString & msg, bool timeout, const QString & n
 
 	emit errored( msg );
 	cleanup();
+	slotReadStdOut();
+	slotReadStdError();
 	updateOutput();
 }
 
@@ -521,6 +523,11 @@ void JobBurner::cancel()
 
 void JobBurner::jobFinished()
 {
+    if( mState == StateError || mState == StateCancelled ) {
+        LOG_3( "JobBurner: ERROR an error has occurred, job can't be finished" );
+        return;
+    }
+
 	if( isActive() )
 		mState = StateDone;
 
