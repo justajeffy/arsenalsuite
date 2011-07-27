@@ -367,10 +367,11 @@ bool JobBurner::taskStart( int task, const QString & outputName, int secondsSinc
 
 void JobBurner::taskDone( int task )
 {
-//	if( task != mCurrentTask.frameNumber() ) {
-//		LOG_1( "Slave::slotTaskDone: Task number doesn't match last call to slotTaskStart" );
-//		return;
-//	}
+    if( mState == StateError ) {
+        LOG_3( "JobBurner: ERROR an error has occurred, can't be done" );
+        return;
+    }
+
 	bool needMemoryCheck = false;
 	foreach( JobTaskAssignment jta, mCurrentTaskAssignments )
 		if( jta.memory() == 0 ) needMemoryCheck = true;
@@ -386,8 +387,9 @@ void JobBurner::taskDone( int task )
 	mCurrentTasks.commit();
     Database::current()->commitTransaction();
 
-	mCurrentTaskAssignments = mCurrentTasks = RecordList();
-	
+    mCurrentTaskAssignments.clear();
+    mCurrentTasks.clear();
+
 	// Reset this, so that we can keep track of last frame finished until next frame started time
 	mTaskStart = QDateTime::currentDateTime();
 }
@@ -626,10 +628,16 @@ void JobBurner::checkMemory()
 			// reload and check again in case they changed it
 			mJob.reload();
 			if( mJob.maxMemory() > 0 && mem > mJob.maxMemory() ) {
-				QString msg = "Process exceeded max memory of " + QString::number( mJob.maxMemory() );
-				jobErrored( msg );
-				return;
-			}
+                SystemMemInfo mi = systemMemoryInfo();
+                int usedMem = mi.freeMemory + mi.cachedMemory;
+                if( usedMem / mi.totalMemory < 0.11 ) {
+                    QString msg = QString("Process exceeded max memory of %1, with %2 of %3 used")
+                        .arg(mJob.maxMemory())
+                        .arg(usedMem)
+                        .arg(mi.totalMemory);
+                    jobErrored( msg );
+                }
+            }
 		}
 
 #ifdef USE_ACCOUNTING_INTERFACE
