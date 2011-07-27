@@ -32,6 +32,14 @@ public:
 		GroupingUpdate = Qt::UserRole + 3
 	};
 	
+	enum EmptyGroupPolicy {
+		// This requires ExtTreeView, or your view to listen to the groupEmptied and
+		// groupPopulated signals and respond appropriately
+		HideEmptyGroups,
+		RemoveEmptyGroups,
+		LeaveEmptyGroups
+	};
+	
 	SuperModel * model() const { return mModel; }
 	ModelDataTranslator * groupedItemTranslator() const;
 	void setGroupedItemTranslator( ModelDataTranslator * trans );
@@ -48,10 +56,25 @@ public:
 	
 	QString groupValue( const QModelIndex & idx );
 
+	EmptyGroupPolicy emptyGroupPolicy() const;
+	void setEmptyGroupPolicy( EmptyGroupPolicy policy );
+	
+	// Opening new groups requires the view to connect to the groupCreated
+	// signal and honor this setting. Automatically done by ExtTreeView/RecordTreeView
+	void setExpandNewGroups(bool openNewGroups);
+	bool expandNewGroups() const;
+	
 signals:
 	void groupingChanged( bool grouped );
 	void grouped();
 	void ungrouped();
+	
+	// Emitted whenever a new group item is created
+	void groupCreated( const QModelIndex & );
+	// Emitted when a group item becomes empty
+	void groupEmptied( const QModelIndex & );
+	// Emitted when an existing empty group item has new grouped children
+	void groupPopulated( const QModelIndex & );
 	
 protected slots:
 	void slotRowsInserted( const QModelIndex & parent, int start, int end );
@@ -74,6 +97,8 @@ protected:
 	QList<QPersistentModelIndex> mGroupItemsToUpdate, mItemsToRegroup;
 	typedef QMap<int,QRegExp> ColumnRegexMap;
 	ColumnRegexMap mColumnRegexMap;
+	EmptyGroupPolicy mEmptyGroupPolicy;
+	bool mExpandNewGroups;
 };
 
 

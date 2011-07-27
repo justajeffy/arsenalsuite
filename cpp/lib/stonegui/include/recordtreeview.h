@@ -111,6 +111,12 @@ protected slots:
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     void slotSectionResized();
 
+    void slotGrouperChanged( ModelGrouper * grouper );
+    void slotGroupingChanged();
+    void slotGroupCreated( const QModelIndex & );
+    void slotGroupEmptied( const QModelIndex & );
+    void slotGroupPopulated( const QModelIndex & );
+
 protected:
 	void saveColumns( IniConfig & ini, const ColumnStruct columns [] );
 	void setupColumns( IniConfig & ini, const ColumnStruct columns [] );
@@ -135,6 +141,10 @@ protected:
 
     BusyWidget * mBusyWidget;
     bool mHeaderClickIsResize;
+
+    // Loaded from config file, so we can restore the expanded/collapsed state of each group
+    int mLastGroupColumn;
+    QMap<QString,bool> mGroupExpandState;
 };
 
 class STONEGUI_EXPORT RecordTreeView : public ExtTreeView

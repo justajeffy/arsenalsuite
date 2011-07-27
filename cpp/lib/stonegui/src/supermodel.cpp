@@ -53,7 +53,7 @@ void ModelTreeBuilder::_loadChildren( const QModelIndex & parentIndex, SuperMode
 	ModelNode * previousLoadingNode = mLoadingNode;
 	mLoadingNode = node;
 	node->setTranslator(defaultTranslator());
-	loadChildren(parentIndex,model);	
+	loadChildren(parentIndex,model);
 	mLoadingNode = previousLoadingNode;
 }
 
@@ -110,6 +110,10 @@ int ItemBase::compare( const QModelIndex & idx, const QModelIndex & idx2, int co
 	Q_UNUSED(column);
 	return qVariantCmp(idx.data(Qt::DisplayRole),idx2.data(Qt::DisplayRole)); 
 }
+
+StandardItem::StandardItem()
+: mFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled )
+{}
 
 int StandardItem::findItem(int column, int role ) const {
 	for( int i=0; i < mData.size(); ++i ) {
@@ -601,7 +605,6 @@ SuperModel::SuperModel( QObject * parent )
 , mGrouper( 0 )
 , mColumnFilterMap()
 {
-	
 }
 
 SuperModel::~SuperModel()
@@ -611,17 +614,23 @@ SuperModel::~SuperModel()
 
 ModelGrouper * SuperModel::grouper( bool autoCreate )
 {
-       if( !mGrouper && autoCreate )
+       if( !mGrouper && autoCreate ) {
                mGrouper = new ModelGrouper(this);
+               emit grouperChanged( mGrouper );
+       }
        return mGrouper;
 }
 
 void SuperModel::setGrouper( ModelGrouper * grouper )
 {
-       if( mGrouper && mGrouper != grouper ) {
+       if(  mGrouper != grouper ) {
+           if( mGrouper ) {
                if( mGrouper->isGrouped() )
-                       mGrouper->ungroup();
+                   mGrouper->ungroup();
                delete mGrouper;
+           }
+           mGrouper = grouper;
+           emit grouperChanged( mGrouper );
        }
        mGrouper = grouper;
 }
@@ -692,11 +701,31 @@ int SuperModel::rowCount( const QModelIndex & parent ) const
 	return ret;
 }
 
+/// Same as rowCount but will not load the children using the treeBuilder
+int SuperModel::rowCountWithoutLoad( const QModelIndex & parent ) const
+{
+    if( !parent.isValid() ) return rootNode() ? rootNode()->rowCount() : 0;
+
+    ModelNode * node = indexToNode(parent);
+    // This line skips the loading by calling hasChildren with skipTreeBuilderCheck=true
+    ModelNode * childNode = node->hasChildren(parent,false,true) ? node->child(parent) : 0;
+    int ret = (childNode ? childNode->rowCount() : 0);
+    return ret;
+}
+
 bool SuperModel::hasChildren( const QModelIndex & parent ) const
 {
 	if( !parent.isValid() ) return rootNode()->rowCount() > 0;
 	ModelNode * node = indexToNode(parent);
 	return node->hasChildren(parent);
+}
+
+bool SuperModel::hasChildrenWithoutLoad( const QModelIndex & parent ) const
+{
+    if( !parent.isValid() ) return rootNode()->rowCount() > 0;
+
+    ModelNode * node = indexToNode(parent);
+    return node->hasChildren(parent,false,true);
 }
 
 bool SuperModel::childrenLoaded( const QModelIndex & parent )
@@ -1073,8 +1102,8 @@ void SuperModel::setAutoSort( bool as )
 
 void SuperModel::checkAutoSort( const QModelIndex & parent, bool quiet )
 {
-	if( mAutoSort )
-		_sort( -1, sortOrder(), true, parent, 0, -1, quiet );
+    if( mAutoSort )
+            _sort( -1, sortOrder(), true, parent, 0, -1, quiet );
 }
 
 void SuperModel::resort()
@@ -1108,7 +1137,7 @@ void SuperModel::_sort ( int column, Qt::SortOrder order, bool recursive, const 
 	if( column < 0 )
 		column = mSortColumns.isEmpty() ? 0 : mSortColumns[0].first;
 	SortColumnPair sc(column,order);
-	
+
 	/* Save sort settings for future sorting(resort and auto sort) */
 	for( QList<SortColumnPair>::iterator it = mSortColumns.begin(); it != mSortColumns.end(); )
 		if( (*it).first == column )
@@ -1116,8 +1145,8 @@ void SuperModel::_sort ( int column, Qt::SortOrder order, bool recursive, const 
 		else
 			++it;
 	mSortColumns.prepend(sc);
-//	LOG_1( "Sorting with order " + QString( (order == Qt::AscendingOrder) ? "Ascending" : "Descending" ) );
-	
+	//LOG_3( "Sorting with order " + QString( (order == Qt::AscendingOrder) ? "Ascending" : "Descending" ) );
+
 	/* Do actual sorting if node is available */
 	ModelNode * node = parentIn.isValid() ? indexToNode(parentIn)->child(parentIn) : rootNode();
 	if( node ) {
@@ -1232,6 +1261,7 @@ void SuperModel::openInsertClosure()
 		mInsertClosureNode = node;
 	}
 	mInsertClosureNode->count++;
+    //LOG_3("Model has InsertClosure count of: "+ QString::number(mInsertClosureNode->count));
 }
 
 void SuperModel::closeInsertClosure()

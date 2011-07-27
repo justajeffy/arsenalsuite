@@ -15,6 +15,8 @@ ModelGrouper::ModelGrouper( SuperModel * model )
 , mIsGrouped( false )
 , mInsertingGroupItems( false )
 , mUpdateScheduled( false )
+, mEmptyGroupPolicy( HideEmptyGroups )
+, mExpandNewGroups( true )
 {
 	model->setGrouper(this);
 	connect( model, SIGNAL( rowsInserted(const QModelIndex &, int, int) ), SLOT( slotRowsInserted( const QModelIndex &, int, int) ) );
@@ -59,6 +61,30 @@ void ModelGrouper::setGroupedItemTranslator( ModelDataTranslator * trans )
 	mCustomTranslator = trans;
 	if( grouped )
 		groupByColumn(mGroupColumn);
+}
+
+
+ModelGrouper::EmptyGroupPolicy ModelGrouper::emptyGroupPolicy() const
+{
+	return mEmptyGroupPolicy;
+}
+
+void ModelGrouper::setEmptyGroupPolicy( ModelGrouper::EmptyGroupPolicy policy )
+{
+	if( mEmptyGroupPolicy != policy ) {
+		mEmptyGroupPolicy = policy;
+		// TODO: Remove empty groups if needed
+	}
+}
+
+void ModelGrouper::setExpandNewGroups(bool expandNewGroups)
+{
+	mExpandNewGroups = expandNewGroups;
+}
+
+bool ModelGrouper::expandNewGroups() const
+{
+	return mExpandNewGroups;
 }
 
 void ModelGrouper::groupByColumn( int column ) {
@@ -128,12 +154,15 @@ void ModelGrouper::group( GroupMap & grouped )
 			persistentGroupIndexes.append( *it );
 		foreach( QPersistentModelIndex idx, persistentGroupIndexes ) {
 			if( model()->translator(idx) == groupedItemTranslator() ) {
+				bool isEmptyGroup = model()->rowCount(idx) == 0;
 				QString groupVal = idx.sibling( idx.row(), mGroupColumn ).data( Qt::DisplayRole ).toString();
 				GroupMap::Iterator mapIt = grouped.find( groupVal );
 				if( mapIt != grouped.end() ) {
 					QModelIndexList toMove(fromPersist(mapIt.value()));
 					LOG_5( QString("Moving indexes %1 to existing group item at index %2").arg(indexListToStr(toMove)).arg(indexToStr(idx)) );
 					model()->move( toMove, idx );
+					if( isEmptyGroup )
+						emit groupPopulated( idx );
 					if( mUpdateScheduled ) {
 						if( !mGroupItemsToUpdate.contains( idx ) )
 							mGroupItemsToUpdate.append(idx);
@@ -144,13 +173,16 @@ void ModelGrouper::group( GroupMap & grouped )
 				}
 			}
 		}
-		// Remove any now-empty groups
+		// Deal with any now-empty groups
 		for( QList<QPersistentModelIndex>::Iterator it = persistentGroupIndexes.begin(); it != persistentGroupIndexes.end(); )
-			if( model()->translator(*it) == groupedItemTranslator() && model()->rowCount(*it) == 0 )
+			if( model()->translator(*it) == groupedItemTranslator() && model()->rowCount(*it) == 0 ) {
+				emit groupEmptied(*it);
 				++it;
-			else
+			} else
 				it = persistentGroupIndexes.erase( it );
-		model()->remove( fromPersist( persistentGroupIndexes ) );
+		
+		if( emptyGroupPolicy() == RemoveEmptyGroups )
+			model()->remove( fromPersist( persistentGroupIndexes ) );
 	}
 	
 	if( grouped.size() ) {
@@ -175,13 +207,19 @@ void ModelGrouper::group( GroupMap & grouped )
 		i = 0;
 		for( QMap<QString, QList<QPersistentModelIndex> >::Iterator it = grouped.begin(); it != grouped.end(); ++it, ++i ) {
 			QModelIndex groupIndex = persistentGroupIndexes[i];
-			if( mStandardTranslator )
-				mStandardTranslator->data(groupIndex).setModelData( groupIndex.sibling(groupIndex.row(), mGroupColumn), QVariant( it.key() ), Qt::DisplayRole );
+			if( mStandardTranslator ) {
+				StandardItem & item = mStandardTranslator->data(groupIndex);
+				if( mGroupColumn != 0 )
+					item.setModelData( groupIndex.sibling(groupIndex.row(), mGroupColumn), QVariant( it.key() ), Qt::DisplayRole );
+				item.setModelData( groupIndex.sibling(groupIndex.row(), 0), QString( "%1 (%2 rows)" ).arg(it.key()).arg(model()->rowCount(groupIndex)), Qt::DisplayRole );
+			}
 			if( mCustomTranslator ) {
 				model()->setData( groupIndex, QVariant(mGroupColumn), GroupingColumn );
 				model()->setData( groupIndex, QVariant(it.key()), GroupingValue );
 				model()->setData( groupIndex, QVariant(), GroupingUpdate );
 			}
+			// Emit this here(as opposed to above) so that any slots can get the group value by calling groupValue(idx)
+			emit groupCreated( persistentGroupIndexes[i] );
 		}
 	}
 }
@@ -217,10 +255,10 @@ void ModelGrouper::ungroup()
 		model()->resort();
 	}
 
-	mGroupColumn = 0;
 	emit ungrouped();
 	emit groupingChanged( false );
 }
+
 
 void ModelGrouper::slotRowsInserted( const QModelIndex & parent, int start, int end )
 {
@@ -232,9 +270,11 @@ void ModelGrouper::slotRowsInserted( const QModelIndex & parent, int start, int 
 void ModelGrouper::slotRowsRemoved( const QModelIndex & parent, int, int )
 {
 	if( mIsGrouped && parent.isValid() && model()->translator(parent) == groupedItemTranslator() ) {
-		if( model()->rowCount(parent) == 0 )
-			model()->remove( parent );
-		else {
+		if( model()->rowCount(parent) == 0 ) {
+			emit groupEmptied( parent );
+			if( emptyGroupPolicy() == RemoveEmptyGroups )
+				model()->remove( parent );
+		} else {
 			if( !mGroupItemsToUpdate.contains( parent ) )
 				mGroupItemsToUpdate += parent;
 			scheduleUpdate();
@@ -286,8 +326,12 @@ void ModelGrouper::slotUpdate()
 
 	if( mGroupItemsToUpdate.size() ) {
 		foreach( QModelIndex i, mGroupItemsToUpdate )
-			if( i.isValid() )
-				model()->setData( i, QVariant(), GroupingUpdate );
+			if( i.isValid() ) {
+				if( !mStandardTranslator )
+					//mStandardTranslator->data(i).setModelData( i.sibling(i.row(), 0), QString( "%1 (%2 rows)" ).arg(it.key()).arg(model()->rowCount(groupIndex)), Qt::DisplayRole );
+				//else
+					model()->setData( i, QVariant(), GroupingUpdate );
+			}
 		mGroupItemsToUpdate.clear();
 	}
 	
