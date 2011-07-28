@@ -563,8 +563,8 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
 	uint tat = jobStatus.tasksAverageTime();
 	avgTime.sprintf("%02i:%02i:%02i", (tat/3600)%60, (tat/60)%60, tat%60 );
 
-	Interval tiq( job.submittedts(), job.endedts().isNull() ? QDateTime::currentDateTime() : job.endedts() );
-	timeInQueue = tiq.toString( tiq.asOrder(Interval::Hours) >= 100 ? Interval::Days : Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
+	//Interval tiq( job.submittedts(), job.endedts().isNull() ? QDateTime::currentDateTime() : job.endedts() );
+	//timeInQueue = tiq.toString( tiq.asOrder(Interval::Hours) >= 100 ? Interval::Days : Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
 
 	type = job.jobType().name();
 	icon = ((JobModel*)idx.model())->jobTypeIcon(job.jobType());
@@ -606,7 +606,7 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			//case 14: return job.stats();
 			case 15: return job.currentMapServerWeight();
 			case 17: return job.endedts().toString();
-			case 18: return timeInQueue;
+			case 18: return Interval( job.submittedts(), job.endedts().isNull() ? QDateTime::currentDateTime() : job.endedts() ).toString( Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
 			case 19: return services;
 			case 20: return avgMemory;
 			case 21: return efficiency;
