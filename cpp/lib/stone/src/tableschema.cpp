@@ -34,13 +34,13 @@ namespace Stone {
 TableSchema::TableSchema( Schema * schema )
 : mSchema( schema )
 , mParent( 0 )
+, mColumnCount( 0 )
 , mPrimaryKeyIndex( -1 )
 , mFirstColumnIndex( 0 )
 , mPreload( false )
 , mBaseOnly( false )
 , mUseCodeGen( false )
 , mExpireKeyCache( true )
-, mColumnCount(0)
 {
 	if( schema )
 		schema->addTable( this );
@@ -144,7 +144,7 @@ void TableSchema::removeChild( TableSchema * TableSchema )
 	mChildren.removeAll( TableSchema );
 }
 
-QString TableSchema::tableName() const
+QString TableSchema::tableName()
 {
 	return mTableName;
 }
@@ -157,7 +157,7 @@ void TableSchema::setTableName(const QString & tn)
 		mSchema->tableRenamed( this, on );
 }
 
-QString TableSchema::className() const
+QString TableSchema::className()
 {
 	return mClassName;
 }
@@ -193,19 +193,20 @@ bool TableSchema::addField( Field * field )
 			if( f->flag( Field::PrimaryKey ) )
 				return false;
 	}
-
+	
 	int pos = fields().size();
 	mFields += field;
 	mAllFieldsCache += field;
 	if( !field->flag(Field::LocalVariable) )
 		mAllColumnsCache += field;
 	field->setPos( pos );
+	if( field->flag( Field::PrimaryKey ) )
+		mPrimaryKeyIndex = pos;
 
 	// All the children TableSchemas need to recalc, but this TableSchema
 	// is fine
 	recalcFieldPositions( pos + 1, true );
 
-    mColumnCount = mAllColumnsCache.size();
 	return true;
 }
 
@@ -221,17 +222,24 @@ FieldList filterFields( FieldList src, bool local )
 void TableSchema::recalcFieldPositions( int start, bool skipSelf )
 {
 	if( !skipSelf ) {
+		if( mParent )
+			mPrimaryKeyIndex = mParent->mPrimaryKeyIndex;
+		else
+			mPrimaryKeyIndex = -1;
 		mFirstColumnIndex = start;
-		for( FieldIter it = mFields.begin(); it != mFields.end(); ++it )
+		for( FieldIter it = mFields.begin(); it != mFields.end(); ++it ) {
+			if( mPrimaryKeyIndex < 0 && (*it)->flag( Field::PrimaryKey ) )
+				mPrimaryKeyIndex = start;
 			(*it)->setPos( start++ );
+		}
 		mAllFieldsCache = mParent ? mParent->fields() + mFields : mFields;
 		mAllColumnsCache = filterFields( mFields, false );
 		if( mParent ) mAllColumnsCache = mParent->columns() + mAllColumnsCache;
-        mColumnCount = mAllColumnsCache.size();
 	}
 
 	for( TableSchemaIter it = mChildren.begin(); it != mChildren.end(); ++it )
 		(*it)->recalcFieldPositions( start );
+	
 }
 
 FieldList TableSchema::localVariables()
@@ -250,27 +258,22 @@ void TableSchema::removeField( Field * f )
 	recalcFieldPositions( parent() ? parent()->columns().size() : 0 );
 }
 
-uint TableSchema::columnCount() const
+uint TableSchema::columnCount()
 {
-	return mColumnCount;
+	return columns().size();
 }
-
-FieldList TableSchema::columns() const
+/*
+FieldList TableSchema::columns()
 {
 	return mAllColumnsCache;
 }
-
+*/
 FieldList TableSchema::ownedColumns()
 {
 	return filterFields( ownedFields(), false );
 }
 
-uint TableSchema::fieldCount() const
-{
-    return mAllFieldsCache.size();
-}
-
-QStringList TableSchema::fieldDisplayNames() const
+QStringList TableSchema::fieldDisplayNames()
 {
 	QStringList ret;
 	foreach( Field * field, mAllFieldsCache )
@@ -278,44 +281,37 @@ QStringList TableSchema::fieldDisplayNames() const
 	return ret;
 }
 
-QStringList TableSchema::fieldNames() const
+QStringList TableSchema::fieldNames()
 {
 	QStringList ret;
 	foreach( Field * field, mAllFieldsCache )
 		ret << field->name();
 	return ret;
 }
-
-FieldList TableSchema::fields() const
+/*
+FieldList TableSchema::fields()
 {
 	return mAllFieldsCache;
 }
-
-/*
-bool TableSchema::fieldContains(Field * field) const
-{
-	return mAllFieldsCache.contains(field);
-}
 */
-
-FieldList TableSchema::ownedFields() const
+FieldList TableSchema::ownedFields()
 {
 	return mFields;
 }
 
-Field * TableSchema::field( const QString & fieldName, bool silent ) const
+Field * TableSchema::field( const QString & fieldName, bool silent )
 {
 	QString fnl = fieldName.toLower();
 	FieldList fl = fields();
 	foreach( Field * f, fl )
-		if( f->mMethodNameLower == fnl || f->mNameLower == fnl )
+		if( f->methodName().toLower() == fnl || f->name().toLower() == fnl )
 			return f;
 	if( !silent )
 		LOG_5( "TableSchema " + tableName() + " Couldn't find field: " + fieldName );
 	return 0;
 }
 
-Field * TableSchema::field( int pos ) const
+Field * TableSchema::field( int pos )
 {
 	FieldList cl = fields();
 	if( pos >=0 && pos < (int)cl.size() )
@@ -328,22 +324,6 @@ int TableSchema::fieldPos( const QString & column )
 	Field * f = field( column );
 	if( f ) return f->pos();
 	return -1;
-}
-
-uint TableSchema::primaryKeyIndex()
-{
-    if( mPrimaryKeyIndex > -1 ) return mPrimaryKeyIndex;
-
-	FieldList fields = columns();
-	foreach( Field * f, fields ) {
-		if( f->flag( Field::PrimaryKey ) ) {
-			mPrimaryKeyIndex = f->pos();
-            break;
-        }
-    }
-	if( mPrimaryKeyIndex ==  -1 ) mPrimaryKeyIndex = fields.size();
-
-    return mPrimaryKeyIndex;
 }
 
 QString TableSchema::primaryKey()
@@ -421,10 +401,10 @@ IndexSchema * TableSchema::index( const QString & name ) const
 	return 0;
 }
 
-void TableSchema::preUpdate( const Record & updated, const Record & old )
+void TableSchema::preUpdate( const Record & u, const Record & r )
 {
 	if( mParent )
-		mParent->preUpdate( updated, old );
+		mParent->preUpdate( u, r );
 }
 
 void TableSchema::preInsert( RecordList rl )
@@ -457,5 +437,33 @@ void TableSchema::postRemove( RecordList rl )
 		mParent->postRemove( rl );
 }
 
-} //namespace
+QString TableSchema::diff( TableSchema * after )
+{
+	QStringList changes;
+	if( className() != after->className() )
+		changes += "Class Name change from " + className() + " to " + after->className();
+	if( (bool(parent()) != bool(after->parent())) || (parent() && parent()->tableName() != after->parent()->tableName()) )
+		changes += "Parent class changed from " + (parent() ? parent()->tableName() : "") + " to " + (after->parent() ? after->parent()->tableName() : "");
+	if( docs() != after->docs() )
+		changes += "Docs changed from: \n\t" + docs().simplified().replace("\n","\n\t") + "\nto:\n\t" + after->docs().simplified().replace("\n","\n\t");
+	foreach( Field * before_field, ownedFields() )
+	{
+		Field * after_field = after->field( before_field->name() );
+		if( !after_field || after_field->table() != after ) {
+			changes += "Removed Column " + className() + "." + before_field->name();
+			continue;
+		}
+		changes += before_field->diff( after_field );
+	}
+	foreach( Field * after_field, after->ownedFields() )
+	{
+		Field * before_field = field( after_field->name() );
+		if( !before_field || before_field->table() != this ) {
+			changes += "Added Column " + className() + "." + after_field->name();
+		}
+	}
+	changes = changes.filter( QRegExp( "." ) );
+	return changes.isEmpty() ? QString() : (tableName() + " Changes:\n\t" + changes.join("\n\t"));
+}
 
+} // namespace

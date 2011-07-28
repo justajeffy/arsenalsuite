@@ -1,4 +1,81 @@
 
+// QList<RecordList> is implemented as a Python list of RecordLists.
+%MappedType QList<RecordList>
+{
+%TypeHeaderCode
+#include <qlist.h>
+%End
+
+%ConvertFromTypeCode
+    // Create the list.
+    PyObject *l;
+
+    if ((l = PyList_New(sipCpp->size())) == NULL)
+        return NULL;
+
+    // Set the list elements.
+    for (int i = 0; i < sipCpp->size(); ++i)
+    {
+		RecordList rl = sipCpp->value(i);
+
+		PyList_SET_ITEM(l, i, sipConvertFromNewType( new RecordList(rl), sipType_RecordList, NULL ) );
+    }
+
+    return l;
+%End
+
+%ConvertToTypeCode
+    SIP_SSIZE_T len;
+
+    // Check the type if that is all that is required.
+	if (sipIsErr == NULL)
+	{
+		if (!PySequence_Check(sipPy) || (len = PySequence_Size(sipPy)) < 0)
+			return 0;
+
+		for (SIP_SSIZE_T i = 0; i < len; ++i)
+		{
+			PyObject *itm = PySequence_ITEM(sipPy, i);
+			bool ok = (itm && sipCanConvertToType(itm, sipType_RecordList, SIP_NOT_NONE));
+
+			Py_XDECREF(itm);
+
+			if (!ok)
+				return 0;
+		}
+
+		return 1;
+	}
+
+	QList<RecordList> *ql = new QList<RecordList>;
+	len = PySequence_Size(sipPy);
+
+	for (SIP_SSIZE_T i = 0; i < len; ++i)
+	{
+		PyObject *itm = PySequence_ITEM(sipPy, i);
+		int state;
+		RecordList * t = reinterpret_cast<RecordList*>(sipConvertToType(itm, sipType_RecordList, sipTransferObj, SIP_NOT_NONE, &state, sipIsErr));
+
+		Py_DECREF(itm);
+
+		if (*sipIsErr)
+		{
+			sipReleaseType(t, sipType_RecordList, state);
+
+			delete ql;
+			return 0;
+		}
+
+		ql->append(*t);
+
+		sipReleaseType(t, sipType_RecordList, state);
+	}
+
+	*sipCppPtr = ql;
+
+	return sipGetState(sipTransferObj);
+%End
+};
 
 class Connection : QObject
 {
@@ -39,6 +116,9 @@ public:
 	int reconnectDelay() const;
 	void setReconnectDelay( int reconnectDelay );
 
+	int maxConnectionAttempts() const;
+	void setMaxConnectionAttempts( int maxConnectionAttempts );
+
 	enum Capabilities {
 		Cap_Inheritance = 		1,
 		Cap_MultipleInsert = 	2,
@@ -77,8 +157,9 @@ public:
 	virtual bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 ) = 0 /PyName=exec_/;
 
 	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() ) = 0;
+	virtual QList<RecordList> joinedSelect( const JoinedSelect &, QString where, QList<QVariant> vars ) = 0;
 
-    virtual void selectFields( Table * table, RecordList, QList<Field*> ) = 0;
+	virtual void selectFields( Table * table, RecordList, QList<Field*> ) = 0;
 
 	virtual bool insert( Table *, const RecordList & rl, bool newPrimaryKey = true ) = 0;
 
@@ -100,7 +181,7 @@ signals:
 	void connected();
 };
 
-class QSqlDbConnection : Connection
+class QSqlDbConnection : Connection /Abstract/
 {
 %TypeHeaderCode
 #include <connection.h>

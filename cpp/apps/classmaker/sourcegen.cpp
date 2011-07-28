@@ -102,7 +102,14 @@ QString retify( const QString & type )
 	return QString("RET(%1)").arg(type);
 }
 
-static void writeClass( TableSchema * table, const QString & path, const QString & templateDir )
+QString fieldArgName( const QString & fieldName )
+{
+	QString ret(fieldName);
+	ret[0] = ret[0].toLower();
+	return ret;
+}
+
+static void writeClass( TableSchema * table, const QString & path )
 {
 	Path autoPath( path + "/autocore/" );
 	Path sipPath( path + "/sip/" );
@@ -184,9 +191,10 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 	
 	// methodDefs
 	QStringList memberCtorList;
-	QString methodDefs, methods, listMethodDefs, listMethods, memberVars, memberCtors, setCode, getCode;
+	QString methodDefs, sipMethodDefs, methods, listMethodDefs, sipListMethodDefs, listMethods, memberVars, memberCtors, setCode, getCode;
 	QString getColumn, setColumn, addFields, tableData;
-
+	QString tableMembers, schemaFieldDecls, schemaFieldDefs;
+	
 	tableData += "const char * " + tbldef + " = \"" + tblname + "\";\n";
 	tableData += "const char * " + tblclassdef + " = \"" + name + "\";\n";
 
@@ -198,9 +206,14 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 		QString pmeth = f->pluralMethodName();
 		QString disp = f->displayName();
 		QString methdef = colmethdef.arg( fn.toUpper() );
-		QString idx = colidx.arg( fn.toUpper() );
-		if( table->parent() )
-			idx = QString( "(%1 + schema()->firstColumnIndex())" ).arg(idx);
+		QString camelMeth = meth;
+		camelMeth[0] = camelMeth[0].toUpper();
+		if( f->flag( Field::PrimaryKey ) )
+			camelMeth = "Key";
+		schemaFieldDecls += "\tsnu___EXPORT extern Field * " + camelMeth + ";\n";
+		camelMeth = "t__Fields::" + camelMeth;
+		QString idx = camelMeth;
+		schemaFieldDefs += "Field * " + camelMeth + " = 0;\n";
 		
 		tableData += "const char * " + fndef + " = \"" + fn + "\";\n";
 		tableData += "const char * " + methdef + " = ";
@@ -210,41 +223,35 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 			tableData += "\"" + meth + "\";\n";
 		
 		if( f->flag( Field::PrimaryKey ) ){
-			addFields += "\tnew Field( this, " + fndef + ", Field::UInt, Field::Flags(Field::PrimaryKey | Field::Unique | Field::NotNull), \"key\" );\n";
+			addFields += "\t" + camelMeth + " = new Field( this, " + fndef + ", Field::UInt, Field::Flags(Field::PrimaryKey | Field::Unique | Field::NotNull), \"key\" );\n";
 			continue;
 		}
 
 		if( !f->docs().isEmpty() )
 			methodDefs += commentifyDocString( f->docs(), 1 );
-		bool needBlock = (f->generatedDisplayName() != disp) || f->hasIndex();
-		if( needBlock )
-			addFields += "\t{\n\tField * f = ";
+		addFields += "\t" + camelMeth + " = ";
 		if( f->flag( Field::ForeignKey ) ) {
 			QString fkt = f->foreignKey();
 			methodDefs += "\t" + retify(fkt) + " " + lcf( meth ) + "() const;\n";
 			methodDefs += "\tRET(t__) & set" + ucf( meth ) + "( const " + fkt + " & );\n";
+			sipMethodDefs += "\t" + retify(fkt) + " " + lcf( meth ) + "() const /HoldGIL/;\n";
+			sipMethodDefs += "\tRET(t__) & set" + ucf( meth ) + "( const " + fkt + " & );\n";
 			methods += fkt + " t__::" + lcf( meth ) + "() const\n{\n";
-			methods += "\treturn getValue( " + idx + " ).toUInt();\n";
+			methods += "\treturn foreignKey( " + idx + " );\n";
 			methods += "}\n\n";
 			methods += "t__ & t__::set" + ucf( meth ) + "( const " + fkt + " & val )\n{\n";
-			methods += "\tRecord::setValue( " + idx + ", QVariant( val.key() ) );\n\treturn *this;\n";
+			methods += "\tRecord::setForeignKey( " + idx + ", val );\n\treturn *this;\n";
 			methods += "}\n\n";
 			listMethodDefs += "\t" + retify(fkt + "List") + " " + lcf( pmeth ) + "() const;\n";
 			listMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + fkt + " & );\n";
+			sipListMethodDefs += "\t" + retify(fkt + "List") + " " + lcf( pmeth ) + "() const /HoldGIL/;\n";
+			sipListMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + fkt + " & );\n";
 			listMethods += fkt + "List t__List::" + lcf( pmeth ) + "() const\n{\n";
-			listMethods += "\t" + fkt + "List ret = " + fkt + "::table()->records( keys( " + idx + " ) );\n";
-			listMethods += "\treturn ret;\n}\n\n";
+			listMethods += "\treturn RecordList::foreignKey( " + idx + " );\n}\n\n";
 			listMethods += "t__List & t__List::set" + ucf( pmeth ) + "( const " + fkt + " & val )\n{\n";
 			listMethods += "\tRecordList::setForeignKey( " + idx + ", val );\n";
 			listMethods += "\treturn *this;\n";
 			listMethods += "}\n\n";
-/*
-			listMethods += "\tif( d ) {\n\t\tdetach();\n";
-			listMethods += "\t\tfor( QList<RecordImp*>::Iterator it = d->mList.begin(); it != d->mList.end(); ++it ) {\n";
-			listMethods += "\t\t\tt__ temp( *it );\n\t\t\ttemp.set" + ucf( meth ) + "( val );\n";
-			listMethods += "\t\t\tif( *it != temp.imp() ) {\n\t\t\t\t(*it)->deref();\n\t\t\t\t(*it) = temp.imp();\n";
-			listMethods += "\t\t\t\t(*it)->ref();\n\t\t\t}\n\t\t}\n\t}\n\treturn *this;\n}\n\n";
-*/
 			// Field Name, Foreign Key Table Name, Flags, hasIndex, indexDeleteMode
 			addFields += QString( "new Field( this, %1, %2, %3, %4, %5 );\n" )
 						.arg( fndef ) 
@@ -253,12 +260,14 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 						.arg( f->hasIndex() ? "true": "false" )
 						.arg( "Field::" + f->indexDeleteModeString() );
 			if( f->hasIndex() ) {
-				addFields += "\t\tif( f->index() ) m" + f->index()->name() + " = f->index();\n\t";
-				addFields += "\t\tf->index()->setUseCache( " + QString( f->index()->useCache() ? "true" : "false" ) + " );";
+				addFields += "\t\tif( " + camelMeth + "->index() ) m" + f->index()->name() + " = " + camelMeth + "->index();\n\t";
+				addFields += "\t\t" + camelMeth + "->index()->setUseCache( " + QString( f->index()->useCache() ? "true" : "false" ) + " );";
 			}
 		} else {
 			methodDefs += "\t" + f->typeString() + " " + lcf( meth ) + "() const;\n";
 			methodDefs += "\tRET(t__) & set" + ucf( meth ) + "( const " + f->typeString() + " & );\n";
+			sipMethodDefs += "\t" + f->typeString() + " " + lcf( meth ) + "() const /HoldGIL/;\n";
+			sipMethodDefs += "\tRET(t__) & set" + ucf( meth ) + "( const " + f->typeString() + " & );\n";
 			methods += f->typeString() + " t__::" + lcf( meth ) + "() const\n{\n";
 			methods += "\treturn " + f->typeFromVariantCode().arg( "Record::getValue( " + idx + " )") + ";\n";
 			methods += "}\n\n";
@@ -276,30 +285,22 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 			listMethods += "\tRecordList::setValue( " + idx + ", " + f->variantFromTypeCode().arg("val") + " );\n";
 			listMethods += "\treturn *this;\n";
 			listMethods += "}\n\n";
-/*
-			listMethods += "\tif( d ) {\n\t\tdetach();\n";
-			listMethods += "\t\tfor( QList<RecordImp*>::Iterator it = d->mList.begin(); it != d->mList.end(); ++it ) {\n";
-			listMethods += "\t\t\tt__ temp( *it );\n\t\t\ttemp.set" + ucf( meth ) + "( val );\n";
-			listMethods += "\t\t\tif( *it != temp.imp() ) {\n\t\t\t\t(*it)->deref();\n\t\t\t\t(*it) = temp.imp();\n";
-			listMethods += "\t\t\t\t(*it)->ref();\n\t\t\t}\n\t\t}\n\t}\n\treturn *this;\n}\n\n";
-*/
+			// TODO: the "key" string should be shared across the entire module
 			addFields += QString( "new Field( this, %1, %2, %3, %4 );\n" )
 						.arg( fndef )
 						.arg( "Field::" + f->variantTypeString() )
 						.arg( f->flagString() )
-						.arg( methdef );
+						.arg( f->flag( Field::PrimaryKey ) ? QString("\"key\"") : methdef );
 		}
 		if( f->generatedDisplayName() != disp )
-			addFields += "\t\tf->setDisplayName( \"" + disp + "\" );\n";
-		if( needBlock )
-			addFields += "\n}\n";
+			addFields += "\t\t" + camelMeth + "->setDisplayName( \"" + disp + "\" );\n";
 	}
 	
 	if( !memberCtorList.isEmpty() )
 		memberCtors = ": " + memberCtorList.join( "\n ," );
 
 	// indexDefs
-	QString indexDefs, indexMethods, addIdxCols, tableMembers, indexCtors, indexFunctions;
+	QString indexDefs, indexMethods, addIdxCols, indexCtors, indexFunctions;
 	foreach( IndexSchema * index, indexes )
 	{
 		FieldList fl = index->columns();
@@ -325,14 +326,15 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 			indexCtors += " new IndexSchema( \"" + index->name() + "\", this, " +
 		 	QString(index->holdsList() ? "true" : "false") + "," + QString(index->useCache() ? "true" : "false") + " ) )\n";
 		
-		QStringList args, argsWOTypes, tml;
+		QStringList args, argsWOTypes, tml, nullChecks;
 		if( !primaryKeyIndex ) {
 			for( FieldIter it = fl.begin(); it != fl.end(); ++it ){
 				Field * f = *it;
-				QString fn = f->name();
+				QString fn = fieldArgName(f->name());
 				if( f->flag( Field::ForeignKey ) ) {
 					args += "const " + f->foreignKey() + " &" + fn;
 					argsWOTypes += fn + ".key()";
+					nullChecks += fn + " == 0";
 				} else {
 					args += "const " + f->typeString() + " &" + fn;
 					argsWOTypes += fn;
@@ -361,6 +363,14 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 			}
 			indexMethods += "}\n";
 		
+			if( nullChecks.size() ) {
+				indexFunctions += "\tif( (" + nullChecks.join( ") || (" ) + ") )\n";
+				if( index->holdsList() )
+					indexFunctions += "\t\treturn t__List();\n";
+				else
+					indexFunctions += "\t\treturn t__();\n";
+			}
+
 			indexFunctions += "\tt__List ret;\n";
 		
 			bool checkPP = false;
@@ -369,16 +379,16 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 			foreach( Field * f, fl ) {
 				if( f->name() == table->projectPreloadColumn() )
 					checkPP = true;
-				indexFunctions += "\targs += QVariant( " + f->name() + " );\n";
+				indexFunctions += "\targs += QVariant( " + fieldArgName(f->name()) + " );\n";
 			}
 		
 			indexFunctions += "\tret = table()->indexFromSchema( m" + index->name() + " )->recordsByIndex( args );\n";
 			if( index->holdsList() )
-				indexFunctions += "\t\treturn ret;\n";
+				indexFunctions += "\treturn ret;\n";
 			else
-				indexFunctions += "\t\treturn ret[0];\n";
+				indexFunctions += "\treturn ret[0];\n";
 		
-			indexFunctions += "}\n;";
+			indexFunctions += "}\n\n";
 		}
 	}
 	
@@ -399,6 +409,7 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 			classDefines += "class " + ret + "List;\n";
 			classHeaders += "#include \"" + t->className().toLower() + ".h\"\n";
 			methodDefs += "\t" + retify(ret) + " " + method + "() const;\n";
+			sipMethodDefs += "\t" + retify(ret) + " " + method + "() const;\n";
 			methods += ret + " t__::" + method + "() const\n{\n";
 			methods += "\treturn " + t->className() + QString(f->flag( Field::Unique ) ? "::recordBy" : "::recordsBy") + f->index()->name() + "( ";
 			methods += "*this );\n}\n";
@@ -446,7 +457,7 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 		listMethods += "\t\tret += (*it).children( etl, recursive );\n\treturn ret;\n}\n";
 	}
 
-	QString temp = readFile( templateDir+"/autocore.h" );
+	QString temp = readFile( "templates/autocore.h" );
 	temp.replace( "<%METHODDEFS%>", methodDefs );
 	temp.replace( "<%INDEXDEFS%>", indexDefs );
 	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
@@ -468,8 +479,8 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 
 	write( temp, path + "/autocore/" + name.toLower() + ".h" );
 
-	temp = readFile( templateDir+"/autocore.sip" );
-	temp.replace( "<%METHODDEFS%>", methodDefs );
+	temp = readFile( "templates/autocore.sip" );
+	temp.replace( "<%METHODDEFS%>", sipMethodDefs );
 	temp.replace( "<%INDEXDEFS%>", indexDefs );
 	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
 	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
@@ -489,10 +500,10 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 	temp.replace( QRegExp( "RET\\(([^\\)]+)\\)" ), "Mapped\\1" );
 	write( temp, path + "/sip/" + name.toLower() + ".sip" );
 	
-	temp = readFile( templateDir+"/autocore.cpp" );
+	temp = readFile( "templates/autocore.cpp" );
+	temp.replace( "<%CLASSHEADERS%>", classHeaders );
 	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
 	temp.replace( "<%CLASSDEFS%>", classDefines );
-	temp.replace( "<%CLASSHEADERS%>", classHeaders );
 	temp.replace( "<%TABLEDATA%>", tableData );
 	temp.replace( "<%METHODS%>", methods );
 	temp.replace( "<%ELEMENTMETHODS%>", elementMethods );
@@ -508,8 +519,53 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 	temp.replace( "snu__", schema->name().toUpper() );
 	temp.replace( "snl__", schema->name().toLower() );
 	write( temp, path + "/autocore/" + name.toLower() + ".cpp" );
-
-	temp = readFile( templateDir+"/autotable.h" );
+	/*
+	temp = readFile( "templates/autoimp.h" );
+	temp.replace( "<%METHODDEFS%>", methodDefs );
+	temp.replace( "<%INDEXDEFS%>", indexDefs );
+	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
+	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
+	temp.replace( "<%CLASSDEFS%>", classDefines );
+	temp.replace( "<%CLASSHEADERS%>", classHeaders );
+	temp.replace( "<%MEMBERVARS%>", memberVars );
+	temp.replace( "<%BASEHEADER%>", baseHeader );
+	temp.replace( "<%BASEFUNCTIONS%>", baseFunctions );
+	temp.replace( "t__", name );
+	temp.replace( "tu__", name.upper() );
+	temp.replace( "tl__", name.lower() );
+	temp.replace( "tlcf__", lcf( name ) );
+	temp.replace( "b__", base );
+	temp.replace( "bu__", base.upper() );
+	temp.replace( "bl__", base.lower() );
+	temp.replace( "snu__", schema->name().toUpper() );
+	temp.replace( "snl__", schema->name().toLower() );
+	write( temp, path + "/autoimp/" + name.lower() + "imp.h" );
+	
+	temp = readFile( "templates/autoimp.cpp" );
+	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
+	temp.replace( "<%CLASSDEFS%>", classDefines );
+	temp.replace( "<%CLASSHEADERS%>", classHeaders );
+	temp.replace( "<%ELEMENTTYPEHACK%>", elementTypeHacks );
+	temp.replace( "<%METHODS%>", methods );
+	temp.replace( "<%GETCODE%>", getCode );
+	temp.replace( "<%SETCODE%>", setCode );
+	temp.replace( "<%GETCOLUMNCODE%>", getColumn );
+	temp.replace( "<%SETCOLUMNCODE%>", setColumn );
+	temp.replace( "<%MEMBERCTORS%>", memberCtors );
+	temp.replace( "<%BASEFUNCTIONS%>", baseFunctions );
+	temp.replace( "t__", name );
+	temp.replace( "tu__", name.upper() );
+	temp.replace( "tl__", name.lower() );
+	temp.replace( "tlcf__", lcf( name ) );
+	temp.replace( "b__", base );
+	temp.replace( "bu__", base.upper() );
+	temp.replace( "bl__", base.lower() );
+	temp.replace( "snu__", schema->name().toUpper() );
+	temp.replace( "snl__", schema->name().toLower() );
+	write( temp, path + "/autoimp/" + name.lower() + "imp.cpp" );
+	*/
+	temp = readFile( "templates/autotable.h" );
+	temp.replace( "<%SCHEMAFIELDDECLS%>", schemaFieldDecls );
 	temp.replace( "<%METHODDEFS%>", methodDefs );
 	temp.replace( "<%INDEXDEFS%>", indexDefs );
 	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
@@ -530,10 +586,11 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 	temp.replace( QRegExp( "RET\\(([^\\)]+)\\)" ), "\\1" );
 	write( temp, path + "/autocore/" + name.toLower() + "table.h" );
 	
-	temp = readFile( templateDir+"/autotable.cpp" );
+	temp = readFile( "templates/autotable.cpp" );
 	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
 	temp.replace( "<%CLASSDEFS%>", classDefines );
 	temp.replace( "<%CLASSHEADERS%>", classHeaders );
+	temp.replace( "<%SCHEMAFIELDDEFS%>", schemaFieldDefs );
 	temp.replace( "<%METHODS%>", methods );
 	temp.replace( "<%SETPARENT%>", table->parent() ? "\tsetParent( b__Schema::instance() );\n" : "" );
 	temp.replace( "<%ADDFIELDS%>", addFields );
@@ -557,8 +614,7 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 	temp.replace( "recordtable", "table" );
 	write( temp, path + "/autocore/" + name.toLower() + "table.cpp" );
 	
-	temp = readFile( templateDir+"/autolist.h" );
-	temp.replace( "<%METHODDEFS%>", methodDefs );
+	temp = readFile( "templates/autolist.h" );
 	temp.replace( "<%INDEXDEFS%>", indexDefs );
 	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
 	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
@@ -577,14 +633,13 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 	temp.replace( QRegExp( "RET\\(([^\\)]+)\\)" ), "\\1" );
 	write( temp, path + "/autocore/" + name.toLower() + "list.h" );
 
-	temp = readFile( templateDir+"/autolist.sip" );
-	temp.replace( "<%METHODDEFS%>", methodDefs );
+	temp = readFile( "templates/autolist.sip" );
 	temp.replace( "<%INDEXDEFS%>", indexDefs );
 	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
 	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
 	temp.replace( "<%CLASSDEFS%>", classDefines );
 	temp.replace( "<%CLASSHEADERS%>", classHeaders );
-	temp.replace( "<%LISTDEFS%>", listMethodDefs );
+	temp.replace( "<%LISTDEFS%>", sipListMethodDefs );
 	temp.replace( QRegExp( "RET\\(([^\\)]+List)\\)" ), "Mapped\\1" );
 	temp.replace( "t__", name );
 	temp.replace( "tu__", name.toUpper() );
@@ -598,7 +653,7 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 	temp.replace( QRegExp( "RET\\(([^\\)]+)\\)" ), "Mapped\\1" );
 	write( temp, path + "/sip/" + name.toLower() + "list.sip" );
 
-	temp = readFile( templateDir+"/autolist.cpp" );
+	temp = readFile( "templates/autolist.cpp" );
 	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
 	temp.replace( "<%CLASSDEFS%>", classDefines );
 	temp.replace( "<%CLASSHEADERS%>", classHeaders );
@@ -617,10 +672,8 @@ static void writeClass( TableSchema * table, const QString & path, const QString
 	
 }
 
-void writeSource( Schema * schema, const QString & path, const QString & templateDir )
+void writeSource( Schema * schema, const QString & path )
 {
-	if( !QFile::exists(templateDir) )
-		LOG_1( "writeSource: ERROR: templates directory does not exist" );
 	LOG_1( "writeSource: Writing sources to " + path );
 	TableSchemaList tables = schema->tables();
 	QStringList headers, sources, classes;
@@ -632,14 +685,16 @@ void writeSource( Schema * schema, const QString & path, const QString & templat
 			nonCodeGen += t;
 			continue;
 		}
-		writeClass( t, path, templateDir );
+		writeClass( t, path );
 		QString lct = t->className().toLower();
 		classes += t->className();
 		headers += "\tautocore/" + lct + ".h";
 		headers += "\tautocore/" + lct + "list.h";
+//		headers += "\tautoimp/" + lct + "imp.h";
 		headers += "\tautocore/" + lct + "table.h";
 		sources += "\tautocore/" + lct + ".cpp";
 		sources += "\tautocore/" + lct + "list.cpp";
+//		sources += "\tautoimp/" + lct + "imp.cpp";
 		sources += "\tautocore/" + lct + "table.cpp";
 		if( QFile::exists( path + "/base/" + lct + "base.cpp" ) )
 			sources += "\tbase/" + lct + "base.cpp";
@@ -666,7 +721,7 @@ void writeSource( Schema * schema, const QString & path, const QString & templat
 	loader += "#include \"" + schema->name().toLower() + ".h\"\n";
 	for( QStringList::Iterator it = classes.begin(); it != classes.end(); ++it )
 		loader += "#include \"" + (*it).toLower() + "table.h\"\n";
-	loader += "\n\n" + schema->name().toUpper() + "_EXPORT void "+ schema->name().toLower() + "_loader() {\n\t";
+    loader += "\n\n" + schema->name().toUpper() + "_EXPORT void "+ schema->name().toLower() + "_loader() {\n\t";
 	loader += "static bool classesLoaded = false;\n\t";
 	loader += "if( classesLoaded )\n\t\treturn;\n\t";
 	loader += "classesLoaded = true;\n\t";

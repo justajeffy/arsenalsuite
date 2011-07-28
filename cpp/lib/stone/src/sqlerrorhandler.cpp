@@ -36,25 +36,25 @@ static bool inHandler = false;
 
 void SqlErrorHandler::handleError(const QString & error)
 {
-    if( inHandler ) {
-        LOG_1( "Recursive Sql Error Detected; ignoring error: " + error );
-        return;
-    }
-    inHandler = true;
+	if( inHandler ) {
+		LOG_1( "Recursive Sql Error Detected, ignoring error: " + error );
+		return;
+	}
+	inHandler = true;
 	QString hostName = QHostInfo::localHostName();
 	IniConfig & ini = config();
 	ini.pushSection("Database");
-	QStringList dests = ini.readString("SqlErrorEmailList","newellm@blur.com").split(",");
+	QStringList dests = ini.readString("SqlErrorEmailList","newellm@blur.com").split(",", QString::SkipEmptyParts);
+	ini.popSection();
 	if( !dests.isEmpty() ) {
-		sendEmail( dests, "Sql Error: " + hostName,
+		sendEmail( dests, "Sql Error: " + hostName, 
 			"Host: " + hostName + "\n" +
 			"User: " + getUserName() + "\n" +
 			"Application Name: " + QCoreApplication::instance()->applicationName() + "\n" +
 			"Sql Error: " + error + "\n\n",
-			ini.readString("SqlErrorSender","thePipe@blur.com") );
+			"thePipe@blur.com" );
 	}
-	ini.popSection();
-    inHandler = false;
+	inHandler = false;
 }
 
 static SqlErrorHandler * sSqlErrorHandler = 0;

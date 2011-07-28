@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: process.cpp 9060 2009-11-23 00:52:42Z brobison $
+ * $Id$
  */
 
 #include <qglobal.h>
@@ -104,12 +104,12 @@ bool killProcess(int pid)
 	return kill( pid, SIGKILL )==0;
 }
 
-bool systemShutdown( bool reboot )
+bool systemShutdown( bool reboot, const QString & )
 {
 	return QProcess::startDetached("shutdown",QStringList() << (reboot ? "-r" : "-h") << "now");
 }
 
-bool killWindows( QStringList /*titles*/, QStringList /*procs*/, QString * /*windowFound*/, bool /*caseSensitive*/ )
+bool findMatchingWindow( int pid, QStringList titles, bool matchProcessChildren, bool caseSensitive, QString * foundTitle  )
 {
 	return false;
 }
@@ -228,7 +228,7 @@ void vncHost(const QString & host)
 	}
 	QProcess::startDetached( "cmd /c start " + vncFileName );
 #else
-	QProcess::startDetached( QString::fromLatin1("krdc"), QStringList(host + ".x:0") );
+	QProcess::startDetached( QString::fromLatin1("krdc"), QStringList(host + ".blur.com:0") );
 #endif // Q_WS_WIN
 }
 
@@ -369,6 +369,25 @@ QList<qint32> processChildrenIds( qint32 _pid, bool recursive )
 	QList<qint32> ret;
 	QString psOutput = backtick("ps -A -o pid,ppid");
 	return findChildrenFromPS( _pid, psOutput.split("\n"), recursive );
+}
+
+Interval systemUpTime()
+{
+	QRegExp rx("up\\s+(.*)\\s+\\d+\\s+users");
+	if( rx.indexIn( backtick("uptime"), 0 ) >= 0 ) {
+		QString uptime = rx.cap(1).replace(","," ");
+		return Interval::fromString(uptime);
+	}
+	return Interval();
+}
+
+/// Interval since the last input event(mouse movement, keyboard click, etc)
+//#include "idle.h"
+Interval idleTime()
+{
+	//Idle idle;
+	//return Interval(idle.idleTime());
+    return Interval();
 }
 
 #endif // !Q_OS_WIN

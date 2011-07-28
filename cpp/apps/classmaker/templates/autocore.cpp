@@ -33,12 +33,8 @@ t__ & t__::operator=( const t__ & other ) {
 }
 
 <%METHODS%>
-
 <%INDEXMETHODS%>
-
 <%ELEMENTMETHODS%>
-
-
 t__List t__::select( const QString & where, const VarList & args )
 {
 	return table()->select( where, args );

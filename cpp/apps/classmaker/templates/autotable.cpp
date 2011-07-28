@@ -12,21 +12,18 @@
 <%CLASSHEADERS%>
 <%ELEMENTHEADERS%>
 
+<%SCHEMAFIELDDEFS%>
+
 t__Schema * t__Schema::mSelf = 0;
 
 t__Schema::t__Schema( Schema * schema )
 : TableSchema( schema )
 <%INDEXCTORS%>
 {
-<%SETPARENT%>
-	setTableName(__tu___TABLE__);
+<%SETPARENT%>	setTableName(__tu___TABLE__);
 	setClassName(__tu___CLASS__);
 	setUseCodeGen( true );
-<%SETWHERE%>
-<%ADDFIELDS%>
-<%ADDINDEXCOLUMNS%>
-<%PRELOAD%>
-}
+<%SETWHERE%><%ADDFIELDS%><%ADDINDEXCOLUMNS%><%PRELOAD%>}
 
 t__Schema::~t__Schema()
 {

@@ -26,9 +26,12 @@
 
 #include <qstring.h>
 
+namespace Stone {
 class Database;
+}
+using namespace Stone;
 
-void writeSource( Schema *, const QString & path, const QString & templateDir="templates" );
+void writeSource( Schema *, const QString & path );
 
 #endif // SOURCE_GEN_H
 

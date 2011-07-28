@@ -4,7 +4,11 @@ OBJECTS_DIR=.out
 UI_DIR=.out
 
 FORMS+=ui/lostconnectiondialogui.ui \
+	ui/addlinkdialog.ui \
 	ui/configdbdialogui.ui \
+    ui/graphitedialogui.ui \
+    ui/graphitesourceswidgetui.ui \
+    ui/graphiteoptionswidgetui.ui \
 	ui/imagesequencewidget.ui \
 	ui/remotetailwindowui.ui
 
@@ -19,6 +23,12 @@ SOURCES += \
 	src/fieldtextedit.cpp \
 	src/fieldspinbox.cpp \
 	src/glutil.cpp \
+    src/graphitedialog.cpp \
+    src/graphitesource.cpp \
+    src/graphitesourceswidget.cpp \
+    src/graphiteoptionswidget.cpp \
+    src/graphitewidget.cpp \
+    src/htmlhighlighter.cpp \
 	src/iconserver.cpp \
 	src/imagesequenceprovider.cpp \
 	src/lostconnectiondialog.cpp \
@@ -56,6 +66,12 @@ HEADERS += \
 	include/fieldtextedit.h \
 	include/fieldspinbox.h \
 	include/glutil.h \
+    include/graphitedialog.h \
+    include/graphitesource.h \
+    include/graphitesourceswidget.h \
+    include/graphiteoptionswidget.h \
+    include/graphitewidget.h \
+    include/htmlhighlighter.h \
 	include/iconserver.h \
 	include/imagesequenceprovider.h \
 	include/lostconnectiondialog.h \

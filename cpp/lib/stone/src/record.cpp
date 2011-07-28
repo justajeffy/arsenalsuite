@@ -35,6 +35,10 @@
 
 static int sRecordCount = 0;
 
+static QVariant sNullVariant;
+
+namespace Stone {
+
 // static
 int Record::totalRecordCount()
 { return sRecordCount; }
@@ -111,6 +115,11 @@ bool Record::operator!=( const Record & other ) const
 bool Record::operator <( const Record & other ) const
 {
 	if( operator==(other) ) return false;
+	if( mImp && other.mImp ) {
+		if( mImp->mTable == other.mImp->mTable )
+			return mImp->key() < other.mImp->key();
+		return mImp->mTable < other.mImp->mTable;
+	}
 	return mImp < other.mImp;
 }
 
@@ -119,27 +128,28 @@ bool Record::isRecord() const
 	return (mImp && (mImp->mState & RecordImp::COMMITTED) && mImp->key());
 }
 
-uint Record::key( bool generate ) const
+uint Record::generateKey() const
 {
 	if( !mImp ) return 0;
 	uint k = mImp->key();
-	if( !k && generate ) {
+	if( !k ) {
 		Table * t = table();
 		if( t ) {
 			k = t->connection()->newPrimaryKey( t->schema() );
-			mImp->setValue( t->schema()->primaryKey(), k );
+			mImp = mImp->setColumn( t->schema()->primaryKeyIndex(), k );
 		}
 	}
 	return k;
 }
 
-QVariant Record::getValue( const QString & column ) const
+const QVariant & Record::getValue( const QString & column ) const
 {
-	QVariant ret( mImp ? mImp->getValue( column ) : QVariant() );
+	const QVariant & ret( mImp ? mImp->getValue( column ) : sNullVariant );
 	if( ret.userType() == qMetaTypeId<Record>() ) {
-		uint key = qvariant_cast<Record>(ret).key();
-		if( key )
-			ret = QVariant( key );
+		// We have to call getValue so we can return a const QVariant & of the key
+		Record r = qvariant_cast<Record>(ret);
+		Table * t = r.table();
+		return t ? r.getValue(t->schema()->primaryKeyIndex()) : sNullVariant;
 	}
 	return ret;
 }
@@ -155,33 +165,59 @@ Record & Record::setValue( const QString & column, const QVariant & value )
 	return *this;
 }
 
-QVariant Record::getValue( int column ) const
+const QVariant & Record::getValue( int column ) const
 {
-	return mImp ? mImp->getColumn( column ) : QVariant();
+	return mImp ? mImp->getColumn( column ) : sNullVariant;
 }
 
-QVariant Record::getValue( Field * f ) const
+const QVariant & Record::getValue( Field * f ) const
 {
-    return mImp ? mImp->getColumn( f ) : QVariant();
+	return mImp ? mImp->getColumn( f ) : sNullVariant;
 }
 
 Record & Record::setValue( int column, const QVariant & value )
 {
-    if( mImp )
-        mImp = mImp->setColumn( column, value );
+	if( mImp )
+		mImp = mImp->setColumn( column, value );
 	return *this;
 }
 
 Record & Record::setValue( Field * f, const QVariant & value )
 {
-    if( mImp )
-        mImp = mImp->setColumn( f, value );
-    return *this;
+	if( mImp )
+		mImp = mImp->setColumn( f, value );
+	return *this;
 }
 
-static Record getForeignKeyRecord( Field * f, const QVariant & val, Table * t )
+Record Record::foreignKey( const QString & column ) const
 {
-	if( !f->flag( Field::ForeignKey ) ) return Record();
+	do {
+		Table * t = table();
+		if( !t ) break;
+		Field * f = t->schema()->field( column );
+		if( !f ) break;
+		return foreignKey( f );
+	} while( 0 );
+	return Record();
+}
+
+Record Record::foreignKey( int column ) const
+{
+	do {
+		Table * t = table();
+		if( !t ) break;
+		Field * f = t->schema()->field( column );
+		if( !f ) break;
+		return foreignKey( f );
+	} while( 0 );
+	return Record();
+}
+
+Record Record::foreignKey( Field * f ) const
+{
+	if( !f->flag( Field::ForeignKey ) || !mImp ) return Record();
+	QVariant val = mImp->getColumn( f );
+	Table * t = table();
 	Table * fkt = t->database()->tableFromSchema( f->foreignKeyTable() );
 	if( !fkt ) return Record();
 	if( val.canConvert( QVariant::LongLong ) ) {
@@ -195,57 +231,15 @@ static Record getForeignKeyRecord( Field * f, const QVariant & val, Table * t )
 	return Record();
 }
 
-Record Record::foreignKey( const QString & column ) const
-{
-	do {
-		Table * t = table();
-		if( !t ) break;
-		Field * f = t->schema()->field( column );
-		if( !f ) break;
-        return foreignKey( f );
-	} while( 0 );
-	return Record();
-}
-
-Record Record::foreignKey( int column ) const
-{
-	do {
-		Table * t = table();
-		if( !t ) break;
-		Field * f = t->schema()->field( column );
-		if( !f ) break;
-        return foreignKey( f );
-	} while( 0 );
-	return Record();
-}
-
-Record Record::foreignKey( Field * f ) const
-{
-    if( !f->flag( Field::ForeignKey ) || !mImp ) return Record();
-    QVariant val = mImp->getColumn( f );
-    Table * t = table();
-    Table * fkt = t->database()->tableFromSchema( f->foreignKeyTable() );
-    if( !fkt ) return Record();
-
-    if( val.canConvert( QVariant::LongLong ) ) {
-        qlonglong ll = val.toLongLong();
-        return fkt->record( ll );
-    }
-    if( val.userType() == qMetaTypeId<Record>() ) {
-        Record r = qvariant_cast<Record>(val);
-        return r;
-    }
-    return Record();
-}
-
 Record & Record::setForeignKey( int column, const Record & other )
 {
 	Table * t = table();
 	if( !t ) return *this;
 	Field * f = t->schema()->field( column );
 	if( !f ) return *this;
-	if( f->type() == Field::UInt || f->type() == Field::UInt8 || f->type() == Field::Int )
-        setValue( f, other.key() ? other.key() : qVariantFromValue<Record>(other) );
+	if( f->type() == Field::UInt || f->type() == Field::UInt8 || f->type() == Field::Int ) {
+		setValue( f, other.key() ? other.key() : qVariantFromValue<Record>(other) );
+	}
 	return *this;
 }
 
@@ -255,16 +249,18 @@ Record & Record::setForeignKey( const QString & column, const Record & other )
 	if( !t ) return *this;
 	Field * f = t->schema()->field( column );
 	if( !f ) return *this;
-	if( f->type() == Field::UInt || f->type() == Field::UInt8 || f->type() == Field::Int )
-        setValue( f, other.key() ? other.key() : qVariantFromValue<Record>(other) );
-    return *this;
+	if( f->type() == Field::UInt || f->type() == Field::UInt8 || f->type() == Field::Int ) {
+		setValue( f, other.key() ? other.key() : qVariantFromValue<Record>(other) );
+	}
+	return *this;
 }
 
 Record & Record::setForeignKey( Field * f, const Record & other )
 {
-    if( f->type() == Field::UInt || f->type() == Field::UInt8 || f->type() == Field::Int )
-        setValue( f, other.key() ? other.key() : qVariantFromValue<Record>(other) );
-    return *this;
+	if( f->type() == Field::UInt || f->type() == Field::UInt8 || f->type() == Field::Int ) {
+		setValue( f, other.key() ? other.key() : qVariantFromValue<Record>(other) );
+	}
+	return *this;
 }
 
 Record & Record::setColumnLiteral( const QString & column, const QString & literal )
@@ -312,6 +308,28 @@ QString Record::stateString() const
 	return ret.join(" ");
 }
 
+	
+QString Record::displayName() const
+{
+	Table * t = table();
+	if( t ) {
+		TableSchema * ts = t->schema();
+		Field * field = 0;
+		foreach( Field * f, ts->fields() )
+			if( f->flag( Field::DisplayName ) ) {
+				field = f;
+				break;
+			}
+		if( !field ) field = ts->field("name",true);
+		if( !field ) field = ts->field("displayname",true);
+		if( !field ) field = ts->field(ts->className(),true);
+		if( !field ) field = ts->field(ts->tableName(),true);
+		
+		if( field ) return getValue( field->pos() ).toString();
+	}
+	return QString();
+}
+
 static QString tabAlign( const QStringList & keylist, const QStringList & valueList, int tabSize = 8 )
 {
 	int max_w = 0;
@@ -333,18 +351,25 @@ QString Record::dump() const
 {
 	Table * t = table();
 	QStringList keys, values;
-	keys << (t ? t->tableName() : QString("Invalid Record"));
+	keys << (t ? t->tableName() : QString("Invalid Record")) + " @ 0x" + QString::number((quint64)mImp,16);
 	values << stateString();
 	if( t ) {
 		QStringList fieldNames = t->schema()->fieldNames();
 		fieldNames.sort();
 		foreach( QString fieldName, fieldNames ) {
 			Field * f = t->schema()->field(fieldName);
+			QVariant v = imp()->isColumnSelected(f->pos()) ? getValue(f->pos()) : "NOT SELECTED";
 			keys << f->name();
 			if( f->type() == Field::Interval )
-				values << getValue(f->pos()).value<Interval>().toString();
-			else
-				values << getValue(f->pos()).toString();
+				values << v.value<Interval>().toString();
+			else if( v.userType() == qMetaTypeId<Record>() && f->flag( Field::ForeignKey ) ) {
+				Record r = v.value<Record>();
+				if( r.isRecord() )
+					values << QString::number(r.key());
+				else
+					values << "<Uncommitted " + r.table()->schema()->className() + " @ 0x" + QString::number((quint64)r.mImp,16) + ">";
+			} else
+				values << v.toString();
 		}
 	}
 	return tabAlign(keys,values);
@@ -363,7 +388,7 @@ QString Record::changeString() const
 			if( mImp->isColumnModified(f->pos()) ) {
 				if( !orig.isRecord() ) {
 					orig = t->record( key() );
-					if( !orig.isRecord() ) continue;
+					if( !orig.isRecord() ) break;
 				}
 				if( !changeString.isEmpty() )
 					changeString += "\n";
@@ -388,16 +413,16 @@ bool Record::isUpdated() const
 
 void Record::selectFields( FieldList fields, bool refreshExisting )
 {
-    if( isRecord() ) {
-        if( !refreshExisting ) {
-            if( fields.size() )
-                fields = fields & mImp->notSelectedColumns();
-            else
-                fields = mImp->notSelectedColumns();
-        }
-        if( fields.size() )
-            table()->selectFields( RecordList(*this), fields );
-    }
+	if( isRecord() ) {
+		if( !refreshExisting ) {
+			if( fields.size() )
+				fields = fields & mImp->notSelectedColumns();
+			else
+				fields = mImp->notSelectedColumns();
+		}
+		if( fields.size() )
+			table()->selectFields( RecordList(*this), fields );
+	}
 }
 
 Record & Record::reload( bool lockForUpdate )
@@ -423,14 +448,14 @@ Record & Record::reload( bool lockForUpdate )
 
 int Record::remove()
 {
-	if( mImp )
+	if( isValid() )
 		return table()->remove( *this );
 	return 0;
 }
 
 Record & Record::commit( bool sync )
 {
-	if( mImp )
+	if( isValid() )
 		mImp = mImp->commit(key()==0,sync);
 	return *this;
 }
@@ -455,8 +480,12 @@ void Record::checkImpType(TableSchema * ts)
 		mImp->deref();
 		mImp = 0;
 	}
+	
 	if( !mImp ) {
 		mImp = ts->table()->mEmptyImp;
 		mImp->ref();
 	}
 }
+
+} // namespace
+

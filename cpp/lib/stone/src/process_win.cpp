@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: process_win.cpp 9359 2010-02-16 06:20:33Z brobison $
+ * $Id$
  */
 
 #define UNICODE 1
@@ -48,10 +48,10 @@
 #include <Userenv.h>
 #include <tlhelp32.h>
 #include <tchar.h>
+#include <lm.h>
 #include <pdh.h>
 #include <pdhmsg.h>
 #include <qfileinfo.h>
-
 
 Win32Process::Win32Process( QObject * parent )
 : QObject( parent )
@@ -87,6 +87,7 @@ void Win32Process::setEnvironment( QStringList env )
 {
 	mEnv = env;
 }
+
 /*
 QIODevice * Win32Process::stdin()
 {
@@ -113,6 +114,11 @@ QProcess::ProcessError Win32Process::error() const
 	return mError;
 }
 
+QString Win32Process::errorString() const
+{
+	return mErrorString;
+}
+
 bool Win32Process::isRunning()
 {
 	if( mState == QProcess::Running || mState == QProcess::Starting ) {
@@ -123,7 +129,7 @@ bool Win32Process::isRunning()
 				mState = QProcess::Running;
 				emit stateChanged( mState );
 			}
-			LOG_3( "Process Running" );
+			//LOG_3( "Process Running" );
 			return true;
 		}
 		mExitCode = exitCode;
@@ -150,8 +156,8 @@ Q_PID Win32Process::pid()
 
 void Win32Process::terminate()
 {
-    if(isRunning())
-        TerminateProcess(mProcessInfo.hProcess, 0xf291);
+	if(isRunning())
+		TerminateProcess(mProcessInfo.hProcess, 0xf291);
 }
 
 void Win32Process::setLogonFlag( LogonFlag flag )
@@ -159,38 +165,71 @@ void Win32Process::setLogonFlag( LogonFlag flag )
 	mLogonFlag = flag;
 }
 
+/*
+static void qt_create_pipe(Q_PIPE *pipe, bool in)
+{
+    // Open the pipes.  Make non-inheritable copies of input write and output
+    // read handles to avoid non-closable handles (this is done by the
+    // DuplicateHandle() call).
+
+#if !defined(Q_OS_WINCE)
+    SECURITY_ATTRIBUTES secAtt = { sizeof( SECURITY_ATTRIBUTES ), NULL, TRUE };
+
+    HANDLE tmpHandle;
+    if (in) {                   // stdin
+        if (!CreatePipe(&pipe[0], &tmpHandle, &secAtt, 1024 * 1024))
+            return;
+        if (!DuplicateHandle(GetCurrentProcess(), tmpHandle, GetCurrentProcess(),
+                             &pipe[1], 0, FALSE, DUPLICATE_SAME_ACCESS))
+            return;
+    } else {                    // stdout or stderr
+        if (!CreatePipe(&tmpHandle, &pipe[1], &secAtt, 1024 * 1024))
+            return;
+        if (!DuplicateHandle(GetCurrentProcess(), tmpHandle, GetCurrentProcess(),
+                             &pipe[0], 0, FALSE, DUPLICATE_SAME_ACCESS))
+            return;
+    }
+
+    CloseHandle(tmpHandle);
+#else
+	Q_UNUSED(pipe);
+	Q_UNUSED(in);
+#endif
+}
+*/
+
 static QString qt_create_commandline(const QString &program, const QStringList &arguments)
 {
-    QString programName = program;
-    if (!programName.startsWith(QLatin1Char('\"')) && !programName.endsWith(QLatin1Char('\"')) && programName.contains(QLatin1String(" ")))
-        programName = QLatin1String("\"") + programName + QLatin1String("\"");
-    programName.replace(QLatin1String("/"), QLatin1String("\\"));
+	QString programName = program;
+	if (!programName.startsWith(QLatin1Char('\"')) && !programName.endsWith(QLatin1Char('\"')) && programName.contains(QLatin1String(" ")))
+		programName = QLatin1String("\"") + programName + QLatin1String("\"");
+	programName.replace(QLatin1String("/"), QLatin1String("\\"));
 
-    QString args;
-    // add the prgram as the first arrg ... it works better
-    args = programName + QLatin1String(" ");
-    for (int i=0; i<arguments.size(); ++i) {
-        QString tmp = arguments.at(i);
-        // in the case of \" already being in the string the \ must also be escaped
-        tmp.replace( QLatin1String("\\\""), QLatin1String("\\\\\"") );
-        // escape a single " because the arguments will be parsed
-        tmp.replace( QLatin1String("\""), QLatin1String("\\\"") );
-        if (tmp.isEmpty() || tmp.contains(QLatin1Char(' ')) || tmp.contains(QLatin1Char('\t'))) {
-            // The argument must not end with a \ since this would be interpreted
-            // as escaping the quote -- rather put the \ behind the quote: e.g.
-            // rather use "foo"\ than "foo\"
-            QString endQuote(QLatin1String("\""));
-            int i = tmp.length();
-            while (i>0 && tmp.at(i-1) == QLatin1Char('\\')) {
-                --i;
-                endQuote += QLatin1String("\\");
-            }
-            args += QLatin1String(" \"") + tmp.left(i) + endQuote;
-        } else {
-            args += QLatin1Char(' ') + tmp;
-        }
-    }
-    return args;
+	QString args;
+	// add the prgram as the first arrg ... it works better
+	args = programName + QLatin1String(" ");
+	for (int i=0; i<arguments.size(); ++i) {
+		QString tmp = arguments.at(i);
+		// in the case of \" already being in the string the \ must also be escaped
+		tmp.replace( QLatin1String("\\\""), QLatin1String("\\\\\"") );
+		// escape a single " because the arguments will be parsed
+		tmp.replace( QLatin1String("\""), QLatin1String("\\\"") );
+		if (tmp.isEmpty() || tmp.contains(QLatin1Char(' ')) || tmp.contains(QLatin1Char('\t'))) {
+			// The argument must not end with a \ since this would be interpreted
+			// as escaping the quote -- rather put the \ behind the quote: e.g.
+			// rather use "foo"\ than "foo\"
+			QString endQuote(QLatin1String("\""));
+			int i = tmp.length();
+			while (i>0 && tmp.at(i-1) == QLatin1Char('\\')) {
+				--i;
+				endQuote += QLatin1String("\\");
+			}
+			args += QLatin1String(" \"") + tmp.left(i) + endQuote;
+		} else {
+			args += QLatin1Char(' ') + tmp;
+		}
+	}
+	return args;
 }
 
 // This opens CreateProcessWithLogonW dynamically, so that if it doesn't exist
@@ -204,8 +243,8 @@ typedef int (WINAPI * ExtCreateProcessWithLogonW) (LPCWSTR,LPCWSTR,LPCWSTR,DWORD
 
 ExtCreateProcessWithLogonW getCreateProcessWithLogonW()
 {
-    static ExtCreateProcessWithLogonW cpwl = (ExtCreateProcessWithLogonW)QLibrary::resolve( "advapi32", "CreateProcessWithLogonW" );
-    return cpwl;
+	static ExtCreateProcessWithLogonW cpwl = (ExtCreateProcessWithLogonW)QLibrary::resolve( "advapi32", "CreateProcessWithLogonW" );
+	return cpwl;
 }
 
 // This opens CreateProcessWithLogonW dynamically, so that if it doesn't exist
@@ -219,8 +258,8 @@ typedef BOOL (WINAPI * ExtCreateProcessWithTokenW) (HANDLE,DWORD,
 
 ExtCreateProcessWithTokenW getCreateProcessWithTokenW()
 {
-    static ExtCreateProcessWithTokenW cpwl = (ExtCreateProcessWithTokenW)QLibrary::resolve( "advapi32", "CreateProcessWithTokenW" );
-    return cpwl;
+	static ExtCreateProcessWithTokenW cpwl = (ExtCreateProcessWithTokenW)QLibrary::resolve( "advapi32", "CreateProcessWithTokenW" );
+	return cpwl;
 }
 
 bool SetPrivilege( HANDLE hToken, LPCTSTR lpszPrivilege, bool enable, QString * error )
@@ -765,13 +804,15 @@ bool setupPrivileges( QString * error )
 	}
 	
 	do {
-		if( !SetPrivilege( hToken, SE_ASSIGNPRIMARYTOKEN_NAME, TRUE, error ) )
+		if( !SetPrivilege( hToken, SE_ASSIGNPRIMARYTOKEN_NAME, TRUE, error ) ) {
+			*error = "SetPrivilege failed to set SE_ASSIGNPRIMARYTOKEN_NAME";
 			break;
-		LOG_5( "SE_ASSIGNPRIMARYTOKEN_NAME set" );
+		}
 
-		if( !SetPrivilege( hToken, SE_INCREASE_QUOTA_NAME, TRUE, error ) )
+		if( !SetPrivilege( hToken, SE_INCREASE_QUOTA_NAME, TRUE, error ) ) {
+			*error = "SetPrivilege failed to set SE_INCREASE_QUOTA_NAME";
 			break;
-		LOG_5( "SE_INCREASE_QUOTA_NAME set" );
+		}
 	
 		ret = true;
 	} while( 0 );
@@ -797,6 +838,10 @@ bool Win32Process::start( const QString & program, const QStringList & args )
 
 	QString command = qt_create_commandline(program, args);
 
+	QString domain = mDomain;
+	if( !mUserName.contains( "@" ) && domain.isEmpty() )
+		domain = ".";
+
 	ExtCreateProcessWithLogonW cpwl = getCreateProcessWithLogonW();
 	if( cpwl ) {
 		LOG_3( "Using CreateProcessWithLogonW" );
@@ -812,7 +857,7 @@ bool Win32Process::start( const QString & program, const QStringList & args )
 
 		success = cpwl(
 			(WCHAR*)mUserName.utf16(),
-			(WCHAR*)mDomain.utf16(),
+			(WCHAR*)domain.utf16(),
 			(WCHAR*)mPassword.utf16(),
 			logonFlag,
 			0,
@@ -823,12 +868,12 @@ bool Win32Process::start( const QString & program, const QStringList & args )
 			&startInfo,
 			&mProcessInfo
 		);
+		delete [] command_wchar;
+
 		if( !success ) {
 			_error( QProcess::FailedToStart, "Unable to create process for user " + mDomain + "\\" + mUserName + " error was: " + QString::number( GetLastError() ) );
 			return false;
 		}
-
-		delete [] command_wchar;
 	}
 		else
 	{
@@ -837,7 +882,7 @@ bool Win32Process::start( const QString & program, const QStringList & args )
 		HANDLE userHandle;
 		success = LogonUserA(
 			mUserName.toLatin1().data(),
-			mDomain.toLatin1().data(),
+			domain.toLatin1().data(),
 			mPassword.toLatin1().data(),
 			LOGON32_LOGON_INTERACTIVE,
 			LOGON32_PROVIDER_DEFAULT,
@@ -942,7 +987,7 @@ bool Win32Process::start( const QString & program, const QStringList & args )
 void Win32Process::_checkup()
 {
 	isRunning();
-	if( mCheckupTimer->interval() == 15 )
+	if( mCheckupTimer && mCheckupTimer->interval() == 15 )
 		mCheckupTimer->start(50);
 }
 
@@ -1031,11 +1076,14 @@ int processID()
 bool killProcess(int pid)
 {
 	HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, false, pid );
-	if( !hProcess )
+	if( !hProcess ) {
+		LOG_5( "Unable to open process with pid: " + QString::number( pid ) );
 		return false;
-	bool ret = bool(TerminateProcess( hProcess, (DWORD)-1 ));
-	if( !ret )
-		LOG_3( "TerminateProcess Failed to kill PID: " + QString::number( pid ) );
+	}
+	// Set a notable exit code so we can check for it in pidsByName
+	bool ret = bool(TerminateProcess( hProcess, 666 ));
+	LOG_5( (ret ? "Killed PID: " : "Failed to kill PID: ") + QString::number( pid ) );
+
 	CloseHandle( hProcess );
 	return ret;
 }
@@ -1045,11 +1093,15 @@ bool setProcessPriorityClass( int pid, DWORD priorityClass )
 	HANDLE h;
 	bool ret = false;
 	if( pid<=0 ) return ret;
-	h = OpenProcess(PROCESS_ALL_ACCESS, FALSE,pid);
-	if ( h == NULL )
+	h = OpenProcess(PROCESS_SET_INFORMATION, FALSE,pid);
+	if ( h == NULL ) {
+		LOG_3( QString("Unable to open process %1 to set priority class").arg( pid ) );
 		return ret;
+	}
 	if( SetPriorityClass( h, priorityClass ) )
 		ret = true;
+	else
+		LOG_3( QString("SetPriorityClass failed for process %1").arg( pid ) );
 	CloseHandle( h );
 	return ret;
 	
@@ -1060,6 +1112,7 @@ int setProcessPriorityClassByName( const QString & name, DWORD priorityClass )
 	int ret = 0;
 	QList<int> pids;
 	pidsByName( name, &pids );
+	LOG_5( QString("Setting process priority class for %1 processes with name %2").arg( pids.size() ).arg( name ) );
 	foreach( int pid, pids )
 		if( setProcessPriorityClass( pid, priorityClass ) )
 			ret++;
@@ -1239,6 +1292,10 @@ int pidsByName( const QString & name, QList<int> * pidList, bool caseSensitive )
 			QString processName = QFileInfo(QString::fromWCharArray( processNameW, len )).fileName();
 			//LOG_5( "Got Process Name: " + processName );
 			if( (caseSensitive && name == processName) || (!caseSensitive && name.toLower() == processName.toLower()) ){
+				DWORD exitCode = 0;
+				// Consider a process to be non-existent if we killed it previously with terminateprocess
+				if( GetExitCodeProcess( hProcess, &exitCode ) && exitCode != STILL_ACTIVE )
+					continue;
 				retcount++;
 				if( pidList )
 					(*pidList) += processIds[i];
@@ -1270,36 +1327,6 @@ int pidsByName( const QString & name, QList<int> * pidList, bool caseSensitive )
 
 }
 
-static QStringList tk_titles, tk_procs;
-static QString tk_windowFound;
-static bool tk_caseSensitive;
-
-BOOL CALLBACK MyEnumWindowsProc( HWND hwnd, LPARAM  )
-{
-	char temp[1024];
-	if( GetWindowTextA( hwnd, temp, 1024 ) )
-	{
-		QString title( temp );
-		bool match = false;
-		QStringList titles = tk_titles;
-		for( QStringList::Iterator it = titles.begin(); it != titles.end(); ++it )
-			if( title.contains( *it ) ) {
-				match = true;
-				tk_windowFound = title;
-				break;
-			}
-		
-		if( match )
-		{
-			LOG_5( "killWindows: Found matching window title: " + title + "  killing processes: " + tk_procs.join(",") );
-			QStringList to_kill = tk_procs;
-			for( QStringList::Iterator it = to_kill.begin(); it != to_kill.end(); ++it )
-				killAll( *it, 0, tk_caseSensitive );
-			return false;
-		}
-	}
-	return true;
-}
 
 static QList<HWND> sGetHandlesRet;
 static QString sGetHandlesRE;
@@ -1318,36 +1345,78 @@ BOOL CALLBACK GetHandles_EnumWindowsProc( HWND hwnd, LPARAM  )
 	return true;
 }
 
+int killAllWindows( const QString & windowTitleRE )
+{
+	int count = 0;
+	QList<HWND> windows = getWindowsByName( windowTitleRE );
+	foreach ( HWND hwnd, windows ) {
+		qint32 processId = windowProcess(hwnd);
+		if( processId ) {
+			if( killProcess( processId ) )
+				count++;
+		}
+	}
+	return count;
+}
+
 QList<HWND> getWindowsByName( const QString & nameRE )
 {
 	sGetHandlesRE = nameRE;
 	sGetHandlesRet.clear();
-	DWORD threadId = GetCurrentThreadId();
-	HDESK hdesk = GetThreadDesktop( threadId );
-	EnumDesktopWindows( hdesk, (WNDENUMPROC)GetHandles_EnumWindowsProc, (LPARAM)0 );
+	EnumDesktopWindows( NULL, (WNDENUMPROC)GetHandles_EnumWindowsProc, (LPARAM)0 );
 	return sGetHandlesRet;
 }
 
-bool killWindows( QStringList titles, QStringList procs, QString * windowFound, bool caseSensitive )
+struct FindMatchingWindowsStruct
 {
-	tk_titles = titles;
-	tk_procs = procs;
-	tk_windowFound = QString();
-	tk_caseSensitive = caseSensitive;
+	QStringList titles;
+	QString windowFound;
+	QList<qint32> processIds;
+	bool caseSensitive;
+};
 
-	DWORD threadId = GetCurrentThreadId();
-	HDESK hdesk = GetThreadDesktop( threadId );
-	EnumDesktopWindows( hdesk, (WNDENUMPROC)MyEnumWindowsProc, (LPARAM)0 );
+BOOL CALLBACK findMatchingWindow_WindowsProc( HWND hwnd, LPARAM param )
+{
+	char temp[1024];
+	
+	FindMatchingWindowsStruct * fmws = (FindMatchingWindowsStruct*)param;
 
-	if( !tk_windowFound.isEmpty() ) {
-		if( windowFound )
-			*windowFound = tk_windowFound;
+	if( fmws->processIds.contains( windowProcess(hwnd) ) ) {
+		if( GetWindowTextA( hwnd, temp, 1024 ) )
+		{
+			QString title( temp );
+			foreach( QString titleMatch, fmws->titles )
+				if( title.contains( titleMatch, fmws->caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive ) ) {
+					fmws->windowFound = title;
+					LOG_5( "Found matching window title: " + title );
+					return false;
+				}
+		}
+	}
+	return true;
+}
+
+bool findMatchingWindow( int pid, QStringList titles, bool matchProcessChildren, bool caseSensitive, QString * foundTitle )
+{
+	FindMatchingWindowsStruct fmws;
+	fmws.titles = titles;
+	fmws.caseSensitive = caseSensitive;
+	fmws.processIds = QList<qint32>();
+	fmws.processIds += pid;
+	if( matchProcessChildren )
+		fmws.processIds += processChildrenIds(pid,true);
+
+	EnumDesktopWindows( NULL, (WNDENUMPROC)findMatchingWindow_WindowsProc, (LPARAM)(&fmws) );
+
+	if( !fmws.windowFound.isEmpty() ) {
+		if( foundTitle )
+			*foundTitle = fmws.windowFound;
 		return true;
 	}
 	return false;
 }
 
-bool systemShutdown( bool reboot )
+bool systemShutdown( bool reboot, const QString & message )
 {
 #ifndef EWX_FORCEIFHUNG
 #define EWX_FORCEIFHUNG 0x00000010
@@ -1374,6 +1443,7 @@ bool systemShutdown( bool reboot )
 		return false;
 	}
 
+/*
 	// Shut down the system and force all applications to close.
 	uint flags = EWX_FORCEIFHUNG | (reboot ? EWX_REBOOT : EWX_SHUTDOWN | EWX_POWEROFF);
 	if ( !ExitWindowsEx(flags, 0 ) ) {
@@ -1381,20 +1451,32 @@ bool systemShutdown( bool reboot )
 		return false;
 	}
 	return true;
+*/
+	BOOL success = InitiateSystemShutdownEx( NULL, message.isEmpty() ? NULL : (WCHAR*)message.utf16(),
+		/*timeout=*/0, /*force=*/BOOL(true), BOOL(reboot),
+		SHTDN_REASON_MAJOR_APPLICATION | SHTDN_REASON_MINOR_MAINTENANCE | SHTDN_REASON_FLAG_PLANNED );
+	if ( !success ) {
+		LOG_1( "Windows Shutdown Failed with error: " + QString::number( GetLastError() ) );
+		return false;
+	}
+	return true;
 }
 
-ProcessMemInfo processMemoryInfo( qint32 pid, bool recursive )
+static ProcessMemInfo processMemoryInfoWorker( qint32 pid, bool recursive, QList<qint32> * pidsChecked )
 {
 	ProcessMemInfo ret;
 	PROCESS_MEMORY_COUNTERS pmc;
 
 	if( pid == 0 ) return ret;
+	if( pidsChecked->contains( pid ) ) return ret;
+
+	pidsChecked->append( pid );
 
 	HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid );
 	if( hProcess && GetProcessMemoryInfo( hProcess, &pmc, sizeof(pmc) ) ) {
 		ret.caps = ProcessMemInfo::CurrentSize | ProcessMemInfo::MaxSize;
-		ret.currentSize = pmc.WorkingSetSize / 1024;
-		ret.maxSize = pmc.PeakWorkingSetSize / 1024;
+		ret.currentSize = pmc.PagefileUsage / 1024;
+		ret.maxSize = pmc.PeakPagefileUsage / 1024;
 	}
 
 	if( hProcess ) CloseHandle( hProcess );
@@ -1408,7 +1490,7 @@ ProcessMemInfo processMemoryInfo( qint32 pid, bool recursive )
 			childPidStrings += QString::number(childPid);
 		LOG_5( "Getting memory info for children with pids " + childPidStrings.join(",") );
 		foreach( qint32 childPid, children ) {
-			ProcessMemInfo childMem = processMemoryInfo( childPid, true );
+			ProcessMemInfo childMem = processMemoryInfoWorker( childPid, true, pidsChecked );
 			if( childMem.caps == (ProcessMemInfo::CurrentSize | ProcessMemInfo::MaxSize) ) {
 				ret.currentSize += childMem.currentSize;
 				ret.maxSize += childMem.maxSize;
@@ -1416,6 +1498,12 @@ ProcessMemInfo processMemoryInfo( qint32 pid, bool recursive )
 		}
 	}
 	return ret;
+}
+
+ProcessMemInfo processMemoryInfo( qint32 pid, bool recursive )
+{
+	QList<qint32> pidsChecked;
+	return processMemoryInfoWorker( pid, recursive, &pidsChecked );
 }
 
 // If returnParent is true, then the processId is matched, and the parentProcessId is returned
@@ -1446,6 +1534,33 @@ static QList<qint32> enumProcessesForPidMatch( qint32 pid, bool returnParent )
 	return ret;
 }
 
+struct ParentProcessItem
+{
+	ParentProcessItem( qint32 _processId, qint32 _parentProcessId ) : processId(_processId), parentProcessId(_parentProcessId) {}
+	qint32 processId, parentProcessId;
+};
+
+// If returnParent is true, then the processId is matched, and the parentProcessId is returned
+// else the parentProcessId is matched, and the processId's are returned.
+static QList<ParentProcessItem> processParentTable()
+{
+	QList<ParentProcessItem> ret;
+	PROCESSENTRY32 procentry;
+	procentry.dwSize = sizeof(PROCESSENTRY32);
+	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0 );
+	if( hSnapShot != INVALID_HANDLE_VALUE ) {
+		BOOL bContinue = Process32First( hSnapShot, &procentry ) ;
+		while( bContinue )
+		{
+			ret.append( ParentProcessItem( procentry.th32ProcessID, procentry.th32ParentProcessID ) );
+			procentry.dwSize = sizeof(PROCESSENTRY32) ;
+			bContinue = Process32Next( hSnapShot, &procentry );
+		}
+		CloseHandle( hSnapShot );
+	}
+	return ret;
+}
+
 qint32 processParentId( qint32 pid )
 {
 	QList<qint32> list = enumProcessesForPidMatch( pid, true );
@@ -1455,6 +1570,22 @@ qint32 processParentId( qint32 pid )
 QList<qint32> processChildrenIds( qint32 pid, bool recursive )
 {
 	Q_UNUSED(recursive);
+	if( recursive ) {
+		QList<ParentProcessItem> parentTable = processParentTable();
+		QList<qint32> ret;
+		ret.append(pid);
+		bool foundMatch = false;
+		do {
+			foundMatch = false;
+			foreach( ParentProcessItem item, parentTable ) {
+				if( ret.contains(item.parentProcessId) && !ret.contains(item.processId) ) {
+					ret.append( item.processId );
+					foundMatch = true;
+				}
+			}
+		} while( foundMatch );
+		return ret;
+	}
 	return enumProcessesForPidMatch( pid, false );
 }
 
@@ -1529,6 +1660,20 @@ bool isWow64()
 	return isWow64;
 }
 
+static bool setRegKeyHKLMDword( const char * path, const char * key, DWORD val )
+{
+	bool ret = false;
+	HKEY hkey;
+	if( RegCreateKeyExA( HKEY_LOCAL_MACHINE, path, 0, 0, 0, KEY_ALL_ACCESS | (isWow64() ? KEY_WOW64_64KEY : 0), 0, &hkey, 0 ) == ERROR_SUCCESS ) {
+		DWORD value = 1;
+		if( ERROR_SUCCESS == RegSetValueExA( hkey, key, 0, REG_DWORD, (const BYTE *)&val, sizeof(DWORD) ) )
+			ret = true;
+		RegCloseKey( hkey );
+	} else
+		LOG_3( "Unable to create/open registry key HKEY_LOCAL_MACHINE\\" + QString::fromLatin1(path) + "\\" + QString::fromLatin1(key) );
+	return ret;
+}
+
 // Have to pass this flag when running under wow64 or else
 // registry redirection will bite us in the ass
 #ifndef KEY_WOW64_64KEY
@@ -1537,15 +1682,99 @@ bool isWow64()
 bool disableWindowsErrorReporting( const QString & executableName )
 {
 	bool ret = false;
-	HKEY hkey;
-	if( RegCreateKeyExA( HKEY_LOCAL_MACHINE, "Software\\Microsoft\\PCHealth\\ErrorReporting\\ExclusionList", 0, 0, 0, KEY_ALL_ACCESS | (isWow64() ? KEY_WOW64_64KEY : 0), 0, &hkey, 0 ) == ERROR_SUCCESS ) {
-		DWORD value = 1;
-		if( ERROR_SUCCESS == RegSetValueExA( hkey, executableName.toLatin1().constData(), 0, REG_DWORD, (const BYTE *)&value, sizeof(DWORD) ) )
-			ret = true;
-		RegCloseKey( hkey );
-	} else
-		qWarning( "Unable to create/open registry key HKEY_LOCAL_MACHINE\\Software\\Microsoft\\PCHealth\\ErrorReporting\\ExclusionList" );
+	if( executableName.isEmpty() ) {
+		ret = setRegKeyHKLMDword( "Software\\Microsoft\\PCHealth\\ErrorReporting", "DoReport", 0 );
+		ret &= setRegKeyHKLMDword( "Software\\Microsoft\\PCHealth\\ErrorReporting", "ShowUI", 0 );
+		ret &= setRegKeyHKLMDword( "Software\\Microsoft\\Windows\\Windows Error Reporting", "DontShowUI", 1 );
+	} else {
+		ret = setRegKeyHKLMDword( "Software\\Microsoft\\PCHealth\\ErrorReporting\\ExclusionList", executableName.toLatin1().constData(), 1 );
+	}
 	return ret;
+}
+
+QString localDomain()
+{
+	LPWKSTA_INFO_100 pBuf = NULL;
+	NET_API_STATUS nStatus;
+	QString ret;
+
+	if( (nStatus = NetWkstaGetInfo(NULL, 100, (LPBYTE *)&pBuf)) == NERR_Success )
+		ret = QString::fromWCharArray( pBuf->wki100_langroup );
+	else
+		LOG_1( "Call to NetWkstaGetInfo failed with error: " + QString::number( nStatus ) + ", couldnt find current domain" );
+
+	if( pBuf )
+		NetApiBufferFree(pBuf);
+
+	return ret;
+}
+
+
+typedef ULONGLONG (WINAPI * ExtGetTickCount64) ();
+ExtGetTickCount64 getTickCount64()
+{
+	static ExtGetTickCount64 gtc = (ExtGetTickCount64)QLibrary::resolve( "kernel32", "GetTickCount64" );
+	return gtc;
+}
+
+Interval systemUpTime()
+{
+	ExtGetTickCount64 gtc64 = getTickCount64();
+	if( gtc64 ) {
+		ULONGLONG ms = gtc64();
+		// Seconds is only an int, but that gives us 68 years...
+		// never will a windows system be up that long, nor will this code matter if it was
+		return Interval( ms / 1000 );
+	}
+
+	/* This will likely fail on a localized version of windows.  FUCK YOU Microsoft
+	 * We could possible fix this with a bunch more ugly code, but not worth it as the above will
+	 * be whats actually used in most cases going forward */
+	PDH_HQUERY phQuery;
+	DWORD errorCode;
+	if( (errorCode = PdhOpenQuery( 0, 0, &phQuery )) != ERROR_SUCCESS ) {
+		LOG_1( "Error opening pdh query, error code: " + QString::number(errorCode) );
+		return Interval();
+	}
+	PDH_HCOUNTER phCounter;
+	const WCHAR * counterPath = L"\\\\.\\System\\System Up Time";
+	if( (errorCode = PdhAddCounter( phQuery, counterPath, 0, &phCounter )) != ERROR_SUCCESS ) {
+		PdhCloseQuery( &phQuery );
+		LOG_1( "Error opening counter path: " + QString::fromWCharArray( counterPath ) + " error code: " + QString::number(errorCode) );
+		return Interval();
+	}
+	if( (errorCode = PdhCollectQueryData( phQuery )) != ERROR_SUCCESS ) {
+		PdhCloseQuery( &phQuery );
+		LOG_1( "PdhCollectQueryData returned error code: " + QString::number(errorCode) );
+		return Interval();
+	}
+	PDH_FMT_COUNTERVALUE uptimeValue;
+	if( (errorCode = PdhGetFormattedCounterValue( phCounter, PDH_FMT_LARGE, NULL, &uptimeValue )) != ERROR_SUCCESS ) {
+		PdhCloseQuery( &phQuery );
+		LOG_1( "PdhGetFormattedCounterValue returned error code: " + QString::number(errorCode) );
+		return Interval();
+	}
+
+	PdhCloseQuery( &phQuery );
+	DWORD seconds = (DWORD) (uptimeValue.largeValue);
+	return Interval(seconds);
+}
+
+typedef HRESULT (WINAPI * ExtSetCurrentProcessExplicitAppUserModelID) ( PCWSTR AppID );
+ExtSetCurrentProcessExplicitAppUserModelID setCurrentProcessExplicitAppUserModelID()
+{
+	static ExtSetCurrentProcessExplicitAppUserModelID proc = (ExtSetCurrentProcessExplicitAppUserModelID)QLibrary::resolve( "shell32", "SetCurrentProcessExplicitAppUserModelID" );
+	return proc;
+}
+
+bool qSetCurrentProcessExplicitAppUserModelID( const QString & appId )
+{
+	ExtSetCurrentProcessExplicitAppUserModelID proc = setCurrentProcessExplicitAppUserModelID();
+	if( proc ) {
+		HRESULT res = proc( (const WCHAR*)appId.utf16() );
+		return res == S_OK ? true : false;
+	}
+	return false;
 }
 
 #endif // Q_OS_WIN

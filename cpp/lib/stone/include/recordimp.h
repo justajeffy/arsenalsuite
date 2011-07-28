@@ -28,7 +28,7 @@
 #ifndef RECORD_BASE_H
 #define RECORD_BASE_H
 
-#include <qbasicatomic.h>
+#include <qatomic.h>
 #include <qstring.h>
 #include <qvector.h>
 
@@ -37,19 +37,18 @@
 class QVariant;
 class QSqlQuery;
 
-class Record;
-
 typedef QVector<QVariant> VariantVector;
 template <class T> class QList;
 
 namespace Stone {
 
+class Record;
 class KeyIndex;
 class Field;
 typedef QList<Field *> FieldList;
 class Table;
 
-/**
+	/**
  *  This class stores data for a single record in the layout
  *  determined by a \ref Table.  This class is wrapped by
  *  \ref Record, and is only used internally.
@@ -58,24 +57,23 @@ class Table;
 class STONE_EXPORT RecordImp
 {
 public:
-    // Loads mValues with the values in toLoad.  There needs to be table->fields().size() values in the array
-    // If toLoad=0 then constructs a new record with empty values. If table is specified
-    // then each value is filled with the corrosponding field->defaultValue()
-    RecordImp( Table * table, QVariant * toLoad = 0 );
-
-    // Loads mValues with the data in the sql query, starting with queryPosOffset.
-    // If fields is 0, then q should have data for every non-local field that doesn't have NoDefaultSelect set
-    // otherwise fields should contain the full list of fields contained in q
-    RecordImp( Table * table, QSqlQuery & q, int queryPosOffset = 0, FieldList * fields = 0 );
-
-    // Loads mValues with the data in the sql query, indexed by the entries in the queryColPos array
-    // If fields is 0, then q should have data for every non-local field that doesn't have NoDefaultSelect set
-    // otherwise fields should contain the full list of fields contained in q
-    RecordImp( Table * table, QSqlQuery & q, int * queryColPos, FieldList * fields = 0 );
-
-
-    ~RecordImp();
-
+	// Loads mValues with the values in toLoad.  There needs to be table->fields().size() values in the array
+	// If toLoad=0 then constructs a new record with empty values. If table is specified
+	// then each value is filled with the corrosponding field->defaultValue()
+	RecordImp( Table * table, QVariant * toLoad = 0 );
+	
+	// Loads mValues with the data in the sql query, starting with queryPosOffset.
+	// If fields is 0, then q should have data for every non-local field that doesn't have NoDefaultSelect set
+	// otherwise fields should contain the full list of fields contained in q
+	RecordImp( Table * table, QSqlQuery & q, int queryPosOffset = 0, FieldList * fields = 0 );
+	
+	// Loads mValues with the data in the sql query, indexed by the entries in the queryColPos array
+	// If fields is 0, then q should have data for every non-local field that doesn't have NoDefaultSelect set
+	// otherwise fields should contain the full list of fields contained in q
+	RecordImp( Table * table, QSqlQuery & q, int * queryColPos, FieldList * fields = 0 );
+	
+	~RecordImp();
+	
 	/// Adds 1 to the reference count
 	void ref();
 
@@ -99,19 +97,20 @@ public:
 	void set( QVariant * v );
 
 	///  Returns the QVariant value at the position \param col
-	QVariant getColumn( int col ) const;
-    QVariant getColumn( Field * f ) const;
-
+	const QVariant & getColumn( int col ) const;
+	
+	const QVariant & getColumn( Field * f ) const;
+	
 	/// Sets the QVariant value at the position \param col
 	RecordImp * setColumn( int col, const QVariant & v );
-    RecordImp * setColumn( Field * f, const QVariant & v );
-
-    /// Sets the QVariant value at position \param col
-    /// This function does not modify mState, it does clear mNotSelectedBits
-    void fillColumn( int col, const QVariant & v );
-
+	RecordImp * setColumn( Field * f, const QVariant & v );
+	
+	/// Sets the QVariant value at position \param col
+	/// This function does not modify mState, it does clear mNotSelectedBits
+	void fillColumn( int col, const QVariant & v );
+	
 	/// Returns the QVariant value at \param column
-	QVariant getValue( const QString & column ) const;
+	const QVariant & getValue( const QString & column ) const;
 
 	/// Sets the QVariant value at \param column
 	/// May return a newly allocated and referenced RecordImp, if so
@@ -125,9 +124,10 @@ public:
 	RecordImp * copy();
 
 	/// Returns the primary key for this record
-	uint key();
-    uint mKeyValue;
-
+	/// This is inlined as a special case because we can ensure the primary key
+	/// is always selected(doesn't have NoDefaultSelect set).
+	uint key() const;
+	
 	/// Commits this record to the database.
 	/// If \param newPrimaryKey is true, a new primary key
 	/// is generated, else the existing key is used.
@@ -143,14 +143,14 @@ public:
 	void setColumnModified( uint col, bool modified );
 	bool isColumnModified( uint col ) const;
 	void clearModifiedBits();
-
-    bool isColumnSelected( uint col );
-    FieldList notSelectedColumns();
-
+	
+	bool isColumnSelected( uint col );
+	FieldList notSelectedColumns();
+	
 	RecordImp * setColumnLiteral( uint col, bool modified );
 	bool isColumnLiteral( uint col ) const;
 	void clearColumnLiterals();
-
+	
 	enum {
 		NEWRECORD = 0,
 		COMMITTED = 1,
@@ -177,15 +177,17 @@ protected:
 	QAtomicInt mRefCount;
 	Table * mTable;
 	VariantVector * mValues;
-    char * mModifiedBits;
+	char * mModifiedBits;
 	char * mLiterals;
-    char * mNotSelectedBits;
-	friend class ::Record;
+	char * mNotSelectedBits;
+	friend class Record;
 	friend class Table;
 	friend class KeyIndex;
 };
 
 } //namespace
+
+using Stone::RecordImp;
 
 #endif // RECORD_BASE_H
 

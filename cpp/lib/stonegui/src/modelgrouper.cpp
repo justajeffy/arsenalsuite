@@ -124,7 +124,7 @@ QString ModelGrouper::groupValue( const QModelIndex & idx )
 	QString strValue = model()->data( idx.column() == mGroupColumn ? idx : idx.sibling(idx.row(),mGroupColumn), Qt::DisplayRole ).toString();
 	if( !regEx.isEmpty() && regEx.isValid() && strValue.contains(regEx) )
 		strValue = regEx.cap(regEx.captureCount() > 1 ? 1 : 0);
-	LOG_5( QString("Index %1 grouped with value %2").arg(indexToStr(idx)).arg(strValue) );
+	//LOG_5( QString("Index %1 grouped with value %2").arg(indexToStr(idx)).arg(strValue) );
 	return strValue;
 }
 
@@ -159,7 +159,7 @@ void ModelGrouper::group( GroupMap & grouped )
 				GroupMap::Iterator mapIt = grouped.find( groupVal );
 				if( mapIt != grouped.end() ) {
 					QModelIndexList toMove(fromPersist(mapIt.value()));
-					LOG_5( QString("Moving indexes %1 to existing group item at index %2").arg(indexListToStr(toMove)).arg(indexToStr(idx)) );
+					//LOG_5( QString("Moving indexes %1 to existing group item at index %2").arg(indexListToStr(toMove)).arg(indexToStr(idx)) );
 					model()->move( toMove, idx );
 					if( isEmptyGroup )
 						emit groupPopulated( idx );
@@ -190,7 +190,7 @@ void ModelGrouper::group( GroupMap & grouped )
 		{
 			mInsertingGroupItems = true;
 			QModelIndexList groupIndexes = model()->insert( QModelIndex(), model()->rowCount(), grouped.size(), groupedItemTranslator() );
-			LOG_5( QString("Created %1 new group items at indexes %2").arg(grouped.size()).arg(indexListToStr(groupIndexes)) );
+			//LOG_5( QString("Created %1 new group items at indexes %2").arg(grouped.size()).arg(indexListToStr(groupIndexes)) );
 			mInsertingGroupItems = false;
 			foreach( QModelIndex idx, groupIndexes ) persistentGroupIndexes.append(idx);
 		}
@@ -200,7 +200,7 @@ void ModelGrouper::group( GroupMap & grouped )
 		for( QMap<QString, QList<QPersistentModelIndex> >::Iterator it = grouped.begin(); it != grouped.end(); ++it, ++i ) {
 			QModelIndex groupIndex = persistentGroupIndexes[i];
 			QModelIndexList toMove(fromPersist(it.value()));
-			LOG_5( QString("Moving indexes %1 to existing group item at index %2").arg(indexListToStr(toMove)).arg(indexToStr(groupIndex)) );
+			//LOG_5( QString("Moving indexes %1 to existing group item at index %2").arg(indexListToStr(toMove)).arg(indexToStr(groupIndex)) );
 			model()->move( toMove, groupIndex );
 		}
 		
@@ -284,9 +284,9 @@ void ModelGrouper::slotRowsRemoved( const QModelIndex & parent, int, int )
 
 void ModelGrouper::slotDataChanged( const QModelIndex & topLeft, const QModelIndex & bottomRight )
 {
-	LOG_5( "topLeft " + indexToStr(topLeft) + " bottomRight " + indexToStr(bottomRight) );
+	if( !mIsGrouped ) return;
 	QModelIndex parent = topLeft.parent();
-	if( mIsGrouped && parent.isValid() && model()->translator(parent) == groupedItemTranslator() ) {
+	if( parent.isValid() && model()->translator(parent) == groupedItemTranslator() ) {
 		if( !mGroupItemsToUpdate.contains( parent ) )
 			mGroupItemsToUpdate += parent;
 		scheduleUpdate();

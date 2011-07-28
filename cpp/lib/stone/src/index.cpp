@@ -165,44 +165,45 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 		}
 	}
 
-    QString sel;
-    QList<QVariant> mod_args;
-    if( entrySize == 1 && mSchema->columns()[0]->flag( Field::ForeignKey ) ) {
-        bool hasNull = false;
-        Field * f = mSchema->columns()[0];
-        QStringList ss;
-        for( int entry = 0; entry < entryCount; entry++ ) {
-            if( args[entry].isNull() )
-                hasNull = true;
-            else
-                ss += args[entry].toString();
-        }
-        sel = f->name() + " IN (" + ss.join(",") + ")";
-        if( hasNull )
-            sel += " OR " + f->name() + " IS NULL";
-    } else {
-        // Setup sql
-        QStringList entryFilters;
-        for( int entry = 0; entry < entryCount; entry++ ) {
-            QStringList ss;
-            int column=0;
-            foreach( Field * f, mSchema->columns() ) {
-                QString check = "(" + f->name();
-                QVariant arg = args[entry * entrySize + column];
-                if( f->flag( Field::ForeignKey ) && arg.toInt() == 0 ) {
-                    check += " is NULL)";
-                } else {
-                    check += "=?)";
-                    mod_args += args;
-                }
-                ss += check;
-                ++column;
-            }
-            entryFilters += ss.join( " AND " );
-        }
-        sel = entryFilters.join( " OR " );
-    }
-
+	QString sel;
+	QList<QVariant> mod_args;
+	if( entrySize == 1 && mSchema->columns()[0]->flag( Field::ForeignKey ) ) {
+		bool hasNull = false;
+		Field * f = mSchema->columns()[0];
+		QStringList ss;
+		for( int entry = 0; entry < entryCount; entry++ ) {
+			if( args[entry].isNull() )
+				hasNull = true;
+			else
+				ss += args[entry].toString();
+		}
+		sel = f->name() + " IN (" + ss.join(",") + ")";
+		if( hasNull )
+			sel += " OR " + f->name() + " IS NULL";
+	} else {
+		// Setup sql
+		QStringList entryFilters;
+		for( int entry = 0; entry < entryCount; entry++ ) {
+			QStringList ss;
+			int column=0;
+			foreach( Field * f, mSchema->columns() ) {
+				QString check = "(" + f->name();
+				QVariant arg = args[entry * entrySize + column];
+				if( f->flag( Field::ForeignKey ) && arg.toInt() == 0 ) {
+					check += " is NULL)";
+				} else {
+					check += "=?)";
+					mod_args += args;
+				}
+				ss += check;
+				++column;
+			}
+			entryFilters += ss.join( " AND " );
+		}
+	
+		sel = entryFilters.join( " OR " );
+	}
+	
 	bool ciRestore = false;
 	if( mUseCache ) {
 		mMutex.lock();
@@ -277,6 +278,7 @@ RecordList Index::recordsByIndex( const QList<QVariant> & args )
 		QString check = "(\"" + f->name().toLower();
 		if( f->flag( Field::ForeignKey ) && args[i].toInt() == 0 ) {
 			check += "\" is NULL)";
+			//check += "\" is ?)";
 			// Make sure the variant is NULL
 			//mod_args[i] = QVariant(QVariant::Int);
 		} else
@@ -478,16 +480,6 @@ void HashIndex::setEmptyEntry( QList<QVariant> vars )
 	mMutex.unlock();
 }
 
-struct AutoTime {
-	Index & index;
-	QTime mTime;
-	AutoTime( Index & i ) : index( i ) { mTime.start(); }
-	~AutoTime(){
-		uint elap = mTime.elapsed();
-		index.table()->addIndexTime( elap, Table::IndexSearch );
-	}
-};
-
 RecordList HashIndex::records( QList<QVariant> vars, int & status )
 {
 	status = NoInfo;
@@ -496,8 +488,6 @@ RecordList HashIndex::records( QList<QVariant> vars, int & status )
 
 	mTable->preload();
 	
-	//AutoTime at( *this );
-
 	VarHash * node = (VarHash*)mRoot;
 	void * next=0;
 	mMutex.lock();
@@ -528,7 +518,7 @@ RecordList HashIndex::records( QList<QVariant> vars, int & status )
 			ret += (RecordImp*)next;
 	}
 	mMutex.unlock();
-	return ret; //.unique();
+	return ret;
 }
 
 static QString emptyString("");
@@ -579,8 +569,7 @@ void HashIndex::recordIncomingNode( VarHash * node, int fieldIndex, RecordImp * 
 //				printf( "Inserting list %p under node %p with value %s\n", list, node, v.toString().toLatin1().constData() );
 				node->insert( v, list );
 			}
-			//if( list && !list->contains( valRecord ) ) {
-			if( list ) {
+			if( list && !list->contains( valRecord ) ){
 				(*list) += valRecord;
 //				printf( "Adding %p to list %p under node %p with value %s\n", valRecord, list, node, v.toString().toLatin1().constData() );
 			}
@@ -711,7 +700,6 @@ void KeyIndex::recordsIncoming( const RecordList & records, bool )
 
 Record KeyIndex::record( uint key, bool * found )
 {
-	//AutoTime t( *this );
 	//LOG_5( "Checking " + mTable->tableName() + " KeyIndex for record: " + QString::number(key) + " index id: " + QString::number( (int)this ) );
 
 	QMutexLocker locker( &mMutex );
@@ -802,4 +790,3 @@ void KeyIndex::expire( uint recordKey, RecordImp * imp )
 }
 
 } //namespace
-

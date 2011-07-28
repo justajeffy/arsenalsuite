@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: interval.cpp 9056 2009-11-23 00:34:05Z brobison $
+ * $Id$
  */
 
 #include <stdlib.h>
@@ -127,6 +127,19 @@ Interval & Interval::operator/=( double d )
 {
 	*this = operator/(d);
 	return *this;
+}
+
+Interval Interval::abs() const
+{
+	if( *this > Interval() )
+		return *this;
+	return this->operator*(-1.0);
+}
+
+double Interval::operator/( const Interval & other ) const
+{
+	double ret = 0;
+	return asOrder(Microseconds) / double(other.asOrder(Microseconds));
 }
 
 int Interval::compare( const Interval & i1, const Interval & i2 )
@@ -271,7 +284,8 @@ QString Interval::toString( Order maximumOrder, Order minimumOrder, int flags ) 
 	QString ret;
 	qint64 months = mMonths, days = mDays, micros = mMicroseconds;
 	qint64 millis = 0, seconds = 0, hours = 0, minutes = 0, millenia = 0, centuries = 0, decades = 0;
-	bool trimMax = flags &	TrimMaximum;
+	bool isMinus = false;
+	bool trimMax = flags & TrimMaximum;
 #define TRIM_MIN ((flags & TrimMinimum) && months == 0 && days == 0 && micros == 0)
 	if( maximumOrder < Seconds ) maximumOrder = Seconds;
 
@@ -309,16 +323,16 @@ QString Interval::toString( Order maximumOrder, Order minimumOrder, int flags ) 
 			days = 0;
 			if( minimumOrder == Days || TRIM_MIN ) break;
 		case Hours:
-			if( micros < 0 ) {
+			isMinus = (micros < 0);
+			if( isMinus )
 				micros = llabs(micros);
-				ret += "-";
-			}
 			hours = micros / (MICROSECONDS_PER_MINUTE * 60);
 			micros %= (MICROSECONDS_PER_MINUTE * 60);
 			if( minimumOrder == Hours || TRIM_MIN )
-				ret = aip( ret, hours, " hour", trimMax );
+				ret = aip( ret + (isMinus ? "-" : ""), hours, " hour", trimMax );
 			else {
 				if( !ret.isEmpty() ) ret += " ";
+				if( isMinus ) ret += "-";
 				ret += padString( hours, (flags & PadHours) ? 2 : 0 ) + ":";
 			}
 			if( minimumOrder == Hours || TRIM_MIN ) break;
@@ -328,9 +342,9 @@ QString Interval::toString( Order maximumOrder, Order minimumOrder, int flags ) 
 			minutes = llabs(micros / MICROSECONDS_PER_MINUTE);
 			micros %= MICROSECONDS_PER_MINUTE;
 			ret += padString( minutes, 2 );
-			if( TRIM_MIN ) break;
+			// If we display minutes always display seconds even if zero
+			//if( minimumOrder == Minutes || TRIM_MIN ) break;
 			ret += ":";
-			if( minimumOrder == Minutes || TRIM_MIN ) break;
 		case Seconds:
 			if( micros < 0 && hours == 0 && minutes == 0 )
 				ret += "-";
@@ -348,21 +362,23 @@ QString Interval::toString( Order maximumOrder, Order minimumOrder, int flags ) 
 			ret += padString(micros, 3);
 			break;
 	}
+	if( ret.isEmpty() )
+		ret = "00:00:00";
 	return ret;
 }
 
 QString Interval::toDisplayString() const
 {
-    if( mDays == 0 && mMonths == 0 ) {
-        qint64 _hours = hours(), _minutes = minutes(), _seconds = seconds();
-        if( _hours > 0 && (_minutes % 60 == 0) && (_seconds % 3600 == 0) )
-            return aip( "", _hours, " hour", false );
-        if( _hours == 0 && (_minutes > 0) && (_seconds % 60 == 0) )
-            return aip( "", _minutes, " minute", false );
-        if( _hours == 0 && _minutes == 0 )
-            return aip( "", _seconds, " second", false );
-    }
-    return toString();
+	if( mDays == 0 && mMonths == 0 ) {
+		qint64 _hours = hours(), _minutes = minutes(), _seconds = seconds();
+		if( _hours > 0 && (_minutes % 60 == 0) && (_seconds % 3600 == 0) )
+			return aip( "", _hours, " hour", false );
+		if( _hours == 0 && (_minutes > 0) && (_seconds % 60 == 0) )
+			return aip( "", _minutes, " minute", false );
+		if( _hours == 0 && _minutes == 0 )
+			return aip( "", _seconds, " second", false );
+	}
+	return toString();
 }
 
 Interval Interval::fromString( const QString & iso, bool * valid )
@@ -421,19 +437,19 @@ Interval Interval::fromString( const QString & iso, bool * valid )
 	}
 	QRegExp seconds( "^([-\\d\\.]+) (seconds?)", Qt::CaseInsensitive );
 	if( is.contains(seconds) ) {
-		ret = ret.addSeconds( seconds.cap(1).toInt() );
+		ret = ret.addSeconds( seconds.cap(1).toDouble() );
 		is = is.remove(seconds).simplified();
 		parseTimeString = false;
 	}
 	QRegExp ms( "^([-\\d\\.]+) (milliseconds?)", Qt::CaseInsensitive );
 	if( is.contains(ms) ) {
-		ret = ret.addMilliseconds( ms.cap(1).toInt() );
+		ret = ret.addMilliseconds( ms.cap(1).toDouble() );
 		is = is.remove(ms).simplified();
 		parseTimeString = false;
 	}
 	QRegExp micro( "^([-\\d\\.]+) (microseconds?)", Qt::CaseInsensitive );
 	if( is.contains(micro) ) {
-		ret = ret.addMicroseconds( micro.cap(1).toInt() );
+		ret = ret.addMicroseconds( (int)micro.cap(1).toDouble() );
 		is = is.remove(micro).simplified();
 		parseTimeString = false;
 	}
@@ -571,7 +587,7 @@ Interval Interval::addMicroseconds( qint64 m )
 	return ret;
 }
 
-QDateTime Interval::adjust( const QDateTime & dt )
+QDateTime Interval::adjust( const QDateTime & dt ) const
 {
 	return dt.addMonths( mMonths ).addDays( mDays ).addMSecs( mMicroseconds / 1000 );
 }
