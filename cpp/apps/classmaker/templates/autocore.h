@@ -10,7 +10,11 @@
 
 #include "snl__.h"
 #include "interval.h"
+#include "joinedselect.h"
+#include "table.h"
 #include "bl__.h"
+
+using namespace Stone;
 
 #define HEADER_FILES
 <%BASEHEADER%>
@@ -55,7 +59,7 @@ public:
 		checkImpType();
 	}
 
-	t__( Stone::RecordImp * imp, bool checkType = true )
+	t__( RecordImp * imp, bool checkType = true )
 	: b__( imp, false )
 	{
 		if( checkType ) checkImpType();
@@ -73,6 +77,12 @@ public:
 
 	static t__List select( const QString & where, const VarList & args );
 	static t__List select( const QString & where = QString::null );
+	
+	// Usage
+	// Employee::join<UserGroup>().join<Group>().select()
+	template<typename T> static JoinedSelect join( QString condition = QString(), JoinType joinType = InnerJoin, bool ignoreResults = false, const QString & alias = QString() )
+	{ return table()->join( T::table(), condition, joinType, ignoreResults, alias ); }
+	
 <%INDEXDEFS%>
 
 <%ELEMENTHACKS%>

@@ -146,7 +146,7 @@ public:
 	}
 	int compare( const QModelIndex & a, const QModelIndex & b, QList<int> , bool )
 	{
-		return typeScore(a) - typeScore(b);	
+		return typeScore(a) - typeScore(b);
 	}
 
 	TableTranslator * mTableTranslator;
@@ -155,7 +155,7 @@ public:
 	StandardTranslator * mStandardTranslator;
 };
 
-MainWindow::MainWindow()
+MainWindow::MainWindow( Schema * schema )
 : QMainWindow( 0 )
 , mSchema( 0 )
 , mChanges( false )
@@ -168,7 +168,8 @@ MainWindow::MainWindow()
 	QAction * saveSchemaAs = new QAction( QIcon(::icon( "filesaveas.png" ) ), "Save Schema As", this );
 	QAction * outputSource = new QAction( QIcon(::icon( "exec.png" ) ), "Output Source", this );
 	QAction * createDatabase = new QAction( QIcon(::icon( "create_database.png" ) ), "Create Database", this );
-
+	QAction * diff = new QAction( QIcon(::icon( "diff.png" )), "Generate Diff with Schema...", this );
+	
 	QToolBar * toolbar = addToolBar( "Main Toolbar" );
 	toolbar->addAction( openSchema );
 	toolbar->addAction( importSchema );
@@ -176,14 +177,16 @@ MainWindow::MainWindow()
 	toolbar->addAction( saveSchemaAs );
 	toolbar->addAction( outputSource );
 	toolbar->addAction( createDatabase );
-
+	toolbar->addAction( diff );
+	
 	connect( openSchema, SIGNAL( triggered() ), SLOT( slotOpenSchema() ) );
 	connect( importSchema, SIGNAL( triggered() ), SLOT( slotImportSchema() ) );
 	connect( saveSchema, SIGNAL( triggered() ), SLOT( slotSaveSchema() ) );
 	connect( saveSchemaAs, SIGNAL( triggered() ), SLOT( slotSaveSchemaAs() ) );
 	connect( outputSource, SIGNAL( triggered() ), SLOT( slotOutputSource() ) );
 	connect( createDatabase, SIGNAL( triggered() ), SLOT( slotCreateDatabase() ) );
-
+	connect( diff, SIGNAL( triggered() ), SLOT( slotGenerateDiff() ) );
+	
 	connect( mUI.mTreeView, SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( showContextMenu( const QPoint & ) ) );
 	mUI.mTreeView->setContextMenuPolicy( Qt::CustomContextMenu );
 
@@ -199,7 +202,22 @@ MainWindow::MainWindow()
 	mModel->setTreeBuilder( mTreeBuilder );
 
 	mUI.mTreeView->setModel(mModel);
+	
 	setSchema( 0 );
+}
+
+void MainWindow::expandChildTables( const QModelIndex & idx )
+{
+	for( ModelIter it = idx.isValid() ? ModelIter(idx.child(0,0)) : ModelIter(mModel); it.isValid(); ++it )
+	{
+		if( TableTranslator::isType(*it) ) {
+			TableSchema * ts = TableTranslator::data(*it).mTable;
+			if( ts->children().size() ) {
+				mUI.mTreeView->expand( *it );
+				expandChildTables( *it );
+			}
+		}
+	}
 }
 
 void MainWindow::slotOpenSchema()
@@ -224,7 +242,6 @@ void MainWindow::openSchema( const QString & schema )
 	if( QFile::exists( schema ) ) {
 		mFileName = schema;
 		setSchema( Schema::createFromXmlSchema( schema, /*isfile=*/true, /*ignoreDocs*/false ) );
-		mChanges = false;
 	}
 }
 
@@ -240,6 +257,8 @@ void MainWindow::setSchema( Schema * schema )
 	foreach( TableSchema * t, mSchema->tables() )
 		if( !t->parent() )
 			addTable( t );
+	expandChildTables( QModelIndex() );
+	mChanges = false;
 }
 
 void MainWindow::setFileName( const QString & fn )
@@ -264,9 +283,11 @@ void MainWindow::slotSaveSchemaAs()
 	mChanges = false;
 }
 
-void MainWindow::slotCreateDatabase()
+void MainWindow::slotCreateDatabase( TableSchema * ts )
 {
 	CreateDatabaseDialog * cdd = new CreateDatabaseDialog( mSchema, this );
+	if( ts )
+		cdd->setTableSchema( ts );
 	cdd->exec();
 	delete cdd;
 }
@@ -283,8 +304,23 @@ void MainWindow::slotOutputSource()
 {
 	QString dir = QFileDialog::getExistingDirectory(
 		this, "Select folder to save source", QFileInfo( mFileName ).path() );
-	if( Path::mkdir( dir + "/autocore" ) )
+	if( Path::mkdir( dir + "/autoimp" ) && Path::mkdir( dir + "/autocore" ) )
 		writeSource( mSchema, dir );
+}
+
+void MainWindow::slotGenerateDiff()
+{
+	if( !mSchema ) {
+		// TODO warn user
+		return;
+	}
+	QString otherSchemaPath = QFileDialog::getOpenFileName( this, "Choose A Schema", QString::null, "Schemas (*.xml)" );
+	if( otherSchemaPath.isEmpty() ) return;
+	
+	Schema * otherSchema = Schema::createFromXmlSchema( otherSchemaPath, true, false );
+	if( otherSchema ) {
+		LOG_1( Schema::diff( mSchema, otherSchema ) );
+	}
 }
 
 void MainWindow::closeEvent( QCloseEvent * ce )
@@ -319,7 +355,7 @@ void MainWindow::showContextMenu( const QPoint & )
 	if( selectedRows.size() == 1 ) idx = selectedRows[0];
 
 	QMenu * m = new QMenu( this );
-	QAction * newTable = 0, * newTableInherit = 0, * newField = 0, * newIndex = 0, * modifyTable = 0, * removeTable = 0;
+	QAction * newTable = 0, * newTableInherit = 0, * newField = 0, * newIndex = 0, * modifyTable = 0, * removeTable = 0, * createVerifyTable = 0;
 	QAction * modifyField = 0, * removeField = 0, * modifyIndex = 0, * removeIndex = 0;
 	TableSchema * table = 0;
 	if( !idx.isValid() || TableTranslator::isType(idx) ) {
@@ -343,6 +379,8 @@ void MainWindow::showContextMenu( const QPoint & )
 		m->addSeparator();
 		modifyTable = m->addAction( "Modify Table" );
 		removeTable = m->addAction( "Remove Table" );
+		m->addSeparator();
+		createVerifyTable = m->addAction( "Create or Verify Table in Database..." );
 	}
 
 	if( FieldTranslator::isType(idx) ) {
@@ -369,9 +407,11 @@ void MainWindow::showContextMenu( const QPoint & )
 			mChanges = true;
 		}
 	} else if( res == removeTable ) {
-		delete table;
 		mModel->remove(idx);
+		delete table;
 		mChanges = true;
+	} else if( res == createVerifyTable ) {
+		slotCreateDatabase( table );
 	} else if( res == newField ) {
 		addField( FieldDialog::createField( this, table ) );
 	} else if( res == modifyField ) {
@@ -380,8 +420,9 @@ void MainWindow::showContextMenu( const QPoint & )
 			mChanges = true;
 		}
 	} else if( res == removeField ) {
-		delete FieldTranslator::data(idx).mField;
+		Field * f = FieldTranslator::data(idx).mField;
 		mModel->remove(idx);
+		delete f;
 		mChanges = true;
 	} else if( res == newIndex ) {
 		addIndex( IndexDialog::createIndex( this, table ) );
@@ -391,8 +432,9 @@ void MainWindow::showContextMenu( const QPoint & )
 			mChanges = true;
 		}
 	} else if( res == removeIndex ) {
-		delete IndexTranslator::data(idx).mIndex;
+		IndexSchema * i = IndexTranslator::data(idx).mIndex;
 		mModel->remove(idx);
+		delete i;
 		mChanges = true;
 	}
 	delete m;

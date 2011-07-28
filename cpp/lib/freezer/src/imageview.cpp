@@ -107,8 +107,8 @@ void LoadImageThread::run()
 			continue;
 		}
 		task->run();
-		if( task->mReceiver )
-			QCoreApplication::postEvent( task->mReceiver, task );
+		if( task->mReciever )
+			QCoreApplication::postEvent( task->mReciever, task );
 		else
 			delete task;
 	}

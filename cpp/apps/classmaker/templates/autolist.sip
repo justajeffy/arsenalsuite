@@ -27,12 +27,12 @@ class t__List : b__List
 <%CLASSHEADERS%>
 %End
 public:
-	t__List();
-	t__List( const RecordList &, Table * t = 0 );
-	t__List( const t__List & );
-	t__List( const Record &, Table * t = 0 );
+	t__List() /HoldGIL/;
+	t__List( const RecordList &, Table * t = 0 ) /HoldGIL/;
+	t__List( const t__List & ) /HoldGIL/;
+	t__List( const Record &, Table * t = 0 ) /HoldGIL/;
 	
-	~t__List();
+	~t__List() /HoldGIL/;
 
 //	void insert( t__Iter, const t__ & );
 
@@ -42,7 +42,7 @@ public:
 
 //	t__Iter remove( const t__Iter & );
 
-	int remove( const Record & );
+	int remove( const Record & ) /HoldGIL/;
 	
 	int remove();
 	
@@ -50,8 +50,8 @@ public:
 
 	//t__Iter end();
 
-	Table * table() const;
-	TableSchema * schema() const;
+	Table * table() const /HoldGIL/;
+	TableSchema * schema() const /HoldGIL/;
 
 	Mappedt__List filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
 	Mappedt__List filter( const QString & column, const QVariant & value, bool keepMatches = true ) const;

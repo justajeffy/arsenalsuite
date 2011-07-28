@@ -27,6 +27,7 @@ FieldDialog::FieldDialog( Field * field, QWidget * parent )
 	mUI.mName->setText( field->name() );
 	mUI.mType->setCurrentIndex( mUI.mType->findText( field->variantTypeString() ) );
 	mUI.mLocal->setChecked( field->flag( Field::LocalVariable ) );
+	mUI.mDefaultSelectCheck->setChecked( !field->flag( Field::NoDefaultSelect ) );
 	mUI.mMethod->setText( field->methodName() );
 	mUI.mPluralMethod->setText( field->pluralMethodName() );
 	mUI.mIndexName->setText( field->methodName() );
@@ -34,7 +35,9 @@ FieldDialog::FieldDialog( Field * field, QWidget * parent )
 	
 	bool fk = field->flag( Field::ForeignKey );
 	mUI.mFKGroup->setEnabled( fk );
-        mUI.mListCheck->setChecked( field->flag( Field::Unique ) );
+	mUI.mListCheck->setChecked( field->flag( Field::Unique ) );
+	mUI.mDisplayNameCheck->setChecked( field->flag( Field::DisplayName ) );
+	
 	if( fk ) {
 		mUI.mTableCombo->setCurrentIndex( mUI.mTableCombo->findText( field->foreignKey() ) );
 		mUI.mType->setCurrentIndex( mUI.mType->findText( "Foreign Key" ) );
@@ -76,6 +79,8 @@ void FieldDialog::applySettings()
 
 	QString ts = mUI.mType->currentText();
 	mField->setFlag( Field::Unique, mUI.mListCheck->isChecked() );
+	mField->setFlag( Field::DisplayName, mUI.mDisplayNameCheck->isChecked() );
+	mField->setFlag( Field::NoDefaultSelect, !mUI.mDefaultSelectCheck->isChecked() );
 	if( ts == "Foreign Key" ) {
 		mField->setFlag( Field::ForeignKey, true );
 		mField->setForeignKey( mUI.mTableCombo->currentText() );
@@ -147,6 +152,8 @@ void FieldDialog::typeChanged( const QString & type )
 void FieldDialog::methodNameChanged( const QString & name )
 {
 	mUI.mPluralMethod->setText( pluralizeName(mLastMethodName) == mUI.mPluralMethod->text() ? pluralizeName( mUI.mMethod->text() ) : mField->pluralMethodName() );
+	if( name.toLower() == "name" )
+		mUI.mDisplayNameCheck->setChecked(true);
 	mLastMethodName = name;
 }
 
@@ -174,7 +181,6 @@ void FieldDialog::nameChanged( const QString & name )
 		mUI.mDisplayName->setText( mField->displayName() );
 	}
 }
-
 
 void FieldDialog::editDocs()
 {

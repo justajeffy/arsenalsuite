@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: database.h 8509 2009-06-24 08:33:50Z brobison $
+ * $Id$
  */
 
 #ifndef DATABASE_H
@@ -276,8 +276,8 @@ protected:
 	int mRefCount;
 
 	friend class ::Table;
-	friend class ::UpdateManager;
-	friend class ::RecordUndoOperation;
+	friend class Stone::UpdateManager;
+	friend class Stone::RecordUndoOperation;
 };
 
 }

@@ -22,12 +22,13 @@
  */
 
 /*
- * $Id: stonegui.cpp 5411 2007-12-18 01:03:08Z brobison $
+ * $Id$
  */
 
 #include <qsqldatabase.h>
 #include <qsqlerror.h>
 #include <qtimer.h>
+#include <qthread.h>
 
 #include "stonegui.h"
 #include "database.h"
@@ -46,6 +47,19 @@ ConnectionWatcher::ConnectionWatcher()
 
 void ConnectionWatcher::connectionLost()
 {
+	LOG_5( "Here1" );
+	mMutex.lock();
+	LOG_5( "Here2" );
+	if( QThread::currentThread() != QApplication::instance()->thread() )
+		QMetaObject::invokeMethod( this, "showDialog", Qt::BlockingQueuedConnection );
+	else
+		showDialog();
+	mMutex.unlock();
+}
+
+void ConnectionWatcher::showDialog()
+{
+	LOG_5( "Here3" );
 	if( mDialog == 0 ) {
 		Connection * c = Database::current()->connection();
 		mDialog = new LostConnectionDialog( c, c->lastErrorText() );
@@ -55,15 +69,21 @@ void ConnectionWatcher::connectionLost()
 	}
 }
 
-
 void ConnectionWatcher::connected()
 {
 }
 
-void initStoneGui()
+ConnectionWatcher * ConnectionWatcher::connectionWatcher()
 {
 	if( !sWatcher )
 		sWatcher = new ConnectionWatcher();
+	return sWatcher;
+}
+
+
+void initStoneGui()
+{
+	ConnectionWatcher::connectionWatcher();
 	registerBuiltinImageSequenceProviderPlugins();
 }
 

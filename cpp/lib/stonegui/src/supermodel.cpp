@@ -53,7 +53,7 @@ void ModelTreeBuilder::_loadChildren( const QModelIndex & parentIndex, SuperMode
 	ModelNode * previousLoadingNode = mLoadingNode;
 	mLoadingNode = node;
 	node->setTranslator(defaultTranslator());
-	loadChildren(parentIndex,model);
+	loadChildren(parentIndex,model);	
 	mLoadingNode = previousLoadingNode;
 }
 
@@ -64,13 +64,13 @@ void ModelTreeBuilder::setTranslator( ModelDataTranslator * trans )
 
 void ModelTreeBuilder::setDefaultTranslator( ModelDataTranslator * trans )
 {
-       int idx = mTranslators.indexOf(trans);
-       if( idx >= 0 ) {
-               mTranslators.removeAt(idx);
-               mTranslators.push_front(trans);
-       }
+	int idx = mTranslators.indexOf(trans);
+	if( idx >= 0 ) {
+		mTranslators.removeAt(idx);
+		mTranslators.push_front(trans);
+	}
 }
-
+	
 ModelDataTranslator * ModelTreeBuilder::defaultTranslator()
 {
 	if( !mTranslators.isEmpty() ) return mTranslators[0];
@@ -168,7 +168,7 @@ void ModelNode::clear()
 {
 	for( int i=rowCount()-1; i>=0; i-- ) {
 		ItemInfo ii = rowToItemInfo(i);
-        _translator(ii.translatorIndex)->deleteData( _itemData(ii.dataOffset) );
+		_translator(ii.translatorIndex)->deleteData( _itemData(ii.dataOffset) );
 		if( ii.index < (uint)mChildren.size() ) {
 			ModelNode * child = mChildren[ii.index];
 			if( child && child != (ModelNode*)1 )
@@ -246,7 +246,7 @@ bool ModelNode::insertChildren( int index, int count, ModelDataTranslator * tran
 
 	mRowCount += count;
 
-    fixupChildParentRows( index + count );
+	fixupChildParentRows( index + count );
 
 	return true;
 }
@@ -277,21 +277,21 @@ bool ModelNode::removeChildren( int index, int count, bool stealObject )
 	}
 	mItemInfoVector.remove(index,count);
 	mRowCount -= count;
-    fixupChildParentRows( index );
+	fixupChildParentRows( index );
 	return true;
 }
 
 void ModelNode::fixupChildParentRows( int startIndex )
 {
-       if( startIndex < 0 || startIndex >= mRowCount ) return;
-
-       for( int i = startIndex; i < mRowCount; ++i ) {
-               int index = rowToItemInfo(i).index;
-               if( mChildren.size() <= index ) continue;
-               ModelNode * mn = mChildren[index];
-               if( mn && mn != (ModelNode*)1 )
-                       mn->mParentRow = i;
-       }
+	if( startIndex < 0 || startIndex >= mRowCount ) return;
+	
+	for( int i = startIndex; i < mRowCount; ++i ) {
+		int index = rowToItemInfo(i).index;
+		if( mChildren.size() <= index ) continue;
+		ModelNode * mn = mChildren[index];
+		if( mn && mn != (ModelNode*)1 )
+			mn->mParentRow = i;
+	}
 }
 
 bool ModelNode::hasChildren( const QModelIndex & idx, bool insert, bool skipTreeBuilderCheck ) {
@@ -301,10 +301,10 @@ bool ModelNode::hasChildren( const QModelIndex & idx, bool insert, bool skipTree
 		else return false;
 	}
 	if( insert || mChildren.size() <= index || mChildren.at(index) == 0 ) {
-        if( skipTreeBuilderCheck )
-            return false;
+		if( skipTreeBuilderCheck )
+			return false;
 		if( !insert ) {
-			bool hasChildren = model(idx)->treeBuilder()->hasChildren(idx,model(idx)); // TODO Fetch From Tree Builder
+			bool hasChildren = model(idx)->treeBuilder()->hasChildren(idx,model(idx));
 			if( !hasChildren ) {
 				mNoChildrenArray.setBit( index, true );
 				return false;
@@ -332,8 +332,8 @@ void ModelNode::setChild( const QModelIndex & idx, ModelNode * childNode )
 	if( current && current != (ModelNode*)1 )
 		delete current;
 	mChildren[rowToItemInfo(idx.row()).index] = childNode;
-    childNode->mParent = this;
-    childNode->mParentRow = idx.row();
+	childNode->mParent = this;
+	childNode->mParentRow = idx.row();
 }
 
 ModelNode * ModelNode::child( const QModelIndex & idx, bool insert, bool steal )
@@ -532,17 +532,18 @@ void ModelNode::sort ( const QList<SortColumnPair> & columns, bool recursive, co
 
 void ModelNode::rearrange( QVector<int> newRowPositions, QModelIndex parent )
 {
-	if( newRowPositions.size() != rowCount() )
+	int rc = rowCount();
+	if( newRowPositions.size() != rc )
 		return;
 
 	/* Double check the integrity of the new positions.  The newRowPositions vector
 		must contain each row as a source.
 	*/
-	{
+	if(false){
 		QVector<bool> sourceCheckVector(rowCount());
-		for( int i = rowCount() - 1; i >= 0; i-- )
+		for( int i = rc - 1; i >= 0; i-- )
 			sourceCheckVector[i] = false;
-		for( int i = rowCount() - 1; i >= 0; i-- ) {
+		for( int i = rc - 1; i >= 0; i-- ) {
 			int source = newRowPositions[i];
 			if( sourceCheckVector[source] ) {
 				LOG_1( "ERROR! invalid newRowPositions vector!" );
@@ -559,21 +560,25 @@ void ModelNode::rearrange( QVector<int> newRowPositions, QModelIndex parent )
 	// Marks which columns we need to report persistent index changes
 	int cc = sm->columnCount(sm->index(0,0,parent));
 	QBitArray needColumnPIC(cc);
-	int pic_last = 0;
+	int pic_first = cc, pic_last = 0;
 	foreach( QModelIndex i, persist ) {
 		QModelIndex par = i.parent();
 		if( par == parent || (!par.isValid() && !parent.isValid()) ) {
 			int col = i.column();
 			if( col >= 0 && !needColumnPIC[col] ) {
 				needColumnPIC[col] = true;
-				pic_last = qMax(pic_last,col+1);
+				pic_last = qMax(pic_last,col);
+				pic_first = qMin(pic_first,col);
 			}
+			int row = i.row();
+			// Use the dataOffset field to indicate that we have persistent indexes to update for this row
+			newItemInfoVector[row].dataOffset = 1;
 		}
 	}
-	for( int i = rowCount() - 1; i>=0; --i ) {
+	for( int i = rc - 1; i>=0; --i ) {
 		int fromIndex = newRowPositions[i];
-		if( fromIndex != i ) {
-			for( int c = 0; c < pic_last; ++c ) {
+		if( fromIndex != i && newItemInfoVector[i].dataOffset ) {
+			for( int c = 0; c <= pic_last; ++c ) {
 				if( needColumnPIC[c] ) {
 					from.append( sm->nodeToIndex(fromIndex,c,this) );
 					to.append( sm->nodeToIndex(i,c,this) );
@@ -614,25 +619,24 @@ SuperModel::~SuperModel()
 
 ModelGrouper * SuperModel::grouper( bool autoCreate )
 {
-       if( !mGrouper && autoCreate ) {
-               mGrouper = new ModelGrouper(this);
-               emit grouperChanged( mGrouper );
-       }
-       return mGrouper;
+	if( !mGrouper && autoCreate ) {
+		mGrouper = new ModelGrouper(this);
+		emit grouperChanged( mGrouper );
+	}
+	return mGrouper;
 }
 
 void SuperModel::setGrouper( ModelGrouper * grouper )
 {
-       if(  mGrouper != grouper ) {
-           if( mGrouper ) {
-               if( mGrouper->isGrouped() )
-                   mGrouper->ungroup();
-               delete mGrouper;
-           }
-           mGrouper = grouper;
-           emit grouperChanged( mGrouper );
-       }
-       mGrouper = grouper;
+	if(  mGrouper != grouper ) {
+		if( mGrouper ) {
+			if( mGrouper->isGrouped() )
+				mGrouper->ungroup();
+			delete mGrouper;
+		}
+		mGrouper = grouper;
+		emit grouperChanged( mGrouper );
+	}
 }
 
 ModelTreeBuilder * SuperModel::treeBuilder()
@@ -701,31 +705,11 @@ int SuperModel::rowCount( const QModelIndex & parent ) const
 	return ret;
 }
 
-/// Same as rowCount but will not load the children using the treeBuilder
-int SuperModel::rowCountWithoutLoad( const QModelIndex & parent ) const
-{
-    if( !parent.isValid() ) return rootNode() ? rootNode()->rowCount() : 0;
-
-    ModelNode * node = indexToNode(parent);
-    // This line skips the loading by calling hasChildren with skipTreeBuilderCheck=true
-    ModelNode * childNode = node->hasChildren(parent,false,true) ? node->child(parent) : 0;
-    int ret = (childNode ? childNode->rowCount() : 0);
-    return ret;
-}
-
 bool SuperModel::hasChildren( const QModelIndex & parent ) const
 {
 	if( !parent.isValid() ) return rootNode()->rowCount() > 0;
 	ModelNode * node = indexToNode(parent);
 	return node->hasChildren(parent);
-}
-
-bool SuperModel::hasChildrenWithoutLoad( const QModelIndex & parent ) const
-{
-    if( !parent.isValid() ) return rootNode()->rowCount() > 0;
-
-    ModelNode * node = indexToNode(parent);
-    return node->hasChildren(parent,false,true);
 }
 
 bool SuperModel::childrenLoaded( const QModelIndex & parent )
@@ -789,7 +773,7 @@ QModelIndexList SuperModel::insert( const QModelIndex & par, int row, int count,
 		if( !mBlockInsertNots )
 			beginInsertRows( par, row, row + count - 1 );
 
-        if( node->insertChildren( row, count, trans, skipConstruction ) ) {
+		if( node->insertChildren( row, count, trans, skipConstruction ) ) {
 			for( int i = row; i < row + count; i++ )
 				ret += createIndex( i, 0, node );
 		}
@@ -799,13 +783,13 @@ QModelIndexList SuperModel::insert( const QModelIndex & par, int row, int count,
 		} else {
 			if( !mBlockInsertNots )
 				endInsertRows();
-            if( mAutoSort && !skipConstruction ) {
-                QList<QPersistentModelIndex> persist;
-                foreach( QModelIndex idx, ret ) persist.append( QPersistentModelIndex(idx) );
-                ret.clear();
-                checkAutoSort(par,true);
-                foreach( QPersistentModelIndex p, persist ) ret.append( p );
-            }
+			if( mAutoSort && !skipConstruction ) {
+				QList<QPersistentModelIndex> persist;
+				foreach( QModelIndex idx, ret ) persist.append( QPersistentModelIndex(idx) );
+				ret.clear();
+				checkAutoSort(par,true);
+				foreach( QPersistentModelIndex p, persist ) ret.append( p );
+			}
 		}
 	}
 	return ret;
@@ -865,14 +849,14 @@ QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & d
 		QList<RowSpan> & spanList = it.value();
 		foreach( const RowSpan & rs, spanList )
 			toInsert += rs.count;
-		LOG_5( "Inserting " + QString::number( toInsert ) + " children" );
+//		LOG_5( "Inserting " + QString::number( toInsert ) + " children" );
 		beginInsertRows( destParent, insertPos, insertPos + toInsert - 1 );
 		if( destNode->insertChildren( insertPos, toInsert, trans, /*skipConstruction=*/false ) ) {
 			endInsertRows();
 			int currentDestRow = insertPos;
 			foreach( const RowSpan & rs, spanList ) {
 				ModelNode * sourceNode = rs.parent.isValid() ? indexToNode(rs.parent)->child(rs.parent,true) : rootNode();
-				LOG_5( "Trying beginMoveRows for " + QString::number( rs.count ) + " rows" );
+//				LOG_5( "Trying beginMoveRows for " + QString::number( rs.count ) + " rows" );
 				{
 					emit layoutAboutToBeChanged();
 					int start = rs.start;
@@ -880,7 +864,7 @@ QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & d
 					// after the insert position
 					if( destParent == rs.parent && insertPos < rs.start )
 						start += toInsert;
-					LOG_5( "Moving " + QString::number( rs.count ) + " rows starting at " + QString::number(start) );
+//					LOG_5( "Moving " + QString::number( rs.count ) + " rows starting at " + QString::number(start) );
 					// Do the actual copies, we have to do this one at a time because there's no guarantee contiguous
 					// items occupy contiguous memory
 					for( int i = start + rs.count - 1; i >= start; --i ) {
@@ -933,19 +917,19 @@ QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & d
 		QList<RowSpan> & spanList = it.value();
 		foreach( const RowSpan & rs, spanList )
 			toInsert += rs.count;
-		LOG_5( "Inserting " + QString::number( toInsert ) + " children" );
+//		LOG_5( "Inserting " + QString::number( toInsert ) + " children" );
 		if( destNode->insertChildren( insertPos, toInsert, trans, /*skipConstruction=*/stealObjects ) ) {
 			int currentDestRow = insertPos;
 			foreach( const RowSpan & rs, spanList ) {
 				ModelNode * sourceNode = rs.parent.isValid() ? indexToNode(rs.parent)->child(rs.parent,true) : rootNode();
-				LOG_5( "Trying beginMoveRows for " + QString::number( rs.count ) + " rows" );
+//				LOG_5( "Trying beginMoveRows for " + QString::number( rs.count ) + " rows" );
 				if( beginMoveRows( rs.parent, rs.start, rs.start + rs.count - 1, destParent, currentDestRow ) ) {
 					int start = rs.start;
 					// If we are moving items without changing parent, we have to adjust the start position if it falls
 					// after the insert position
 					if( destParent == rs.parent && insertPos < rs.start )
 						start += toInsert;
-					LOG_5( "Moving " + QString::number( rs.count ) + " rows starting at " + QString::number(start) );
+//					LOG_5( "Moving " + QString::number( rs.count ) + " rows starting at " + QString::number(start) );
 					// Do the actual copies, we have to do this one at a time because there's no guarantee contiguous
 					// items occupy contiguous memory
 					for( int i = start + rs.count - 1; i >= start; --i ) {
@@ -1102,8 +1086,8 @@ void SuperModel::setAutoSort( bool as )
 
 void SuperModel::checkAutoSort( const QModelIndex & parent, bool quiet )
 {
-    if( mAutoSort )
-            _sort( -1, sortOrder(), true, parent, 0, -1, quiet );
+	if( mAutoSort )
+		_sort( -1, sortOrder(), true, parent, 0, -1, quiet );
 }
 
 void SuperModel::resort()
@@ -1137,7 +1121,7 @@ void SuperModel::_sort ( int column, Qt::SortOrder order, bool recursive, const 
 	if( column < 0 )
 		column = mSortColumns.isEmpty() ? 0 : mSortColumns[0].first;
 	SortColumnPair sc(column,order);
-
+	
 	/* Save sort settings for future sorting(resort and auto sort) */
 	for( QList<SortColumnPair>::iterator it = mSortColumns.begin(); it != mSortColumns.end(); )
 		if( (*it).first == column )
@@ -1145,8 +1129,8 @@ void SuperModel::_sort ( int column, Qt::SortOrder order, bool recursive, const 
 		else
 			++it;
 	mSortColumns.prepend(sc);
-	//LOG_3( "Sorting with order " + QString( (order == Qt::AscendingOrder) ? "Ascending" : "Descending" ) );
-
+//	LOG_1( "Sorting with order " + QString( (order == Qt::AscendingOrder) ? "Ascending" : "Descending" ) );
+	
 	/* Do actual sorting if node is available */
 	ModelNode * node = parentIn.isValid() ? indexToNode(parentIn)->child(parentIn) : rootNode();
 	if( node ) {
@@ -1261,7 +1245,6 @@ void SuperModel::openInsertClosure()
 		mInsertClosureNode = node;
 	}
 	mInsertClosureNode->count++;
-    //LOG_3("Model has InsertClosure count of: "+ QString::number(mInsertClosureNode->count));
 }
 
 void SuperModel::closeInsertClosure()

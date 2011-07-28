@@ -11,12 +11,12 @@
 #include "bl__list.h"
 #include "recordlist_p.h"
 
-class Record;
-
 namespace Stone {
+class Record;
 class RecordImp;
 class TableSchema;
-}
+};
+
 using namespace Stone;
 
 class t__;

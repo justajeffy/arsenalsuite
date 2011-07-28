@@ -7,21 +7,22 @@
 #include "snl__.h"
 #include "index.h"
 #include "table.h"
-#include "tableschema.h"
-#include "schema.h"
 #include "tl__list.h"
 
 class t__;
 namespace Stone {
-class Schema;
 class Database;
 }
 using namespace Stone;
 
+namespace t__Fields {
+	<%SCHEMAFIELDDECLS%>
+};
+
 class snu___EXPORT t__Schema : public TableSchema
 {
 public:
-	t__Schema( Stone::Schema * schema );
+	t__Schema( Schema * schema );
 	~t__Schema();
 
 	virtual t__ * createObject( const Record & );

@@ -52,6 +52,7 @@
 #include "interval.h"
 #include "multilog.h"
 #include "record.h"
+#include "recordlist.h"
 #include "schema.h"
 
 IniConfig sConfig, sUserConfig;
@@ -84,9 +85,9 @@ void initStone( const QStringList & args )
 			cfg.popSection();
 		} else
 		if( arg == "-db-name" && hasNext ) {
-			cfg.pushSection( "Database" );
-			cfg.writeString( "DatabaseName", args[++i] );
-			cfg.popSection();
+				cfg.pushSection( "Database" );
+				cfg.writeString( "DatabaseName", args[++i] );
+				cfg.popSection();
 		}
 		if( arg == "-db-user" && hasNext ) {
 			cfg.pushSection( "Database" );
@@ -116,6 +117,20 @@ void initStone( const QStringList & args )
 		if( arg == "-log-file" && hasNext ) {
 			sLogFile = args[++i];
 		}
+/*		else if( arg == "-create-database" ){
+			printf( "VALIDATING/CREATING Tables" );
+			printf( Database::current()->createTables() ? "Success" : "Failure" );
+			return;
+		}
+		else if( arg == "-verify-database" ){
+			printf( "VALIDATING Tables" );
+			printf( Database::current()->verifyTables() ? "Success" : "Failure" );
+			return;
+		}
+		else if( arg == "-output-schema" && (i+1 < argc) ){
+			Database::current()->schema()->writeXmlSchema( args[++i] );
+			return;
+		} */
 	}
 }
 
@@ -157,15 +172,18 @@ void initConfig( const QString & configName, const QString & logfile )
 	}
 #ifdef Q_OS_WIN
 	// Used for 64 bit dlls, won't show up under syswow64
+#ifdef Q_OS_WIN64
 	QCoreApplication::addLibraryPath("c:/windows/system32/blur64/");
+#else
 	QCoreApplication::addLibraryPath("c:/blur/common/");
 #endif
-	sConfigName = configName;
-	sConfig.setFileName( configName );
-	sConfig.readFromFile();
+#endif // Q_OS_WIN
 	sLogFile = logfile;
 	if( !sLogFile.isEmpty() && sLogFile.right(4) != ".log" )
 		sLogFile = sLogFile + ".log";
+	sConfigName = configName;
+	sConfig.setFileName( configName );
+	sConfig.readFromFile();
 	qRegisterMetaType<Record>("Record");
 	qRegisterMetaType<RecordList>("RecordList");
 	qRegisterMetaType<Interval>("Interval");
@@ -212,7 +230,7 @@ Multilog * log()
 			mLog = new Multilog(
 			sLogFile.isEmpty() ? sConfig.readString( "File", sConfigName.replace(".ini","") + ".log" ) : sLogFile, // Filename
 			sConfig.readBool( "EchoStdOut", true ),
-			sConfig.readInt( "MaxSeverity", 2 ), // Only critical and important errors by default
+			sConfig.readInt( "MaxSeverity", 5 ), // Only critical and important errors by default
 			sConfig.readInt( "MaxFiles", 10 ),
 			sConfig.readInt( "MaxSize", 1024 * 1024 ) ); // One megabyte
 		}

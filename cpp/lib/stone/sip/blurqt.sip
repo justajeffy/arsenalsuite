@@ -13,6 +13,7 @@
 #include "path.h"
 #include "process.h"
 #include "pyembed.h"
+#include "graphite.h"
 %End
 
 void initStone( const QStringList & );
@@ -41,10 +42,12 @@ bool sendEmail( QStringList recipients, const QString & subject, const QString &
 %Include dateutil.sip
 %Include field.sip
 %Include freezercore.sip
+%Include graphite.sip
 %Include index.sip
 %Include indexschema.sip
 %Include iniconfig.sip
 %Include interval.sip
+%Include joinedselect.sip
 %Include multilog.sip
 %Include path.sip
 %Include process.sip
@@ -55,6 +58,7 @@ bool sendEmail( QStringList recipients, const QString & subject, const QString &
 %Include recordlist.sip
 %Include recordproxy.sip
 %Include recordxml.sip
+%Include resultset.sip
 %Include schema.sip
 %Include sqlerrorhandler.sip
 %Include table.sip

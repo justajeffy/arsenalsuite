@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: schema.h 8509 2009-06-24 08:33:50Z brobison $
+ * $Id$
  */
 
 #ifndef SCHEMA_H
@@ -32,6 +32,7 @@
 #include <qmap.h>
 
 #include "tableschema.h"
+
 namespace Stone {
 
 class IndexSchema;
@@ -83,6 +84,9 @@ public:
 	QString name() const;
 	void setName(const QString &);
 
+	
+	static QString diff( Schema * before, Schema * after );
+	
 signals:
 	void tableAdded( TableSchema * table );
 	void tableRemove( TableSchema * table );

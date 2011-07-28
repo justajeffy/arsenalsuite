@@ -22,21 +22,22 @@
  */
 
 /*
- * $Id: recordpropvalmodel.cpp 9390 2010-02-25 00:23:53Z brobison $
+ * $Id$
  */
 
 #include "recordpropvalmodel.h"
 #include "table.h"
+#include "field.h"
 
 class PropValItem : public ItemBase
 {
 public:
 	int column;
 	int row;
-	RecordList mRecords;
-	bool mIsFkey;
+	RecordList records;
+	bool isfkey;
 	mutable Record fkey;
-	QString mPropName;
+	QString prop;
 
 	PropValItem();
 
@@ -56,52 +57,48 @@ typedef TemplateDataTranslator<PropValItem> RecordPropValTranslator;
 PropValItem::PropValItem()
 : column( 0 )
 , row( -1 )
-, mIsFkey( false )
+, isfkey( false )
 {}
 
 void PropValItem::setup( int c, const RecordList & recs, int r )
 {
 	column = c;
 	row = r;
-	mRecords = recs;
-	if( mRecords.isEmpty() )
-        return;
-
-    TableSchema * s = mRecords[0].table()->schema();
-    if( s ) {
-        Field * f = s->field(column);
-        if( f ) {
-            mPropName = f->displayName();
-            TableSchema * fkt = f->foreignKeyTable();
-            mIsFkey = fkt && fkt->field( "name" );
-        }
-    }
+	records = recs;
+	if( recs.size() ) {
+		TableSchema * s = records[0].table()->schema();
+		if( s ) {
+			Field * f = s->field(column);
+			if( f ) {
+				prop = f->displayName();
+				TableSchema * fkt = f->foreignKeyTable();
+				isfkey = fkt && fkt->field( "name" );
+			}
+		}
+	}
 }
 
 QVariant PropValItem::modelData( const QModelIndex & i, int role ) const
 {
-	if( mRecords.isEmpty() ) return QVariant();
-
+	if( records.isEmpty() ) return QVariant();
+	
 	if( i.column() == 0 && role == Qt::DisplayRole ) {
-		return mPropName;
+		return prop;
 	} else if( i.column() == 1 ) {
 		if( role == Qt::DisplayRole || role == Qt::EditRole ) {
-			if( (row >= 0 && row < (int)mRecords.size()) || mRecords.size() == 1 ) {
-				Record r = mRecords[row >= 0 ? row : 0];
-
-                // for values that point that are foreign keys that point to
-                // another table, get the value from that table
-				if( mIsFkey && role == Qt::DisplayRole ) {
+			if( (row >= 0 && row < (int)records.size()) || records.size() == 1 ) {
+				Record r = records[row >= 0 ? row : 0];
+				if( isfkey && role == Qt::DisplayRole ) {
 					fkey = r.foreignKey(column);
 					return fkey.getValue( "name" );
 				}
 				return r.getValue( column );
 			} else if( row == -1 ) {
 				QVariantList vals;
-				if( mIsFkey )
-					vals = mRecords.foreignKey(column).getValue("name");
+				if( isfkey )
+					vals = records.foreignKey(column).getValue("name");
 				else
-					vals = mRecords.getValue(column);
+					vals = records.getValue(column);
 				QStringList strings;
 				foreach( QVariant v, vals ) {
 					QString s = v.toString();
@@ -122,11 +119,11 @@ bool PropValItem::setModelData( const QModelIndex & i, const QVariant & v, int r
 	if( col == 1 ) {
 		if( role == Qt::EditRole ) {
 			if( row == -1 ) {
-				mRecords.setValue( column, v );
-				mRecords.commit();
+				records.setValue( column, v );
+				records.commit();
 				return true;
-			} else if( row >= 0 && row < (int)mRecords.size() ) {
-				Record r = mRecords[row];
+			} else if( row >= 0 && row < (int)records.size() ) {
+				Record r = records[row];
 				r.setValue( column, v );
 				r.commit();
 				return true;
@@ -160,7 +157,7 @@ public:
 	bool hasChildren( const QModelIndex & parentIndex, SuperModel * model );
 	void loadChildren( const QModelIndex & parentIndex, SuperModel * model );
 
-	RecordList mRecords;
+	RecordList records;
 };
 
 RecordPropValTreeBuilder::RecordPropValTreeBuilder( SuperModel * model )
@@ -175,33 +172,31 @@ bool RecordPropValTreeBuilder::hasChildren( const QModelIndex & parentIndex, Sup
 
 	if( RecordPropValTranslator::isType(parentIndex) ) {
 		PropValItem & pvi = RecordPropValTranslator::data(parentIndex);
-		return pvi.mRecords.size() > 1 && pvi.row == -1;
+		return pvi.records.size() > 1 && pvi.row == -1;
 	}
 	return false;
 }
 
 void RecordPropValTreeBuilder::loadChildren( const QModelIndex & parentIndex, SuperModel * model )
 {
-	if( mRecords.isEmpty() ) return;
+	if( records.isEmpty() ) return;
+	
+	Record r = records[0];
+	TableSchema * ts = r.table()->schema();
 
-    // TableSchema holds the list of Properties we show in the left column
-	TableSchema * ts = mRecords[0].table()->schema();
 	if( !ts ) return;
-	int fieldCount = ts->fieldCount();
 
+	int cnt = ts->fieldCount();
 	model->clearChildren(parentIndex);
-	model->append(parentIndex, fieldCount);
-	for( int row=0; row<fieldCount; row++ ) {
-		QModelIndex idx = model->index(row,0,parentIndex);
-		RecordPropValTranslator::data(idx).setup(row, mRecords);
-
-/*
-		if( mRecords.size() > 1 ) {
-			model->append(idx, mRecords.size());
-			for( int r=0; r < (int)mRecords.size(); r++ )
-				RecordPropValTranslator::data(idx.child(r,0)).setup(row,mRecords,r);
+	model->append(parentIndex,cnt);
+	for( int i=0; i<cnt; i++ ) {
+		QModelIndex idx = model->index(i,0,parentIndex);
+		RecordPropValTranslator::data(idx).setup(i,records);
+		if( records.size() > 1 ) {
+			model->append(idx,records.size());
+			for( int r=0; r < (int)records.size(); r++ )
+				RecordPropValTranslator::data(idx.child(r,0)).setup(i,records,r);
 		}
-        */
 	}
 	return;
 }
@@ -218,7 +213,8 @@ RecordPropValModel::RecordPropValModel( QObject * parent )
 void RecordPropValModel::setRecords( const RecordList & rl )
 {
 	mRecords = rl;
-	((RecordPropValTreeBuilder*)treeBuilder())->mRecords = rl;
+	mRecords.selectFields();
+	((RecordPropValTreeBuilder*)treeBuilder())->records = rl;
 	treeBuilder()->loadChildren( QModelIndex(), this );
 }
 
@@ -251,7 +247,7 @@ RecordList RecordPropValModel::foreignKeyRecords( const QModelIndex & index )
 {
 	if( RecordPropValTranslator::isType(index) ) {
 		PropValItem * item = &RecordPropValTranslator::data(index);
-		RecordList records = item->mRecords;
+		RecordList records = item->records;
 		if( item->row >= 0 && item->row < (int)records.size() )
 			return records[item->row].foreignKey(item->column);
 		return records.foreignKey(item->column);

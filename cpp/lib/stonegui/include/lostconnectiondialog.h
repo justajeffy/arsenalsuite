@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: lostconnectiondialog.h 8501 2009-06-24 07:47:46Z brobison $
+ * $Id$
  */
 
 #ifndef LOST_CONNECTION_DIALOG_H
@@ -31,11 +31,11 @@
 #include "ui_lostconnectiondialogui.h"
 #include "stonegui.h"
 
+class QTimer;
 namespace Stone {
 class Connection;
 }
 using namespace Stone;
-class QTimer;
 
 class STONEGUI_EXPORT LostConnectionDialog : public QDialog
 {

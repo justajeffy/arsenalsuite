@@ -30,25 +30,25 @@ class t__ : b__
 <%CLASSHEADERS%>
 %End
 public:
-	t__();
+	t__() /HoldGIL/;
 
 	t__( uint key );
 
-	t__( const t__ & other );
+	t__( const t__ & other ) /HoldGIL/;
 
-	t__( const Record & r );
+	t__( const Record & r ) /HoldGIL/;
 
-	t__( RecordImp * imp, bool checkType = true );
+	t__( RecordImp * imp, bool checkType = true ) /HoldGIL/;
 	
-	Mappedt__ copy() const;
+	Mappedt__ copy() const /HoldGIL/;
 
-	bool operator==( const Record & other ) const;
+	bool operator==( const Record & other ) const /HoldGIL/;
 
-	bool operator!=( const Record & other ) const;
+	bool operator!=( const Record & other ) const /HoldGIL/;
 	
-	bool operator <( const Record & other ) const;
+	bool operator <( const Record & other ) const /HoldGIL/;
 
-	long __hash__() const;
+	long __hash__() const /HoldGIL/;
 %MethodCode
 		sipRes = sipCpp->key();
 %End
@@ -56,6 +56,34 @@ public:
 <%METHODDEFS%>
 
 	static Mappedt__List select( const QString & where = QString::null, const QList<QVariant> & args = QList<QVariant>() );
+	
+	static JoinedSelect join( SIP_PYOBJECT cls, QString condition = QString(), JoinType joinType = InnerJoin, bool ignoreResults = false, const QString & alias = QString() );
+%MethodCode
+		// Convert to python
+		Table * inst = 0;
+
+		if( !sipCanConvertToType(a0,sipType_Table,SIP_NOT_NONE) ) {
+			// Attempt to get the table * by calling the static method table()
+			if( !sipIsErr && !inst ) {
+				PyObject * pyTableMethod = PyObject_GetAttrString( a0, "table" );
+				if( pyTableMethod ) {
+					PyObject * pyTable = PyObject_CallObject( pyTableMethod, 0 );
+					if( pyTable && sipCanConvertToType(pyTable,sipType_Table,SIP_NOT_NONE) )
+						inst = (Table*)sipConvertToType(pyTable,sipType_Table,0,SIP_NOT_NONE,0,&sipIsErr);
+					Py_XDECREF(pyTable);
+				} else
+					sipIsErr = 1;
+			}
+		}
+		
+		if( !inst && !sipIsErr && a0 && sipCanConvertToType(a0,sipType_Table,SIP_NOT_NONE) ) {
+			inst = (Table*)sipConvertToType(a0,sipType_Table,0,SIP_NOT_NONE,0,&sipIsErr);
+		}
+
+		if( !sipIsErr ) {
+			sipRes = new JoinedSelect(t__::table()->join( inst, *a1, a2, a3, *a4 ));
+		}
+%End
 
 	Mappedt__ reload( bool lockForUpdate = false );
 
@@ -65,7 +93,7 @@ public:
 
 <%BASEHEADER%>
 
-	static Table * table();
+	static Table * table() /HoldGIL/;
 	//static t__Schema * schema();
 };
 

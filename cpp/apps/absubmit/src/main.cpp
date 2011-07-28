@@ -8,6 +8,7 @@
 #include <qtimer.h>
 
 #include "blurqt.h"
+#include "classes.h"
 #include "database.h"
 #include "freezercore.h"
 

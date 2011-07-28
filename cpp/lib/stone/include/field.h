@@ -252,6 +252,8 @@ public:
 	int qvariantType() const;
 	static int qvariantType(Field::Type);
 
+	QString diff( Field * after );
+
 private:
 	static const char * typeStrings[];
 	static const char * listTypeStrings[];
@@ -278,6 +280,8 @@ FieldList operator|(const FieldList & one, const FieldList & two);
 FieldList operator&(const FieldList & one, const FieldList & two);
 
 } //namespace
+
+using Stone::Field;
 
 #endif // FIELD_H
 

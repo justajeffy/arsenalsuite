@@ -30,6 +30,8 @@
 
 #include <qsqlquery.h>
 
+#include "Python.h"
+
 #include "blurqt.h"
 #include "freezercore.h"
 #include "index.h"
@@ -38,64 +40,66 @@
 #include "table.h"
 #include "tableschema.h"
 
+static int sRecordImpCount = 0;
+
+static QVariant sNullVariant;
+
 namespace Stone {
 
 static char * copyBitArray( char * ba, int size )
 {
-       if( !ba ) return 0;
-       int stateSize = (size+7) / 8;
-       char * ret = new char[stateSize];
-       memcpy( ret, ba, stateSize );
-       return ret;
+	if( !ba ) return 0;
+	int stateSize = (size+7) / 8;
+	char * ret = new char[stateSize];
+	memcpy( ret, ba, stateSize );
+	return ret;
 }
 
 static void clearBitArray( char * ba, int size )
 {
-       if( !ba ) return;
-       int stateSize = (size+7) / 8;
-       for( int i=0; i<stateSize; i++ )
-               ba[i] = 0;
+	if( !ba ) return;
+	int stateSize = (size+7) / 8;
+	for( int i=0; i<stateSize; i++ )
+		ba[i] = 0;
 }
 
 static char * newBitArray( int size )
 {
-       int stateSize = (size+7) / 8;
-       char * ret = new char[stateSize];
-       clearBitArray( ret, size );
-       return ret;
+	int stateSize = (size+7) / 8;
+	char * ret = new char[stateSize];
+	clearBitArray( ret, size );
+	return ret;
 }
 
 static char * setBit( char * ba, int bit, bool value, int size )
 {
-       if( !ba )
-               ba = newBitArray( size );
-       int block = bit / 8;
-       int shift = bit % 8;
-       char c = ba[block];
-       if( value )
-               c = c | (1 << shift);
-       else
-               c = c ^ (1 << shift);
-       ba[block] = c;
-       return ba;
+	if( !ba )
+		ba = newBitArray( size );
+	int block = bit / 8;
+	int shift = bit % 8;
+	char c = ba[block];
+	if( value )
+		c = c | (1 << shift);
+	else
+		c = c ^ (1 << shift);
+	ba[block] = c;
+	return ba;
 }
 
 static void clearBit( char * ba, int bit )
 {
-       if( !ba ) return;
-       ba[bit / 8] ^= 1 << (bit % 8);
+	if( !ba ) return;
+	ba[bit / 8] ^= 1 << (bit % 8);
 }
 
 static bool getBit( const char * ba, int bit )
 {
-       if( !ba ) return false;
-       int block = bit / 8;
-       int shift = bit % 8;
-       char c = ba[block];
-       return c & (1 << shift);
+	if( !ba ) return false;
+	int block = bit / 8;
+	int shift = bit % 8;
+	char c = ba[block];
+	return c & (1 << shift);
 }
-
-static int sRecordImpCount = 0;
 
 // static
 int RecordImp::totalCount()
@@ -115,16 +119,16 @@ RecordImp::RecordImp( Table * table, QVariant * toLoad )
 		FieldList allFields = table->schema()->fields();
 		int size = allFields.size();
 		mValues = new VariantVector( size );
-        if( toLoad ) {
-            int i = 0;
-            foreach( Field * f, allFields )
-            (*mValues)[f->pos()] = f->coerce(toLoad[i++]);
+		if( toLoad ) {
+			int i = 0;
+			foreach( Field * f, allFields )
+				(*mValues)[f->pos()] = f->coerce(toLoad[i++]);
 			mState = COMMITTED;
 		} else {
-            foreach( Field * f, allFields )
-                (*mValues)[f->pos()] = f->defaultValue();
+			foreach( Field * f, allFields )
+				(*mValues)[f->pos()] = f->defaultValue();
 			mState = NEWRECORD;
-        }
+		}
 //		printf( "NEW RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
 	}
 }
@@ -136,7 +140,6 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int queryPosOffset, FieldLis
 , mModifiedBits( 0 )
 , mLiterals( 0 )
 , mNotSelectedBits( 0 )
-, mKeyValue( -1 )
 {
 	sRecordImpCount++;
 	if( table ) {
@@ -145,18 +148,15 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int queryPosOffset, FieldLis
 		int size = allFields.size();
 		mValues = new VariantVector( size );
 		int pos = queryPosOffset;
-        foreach( Field * f, allFields ) {
-            bool isIncoming = !f->flag(Field::LocalVariable) && ( (incomingFields && incomingFields->contains(f)) || !f->flag(Field::NoDefaultSelect) );
-            if( isIncoming ) {
-                if(f->flag(Field::Compress))
-                    (*mValues)[f->pos()] = qCompress(f->coerce(q.value(pos++)).toString().toUtf8());
-                else
-                    (*mValues)[f->pos()] = f->coerce(q.value(pos++));
-            } else {
-                (*mValues)[f->pos()] = f->defaultValue();
-                if( !f->flag(Field::LocalVariable) ) mNotSelectedBits = setBit( mNotSelectedBits, f->pos(), true, allFields.size() );
-            }
-        }
+		foreach( Field * f, allFields ) {
+			bool isIncoming = !f->flag(Field::LocalVariable) && ( (incomingFields && incomingFields->contains(f)) || !f->flag(Field::NoDefaultSelect) );
+			if( isIncoming )
+				(*mValues)[f->pos()] = f->coerce(q.value(pos++));
+			else {
+				(*mValues)[f->pos()] = f->defaultValue();
+				if( !f->flag(Field::LocalVariable) ) mNotSelectedBits = setBit( mNotSelectedBits, f->pos(), true, allFields.size() );
+			}
+		}
 		mState = COMMITTED;
 //		printf( "NEW RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
 	}
@@ -169,7 +169,6 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int * queryColPos, FieldList
 , mModifiedBits( 0 )
 , mLiterals( 0 )
 , mNotSelectedBits( 0 )
-, mKeyValue( -1 )
 {
 	sRecordImpCount++;
 	if( table ) {
@@ -178,19 +177,15 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int * queryColPos, FieldList
 		int size = allFields.size();
 		mValues = new VariantVector( size );
 		int pos = 0;
-        foreach( Field * f, allFields ) {
-            bool isIncoming = !f->flag(Field::LocalVariable) && ( (incomingFields && incomingFields->contains(f)) || !f->flag(Field::NoDefaultSelect) );
-            if( isIncoming ) {
-                if(f->flag(Field::Compress))
-                    (*mValues)[f->pos()] = qCompress(f->coerce(q.value(pos++)).toString().toUtf8());
-                else
-                    (*mValues)[f->pos()] = f->coerce(q.value(queryColPos[pos++]));
-            } else {
-                (*mValues)[f->pos()] = f->defaultValue();
-                if( !f->flag(Field::LocalVariable) )
-                    mNotSelectedBits = setBit( mNotSelectedBits, f->pos(), true, allFields.size() );
-            }
-        }
+		foreach( Field * f, allFields ) {
+			bool isIncoming = !f->flag(Field::LocalVariable) && ( (incomingFields && incomingFields->contains(f)) || !f->flag(Field::NoDefaultSelect) );
+			if( isIncoming )
+				(*mValues)[f->pos()] = f->coerce(q.value(queryColPos[pos++]));
+			else {
+				(*mValues)[f->pos()] = f->defaultValue();
+				if( !f->flag(Field::LocalVariable) ) mNotSelectedBits = setBit( mNotSelectedBits, f->pos(), true, allFields.size() );
+			}
+		}
 		mState = COMMITTED;
 		//printf( "NEW RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
 	}
@@ -203,7 +198,6 @@ RecordImp::~RecordImp()
 		mTable->mImpCount--;
 		//printf( "DELETE RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
 	}
-    mValues->clear();
 	delete mValues;
 	mValues = 0;
 	delete [] mModifiedBits;
@@ -240,51 +234,47 @@ void RecordImp::deref()
 	}
 }
 
+uint RecordImp::key() const
+{
+	return (mTable && mValues) ? mValues->at( mTable->schema()->primaryKeyIndex() ).toInt() : 0;
+}
+
 void RecordImp::set( QVariant * v )
 {
 	if( !mTable ) return;
 	int fc = mTable->schema()->fieldCount();
-    for( int i=0; i<fc; i++ )
-        (*mValues)[i] = v[i];
-/*
-	FieldList fields = mTable->schema()->fields();
-	for( int i=0; i<fc; i++ ) {
-        if(fields[i]->flag(Field::Compress))
-            (*mValues)[i] = qCompress(v[i].toString().toUtf8());
-        else
-            (*mValues)[i] = v[i];
-    }
-*/
+	for( int i=0; i<fc; i++ )
+		(*mValues)[i] = v[i];
 }
 
 void RecordImp::get( QVariant * v )
 {
 	if( !mTable ) return;
 	int fc = mTable->schema()->fieldCount();
-	FieldList fields = mTable->schema()->fields();
-	for( int i=0; i<fc; i++ ) {
-        if(fields[i]->flag(Field::Compress))
-            v[i] = QString::fromUtf8(qUncompress(mValues->at( i ).toByteArray()));
-        else
-            v[i] = mValues->at( i );
-    }
+	for( int i=0; i<fc; i++ )
+		v[i] = mValues->at( i );
 }
 
-QVariant RecordImp::getColumn( int col ) const
+const QVariant & RecordImp::getColumn( int col ) const
 {
 	if( !mTable || !mValues || col >= (int)mTable->schema()->fieldCount() || col < 0 )
-		return QVariant();
-
-    if( getBit( mNotSelectedBits, col ) )
-        mTable->selectFields( RecordList() += Record(const_cast<RecordImp*>(this)), FieldList() += mTable->schema()->field(col) );
-    return mValues->at(col);
+		return sNullVariant;
+	if( getBit( mNotSelectedBits, col ) ) {
+		PyThreadState *_save = 0;
+		if( Py_IsInitialized() && PyEval_ThreadsInitialized() && PyThreadState_GetDict() )
+			_save = PyEval_SaveThread();
+		mTable->selectFields( RecordList() += Record(const_cast<RecordImp*>(this)), FieldList() += mTable->schema()->field(col) );
+		if( _save )
+			PyEval_RestoreThread(_save);
+	}
+	return mValues->at(col);
 }
 
-QVariant RecordImp::getColumn( Field * f ) const
+const QVariant & RecordImp::getColumn( Field * f ) const
 {
-    if( !mTable || !mTable->schema()->fields().contains(f) )
-        return QVariant();
-    return getColumn( f->pos() );
+	if( !mTable || !mTable->schema()->fields().contains(f) )
+		return sNullVariant;
+	return getColumn( f->pos() );
 }
 
 RecordImp * RecordImp::setColumn( int col, const QVariant & v )
@@ -296,24 +286,11 @@ RecordImp * RecordImp::setColumn( int col, const QVariant & v )
 	}
 	Field * f = fields[col];
 	QVariant vnew(f->coerce(v));
-
-    bool notSel = getBit( mNotSelectedBits, col );
-
-    QVariant & vr = (*mValues)[col];
-/*
-    if(f->flag(Field::Compress)) {
-        vnew = qCompress(vnew.toString().toUtf8());
-    }
-    //LOG_3( "RecordImp::setColumn: vnew value is " + vnew.toString() );
-
-    QVariant & vr = (*mValues)[col];
-    if(f->flag(Field::Compress)) {
-        vr = qCompress(vr.toString().toUtf8());
-    }
-    //LOG_3( "RecordImp::setColumn: vr value is " + vr.toString() );
-*/
-
-    if( notSel || (vr.isNull() != vnew.isNull()) || (vr != vnew) ) {
+	
+	bool notSel = getBit( mNotSelectedBits, col );
+	
+	QVariant & vr = (*mValues)[col];
+	if( notSel || (vr.isNull() != vnew.isNull()) || (vr != vnew) ) {
 		bool isVar = f->flag( Field::LocalVariable );
 
 		if( (mState == EMPTY_SHARED) || (!isVar && (mState & COMMITTED) && !(mState & MODIFIED)) ) {
@@ -336,56 +313,56 @@ RecordImp * RecordImp::setColumn( int col, const QVariant & v )
 
 RecordImp * RecordImp::setColumn( Field * f, const QVariant & v )
 {
-    if( !mTable || !mTable->schema()->fields().contains(f) )
-        return this;
-    return setColumn( f->pos(), v );
+	if( !mTable || !mTable->schema()->fields().contains(f) )
+		return this;
+	return setColumn( f->pos(), v );
 }
 
 void RecordImp::fillColumn( int col, const QVariant & v )
 {
-    FieldList fields = mTable->schema()->fields();
-    if( !mTable || col >= (int)fields.size() || col < 0 ) {
-        LOG_5( "RecordImp::fillColumn: Column " + QString::number( col ) + " is out of range" );
-        return;
-    }
-    Field * f = fields[col];
-    QVariant vnew(f->coerce(v));
-    (*mValues)[col] = vnew;
-    clearBit( mNotSelectedBits, col );
+	FieldList fields = mTable->schema()->fields();
+	if( !mTable || col >= (int)fields.size() || col < 0 ) {
+		LOG_5( "RecordImp::fillColumn: Column " + QString::number( col ) + " is out of range" );
+		return;
+	}
+	Field * f = fields[col];
+	QVariant vnew(f->coerce(v));
+	(*mValues)[col] = vnew;
+	clearBit( mNotSelectedBits, col );
 }
 
 void RecordImp::setColumnModified( uint col, bool modified )
 {
-    if( !modified && !mModifiedBits )
-        return;
-    mModifiedBits = setBit( mModifiedBits, col, modified, mTable->schema()->fieldCount() );
+	if( !modified && !mModifiedBits )
+		return;
+	mModifiedBits = setBit( mModifiedBits, col, modified, mTable->schema()->fieldCount() );
 }
 
 bool RecordImp::isColumnModified( uint col ) const
 {
-    return getBit( mModifiedBits, col );
+	return getBit( mModifiedBits, col );
 }
 
 void RecordImp::clearModifiedBits()
 {
-    clearBitArray( mModifiedBits, mTable->schema()->fieldCount() );
+	clearBitArray( mModifiedBits, mTable->schema()->fieldCount() );
 }
 
 bool RecordImp::isColumnSelected( uint col )
 {
-       return !getBit( mNotSelectedBits, col );
+	return !getBit( mNotSelectedBits, col );
 }
 
 FieldList RecordImp::notSelectedColumns()
 {
-    FieldList ret;
-    if( mTable && mNotSelectedBits ) {
-        FieldList fields = mTable->schema()->fields();
-        for( int i = 0; i < fields.size(); ++i )
-            if( getBit( mNotSelectedBits, i ) )
-                ret += fields[i];
-    }
-    return ret;
+	FieldList ret;
+	if( mTable && mNotSelectedBits ) {
+		FieldList fields = mTable->schema()->fields();
+		for( int i = 0; i < fields.size(); ++i )
+			if( getBit( mNotSelectedBits, i ) )
+				ret += fields[i];
+	}
+	return ret;
 }
 
 RecordImp * RecordImp::setColumnLiteral( uint col, bool literal )
@@ -415,9 +392,9 @@ void RecordImp::clearColumnLiterals()
 	clearBitArray( mLiterals, mTable->schema()->fieldCount() );
 }
 
-QVariant RecordImp::getValue( const QString & column ) const
+const QVariant & RecordImp::getValue( const QString & column ) const
 {
-	return mTable ? getColumn( mTable->schema()->fieldPos( column ) ) : QVariant();
+	return mTable ? getColumn( mTable->schema()->fieldPos( column ) ) : sNullVariant;
 }
 
 RecordImp * RecordImp::setValue( const QString & column, const QVariant & var )
@@ -428,22 +405,22 @@ RecordImp * RecordImp::setValue( const QString & column, const QVariant & var )
 	return this;
 }
 
-uint RecordImp::key()
-{
-    if( mKeyValue > -1 ) return mKeyValue;
-	mKeyValue = mTable ? getColumn( mTable->schema()->primaryKeyIndex() ).toInt() : 0;
-    return mKeyValue;
-}
-
 RecordImp * RecordImp::copy()
 {
-	RecordImp * t = new RecordImp( mTable, mValues ? mValues->data() : 0 );
-	t->mState = (mState & COMMITTED) | MODIFIED;
 	if( mTable ) {
-		t->mModifiedBits = copyBitArray( mModifiedBits, mTable->schema()->fieldCount() );
-		t->mLiterals = copyBitArray( mLiterals, mTable->schema()->fieldCount() );
+		TableSchema * schema = mTable->schema();
+		Table * table = schema->table();
+		if( table ) {
+			RecordImp * t = new RecordImp( table, mValues ? mValues->data() : 0 );
+			t->mState = (mState & COMMITTED) | MODIFIED;
+			if( mTable ) {
+				t->mModifiedBits = copyBitArray( mModifiedBits, schema->fieldCount() );
+				t->mLiterals = copyBitArray( mLiterals, schema->fieldCount() );
+			}
+			return t;
+		}
 	}
-	return t;
+	return 0;
 }
 
 
@@ -527,5 +504,4 @@ QString RecordImp::debugString()
 	return ret;
 }
 
-} //namespace
-
+} // namespace

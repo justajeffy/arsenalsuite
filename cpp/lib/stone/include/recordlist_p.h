@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordlist_p.h 8503 2009-06-24 07:48:50Z brobison $
+ * $Id$
  */
 
 
@@ -36,8 +36,6 @@
 
 namespace Stone {
 class RecordImp;
-}
-using namespace Stone;
 
 class STONE_EXPORT ImpList : public QList<RecordImp*>
 {
@@ -60,6 +58,10 @@ public:
 	ImpList mList;
 	QAtomicInt mCount;
 };
+
+}
+
+using Stone::ImpList;
 
 #endif // RECORD_LIST_PRIVATE_H
 

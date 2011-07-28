@@ -597,7 +597,7 @@ void ExtTreeView::slotGrouperChanged( ModelGrouper * grouper )
                connect( grouper, SIGNAL( groupCreated( const QModelIndex & ) ), SLOT( slotGroupCreated( const QModelIndex & ) ) );
                connect( grouper, SIGNAL( groupEmptied( const QModelIndex & ) ), SLOT( slotGroupEmptied( const QModelIndex & ) ) );
                connect( grouper, SIGNAL( groupPopulated( const QModelIndex & ) ), SLOT( slotGroupPopulated( const QModelIndex & ) ) );
-               connect( grouper, SIGNAL( groupingChanged( bool ) ), SLOT( slotGroupingChanged( bool ) ) );
+               connect( grouper, SIGNAL( groupingChanged( bool ) ), SLOT( slotGroupingChanged() ) );
        }
 }
 
@@ -607,7 +607,7 @@ void ExtTreeView::slotGroupCreated( const QModelIndex & idx )
        if( sm && sm->grouper(false) ) {
                QMap<QString,bool>::Iterator it = mGroupExpandState.find( sm->grouper()->groupValue(idx) );
                if( (it != mGroupExpandState.end() && it.value()) || (it == mGroupExpandState.end() && sm->grouper()->expandNewGroups()) ) {
-                       LOG_5( QString("Expanding new group, row %1").arg(idx.row()) );
+                       //LOG_5( QString("Expanding new group, row %1").arg(idx.row()) );
                        expand(idx);
                }
        }
@@ -617,14 +617,14 @@ void ExtTreeView::slotGroupEmptied( const QModelIndex & idx )
 {
        SuperModel * sm = dynamic_cast<SuperModel*>(model());
        if( sm && sm->grouper(false) && sm->grouper()->emptyGroupPolicy() == ModelGrouper::HideEmptyGroups ) {
-               LOG_5( QString("Hiding empty group, row %1").arg(idx.row()) );
+               //LOG_5( QString("Hiding empty group, row %1").arg(idx.row()) );
                setRowHidden( idx.row(), idx.parent(), true );
        }
 }
 
 void ExtTreeView::slotGroupPopulated( const QModelIndex & idx )
 {
-       LOG_5( QString("Unhiding populated group, row %1").arg(idx.row()) );
+       //LOG_5( QString("Unhiding populated group, row %1").arg(idx.row()) );
        // Since this will only happen if the empty group state is hide or do nothing, we are safe to always call this
        setRowHidden( idx.row(), idx.parent(), false );
 }
@@ -639,7 +639,7 @@ void ExtTreeView::slotGroupingChanged()
                        // If the user groups by a different column they'll have to re-expand/collapse,
                        // otherwise we could end up keeping a large amount of data if we keep track of expanded/collapsed
                        // state for each possible group value for each possible group column
-                       LOG_5( "Clearing saved group expand states" );
+                       //LOG_5( "Clearing saved group expand states" );
                        mGroupExpandState.clear();
                        mLastGroupColumn = grp->groupColumn();
                }

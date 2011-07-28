@@ -11,10 +11,10 @@ public:
 	QDomElement addRecord( const Record & r );
 
 	QDomDocument document() const;
-	bool saveToFile(const QString & fileName, QString * errorMessage = 0);
+	bool saveToFile(const QString & fileName, QString * errorMessage /Out/);
 
-	static bool toFile(RecordList rl, const QString & fileName, QString * errorMessage = 0);
-	static QDomDocument toDocument(RecordList rl, QString * errorMessage = 0);
+	static bool toFile(RecordList rl, const QString & fileName, QString * errorMessage /Out/);
+	static QDomDocument toDocument(RecordList rl, QString * errorMessage /Out/);
 };
 
 
@@ -31,9 +31,9 @@ public:
 	RecordList records() const;
 	QMap<Record,QDomElement> recordElementMap() const;
 
-	bool loadFile( const QString & fileName, QString * errorMessage = 0);
-	bool loadDocument( const QDomDocument & document, QString * errorMessage = 0);
+	bool loadFile( const QString & fileName, QString * errorMessage /Out/);
+	bool loadDocument( const QDomDocument & document, QString * errorMessage /Out/);
 
-	static RecordList fromFile(const QString & fileName, QString * errorMessage = 0);
-	static RecordList fromDocument(const QDomDocument & document, QString * errorMessage = 0);
+	static RecordList fromFile(const QString & fileName, QString * errorMessage /Out/);
+	static RecordList fromDocument(const QDomDocument & document, QString * errorMessage /Out/);
 };

@@ -28,18 +28,20 @@
 #ifndef RECORD_H
 #define RECORD_H
 
+#include "blurqt.h"
+
 #include <qstring.h>
 #include <qvariant.h>
 
-#include "recordimp.h"
+template<class T> class QList;
 
 namespace Stone {
-class Table;
+class Field;
 class RecordImp;
+class Table;
 class TableSchema;
-}
-using namespace Stone;
 
+typedef QList<Field*> FieldList;
 
 STONE_EXPORT bool isChanged( const QString &, const QString & );
 
@@ -75,11 +77,10 @@ public:
 	
 	bool operator <( const Record & other ) const;
 
-	/** Returns true if this object has a valid
-	 * recordimp object, ie it can be written to
-	 * and read from.  It does not matter
-	 * whether the object is committed, deleted,
-	 * modifed or brand new
+	/** Returns true if this object is a valid
+	 * object, ie it contains some data.
+	 * It does not matter whether the object is
+	 * committed, deleted, or a modifed new record
 	 *
 	 * Use this method in derived record classes
 	 * to check for inheritance:
@@ -90,58 +91,67 @@ public:
 	 * }
 	 * This is the same as
 	 * return r.table() ? r.table()->inherits( User::table() ) : false;
+	 *
+	 * Host host = Host()
+	 *  // host.isValid() == false
+	 * host.setHostName( 'test' )
+	 *  // host.isValid() == true
+	 * User(host).isValid() == false
 	 */
-	bool isValid() const { return bool(mImp); }
+	bool isValid() const;
 
 	/// Returns true if this record is in the database
 	bool isRecord() const;
 
 	/// Returns this record's primary key
 	uint key( bool generate = false ) const;
-
+	/// Generates a primary key if needed, and returns it
+	uint generateKey() const;
+	
 	/// Returns the value in column 'column'
-	QVariant getValue( const QString & column ) const;
+	const QVariant & getValue( const QString & column ) const;
 
 	/// Sets the value in 'column' to 'value'
 	Record & setValue( const QString & column, const QVariant & value );
 
 	Record & setForeignKey( const QString & column, const Record & other );
 	Record & setForeignKey( int column, const Record & other );
-    Record & setForeignKey( Field * field, const Record & other );
-
+	Record & setForeignKey( Field * field, const Record & other );
+	
 	Record foreignKey( const QString & column ) const;
 	Record foreignKey( int column ) const;
-    Record foreignKey( Field * field ) const;
-
+	Record foreignKey( Field * field ) const;
+	
 	/// Sets the column to a literal SQL value that will be used for
 	/// the next update/commit.  A null QString will clear the literal
 	/// for this column.
 	Record & setColumnLiteral( const QString & column, const QString & literal );
-
+	
 	/// Returns the literal value assigned to this column.
 	/// Returns QString::null if there is none.
 	QString columnLiteral( const QString & column ) const;
-
+	
 	/// Gets or sets the value in the column at position 'column'
 	/// Column positions are not guaranteed to be in any
 	/// particular order
-	QVariant getValue( int column ) const;
-    QVariant getValue( Field * field ) const;
-
+	const QVariant & getValue( int column ) const;
+	const QVariant & getValue( Field * field ) const;
+	
 	Record & setValue( int column, const QVariant & value );
-    Record & setValue( Field * field, const QVariant & value );
-
+	Record & setValue( Field * field, const QVariant & value );
+	
 	QString stateString() const;
 
-	// human readable output
+	/// human readable output
+	QString displayName() const;
 	QString dump() const;
 	QString changeString() const;
 
-    // If refreshExisting is false, only fields in the list are selected that
-    // have not previously been selected, otherwise all fields in the list are
-    // selected.  If fields is empty and refreshExisting is false, all unselected
-    // fields are selected.
-    void selectFields( FieldList fields = FieldList(), bool refreshExisting = false );
+	// If refreshExisting is false, only fields in the list are selected that
+	// have not previously been selected, otherwise all fields in the list are
+	// selected.  If fields is empty and refreshExisting is false, all unselected
+	// fields are selected.
+	void selectFields( FieldList fields = FieldList(), bool refreshExisting = false );
 
 	/// Removes this record from the database and indexes
 	/// return value of -1 indicates error. 0 indicates that
@@ -163,26 +173,38 @@ public:
 	Record & commit( bool sync = true );
 
 	RecordImp * imp() const { return mImp; }
-
+	
 	bool isUpdated() const;
 
-	Table * table() const { return mImp ? mImp->table() : 0; }
+	Table * table() const;
 
 	Record copy() const;
-
+	
 	/// Number of Record objects in existence
 	static int totalRecordCount();
-
 	/// Number of RecordImp objects in existence
 	static int totalRecordImpCount();
 
 	friend class Stone::RecordImp;
-
 protected:
 	void checkImpType(TableSchema * ts);
 };
 
-///@}
+} // namespace
+
+using Stone::Record;
+
+#include "recordimp.h"
+
+inline bool Record::isValid() const
+{ return bool(mImp) && !(mImp->mState & RecordImp::EMPTY_SHARED); }
+
+inline Stone::Table * Record::table() const
+{ return mImp ? mImp->table() : 0; }
+
+inline uint Record::key( bool generate ) const
+{ return generate ? generateKey() : (mImp ? mImp->key() : 0); }
+
 
 Q_DECLARE_METATYPE(Record)
 
