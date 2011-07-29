@@ -156,21 +156,14 @@ void JobListTask::run()
 	if( mFetchJobDeps ) {
 		JobList jobsNeedingDeps = mReturn.unique();
 		Index * idx = JobDep::table()->indexFromField( "fkeyJob" );
-		while( !jobsNeedingDeps.isEmpty() ) {
-			idx->cacheIncoming(true);
-			JobDepList jobDeps = JobDep::select( "fkeyJob IN (" + jobsNeedingDeps.keyString() + ")" );
-			idx->cacheIncoming(false);
-			QMap<uint,JobDepList> depsByJob = jobDeps.groupedBy<uint,JobDepList>("fkeyJob");
-			foreach( Job j, jobsNeedingDeps )
-				if( !depsByJob.contains(j.key()) )
-					idx->setEmptyEntry( QList<QVariant>() << j.getValue( "keyjob" ) );
-			CHECK_CANCEL
-			JobList dependentJobs = jobDeps.deps();
-			jobsNeedingDeps = dependentJobs - mReturn - mDependentJobs;
-			mJobDeps += jobDeps;
-			mDependentJobs += dependentJobs;
-			dependentJobs.clear();
-		}
+        idx->cacheIncoming(true);
+        mJobDeps = JobDep::table()->selectFrom( "jobdep_recursive('" + jobsNeedingDeps.keyString() + "') AS JobDep" );
+        idx->cacheIncoming(false);
+        QMap<uint,JobDepList> depsByJob = mJobDeps.groupedBy<uint,JobDepList>("fkeyJob");
+        foreach( Job j, jobsNeedingDeps )
+            if( !depsByJob.contains(j.key()) )
+                idx->setEmptyEntry( QList<QVariant>() << j.getValue( "keyjob" ) );
+        mDependentJobs = mJobDeps.deps();
 		jobsNeedingRefresh = (mDependentJobs - mReturn);
 		if( jobsNeedingRefresh.size() )
 			Job::select("keyjob in (" + jobsNeedingRefresh.keyString() + ")");
