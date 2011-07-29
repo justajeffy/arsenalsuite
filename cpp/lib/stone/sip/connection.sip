@@ -156,6 +156,8 @@ public:
 
 	virtual bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 ) = 0 /PyName=exec_/;
 
+	virtual RecordList selectFrom( Table * table, const QString & from, const QList<QVariant> & args ) = 0;
+
 	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() ) = 0;
 	virtual QList<RecordList> joinedSelect( const JoinedSelect &, QString where, QList<QVariant> vars ) = 0;
 

@@ -763,7 +763,8 @@ QModelIndex SuperModel::insert( const QModelIndex & par, int row, ModelDataTrans
 QModelIndexList SuperModel::insert( const QModelIndex & par, int row, int count, ModelDataTranslator * trans, bool skipConstruction )
 {
 	QModelIndexList ret;
-	if( count < 1 || row > rowCount(par) || row < 0 ) {
+    int maxRow = childrenLoaded(par) ? rowCount(par) : 0;
+    if( count < 1 || row > maxRow || row < 0 ) {
 		if( mInsertClosureNode && mInsertClosureNode->state == 0 )
 			mInsertClosureNode->state = 2;
 		return ret;
