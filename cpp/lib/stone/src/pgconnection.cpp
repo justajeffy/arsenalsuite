@@ -30,6 +30,7 @@
 #include <qregexp.h>
 
 #include "iniconfig.h"
+#include "joinedselect.h"
 #include "pgconnection.h"
 #include "table.h"
 #include "tableschema.h"
@@ -44,13 +45,13 @@ PGConnection::PGConnection()
 
 void PGConnection::setOptionsFromIni( const IniConfig & ini )
 {
-    QSqlDbConnection::setOptionsFromIni( ini );
-    mUseMultiTableSelect = ini.readBool( "UseMultiTableSelect", false );
+	QSqlDbConnection::setOptionsFromIni( ini );
+	mUseMultiTableSelect = ini.readBool( "UseMultiTableSelect", false );
 }
 
 Connection::Capabilities PGConnection::capabilities() const
 {
-    Connection::Capabilities ret = static_cast<Connection::Capabilities>(QSqlDbConnection::capabilities() | Cap_Inheritance | Cap_MultipleInsert | (mUseMultiTableSelect ? Cap_MultiTableSelect : 0));
+	Connection::Capabilities ret = static_cast<Connection::Capabilities>(QSqlDbConnection::capabilities() | Cap_Inheritance | Cap_MultipleInsert | (mUseMultiTableSelect ? Cap_MultiTableSelect : 0));
 	if( checkVersion( 8, 2 ) )
 		ret = static_cast<Connection::Capabilities>(ret | Cap_Returning);
 	return ret;
@@ -61,12 +62,12 @@ static void getVersion( PGConnection * c, int & vMaj, int & vMin )
 	QSqlQuery q = c->exec( "SELECT version()" );
 	if( q.next() ) {
 		QString versionString = q.value(0).toString();
-		LOG_5( "Got Postgres Version string: " + versionString );
+		LOG_3( "Got Postgres Version string: " + versionString );
 		QRegExp vre( "PostgreSQL (\\d+)\\.(\\d+)" );
 		if( versionString.contains( vre ) ) {
 			vMaj = vre.cap(1).toInt();
 			vMin = vre.cap(2).toInt();
-			LOG_5( "Got Postgres Version: " + QString::number( vMaj ) + "." + QString::number( vMin ) );
+			LOG_3( "Got Postgres Version: " + QString::number( vMaj ) + "." + QString::number( vMin ) );
 		}
 	}
 }
@@ -83,7 +84,7 @@ bool PGConnection::checkVersion( int major, int minor ) const
 bool PGConnection::reconnect()
 {
 	if( QSqlDbConnection::reconnect() ) {
-		checkVersion(0,0);
+		//checkVersion(0,0);
 		return true;
 	}
 	return false;
@@ -91,6 +92,7 @@ bool PGConnection::reconnect()
 
 uint PGConnection::newPrimaryKey( TableSchema * schema )
 {
+	while( schema->parent() ) schema = schema->parent();
 	QString name = schema->tableName();
 	QString sql("SELECT nextval('" + name + "_key" + name + "_seq')" );
 	QSqlQuery q = exec( sql );
@@ -119,6 +121,8 @@ bool pgtypeIsCompat( const QString pg_type, uint enumType )
 		return (enumType==Field::Double || enumType==Field::Float);
 	if( pg_type == "timestamp" )
 		return ( enumType==Field::DateTime );
+	if( pg_type == "time" )
+		return ( enumType==Field::Time );
 	if( pg_type == "date" )
 		return ( enumType==Field::Date );
 	if( pg_type == "boolean" || pg_type == "bool" )
@@ -148,6 +152,8 @@ uint fieldTypeFromPgType( const QString & pg_type )
 		return Field::Double;
 	if( pg_type == "timestamp" )
 		return Field::DateTime;
+	if( pg_type == "time" )
+		return Field::Time;
 	if( pg_type == "date" )
 		return Field::Date;
 	if( pg_type == "boolean" || pg_type == "bool" )
@@ -172,6 +178,13 @@ bool PGConnection::verifyTable( TableSchema * schema, bool createMissingColumns,
 {
 	QString out;
 	bool ret = false, updateDocs = false;
+
+	if( !tableExists( schema ) ) {
+		out += warnAndRet( "Table does not exist: " + schema->tableName() );
+		if( output )
+			*output = out;
+		return false;
+	}
 
 	FieldList fl = schema->columns();
 	QMap<QString, Field*> fieldMap;
@@ -228,12 +241,12 @@ bool PGConnection::verifyTable( TableSchema * schema, bool createMissingColumns,
 		QStringList cols;
 		for( QMap<QString, Field*>::Iterator it = fieldMap.begin(); it != fieldMap.end(); ++it )
 			cols += it.key();
-		LOG_5( cols.join( "," ) );
+		out += warnAndRet( cols.join( "," ) );
 		if( createMissingColumns ) {
 			out += warnAndRet( "Creating missing columns" );
 			for( QMap<QString, Field*>::Iterator it = fieldMap.begin(); it != fieldMap.end(); ++it ) {
 				Field * f = it.value();
-				QString cc = "ALTER TABLE " + schema->tableName() + " ADD COLUMN " + f->name() + " " + f->dbTypeString() + ";";
+				QString cc = "ALTER TABLE " + schema->tableName() + " ADD COLUMN \"" + f->name().toLower() + "\" " + f->dbTypeString() + ";";
 				QSqlQuery query = exec(cc);
 				if( !query.isActive() ) {
 					out += warnAndRet( "Unable to create column: " + f->name() );
@@ -325,8 +338,8 @@ QString PGConnection::getSqlFields( TableSchema * schema )
 	if( it == mSqlFields.end() ) {
 		QStringList fields;
 		foreach( Field * f, schema->columns() )
-            if( !f->flag( Field::NoDefaultSelect ) )
-                fields += f->name().toLower();
+			if( !f->flag( Field::NoDefaultSelect ) )
+				fields += f->name().toLower();
 		QString tableName = tableQuoted(schema->tableName());
 		QString sql = tableName + ".\"" + fields.join( "\", " + tableName + ".\"" ) + "\"";
 		mSqlFields.insert( schema, sql );
@@ -358,6 +371,76 @@ RecordList PGConnection::selectOnly( Table * table, const QString & where, const
 	QSqlQuery sq = exec( select, args, true /*retry*/, table );
 	while( sq.next() )
 		ret += Record( new RecordImp( table, sq ), false );
+	return ret;
+}
+
+QList<RecordList> PGConnection::joinedSelect( const JoinedSelect & joined, QString where, QList<QVariant> args )
+{
+	QList<RecordList> ret;
+	QList<JoinCondition> joinConditions = joined.joinConditions();
+	QList<Table*> tables;
+	tables += joined.table();
+	foreach( JoinCondition jc, joinConditions )
+		if( !jc.ignoreResults )
+			tables += jc.table;
+	
+	QString query( "SELECT " );
+	
+	// Generate column list
+	QStringList fields;
+	foreach( Table * table, tables ) {
+		ret += RecordList();
+		fields += getSqlFields(table->schema());
+	}
+	query += fields.join(", ");
+	
+	query += " FROM ONLY " + tableQuoted(joined.table()->schema()->tableName());
+	
+	// Generate join list
+	int idx = 0;
+	foreach( JoinCondition jc, joinConditions ) {
+		switch( jc.type ) {
+			case InnerJoin:
+				query += " INNER";
+				break;
+			case LeftJoin:
+				query += " LEFT";
+				break;
+			case RightJoin:
+				query += " RIGHT";
+				break;
+			case OuterJoin:
+				query += " OUTER";
+				break;
+		}
+		query += " JOIN ONLY ";
+		query += tableQuoted(jc.table->schema()->tableName());
+		if( !jc.alias.isEmpty() && jc.alias != jc.table->schema()->tableName() )
+			query += " AS " + jc.alias;
+
+		query += " ON " + jc.condition;
+		++idx;
+	}
+	
+	if( !where.isEmpty() ) {
+		if( !where.contains("WHERE") )
+			query += " WHERE";
+		query += " " + where;
+	}
+
+	query += ";";
+	
+	QSqlQuery sq = exec( query, args, true /*retry*/, tables[0] );
+	
+	while( sq.next() ) {
+		int tableIndex = 0;
+		int colOffset = 0;
+		foreach( Table * table, tables ) {
+			ret[tableIndex] += Record( new RecordImp( table, sq, colOffset ), false );
+			colOffset += table->schema()->columns().size();
+			++tableIndex;
+		}
+	}
 	return ret;
 }
 
@@ -394,7 +477,7 @@ QMap<Table *, RecordList> PGConnection::selectMulti( QList<Table*> tables,
 		QString tableName = schema->tableName();
 		sql << QString::number(tablePos);
 		foreach( Field * f, fields ) {
-            if( f->flag( Field::NoDefaultSelect ) ) continue;
+			if( f->flag( Field::NoDefaultSelect ) ) continue;
 			while( pos < typesByPosition.size() && typesByPosition[pos] != f->type() ) {
 				if( tablePos == 0 )
 					sql << "NULL::" + Field::dbTypeString(Field::Type(typesByPosition[pos]));
@@ -448,26 +531,26 @@ QMap<Table *, RecordList> PGConnection::selectMulti( QList<Table*> tables,
 
 void PGConnection::selectFields( Table * table, RecordList records, FieldList fields )
 {
-    TableSchema * schema = table->schema();
-    RecordList ret;
+	TableSchema * schema = table->schema();
+	RecordList ret;
+	
+	QStringList fieldNames;
+	foreach( Field * f, fields )
+		if( !f->flag( Field::LocalVariable ) )
+			fieldNames += f->name().toLower();
 
-    QStringList fieldNames;
-    foreach( Field * f, fields )
-        if( !f->flag( Field::LocalVariable ) )
-            fieldNames += f->name().toLower();
+	QString tableName = tableQuoted(schema->tableName());
+	QString sql = "SELECT " + tableName + ".\"" + fieldNames.join( "\", " + tableName + ".\"" ) + "\"" + " FROM ONLY " + tableName + " WHERE " + schema->primaryKey() + " IN (" + records.keyString() + ");";
 
-    QString tableName = tableQuoted(schema->tableName());
-    QString sql = "SELECT " + tableName + ".\"" + fieldNames.join( "\", " + tableName + ".\"" ) + "\"" + " FROM ONLY " + tableName + " WHERE " + schema->primaryKey() + " IN (" + records.keyString() + ");";
-
-    QSqlQuery sq = exec( sql, VarList(), true /*retry*/, table );
-    RecordIter it = records.begin();
-    while( sq.next() ) {
-        if( it == records.end() ) break;
-        int i = 0;
-        Record r(*it);
-        foreach( Field * f, fields )
-            r.imp()->fillColumn( f->pos(), sq.value(i++) );
-    }
+	QSqlQuery sq = exec( sql, VarList(), true /*retry*/, table );
+	RecordIter it = records.begin();
+	while( sq.next() ) {
+		if( it == records.end() ) break;
+		int i = 0;
+		Record r(*it);
+		foreach( Field * f, fields )
+			r.imp()->fillColumn( f->pos(), sq.value(i++) );
+	}
 }
 
 bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimaryKey )
@@ -496,12 +579,11 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 		sql += "\"" + cols.join( "\", \"" ) + "\" ) VALUES ";
 	}
 
+	// multiInsert means the database supports inserting multiple rows with on statement
+	// INSERT INTO table (column1,column2) VALUES (data1,data2), (data11,data22);
 	if( multiInsert ) {
-        // multiInsert means the database supports inserting multiple rows with on statement
-        // INSERT INTO table (column1,column2) VALUES ( (data1,data2), (data11,data22) );
-		QSqlQuery q( mDb );
 		QStringList recVals;
-		st_foreach( RecordIter, it, rl )
+		st_foreach( RecordIter, it, rl ) 
 		{
 			QStringList vals;
 			RecordImp * rb = it.imp();
@@ -514,7 +596,7 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 						if( rb->isColumnLiteral( pos ) )
 							vals += rb->getColumn( pos ).toString();
 						else {
-                            vals += "?";
+							vals += "?";
 						}
 					} else
 						vals += "DEFAULT";
@@ -524,48 +606,53 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 		}
 		sql += recVals.join( ", " );
 
-        // if we generated a new primary key, return it for the key cache
+		// if we generated a new primary key, return it for the key cache
 		if( newPrimaryKey )
 			sql += "RETURNING \"" + schema->primaryKey().toLower() + "\";";
+		
+		VarList args;
 
-		q.prepare( sql );
-
-		st_foreach( RecordIter, it, rl )
+		st_foreach( RecordIter, it, rl ) 
 		{
 			RecordImp * rb = it.imp();
 			foreach( Field * f, fields ) {
 				int pos = f->pos();
 				if( !(newPrimaryKey && f->flag( Field::PrimaryKey )) && (rb->isColumnModified( pos ) || rb->mState == RecordImp::COMMIT_ALL_FIELDS) && !rb->isColumnLiteral( pos ) ) {
 					QVariant v = f->dbPrepare( rb->getColumn( f->pos() ) );
-					q.addBindValue( v );
+					args += v;
 				}
 			}
 		}
-
-		if( exec( q, true/*retry*/, table ) ) {
-			if( newPrimaryKey ) {
-                // if we're getting new primary keys back from the database
-                // we want to update the Records with the new value
-                // and the Record should be "cleaned up" internally
-				uint i = 0;
-				while( q.next() && i < rl.size() ) {
-					Record r = rl[i];
+		QSqlQuery q = exec( sql, args, true /*retry*/, table );
+		if( q.isActive() ) {
+			if( newPrimaryKey && q.size() != (int)rl.size() ) {
+				LOG_1( "INSERT succeeded but rows returned(primary keys) doesnt match number of records inserted" );
+				return false;
+			}
+			// if we're getting new primary keys back from the database
+			// we want to update the Records with the new value
+			// and the Record should be "cleaned up" internally
+			uint i = 0;
+			while( i < rl.size() ) {
+				Record r = rl[i];
+				if( newPrimaryKey ) {
+					q.next();
 					r.setValue( schema->primaryKeyIndex(), q.value(0).toUInt() );
-					r.imp()->mState = RecordImp::COMMITTED;
-					r.imp()->clearModifiedBits();
-					r.imp()->clearColumnLiterals();
-					i++;
 				}
+				r.imp()->mState = RecordImp::COMMITTED;
+				r.imp()->clearModifiedBits();
+				r.imp()->clearColumnLiterals();
+				i++;
 			}
 		}
 	} else {
-		st_foreach( RecordIter, it, rl )
+		st_foreach( RecordIter, it, rl ) 
 		{
 			RecordImp * rb = (*it).imp();
 			QString sql( "INSERT INTO %1 (" ), values( ") VALUES (" );
 			sql = sql.arg( tableQuoted(schema->tableName()) );
 			FieldList fields = schema->columns();
-
+		
 			bool nc = false;
 			foreach( Field * f, fields )
 			{
@@ -585,25 +672,24 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 					nc = true;
 				}
 			}
-
+		
 			if( values.isEmpty() ) continue;
-
+		
 			sql = sql + values + ")";
-
+		
 			TableSchema * base = schema;
 			if( schema->inherits().size() )
 				base = schema->inherits()[0];
-
+		
 			if( newPrimaryKey ) {
 				if( checkVersion( 8, 2 ) )
 					sql += " RETURNING \"" + schema->primaryKey() + "\";";
 				else
 					sql += "; SELECT currval('" + base->tableName() + "_" + schema->primaryKey() + "_seq');";
 			}
-
-			QSqlQuery q(mDb);
-			q.prepare( sql );
-
+			
+			QSqlQuery q = fakePrepare(sql);
+		
 			foreach( Field * f, fields ) {
 				int pos = f->pos();
 				if( !(newPrimaryKey && f->flag( Field::PrimaryKey )) && ((rb->isColumnModified( pos ) || rb->mState == RecordImp::COMMIT_ALL_FIELDS) && !rb->isColumnLiteral( pos )) ) {
@@ -611,8 +697,8 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 					q.bindValue( f->placeholder(), v );
 				}
 			}
-
-			if( exec( q, true /*retry*/, table ) ) {
+		
+			if( exec( q, true /*retry*/, table, /* Using fake prepare */ true ) ) {
 				if( newPrimaryKey ){
 					if( q.next() ) {
 		//				qWarning( "Table::insert: Setting primary key to " + QString::number( q.value(0).toUInt() ) );
@@ -627,8 +713,9 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 				rb->clearColumnLiterals();
 			}
 		}
-	}
 
+	}
+	
 	return true;
 }
 
@@ -637,22 +724,22 @@ bool PGConnection::update( Table * table, RecordImp * imp, Record * returnValues
 	TableSchema * schema = table->schema();
 	bool needComma = false, selectAfterUpdate = false;
 	FieldList fields = schema->columns();
-
+	
 	QString up("UPDATE %1 SET ");
 	up = up.arg( tableQuoted(schema->tableName()) );
 	for( FieldIter it = fields.begin(); it != fields.end(); ++it ){
 		Field * f = *it;
-        // if the field is the primary key we don't want to change it
-        // or if the field hasn't been modified locally, don't change it
+		// if the field is the primary key we don't want to change it
+		// or if the field hasn't been modified locally, don't change it
 		if( f->flag( Field::PrimaryKey ) || !imp->isColumnModified( f->pos() ) )
 			continue;
 		if( needComma ) up += ", ";
 
-        // column name is wrapped in quotes
+		// column name is wrapped in quotes
 		up += "\"" + f->name().toLower() + "\"";
 
-        // if we're updating to a literal value ( such as NOW() or something )
-        // put that value in, otherwise put in a bind marker
+		// if we're updating to a literal value ( such as NOW() or something )
+		// put that value in, otherwise put in a bind marker
 		if( imp->isColumnLiteral( f->pos() ) ) {
 			up += "=" + imp->getColumn( f->pos() ).toString();
 			selectAfterUpdate = true;
@@ -660,21 +747,20 @@ bool PGConnection::update( Table * table, RecordImp * imp, Record * returnValues
 			up += "="+f->placeholder();
 		needComma = true;
 	}
-
+	
 	// There were no columns to update
 	if( !needComma ) {
 		//qWarning( "Table::update: Record had MODIFIED field set, but no modified columns" );
 		return false;
 	}
-
+		
 	up += QString(" WHERE ") + schema->primaryKey() + "=:primarykey"; // + QString::number( imp->key() );
 
 	if( returnValues )
 		up += " RETURNING " + getSqlFields( schema );
 	up += ";";
 
-	QSqlQuery q( mDb );
-	q.prepare( up );
+	QSqlQuery q = fakePrepare( up );
 	for( FieldIter it = fields.begin(); it != fields.end(); ++it ){
 		Field * f = *it;
 		if( f->flag( Field::PrimaryKey ) || !imp->isColumnModified( f->pos() ) || imp->isColumnLiteral( f->pos() ) )
@@ -684,7 +770,7 @@ bool PGConnection::update( Table * table, RecordImp * imp, Record * returnValues
 	}
     q.bindValue( ":primarykey", imp->key() );
 
-	if( exec( q, true /*retryLostConn*/, table ) ) {
+	if( exec( q, true /*retryLostConn*/, table, /*usingFakePrepare =*/ true ) ) {
 		if( returnValues && q.next() )
 			*returnValues = Record( new RecordImp( table, q ), false );
 		return true;
@@ -696,7 +782,7 @@ int PGConnection::remove( Table * table, const QStringList & keys )
 {
 	TableSchema * schema = table->schema();
 	TableSchema * base = schema;
-    // is this an inherited table? if so remove from the base class
+	// is this an inherited table? if so remove from the base class
 	if( schema->inherits().size() )
 		base = schema->inherits()[0];
 	QString del("DELETE FROM ");

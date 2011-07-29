@@ -27,6 +27,7 @@
 
 #include <limits.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <qfile.h>
 #include <qfileinfo.h>
@@ -38,43 +39,41 @@
 #include "database.h"
 
 #ifdef Q_OS_WIN
+
+#define UNICODE 1
+#define _UNICODE 1
+
 #include "windows.h"
+#include <tchar.h>
+#include "accctrl.h"
+#include "aclapi.h"
+#else
+#include <pwd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 
 #include "path.h"
 
-QString makeFramePath( const QString & basePath, uint frame, uint padWidth )
+QString makeFramePath( const QString & bp, uint in, uint padWidth, bool endDigitsAreFrameNumber )
 {
-    QString path = basePath;
-
-    // if the basePath contains @ or #, then the user has provided the padWidth hint in the path
-    QRegExp padHintMatch("([@#]+)");
-    if( padHintMatch.indexIn(path) > -1 ) {
-        QString padHint = padHintMatch.cap(1);
-        padWidth = padHint.length();
-
-        QString num;
-        num = num.sprintf(QString("%0" + QString::number(padWidth) + "i").toLatin1().constData(), frame);
-
-        path.replace(padHintMatch, num);
-        return path;
-    }
-
-    // if no replace hint provided, then try to guess where in the string to put the frame
 	QString num;
-	num = num.sprintf(QString("%0" + QString::number(padWidth) + "i").toLatin1().constData(), frame);
-
+	num = num.sprintf(QString("%0" + QString::number(padWidth) + "i").toLatin1().constData(), in);
+	QString path = bp;
 	int loc = path.lastIndexOf('.');
 	if( loc==-1 )
 		return QString::null;
 	QString tail = path.mid( loc );
-	int remNums=0;
-	while( loc > 0 && remNums < num.size() && QChar(path[loc-1]).isNumber() ){
-		remNums++;
-		loc--;
+	if( endDigitsAreFrameNumber ) {
+		int remNums=0;
+		while( loc > 0 && remNums < num.size() && QChar(path[loc-1]).isNumber() ){
+			remNums++;
+			loc--;
+		}
+		if( loc==0 )
+			return QString::null;
 	}
-	if( loc==0 )
-		return QString::null;
 	QString head = path.left( loc );
 	path = head + num + tail;
 	path.replace('\\', "/");
@@ -223,7 +222,6 @@ QString compactNumberList( const QList<int> & _list )
 	return retList.join(",");
 }
 
-
 QString readFullFile( const QString & path, bool * error )
 {
 	QFile file(path);
@@ -242,6 +240,136 @@ bool writeFullFile( const QString & path, const QString & contents )
 	QTextStream(&file) << contents;
 	return true;
 }
+
+QString pathOwner( const QString & path, QString * errorMessage )
+{
+#ifdef Q_OS_WIN
+	QPair<QString,QString> pair = pathOwnerDomain( path, errorMessage );
+	return pair.first;
+#else
+	struct stat sb;
+	int statRet = stat( path.toLatin1(), &sb );
+	if( statRet == -1 ) {
+		if( errorMessage ) *errorMessage = "Stat failed";
+		return QString();
+	}
+	
+	struct passwd * pas = getpwuid(sb.st_uid);
+	if( !pas ) {
+		if( errorMessage ) *errorMessage = "getpwuid failed";
+		return QString();
+	}
+	
+	return QString::fromLatin1( pas->pw_name );
+#endif
+}
+
+#ifdef Q_OS_WIN
+
+static QString hostFromUnc( const QString & path )
+{
+	if( path.startsWith( "\\\\" ) ) {
+		int firstHostChar = 2;
+		while( firstHostChar + 1 < path.size() && path[firstHostChar] == '\\' ) firstHostChar++;
+		int lastHostChar = qMin(firstHostChar + 1, path.size());
+		while( lastHostChar + 1 < path.size() && path[lastHostChar] != '\\' ) lastHostChar++;
+		return path.mid(firstHostChar,lastHostChar - firstHostChar);
+	}
+	return QString();
+}
+
+QPair<QString,QString> pathOwnerDomain( const QString & _path, QString * errorMessage )
+{
+	DWORD dwRtnCode = 0;
+	PSID pSidOwner = NULL;
+	BOOL bRtnBool = TRUE;
+	LPTSTR AcctName = 0, DomainName = 0;
+	DWORD dwAcctName = 1, dwDomainName = 1;
+	SID_NAME_USE eUse = SidTypeUnknown;
+	HANDLE hFile;
+	PSECURITY_DESCRIPTOR pSD = NULL;
+	QString host;
+	LPTSTR fileHost = 0;
+
+	QString path(_path);
+	path.replace( "/", "\\" );
+	
+	// Get the handle of the file or path
+	hFile = CreateFile( (WCHAR*)path.utf16(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+
+	// Check GetLastError for CreateFile error code.
+	if (hFile == INVALID_HANDLE_VALUE) {
+		if( errorMessage ) *errorMessage = QString( "Error opening file to get security info: %1" ).arg( GetLastError() );
+		return qMakePair(QString(),QString());
+	}
+
+	// Get the owner SID of the file.
+	dwRtnCode = GetSecurityInfo( hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &pSidOwner, NULL, NULL, NULL, &pSD);
+
+	// Check GetLastError for GetSecurityInfo error condition.
+	if (dwRtnCode != ERROR_SUCCESS) {
+		if( errorMessage ) *errorMessage = QString( "GetSecurityInfo failed: %1" ).arg( GetLastError() );
+		CloseHandle(hFile);
+		return qMakePair(QString(),QString());
+	}
+
+	if( path.startsWith( "\\\\" ) )
+		host = hostFromUnc( path );
+	else
+		host = hostFromUnc( driveMapping( path[0].toLatin1() ) );
+	
+	if( !host.isEmpty() )
+		fileHost = (LPTSTR)host.utf16();
+
+	// First call to LookupAccountSid to get the buffer sizes.
+	bRtnBool = LookupAccountSid( fileHost /* local computer */, pSidOwner, AcctName, (LPDWORD)&dwAcctName, DomainName, (LPDWORD)&dwDomainName, &eUse);
+
+	// Allocate memory for the buffers.
+	AcctName = (LPTSTR)GlobalAlloc( GMEM_FIXED, dwAcctName * sizeof(TCHAR));
+	if( dwDomainName )
+		DomainName = (LPTSTR)GlobalAlloc( GMEM_FIXED, dwDomainName * sizeof(TCHAR) );
+
+	// Check GetLastError for GlobalAlloc error condition.
+	if (AcctName == NULL || (dwDomainName && !DomainName)) {
+		if( errorMessage ) *errorMessage = QString( "Failed to allocate space for LookupAccountSid: %1" ).arg( GetLastError() );
+		GlobalFree((HGLOBAL)AcctName);
+		GlobalFree((HGLOBAL)DomainName);
+		CloseHandle(hFile);
+		LocalFree(pSD);
+		return qMakePair(QString(),QString());
+	}
+
+	// Second call to LookupAccountSid to get the account name.
+	bRtnBool = LookupAccountSid( fileHost /* local computer */, pSidOwner, AcctName, (LPDWORD)&dwAcctName, DomainName, (LPDWORD)&dwDomainName, &eUse);
+
+	// Check GetLastError for LookupAccountSid error condition.
+	if (bRtnBool == FALSE) {
+		if( errorMessage ) {
+			DWORD dwErrorCode = GetLastError();
+			if (dwErrorCode == ERROR_NONE_MAPPED)
+				*errorMessage = QString( "Account owner not found for specified SID." );
+			else 
+				*errorMessage = QString( "Failed to allocate space for LookupAccountSid: %1" ).arg( dwErrorCode );
+		}
+		GlobalFree((HGLOBAL)AcctName);
+		GlobalFree((HGLOBAL)DomainName);
+		CloseHandle(hFile);
+		LocalFree(pSD);
+		return qMakePair(QString(),QString());
+	}
+
+	QPair<QString,QString> ret = qMakePair( QString::fromWCharArray( AcctName ), QString::fromWCharArray( DomainName ) );
+	      
+	GlobalFree((HGLOBAL)AcctName);
+	GlobalFree((HGLOBAL)DomainName);
+	CloseHandle(hFile);
+	LocalFree(pSD);
+
+	return ret;
+}
+
+#endif // Q_OS_WIN
+
 
 namespace Stone {
 
@@ -780,7 +908,6 @@ QValueList< QPair<char,QString> > driveMappings()
 	
 	return ret;
 }
-}
 */
 
 #else
@@ -840,5 +967,4 @@ long long Path::dirSize( const QString & path )
 	return ret;
 }
 
-} //namespace
-
+} // namespace

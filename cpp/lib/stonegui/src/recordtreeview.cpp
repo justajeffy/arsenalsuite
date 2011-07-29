@@ -61,6 +61,7 @@ ExtTreeView::ExtTreeView( QWidget * parent, ExtDelegate * delegate )
 , mRecordFilterWidget( 0 )
 , mBusyWidget( 0 )
 , mHeaderClickIsResize( false )
+, mLastGroupColumn(-1)
 {
 	header()->setClickable( true );
 	header()->setSortIndicatorShown( true );
@@ -370,6 +371,10 @@ void ExtTreeView::setModel( QAbstractItemModel * model )
     if( sm ) {
         QList<SortColumnPair> sortColumns = sm->sortColumns();
         header()->setSortIndicator( sortColumns.size() ? sortColumns[0].first : 0, sm->sortOrder() );
+        connect( model, SIGNAL( grouperChanged( ModelGrouper* ) ), SLOT( slotGrouperChanged( ModelGrouper * ) ) );
+        // If the grouper is already set/created, then connect to it now
+        if( sm->grouper(false) )
+            slotGrouperChanged( sm->grouper() );
     }
 	QTreeView::setModel( model );
 	if( mColumnAutoResize )
@@ -522,8 +527,6 @@ void ExtTreeView::drawBranches ( QPainter * p, const QRect & rect, const QModelI
 			level++;
 		}
 	}
-
-
 	//RecordTreeView * rtc = const_cast<RecordTreeView*>(this);
 	if( !mShowBranches )
 	{
@@ -586,6 +589,61 @@ void ExtTreeView::drawBranches ( QPainter * p, const QRect & rect, const QModelI
 		return;
 	}
 	QTreeView::drawBranches( p, rect, index );
+}
+
+void ExtTreeView::slotGrouperChanged( ModelGrouper * grouper )
+{
+       if( grouper ) {
+               connect( grouper, SIGNAL( groupCreated( const QModelIndex & ) ), SLOT( slotGroupCreated( const QModelIndex & ) ) );
+               connect( grouper, SIGNAL( groupEmptied( const QModelIndex & ) ), SLOT( slotGroupEmptied( const QModelIndex & ) ) );
+               connect( grouper, SIGNAL( groupPopulated( const QModelIndex & ) ), SLOT( slotGroupPopulated( const QModelIndex & ) ) );
+               connect( grouper, SIGNAL( groupingChanged( bool ) ), SLOT( slotGroupingChanged() ) );
+       }
+}
+
+void ExtTreeView::slotGroupCreated( const QModelIndex & idx )
+{
+       SuperModel * sm = dynamic_cast<SuperModel*>(model());
+       if( sm && sm->grouper(false) ) {
+               QMap<QString,bool>::Iterator it = mGroupExpandState.find( sm->grouper()->groupValue(idx) );
+               if( (it != mGroupExpandState.end() && it.value()) || (it == mGroupExpandState.end() && sm->grouper()->expandNewGroups()) ) {
+                       //LOG_5( QString("Expanding new group, row %1").arg(idx.row()) );
+                       expand(idx);
+               }
+       }
+}
+
+void ExtTreeView::slotGroupEmptied( const QModelIndex & idx )
+{
+       SuperModel * sm = dynamic_cast<SuperModel*>(model());
+       if( sm && sm->grouper(false) && sm->grouper()->emptyGroupPolicy() == ModelGrouper::HideEmptyGroups ) {
+               //LOG_5( QString("Hiding empty group, row %1").arg(idx.row()) );
+               setRowHidden( idx.row(), idx.parent(), true );
+       }
+}
+
+void ExtTreeView::slotGroupPopulated( const QModelIndex & idx )
+{
+       //LOG_5( QString("Unhiding populated group, row %1").arg(idx.row()) );
+       // Since this will only happen if the empty group state is hide or do nothing, we are safe to always call this
+       setRowHidden( idx.row(), idx.parent(), false );
+}
+
+void ExtTreeView::slotGroupingChanged()
+{
+       SuperModel * sm = dynamic_cast<SuperModel*>(model());
+       if( sm && sm->grouper(false) ) {
+               ModelGrouper * grp = sm->grouper();
+               if( grp->groupColumn() != mLastGroupColumn ) {
+                       // We only keep track of group expand states for a single group column
+                       // If the user groups by a different column they'll have to re-expand/collapse,
+                       // otherwise we could end up keeping a large amount of data if we keep track of expanded/collapsed
+                       // state for each possible group value for each possible group column
+                       //LOG_5( "Clearing saved group expand states" );
+                       mGroupExpandState.clear();
+                       mLastGroupColumn = grp->groupColumn();
+               }
+       }
 }
 
 void ExtTreeView::slotCustomContextMenuRequested( const QPoint & p )
@@ -654,10 +712,13 @@ void ExtTreeView::setupTreeView( IniConfig & ini, const ColumnStruct columns [] 
             sortColumns.append( SortColumnPair( scl[i], (i < sortDirections.size()) && (sortDirections[i] == "Ascending") ? Qt::AscendingOrder : Qt::DescendingOrder ) );
         sm->setSortColumns( sortColumns );
 		sc = scl.isEmpty() ? 0 : scl[0];
-        int groupColumn = ini.readInt( "GroupedByColumn", -1 );
-        if( groupColumn >= 0 ) {
+        mLastGroupColumn = ini.readInt( "GroupedByColumn", -1 );
+        if( mLastGroupColumn >= 0 ) {
             ModelGrouper * grouper = sm->grouper();
-            grouper->groupByColumn( groupColumn );
+            grouper->groupByColumn( mLastGroupColumn );
+            foreach( QString key, ini.keys() )
+                if( key.startsWith( "GroupExpandState:" ) )
+                    mGroupExpandState[key.mid(17)] = ini.readBool(key);
         }
 	} else
 		sc = ini.readInt("SortColumn", 0);
@@ -699,10 +760,22 @@ void ExtTreeView::saveTreeView( IniConfig & ini, const ColumnStruct columns [] )
         }
         ini.writeIntList( "SortColumnOrder", sortColumns );
         ini.writeString( "SortColumnDirection", sortDirections.join(",") );
-        if( sm->grouper(false) && sm->grouper()->isGrouped() )
+        if( sm->grouper(false) && sm->grouper()->isGrouped() ) {
+            ModelGrouper * grp = sm->grouper();
+            ModelDataTranslator * git = grp->groupedItemTranslator();
             ini.writeInt( "GroupedByColumn", sm->grouper()->groupColumn() );
-        else
+            for( QMap<QString,bool>::Iterator it = mGroupExpandState.begin(); it != mGroupExpandState.end(); ++it )
+                ini.writeBool( "GroupExpandState:" + it.key(), it.value() );
+            for( ModelIter it(sm); it.isValid(); ++it ) {
+                QModelIndex idx(*it);
+                if( sm->translator(idx) == git )
+                    ini.writeBool( "GroupExpandState:" + grp->groupValue(idx), isExpanded(idx) );
+            }
+        } else {
             ini.removeKey( "GroupedByColumn" );
+            foreach( QString key, ini.keys( QRegExp("^GroupExpandState:") ) )
+            ini.removeKey(key);
+        }
     } else
 		ini.writeInt( "SortColumn", header()->sortIndicatorSection() );
 	ini.writeInt( "SortOrder", header()->sortIndicatorOrder() );

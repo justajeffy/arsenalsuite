@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: updatemanager.h 8496 2009-06-24 06:42:18Z brobison $
+ * $Id$
  */
 
 #ifndef UPDATE_MANAGER_H
@@ -43,11 +43,9 @@ class QTimer;
 
 class RecordList;
 class PacketSocket;
-namespace Stone {
-class Database;
-}
 
 namespace Stone {
+class Database;
 
 static const quint32 ACK = 0x0;
 static const quint32 REPLAY = 0x1;
@@ -89,7 +87,7 @@ protected slots:
 protected:
 	UpdateManager();
 
-	friend class ::Table;
+	friend class Stone::Table;
 	friend class Stone::Database;
 
 	void flushPending();
@@ -141,6 +139,8 @@ protected:
 };
 
 } //namespace
+
+using Stone::UpdateManager;
 
 #endif // UPDATE_MANAGER_H
 

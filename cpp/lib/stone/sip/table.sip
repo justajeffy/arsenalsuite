@@ -48,6 +48,8 @@ public:
 //	RecordList records( QList<uint> keys );
 	MappedRecordList records( const QString & keystring );
 	
+	JoinedSelect join( Table * table, QString condition = QString(), JoinType joinType = InnerJoin, bool ignoreResults = false, const QString & alias = QString() );
+
 	MappedRecordList select( 
 		const QString & where = QString::null,
 		const QList<QVariant> & args = QList<QVariant>(),
@@ -107,6 +109,5 @@ protected slots:
 	virtual void recordsAdded( RecordList, bool notifyIndexes = true );
 	virtual void recordsRemoved( RecordList, bool notifyIndexes = true );
 	virtual void recordUpdated( const Record &, const Record &, bool notifyIndexes = true );
-	
 };
 

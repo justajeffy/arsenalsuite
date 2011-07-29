@@ -537,5 +537,4 @@ UpdateManager * UpdateManager::instance()
 	return mSelf;
 }
 
-} //namespace
-
+} // namespace

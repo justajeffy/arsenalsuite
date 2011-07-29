@@ -39,15 +39,7 @@
 
 #include "blurqt.h"
 
-/*
 namespace Stone {
-}
-using Stone::Database;
-using namespace Stone;
-*/
-
-namespace Stone {
-
 class BackgroundThread;
 class Database;
 class Connection;
@@ -64,10 +56,16 @@ class Connection;
 class STONE_EXPORT ThreadTask : public QEvent
 {
 public:
-	ThreadTask( int type = 0, QObject * receiver = 0 );
+	ThreadTask( int type = 0, QObject * reciever = 0 );
 	
 	virtual void run();
-	QObject * mReceiver;
+	
+	bool canceled() const { return mCancel; }
+	void cancel() { mCancel = true; }
+
+	QObject * reciever() const { return mReciever; }
+	
+	QObject * mReciever;
 	bool mCancel;
 };
 
@@ -97,6 +95,15 @@ public:
 	 */
 	void shutdownThreads();
 
+	static void addTask( ThreadTask * );
+	static void wakeup();
+	static void setDatabaseForThread( Database * db, Stone::Connection * c );
+	
+	// Cancels all tasks that have their reciever set to the object
+	void cancelObjectTasks( QObject * );
+	
+	static void cancelTask( ThreadTask * task );
+
 signals:
 
 protected:
@@ -117,12 +124,6 @@ protected:
 	void deliver(BackgroundThread * thread);
 
 	friend class BackgroundThread;
-public:
-	static void addTask( ThreadTask * );
-	static void wakeup();
-	static void setDatabaseForThread( Database * db, Stone::Connection * c );
-	void cancelObjectTasks( QObject * );
-	static void cancelTask( ThreadTask * task );
 };
 
 class STONE_EXPORT BackgroundThread : public QThread

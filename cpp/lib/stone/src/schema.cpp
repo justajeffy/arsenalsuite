@@ -150,17 +150,15 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 							f = new Field( ret, name, fkey.attribute( "table" ), Field::Flags((fkey.attribute( "type" ) == "multi" ? Field::None : Field::Unique)  | Field::ForeignKey),
 								fkey.attribute( "hasIndex" ) == "true", Field::indexDeleteModeFromString( fkey.attribute( "indexDeleteMode" ) ) );
 							QString in = fkey.attribute( "indexName" );
-							if( !in.isEmpty() && f->index() ) {
+							if( !in.isEmpty() ) {
+								if( !f->index() )
+									f->setHasIndex( true, Field::indexDeleteModeFromString( fkey.attribute( "indexDeleteMode" ) ) );
 								f->index()->setName( in );
 								f->index()->setUseCache( fkey.attribute( "indexUseCache" ) != "false" );
 							}
 						} else {
-							if( ct >= 0 ) {
-                                if( el.attribute("compress") == "true" )
-                                    f = new Field( ret, name, ct, Field::Flags( Field::Compress ) );
-                                else
-                                    f = new Field( ret, name, ct );
-                            }
+							if( ct >= 0 )
+								f = new Field( ret, name, ct );
 							else
 								LOG_1( "Couldn't find the correct type for field: " + name );
 						}
@@ -203,8 +201,8 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 								LOG_5( QString("Changing %1.%2 default value from %3 to %4").arg(ret->tableName()).arg(f->name()).arg(f->defaultValue().toString()).arg(defVal.toString()) );
 							f->setDefaultValue( defVal );
 						}
-                        f->setFlag( Field::DisplayName, el.attribute("displayName") == "true" );
-                        f->setFlag( Field::NoDefaultSelect, el.attribute("noDefaultSelect") == "true" );
+						f->setFlag( Field::DisplayName, el.attribute("displayName") == "true" );
+						f->setFlag( Field::NoDefaultSelect, el.attribute("noDefaultSelect") == "true" );
 					}
 				}
 			}
@@ -218,24 +216,32 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 			else if( el.tagName() == "index" ){
 				QString name = el.attribute( "name" );
 				bool multi = el.attribute( "type" ) == "multi";
-				if( !ret->index( name ) ) {
-					IndexSchema * idx = new IndexSchema( name, ret, multi );
-					idx->setUseCache( el.attribute( "useCache" ) == "true" );
-						
-					// Iterate through the index's nodes
-					QDomNode index_c = el.firstChild();
-					while( !index_c.isNull() ) {
-						// try to convert the node to an element.
-						QDomElement column = index_c.toElement();
-						if( !column.isNull() && column.tagName() == "column" ) {
-							const QString & colName( column.attribute( "name" ) );
-							Field * f = ret->field( colName );
-							if( f )
-								idx->addField( f );
-						}
-						index_c = index_c.nextSibling();
+				IndexSchema * idx = ret->index(name);
+				FieldList newFields;
+				bool existingIndex = bool(idx);
+				if( !idx )
+					idx = new IndexSchema( name, ret, multi );
+				// Iterate through the index's nodes
+				QDomNode index_c = el.firstChild();
+				while( !index_c.isNull() ) {
+					// try to convert the node to an element.
+					QDomElement column = index_c.toElement();
+					if( !column.isNull() && column.tagName() == "column" ) {
+						const QString & colName( column.attribute( "name" ) );
+						Field * f = ret->field( colName );
+						if( f )
+							newFields.append(f);
 					}
+					index_c = index_c.nextSibling();
 				}
+				if( existingIndex ) {
+					if( newFields != idx->columns() )
+						LOG_1( "ERROR: Index " + name + " in table " + tableName + " redifined with different list of fields" );
+				} else {
+					foreach( Field * f, newFields )
+						idx->addField( f );
+				}
+				idx->setUseCache( el.attribute( "useCache" ) == "true" );
 			}
 		}
 		
@@ -261,6 +267,7 @@ bool Schema::mergeXmlSchema( const QString & schema, bool isFile, bool ignoreDoc
 	int errorLine, errorColumn;
 
 	if( isFile ) {
+		LOG_1( "Merging schema: " + schema );
 		QFile file( schema );
 		if ( !file.open( QIODevice::ReadOnly ) ) {
 			LOG_1( "Database::mergeSchema: Couldn't Open File (" + schema + ")" );
@@ -386,7 +393,10 @@ bool Schema::writeXmlSchema( const QString & outputFile, QString * xmlOut, Table
 				column.setAttribute( "pkey", "true" );
 			if( f->flag( Field::ReverseAccess ) )
 				column.setAttribute( "reverseAccess", "true" );
-				
+			if( f->flag( Field::DisplayName ) )
+				column.setAttribute( "displayName", "true" );
+			if( f->flag( Field::NoDefaultSelect ) )
+				column.setAttribute( "noDefaultSelect", "true" );
 			if( f->flag( Field::ForeignKey ) ) {
 				QDomElement fkey = doc.createElement( "fkey" );
 				column.appendChild( fkey );
@@ -467,5 +477,25 @@ void Schema::setName(const QString & name)
 	mName = name;	
 }
 
-} //namespace
+QString Schema::diff( Schema * before, Schema * after )
+{
+	QString ret;
+	foreach( TableSchema * before_table, before->tables() ) {
+		TableSchema * after_table = after->tableByName( before_table->tableName() );
+		if( !after_table ) {
+			ret += "Removed Table " + before_table->className() + "\n";
+			continue;
+		}
+		ret += before_table->diff( after_table );
+	}
+	foreach( TableSchema * after_table, after->tables() ) {
+		TableSchema * before_table = before->tableByName( after_table->tableName() );
+		if( !before_table ) {
+			ret += "Added Table " + after_table->className() + "\n";
+			continue;
+		}
+	}
+	return ret;
+}
 
+} // namespace

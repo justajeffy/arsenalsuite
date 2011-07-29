@@ -36,12 +36,13 @@ class Schema;
 }
 using namespace Stone;
 
+
 class STONE_EXPORT PGConnection : public QSqlDbConnection
 {
 public:
 	PGConnection();
 
-    virtual void setOptionsFromIni( const IniConfig & );
+	virtual void setOptionsFromIni( const IniConfig & );
 
 	virtual Capabilities capabilities() const;
 
@@ -64,9 +65,11 @@ public:
 
 	/// Same as above, but won't select from offspring
 	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() );
+	virtual QList<RecordList> joinedSelect( const JoinedSelect &, QString where, QList<QVariant> vars );
+
 	virtual QMap<Table *, RecordList> selectMulti( QList<Table*>, const QString & innerWhere = QString::null, const QList<QVariant> & innerArgs = QList<QVariant>(), const QString & outerWhere = QString::null, const QList<QVariant> & outerArgs = QList<QVariant>() );
 
-    virtual void selectFields( Table * table, RecordList, FieldList );
+	virtual void selectFields( Table * table, RecordList, FieldList );
 
 	virtual bool insert( Table *, const RecordList & rl, bool newPrimaryKey = true );
 
@@ -87,7 +90,7 @@ protected:
 
 	QHash<TableSchema*,QString> mSqlFields;
 	int mVersionMajor, mVersionMinor;
-    bool mUseMultiTableSelect;
+	bool mUseMultiTableSelect;
 };
 
 #endif // PG_CONNECTION_H

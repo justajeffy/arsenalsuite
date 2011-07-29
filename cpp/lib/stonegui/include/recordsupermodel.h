@@ -10,6 +10,11 @@
 
 #include "supermodel.h"
 
+namespace Stone {
+    class Table;
+};
+using Stone::Table;
+
 class RecordItemBase;
 /**
  * Abstract class that provides generic methods dealing with Records

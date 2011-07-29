@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordproxy.cpp 8500 2009-06-24 07:47:18Z brobison $
+ * $Id$
  */
 
 #include "recordproxy.h"
@@ -60,5 +60,4 @@ void RecordProxy::clear()
 	emit recordListChange();
 }
 
-} //namespace
-
+} // namespace

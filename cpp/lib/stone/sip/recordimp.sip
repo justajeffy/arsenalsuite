@@ -7,7 +7,7 @@ class RecordImp
 
 public:
 	RecordImp( Table * table, QVariant * toLoad=0 );
-	RecordImp( Table * table, QSqlQuery & query );
+	RecordImp( Table * table, QSqlQuery & q, int queryPosOffset = 0 );
 
 	~RecordImp();
 	

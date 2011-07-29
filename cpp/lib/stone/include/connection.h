@@ -36,23 +36,25 @@
 
 
 namespace Stone {
-class TableSchema;
+class JoinedSelect;
 class Schema;
+class TableSchema;
 class IndexSchema;
 class Table;
 
 /**
-	* \class Connection
-	*
-	* Connection handles communication to the database server.
-	* Only Postgresql is supported.
-	*
-	* \ingroup Stone
-	*/
+* \class Connection
+*
+* Connection handles communication to the database server.
+* Only Postgresql is supported.
+*
+* \ingroup Stone
+*/
 class STONE_EXPORT Connection : public QObject
 {
 Q_OBJECT
 public:
+	Connection(QObject * parent=0);
 	virtual ~Connection() {}
 
 	static Connection * create( const QString & dbType );
@@ -87,6 +89,14 @@ public:
 	int reconnectDelay() const { return mReconnectDelay; }
 	void setReconnectDelay( int reconnectDelay );
 
+	/// This is the maximum number of tries to connect to the database when executing a query.
+	/// Calling checkConnection or reconnect will not check this value.
+	/// If set to 0 there will be no automatic (re)connects, but the database can still
+	/// be used after manually initiating the connection with checkConnection or reconnect.
+	/// If set to -1 there is no limit.  The number of tries will be reset after each successful connection.
+	int maxConnectionAttempts() const { return mMaxConnectionAttempts; }
+	void setMaxConnectionAttempts( int maxConnectionAttempts );
+	
 	enum Capabilities {
 		Cap_Inheritance = 		1 << 0,
 		Cap_MultipleInsert = 	1 << 1,
@@ -154,6 +164,7 @@ public:
 
 	/// Same as above, but won't select from offspring
 	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() ) = 0;
+	virtual QList<RecordList> joinedSelect( const JoinedSelect &, QString where, QList<QVariant> vars ) = 0;
 	
 	/// Selects from multiple tables using UNION and returns results per table
 	/// Only supported if the connection returns Cap_MultiTableSelect
@@ -162,8 +173,8 @@ public:
 		const QString & /*outerWhere*/ = QString::null, const QList<QVariant> & /*outerArgs*/ = QList<QVariant>() )
 	{ return QMap<Table*,RecordList>(); }
 
-    virtual void selectFields( Table * table, RecordList, FieldList ) = 0;
-
+	virtual void selectFields( Table * table, RecordList, FieldList ) = 0;
+	
 	/// inserts a RecordList into the database, by default use the sequence to 
 	/// generate a new primary key
 	virtual bool insert( Table *, const RecordList & rl, bool newPrimaryKey = true ) = 0;
@@ -206,24 +217,24 @@ signals:
 protected:
 	QString mLastErrorText;
 	QString mHost, mUserName, mPassword, mDatabaseName;
-	int mPort, mReconnectDelay;
+	int mPort, mReconnectDelay, mConnectionAttempts, mMaxConnectionAttempts;
 	QString mDatabaseType;
 };
 
 /** 
-  * \class QSqlDbConnection
-	*
-  * Subclass of Connection
-	*
-	* \ingroup Stone
-	*/
+* \class QSqlDbConnection
+*
+* Subclass of connection that takes care of the generic QSql database connection stuff
+*
+* \ingroup Stone
+*/
 class STONE_EXPORT QSqlDbConnection : public Connection
 {
 public:
 	QSqlDbConnection( const QString & driverName );
 	~QSqlDbConnection();
 
-	// Reads all options from the ini object
+	/// Reads all options from the ini object
 	virtual void setOptionsFromIni( const IniConfig & );
 
 	virtual Capabilities capabilities() const;
@@ -248,6 +259,8 @@ public:
 	 *  passes them to SqlErrorHandler::instance()->handleError.
 	 */
 	virtual bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 );
+	QSqlQuery fakePrepare( const QString & sql );
+	bool exec( QSqlQuery & query, bool reExecLostConn, Table * table, bool usingFakePrepareHack );
 
 	virtual bool beginTransaction();
 	virtual bool commitTransaction();

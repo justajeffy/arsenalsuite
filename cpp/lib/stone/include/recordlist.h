@@ -28,27 +28,28 @@
 #ifndef RECORD_LIST_H
 #define RECORD_LIST_H
 
-#include "record.h"
 #include <qlist.h>
 
-class QRegExp;
+#include "record.h"
 
-class RecordIter;
-class ImpList;
+class QRegExp;
 
 namespace Stone {
 class Table;
 class RecordImp;
-}
-using namespace Stone;
+class RecordIter;
+class ImpList;
 
 typedef QList<RecordImp*>::Iterator ImpIter;
 typedef QList<RecordImp*>::ConstIterator ConstImpIter;
 #define st_foreach(iterclass, iter,list) for( iterclass iter = list.begin(); iter != list.end(); ++iter )
 
+
 /**
  *  \class RecordList
  *  \brief  This class encapsulates a list of Records.
+ *  This class encapsulates a list of Records and can perform
+ *  many operations on those records.
  *
  *  This class is implicitly shared, and is copy-on-write.
  *
@@ -186,8 +187,8 @@ public:
 	/// Returns the number of records in the list
 	uint count() const;
 
-    void selectFields( FieldList fields = FieldList(), bool refreshExisting = false );
-
+	void selectFields( FieldList fields = FieldList(), bool refreshExisting = false );
+	
 	/// Calls Record::commit() on each record in this list.
 	void commit( bool newPrimaryKeys = true, bool sync = true );
 
@@ -200,31 +201,32 @@ public:
 	/// the returned value after calling getValue( \param column )
 	/// on each value in this list.
 	QList<QVariant> getValue( const QString & column ) const;
-    QList<QVariant> getValue( Field * f ) const;
 
 	/// Calls Record::setValue( \param column, \param value ) on
 	/// each record in this list.
 	void setValue( const QString & column, const QVariant & value );
-    void setValue( Field * f, const QVariant & value );
 
+	
 	/// Returns a QList<QVariant> list of values, filled with
 	/// the returned value after calling getValue( \param column )
 	/// on each value in this list.
 	QList<QVariant> getValue( int column ) const;
-
+	QList<QVariant> getValue( Field * f ) const;
+	
 	/// Calls Record::setValue( \param column, \param value ) on
 	/// each record in this list.
 	void setValue( int column, const QVariant & value );
-
+	void setValue( Field * f, const QVariant & value );
+	
 	/// Returns the return values of Record::foreignKey for each record.
 	RecordList foreignKey( int column ) const;
 	RecordList foreignKey( const QString & column ) const;
-    RecordList foreignKey( Field * f ) const;
-
+	RecordList foreignKey( Field * f ) const;
+	
 	RecordList & setForeignKey( int column, const Record & fkey );
 	RecordList & setForeignKey( const QString & column, const Record & fkey );
-    RecordList & setForeignKey( Field * f, const Record & fkey );
-
+	RecordList & setForeignKey( Field * f, const Record & fkey );
+	
 	/// Calls Record::setColumnLiteral(\param column,\param value) on
 	/// each record in this list.
 	void setColumnLiteral( const QString & column, const QString & value );
@@ -271,8 +273,8 @@ public:
 	template<class KEY,class LIST,class VARIANT_TYPE,class KEY_CAST_TYPE> QMap<KEY,LIST> groupedBy( const QString & column ) const;
 	template<class KEY> QMap<KEY,RecordList> groupedBy( const QString & column ) const { return groupedBy<KEY,RecordList>(column); }
 
-    template<class KEY,class LIST> QMap<KEY,LIST> groupedByForeignKey( const QString & column );
-
+	template<class KEY,class LIST> QMap<KEY,LIST> groupedByForeignKey( const QString & column );
+	
 	/// Sorts the list according the the value in column.
 	RecordList sorted( const QString & column, bool asc = true ) const;
 
@@ -281,7 +283,7 @@ public:
 
 	/// Returns a new list with the same contents as this, in reversed order.
 	RecordList reversed() const;
-
+	
 	RecordList copy( bool updateCopiedRelations = false );
 
 	/// Calls Record::reload() on each record in this list.
@@ -291,7 +293,7 @@ public:
 	/// Record::reload() on each record.
 	RecordList reloaded() const;
 
-	/// print human friendly dump of the record
+	/// print human readable dump of the records
 	QString dump() const;
 
 	typedef RecordIter Iter;
@@ -299,6 +301,7 @@ public:
 	typedef RecordIter const_iterator;
 
 protected:
+
 	friend class RecordIter;
 
 	class Private;
@@ -308,18 +311,16 @@ protected:
 
 	Private * d;
 	RecordList( const ImpList & , Table * table = 0 );
-
 private:
 	static ImpList sEmptyList;
 };
 
-Q_DECLARE_METATYPE(RecordList)
-
 /**
  *  \class RecordIter
  *
- *	An easy way to iterate through RecordLists.
- *  Not quite compatible with a QList Iterator
+ *  An easy way to iterate through RecordLists.
+ *  Not quite compatible with a QList Iterator, but
+ *  compatible with q_foreach macro.
  *
  *  \ingroup Stone
  */
@@ -363,14 +364,22 @@ template<class KEY,class LIST,class VARIANT_TYPE,class KEY_CAST_TYPE> QMap<KEY,L
 
 template<class KEY,class LIST> QMap<KEY,LIST> RecordList::groupedByForeignKey( const QString & column )
 {
-    QMap<KEY,LIST> ret;
-    foreach( Record r, (*this) ) {
-        ret[KEY(r.foreignKey(column))] += r;
-    }
-    return ret;
+	QMap<KEY,LIST> ret;
+	foreach( Record r, (*this) ) {
+		ret[KEY(r.foreignKey(column))] += r;
+	}
+	return ret;
 }
 
 ///@}
+
+} // namespace Stone
+
+using Stone::RecordList;
+using Stone::RecordIter;
+
+
+Q_DECLARE_METATYPE(RecordList)
 
 #endif // RECORD_LIST_H
 

@@ -272,13 +272,18 @@ Record Table::record( uint key, bool doSelect, bool useCache, bool baseOnly )
 
 	bool preloadCheck = false;
 	while( useCache ) {
-		foreach( Table * t, tableTree() ) {
-			KeyIndex * ki = t->keyIndex();
-			if( ki ) {
-				bool found = false;
-				ret = ki->record( key, &found );
-				// Ignore empty entries for child tables
-				if( found && (ret.isRecord() || t == this) )
+		KeyIndex * ki = keyIndex();
+		if( ki ) {
+			bool found = false;
+			ret = ki->record( key, &found );
+			// Ignore empty entries for child tables
+			if( found )
+				return ret;
+		}
+		if( !baseOnly ) {
+			foreach( Table * t, mChildren ) {
+				ret = t->record( key, false, true, false );
+				if( ret.isRecord() )
 					return ret;
 			}
 		}
@@ -426,16 +431,32 @@ void Table::recordUpdated( const Record & current, const Record & upd, bool noti
 	emit updated( current, upd );
 }
 
-void Table::recordsIncoming( const RecordList & records, bool ci )
+RecordList Table::processIncoming( const RecordList & records, bool cacheIncoming, bool checkForUpdates )
 {
+	RecordList processed;
+	
+	if( checkForUpdates ) {
+		foreach( Record r, records )
+			processed += checkForUpdate( r );
+	} else
+		processed = records;
+	
 	if( mParent )
-		mParent->recordsIncoming( records, ci );
+		mParent->processIncoming( processed, cacheIncoming, false );
 	
 	QTime time;
 	time.start();
 	foreach( Index * i, mIndexes )
-		i->recordsIncoming( records, ci );
+		i->recordsIncoming( processed, cacheIncoming );
 	addIndexTime( time.elapsed(), IndexIncoming );
+	
+	mDatabase->recordsIncoming( processed, cacheIncoming );
+	return processed;
+}
+
+JoinedSelect Table::join( Table * table, QString condition, JoinType joinType, bool ignoreResults, const QString & alias )
+{
+	return JoinedSelect( this ).join( table, condition, joinType, ignoreResults, alias );
 }
 
 RecordList Table::select( const QString & where, const VarList & args, bool selectChildren, bool expectSingle, bool needResults )
@@ -513,7 +534,6 @@ Table * Table::importSchema( const QString & tableName, Database * parent )
 }
 */
 
-
 RecordList Table::selectOnly( const QString & where, const VarList & args, bool needResults, bool cacheIncoming )
 {
 	RecordList ret;
@@ -537,16 +557,7 @@ RecordList Table::selectOnly( const QString & where, const VarList & args, bool 
 	if( where.toLower().contains( "for update" ) && !mDatabase->ensureInsideTransaction() )
 		return ret;
 	
-	RecordList raw = connection()->selectOnly( this, where, args );
-
-	if( mKeyIndex ) {
-		foreach( Record r, raw )
-			ret += checkForUpdate( r );
-	} else
-		ret = raw;
-
-	recordsIncoming( ret, cacheIncoming );
-	mDatabase->recordsIncoming( ret, cacheIncoming );
+	ret = processIncoming( connection()->selectOnly( this, where, args ), cacheIncoming );
 
 	// Don't select if where is empty and we already have the table contents
 	if( where.isEmpty() && mSchema->isPreloadEnabled() )
@@ -578,13 +589,7 @@ RecordList Table::selectMulti( TableList tables, const QString & innerWhere, con
 
 	for( QMap<Table*,RecordList>::iterator it = resultsByTable.begin(); it != resultsByTable.end(); ++it ) {
 		Table * t = it.key();
-		RecordList results = it.value();
-		RecordList updated;
-		foreach( Record r, results )
-			updated += t->checkForUpdate( r );
-		t->recordsIncoming( updated, cacheIncoming );
-		mDatabase->recordsIncoming( updated, cacheIncoming );
-		ret += updated;
+		ret += t->processIncoming( it.value(), cacheIncoming );
 	}
 
 	// Don't select if where is empty and we already have the table contents
@@ -598,16 +603,16 @@ RecordList Table::selectMulti( TableList tables, const QString & innerWhere, con
 
 void Table::selectFields( RecordList records, FieldList fields )
 {
-    if( fields.isEmpty() || records.isEmpty() ) return;
-    RecordList validRecords;
-    foreach( Record r, records )
-        if( r.table() == this )
-            validRecords += r;
-    FieldList validFields, myFields( schema()->columns() );
-    foreach( Field * f, fields )
-        if( myFields.contains( f ) )
-            validFields += f;
-    connection()->selectFields( this, validRecords, validFields );
+	if( fields.isEmpty() || records.isEmpty() ) return;
+	RecordList validRecords;
+	foreach( Record r, records )
+		if( r.table() == this )
+			validRecords += r;
+	FieldList validFields, myFields( schema()->columns() );
+	foreach( Field * f, fields )
+		if( myFields.contains( f ) )
+			validFields += f;
+	connection()->selectFields( this, validRecords, validFields );
 }
 
 bool Table::insert( const RecordList & rl, bool newPrimaryKey )
@@ -652,9 +657,9 @@ Record Table::checkForUpdate( Record rec )
 		bool needsUpdateSignal = false;
 		FieldList fl = mSchema->fields();
 		foreach( Field * f, fl ) {
-            // Don't do a comparison if the before-update record didn't have this column selected
-            if( f->flag( Field::NoDefaultSelect ) && !bu.imp()->isColumnSelected( f->pos() ) )
-                continue;
+			// Don't do a comparison if the before-update record didn't have this column selected
+			if( f->flag( Field::NoDefaultSelect ) && !bu.imp()->isColumnSelected( f->pos() ) )
+				continue;
 			QVariant v1 = bu.getValue( f->pos() );
 			QVariant v2 = old.getValue( f->pos() );
 			if( (v1.isNull() != v2.isNull()) || (v1 != v2) ) {
@@ -892,5 +897,4 @@ RecordImp * Table::emptyImp()
 	return mEmptyImp;
 }
 
-} //namespace
-
+} // namespace

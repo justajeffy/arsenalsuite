@@ -214,7 +214,6 @@ struct FlagMap { Field::Flags f; const char * s; };
 
 static FlagMap sFlagMap [] = 
 {
-	{ Field::Compress, "Compress" },
 	{ Field::PrimaryKey, "PrimaryKey" },
 	{ Field::ForeignKey, "ForeignKey" },
 	{ Field::NotNull, "NotNull" },
@@ -223,9 +222,17 @@ static FlagMap sFlagMap [] =
 	{ Field::ReverseAccess, "ReverseAccess" },
     { Field::DisplayName, "DisplayName" },
     { Field::NoDefaultSelect, "NoDefaultSelect" },
-    { Field::Compress, "Compress" },
 	{ Field::None, 0 }
 };
+
+static const char * stringFromFlag( int f )
+{
+	for( FlagMap * first = sFlagMap; first->f; ++first ) {
+		if( first->f == f )
+			return first->s;
+	}
+	return 0;
+}
 
 QString Field::flagString() const
 {
@@ -413,7 +420,7 @@ static const char * indexDeleteModes [] =
 
 QString Field::indexDeleteModeString() const
 {
-	return ::indexDeleteModes[indexDeleteMode()];
+	return indexDeleteModes[indexDeleteMode()];
 }
 
 int Field::indexDeleteModeFromString( const QString & s )
@@ -690,6 +697,29 @@ int Field::qvariantType(Field::Type type)
 			ret = qMetaTypeId< ::Interval>();
 	}
 	return ret;
+}
+
+QString Field::diff( Field * after )
+{
+	QStringList ret;
+	if( type() != after->type() )
+		ret += "Type Changed from " + typeString() + " to " + after->typeString();
+	for( int i=0; i<Field::LastFlag; i++ ) {
+		Flags f((Field::Flags)i);
+		if( flag(f) != after->flag(f) )
+			ret += QString(flag(f) ? "-" : "+") + " " + stringFromFlag(i);
+	}
+	if( pluralMethodName() != after->pluralMethodName() )
+		ret += "Plural Method Name changed from " + pluralMethodName() + " to " + after->pluralMethodName();
+	if( methodName() != after->methodName() )
+		ret += "Method Name changed from " + methodName() + " to " + after->methodName();
+	if( displayName() != after->displayName() )
+		ret += "Display Name changed from " + displayName() + " to " + after->displayName();
+	if( defaultValue() != after->defaultValue() )
+		ret += "Default Value changed from " + defaultValueString() + " to " + after->defaultValueString();
+	if( (bool(foreignKeyTable()) != bool(after->foreignKeyTable())) || (foreignKeyTable() && foreignKeyTable()->tableName().toLower() != after->foreignKeyTable()->tableName().toLower()) )
+		ret += "Foreign Key Table changed from " + (foreignKeyTable() ? foreignKeyTable()->tableName() : "") + " to " + (after->foreignKeyTable() ? after->foreignKeyTable()->tableName() : "");
+	return ret.isEmpty() ? QString() : ("\t" + table()->tableName() + "." + name() + " Changes:\n\t\t" + ret.join("\n\t\t"));
 }
 
 // Optmized to not copy(because of implicit sharing) if one already contains all of two

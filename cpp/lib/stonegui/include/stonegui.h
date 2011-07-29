@@ -22,13 +22,14 @@
  */
 
 /*
- * $Id: stonegui.h 5411 2007-12-18 01:03:08Z brobison $
+ * $Id$
  */
 
 #ifndef STONE_GUI_H
 #define STONE_GUI_H
 
 #include <qobject.h>
+#include <qmutex.h>
 
 #ifdef STONEGUI_MAKE_DLL
 #define STONEGUI_EXPORT Q_DECL_EXPORT
@@ -44,12 +45,18 @@ Q_OBJECT
 public:
 	ConnectionWatcher();
 
+	LostConnectionDialog * dialog() { return mDialog; }
+	
+	static ConnectionWatcher * connectionWatcher();
 public slots:
 	void connectionLost();
 	void connected();
 
+protected slots:
+	void showDialog();
 protected:
 	LostConnectionDialog * mDialog;
+	QMutex mMutex;
 };
 
 STONEGUI_EXPORT void initStoneGui();

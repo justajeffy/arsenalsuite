@@ -1,7 +1,7 @@
 
 
 
-QString makeFramePath( const QString & base, uint frameNumber, uint padWidth = 4 );
+QString makeFramePath( const QString & base, uint frameNumber, uint padWidth = 4, bool endDigitsAreFrameNumber = true );
 
 QStringList filesFromFramePath( const QString & basepath, QList<int> * frames, int * padWidth = 0 );
 
@@ -13,6 +13,30 @@ QString compactNumberList( const QList<int> & list );
 
 QString readFullFile( const QString & path, bool * error = 0 );
 bool writeFullFile( const QString & path, const QString & contents );
+
+QString pathOwner( const QString & path, QString * errorMessage /Out/ );
+
+%If (WS_WIN)
+SIP_PYTUPLE pathOwnerDomain( const QString & path ) [QPair<QString,QString> (const QString & path, QString * errorMessage )];
+%MethodCode
+	QString errorMessage;
+	QPair<QString,QString> ret = pathOwnerDomain(*a0,&errorMessage);
+
+	PyObject * username_obj = sipConvertFromNewType(new QString(ret.first), sipType_QString, NULL);
+	PyObject * domain_obj = sipConvertFromNewType(new QString(ret.second), sipType_QString, NULL);
+	PyObject * errorMessage_obj = sipConvertFromNewType(new QString(errorMessage), sipType_QString, NULL);
+
+	#if PY_VERSION_HEX >= 0x02040000
+		sipRes = PyTuple_Pack(3, username_obj, domain_obj, errorMessage_obj);
+	#else
+		sipRes = Py_BuildValue("(OO)", username_obj, domain_obj, errorMessage_obj);
+	#endif
+
+	Py_XDECREF(username_obj);
+	Py_XDECREF(domain_obj);
+	Py_XDECREF(errorMessage_obj);
+%End
+%End
 
 class Path
 {

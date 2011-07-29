@@ -13,9 +13,11 @@ SOURCES += \
 	src/database.cpp \
 	src/field.cpp \
 	src/freezercore.cpp \
+	src/graphite.cpp \
 	src/index.cpp \
 	src/indexschema.cpp \
 	src/interval.cpp \
+	src/joinedselect.cpp \
 	src/path.cpp \
 	src/packetsocket.cpp \
 	src/pgconnection.cpp \
@@ -29,6 +31,7 @@ SOURCES += \
 	src/recordimp.cpp \
 	src/recordxml.cpp \
 	src/remotelogserver.cpp \
+	src/resultset.cpp \
 	src/schema.cpp \
 	src/sqlerrorhandler.cpp \
 	src/table.cpp \
@@ -52,9 +55,12 @@ HEADERS += \
 	include/database.h \
 	include/field.h \
 	include/freezercore.h \
+    include/graphite.h \
+    include/graphite_p.h \
 	include/index.h \
 	include/indexschema.h \
 	include/interval.h \
+    include/joincondition.h \
 	include/path.h \
 	include/packetsocket.h \
 	include/pgconnection.h \
@@ -67,6 +73,7 @@ HEADERS += \
 	include/recordlist.h \
 	include/recordxml.h \
 	include/remotelogserver.h \
+    include/resultset.h \
 	include/schema.h \
 	include/sqlerrorhandler.h \
 	include/table.h \
