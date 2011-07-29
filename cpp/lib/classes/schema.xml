@@ -679,6 +679,7 @@
   <column type="uint" methodName="environment" name="fkeyjobenvironment">
    <fkey indexDeleteMode="DoNothingOnDelete" table="JobEnvironment" type="multi" hasIndex="false"/>
   </column>
+  <column type="QDateTime" methodName="suspendedts" name="suspendedts"/>
  </table>
  <table useCodeGen="true" parent="Job" name="Job3Delight" expireKeyCache="true" className="Job3Delight">
   <column type="uint" methodName="width" name="width"/>
