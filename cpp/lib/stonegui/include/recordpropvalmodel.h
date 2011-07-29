@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordpropvalmodel.h 6486 2008-05-02 01:34:01Z newellm $
+ * $Id$
  */
 
 #ifndef RECORD_PROP_VAL_MODEL_H

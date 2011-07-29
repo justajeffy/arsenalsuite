@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: interval.h 5490 2008-01-16 19:06:53Z newellm $
+ * $Id$
  */
 
 #ifndef INTERVAL_H
@@ -65,6 +65,10 @@ public:
 	Interval operator/( double d ) const;
 	Interval & operator/=( double d );
 
+	Interval abs() const;
+	
+	double operator/( const Interval & ) const;
+	
 	bool operator == ( const Interval & other ) const;
 	bool operator != ( const Interval & other ) const;
 	bool operator > ( const Interval & other ) const;
@@ -107,15 +111,15 @@ public:
 	};
 
 	qint64 asOrder( Order order ) const;
-
-	// Same as toString( Years, Microseconds, AutoChopMinimum | AutoChopMaximum ), which is compatible with postres output.
+	
+	// Same as toString( Years, Microseconds, AutoChopMinimum | AutoChopMaximum ), which is compatible with postgres input/output.
 	QString toString() const;
 
 	QString toString( Order maximumOrder, Order minimumOrder = Seconds, int flags = TrimMinimum | TrimMaximum ) const;
 
-    /// Same as toString, except will write "1 hour", "12 minutes", "25 seconds", in the cases where the
-    /// interval is an even number of hours, minutes OR seconds
-    QString toDisplayString() const;
+	/// Same as toString, except will write "1 hour", "12 minutes", "25 seconds", in the cases where the
+	/// interval is an even number of hours, minutes OR seconds
+	QString toDisplayString() const;
 
 	Interval addMillenia( double );
 	Interval addCenturies( double );
@@ -129,7 +133,7 @@ public:
 	Interval addMilliseconds( double );
 	Interval addMicroseconds( qint64 );
 
-	QDateTime adjust( const QDateTime & );
+	QDateTime adjust( const QDateTime & ) const;
 
 	static Interval fromString( const QString &, bool * valid = 0 );
 

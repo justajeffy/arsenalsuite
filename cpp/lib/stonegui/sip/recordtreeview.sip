@@ -38,10 +38,11 @@ public:
 	void saveTreeView( const QString & group, const QString & key, const ColumnStruct columns [] );
 */
 
-    BusyWidget * busyWidget( bool autoCreate = true );
-
+	BusyWidget * busyWidget( bool autoCreate = true );
+	
 public slots:
 	void expandRecursive( const QModelIndex & index = QModelIndex(), int levels = -1 );
+	void sortBySelection();
 
 signals:
 	void showMenu( const QPoint & pos, const QModelIndex & underMouse );

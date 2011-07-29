@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: index.h 8504 2009-06-24 07:54:11Z brobison $
+ * $Id$
  */
 
 #ifndef INDEX_H
@@ -35,16 +35,14 @@
 
 #include "field.h"
 #include "indexschema.h"
-#include "record.h"
-
-class RecordList;
-class Record;
 
 typedef QHash<QVariant, void*> VarHash;
 typedef QHash<QVariant, void*>::iterator VarHashIter;
 
 namespace Stone {
+class Record;
 class RecordImp;
+class RecordList;
 class Table;
 
 /**
@@ -160,12 +158,18 @@ protected:
 	uint mPrimaryKeyColumn;
 };
 
+/// @}
+
 } //namespace
+
+using Stone::Index;
+using Stone::KeyIndex;
+using Stone::HashIndex;
 
 typedef QList<Index*> IndexList;
 typedef QList<Index*>::Iterator IndexIter;
 
-/// @}
+#include "record.h"
 
 #endif // INDEX_H
 

@@ -30,26 +30,28 @@
 
 #include <qobject.h>
 
-#include "index.h"
 #include "field.h"
-#include "record.h"
+#include "index.h"
+#include "joinedselect.h"
+#include "recordimp.h"
 #include "tableschema.h"
 
 class QSqlError;
-class Record;
-
-namespace Stone {
-class Database;
-class Connection;
-class RecordUndoOperation;
-class UpdateManager;
-class Field;
-class Table;
-}
-
 typedef QList<QVariant> VarList;
 
 namespace Stone {
+class Connection;
+class Database;
+class Field;
+class Index;
+class HashIndex;
+class KeyIndex;
+class RecordUndoOperation;
+class Record;
+class RecordList;
+class Table;
+class TableSchema;
+class UpdateManager;
 
 typedef QList<Table*> TableList;
 typedef QList<Table*>::iterator TableIter;
@@ -145,6 +147,10 @@ public:
 	RecordList records( QList<uint> keys, bool select=true, bool useCache=true );
 	/// keystring is a comma seperated list of keys eg "1,2,3,4"
 	RecordList records( const QString & keystring );
+
+	JoinedSelect join( Table * table, QString condition = QString(), JoinType joinType = InnerJoin, bool ignoreResults = false, const QString & alias = QString() );
+	template<typename T> JoinedSelect join(QString condition = QString(), JoinType joinType = InnerJoin, bool ignoreResults = false, const QString & alias = QString() )
+	{ return join( T::table(), condition, joinType, ignoreResults, alias ); }
 	
 	/// Functions to retrieve records using a where statement
 	///
@@ -159,8 +165,8 @@ public:
 	RecordList selectMulti( TableList tables, const QString & innerWhere, const VarList & innerArgs = VarList(),
 			const QString & outerWhere = QString(), const VarList & outerArgs = VarList(), bool needResults = true, bool cacheIncoming = false );
 
-    void selectFields( RecordList, FieldList );
-
+	void selectFields( RecordList, FieldList );
+	
 	/**
 	 * Inserts the record into the database
 	 * This function will get an array of
@@ -252,7 +258,7 @@ protected:
 
 	Record checkForUpdate( Record rec );
 	
-	void recordsIncoming( const RecordList &, bool ci=false );
+	RecordList processIncoming( const RecordList &, bool cacheIncoming=false, bool checkForUpdates = true );
 
 	Database * mDatabase;
 
@@ -286,12 +292,15 @@ protected:
 	friend class Stone::RecordUndoOperation;
 	friend class Stone::Database;
 	friend class Stone::Field;
+	friend class Stone::JoinedSelect;
 public:
 	int mImpCount;
 	RecordImp * mEmptyImp;
 };
 
 } //namespace
+
+using Stone::Table;
 
 #endif // TABLE_H
 

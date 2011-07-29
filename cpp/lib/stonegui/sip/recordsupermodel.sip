@@ -6,13 +6,13 @@ class RecordDataTranslatorInterface : ModelDataTranslator /Abstract/
 #include <recordsupermodel.h>
 %End
 public:
-	RecordDataTranslatorInterface(ModelTreeBuilder * builder);
+	RecordDataTranslatorInterface(ModelTreeBuilder * builder /TransferThis/ );
 
-	virtual QVariant recordData(const Record &, const QModelIndex &, int role) const = 0;
-	virtual bool setRecordData(Record, const QModelIndex &, const QVariant &, int role) = 0;
-	virtual Qt::ItemFlags recordFlags(const Record &, const QModelIndex &) const = 0;
-	virtual int recordCompare( const Record &, const Record &, const QModelIndex &, const QModelIndex &, int, bool ) const = 0;
-	virtual RecordList recordChildren( const Record &, const QModelIndex & ) const = 0;
+	virtual QVariant recordData(const MappedRecord &, const QModelIndex &, int role) const = 0;
+	virtual bool setRecordData(MappedRecord, const QModelIndex &, const QVariant &, int role) = 0;
+	virtual Qt::ItemFlags recordFlags(const MappedRecord &, const QModelIndex &) const = 0;
+	virtual int recordCompare( const MappedRecord &, const MappedRecord &, const QModelIndex &, const QModelIndex &, int, bool ) const = 0;
+	virtual RecordList recordChildren( const MappedRecord &, const QModelIndex & ) const = 0;
 
 	virtual MappedRecord getRecord(const QModelIndex &) = 0;
 	virtual void setup(const QModelIndex & idx, const Record & record ) = 0;
@@ -26,14 +26,14 @@ class RecordDataTranslatorBase : RecordDataTranslatorInterface /Abstract/
 #include <recordsupermodel.h>
 %End
 public:
-	RecordDataTranslatorBase(ModelTreeBuilder * builder);
+	RecordDataTranslatorBase(ModelTreeBuilder * builder /TransferThis/ );
 	~RecordDataTranslatorBase();
 
-	virtual QVariant recordData(const Record &, const QModelIndex &, int role) const;
-	virtual bool setRecordData(Record, const QModelIndex &, const QVariant &, int role);
-	virtual Qt::ItemFlags recordFlags(const Record &, const QModelIndex &) const;
-	virtual int recordCompare( const Record &, const Record &, const QModelIndex &, const QModelIndex &, int, bool ) const;
-	virtual RecordList recordChildren( const Record &, const QModelIndex & ) const;
+	virtual QVariant recordData(const MappedRecord &, const QModelIndex &, int role) const;
+	virtual bool setRecordData(MappedRecord, const QModelIndex &, const QVariant &, int role);
+	virtual Qt::ItemFlags recordFlags(const MappedRecord &, const QModelIndex &) const;
+	virtual int recordCompare( const MappedRecord &, const MappedRecord &, const QModelIndex &, const QModelIndex &, int, bool ) const;
+	virtual RecordList recordChildren( const MappedRecord &, const QModelIndex & ) const;
 
 	void setRecordColumnList( QStringList columns, bool defaultEditable = false );
 	void setColumnEditable( int column, bool editable );
@@ -49,7 +49,7 @@ class RecordDataTranslator : RecordDataTranslatorBase
 #include <recordsupermodel.h>
 %End
 public:
-	RecordDataTranslator(ModelTreeBuilder * builder);
+	RecordDataTranslator(ModelTreeBuilder * builder /TransferThis/ );
 	static MappedRecord getRecordStatic(const QModelIndex &idx);
 	virtual MappedRecord getRecord(const QModelIndex &idx);
 	virtual void setup(const QModelIndex & idx, const Record & record );

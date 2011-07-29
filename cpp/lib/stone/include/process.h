@@ -22,17 +22,20 @@
  */
 
 /*
- * $Id: process.h 9060 2009-11-23 00:52:42Z brobison $
+ * $Id$
  */
 
 #ifndef LIB_BLUR_QT_PROCESS_H
 #define LIB_BLUR_QT_PROCESS_H
 
+#define UNICODE 1
+#define _UNICODE 1
+
 #include <qstring.h>
 #include <qlist.h>
 
 #include "blurqt.h"
-#include <qprocess.h>
+#include "interval.h"
 
 #include <qprocess.h>
 
@@ -71,7 +74,7 @@ public:
 	void setEnvironment( QStringList env );
 
 	QProcess::ProcessError error() const;
-
+	QString errorString() const;
 /*
 	QIODevice * stdin();
 	QIODevice * stderr();
@@ -170,11 +173,14 @@ STONE_EXPORT bool killAll( const QString & processName, int timeout = 0, bool ca
 STONE_EXPORT QString backtick(const QString & cmd);
 
 /// Enums through all the windows, if any of the window titles
-/// matches the titles list, then all the processes with names
-/// contained in the toKill list will be terminated
-STONE_EXPORT bool killWindows( QStringList titles, QStringList toKill, QString * windowFound = 0, bool caseSensitive = false );
+/// matches the titles list and belows to pid or one of it's children(if matchProcessChildren is true),
+/// then return true and store the window title found in foundTitle, if not null
+STONE_EXPORT bool findMatchingWindow( int pid, QStringList titles, bool matchProcessChildren, bool caseSensitive, QString * foundTitle = 0 );
 
 #ifdef Q_OS_WIN
+
+STONE_EXPORT int killAllWindows( const QString & windowTitleRE );
+
 /// returns a list of window handles
 /// for every window that has a title that matches
 /// the regular expression nameRE
@@ -226,9 +232,12 @@ STONE_EXPORT qint32 qpidToId( Q_PID qpid );
 
 STONE_EXPORT qint32 processParentId( qint32 pid );
 
+/// Returns the ids of the children of `pid`
+/// If recursive==true, then return the entire process tree
+/// including `pid` and all it's descendents
 STONE_EXPORT QList<qint32> processChildrenIds( qint32 pid, bool recursive = false );
 
-STONE_EXPORT bool systemShutdown( bool reboot = false );
+STONE_EXPORT bool systemShutdown( bool reboot = false, const QString & message = QString() );
 
 #ifdef Q_OS_WIN
 /// Win32 only
@@ -258,9 +267,34 @@ STONE_EXPORT bool isWow64();
  *  Turns off windows error reporting crash dialog for executableName.
  *
  *  Addes executableName key HKEY_LOCAL_MACHINE/Software/Microsoft/PCHealth/ErrorReporting/ExclusionList with
- *  DWORD value of 1.  Sets KEY_WOW64_64KEY when running under Wow64 to workaround registry redirect. */
-STONE_EXPORT bool disableWindowsErrorReporting( const QString & executableName );
+ *  DWORD value of 1.  Sets KEY_WOW64_64KEY when running under Wow64 to workaround registry redirect.
+ 
+ *  If executableName is empty, it will disable reporting and warning dialogs for all apps
+ *  by setting
+	[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PCHealth\ErrorReporting]
+	"DoReport"=dword:00000000                                                                                                                                                                                                                                                     
+	"ShowUI"=dword:00000000                                                                                                                                                                                                                                                       
+	[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Windows Error Reporting]                                                                                                                                                                                                       
+	"DontShowUI"=dword:00000001                                                                                                                                                                                                                                                   
+ */
+STONE_EXPORT bool disableWindowsErrorReporting( const QString & executableName = QString() );
+
+/**
+ *  Win32 only
+ *  Returns the domain the local computer belongs to.
+ */
+STONE_EXPORT QString localDomain();
+
+// Qt wrapper for windows 7 SetCurrentProcessExplicitAppUserModelID
+// Use this to provide proper task bar grouping
+STONE_EXPORT bool qSetCurrentProcessExplicitAppUserModelID( const QString & appId );
+
 #endif
+
+STONE_EXPORT Interval systemUpTime();
+
+/// Interval since the last input event(mouse movement, keyboard click, etc)
+//STONE_EXPORT Interval idleTime();
 
 #endif // LIB_BLUR_QT_PROCESS_H
 

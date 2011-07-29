@@ -29,10 +29,7 @@ int pidsByName( const QString & name, QList<int> * pidList=0, bool caseSensitive
 
 bool killAll( const QString & processName, int timeout = 0, bool caseSensitive=false );
 
-// Enums through all the windows, if any of the window titles
-// matches the titles list, then all the processes with names
-// contained in the toKill list will be terminated
-void killWindows( QStringList titles, QStringList toKill, QString * windowTitle=0, bool caseSensitive=false );
+bool findMatchingWindow( int pid, QStringList titles, bool matchProcessChildren, bool caseSensitive, QString * foundTitle /Out/ );
 
 bool setProcessPriorityClass( int pid, unsigned long priorityClass );
 
@@ -76,17 +73,17 @@ int processParentId( int pid );
 
 QList<int> processChildrenIds( int pid, bool recursive = false );
 
-bool systemShutdown( bool reboot = false );
+bool systemShutdown( bool reboot = false, const QString & message = QString() );
 
 %If (WS_WIN)
+
+int killAllWindows( const QString & windowTitleRE );
+
+//QList<HWND> getWindowsByName( const QString & nameRE );
+
 bool processHasNamedWindow( int pid, const QString & nameRE, bool processRecursive = false );
 
-%End
-
-/*
-%If (WS_WIN)
-
-//int windowProcess( HANDLE hWin );
+//qint32 windowProcess( HWND hWin );
 
 struct WindowInfo {
 	QString title;
@@ -99,5 +96,13 @@ QList<WindowInfo> windowInfoByProcess( int pid, bool recursive = false );
 bool isWow64();
 
 bool disableWindowsErrorReporting( const QString & );
+
+QString localDomain();
+
+bool qSetCurrentProcessExplicitAppUserModelID( const QString & appId );
+
 %End
-*/
+
+Interval systemUpTime();
+
+//Interval idleTime();

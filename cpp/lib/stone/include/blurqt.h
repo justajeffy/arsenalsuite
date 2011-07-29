@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: blurqt.h 8493 2009-06-24 06:09:43Z brobison $
+ * $Id$
  */
 
 #ifndef LIB_BLUR_QT_H
@@ -43,14 +43,12 @@ class IniConfig;
 
 /**
   * \defgroup Stone Stone - Library for database access, and other common functionality
-	* 
-	* Stone is an ORM ( Object Relational Mapper ) library. It provides an abstraction
-	* layer between application logic and a relational database for data. Using PyQt
-	* you can get easy access to centralized business logic from C++ and Python.
-	*
-	*/
-
-/// @{
+  * 
+  * Stone is an ORM ( Object Relational Mapper ) library. It provides an abstraction
+  * layer between application logic and a relational database for data. Using PyQt
+  * you can get easy access to centralized business logic from C++ and Python.
+  *
+  */
 
 /** \brief Initializes the library, and parses options.
  *

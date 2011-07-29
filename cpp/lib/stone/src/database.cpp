@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: database.cpp 7367 2008-12-10 22:28:03Z brobison $
+ * $Id$
  */
 
 #include <QSqlDatabase>
@@ -342,35 +342,43 @@ bool Database::insideTransaction()
 	return mInsideTransactionCount>0;
 }
 
-bool Database::verifyTables( QString * output )
+static bool createVerifyHelper( Database * db, bool create, QString * output )
 {
 	bool success = true;
-	foreach( Table * t, tables() )
+	QList<Table*> checked;
+	foreach( Table * t, db->tables() )
 	{
-		QString tmp;
-		if( !t->verifyTable( false, &tmp ) )
-			success = false;
-		if( output )
-			*output += tmp;
+		QStack<Table*> ans;
+		while( t->parent() ) {
+			ans.push(t);
+			t = t->parent();
+		}
+		while( t ) {
+			if( !checked.contains(t) ) {
+				QString tmp1, tmp2;
+				if( create && !t->exists() ) {
+					if( !t->createTable( &tmp1 ) )
+						success = false;
+				} else if( !t->verifyTable( true, &tmp2 ) )
+					success = false;
+				if( output )
+					*output += tmp1 + tmp2;
+			}
+			checked += t;
+			t = ans.size() ? ans.pop() : 0;
+		}
 	}
 	return success;
 }
 
+bool Database::verifyTables( QString * output )
+{
+	return createVerifyHelper( this, false, output );
+}
+
 bool Database::createTables( QString * output )
 {
-	bool success = true;
-	foreach( Table * t, tables() )
-	{
-		QString tmp1, tmp2;
-		if( !t->exists() ) {
-			if( !t->createTable( &tmp1 ) )
-				success = false;
-		} else if( !t->verifyTable( true, &tmp2 ) )
-			success = false;
-		if( output )
-			*output += tmp1 + tmp2;
-	}
-	return success;
+	return createVerifyHelper( this, true, output );
 }
 
 void Database::addDeleteAction( Field * f )

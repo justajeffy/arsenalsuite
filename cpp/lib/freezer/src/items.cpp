@@ -561,11 +561,11 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
 
 	errorCnt = QString::number(jobStatus.errorCount());
 
-	uint tat = jobStatus.tasksAverageTime();
-	avgTime.sprintf("%02i:%02i:%02i", (tat/3600)%60, (tat/60)%60, tat%60 );
+	//uint tat = jobStatus.tasksAverageTime();
+	avgTime = Interval(jobStatus.tasksAverageTime()).toString( Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
 
 	Interval tiq( job.submittedts(), job.endedts().isNull() ? QDateTime::currentDateTime() : job.endedts() );
-	timeInQueue = tiq.toString( tiq.asOrder(Interval::Hours) >= 100 ? Interval::Days : Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
+	timeInQueue = tiq.toString( Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
 
 	type = job.jobType().name();
 	icon = ((JobModel*)idx.model())->jobTypeIcon(job.jobType());

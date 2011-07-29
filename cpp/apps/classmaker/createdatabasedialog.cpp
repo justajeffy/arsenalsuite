@@ -17,15 +17,21 @@ CreateDatabaseDialog::CreateDatabaseDialog( Schema * schema, QWidget * parent )
 : QDialog( parent )
 , mSchema( schema )
 , mDatabase( new Database( schema, Connection::createFromIni( config(), "Database" ) ) )
+, mTableSchema( 0 )
 {
 	mUI.setupUi( this );
 
-	connect( mUI.mVerifyButton, SIGNAL( clicked() ), SLOT( verifyDatabase() ) );
-	connect( mUI.mCreateButton, SIGNAL( clicked() ), SLOT( createDatabase() ) );
+	connect( mUI.mVerifyButton, SIGNAL( clicked() ), SLOT( verify() ) );
+	connect( mUI.mCreateButton, SIGNAL( clicked() ), SLOT( create() ) );
 	connect( mUI.mCloseButton, SIGNAL( clicked() ), SLOT( reject() ) );
 	connect( mUI.mEditConnectionButton, SIGNAL( clicked() ), SLOT( editConnection() ) );
 
 	updateConnectionLabel();
+}
+
+void CreateDatabaseDialog::setTableSchema( TableSchema * tableSchema )
+{
+	mTableSchema = tableSchema;
 }
 
 void CreateDatabaseDialog::editConnection()
@@ -40,29 +46,31 @@ void CreateDatabaseDialog::editConnection()
 	delete cdb;
 }
 
-void addStringListView( QTableWidget * tw, const QString & string )
+void CreateDatabaseDialog::verify()
 {
-	tw->clear();
-	QStringList ol = string.split('\n');
-	int row = 0;
-	for( QStringList::Iterator it = ol.begin(); it != ol.end(); ++it ) {
-		QTableWidgetItem * twi = new QTableWidgetItem( *it );
-		tw->setItem( row++, 0, twi );
+	QString output;
+	if( mTableSchema ) {
+		Table * table = mDatabase->tableFromSchema( mTableSchema );
+		table->verifyTable( false, &output );
+	} else {
+		mDatabase->verifyTables( &output );
 	}
+	mUI.mHistoryEdit->setText( output );
 }
 
-void CreateDatabaseDialog::verifyDatabase()
+void CreateDatabaseDialog::create()
 {
 	QString output;
-	mDatabase->verifyTables( &output );
-	addStringListView( mUI.mTableWidget, output );
-}
-
-void CreateDatabaseDialog::createDatabase()
-{
-	QString output;
-	mDatabase->createTables( &output );
-	addStringListView( mUI.mTableWidget, output );
+	if( mTableSchema ) {
+		Table * table = mDatabase->tableFromSchema( mTableSchema );
+		if( table->exists() )
+			table->verifyTable( true, &output );
+		else
+			table->createTable( &output );
+	} else {
+		mDatabase->createTables( &output );
+	}
+	mUI.mHistoryEdit->setText( output );
 }
 
 void CreateDatabaseDialog::updateConnectionLabel()

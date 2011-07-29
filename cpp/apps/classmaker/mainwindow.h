@@ -29,6 +29,8 @@
 
 #include "ui_mainwindowui.h"
 
+class QPoint;
+
 namespace Stone {
 class Database;
 class Field;
@@ -36,7 +38,8 @@ class IndexSchema;
 class Schema;
 class TableSchema;
 }
-class QPoint;
+using namespace Stone;
+
 class SuperModel;
 class SchemaTreeBuilder;
 
@@ -44,16 +47,19 @@ class MainWindow : public QMainWindow
 {
 Q_OBJECT
 public:
-	MainWindow();
-
+	MainWindow( Schema * schema = 0 );
+	
 public slots:
 	void slotOpenSchema();
 	void slotImportSchema();
 	void slotSaveSchema();
 	void slotSaveSchemaAs();
 	void slotOutputSource();
-	void slotCreateDatabase();
+	/// Creates/verifys the table only if supplied
+	void slotCreateDatabase(TableSchema * ts = 0);
 
+	void slotGenerateDiff();
+	
 	void openSchema( const QString & );
 	void exportSchema( const QString & );
 	void setFileName( const QString & );
@@ -61,21 +67,23 @@ public slots:
 	void showContextMenu( const QPoint & pos );
 
 	void setSchema( Schema * schema );
-
+	
 	void addTable( TableSchema * table );
 	void addIndex( IndexSchema * index );
 	void addField( Field * field );
-
+	
 protected:
+	
 	virtual void closeEvent( QCloseEvent * );
-
+	void expandChildTables( const QModelIndex & );
+	
 	Schema * mSchema;
 	QString mFileName;
 	SuperModel * mModel;
 	SchemaTreeBuilder * mTreeBuilder;
-
+	
 	bool mChanges;
-
+	
 	Ui::MainWindowUI mUI;
 };
 

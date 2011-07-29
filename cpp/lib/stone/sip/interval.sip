@@ -5,20 +5,23 @@ class Interval
 #include <interval.h>
 %End
 public:
-    Interval();
+	Interval();
 	Interval( const QDateTime &, const QDateTime & );
 	Interval( const QDate &, const QDate & );
-	Interval( int seconds, int microseconds );
+	Interval( int seconds, int microseconds = 0 );
 	Interval( int months, int days, int seconds, int microseconds = 0 );
 
 	Interval operator+( const Interval & other ) const;
-	Interval & operator+=( const Interval & other );
+	//Interval & operator+=( const Interval & other );
 	Interval operator-( const Interval & other ) const;
-	Interval & operator-=( const Interval & other );
+	//Interval & operator-=( const Interval & other );
 	Interval operator*( double m ) const;
-	Interval & operator*=( double m );
+	//Interval & operator*=( double m );
 	Interval operator/( double d ) const;
-	Interval & operator/=( double d );
+	//Interval & operator/=( double d );
+	double operator/( const Interval & ) const;
+
+	Interval abs() const;
 
 	bool operator == ( const Interval & other ) const;
 	bool operator != ( const Interval & other ) const;
@@ -70,6 +73,8 @@ public:
 
 	QString toString( Order maximumOrder, Order minimumOrder = Microseconds, int orderFlags = TrimMinimum | TrimMaximum ) const;
 	
+	QString toDisplayString() const;
+
 	Interval addMillenia( double );
 	Interval addCenturies( double );
 	Interval addYears( double );
@@ -82,7 +87,7 @@ public:
 	Interval addMilliseconds( double );
 	Interval addMicroseconds( int );
 
-	QDateTime adjust( const QDateTime & );
+	QDateTime adjust( const QDateTime & ) const;
 
 	static Interval fromString( const QString &, bool * success = 0 );
 

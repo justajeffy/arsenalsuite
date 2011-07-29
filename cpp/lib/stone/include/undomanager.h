@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: undomanager.h 8495 2009-06-24 06:26:18Z brobison $
+ * $Id$
  */
 
 #ifndef UNDO_MANAGER_H
@@ -194,6 +194,10 @@ protected:
 /// @}
 
 } //namespace
+
+using Stone::UndoOperation;
+using Stone::RecordUndoOperation;
+using Stone::UndoManager;
 
 #endif // UNDO_MANAGER_H
 

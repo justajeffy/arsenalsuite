@@ -20,6 +20,7 @@ public:
 	virtual uint newPrimaryKey( TableSchema * );
 
 	virtual MappedRecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() );
+	virtual QList<RecordList> joinedSelect( const JoinedSelect &, QString where, QList<QVariant> vars );
 
 	virtual bool insert( Table *, const RecordList & rl, bool newPrimaryKey = true );
 

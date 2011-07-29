@@ -145,6 +145,7 @@ void RecordTreeBuilder::loadChildren( const QModelIndex & parentIndex, SuperMode
 	}
 }
 
+
 RecordSuperModel::RecordSuperModel( QObject * parent )
 : SuperModel(parent)
 {
@@ -164,7 +165,7 @@ bool RecordSuperModel::setupIndex( const QModelIndex & i, const Record & r )
 void RecordSuperModel::updateIndex( const QModelIndex & i )
 {
 	if( setupIndex(i,getRecord(i)) )
-        dataChanged(i,i.sibling(i.row(),columnCount()-1));
+		dataChanged(i,i.sibling(i.row(),columnCount()-1));
 }
 
 Record RecordSuperModel::getRecord(const QModelIndex & i) const
@@ -306,47 +307,48 @@ void RecordSuperModel::updateRecords( RecordList newRecords, const QModelIndex &
 {
 	typedef QMap<Record, QModelIndexList> RecordIndexListMap;
 	RecordIndexListMap existingMap;
-	QModelIndex startIndex = parent.isValid() ? parent.child(0,0) : index(0,0);
-	// O(n) iteration with O(log n) per loop give O(n log n )
-	for( ModelIter it( startIndex, updateRecursive ? ModelIter::Recursive : ModelIter::Filter() ); it.isValid(); ++it ) {
-		// Constant time
-		Record r = getRecord(*it);
-		if( r.isRecord() )
-			// O(log n)
-			existingMap[r] += *it;
-	}
-	
-	QModelIndexList toUpdate;
 	RecordList toAdd;
-	// O(n) iteration
-	foreach( Record n, newRecords ) {
-		// O(log n)
-		RecordIndexListMap::Iterator it = existingMap.find( n );
-		// Constant + allocs
-		if( it == existingMap.end() )
-			toAdd += n;
-		else {
-			toUpdate += it.value();
-			it.value().clear();
+	if( childrenLoaded(parent) && hasChildren(parent) ) {
+		QModelIndex startIndex = parent.isValid() ? parent.child(0,0) : index(0,0);
+		// O(n) iteration with O(log n) per loop give O(n log n )
+		for( ModelIter it( startIndex, updateRecursive ? ModelIter::Recursive : ModelIter::Filter() ); it.isValid(); ++it ) {
+			// Constant time
+			Record r = getRecord(*it);
+			if( r.isRecord() )
+				// O(log n)
+				existingMap[r] += *it;
 		}
-	}
 	
-	// O(n)
-	QModelIndexList toRemove;
-	for( RecordIndexListMap::Iterator it = existingMap.begin(); it != existingMap.end(); ++it ) {
-		if( it.value().isEmpty() )
-			continue;
-		// Constant + alloc
-		toRemove += it.value();
-	}
+		QModelIndexList toUpdate;
+		// O(n) iteration
+		foreach( Record n, newRecords ) {
+			// O(log n)
+			RecordIndexListMap::Iterator it = existingMap.find( n );
+			// Constant + allocs
+			if( it == existingMap.end() )
+				toAdd += n;
+			else {
+				toUpdate += it.value();
+				it.value().clear();
+			}
+		}
+		// O(n)
+		QModelIndexList toRemove;
+		for( RecordIndexListMap::Iterator it = existingMap.begin(); it != existingMap.end(); ++it ) {
+			if( it.value().isEmpty() )
+				continue;
+			// Constant + alloc
+			toRemove += it.value();
+		}
 	
-	// O(n)
-	foreach( QModelIndex i, toUpdate )
-		// Constant
-		updateIndex(i);
-	
-	remove( toRemove );
-	append( toAdd, parent );
+		// O(n)
+		foreach( QModelIndex i, toUpdate )
+			// Constant
+			updateIndex(i);
+		remove( toRemove );
+		append( toAdd, parent );
+	} else
+		append( newRecords, parent );
 }
 
 void RecordSuperModel::remove( RecordList rl, bool recursive, const QModelIndex & parent )
@@ -388,5 +390,5 @@ RecordDataTranslatorInterface * RecordSuperModel::recordDataTranslator( const QM
 {
 	ModelNode * node = indexToNode(i);
 	if( !node ) node = rootNode();
-	return const_cast<RecordDataTranslatorInterface*>(RecordDataTranslatorInterface::cast(node->translator(i)));
+	return dynamic_cast<RecordDataTranslatorInterface*>(node->translator(i));
 }

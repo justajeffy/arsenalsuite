@@ -92,6 +92,9 @@ public:
 	SuperModel( QObject * parent );
 	~SuperModel();
 
+	ModelGrouper * grouper( bool autoCreate = true );
+	void setGrouper( ModelGrouper * grouper );
+
 	void setTreeBuilder( ModelTreeBuilder * treeBuilder );
 	QModelIndex parent( const QModelIndex & idx ) const;
 
@@ -134,7 +137,7 @@ public:
 
 	void sort ( int column, Qt::SortOrder order, bool recursive, const QModelIndex & parent, int startRow=0, int endRow=-1 );
 
-    void moveToTop( QModelIndexList indexes );
+	void moveToTop( QModelIndexList indexes );
 
 	bool childrenLoaded( const QModelIndex & );
 
@@ -148,15 +151,15 @@ public:
 	void setHeaderLabels( const QStringList & labels );
 	QStringList headerLabels() const;
 
-    // Backward compat, depreciated
-    void setSortColumns( const QList<int> & sortColumns, bool forceResort = false );
+	// Backward compat, depreciated
+	void setSortColumns( const QList<int> & sortColumns, bool forceResort = false );
 
-    // TODO: Need to write custom bindings
-    //     QList<SortColumnPair> sortColumns() const { return mSortColumns; }
-    //     void setSortColumns( const QList<SortColumnPair> & sortColumns, bool forceResort = false );
+// TODO: Need to write custom bindings
+//	QList<SortColumnPair> sortColumns() const { return mSortColumns; }
+//	void setSortColumns( const QList<SortColumnPair> & sortColumns, bool forceResort = false );
 
-    Qt::SortOrder sortOrder( int column = -1 ) const;
-    void setSortOrder( Qt::SortOrder order, int column = -1 );
+	Qt::SortOrder sortOrder( int column = -1 ) const;
+	void setSortOrder( Qt::SortOrder order, int column = -1 );
 
 	ModelTreeBuilder * treeBuilder();
 

@@ -33,7 +33,8 @@ public:
 		NotNull = 4,
 		Unique = 8,
 		LocalVariable = 16,
-		ReverseAccess = 32
+		ReverseAccess = 32,
+		DisplayName = 64
 	};
 
 	enum {

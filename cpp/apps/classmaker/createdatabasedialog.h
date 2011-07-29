@@ -10,6 +10,7 @@
 namespace Stone {
 class Database;
 class Schema;
+class TableSchema;
 }
 using namespace Stone;
 
@@ -20,14 +21,17 @@ public:
 	CreateDatabaseDialog( Schema * schema, QWidget * parent=0 );
 
 public slots:
+	void setTableSchema( TableSchema * tableSchema );
+
 	void editConnection();
-	void verifyDatabase();
-	void createDatabase();
+	void verify();
+	void create();
 	void updateConnectionLabel();
 
 protected:
 	Schema * mSchema;
 	Database * mDatabase;
+	TableSchema * mTableSchema;
 	Ui::CreateDatabaseDialogUI mUI;
 };
 

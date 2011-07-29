@@ -33,14 +33,14 @@
 
 #include "field.h"
 #include "indexschema.h"
-#include "record.h"
-
 
 namespace Stone {
 class Schema;
 class Field;
 class Table;
 class IndexSchema;
+class Record;
+class RecordList;
 
 class STONE_EXPORT TableSchema
 {
@@ -92,7 +92,7 @@ public:
 	void setTableName(const QString &);
 	/// Returns the name of this table, this must match the name
 	/// in the database.
-	QString tableName() const;
+	QString tableName();
 	
 	/// This doesn't have to be set unless
 	/// it is different from the table name
@@ -100,7 +100,7 @@ public:
 	void setClassName( const QString & );
 	/// Returns the class name of this table, this
 	/// is used for generated c++ classes.
-	QString className() const;
+	QString className();
 
 	/// Documentation string in doxygen format
 	/// Inserted into generated code
@@ -112,27 +112,27 @@ public:
 
 	/// Returns the index of the primary key field
 	/// in this table's list of fields.
-	uint primaryKeyIndex();
+	int primaryKeyIndex() { return mPrimaryKeyIndex; }
 
 	/// Returns the number of fields in this table, including
 	/// fields that inherit from the parent table.
-	uint fieldCount() const;
+	uint fieldCount() { return mAllFieldsCache.size(); }
 
 	/// Convencience function returns a list of the names of each field in the table
-	QStringList fieldDisplayNames() const;
-	QStringList fieldNames() const;
+	QStringList fieldDisplayNames();
+	QStringList fieldNames();
 
 	/// Returns a list of all the fields in this table.
-	FieldList fields() const;
+	FieldList fields() { return mAllFieldsCache; }
 
 	/// Returns a list of all the fields in this table that
 	/// are not inherited by the parent table.
-	FieldList ownedFields() const;
-
+	FieldList ownedFields();
+	
 	/// All the columns in the table( including inherited columns )
 	/// Returns a list of all the fields, and the local data columns
 	/// that are not stored in the database.
-	FieldList columns() const;
+	FieldList columns() { return mAllColumnsCache; }
 
 	/// Returns all of the non-inherited columns
 	FieldList ownedColumns();
@@ -147,12 +147,12 @@ public:
 	/// matching field in this table.  This function is
 	/// case-insensitive.
 	/// If silent is false a warning is printed if the field is not found
-	Field * field( const QString & fieldName, bool silent=false ) const;
+	Field * field( const QString & fieldName, bool silent=false );
 
 	/// Returns a field by its position in the field list,
 	/// returns 0 if \param pos is out of range.
-	Field * field( int pos ) const;
-
+	Field * field( int pos );
+	
 	/// Adds a field to this table, takes ownership of the Field
 	/// object.
 	bool addField( Field * field );
@@ -167,7 +167,7 @@ public:
 
 	/// Returns the total number of columns, including local data members
 	/// that are not stored in the database.
-	uint columnCount() const;
+	uint columnCount();
 
 	void setPreloadEnabled( bool );
 	bool isPreloadEnabled() const;
@@ -196,6 +196,8 @@ public:
 
 	uint firstColumnIndex() const { return mFirstColumnIndex; }
 
+	QString diff( TableSchema * table );
+
 protected:
 	virtual void preUpdate( const Record & updated, const Record & existing );
 	virtual void preInsert( RecordList );
@@ -206,7 +208,7 @@ protected:
 	virtual void postRemove( RecordList );
 
 	void recalcFieldPositions( int start = 0, bool skipSelf = false );
-
+	
 	void addChild( TableSchema * );
 	void removeChild( TableSchema * table );
 
@@ -217,6 +219,7 @@ protected:
 
 	IndexSchemaList mIndexes;
 
+	uint mColumnCount;
 	int mPrimaryKeyIndex;
 	uint mFirstColumnIndex;
 	QString mTableName, mClassName, mDocs;
@@ -229,8 +232,6 @@ protected:
 	bool mUseCodeGen;
 	bool mExpireKeyCache;
 
-    uint mColumnCount;
-
 	friend class Stone::Table;
 };
 
@@ -239,6 +240,10 @@ typedef QList<TableSchema*>::iterator TableSchemaIter;
 typedef QList<TableSchema*>::const_iterator ConstTableSchemaIter;
 
 } //namespace
+
+using Stone::TableSchema;
+
+#include "record.h"
 
 #endif // TABLE_SCHEMA_H
 

@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: pyembed.h 8499 2009-06-24 07:18:15Z brobison $
+ * $Id$
  */
 
 #ifndef PY_EMBED_H
@@ -139,6 +139,10 @@ STONE_EXPORT PyObject * getSchemaCastModule( Schema * schema );
 STONE_EXPORT int registerPythonQMetaType( PyObject * type );
 STONE_EXPORT PyObject * qvariantFromPyObject( PyObject * object );
 STONE_EXPORT PyObject * pyObjectFromQVariant( PyObject * py_qvariant );
+
+/// Returns the result of traceback.format_exception, converted into a QString
+/// Clears the python exception by default
+STONE_EXPORT QString pythonExceptionTraceback( bool clearException = true );
 
 #endif // PY_EMBED_H
 

@@ -30,6 +30,7 @@
 #include <qcolor.h>
 #include <qdatetime.h>
 #include <qmetatype.h>
+#include <qimage.h>
 
 #include "interval.h"
 #include "tableschema.h"
@@ -193,6 +194,9 @@ PyObject * getCompiledFunction( const char * functionName, const Record & r, con
 static sipTypeDef * sipColorType()
 { static sipTypeDef * sColorW = 0; if( !sColorW ) sColorW = getSipType("PyQt4.QtGui", "QColor"); return sColorW; }
 
+static sipTypeDef * sipImageType()
+{ static sipTypeDef * sImageW = 0; if( !sImageW ) sImageW = getSipType("PyQt4.QtGui", "QImage"); return sImageW; }
+
 static sipTypeDef * sipDateType()
 { static sipTypeDef * sDateW = 0; if( !sDateW ) sDateW = getSipType("PyQt4.QtCore","QDate"); return sDateW; }
 
@@ -272,7 +276,6 @@ PyObject * sipWrapRecord( Record * r, bool makeCopy, TableSchema * defaultType )
 			ret = getSipAPI()->api_convert_from_new_type( new Record(*r), type, NULL );
 		else {
 			ret = getSipAPI()->api_convert_from_type( r, type, Py_None );
-			LOG_1( "Not copying record" );
 		}
 	} else {
 		LOG_1( "Stone.Record not found" );
@@ -287,10 +290,8 @@ PyObject * sipWrapRecord( Record * r, bool makeCopy, TableSchema * defaultType )
 		tableSchema = table->schema();
 	else if( defaultType )
 		tableSchema = defaultType;
-	else {
-		LOG_1( "Record has no table and no default tableschema passed" );
+	else
 		return ret;
-	}
 
 	bool isErr = false;
 	if( tableSchema ) {
@@ -510,6 +511,11 @@ QVariant unwrapQVariant( PyObject * pyObject )
 		if( i ) ret = qVariantFromValue<Interval>(*i);
 	}
 
+	else if( api->api_can_convert_to_type( pyObject, sipImageType(), 0 ) ) {
+		QImage * i = (QImage*)api->api_convert_to_type( pyObject, sipImageType(), 0, 0, 0, &err );
+		if( i ) ret = QVariant(*i);
+	}
+	
 	else {
 		SIP_BLOCK_THREADS
 
@@ -576,6 +582,12 @@ PyObject * wrapQVariant( const QVariant & var, bool stringAsPyString, bool noneO
 				ret = getSipAPI()->api_convert_from_new_type(new QColor(var.value<QColor>()), sipColorType(), 0);
 			break;
 		}
+		case QVariant::Image:
+		{
+			if( sipImageType() )
+				ret = getSipAPI()->api_convert_from_new_type(new QImage(var.value<QImage>()), sipImageType(), 0);
+			break;
+		}
 		case QVariant::Date:
 		{
 			if( sipDateType() )
@@ -636,8 +648,8 @@ PyObject * wrapQVariant( const QVariant & var, bool stringAsPyString, bool noneO
 		Record r = qvariant_cast<Record>(var);
 		ret = sipWrapRecord( &r );
 	}
-    if( qvt == qMetaTypeId<Interval>() )
-        ret = getSipAPI()->api_convert_from_new_type(new Interval(qvariant_cast<Interval>(var)),sipIntervalType(),0);
+	if( qvt == qMetaTypeId<Interval>() )
+		ret = getSipAPI()->api_convert_from_new_type(new Interval(qvariant_cast<Interval>(var)),sipIntervalType(),0);
 	if( !ret && noneOnFailure ) {
 		ret = Py_None;
 		Py_INCREF(ret);
@@ -887,4 +899,68 @@ PyObject * pyObjectFromQVariant( PyObject * py_qvariant )
 	}
 	Py_INCREF(Py_None);
 	return Py_None;
+}
+
+QString pythonExceptionTraceback( bool clearException )
+{
+	/*
+		import traceback
+		return '\n'.join(traceback.format_exc())
+	*/
+	QString ret;
+	bool success = false;
+	SIP_BLOCK_THREADS
+
+	PyObject * type, * value, * traceback;
+	/* Save the current exception */
+	PyErr_Fetch(&type, &value, &traceback);
+	if( type ) {
+	
+		PyObject * traceback_module = PyImport_ImportModule("traceback");
+		if (traceback_module) {
+
+			/* Call the traceback module's format_exception function, which returns a list */
+			PyObject * traceback_list = PyObject_CallMethod(traceback_module, "format_exception", "OOO", type, value ? value : Py_None, traceback ? traceback : Py_None);
+			if( traceback_list ) {
+
+				PyObject * separator = PyString_FromString("");
+				if( separator ) {
+
+					PyObject * retString = PyUnicode_Join(separator, traceback_list);
+					if( retString ) {
+						ret = unwrapQVariant(retString).toString();
+						success = true;
+						Py_DECREF(retString);
+
+					} else
+						ret = "PyUnicode_Join failed";
+
+					Py_DECREF(separator);
+				} else
+					ret = "PyUnicode_FromString failed";
+
+				Py_DECREF(traceback_list);
+			} else
+				ret = "Failure calling traceback.format_exception";
+
+			Py_DECREF(traceback_module);
+		} else
+			ret = "Unable to load the traceback module, can't get exception text";
+	} else
+		ret = "pythonExceptionTraceback called, but no exception set";
+
+	if( clearException ) {
+		Py_DECREF(type);
+		Py_XDECREF(value);
+		Py_XDECREF(traceback);
+	} else
+		PyErr_Restore(type,value,traceback);
+
+	SIP_UNBLOCK_THREADS
+
+	// Ret is an error message if success is false
+	if( !success )
+		LOG_1( ret );
+
+	return ret;
 }

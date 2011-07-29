@@ -34,6 +34,7 @@ IndexDialog::IndexDialog( IndexSchema * index, QWidget * parent )
 	}
 	mUI.mAddField->setEnabled( mUI.mFieldCombo->count() > 0 );
 	mUI.mMultiCheck->setChecked( index->holdsList() );
+	mUI.mCacheCheck->setChecked( index->useCache() );
 	connect( mUI.mAddField, SIGNAL( clicked() ), SLOT( addField() ) );
 }
 

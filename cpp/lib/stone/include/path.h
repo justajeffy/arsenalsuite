@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: path.h 9060 2009-11-23 00:52:42Z brobison $
+ * $Id$
  */
 
 #ifndef PATH_H
@@ -34,9 +34,12 @@
 
 #include "blurqt.h"
 
+
 /// \brief Contructs a filepath by inserting frameNumber before the extension of base path.
 /// \ingroup Stone
-STONE_EXPORT QString makeFramePath( const QString & base, uint frameNumber, uint padWidth = 4 );
+/// If endDigitsAreFrameNumber == false, then any digits before the extension are left as is, and the frame number is appended,
+/// otherwise any end digits are replaced with the frame number
+STONE_EXPORT QString makeFramePath( const QString & base, uint frameNumber, uint padWidth = 4, bool endDigitsAreFrameNumber = true );
 
 /// \brief Returns just the filename portion of the path, with the frame number removed
 /// \ingroup Stone
@@ -62,7 +65,14 @@ STONE_EXPORT bool mapDrive( char driveLetter, const QString & uncPath, bool forc
 STONE_EXPORT QString readFullFile( const QString & path, bool * error = 0 );
 STONE_EXPORT bool writeFullFile( const QString & path, const QString & contents );
 
+/// Returns the username of the owner of the path(file or directory)
+STONE_EXPORT QString pathOwner( const QString & path, QString * errorMessage );
 
+#ifdef Q_OS_WIN
+/// Returns the <username,domain> of the owner of the path(file or directory)
+STONE_EXPORT QPair<QString,QString> pathOwnerDomain( const QString & path, QString * errorMessage );
+
+#endif // Q_OS_WIN
 /**
  *  \ingroup Stone
  * @{

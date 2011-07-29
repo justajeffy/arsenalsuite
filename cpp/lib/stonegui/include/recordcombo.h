@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordcombo.h 8505 2009-06-24 08:01:20Z brobison $
+ * $Id$
  */
 
 #ifndef RECORD_COMBO_H
@@ -36,9 +36,9 @@
 namespace Stone {
 class Table;
 class Index;
+class Record;
 }
 using namespace Stone;
-class Record;
 
 class STONEGUI_EXPORT RecordCombo : public QComboBox
 {
