@@ -366,7 +366,7 @@ QModelIndex RecordSuperModel::append( const Record & r, const QModelIndex & pare
 
 QModelIndexList RecordSuperModel::append( RecordList rl, const QModelIndex & parent, RecordDataTranslatorInterface * trans )
 {
-	return insert( rl, rowCount(parent), parent, trans );
+    return insert( rl, childrenLoaded(parent) ? rowCount(parent) : 0, parent, trans );
 }
 
 void RecordSuperModel::updated( RecordList rl, bool recursive, const QModelIndex & parentIndex, bool loadChildren )
