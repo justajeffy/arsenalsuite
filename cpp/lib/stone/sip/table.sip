@@ -27,6 +27,8 @@ public:
 
 	QList<Index*> indexes();
 	Index * indexFromSchema( IndexSchema * schema ) const;
+	Index * indexFromField( const QString & name ) const;
+	Index * index( const QString & name ) const;
 
 	void addIndex( Index * index /Transfer/ );
 	void removeIndex( Index * index, bool dontDelete = false );
@@ -49,6 +51,8 @@ public:
 	MappedRecordList records( const QString & keystring );
 	
 	JoinedSelect join( Table * table, QString condition = QString(), JoinType joinType = InnerJoin, bool ignoreResults = false, const QString & alias = QString() );
+
+	RecordList selectFrom( const QString & from, const QList<QVariant> & args = VarList() );
 
 	MappedRecordList select( 
 		const QString & where = QString::null,
