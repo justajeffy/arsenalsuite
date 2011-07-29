@@ -348,30 +348,34 @@ QString PGConnection::getSqlFields( TableSchema * schema )
 	return it.value();
 }
 
-QString PGConnection::generateSelectSql( TableSchema * schema )
-{
-	return "SELECT " + getSqlFields(schema) + " FROM ONLY " + tableQuoted(schema->tableName());
-}
-
-RecordList PGConnection::selectOnly( Table * table, const QString & where, const QList<QVariant> & args )
+RecordList PGConnection::selectFrom( Table * table, const QString & _from, const QList<QVariant> & args )
 {
 	TableSchema * schema = table->schema();
 	RecordList ret;
 	
-	QString select( generateSelectSql(schema) ), w(where);
-
-	if( !w.isEmpty() ) {
-		if( !w.contains("WHERE") )
-			select += " WHERE";
-		select += " " + w;
-	}
-
-	select += ";";
+	QString from(_from.trimmed());
+	if( !from.startsWith( "FROM", Qt::CaseInsensitive ) )
+		from = "FROM " + from;
+	
+	QString select( "SELECT " + getSqlFields(schema) + " " + from );
 
 	QSqlQuery sq = exec( select, args, true /*retry*/, table );
 	while( sq.next() )
 		ret += Record( new RecordImp( table, sq ), false );
 	return ret;
+}
+
+RecordList PGConnection::selectOnly( Table * table, const QString & where, const QList<QVariant> & args )
+{
+	QString from( " FROM ONLY " + tableQuoted(table->schema()->tableName()) ), w(where);
+	
+	if( !w.isEmpty() ) {
+		if( !w.contains("WHERE") )
+			from += " WHERE";
+		from += " " + w;
+	}
+
+	return selectFrom( table, from, args );
 }
 
 QList<RecordList> PGConnection::joinedSelect( const JoinedSelect & joined, QString where, QList<QVariant> args )

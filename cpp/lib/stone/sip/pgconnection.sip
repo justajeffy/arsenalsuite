@@ -19,6 +19,8 @@ public:
 
 	virtual uint newPrimaryKey( TableSchema * );
 
+	virtual RecordList selectFrom( Table * table, const QString & from, const QList<QVariant> & args );
+
 	virtual MappedRecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() );
 	virtual QList<RecordList> joinedSelect( const JoinedSelect &, QString where, QList<QVariant> vars );
 
