@@ -21,12 +21,13 @@ BusyWidget::BusyWidget(QWidget * parent, const QPixmap & pixmap, double loopTime
 		mTimer = new QTimer(this);
 		connect(mTimer, SIGNAL(timeout()), SLOT(step()) );
 		resize(pixmap.width(),pixmap.width());
-		start();
 	}
+	hide();
 }
 
 void BusyWidget::start()
 {
+	show();
 	if( mTimer ) {
 		mTimer->start(40);
 		mStartTime.restart();
@@ -40,6 +41,7 @@ void BusyWidget::stop()
 		mTimer->stop();
 		update();
 	}
+	hide();
 }
 
 void BusyWidget::step()
