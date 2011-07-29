@@ -63,6 +63,8 @@ public:
 
 	virtual uint newPrimaryKey( TableSchema * );
 
+	virtual RecordList selectFrom( Table * table, const QString & from, const QList<QVariant> & args );
+
 	/// Same as above, but won't select from offspring
 	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() );
 	virtual QList<RecordList> joinedSelect( const JoinedSelect &, QString where, QList<QVariant> vars );
@@ -86,7 +88,6 @@ public:
 	bool checkVersion( int major, int minor ) const;
 protected:
 	QString getSqlFields(TableSchema*);
-	QString generateSelectSql( TableSchema * schema );
 
 	QHash<TableSchema*,QString> mSqlFields;
 	int mVersionMajor, mVersionMinor;

@@ -150,7 +150,7 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 							f = new Field( ret, name, fkey.attribute( "table" ), Field::Flags((fkey.attribute( "type" ) == "multi" ? Field::None : Field::Unique)  | Field::ForeignKey),
 								fkey.attribute( "hasIndex" ) == "true", Field::indexDeleteModeFromString( fkey.attribute( "indexDeleteMode" ) ) );
 							QString in = fkey.attribute( "indexName" );
-							if( !in.isEmpty() ) {
+							if( !in.isEmpty() && f->index() ) {
 								if( !f->index() )
 									f->setHasIndex( true, Field::indexDeleteModeFromString( fkey.attribute( "indexDeleteMode" ) ) );
 								f->index()->setName( in );
@@ -161,6 +161,14 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 								f = new Field( ret, name, ct );
 							else
 								LOG_1( "Couldn't find the correct type for field: " + name );
+						}
+					} else {
+						if( fkey.attribute( "hasIndex" ) == "true" ) {
+							QString in = fkey.attribute( "indexName" );
+							if( !f->index() )
+								f->setHasIndex( true, Field::indexDeleteModeFromString( fkey.attribute( "indexDeleteMode" ) ) );
+							f->index()->setName( in );
+							f->index()->setUseCache( fkey.attribute( "indexUseCache" ) != "false" );
 						}
 					}
 					if( f ) {

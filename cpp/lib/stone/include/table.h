@@ -152,6 +152,8 @@ public:
 	template<typename T> JoinedSelect join(QString condition = QString(), JoinType joinType = InnerJoin, bool ignoreResults = false, const QString & alias = QString() )
 	{ return join( T::table(), condition, joinType, ignoreResults, alias ); }
 	
+	RecordList selectFrom( const QString & from, const VarList & args = VarList() );
+
 	/// Functions to retrieve records using a where statement
 	///
 	RecordList select( 

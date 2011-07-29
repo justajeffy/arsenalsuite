@@ -444,11 +444,11 @@ RecordList Table::processIncoming( const RecordList & records, bool cacheIncomin
 	if( mParent )
 		mParent->processIncoming( processed, cacheIncoming, false );
 	
-	QTime time;
-	time.start();
+//	QTime time;
+//	time.start();
 	foreach( Index * i, mIndexes )
 		i->recordsIncoming( processed, cacheIncoming );
-	addIndexTime( time.elapsed(), IndexIncoming );
+//	addIndexTime( time.elapsed(), IndexIncoming );
 	
 	mDatabase->recordsIncoming( processed, cacheIncoming );
 	return processed;
@@ -533,6 +533,11 @@ Table * Table::importSchema( const QString & tableName, Database * parent )
 	return ret;
 }
 */
+
+RecordList Table::selectFrom( const QString & from, const VarList & args )
+{
+	return processIncoming( connection()->selectFrom( this, from, args ) );
+}
 
 RecordList Table::selectOnly( const QString & where, const VarList & args, bool needResults, bool cacheIncoming )
 {
