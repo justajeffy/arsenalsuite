@@ -422,10 +422,11 @@ static void writeClass( TableSchema * table, const QString & path )
 			}
 
 			listMethodDefs += "\t" + retify(ret) + " " + listMethod + "();\n";
+            sipListMethodDefs += "\t" + retify(ret) + " " + listMethod + "();\n";
 
 			listMethods += ret + " t__List::" + listMethod + "()\n{\n";
 			listMethods += "\tIndex * idx = " + t->className() + "::table()->indexFromField( \"" + f->name() + "\" );\n";
-			listMethods += "\treturn idx ? idx->recordsByIndexMulti( getValue( \"key\" ) ) : " + t->className() + "List();\n}\n\n";
+            listMethods += "\treturn idx ? idx->recordsByIndexMulti( getValue( " + table->field(table->primaryKeyIndex())->table()->className() + "Fields::Key ) ) : " + t->className() + "List();\n}\n\n";
 		}
 	}
 
