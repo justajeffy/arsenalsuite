@@ -248,6 +248,14 @@ def reaper():
             if errorCount > job.maxErrors() or (done == 0 and errorCount > config.totalFailureThreshold):
                 suspend = True
                 suspendMsg = 'Job %s (%i) has been suspended.  The job has produced %i errors.' % (job.name(), job.key(), errorCount)
+                jobErrors = job.jobErrors()
+                messages = []
+                for i in range (0, min(5, len(jobErrors))):
+                    message.append(str(jobErrors[i].message()))
+
+                suspendMsg += "\nThe last %d errors produced were:\n" % (min(5, len(jobErrors)))
+                suspendMsg += "\n\n".join(messages)
+
                 suspendTitle = 'Job %s (%i) suspended.' % (job.name(), job.key())
 
             if suspend:

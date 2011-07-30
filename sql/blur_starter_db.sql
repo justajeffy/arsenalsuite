@@ -2,6 +2,7 @@
 -- PostgreSQL database dump
 --
 
+SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = off;
 SET check_function_bodies = false;
@@ -9,23 +10,27 @@ SET client_min_messages = warning;
 SET escape_string_warning = off;
 
 --
--- Name: jabberd; Type: SCHEMA; Schema: -; Owner: -
+-- Name: jabberd; Type: SCHEMA; Schema: -; Owner: farmer
 --
 
 CREATE SCHEMA jabberd;
 
 
+ALTER SCHEMA jabberd OWNER TO farmer;
+
 --
--- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: -
+-- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: farmer
 --
 
-CREATE PROCEDURAL LANGUAGE plpgsql;
+CREATE OR REPLACE PROCEDURAL LANGUAGE plpgsql;
 
+
+ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO farmer;
 
 SET search_path = public, pg_catalog;
 
 --
--- Name: hosthistory_status_percentages_return; Type: TYPE; Schema: public; Owner: -
+-- Name: hosthistory_status_percentages_return; Type: TYPE; Schema: public; Owner: farmer
 --
 
 CREATE TYPE hosthistory_status_percentages_return AS (
@@ -39,8 +44,10 @@ CREATE TYPE hosthistory_status_percentages_return AS (
 );
 
 
+ALTER TYPE public.hosthistory_status_percentages_return OWNER TO farmer;
+
 --
--- Name: hosthistory_status_summary_return; Type: TYPE; Schema: public; Owner: -
+-- Name: hosthistory_status_summary_return; Type: TYPE; Schema: public; Owner: farmer
 --
 
 CREATE TYPE hosthistory_status_summary_return AS (
@@ -55,8 +62,10 @@ CREATE TYPE hosthistory_status_summary_return AS (
 );
 
 
+ALTER TYPE public.hosthistory_status_summary_return OWNER TO farmer;
+
 --
--- Name: hosthistory_user_slave_summary_return; Type: TYPE; Schema: public; Owner: -
+-- Name: hosthistory_user_slave_summary_return; Type: TYPE; Schema: public; Owner: farmer
 --
 
 CREATE TYPE hosthistory_user_slave_summary_return AS (
@@ -66,8 +75,10 @@ CREATE TYPE hosthistory_user_slave_summary_return AS (
 );
 
 
+ALTER TYPE public.hosthistory_user_slave_summary_return OWNER TO farmer;
+
 --
--- Name: job_gatherstats_result; Type: TYPE; Schema: public; Owner: -
+-- Name: job_gatherstats_result; Type: TYPE; Schema: public; Owner: farmer
 --
 
 CREATE TYPE job_gatherstats_result AS (
@@ -95,8 +106,51 @@ CREATE TYPE job_gatherstats_result AS (
 );
 
 
+ALTER TYPE public.job_gatherstats_result OWNER TO farmer;
+
 --
--- Name: waywardhostret; Type: TYPE; Schema: public; Owner: -
+-- Name: job_gatherstats_result_2; Type: TYPE; Schema: public; Owner: farmer
+--
+
+CREATE TYPE job_gatherstats_result_2 AS (
+	mintasktime interval,
+	avgtasktime interval,
+	maxtasktime interval,
+	totaltasktime interval,
+	mincputime interval,
+	avgcputime interval,
+	maxcputime interval,
+	totalcputime interval,
+	taskcount integer,
+	totalloadtime interval,
+	loadcount integer,
+	totalerrortime interval,
+	errorcount integer,
+	totalcopytime interval,
+	copycount integer,
+	totalcanceltime interval,
+	cancelcount integer,
+	totaltime interval
+);
+
+
+ALTER TYPE public.job_gatherstats_result_2 OWNER TO farmer;
+
+--
+-- Name: passpreseedret; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE passpreseedret AS (
+	slots integer,
+	averagememory integer,
+	maxmemory integer
+);
+
+
+ALTER TYPE public.passpreseedret OWNER TO postgres;
+
+--
+-- Name: waywardhostret; Type: TYPE; Schema: public; Owner: farmer
 --
 
 CREATE TYPE waywardhostret AS (
@@ -105,29 +159,94 @@ CREATE TYPE waywardhostret AS (
 );
 
 
+ALTER TYPE public.waywardhostret OWNER TO farmer;
+
 --
--- Name: after_update_jobtask(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: after_update_jobtask(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION after_update_jobtask() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 BEGIN
-	-- Update Job Counters when a tasks status changes
-	IF (NEW.status != coalesce(OLD.status,'')) THEN
-		PERFORM update_job_task_counts(NEW.fkeyjob);
-	END IF;
+    -- Update Job Counters when a tasks status changes
+    IF (NEW.status != coalesce(OLD.status,'')) THEN
+        PERFORM update_job_task_counts(NEW.fkeyjob);
+    END IF;
 RETURN new;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.after_update_jobtask() OWNER TO farmer;
 
 --
--- Name: assign_single_host(integer, integer, integer[]); Type: FUNCTION; Schema: public; Owner: -
+-- Name: are_ontens_complete(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION are_ontens_complete(_fkeyjob integer) RETURNS boolean
+    LANGUAGE plpgsql COST 10
+    AS $$
+DECLARE
+	task RECORD;
+	stripe int := 10;
+	cur_pos int := 0;
+	is_complete BOOLEAN := TRUE;
+BEGIN
+
+	FOR task IN SELECT * FROM JobTask WHERE JobTask.fkeyjob=_fkeyjob ORDER BY jobtask ASC LOOP
+		cur_pos := cur_pos + 1;
+		IF (cur_pos = 1 OR cur_pos % stripe = 0) AND task.status != 'done' THEN
+			--RAISE NOTICE 'RETURN NEXT pos % is task %', cur_pos, task.jobtask;
+			-- one of the on-tens is not complete, so NO
+			is_complete := FALSE;
+		END IF;
+		--RAISE NOTICE 'pos % is task % with stripe % and task status %. start_task is %', cur_pos, task.jobtask, (cur_pos % stripe), task.status, start_task;
+	END LOOP;
+
+	RETURN is_complete;
+END;$$;
+
+
+ALTER FUNCTION public.are_ontens_complete(_fkeyjob integer) OWNER TO postgres;
+
+--
+-- Name: are_ontens_dispatched(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION are_ontens_dispatched(_fkeyjob integer) RETURNS boolean
+    LANGUAGE plpgsql COST 10
+    AS $$
+DECLARE
+	task RECORD;
+	stripe int := 10;
+	cur_pos int := 0;
+	is_running BOOLEAN := TRUE;
+BEGIN
+
+	FOR task IN SELECT * FROM JobTask WHERE JobTask.fkeyjob=_fkeyjob ORDER BY jobtask ASC LOOP
+		cur_pos := cur_pos + 1;
+		IF (cur_pos = 1 OR cur_pos % stripe = 0) AND task.status = 'new' THEN
+			--RAISE NOTICE 'RETURN NEXT pos % is task %', cur_pos, task.jobtask;
+			-- one of the on-tens is not complete, so NO
+			is_running := FALSE;
+		END IF;
+		--RAISE NOTICE 'pos % is task % with stripe % and task status %. start_task is %', cur_pos, task.jobtask, (cur_pos % stripe), task.status, start_task;
+	END LOOP;
+
+	RETURN is_running;
+END;$$;
+
+
+ALTER FUNCTION public.are_ontens_dispatched(_fkeyjob integer) OWNER TO postgres;
+
+--
+-- Name: assign_single_host(integer, integer, integer[]); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _tasks integer[]) RETURNS integer
+    LANGUAGE plpgsql
     AS $$
 DECLARE
     _hostStatus hoststatus;
@@ -186,15 +305,17 @@ END IF;
 return _assignedTasks;
 
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.assign_single_host(_keyjob integer, _keyhost integer, _tasks integer[]) OWNER TO farmer;
 
 --
--- Name: assign_single_host(integer, integer, integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: assign_single_host(integer, integer, integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _packetsize integer) RETURNS integer
+    LANGUAGE plpgsql
     AS $$
 DECLARE
     _hostStatus hoststatus;
@@ -265,15 +386,97 @@ END IF;
 return _assignedTasks;
 
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.assign_single_host(_keyjob integer, _keyhost integer, _packetsize integer) OWNER TO farmer;
 
 --
--- Name: assignment_status_count(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: assign_single_host_2(integer, integer, integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION assign_single_host_2(_keyjob integer, _keyhost integer, _packetsize integer) RETURNS SETOF integer
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    --_hostStatus hoststatus;
+    --_readyStatus integer;
+    _jobstatus jobstatus;
+    _job job;
+    _minMem integer;
+    _keyjobassignment integer;
+    _keyjobtaskassignment integer;
+    _keytask integer;
+    _task jobtask;
+    _tasksql text;
+    _assigned integer;
+BEGIN
+
+--SELECT INTO _hostStatus availableMemory FROM hoststatus WHERE fkeyHost = _keyhost;
+
+--IF _hostStatus.slaveStatus != 'ready' THEN
+--    ROLLBACK;
+--    RAISE EXCEPTION 'Host is no longer ready for frames(status is ) returning';
+--    return 0;
+--END IF;
+
+_assigned := 0;
+SELECT INTO _job * FROM job WHERE keyjob = _keyjob;
+
+_minMem := _job.minmemory;
+
+UPDATE hoststatus SET availablememory = ((availablememory * 1024) - _minMem)/1024 WHERE fkeyhost = _keyhost;
+
+--SELECT INTO _readyStatus keyjobassignmentstatus FROM jobassignmentstatus WHERE status = 'ready';
+INSERT INTO jobassignment (fkeyjob, fkeyhost, fkeyjobassignmentstatus)
+    VALUES (_keyjob, _keyhost, 1)
+    RETURNING keyjobassignment INTO _keyjobassignment;
+
+
+IF _job.packetType = 'random' THEN
+	_tasksql := 'SELECT keyjobtask FROM jobtask WHERE fkeyjob = ' || _keyjob || ' AND status=''new'' ORDER BY random() ASC LIMIT ' || _packetSize;
+ELSIF _job.packetType = 'preassigned' THEN
+	_tasksql := 'SELECT keyjobtask FROM jobtask WHERE fkeyjob = ' || _keyjob || ' AND fkeyhost=' || _keyhost || ' AND status=''new''';
+ELSIF _job.packetType = 'continuous' THEN
+	_tasksql := 'SELECT * FROM get_continuous_tasks(' || _keyjob || ', ' || _packetSize || ')';
+ELSIF _job.packetType = 'iterative' THEN
+	_tasksql := 'SELECT * FROM get_iterative_tasks(' || _keyjob || ', ' || _packetSize || ',10)';
+ELSE
+	_tasksql := 'SELECT keyjobtask FROM jobtask WHERE fkeyjob = ' || _keyjob || ' AND status=''new'' ORDER BY jobtask ASC LIMIT ' || _packetSize;
+END IF;
+
+IF _job.maxhosts > 0 THEN
+    UPDATE jobstatus SET hostsonjob=hostsonjob+1 WHERE fkeyjob = _keyjob;
+END IF;
+
+FOR _keytask IN EXECUTE(_tasksql) LOOP  
+    INSERT INTO jobtaskassignment (fkeyjobtask, fkeyjobassignment, fkeyjobassignmentstatus)
+        VALUES (_keytask, _keyjobassignment, 1)
+        RETURNING keyjobtaskassignment INTO _keyjobtaskassignment;
+    UPDATE jobtask SET fkeyjobtaskassignment = _keyjobtaskassignment, status = 'assigned', fkeyhost = _keyhost 
+        WHERE keyjobtask = _keytask;
+
+    _assigned := _assigned + 1;
+        
+    RETURN NEXT _keytask;
+END LOOP;
+
+IF _assigned = 0 THEN
+	RAISE EXCEPTION 'no tasks to assign';
+END IF;
+
+END;
+$$;
+
+
+ALTER FUNCTION public.assign_single_host_2(_keyjob integer, _keyhost integer, _packetsize integer) OWNER TO farmer;
+
+--
+-- Name: assignment_status_count(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION assignment_status_count(fkeyjobassignmentstatus integer) RETURNS integer
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	status jobassignmentstatus;
@@ -287,15 +490,17 @@ BEGIN
 	END IF;
 	RETURN 0;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.assignment_status_count(fkeyjobassignmentstatus integer) OWNER TO farmer;
 
 --
--- Name: cancel_job_assignment(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: cancel_job_assignment(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION cancel_job_assignment(_keyjobassignment integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	cancelledStatusKey int;
@@ -317,15 +522,48 @@ BEGIN
 	-- Dont set it to cancelled if it already cancelled or error
 	UPDATE JobAssignment SET fkeyjobassignmentstatus=cancelledStatusKey WHERE keyjobassignment=_keyjobassignment AND fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus from jobassignmentstatus WHERE status IN ('ready','copy','busy'));
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.cancel_job_assignment(_keyjobassignment integer) OWNER TO farmer;
 
 --
--- Name: cancel_job_assignments(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: cancel_job_assignment(integer, text, text); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION cancel_job_assignment(_keyjobassignment integer, _reason text, _nextstate text) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+	_statusKey int;
+	_packettype text;
+BEGIN
+	SELECT INTO _statusKey keyjobassignmentstatus FROM jobassignmentstatus WHERE status=_reason;
+
+	UPDATE JobTask SET status=_nextstate, fkeyhost=NULL 
+		WHERE fkeyjobtaskassignment IN (SELECT keyjobtaskassignment FROM jobtaskassignment WHERE fkeyjobassignment=_keyjobassignment) 
+		AND status IN ('assigned','busy');
+
+	UPDATE JobTaskAssignment SET fkeyjobassignmentstatus=_statusKey, ended=now()
+		WHERE fkeyjobassignment=_keyjobassignment 
+		AND fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus from jobassignmentstatus WHERE status IN ('ready','copy','busy'));
+
+	-- Dont set it to cancelled if it already cancelled or error
+	UPDATE JobAssignment SET fkeyjobassignmentstatus=_statusKey, ended=now()
+		WHERE keyjobassignment=_keyjobassignment 
+		AND fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus from jobassignmentstatus WHERE status IN ('ready','copy','busy'));
+END;
+$$;
+
+
+ALTER FUNCTION public.cancel_job_assignment(_keyjobassignment integer, _reason text, _nextstate text) OWNER TO farmer;
+
+--
+-- Name: cancel_job_assignments(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION cancel_job_assignments(_keyjob integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	cancelledStatusKey int;
@@ -344,26 +582,83 @@ BEGIN
 
 	UPDATE JobAssignment SET fkeyjobassignmentstatus=cancelledStatusKey WHERE fkeyjob=_keyjob AND fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus from jobassignmentstatus WHERE status IN ('ready','copy','busy'));
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.cancel_job_assignments(_keyjob integer) OWNER TO farmer;
 
 --
--- Name: epoch_to_timestamp(double precision); Type: FUNCTION; Schema: public; Owner: -
+-- Name: cancel_job_assignments(integer, text, text); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION cancel_job_assignments(_keyjob integer, _reason text, _nextstate text) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    _statusKey int;
+    _job job;
+BEGIN
+    SELECT INTO _statusKey keyjobassignmentstatus FROM jobassignmentstatus WHERE status=_reason;
+    SELECT INTO _job * FROM job WHERE keyjob=_keyjob;
+        
+    IF _job.packettype = 'preassigned' THEN
+        UPDATE JobTask SET status=_nextstate WHERE fkeyjob=_keyjob AND status IN ('assigned','busy');
+    ELSE
+        UPDATE JobTask SET status=_nextstate, fkeyhost=NULL WHERE fkeyjob=_keyjob AND status IN ('assigned','busy');
+    END IF;
+
+    UPDATE JobTaskAssignment SET fkeyjobassignmentstatus=_statusKey, ended=now()
+        WHERE fkeyjobassignment IN(SELECT keyjobassignment FROM JobAssignment WHERE fkeyjob=_keyjob) 
+        AND fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus from jobassignmentstatus WHERE status IN ('ready','copy','busy'));
+
+    UPDATE JobAssignment SET fkeyjobassignmentstatus=_statusKey, ended=now()
+        WHERE fkeyjob=_keyjob 
+        AND fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus from jobassignmentstatus WHERE status IN ('ready','copy','busy'));
+END;
+$$;
+
+
+ALTER FUNCTION public.cancel_job_assignments(_keyjob integer, _reason text, _nextstate text) OWNER TO farmer;
+
+--
+-- Name: epoch_to_timestamp(double precision); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION epoch_to_timestamp(double precision) RETURNS timestamp without time zone
+    LANGUAGE sql IMMUTABLE STRICT
     AS $_$
 SELECT ('epoch'::timestamp + $1 * '1 second'::interval)::timestamp;
-$_$
-    LANGUAGE sql IMMUTABLE STRICT;
+$_$;
 
+
+ALTER FUNCTION public.epoch_to_timestamp(double precision) OWNER TO farmer;
 
 --
--- Name: get_continuous_tasks(integer, integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: fix_jobstatus(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
-CREATE FUNCTION get_continuous_tasks(fkeyjob integer, max_tasks integer) RETURNS SETOF integer
+CREATE FUNCTION fix_jobstatus() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+	j job;
+BEGIN
+	FOR j IN SELECT * FROM job LOOP
+		INSERT INTO jobstatus (fkeyjob) VALUES (j.keyjob);
+	END LOOP;
+
+END;
+$$;
+
+
+ALTER FUNCTION public.fix_jobstatus() OWNER TO farmer;
+
+--
+-- Name: get_continuous_tasks(integer, integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION get_continuous_tasks(_fkeyjob integer, max_tasks integer) RETURNS SETOF integer
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	task RECORD;
@@ -374,7 +669,7 @@ DECLARE
 	sav_end_task int;
 	sav_cont_len int := 0;
 BEGIN
-	FOR task IN SELECT count(*) as cnt, jobtask FROM JobTask WHERE JobTask.fkeyjob=fkeyjob AND status='new' GROUP BY jobtask ORDER BY jobtask ASC LOOP
+	FOR task IN SELECT count(*) as cnt, jobtask FROM JobTask WHERE JobTask.fkeyjob=_fkeyjob AND status='new' GROUP BY jobtask ORDER BY jobtask ASC LOOP
 		IF cont_len < 0 OR (last_task != task.jobTask AND last_task + 1 != task.jobTask) THEN
 			start_task := task.jobTask;
 			last_task := task.jobTask;
@@ -401,22 +696,251 @@ BEGIN
 	END LOOP;
 
 	IF sav_cont_len > 0 THEN
-		FOR task IN SELECT * FROM JobTask WHERE JobTask.fkeyjob=fkeyjob AND status='new' AND jobtask >= sav_start_task AND jobtask <= sav_end_task ORDER BY jobtask ASC LOOP
+		FOR task IN SELECT * FROM JobTask WHERE JobTask.fkeyjob=_fkeyjob AND status='new' AND jobtask >= sav_start_task AND jobtask <= sav_end_task ORDER BY jobtask ASC LOOP
 			RETURN NEXT task.keyjobtask;
 		END LOOP;
 	END IF;
 
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.get_continuous_tasks(_fkeyjob integer, max_tasks integer) OWNER TO farmer;
 
 --
--- Name: get_wayward_hosts(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: get_iterative_tasks(integer, integer, integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION get_iterative_tasks(_fkeyjob integer, max_tasks integer, stripe integer) RETURNS SETOF integer
+    LANGUAGE plpgsql
+    AS $$DECLARE
+	task RECORD;
+	start_task int := 0;
+	cur_pos int := 0;
+	found_tasks int := 0;
+	cur_loop int := 0;
+	found_start_task BOOLEAN;
+BEGIN
+	--WHILE found_tasks < max_tasks AND cur_loop <= stripe LOOP
+	WHILE found_tasks < max_tasks AND cur_loop <= stripe LOOP
+	--RAISE NOTICE 'starting loop % of %', cur_loop, stripe;
+	cur_pos := 0;
+	cur_loop := cur_loop + 1;
+	found_start_task := FALSE;
+	
+	FOR task IN SELECT * FROM JobTask WHERE JobTask.fkeyjob=_fkeyjob AND jobtask  >= start_task ORDER BY jobtask ASC LOOP
+	
+		IF start_task < task.jobTask AND found_start_task = FALSE THEN
+			start_task := task.jobTask;
+			found_start_task := TRUE;
+		END IF;
+
+		cur_pos := cur_pos + 1;
+
+		IF (cur_pos = 1 OR cur_pos % stripe = 0) AND task.status = 'new' THEN
+			--RAISE NOTICE 'RETURN NEXT pos % is task %', cur_pos, task.jobtask;
+			found_tasks := found_tasks + 1;
+			RETURN NEXT task.keyjobtask;
+		END IF;
+		--RAISE NOTICE 'pos % is task % with stripe % and task status %. start_task is %', cur_pos, task.jobtask, (cur_pos % stripe), task.status, start_task;
+	
+		-- If we already found enough continous frames, then break out of the loop and return them
+		IF found_tasks >= max_tasks THEN	
+			EXIT;
+		END IF;
+	END LOOP;
+	
+	END LOOP;
+	RETURN;
+END;$$;
+
+
+ALTER FUNCTION public.get_iterative_tasks(_fkeyjob integer, max_tasks integer, stripe integer) OWNER TO farmer;
+
+--
+-- Name: get_iterative_tasks_2(integer, integer, integer, boolean); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strictontens boolean) RETURNS SETOF integer
+    LANGUAGE plpgsql COST 200 ROWS 100
+    AS $$DECLARE
+	task RECORD;
+	start_task int := 0;
+	cur_pos int := 0;
+	found_tasks int := 0;
+	cur_loop int := 0;
+	found_start_task BOOLEAN;
+BEGIN
+	--WHILE found_tasks < max_tasks AND cur_loop <= stripe LOOP
+	WHILE found_tasks < max_tasks AND cur_loop <= stripe LOOP
+	--RAISE NOTICE 'starting loop % of %', cur_loop, stripe;
+	cur_pos := 0;
+	cur_loop := cur_loop + 1;
+	found_start_task := FALSE;
+	
+	FOR task IN SELECT * FROM JobTask WHERE JobTask.fkeyjob=_fkeyjob AND jobtask  >= start_task ORDER BY jobtask ASC LOOP
+	
+		IF start_task < task.jobTask AND found_start_task = FALSE THEN
+			start_task := task.jobTask;
+			found_start_task := TRUE;
+		END IF;
+
+		cur_pos := cur_pos + 1;
+
+		IF ((cur_pos-1) % stripe = 0) AND task.status = 'new' THEN
+			--RAISE NOTICE 'RETURN NEXT pos % is task %', cur_pos, task.jobtask;
+			found_tasks := found_tasks + 1;
+			RETURN NEXT task.keyjobtask;
+		END IF;
+		--RAISE NOTICE 'pos % is task % with stripe % and task status %. start_task is %', cur_pos, task.jobtask, (cur_pos % stripe), task.status, start_task;
+	
+		-- If we already found enough continous frames, then break out of the loop and return them
+		IF found_tasks >= max_tasks THEN	
+			EXIT;
+		END IF;
+	END LOOP;
+
+	-- if strictOnTens then exit after the first loop attempt
+	IF strictOnTens = TRUE THEN
+		EXIT;
+	END IF;
+	
+	END LOOP;
+	RETURN;
+END;$$;
+
+
+ALTER FUNCTION public.get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strictontens boolean) OWNER TO postgres;
+
+--
+-- Name: get_iterative_tasks_debug(integer, integer, integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION get_iterative_tasks_debug(_fkeyjob integer, max_tasks integer, stripe integer) RETURNS SETOF integer
+    LANGUAGE plpgsql
+    AS $$DECLARE
+	task RECORD;
+	start_task int := 0;
+	cur_pos int := 0;
+	found_tasks int := 0;
+	cur_loop int := 0;
+	found_next_start_task BOOLEAN;
+BEGIN
+	--WHILE found_tasks < max_tasks AND cur_loop <= stripe LOOP
+	WHILE found_tasks < max_tasks AND cur_loop <= stripe LOOP
+	--RAISE NOTICE 'starting loop % of %', cur_loop, stripe;
+	cur_pos := 0;
+	cur_loop := cur_loop + 1;
+	found_next_start_task := FALSE;
+	
+	FOR task IN SELECT * FROM JobTask WHERE JobTask.fkeyjob=_fkeyjob AND jobtask  >= start_task ORDER BY jobtask ASC LOOP
+	
+		IF start_task < task.jobTask AND found_next_start_task = FALSE THEN
+			start_task := task.jobTask;
+			found_next_start_task := TRUE;
+		END IF;
+
+		--IF (start_task = 0) THEN
+		--	start_task := task.jobTask;
+		--END IF;
+
+		--IF (start_task < task.jobTask) AND found_next_start_task = FALSE THEN
+		--	start_task := task.jobTask;
+		--	found_next_start_task := TRUE;
+		--END IF;
+
+		cur_pos := cur_pos + 1;
+
+		IF (cur_pos = 1 OR cur_pos % stripe = 0) AND task.status = 'new' THEN
+			RAISE NOTICE 'RETURN NEXT pos % is task %', cur_pos, task.jobtask;
+			found_tasks := found_tasks + 1;
+			RETURN NEXT task.keyjobtask;
+		END IF;
+		--RAISE NOTICE 'pos % is task % with stripe % and task status %. start_task is %', cur_pos, task.jobtask, (cur_pos % stripe), task.status, start_task;
+	
+		-- If we already found enough continous frames, then break out of the loop and return them
+		IF found_tasks >= max_tasks THEN	
+			EXIT;
+		END IF;
+	END LOOP;
+
+	--start_task := start_task + 1;
+	--IF stripe > 1 THEN
+	--	stripe := stripe / 2;
+	--END IF;
+	
+	END LOOP;
+	RETURN;
+END;$$;
+
+
+ALTER FUNCTION public.get_iterative_tasks_debug(_fkeyjob integer, max_tasks integer, stripe integer) OWNER TO farmer;
+
+--
+-- Name: get_job_efficiency(integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION get_job_efficiency(_keyhost integer) RETURNS SETOF double precision
+    LANGUAGE plpgsql ROWS 10
+    AS $$
+DECLARE
+	job record;
+BEGIN
+
+        FOR job IN SELECT ((sum(usertime+systime)::float8/coalesce(assignslots,8)::float8) / GREATEST(
+		extract(epoch from sum((coalesce(ended,now())-started)))::bigint*1000,1
+		))::float8 as jobefficiency
+		FROM jobassignment ja
+		WHERE fkeyjob = _keyhost AND fkeyjobassignmentstatus = 4
+		group by assignslots
+	LOOP
+		RETURN NEXT job.jobefficiency::float8;
+	END LOOP;
+
+        
+END;
+$$;
+
+
+ALTER FUNCTION public.get_job_efficiency(_keyhost integer) OWNER TO farmer;
+
+--
+-- Name: get_pass_preseed(text, text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION get_pass_preseed(_shot text, _pass text) RETURNS SETOF passpreseedret
+    LANGUAGE plpgsql ROWS 1
+    AS $$
+DECLARE
+    _ret RECORD;
+BEGIN
+
+SELECT INTO _ret job.slots, 
+js.averagememory, 
+(select MAX(maxmemory) FROM jobassignment ja WHERE ja.fkeyjob = keyjob) as maxmemory
+FROM job
+JOIN jobstatus js on js.fkeyjob = keyjob
+WHERE shotName = _shot 
+AND job LIKE '%' || _pass
+AND status IN ('done','deleted')
+order by submittedts desc
+limit 1;
+
+RETURN NEXT _ret;
+
+END;
+$$;
+
+
+ALTER FUNCTION public.get_pass_preseed(_shot text, _pass text) OWNER TO postgres;
+
+--
+-- Name: get_wayward_hosts(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION get_wayward_hosts() RETURNS SETOF integer
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	hs hoststatus;
@@ -429,15 +953,17 @@ BEGIN
 		RETURN NEXT hs.fkeyhost;
 	END LOOP;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.get_wayward_hosts() OWNER TO farmer;
 
 --
--- Name: get_wayward_hosts_2(interval, interval); Type: FUNCTION; Schema: public; Owner: -
+-- Name: get_wayward_hosts_2(interval, interval); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION get_wayward_hosts_2(pulse_period interval, loop_time interval) RETURNS SETOF waywardhostret
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	hs hoststatus;
@@ -460,16 +986,17 @@ BEGIN
 		RETURN NEXT ret;
 	END LOOP;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.get_wayward_hosts_2(pulse_period interval, loop_time interval) OWNER TO farmer;
 
 SET default_tablespace = '';
 
 SET default_with_oids = false;
 
 --
--- Name: countercache; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: countercache; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE countercache (
@@ -479,15 +1006,21 @@ CREATE TABLE countercache (
     jobstotal integer,
     jobsactive integer,
     jobsdone integer,
-    lastupdated timestamp without time zone
+    lastupdated timestamp without time zone,
+    slotstotal integer,
+    slotsactive integer,
+    jobswaiting integer
 );
 
 
+ALTER TABLE public.countercache OWNER TO farmer;
+
 --
--- Name: getcounterstate(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: getcounterstate(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION getcounterstate() RETURNS countercache
+    LANGUAGE plpgsql
     AS $$
 	DECLARE
 		cache countercache;
@@ -497,7 +1030,7 @@ CREATE FUNCTION getcounterstate() RETURNS countercache
 			INSERT INTO countercache (hoststotal) values (null);
 			cache.lastUpdated := now() - interval'1 year';
 		END IF;
-		IF now() - cache.lastUpdated > interval'10 seconds' THEN
+		IF now() - cache.lastUpdated > interval'200000 seconds' THEN
 			DECLARE
 				hosts_total int;
 				hosts_active int;
@@ -505,44 +1038,67 @@ CREATE FUNCTION getcounterstate() RETURNS countercache
 				jobs_total int;
 				jobs_active int;
 				jobs_done int;
+				jobs_waiting int;
+				slots_total int;
+				slots_active int;
 			BEGIN
-				SELECT count(*) INTO hosts_total FROM HostService INNER JOIN HostStatus ON HostStatus.fkeyHost=HostService.fkeyHost WHERE fkeyService=23 AND online=1;
-				SELECT count(fkeyHost) INTO hosts_active FROM HostStatus WHERE slaveStatus IN('busy','copy', 'assigned') AND online=1;
+				SELECT count(*) INTO hosts_total FROM HostService INNER JOIN HostStatus ON HostStatus.fkeyHost=HostService.fkeyHost AND fkeyService=1;
+
+				SELECT count(fkeyHost) INTO hosts_active FROM JobAssignment WHERE fkeyjobassignmentstatus < 4;
+				
 				SELECT count(fkeyHost) INTO hosts_ready FROM HostStatus WHERE slaveStatus='ready';
+
+				SELECT SUM(maxassignments) INTO slots_total FROM Host
+					JOIN HostStatus hs ON keyhost=hs.fkeyhost
+					WHERE host.online=1 AND hs.slaveStatus = 'ready';
+
+				SELECT sum(slots) INTO slots_active FROM Job
+					JOIN JobAssignment ja ON keyjob=ja.fkeyjob
+					WHERE ja.fkeyjobassignmentstatus < 4;
+
 				SELECT count(keyJob) INTO jobs_total FROM Job WHERE status IN('submit','verify','holding','ready', 'busy', 'started','suspended','done');
-				SELECT count(keyJob) INTO jobs_active FROM Job WHERE status IN ('ready', 'started');
+				SELECT count(keyJob) INTO jobs_active FROM Job WHERE status = 'started';
+				SELECT count(keyJob) INTO jobs_waiting FROM Job WHERE status IN ('ready', 'holding');
 				SELECT count(keyJob) INTO jobs_done FROM Job WHERE status='done';
+				
 				UPDATE CounterCache SET hoststotal=hosts_total, hostsactive=hosts_active, hostsReady=hosts_ready,
-					jobsTotal=jobs_total, jobsActive=jobs_active, jobsDone=jobs_done, lastUpdated=now();
+					jobsTotal=jobs_total, jobsActive=jobs_active, jobsDone=jobs_done, jobsWaiting=jobs_waiting,
+					slotsTotal=slots_total, slotsActive=slots_active,
+					lastUpdated=now();
+
 				SELECT INTO cache * FROM countercache LIMIT 1;
 			END;
 		END IF;
 		RETURN cache;
 	END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.getcounterstate() OWNER TO farmer;
 
 --
--- Name: hosthistory_keyhosthistory_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hosthistory_keyhosthistory_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hosthistory_keyhosthistory_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: hosthistory_keyhosthistory_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('hosthistory_keyhosthistory_seq', 41712358, true);
-
+ALTER TABLE public.hosthistory_keyhosthistory_seq OWNER TO farmer;
 
 --
--- Name: hosthistory; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hosthistory_keyhosthistory_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('hosthistory_keyhosthistory_seq', 1, false);
+
+
+--
+-- Name: hosthistory; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hosthistory (
@@ -564,11 +1120,14 @@ CREATE TABLE hosthistory (
 );
 
 
+ALTER TABLE public.hosthistory OWNER TO farmer;
+
 --
--- Name: hosthistory_dynamic_query(text, text); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hosthistory_dynamic_query(text, text); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION hosthistory_dynamic_query(where_stmt text, order_limit text) RETURNS SETOF hosthistory
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	rec hosthistory;
@@ -591,15 +1150,17 @@ BEGIN
 	END LOOP;
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.hosthistory_dynamic_query(where_stmt text, order_limit text) OWNER TO farmer;
 
 --
--- Name: hosthistory_overlaps_timespan(timestamp without time zone, timestamp without time zone, text, text); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hosthistory_overlaps_timespan(timestamp without time zone, timestamp without time zone, text, text); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION hosthistory_overlaps_timespan(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) RETURNS SETOF hosthistory
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	rec hosthistory;
@@ -627,15 +1188,17 @@ BEGIN
 	END LOOP;
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.hosthistory_overlaps_timespan(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) OWNER TO farmer;
 
 --
--- Name: hosthistory_status_percentages(text); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hosthistory_status_percentages(text); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION hosthistory_status_percentages(query_input text) RETURNS SETOF hosthistory_status_percentages_return
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	rec hosthistory_status_summary_return;
@@ -674,15 +1237,17 @@ BEGIN
 	END LOOP;
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.hosthistory_status_percentages(query_input text) OWNER TO farmer;
 
 --
--- Name: hosthistory_status_percentages_duration_adjusted(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hosthistory_status_percentages_duration_adjusted(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION hosthistory_status_percentages_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) RETURNS SETOF hosthistory_status_percentages_return
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	rec hosthistory_status_percentages_return;
@@ -692,15 +1257,17 @@ BEGIN
 		RETURN NEXT rec;
 	END LOOP;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.hosthistory_status_percentages_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) OWNER TO farmer;
 
 --
--- Name: hosthistory_status_summary(text); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hosthistory_status_summary(text); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION hosthistory_status_summary(query_input text) RETURNS SETOF hosthistory_status_summary_return
+    LANGUAGE plpgsql
     AS $$
 DECLARE
  rec hosthistory_status_summary_return;
@@ -724,15 +1291,17 @@ BEGIN
 	END LOOP;
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.hosthistory_status_summary(query_input text) OWNER TO farmer;
 
 --
--- Name: hosthistory_status_summary_duration_adjusted(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hosthistory_status_summary_duration_adjusted(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION hosthistory_status_summary_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) RETURNS SETOF hosthistory_status_summary_return
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	rec hosthistory_status_summary_return;
@@ -742,15 +1311,17 @@ BEGIN
 		RETURN NEXT rec;
 	END LOOP;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.hosthistory_status_summary_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) OWNER TO farmer;
 
 --
--- Name: hosthistory_timespan_duration_adjusted(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hosthistory_timespan_duration_adjusted(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone) RETURNS SETOF hosthistory
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	rec hosthistory;
@@ -798,15 +1369,17 @@ BEGIN
 		END LOOP;
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone) OWNER TO farmer;
 
 --
--- Name: hosthistory_timespan_duration_adjusted(timestamp without time zone, timestamp without time zone, text, text); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hosthistory_timespan_duration_adjusted(timestamp without time zone, timestamp without time zone, text, text); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) RETURNS SETOF hosthistory
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	rec hosthistory;
@@ -837,15 +1410,17 @@ BEGIN
 		END LOOP;
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) OWNER TO farmer;
 
 --
--- Name: hosthistory_user_slave_summary(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hosthistory_user_slave_summary(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION hosthistory_user_slave_summary(history_start timestamp without time zone, history_end timestamp without time zone) RETURNS SETOF hosthistory_user_slave_summary_return
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	ret hosthistory_user_slave_summary_return;
@@ -876,39 +1451,41 @@ BEGIN
 	END LOOP;
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.hosthistory_user_slave_summary(history_start timestamp without time zone, history_end timestamp without time zone) OWNER TO farmer;
 
 --
--- Name: hoststatus_update(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: hoststatus_update(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION hoststatus_update() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 BEGIN
-	IF (NEW.slavestatus IS NOT NULL)
-	AND (NEW.slavestatus != OLD.slavestatus) THEN
-		NEW.lastStatusChange = NOW();
-	END IF;
+    IF (NEW.slavestatus IS NOT NULL)
+    AND (NEW.slavestatus != OLD.slavestatus) THEN
+        NEW.lastStatusChange = NOW();
+    END IF;
 
-	IF (NEW.slavestatus IS NOT NULL)
-	AND (NEW.slavestatus != OLD.slavestatus) THEN
-		UPDATE hosthistory SET duration = now() - datetime, nextstatus=NEW.slavestatus WHERE duration is null and fkeyhost=NEW.fkeyhost;
-		INSERT INTO hosthistory (datetime,fkeyhost,status,laststatus, change_from_ip) VALUES (now(),NEW.fkeyhost,NEW.slavestatus,OLD.slavestatus,inet_client_addr());
-	END IF;
-	
-	RETURN NEW;
+    IF (OLD.slavestatus != NEW.slavestatus) AND (NEW.slavestatus IN ('starting','stopping','restart')) THEN
+        PERFORM return_slave_tasks_3(NEW.fkeyhost);
+    END IF;
+    
+    RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.hoststatus_update() OWNER TO farmer;
 
 --
--- Name: increment_loadavgadjust(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: increment_loadavgadjust(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION increment_loadavgadjust(_fkeyhost integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	loadavgadjust_inc float;
@@ -916,42 +1493,75 @@ BEGIN
 	SELECT INTO loadavgadjust_inc value::float FROM config WHERE config='assburnerLoadAvgAdjustInc';
 	UPDATE HostLoad SET loadavgadjust=loadavgadjust_inc+loadavgadjust WHERE fkeyhost=_fkeyhost;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.increment_loadavgadjust(_fkeyhost integer) OWNER TO farmer;
 
 --
--- Name: insert_jobtask(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: insert_jobtask(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION insert_jobtask() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 BEGIN
 UPDATE JobStatus SET tasksCount = tasksCount + 1, tasksUnassigned = tasksUnassigned + 1 WHERE fkeyJob = NEW.fkeyjob;
 RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.insert_jobtask() OWNER TO farmer;
 
 --
--- Name: interval_divide(interval, interval); Type: FUNCTION; Schema: public; Owner: -
+-- Name: interval_divide(interval, interval); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION interval_divide(numerator interval, denominator interval) RETURNS double precision
+    LANGUAGE plpgsql
     AS $$
 BEGIN
 	RETURN extract(epoch from numerator) / extract(epoch from denominator)::float;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.interval_divide(numerator interval, denominator interval) OWNER TO farmer;
 
 --
--- Name: job_error_increment(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: job_delete(); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION job_delete() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    stat RECORD;
+BEGIN
+-- this is too goddamn slow
+    --DELETE FROM jobassignment WHERE fkeyjob = OLD.keyjob;
+    --DELETE FROM jobtask     WHERE fkeyjob = OLD.keyjob;
+    --DELETE FROM joberror    WHERE fkeyjob = OLD.keyjob;
+    --DELETE FROM jobhistory  WHERE fkeyjob = OLD.keyjob;
+    --DELETE FROM jobstatus   WHERE fkeyjob = OLD.keyjob;
+    --DELETE FROM jobservice  WHERE fkeyjob = OLD.keyjob;
+    --DELETE FROM jobdep      WHERE fkeyjob = OLD.keyjob;
+    --DELETE FROM joboutput   WHERE fkeyjob = OLD.keyjob;
+
+    RETURN OLD;
+END;
+$$;
+
+
+ALTER FUNCTION public.job_delete() OWNER TO farmer;
+
+--
+-- Name: job_error_increment(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION job_error_increment() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 BEGIN
 	IF (NEW.cleared IS NULL OR NEW.cleared=false) AND (NEW.count > coalesce(OLD.count,0)) THEN
@@ -963,29 +1573,33 @@ BEGIN
 	END IF;
 	RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.job_error_increment() OWNER TO farmer;
 
 --
--- Name: job_error_insert(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: job_error_insert(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION job_error_insert() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 BEGIN
 	UPDATE jobstatus SET errorcount=errorcount+1 WHERE fkeyjob=NEW.fkeyjob;
 	RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.job_error_insert() OWNER TO farmer;
 
 --
--- Name: job_gatherstats(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: job_gatherstats(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION job_gatherstats(_keyjob integer) RETURNS job_gatherstats_result
+    LANGUAGE plpgsql
     AS $$
 DECLARE
         ret Job_GatherStats_Result;
@@ -1029,8 +1643,8 @@ BEGIN
                         JOIN jobassignment ja ON ja.keyjobassignment=jta.fkeyjobassignment
                         WHERE
                                 ja.fkeyjob=_keyjob
-                                AND jas.status='error'
-                        GROUP BY jas.status;
+                                AND (jas.status='error' OR jas.status='cancelled')
+                        GROUP BY ja.fkeyjob;
         SELECT INTO ret.mincopytime, ret.avgcopytime, ret.maxcopytime, ret.totalcopytime, ret.copycount
                                 min(ja.ended-ja.started) as minloadtime,
                                 avg(ja.ended-ja.started) as avgloadtime,
@@ -1056,96 +1670,232 @@ BEGIN
         END IF;
         RETURN ret;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.job_gatherstats(_keyjob integer) OWNER TO farmer;
 
 --
--- Name: job_insert(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: job_gatherstats_2(integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION job_gatherstats_2(_keyjob integer) RETURNS job_gatherstats_result_2
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+        ret Job_GatherStats_Result_2;
+BEGIN
+	-- Task (frame) times - only this stat is in wallclock time
+	-- cputime is amount of actual processor time spent
+        SELECT INTO ret.mintasktime, ret.avgtasktime, ret.maxtasktime, ret.totaltasktime,
+                    ret.mincputime, ret.avgcputime, ret.maxcputime, ret.totalcputime,
+                    ret.taskcount
+		min(ja.ended-ja.started) as mintime,
+		avg(ja.ended-ja.started) as avgtime,
+		max(ja.ended-ja.started) as maxtime,
+		sum(ja.ended-ja.started) as totaltime,
+		min(usertime+systime) * '1 msecs'::interval as mincputime,
+		avg(usertime+systime) * '1 msecs'::interval as avgcputime,
+		max(usertime+systime) * '1 msecs'::interval as maxcputime,
+		sum(usertime+systime) * '1 msecs'::interval as totalcputime,
+                count(*) as loadcount
+        FROM jobtaskassignment jta
+        JOIN jobassignmentstatus jas ON jas.keyjobassignmentstatus=jta.fkeyjobassignmentstatus
+        JOIN jobassignment ja ON ja.keyjobassignment=jta.fkeyjobassignment
+        WHERE ja.fkeyjob=_keyjob
+              AND jas.status='done'
+        GROUP BY jas.status;
+        
+	-- Load Times
+        SELECT INTO ret.totalloadtime, ret.loadcount
+		sum(ja.ended-ja.started) as totaltime,
+                count(*) as loadcount
+        FROM jobtaskassignment jta
+        JOIN jobassignmentstatus jas ON jas.keyjobassignmentstatus=jta.fkeyjobassignmentstatus
+        JOIN jobassignment ja ON ja.keyjobassignment=jta.fkeyjobassignment
+        WHERE ja.fkeyjob=_keyjob
+              AND jas.status='copy'
+        GROUP BY jas.status;
+        
+        -- Error Times
+        SELECT INTO ret.totalerrortime, ret.errorcount
+		sum(ja.ended-ja.started) as totaltime,
+		count(*) as loadcount
+        FROM jobtaskassignment jta
+        JOIN jobassignmentstatus jas ON jas.keyjobassignmentstatus=jta.fkeyjobassignmentstatus
+        JOIN jobassignment ja ON ja.keyjobassignment=jta.fkeyjobassignment
+        WHERE ja.fkeyjob=_keyjob
+              AND jas.status='error'
+        GROUP BY ja.fkeyjob;
+
+        -- Cancel Times
+        SELECT INTO ret.totalcanceltime, ret.cancelcount
+		sum(ja.ended-ja.started) as totaltime,
+		count(*) as loadcount
+        FROM jobtaskassignment jta
+        JOIN jobassignmentstatus jas ON jas.keyjobassignmentstatus=jta.fkeyjobassignmentstatus
+        JOIN jobassignment ja ON ja.keyjobassignment=jta.fkeyjobassignment
+        WHERE ja.fkeyjob=_keyjob
+              AND jas.status='cancelled'
+        GROUP BY ja.fkeyjob;
+
+        -- Copy times
+        SELECT INTO ret.totalcopytime, ret.copycount
+		sum(ja.ended-ja.started) as totaltime,
+                count(*) as loadcount
+        FROM jobtaskassignment jta
+        JOIN jobassignmentstatus jas ON jas.keyjobassignmentstatus=jta.fkeyjobassignmentstatus
+        JOIN jobassignment ja ON ja.keyjobassignment=jta.fkeyjobassignment
+        WHERE ja.fkeyjob=_keyjob
+	      AND jas.status='copy'
+        GROUP BY jas.status;
+
+        
+        ret.totaltime := '0 minutes'::interval;
+        IF ret.totaltasktime IS NOT NULL THEN
+                ret.totaltime := ret.totaltime + ret.totaltasktime;
+        END IF;
+        IF ret.totalloadtime IS NOT NULL THEN
+                ret.totaltime := ret.totaltime + ret.totalloadtime;
+        END IF;
+        IF ret.totalerrortime IS NOT NULL THEN
+                ret.totaltime := ret.totaltime + ret.totalerrortime;
+        END IF;
+        IF ret.totalcanceltime IS NOT NULL THEN
+                ret.totaltime := ret.totaltime + ret.totalcanceltime;
+        END IF;
+        IF ret.totalcopytime IS NOT NULL THEN
+                ret.totaltime := ret.totaltime + ret.totalcopytime;
+        END IF;
+        RETURN ret;
+END;
+$$;
+
+
+ALTER FUNCTION public.job_gatherstats_2(_keyjob integer) OWNER TO farmer;
+
+--
+-- Name: job_insert(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION job_insert() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
+DECLARE
+    _envkey integer;
 BEGIN
 	INSERT INTO jobstatus (fkeyjob) VALUES (NEW.keyjob);
-RETURN NEW;
+	RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.job_insert() OWNER TO farmer;
 
 --
--- Name: job_update(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: job_update(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION job_update() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
-	stat RECORD;
+    stat RECORD;
 BEGIN
-	-- Set Job.taskscount and Job.tasksunassigned
-	IF NEW.status IN ('verify','verify-suspended') THEN
-		PERFORM update_job_task_counts(NEW.keyjob);
-	END IF;
+    -- Set Job.taskscount and Job.tasksunassigned
+    IF NEW.status IN ('verify','verify-suspended') THEN
+        PERFORM update_job_task_counts(NEW.keyjob);
+    END IF;
 
-	IF NEW.status IN ('verify', 'suspended', 'deleted') AND OLD.status != 'submit' THEN
-		PERFORM cancel_job_assignments(NEW.keyjob);
-	END IF;
+    IF NEW.status IN ('verify', 'suspended', 'deleted') AND OLD.status != 'submit' THEN
+        PERFORM cancel_job_assignments(NEW.keyjob, 'cancelled', 'new');
+    END IF;
 
-	IF (NEW.fkeyjobstat IS NOT NULL) THEN
-		IF (NEW.status='started' AND OLD.status='ready') THEN
-			UPDATE jobstat SET started=NOW() WHERE keyjobstat=NEW.fkeyjobstat AND started IS NULL;
-		END IF;
-		IF (NEW.status='ready' AND OLD.status='done') THEN
-			SELECT INTO stat * from jobstat where keyjobstat=NEW.fkeyjobstat;
-			INSERT INTO jobstat (fkeyelement, fkeyproject, taskCount, fkeyusr, started, pass) VALUES (stat.fkeyelement, stat.fkeyproject, stat.taskCount, stat.fkeyusr, NOW(), stat.pass);
-			SELECT INTO NEW.fkeyjobstat currval('jobstat_keyjobstat_seq');
-		END IF;
-		IF (NEW.status IN ('done','deleted') AND OLD.status IN ('ready','started') ) THEN
-			UPDATE jobstat
-			SET
-				ended=NOW(),
-				errorcount=iq.errorcount,
-				totaltasktime=iq.totaltasktime, mintasktime=iq.mintasktime, maxtasktime=iq.maxtasktime, avgtasktime=iq.avgtasktime,
-				totalloadtime=iq.totalloadtime, minloadtime=iq.minloadtime, maxloadtime=iq.maxloadtime, avgloadtime=iq.avgloadtime,
-				totalerrortime=iq.totalerrortime, minerrortime=iq.minerrortime, maxerrortime=iq.maxerrortime, avgerrortime=iq.avgerrortime,
-				totalcopytime=iq.totalcopytime, mincopytime=iq.mincopytime, maxcopytime=iq.maxcopytime, avgcopytime=iq.avgcopytime
-			FROM (select * FROM Job_GatherStats(NEW.keyjob)) as iq
-			WHERE keyjobstat=NEW.fkeyjobstat;
-			UPDATE jobstat
-			SET
-				taskcount=iq.taskscount,
-				taskscompleted=iq.tasksdone
-			FROM (select jobstatus.taskscount, jobstatus.tasksdone FROM jobstatus WHERE jobstatus.fkeyjob=NEW.keyjob) as iq
-			WHERE keyjobstat=NEW.fkeyjobstat;
-		END IF;
-	END IF;
+    IF (NEW.fkeyjobstat IS NOT NULL) THEN
+        IF (NEW.status='started' AND OLD.status='ready') THEN
+            UPDATE jobstat SET started=NOW() WHERE keyjobstat=NEW.fkeyjobstat AND started IS NULL;
+        END IF;
+        IF (NEW.status='ready' AND OLD.status='done') THEN
+            SELECT INTO stat * from jobstat where keyjobstat=NEW.fkeyjobstat;
+            INSERT INTO jobstat (fkeyelement, fkeyproject, taskCount, fkeyusr, started, pass, fkeyjobtype, fkeyjob) VALUES (stat.fkeyelement, stat.fkeyproject, stat.taskCount, stat.fkeyusr, NOW(), stat.pass, NEW.fkeyjobtype, NEW.keyjob);
+            SELECT INTO NEW.fkeyjobstat currval('jobstat_keyjobstat_seq');
+        END IF;
+        IF (NEW.status IN ('done','deleted') AND OLD.status IN ('ready','started','suspended') ) THEN
+            UPDATE jobstat
+            SET
+                fkeyjobtype=NEW.fkeyjobtype,
+                fkeyjob=NEW.keyjob,
+                ended=NOW(),
+                errorcount=iq.errorcount,
+                totaltasktime=iq.totaltasktime, mintasktime=iq.mintasktime, maxtasktime=iq.maxtasktime, avgtasktime=iq.avgtasktime,
+                totalcputime=iq.totalcputime, mincputime=iq.mincputime, maxcputime=iq.maxcputime, avgcputime=iq.avgcputime,
+                totalloadtime=iq.totalloadtime,
+                totalerrortime=iq.totalerrortime,
+                totalcanceltime=iq.totalcanceltime,
+                totalcopytime=iq.totalcopytime,
+                avgefficiency = (iq.totalcputime / iq.totaltasktime) / NEW.slots
+            FROM (select * FROM Job_GatherStats_2(NEW.keyjob)) as iq
+            WHERE keyjobstat=NEW.fkeyjobstat;
+            UPDATE jobstat
+            SET
+                taskcount=iq.taskscount,
+                taskscompleted=iq.tasksdone
+            FROM (select jobstatus.taskscount, jobstatus.tasksdone FROM jobstatus WHERE jobstatus.fkeyjob=NEW.keyjob) as iq
+            WHERE keyjobstat=NEW.fkeyjobstat;
+        END IF;
+    END IF;
 
-	RETURN NEW;
+
+    --IF NEW.fkeyjobenvironment IS NOT NULL AND NEW.environment IS NULL THEN
+	--SELECT INTO NEW.environment environment from jobenvironment where keyjobenvironment = NEW.fkeyjobenvironment;
+    --END IF;
+
+    IF NEW.fkeyjobenvironment IS NULL AND (OLD.environment IS NULL OR NEW.environment != OLD.environment) THEN
+	INSERT INTO jobenvironment (keyjobenvironment, environment) VALUES (DEFAULT, NEW.environment) RETURNING keyjobenvironment INTO NEW.fkeyjobenvironment;
+    END IF;
+
+    -- Set the suspended timestamp if job gets suspended
+    IF NEW.status IN ('suspended') THEN
+        NEW.suspendedts = NOW();
+    END IF;
+
+    -- Clear the suspended timestamp if the job is removed from suspension
+    IF (NEW.status != OLD.status AND OLD.status='suspended') THEN
+        NEW.suspendedts = NULL;
+    END IF;
+
+    RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.job_update() OWNER TO farmer;
 
 --
--- Name: jobassignment_after_update(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: jobassignment_after_update(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION jobassignment_after_update() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 BEGIN
 	PERFORM update_host_assignment_count(NEW.fkeyhost);
+	--IF TG_OP = 'UPDATE' AND OLD.fkeyjobassignmentstatus != NEW.fkeyjobassignmentstatus THEN
+	--	PERFORM update_job_task_counts_2(NEW.fkeyjob);
+	--END IF;
 	return NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.jobassignment_after_update() OWNER TO farmer;
 
 --
--- Name: jobassignment_delete(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: jobassignment_delete(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION jobassignment_delete() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	oldstatusval int := 0;
@@ -1159,68 +1909,175 @@ BEGIN
 	END IF;
 	RETURN OLD;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.jobassignment_delete() OWNER TO farmer;
 
 --
--- Name: jobassignment_insert(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: jobassignment_insert(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION jobassignment_insert() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 BEGIN
+	SELECT INTO NEW.assignslots slots FROM job WHERE keyjob = NEW.fkeyjob;
+	
 	PERFORM updateJobLicenseCounts( NEW.fkeyjob, 1 );
 
 	RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.jobassignment_insert() OWNER TO farmer;
 
 --
--- Name: jobassignment_update(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: jobassignment_update(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION jobassignment_update() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
-	currentjob job;
-	oldstatusval int := 0;
-	newstatusval int := 0;
-	assignmentcountchange int :=0;
+    oldstatusval int := 0;
+    newstatusval int := 0;
 BEGIN
-	IF NEW.fkeyhost != OLD.fkeyhost THEN
-		-- TODO: Raise some kind of error
-		RAISE NOTICE 'JobAssignment.fkeyhost is immutable';
-	END IF;
+    IF NEW.fkeyhost != OLD.fkeyhost THEN
+        -- TODO: Raise some kind of error
+        RAISE NOTICE 'JobAssignment.fkeyhost is immutable';
+    END IF;
 
-	IF OLD.fkeyjobassignmentstatus != NEW.fkeyjobassignmentstatus THEN
-		oldstatusval := assignment_status_count(OLD.fkeyjobassignmentstatus);
-		newstatusval := assignment_status_count(NEW.fkeyjobassignmentstatus);
+    IF OLD.fkeyjobassignmentstatus != NEW.fkeyjobassignmentstatus THEN
+        oldstatusval := assignment_status_count(OLD.fkeyjobassignmentstatus);
+        newstatusval := assignment_status_count(NEW.fkeyjobassignmentstatus);
 
-		-- Update license count if status is changing from one that requires a license to one that doesnt
-		IF oldstatusval > newstatusval THEN
-			PERFORM updateJobLicenseCounts( NEW.fkeyjob, -1 );
-			IF NEW.started IS NOT NULL THEN
-				NEW.ended := NOW();
-			END IF;
-		END IF;
-		IF newstatusval > oldstatusval THEN
-			PERFORM updateJobLicenseCounts( NEW.fkeyjob, 1 );
-		END IF;
-	END IF;
-	RETURN NEW;
+        -- Update license count if status is changing from one that requires a license to one that doesnt
+        IF oldstatusval > newstatusval THEN
+            PERFORM updateJobLicenseCounts( NEW.fkeyjob, -1 );
+            IF NEW.started IS NOT NULL THEN
+                NEW.ended := NOW();
+            END IF;
+        END IF;
+        IF newstatusval > oldstatusval THEN
+            PERFORM updateJobLicenseCounts( NEW.fkeyjob, 1 );
+        END IF;
+
+        IF NEW.fkeyjobassignmentstatus > 4 THEN
+            -- somethere terrible has happened so trickle down to all active JobAssignmentTasks
+            --RAISE NOTICE 'JA bugging out, let JTAs know';
+
+            UPDATE JobTaskAssignment 
+            SET fkeyjoberror = NEW.fkeyjoberror
+            WHERE fkeyjobassignment=NEW.keyjobassignment;
+        END IF;
+        IF NEW.fkeyjobassignmentstatus > 3 THEN
+            NEW.ended = now();
+        END IF;
+    END IF;
+
+    RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
+
+
+ALTER FUNCTION public.jobassignment_update() OWNER TO farmer;
+
+--
+-- Name: jobdep_delete(); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION jobdep_delete() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$DECLARE
+    dependentJob RECORD;
+    curStatus text;
+BEGIN
+    FOR dependentJob IN
+        SELECT job.keyjob as dependentKey
+        FROM jobdep
+        JOIN job ON jobdep.fkeyjob = job.keyjob
+        WHERE fkeydep = OLD.fkeyjob
+    LOOP
+	SELECT INTO curStatus status
+	FROM job
+	WHERE keyjob = dependentJob.dependentKey;
+
+	IF curStatus = 'holding' THEN
+		RAISE WARNING 'Updating job status for %', dependentJob.dependentKey;
+
+		UPDATE job SET status = 'verify' WHERE keyjob = dependentJob.dependentKey;
+		INSERT INTO jobhistory (fkeyjob, message) VALUES (dependentJob.dependentKey, 'Job dependency has been removed by parent job. Setting job status to verify.');
+	END IF;
+    END LOOP;
+    RETURN OLD;
+END;$$;
+
+
+ALTER FUNCTION public.jobdep_delete() OWNER TO farmer;
+
+--
+-- Name: jobdep_keyjobdep_seq; Type: SEQUENCE; Schema: public; Owner: farmer
+--
+
+CREATE SEQUENCE jobdep_keyjobdep_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.jobdep_keyjobdep_seq OWNER TO farmer;
+
+--
+-- Name: jobdep_keyjobdep_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobdep_keyjobdep_seq', 1, false);
 
 
 --
--- Name: joberror_inc(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: jobdep; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobdep (
+    keyjobdep integer DEFAULT nextval('jobdep_keyjobdep_seq'::regclass) NOT NULL,
+    fkeyjob integer,
+    fkeydep integer,
+    deptype integer DEFAULT 1 NOT NULL
+);
+
+
+ALTER TABLE public.jobdep OWNER TO farmer;
+
+--
+-- Name: jobdep_recursive(text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION jobdep_recursive(keylist text) RETURNS SETOF jobdep
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+       RETURN QUERY EXECUTE
+               'WITH RECURSIVE job_dep_rec AS (
+                       SELECT jobdep.* from jobdep WHERE fkeyjob IN (' || keylist || ')
+                       UNION
+                       SELECT jd.* FROM job_dep_rec jdr, jobdep jd WHERE jd.fkeyjob=jdr.fkeydep
+               ) SELECT * FROM job_dep_rec';
+END;
+$$;
+
+
+ALTER FUNCTION public.jobdep_recursive(keylist text) OWNER TO postgres;
+
+--
+-- Name: joberror_inc(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION joberror_inc() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	j RECORD;
@@ -1231,36 +2088,57 @@ BEGIN
 	END IF;
 	RETURN NULL;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.joberror_inc() OWNER TO farmer;
 
 --
--- Name: jobtaskassignment_update(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: jobtaskassignment_update(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION jobtaskassignment_update() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
-DECLARE
-	cancelledStatusKey int;
-	busyStatusKey int;
 BEGIN
-	SELECT INTO cancelledStatusKey keyjobassignmentstatus FROM jobassignmentstatus WHERE status='cancelled';
-	SELECT INTO busyStatusKey keyjobassignmentstatus FROM jobassignmentstatus WHERE status='busy';
-	IF NEW.fkeyjobassignmentstatus = cancelledStatusKey AND OLD.fkeyjobassignmentstatus = busyStatusKey THEN
-		UPDATE JobAssignment SET fkeyjobassignmentstatus=cancelledStatusKey WHERE keyjobassignment=NEW.fkeyjobassignment;
-	END IF;
-	RETURN NEW;
+    IF OLD.memory IS NOT NULL AND OLD.memory > NEW.memory THEN
+        NEW.memory := OLD.memory;
+    END IF;
+    RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.jobtaskassignment_update() OWNER TO farmer;
 
 --
--- Name: return_slave_tasks(integer, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
+-- Name: pg_stat_statements(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION pg_stat_statements(OUT userid oid, OUT dbid oid, OUT query text, OUT calls bigint, OUT total_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint) RETURNS SETOF record
+    LANGUAGE c
+    AS '$libdir/pg_stat_statements', 'pg_stat_statements';
+
+
+ALTER FUNCTION public.pg_stat_statements(OUT userid oid, OUT dbid oid, OUT query text, OUT calls bigint, OUT total_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint) OWNER TO postgres;
+
+--
+-- Name: pg_stat_statements_reset(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION pg_stat_statements_reset() RETURNS void
+    LANGUAGE c
+    AS '$libdir/pg_stat_statements', 'pg_stat_statements_reset';
+
+
+ALTER FUNCTION public.pg_stat_statements_reset() OWNER TO postgres;
+
+--
+-- Name: return_slave_tasks(integer, boolean, boolean); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION return_slave_tasks(_keyhost integer, commithoststatus boolean, preassigned boolean) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 BEGIN
 	IF commitHostStatus THEN
@@ -1272,15 +2150,17 @@ BEGIN
 		UPDATE jobtask SET status = 'new', fkeyhost=NULL, started=NULL, memory=NULL, fkeyjobcommandhistory=NULL WHERE fkeyhost=_keyhost AND status IN ('assigned','busy');
 	END IF;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.return_slave_tasks(_keyhost integer, commithoststatus boolean, preassigned boolean) OWNER TO farmer;
 
 --
--- Name: return_slave_tasks_2(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: return_slave_tasks_2(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION return_slave_tasks_2(_keyhost integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	j job;
@@ -1303,15 +2183,17 @@ BEGIN
 		END IF;
 	END LOOP;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.return_slave_tasks_2(_keyhost integer) OWNER TO farmer;
 
 --
--- Name: return_slave_tasks_3(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: return_slave_tasks_3(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION return_slave_tasks_3(_keyhost integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	cancelledStatusKey int;
@@ -1332,44 +2214,50 @@ BEGIN
 								      FROM jobassignmentstatus 
 								      WHERE status IN ('ready','copy','busy'));
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.return_slave_tasks_3(_keyhost integer) OWNER TO farmer;
 
 --
--- Name: sync_host_to_hoststatus(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: sync_host_to_hoststatus(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION sync_host_to_hoststatus() RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 BEGIN
 	DELETE FROM HostStatus WHERE fkeyhost NOT IN (SELECT keyhost FROM Host);
 	INSERT INTO HostStatus (fkeyhost) SELECT keyhost FROM Host WHERE keyhost NOT IN (SELECT fkeyhost FROM HostStatus WHERE fkeyhost IS NOT NULL);
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.sync_host_to_hoststatus() OWNER TO farmer;
 
 --
--- Name: sync_host_to_hoststatus_trigger(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: sync_host_to_hoststatus_trigger(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION sync_host_to_hoststatus_trigger() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 BEGIN
 	PERFORM sync_host_to_hoststatus();
 	RETURN NEW;
 END
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.sync_host_to_hoststatus_trigger() OWNER TO farmer;
 
 --
--- Name: update_host(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_host(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_host() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 currentjob job;
@@ -1400,39 +2288,38 @@ IF (NEW.slavestatus IS NOT NULL)
 END IF;
 RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_host() OWNER TO farmer;
 
 --
--- Name: update_host_assignment_count(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_host_assignment_count(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_host_assignment_count(_keyhost integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$ 
 BEGIN
 UPDATE HostStatus hs
 SET activeAssignmentCount = coalesce((
-	SELECT sum(slots)  
-	FROM job j
-	JOIN jobassignment ja ON (ja.fkeyjob = j.keyjob)
-	JOIN jobassignmentstatus jas ON (ja.fkeyjobassignmentstatus = keyjobassignmentstatus)
-	JOIN hoststatus hs ON hs.fkeyhost = ja.fkeyhost
-        WHERE jas.status IN ('ready','copy','busy')
-	  AND hs.fkeyhost = _keyhost
-	GROUP BY hs.fkeyhost),0),
+	SELECT sum(assignslots)  
+	FROM jobassignment ja
+        WHERE ja.fkeyjobassignmentstatus < 4 AND ja.fkeyhost = _keyhost),0),
     lastAssignmentChange=NOW()
 WHERE hs.fkeyhost = _keyhost;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_host_assignment_count(_keyhost integer) OWNER TO farmer;
 
 --
--- Name: update_hostload(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_hostload(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_hostload() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	seconds float;
@@ -1458,15 +2345,17 @@ BEGIN
 	END IF;
 	RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_hostload() OWNER TO farmer;
 
 --
--- Name: update_hostservice(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_hostservice(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_hostservice() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 BEGIN
@@ -1475,15 +2364,17 @@ IF (NEW.pulse != OLD.pulse) OR (NEW.pulse IS NOT NULL AND OLD.pulse IS NULL) THE
 END IF;
 RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_hostservice() OWNER TO farmer;
 
 --
--- Name: update_job_deps(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_job_deps(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_job_deps(_keyjob integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
     childDepRec RECORD;
@@ -1494,7 +2385,7 @@ BEGIN
         SELECT job.keyjob as childKey
         FROM jobdep
         JOIN job ON jobdep.fkeyjob = job.keyjob
-        WHERE jobdep.deptype = 1 AND fkeydep = _keyjob
+        WHERE fkeydep = _keyjob
     LOOP
         newstatus := 'ready';
         FOR childDepRec IN
@@ -1508,18 +2399,70 @@ BEGIN
             END IF;
         END LOOP;
         UPDATE job SET status = newstatus WHERE keyjob = jobDepRec.childKey;
+        INSERT INTO jobhistory (fkeyjob, message) VALUES (jobDepRec.childKey, 'Job status set to: ' || newstatus || ' by parent job'); 
     END LOOP;
     RETURN;
 END;    
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_job_deps(_keyjob integer) OWNER TO farmer;
 
 --
--- Name: update_job_health(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_job_hard_deps(integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION update_job_hard_deps(_keyjob integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    childDepRec RECORD;
+    jobDepRec RECORD;
+    newstatus text;
+BEGIN
+    -- iterate through all a jobs children when its status has changed
+    FOR jobDepRec IN
+        SELECT fkeyjob as childKey 
+        FROM jobdep
+        WHERE fkeydep = _keyjob AND deptype = 1
+    LOOP
+        newstatus := 'ready';
+
+        -- if it's a hard dependency, check all possible parents to make sure they are
+        -- done as well
+	FOR childDepRec IN
+		SELECT status
+                FROM jobdep
+                JOIN job ON jobdep.fkeydep = job.keyjob
+                WHERE keyjob != _keyjob AND fkeyjob = jobDepRec.childKey AND deptype = 1
+        LOOP
+                -- if a parent is not done or deleted then the child should stay on holding
+                IF childDepRec.status != 'done' AND childDepRec.status != 'deleted' THEN
+                    newstatus := 'holding';
+                END IF;
+        END LOOP;
+
+	-- for suspend dependencies, we want to fire regardless of other parents
+	--IF (_oldstatus = 'started' OR _oldstatus = 'ready') AND _newstatus = 'suspended' AND jobDepRec.childDepType = 3 THEN
+	--END IF;
+
+        -- this update should be a null op if the newstatus doesn't change
+        UPDATE job SET status = newstatus WHERE keyjob = jobDepRec.childKey;
+        INSERT INTO jobhistory (fkeyjob, message) VALUES (jobDepRec.childKey, 'Job status set to: ' || newstatus || ' by hard parent job');
+    END LOOP;
+    RETURN;
+END;    
+$$;
+
+
+ALTER FUNCTION public.update_job_hard_deps(_keyjob integer) OWNER TO farmer;
+
+--
+-- Name: update_job_health(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_job_health() RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	j job;
@@ -1529,32 +2472,36 @@ BEGIN
 	END LOOP;
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_job_health() OWNER TO farmer;
 
 --
--- Name: update_job_health_by_key(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_job_health_by_key(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
-CREATE FUNCTION update_job_health_by_key(jobkey integer) RETURNS void
+CREATE FUNCTION update_job_health_by_key(_jobkey integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	j job;
 BEGIN
-	SELECT INTO j * FROM job WHERE keyjob=jobkey;
+	SELECT INTO j * FROM job WHERE keyjob=_jobkey;
 	PERFORM update_single_job_health( j );
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_job_health_by_key(_jobkey integer) OWNER TO farmer;
 
 --
--- Name: update_job_links(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_job_links(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_job_links(_keyjob integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$ 
 BEGIN
 UPDATE jobtask SET status = 'new' WHERE keyjobtask IN (
@@ -1565,15 +2512,164 @@ UPDATE jobtask SET status = 'new' WHERE keyjobtask IN (
         WHERE jobdep.deptype = 2 AND jobdep.fkeydep = _keyjob AND jt1.jobtask = jt2.jobtask
 );  
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_job_links(_keyjob integer) OWNER TO farmer;
 
 --
--- Name: update_job_tallies(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_job_other_deps(integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION update_job_other_deps(_keyjob integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    jobDepRec RECORD;
+BEGIN
+    -- iterate through all a jobs children when its status has changed
+    FOR jobDepRec IN
+        SELECT fkeyjob as childKey 
+        FROM jobdep
+        WHERE fkeydep = _keyjob AND (deptype = 3 OR deptype = 4)
+    LOOP
+        -- this update should be a null op if the newstatus doesn't change
+        UPDATE job SET status = 'ready' WHERE keyjob = jobDepRec.childKey AND status = 'holding';
+        INSERT INTO jobhistory (fkeyjob, message) VALUES (jobDepRec.childKey, 'Job status set to: ' || newstatus || ' by hard parent job');
+    END LOOP;
+    RETURN;
+END;    
+$$;
+
+
+ALTER FUNCTION public.update_job_other_deps(_keyjob integer) OWNER TO farmer;
+
+--
+-- Name: update_job_soft_deps(integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION update_job_soft_deps(_keyjob integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    childDepRec RECORD;
+    jobDepRec RECORD;
+    newstatus text;
+BEGIN
+    -- iterate through all a jobs children, find tasks that can be now be run
+    FOR jobDepRec IN
+        SELECT jt1.keyjobtask as _taskKey, jobdep.fkeyjob as _depKey
+        FROM jobdep 
+        JOIN jobtask AS jt1 ON jt1.fkeyjob = jobdep.fkeyjob AND jt1.status = 'holding'
+        JOIN jobtask AS jt2 ON jt2.fkeyjob = jobdep.fkeydep AND jt2.status = 'done'
+        WHERE jobdep.deptype = 2 AND jobdep.fkeydep = _keyjob AND jt1.jobtask = jt2.jobtask
+    LOOP
+        newstatus := 'new';
+
+        -- check all possible parents to make sure they are done as well
+	FOR childDepRec IN
+		SELECT jt2.status
+                FROM jobdep
+                JOIN jobtask AS jt1 ON jt1.fkeyjob = jobdep.fkeyjob AND jt1.status = 'holding'
+		JOIN jobtask AS jt2 ON jt2.fkeyjob = jobdep.fkeydep AND jt2.status != 'done'
+		WHERE jobdep.deptype = 2 AND jobdep.fkeyjob = jobDepRec._depKey AND jt1.jobtask = jt2.jobtask AND jt1.keyjobtask = jobDepRec._taskKey
+        LOOP
+                -- if a parent is not done or canceled then the child should stay on holding
+                IF childDepRec.status != 'done' AND childDepRec.status != 'canceled' THEN
+                    newstatus := 'holding';
+                END IF;
+        END LOOP;
+
+
+	RAISE NOTICE 'jobtask % change to status %', jobDepRec._taskKey, newstatus;
+        -- this update should be a null op if the newstatus doesn't change
+        UPDATE jobtask SET status = newstatus WHERE keyjobtask = jobDepRec._taskKey;
+    END LOOP;
+    RETURN;
+END;    
+$$;
+
+
+ALTER FUNCTION public.update_job_soft_deps(_keyjob integer) OWNER TO farmer;
+
+--
+-- Name: update_job_stats(integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION update_job_stats(_keyjob integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+        _totaltime bigint := 0;
+        _cputime bigint := 0;
+        _byteswrite bigint := 0;
+        _bytesread bigint := 0;
+        _opswrite bigint := 0;
+        _opsread bigint := 0;
+        _avgtasktime bigint := 0;
+        _avgdonetime int := 0;
+        _avgmem bigint := 0;
+        _efficiency float := 0.0;
+
+BEGIN
+
+SELECT INTO _avgtasktime, _avgmem GREATEST(0, 
+                AVG( GREATEST(0, 
+                              EXTRACT(epoch FROM (coalesce(jobtaskassignment.ended,now())-jobtaskassignment.started))*job.slots
+                             )
+                   )
+                )::int,
+                AVG( jobtaskassignment.memory )::int
+        FROM JobTaskAssignment 
+        INNER JOIN JobTask ON JobTask.fkeyjobtaskassignment=jobtaskassignment.keyjobtaskassignment 
+        JOIN job ON jobtask.fkeyjob=job.keyjob
+        WHERE fkeyjob=_keyjob
+        AND jobtaskassignment.started IS NOT NULL;
+
+SELECT INTO _avgdonetime AVG(date_part('epoch'::text, jobassignment.ended::timestamp with time zone - jobassignment.started::timestamp with time zone) * jobassignment.assignslots )::integer AS avgtime
+   FROM jobassignment
+   JOIN job ON jobassignment.fkeyjob = job.keyjob AND (job.status = ANY (ARRAY['ready'::text, 'started'::text]))
+  WHERE fkeyjob=_keyjob AND jobassignment.ended IS NOT NULL
+  GROUP BY job.keyjob;
+
+SELECT INTO _totaltime, _cputime, _byteswrite, _bytesread, _opswrite, _opsread
+        extract(epoch from sum((coalesce(ended,now())-started)))::bigint,
+        sum(usertime+systime),
+        sum(byteswrite),
+        sum(bytesread),
+        sum(opswrite),
+        sum(opsread)
+        FROM jobassignment ja
+        WHERE fkeyjob = _keyjob AND fkeyjobassignmentstatus < 5;
+
+        UPDATE jobstatus SET
+        averagememory = _avgmem,
+        tasksaveragetime = _avgtasktime,
+        averagedonetime = _avgdonetime,
+        totaltime = _totaltime,
+        cputime = _cputime,
+        byteswrite = _byteswrite,
+        bytesread = _bytesread,
+        opswrite = _opswrite,
+        opsread = _opsread,
+        efficiency = (
+select avg(get_job_efficiency) from get_job_efficiency(_keyjob)
+        )::double precision
+    WHERE fkeyjob = _keyjob;
+
+    RETURN;
+END;
+$$;
+
+
+ALTER FUNCTION public.update_job_stats(_keyjob integer) OWNER TO farmer;
+
+--
+-- Name: update_job_tallies(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_job_tallies() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
         cur RECORD;
@@ -1589,15 +2685,17 @@ BEGIN
         END;
 RETURN NEW;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_job_tallies() OWNER TO farmer;
 
 --
--- Name: update_job_task_counts(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_job_task_counts(integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_job_task_counts(_keyjob integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
         cur RECORD;
@@ -1641,15 +2739,73 @@ BEGIN
         WHERE fkeyjob = _keyjob;
         RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_job_task_counts(_keyjob integer) OWNER TO farmer;
 
 --
--- Name: update_jobtask_counts(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_job_task_counts_2(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION update_job_task_counts_2(_keyjob integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+        cur RECORD;
+        unassigned integer := 0;
+        busy integer := 0;
+        assigned integer := 0;
+        done integer := 0;
+        cancelled integer := 0;
+        suspended integer := 0;
+        holding integer := 0;
+        bitmap text := '';
+BEGIN
+        FOR cur IN
+                SELECT * FROM jobtask WHERE fkeyjob=_keyjob ORDER BY jobtask
+        LOOP
+		bitmap := bitmap || substring(cur.status from 1 for 1);
+                IF( cur.status = 'new' ) THEN
+                        unassigned := unassigned + 1;
+                ELSIF( cur.status = 'assigned' ) THEN
+                        assigned := assigned + 1;
+                ELSIF( cur.status = 'busy' ) THEN
+                        busy := busy + 1;
+                ELSIF( cur.status = 'done' ) THEN
+                        done := done + 1;
+                ELSIF( cur.status = 'cancelled' ) THEN
+                        cancelled := cancelled + 1;
+                ELSIF( cur.status = 'suspended' ) THEN
+                        suspended := suspended + 1;
+                ELSIF( cur.status = 'holding' ) THEN
+                        holding := holding + 1;
+                END IF;
+        END LOOP;
+
+        UPDATE JobStatus SET
+                taskscount = unassigned + assigned + busy + done + cancelled + suspended + holding,
+                tasksUnassigned = unassigned,
+                tasksAssigned = assigned,
+                tasksBusy = busy,
+                tasksDone = done,
+                tasksCancelled = cancelled,
+                tasksSuspended = suspended,
+                taskBitmap = bitmap
+        WHERE fkeyjob = _keyjob;
+        RETURN;
+END;
+$$;
+
+
+ALTER FUNCTION public.update_job_task_counts_2(_keyjob integer) OWNER TO postgres;
+
+--
+-- Name: update_jobtask_counts(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_jobtask_counts() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 BEGIN
@@ -1659,15 +2815,17 @@ BEGIN
         END IF;
 RETURN new;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_jobtask_counts() OWNER TO farmer;
 
 --
--- Name: update_laststatuschange(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_laststatuschange(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_laststatuschange() RETURNS trigger
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 currentjob job;
@@ -1699,15 +2857,17 @@ END IF;
 
 RETURN new;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_laststatuschange() OWNER TO farmer;
 
 --
--- Name: update_project_tempo(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_project_tempo(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_project_tempo() RETURNS void
+    LANGUAGE plpgsql
     AS $$
 	DECLARE
 		cur RECORD;
@@ -1741,30 +2901,34 @@ CREATE FUNCTION update_project_tempo() RETURNS void
 		END LOOP;
 		RETURN;
 	END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_project_tempo() OWNER TO farmer;
 
 --
--- Name: job_keyjob_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: job_keyjob_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE job_keyjob_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: job_keyjob_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('job_keyjob_seq', 265494, true);
-
+ALTER TABLE public.job_keyjob_seq OWNER TO farmer;
 
 --
--- Name: job; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: job_keyjob_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('job_keyjob_seq', 1349504, true);
+
+
+--
+-- Name: job; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE job (
@@ -1843,15 +3007,27 @@ CREATE TABLE job (
     minmemory integer,
     scenename text,
     shotname text,
-    slots integer DEFAULT 4 NOT NULL
+    slots integer DEFAULT 4 NOT NULL,
+    fkeyjobfilterset integer,
+    maxerrors integer DEFAULT 27 NOT NULL,
+    notifycompletemessage text,
+    notifyerrormessage text,
+    fkeywrangler integer,
+    maxquiettime integer DEFAULT 3600 NOT NULL,
+    autoadaptslots integer DEFAULT (-1) NOT NULL,
+    fkeyjobenvironment integer,
+    suspendedts timestamp without time zone
 );
 
 
+ALTER TABLE public.job OWNER TO farmer;
+
 --
--- Name: update_single_job_health(job); Type: FUNCTION; Schema: public; Owner: -
+-- Name: update_single_job_health(job); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
 CREATE FUNCTION update_single_job_health(j job) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
 	history hosthistory_status_summary_return;
@@ -1890,30 +3066,33 @@ BEGIN
 	UPDATE jobstatus SET health = job_health where jobstatus.fkeyjob=j.keyjob;
 	RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.update_single_job_health(j job) OWNER TO farmer;
 
 --
--- Name: updatejoblicensecounts(integer, integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: updatejoblicensecounts(integer, integer); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
-CREATE FUNCTION updatejoblicensecounts(fkeyjob integer, countchange integer) RETURNS void
+CREATE FUNCTION updatejoblicensecounts(_fkeyjob integer, countchange integer) RETURNS void
+    LANGUAGE plpgsql
     AS $$
 DECLARE
     serv service;
 BEGIN
-    FOR serv IN SELECT * FROM Service s JOIN JobService js ON (s.keyService = js.fkeyService AND js.fkeyjob=fkeyjob) WHERE fkeyLicense IS NOT NULL LOOP
-        UPDATE License SET inUse=greatest(0,coalesce(inUse,0) + countChange) WHERE keylicense=serv.fkeylicense;
-    END LOOP;
+    --FOR serv IN SELECT * FROM Service s JOIN JobService js ON (s.keyService = js.fkeyService AND js.fkeyjob=_fkeyjob) WHERE fkeyLicense IS NOT NULL LOOP
+    --    UPDATE License SET inUse=greatest(0,coalesce(inUse,0) + countChange) WHERE keylicense=serv.fkeylicense;
+    --END LOOP;
     RETURN;
 END;
-$$
-    LANGUAGE plpgsql;
+$$;
 
+
+ALTER FUNCTION public.updatejoblicensecounts(_fkeyjob integer, countchange integer) OWNER TO farmer;
 
 --
--- Name: /; Type: OPERATOR; Schema: public; Owner: -
+-- Name: /; Type: OPERATOR; Schema: public; Owner: farmer
 --
 
 CREATE OPERATOR / (
@@ -1923,10 +3102,12 @@ CREATE OPERATOR / (
 );
 
 
+ALTER OPERATOR public./ (interval, interval) OWNER TO farmer;
+
 SET search_path = jabberd, pg_catalog;
 
 --
--- Name: active; Type: TABLE; Schema: jabberd; Owner: -; Tablespace: 
+-- Name: active; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE active (
@@ -1936,8 +3117,10 @@ CREATE TABLE active (
 );
 
 
+ALTER TABLE jabberd.active OWNER TO farmer;
+
 --
--- Name: authreg; Type: TABLE; Schema: jabberd; Owner: -; Tablespace: 
+-- Name: authreg; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE authreg (
@@ -1950,8 +3133,10 @@ CREATE TABLE authreg (
 );
 
 
+ALTER TABLE jabberd.authreg OWNER TO farmer;
+
 --
--- Name: logout; Type: TABLE; Schema: jabberd; Owner: -; Tablespace: 
+-- Name: logout; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE logout (
@@ -1961,27 +3146,31 @@ CREATE TABLE logout (
 );
 
 
+ALTER TABLE jabberd.logout OWNER TO farmer;
+
 --
--- Name: object-sequence; Type: SEQUENCE; Schema: jabberd; Owner: -
+-- Name: object-sequence; Type: SEQUENCE; Schema: jabberd; Owner: farmer
 --
 
 CREATE SEQUENCE "object-sequence"
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE jabberd."object-sequence" OWNER TO farmer;
+
 --
--- Name: object-sequence; Type: SEQUENCE SET; Schema: jabberd; Owner: -
+-- Name: object-sequence; Type: SEQUENCE SET; Schema: jabberd; Owner: farmer
 --
 
 SELECT pg_catalog.setval('"object-sequence"', 1, false);
 
 
 --
--- Name: privacy-items; Type: TABLE; Schema: jabberd; Owner: -; Tablespace: 
+-- Name: privacy-items; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE "privacy-items" (
@@ -1996,8 +3185,10 @@ CREATE TABLE "privacy-items" (
 );
 
 
+ALTER TABLE jabberd."privacy-items" OWNER TO farmer;
+
 --
--- Name: private; Type: TABLE; Schema: jabberd; Owner: -; Tablespace: 
+-- Name: private; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE private (
@@ -2008,8 +3199,10 @@ CREATE TABLE private (
 );
 
 
+ALTER TABLE jabberd.private OWNER TO farmer;
+
 --
--- Name: queue; Type: TABLE; Schema: jabberd; Owner: -; Tablespace: 
+-- Name: queue; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE queue (
@@ -2019,8 +3212,10 @@ CREATE TABLE queue (
 );
 
 
+ALTER TABLE jabberd.queue OWNER TO farmer;
+
 --
--- Name: roster-groups; Type: TABLE; Schema: jabberd; Owner: -; Tablespace: 
+-- Name: roster-groups; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE "roster-groups" (
@@ -2031,8 +3226,10 @@ CREATE TABLE "roster-groups" (
 );
 
 
+ALTER TABLE jabberd."roster-groups" OWNER TO farmer;
+
 --
--- Name: roster-items; Type: TABLE; Schema: jabberd; Owner: -; Tablespace: 
+-- Name: roster-items; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE "roster-items" (
@@ -2046,8 +3243,10 @@ CREATE TABLE "roster-items" (
 );
 
 
+ALTER TABLE jabberd."roster-items" OWNER TO farmer;
+
 --
--- Name: vcard; Type: TABLE; Schema: jabberd; Owner: -; Tablespace: 
+-- Name: vcard; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE vcard (
@@ -2075,28 +3274,33 @@ CREATE TABLE vcard (
 );
 
 
+ALTER TABLE jabberd.vcard OWNER TO farmer;
+
 SET search_path = public, pg_catalog;
 
 --
--- Name: host_keyhost_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: host_keyhost_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE host_keyhost_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: host_keyhost_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('host_keyhost_seq', 876, true);
-
+ALTER TABLE public.host_keyhost_seq OWNER TO farmer;
 
 --
--- Name: host; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: host_keyhost_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('host_keyhost_seq', 2541, true);
+
+
+--
+-- Name: host; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE host (
@@ -2148,30 +3352,36 @@ CREATE TABLE host (
     slavepulse timestamp without time zone,
     puppetpulse timestamp without time zone,
     maxassignments integer DEFAULT 2 NOT NULL,
-    fkeyuser integer
+    fkeyuser integer,
+    maxmemory integer
 );
 
 
+ALTER TABLE public.host OWNER TO farmer;
+
 --
--- Name: hostinterface_keyhostinterface_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostinterface_keyhostinterface_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostinterface_keyhostinterface_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: hostinterface_keyhostinterface_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('hostinterface_keyhostinterface_seq', 590, true);
-
+ALTER TABLE public.hostinterface_keyhostinterface_seq OWNER TO farmer;
 
 --
--- Name: hostinterface; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostinterface_keyhostinterface_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('hostinterface_keyhostinterface_seq', 1, false);
+
+
+--
+-- Name: hostinterface; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostinterface (
@@ -2186,39 +3396,45 @@ CREATE TABLE hostinterface (
 );
 
 
+ALTER TABLE public.hostinterface OWNER TO farmer;
+
 --
--- Name: HostInterfacesVerbose; Type: VIEW; Schema: public; Owner: -
+-- Name: HostInterfacesVerbose; Type: VIEW; Schema: public; Owner: farmer
 --
 
 CREATE VIEW "HostInterfacesVerbose" AS
     SELECT host.keyhost, host.backupbytes, host.cpus, host.description, host.diskusage, host.fkeyjob, host.host, host.manufacturer, host.model, host.os, host.rendertime, host.slavepluginlist, host.sn, host.version, host.renderrate, host.dutycycle, host.memory, host.mhtz, host.online, host.uid, host.slavepacketweight, host.framecount, host.viruscount, host.virustimestamp, host.errortempo, host.fkeyhost_backup, host.oldkey, host.abversion, host.laststatuschange, host.loadavg, host.allowmapping, host.allowsleep, host.fkeyjobtask, host.wakeonlan, host.architecture, host.loc_x, host.loc_y, host.loc_z, host.ostext, host.bootaction, host.fkeydiskimage, host.syncname, host.fkeylocation, host.cpuname, host.osversion, host.slavepulse, hostinterface.keyhostinterface, hostinterface.fkeyhost, hostinterface.mac, hostinterface.ip, hostinterface.fkeyhostinterfacetype, hostinterface.switchport, hostinterface.fkeyswitch, hostinterface.inst FROM (host JOIN hostinterface ON ((host.keyhost = hostinterface.fkeyhost)));
 
 
+ALTER TABLE public."HostInterfacesVerbose" OWNER TO farmer;
+
 --
--- Name: jobtask_keyjobtask_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobtask_keyjobtask_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobtask_keyjobtask_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: jobtask_keyjobtask_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobtask_keyjobtask_seq', 22922963, true);
-
+ALTER TABLE public.jobtask_keyjobtask_seq OWNER TO farmer;
 
 --
--- Name: jobtask; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobtask_keyjobtask_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobtask_keyjobtask_seq', 1, false);
+
+
+--
+-- Name: jobtask; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobtask (
     keyjobtask integer DEFAULT nextval('jobtask_keyjobtask_seq'::regclass) NOT NULL,
-    ended integer,
     fkeyhost integer,
     fkeyjob integer NOT NULL,
     status text DEFAULT 'new'::text,
@@ -2230,26 +3446,31 @@ CREATE TABLE jobtask (
 );
 
 
+ALTER TABLE public.jobtask OWNER TO farmer;
+
 --
--- Name: jobtype_keyjobtype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobtype_keyjobtype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobtype_keyjobtype_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: jobtype_keyjobtype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobtype_keyjobtype_seq', 35, true);
-
+ALTER TABLE public.jobtype_keyjobtype_seq OWNER TO farmer;
 
 --
--- Name: jobtype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobtype_keyjobtype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobtype_keyjobtype_seq', 40, true);
+
+
+--
+-- Name: jobtype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobtype (
@@ -2260,35 +3481,41 @@ CREATE TABLE jobtype (
 );
 
 
+ALTER TABLE public.jobtype OWNER TO farmer;
+
 --
--- Name: StatsByType; Type: VIEW; Schema: public; Owner: -
+-- Name: StatsByType; Type: VIEW; Schema: public; Owner: farmer
 --
 
 CREATE VIEW "StatsByType" AS
-    SELECT "substring"((date_trunc('day'::text, ('1970-01-01 10:00:00+10'::timestamp with time zone + ((jobtask.ended)::double precision * '00:00:01'::interval))))::text, 0, 11) AS day, jobtype.jobtype, count(*) AS frames FROM ((jobtask LEFT JOIN job ON ((jobtask.fkeyjob = job.keyjob))) LEFT JOIN jobtype ON ((jobtype.keyjobtype = job.fkeyjobtype))) WHERE (jobtask.status = 'done'::text) GROUP BY "substring"((date_trunc('day'::text, ('1970-01-01 10:00:00+10'::timestamp with time zone + ((jobtask.ended)::double precision * '00:00:01'::interval))))::text, 0, 11), jobtype.jobtype ORDER BY "substring"((date_trunc('day'::text, ('1970-01-01 10:00:00+10'::timestamp with time zone + ((jobtask.ended)::double precision * '00:00:01'::interval))))::text, 0, 11);
+    SELECT ''::text AS day, jobtype.jobtype, count(*) AS frames FROM ((jobtask LEFT JOIN job ON ((jobtask.fkeyjob = job.keyjob))) LEFT JOIN jobtype ON ((jobtype.keyjobtype = job.fkeyjobtype))) WHERE (jobtask.status = 'done'::text) GROUP BY jobtype.jobtype;
 
+
+ALTER TABLE public."StatsByType" OWNER TO farmer;
 
 --
--- Name: abdownloadstat_keyabdownloadstat_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: abdownloadstat_keyabdownloadstat_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE abdownloadstat_keyabdownloadstat_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.abdownloadstat_keyabdownloadstat_seq OWNER TO farmer;
+
 --
--- Name: abdownloadstat_keyabdownloadstat_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: abdownloadstat_keyabdownloadstat_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('abdownloadstat_keyabdownloadstat_seq', 1, false);
 
 
 --
--- Name: abdownloadstat; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: abdownloadstat; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE abdownloadstat (
@@ -2303,27 +3530,31 @@ CREATE TABLE abdownloadstat (
 );
 
 
+ALTER TABLE public.abdownloadstat OWNER TO farmer;
+
 --
--- Name: annotation_keyannotation_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: annotation_keyannotation_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE annotation_keyannotation_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.annotation_keyannotation_seq OWNER TO farmer;
+
 --
--- Name: annotation_keyannotation_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: annotation_keyannotation_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('annotation_keyannotation_seq', 1, false);
 
 
 --
--- Name: annotation; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: annotation; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE annotation (
@@ -2336,26 +3567,31 @@ CREATE TABLE annotation (
 );
 
 
+ALTER TABLE public.annotation OWNER TO farmer;
+
 --
--- Name: element_keyelement_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: element_keyelement_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE element_keyelement_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: element_keyelement_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('element_keyelement_seq', 1851, true);
-
+ALTER TABLE public.element_keyelement_seq OWNER TO farmer;
 
 --
--- Name: element; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: element_keyelement_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('element_keyelement_seq', 2356, true);
+
+
+--
+-- Name: element; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE element (
@@ -2379,17 +3615,23 @@ CREATE TABLE element (
     datestart date,
     datecomplete date,
     fkeyassettemplate integer,
-    icon bytea
+    icon bytea,
+    arsenalslotlimit integer DEFAULT (-1) NOT NULL,
+    arsenalslotreserve integer DEFAULT 0 NOT NULL
 );
 
 
+ALTER TABLE public.element OWNER TO farmer;
+
 --
--- Name: asset; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: asset; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE asset (
     fkeyassettype integer,
     icon bytea,
+    arsenalslotlimit integer,
+    arsenalslotreserve integer,
     fkeystatus integer,
     keyasset integer,
     version integer
@@ -2397,8 +3639,10 @@ CREATE TABLE asset (
 INHERITS (element);
 
 
+ALTER TABLE public.asset OWNER TO farmer;
+
 --
--- Name: assetdep; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: assetdep; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE assetdep (
@@ -2409,44 +3653,52 @@ CREATE TABLE assetdep (
 );
 
 
+ALTER TABLE public.assetdep OWNER TO farmer;
+
 --
--- Name: assetdep_keyassetdep_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: assetdep_keyassetdep_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE assetdep_keyassetdep_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.assetdep_keyassetdep_seq OWNER TO farmer;
+
 --
--- Name: assetdep_keyassetdep_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: assetdep_keyassetdep_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE assetdep_keyassetdep_seq OWNED BY assetdep.keyassetdep;
 
 
 --
--- Name: assetdep_keyassetdep_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: assetdep_keyassetdep_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('assetdep_keyassetdep_seq', 1, false);
 
 
 --
--- Name: assetgroup; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: assetgroup; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE assetgroup (
-    fkeyassettype integer
+    fkeyassettype integer,
+    arsenalslotlimit integer,
+    arsenalslotreserve integer
 )
 INHERITS (element);
 
 
+ALTER TABLE public.assetgroup OWNER TO farmer;
+
 --
--- Name: assetprop; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: assetprop; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE assetprop (
@@ -2456,53 +3708,59 @@ CREATE TABLE assetprop (
 );
 
 
+ALTER TABLE public.assetprop OWNER TO farmer;
+
 --
--- Name: assetprop_keyassetprop_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: assetprop_keyassetprop_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE assetprop_keyassetprop_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.assetprop_keyassetprop_seq OWNER TO farmer;
+
 --
--- Name: assetprop_keyassetprop_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: assetprop_keyassetprop_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE assetprop_keyassetprop_seq OWNED BY assetprop.keyassetprop;
 
 
 --
--- Name: assetprop_keyassetprop_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: assetprop_keyassetprop_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('assetprop_keyassetprop_seq', 1, false);
 
 
 --
--- Name: assetproperty_keyassetproperty_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: assetproperty_keyassetproperty_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE assetproperty_keyassetproperty_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.assetproperty_keyassetproperty_seq OWNER TO farmer;
+
 --
--- Name: assetproperty_keyassetproperty_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: assetproperty_keyassetproperty_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('assetproperty_keyassetproperty_seq', 1, false);
 
 
 --
--- Name: assetproperty; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: assetproperty; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE assetproperty (
@@ -2514,8 +3772,10 @@ CREATE TABLE assetproperty (
 );
 
 
+ALTER TABLE public.assetproperty OWNER TO farmer;
+
 --
--- Name: assetproptype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: assetproptype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE assetproptype (
@@ -2525,53 +3785,59 @@ CREATE TABLE assetproptype (
 );
 
 
+ALTER TABLE public.assetproptype OWNER TO farmer;
+
 --
--- Name: assetproptype_keyassetproptype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: assetproptype_keyassetproptype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE assetproptype_keyassetproptype_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.assetproptype_keyassetproptype_seq OWNER TO farmer;
+
 --
--- Name: assetproptype_keyassetproptype_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: assetproptype_keyassetproptype_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE assetproptype_keyassetproptype_seq OWNED BY assetproptype.keyassetproptype;
 
 
 --
--- Name: assetproptype_keyassetproptype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: assetproptype_keyassetproptype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('assetproptype_keyassetproptype_seq', 1, false);
 
 
 --
--- Name: assetset_keyassetset_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: assetset_keyassetset_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE assetset_keyassetset_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.assetset_keyassetset_seq OWNER TO farmer;
+
 --
--- Name: assetset_keyassetset_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: assetset_keyassetset_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('assetset_keyassetset_seq', 1, false);
 
 
 --
--- Name: assetset; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: assetset; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE assetset (
@@ -2583,27 +3849,31 @@ CREATE TABLE assetset (
 );
 
 
+ALTER TABLE public.assetset OWNER TO farmer;
+
 --
--- Name: assetsetitem_keyassetsetitem_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: assetsetitem_keyassetsetitem_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE assetsetitem_keyassetsetitem_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.assetsetitem_keyassetsetitem_seq OWNER TO farmer;
+
 --
--- Name: assetsetitem_keyassetsetitem_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: assetsetitem_keyassetsetitem_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('assetsetitem_keyassetsetitem_seq', 1, false);
 
 
 --
--- Name: assetsetitem; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: assetsetitem; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE assetsetitem (
@@ -2615,26 +3885,31 @@ CREATE TABLE assetsetitem (
 );
 
 
+ALTER TABLE public.assetsetitem OWNER TO farmer;
+
 --
--- Name: assettemplate_keyassettemplate_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: assettemplate_keyassettemplate_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE assettemplate_keyassettemplate_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: assettemplate_keyassettemplate_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('assettemplate_keyassettemplate_seq', 172, true);
-
+ALTER TABLE public.assettemplate_keyassettemplate_seq OWNER TO farmer;
 
 --
--- Name: assettemplate; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: assettemplate_keyassettemplate_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('assettemplate_keyassettemplate_seq', 1, false);
+
+
+--
+-- Name: assettemplate; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE assettemplate (
@@ -2646,26 +3921,31 @@ CREATE TABLE assettemplate (
 );
 
 
+ALTER TABLE public.assettemplate OWNER TO farmer;
+
 --
--- Name: assettype_keyassettype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: assettype_keyassettype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE assettype_keyassettype_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.assettype_keyassettype_seq OWNER TO farmer;
+
 --
--- Name: assettype_keyassettype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: assettype_keyassettype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('assettype_keyassettype_seq', 3, true);
 
 
 --
--- Name: assettype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: assettype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE assettype (
@@ -2675,27 +3955,31 @@ CREATE TABLE assettype (
 );
 
 
+ALTER TABLE public.assettype OWNER TO farmer;
+
 --
--- Name: attachment_keyattachment_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: attachment_keyattachment_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE attachment_keyattachment_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.attachment_keyattachment_seq OWNER TO farmer;
+
 --
--- Name: attachment_keyattachment_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: attachment_keyattachment_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('attachment_keyattachment_seq', 1, false);
 
 
 --
--- Name: attachment; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: attachment; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE attachment (
@@ -2714,27 +3998,31 @@ CREATE TABLE attachment (
 );
 
 
+ALTER TABLE public.attachment OWNER TO farmer;
+
 --
--- Name: attachmenttype_keyattachmenttype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: attachmenttype_keyattachmenttype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE attachmenttype_keyattachmenttype_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.attachmenttype_keyattachmenttype_seq OWNER TO farmer;
+
 --
--- Name: attachmenttype_keyattachmenttype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: attachmenttype_keyattachmenttype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('attachmenttype_keyattachmenttype_seq', 1, false);
 
 
 --
--- Name: attachmenttype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: attachmenttype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE attachmenttype (
@@ -2743,27 +4031,31 @@ CREATE TABLE attachmenttype (
 );
 
 
+ALTER TABLE public.attachmenttype OWNER TO farmer;
+
 --
--- Name: calendar_keycalendar_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: calendar_keycalendar_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE calendar_keycalendar_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.calendar_keycalendar_seq OWNER TO farmer;
+
 --
--- Name: calendar_keycalendar_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: calendar_keycalendar_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('calendar_keycalendar_seq', 1, false);
 
 
 --
--- Name: calendar; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: calendar; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE calendar (
@@ -2785,26 +4077,31 @@ CREATE TABLE calendar (
 );
 
 
+ALTER TABLE public.calendar OWNER TO farmer;
+
 --
--- Name: calendarcategory_keycalendarcategory_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: calendarcategory_keycalendarcategory_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE calendarcategory_keycalendarcategory_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: calendarcategory_keycalendarcategory_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('calendarcategory_keycalendarcategory_seq', 1, true);
-
+ALTER TABLE public.calendarcategory_keycalendarcategory_seq OWNER TO farmer;
 
 --
--- Name: calendarcategory; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: calendarcategory_keycalendarcategory_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('calendarcategory_keycalendarcategory_seq', 1, false);
+
+
+--
+-- Name: calendarcategory; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE calendarcategory (
@@ -2813,27 +4110,31 @@ CREATE TABLE calendarcategory (
 );
 
 
+ALTER TABLE public.calendarcategory OWNER TO farmer;
+
 --
--- Name: checklistitem_keychecklistitem_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: checklistitem_keychecklistitem_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE checklistitem_keychecklistitem_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.checklistitem_keychecklistitem_seq OWNER TO farmer;
+
 --
--- Name: checklistitem_keychecklistitem_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: checklistitem_keychecklistitem_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('checklistitem_keychecklistitem_seq', 1, false);
 
 
 --
--- Name: checklistitem; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: checklistitem; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE checklistitem (
@@ -2848,27 +4149,31 @@ CREATE TABLE checklistitem (
 );
 
 
+ALTER TABLE public.checklistitem OWNER TO farmer;
+
 --
--- Name: checkliststatus_keycheckliststatus_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: checkliststatus_keycheckliststatus_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE checkliststatus_keycheckliststatus_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.checkliststatus_keycheckliststatus_seq OWNER TO farmer;
+
 --
--- Name: checkliststatus_keycheckliststatus_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: checkliststatus_keycheckliststatus_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('checkliststatus_keycheckliststatus_seq', 1, false);
 
 
 --
--- Name: checkliststatus; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: checkliststatus; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE checkliststatus (
@@ -2880,26 +4185,31 @@ CREATE TABLE checkliststatus (
 );
 
 
+ALTER TABLE public.checkliststatus OWNER TO farmer;
+
 --
--- Name: client_keyclient_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: client_keyclient_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE client_keyclient_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: client_keyclient_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('client_keyclient_seq', 2, true);
-
+ALTER TABLE public.client_keyclient_seq OWNER TO farmer;
 
 --
--- Name: client; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: client_keyclient_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('client_keyclient_seq', 1, false);
+
+
+--
+-- Name: client; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE client (
@@ -2909,26 +4219,31 @@ CREATE TABLE client (
 );
 
 
+ALTER TABLE public.client OWNER TO farmer;
+
 --
--- Name: config_keyconfig_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: config_keyconfig_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE config_keyconfig_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: config_keyconfig_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('config_keyconfig_seq', 29, true);
-
+ALTER TABLE public.config_keyconfig_seq OWNER TO farmer;
 
 --
--- Name: config; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: config_keyconfig_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('config_keyconfig_seq', 33, true);
+
+
+--
+-- Name: config; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE config (
@@ -2938,37 +4253,87 @@ CREATE TABLE config (
 );
 
 
+ALTER TABLE public.config OWNER TO farmer;
+
 --
--- Name: delivery; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: darwinweight; Type: TABLE; Schema: public; Owner: farmers; Tablespace: 
+--
+
+CREATE TABLE darwinweight (
+    keydarwinscore integer NOT NULL,
+    shotname text NOT NULL,
+    projectname text NOT NULL,
+    weight integer DEFAULT 1 NOT NULL
+);
+
+
+ALTER TABLE public.darwinweight OWNER TO farmers;
+
+--
+-- Name: darwinweight_keydarwinscore_seq; Type: SEQUENCE; Schema: public; Owner: farmers
+--
+
+CREATE SEQUENCE darwinweight_keydarwinscore_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.darwinweight_keydarwinscore_seq OWNER TO farmers;
+
+--
+-- Name: darwinweight_keydarwinscore_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmers
+--
+
+ALTER SEQUENCE darwinweight_keydarwinscore_seq OWNED BY darwinweight.keydarwinscore;
+
+
+--
+-- Name: darwinweight_keydarwinscore_seq; Type: SEQUENCE SET; Schema: public; Owner: farmers
+--
+
+SELECT pg_catalog.setval('darwinweight_keydarwinscore_seq', 1, false);
+
+
+--
+-- Name: delivery; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE delivery (
-    icon bytea
+    icon bytea,
+    arsenalslotlimit integer,
+    arsenalslotreserve integer
 )
 INHERITS (element);
 
 
+ALTER TABLE public.delivery OWNER TO farmer;
+
 --
--- Name: deliveryelement_keydeliveryshot_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: deliveryelement_keydeliveryshot_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE deliveryelement_keydeliveryshot_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.deliveryelement_keydeliveryshot_seq OWNER TO farmer;
+
 --
--- Name: deliveryelement_keydeliveryshot_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: deliveryelement_keydeliveryshot_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('deliveryelement_keydeliveryshot_seq', 1, false);
 
 
 --
--- Name: deliveryelement; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: deliveryelement; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE deliveryelement (
@@ -2980,27 +4345,31 @@ CREATE TABLE deliveryelement (
 );
 
 
+ALTER TABLE public.deliveryelement OWNER TO farmer;
+
 --
--- Name: demoreel_keydemoreel_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: demoreel_keydemoreel_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE demoreel_keydemoreel_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.demoreel_keydemoreel_seq OWNER TO farmer;
+
 --
--- Name: demoreel_keydemoreel_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: demoreel_keydemoreel_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('demoreel_keydemoreel_seq', 1, false);
 
 
 --
--- Name: demoreel; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: demoreel; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE demoreel (
@@ -3015,26 +4384,31 @@ CREATE TABLE demoreel (
 );
 
 
+ALTER TABLE public.demoreel OWNER TO farmer;
+
 --
--- Name: diskimage_keydiskimage_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: diskimage_keydiskimage_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE diskimage_keydiskimage_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: diskimage_keydiskimage_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('diskimage_keydiskimage_seq', 8, true);
-
+ALTER TABLE public.diskimage_keydiskimage_seq OWNER TO farmer;
 
 --
--- Name: diskimage; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: diskimage_keydiskimage_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('diskimage_keydiskimage_seq', 1, false);
+
+
+--
+-- Name: diskimage; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE diskimage (
@@ -3045,45 +4419,52 @@ CREATE TABLE diskimage (
 );
 
 
+ALTER TABLE public.diskimage OWNER TO farmer;
+
 --
--- Name: dynamichostgroup_keydynamichostgroup_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: dynamichostgroup_keydynamichostgroup_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE dynamichostgroup_keydynamichostgroup_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.dynamichostgroup_keydynamichostgroup_seq OWNER TO farmer;
+
 --
--- Name: dynamichostgroup_keydynamichostgroup_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: dynamichostgroup_keydynamichostgroup_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('dynamichostgroup_keydynamichostgroup_seq', 1, false);
 
 
 --
--- Name: hostgroup_keyhostgroup_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostgroup_keyhostgroup_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostgroup_keyhostgroup_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: hostgroup_keyhostgroup_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('hostgroup_keyhostgroup_seq', 54, true);
-
+ALTER TABLE public.hostgroup_keyhostgroup_seq OWNER TO farmer;
 
 --
--- Name: hostgroup; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostgroup_keyhostgroup_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('hostgroup_keyhostgroup_seq', 1, false);
+
+
+--
+-- Name: hostgroup; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostgroup (
@@ -3094,8 +4475,10 @@ CREATE TABLE hostgroup (
 );
 
 
+ALTER TABLE public.hostgroup OWNER TO farmer;
+
 --
--- Name: dynamichostgroup; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: dynamichostgroup; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE dynamichostgroup (
@@ -3105,27 +4488,31 @@ CREATE TABLE dynamichostgroup (
 INHERITS (hostgroup);
 
 
+ALTER TABLE public.dynamichostgroup OWNER TO farmer;
+
 --
--- Name: elementdep_keyelementdep_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: elementdep_keyelementdep_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE elementdep_keyelementdep_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.elementdep_keyelementdep_seq OWNER TO farmer;
+
 --
--- Name: elementdep_keyelementdep_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: elementdep_keyelementdep_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('elementdep_keyelementdep_seq', 1, false);
 
 
 --
--- Name: elementdep; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: elementdep; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE elementdep (
@@ -3136,26 +4523,31 @@ CREATE TABLE elementdep (
 );
 
 
+ALTER TABLE public.elementdep OWNER TO farmer;
+
 --
--- Name: elementstatus_keyelementstatus_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: elementstatus_keyelementstatus_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE elementstatus_keyelementstatus_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.elementstatus_keyelementstatus_seq OWNER TO farmer;
+
 --
--- Name: elementstatus_keyelementstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: elementstatus_keyelementstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('elementstatus_keyelementstatus_seq', 8, true);
 
 
 --
--- Name: elementstatus; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: elementstatus; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE elementstatus (
@@ -3167,26 +4559,31 @@ CREATE TABLE elementstatus (
 );
 
 
+ALTER TABLE public.elementstatus OWNER TO farmer;
+
 --
--- Name: elementthread_keyelementthread_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: elementthread_keyelementthread_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE elementthread_keyelementthread_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: elementthread_keyelementthread_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('elementthread_keyelementthread_seq', 31, true);
-
+ALTER TABLE public.elementthread_keyelementthread_seq OWNER TO farmer;
 
 --
--- Name: elementthread; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: elementthread_keyelementthread_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('elementthread_keyelementthread_seq', 1, false);
+
+
+--
+-- Name: elementthread; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE elementthread (
@@ -3203,26 +4600,31 @@ CREATE TABLE elementthread (
 );
 
 
+ALTER TABLE public.elementthread OWNER TO farmer;
+
 --
--- Name: elementtype_keyelementtype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: elementtype_keyelementtype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE elementtype_keyelementtype_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.elementtype_keyelementtype_seq OWNER TO farmer;
+
 --
--- Name: elementtype_keyelementtype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: elementtype_keyelementtype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('elementtype_keyelementtype_seq', 8, true);
 
 
 --
--- Name: elementtype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: elementtype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE elementtype (
@@ -3232,27 +4634,31 @@ CREATE TABLE elementtype (
 );
 
 
+ALTER TABLE public.elementtype OWNER TO farmer;
+
 --
--- Name: elementtypetasktype_keyelementtypetasktype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: elementtypetasktype_keyelementtypetasktype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE elementtypetasktype_keyelementtypetasktype_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.elementtypetasktype_keyelementtypetasktype_seq OWNER TO farmer;
+
 --
--- Name: elementtypetasktype_keyelementtypetasktype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: elementtypetasktype_keyelementtypetasktype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('elementtypetasktype_keyelementtypetasktype_seq', 1, false);
 
 
 --
--- Name: elementtypetasktype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: elementtypetasktype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE elementtypetasktype (
@@ -3263,26 +4669,31 @@ CREATE TABLE elementtypetasktype (
 );
 
 
+ALTER TABLE public.elementtypetasktype OWNER TO farmer;
+
 --
--- Name: elementuser_keyelementuser_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: elementuser_keyelementuser_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE elementuser_keyelementuser_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: elementuser_keyelementuser_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('elementuser_keyelementuser_seq', 79, true);
-
+ALTER TABLE public.elementuser_keyelementuser_seq OWNER TO farmer;
 
 --
--- Name: elementuser; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: elementuser_keyelementuser_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('elementuser_keyelementuser_seq', 1, false);
+
+
+--
+-- Name: elementuser; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE elementuser (
@@ -3294,11 +4705,15 @@ CREATE TABLE elementuser (
 );
 
 
+ALTER TABLE public.elementuser OWNER TO farmer;
+
 --
--- Name: usr; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: usr; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE usr (
+    arsenalslotlimit integer,
+    arsenalslotreserve integer,
     dateoflastlogon date,
     email text,
     fkeyhost integer,
@@ -3333,11 +4748,14 @@ CREATE TABLE usr (
 INHERITS (element);
 
 
+ALTER TABLE public.usr OWNER TO farmer;
+
 --
--- Name: employee; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: employee; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE employee (
+    arsenalslotlimit integer,
     namefirst text,
     namelast text,
     dateofhire date,
@@ -3356,27 +4774,31 @@ CREATE TABLE employee (
 INHERITS (usr);
 
 
+ALTER TABLE public.employee OWNER TO farmer;
+
 --
--- Name: eventalert_keyEventAlert_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: eventalert_keyEventAlert_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE "eventalert_keyEventAlert_seq"
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public."eventalert_keyEventAlert_seq" OWNER TO farmer;
+
 --
--- Name: eventalert_keyEventAlert_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: eventalert_keyEventAlert_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('"eventalert_keyEventAlert_seq"', 1, false);
 
 
 --
--- Name: eventalert; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: eventalert; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE eventalert (
@@ -3392,27 +4814,31 @@ CREATE TABLE eventalert (
 );
 
 
+ALTER TABLE public.eventalert OWNER TO farmer;
+
 --
--- Name: filetemplate_keyfiletemplate_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: filetemplate_keyfiletemplate_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE filetemplate_keyfiletemplate_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.filetemplate_keyfiletemplate_seq OWNER TO farmer;
+
 --
--- Name: filetemplate_keyfiletemplate_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: filetemplate_keyfiletemplate_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('filetemplate_keyfiletemplate_seq', 1, false);
 
 
 --
--- Name: filetemplate; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: filetemplate; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE filetemplate (
@@ -3427,26 +4853,31 @@ CREATE TABLE filetemplate (
 );
 
 
+ALTER TABLE public.filetemplate OWNER TO farmer;
+
 --
--- Name: filetracker_keyfiletracker_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: filetracker_keyfiletracker_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE filetracker_keyfiletracker_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: filetracker_keyfiletracker_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('filetracker_keyfiletracker_seq', 206762, true);
-
+ALTER TABLE public.filetracker_keyfiletracker_seq OWNER TO farmer;
 
 --
--- Name: filetracker; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: filetracker_keyfiletracker_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('filetracker_keyfiletracker_seq', 1, false);
+
+
+--
+-- Name: filetracker; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE filetracker (
@@ -3461,27 +4892,31 @@ CREATE TABLE filetracker (
 );
 
 
+ALTER TABLE public.filetracker OWNER TO farmer;
+
 --
--- Name: filetrackerdep_keyfiletrackerdep_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: filetrackerdep_keyfiletrackerdep_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE filetrackerdep_keyfiletrackerdep_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.filetrackerdep_keyfiletrackerdep_seq OWNER TO farmer;
+
 --
--- Name: filetrackerdep_keyfiletrackerdep_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: filetrackerdep_keyfiletrackerdep_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('filetrackerdep_keyfiletrackerdep_seq', 1, false);
 
 
 --
--- Name: filetrackerdep; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: filetrackerdep; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE filetrackerdep (
@@ -3491,27 +4926,31 @@ CREATE TABLE filetrackerdep (
 );
 
 
+ALTER TABLE public.filetrackerdep OWNER TO farmer;
+
 --
--- Name: fileversion_keyfileversion_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: fileversion_keyfileversion_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE fileversion_keyfileversion_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.fileversion_keyfileversion_seq OWNER TO farmer;
+
 --
--- Name: fileversion_keyfileversion_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: fileversion_keyfileversion_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('fileversion_keyfileversion_seq', 1, false);
 
 
 --
--- Name: fileversion; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: fileversion; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE fileversion (
@@ -3528,27 +4967,31 @@ CREATE TABLE fileversion (
 );
 
 
+ALTER TABLE public.fileversion OWNER TO farmer;
+
 --
--- Name: folder_keyfolder_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: folder_keyfolder_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE folder_keyfolder_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.folder_keyfolder_seq OWNER TO farmer;
+
 --
--- Name: folder_keyfolder_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: folder_keyfolder_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('folder_keyfolder_seq', 1, false);
 
 
 --
--- Name: folder; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: folder; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE folder (
@@ -3564,26 +5007,31 @@ CREATE TABLE folder (
 );
 
 
+ALTER TABLE public.folder OWNER TO farmer;
+
 --
--- Name: graph_keygraph_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: graph_keygraph_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE graph_keygraph_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: graph_keygraph_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('graph_keygraph_seq', 13, true);
-
+ALTER TABLE public.graph_keygraph_seq OWNER TO farmer;
 
 --
--- Name: graph; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: graph_keygraph_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('graph_keygraph_seq', 1, false);
+
+
+--
+-- Name: graph; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE graph (
@@ -3602,26 +5050,31 @@ CREATE TABLE graph (
 );
 
 
+ALTER TABLE public.graph OWNER TO farmer;
+
 --
--- Name: graphds_keygraphds_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: graphds_keygraphds_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE graphds_keygraphds_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: graphds_keygraphds_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('graphds_keygraphds_seq', 360, true);
-
+ALTER TABLE public.graphds_keygraphds_seq OWNER TO farmer;
 
 --
--- Name: graphds; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: graphds_keygraphds_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('graphds_keygraphds_seq', 1, false);
+
+
+--
+-- Name: graphds; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE graphds (
@@ -3637,33 +5090,38 @@ CREATE TABLE graphds (
 );
 
 
+ALTER TABLE public.graphds OWNER TO farmer;
+
 --
--- Name: TABLE graphds; Type: COMMENT; Schema: public; Owner: -
+-- Name: TABLE graphds; Type: COMMENT; Schema: public; Owner: farmer
 --
 
 COMMENT ON TABLE graphds IS 'Graph Datasource';
 
 
 --
--- Name: graphpage_keygraphpage_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: graphpage_keygraphpage_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE graphpage_keygraphpage_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: graphpage_keygraphpage_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('graphpage_keygraphpage_seq', 91, true);
-
+ALTER TABLE public.graphpage_keygraphpage_seq OWNER TO farmer;
 
 --
--- Name: graphpage; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: graphpage_keygraphpage_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('graphpage_keygraphpage_seq', 1, false);
+
+
+--
+-- Name: graphpage; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE graphpage (
@@ -3673,26 +5131,31 @@ CREATE TABLE graphpage (
 );
 
 
+ALTER TABLE public.graphpage OWNER TO farmer;
+
 --
--- Name: graphrelationship_keygraphrelationship_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: graphrelationship_keygraphrelationship_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE graphrelationship_keygraphrelationship_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: graphrelationship_keygraphrelationship_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('graphrelationship_keygraphrelationship_seq', 7, true);
-
+ALTER TABLE public.graphrelationship_keygraphrelationship_seq OWNER TO farmer;
 
 --
--- Name: graphrelationship; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: graphrelationship_keygraphrelationship_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('graphrelationship_keygraphrelationship_seq', 1, false);
+
+
+--
+-- Name: graphrelationship; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE graphrelationship (
@@ -3703,27 +5166,31 @@ CREATE TABLE graphrelationship (
 );
 
 
+ALTER TABLE public.graphrelationship OWNER TO farmer;
+
 --
--- Name: gridtemplate_keygridtemplate_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: gridtemplate_keygridtemplate_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE gridtemplate_keygridtemplate_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.gridtemplate_keygridtemplate_seq OWNER TO farmer;
+
 --
--- Name: gridtemplate_keygridtemplate_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: gridtemplate_keygridtemplate_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('gridtemplate_keygridtemplate_seq', 1, false);
 
 
 --
--- Name: gridtemplate; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: gridtemplate; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE gridtemplate (
@@ -3733,27 +5200,31 @@ CREATE TABLE gridtemplate (
 );
 
 
+ALTER TABLE public.gridtemplate OWNER TO farmer;
+
 --
--- Name: gridtemplateitem_keygridtemplateitem_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: gridtemplateitem_keygridtemplateitem_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE gridtemplateitem_keygridtemplateitem_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.gridtemplateitem_keygridtemplateitem_seq OWNER TO farmer;
+
 --
--- Name: gridtemplateitem_keygridtemplateitem_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: gridtemplateitem_keygridtemplateitem_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('gridtemplateitem_keygridtemplateitem_seq', 1, false);
 
 
 --
--- Name: gridtemplateitem; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: gridtemplateitem; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE gridtemplateitem (
@@ -3767,27 +5238,31 @@ CREATE TABLE gridtemplateitem (
 );
 
 
+ALTER TABLE public.gridtemplateitem OWNER TO farmer;
+
 --
--- Name: groupmapping_keygroupmapping_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: groupmapping_keygroupmapping_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE groupmapping_keygroupmapping_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.groupmapping_keygroupmapping_seq OWNER TO farmer;
+
 --
--- Name: groupmapping_keygroupmapping_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: groupmapping_keygroupmapping_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('groupmapping_keygroupmapping_seq', 1, false);
 
 
 --
--- Name: groupmapping; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: groupmapping; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE groupmapping (
@@ -3797,26 +5272,31 @@ CREATE TABLE groupmapping (
 );
 
 
+ALTER TABLE public.groupmapping OWNER TO farmer;
+
 --
--- Name: grp_keygrp_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: grp_keygrp_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE grp_keygrp_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.grp_keygrp_seq OWNER TO farmer;
+
 --
--- Name: grp_keygrp_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: grp_keygrp_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('grp_keygrp_seq', 2, true);
 
 
 --
--- Name: grp; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: grp; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE grp (
@@ -3826,27 +5306,31 @@ CREATE TABLE grp (
 );
 
 
+ALTER TABLE public.grp OWNER TO farmer;
+
 --
--- Name: gruntscript_keygruntscript_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: gruntscript_keygruntscript_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE gruntscript_keygruntscript_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.gruntscript_keygruntscript_seq OWNER TO farmer;
+
 --
--- Name: gruntscript_keygruntscript_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: gruntscript_keygruntscript_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('gruntscript_keygruntscript_seq', 1, false);
 
 
 --
--- Name: gruntscript; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: gruntscript; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE gruntscript (
@@ -3857,27 +5341,31 @@ CREATE TABLE gruntscript (
 );
 
 
+ALTER TABLE public.gruntscript OWNER TO farmer;
+
 --
--- Name: history_keyhistory_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: history_keyhistory_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE history_keyhistory_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.history_keyhistory_seq OWNER TO farmer;
+
 --
--- Name: history_keyhistory_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: history_keyhistory_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('history_keyhistory_seq', 1, false);
 
 
 --
--- Name: history; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: history; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE history (
@@ -3889,27 +5377,31 @@ CREATE TABLE history (
 );
 
 
+ALTER TABLE public.history OWNER TO farmer;
+
 --
--- Name: hostdailystat_keyhostdailystat_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostdailystat_keyhostdailystat_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostdailystat_keyhostdailystat_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.hostdailystat_keyhostdailystat_seq OWNER TO farmer;
+
 --
--- Name: hostdailystat_keyhostdailystat_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: hostdailystat_keyhostdailystat_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('hostdailystat_keyhostdailystat_seq', 1, false);
 
 
 --
--- Name: hostdailystat; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostdailystat; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostdailystat (
@@ -3930,26 +5422,31 @@ CREATE TABLE hostdailystat (
 );
 
 
+ALTER TABLE public.hostdailystat OWNER TO farmer;
+
 --
--- Name: hostgroupitem_keyhostgroupitem_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostgroupitem_keyhostgroupitem_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostgroupitem_keyhostgroupitem_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: hostgroupitem_keyhostgroupitem_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('hostgroupitem_keyhostgroupitem_seq', 6400, true);
-
+ALTER TABLE public.hostgroupitem_keyhostgroupitem_seq OWNER TO farmer;
 
 --
--- Name: hostgroupitem; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostgroupitem_keyhostgroupitem_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('hostgroupitem_keyhostgroupitem_seq', 1, false);
+
+
+--
+-- Name: hostgroupitem; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostgroupitem (
@@ -3959,26 +5456,31 @@ CREATE TABLE hostgroupitem (
 );
 
 
+ALTER TABLE public.hostgroupitem OWNER TO farmer;
+
 --
--- Name: hostinterfacetype_keyhostinterfacetype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostinterfacetype_keyhostinterfacetype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostinterfacetype_keyhostinterfacetype_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.hostinterfacetype_keyhostinterfacetype_seq OWNER TO farmer;
+
 --
--- Name: hostinterfacetype_keyhostinterfacetype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: hostinterfacetype_keyhostinterfacetype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('hostinterfacetype_keyhostinterfacetype_seq', 3, true);
 
 
 --
--- Name: hostinterfacetype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostinterfacetype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostinterfacetype (
@@ -3987,27 +5489,31 @@ CREATE TABLE hostinterfacetype (
 );
 
 
+ALTER TABLE public.hostinterfacetype OWNER TO farmer;
+
 --
--- Name: hostload_keyhostload_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostload_keyhostload_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostload_keyhostload_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.hostload_keyhostload_seq OWNER TO farmer;
+
 --
--- Name: hostload_keyhostload_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: hostload_keyhostload_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('hostload_keyhostload_seq', 1, false);
 
 
 --
--- Name: hostload; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostload; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostload (
@@ -4019,27 +5525,31 @@ CREATE TABLE hostload (
 );
 
 
+ALTER TABLE public.hostload OWNER TO farmer;
+
 --
--- Name: hostmapping_keyhostmapping_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostmapping_keyhostmapping_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostmapping_keyhostmapping_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.hostmapping_keyhostmapping_seq OWNER TO farmer;
+
 --
--- Name: hostmapping_keyhostmapping_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: hostmapping_keyhostmapping_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('hostmapping_keyhostmapping_seq', 1, false);
 
 
 --
--- Name: hostmapping; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostmapping; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostmapping (
@@ -4049,26 +5559,31 @@ CREATE TABLE hostmapping (
 );
 
 
+ALTER TABLE public.hostmapping OWNER TO farmer;
+
 --
--- Name: hostport_keyhostport_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostport_keyhostport_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostport_keyhostport_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: hostport_keyhostport_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('hostport_keyhostport_seq', 745, true);
-
+ALTER TABLE public.hostport_keyhostport_seq OWNER TO farmer;
 
 --
--- Name: hostport; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostport_keyhostport_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('hostport_keyhostport_seq', 1, false);
+
+
+--
+-- Name: hostport; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostport (
@@ -4080,27 +5595,31 @@ CREATE TABLE hostport (
 );
 
 
+ALTER TABLE public.hostport OWNER TO farmer;
+
 --
--- Name: hostresource_keyhostresource_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostresource_keyhostresource_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostresource_keyhostresource_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.hostresource_keyhostresource_seq OWNER TO farmer;
+
 --
--- Name: hostresource_keyhostresource_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: hostresource_keyhostresource_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('hostresource_keyhostresource_seq', 1, false);
 
 
 --
--- Name: hostresource; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostresource; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostresource (
@@ -4110,8 +5629,21 @@ CREATE TABLE hostresource (
 );
 
 
+ALTER TABLE public.hostresource OWNER TO farmer;
+
 --
--- Name: hosts_ready; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hosts_active; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE hosts_active (
+    count bigint
+);
+
+
+ALTER TABLE public.hosts_active OWNER TO farmer;
+
+--
+-- Name: hosts_ready; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hosts_ready (
@@ -4119,8 +5651,10 @@ CREATE TABLE hosts_ready (
 );
 
 
+ALTER TABLE public.hosts_ready OWNER TO farmer;
+
 --
--- Name: hosts_total; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hosts_total; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hosts_total (
@@ -4128,26 +5662,31 @@ CREATE TABLE hosts_total (
 );
 
 
+ALTER TABLE public.hosts_total OWNER TO farmer;
+
 --
--- Name: hostservice_keyhostservice_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostservice_keyhostservice_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostservice_keyhostservice_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: hostservice_keyhostservice_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('hostservice_keyhostservice_seq', 2572314, true);
-
+ALTER TABLE public.hostservice_keyhostservice_seq OWNER TO farmer;
 
 --
--- Name: hostservice; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostservice_keyhostservice_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('hostservice_keyhostservice_seq', 1, false);
+
+
+--
+-- Name: hostservice; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostservice (
@@ -4163,26 +5702,31 @@ CREATE TABLE hostservice (
 );
 
 
+ALTER TABLE public.hostservice OWNER TO farmer;
+
 --
--- Name: hostsoftware_keyhostsoftware_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hostsoftware_keyhostsoftware_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hostsoftware_keyhostsoftware_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: hostsoftware_keyhostsoftware_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('hostsoftware_keyhostsoftware_seq', 283, true);
-
+ALTER TABLE public.hostsoftware_keyhostsoftware_seq OWNER TO farmer;
 
 --
--- Name: hostsoftware; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hostsoftware_keyhostsoftware_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('hostsoftware_keyhostsoftware_seq', 1, false);
+
+
+--
+-- Name: hostsoftware; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hostsoftware (
@@ -4192,26 +5736,31 @@ CREATE TABLE hostsoftware (
 );
 
 
+ALTER TABLE public.hostsoftware OWNER TO farmer;
+
 --
--- Name: hoststatus_keyhoststatus_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hoststatus_keyhoststatus_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE hoststatus_keyhoststatus_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: hoststatus_keyhoststatus_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('hoststatus_keyhoststatus_seq', 2011, true);
-
+ALTER TABLE public.hoststatus_keyhoststatus_seq OWNER TO farmer;
 
 --
--- Name: hoststatus; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: hoststatus_keyhoststatus_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('hoststatus_keyhoststatus_seq', 1, false);
+
+
+--
+-- Name: hoststatus; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE hoststatus (
@@ -4228,8 +5777,10 @@ CREATE TABLE hoststatus (
 );
 
 
+ALTER TABLE public.hoststatus OWNER TO farmer;
+
 --
--- Name: job3delight; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: job3delight; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE job3delight (
@@ -4247,66 +5798,19 @@ CREATE TABLE job3delight (
     threads integer DEFAULT 4,
     processes integer,
     jobscript text,
-    jobscriptparam text
+    jobscriptparam text,
+    renderdlcmd text
 )
 INHERITS (job);
 
 
---
--- Name: jobaftereffects; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobaftereffects (
-    fkeyjobparent integer,
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    framenth integer,
-    framenthmode integer,
-    scenename text,
-    shotname text,
-    comp text,
-    frameend integer,
-    framestart integer,
-    height integer,
-    width integer
-)
-INHERITS (job);
-
+ALTER TABLE public.job3delight OWNER TO farmer;
 
 --
--- Name: jobaftereffects7; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobassignment_old; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE TABLE jobaftereffects7 (
-    maxhosts integer,
-    environment text,
-    framenth integer,
-    framenthmode integer,
-    scenename text,
-    shotname text
-)
-INHERITS (jobaftereffects);
-
-
---
--- Name: jobaftereffects8; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobaftereffects8 (
-    maxhosts integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer
-)
-INHERITS (jobaftereffects);
-
-
---
--- Name: jobassignment; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobassignment (
+CREATE TABLE jobassignment_old (
     keyjobassignment integer NOT NULL,
     fkeyjob integer,
     fkeyjobassignmentstatus integer,
@@ -4318,9 +5822,9 @@ CREATE TABLE jobassignment (
     started timestamp without time zone,
     ended timestamp without time zone,
     fkeyjoberror integer,
-    realtime double precision,
-    usertime double precision,
-    systime double precision,
+    realtime bigint DEFAULT 0 NOT NULL,
+    usertime bigint DEFAULT 0 NOT NULL,
+    systime bigint DEFAULT 0 NOT NULL,
     iowait bigint,
     bytesread bigint,
     byteswrite bigint,
@@ -4330,33 +5834,69 @@ CREATE TABLE jobassignment (
 );
 
 
+ALTER TABLE public.jobassignment_old OWNER TO farmer;
+
 --
--- Name: jobassignment_keyjobassignment_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobassignment_keyjobassignment_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobassignment_keyjobassignment_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
-    CACHE 1;
+    NO MAXVALUE
+    CACHE 10;
+
+
+ALTER TABLE public.jobassignment_keyjobassignment_seq OWNER TO farmer;
+
+--
+-- Name: jobassignment_keyjobassignment_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
+--
+
+ALTER SEQUENCE jobassignment_keyjobassignment_seq OWNED BY jobassignment_old.keyjobassignment;
 
 
 --
--- Name: jobassignment_keyjobassignment_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: jobassignment_keyjobassignment_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-ALTER SEQUENCE jobassignment_keyjobassignment_seq OWNED BY jobassignment.keyjobassignment;
-
-
---
--- Name: jobassignment_keyjobassignment_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobassignment_keyjobassignment_seq', 990376, true);
+SELECT pg_catalog.setval('jobassignment_keyjobassignment_seq', 1, false);
 
 
 --
--- Name: jobassignmentstatus; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobassignment; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobassignment (
+    keyjobassignment integer DEFAULT nextval('jobassignment_keyjobassignment_seq'::regclass) NOT NULL,
+    fkeyjob integer,
+    fkeyjobassignmentstatus integer,
+    fkeyhost integer,
+    stdout text,
+    stderr text,
+    command text,
+    maxmemory integer,
+    started timestamp without time zone,
+    ended timestamp without time zone,
+    fkeyjoberror integer,
+    realtime bigint DEFAULT 0 NOT NULL,
+    usertime bigint DEFAULT 0 NOT NULL,
+    systime bigint DEFAULT 0 NOT NULL,
+    iowait bigint,
+    bytesread bigint,
+    byteswrite bigint,
+    efficiency double precision,
+    opsread integer,
+    opswrite integer,
+    assignslots integer
+);
+
+
+ALTER TABLE public.jobassignment OWNER TO farmer;
+
+--
+-- Name: jobassignmentstatus; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobassignmentstatus (
@@ -4365,56 +5905,38 @@ CREATE TABLE jobassignmentstatus (
 );
 
 
+ALTER TABLE public.jobassignmentstatus OWNER TO farmer;
+
 --
--- Name: jobassignmentstatus_keyjobassignmentstatus_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobassignmentstatus_keyjobassignmentstatus_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobassignmentstatus_keyjobassignmentstatus_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.jobassignmentstatus_keyjobassignmentstatus_seq OWNER TO farmer;
+
 --
--- Name: jobassignmentstatus_keyjobassignmentstatus_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: jobassignmentstatus_keyjobassignmentstatus_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE jobassignmentstatus_keyjobassignmentstatus_seq OWNED BY jobassignmentstatus.keyjobassignmentstatus;
 
 
 --
--- Name: jobassignmentstatus_keyjobassignmentstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: jobassignmentstatus_keyjobassignmentstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('jobassignmentstatus_keyjobassignmentstatus_seq', 6, true);
 
 
 --
--- Name: jobautodeskburn; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobautodeskburn (
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    loggingenabled boolean,
-    framenth integer,
-    framenthmode integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer,
-    scenename text,
-    shotname text,
-    framestart integer,
-    frameend integer,
-    handle text
-)
-INHERITS (job);
-
-
---
--- Name: jobbatch; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobbatch; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobbatch (
@@ -4431,6 +5953,9 @@ CREATE TABLE jobbatch (
     exclusiveassignment boolean,
     hastaskprogress boolean,
     minmemory integer,
+    fkeyjobfilterset integer,
+    maxerrors integer,
+    fkeyjobenvironment integer,
     cmd text,
     restartafterfinish boolean DEFAULT false,
     restartaftershutdown boolean,
@@ -4440,26 +5965,31 @@ CREATE TABLE jobbatch (
 INHERITS (job);
 
 
+ALTER TABLE public.jobbatch OWNER TO farmer;
+
 --
--- Name: jobcannedbatch_keyjobcannedbatch_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobcannedbatch_keyjobcannedbatch_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobcannedbatch_keyjobcannedbatch_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: jobcannedbatch_keyjobcannedbatch_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobcannedbatch_keyjobcannedbatch_seq', 10, true);
-
+ALTER TABLE public.jobcannedbatch_keyjobcannedbatch_seq OWNER TO farmer;
 
 --
--- Name: jobcannedbatch; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobcannedbatch_keyjobcannedbatch_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobcannedbatch_keyjobcannedbatch_seq', 1, false);
+
+
+--
+-- Name: jobcannedbatch; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobcannedbatch (
@@ -4471,43 +6001,31 @@ CREATE TABLE jobcannedbatch (
 );
 
 
---
--- Name: jobcinema4d; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobcinema4d (
-    license text,
-    fkeyjobparent integer,
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    loggingenabled boolean,
-    scenename text,
-    shotname text
-)
-INHERITS (job);
-
+ALTER TABLE public.jobcannedbatch OWNER TO farmer;
 
 --
--- Name: jobcommandhistory_keyjobcommandhistory_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobcommandhistory_keyjobcommandhistory_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobcommandhistory_keyjobcommandhistory_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: jobcommandhistory_keyjobcommandhistory_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobcommandhistory_keyjobcommandhistory_seq', 6283934, true);
-
+ALTER TABLE public.jobcommandhistory_keyjobcommandhistory_seq OWNER TO farmer;
 
 --
--- Name: jobcommandhistory; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobcommandhistory_keyjobcommandhistory_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobcommandhistory_keyjobcommandhistory_seq', 1, false);
+
+
+--
+-- Name: jobcommandhistory; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobcommandhistory (
@@ -4526,56 +6044,71 @@ CREATE TABLE jobcommandhistory (
 );
 
 
---
--- Name: jobdep_keyjobdep_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE jobdep_keyjobdep_seq
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
+ALTER TABLE public.jobcommandhistory OWNER TO farmer;
 
 --
--- Name: jobdep_keyjobdep_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: jobenvironment; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
-SELECT pg_catalog.setval('jobdep_keyjobdep_seq', 78403, true);
-
-
---
--- Name: jobdep; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobdep (
-    keyjobdep integer DEFAULT nextval('jobdep_keyjobdep_seq'::regclass) NOT NULL,
-    fkeyjob integer,
-    fkeydep integer,
-    deptype integer DEFAULT 1 NOT NULL
+CREATE TABLE jobenvironment (
+    keyjobenvironment integer NOT NULL,
+    environment text
 );
 
 
+ALTER TABLE public.jobenvironment OWNER TO farmer;
+
 --
--- Name: joberror_keyjoberror_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobenvironment_keyjobenvironment_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
-CREATE SEQUENCE joberror_keyjoberror_seq
+CREATE SEQUENCE jobenvironment_keyjobenvironment_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: joberror_keyjoberror_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('joberror_keyjoberror_seq', 511524, true);
-
+ALTER TABLE public.jobenvironment_keyjobenvironment_seq OWNER TO farmer;
 
 --
--- Name: joberror; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobenvironment_keyjobenvironment_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
+--
+
+ALTER SEQUENCE jobenvironment_keyjobenvironment_seq OWNED BY jobenvironment.keyjobenvironment;
+
+
+--
+-- Name: jobenvironment_keyjobenvironment_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobenvironment_keyjobenvironment_seq', 1, false);
+
+
+--
+-- Name: joberror_keyjoberror_seq; Type: SEQUENCE; Schema: public; Owner: farmer
+--
+
+CREATE SEQUENCE joberror_keyjoberror_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.joberror_keyjoberror_seq OWNER TO farmer;
+
+--
+-- Name: joberror_keyjoberror_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('joberror_keyjoberror_seq', 1225720, true);
+
+
+--
+-- Name: joberror; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE joberror (
@@ -4592,27 +6125,31 @@ CREATE TABLE joberror (
 );
 
 
+ALTER TABLE public.joberror OWNER TO farmer;
+
 --
--- Name: joberrorhandler_keyjoberrorhandler_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: joberrorhandler_keyjoberrorhandler_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE joberrorhandler_keyjoberrorhandler_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.joberrorhandler_keyjoberrorhandler_seq OWNER TO farmer;
+
 --
--- Name: joberrorhandler_keyjoberrorhandler_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: joberrorhandler_keyjoberrorhandler_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('joberrorhandler_keyjoberrorhandler_seq', 1, false);
 
 
 --
--- Name: joberrorhandler; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: joberrorhandler; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE joberrorhandler (
@@ -4623,27 +6160,31 @@ CREATE TABLE joberrorhandler (
 );
 
 
+ALTER TABLE public.joberrorhandler OWNER TO farmer;
+
 --
--- Name: joberrorhandlerscript_keyjoberrorhandlerscript_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: joberrorhandlerscript_keyjoberrorhandlerscript_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE joberrorhandlerscript_keyjoberrorhandlerscript_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.joberrorhandlerscript_keyjoberrorhandlerscript_seq OWNER TO farmer;
+
 --
--- Name: joberrorhandlerscript_keyjoberrorhandlerscript_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: joberrorhandlerscript_keyjoberrorhandlerscript_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('joberrorhandlerscript_keyjoberrorhandlerscript_seq', 1, false);
 
 
 --
--- Name: joberrorhandlerscript; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: joberrorhandlerscript; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE joberrorhandlerscript (
@@ -4652,73 +6193,155 @@ CREATE TABLE joberrorhandlerscript (
 );
 
 
---
--- Name: jobfusion; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobfusion (
-    filename text,
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    maxhosts integer,
-    framenth integer,
-    framenthmode integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer,
-    frameend integer,
-    framestart integer,
-    framelist text,
-    allframesassingletask boolean,
-    outputcount integer
-)
-INHERITS (job);
-
+ALTER TABLE public.joberrorhandlerscript OWNER TO farmer;
 
 --
--- Name: jobfusionvideomaker; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobfiltermessage; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE TABLE jobfusionvideomaker (
-    framenth integer,
-    framenthmode integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer,
-    scenename text,
-    shotname text,
-    codec text,
-    inputframepath text,
-    sequenceframestart integer,
-    sequenceframeend integer,
-    allframesassingletask boolean,
-    framelist text,
-    outputcount integer
-)
-INHERITS (job);
+CREATE TABLE jobfiltermessage (
+    keyjobfiltermessage integer NOT NULL,
+    fkeyjobfiltertype integer,
+    fkeyjobfilterset integer,
+    regex text,
+    comment text,
+    enabled boolean
+);
 
+
+ALTER TABLE public.jobfiltermessage OWNER TO farmer;
 
 --
--- Name: jobhistory_keyjobhistory_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobfiltermessage_keyjobfiltermessage_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
-CREATE SEQUENCE jobhistory_keyjobhistory_seq
+CREATE SEQUENCE jobfiltermessage_keyjobfiltermessage_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: jobhistory_keyjobhistory_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobhistory_keyjobhistory_seq', 314398, true);
-
+ALTER TABLE public.jobfiltermessage_keyjobfiltermessage_seq OWNER TO farmer;
 
 --
--- Name: jobhistory; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobfiltermessage_keyjobfiltermessage_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
+--
+
+ALTER SEQUENCE jobfiltermessage_keyjobfiltermessage_seq OWNED BY jobfiltermessage.keyjobfiltermessage;
+
+
+--
+-- Name: jobfiltermessage_keyjobfiltermessage_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobfiltermessage_keyjobfiltermessage_seq', 93, true);
+
+
+--
+-- Name: jobfilterset; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobfilterset (
+    keyjobfilterset integer NOT NULL,
+    name text
+);
+
+
+ALTER TABLE public.jobfilterset OWNER TO farmer;
+
+--
+-- Name: jobfilterset_keyjobfilterset_seq; Type: SEQUENCE; Schema: public; Owner: farmer
+--
+
+CREATE SEQUENCE jobfilterset_keyjobfilterset_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.jobfilterset_keyjobfilterset_seq OWNER TO farmer;
+
+--
+-- Name: jobfilterset_keyjobfilterset_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
+--
+
+ALTER SEQUENCE jobfilterset_keyjobfilterset_seq OWNED BY jobfilterset.keyjobfilterset;
+
+
+--
+-- Name: jobfilterset_keyjobfilterset_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobfilterset_keyjobfilterset_seq', 6, true);
+
+
+--
+-- Name: jobfiltertype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobfiltertype (
+    keyjobfiltertype integer NOT NULL,
+    name text
+);
+
+
+ALTER TABLE public.jobfiltertype OWNER TO farmer;
+
+--
+-- Name: jobfiltertype_keyjobfiltertype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
+--
+
+CREATE SEQUENCE jobfiltertype_keyjobfiltertype_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.jobfiltertype_keyjobfiltertype_seq OWNER TO farmer;
+
+--
+-- Name: jobfiltertype_keyjobfiltertype_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
+--
+
+ALTER SEQUENCE jobfiltertype_keyjobfiltertype_seq OWNED BY jobfiltertype.keyjobfiltertype;
+
+
+--
+-- Name: jobfiltertype_keyjobfiltertype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobfiltertype_keyjobfiltertype_seq', 4, true);
+
+
+--
+-- Name: jobhistory_keyjobhistory_seq; Type: SEQUENCE; Schema: public; Owner: farmer
+--
+
+CREATE SEQUENCE jobhistory_keyjobhistory_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.jobhistory_keyjobhistory_seq OWNER TO farmer;
+
+--
+-- Name: jobhistory_keyjobhistory_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobhistory_keyjobhistory_seq', 1, false);
+
+
+--
+-- Name: jobhistory; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobhistory (
@@ -4728,31 +6351,35 @@ CREATE TABLE jobhistory (
     fkeyhost integer,
     fkeyuser integer,
     message text,
-    created timestamp without time zone
+    created timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
+ALTER TABLE public.jobhistory OWNER TO farmer;
+
 --
--- Name: jobhistorytype_keyjobhistorytype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobhistorytype_keyjobhistorytype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobhistorytype_keyjobhistorytype_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.jobhistorytype_keyjobhistorytype_seq OWNER TO farmer;
+
 --
--- Name: jobhistorytype_keyjobhistorytype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: jobhistorytype_keyjobhistorytype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('jobhistorytype_keyjobhistorytype_seq', 1, false);
 
 
 --
--- Name: jobhistorytype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobhistorytype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobhistorytype (
@@ -4761,27 +6388,15 @@ CREATE TABLE jobhistorytype (
 );
 
 
---
--- Name: jobhoudinisim10; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobhoudinisim10 (
-    scenename text,
-    shotname text,
-    slices integer,
-    tracker text,
-    framestart integer,
-    frameend integer,
-    nodename text
-)
-INHERITS (job);
-
+ALTER TABLE public.jobhistorytype OWNER TO farmer;
 
 --
--- Name: jobmantra100; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmantra100; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmantra100 (
+    fkeyjobfilterset integer,
+    maxerrors integer,
     keyjobmantra100 integer NOT NULL,
     forceraytrace boolean,
     geocachesize integer,
@@ -4794,33 +6409,38 @@ CREATE TABLE jobmantra100 (
 INHERITS (job);
 
 
+ALTER TABLE public.jobmantra100 OWNER TO farmer;
+
 --
--- Name: jobmantra100_keyjobmantra100_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobmantra100_keyjobmantra100_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobmantra100_keyjobmantra100_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.jobmantra100_keyjobmantra100_seq OWNER TO farmer;
+
 --
--- Name: jobmantra100_keyjobmantra100_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: jobmantra100_keyjobmantra100_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE jobmantra100_keyjobmantra100_seq OWNED BY jobmantra100.keyjobmantra100;
 
 
 --
--- Name: jobmantra100_keyjobmantra100_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: jobmantra100_keyjobmantra100_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('jobmantra100_keyjobmantra100_seq', 696, true);
+SELECT pg_catalog.setval('jobmantra100_keyjobmantra100_seq', 1, false);
 
 
 --
--- Name: jobmantra95; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmantra95; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmantra95 (
@@ -4836,260 +6456,38 @@ CREATE TABLE jobmantra95 (
 INHERITS (job);
 
 
+ALTER TABLE public.jobmantra95 OWNER TO farmer;
+
 --
--- Name: jobmantra95_keyjobmantra95_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobmantra95_keyjobmantra95_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobmantra95_keyjobmantra95_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.jobmantra95_keyjobmantra95_seq OWNER TO farmer;
+
 --
--- Name: jobmantra95_keyjobmantra95_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: jobmantra95_keyjobmantra95_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE jobmantra95_keyjobmantra95_seq OWNED BY jobmantra95.keyjobmantra95;
 
 
 --
--- Name: jobmantra95_keyjobmantra95_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: jobmantra95_keyjobmantra95_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('jobmantra95_keyjobmantra95_seq', 1, false);
 
 
 --
--- Name: jobmax; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobmax (
-    fkeyjobtype integer DEFAULT 6,
-    filename text,
-    license text,
-    fkeyjobparent integer,
-    loggingenabled boolean,
-    environment text,
-    framenth integer,
-    framenthmode integer,
-    scenename text,
-    shotname text,
-    camera text,
-    elementfile text,
-    fileoriginal text,
-    flag_h integer,
-    flag_v integer,
-    flag_w integer,
-    flag_x2 integer,
-    flag_xa integer,
-    flag_xc integer,
-    flag_xd integer,
-    flag_xe integer,
-    flag_xf integer,
-    flag_xh integer,
-    flag_xk integer,
-    flag_xn integer,
-    flag_xo integer,
-    flag_xp integer,
-    flag_xv integer,
-    frameend integer,
-    framelist text,
-    framestart integer,
-    exrattributes text,
-    exrchannels text,
-    exrsavebitdepth integer,
-    startupscript text
-)
-INHERITS (job);
-
-
---
--- Name: jobmax10; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobmax10 (
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer
-)
-INHERITS (jobmax);
-
-
---
--- Name: jobmax2009; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobmax2009 (
-)
-INHERITS (jobmax);
-
-
---
--- Name: jobmax5; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobmax5 (
-    rendertime integer,
-    abversion text,
-    filename text,
-    fkeyjobparent integer,
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    maxhosts integer,
-    environment text,
-    framenth integer,
-    framenthmode integer,
-    scenename text,
-    shotname text,
-    camera text,
-    fileoriginal text,
-    flag_h integer,
-    framestart integer,
-    frameend integer,
-    flag_w integer,
-    flag_xv integer,
-    flag_x2 integer,
-    flag_xa integer,
-    flag_xe integer,
-    flag_xk integer,
-    flag_xd integer,
-    flag_xh integer,
-    flag_xo integer,
-    flag_xf integer,
-    flag_xn integer,
-    flag_xp integer,
-    flag_xc integer,
-    flag_v integer,
-    elementfile text,
-    framelist text
-)
-INHERITS (job);
-
-
---
--- Name: jobmax6; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobmax6 (
-    filename text,
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    maxhosts integer,
-    framenth integer,
-    camera text,
-    elementfile text,
-    fileoriginal text,
-    flag_h integer,
-    flag_v integer,
-    flag_w integer,
-    flag_x2 integer,
-    flag_xa integer,
-    flag_xc integer,
-    flag_xd integer,
-    flag_xe integer,
-    flag_xf integer,
-    flag_xh integer,
-    flag_xk integer,
-    flag_xn integer,
-    flag_xo integer,
-    flag_xp integer,
-    flag_xv integer,
-    frameend integer,
-    framelist text,
-    framestart integer
-)
-INHERITS (job);
-
-
---
--- Name: jobmax7; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobmax7 (
-    license text,
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    environment text,
-    checkfilemd5 boolean,
-    uploadedfile boolean,
-    framenthmode integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer
-)
-INHERITS (jobmax);
-
-
---
--- Name: jobmax8; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobmax8 (
-    fkeyjobparent integer,
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    framenthmode integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer
-)
-INHERITS (jobmax);
-
-
---
--- Name: jobmax9; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobmax9 (
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    maxhosts integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer
-)
-INHERITS (jobmax);
-
-
---
--- Name: jobmaxscript; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobmaxscript (
-    fkeyjobtype integer DEFAULT 3,
-    filename text,
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    maxhosts integer,
-    framenth integer,
-    framenthmode integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer,
-    scenename text,
-    shotname text,
-    script text,
-    maxtime integer,
-    outputfiles text,
-    filelist text,
-    silent boolean DEFAULT true,
-    maxversion text,
-    runmax64 boolean
-)
-INHERITS (job);
-
-
---
--- Name: jobmaya; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmaya; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmaya (
@@ -5108,6 +6506,9 @@ CREATE TABLE jobmaya (
     minmemory integer,
     scenename text,
     shotname text,
+    fkeyjobfilterset integer,
+    maxerrors integer,
+    fkeyjobenvironment integer,
     framestart integer,
     frameend integer,
     camera text,
@@ -5120,33 +6521,56 @@ CREATE TABLE jobmaya (
 INHERITS (job);
 
 
+ALTER TABLE public.jobmaya OWNER TO farmer;
+
 --
--- Name: jobmaya2008; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmaya2008; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmaya2008 (
     exclusiveassignment boolean,
     hastaskprogress boolean,
-    minmemory integer
+    minmemory integer,
+    fkeyjobenvironment integer,
+    suspendedts timestamp without time zone
 )
 INHERITS (jobmaya);
 
 
+ALTER TABLE public.jobmaya2008 OWNER TO farmer;
+
 --
--- Name: jobmaya2009; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmaya2009; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmaya2009 (
     framenthmode integer,
     exclusiveassignment boolean,
     hastaskprogress boolean,
-    minmemory integer
+    minmemory integer,
+    notifycompletemessage text,
+    notifyerrormessage text
 )
 INHERITS (jobmaya);
 
 
+ALTER TABLE public.jobmaya2009 OWNER TO farmer;
+
 --
--- Name: jobmaya7; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmaya2011; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobmaya2011 (
+    notifycompletemessage text,
+    notifyerrormessage text
+)
+INHERITS (jobmaya);
+
+
+ALTER TABLE public.jobmaya2011 OWNER TO farmer;
+
+--
+-- Name: jobmaya7; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmaya7 (
@@ -5159,8 +6583,10 @@ CREATE TABLE jobmaya7 (
 INHERITS (jobmaya);
 
 
+ALTER TABLE public.jobmaya7 OWNER TO farmer;
+
 --
--- Name: jobmaya8; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmaya8; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmaya8 (
@@ -5170,13 +6596,17 @@ CREATE TABLE jobmaya8 (
     maxhosts integer,
     exclusiveassignment boolean,
     hastaskprogress boolean,
-    minmemory integer
+    minmemory integer,
+    notifycompletemessage text,
+    notifyerrormessage text
 )
 INHERITS (jobmaya);
 
 
+ALTER TABLE public.jobmaya8 OWNER TO farmer;
+
 --
--- Name: jobmaya85; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmaya85; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmaya85 (
@@ -5189,13 +6619,46 @@ CREATE TABLE jobmaya85 (
     hastaskprogress boolean,
     minmemory integer,
     scenename text,
-    shotname text
+    shotname text,
+    notifycompletemessage text,
+    notifyerrormessage text
 )
 INHERITS (jobmaya);
 
 
+ALTER TABLE public.jobmaya85 OWNER TO farmer;
+
 --
--- Name: jobmentalray7; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmentalray2009; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobmentalray2009 (
+    notifycompletemessage text,
+    notifyerrormessage text,
+    fkeyjobenvironment integer
+)
+INHERITS (jobmaya);
+
+
+ALTER TABLE public.jobmentalray2009 OWNER TO farmer;
+
+--
+-- Name: jobmentalray2011; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobmentalray2011 (
+    notifycompletemessage text,
+    notifyerrormessage text,
+    fkeyjobenvironment integer,
+    suspendedts timestamp without time zone
+)
+INHERITS (jobmaya);
+
+
+ALTER TABLE public.jobmentalray2011 OWNER TO farmer;
+
+--
+-- Name: jobmentalray7; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmentalray7 (
@@ -5206,13 +6669,17 @@ CREATE TABLE jobmentalray7 (
     hastaskprogress boolean,
     minmemory integer,
     scenename text,
-    shotname text
+    shotname text,
+    notifycompletemessage text,
+    notifyerrormessage text
 )
 INHERITS (jobmaya);
 
 
+ALTER TABLE public.jobmentalray7 OWNER TO farmer;
+
 --
--- Name: jobmentalray8; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmentalray8; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmentalray8 (
@@ -5225,8 +6692,10 @@ CREATE TABLE jobmentalray8 (
 INHERITS (jobmaya);
 
 
+ALTER TABLE public.jobmentalray8 OWNER TO farmer;
+
 --
--- Name: jobmentalray85; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmentalray85; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobmentalray85 (
@@ -5240,8 +6709,48 @@ CREATE TABLE jobmentalray85 (
 INHERITS (jobmaya);
 
 
+ALTER TABLE public.jobmentalray85 OWNER TO farmer;
+
 --
--- Name: jobnuke51; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobnaiad; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobnaiad (
+    notifycompletemessage text,
+    notifyerrormessage text,
+    fkeyjobenvironment integer,
+    framestart integer,
+    frameend integer,
+    threads integer,
+    append text,
+    restartcache text,
+    fullframe integer
+)
+INHERITS (job);
+
+
+ALTER TABLE public.jobnaiad OWNER TO farmer;
+
+--
+-- Name: jobnuke; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobnuke (
+    fkeyjobenvironment integer,
+    framestart integer,
+    frameend integer,
+    outputcount integer,
+    viewname text,
+    nodes text,
+    terminalonly boolean
+)
+INHERITS (job);
+
+
+ALTER TABLE public.jobnuke OWNER TO farmer;
+
+--
+-- Name: jobnuke51; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobnuke51 (
@@ -5250,6 +6759,7 @@ CREATE TABLE jobnuke51 (
     exclusiveassignment boolean,
     hastaskprogress boolean,
     minmemory integer,
+    fkeyjobfilterset integer,
     framestart integer,
     frameend integer,
     outputcount integer
@@ -5257,13 +6767,17 @@ CREATE TABLE jobnuke51 (
 INHERITS (job);
 
 
+ALTER TABLE public.jobnuke51 OWNER TO farmer;
+
 --
--- Name: jobnuke52; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobnuke52; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobnuke52 (
     scenename text,
     shotname text,
+    fkeyjobfilterset integer,
+    maxerrors integer,
     framestart integer,
     frameend integer,
     outputcount integer
@@ -5271,26 +6785,31 @@ CREATE TABLE jobnuke52 (
 INHERITS (job);
 
 
+ALTER TABLE public.jobnuke52 OWNER TO farmer;
+
 --
--- Name: joboutput_keyjoboutput_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: joboutput_keyjoboutput_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE joboutput_keyjoboutput_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: joboutput_keyjoboutput_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('joboutput_keyjoboutput_seq', 264835, true);
-
+ALTER TABLE public.joboutput_keyjoboutput_seq OWNER TO farmer;
 
 --
--- Name: joboutput; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: joboutput_keyjoboutput_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('joboutput_keyjoboutput_seq', 1, false);
+
+
+--
+-- Name: joboutput; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE joboutput (
@@ -5301,134 +6820,73 @@ CREATE TABLE joboutput (
 );
 
 
---
--- Name: jobrealflow; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobrealflow (
-    framenth integer,
-    framenthmode integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer,
-    scenename text,
-    shotname text,
-    keyjobrealflow integer NOT NULL,
-    framestart integer,
-    frameend integer,
-    simtype text,
-    threads integer
-)
-INHERITS (job);
-
+ALTER TABLE public.joboutput OWNER TO farmer;
 
 --
--- Name: jobrealflow_keyjobrealflow_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE jobrealflow_keyjobrealflow_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: jobrealflow_keyjobrealflow_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE jobrealflow_keyjobrealflow_seq OWNED BY jobrealflow.keyjobrealflow;
-
-
---
--- Name: jobrealflow_keyjobrealflow_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobrealflow_keyjobrealflow_seq', 1, false);
-
-
---
--- Name: jobrenderman; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobrenderman (
-    framestart integer,
-    frameend integer,
-    version text
-)
-INHERITS (job);
-
-
---
--- Name: jobrenderman_keyjob_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobrenderman_keyjob_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobrenderman_keyjob_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.jobrenderman_keyjob_seq OWNER TO farmer;
+
 --
--- Name: jobrenderman_keyjob_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: jobrenderman_keyjob_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('jobrenderman_keyjob_seq', 1, false);
 
 
 --
--- Name: jobribgen; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobribgen (
-    framestart integer,
-    frameend integer,
-    version text
-)
-INHERITS (job);
-
-
---
--- Name: jobribgen_keyjob_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobribgen_keyjob_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobribgen_keyjob_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.jobribgen_keyjob_seq OWNER TO farmer;
+
 --
--- Name: jobribgen_keyjob_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: jobribgen_keyjob_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('jobribgen_keyjob_seq', 1, true);
 
 
 --
--- Name: jobservice_keyjobservice_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobservice_keyjobservice_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobservice_keyjobservice_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: jobservice_keyjobservice_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobservice_keyjobservice_seq', 273119, true);
-
+ALTER TABLE public.jobservice_keyjobservice_seq OWNER TO farmer;
 
 --
--- Name: jobservice; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobservice_keyjobservice_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobservice_keyjobservice_seq', 1, false);
+
+
+--
+-- Name: jobservice; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobservice (
@@ -5438,70 +6896,31 @@ CREATE TABLE jobservice (
 );
 
 
---
--- Name: jobshake; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobshake (
-    packettype text DEFAULT 'sequential'::text,
-    license text,
-    fkeyjobparent integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer,
-    scenename text,
-    shotname text,
-    framestart integer,
-    frameend integer,
-    codec text,
-    slatepath text,
-    framerange text
-)
-INHERITS (job);
-
+ALTER TABLE public.jobservice OWNER TO farmer;
 
 --
--- Name: jobspool; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobspool (
-    flowfile text,
-    flowpath text,
-    holdend integer,
-    inputfile text,
-    inputpath text,
-    outputfile text,
-    inputstart integer,
-    inputend integer,
-    holdstart integer,
-    importmode integer,
-    keepinqueue integer,
-    lastscanned integer,
-    jobpath text
-)
-INHERITS (job);
-
-
---
--- Name: jobstat_keyjobstat_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobstat_keyjobstat_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobstat_keyjobstat_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: jobstat_keyjobstat_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobstat_keyjobstat_seq', 306607, true);
-
+ALTER TABLE public.jobstat_keyjobstat_seq OWNER TO farmer;
 
 --
--- Name: jobstat; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobstat_keyjobstat_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobstat_keyjobstat_seq', 1, false);
+
+
+--
+-- Name: jobstat; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobstat (
@@ -5536,10 +6955,6 @@ CREATE TABLE jobstat (
     totalloadtime interval,
     loadcount integer,
     submitted timestamp without time zone DEFAULT now(),
-    totalcputime integer,
-    mincputime integer,
-    maxcputime integer,
-    avgcputime integer,
     minmemory integer,
     maxmemory integer,
     avgmemory integer,
@@ -5565,30 +6980,85 @@ CREATE TABLE jobstat (
     totaliowait integer,
     miniowait integer,
     maxiowait integer,
-    avgiowait integer
+    avgiowait integer,
+    avgcputime interval,
+    maxcputime interval,
+    mincputime interval,
+    totalcanceltime interval,
+    totalcputime interval,
+    fkeyjobtype integer,
+    fkeyjob integer
 );
 
 
+ALTER TABLE public.jobstat OWNER TO farmer;
+
 --
--- Name: jobstatus_keyjobstatus_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobstateaction; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE SEQUENCE jobstatus_keyjobstatus_seq
+CREATE TABLE jobstateaction (
+    keyjobstateaction integer NOT NULL,
+    fkeyjob integer,
+    oldstatus text,
+    newstatus text,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE public.jobstateaction OWNER TO farmer;
+
+--
+-- Name: jobstateaction_keyjobstateaction_seq; Type: SEQUENCE; Schema: public; Owner: farmer
+--
+
+CREATE SEQUENCE jobstateaction_keyjobstateaction_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: jobstatus_keyjobstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobstatus_keyjobstatus_seq', 255832, true);
-
+ALTER TABLE public.jobstateaction_keyjobstateaction_seq OWNER TO farmer;
 
 --
--- Name: jobstatus; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobstateaction_keyjobstateaction_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
+--
+
+ALTER SEQUENCE jobstateaction_keyjobstateaction_seq OWNED BY jobstateaction.keyjobstateaction;
+
+
+--
+-- Name: jobstateaction_keyjobstateaction_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobstateaction_keyjobstateaction_seq', 1, false);
+
+
+--
+-- Name: jobstatus_keyjobstatus_seq; Type: SEQUENCE; Schema: public; Owner: farmer
+--
+
+CREATE SEQUENCE jobstatus_keyjobstatus_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.jobstatus_keyjobstatus_seq OWNER TO farmer;
+
+--
+-- Name: jobstatus_keyjobstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobstatus_keyjobstatus_seq', 1, false);
+
+
+--
+-- Name: jobstatus; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobstatus (
@@ -5607,46 +7077,61 @@ CREATE TABLE jobstatus (
     joblastupdated timestamp without time zone,
     errorcount integer DEFAULT 0,
     lastnotifiederrorcount integer,
-    averagememory integer
+    averagememory integer,
+    bytesread bigint,
+    byteswrite bigint,
+    cputime bigint,
+    efficiency double precision,
+    opsread bigint,
+    opswrite bigint,
+    totaltime bigint,
+    queueorder smallint DEFAULT 0 NOT NULL,
+    taskbitmap text,
+    averagedonetime integer DEFAULT 0
 );
 
 
---
--- Name: jobsync; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobsync (
-    fkeyjobparent integer,
-    endedts timestamp without time zone,
-    startedts timestamp without time zone,
-    submittedts timestamp without time zone,
-    maxhosts integer,
-    framenth integer,
-    framenthmode integer,
-    scenename text,
-    shotname text,
-    direction text,
-    append text,
-    filesfrom text
-)
-INHERITS (job);
-
+ALTER TABLE public.jobstatus OWNER TO farmer;
 
 --
--- Name: jobsystem; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobstatus_old; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE TABLE jobsystem (
-)
-INHERITS (job);
+CREATE TABLE jobstatus_old (
+    keyjobstatus integer DEFAULT 0 NOT NULL,
+    hostsonjob integer DEFAULT 0,
+    fkeyjob integer,
+    tasksunassigned integer DEFAULT 0,
+    taskscount integer DEFAULT 0,
+    tasksdone integer DEFAULT 0,
+    taskscancelled integer DEFAULT 0,
+    taskssuspended integer DEFAULT 0,
+    tasksassigned integer DEFAULT 0,
+    tasksbusy integer DEFAULT 0,
+    tasksaveragetime integer,
+    health double precision,
+    joblastupdated timestamp without time zone,
+    errorcount integer DEFAULT 0,
+    lastnotifiederrorcount integer,
+    averagememory integer,
+    bytesread bigint,
+    byteswrite bigint,
+    cputime bigint,
+    efficiency double precision,
+    opsread bigint,
+    opswrite bigint,
+    totaltime bigint
+);
 
+
+ALTER TABLE public.jobstatus_old OWNER TO farmer;
 
 --
--- Name: jobtaskassignment; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobtaskassignment_old; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE TABLE jobtaskassignment (
-    keyjobtaskassignment integer NOT NULL,
+CREATE TABLE jobtaskassignment_old (
+    keyjobtaskassignment integer,
     fkeyjobassignment integer,
     memory integer,
     started timestamp without time zone,
@@ -5657,52 +7142,77 @@ CREATE TABLE jobtaskassignment (
 );
 
 
+ALTER TABLE public.jobtaskassignment_old OWNER TO farmer;
+
 --
--- Name: jobtaskassignment_keyjobtaskassignment_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobtaskassignment_keyjobtaskassignment_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobtaskassignment_keyjobtaskassignment_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
-    CACHE 1;
+    NO MAXVALUE
+    CACHE 10;
+
+
+ALTER TABLE public.jobtaskassignment_keyjobtaskassignment_seq OWNER TO farmer;
+
+--
+-- Name: jobtaskassignment_keyjobtaskassignment_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
+--
+
+ALTER SEQUENCE jobtaskassignment_keyjobtaskassignment_seq OWNED BY jobtaskassignment_old.keyjobtaskassignment;
 
 
 --
--- Name: jobtaskassignment_keyjobtaskassignment_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: jobtaskassignment_keyjobtaskassignment_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-ALTER SEQUENCE jobtaskassignment_keyjobtaskassignment_seq OWNED BY jobtaskassignment.keyjobtaskassignment;
-
-
---
--- Name: jobtaskassignment_keyjobtaskassignment_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('jobtaskassignment_keyjobtaskassignment_seq', 4223846, true);
+SELECT pg_catalog.setval('jobtaskassignment_keyjobtaskassignment_seq', 1, false);
 
 
 --
--- Name: jobtypemapping_keyjobtypemapping_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: jobtaskassignment; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobtaskassignment (
+    keyjobtaskassignment integer DEFAULT nextval('jobtaskassignment_keyjobtaskassignment_seq'::regclass) NOT NULL,
+    fkeyjobassignment integer,
+    memory integer,
+    started timestamp without time zone,
+    ended timestamp without time zone,
+    fkeyjobassignmentstatus integer,
+    fkeyjobtask integer,
+    fkeyjoberror integer
+);
+
+
+ALTER TABLE public.jobtaskassignment OWNER TO farmer;
+
+--
+-- Name: jobtypemapping_keyjobtypemapping_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE jobtypemapping_keyjobtypemapping_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.jobtypemapping_keyjobtypemapping_seq OWNER TO farmer;
+
 --
--- Name: jobtypemapping_keyjobtypemapping_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: jobtypemapping_keyjobtypemapping_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('jobtypemapping_keyjobtypemapping_seq', 1, false);
 
 
 --
--- Name: jobtypemapping; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobtypemapping; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE jobtypemapping (
@@ -5712,73 +7222,31 @@ CREATE TABLE jobtypemapping (
 );
 
 
---
--- Name: jobxsi; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobxsi (
-    maxhosts integer,
-    framenth integer,
-    scenename text,
-    shotname text,
-    framestart integer,
-    frameend integer,
-    framelist text,
-    pass text,
-    flag_w integer,
-    flag_h integer,
-    deformmotionblur boolean,
-    motionblur boolean,
-    renderer text,
-    resolutionx integer,
-    resolutiony integer
-)
-INHERITS (job);
-
+ALTER TABLE public.jobtypemapping OWNER TO farmer;
 
 --
--- Name: jobxsiscript; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobxsiscript (
-    framenth integer,
-    framenthmode integer,
-    exclusiveassignment boolean,
-    hastaskprogress boolean,
-    minmemory integer,
-    scenename text,
-    shotname text,
-    framestart integer,
-    frameend integer,
-    scriptrequiresui boolean,
-    scriptfile text,
-    xsifile text,
-    scriptmethod text,
-    framelist text
-)
-INHERITS (job);
-
-
---
--- Name: license_keylicense_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: license_keylicense_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE license_keylicense_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: license_keylicense_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('license_keylicense_seq', 19, true);
-
+ALTER TABLE public.license_keylicense_seq OWNER TO farmer;
 
 --
--- Name: license; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: license_keylicense_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('license_keylicense_seq', 30, true);
+
+
+--
+-- Name: license; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE license (
@@ -5787,35 +7255,98 @@ CREATE TABLE license (
     fkeyhost integer,
     fkeysoftware integer,
     total integer,
-    available integer,
     reserved integer,
     inuse integer,
-    CONSTRAINT check_licenses_available CHECK ((available >= 0)),
-    CONSTRAINT check_licenses_inuse CHECK ((inuse <= (total - reserved))),
-    CONSTRAINT check_licenses_total CHECK ((available <= total))
+    CONSTRAINT check_licenses_inuse CHECK ((inuse <= total))
 );
 
 
+ALTER TABLE public.license OWNER TO farmer;
+
 --
--- Name: location_keylocation_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: service_keyservice_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
-CREATE SEQUENCE location_keylocation_seq
+CREATE SEQUENCE service_keyservice_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: location_keylocation_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('location_keylocation_seq', 3, true);
-
+ALTER TABLE public.service_keyservice_seq OWNER TO farmer;
 
 --
--- Name: location; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: service_keyservice_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('service_keyservice_seq', 252, true);
+
+
+--
+-- Name: service; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE service (
+    keyservice integer DEFAULT nextval('service_keyservice_seq'::regclass) NOT NULL,
+    service text,
+    description text,
+    fkeylicense integer,
+    enabled boolean,
+    forbiddenprocesses text,
+    active boolean,
+    "unique" boolean,
+    fkeysoftware integer,
+    fkeyjobfilterset integer
+);
+
+
+ALTER TABLE public.service OWNER TO farmer;
+
+--
+-- Name: license_usage; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW license_usage AS
+    SELECT service.service, license.license, (license.total - license.reserved), count(*) AS count FROM ((((jobassignment ja JOIN job ON ((ja.fkeyjob = job.keyjob))) JOIN jobservice js ON ((js.fkeyjob = job.keyjob))) JOIN service ON ((js.fkeyservice = service.keyservice))) JOIN license ON ((service.fkeylicense = license.keylicense))) WHERE (ja.fkeyjobassignmentstatus < 4) GROUP BY service.service, license.license, license.total, license.reserved;
+
+
+ALTER TABLE public.license_usage OWNER TO farmer;
+
+--
+-- Name: license_usage_2; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW license_usage_2 AS
+    SELECT service.service, (license.total - license.reserved), count(ja.keyjobassignment) AS count FROM ((((service JOIN jobservice js ON ((js.fkeyservice = service.keyservice))) JOIN job ON ((js.fkeyjob = job.keyjob))) LEFT JOIN jobassignment ja ON (((ja.fkeyjob = job.keyjob) AND (ja.fkeyjobassignmentstatus < 4)))) JOIN license ON ((service.fkeylicense = license.keylicense))) GROUP BY service.service, license.total, license.reserved;
+
+
+ALTER TABLE public.license_usage_2 OWNER TO farmer;
+
+--
+-- Name: location_keylocation_seq; Type: SEQUENCE; Schema: public; Owner: farmer
+--
+
+CREATE SEQUENCE location_keylocation_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.location_keylocation_seq OWNER TO farmer;
+
+--
+-- Name: location_keylocation_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('location_keylocation_seq', 1, false);
+
+
+--
+-- Name: location; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE location (
@@ -5824,27 +7355,31 @@ CREATE TABLE location (
 );
 
 
+ALTER TABLE public.location OWNER TO farmer;
+
 --
--- Name: mapping_keymapping_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: mapping_keymapping_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE mapping_keymapping_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.mapping_keymapping_seq OWNER TO farmer;
+
 --
--- Name: mapping_keymapping_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: mapping_keymapping_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('mapping_keymapping_seq', 1, false);
 
 
 --
--- Name: mapping; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: mapping; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE mapping (
@@ -5857,27 +7392,31 @@ CREATE TABLE mapping (
 );
 
 
+ALTER TABLE public.mapping OWNER TO farmer;
+
 --
--- Name: mappingtype_keymappingtype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: mappingtype_keymappingtype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE mappingtype_keymappingtype_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.mappingtype_keymappingtype_seq OWNER TO farmer;
+
 --
--- Name: mappingtype_keymappingtype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: mappingtype_keymappingtype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('mappingtype_keymappingtype_seq', 1, false);
 
 
 --
--- Name: mappingtype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: mappingtype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE mappingtype (
@@ -5886,27 +7425,31 @@ CREATE TABLE mappingtype (
 );
 
 
+ALTER TABLE public.mappingtype OWNER TO farmer;
+
 --
--- Name: methodperms_keymethodperms_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: methodperms_keymethodperms_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE methodperms_keymethodperms_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.methodperms_keymethodperms_seq OWNER TO farmer;
+
 --
--- Name: methodperms_keymethodperms_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: methodperms_keymethodperms_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('methodperms_keymethodperms_seq', 1, false);
 
 
 --
--- Name: methodperms; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: methodperms; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE methodperms (
@@ -5918,26 +7461,31 @@ CREATE TABLE methodperms (
 );
 
 
+ALTER TABLE public.methodperms OWNER TO farmer;
+
 --
--- Name: notification_keynotification_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: notification_keynotification_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE notification_keynotification_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: notification_keynotification_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('notification_keynotification_seq', 12063, true);
-
+ALTER TABLE public.notification_keynotification_seq OWNER TO farmer;
 
 --
--- Name: notification; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: notification_keynotification_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('notification_keynotification_seq', 1, false);
+
+
+--
+-- Name: notification; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE notification (
@@ -5952,27 +7500,31 @@ CREATE TABLE notification (
 );
 
 
+ALTER TABLE public.notification OWNER TO farmer;
+
 --
--- Name: notificationdestination_keynotificationdestination_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: notificationdestination_keynotificationdestination_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE notificationdestination_keynotificationdestination_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.notificationdestination_keynotificationdestination_seq OWNER TO farmer;
+
 --
--- Name: notificationdestination_keynotificationdestination_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: notificationdestination_keynotificationdestination_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('notificationdestination_keynotificationdestination_seq', 1, false);
 
 
 --
--- Name: notificationdestination; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: notificationdestination; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE notificationdestination (
@@ -5986,27 +7538,31 @@ CREATE TABLE notificationdestination (
 );
 
 
+ALTER TABLE public.notificationdestination OWNER TO farmer;
+
 --
--- Name: notificationmethod_keynotificationmethod_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: notificationmethod_keynotificationmethod_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE notificationmethod_keynotificationmethod_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.notificationmethod_keynotificationmethod_seq OWNER TO farmer;
+
 --
--- Name: notificationmethod_keynotificationmethod_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: notificationmethod_keynotificationmethod_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('notificationmethod_keynotificationmethod_seq', 1, false);
 
 
 --
--- Name: notificationmethod; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: notificationmethod; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE notificationmethod (
@@ -6015,27 +7571,31 @@ CREATE TABLE notificationmethod (
 );
 
 
+ALTER TABLE public.notificationmethod OWNER TO farmer;
+
 --
--- Name: notificationroute_keynotificationuserroute_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: notificationroute_keynotificationuserroute_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE notificationroute_keynotificationuserroute_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.notificationroute_keynotificationuserroute_seq OWNER TO farmer;
+
 --
--- Name: notificationroute_keynotificationuserroute_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: notificationroute_keynotificationuserroute_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('notificationroute_keynotificationuserroute_seq', 1, false);
 
 
 --
--- Name: notificationroute; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: notificationroute; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE notificationroute (
@@ -6052,27 +7612,31 @@ CREATE TABLE notificationroute (
 );
 
 
+ALTER TABLE public.notificationroute OWNER TO farmer;
+
 --
--- Name: notify_keynotify_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: notify_keynotify_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE notify_keynotify_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.notify_keynotify_seq OWNER TO farmer;
+
 --
--- Name: notify_keynotify_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: notify_keynotify_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('notify_keynotify_seq', 1, false);
 
 
 --
--- Name: notify; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: notify; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE notify (
@@ -6091,27 +7655,31 @@ CREATE TABLE notify (
 );
 
 
+ALTER TABLE public.notify OWNER TO farmer;
+
 --
--- Name: notifymethod_keynotifymethod_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: notifymethod_keynotifymethod_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE notifymethod_keynotifymethod_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.notifymethod_keynotifymethod_seq OWNER TO farmer;
+
 --
--- Name: notifymethod_keynotifymethod_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: notifymethod_keynotifymethod_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('notifymethod_keynotifymethod_seq', 1, false);
 
 
 --
--- Name: notifymethod; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: notifymethod; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE notifymethod (
@@ -6120,27 +7688,31 @@ CREATE TABLE notifymethod (
 );
 
 
+ALTER TABLE public.notifymethod OWNER TO farmer;
+
 --
--- Name: notifysent_keynotifysent_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: notifysent_keynotifysent_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE notifysent_keynotifysent_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.notifysent_keynotifysent_seq OWNER TO farmer;
+
 --
--- Name: notifysent_keynotifysent_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: notifysent_keynotifysent_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('notifysent_keynotifysent_seq', 1, false);
 
 
 --
--- Name: notifysent; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: notifysent; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE notifysent (
@@ -6150,27 +7722,31 @@ CREATE TABLE notifysent (
 );
 
 
+ALTER TABLE public.notifysent OWNER TO farmer;
+
 --
--- Name: notifywho_keynotifywho_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: notifywho_keynotifywho_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE notifywho_keynotifywho_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.notifywho_keynotifywho_seq OWNER TO farmer;
+
 --
--- Name: notifywho_keynotifywho_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: notifywho_keynotifywho_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('notifywho_keynotifywho_seq', 1, false);
 
 
 --
--- Name: notifywho; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: notifywho; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE notifywho (
@@ -6182,8 +7758,10 @@ CREATE TABLE notifywho (
 );
 
 
+ALTER TABLE public.notifywho OWNER TO farmer;
+
 --
--- Name: package; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: package; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE package (
@@ -6193,34 +7771,38 @@ CREATE TABLE package (
 );
 
 
+ALTER TABLE public.package OWNER TO farmer;
+
 --
--- Name: package_keypackage_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: package_keypackage_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE package_keypackage_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.package_keypackage_seq OWNER TO farmer;
+
 --
--- Name: package_keypackage_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: package_keypackage_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE package_keypackage_seq OWNED BY package.keypackage;
 
 
 --
--- Name: package_keypackage_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: package_keypackage_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('package_keypackage_seq', 1, false);
 
 
 --
--- Name: packageoutput; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: packageoutput; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE packageoutput (
@@ -6229,53 +7811,59 @@ CREATE TABLE packageoutput (
 );
 
 
+ALTER TABLE public.packageoutput OWNER TO farmer;
+
 --
--- Name: packageoutput_keypackageoutput_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: packageoutput_keypackageoutput_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE packageoutput_keypackageoutput_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.packageoutput_keypackageoutput_seq OWNER TO farmer;
+
 --
--- Name: packageoutput_keypackageoutput_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: packageoutput_keypackageoutput_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE packageoutput_keypackageoutput_seq OWNED BY packageoutput.keypackageoutput;
 
 
 --
--- Name: packageoutput_keypackageoutput_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: packageoutput_keypackageoutput_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('packageoutput_keypackageoutput_seq', 1, false);
 
 
 --
--- Name: pathsynctarget_keypathsynctarget_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: pathsynctarget_keypathsynctarget_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE pathsynctarget_keypathsynctarget_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.pathsynctarget_keypathsynctarget_seq OWNER TO farmer;
+
 --
--- Name: pathsynctarget_keypathsynctarget_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: pathsynctarget_keypathsynctarget_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('pathsynctarget_keypathsynctarget_seq', 1, false);
 
 
 --
--- Name: pathsynctarget; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: pathsynctarget; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE pathsynctarget (
@@ -6285,27 +7873,31 @@ CREATE TABLE pathsynctarget (
 );
 
 
+ALTER TABLE public.pathsynctarget OWNER TO farmer;
+
 --
--- Name: pathtemplate_keypathtemplate_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: pathtemplate_keypathtemplate_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE pathtemplate_keypathtemplate_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.pathtemplate_keypathtemplate_seq OWNER TO farmer;
+
 --
--- Name: pathtemplate_keypathtemplate_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: pathtemplate_keypathtemplate_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('pathtemplate_keypathtemplate_seq', 1, false);
 
 
 --
--- Name: pathtemplate; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: pathtemplate; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE pathtemplate (
@@ -6320,27 +7912,31 @@ CREATE TABLE pathtemplate (
 );
 
 
+ALTER TABLE public.pathtemplate OWNER TO farmer;
+
 --
--- Name: pathtracker_keypathtracker_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: pathtracker_keypathtracker_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE pathtracker_keypathtracker_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.pathtracker_keypathtracker_seq OWNER TO farmer;
+
 --
--- Name: pathtracker_keypathtracker_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: pathtracker_keypathtracker_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('pathtracker_keypathtracker_seq', 1, false);
 
 
 --
--- Name: pathtracker; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: pathtracker; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE pathtracker (
@@ -6353,26 +7949,31 @@ CREATE TABLE pathtracker (
 );
 
 
+ALTER TABLE public.pathtracker OWNER TO farmer;
+
 --
--- Name: permission_keypermission_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: permission_keypermission_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE permission_keypermission_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.permission_keypermission_seq OWNER TO farmer;
+
 --
--- Name: permission_keypermission_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: permission_keypermission_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('permission_keypermission_seq', 2, true);
 
 
 --
--- Name: permission; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: permission; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE permission (
@@ -6385,27 +7986,41 @@ CREATE TABLE permission (
 );
 
 
+ALTER TABLE public.permission OWNER TO farmer;
+
 --
--- Name: phoneno_keyphoneno_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: pg_stat_statements; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW pg_stat_statements AS
+    SELECT pg_stat_statements.userid, pg_stat_statements.dbid, pg_stat_statements.query, pg_stat_statements.calls, pg_stat_statements.total_time, pg_stat_statements.rows, pg_stat_statements.shared_blks_hit, pg_stat_statements.shared_blks_read, pg_stat_statements.shared_blks_written, pg_stat_statements.local_blks_hit, pg_stat_statements.local_blks_read, pg_stat_statements.local_blks_written, pg_stat_statements.temp_blks_read, pg_stat_statements.temp_blks_written FROM pg_stat_statements() pg_stat_statements(userid, dbid, query, calls, total_time, rows, shared_blks_hit, shared_blks_read, shared_blks_written, local_blks_hit, local_blks_read, local_blks_written, temp_blks_read, temp_blks_written);
+
+
+ALTER TABLE public.pg_stat_statements OWNER TO postgres;
+
+--
+-- Name: phoneno_keyphoneno_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE phoneno_keyphoneno_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.phoneno_keyphoneno_seq OWNER TO farmer;
+
 --
--- Name: phoneno_keyphoneno_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: phoneno_keyphoneno_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('phoneno_keyphoneno_seq', 1, false);
 
 
 --
--- Name: phoneno; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: phoneno; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE phoneno (
@@ -6417,27 +8032,31 @@ CREATE TABLE phoneno (
 );
 
 
+ALTER TABLE public.phoneno OWNER TO farmer;
+
 --
--- Name: phonetype_keyphonetype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: phonetype_keyphonetype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE phonetype_keyphonetype_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.phonetype_keyphonetype_seq OWNER TO farmer;
+
 --
--- Name: phonetype_keyphonetype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: phonetype_keyphonetype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('phonetype_keyphonetype_seq', 1, false);
 
 
 --
--- Name: phonetype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: phonetype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE phonetype (
@@ -6446,13 +8065,17 @@ CREATE TABLE phonetype (
 );
 
 
+ALTER TABLE public.phonetype OWNER TO farmer;
+
 --
--- Name: project; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: project; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE project (
     datestart date,
     icon bytea,
+    arsenalslotlimit integer,
+    arsenalslotreserve integer,
     compoutputdrive text,
     datedue date,
     filetype text,
@@ -6483,26 +8106,51 @@ CREATE TABLE project (
 INHERITS (element);
 
 
+ALTER TABLE public.project OWNER TO farmer;
+
 --
--- Name: projectresolution_keyprojectresolution_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: project_slots_current; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW project_slots_current AS
+    SELECT project.name, COALESCE(sum(jobstatus.hostsonjob), (0)::bigint) AS sum, project.arsenalslotreserve, project.arsenalslotlimit FROM ((project LEFT JOIN job ON (((project.keyelement = job.fkeyproject) AND (job.status = 'started'::text)))) LEFT JOIN jobstatus jobstatus ON ((job.keyjob = jobstatus.fkeyjob))) GROUP BY project.name, project.arsenalslotreserve, project.arsenalslotlimit;
+
+
+ALTER TABLE public.project_slots_current OWNER TO farmer;
+
+--
+-- Name: project_slots_limits; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW project_slots_limits AS
+    SELECT project.name, project.arsenalslotlimit, project.arsenalslotreserve FROM project WHERE ((project.arsenalslotlimit > (-1)) OR (project.arsenalslotreserve > 0));
+
+
+ALTER TABLE public.project_slots_limits OWNER TO farmer;
+
+--
+-- Name: projectresolution_keyprojectresolution_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE projectresolution_keyprojectresolution_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: projectresolution_keyprojectresolution_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('projectresolution_keyprojectresolution_seq', 3, true);
-
+ALTER TABLE public.projectresolution_keyprojectresolution_seq OWNER TO farmer;
 
 --
--- Name: projectresolution; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: projectresolution_keyprojectresolution_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('projectresolution_keyprojectresolution_seq', 1, false);
+
+
+--
+-- Name: projectresolution; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE projectresolution (
@@ -6518,26 +8166,31 @@ CREATE TABLE projectresolution (
 );
 
 
+ALTER TABLE public.projectresolution OWNER TO farmer;
+
 --
--- Name: projectstatus_keyprojectstatus_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: projectstatus_keyprojectstatus_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE projectstatus_keyprojectstatus_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: projectstatus_keyprojectstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('projectstatus_keyprojectstatus_seq', 6, true);
-
+ALTER TABLE public.projectstatus_keyprojectstatus_seq OWNER TO farmer;
 
 --
--- Name: projectstatus; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: projectstatus_keyprojectstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('projectstatus_keyprojectstatus_seq', 1, false);
+
+
+--
+-- Name: projectstatus; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE projectstatus (
@@ -6547,26 +8200,31 @@ CREATE TABLE projectstatus (
 );
 
 
+ALTER TABLE public.projectstatus OWNER TO farmer;
+
 --
--- Name: projectstorage_keyprojectstorage_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: projectstorage_keyprojectstorage_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE projectstorage_keyprojectstorage_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: projectstorage_keyprojectstorage_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('projectstorage_keyprojectstorage_seq', 34, true);
-
+ALTER TABLE public.projectstorage_keyprojectstorage_seq OWNER TO farmer;
 
 --
--- Name: projectstorage; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: projectstorage_keyprojectstorage_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('projectstorage_keyprojectstorage_seq', 1, false);
+
+
+--
+-- Name: projectstorage; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE projectstorage (
@@ -6580,8 +8238,10 @@ CREATE TABLE projectstorage (
 );
 
 
+ALTER TABLE public.projectstorage OWNER TO farmer;
+
 --
--- Name: projecttempo; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: projecttempo; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE projecttempo (
@@ -6590,8 +8250,10 @@ CREATE TABLE projecttempo (
 );
 
 
+ALTER TABLE public.projecttempo OWNER TO farmer;
+
 --
--- Name: queueorder; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: queueorder; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE queueorder (
@@ -6600,8 +8262,10 @@ CREATE TABLE queueorder (
 );
 
 
+ALTER TABLE public.queueorder OWNER TO farmer;
+
 --
--- Name: rangefiletracker; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: rangefiletracker; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE rangefiletracker (
@@ -6614,27 +8278,31 @@ CREATE TABLE rangefiletracker (
 INHERITS (filetracker);
 
 
+ALTER TABLE public.rangefiletracker OWNER TO farmer;
+
 --
--- Name: renderframe_keyrenderframe_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: renderframe_keyrenderframe_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE renderframe_keyrenderframe_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.renderframe_keyrenderframe_seq OWNER TO farmer;
+
 --
--- Name: renderframe_keyrenderframe_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: renderframe_keyrenderframe_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('renderframe_keyrenderframe_seq', 1, false);
 
 
 --
--- Name: renderframe; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: renderframe; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE renderframe (
@@ -6646,27 +8314,71 @@ CREATE TABLE renderframe (
 );
 
 
+ALTER TABLE public.renderframe OWNER TO farmer;
+
 --
--- Name: schedule_keyschedule_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: running_shots_averagetime; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW running_shots_averagetime AS
+    SELECT job.shotname, avg(jobstatus.tasksaveragetime) AS avgtime FROM (job JOIN jobstatus jobstatus ON ((jobstatus.fkeyjob = job.keyjob))) WHERE (job.status = ANY (ARRAY['ready'::text, 'started'::text])) GROUP BY job.shotname;
+
+
+ALTER TABLE public.running_shots_averagetime OWNER TO farmer;
+
+--
+-- Name: running_shots_averagetime_2; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW running_shots_averagetime_2 AS
+    SELECT job.shotname, project.name, (GREATEST((0)::double precision, avg(GREATEST((0)::double precision, (date_part('epoch'::text, ((jobtaskassignment.ended)::timestamp with time zone - (jobtaskassignment.started)::timestamp with time zone)) * (job.slots)::double precision)))))::numeric AS avgtime FROM ((((jobtaskassignment JOIN jobtask ON ((jobtask.fkeyjobtaskassignment = jobtaskassignment.keyjobtaskassignment))) JOIN job ON ((jobtask.fkeyjob = job.keyjob))) JOIN jobstatus jobstatus ON ((jobstatus.fkeyjob = job.keyjob))) JOIN project ON ((job.fkeyproject = project.keyelement))) WHERE ((jobtaskassignment.ended IS NOT NULL) AND (job.status = ANY (ARRAY['ready'::text, 'started'::text]))) GROUP BY job.shotname, project.name;
+
+
+ALTER TABLE public.running_shots_averagetime_2 OWNER TO farmer;
+
+--
+-- Name: running_shots_averagetime_3; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW running_shots_averagetime_3 AS
+    SELECT job.shotname, project.name, (GREATEST((0)::double precision, avg(GREATEST((0)::double precision, (date_part('epoch'::text, ((jobassignment.ended)::timestamp with time zone - (jobassignment.started)::timestamp with time zone)) * (jobassignment.assignslots)::double precision)))))::integer AS avgtime FROM ((jobassignment JOIN job ON (((jobassignment.fkeyjob = job.keyjob) AND (job.status = ANY (ARRAY['ready'::text, 'started'::text]))))) JOIN project ON ((job.fkeyproject = project.keyelement))) WHERE (jobassignment.ended IS NOT NULL) GROUP BY job.shotname, project.name;
+
+
+ALTER TABLE public.running_shots_averagetime_3 OWNER TO farmer;
+
+--
+-- Name: running_shots_averagetime_4; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW running_shots_averagetime_4 AS
+    SELECT job.shotname, project.name, ((sum(jobstatus.averagedonetime))::integer / COALESCE(dw.weight, 1)) AS avgtime FROM (((job JOIN jobstatus ON ((jobstatus.fkeyjob = job.keyjob))) JOIN project ON ((job.fkeyproject = project.keyelement))) LEFT JOIN darwinweight dw ON (((job.shotname = dw.shotname) AND (project.name = dw.projectname)))) WHERE (job.status = ANY (ARRAY['ready'::text, 'started'::text])) GROUP BY job.shotname, project.name, dw.weight ORDER BY job.shotname;
+
+
+ALTER TABLE public.running_shots_averagetime_4 OWNER TO postgres;
+
+--
+-- Name: schedule_keyschedule_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE schedule_keyschedule_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.schedule_keyschedule_seq OWNER TO farmer;
+
 --
--- Name: schedule_keyschedule_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: schedule_keyschedule_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('schedule_keyschedule_seq', 1, false);
 
 
 --
--- Name: schedule; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schedule; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE schedule (
@@ -6683,8 +8395,10 @@ CREATE TABLE schedule (
 );
 
 
+ALTER TABLE public.schedule OWNER TO farmer;
+
 --
--- Name: serverfileaction; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: serverfileaction; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE serverfileaction (
@@ -6698,34 +8412,38 @@ CREATE TABLE serverfileaction (
 );
 
 
+ALTER TABLE public.serverfileaction OWNER TO farmer;
+
 --
--- Name: serverfileaction_keyserverfileaction_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: serverfileaction_keyserverfileaction_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE serverfileaction_keyserverfileaction_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.serverfileaction_keyserverfileaction_seq OWNER TO farmer;
+
 --
--- Name: serverfileaction_keyserverfileaction_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: serverfileaction_keyserverfileaction_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE serverfileaction_keyserverfileaction_seq OWNED BY serverfileaction.keyserverfileaction;
 
 
 --
--- Name: serverfileaction_keyserverfileaction_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: serverfileaction_keyserverfileaction_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('serverfileaction_keyserverfileaction_seq', 1, false);
 
 
 --
--- Name: serverfileactionstatus; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: serverfileactionstatus; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE serverfileactionstatus (
@@ -6735,34 +8453,38 @@ CREATE TABLE serverfileactionstatus (
 );
 
 
+ALTER TABLE public.serverfileactionstatus OWNER TO farmer;
+
 --
--- Name: serverfileactionstatus_keyserverfileactionstatus_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: serverfileactionstatus_keyserverfileactionstatus_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE serverfileactionstatus_keyserverfileactionstatus_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.serverfileactionstatus_keyserverfileactionstatus_seq OWNER TO farmer;
+
 --
--- Name: serverfileactionstatus_keyserverfileactionstatus_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: serverfileactionstatus_keyserverfileactionstatus_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE serverfileactionstatus_keyserverfileactionstatus_seq OWNED BY serverfileactionstatus.keyserverfileactionstatus;
 
 
 --
--- Name: serverfileactionstatus_keyserverfileactionstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: serverfileactionstatus_keyserverfileactionstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('serverfileactionstatus_keyserverfileactionstatus_seq', 1, false);
 
 
 --
--- Name: serverfileactiontype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: serverfileactiontype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE serverfileactiontype (
@@ -6771,69 +8493,38 @@ CREATE TABLE serverfileactiontype (
 );
 
 
+ALTER TABLE public.serverfileactiontype OWNER TO farmer;
+
 --
--- Name: serverfileactiontype_keyserverfileactiontype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: serverfileactiontype_keyserverfileactiontype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE serverfileactiontype_keyserverfileactiontype_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.serverfileactiontype_keyserverfileactiontype_seq OWNER TO farmer;
+
 --
--- Name: serverfileactiontype_keyserverfileactiontype_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: serverfileactiontype_keyserverfileactiontype_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE serverfileactiontype_keyserverfileactiontype_seq OWNED BY serverfileactiontype.keyserverfileactiontype;
 
 
 --
--- Name: serverfileactiontype_keyserverfileactiontype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: serverfileactiontype_keyserverfileactiontype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('serverfileactiontype_keyserverfileactiontype_seq', 1, false);
 
 
 --
--- Name: service_keyservice_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE service_keyservice_seq
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: service_keyservice_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('service_keyservice_seq', 44, true);
-
-
---
--- Name: service; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE service (
-    keyservice integer DEFAULT nextval('service_keyservice_seq'::regclass) NOT NULL,
-    service text,
-    description text,
-    fkeylicense integer,
-    enabled boolean,
-    forbiddenprocesses text,
-    active boolean,
-    "unique" boolean,
-    fkeysoftware integer
-);
-
-
---
--- Name: sessions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: sessions; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE sessions (
@@ -6844,11 +8535,15 @@ CREATE TABLE sessions (
 );
 
 
+ALTER TABLE public.sessions OWNER TO farmer;
+
 --
--- Name: shot; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: shot; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE shot (
+    arsenalslotlimit integer,
+    arsenalslotreserve integer,
     dialog text,
     frameend integer,
     framestart integer,
@@ -6861,36 +8556,56 @@ CREATE TABLE shot (
 INHERITS (element);
 
 
+ALTER TABLE public.shot OWNER TO farmer;
+
 --
--- Name: shotgroup; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: shotgroup; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE shotgroup (
+    arsenalslotlimit integer,
+    arsenalslotreserve integer,
     shotgroup text
 )
 INHERITS (element);
 
 
+ALTER TABLE public.shotgroup OWNER TO farmer;
+
 --
--- Name: software_keysoftware_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: slots_total; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE slots_total (
+    sum bigint
+);
+
+
+ALTER TABLE public.slots_total OWNER TO farmer;
+
+--
+-- Name: software_keysoftware_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE software_keysoftware_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: software_keysoftware_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('software_keysoftware_seq', 9, true);
-
+ALTER TABLE public.software_keysoftware_seq OWNER TO farmer;
 
 --
--- Name: software; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: software_keysoftware_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('software_keysoftware_seq', 1, false);
+
+
+--
+-- Name: software; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE software (
@@ -6907,8 +8622,10 @@ CREATE TABLE software (
 );
 
 
+ALTER TABLE public.software OWNER TO farmer;
+
 --
--- Name: status; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: status; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE status (
@@ -6917,53 +8634,59 @@ CREATE TABLE status (
 );
 
 
+ALTER TABLE public.status OWNER TO farmer;
+
 --
--- Name: status_keystatus_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: status_keystatus_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE status_keystatus_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.status_keystatus_seq OWNER TO farmer;
+
 --
--- Name: status_keystatus_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: status_keystatus_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE status_keystatus_seq OWNED BY status.keystatus;
 
 
 --
--- Name: status_keystatus_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: status_keystatus_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('status_keystatus_seq', 1, false);
 
 
 --
--- Name: statusset_keystatusset_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: statusset_keystatusset_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE statusset_keystatusset_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.statusset_keystatusset_seq OWNER TO farmer;
+
 --
--- Name: statusset_keystatusset_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: statusset_keystatusset_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('statusset_keystatusset_seq', 1, false);
 
 
 --
--- Name: statusset; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: statusset; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE statusset (
@@ -6972,26 +8695,31 @@ CREATE TABLE statusset (
 );
 
 
+ALTER TABLE public.statusset OWNER TO farmer;
+
 --
--- Name: syslog_keysyslog_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: syslog_keysyslog_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE syslog_keysyslog_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: syslog_keysyslog_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('syslog_keysyslog_seq', 17359, true);
-
+ALTER TABLE public.syslog_keysyslog_seq OWNER TO farmer;
 
 --
--- Name: syslog; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: syslog_keysyslog_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('syslog_keysyslog_seq', 1, false);
+
+
+--
+-- Name: syslog; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE syslog (
@@ -7012,45 +8740,52 @@ CREATE TABLE syslog (
 );
 
 
+ALTER TABLE public.syslog OWNER TO farmer;
+
 --
--- Name: syslog_count_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: syslog_count_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE syslog_count_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: syslog_count_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('syslog_count_seq', 1, false);
-
+ALTER TABLE public.syslog_count_seq OWNER TO farmer;
 
 --
--- Name: syslogrealm_keysyslogrealm_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: syslog_count_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('syslog_count_seq', 4034, true);
+
+
+--
+-- Name: syslogrealm_keysyslogrealm_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE syslogrealm_keysyslogrealm_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.syslogrealm_keysyslogrealm_seq OWNER TO farmer;
+
 --
--- Name: syslogrealm_keysyslogrealm_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: syslogrealm_keysyslogrealm_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('syslogrealm_keysyslogrealm_seq', 6, true);
 
 
 --
--- Name: syslogrealm; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: syslogrealm; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE syslogrealm (
@@ -7059,26 +8794,31 @@ CREATE TABLE syslogrealm (
 );
 
 
+ALTER TABLE public.syslogrealm OWNER TO farmer;
+
 --
--- Name: syslogseverity_keysyslogseverity_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: syslogseverity_keysyslogseverity_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE syslogseverity_keysyslogseverity_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.syslogseverity_keysyslogseverity_seq OWNER TO farmer;
+
 --
--- Name: syslogseverity_keysyslogseverity_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: syslogseverity_keysyslogseverity_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('syslogseverity_keysyslogseverity_seq', 4, true);
 
 
 --
--- Name: syslogseverity; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: syslogseverity; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE syslogseverity (
@@ -7088,39 +8828,46 @@ CREATE TABLE syslogseverity (
 );
 
 
+ALTER TABLE public.syslogseverity OWNER TO farmer;
+
 --
--- Name: task; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: task; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE task (
     icon bytea,
+    arsenalslotlimit integer,
     fkeytasktype integer,
     shotgroup integer
 )
 INHERITS (element);
 
 
+ALTER TABLE public.task OWNER TO farmer;
+
 --
--- Name: tasktype_keytasktype_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: tasktype_keytasktype_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE tasktype_keytasktype_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.tasktype_keytasktype_seq OWNER TO farmer;
+
 --
--- Name: tasktype_keytasktype_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: tasktype_keytasktype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('tasktype_keytasktype_seq', 1, false);
 
 
 --
--- Name: tasktype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tasktype; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE tasktype (
@@ -7130,27 +8877,31 @@ CREATE TABLE tasktype (
 );
 
 
+ALTER TABLE public.tasktype OWNER TO farmer;
+
 --
--- Name: taskuser_keytaskuser_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: taskuser_keytaskuser_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE taskuser_keytaskuser_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.taskuser_keytaskuser_seq OWNER TO farmer;
+
 --
--- Name: taskuser_keytaskuser_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: taskuser_keytaskuser_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('taskuser_keytaskuser_seq', 1, false);
 
 
 --
--- Name: taskuser; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: taskuser; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE taskuser (
@@ -7161,27 +8912,31 @@ CREATE TABLE taskuser (
 );
 
 
+ALTER TABLE public.taskuser OWNER TO farmer;
+
 --
--- Name: thread_keythread_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: thread_keythread_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE thread_keythread_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.thread_keythread_seq OWNER TO farmer;
+
 --
--- Name: thread_keythread_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: thread_keythread_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('thread_keythread_seq', 1, false);
 
 
 --
--- Name: thread; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: thread; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE thread (
@@ -7198,27 +8953,31 @@ CREATE TABLE thread (
 );
 
 
+ALTER TABLE public.thread OWNER TO farmer;
+
 --
--- Name: threadcategory_keythreadcategory_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: threadcategory_keythreadcategory_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE threadcategory_keythreadcategory_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.threadcategory_keythreadcategory_seq OWNER TO farmer;
+
 --
--- Name: threadcategory_keythreadcategory_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: threadcategory_keythreadcategory_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('threadcategory_keythreadcategory_seq', 1, false);
 
 
 --
--- Name: threadcategory; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: threadcategory; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE threadcategory (
@@ -7227,26 +8986,31 @@ CREATE TABLE threadcategory (
 );
 
 
+ALTER TABLE public.threadcategory OWNER TO farmer;
+
 --
--- Name: threadnotify_keythreadnotify_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: threadnotify_keythreadnotify_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE threadnotify_keythreadnotify_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: threadnotify_keythreadnotify_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('threadnotify_keythreadnotify_seq', 12, true);
-
+ALTER TABLE public.threadnotify_keythreadnotify_seq OWNER TO farmer;
 
 --
--- Name: threadnotify; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: threadnotify_keythreadnotify_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('threadnotify_keythreadnotify_seq', 1, false);
+
+
+--
+-- Name: threadnotify; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE threadnotify (
@@ -7257,26 +9021,31 @@ CREATE TABLE threadnotify (
 );
 
 
+ALTER TABLE public.threadnotify OWNER TO farmer;
+
 --
--- Name: thumbnail_keythumbnail_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: thumbnail_keythumbnail_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE thumbnail_keythumbnail_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: thumbnail_keythumbnail_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('thumbnail_keythumbnail_seq', 25, true);
-
+ALTER TABLE public.thumbnail_keythumbnail_seq OWNER TO farmer;
 
 --
--- Name: thumbnail; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: thumbnail_keythumbnail_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('thumbnail_keythumbnail_seq', 1, false);
+
+
+--
+-- Name: thumbnail; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE thumbnail (
@@ -7290,26 +9059,31 @@ CREATE TABLE thumbnail (
 );
 
 
+ALTER TABLE public.thumbnail OWNER TO farmer;
+
 --
--- Name: timesheet_keytimesheet_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: timesheet_keytimesheet_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE timesheet_keytimesheet_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: timesheet_keytimesheet_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('timesheet_keytimesheet_seq', 4, true);
-
+ALTER TABLE public.timesheet_keytimesheet_seq OWNER TO farmer;
 
 --
--- Name: timesheet; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: timesheet_keytimesheet_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('timesheet_keytimesheet_seq', 1, false);
+
+
+--
+-- Name: timesheet; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE timesheet (
@@ -7326,26 +9100,31 @@ CREATE TABLE timesheet (
 );
 
 
+ALTER TABLE public.timesheet OWNER TO farmer;
+
 --
--- Name: timesheetcategory_keytimesheetcategory_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: timesheetcategory_keytimesheetcategory_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE timesheetcategory_keytimesheetcategory_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.timesheetcategory_keytimesheetcategory_seq OWNER TO farmer;
+
 --
--- Name: timesheetcategory_keytimesheetcategory_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: timesheetcategory_keytimesheetcategory_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('timesheetcategory_keytimesheetcategory_seq', 179, true);
 
 
 --
--- Name: timesheetcategory; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: timesheetcategory; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE timesheetcategory (
@@ -7368,27 +9147,31 @@ CREATE TABLE timesheetcategory (
 );
 
 
+ALTER TABLE public.timesheetcategory OWNER TO farmer;
+
 --
--- Name: tracker_keytracker_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: tracker_keytracker_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE tracker_keytracker_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.tracker_keytracker_seq OWNER TO farmer;
+
 --
--- Name: tracker_keytracker_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: tracker_keytracker_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('tracker_keytracker_seq', 1, false);
 
 
 --
--- Name: tracker; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tracker; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE tracker (
@@ -7408,27 +9191,31 @@ CREATE TABLE tracker (
 );
 
 
+ALTER TABLE public.tracker OWNER TO farmer;
+
 --
--- Name: trackercategory_keytrackercategory_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: trackercategory_keytrackercategory_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE trackercategory_keytrackercategory_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.trackercategory_keytrackercategory_seq OWNER TO farmer;
+
 --
--- Name: trackercategory_keytrackercategory_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: trackercategory_keytrackercategory_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('trackercategory_keytrackercategory_seq', 1, false);
 
 
 --
--- Name: trackercategory; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: trackercategory; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE trackercategory (
@@ -7437,27 +9224,31 @@ CREATE TABLE trackercategory (
 );
 
 
+ALTER TABLE public.trackercategory OWNER TO farmer;
+
 --
--- Name: trackerlog_keytrackerlog_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: trackerlog_keytrackerlog_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE trackerlog_keytrackerlog_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.trackerlog_keytrackerlog_seq OWNER TO farmer;
+
 --
--- Name: trackerlog_keytrackerlog_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: trackerlog_keytrackerlog_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('trackerlog_keytrackerlog_seq', 1, false);
 
 
 --
--- Name: trackerlog; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: trackerlog; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE trackerlog (
@@ -7469,27 +9260,31 @@ CREATE TABLE trackerlog (
 );
 
 
+ALTER TABLE public.trackerlog OWNER TO farmer;
+
 --
--- Name: trackerqueue_keytrackerqueue_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: trackerqueue_keytrackerqueue_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE trackerqueue_keytrackerqueue_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.trackerqueue_keytrackerqueue_seq OWNER TO farmer;
+
 --
--- Name: trackerqueue_keytrackerqueue_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: trackerqueue_keytrackerqueue_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('trackerqueue_keytrackerqueue_seq', 1, false);
 
 
 --
--- Name: trackerqueue; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: trackerqueue; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE trackerqueue (
@@ -7498,27 +9293,31 @@ CREATE TABLE trackerqueue (
 );
 
 
+ALTER TABLE public.trackerqueue OWNER TO farmer;
+
 --
--- Name: trackerseverity_keytrackerseverity_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: trackerseverity_keytrackerseverity_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE trackerseverity_keytrackerseverity_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.trackerseverity_keytrackerseverity_seq OWNER TO farmer;
+
 --
--- Name: trackerseverity_keytrackerseverity_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: trackerseverity_keytrackerseverity_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('trackerseverity_keytrackerseverity_seq', 1, false);
 
 
 --
--- Name: trackerseverity; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: trackerseverity; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE trackerseverity (
@@ -7527,27 +9326,31 @@ CREATE TABLE trackerseverity (
 );
 
 
+ALTER TABLE public.trackerseverity OWNER TO farmer;
+
 --
--- Name: trackerstatus_keytrackerstatus_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: trackerstatus_keytrackerstatus_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE trackerstatus_keytrackerstatus_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.trackerstatus_keytrackerstatus_seq OWNER TO farmer;
+
 --
--- Name: trackerstatus_keytrackerstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: trackerstatus_keytrackerstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('trackerstatus_keytrackerstatus_seq', 1, false);
 
 
 --
--- Name: trackerstatus; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: trackerstatus; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE trackerstatus (
@@ -7556,27 +9359,85 @@ CREATE TABLE trackerstatus (
 );
 
 
+ALTER TABLE public.trackerstatus OWNER TO farmer;
+
 --
--- Name: userelement_keyuserelement_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: user_service_current; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW user_service_current AS
+    SELECT ((usr.name || ':'::text) || service.service), sum(jobstatus.hostsonjob) AS sum FROM ((((usr JOIN job ON (((usr.keyelement = job.fkeyusr) AND (job.status = ANY (ARRAY['ready'::text, 'started'::text]))))) JOIN jobstatus jobstatus ON ((job.keyjob = jobstatus.fkeyjob))) JOIN jobservice js ON ((job.keyjob = js.fkeyjob))) JOIN service ON ((service.keyservice = js.fkeyservice))) GROUP BY usr.name, service.service;
+
+
+ALTER TABLE public.user_service_current OWNER TO farmer;
+
+--
+-- Name: userservice; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE userservice (
+    keyuserservice integer NOT NULL,
+    "user" integer,
+    service integer,
+    "limit" integer
+);
+
+
+ALTER TABLE public.userservice OWNER TO farmer;
+
+--
+-- Name: user_service_limits; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW user_service_limits AS
+    SELECT ((usr.name || ':'::text) || service.service), sum(us."limit") AS nottoexceed FROM ((usr JOIN userservice us ON ((usr.keyelement = us."user"))) JOIN service ON ((service.keyservice = us.service))) GROUP BY usr.name, service.service;
+
+
+ALTER TABLE public.user_service_limits OWNER TO farmer;
+
+--
+-- Name: user_slots_current; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW user_slots_current AS
+    SELECT usr.name, sum(jobstatus.hostsonjob) AS sum FROM ((usr JOIN job ON (((usr.keyelement = job.fkeyusr) AND (job.status = 'started'::text)))) JOIN jobstatus jobstatus ON ((job.keyjob = jobstatus.fkeyjob))) GROUP BY usr.name;
+
+
+ALTER TABLE public.user_slots_current OWNER TO farmer;
+
+--
+-- Name: user_slots_limits; Type: VIEW; Schema: public; Owner: farmer
+--
+
+CREATE VIEW user_slots_limits AS
+    SELECT usr.name, usr.arsenalslotlimit, usr.arsenalslotreserve FROM usr WHERE ((usr.arsenalslotlimit > (-1)) OR (usr.arsenalslotreserve > 0));
+
+
+ALTER TABLE public.user_slots_limits OWNER TO farmer;
+
+--
+-- Name: userelement_keyuserelement_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE userelement_keyuserelement_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.userelement_keyuserelement_seq OWNER TO farmer;
+
 --
--- Name: userelement_keyuserelement_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: userelement_keyuserelement_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('userelement_keyuserelement_seq', 1, false);
 
 
 --
--- Name: userelement; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: userelement; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE userelement (
@@ -7587,27 +9448,31 @@ CREATE TABLE userelement (
 );
 
 
+ALTER TABLE public.userelement OWNER TO farmer;
+
 --
--- Name: usermapping_keyusermapping_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: usermapping_keyusermapping_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE usermapping_keyusermapping_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.usermapping_keyusermapping_seq OWNER TO farmer;
+
 --
--- Name: usermapping_keyusermapping_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: usermapping_keyusermapping_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('usermapping_keyusermapping_seq', 1, false);
 
 
 --
--- Name: usermapping; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: usermapping; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE usermapping (
@@ -7617,26 +9482,31 @@ CREATE TABLE usermapping (
 );
 
 
+ALTER TABLE public.usermapping OWNER TO farmer;
+
 --
--- Name: userrole_keyuserrole_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: userrole_keyuserrole_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE userrole_keyuserrole_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: userrole_keyuserrole_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('userrole_keyuserrole_seq', 3, true);
-
+ALTER TABLE public.userrole_keyuserrole_seq OWNER TO farmer;
 
 --
--- Name: userrole; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: userrole_keyuserrole_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('userrole_keyuserrole_seq', 1, false);
+
+
+--
+-- Name: userrole; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE userrole (
@@ -7646,26 +9516,59 @@ CREATE TABLE userrole (
 );
 
 
+ALTER TABLE public.userrole OWNER TO farmer;
+
 --
--- Name: usrgrp_keyusrgrp_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: userservice_keyuserservice_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
-CREATE SEQUENCE usrgrp_keyusrgrp_seq
+CREATE SEQUENCE userservice_keyuserservice_seq
+    START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
---
--- Name: usrgrp_keyusrgrp_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('usrgrp_keyusrgrp_seq', 3, true);
-
+ALTER TABLE public.userservice_keyuserservice_seq OWNER TO farmer;
 
 --
--- Name: usrgrp; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: userservice_keyuserservice_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
+--
+
+ALTER SEQUENCE userservice_keyuserservice_seq OWNED BY userservice.keyuserservice;
+
+
+--
+-- Name: userservice_keyuserservice_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('userservice_keyuserservice_seq', 1, false);
+
+
+--
+-- Name: usrgrp_keyusrgrp_seq; Type: SEQUENCE; Schema: public; Owner: farmer
+--
+
+CREATE SEQUENCE usrgrp_keyusrgrp_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.usrgrp_keyusrgrp_seq OWNER TO farmer;
+
+--
+-- Name: usrgrp_keyusrgrp_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('usrgrp_keyusrgrp_seq', 1, false);
+
+
+--
+-- Name: usrgrp; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE usrgrp (
@@ -7676,8 +9579,10 @@ CREATE TABLE usrgrp (
 );
 
 
+ALTER TABLE public.usrgrp OWNER TO farmer;
+
 --
--- Name: version; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: version; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE version (
@@ -7685,34 +9590,38 @@ CREATE TABLE version (
 );
 
 
+ALTER TABLE public.version OWNER TO farmer;
+
 --
--- Name: version_keyversion_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: version_keyversion_seq; Type: SEQUENCE; Schema: public; Owner: farmer
 --
 
 CREATE SEQUENCE version_keyversion_seq
     START WITH 1
     INCREMENT BY 1
-    NO MAXVALUE
     NO MINVALUE
+    NO MAXVALUE
     CACHE 1;
 
 
+ALTER TABLE public.version_keyversion_seq OWNER TO farmer;
+
 --
--- Name: version_keyversion_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: version_keyversion_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
 --
 
 ALTER SEQUENCE version_keyversion_seq OWNED BY version.keyversion;
 
 
 --
--- Name: version_keyversion_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: version_keyversion_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
 SELECT pg_catalog.setval('version_keyversion_seq', 1, false);
 
 
 --
--- Name: versionfiletracker; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: versionfiletracker; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE TABLE versionfiletracker (
@@ -7726,113 +9635,150 @@ CREATE TABLE versionfiletracker (
 INHERITS (filetracker);
 
 
+ALTER TABLE public.versionfiletracker OWNER TO farmer;
+
 --
--- Name: keyassetdep; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyassetdep; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE assetdep ALTER COLUMN keyassetdep SET DEFAULT nextval('assetdep_keyassetdep_seq'::regclass);
 
 
 --
--- Name: keyassetprop; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyassetprop; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE assetprop ALTER COLUMN keyassetprop SET DEFAULT nextval('assetprop_keyassetprop_seq'::regclass);
 
 
 --
--- Name: keyassetproptype; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyassetproptype; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE assetproptype ALTER COLUMN keyassetproptype SET DEFAULT nextval('assetproptype_keyassetproptype_seq'::regclass);
 
 
 --
--- Name: keyjobassignment; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keydarwinscore; Type: DEFAULT; Schema: public; Owner: farmers
 --
 
-ALTER TABLE jobassignment ALTER COLUMN keyjobassignment SET DEFAULT nextval('jobassignment_keyjobassignment_seq'::regclass);
+ALTER TABLE darwinweight ALTER COLUMN keydarwinscore SET DEFAULT nextval('darwinweight_keydarwinscore_seq'::regclass);
 
 
 --
--- Name: keyjobassignmentstatus; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyjobassignment; Type: DEFAULT; Schema: public; Owner: farmer
+--
+
+ALTER TABLE jobassignment_old ALTER COLUMN keyjobassignment SET DEFAULT nextval('jobassignment_keyjobassignment_seq'::regclass);
+
+
+--
+-- Name: keyjobassignmentstatus; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE jobassignmentstatus ALTER COLUMN keyjobassignmentstatus SET DEFAULT nextval('jobassignmentstatus_keyjobassignmentstatus_seq'::regclass);
 
 
 --
--- Name: keyjobmantra100; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyjobenvironment; Type: DEFAULT; Schema: public; Owner: farmer
+--
+
+ALTER TABLE jobenvironment ALTER COLUMN keyjobenvironment SET DEFAULT nextval('jobenvironment_keyjobenvironment_seq'::regclass);
+
+
+--
+-- Name: keyjobfiltermessage; Type: DEFAULT; Schema: public; Owner: farmer
+--
+
+ALTER TABLE jobfiltermessage ALTER COLUMN keyjobfiltermessage SET DEFAULT nextval('jobfiltermessage_keyjobfiltermessage_seq'::regclass);
+
+
+--
+-- Name: keyjobfilterset; Type: DEFAULT; Schema: public; Owner: farmer
+--
+
+ALTER TABLE jobfilterset ALTER COLUMN keyjobfilterset SET DEFAULT nextval('jobfilterset_keyjobfilterset_seq'::regclass);
+
+
+--
+-- Name: keyjobfiltertype; Type: DEFAULT; Schema: public; Owner: farmer
+--
+
+ALTER TABLE jobfiltertype ALTER COLUMN keyjobfiltertype SET DEFAULT nextval('jobfiltertype_keyjobfiltertype_seq'::regclass);
+
+
+--
+-- Name: keyjobmantra100; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE jobmantra100 ALTER COLUMN keyjobmantra100 SET DEFAULT nextval('jobmantra100_keyjobmantra100_seq'::regclass);
 
 
 --
--- Name: keyjobmantra95; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyjobmantra95; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE jobmantra95 ALTER COLUMN keyjobmantra95 SET DEFAULT nextval('jobmantra95_keyjobmantra95_seq'::regclass);
 
 
 --
--- Name: keyjobrealflow; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyjobstateaction; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
-ALTER TABLE jobrealflow ALTER COLUMN keyjobrealflow SET DEFAULT nextval('jobrealflow_keyjobrealflow_seq'::regclass);
-
-
---
--- Name: keyjobtaskassignment; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE jobtaskassignment ALTER COLUMN keyjobtaskassignment SET DEFAULT nextval('jobtaskassignment_keyjobtaskassignment_seq'::regclass);
+ALTER TABLE jobstateaction ALTER COLUMN keyjobstateaction SET DEFAULT nextval('jobstateaction_keyjobstateaction_seq'::regclass);
 
 
 --
--- Name: keypackage; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keypackage; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE package ALTER COLUMN keypackage SET DEFAULT nextval('package_keypackage_seq'::regclass);
 
 
 --
--- Name: keypackageoutput; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keypackageoutput; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE packageoutput ALTER COLUMN keypackageoutput SET DEFAULT nextval('packageoutput_keypackageoutput_seq'::regclass);
 
 
 --
--- Name: keyserverfileaction; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyserverfileaction; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE serverfileaction ALTER COLUMN keyserverfileaction SET DEFAULT nextval('serverfileaction_keyserverfileaction_seq'::regclass);
 
 
 --
--- Name: keyserverfileactionstatus; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyserverfileactionstatus; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE serverfileactionstatus ALTER COLUMN keyserverfileactionstatus SET DEFAULT nextval('serverfileactionstatus_keyserverfileactionstatus_seq'::regclass);
 
 
 --
--- Name: keyserverfileactiontype; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyserverfileactiontype; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE serverfileactiontype ALTER COLUMN keyserverfileactiontype SET DEFAULT nextval('serverfileactiontype_keyserverfileactiontype_seq'::regclass);
 
 
 --
--- Name: keystatus; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keystatus; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE status ALTER COLUMN keystatus SET DEFAULT nextval('status_keystatus_seq'::regclass);
 
 
 --
--- Name: keyversion; Type: DEFAULT; Schema: public; Owner: -
+-- Name: keyuserservice; Type: DEFAULT; Schema: public; Owner: farmer
+--
+
+ALTER TABLE userservice ALTER COLUMN keyuserservice SET DEFAULT nextval('userservice_keyuserservice_seq'::regclass);
+
+
+--
+-- Name: keyversion; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE version ALTER COLUMN keyversion SET DEFAULT nextval('version_keyversion_seq'::regclass);
@@ -7841,7 +9787,7 @@ ALTER TABLE version ALTER COLUMN keyversion SET DEFAULT nextval('version_keyvers
 SET search_path = jabberd, pg_catalog;
 
 --
--- Data for Name: active; Type: TABLE DATA; Schema: jabberd; Owner: -
+-- Data for Name: active; Type: TABLE DATA; Schema: jabberd; Owner: farmer
 --
 
 COPY active ("collection-owner", "object-sequence", "time") FROM stdin;
@@ -7849,7 +9795,7 @@ COPY active ("collection-owner", "object-sequence", "time") FROM stdin;
 
 
 --
--- Data for Name: authreg; Type: TABLE DATA; Schema: jabberd; Owner: -
+-- Data for Name: authreg; Type: TABLE DATA; Schema: jabberd; Owner: farmer
 --
 
 COPY authreg (username, realm, password, token, sequence, hash) FROM stdin;
@@ -7857,7 +9803,7 @@ COPY authreg (username, realm, password, token, sequence, hash) FROM stdin;
 
 
 --
--- Data for Name: logout; Type: TABLE DATA; Schema: jabberd; Owner: -
+-- Data for Name: logout; Type: TABLE DATA; Schema: jabberd; Owner: farmer
 --
 
 COPY logout ("collection-owner", "object-sequence", "time") FROM stdin;
@@ -7865,7 +9811,7 @@ COPY logout ("collection-owner", "object-sequence", "time") FROM stdin;
 
 
 --
--- Data for Name: privacy-items; Type: TABLE DATA; Schema: jabberd; Owner: -
+-- Data for Name: privacy-items; Type: TABLE DATA; Schema: jabberd; Owner: farmer
 --
 
 COPY "privacy-items" ("collection-owner", "object-sequence", list, type, value, deny, "order", block) FROM stdin;
@@ -7873,7 +9819,7 @@ COPY "privacy-items" ("collection-owner", "object-sequence", list, type, value, 
 
 
 --
--- Data for Name: private; Type: TABLE DATA; Schema: jabberd; Owner: -
+-- Data for Name: private; Type: TABLE DATA; Schema: jabberd; Owner: farmer
 --
 
 COPY private ("collection-owner", "object-sequence", ns, xml) FROM stdin;
@@ -7881,7 +9827,7 @@ COPY private ("collection-owner", "object-sequence", ns, xml) FROM stdin;
 
 
 --
--- Data for Name: queue; Type: TABLE DATA; Schema: jabberd; Owner: -
+-- Data for Name: queue; Type: TABLE DATA; Schema: jabberd; Owner: farmer
 --
 
 COPY queue ("collection-owner", "object-sequence", xml) FROM stdin;
@@ -7889,7 +9835,7 @@ COPY queue ("collection-owner", "object-sequence", xml) FROM stdin;
 
 
 --
--- Data for Name: roster-groups; Type: TABLE DATA; Schema: jabberd; Owner: -
+-- Data for Name: roster-groups; Type: TABLE DATA; Schema: jabberd; Owner: farmer
 --
 
 COPY "roster-groups" ("collection-owner", "object-sequence", jid, "group") FROM stdin;
@@ -7897,7 +9843,7 @@ COPY "roster-groups" ("collection-owner", "object-sequence", jid, "group") FROM 
 
 
 --
--- Data for Name: roster-items; Type: TABLE DATA; Schema: jabberd; Owner: -
+-- Data for Name: roster-items; Type: TABLE DATA; Schema: jabberd; Owner: farmer
 --
 
 COPY "roster-items" ("collection-owner", "object-sequence", jid, name, ask, "to", "from") FROM stdin;
@@ -7905,7 +9851,7 @@ COPY "roster-items" ("collection-owner", "object-sequence", jid, name, ask, "to"
 
 
 --
--- Data for Name: vcard; Type: TABLE DATA; Schema: jabberd; Owner: -
+-- Data for Name: vcard; Type: TABLE DATA; Schema: jabberd; Owner: farmer
 --
 
 COPY vcard ("collection-owner", "object-sequence", fn, nickname, url, tel, email, title, role, bday, "desc", "n-given", "n-family", "adr-street", "adr-extadd", "adr-locality", "adr-region", "adr-pcode", "adr-country", "org-orgname", "org-orgunit") FROM stdin;
@@ -7915,7 +9861,7 @@ COPY vcard ("collection-owner", "object-sequence", fn, nickname, url, tel, email
 SET search_path = public, pg_catalog;
 
 --
--- Data for Name: abdownloadstat; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: abdownloadstat; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY abdownloadstat (keyabdownloadstat, type, size, fkeyhost, "time", abrev, finished, fkeyjob) FROM stdin;
@@ -7923,7 +9869,7 @@ COPY abdownloadstat (keyabdownloadstat, type, size, fkeyhost, "time", abrev, fin
 
 
 --
--- Data for Name: annotation; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: annotation; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY annotation (keyannotation, notes, sequence, framestart, frameend, markupdata) FROM stdin;
@@ -7931,15 +9877,15 @@ COPY annotation (keyannotation, notes, sequence, framestart, frameend, markupdat
 
 
 --
--- Data for Name: asset; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: asset; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY asset (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, fkeystatus, keyasset, version) FROM stdin;
+COPY asset (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, arsenalslotlimit, arsenalslotreserve, fkeystatus, keyasset, version) FROM stdin;
 \.
 
 
 --
--- Data for Name: assetdep; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: assetdep; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY assetdep (keyassetdep, path, fkeypackage, fkeyasset) FROM stdin;
@@ -7947,15 +9893,15 @@ COPY assetdep (keyassetdep, path, fkeypackage, fkeyasset) FROM stdin;
 
 
 --
--- Data for Name: assetgroup; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: assetgroup; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY assetgroup (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon) FROM stdin;
+COPY assetgroup (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, arsenalslotlimit, arsenalslotreserve) FROM stdin;
 \.
 
 
 --
--- Data for Name: assetprop; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: assetprop; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY assetprop (keyassetprop, fkeyassetproptype, fkeyasset) FROM stdin;
@@ -7963,7 +9909,7 @@ COPY assetprop (keyassetprop, fkeyassetproptype, fkeyasset) FROM stdin;
 
 
 --
--- Data for Name: assetproperty; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: assetproperty; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY assetproperty (keyassetproperty, name, type, value, fkeyelement) FROM stdin;
@@ -7971,7 +9917,7 @@ COPY assetproperty (keyassetproperty, name, type, value, fkeyelement) FROM stdin
 
 
 --
--- Data for Name: assetproptype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: assetproptype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY assetproptype (keyassetproptype, name, depth) FROM stdin;
@@ -7979,7 +9925,7 @@ COPY assetproptype (keyassetproptype, name, depth) FROM stdin;
 
 
 --
--- Data for Name: assetset; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: assetset; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY assetset (keyassetset, fkeyproject, fkeyelementtype, fkeyassettype, name) FROM stdin;
@@ -7987,7 +9933,7 @@ COPY assetset (keyassetset, fkeyproject, fkeyelementtype, fkeyassettype, name) F
 
 
 --
--- Data for Name: assetsetitem; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: assetsetitem; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY assetsetitem (keyassetsetitem, fkeyassetset, fkeyassettype, fkeyelementtype, fkeytasktype) FROM stdin;
@@ -7995,7 +9941,7 @@ COPY assetsetitem (keyassetsetitem, fkeyassetset, fkeyassettype, fkeyelementtype
 
 
 --
--- Data for Name: assettemplate; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: assettemplate; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY assettemplate (keyassettemplate, fkeyassettype, fkeyelement, fkeyproject, name) FROM stdin;
@@ -8003,15 +9949,18 @@ COPY assettemplate (keyassettemplate, fkeyassettype, fkeyelement, fkeyproject, n
 
 
 --
--- Data for Name: assettype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: assettype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY assettype (keyassettype, assettype, deleted) FROM stdin;
+1	Character	f
+2	Environment	f
+3	Prop	f
 \.
 
 
 --
--- Data for Name: attachment; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: attachment; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY attachment (keyattachment, caption, created, filename, fkeyelement, fkeyuser, origpath, attachment, url, description, fkeyauthor, fkeyattachmenttype) FROM stdin;
@@ -8019,7 +9968,7 @@ COPY attachment (keyattachment, caption, created, filename, fkeyelement, fkeyuse
 
 
 --
--- Data for Name: attachmenttype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: attachmenttype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY attachmenttype (keyattachmenttype, attachmenttype) FROM stdin;
@@ -8027,7 +9976,7 @@ COPY attachmenttype (keyattachmenttype, attachmenttype) FROM stdin;
 
 
 --
--- Data for Name: calendar; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: calendar; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY calendar (keycalendar, repeat, fkeycalendarcategory, url, fkeyauthor, fieldname, notifylist, notifybatch, leadtime, notifymask, fkeyusr, private, date, calendar, fkeyproject) FROM stdin;
@@ -8035,7 +9984,7 @@ COPY calendar (keycalendar, repeat, fkeycalendarcategory, url, fkeyauthor, field
 
 
 --
--- Data for Name: calendarcategory; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: calendarcategory; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY calendarcategory (keycalendarcategory, calendarcategory) FROM stdin;
@@ -8043,7 +9992,7 @@ COPY calendarcategory (keycalendarcategory, calendarcategory) FROM stdin;
 
 
 --
--- Data for Name: checklistitem; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: checklistitem; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY checklistitem (keychecklistitem, body, checklistitem, fkeyproject, fkeythumbnail, fkeytimesheetcategory, type, fkeystatusset) FROM stdin;
@@ -8051,7 +10000,7 @@ COPY checklistitem (keychecklistitem, body, checklistitem, fkeyproject, fkeythum
 
 
 --
--- Data for Name: checkliststatus; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: checkliststatus; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY checkliststatus (keycheckliststatus, fkeychecklistitem, fkeyelement, state, fkeyelementstatus) FROM stdin;
@@ -8059,7 +10008,7 @@ COPY checkliststatus (keycheckliststatus, fkeychecklistitem, fkeyelement, state,
 
 
 --
--- Data for Name: client; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: client; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY client (keyclient, client, textcard) FROM stdin;
@@ -8067,7 +10016,7 @@ COPY client (keyclient, client, textcard) FROM stdin;
 
 
 --
--- Data for Name: config; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: config; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY config (keyconfig, config, value) FROM stdin;
@@ -8082,46 +10031,57 @@ COPY config (keyconfig, config, value) FROM stdin;
 11	assburnerSubmissionSort	1
 12	assburnerHostsSort	5
 17	jabberSystemResource	Autobot
-13	assburnerSortMethod	key_even_by_priority
 18	assburnerAssignRate	15000
 21	assburnerAutoPacketTarget	420
 22	assburnerAutoPacketDefault	150
 4	managerDriveLetter	/drd/jobs
 5	emailDomain	@drdstudios.com
-14	jabberDomain	im.drd.int
+14	jabberDomain	im.drd.dmz
 15	jabberSystemUser	farm
 16	jabberSystemPassword	autologin
 23	emailServer	smtp.drd.roam
 24	assburnerLogRootDir	/farm/logs/
 26	attachmentPathUnix	/farm/logs/.attachments/
 27	attachmentPathWin	T:/farm/logs/.attachments/
-29	assburnerPulsePeriod	600
 25	emailSender	farm@drdstudios.com
+30	assburnerErrorStep	7
 8	assburnerTotalFailureErrorThreshold	9
-19	assburnerHostErrorLimit	2
-28	assburnerLoopTime	4000
+19	assburnerHostErrorLimit	1
+29	assburnerPulsePeriod	600
+28	assburnerLoopTime	3000
+33	arsenalMaxAutoAdapts	1
+13	arsenalSortMethod	key_darwin
+31	arsenalAssignSloppiness	20.0
+32	arsenalAssignMaxHosts	0.2
 \.
 
 
 --
--- Data for Name: countercache; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: countercache; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY countercache (hoststotal, hostsactive, hostsready, jobstotal, jobsactive, jobsdone, lastupdated) FROM stdin;
-0	0	243	1043	0	979	2010-05-21 02:00:24.573258
+COPY countercache (hoststotal, hostsactive, hostsready, jobstotal, jobsactive, jobsdone, lastupdated, slotstotal, slotsactive, jobswaiting) FROM stdin;
 \.
 
 
 --
--- Data for Name: delivery; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: darwinweight; Type: TABLE DATA; Schema: public; Owner: farmers
 --
 
-COPY delivery (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon) FROM stdin;
+COPY darwinweight (keydarwinscore, shotname, projectname, weight) FROM stdin;
 \.
 
 
 --
--- Data for Name: deliveryelement; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: delivery; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY delivery (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, arsenalslotlimit, arsenalslotreserve) FROM stdin;
+\.
+
+
+--
+-- Data for Name: deliveryelement; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY deliveryelement (keydeliveryshot, fkeydelivery, fkeyelement, framestart, frameend) FROM stdin;
@@ -8129,7 +10089,7 @@ COPY deliveryelement (keydeliveryshot, fkeydelivery, fkeyelement, framestart, fr
 
 
 --
--- Data for Name: demoreel; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: demoreel; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY demoreel (keydemoreel, demoreel, datesent, projectlist, contactinfo, notes, playlist, shippingtype) FROM stdin;
@@ -8137,7 +10097,7 @@ COPY demoreel (keydemoreel, demoreel, datesent, projectlist, contactinfo, notes,
 
 
 --
--- Data for Name: diskimage; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: diskimage; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY diskimage (keydiskimage, diskimage, path, created) FROM stdin;
@@ -8145,7 +10105,7 @@ COPY diskimage (keydiskimage, diskimage, path, created) FROM stdin;
 
 
 --
--- Data for Name: dynamichostgroup; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: dynamichostgroup; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY dynamichostgroup (keyhostgroup, hostgroup, fkeyusr, private, keydynamichostgroup, hostwhereclause) FROM stdin;
@@ -8153,15 +10113,15 @@ COPY dynamichostgroup (keyhostgroup, hostgroup, fkeyusr, private, keydynamichost
 
 
 --
--- Data for Name: element; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: element; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY element (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon) FROM stdin;
+COPY element (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, arsenalslotlimit, arsenalslotreserve) FROM stdin;
 \.
 
 
 --
--- Data for Name: elementdep; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: elementdep; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY elementdep (keyelementdep, fkeyelement, fkeyelementdep, relationtype) FROM stdin;
@@ -8169,7 +10129,7 @@ COPY elementdep (keyelementdep, fkeyelement, fkeyelementdep, relationtype) FROM 
 
 
 --
--- Data for Name: elementstatus; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: elementstatus; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY elementstatus (keyelementstatus, name, color, fkeystatusset, "order") FROM stdin;
@@ -8185,7 +10145,7 @@ COPY elementstatus (keyelementstatus, name, color, fkeystatusset, "order") FROM 
 
 
 --
--- Data for Name: elementthread; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: elementthread; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY elementthread (keyelementthread, datetime, elementthread, fkeyelement, fkeyusr, skeyreply, topic, todostatus, hasattachments, fkeyjob) FROM stdin;
@@ -8193,7 +10153,7 @@ COPY elementthread (keyelementthread, datetime, elementthread, fkeyelement, fkey
 
 
 --
--- Data for Name: elementtype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: elementtype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY elementtype (keyelementtype, elementtype, sortprefix) FROM stdin;
@@ -8209,7 +10169,7 @@ COPY elementtype (keyelementtype, elementtype, sortprefix) FROM stdin;
 
 
 --
--- Data for Name: elementtypetasktype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: elementtypetasktype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY elementtypetasktype (keyelementtypetasktype, fkeyelementtype, fkeytasktype, fkeyassettype) FROM stdin;
@@ -8217,7 +10177,7 @@ COPY elementtypetasktype (keyelementtypetasktype, fkeyelementtype, fkeytasktype,
 
 
 --
--- Data for Name: elementuser; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: elementuser; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY elementuser (keyelementuser, fkeyelement, fkeyuser, active, fkeyassettype) FROM stdin;
@@ -8225,15 +10185,15 @@ COPY elementuser (keyelementuser, fkeyelement, fkeyuser, active, fkeyassettype) 
 
 
 --
--- Data for Name: employee; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: employee; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY employee (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, dateoflastlogon, email, fkeyhost, gpgkey, jid, pager, password, remoteips, schedule, shell, uid, threadnotifybyjabber, threadnotifybyemail, fkeyclient, intranet, homedir, disabled, gid, usr, keyusr, rolemask, usrlevel, remoteok, requestcount, sessiontimeout, logoncount, useradded, oldkeyusr, sid, lastlogontype, namefirst, namelast, dateofhire, dateoftermination, dateofbirth, logon, lockedout, bebackat, comment, userlevel, nopostdays, initials, missingtimesheetcount, namemiddle) FROM stdin;
+COPY employee (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, arsenalslotlimit, arsenalslotreserve, dateoflastlogon, email, fkeyhost, gpgkey, jid, pager, password, remoteips, schedule, shell, uid, threadnotifybyjabber, threadnotifybyemail, fkeyclient, intranet, homedir, disabled, gid, usr, keyusr, rolemask, usrlevel, remoteok, requestcount, sessiontimeout, logoncount, useradded, oldkeyusr, sid, lastlogontype, namefirst, namelast, dateofhire, dateoftermination, dateofbirth, logon, lockedout, bebackat, comment, userlevel, nopostdays, initials, missingtimesheetcount, namemiddle) FROM stdin;
 \.
 
 
 --
--- Data for Name: eventalert; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: eventalert; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY eventalert ("keyEventAlert", "fkeyHost", graphds, "sampleType", "samplePeriod", severity, "sampleDirection", varname, "sampleValue") FROM stdin;
@@ -8241,7 +10201,7 @@ COPY eventalert ("keyEventAlert", "fkeyHost", graphds, "sampleType", "samplePeri
 
 
 --
--- Data for Name: filetemplate; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: filetemplate; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY filetemplate (keyfiletemplate, fkeyelementtype, fkeyproject, fkeytasktype, name, sourcefile, templatefilename, trackertable) FROM stdin;
@@ -8249,7 +10209,7 @@ COPY filetemplate (keyfiletemplate, fkeyelementtype, fkeyproject, fkeytasktype, 
 
 
 --
--- Data for Name: filetracker; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: filetracker; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY filetracker (keyfiletracker, fkeyelement, name, path, filename, fkeypathtemplate, fkeyprojectstorage, storagename) FROM stdin;
@@ -8257,7 +10217,7 @@ COPY filetracker (keyfiletracker, fkeyelement, name, path, filename, fkeypathtem
 
 
 --
--- Data for Name: filetrackerdep; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: filetrackerdep; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY filetrackerdep (keyfiletrackerdep, fkeyinput, fkeyoutput) FROM stdin;
@@ -8265,7 +10225,7 @@ COPY filetrackerdep (keyfiletrackerdep, fkeyinput, fkeyoutput) FROM stdin;
 
 
 --
--- Data for Name: fileversion; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: fileversion; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY fileversion (keyfileversion, version, iteration, path, oldfilenames, filename, filenametemplate, automaster, fkeyelement, fkeyfileversion) FROM stdin;
@@ -8273,7 +10233,7 @@ COPY fileversion (keyfileversion, version, iteration, path, oldfilenames, filena
 
 
 --
--- Data for Name: folder; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: folder; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY folder (keyfolder, folder, mount, tablename, fkey, online, alias, host, link) FROM stdin;
@@ -8281,7 +10241,7 @@ COPY folder (keyfolder, folder, mount, tablename, fkey, online, alias, host, lin
 
 
 --
--- Data for Name: graph; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: graph; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY graph (keygraph, height, width, vlabel, period, fkeygraphpage, upperlimit, lowerlimit, stack, graphmax, sortorder, graph) FROM stdin;
@@ -8289,7 +10249,7 @@ COPY graph (keygraph, height, width, vlabel, period, fkeygraphpage, upperlimit, 
 
 
 --
--- Data for Name: graphds; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: graphds; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY graphds (keygraphds, varname, dstype, fkeyhost, cdef, graphds, fieldname, filename, negative) FROM stdin;
@@ -8297,7 +10257,7 @@ COPY graphds (keygraphds, varname, dstype, fkeyhost, cdef, graphds, fieldname, f
 
 
 --
--- Data for Name: graphpage; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: graphpage; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY graphpage (keygraphpage, fkeygraphpage, name) FROM stdin;
@@ -8305,7 +10265,7 @@ COPY graphpage (keygraphpage, fkeygraphpage, name) FROM stdin;
 
 
 --
--- Data for Name: graphrelationship; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: graphrelationship; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY graphrelationship (keygraphrelationship, fkeygraphds, fkeygraph, negative) FROM stdin;
@@ -8313,7 +10273,7 @@ COPY graphrelationship (keygraphrelationship, fkeygraphds, fkeygraph, negative) 
 
 
 --
--- Data for Name: gridtemplate; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: gridtemplate; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY gridtemplate (keygridtemplate, fkeyproject, gridtemplate) FROM stdin;
@@ -8321,7 +10281,7 @@ COPY gridtemplate (keygridtemplate, fkeyproject, gridtemplate) FROM stdin;
 
 
 --
--- Data for Name: gridtemplateitem; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: gridtemplateitem; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY gridtemplateitem (keygridtemplateitem, fkeygridtemplate, fkeytasktype, checklistitems, columntype, headername, "position") FROM stdin;
@@ -8329,7 +10289,7 @@ COPY gridtemplateitem (keygridtemplateitem, fkeygridtemplate, fkeytasktype, chec
 
 
 --
--- Data for Name: groupmapping; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: groupmapping; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY groupmapping (keygroupmapping, fkeygrp, fkeymapping) FROM stdin;
@@ -8337,15 +10297,18 @@ COPY groupmapping (keygroupmapping, fkeygrp, fkeymapping) FROM stdin;
 
 
 --
--- Data for Name: grp; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: grp; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY grp (keygrp, grp, alias) FROM stdin;
+1	Admin	\N
+2	2D	\N
+3	RenderOps	\N
 \.
 
 
 --
--- Data for Name: gruntscript; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: gruntscript; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY gruntscript (keygruntscript, runcount, lastrun, scriptname) FROM stdin;
@@ -8353,7 +10316,7 @@ COPY gruntscript (keygruntscript, runcount, lastrun, scriptname) FROM stdin;
 
 
 --
--- Data for Name: history; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: history; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY history (keyhistory, date, fkeyelement, fkeyusr, history) FROM stdin;
@@ -8361,15 +10324,15 @@ COPY history (keyhistory, date, fkeyelement, fkeyusr, history) FROM stdin;
 
 
 --
--- Data for Name: host; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: host; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY host (keyhost, backupbytes, cpus, description, diskusage, fkeyjob, host, manufacturer, model, os, rendertime, slavepluginlist, sn, version, renderrate, dutycycle, memory, mhtz, online, uid, slavepacketweight, framecount, viruscount, virustimestamp, errortempo, fkeyhost_backup, oldkey, abversion, laststatuschange, loadavg, allowmapping, allowsleep, fkeyjobtask, wakeonlan, architecture, loc_x, loc_y, loc_z, ostext, bootaction, fkeydiskimage, syncname, fkeylocation, cpuname, osversion, slavepulse, puppetpulse, maxassignments, fkeyuser) FROM stdin;
+COPY host (keyhost, backupbytes, cpus, description, diskusage, fkeyjob, host, manufacturer, model, os, rendertime, slavepluginlist, sn, version, renderrate, dutycycle, memory, mhtz, online, uid, slavepacketweight, framecount, viruscount, virustimestamp, errortempo, fkeyhost_backup, oldkey, abversion, laststatuschange, loadavg, allowmapping, allowsleep, fkeyjobtask, wakeonlan, architecture, loc_x, loc_y, loc_z, ostext, bootaction, fkeydiskimage, syncname, fkeylocation, cpuname, osversion, slavepulse, puppetpulse, maxassignments, fkeyuser, maxmemory) FROM stdin;
 \.
 
 
 --
--- Data for Name: hostdailystat; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostdailystat; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostdailystat (keyhostdailystat, fkeyhost, readytime, assignedtime, copytime, loadtime, busytime, offlinetime, date, tasksdone, loaderrors, taskerrors, loaderrortime, busyerrortime) FROM stdin;
@@ -8377,7 +10340,7 @@ COPY hostdailystat (keyhostdailystat, fkeyhost, readytime, assignedtime, copytim
 
 
 --
--- Data for Name: hostgroup; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostgroup; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostgroup (keyhostgroup, hostgroup, fkeyusr, private) FROM stdin;
@@ -8385,7 +10348,7 @@ COPY hostgroup (keyhostgroup, hostgroup, fkeyusr, private) FROM stdin;
 
 
 --
--- Data for Name: hostgroupitem; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostgroupitem; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostgroupitem (keyhostgroupitem, fkeyhostgroup, fkeyhost) FROM stdin;
@@ -8393,7 +10356,7 @@ COPY hostgroupitem (keyhostgroupitem, fkeyhostgroup, fkeyhost) FROM stdin;
 
 
 --
--- Data for Name: hosthistory; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hosthistory; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hosthistory (keyhosthistory, fkeyhost, fkeyjob, fkeyjobstat, status, laststatus, datetime, duration, fkeyjobtask, fkeyjobtype, nextstatus, success, fkeyjoberror, change_from_ip, fkeyjobcommandhistory) FROM stdin;
@@ -8401,7 +10364,7 @@ COPY hosthistory (keyhosthistory, fkeyhost, fkeyjob, fkeyjobstat, status, lastst
 
 
 --
--- Data for Name: hostinterface; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostinterface; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostinterface (keyhostinterface, fkeyhost, mac, ip, fkeyhostinterfacetype, switchport, fkeyswitch, inst) FROM stdin;
@@ -8409,7 +10372,7 @@ COPY hostinterface (keyhostinterface, fkeyhost, mac, ip, fkeyhostinterfacetype, 
 
 
 --
--- Data for Name: hostinterfacetype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostinterfacetype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostinterfacetype (keyhostinterfacetype, hostinterfacetype) FROM stdin;
@@ -8420,7 +10383,7 @@ COPY hostinterfacetype (keyhostinterfacetype, hostinterfacetype) FROM stdin;
 
 
 --
--- Data for Name: hostload; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostload; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostload (keyhostload, fkeyhost, loadavg, loadavgadjust, loadavgadjusttimestamp) FROM stdin;
@@ -8428,7 +10391,7 @@ COPY hostload (keyhostload, fkeyhost, loadavg, loadavgadjust, loadavgadjusttimes
 
 
 --
--- Data for Name: hostmapping; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostmapping; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostmapping (keyhostmapping, fkeyhost, fkeymapping) FROM stdin;
@@ -8436,7 +10399,7 @@ COPY hostmapping (keyhostmapping, fkeyhost, fkeymapping) FROM stdin;
 
 
 --
--- Data for Name: hostport; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostport; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostport (keyhostport, fkeyhost, port, monitor, monitorstatus) FROM stdin;
@@ -8444,7 +10407,7 @@ COPY hostport (keyhostport, fkeyhost, port, monitor, monitorstatus) FROM stdin;
 
 
 --
--- Data for Name: hostresource; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostresource; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostresource (keyhostresource, fkeyhost, hostresource) FROM stdin;
@@ -8452,7 +10415,15 @@ COPY hostresource (keyhostresource, fkeyhost, hostresource) FROM stdin;
 
 
 --
--- Data for Name: hosts_ready; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hosts_active; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY hosts_active (count) FROM stdin;
+\.
+
+
+--
+-- Data for Name: hosts_ready; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hosts_ready (count) FROM stdin;
@@ -8460,7 +10431,7 @@ COPY hosts_ready (count) FROM stdin;
 
 
 --
--- Data for Name: hosts_total; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hosts_total; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hosts_total (count) FROM stdin;
@@ -8468,7 +10439,7 @@ COPY hosts_total (count) FROM stdin;
 
 
 --
--- Data for Name: hostservice; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostservice; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostservice (keyhostservice, fkeyhost, fkeyservice, hostserviceinfo, hostservice, fkeysyslog, enabled, pulse, remotelogport) FROM stdin;
@@ -8476,7 +10447,7 @@ COPY hostservice (keyhostservice, fkeyhost, fkeyservice, hostserviceinfo, hostse
 
 
 --
--- Data for Name: hostsoftware; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hostsoftware; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hostsoftware (keyhostsoftware, fkeyhost, fkeysoftware) FROM stdin;
@@ -8484,7 +10455,7 @@ COPY hostsoftware (keyhostsoftware, fkeyhost, fkeysoftware) FROM stdin;
 
 
 --
--- Data for Name: hoststatus; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: hoststatus; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY hoststatus (keyhoststatus, fkeyhost, slavestatus, laststatuschange, slavepulse, fkeyjobtask, online, activeassignmentcount, availablememory, lastassignmentchange) FROM stdin;
@@ -8492,55 +10463,39 @@ COPY hoststatus (keyhoststatus, fkeyhost, slavestatus, laststatuschange, slavepu
 
 
 --
--- Data for Name: job; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: job; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY job (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots) FROM stdin;
+COPY job (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts) FROM stdin;
 \.
 
 
 --
--- Data for Name: job3delight; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: job3delight; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY job3delight (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, width, height, framestart, frameend, threads, processes, jobscript, jobscriptparam) FROM stdin;
+COPY job3delight (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, width, height, framestart, frameend, threads, processes, jobscript, jobscriptparam, renderdlcmd) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobaftereffects; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobassignment; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobaftereffects (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, comp, frameend, framestart, height, width) FROM stdin;
+COPY jobassignment (keyjobassignment, fkeyjob, fkeyjobassignmentstatus, fkeyhost, stdout, stderr, command, maxmemory, started, ended, fkeyjoberror, realtime, usertime, systime, iowait, bytesread, byteswrite, efficiency, opsread, opswrite, assignslots) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobaftereffects7; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobassignment_old; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobaftereffects7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, comp, frameend, framestart, height, width) FROM stdin;
+COPY jobassignment_old (keyjobassignment, fkeyjob, fkeyjobassignmentstatus, fkeyhost, stdout, stderr, command, maxmemory, started, ended, fkeyjoberror, realtime, usertime, systime, iowait, bytesread, byteswrite, efficiency, opsread, opswrite) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobaftereffects8; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobaftereffects8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, comp, frameend, framestart, height, width) FROM stdin;
-\.
-
-
---
--- Data for Name: jobassignment; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobassignment (keyjobassignment, fkeyjob, fkeyjobassignmentstatus, fkeyhost, stdout, stderr, command, maxmemory, started, ended, fkeyjoberror, realtime, usertime, systime, iowait, bytesread, byteswrite, efficiency, opsread, opswrite) FROM stdin;
-\.
-
-
---
--- Data for Name: jobassignmentstatus; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobassignmentstatus; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY jobassignmentstatus (keyjobassignmentstatus, status) FROM stdin;
@@ -8554,48 +10509,23 @@ COPY jobassignmentstatus (keyjobassignmentstatus, status) FROM stdin;
 
 
 --
--- Data for Name: jobautodeskburn; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobbatch; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobautodeskburn (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, handle) FROM stdin;
+COPY jobbatch (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, cmd, restartafterfinish, restartaftershutdown, passslaveframesasparam, disablewow64fsredirect) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobbatch; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobbatch (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, cmd, restartafterfinish, restartaftershutdown, passslaveframesasparam, disablewow64fsredirect) FROM stdin;
-\.
-
-
---
--- Data for Name: jobcannedbatch; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobcannedbatch; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY jobcannedbatch (keyjobcannedbatch, name, "group", cmd, disablewow64fsredirect) FROM stdin;
-2	Switch2Mac	DualBoot	sh -c "/usr/local/bin/switchtomac && reboot"	\N
-3	Switch2Linux	DualBoot	sh -c "/usr/local/bin/switchtolinux && reboot"	\N
-4	Switch to Mac	DualBoot	sh -c "/mnt/x5/Global/infrastructure/perl/scripts/switchtomac"	\N
-5	Switch to Linux	DualBoot	sh -c "/mnt/x5/Global/infrastructure/perl/scripts/switchtolinux"	\N
-6	puppet	Admin	/usr/sbin/puppetd --test	f
-7	yum-update	Admin	/usr/bin/yum update -y	f
-8	gnglia	Restart Ganglia	/sbin/service gmond restart	f
-9	Tank Fuse restart	Admin	/sbin/service tank_hf2_fuse restart	f
-10	restart tasklogger	Services	svc-restart tasklogger	f
 \.
 
 
 --
--- Data for Name: jobcinema4d; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobcinema4d (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots) FROM stdin;
-\.
-
-
---
--- Data for Name: jobcommandhistory; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobcommandhistory; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY jobcommandhistory (keyjobcommandhistory, stderr, stdout, command, memory, fkeyjob, fkeyhost, fkeyhosthistory, iowait, realtime, systime, usertime) FROM stdin;
@@ -8603,7 +10533,7 @@ COPY jobcommandhistory (keyjobcommandhistory, stderr, stdout, command, memory, f
 
 
 --
--- Data for Name: jobdep; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobdep; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY jobdep (keyjobdep, fkeyjob, fkeydep, deptype) FROM stdin;
@@ -8611,7 +10541,15 @@ COPY jobdep (keyjobdep, fkeyjob, fkeydep, deptype) FROM stdin;
 
 
 --
--- Data for Name: joberror; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobenvironment; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY jobenvironment (keyjobenvironment, environment) FROM stdin;
+\.
+
+
+--
+-- Data for Name: joberror; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY joberror (keyjoberror, fkeyhost, fkeyjob, frames, message, errortime, count, cleared, lastoccurrence, timeout) FROM stdin;
@@ -8619,7 +10557,7 @@ COPY joberror (keyjoberror, fkeyhost, fkeyjob, frames, message, errortime, count
 
 
 --
--- Data for Name: joberrorhandler; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: joberrorhandler; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY joberrorhandler (keyjoberrorhandler, fkeyjobtype, errorregex, fkeyjoberrorhandlerscript) FROM stdin;
@@ -8627,7 +10565,7 @@ COPY joberrorhandler (keyjoberrorhandler, fkeyjobtype, errorregex, fkeyjoberrorh
 
 
 --
--- Data for Name: joberrorhandlerscript; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: joberrorhandlerscript; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY joberrorhandlerscript (keyjoberrorhandlerscript, script) FROM stdin;
@@ -8635,23 +10573,125 @@ COPY joberrorhandlerscript (keyjoberrorhandlerscript, script) FROM stdin;
 
 
 --
--- Data for Name: jobfusion; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobfiltermessage; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobfusion (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, frameend, framestart, framelist, allframesassingletask, outputcount) FROM stdin;
+COPY jobfiltermessage (keyjobfiltermessage, fkeyjobfiltertype, fkeyjobfilterset, regex, comment, enabled) FROM stdin;
+83	2	1	S2069: the interface of shader	\N	t
+87	3	6	NameError: name 'left' is not defined	\N	t
+91	4	1	No space left on device	\N	t
+93	1	6	Error: maximum recursion depth exceeded	\N	f
+84	3	1	S2050: cannot find shader	\N	t
+88	2	2	No valid license available!	\N	t
+92	2	2	attempting to kill process	\N	t
+85	3	1	Cannot read image file .* File is not an image file	\N	t
+89	3	2	Foundry::Cache::CacheDiskSizeLockFailed	\N	t
+1	2	1	cannot open output file	\N	t
+2	2	1	3DL SEVERE ERROR L2033	\N	t
+3	2	1	Command exited with non-zero status	\N	t
+4	2	1	^renderdl: cannot open input file	\N	t
+5	2	1	^3DL INFO L2374: no license available	\N	t
+6	1	1	Could not find file:	\N	t
+7	2	1	Received signal	\N	t
+8	3	1	3DL ERROR R5030:	\N	t
+9	2	2	^Error:	\N	t
+10	3	2	Read-only file system	\N	t
+11	2	2	FOUNDRY LICENSE ERROR	\N	t
+13	2	3	^Error:	\N	t
+14	2	3	^Unable to access file	\N	t
+15	2	3	CAUGHT SIGNAL SIGABRT	\N	t
+16	3	4	dammit	\N	f
+17	3	4	exist	\N	t
+18	2	3	CAUGHT SIGNAL SIGSEGV	\N	t
+19	3	5	No NI file specified. Stop teasing Naiad	\N	t
+20	2	5	Error checking out license: LM-X Error	\N	t
+21	2	1	Transport endpoint is not connected:	\N	t
+22	3	1	3DL ERROR T2373: cannot read 3D texture file	\N	t
+23	2	1	R5030: error reading from point cloud file	\N	t
+25	2	5	Command exited with non-zero status	\N	t
+26	1	1	Internal 3Delight Message code: 45 -> "Can't load requested shader", message severity: 2	 	t
+27	2	2	Command exited with non-zero status	\N	t
+28	2	1	message contents: T2040	\N	t
+86	3	1	Cannot access the OTL source	\N	t
+90	4	1	Exception occurred in python burner: Please contact IT	\N	t
+30	2	1	TextureLoader: file doesn't exist /drd/jobs/hf2/tank/	\N	t
+31	1	2	R2086: incomplete (or invalid) parameters set for subsurface scattering	\N	t
+32	3	1	"Internal 3Delight Message code: 24 -> "Bad begin-end nesting", message severity: 2	\N	t
+33	2	1	^DRD ERROR: EXR is not complete	\N	t
+34	2	6	^DRD_ERROR: A rib file	\N	t
+35	2	1	DRD_ERROR_RETRY	\N	t
+36	1	1	DRD_ERROR_FATAL	\N	t
+37	1	1	DRD_RIB_FATAL	\N	t
+38	3	1	^DRD ERROR: couldn't find file	\N	f
+39	2	1	^DRD ERROR: post_renderdl_frame command failed on file	\N	t
+40	3	1	3DL ERROR: .* Invalid char:	\N	t
+41	3	1	imdisplay-bin: Unable to open the mplay application	\N	t
+43	3	5	NAIAD ERROR	\N	t
+44	3	1	ERROR: File is empty	\N	t
+45	2	1	!!! CAUGHT SIGNAL	\N	t
+46	3	6	output: 'error: Cannot create folder	\N	t
+47	3	6	ERROR: Stopping on error	\N	t
+48	1	1	guide verts don't seem to match mesh	\N	t
+49	4	1	No space left on device.	\N	t
+50	3	6	Fatal error: Segmentation fault	\N	t
+51	1	2	Command exited with non-zero status 1	\N	t
+52	2	1	netcache: could not copy file from	\N	t
+53	3	1	code: 13 -> "Arbitrary program limit"	\N	f
+54	2	6	Hbatch job wouldn't run due to 'No License Found' error	\N	t
+55	2	2	FLEXnet Licensing error	\N	t
+56	3	1	T2028: netcache: lock file has disappeared	\N	t
+57	3	1	error message: R5022	\N	t
+58	3	1	Cannot find method "get_pointcloudname"	\N	t
+59	3	1	message contents: P1165	\N	f
+60	3	1	message contents: P1111	\N	t
+61	3	1	input in flex scanner failed	\N	t
+62	2	2	'No License Found'	\N	t
+63	3	6	3DL ERROR T2087	\N	t
+64	3	6	Batch script exited with result: 1	\N	t
+67	3	1	Transport endpoint is not connected	\N	t
+68	3	1	'drd::VacuumError'	\N	t
+69	3	1	'drd::VacuumHDF5Error'	\N	t
+71	2	1	message contents: R5031	\N	t
+72	3	1	message contents: T2087	\N	t
+73	4	1	No space left on device	\N	t
+74	2	6	post_renderdl_frame command	\N	t
+75	3	1	message contents: P1124	\N	f
+76	2	1	message contents: A2066	\N	f
+77	3	1	message contents: A2057	\N	t
+78	3	1	CrowdCharacterProcedural.ERROR:	\N	t
+79	3	3	AttributeError: 'NoneType' object has no attribute 'set'	\N	t
+80	2	1	DRD_ERROR: bad block	\N	t
 \.
 
 
 --
--- Data for Name: jobfusionvideomaker; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobfilterset; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobfusionvideomaker (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, codec, inputframepath, sequenceframestart, sequenceframeend, allframesassingletask, framelist, outputcount) FROM stdin;
+COPY jobfilterset (keyjobfilterset, name) FROM stdin;
+1	3Delight
+3	Mantra100
+4	filterTest
+5	Naiad
+2	Nuke
+6	Batch
 \.
 
 
 --
--- Data for Name: jobhistory; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobfiltertype; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY jobfiltertype (keyjobfiltertype, name) FROM stdin;
+1	Error-TaskCancel
+2	Error-TaskRetry
+3	Error-JobSuspend
+4	Error-HostOffline
+\.
+
+
+--
+-- Data for Name: jobhistory; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY jobhistory (keyjobhistory, fkeyjobhistorytype, fkeyjob, fkeyhost, fkeyuser, message, created) FROM stdin;
@@ -8659,7 +10699,7 @@ COPY jobhistory (keyjobhistory, fkeyjobhistorytype, fkeyjob, fkeyhost, fkeyuser,
 
 
 --
--- Data for Name: jobhistorytype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobhistorytype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY jobhistorytype (keyjobhistorytype, type) FROM stdin;
@@ -8667,191 +10707,151 @@ COPY jobhistorytype (keyjobhistorytype, type) FROM stdin;
 
 
 --
--- Data for Name: jobhoudinisim10; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmantra100; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobhoudinisim10 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, slices, tracker, framestart, frameend, nodename) FROM stdin;
+COPY jobmantra100 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, keyjobmantra100, forceraytrace, geocachesize, height, qualityflag, renderquality, threads, width) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmantra100; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmantra95; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmantra100 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, keyjobmantra100, forceraytrace, geocachesize, height, qualityflag, renderquality, threads, width) FROM stdin;
+COPY jobmantra95 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, keyjobmantra95, forceraytrace, geocachesize, height, qualityflag, renderquality, threads, width) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmantra95; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmaya; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmantra95 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, keyjobmantra95, forceraytrace, geocachesize, height, qualityflag, renderquality, threads, width) FROM stdin;
+COPY jobmaya (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmax; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmaya2008; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmax (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, camera, elementfile, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart, exrattributes, exrchannels, exrsavebitdepth, startupscript) FROM stdin;
+COPY jobmaya2008 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmax10; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmaya2009; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmax10 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, camera, elementfile, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart, exrattributes, exrchannels, exrsavebitdepth, startupscript) FROM stdin;
+COPY jobmaya2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmax2009; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmaya2011; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmax2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, camera, elementfile, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart, exrattributes, exrchannels, exrsavebitdepth, startupscript) FROM stdin;
+COPY jobmaya2011 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmax5; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmaya7; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmax5 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, camera, fileoriginal, flag_h, framestart, frameend, flag_w, flag_xv, flag_x2, flag_xa, flag_xe, flag_xk, flag_xd, flag_xh, flag_xo, flag_xf, flag_xn, flag_xp, flag_xc, flag_v, elementfile, framelist) FROM stdin;
+COPY jobmaya7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmax6; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmaya8; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmax6 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, camera, elementfile, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart) FROM stdin;
+COPY jobmaya8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmax7; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmaya85; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmax7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, camera, elementfile, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart, exrattributes, exrchannels, exrsavebitdepth, startupscript) FROM stdin;
+COPY jobmaya85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmax8; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmentalray2009; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmax8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, camera, elementfile, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart, exrattributes, exrchannels, exrsavebitdepth, startupscript) FROM stdin;
+COPY jobmentalray2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmax9; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmentalray2011; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmax9 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, camera, elementfile, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart, exrattributes, exrchannels, exrsavebitdepth, startupscript) FROM stdin;
+COPY jobmentalray2011 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmaxscript; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmentalray7; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaxscript (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, script, maxtime, outputfiles, filelist, silent, maxversion, runmax64) FROM stdin;
+COPY jobmentalray7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmaya; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmentalray8; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmentalray8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmaya2008; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobmentalray85; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya2008 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmentalray85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmaya2009; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobnaiad; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobnaiad (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, threads, append, restartcache, fullframe) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmaya7; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobnuke; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobnuke (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, outputcount, viewname, nodes, terminalonly) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmaya8; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobnuke51; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobnuke51 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, outputcount) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmaya85; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobnuke52; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobnuke52 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, outputcount) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobmentalray7; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobmentalray7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
-\.
-
-
---
--- Data for Name: jobmentalray8; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobmentalray8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
-\.
-
-
---
--- Data for Name: jobmentalray85; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobmentalray85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
-\.
-
-
---
--- Data for Name: jobnuke51; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobnuke51 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, outputcount) FROM stdin;
-\.
-
-
---
--- Data for Name: jobnuke52; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobnuke52 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, outputcount) FROM stdin;
-\.
-
-
---
--- Data for Name: joboutput; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: joboutput; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY joboutput (keyjoboutput, fkeyjob, name, fkeyfiletracker) FROM stdin;
@@ -8859,31 +10859,7 @@ COPY joboutput (keyjoboutput, fkeyjob, name, fkeyfiletracker) FROM stdin;
 
 
 --
--- Data for Name: jobrealflow; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobrealflow (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, keyjobrealflow, framestart, frameend, simtype, threads) FROM stdin;
-\.
-
-
---
--- Data for Name: jobrenderman; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobrenderman (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, version) FROM stdin;
-\.
-
-
---
--- Data for Name: jobribgen; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobribgen (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, version) FROM stdin;
-\.
-
-
---
--- Data for Name: jobservice; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobservice; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY jobservice (keyjobservice, fkeyjob, fkeyservice) FROM stdin;
@@ -8891,63 +10867,47 @@ COPY jobservice (keyjobservice, fkeyjob, fkeyservice) FROM stdin;
 
 
 --
--- Data for Name: jobshake; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobstat; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobshake (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, codec, slatepath, framerange) FROM stdin;
+COPY jobstat (keyjobstat, fkeyelement, fkeyproject, fkeyusr, pass, taskcount, taskscompleted, tasktime, started, ended, name, errorcount, mintasktime, maxtasktime, avgtasktime, totaltasktime, minerrortime, maxerrortime, avgerrortime, totalerrortime, mincopytime, maxcopytime, avgcopytime, totalcopytime, copycount, minloadtime, maxloadtime, avgloadtime, totalloadtime, loadcount, submitted, minmemory, maxmemory, avgmemory, minefficiency, maxefficiency, avgefficiency, totalbytesread, minbytesread, maxbytesread, avgbytesread, totalopsread, minopsread, maxopsread, avgopsread, totalbyteswrite, minbyteswrite, maxbyteswrite, avgbyteswrite, totalopswrite, minopswrite, maxopswrite, avgopswrite, totaliowait, miniowait, maxiowait, avgiowait, avgcputime, maxcputime, mincputime, totalcanceltime, totalcputime, fkeyjobtype, fkeyjob) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobspool; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobstateaction; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobspool (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, flowfile, flowpath, holdend, inputfile, inputpath, outputfile, inputstart, inputend, holdstart, importmode, keepinqueue, lastscanned, jobpath) FROM stdin;
+COPY jobstateaction (keyjobstateaction, fkeyjob, oldstatus, newstatus, modified) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobstat; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobstatus; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobstat (keyjobstat, fkeyelement, fkeyproject, fkeyusr, pass, taskcount, taskscompleted, tasktime, started, ended, name, errorcount, mintasktime, maxtasktime, avgtasktime, totaltasktime, minerrortime, maxerrortime, avgerrortime, totalerrortime, mincopytime, maxcopytime, avgcopytime, totalcopytime, copycount, minloadtime, maxloadtime, avgloadtime, totalloadtime, loadcount, submitted, totalcputime, mincputime, maxcputime, avgcputime, minmemory, maxmemory, avgmemory, minefficiency, maxefficiency, avgefficiency, totalbytesread, minbytesread, maxbytesread, avgbytesread, totalopsread, minopsread, maxopsread, avgopsread, totalbyteswrite, minbyteswrite, maxbyteswrite, avgbyteswrite, totalopswrite, minopswrite, maxopswrite, avgopswrite, totaliowait, miniowait, maxiowait, avgiowait) FROM stdin;
+COPY jobstatus (keyjobstatus, hostsonjob, fkeyjob, tasksunassigned, taskscount, tasksdone, taskscancelled, taskssuspended, tasksassigned, tasksbusy, tasksaveragetime, health, joblastupdated, errorcount, lastnotifiederrorcount, averagememory, bytesread, byteswrite, cputime, efficiency, opsread, opswrite, totaltime, queueorder, taskbitmap, averagedonetime) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobstatus; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobstatus_old; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobstatus (keyjobstatus, hostsonjob, fkeyjob, tasksunassigned, taskscount, tasksdone, taskscancelled, taskssuspended, tasksassigned, tasksbusy, tasksaveragetime, health, joblastupdated, errorcount, lastnotifiederrorcount, averagememory) FROM stdin;
+COPY jobstatus_old (keyjobstatus, hostsonjob, fkeyjob, tasksunassigned, taskscount, tasksdone, taskscancelled, taskssuspended, tasksassigned, tasksbusy, tasksaveragetime, health, joblastupdated, errorcount, lastnotifiederrorcount, averagememory, bytesread, byteswrite, cputime, efficiency, opsread, opswrite, totaltime) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobsync; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobtask; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobsync (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, direction, append, filesfrom) FROM stdin;
+COPY jobtask (keyjobtask, fkeyhost, fkeyjob, status, jobtask, label, fkeyjoboutput, progress, fkeyjobtaskassignment) FROM stdin;
 \.
 
 
 --
--- Data for Name: jobsystem; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobsystem (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots) FROM stdin;
-\.
-
-
---
--- Data for Name: jobtask; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobtask (keyjobtask, ended, fkeyhost, fkeyjob, status, jobtask, label, fkeyjoboutput, progress, fkeyjobtaskassignment) FROM stdin;
-\.
-
-
---
--- Data for Name: jobtaskassignment; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobtaskassignment; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY jobtaskassignment (keyjobtaskassignment, fkeyjobassignment, memory, started, ended, fkeyjobassignmentstatus, fkeyjobtask, fkeyjoberror) FROM stdin;
@@ -8955,46 +10915,43 @@ COPY jobtaskassignment (keyjobtaskassignment, fkeyjobassignment, memory, started
 
 
 --
--- Data for Name: jobtype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobtaskassignment_old; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY jobtaskassignment_old (keyjobtaskassignment, fkeyjobassignment, memory, started, ended, fkeyjobassignmentstatus, fkeyjobtask, fkeyjoberror) FROM stdin;
+\.
+
+
+--
+-- Data for Name: jobtype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY jobtype (keyjobtype, jobtype, fkeyservice, icon) FROM stdin;
-1	Max5	\N	\N
-2	Max6	\N	\N
-3	Max7	\N	\N
-4	Max8	\N	\N
-5	Max9	\N	\N
-7	MaxScript	\N	\N
-17	AfterEffects	6	\N
-9	XSI	\N	\N
 14	Maya7	3	\N
 15	Shake	4	\N
 13	Maya8	3	\N
-24	AfterEffects7	6	\N
-18	RibGen	7	\N
-19	RenderMan	7	\N
-11	Fusion	8	\N
 21	MentalRay7	9	\N
 20	Maya85	3	\N
 23	MentalRay85	9	\N
 22	MentalRay8	9	\N
 16	Batch	10	\N
-26	AfterEffects8	17	\N
-25	Sync	15	\N
-27	AutodeskBurn	13	\N
 28	Maya2009	3	\N
 29	Maya2008	3	\N
 30	Nuke51	32	\N
 31	Mantra95	33	\N
 32	Mantra100	33	\N
 33	3Delight	36	\N
-34	HoudiniSim10	33	\N
 35	Nuke52	32	\N
+36	MentalRay2009	9	\N
+37	MentalRay2011	9	\N
+38	Maya2011	3	\N
+39	Naiad	46	\N
+40	Nuke	32	\N
 \.
 
 
 --
--- Data for Name: jobtypemapping; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: jobtypemapping; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY jobtypemapping (keyjobtypemapping, fkeyjobtype, fkeymapping) FROM stdin;
@@ -9002,48 +10959,38 @@ COPY jobtypemapping (keyjobtypemapping, fkeyjobtype, fkeymapping) FROM stdin;
 
 
 --
--- Data for Name: jobxsi; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: license; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobxsi (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, framelist, pass, flag_w, flag_h, deformmotionblur, motionblur, renderer, resolutionx, resolutiony) FROM stdin;
+COPY license (keylicense, license, fkeyhost, fkeysoftware, total, reserved, inuse) FROM stdin;
+19	ocula	\N	\N	5	0	0
+15	fah	\N	\N	8	0	0
+18	vue	\N	\N	13	0	0
+20	mentalray	\N	\N	112	8	0
+24	rollingshutter	\N	\N	5	0	0
+21	rvio	\N	\N	20	0	0
+16	nuke_r	\N	\N	100	0	0
+14	hbatch	\N	\N	162	0	113
+28	fastlane	\N	\N	300	0	13
+25	tank	\N	\N	100	0	4
+29	truelight01_transfer	\N	\N	3	0	0
+30	gpu	\N	\N	10	0	0
+23	mantra	\N	\N	800	0	13
+17	3delight	\N	\N	2000	0	0
+22	naiad	\N	\N	10	0	6
 \.
 
 
 --
--- Data for Name: jobxsiscript; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY jobxsiscript (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, framestart, frameend, scriptrequiresui, scriptfile, xsifile, scriptmethod, framelist) FROM stdin;
-\.
-
-
---
--- Data for Name: license; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY license (keylicense, license, fkeyhost, fkeysoftware, total, available, reserved, inuse) FROM stdin;
-15	fah	\N	\N	8	8	\N	\N
-16	nuke_r	\N	\N	12	12	0	0
-18	vue	\N	\N	13	3	0	0
-19	ocula	\N	\N	5	5	0	0
-14	hbatch	\N	\N	6	6	0	0
-17	3delight	\N	\N	128	37	10	0
-\.
-
-
---
--- Data for Name: location; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: location; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY location (keylocation, name) FROM stdin;
-1	SMO
-2	VCO
-3	BrianHarding
 \.
 
 
 --
--- Data for Name: mapping; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: mapping; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY mapping (keymapping, fkeyhost, share, mount, fkeymappingtype, description) FROM stdin;
@@ -9051,7 +10998,7 @@ COPY mapping (keymapping, fkeyhost, share, mount, fkeymappingtype, description) 
 
 
 --
--- Data for Name: mappingtype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: mappingtype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY mappingtype (keymappingtype, name) FROM stdin;
@@ -9059,7 +11006,7 @@ COPY mappingtype (keymappingtype, name) FROM stdin;
 
 
 --
--- Data for Name: methodperms; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: methodperms; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY methodperms (keymethodperms, method, users, groups, fkeyproject) FROM stdin;
@@ -9067,7 +11014,7 @@ COPY methodperms (keymethodperms, method, users, groups, fkeyproject) FROM stdin
 
 
 --
--- Data for Name: notification; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: notification; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY notification (keynotification, created, subject, message, component, event, routed, fkeyelement) FROM stdin;
@@ -9075,7 +11022,7 @@ COPY notification (keynotification, created, subject, message, component, event,
 
 
 --
--- Data for Name: notificationdestination; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: notificationdestination; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY notificationdestination (keynotificationdestination, fkeynotification, fkeynotificationmethod, delivered, destination, fkeyuser, routed) FROM stdin;
@@ -9083,7 +11030,7 @@ COPY notificationdestination (keynotificationdestination, fkeynotification, fkey
 
 
 --
--- Data for Name: notificationmethod; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: notificationmethod; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY notificationmethod (keynotificationmethod, name) FROM stdin;
@@ -9091,7 +11038,7 @@ COPY notificationmethod (keynotificationmethod, name) FROM stdin;
 
 
 --
--- Data for Name: notificationroute; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: notificationroute; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY notificationroute (keynotificationuserroute, eventmatch, componentmatch, fkeyuser, subjectmatch, messagematch, actions, priority, fkeyelement, routeassetdescendants) FROM stdin;
@@ -9099,7 +11046,7 @@ COPY notificationroute (keynotificationuserroute, eventmatch, componentmatch, fk
 
 
 --
--- Data for Name: notify; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: notify; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY notify (keynotify, notify, fkeyusr, fkeysyslogrealm, severitymask, starttime, endtime, threshhold, notifyclass, notifymethod, fkeynotifymethod, threshold) FROM stdin;
@@ -9107,7 +11054,7 @@ COPY notify (keynotify, notify, fkeyusr, fkeysyslogrealm, severitymask, starttim
 
 
 --
--- Data for Name: notifymethod; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: notifymethod; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY notifymethod (keynotifymethod, notifymethod) FROM stdin;
@@ -9115,7 +11062,7 @@ COPY notifymethod (keynotifymethod, notifymethod) FROM stdin;
 
 
 --
--- Data for Name: notifysent; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: notifysent; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY notifysent (keynotifysent, fkeynotify, fkeysyslog) FROM stdin;
@@ -9123,7 +11070,7 @@ COPY notifysent (keynotifysent, fkeynotify, fkeysyslog) FROM stdin;
 
 
 --
--- Data for Name: notifywho; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: notifywho; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY notifywho (keynotifywho, class, fkeynotify, fkeyusr, fkey) FROM stdin;
@@ -9131,7 +11078,7 @@ COPY notifywho (keynotifywho, class, fkeynotify, fkeyusr, fkey) FROM stdin;
 
 
 --
--- Data for Name: package; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: package; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY package (keypackage, version, fkeystatus) FROM stdin;
@@ -9139,7 +11086,7 @@ COPY package (keypackage, version, fkeystatus) FROM stdin;
 
 
 --
--- Data for Name: packageoutput; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: packageoutput; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY packageoutput (keypackageoutput, fkeyasset) FROM stdin;
@@ -9147,7 +11094,7 @@ COPY packageoutput (keypackageoutput, fkeyasset) FROM stdin;
 
 
 --
--- Data for Name: pathsynctarget; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: pathsynctarget; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY pathsynctarget (keypathsynctarget, fkeypathtracker, fkeyprojectstorage) FROM stdin;
@@ -9155,7 +11102,7 @@ COPY pathsynctarget (keypathsynctarget, fkeypathtracker, fkeyprojectstorage) FRO
 
 
 --
--- Data for Name: pathtemplate; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: pathtemplate; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY pathtemplate (keypathtemplate, name, pathtemplate, pathre, filenametemplate, filenamere, version, pythoncode) FROM stdin;
@@ -9163,7 +11110,7 @@ COPY pathtemplate (keypathtemplate, name, pathtemplate, pathre, filenametemplate
 
 
 --
--- Data for Name: pathtracker; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: pathtracker; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY pathtracker (keypathtracker, fkeyelement, path, fkeypathtemplate, fkeyprojectstorage, storagename) FROM stdin;
@@ -9171,7 +11118,7 @@ COPY pathtracker (keypathtracker, fkeyelement, path, fkeypathtemplate, fkeyproje
 
 
 --
--- Data for Name: permission; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: permission; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY permission (keypermission, methodpattern, fkeyusr, permission, fkeygrp, class) FROM stdin;
@@ -9181,7 +11128,7 @@ COPY permission (keypermission, methodpattern, fkeyusr, permission, fkeygrp, cla
 
 
 --
--- Data for Name: phoneno; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: phoneno; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY phoneno (keyphoneno, phoneno, fkeyphonetype, fkeyemployee, domain) FROM stdin;
@@ -9189,7 +11136,7 @@ COPY phoneno (keyphoneno, phoneno, fkeyphonetype, fkeyemployee, domain) FROM std
 
 
 --
--- Data for Name: phonetype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: phonetype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY phonetype (keyphonetype, phonetype) FROM stdin;
@@ -9197,15 +11144,15 @@ COPY phonetype (keyphonetype, phonetype) FROM stdin;
 
 
 --
--- Data for Name: project; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: project; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY project (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, compoutputdrive, datedue, filetype, fkeyclient, notes, renderoutputdrive, script, shortname, wipdrive, projectnumber, frames, nda, dayrate, usefilecreation, dailydrive, lastscanned, fkeyprojectstatus, assburnerweight, project, fps, resolution, resolutionwidth, resolutionheight, archived, deliverymedium, renderpixelaspect) FROM stdin;
+COPY project (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, arsenalslotlimit, arsenalslotreserve, compoutputdrive, datedue, filetype, fkeyclient, notes, renderoutputdrive, script, shortname, wipdrive, projectnumber, frames, nda, dayrate, usefilecreation, dailydrive, lastscanned, fkeyprojectstatus, assburnerweight, project, fps, resolution, resolutionwidth, resolutionheight, archived, deliverymedium, renderpixelaspect) FROM stdin;
 \.
 
 
 --
--- Data for Name: projectresolution; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: projectresolution; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY projectresolution (keyprojectresolution, deliveryformat, fkeyproject, height, outputformat, projectresolution, width, pixelaspect, fps) FROM stdin;
@@ -9213,7 +11160,7 @@ COPY projectresolution (keyprojectresolution, deliveryformat, fkeyproject, heigh
 
 
 --
--- Data for Name: projectstatus; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: projectstatus; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY projectstatus (keyprojectstatus, projectstatus, chronology) FROM stdin;
@@ -9225,7 +11172,7 @@ COPY projectstatus (keyprojectstatus, projectstatus, chronology) FROM stdin;
 
 
 --
--- Data for Name: projectstorage; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: projectstorage; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY projectstorage (keyprojectstorage, fkeyproject, name, location, storagename, "default", fkeyhost) FROM stdin;
@@ -9233,16 +11180,15 @@ COPY projectstorage (keyprojectstorage, fkeyproject, name, location, storagename
 
 
 --
--- Data for Name: projecttempo; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: projecttempo; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY projecttempo (fkeyproject, tempo) FROM stdin;
-\N	0.001
 \.
 
 
 --
--- Data for Name: queueorder; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: queueorder; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY queueorder (queueorder, fkeyjob) FROM stdin;
@@ -9250,7 +11196,7 @@ COPY queueorder (queueorder, fkeyjob) FROM stdin;
 
 
 --
--- Data for Name: rangefiletracker; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: rangefiletracker; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY rangefiletracker (keyfiletracker, fkeyelement, name, path, filename, fkeypathtemplate, fkeyprojectstorage, storagename, filenametemplate, framestart, frameend, fkeyresolution, renderelement) FROM stdin;
@@ -9258,7 +11204,7 @@ COPY rangefiletracker (keyfiletracker, fkeyelement, name, path, filename, fkeypa
 
 
 --
--- Data for Name: renderframe; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: renderframe; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY renderframe (keyrenderframe, fkeyshot, frame, fkeyresolution, status) FROM stdin;
@@ -9266,7 +11212,7 @@ COPY renderframe (keyrenderframe, fkeyshot, frame, fkeyresolution, status) FROM 
 
 
 --
--- Data for Name: schedule; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: schedule; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY schedule (keyschedule, fkeyuser, date, starthour, hours, fkeyelement, fkeyassettype, fkeycreatedbyuser, duration, starttime) FROM stdin;
@@ -9274,7 +11220,7 @@ COPY schedule (keyschedule, fkeyuser, date, starthour, hours, fkeyelement, fkeya
 
 
 --
--- Data for Name: serverfileaction; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: serverfileaction; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY serverfileaction (keyserverfileaction, fkeyserverfileactionstatus, fkeyserverfileactiontype, fkeyhost, destpath, errormessage, sourcepath) FROM stdin;
@@ -9282,7 +11228,7 @@ COPY serverfileaction (keyserverfileaction, fkeyserverfileactionstatus, fkeyserv
 
 
 --
--- Data for Name: serverfileactionstatus; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: serverfileactionstatus; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY serverfileactionstatus (keyserverfileactionstatus, status, name) FROM stdin;
@@ -9290,7 +11236,7 @@ COPY serverfileactionstatus (keyserverfileactionstatus, status, name) FROM stdin
 
 
 --
--- Data for Name: serverfileactiontype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: serverfileactiontype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY serverfileactiontype (keyserverfileactiontype, type) FROM stdin;
@@ -9298,59 +11244,48 @@ COPY serverfileactiontype (keyserverfileactiontype, type) FROM stdin;
 
 
 --
--- Data for Name: service; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: service; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY service (keyservice, service, description, fkeylicense, enabled, forbiddenprocesses, active, "unique", fkeysoftware) FROM stdin;
-3	Maya	\N	\N	t	maya.bin	\N	\N	\N
-8	Fusion	\N	\N	t	Overseer.exe	\N	\N	\N
-18	ShakeLinux	\N	\N	t	\N	\N	\N	\N
-17	AfterEffects8	\N	\N	t	\N	\N	\N	\N
-16	AB_reclaim_tasks	\N	\N	t	\N	\N	\N	\N
-14	Spool	\N	\N	t	\N	\N	\N	\N
-13	Autodesk_Burn	\N	\N	t	\N	\N	\N	\N
-12	AB_manager	\N	\N	t	\N	\N	\N	\N
-11	AB_manager	\N	\N	t	\N	\N	\N	\N
-10	Batch	\N	\N	t	\N	\N	\N	\N
-9	MentalRay	\N	1	t	\N	\N	\N	\N
-15	Sync	\N	\N	t	\N	\N	\N	\N
-7	RenderMan	\N	\N	t	\N	\N	\N	\N
-4	Shake	\N	\N	t	\N	\N	\N	\N
-2	AB_manager	\N	\N	t	\N	\N	\N	\N
-1	Assburner	\N	\N	t	\N	\N	\N	\N
-19	AB_manager	\N	\N	\N	\N	\N	\N	\N
-6	AfterEffects7	\N	\N	t	\N	\N	\N	\N
-24	LightFactory	\N	\N	t	\N	f	f	\N
-20	Twixtor	\N	\N	t	\N	f	f	\N
-21	Tinderbox1	\N	\N	t	\N	f	f	\N
-22	Tinderbox2	\N	\N	t	\N	f	f	\N
-23	Tinderbox3	\N	\N	t	\N	f	f	\N
-25	AB_manager	\N	\N	\N	\N	\N	\N	\N
-27	AB_manager	\N	\N	\N	\N	\N	\N	\N
-30	AB_manager	\N	\N	\N	\N	\N	\N	\N
-28	AfterEffectsPPC	\N	\N	t	\N	f	f	\N
-29	AfterEffectsIntel	\N	\N	t	\N	f	f	\N
-31	Storage	\N	\N	t	\N	\N	\N	\N
-26	foobar	\N	\N	t	\N	t	f	\N
-5	AB_Reaper	\N	\N	t	\N	t	\N	\N
-32	Nuke	\N	16	t	\N	\N	\N	\N
-33	Mantra	\N	\N	t	\N	\N	\N	\N
-34	hbatch	\N	14	t	\N	t	\N	\N
-37	GPU	\N	\N	t	\N	t	\N	\N
-38	mocap_bmo_vac	\N	\N	t	\N	\N	\N	\N
-39	prores	\N	\N	t	\N	t	\N	\N
-35	fah	\N	15	t	\N	t	\N	\N
-41	AB_manager	\N	\N	\N	\N	\N	\N	\N
-36	3Delight	\N	17	t	\N	t	\N	\N
-40	cputest	\N	\N	t	\N	t	\N	\N
-42	grind	\N	\N	t	\N	\N	\N	\N
-43	Vue	\N	18	t	\N	t	\N	\N
-44	ocula	\N	19	t	\N	t	\N	\N
+COPY service (keyservice, service, description, fkeylicense, enabled, forbiddenprocesses, active, "unique", fkeysoftware, fkeyjobfilterset) FROM stdin;
+51	GPU_testing	\N	30	t	\N	\N	\N	\N	\N
+3	Maya	\N	\N	t	maya.bin	\N	\N	\N	\N
+48	DataOps	\N	\N	t	\N	\N	\N	\N	\N
+16	AB_reclaim_tasks	\N	\N	t	\N	\N	\N	\N	\N
+10	Batch	\N	\N	t	\N	\N	\N	\N	\N
+2	AB_manager	\N	\N	t	\N	\N	\N	\N	\N
+1	Assburner	\N	\N	t	\N	\N	\N	\N	\N
+5	AB_Reaper	\N	\N	t	\N	t	\N	\N	\N
+32	Nuke	\N	16	t	\N	\N	\N	\N	\N
+34	hbatch	\N	14	t	\N	t	\N	\N	\N
+38	mocap_bmo_vac	\N	\N	t	\N	\N	\N	\N	\N
+39	prores	\N	\N	t	\N	t	\N	\N	\N
+42	grind	\N	\N	t	\N	\N	\N	\N	\N
+44	ocula	\N	19	t	\N	t	\N	\N	\N
+45	rv	\N	21	t	\N	t	\N	\N	\N
+47	terrorblock	\N	\N	t	\N	\N	\N	\N	\N
+46	naiad	\N	22	t	\N	t	\N	\N	\N
+33	Mantra	\N	23	t	\N	\N	\N	\N	\N
+50	rollingshutter	\N	24	t	\N	\N	\N	\N	\N
+53	fedex	\N	\N	t	\N	\N	\N	\N	\N
+56	BatchOSX	\N	\N	t	\N	\N	\N	\N	\N
+57	giant	\N	\N	t	\N	\N	\N	\N	\N
+59	AB_Verifier	\N	\N	\N	\N	\N	\N	\N	\N
+60	KimBatch	\N	\N	t	\N	t	\N	\N	\N
+61	WIP-Writer	\N	\N	t	\N	t	\N	\N	\N
+62	truelight01_transfer	\N	29	t	\N	t	\N	\N	\N
+37	GPU	\N	30	t	\N	t	\N	\N	\N
+36	3Delight	\N	\N	t	\N	t	\N	\N	\N
+9	MentalRay	\N	\N	t	\N	\N	\N	\N	\N
+35	fah	\N	\N	t	\N	t	\N	\N	\N
+43	Vue	\N	\N	t	\N	t	\N	\N	\N
+49	tank	\N	\N	t	\N	\N	\N	\N	\N
+55	fastlane	\N	\N	t	\N	t	\N	\N	\N
 \.
 
 
 --
--- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY sessions (id, length, a_session, "time") FROM stdin;
@@ -9358,40 +11293,39 @@ COPY sessions (id, length, a_session, "time") FROM stdin;
 
 
 --
--- Data for Name: shot; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: shot; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY shot (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, dialog, frameend, framestart, shot, framestartedl, frameendedl, camerainfo, scriptpage) FROM stdin;
+COPY shot (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, arsenalslotlimit, arsenalslotreserve, dialog, frameend, framestart, shot, framestartedl, frameendedl, camerainfo, scriptpage) FROM stdin;
 \.
 
 
 --
--- Data for Name: shotgroup; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: shotgroup; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY shotgroup (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, shotgroup) FROM stdin;
+COPY shotgroup (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, arsenalslotlimit, arsenalslotreserve, shotgroup) FROM stdin;
 \.
 
 
 --
--- Data for Name: software; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: slots_total; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY slots_total (sum) FROM stdin;
+\.
+
+
+--
+-- Data for Name: software; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY software (keysoftware, software, icon, vendor, vendorcontact, active, executable, installedpath, sixtyfourbit, version) FROM stdin;
-1	Adobe Photoshop	\N	\N	\N	\N	\N	\N	\N	\N
-2	Adobe Photoshop	\N	\N	\N	\N	\N	\N	\N	\N
-3	Adobe After Effects	\N	\N	\N	\N	\N	\N	\N	\N
-6	3dsMax	\N	\N	\N	\N	\N	\N	\N	\N
-7	Boujou	\N	\N	\N	\N	\N	\N	\N	\N
-8	Adobe Photoshop	\N	\N	\N	\N	\N	\N	\N	\N
-9	Fusion	images/software/dfusion.png	\N	\N	\N	\N	\N	\N	\N
-5	Maya	images/software/maya85.xpm	\N	\N	\N	\N	\N	\N	\N
-4	Maya	images/software/maya70.xpm	\N	\N	\N	\N	\N	\N	\N
 \.
 
 
 --
--- Data for Name: status; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: status; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY status (keystatus, name) FROM stdin;
@@ -9399,7 +11333,7 @@ COPY status (keystatus, name) FROM stdin;
 
 
 --
--- Data for Name: statusset; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: statusset; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY statusset (keystatusset, name) FROM stdin;
@@ -9407,7 +11341,7 @@ COPY statusset (keystatusset, name) FROM stdin;
 
 
 --
--- Data for Name: syslog; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: syslog; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY syslog (keysyslog, fkeyhost, fkeysyslogrealm, fkeysyslogseverity, message, count, lastoccurrence, created, class, method, ack, firstoccurence, hostname, username) FROM stdin;
@@ -9415,7 +11349,7 @@ COPY syslog (keysyslog, fkeyhost, fkeysyslogrealm, fkeysyslogseverity, message, 
 
 
 --
--- Data for Name: syslogrealm; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: syslogrealm; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY syslogrealm (keysyslogrealm, syslogrealm) FROM stdin;
@@ -9429,7 +11363,7 @@ COPY syslogrealm (keysyslogrealm, syslogrealm) FROM stdin;
 
 
 --
--- Data for Name: syslogseverity; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: syslogseverity; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY syslogseverity (keysyslogseverity, syslogseverity, severity) FROM stdin;
@@ -9441,15 +11375,15 @@ COPY syslogseverity (keysyslogseverity, syslogseverity, severity) FROM stdin;
 
 
 --
--- Data for Name: task; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: task; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY task (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, fkeytasktype, shotgroup) FROM stdin;
+COPY task (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, arsenalslotlimit, arsenalslotreserve, fkeytasktype, shotgroup) FROM stdin;
 \.
 
 
 --
--- Data for Name: tasktype; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: tasktype; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY tasktype (keytasktype, tasktype, iconcolor) FROM stdin;
@@ -9457,7 +11391,7 @@ COPY tasktype (keytasktype, tasktype, iconcolor) FROM stdin;
 
 
 --
--- Data for Name: taskuser; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: taskuser; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY taskuser (keytaskuser, fkeytask, fkeyuser, active) FROM stdin;
@@ -9465,7 +11399,7 @@ COPY taskuser (keytaskuser, fkeytask, fkeyuser, active) FROM stdin;
 
 
 --
--- Data for Name: thread; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: thread; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY thread (keythread, thread, topic, tablename, fkey, datetime, fkeyauthor, skeyreply, fkeyusr, fkeythreadcategory) FROM stdin;
@@ -9473,7 +11407,7 @@ COPY thread (keythread, thread, topic, tablename, fkey, datetime, fkeyauthor, sk
 
 
 --
--- Data for Name: threadcategory; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: threadcategory; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY threadcategory (keythreadcategory, threadcategory) FROM stdin;
@@ -9481,7 +11415,7 @@ COPY threadcategory (keythreadcategory, threadcategory) FROM stdin;
 
 
 --
--- Data for Name: threadnotify; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: threadnotify; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY threadnotify (keythreadnotify, fkeythread, fkeyuser, options) FROM stdin;
@@ -9489,7 +11423,7 @@ COPY threadnotify (keythreadnotify, fkeythread, fkeyuser, options) FROM stdin;
 
 
 --
--- Data for Name: thumbnail; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: thumbnail; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY thumbnail (keythumbnail, cliprect, date, fkeyelement, fkeyuser, originalfile, image) FROM stdin;
@@ -9497,7 +11431,7 @@ COPY thumbnail (keythumbnail, cliprect, date, fkeyelement, fkeyuser, originalfil
 
 
 --
--- Data for Name: timesheet; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: timesheet; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY timesheet (keytimesheet, datetime, fkeyelement, fkeyemployee, fkeyproject, fkeytimesheetcategory, scheduledhour, datetimesubmitted, unscheduledhour, comment) FROM stdin;
@@ -9505,7 +11439,7 @@ COPY timesheet (keytimesheet, datetime, fkeyelement, fkeyemployee, fkeyproject, 
 
 
 --
--- Data for Name: timesheetcategory; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: timesheetcategory; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY timesheetcategory (keytimesheetcategory, timesheetcategory, iconcolor, hasdaily, chronology, disabled, istask, fkeypathtemplate, fkeyelementtype, nameregexp, allowtime, color, description, sortcolumn, tags, sortnumber) FROM stdin;
@@ -9597,7 +11531,7 @@ COPY timesheetcategory (keytimesheetcategory, timesheetcategory, iconcolor, hasd
 
 
 --
--- Data for Name: tracker; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: tracker; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY tracker (keytracker, tracker, fkeysubmitter, fkeyassigned, fkeycategory, fkeyseverity, fkeystatus, datetarget, datechanged, datesubmitted, description, timeestimate, fkeytrackerqueue) FROM stdin;
@@ -9605,7 +11539,7 @@ COPY tracker (keytracker, tracker, fkeysubmitter, fkeyassigned, fkeycategory, fk
 
 
 --
--- Data for Name: trackercategory; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: trackercategory; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY trackercategory (keytrackercategory, trackercategory) FROM stdin;
@@ -9613,7 +11547,7 @@ COPY trackercategory (keytrackercategory, trackercategory) FROM stdin;
 
 
 --
--- Data for Name: trackerlog; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: trackerlog; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY trackerlog (keytrackerlog, fkeytracker, fkeyusr, datelogged, message) FROM stdin;
@@ -9621,7 +11555,7 @@ COPY trackerlog (keytrackerlog, fkeytracker, fkeyusr, datelogged, message) FROM 
 
 
 --
--- Data for Name: trackerqueue; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: trackerqueue; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY trackerqueue (keytrackerqueue, trackerqueue) FROM stdin;
@@ -9629,7 +11563,7 @@ COPY trackerqueue (keytrackerqueue, trackerqueue) FROM stdin;
 
 
 --
--- Data for Name: trackerseverity; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: trackerseverity; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY trackerseverity (keytrackerseverity, trackerseverity) FROM stdin;
@@ -9637,7 +11571,7 @@ COPY trackerseverity (keytrackerseverity, trackerseverity) FROM stdin;
 
 
 --
--- Data for Name: trackerstatus; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: trackerstatus; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY trackerstatus (keytrackerstatus, trackerstatus) FROM stdin;
@@ -9645,7 +11579,7 @@ COPY trackerstatus (keytrackerstatus, trackerstatus) FROM stdin;
 
 
 --
--- Data for Name: userelement; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: userelement; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY userelement (keyuserelement, fkeyelement, fkeyusr, fkeyuser) FROM stdin;
@@ -9653,7 +11587,7 @@ COPY userelement (keyuserelement, fkeyelement, fkeyusr, fkeyuser) FROM stdin;
 
 
 --
--- Data for Name: usermapping; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: usermapping; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY usermapping (keyusermapping, fkeyusr, fkeymapping) FROM stdin;
@@ -9661,37 +11595,39 @@ COPY usermapping (keyusermapping, fkeyusr, fkeymapping) FROM stdin;
 
 
 --
--- Data for Name: userrole; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: userrole; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY userrole (keyuserrole, fkeytasktype, fkeyusr) FROM stdin;
-1	14	2
-2	10	122
-3	57	122
 \.
 
 
 --
--- Data for Name: usr; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: userservice; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY usr (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, dateoflastlogon, email, fkeyhost, gpgkey, jid, pager, password, remoteips, schedule, shell, uid, threadnotifybyjabber, threadnotifybyemail, fkeyclient, intranet, homedir, disabled, gid, usr, keyusr, rolemask, usrlevel, remoteok, requestcount, sessiontimeout, logoncount, useradded, oldkeyusr, sid, lastlogontype) FROM stdin;
+COPY userservice (keyuserservice, "user", service, "limit") FROM stdin;
 \.
 
 
 --
--- Data for Name: usrgrp; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: usr; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY usr (keyelement, daysbid, description, fkeyelement, fkeyelementstatus, fkeyelementtype, fkeyproject, fkeythumbnail, name, daysscheduled, daysestimated, status, filepath, fkeyassettype, fkeypathtemplate, fkeystatusset, allowtime, datestart, datecomplete, fkeyassettemplate, icon, arsenalslotlimit, arsenalslotreserve, dateoflastlogon, email, fkeyhost, gpgkey, jid, pager, password, remoteips, schedule, shell, uid, threadnotifybyjabber, threadnotifybyemail, fkeyclient, intranet, homedir, disabled, gid, usr, keyusr, rolemask, usrlevel, remoteok, requestcount, sessiontimeout, logoncount, useradded, oldkeyusr, sid, lastlogontype) FROM stdin;
+\.
+
+
+--
+-- Data for Name: usrgrp; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY usrgrp (keyusrgrp, fkeyusr, fkeygrp, usrgrp) FROM stdin;
-1	2	1	\N
-2	2	2	\N
-3	122	1	\N
 \.
 
 
 --
--- Data for Name: version; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: version; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY version (keyversion) FROM stdin;
@@ -9699,7 +11635,7 @@ COPY version (keyversion) FROM stdin;
 
 
 --
--- Data for Name: versionfiletracker; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: versionfiletracker; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
 COPY versionfiletracker (keyfiletracker, fkeyelement, name, path, filename, fkeypathtemplate, fkeyprojectstorage, storagename, filenametemplate, fkeyversionfiletracker, oldfilenames, version, iteration, automaster) FROM stdin;
@@ -9707,7 +11643,7 @@ COPY versionfiletracker (keyfiletracker, fkeyelement, name, path, filename, fkey
 
 
 --
--- Name: abdownloadstat_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: abdownloadstat_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY abdownloadstat
@@ -9715,7 +11651,7 @@ ALTER TABLE ONLY abdownloadstat
 
 
 --
--- Name: annotation_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: annotation_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY annotation
@@ -9723,7 +11659,7 @@ ALTER TABLE ONLY annotation
 
 
 --
--- Name: assetdep_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: assetdep_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY assetdep
@@ -9731,7 +11667,7 @@ ALTER TABLE ONLY assetdep
 
 
 --
--- Name: assetprop_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: assetprop_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY assetprop
@@ -9739,7 +11675,7 @@ ALTER TABLE ONLY assetprop
 
 
 --
--- Name: assetproperty_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: assetproperty_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY assetproperty
@@ -9747,7 +11683,7 @@ ALTER TABLE ONLY assetproperty
 
 
 --
--- Name: assetproptype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: assetproptype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY assetproptype
@@ -9755,7 +11691,7 @@ ALTER TABLE ONLY assetproptype
 
 
 --
--- Name: assetset_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: assetset_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY assetset
@@ -9763,7 +11699,7 @@ ALTER TABLE ONLY assetset
 
 
 --
--- Name: assetsetitem_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: assetsetitem_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY assetsetitem
@@ -9771,7 +11707,7 @@ ALTER TABLE ONLY assetsetitem
 
 
 --
--- Name: assettemplate_fkeyproject_fkeyassettype_name_unique; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: assettemplate_fkeyproject_fkeyassettype_name_unique; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY assettemplate
@@ -9779,7 +11715,7 @@ ALTER TABLE ONLY assettemplate
 
 
 --
--- Name: assettemplate_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: assettemplate_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY assettemplate
@@ -9787,7 +11723,7 @@ ALTER TABLE ONLY assettemplate
 
 
 --
--- Name: assettype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: assettype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY assettype
@@ -9795,7 +11731,7 @@ ALTER TABLE ONLY assettype
 
 
 --
--- Name: attachment_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: attachment_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY attachment
@@ -9803,7 +11739,7 @@ ALTER TABLE ONLY attachment
 
 
 --
--- Name: attachmenttype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: attachmenttype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY attachmenttype
@@ -9811,7 +11747,7 @@ ALTER TABLE ONLY attachmenttype
 
 
 --
--- Name: c_host_ip; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: c_host_ip; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostinterface
@@ -9819,7 +11755,7 @@ ALTER TABLE ONLY hostinterface
 
 
 --
--- Name: calendar_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: calendar_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY calendar
@@ -9827,7 +11763,7 @@ ALTER TABLE ONLY calendar
 
 
 --
--- Name: calendarcategory_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: calendarcategory_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY calendarcategory
@@ -9835,7 +11771,7 @@ ALTER TABLE ONLY calendarcategory
 
 
 --
--- Name: checklistitem_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: checklistitem_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY checklistitem
@@ -9843,7 +11779,7 @@ ALTER TABLE ONLY checklistitem
 
 
 --
--- Name: checkliststatus_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: checkliststatus_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY checkliststatus
@@ -9851,7 +11787,7 @@ ALTER TABLE ONLY checkliststatus
 
 
 --
--- Name: client_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: client_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY client
@@ -9859,7 +11795,7 @@ ALTER TABLE ONLY client
 
 
 --
--- Name: config_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: config_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY config
@@ -9867,7 +11803,15 @@ ALTER TABLE ONLY config
 
 
 --
--- Name: deliveryelement_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: darwinweight_pkey; Type: CONSTRAINT; Schema: public; Owner: farmers; Tablespace: 
+--
+
+ALTER TABLE ONLY darwinweight
+    ADD CONSTRAINT darwinweight_pkey PRIMARY KEY (keydarwinscore);
+
+
+--
+-- Name: deliveryelement_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY deliveryelement
@@ -9875,7 +11819,7 @@ ALTER TABLE ONLY deliveryelement
 
 
 --
--- Name: demoreel_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: demoreel_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY demoreel
@@ -9883,7 +11827,7 @@ ALTER TABLE ONLY demoreel
 
 
 --
--- Name: diskimage_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: diskimage_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY diskimage
@@ -9891,7 +11835,7 @@ ALTER TABLE ONLY diskimage
 
 
 --
--- Name: dynamichostgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: dynamichostgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY dynamichostgroup
@@ -9899,7 +11843,7 @@ ALTER TABLE ONLY dynamichostgroup
 
 
 --
--- Name: element_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: element_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY element
@@ -9907,7 +11851,7 @@ ALTER TABLE ONLY element
 
 
 --
--- Name: elementdep_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: elementdep_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY elementdep
@@ -9915,7 +11859,7 @@ ALTER TABLE ONLY elementdep
 
 
 --
--- Name: elementstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: elementstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY elementstatus
@@ -9923,7 +11867,7 @@ ALTER TABLE ONLY elementstatus
 
 
 --
--- Name: elementthread_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: elementthread_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY elementthread
@@ -9931,7 +11875,7 @@ ALTER TABLE ONLY elementthread
 
 
 --
--- Name: elementtype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: elementtype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY elementtype
@@ -9939,7 +11883,7 @@ ALTER TABLE ONLY elementtype
 
 
 --
--- Name: elementtypetasktype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: elementtypetasktype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY elementtypetasktype
@@ -9947,7 +11891,7 @@ ALTER TABLE ONLY elementtypetasktype
 
 
 --
--- Name: elementuser_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: elementuser_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY elementuser
@@ -9955,7 +11899,7 @@ ALTER TABLE ONLY elementuser
 
 
 --
--- Name: eventalert_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: eventalert_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY eventalert
@@ -9963,7 +11907,7 @@ ALTER TABLE ONLY eventalert
 
 
 --
--- Name: filetemplate_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: filetemplate_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY filetemplate
@@ -9971,7 +11915,7 @@ ALTER TABLE ONLY filetemplate
 
 
 --
--- Name: filetracker_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: filetracker_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY filetracker
@@ -9979,7 +11923,7 @@ ALTER TABLE ONLY filetracker
 
 
 --
--- Name: filetrackerdep_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: filetrackerdep_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY filetrackerdep
@@ -9987,7 +11931,7 @@ ALTER TABLE ONLY filetrackerdep
 
 
 --
--- Name: fileversion_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: fileversion_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY fileversion
@@ -9995,7 +11939,7 @@ ALTER TABLE ONLY fileversion
 
 
 --
--- Name: folder_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: folder_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY folder
@@ -10003,7 +11947,7 @@ ALTER TABLE ONLY folder
 
 
 --
--- Name: graph_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: graph_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY graph
@@ -10011,7 +11955,7 @@ ALTER TABLE ONLY graph
 
 
 --
--- Name: graphds_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: graphds_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY graphds
@@ -10019,7 +11963,7 @@ ALTER TABLE ONLY graphds
 
 
 --
--- Name: graphpage_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: graphpage_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY graphpage
@@ -10027,7 +11971,7 @@ ALTER TABLE ONLY graphpage
 
 
 --
--- Name: graphrel_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: graphrel_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY graphrelationship
@@ -10035,7 +11979,7 @@ ALTER TABLE ONLY graphrelationship
 
 
 --
--- Name: gridtemplate_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: gridtemplate_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY gridtemplate
@@ -10043,7 +11987,7 @@ ALTER TABLE ONLY gridtemplate
 
 
 --
--- Name: gridtemplateitem_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: gridtemplateitem_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY gridtemplateitem
@@ -10051,7 +11995,7 @@ ALTER TABLE ONLY gridtemplateitem
 
 
 --
--- Name: groupmapping_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: groupmapping_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY groupmapping
@@ -10059,7 +12003,7 @@ ALTER TABLE ONLY groupmapping
 
 
 --
--- Name: grp_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: grp_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY grp
@@ -10067,7 +12011,7 @@ ALTER TABLE ONLY grp
 
 
 --
--- Name: gruntscript_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: gruntscript_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY gruntscript
@@ -10075,7 +12019,7 @@ ALTER TABLE ONLY gruntscript
 
 
 --
--- Name: history_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: history_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY history
@@ -10083,7 +12027,15 @@ ALTER TABLE ONLY history
 
 
 --
--- Name: host_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: host_hostname; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY host
+    ADD CONSTRAINT host_hostname UNIQUE (host);
+
+
+--
+-- Name: host_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY host
@@ -10091,7 +12043,7 @@ ALTER TABLE ONLY host
 
 
 --
--- Name: hostdailystat_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostdailystat_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostdailystat
@@ -10099,7 +12051,7 @@ ALTER TABLE ONLY hostdailystat
 
 
 --
--- Name: hostgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostgroup
@@ -10107,7 +12059,7 @@ ALTER TABLE ONLY hostgroup
 
 
 --
--- Name: hostgroupitem_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostgroupitem_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostgroupitem
@@ -10115,7 +12067,7 @@ ALTER TABLE ONLY hostgroupitem
 
 
 --
--- Name: hosthistory_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hosthistory_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hosthistory
@@ -10123,7 +12075,7 @@ ALTER TABLE ONLY hosthistory
 
 
 --
--- Name: hostinterface_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostinterface_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostinterface
@@ -10131,7 +12083,7 @@ ALTER TABLE ONLY hostinterface
 
 
 --
--- Name: hostinterfacetype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostinterfacetype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostinterfacetype
@@ -10139,7 +12091,7 @@ ALTER TABLE ONLY hostinterfacetype
 
 
 --
--- Name: hostload_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostload_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostload
@@ -10147,7 +12099,7 @@ ALTER TABLE ONLY hostload
 
 
 --
--- Name: hostmapping_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostmapping_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostmapping
@@ -10155,7 +12107,7 @@ ALTER TABLE ONLY hostmapping
 
 
 --
--- Name: hostport_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostport_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostport
@@ -10163,7 +12115,7 @@ ALTER TABLE ONLY hostport
 
 
 --
--- Name: hostresource_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostresource_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostresource
@@ -10171,7 +12123,7 @@ ALTER TABLE ONLY hostresource
 
 
 --
--- Name: hostservice_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostservice_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostservice
@@ -10179,7 +12131,7 @@ ALTER TABLE ONLY hostservice
 
 
 --
--- Name: hostsoftware_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hostsoftware_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostsoftware
@@ -10187,7 +12139,15 @@ ALTER TABLE ONLY hostsoftware
 
 
 --
--- Name: hoststatus_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: hoststatus_fkeyhost; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY hoststatus
+    ADD CONSTRAINT hoststatus_fkeyhost UNIQUE (fkeyhost);
+
+
+--
+-- Name: hoststatus_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hoststatus
@@ -10195,7 +12155,7 @@ ALTER TABLE ONLY hoststatus
 
 
 --
--- Name: job_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: job_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY job
@@ -10203,23 +12163,23 @@ ALTER TABLE ONLY job
 
 
 --
--- Name: jobae_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY jobaftereffects
-    ADD CONSTRAINT jobae_pkey PRIMARY KEY (keyjob);
-
-
---
--- Name: jobassignment_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobassignment2_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobassignment
+    ADD CONSTRAINT jobassignment2_pkey PRIMARY KEY (keyjobassignment);
+
+
+--
+-- Name: jobassignment_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY jobassignment_old
     ADD CONSTRAINT jobassignment_pkey PRIMARY KEY (keyjobassignment);
 
 
 --
--- Name: jobassignmentstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobassignmentstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobassignmentstatus
@@ -10227,7 +12187,7 @@ ALTER TABLE ONLY jobassignmentstatus
 
 
 --
--- Name: jobcannedbatch_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobcannedbatch_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobcannedbatch
@@ -10235,7 +12195,7 @@ ALTER TABLE ONLY jobcannedbatch
 
 
 --
--- Name: jobcommandhistory_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobcommandhistory_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobcommandhistory
@@ -10243,7 +12203,7 @@ ALTER TABLE ONLY jobcommandhistory
 
 
 --
--- Name: jobdep_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobdep_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobdep
@@ -10251,7 +12211,15 @@ ALTER TABLE ONLY jobdep
 
 
 --
--- Name: joberror_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobenvironment_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY jobenvironment
+    ADD CONSTRAINT jobenvironment_pkey PRIMARY KEY (keyjobenvironment);
+
+
+--
+-- Name: joberror_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY joberror
@@ -10259,7 +12227,7 @@ ALTER TABLE ONLY joberror
 
 
 --
--- Name: joberrorhandler_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: joberrorhandler_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY joberrorhandler
@@ -10267,7 +12235,7 @@ ALTER TABLE ONLY joberrorhandler
 
 
 --
--- Name: joberrorhandlerscript_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: joberrorhandlerscript_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY joberrorhandlerscript
@@ -10275,7 +12243,31 @@ ALTER TABLE ONLY joberrorhandlerscript
 
 
 --
--- Name: jobhistory_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobfiltermessage_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY jobfiltermessage
+    ADD CONSTRAINT jobfiltermessage_pkey PRIMARY KEY (keyjobfiltermessage);
+
+
+--
+-- Name: jobfilterset_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY jobfilterset
+    ADD CONSTRAINT jobfilterset_pkey PRIMARY KEY (keyjobfilterset);
+
+
+--
+-- Name: jobfiltertype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY jobfiltertype
+    ADD CONSTRAINT jobfiltertype_pkey PRIMARY KEY (keyjobfiltertype);
+
+
+--
+-- Name: jobhistory_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobhistory
@@ -10283,7 +12275,7 @@ ALTER TABLE ONLY jobhistory
 
 
 --
--- Name: jobhistorytype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobhistorytype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobhistorytype
@@ -10291,7 +12283,7 @@ ALTER TABLE ONLY jobhistorytype
 
 
 --
--- Name: jobmantra100_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmantra100_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobmantra100
@@ -10299,7 +12291,7 @@ ALTER TABLE ONLY jobmantra100
 
 
 --
--- Name: jobmantra95_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobmantra95_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobmantra95
@@ -10307,23 +12299,7 @@ ALTER TABLE ONLY jobmantra95
 
 
 --
--- Name: jobmax5_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY jobmax5
-    ADD CONSTRAINT jobmax5_pkey PRIMARY KEY (keyjob);
-
-
---
--- Name: jobmax8_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY jobmax8
-    ADD CONSTRAINT jobmax8_pkey PRIMARY KEY (keyjob);
-
-
---
--- Name: joboutput_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: joboutput_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY joboutput
@@ -10331,15 +12307,7 @@ ALTER TABLE ONLY joboutput
 
 
 --
--- Name: jobrealflow_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY jobrealflow
-    ADD CONSTRAINT jobrealflow_pkey PRIMARY KEY (keyjobrealflow);
-
-
---
--- Name: jobservice_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobservice_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobservice
@@ -10347,15 +12315,7 @@ ALTER TABLE ONLY jobservice
 
 
 --
--- Name: jobshake_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY jobshake
-    ADD CONSTRAINT jobshake_pkey PRIMARY KEY (keyjob);
-
-
---
--- Name: jobstat_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobstat_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobstat
@@ -10363,15 +12323,31 @@ ALTER TABLE ONLY jobstat
 
 
 --
--- Name: jobstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobstateaction_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY jobstateaction
+    ADD CONSTRAINT jobstateaction_pkey PRIMARY KEY (keyjobstateaction);
+
+
+--
+-- Name: jobstatus2_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobstatus
+    ADD CONSTRAINT jobstatus2_pkey PRIMARY KEY (keyjobstatus);
+
+
+--
+-- Name: jobstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY jobstatus_old
     ADD CONSTRAINT jobstatus_pkey PRIMARY KEY (keyjobstatus);
 
 
 --
--- Name: jobtask_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobtask_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobtask
@@ -10379,15 +12355,15 @@ ALTER TABLE ONLY jobtask
 
 
 --
--- Name: jobtaskassignment_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobtaskassignment2_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobtaskassignment
-    ADD CONSTRAINT jobtaskassignment_pkey PRIMARY KEY (keyjobtaskassignment);
+    ADD CONSTRAINT jobtaskassignment2_pkey PRIMARY KEY (keyjobtaskassignment);
 
 
 --
--- Name: jobtype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobtype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobtype
@@ -10395,7 +12371,7 @@ ALTER TABLE ONLY jobtype
 
 
 --
--- Name: jobtypemapping_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobtypemapping_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobtypemapping
@@ -10403,7 +12379,7 @@ ALTER TABLE ONLY jobtypemapping
 
 
 --
--- Name: license_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: license_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY license
@@ -10411,7 +12387,7 @@ ALTER TABLE ONLY license
 
 
 --
--- Name: location_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: location_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY location
@@ -10419,7 +12395,7 @@ ALTER TABLE ONLY location
 
 
 --
--- Name: mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY mapping
@@ -10427,7 +12403,7 @@ ALTER TABLE ONLY mapping
 
 
 --
--- Name: mappingtype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: mappingtype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY mappingtype
@@ -10435,7 +12411,7 @@ ALTER TABLE ONLY mappingtype
 
 
 --
--- Name: methodperms_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: methodperms_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY methodperms
@@ -10443,7 +12419,7 @@ ALTER TABLE ONLY methodperms
 
 
 --
--- Name: notification_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: notification_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY notification
@@ -10451,7 +12427,7 @@ ALTER TABLE ONLY notification
 
 
 --
--- Name: notificationdestination_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: notificationdestination_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY notificationdestination
@@ -10459,7 +12435,7 @@ ALTER TABLE ONLY notificationdestination
 
 
 --
--- Name: notificationmethod_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: notificationmethod_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY notificationmethod
@@ -10467,7 +12443,7 @@ ALTER TABLE ONLY notificationmethod
 
 
 --
--- Name: notificationroute_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: notificationroute_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY notificationroute
@@ -10475,7 +12451,7 @@ ALTER TABLE ONLY notificationroute
 
 
 --
--- Name: notify_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: notify_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY notify
@@ -10483,7 +12459,7 @@ ALTER TABLE ONLY notify
 
 
 --
--- Name: notifymethod_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: notifymethod_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY notifymethod
@@ -10491,7 +12467,7 @@ ALTER TABLE ONLY notifymethod
 
 
 --
--- Name: notifysent_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: notifysent_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY notifysent
@@ -10499,7 +12475,7 @@ ALTER TABLE ONLY notifysent
 
 
 --
--- Name: notifywho_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: notifywho_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY notifywho
@@ -10507,7 +12483,7 @@ ALTER TABLE ONLY notifywho
 
 
 --
--- Name: package_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: package_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY package
@@ -10515,7 +12491,7 @@ ALTER TABLE ONLY package
 
 
 --
--- Name: packageoutput_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: packageoutput_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY packageoutput
@@ -10523,7 +12499,7 @@ ALTER TABLE ONLY packageoutput
 
 
 --
--- Name: pathsynctarget_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pathsynctarget_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY pathsynctarget
@@ -10531,7 +12507,7 @@ ALTER TABLE ONLY pathsynctarget
 
 
 --
--- Name: pathtemplate_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pathtemplate_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY pathtemplate
@@ -10539,7 +12515,7 @@ ALTER TABLE ONLY pathtemplate
 
 
 --
--- Name: pathtracker_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pathtracker_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY pathtracker
@@ -10547,7 +12523,7 @@ ALTER TABLE ONLY pathtracker
 
 
 --
--- Name: permission_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: permission_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY permission
@@ -10555,7 +12531,7 @@ ALTER TABLE ONLY permission
 
 
 --
--- Name: phoneno_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: phoneno_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY phoneno
@@ -10563,7 +12539,7 @@ ALTER TABLE ONLY phoneno
 
 
 --
--- Name: phonetype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: phonetype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY phonetype
@@ -10571,23 +12547,7 @@ ALTER TABLE ONLY phonetype
 
 
 --
--- Name: pkey_aftereffects7; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY jobaftereffects7
-    ADD CONSTRAINT pkey_aftereffects7 PRIMARY KEY (keyjob);
-
-
---
--- Name: pkey_aftereffects8; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY jobaftereffects8
-    ADD CONSTRAINT pkey_aftereffects8 PRIMARY KEY (keyjob);
-
-
---
--- Name: pkey_employee; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_employee; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY employee
@@ -10595,7 +12555,7 @@ ALTER TABLE ONLY employee
 
 
 --
--- Name: pkey_job_maya2008; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_job_maya2008; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobmaya2008
@@ -10603,7 +12563,7 @@ ALTER TABLE ONLY jobmaya2008
 
 
 --
--- Name: pkey_job_maya2009; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_job_maya2009; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobmaya2009
@@ -10611,7 +12571,7 @@ ALTER TABLE ONLY jobmaya2009
 
 
 --
--- Name: pkey_job_maya85; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_job_maya85; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobmaya85
@@ -10619,15 +12579,7 @@ ALTER TABLE ONLY jobmaya85
 
 
 --
--- Name: pkey_jobautodeskburn; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY jobautodeskburn
-    ADD CONSTRAINT pkey_jobautodeskburn PRIMARY KEY (keyjob);
-
-
---
--- Name: pkey_jobbatch; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_jobbatch; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobbatch
@@ -10635,7 +12587,7 @@ ALTER TABLE ONLY jobbatch
 
 
 --
--- Name: pkey_jobmentalray85; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_jobmentalray85; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobmentalray85
@@ -10643,7 +12595,7 @@ ALTER TABLE ONLY jobmentalray85
 
 
 --
--- Name: pkey_jobnuke51; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_jobnuke51; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY jobnuke51
@@ -10651,15 +12603,7 @@ ALTER TABLE ONLY jobnuke51
 
 
 --
--- Name: pkey_jobsync; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY jobsync
-    ADD CONSTRAINT pkey_jobsync PRIMARY KEY (keyjob);
-
-
---
--- Name: pkey_shot; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_shot; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY shot
@@ -10667,7 +12611,7 @@ ALTER TABLE ONLY shot
 
 
 --
--- Name: pkey_shotgroup; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_shotgroup; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY shotgroup
@@ -10675,7 +12619,7 @@ ALTER TABLE ONLY shotgroup
 
 
 --
--- Name: pkey_task; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_task; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY task
@@ -10683,7 +12627,7 @@ ALTER TABLE ONLY task
 
 
 --
--- Name: pkey_usr; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: pkey_usr; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY usr
@@ -10691,7 +12635,7 @@ ALTER TABLE ONLY usr
 
 
 --
--- Name: project_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: project_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY project
@@ -10699,7 +12643,7 @@ ALTER TABLE ONLY project
 
 
 --
--- Name: projectresolution_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: projectresolution_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY projectresolution
@@ -10707,7 +12651,7 @@ ALTER TABLE ONLY projectresolution
 
 
 --
--- Name: projectstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: projectstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY projectstatus
@@ -10715,7 +12659,7 @@ ALTER TABLE ONLY projectstatus
 
 
 --
--- Name: projectstorage_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: projectstorage_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY projectstorage
@@ -10723,7 +12667,7 @@ ALTER TABLE ONLY projectstorage
 
 
 --
--- Name: renderframe_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: renderframe_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY renderframe
@@ -10731,7 +12675,7 @@ ALTER TABLE ONLY renderframe
 
 
 --
--- Name: schedule_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: schedule_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY schedule
@@ -10739,7 +12683,7 @@ ALTER TABLE ONLY schedule
 
 
 --
--- Name: serverfileaction_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: serverfileaction_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY serverfileaction
@@ -10747,7 +12691,7 @@ ALTER TABLE ONLY serverfileaction
 
 
 --
--- Name: serverfileactionstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: serverfileactionstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY serverfileactionstatus
@@ -10755,7 +12699,7 @@ ALTER TABLE ONLY serverfileactionstatus
 
 
 --
--- Name: serverfileactiontype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: serverfileactiontype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY serverfileactiontype
@@ -10763,7 +12707,15 @@ ALTER TABLE ONLY serverfileactiontype
 
 
 --
--- Name: service_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: service_name_unique; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY service
+    ADD CONSTRAINT service_name_unique UNIQUE (service);
+
+
+--
+-- Name: service_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY service
@@ -10771,7 +12723,7 @@ ALTER TABLE ONLY service
 
 
 --
--- Name: software_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: software_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY software
@@ -10779,7 +12731,7 @@ ALTER TABLE ONLY software
 
 
 --
--- Name: status_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: status_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY status
@@ -10787,7 +12739,7 @@ ALTER TABLE ONLY status
 
 
 --
--- Name: statusset_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: statusset_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY statusset
@@ -10795,7 +12747,7 @@ ALTER TABLE ONLY statusset
 
 
 --
--- Name: syslog_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: syslog_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY syslog
@@ -10803,7 +12755,7 @@ ALTER TABLE ONLY syslog
 
 
 --
--- Name: syslogrealm_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: syslogrealm_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY syslogrealm
@@ -10811,7 +12763,7 @@ ALTER TABLE ONLY syslogrealm
 
 
 --
--- Name: syslogseverity_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: syslogseverity_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY syslogseverity
@@ -10819,7 +12771,7 @@ ALTER TABLE ONLY syslogseverity
 
 
 --
--- Name: tasktype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tasktype_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY tasktype
@@ -10827,7 +12779,7 @@ ALTER TABLE ONLY tasktype
 
 
 --
--- Name: taskuser_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: taskuser_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY taskuser
@@ -10835,7 +12787,7 @@ ALTER TABLE ONLY taskuser
 
 
 --
--- Name: thread_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: thread_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY thread
@@ -10843,7 +12795,7 @@ ALTER TABLE ONLY thread
 
 
 --
--- Name: threadcategory_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: threadcategory_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY threadcategory
@@ -10851,7 +12803,7 @@ ALTER TABLE ONLY threadcategory
 
 
 --
--- Name: threadnotify_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: threadnotify_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY threadnotify
@@ -10859,7 +12811,7 @@ ALTER TABLE ONLY threadnotify
 
 
 --
--- Name: thumbnail_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: thumbnail_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY thumbnail
@@ -10867,7 +12819,7 @@ ALTER TABLE ONLY thumbnail
 
 
 --
--- Name: timesheet_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: timesheet_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY timesheet
@@ -10875,7 +12827,7 @@ ALTER TABLE ONLY timesheet
 
 
 --
--- Name: timesheetcategory_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: timesheetcategory_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY timesheetcategory
@@ -10883,7 +12835,7 @@ ALTER TABLE ONLY timesheetcategory
 
 
 --
--- Name: tracker_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tracker_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY tracker
@@ -10891,7 +12843,7 @@ ALTER TABLE ONLY tracker
 
 
 --
--- Name: trackercategory_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: trackercategory_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY trackercategory
@@ -10899,7 +12851,7 @@ ALTER TABLE ONLY trackercategory
 
 
 --
--- Name: trackerlog_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: trackerlog_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY trackerlog
@@ -10907,7 +12859,7 @@ ALTER TABLE ONLY trackerlog
 
 
 --
--- Name: trackerqueue_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: trackerqueue_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY trackerqueue
@@ -10915,7 +12867,7 @@ ALTER TABLE ONLY trackerqueue
 
 
 --
--- Name: trackerseverity_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: trackerseverity_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY trackerseverity
@@ -10923,7 +12875,7 @@ ALTER TABLE ONLY trackerseverity
 
 
 --
--- Name: trackerstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: trackerstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY trackerstatus
@@ -10931,7 +12883,7 @@ ALTER TABLE ONLY trackerstatus
 
 
 --
--- Name: userelement_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: userelement_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY userelement
@@ -10939,7 +12891,7 @@ ALTER TABLE ONLY userelement
 
 
 --
--- Name: usermapping_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: usermapping_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY usermapping
@@ -10947,7 +12899,7 @@ ALTER TABLE ONLY usermapping
 
 
 --
--- Name: userrole_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: userrole_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY userrole
@@ -10955,7 +12907,15 @@ ALTER TABLE ONLY userrole
 
 
 --
--- Name: usrgrp_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: userservice_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY userservice
+    ADD CONSTRAINT userservice_pkey PRIMARY KEY (keyuserservice);
+
+
+--
+-- Name: usrgrp_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY usrgrp
@@ -10963,7 +12923,7 @@ ALTER TABLE ONLY usrgrp
 
 
 --
--- Name: version_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: version_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY version
@@ -10971,7 +12931,7 @@ ALTER TABLE ONLY version
 
 
 --
--- Name: x_hostservice_fkeyhost_fkeyservice; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: x_hostservice_fkeyhost_fkeyservice; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
 ALTER TABLE ONLY hostservice
@@ -10979,1108 +12939,1022 @@ ALTER TABLE ONLY hostservice
 
 
 --
--- Name: fki_fkey_dep; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: fki_fkey_dep; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX fki_fkey_dep ON jobdep USING btree (fkeydep);
 
 
 --
--- Name: fki_fkey_elementuser_element; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: fki_fkey_elementuser_element; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX fki_fkey_elementuser_element ON elementuser USING btree (fkeyelement);
 
 
 --
--- Name: fki_fkey_elementuser_user; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: fki_fkey_elementuser_user; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX fki_fkey_elementuser_user ON elementuser USING btree (fkeyuser);
 
 
 --
--- Name: fki_fkey_hgi_hg; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: fki_fkey_hgi_hg; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX fki_fkey_hgi_hg ON hostgroupitem USING btree (fkeyhostgroup);
 
 
 --
--- Name: fki_fkey_hgi_host; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: fki_fkey_hgi_host; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX fki_fkey_hgi_host ON hostgroupitem USING btree (fkeyhost);
 
 
 --
--- Name: fki_fkey_host; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: fki_fkey_host; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX fki_fkey_host ON jobcommandhistory USING btree (fkeyhost);
 
 
 --
--- Name: fki_fkey_job; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: fki_fkey_job; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX fki_fkey_job ON jobdep USING btree (fkeyjob);
 
 
 --
--- Name: fki_joboutput_fkey_job; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: fki_fkey_jobassignment; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX fki_fkey_jobassignment ON jobtaskassignment USING btree (fkeyjobassignment);
+
+
+--
+-- Name: fki_joboutput_fkey_job; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX fki_joboutput_fkey_job ON joboutput USING btree (fkeyjob);
 
 
 --
--- Name: fki_jobtask_fkey_host; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: fki_jobtask_fkey_host; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX fki_jobtask_fkey_host ON jobtask USING btree (fkeyhost);
 
 
 --
--- Name: fki_jobtask_fkey_job; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: fki_jobtask_fkey_job; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX fki_jobtask_fkey_job ON jobtask USING btree (fkeyjob);
 
 
 --
--- Name: x_annotation_sequence; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_annotation_sequence; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_annotation_sequence ON annotation USING btree (sequence);
 
 
 --
--- Name: x_config_config; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_config_config; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_config_config ON config USING btree (config);
 
 
 --
--- Name: x_filetracker_fkeyelement; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_filetracker_fkeyelement; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_filetracker_fkeyelement ON filetracker USING btree (fkeyelement);
 
 
 --
--- Name: x_filetracker_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_filetracker_name; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_filetracker_name ON filetracker USING btree (name);
 
 
 --
--- Name: x_filetracker_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_filetracker_path; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_filetracker_path ON filetracker USING btree (path);
 
 
 --
--- Name: x_filetrackerdep_fkeyinput; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_filetrackerdep_fkeyinput; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_filetrackerdep_fkeyinput ON filetrackerdep USING btree (fkeyinput);
 
 
 --
--- Name: x_filetrackerdep_fkeyoutput; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_filetrackerdep_fkeyoutput; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_filetrackerdep_fkeyoutput ON filetrackerdep USING btree (fkeyoutput);
 
 
 --
--- Name: x_hosthistory_datetime; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_hosthistory_datetime; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_hosthistory_datetime ON hosthistory USING btree (datetime);
 
 
 --
--- Name: x_hosthistory_datetimeplusduration; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_hosthistory_datetimeplusduration; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_hosthistory_datetimeplusduration ON hosthistory USING btree (((datetime + duration)));
 
 
 --
--- Name: x_hosthistory_fkeyhost; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_hosthistory_fkeyhost; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_hosthistory_fkeyhost ON hosthistory USING btree (fkeyhost);
 
 
 --
--- Name: x_hosthistory_fkeyjob; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_hosthistory_fkeyjob; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_hosthistory_fkeyjob ON hosthistory USING btree (fkeyjob);
 
 
 --
--- Name: x_hostmapping_fkeymapping; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_hostmapping_fkeymapping; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_hostmapping_fkeymapping ON hostmapping USING btree (fkeymapping);
 
 
 --
--- Name: x_hostservice_fkeyhost; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_hostservice_fkeyhost; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_hostservice_fkeyhost ON hostservice USING btree (fkeyhost);
 
 
 --
--- Name: x_hostservice_fkeyservice; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_hostservice_fkeyservice; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_hostservice_fkeyservice ON hostservice USING btree (fkeyservice);
 
 
 --
--- Name: x_hoststatus_host; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_hoststatus_host; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_hoststatus_host ON hoststatus USING btree (fkeyhost);
 
 
 --
--- Name: x_hoststatus_status; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_hoststatus_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_hoststatus_status ON hoststatus USING btree (slavestatus);
 
 
 --
--- Name: x_jch_job; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jch_job; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_jch_job ON jobcommandhistory USING btree (fkeyjob);
 
 
 --
--- Name: x_job_fkeyusr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jfm_set; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jfm_set ON jobfiltermessage USING btree (fkeyjobfilterset);
+
+
+--
+-- Name: x_job3delight_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_job3delight_status ON job3delight USING btree (status);
+
+
+--
+-- Name: x_job3delight_user; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_job3delight_user ON job3delight USING btree (fkeyusr);
+
+
+--
+-- Name: x_job_fkeyusr; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_job_fkeyusr ON job USING btree (fkeyusr) WHERE ((((status = 'new'::text) OR (status = 'ready'::text)) OR (status = 'started'::text)) OR (status = 'done'::text));
 
 
 --
--- Name: x_job_status; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_job_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE INDEX x_job_status ON job USING btree (status) WHERE ((((status = 'new'::text) OR (status = 'ready'::text)) OR (status = 'started'::text)) OR (status = 'done'::text));
+CREATE INDEX x_job_status ON job USING btree (status);
 
 
 --
--- Name: x_jobassignment_fkeyjob; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_job_user; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_job_user ON job USING btree (fkeyusr);
+
+
+--
+-- Name: x_jobassignment_fkeyjob; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_jobassignment_fkeyjob ON jobassignment USING btree (fkeyjob);
 
 
 --
--- Name: x_jobassignment_host; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jobassignment_host; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_jobassignment_host ON jobassignment USING btree (fkeyhost);
 
 
 --
--- Name: x_jobassignment_status; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jobassignment_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_jobassignment_status ON jobassignment USING btree (fkeyjobassignmentstatus);
 
 
 --
--- Name: x_joberror_cleared; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jobbatch_project; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobbatch_project ON jobbatch USING btree (fkeyproject);
+
+
+--
+-- Name: x_jobbatch_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobbatch_status ON jobbatch USING btree (status);
+
+
+--
+-- Name: x_jobbatch_user; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobbatch_user ON jobbatch USING btree (fkeyusr);
+
+
+--
+-- Name: x_joberror_cleared; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_joberror_cleared ON joberror USING btree (cleared);
 
 
 --
--- Name: x_joberror_fkeyjob; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_joberror_fkeyjob; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_joberror_fkeyjob ON joberror USING btree (fkeyjob);
 
 
 --
--- Name: x_jobmax7_fkeyusr; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jobhistory_job; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE INDEX x_jobmax7_fkeyusr ON jobmax USING btree (fkeyusr) WHERE ((((status = 'new'::text) OR (status = 'ready'::text)) OR (status = 'started'::text)) OR (status = 'done'::text));
-
-
---
--- Name: x_jobmax7_status; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX x_jobmax7_status ON jobmax USING btree (status) WHERE ((((status = 'new'::text) OR (status = 'ready'::text)) OR (status = 'started'::text)) OR (status = 'done'::text));
+CREATE INDEX x_jobhistory_job ON jobhistory USING btree (fkeyjob);
 
 
 --
--- Name: x_jobmax8_status; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jobmantra_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE INDEX x_jobmax8_status ON jobmax8 USING btree (status);
+CREATE INDEX x_jobmantra_status ON jobmantra100 USING btree (status);
 
 
 --
--- Name: x_jobservice_job; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jobmaya2008_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmaya2008_status ON jobmaya2008 USING btree (status);
+
+
+--
+-- Name: x_jobmaya2009_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmaya2009_status ON jobmaya2009 USING btree (status);
+
+
+--
+-- Name: x_jobmaya2011_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmaya2011_status ON jobmaya2011 USING btree (status);
+
+
+--
+-- Name: x_jobmaya7_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmaya7_status ON jobmaya7 USING btree (status);
+
+
+--
+-- Name: x_jobmaya85_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmaya85_status ON jobmaya85 USING btree (status);
+
+
+--
+-- Name: x_jobmaya8_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmaya8_status ON jobmaya8 USING btree (status);
+
+
+--
+-- Name: x_jobmaya_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmaya_status ON jobmaya USING btree (status);
+
+
+--
+-- Name: x_jobmentalray2009_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmentalray2009_status ON jobmentalray2009 USING btree (status);
+
+
+--
+-- Name: x_jobmentalray2011_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmentalray2011_status ON jobmentalray2011 USING btree (status);
+
+
+--
+-- Name: x_jobmentalray7_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmentalray7_status ON jobmentalray7 USING btree (status);
+
+
+--
+-- Name: x_jobmentalray85_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmentalray85_status ON jobmentalray85 USING btree (status);
+
+
+--
+-- Name: x_jobmentalray8_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobmentalray8_status ON jobmentalray8 USING btree (status);
+
+
+--
+-- Name: x_jobnaiad_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobnaiad_status ON jobnaiad USING btree (status);
+
+
+--
+-- Name: x_jobnaiad_user; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobnaiad_user ON jobnaiad USING btree (fkeyusr);
+
+
+--
+-- Name: x_jobnuke51_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobnuke51_status ON jobnuke51 USING btree (status);
+
+
+--
+-- Name: x_jobnuke52_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobnuke52_status ON jobnuke52 USING btree (status);
+
+
+--
+-- Name: x_jobnuke_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobnuke_status ON jobnuke USING btree (status);
+
+
+--
+-- Name: x_jobservice_job; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_jobservice_job ON jobservice USING btree (fkeyjob);
 
 
 --
--- Name: x_jobstatus_job; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jobservice_service; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobservice_service ON jobservice USING btree (fkeyservice);
+
+
+--
+-- Name: x_jobstatus_job; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_jobstatus_job ON jobstatus USING btree (fkeyjob);
 
 
 --
--- Name: x_jobtask_jobtaskassignment; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jobstatus_queueorder; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE INDEX x_jobtask_jobtaskassignment ON jobtask USING btree (fkeyjobtaskassignment);
+CREATE INDEX x_jobstatus_queueorder ON jobstatus USING btree (queueorder);
 
 
 --
--- Name: x_jobtask_status; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_jobtask_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_jobtask_status ON jobtask USING btree (jobtask);
 
 
 --
--- Name: x_jobtaskassignment_status; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_mantra95_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE INDEX x_jobtaskassignment_status ON jobtaskassignment USING btree (fkeyjobassignmentstatus);
+CREATE INDEX x_mantra95_status ON jobmantra95 USING btree (status);
 
 
 --
--- Name: x_rangefiletracker_fkeyelement; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_rangefiletracker_fkeyelement; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_rangefiletracker_fkeyelement ON rangefiletracker USING btree (fkeyelement);
 
 
 --
--- Name: x_rangefiletracker_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_rangefiletracker_name; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_rangefiletracker_name ON rangefiletracker USING btree (name);
 
 
 --
--- Name: x_rangefiletracker_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_rangefiletracker_path; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_rangefiletracker_path ON rangefiletracker USING btree (path);
 
 
 --
--- Name: x_schedule_fkeyelement; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_schedule_fkeyelement; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_schedule_fkeyelement ON schedule USING btree (fkeyelement);
 
 
 --
--- Name: x_schedule_fkeyuser; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_schedule_fkeyuser; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_schedule_fkeyuser ON schedule USING btree (fkeyuser);
 
 
 --
--- Name: x_syslog_ack; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_syslog_ack; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_syslog_ack ON syslog USING btree (ack);
 
 
 --
--- Name: x_timesheet_fkeyemployee; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_timesheet_fkeyemployee; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_timesheet_fkeyemployee ON timesheet USING btree (fkeyemployee);
 
 
 --
--- Name: x_timesheet_fkeyproject; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_timesheet_fkeyproject; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_timesheet_fkeyproject ON timesheet USING btree (fkeyproject);
 
 
 --
--- Name: x_versionfiletracker_fkeyelement; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_versionfiletracker_fkeyelement; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_versionfiletracker_fkeyelement ON versionfiletracker USING btree (fkeyelement);
 
 
 --
--- Name: x_versionfiletracker_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_versionfiletracker_name; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_versionfiletracker_name ON versionfiletracker USING btree (name);
 
 
 --
--- Name: x_versionfiletracker_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: x_versionfiletracker_path; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_versionfiletracker_path ON versionfiletracker USING btree (path);
 
 
 --
--- Name: hoststatus_update_trigger; Type: TRIGGER; Schema: public; Owner: -
+-- Name: hoststatus_update_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER hoststatus_update_trigger
-    BEFORE UPDATE ON hoststatus
-    FOR EACH ROW
-    EXECUTE PROCEDURE hoststatus_update();
+CREATE TRIGGER hoststatus_update_trigger BEFORE UPDATE ON hoststatus FOR EACH ROW EXECUTE PROCEDURE hoststatus_update();
 
 
 --
--- Name: job3delight_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: job3delight_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER job3delight_insert
-    AFTER INSERT ON job3delight
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER job3delight_delete AFTER DELETE ON job3delight FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: job3delight_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: job3delight_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER job3delight_update
-    BEFORE UPDATE ON job3delight
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER job3delight_insert AFTER INSERT ON job3delight FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: job_error_insert_trigger; Type: TRIGGER; Schema: public; Owner: -
+-- Name: job3delight_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER job_error_insert_trigger
-    AFTER INSERT ON joberror
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_error_insert();
+CREATE TRIGGER job3delight_update BEFORE UPDATE ON job3delight FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: job_error_update_trigger; Type: TRIGGER; Schema: public; Owner: -
+-- Name: job_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER job_error_update_trigger
-    AFTER UPDATE ON joberror
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_error_increment();
+CREATE TRIGGER job_delete AFTER DELETE ON job FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: job_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: job_error_insert_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER job_insert
-    AFTER INSERT ON job
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER job_error_insert_trigger AFTER INSERT ON joberror FOR EACH ROW EXECUTE PROCEDURE job_error_insert();
 
 
 --
--- Name: job_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: job_error_update_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER job_update
-    BEFORE UPDATE ON job
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER job_error_update_trigger AFTER UPDATE ON joberror FOR EACH ROW EXECUTE PROCEDURE job_error_increment();
 
 
 --
--- Name: jobaftereffects7_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: job_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobaftereffects7_insert
-    AFTER INSERT ON jobaftereffects7
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER job_insert AFTER INSERT ON job FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobaftereffects7_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: job_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobaftereffects7_update
-    BEFORE UPDATE ON jobaftereffects7
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER job_update BEFORE UPDATE ON job FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobaftereffects8_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobassignment_after_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobaftereffects8_insert
-    AFTER INSERT ON jobaftereffects8
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobassignment_after_trigger AFTER INSERT OR UPDATE ON jobassignment_old FOR EACH ROW EXECUTE PROCEDURE jobassignment_after_update();
 
 
 --
--- Name: jobaftereffects8_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobassignment_after_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobaftereffects8_update
-    BEFORE UPDATE ON jobaftereffects8
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobassignment_after_trigger AFTER INSERT OR UPDATE ON jobassignment FOR EACH ROW EXECUTE PROCEDURE jobassignment_after_update();
 
 
 --
--- Name: jobaftereffects_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobassignment_delete_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobaftereffects_insert
-    AFTER INSERT ON jobaftereffects
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobassignment_delete_trigger BEFORE DELETE ON jobassignment_old FOR EACH ROW EXECUTE PROCEDURE jobassignment_delete();
 
 
 --
--- Name: jobaftereffects_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobassignment_delete_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobaftereffects_update
-    BEFORE UPDATE ON jobaftereffects
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobassignment_delete_trigger BEFORE DELETE ON jobassignment FOR EACH ROW EXECUTE PROCEDURE jobassignment_delete();
 
 
 --
--- Name: jobassignment_after_trigger; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobassignment_insert_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobassignment_after_trigger
-    AFTER INSERT OR UPDATE ON jobassignment
-    FOR EACH ROW
-    EXECUTE PROCEDURE jobassignment_after_update();
+CREATE TRIGGER jobassignment_insert_trigger BEFORE INSERT ON jobassignment_old FOR EACH ROW EXECUTE PROCEDURE jobassignment_insert();
 
 
 --
--- Name: jobassignment_delete_trigger; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobassignment_insert_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobassignment_delete_trigger
-    BEFORE DELETE ON jobassignment
-    FOR EACH ROW
-    EXECUTE PROCEDURE jobassignment_delete();
+CREATE TRIGGER jobassignment_insert_trigger BEFORE INSERT ON jobassignment FOR EACH ROW EXECUTE PROCEDURE jobassignment_insert();
 
 
 --
--- Name: jobassignment_insert_trigger; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobassignment_update_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobassignment_insert_trigger
-    BEFORE INSERT ON jobassignment
-    FOR EACH ROW
-    EXECUTE PROCEDURE jobassignment_insert();
+CREATE TRIGGER jobassignment_update_trigger BEFORE UPDATE ON jobassignment_old FOR EACH ROW EXECUTE PROCEDURE jobassignment_update();
 
 
 --
--- Name: jobassignment_update_trigger; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobassignment_update_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobassignment_update_trigger
-    BEFORE UPDATE ON jobassignment
-    FOR EACH ROW
-    EXECUTE PROCEDURE jobassignment_update();
+CREATE TRIGGER jobassignment_update_trigger BEFORE UPDATE ON jobassignment FOR EACH ROW EXECUTE PROCEDURE jobassignment_update();
 
 
 --
--- Name: jobautodeskburn_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobbatch_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobautodeskburn_insert
-    AFTER INSERT ON jobautodeskburn
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobbatch_delete AFTER DELETE ON jobbatch FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobautodeskburn_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobbatch_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobautodeskburn_update
-    BEFORE UPDATE ON jobautodeskburn
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobbatch_insert AFTER INSERT ON jobbatch FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobbatch_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobbatch_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobbatch_insert
-    AFTER INSERT ON jobbatch
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobbatch_update BEFORE UPDATE ON jobbatch FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobbatch_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobdep_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobbatch_update
-    BEFORE UPDATE ON jobbatch
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobdep_delete AFTER DELETE ON jobdep FOR EACH ROW EXECUTE PROCEDURE jobdep_delete();
 
 
 --
--- Name: jobcinema4d_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: joberror_inc; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobcinema4d_insert
-    AFTER INSERT ON jobcinema4d
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER joberror_inc AFTER INSERT OR UPDATE ON joberror FOR EACH ROW EXECUTE PROCEDURE joberror_inc();
 
 
 --
--- Name: jobcinema4d_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmantra100_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobcinema4d_update
-    BEFORE UPDATE ON jobcinema4d
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmantra100_delete AFTER DELETE ON jobmantra100 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: joberror_inc; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmantra100_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER joberror_inc
-    AFTER INSERT OR UPDATE ON joberror
-    FOR EACH ROW
-    EXECUTE PROCEDURE joberror_inc();
+CREATE TRIGGER jobmantra100_insert AFTER INSERT ON jobmantra100 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobfusion_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmantra100_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobfusion_insert
-    AFTER INSERT ON jobfusion
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmantra100_update BEFORE UPDATE ON jobmantra100 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobfusion_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmax2009_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobfusion_update
-    BEFORE UPDATE ON jobfusion
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmax2009_insert AFTER INSERT ON jobmaya2009 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobfusionvideomaker_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya2008_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobfusionvideomaker_insert
-    AFTER INSERT ON jobfusionvideomaker
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmaya2008_delete AFTER DELETE ON jobmaya2008 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobfusionvideomaker_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya2008_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobfusionvideomaker_update
-    BEFORE UPDATE ON jobfusionvideomaker
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmaya2008_insert AFTER INSERT ON jobmaya2008 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobhoudinisim10_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya2008_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobhoudinisim10_insert
-    AFTER INSERT ON jobhoudinisim10
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmaya2008_update BEFORE UPDATE ON jobmaya2008 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobhoudinisim10_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya2009_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobhoudinisim10_update
-    BEFORE UPDATE ON jobhoudinisim10
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmaya2009_delete AFTER DELETE ON jobmaya2009 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobmantra100_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya2009_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmantra100_insert
-    AFTER INSERT ON jobmantra100
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmaya2009_insert AFTER INSERT ON jobmaya2009 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobmantra100_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya2009_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmantra100_update
-    BEFORE UPDATE ON jobmantra100
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmaya2009_update BEFORE UPDATE ON jobmaya2009 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobmax10_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya2011_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax10_insert
-    AFTER INSERT ON jobmax10
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmaya2011_delete AFTER DELETE ON jobmaya2011 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobmax10_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya2011_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax10_update
-    BEFORE UPDATE ON jobmax10
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmaya2011_insert AFTER INSERT ON jobmaya2011 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobmax2009_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya2011_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax2009_insert
-    AFTER INSERT ON jobmaya2009
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmaya2011_update BEFORE UPDATE ON jobmaya2011 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobmax2009_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya7_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax2009_insert
-    AFTER INSERT ON jobmax2009
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmaya7_delete AFTER DELETE ON jobmaya7 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobmax2009_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya7_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax2009_update
-    BEFORE UPDATE ON jobmax2009
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmaya7_insert AFTER INSERT ON jobmaya7 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobmax7_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya7_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax7_insert
-    AFTER INSERT ON jobmax7
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmaya7_update BEFORE UPDATE ON jobmaya7 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobmax7_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya85_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax7_update
-    BEFORE UPDATE ON jobmax7
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmaya85_delete AFTER DELETE ON jobmaya85 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobmax8_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya85_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax8_insert
-    AFTER INSERT ON jobmax8
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmaya85_insert AFTER INSERT ON jobmaya85 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobmax8_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmaya85_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax8_update
-    BEFORE UPDATE ON jobmax8
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmaya85_update BEFORE UPDATE ON jobmaya85 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobmax9_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmentalray2009_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax9_insert
-    AFTER INSERT ON jobmax9
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmentalray2009_delete AFTER DELETE ON jobmentalray2009 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobmax9_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmentalray2009_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmax9_update
-    BEFORE UPDATE ON jobmax9
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmentalray2009_insert AFTER INSERT ON jobmentalray2009 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobmaxscript_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmentalray2009_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmaxscript_insert
-    AFTER INSERT ON jobmaxscript
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmentalray2009_update BEFORE UPDATE ON jobmentalray2009 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobmaxscript_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmentalray2011_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmaxscript_update
-    BEFORE UPDATE ON jobmaxscript
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmentalray2011_delete AFTER DELETE ON jobmentalray2011 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobmaya2008_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmentalray2011_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmaya2008_insert
-    AFTER INSERT ON jobmaya2008
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmentalray2011_insert AFTER INSERT ON jobmentalray2011 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobmaya2008_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmentalray2011_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmaya2008_update
-    BEFORE UPDATE ON jobmaya2008
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmentalray2011_update BEFORE UPDATE ON jobmentalray2011 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobmaya2009_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmentalray85_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmaya2009_insert
-    AFTER INSERT ON jobmaya2009
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmentalray85_delete AFTER DELETE ON jobmentalray85 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobmaya2009_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmentalray85_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmaya2009_update
-    BEFORE UPDATE ON jobmaya2009
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobmentalray85_insert AFTER INSERT ON jobmentalray85 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobmaya7_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobmentalray85_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmaya7_insert
-    AFTER INSERT ON jobmaya7
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobmentalray85_update BEFORE UPDATE ON jobmentalray85 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobmaya7_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnaiad_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmaya7_update
-    BEFORE UPDATE ON jobmaya7
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobnaiad_delete AFTER DELETE ON jobnaiad FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobmaya85_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnaiad_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmaya85_insert
-    AFTER INSERT ON jobmaya85
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobnaiad_insert AFTER INSERT ON jobnaiad FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobmaya85_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnaiad_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmaya85_update
-    BEFORE UPDATE ON jobmaya85
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobnaiad_update BEFORE UPDATE ON jobnaiad FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobmentalray85_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnuke51_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmentalray85_insert
-    AFTER INSERT ON jobmentalray85
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobnuke51_delete AFTER DELETE ON jobnuke51 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobmentalray85_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnuke51_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobmentalray85_update
-    BEFORE UPDATE ON jobmentalray85
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobnuke51_insert AFTER INSERT ON jobnuke51 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobnuke51_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnuke51_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobnuke51_insert
-    AFTER INSERT ON jobnuke51
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobnuke51_update BEFORE UPDATE ON jobnuke51 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobnuke51_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnuke52_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobnuke51_update
-    BEFORE UPDATE ON jobnuke51
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobnuke52_delete AFTER DELETE ON jobnuke52 FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobnuke52_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnuke52_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobnuke52_insert
-    AFTER INSERT ON jobnuke52
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobnuke52_insert AFTER INSERT ON jobnuke52 FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobnuke52_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnuke52_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobnuke52_update
-    BEFORE UPDATE ON jobnuke52
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobnuke52_update BEFORE UPDATE ON jobnuke52 FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobrealflow_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnuke_delete; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobrealflow_insert
-    AFTER INSERT ON jobrealflow
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobnuke_delete AFTER DELETE ON jobnuke FOR EACH ROW EXECUTE PROCEDURE job_delete();
 
 
 --
--- Name: jobrealflow_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnuke_insert; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobrealflow_update
-    BEFORE UPDATE ON jobrealflow
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobnuke_insert AFTER INSERT ON jobnuke FOR EACH ROW EXECUTE PROCEDURE job_insert();
 
 
 --
--- Name: jobshake_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobnuke_update; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobshake_insert
-    AFTER INSERT ON jobshake
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobnuke_update BEFORE UPDATE ON jobnuke FOR EACH ROW EXECUTE PROCEDURE job_update();
 
 
 --
--- Name: jobshake_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobtaskassignment_update_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobshake_update
-    BEFORE UPDATE ON jobshake
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER jobtaskassignment_update_trigger BEFORE UPDATE ON jobtaskassignment_old FOR EACH ROW EXECUTE PROCEDURE jobtaskassignment_update();
 
 
 --
--- Name: jobsync_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: jobtaskassignment_update_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobsync_insert
-    AFTER INSERT ON jobsync
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER jobtaskassignment_update_trigger BEFORE UPDATE ON jobtaskassignment FOR EACH ROW EXECUTE PROCEDURE jobtaskassignment_update();
 
 
 --
--- Name: jobsync_update; Type: TRIGGER; Schema: public; Owner: -
+-- Name: sync_host_to_hoststatus_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobsync_update
-    BEFORE UPDATE ON jobsync
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
+CREATE TRIGGER sync_host_to_hoststatus_trigger AFTER INSERT OR DELETE ON host FOR EACH STATEMENT EXECUTE PROCEDURE sync_host_to_hoststatus_trigger();
 
 
 --
--- Name: jobtaskassignment_update_trigger; Type: TRIGGER; Schema: public; Owner: -
+-- Name: update_hostload; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobtaskassignment_update_trigger
-    BEFORE UPDATE ON jobtaskassignment
-    FOR EACH ROW
-    EXECUTE PROCEDURE jobtaskassignment_update();
+CREATE TRIGGER update_hostload BEFORE UPDATE ON hostload FOR EACH ROW EXECUTE PROCEDURE update_hostload();
 
 
 --
--- Name: jobxsi_insert; Type: TRIGGER; Schema: public; Owner: -
+-- Name: update_hostservice; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER jobxsi_insert
-    AFTER INSERT ON jobxsi
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
+CREATE TRIGGER update_hostservice BEFORE UPDATE ON hostservice FOR EACH ROW EXECUTE PROCEDURE update_hostservice();
 
 
 --
--- Name: jobxsi_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER jobxsi_update
-    BEFORE UPDATE ON jobxsi
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
-
-
---
--- Name: jobxsiscript_insert; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER jobxsiscript_insert
-    AFTER INSERT ON jobxsiscript
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_insert();
-
-
---
--- Name: jobxsiscript_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER jobxsiscript_update
-    BEFORE UPDATE ON jobxsiscript
-    FOR EACH ROW
-    EXECUTE PROCEDURE job_update();
-
-
---
--- Name: sync_host_to_hoststatus_trigger; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER sync_host_to_hoststatus_trigger
-    AFTER INSERT OR DELETE ON host
-    FOR EACH STATEMENT
-    EXECUTE PROCEDURE sync_host_to_hoststatus_trigger();
-
-
---
--- Name: update_hostload; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_hostload
-    BEFORE UPDATE ON hostload
-    FOR EACH ROW
-    EXECUTE PROCEDURE update_hostload();
-
-
---
--- Name: update_hostservice; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_hostservice
-    BEFORE UPDATE ON hostservice
-    FOR EACH ROW
-    EXECUTE PROCEDURE update_hostservice();
-
-
---
--- Name: fkey_eventalert_host; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_eventalert_host; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY eventalert
@@ -12088,7 +13962,7 @@ ALTER TABLE ONLY eventalert
 
 
 --
--- Name: fkey_graphrel_graph; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_graphrel_graph; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY graphrelationship
@@ -12096,7 +13970,7 @@ ALTER TABLE ONLY graphrelationship
 
 
 --
--- Name: fkey_graphrel_graphds; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_graphrel_graphds; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY graphrelationship
@@ -12104,7 +13978,7 @@ ALTER TABLE ONLY graphrelationship
 
 
 --
--- Name: fkey_hgi_hg; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_hgi_hg; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY hostgroupitem
@@ -12112,7 +13986,7 @@ ALTER TABLE ONLY hostgroupitem
 
 
 --
--- Name: fkey_hgi_host; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_hgi_host; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY hostgroupitem
@@ -12120,7 +13994,7 @@ ALTER TABLE ONLY hostgroupitem
 
 
 --
--- Name: fkey_host; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_host; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY jobcommandhistory
@@ -12128,7 +14002,7 @@ ALTER TABLE ONLY jobcommandhistory
 
 
 --
--- Name: fkey_hostinterface_host; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_hostinterface_host; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY hostinterface
@@ -12136,7 +14010,7 @@ ALTER TABLE ONLY hostinterface
 
 
 --
--- Name: fkey_hostport_host; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_hostport_host; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY hostport
@@ -12144,7 +14018,7 @@ ALTER TABLE ONLY hostport
 
 
 --
--- Name: fkey_hostservice_host; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_hostservice_host; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY hostservice
@@ -12152,7 +14026,7 @@ ALTER TABLE ONLY hostservice
 
 
 --
--- Name: fkey_hostservice_service; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_hostservice_service; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY hostservice
@@ -12160,7 +14034,7 @@ ALTER TABLE ONLY hostservice
 
 
 --
--- Name: fkey_hostsoftware_host; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_hostsoftware_host; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY hostsoftware
@@ -12168,7 +14042,7 @@ ALTER TABLE ONLY hostsoftware
 
 
 --
--- Name: fkey_hostsoftware_software; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_hostsoftware_software; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY hostsoftware
@@ -12176,7 +14050,7 @@ ALTER TABLE ONLY hostsoftware
 
 
 --
--- Name: fkey_hoststatus_host; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_hoststatus_host; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY hoststatus
@@ -12184,7 +14058,15 @@ ALTER TABLE ONLY hoststatus
 
 
 --
--- Name: fkey_syslog_host; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_jobassignment; Type: FK CONSTRAINT; Schema: public; Owner: farmer
+--
+
+ALTER TABLE ONLY jobtaskassignment
+    ADD CONSTRAINT fkey_jobassignment FOREIGN KEY (fkeyjobassignment) REFERENCES jobassignment(keyjobassignment) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: fkey_syslog_host; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY syslog
@@ -12192,7 +14074,7 @@ ALTER TABLE ONLY syslog
 
 
 --
--- Name: fkey_syslog_realm; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_syslog_realm; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY syslog
@@ -12200,7 +14082,7 @@ ALTER TABLE ONLY syslog
 
 
 --
--- Name: fkey_syslog_severity; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fkey_syslog_severity; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY syslog
@@ -12208,7 +14090,7 @@ ALTER TABLE ONLY syslog
 
 
 --
--- Name: jobtask_fkey_host; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: jobtask_fkey_host; Type: FK CONSTRAINT; Schema: public; Owner: farmer
 --
 
 ALTER TABLE ONLY jobtask
@@ -12216,13 +14098,4207 @@ ALTER TABLE ONLY jobtask
 
 
 --
--- Name: public; Type: ACL; Schema: -; Owner: -
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
 
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
 REVOKE ALL ON SCHEMA public FROM postgres;
 GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
+GRANT ALL ON SCHEMA public TO farmers;
+
+
+--
+-- Name: after_update_jobtask(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION after_update_jobtask() FROM PUBLIC;
+REVOKE ALL ON FUNCTION after_update_jobtask() FROM farmer;
+GRANT ALL ON FUNCTION after_update_jobtask() TO farmer;
+GRANT ALL ON FUNCTION after_update_jobtask() TO PUBLIC;
+GRANT ALL ON FUNCTION after_update_jobtask() TO farmers;
+
+
+--
+-- Name: assign_single_host(integer, integer, integer[]); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _tasks integer[]) FROM PUBLIC;
+REVOKE ALL ON FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _tasks integer[]) FROM farmer;
+GRANT ALL ON FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _tasks integer[]) TO farmer;
+GRANT ALL ON FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _tasks integer[]) TO PUBLIC;
+GRANT ALL ON FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _tasks integer[]) TO farmers;
+
+
+--
+-- Name: assign_single_host(integer, integer, integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _packetsize integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _packetsize integer) FROM farmer;
+GRANT ALL ON FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _packetsize integer) TO farmer;
+GRANT ALL ON FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _packetsize integer) TO PUBLIC;
+GRANT ALL ON FUNCTION assign_single_host(_keyjob integer, _keyhost integer, _packetsize integer) TO farmers;
+
+
+--
+-- Name: assign_single_host_2(integer, integer, integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION assign_single_host_2(_keyjob integer, _keyhost integer, _packetsize integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION assign_single_host_2(_keyjob integer, _keyhost integer, _packetsize integer) FROM farmer;
+GRANT ALL ON FUNCTION assign_single_host_2(_keyjob integer, _keyhost integer, _packetsize integer) TO farmer;
+GRANT ALL ON FUNCTION assign_single_host_2(_keyjob integer, _keyhost integer, _packetsize integer) TO PUBLIC;
+GRANT ALL ON FUNCTION assign_single_host_2(_keyjob integer, _keyhost integer, _packetsize integer) TO farmers;
+
+
+--
+-- Name: assignment_status_count(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION assignment_status_count(fkeyjobassignmentstatus integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION assignment_status_count(fkeyjobassignmentstatus integer) FROM farmer;
+GRANT ALL ON FUNCTION assignment_status_count(fkeyjobassignmentstatus integer) TO farmer;
+GRANT ALL ON FUNCTION assignment_status_count(fkeyjobassignmentstatus integer) TO PUBLIC;
+GRANT ALL ON FUNCTION assignment_status_count(fkeyjobassignmentstatus integer) TO farmers;
+
+
+--
+-- Name: cancel_job_assignment(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION cancel_job_assignment(_keyjobassignment integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION cancel_job_assignment(_keyjobassignment integer) FROM farmer;
+GRANT ALL ON FUNCTION cancel_job_assignment(_keyjobassignment integer) TO farmer;
+GRANT ALL ON FUNCTION cancel_job_assignment(_keyjobassignment integer) TO PUBLIC;
+GRANT ALL ON FUNCTION cancel_job_assignment(_keyjobassignment integer) TO farmers;
+
+
+--
+-- Name: cancel_job_assignment(integer, text, text); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION cancel_job_assignment(_keyjobassignment integer, _reason text, _nextstate text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION cancel_job_assignment(_keyjobassignment integer, _reason text, _nextstate text) FROM farmer;
+GRANT ALL ON FUNCTION cancel_job_assignment(_keyjobassignment integer, _reason text, _nextstate text) TO farmer;
+GRANT ALL ON FUNCTION cancel_job_assignment(_keyjobassignment integer, _reason text, _nextstate text) TO PUBLIC;
+GRANT ALL ON FUNCTION cancel_job_assignment(_keyjobassignment integer, _reason text, _nextstate text) TO farmers;
+
+
+--
+-- Name: cancel_job_assignments(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION cancel_job_assignments(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION cancel_job_assignments(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION cancel_job_assignments(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION cancel_job_assignments(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION cancel_job_assignments(_keyjob integer) TO farmers;
+
+
+--
+-- Name: cancel_job_assignments(integer, text, text); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION cancel_job_assignments(_keyjob integer, _reason text, _nextstate text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION cancel_job_assignments(_keyjob integer, _reason text, _nextstate text) FROM farmer;
+GRANT ALL ON FUNCTION cancel_job_assignments(_keyjob integer, _reason text, _nextstate text) TO farmer;
+GRANT ALL ON FUNCTION cancel_job_assignments(_keyjob integer, _reason text, _nextstate text) TO PUBLIC;
+GRANT ALL ON FUNCTION cancel_job_assignments(_keyjob integer, _reason text, _nextstate text) TO farmers;
+
+
+--
+-- Name: epoch_to_timestamp(double precision); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION epoch_to_timestamp(double precision) FROM PUBLIC;
+REVOKE ALL ON FUNCTION epoch_to_timestamp(double precision) FROM farmer;
+GRANT ALL ON FUNCTION epoch_to_timestamp(double precision) TO farmer;
+GRANT ALL ON FUNCTION epoch_to_timestamp(double precision) TO PUBLIC;
+GRANT ALL ON FUNCTION epoch_to_timestamp(double precision) TO farmers;
+
+
+--
+-- Name: fix_jobstatus(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION fix_jobstatus() FROM PUBLIC;
+REVOKE ALL ON FUNCTION fix_jobstatus() FROM farmer;
+GRANT ALL ON FUNCTION fix_jobstatus() TO farmer;
+GRANT ALL ON FUNCTION fix_jobstatus() TO PUBLIC;
+GRANT ALL ON FUNCTION fix_jobstatus() TO farmers;
+
+
+--
+-- Name: get_continuous_tasks(integer, integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION get_continuous_tasks(_fkeyjob integer, max_tasks integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_continuous_tasks(_fkeyjob integer, max_tasks integer) FROM farmer;
+GRANT ALL ON FUNCTION get_continuous_tasks(_fkeyjob integer, max_tasks integer) TO farmer;
+GRANT ALL ON FUNCTION get_continuous_tasks(_fkeyjob integer, max_tasks integer) TO PUBLIC;
+GRANT ALL ON FUNCTION get_continuous_tasks(_fkeyjob integer, max_tasks integer) TO farmers;
+
+
+--
+-- Name: get_iterative_tasks(integer, integer, integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION get_iterative_tasks(_fkeyjob integer, max_tasks integer, stripe integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_iterative_tasks(_fkeyjob integer, max_tasks integer, stripe integer) FROM farmer;
+GRANT ALL ON FUNCTION get_iterative_tasks(_fkeyjob integer, max_tasks integer, stripe integer) TO farmer;
+GRANT ALL ON FUNCTION get_iterative_tasks(_fkeyjob integer, max_tasks integer, stripe integer) TO PUBLIC;
+GRANT ALL ON FUNCTION get_iterative_tasks(_fkeyjob integer, max_tasks integer, stripe integer) TO farmers;
+
+
+--
+-- Name: get_iterative_tasks_debug(integer, integer, integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION get_iterative_tasks_debug(_fkeyjob integer, max_tasks integer, stripe integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_iterative_tasks_debug(_fkeyjob integer, max_tasks integer, stripe integer) FROM farmer;
+GRANT ALL ON FUNCTION get_iterative_tasks_debug(_fkeyjob integer, max_tasks integer, stripe integer) TO farmer;
+GRANT ALL ON FUNCTION get_iterative_tasks_debug(_fkeyjob integer, max_tasks integer, stripe integer) TO PUBLIC;
+GRANT ALL ON FUNCTION get_iterative_tasks_debug(_fkeyjob integer, max_tasks integer, stripe integer) TO farmers;
+
+
+--
+-- Name: get_wayward_hosts(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION get_wayward_hosts() FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_wayward_hosts() FROM farmer;
+GRANT ALL ON FUNCTION get_wayward_hosts() TO farmer;
+GRANT ALL ON FUNCTION get_wayward_hosts() TO PUBLIC;
+GRANT ALL ON FUNCTION get_wayward_hosts() TO farmers;
+
+
+--
+-- Name: get_wayward_hosts_2(interval, interval); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION get_wayward_hosts_2(pulse_period interval, loop_time interval) FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_wayward_hosts_2(pulse_period interval, loop_time interval) FROM farmer;
+GRANT ALL ON FUNCTION get_wayward_hosts_2(pulse_period interval, loop_time interval) TO farmer;
+GRANT ALL ON FUNCTION get_wayward_hosts_2(pulse_period interval, loop_time interval) TO PUBLIC;
+GRANT ALL ON FUNCTION get_wayward_hosts_2(pulse_period interval, loop_time interval) TO farmers;
+
+
+--
+-- Name: countercache; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE countercache FROM PUBLIC;
+REVOKE ALL ON TABLE countercache FROM farmer;
+GRANT ALL ON TABLE countercache TO farmer;
+GRANT ALL ON TABLE countercache TO farmers;
+
+
+--
+-- Name: getcounterstate(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION getcounterstate() FROM PUBLIC;
+REVOKE ALL ON FUNCTION getcounterstate() FROM farmer;
+GRANT ALL ON FUNCTION getcounterstate() TO farmer;
+GRANT ALL ON FUNCTION getcounterstate() TO PUBLIC;
+GRANT ALL ON FUNCTION getcounterstate() TO farmers;
+
+
+--
+-- Name: hosthistory_keyhosthistory_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hosthistory_keyhosthistory_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hosthistory_keyhosthistory_seq FROM farmer;
+GRANT ALL ON SEQUENCE hosthistory_keyhosthistory_seq TO farmer;
+GRANT ALL ON SEQUENCE hosthistory_keyhosthistory_seq TO farmers;
+
+
+--
+-- Name: hosthistory; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hosthistory FROM PUBLIC;
+REVOKE ALL ON TABLE hosthistory FROM farmer;
+GRANT ALL ON TABLE hosthistory TO farmer;
+GRANT ALL ON TABLE hosthistory TO farmers;
+
+
+--
+-- Name: hosthistory_dynamic_query(text, text); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION hosthistory_dynamic_query(where_stmt text, order_limit text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION hosthistory_dynamic_query(where_stmt text, order_limit text) FROM farmer;
+GRANT ALL ON FUNCTION hosthistory_dynamic_query(where_stmt text, order_limit text) TO farmer;
+GRANT ALL ON FUNCTION hosthistory_dynamic_query(where_stmt text, order_limit text) TO PUBLIC;
+GRANT ALL ON FUNCTION hosthistory_dynamic_query(where_stmt text, order_limit text) TO farmers;
+
+
+--
+-- Name: hosthistory_overlaps_timespan(timestamp without time zone, timestamp without time zone, text, text); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION hosthistory_overlaps_timespan(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION hosthistory_overlaps_timespan(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) FROM farmer;
+GRANT ALL ON FUNCTION hosthistory_overlaps_timespan(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) TO farmer;
+GRANT ALL ON FUNCTION hosthistory_overlaps_timespan(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) TO PUBLIC;
+GRANT ALL ON FUNCTION hosthistory_overlaps_timespan(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) TO farmers;
+
+
+--
+-- Name: hosthistory_status_percentages(text); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION hosthistory_status_percentages(query_input text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION hosthistory_status_percentages(query_input text) FROM farmer;
+GRANT ALL ON FUNCTION hosthistory_status_percentages(query_input text) TO farmer;
+GRANT ALL ON FUNCTION hosthistory_status_percentages(query_input text) TO PUBLIC;
+GRANT ALL ON FUNCTION hosthistory_status_percentages(query_input text) TO farmers;
+
+
+--
+-- Name: hosthistory_status_percentages_duration_adjusted(timestamp without time zone, timestamp without time zone); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION hosthistory_status_percentages_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) FROM PUBLIC;
+REVOKE ALL ON FUNCTION hosthistory_status_percentages_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) FROM farmer;
+GRANT ALL ON FUNCTION hosthistory_status_percentages_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) TO farmer;
+GRANT ALL ON FUNCTION hosthistory_status_percentages_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) TO PUBLIC;
+GRANT ALL ON FUNCTION hosthistory_status_percentages_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) TO farmers;
+
+
+--
+-- Name: hosthistory_status_summary(text); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION hosthistory_status_summary(query_input text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION hosthistory_status_summary(query_input text) FROM farmer;
+GRANT ALL ON FUNCTION hosthistory_status_summary(query_input text) TO farmer;
+GRANT ALL ON FUNCTION hosthistory_status_summary(query_input text) TO PUBLIC;
+GRANT ALL ON FUNCTION hosthistory_status_summary(query_input text) TO farmers;
+
+
+--
+-- Name: hosthistory_status_summary_duration_adjusted(timestamp without time zone, timestamp without time zone); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION hosthistory_status_summary_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) FROM PUBLIC;
+REVOKE ALL ON FUNCTION hosthistory_status_summary_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) FROM farmer;
+GRANT ALL ON FUNCTION hosthistory_status_summary_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) TO farmer;
+GRANT ALL ON FUNCTION hosthistory_status_summary_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) TO PUBLIC;
+GRANT ALL ON FUNCTION hosthistory_status_summary_duration_adjusted(history_start timestamp without time zone, history_end timestamp without time zone) TO farmers;
+
+
+--
+-- Name: hosthistory_timespan_duration_adjusted(timestamp without time zone, timestamp without time zone); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone) FROM PUBLIC;
+REVOKE ALL ON FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone) FROM farmer;
+GRANT ALL ON FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone) TO farmer;
+GRANT ALL ON FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone) TO PUBLIC;
+GRANT ALL ON FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone) TO farmers;
+
+
+--
+-- Name: hosthistory_timespan_duration_adjusted(timestamp without time zone, timestamp without time zone, text, text); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) FROM farmer;
+GRANT ALL ON FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) TO farmer;
+GRANT ALL ON FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) TO PUBLIC;
+GRANT ALL ON FUNCTION hosthistory_timespan_duration_adjusted(time_start timestamp without time zone, time_end timestamp without time zone, where_stmt text, order_limit text) TO farmers;
+
+
+--
+-- Name: hosthistory_user_slave_summary(timestamp without time zone, timestamp without time zone); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION hosthistory_user_slave_summary(history_start timestamp without time zone, history_end timestamp without time zone) FROM PUBLIC;
+REVOKE ALL ON FUNCTION hosthistory_user_slave_summary(history_start timestamp without time zone, history_end timestamp without time zone) FROM farmer;
+GRANT ALL ON FUNCTION hosthistory_user_slave_summary(history_start timestamp without time zone, history_end timestamp without time zone) TO farmer;
+GRANT ALL ON FUNCTION hosthistory_user_slave_summary(history_start timestamp without time zone, history_end timestamp without time zone) TO PUBLIC;
+GRANT ALL ON FUNCTION hosthistory_user_slave_summary(history_start timestamp without time zone, history_end timestamp without time zone) TO farmers;
+
+
+--
+-- Name: hoststatus_update(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION hoststatus_update() FROM PUBLIC;
+REVOKE ALL ON FUNCTION hoststatus_update() FROM farmer;
+GRANT ALL ON FUNCTION hoststatus_update() TO farmer;
+GRANT ALL ON FUNCTION hoststatus_update() TO PUBLIC;
+GRANT ALL ON FUNCTION hoststatus_update() TO farmers;
+
+
+--
+-- Name: increment_loadavgadjust(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION increment_loadavgadjust(_fkeyhost integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION increment_loadavgadjust(_fkeyhost integer) FROM farmer;
+GRANT ALL ON FUNCTION increment_loadavgadjust(_fkeyhost integer) TO farmer;
+GRANT ALL ON FUNCTION increment_loadavgadjust(_fkeyhost integer) TO PUBLIC;
+GRANT ALL ON FUNCTION increment_loadavgadjust(_fkeyhost integer) TO farmers;
+
+
+--
+-- Name: insert_jobtask(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION insert_jobtask() FROM PUBLIC;
+REVOKE ALL ON FUNCTION insert_jobtask() FROM farmer;
+GRANT ALL ON FUNCTION insert_jobtask() TO farmer;
+GRANT ALL ON FUNCTION insert_jobtask() TO PUBLIC;
+GRANT ALL ON FUNCTION insert_jobtask() TO farmers;
+
+
+--
+-- Name: interval_divide(interval, interval); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION interval_divide(numerator interval, denominator interval) FROM PUBLIC;
+REVOKE ALL ON FUNCTION interval_divide(numerator interval, denominator interval) FROM farmer;
+GRANT ALL ON FUNCTION interval_divide(numerator interval, denominator interval) TO farmer;
+GRANT ALL ON FUNCTION interval_divide(numerator interval, denominator interval) TO PUBLIC;
+GRANT ALL ON FUNCTION interval_divide(numerator interval, denominator interval) TO farmers;
+
+
+--
+-- Name: job_delete(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION job_delete() FROM PUBLIC;
+REVOKE ALL ON FUNCTION job_delete() FROM farmer;
+GRANT ALL ON FUNCTION job_delete() TO farmer;
+GRANT ALL ON FUNCTION job_delete() TO PUBLIC;
+GRANT ALL ON FUNCTION job_delete() TO farmers;
+
+
+--
+-- Name: job_error_increment(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION job_error_increment() FROM PUBLIC;
+REVOKE ALL ON FUNCTION job_error_increment() FROM farmer;
+GRANT ALL ON FUNCTION job_error_increment() TO farmer;
+GRANT ALL ON FUNCTION job_error_increment() TO PUBLIC;
+GRANT ALL ON FUNCTION job_error_increment() TO farmers;
+
+
+--
+-- Name: job_error_insert(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION job_error_insert() FROM PUBLIC;
+REVOKE ALL ON FUNCTION job_error_insert() FROM farmer;
+GRANT ALL ON FUNCTION job_error_insert() TO farmer;
+GRANT ALL ON FUNCTION job_error_insert() TO PUBLIC;
+GRANT ALL ON FUNCTION job_error_insert() TO farmers;
+
+
+--
+-- Name: job_gatherstats(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION job_gatherstats(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION job_gatherstats(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION job_gatherstats(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION job_gatherstats(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION job_gatherstats(_keyjob integer) TO farmers;
+
+
+--
+-- Name: job_gatherstats_2(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION job_gatherstats_2(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION job_gatherstats_2(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION job_gatherstats_2(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION job_gatherstats_2(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION job_gatherstats_2(_keyjob integer) TO farmers;
+
+
+--
+-- Name: job_insert(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION job_insert() FROM PUBLIC;
+REVOKE ALL ON FUNCTION job_insert() FROM farmer;
+GRANT ALL ON FUNCTION job_insert() TO farmer;
+GRANT ALL ON FUNCTION job_insert() TO PUBLIC;
+GRANT ALL ON FUNCTION job_insert() TO farmers;
+
+
+--
+-- Name: job_update(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION job_update() FROM PUBLIC;
+REVOKE ALL ON FUNCTION job_update() FROM farmer;
+GRANT ALL ON FUNCTION job_update() TO farmer;
+GRANT ALL ON FUNCTION job_update() TO PUBLIC;
+GRANT ALL ON FUNCTION job_update() TO farmers;
+
+
+--
+-- Name: jobassignment_after_update(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION jobassignment_after_update() FROM PUBLIC;
+REVOKE ALL ON FUNCTION jobassignment_after_update() FROM farmer;
+GRANT ALL ON FUNCTION jobassignment_after_update() TO farmer;
+GRANT ALL ON FUNCTION jobassignment_after_update() TO PUBLIC;
+GRANT ALL ON FUNCTION jobassignment_after_update() TO farmers;
+
+
+--
+-- Name: jobassignment_delete(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION jobassignment_delete() FROM PUBLIC;
+REVOKE ALL ON FUNCTION jobassignment_delete() FROM farmer;
+GRANT ALL ON FUNCTION jobassignment_delete() TO farmer;
+GRANT ALL ON FUNCTION jobassignment_delete() TO PUBLIC;
+GRANT ALL ON FUNCTION jobassignment_delete() TO farmers;
+
+
+--
+-- Name: jobassignment_insert(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION jobassignment_insert() FROM PUBLIC;
+REVOKE ALL ON FUNCTION jobassignment_insert() FROM farmer;
+GRANT ALL ON FUNCTION jobassignment_insert() TO farmer;
+GRANT ALL ON FUNCTION jobassignment_insert() TO PUBLIC;
+GRANT ALL ON FUNCTION jobassignment_insert() TO farmers;
+
+
+--
+-- Name: jobassignment_update(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION jobassignment_update() FROM PUBLIC;
+REVOKE ALL ON FUNCTION jobassignment_update() FROM farmer;
+GRANT ALL ON FUNCTION jobassignment_update() TO farmer;
+GRANT ALL ON FUNCTION jobassignment_update() TO PUBLIC;
+GRANT ALL ON FUNCTION jobassignment_update() TO farmers;
+
+
+--
+-- Name: jobdep_delete(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION jobdep_delete() FROM PUBLIC;
+REVOKE ALL ON FUNCTION jobdep_delete() FROM farmer;
+GRANT ALL ON FUNCTION jobdep_delete() TO farmer;
+GRANT ALL ON FUNCTION jobdep_delete() TO PUBLIC;
+GRANT ALL ON FUNCTION jobdep_delete() TO farmers;
+
+
+--
+-- Name: jobdep_keyjobdep_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobdep_keyjobdep_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobdep_keyjobdep_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobdep_keyjobdep_seq TO farmer;
+GRANT ALL ON SEQUENCE jobdep_keyjobdep_seq TO farmers;
+
+
+--
+-- Name: jobdep; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobdep FROM PUBLIC;
+REVOKE ALL ON TABLE jobdep FROM farmer;
+GRANT ALL ON TABLE jobdep TO farmer;
+GRANT ALL ON TABLE jobdep TO farmers;
+
+
+--
+-- Name: joberror_inc(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION joberror_inc() FROM PUBLIC;
+REVOKE ALL ON FUNCTION joberror_inc() FROM farmer;
+GRANT ALL ON FUNCTION joberror_inc() TO farmer;
+GRANT ALL ON FUNCTION joberror_inc() TO PUBLIC;
+GRANT ALL ON FUNCTION joberror_inc() TO farmers;
+
+
+--
+-- Name: jobtaskassignment_update(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION jobtaskassignment_update() FROM PUBLIC;
+REVOKE ALL ON FUNCTION jobtaskassignment_update() FROM farmer;
+GRANT ALL ON FUNCTION jobtaskassignment_update() TO farmer;
+GRANT ALL ON FUNCTION jobtaskassignment_update() TO PUBLIC;
+GRANT ALL ON FUNCTION jobtaskassignment_update() TO farmers;
+
+
+--
+-- Name: pg_stat_statements_reset(); Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION pg_stat_statements_reset() FROM PUBLIC;
+REVOKE ALL ON FUNCTION pg_stat_statements_reset() FROM postgres;
+GRANT ALL ON FUNCTION pg_stat_statements_reset() TO postgres;
+
+
+--
+-- Name: return_slave_tasks(integer, boolean, boolean); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION return_slave_tasks(_keyhost integer, commithoststatus boolean, preassigned boolean) FROM PUBLIC;
+REVOKE ALL ON FUNCTION return_slave_tasks(_keyhost integer, commithoststatus boolean, preassigned boolean) FROM farmer;
+GRANT ALL ON FUNCTION return_slave_tasks(_keyhost integer, commithoststatus boolean, preassigned boolean) TO farmer;
+GRANT ALL ON FUNCTION return_slave_tasks(_keyhost integer, commithoststatus boolean, preassigned boolean) TO PUBLIC;
+GRANT ALL ON FUNCTION return_slave_tasks(_keyhost integer, commithoststatus boolean, preassigned boolean) TO farmers;
+
+
+--
+-- Name: return_slave_tasks_2(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION return_slave_tasks_2(_keyhost integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION return_slave_tasks_2(_keyhost integer) FROM farmer;
+GRANT ALL ON FUNCTION return_slave_tasks_2(_keyhost integer) TO farmer;
+GRANT ALL ON FUNCTION return_slave_tasks_2(_keyhost integer) TO PUBLIC;
+GRANT ALL ON FUNCTION return_slave_tasks_2(_keyhost integer) TO farmers;
+
+
+--
+-- Name: return_slave_tasks_3(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION return_slave_tasks_3(_keyhost integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION return_slave_tasks_3(_keyhost integer) FROM farmer;
+GRANT ALL ON FUNCTION return_slave_tasks_3(_keyhost integer) TO farmer;
+GRANT ALL ON FUNCTION return_slave_tasks_3(_keyhost integer) TO PUBLIC;
+GRANT ALL ON FUNCTION return_slave_tasks_3(_keyhost integer) TO farmers;
+
+
+--
+-- Name: sync_host_to_hoststatus(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION sync_host_to_hoststatus() FROM PUBLIC;
+REVOKE ALL ON FUNCTION sync_host_to_hoststatus() FROM farmer;
+GRANT ALL ON FUNCTION sync_host_to_hoststatus() TO farmer;
+GRANT ALL ON FUNCTION sync_host_to_hoststatus() TO PUBLIC;
+GRANT ALL ON FUNCTION sync_host_to_hoststatus() TO farmers;
+
+
+--
+-- Name: sync_host_to_hoststatus_trigger(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION sync_host_to_hoststatus_trigger() FROM PUBLIC;
+REVOKE ALL ON FUNCTION sync_host_to_hoststatus_trigger() FROM farmer;
+GRANT ALL ON FUNCTION sync_host_to_hoststatus_trigger() TO farmer;
+GRANT ALL ON FUNCTION sync_host_to_hoststatus_trigger() TO PUBLIC;
+GRANT ALL ON FUNCTION sync_host_to_hoststatus_trigger() TO farmers;
+
+
+--
+-- Name: update_host(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_host() FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_host() FROM farmer;
+GRANT ALL ON FUNCTION update_host() TO farmer;
+GRANT ALL ON FUNCTION update_host() TO PUBLIC;
+GRANT ALL ON FUNCTION update_host() TO farmers;
+
+
+--
+-- Name: update_host_assignment_count(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_host_assignment_count(_keyhost integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_host_assignment_count(_keyhost integer) FROM farmer;
+GRANT ALL ON FUNCTION update_host_assignment_count(_keyhost integer) TO farmer;
+GRANT ALL ON FUNCTION update_host_assignment_count(_keyhost integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_host_assignment_count(_keyhost integer) TO farmers;
+
+
+--
+-- Name: update_hostload(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_hostload() FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_hostload() FROM farmer;
+GRANT ALL ON FUNCTION update_hostload() TO farmer;
+GRANT ALL ON FUNCTION update_hostload() TO PUBLIC;
+GRANT ALL ON FUNCTION update_hostload() TO farmers;
+
+
+--
+-- Name: update_hostservice(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_hostservice() FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_hostservice() FROM farmer;
+GRANT ALL ON FUNCTION update_hostservice() TO farmer;
+GRANT ALL ON FUNCTION update_hostservice() TO PUBLIC;
+GRANT ALL ON FUNCTION update_hostservice() TO farmers;
+
+
+--
+-- Name: update_job_deps(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_deps(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_deps(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION update_job_deps(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION update_job_deps(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_deps(_keyjob integer) TO farmers;
+
+
+--
+-- Name: update_job_hard_deps(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_hard_deps(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_hard_deps(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION update_job_hard_deps(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION update_job_hard_deps(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_hard_deps(_keyjob integer) TO farmers;
+
+
+--
+-- Name: update_job_health(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_health() FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_health() FROM farmer;
+GRANT ALL ON FUNCTION update_job_health() TO farmer;
+GRANT ALL ON FUNCTION update_job_health() TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_health() TO farmers;
+
+
+--
+-- Name: update_job_health_by_key(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_health_by_key(_jobkey integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_health_by_key(_jobkey integer) FROM farmer;
+GRANT ALL ON FUNCTION update_job_health_by_key(_jobkey integer) TO farmer;
+GRANT ALL ON FUNCTION update_job_health_by_key(_jobkey integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_health_by_key(_jobkey integer) TO farmers;
+
+
+--
+-- Name: update_job_links(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_links(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_links(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION update_job_links(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION update_job_links(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_links(_keyjob integer) TO farmers;
+
+
+--
+-- Name: update_job_other_deps(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_other_deps(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_other_deps(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION update_job_other_deps(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION update_job_other_deps(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_other_deps(_keyjob integer) TO farmers;
+
+
+--
+-- Name: update_job_soft_deps(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_soft_deps(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_soft_deps(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION update_job_soft_deps(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION update_job_soft_deps(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_soft_deps(_keyjob integer) TO farmers;
+
+
+--
+-- Name: update_job_stats(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_stats(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_stats(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION update_job_stats(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION update_job_stats(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_stats(_keyjob integer) TO farmers;
+
+
+--
+-- Name: update_job_tallies(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_tallies() FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_tallies() FROM farmer;
+GRANT ALL ON FUNCTION update_job_tallies() TO farmer;
+GRANT ALL ON FUNCTION update_job_tallies() TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_tallies() TO farmers;
+
+
+--
+-- Name: update_job_task_counts(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_task_counts(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_task_counts(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION update_job_task_counts(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION update_job_task_counts(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_task_counts(_keyjob integer) TO farmers;
+
+
+--
+-- Name: update_jobtask_counts(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_jobtask_counts() FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_jobtask_counts() FROM farmer;
+GRANT ALL ON FUNCTION update_jobtask_counts() TO farmer;
+GRANT ALL ON FUNCTION update_jobtask_counts() TO PUBLIC;
+GRANT ALL ON FUNCTION update_jobtask_counts() TO farmers;
+
+
+--
+-- Name: update_laststatuschange(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_laststatuschange() FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_laststatuschange() FROM farmer;
+GRANT ALL ON FUNCTION update_laststatuschange() TO farmer;
+GRANT ALL ON FUNCTION update_laststatuschange() TO PUBLIC;
+GRANT ALL ON FUNCTION update_laststatuschange() TO farmers;
+
+
+--
+-- Name: update_project_tempo(); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_project_tempo() FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_project_tempo() FROM farmer;
+GRANT ALL ON FUNCTION update_project_tempo() TO farmer;
+GRANT ALL ON FUNCTION update_project_tempo() TO PUBLIC;
+GRANT ALL ON FUNCTION update_project_tempo() TO farmers;
+
+
+--
+-- Name: job_keyjob_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE job_keyjob_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE job_keyjob_seq FROM farmer;
+GRANT ALL ON SEQUENCE job_keyjob_seq TO farmer;
+GRANT ALL ON SEQUENCE job_keyjob_seq TO farmers;
+
+
+--
+-- Name: job; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE job FROM PUBLIC;
+REVOKE ALL ON TABLE job FROM farmer;
+GRANT ALL ON TABLE job TO farmer;
+GRANT ALL ON TABLE job TO farmers;
+
+
+--
+-- Name: update_single_job_health(job); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_single_job_health(j job) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_single_job_health(j job) FROM farmer;
+GRANT ALL ON FUNCTION update_single_job_health(j job) TO farmer;
+GRANT ALL ON FUNCTION update_single_job_health(j job) TO PUBLIC;
+GRANT ALL ON FUNCTION update_single_job_health(j job) TO farmers;
+
+
+--
+-- Name: updatejoblicensecounts(integer, integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION updatejoblicensecounts(_fkeyjob integer, countchange integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION updatejoblicensecounts(_fkeyjob integer, countchange integer) FROM farmer;
+GRANT ALL ON FUNCTION updatejoblicensecounts(_fkeyjob integer, countchange integer) TO farmer;
+GRANT ALL ON FUNCTION updatejoblicensecounts(_fkeyjob integer, countchange integer) TO PUBLIC;
+GRANT ALL ON FUNCTION updatejoblicensecounts(_fkeyjob integer, countchange integer) TO farmers;
+
+
+--
+-- Name: host_keyhost_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE host_keyhost_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE host_keyhost_seq FROM farmer;
+GRANT ALL ON SEQUENCE host_keyhost_seq TO farmer;
+GRANT ALL ON SEQUENCE host_keyhost_seq TO farmers;
+
+
+--
+-- Name: host; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE host FROM PUBLIC;
+REVOKE ALL ON TABLE host FROM farmer;
+GRANT ALL ON TABLE host TO farmer;
+GRANT ALL ON TABLE host TO farmers;
+
+
+--
+-- Name: hostinterface_keyhostinterface_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostinterface_keyhostinterface_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostinterface_keyhostinterface_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostinterface_keyhostinterface_seq TO farmer;
+GRANT ALL ON SEQUENCE hostinterface_keyhostinterface_seq TO farmers;
+
+
+--
+-- Name: hostinterface; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostinterface FROM PUBLIC;
+REVOKE ALL ON TABLE hostinterface FROM farmer;
+GRANT ALL ON TABLE hostinterface TO farmer;
+GRANT ALL ON TABLE hostinterface TO farmers;
+
+
+--
+-- Name: HostInterfacesVerbose; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE "HostInterfacesVerbose" FROM PUBLIC;
+REVOKE ALL ON TABLE "HostInterfacesVerbose" FROM farmer;
+GRANT ALL ON TABLE "HostInterfacesVerbose" TO farmer;
+GRANT ALL ON TABLE "HostInterfacesVerbose" TO farmers;
+
+
+--
+-- Name: jobtask_keyjobtask_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobtask_keyjobtask_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobtask_keyjobtask_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobtask_keyjobtask_seq TO farmer;
+GRANT ALL ON SEQUENCE jobtask_keyjobtask_seq TO farmers;
+
+
+--
+-- Name: jobtask; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobtask FROM PUBLIC;
+REVOKE ALL ON TABLE jobtask FROM farmer;
+GRANT ALL ON TABLE jobtask TO farmer;
+GRANT ALL ON TABLE jobtask TO farmers;
+
+
+--
+-- Name: jobtype_keyjobtype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobtype_keyjobtype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobtype_keyjobtype_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobtype_keyjobtype_seq TO farmer;
+GRANT ALL ON SEQUENCE jobtype_keyjobtype_seq TO farmers;
+
+
+--
+-- Name: jobtype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobtype FROM PUBLIC;
+REVOKE ALL ON TABLE jobtype FROM farmer;
+GRANT ALL ON TABLE jobtype TO farmer;
+GRANT ALL ON TABLE jobtype TO farmers;
+
+
+--
+-- Name: StatsByType; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE "StatsByType" FROM PUBLIC;
+REVOKE ALL ON TABLE "StatsByType" FROM farmer;
+GRANT ALL ON TABLE "StatsByType" TO farmer;
+GRANT ALL ON TABLE "StatsByType" TO farmers;
+
+
+--
+-- Name: abdownloadstat_keyabdownloadstat_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE abdownloadstat_keyabdownloadstat_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE abdownloadstat_keyabdownloadstat_seq FROM farmer;
+GRANT ALL ON SEQUENCE abdownloadstat_keyabdownloadstat_seq TO farmer;
+GRANT ALL ON SEQUENCE abdownloadstat_keyabdownloadstat_seq TO farmers;
+
+
+--
+-- Name: abdownloadstat; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE abdownloadstat FROM PUBLIC;
+REVOKE ALL ON TABLE abdownloadstat FROM farmer;
+GRANT ALL ON TABLE abdownloadstat TO farmer;
+GRANT ALL ON TABLE abdownloadstat TO farmers;
+
+
+--
+-- Name: annotation_keyannotation_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE annotation_keyannotation_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE annotation_keyannotation_seq FROM farmer;
+GRANT ALL ON SEQUENCE annotation_keyannotation_seq TO farmer;
+GRANT ALL ON SEQUENCE annotation_keyannotation_seq TO farmers;
+
+
+--
+-- Name: annotation; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE annotation FROM PUBLIC;
+REVOKE ALL ON TABLE annotation FROM farmer;
+GRANT ALL ON TABLE annotation TO farmer;
+GRANT ALL ON TABLE annotation TO farmers;
+
+
+--
+-- Name: element_keyelement_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE element_keyelement_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE element_keyelement_seq FROM farmer;
+GRANT ALL ON SEQUENCE element_keyelement_seq TO farmer;
+GRANT ALL ON SEQUENCE element_keyelement_seq TO farmers;
+
+
+--
+-- Name: element; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE element FROM PUBLIC;
+REVOKE ALL ON TABLE element FROM farmer;
+GRANT ALL ON TABLE element TO farmer;
+GRANT ALL ON TABLE element TO farmers;
+
+
+--
+-- Name: asset; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE asset FROM PUBLIC;
+REVOKE ALL ON TABLE asset FROM farmer;
+GRANT ALL ON TABLE asset TO farmer;
+GRANT ALL ON TABLE asset TO farmers;
+
+
+--
+-- Name: assetdep; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE assetdep FROM PUBLIC;
+REVOKE ALL ON TABLE assetdep FROM farmer;
+GRANT ALL ON TABLE assetdep TO farmer;
+GRANT ALL ON TABLE assetdep TO farmers;
+
+
+--
+-- Name: assetdep_keyassetdep_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE assetdep_keyassetdep_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE assetdep_keyassetdep_seq FROM farmer;
+GRANT ALL ON SEQUENCE assetdep_keyassetdep_seq TO farmer;
+GRANT ALL ON SEQUENCE assetdep_keyassetdep_seq TO farmers;
+
+
+--
+-- Name: assetgroup; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE assetgroup FROM PUBLIC;
+REVOKE ALL ON TABLE assetgroup FROM farmer;
+GRANT ALL ON TABLE assetgroup TO farmer;
+GRANT ALL ON TABLE assetgroup TO farmers;
+
+
+--
+-- Name: assetprop; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE assetprop FROM PUBLIC;
+REVOKE ALL ON TABLE assetprop FROM farmer;
+GRANT ALL ON TABLE assetprop TO farmer;
+GRANT ALL ON TABLE assetprop TO farmers;
+
+
+--
+-- Name: assetprop_keyassetprop_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE assetprop_keyassetprop_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE assetprop_keyassetprop_seq FROM farmer;
+GRANT ALL ON SEQUENCE assetprop_keyassetprop_seq TO farmer;
+GRANT ALL ON SEQUENCE assetprop_keyassetprop_seq TO farmers;
+
+
+--
+-- Name: assetproperty_keyassetproperty_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE assetproperty_keyassetproperty_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE assetproperty_keyassetproperty_seq FROM farmer;
+GRANT ALL ON SEQUENCE assetproperty_keyassetproperty_seq TO farmer;
+GRANT ALL ON SEQUENCE assetproperty_keyassetproperty_seq TO farmers;
+
+
+--
+-- Name: assetproperty; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE assetproperty FROM PUBLIC;
+REVOKE ALL ON TABLE assetproperty FROM farmer;
+GRANT ALL ON TABLE assetproperty TO farmer;
+GRANT ALL ON TABLE assetproperty TO farmers;
+
+
+--
+-- Name: assetproptype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE assetproptype FROM PUBLIC;
+REVOKE ALL ON TABLE assetproptype FROM farmer;
+GRANT ALL ON TABLE assetproptype TO farmer;
+GRANT ALL ON TABLE assetproptype TO farmers;
+
+
+--
+-- Name: assetproptype_keyassetproptype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE assetproptype_keyassetproptype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE assetproptype_keyassetproptype_seq FROM farmer;
+GRANT ALL ON SEQUENCE assetproptype_keyassetproptype_seq TO farmer;
+GRANT ALL ON SEQUENCE assetproptype_keyassetproptype_seq TO farmers;
+
+
+--
+-- Name: assetset_keyassetset_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE assetset_keyassetset_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE assetset_keyassetset_seq FROM farmer;
+GRANT ALL ON SEQUENCE assetset_keyassetset_seq TO farmer;
+GRANT ALL ON SEQUENCE assetset_keyassetset_seq TO farmers;
+
+
+--
+-- Name: assetset; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE assetset FROM PUBLIC;
+REVOKE ALL ON TABLE assetset FROM farmer;
+GRANT ALL ON TABLE assetset TO farmer;
+GRANT ALL ON TABLE assetset TO farmers;
+
+
+--
+-- Name: assetsetitem_keyassetsetitem_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE assetsetitem_keyassetsetitem_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE assetsetitem_keyassetsetitem_seq FROM farmer;
+GRANT ALL ON SEQUENCE assetsetitem_keyassetsetitem_seq TO farmer;
+GRANT ALL ON SEQUENCE assetsetitem_keyassetsetitem_seq TO farmers;
+
+
+--
+-- Name: assetsetitem; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE assetsetitem FROM PUBLIC;
+REVOKE ALL ON TABLE assetsetitem FROM farmer;
+GRANT ALL ON TABLE assetsetitem TO farmer;
+GRANT ALL ON TABLE assetsetitem TO farmers;
+
+
+--
+-- Name: assettemplate_keyassettemplate_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE assettemplate_keyassettemplate_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE assettemplate_keyassettemplate_seq FROM farmer;
+GRANT ALL ON SEQUENCE assettemplate_keyassettemplate_seq TO farmer;
+GRANT ALL ON SEQUENCE assettemplate_keyassettemplate_seq TO farmers;
+
+
+--
+-- Name: assettemplate; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE assettemplate FROM PUBLIC;
+REVOKE ALL ON TABLE assettemplate FROM farmer;
+GRANT ALL ON TABLE assettemplate TO farmer;
+GRANT ALL ON TABLE assettemplate TO farmers;
+
+
+--
+-- Name: assettype_keyassettype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE assettype_keyassettype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE assettype_keyassettype_seq FROM farmer;
+GRANT ALL ON SEQUENCE assettype_keyassettype_seq TO farmer;
+GRANT ALL ON SEQUENCE assettype_keyassettype_seq TO farmers;
+
+
+--
+-- Name: assettype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE assettype FROM PUBLIC;
+REVOKE ALL ON TABLE assettype FROM farmer;
+GRANT ALL ON TABLE assettype TO farmer;
+GRANT ALL ON TABLE assettype TO farmers;
+
+
+--
+-- Name: attachment_keyattachment_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE attachment_keyattachment_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE attachment_keyattachment_seq FROM farmer;
+GRANT ALL ON SEQUENCE attachment_keyattachment_seq TO farmer;
+GRANT ALL ON SEQUENCE attachment_keyattachment_seq TO farmers;
+
+
+--
+-- Name: attachment; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE attachment FROM PUBLIC;
+REVOKE ALL ON TABLE attachment FROM farmer;
+GRANT ALL ON TABLE attachment TO farmer;
+GRANT ALL ON TABLE attachment TO farmers;
+
+
+--
+-- Name: attachmenttype_keyattachmenttype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE attachmenttype_keyattachmenttype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE attachmenttype_keyattachmenttype_seq FROM farmer;
+GRANT ALL ON SEQUENCE attachmenttype_keyattachmenttype_seq TO farmer;
+GRANT ALL ON SEQUENCE attachmenttype_keyattachmenttype_seq TO farmers;
+
+
+--
+-- Name: attachmenttype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE attachmenttype FROM PUBLIC;
+REVOKE ALL ON TABLE attachmenttype FROM farmer;
+GRANT ALL ON TABLE attachmenttype TO farmer;
+GRANT ALL ON TABLE attachmenttype TO farmers;
+
+
+--
+-- Name: calendar_keycalendar_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE calendar_keycalendar_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE calendar_keycalendar_seq FROM farmer;
+GRANT ALL ON SEQUENCE calendar_keycalendar_seq TO farmer;
+GRANT ALL ON SEQUENCE calendar_keycalendar_seq TO farmers;
+
+
+--
+-- Name: calendar; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE calendar FROM PUBLIC;
+REVOKE ALL ON TABLE calendar FROM farmer;
+GRANT ALL ON TABLE calendar TO farmer;
+GRANT ALL ON TABLE calendar TO farmers;
+
+
+--
+-- Name: calendarcategory_keycalendarcategory_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE calendarcategory_keycalendarcategory_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE calendarcategory_keycalendarcategory_seq FROM farmer;
+GRANT ALL ON SEQUENCE calendarcategory_keycalendarcategory_seq TO farmer;
+GRANT ALL ON SEQUENCE calendarcategory_keycalendarcategory_seq TO farmers;
+
+
+--
+-- Name: calendarcategory; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE calendarcategory FROM PUBLIC;
+REVOKE ALL ON TABLE calendarcategory FROM farmer;
+GRANT ALL ON TABLE calendarcategory TO farmer;
+GRANT ALL ON TABLE calendarcategory TO farmers;
+
+
+--
+-- Name: checklistitem_keychecklistitem_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE checklistitem_keychecklistitem_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE checklistitem_keychecklistitem_seq FROM farmer;
+GRANT ALL ON SEQUENCE checklistitem_keychecklistitem_seq TO farmer;
+GRANT ALL ON SEQUENCE checklistitem_keychecklistitem_seq TO farmers;
+
+
+--
+-- Name: checklistitem; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE checklistitem FROM PUBLIC;
+REVOKE ALL ON TABLE checklistitem FROM farmer;
+GRANT ALL ON TABLE checklistitem TO farmer;
+GRANT ALL ON TABLE checklistitem TO farmers;
+
+
+--
+-- Name: checkliststatus_keycheckliststatus_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE checkliststatus_keycheckliststatus_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE checkliststatus_keycheckliststatus_seq FROM farmer;
+GRANT ALL ON SEQUENCE checkliststatus_keycheckliststatus_seq TO farmer;
+GRANT ALL ON SEQUENCE checkliststatus_keycheckliststatus_seq TO farmers;
+
+
+--
+-- Name: checkliststatus; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE checkliststatus FROM PUBLIC;
+REVOKE ALL ON TABLE checkliststatus FROM farmer;
+GRANT ALL ON TABLE checkliststatus TO farmer;
+GRANT ALL ON TABLE checkliststatus TO farmers;
+
+
+--
+-- Name: client_keyclient_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE client_keyclient_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE client_keyclient_seq FROM farmer;
+GRANT ALL ON SEQUENCE client_keyclient_seq TO farmer;
+GRANT ALL ON SEQUENCE client_keyclient_seq TO farmers;
+
+
+--
+-- Name: client; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE client FROM PUBLIC;
+REVOKE ALL ON TABLE client FROM farmer;
+GRANT ALL ON TABLE client TO farmer;
+GRANT ALL ON TABLE client TO farmers;
+
+
+--
+-- Name: config_keyconfig_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE config_keyconfig_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE config_keyconfig_seq FROM farmer;
+GRANT ALL ON SEQUENCE config_keyconfig_seq TO farmer;
+GRANT ALL ON SEQUENCE config_keyconfig_seq TO farmers;
+
+
+--
+-- Name: config; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE config FROM PUBLIC;
+REVOKE ALL ON TABLE config FROM farmer;
+GRANT ALL ON TABLE config TO farmer;
+GRANT ALL ON TABLE config TO farmers;
+
+
+--
+-- Name: delivery; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE delivery FROM PUBLIC;
+REVOKE ALL ON TABLE delivery FROM farmer;
+GRANT ALL ON TABLE delivery TO farmer;
+GRANT ALL ON TABLE delivery TO farmers;
+
+
+--
+-- Name: deliveryelement_keydeliveryshot_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE deliveryelement_keydeliveryshot_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE deliveryelement_keydeliveryshot_seq FROM farmer;
+GRANT ALL ON SEQUENCE deliveryelement_keydeliveryshot_seq TO farmer;
+GRANT ALL ON SEQUENCE deliveryelement_keydeliveryshot_seq TO farmers;
+
+
+--
+-- Name: deliveryelement; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE deliveryelement FROM PUBLIC;
+REVOKE ALL ON TABLE deliveryelement FROM farmer;
+GRANT ALL ON TABLE deliveryelement TO farmer;
+GRANT ALL ON TABLE deliveryelement TO farmers;
+
+
+--
+-- Name: demoreel_keydemoreel_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE demoreel_keydemoreel_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE demoreel_keydemoreel_seq FROM farmer;
+GRANT ALL ON SEQUENCE demoreel_keydemoreel_seq TO farmer;
+GRANT ALL ON SEQUENCE demoreel_keydemoreel_seq TO farmers;
+
+
+--
+-- Name: demoreel; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE demoreel FROM PUBLIC;
+REVOKE ALL ON TABLE demoreel FROM farmer;
+GRANT ALL ON TABLE demoreel TO farmer;
+GRANT ALL ON TABLE demoreel TO farmers;
+
+
+--
+-- Name: diskimage_keydiskimage_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE diskimage_keydiskimage_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE diskimage_keydiskimage_seq FROM farmer;
+GRANT ALL ON SEQUENCE diskimage_keydiskimage_seq TO farmer;
+GRANT ALL ON SEQUENCE diskimage_keydiskimage_seq TO farmers;
+
+
+--
+-- Name: diskimage; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE diskimage FROM PUBLIC;
+REVOKE ALL ON TABLE diskimage FROM farmer;
+GRANT ALL ON TABLE diskimage TO farmer;
+GRANT ALL ON TABLE diskimage TO farmers;
+
+
+--
+-- Name: dynamichostgroup_keydynamichostgroup_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE dynamichostgroup_keydynamichostgroup_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE dynamichostgroup_keydynamichostgroup_seq FROM farmer;
+GRANT ALL ON SEQUENCE dynamichostgroup_keydynamichostgroup_seq TO farmer;
+GRANT ALL ON SEQUENCE dynamichostgroup_keydynamichostgroup_seq TO farmers;
+
+
+--
+-- Name: hostgroup_keyhostgroup_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostgroup_keyhostgroup_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostgroup_keyhostgroup_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostgroup_keyhostgroup_seq TO farmer;
+GRANT ALL ON SEQUENCE hostgroup_keyhostgroup_seq TO farmers;
+
+
+--
+-- Name: hostgroup; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostgroup FROM PUBLIC;
+REVOKE ALL ON TABLE hostgroup FROM farmer;
+GRANT ALL ON TABLE hostgroup TO farmer;
+GRANT ALL ON TABLE hostgroup TO farmers;
+
+
+--
+-- Name: dynamichostgroup; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE dynamichostgroup FROM PUBLIC;
+REVOKE ALL ON TABLE dynamichostgroup FROM farmer;
+GRANT ALL ON TABLE dynamichostgroup TO farmer;
+GRANT ALL ON TABLE dynamichostgroup TO farmers;
+
+
+--
+-- Name: elementdep_keyelementdep_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE elementdep_keyelementdep_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE elementdep_keyelementdep_seq FROM farmer;
+GRANT ALL ON SEQUENCE elementdep_keyelementdep_seq TO farmer;
+GRANT ALL ON SEQUENCE elementdep_keyelementdep_seq TO farmers;
+
+
+--
+-- Name: elementdep; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE elementdep FROM PUBLIC;
+REVOKE ALL ON TABLE elementdep FROM farmer;
+GRANT ALL ON TABLE elementdep TO farmer;
+GRANT ALL ON TABLE elementdep TO farmers;
+
+
+--
+-- Name: elementstatus_keyelementstatus_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE elementstatus_keyelementstatus_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE elementstatus_keyelementstatus_seq FROM farmer;
+GRANT ALL ON SEQUENCE elementstatus_keyelementstatus_seq TO farmer;
+GRANT ALL ON SEQUENCE elementstatus_keyelementstatus_seq TO farmers;
+
+
+--
+-- Name: elementstatus; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE elementstatus FROM PUBLIC;
+REVOKE ALL ON TABLE elementstatus FROM farmer;
+GRANT ALL ON TABLE elementstatus TO farmer;
+GRANT ALL ON TABLE elementstatus TO farmers;
+
+
+--
+-- Name: elementthread_keyelementthread_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE elementthread_keyelementthread_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE elementthread_keyelementthread_seq FROM farmer;
+GRANT ALL ON SEQUENCE elementthread_keyelementthread_seq TO farmer;
+GRANT ALL ON SEQUENCE elementthread_keyelementthread_seq TO farmers;
+
+
+--
+-- Name: elementthread; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE elementthread FROM PUBLIC;
+REVOKE ALL ON TABLE elementthread FROM farmer;
+GRANT ALL ON TABLE elementthread TO farmer;
+GRANT ALL ON TABLE elementthread TO farmers;
+
+
+--
+-- Name: elementtype_keyelementtype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE elementtype_keyelementtype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE elementtype_keyelementtype_seq FROM farmer;
+GRANT ALL ON SEQUENCE elementtype_keyelementtype_seq TO farmer;
+GRANT ALL ON SEQUENCE elementtype_keyelementtype_seq TO farmers;
+
+
+--
+-- Name: elementtype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE elementtype FROM PUBLIC;
+REVOKE ALL ON TABLE elementtype FROM farmer;
+GRANT ALL ON TABLE elementtype TO farmer;
+GRANT ALL ON TABLE elementtype TO farmers;
+
+
+--
+-- Name: elementtypetasktype_keyelementtypetasktype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE elementtypetasktype_keyelementtypetasktype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE elementtypetasktype_keyelementtypetasktype_seq FROM farmer;
+GRANT ALL ON SEQUENCE elementtypetasktype_keyelementtypetasktype_seq TO farmer;
+GRANT ALL ON SEQUENCE elementtypetasktype_keyelementtypetasktype_seq TO farmers;
+
+
+--
+-- Name: elementtypetasktype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE elementtypetasktype FROM PUBLIC;
+REVOKE ALL ON TABLE elementtypetasktype FROM farmer;
+GRANT ALL ON TABLE elementtypetasktype TO farmer;
+GRANT ALL ON TABLE elementtypetasktype TO farmers;
+
+
+--
+-- Name: elementuser_keyelementuser_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE elementuser_keyelementuser_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE elementuser_keyelementuser_seq FROM farmer;
+GRANT ALL ON SEQUENCE elementuser_keyelementuser_seq TO farmer;
+GRANT ALL ON SEQUENCE elementuser_keyelementuser_seq TO farmers;
+
+
+--
+-- Name: elementuser; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE elementuser FROM PUBLIC;
+REVOKE ALL ON TABLE elementuser FROM farmer;
+GRANT ALL ON TABLE elementuser TO farmer;
+GRANT ALL ON TABLE elementuser TO farmers;
+
+
+--
+-- Name: usr; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE usr FROM PUBLIC;
+REVOKE ALL ON TABLE usr FROM farmer;
+GRANT ALL ON TABLE usr TO farmer;
+GRANT ALL ON TABLE usr TO farmers;
+
+
+--
+-- Name: employee; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE employee FROM PUBLIC;
+REVOKE ALL ON TABLE employee FROM farmer;
+GRANT ALL ON TABLE employee TO farmer;
+GRANT ALL ON TABLE employee TO farmers;
+
+
+--
+-- Name: eventalert_keyEventAlert_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE "eventalert_keyEventAlert_seq" FROM PUBLIC;
+REVOKE ALL ON SEQUENCE "eventalert_keyEventAlert_seq" FROM farmer;
+GRANT ALL ON SEQUENCE "eventalert_keyEventAlert_seq" TO farmer;
+GRANT ALL ON SEQUENCE "eventalert_keyEventAlert_seq" TO farmers;
+
+
+--
+-- Name: eventalert; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE eventalert FROM PUBLIC;
+REVOKE ALL ON TABLE eventalert FROM farmer;
+GRANT ALL ON TABLE eventalert TO farmer;
+GRANT ALL ON TABLE eventalert TO farmers;
+
+
+--
+-- Name: filetemplate_keyfiletemplate_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE filetemplate_keyfiletemplate_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE filetemplate_keyfiletemplate_seq FROM farmer;
+GRANT ALL ON SEQUENCE filetemplate_keyfiletemplate_seq TO farmer;
+GRANT ALL ON SEQUENCE filetemplate_keyfiletemplate_seq TO farmers;
+
+
+--
+-- Name: filetemplate; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE filetemplate FROM PUBLIC;
+REVOKE ALL ON TABLE filetemplate FROM farmer;
+GRANT ALL ON TABLE filetemplate TO farmer;
+GRANT ALL ON TABLE filetemplate TO farmers;
+
+
+--
+-- Name: filetracker_keyfiletracker_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE filetracker_keyfiletracker_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE filetracker_keyfiletracker_seq FROM farmer;
+GRANT ALL ON SEQUENCE filetracker_keyfiletracker_seq TO farmer;
+GRANT ALL ON SEQUENCE filetracker_keyfiletracker_seq TO farmers;
+
+
+--
+-- Name: filetracker; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE filetracker FROM PUBLIC;
+REVOKE ALL ON TABLE filetracker FROM farmer;
+GRANT ALL ON TABLE filetracker TO farmer;
+GRANT ALL ON TABLE filetracker TO farmers;
+
+
+--
+-- Name: filetrackerdep_keyfiletrackerdep_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE filetrackerdep_keyfiletrackerdep_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE filetrackerdep_keyfiletrackerdep_seq FROM farmer;
+GRANT ALL ON SEQUENCE filetrackerdep_keyfiletrackerdep_seq TO farmer;
+GRANT ALL ON SEQUENCE filetrackerdep_keyfiletrackerdep_seq TO farmers;
+
+
+--
+-- Name: filetrackerdep; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE filetrackerdep FROM PUBLIC;
+REVOKE ALL ON TABLE filetrackerdep FROM farmer;
+GRANT ALL ON TABLE filetrackerdep TO farmer;
+GRANT ALL ON TABLE filetrackerdep TO farmers;
+
+
+--
+-- Name: fileversion_keyfileversion_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE fileversion_keyfileversion_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE fileversion_keyfileversion_seq FROM farmer;
+GRANT ALL ON SEQUENCE fileversion_keyfileversion_seq TO farmer;
+GRANT ALL ON SEQUENCE fileversion_keyfileversion_seq TO farmers;
+
+
+--
+-- Name: fileversion; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE fileversion FROM PUBLIC;
+REVOKE ALL ON TABLE fileversion FROM farmer;
+GRANT ALL ON TABLE fileversion TO farmer;
+GRANT ALL ON TABLE fileversion TO farmers;
+
+
+--
+-- Name: folder_keyfolder_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE folder_keyfolder_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE folder_keyfolder_seq FROM farmer;
+GRANT ALL ON SEQUENCE folder_keyfolder_seq TO farmer;
+GRANT ALL ON SEQUENCE folder_keyfolder_seq TO farmers;
+
+
+--
+-- Name: folder; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE folder FROM PUBLIC;
+REVOKE ALL ON TABLE folder FROM farmer;
+GRANT ALL ON TABLE folder TO farmer;
+GRANT ALL ON TABLE folder TO farmers;
+
+
+--
+-- Name: graph_keygraph_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE graph_keygraph_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE graph_keygraph_seq FROM farmer;
+GRANT ALL ON SEQUENCE graph_keygraph_seq TO farmer;
+GRANT ALL ON SEQUENCE graph_keygraph_seq TO farmers;
+
+
+--
+-- Name: graph; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE graph FROM PUBLIC;
+REVOKE ALL ON TABLE graph FROM farmer;
+GRANT ALL ON TABLE graph TO farmer;
+GRANT ALL ON TABLE graph TO farmers;
+
+
+--
+-- Name: graphds_keygraphds_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE graphds_keygraphds_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE graphds_keygraphds_seq FROM farmer;
+GRANT ALL ON SEQUENCE graphds_keygraphds_seq TO farmer;
+GRANT ALL ON SEQUENCE graphds_keygraphds_seq TO farmers;
+
+
+--
+-- Name: graphds; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE graphds FROM PUBLIC;
+REVOKE ALL ON TABLE graphds FROM farmer;
+GRANT ALL ON TABLE graphds TO farmer;
+GRANT ALL ON TABLE graphds TO farmers;
+
+
+--
+-- Name: graphpage_keygraphpage_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE graphpage_keygraphpage_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE graphpage_keygraphpage_seq FROM farmer;
+GRANT ALL ON SEQUENCE graphpage_keygraphpage_seq TO farmer;
+GRANT ALL ON SEQUENCE graphpage_keygraphpage_seq TO farmers;
+
+
+--
+-- Name: graphpage; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE graphpage FROM PUBLIC;
+REVOKE ALL ON TABLE graphpage FROM farmer;
+GRANT ALL ON TABLE graphpage TO farmer;
+GRANT ALL ON TABLE graphpage TO farmers;
+
+
+--
+-- Name: graphrelationship_keygraphrelationship_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE graphrelationship_keygraphrelationship_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE graphrelationship_keygraphrelationship_seq FROM farmer;
+GRANT ALL ON SEQUENCE graphrelationship_keygraphrelationship_seq TO farmer;
+GRANT ALL ON SEQUENCE graphrelationship_keygraphrelationship_seq TO farmers;
+
+
+--
+-- Name: graphrelationship; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE graphrelationship FROM PUBLIC;
+REVOKE ALL ON TABLE graphrelationship FROM farmer;
+GRANT ALL ON TABLE graphrelationship TO farmer;
+GRANT ALL ON TABLE graphrelationship TO farmers;
+
+
+--
+-- Name: gridtemplate_keygridtemplate_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE gridtemplate_keygridtemplate_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE gridtemplate_keygridtemplate_seq FROM farmer;
+GRANT ALL ON SEQUENCE gridtemplate_keygridtemplate_seq TO farmer;
+GRANT ALL ON SEQUENCE gridtemplate_keygridtemplate_seq TO farmers;
+
+
+--
+-- Name: gridtemplate; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE gridtemplate FROM PUBLIC;
+REVOKE ALL ON TABLE gridtemplate FROM farmer;
+GRANT ALL ON TABLE gridtemplate TO farmer;
+GRANT ALL ON TABLE gridtemplate TO farmers;
+
+
+--
+-- Name: gridtemplateitem_keygridtemplateitem_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE gridtemplateitem_keygridtemplateitem_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE gridtemplateitem_keygridtemplateitem_seq FROM farmer;
+GRANT ALL ON SEQUENCE gridtemplateitem_keygridtemplateitem_seq TO farmer;
+GRANT ALL ON SEQUENCE gridtemplateitem_keygridtemplateitem_seq TO farmers;
+
+
+--
+-- Name: gridtemplateitem; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE gridtemplateitem FROM PUBLIC;
+REVOKE ALL ON TABLE gridtemplateitem FROM farmer;
+GRANT ALL ON TABLE gridtemplateitem TO farmer;
+GRANT ALL ON TABLE gridtemplateitem TO farmers;
+
+
+--
+-- Name: groupmapping_keygroupmapping_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE groupmapping_keygroupmapping_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE groupmapping_keygroupmapping_seq FROM farmer;
+GRANT ALL ON SEQUENCE groupmapping_keygroupmapping_seq TO farmer;
+GRANT ALL ON SEQUENCE groupmapping_keygroupmapping_seq TO farmers;
+
+
+--
+-- Name: groupmapping; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE groupmapping FROM PUBLIC;
+REVOKE ALL ON TABLE groupmapping FROM farmer;
+GRANT ALL ON TABLE groupmapping TO farmer;
+GRANT ALL ON TABLE groupmapping TO farmers;
+
+
+--
+-- Name: grp_keygrp_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE grp_keygrp_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE grp_keygrp_seq FROM farmer;
+GRANT ALL ON SEQUENCE grp_keygrp_seq TO farmer;
+GRANT ALL ON SEQUENCE grp_keygrp_seq TO farmers;
+
+
+--
+-- Name: grp; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE grp FROM PUBLIC;
+REVOKE ALL ON TABLE grp FROM farmer;
+GRANT ALL ON TABLE grp TO farmer;
+GRANT ALL ON TABLE grp TO farmers;
+
+
+--
+-- Name: gruntscript_keygruntscript_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE gruntscript_keygruntscript_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE gruntscript_keygruntscript_seq FROM farmer;
+GRANT ALL ON SEQUENCE gruntscript_keygruntscript_seq TO farmer;
+GRANT ALL ON SEQUENCE gruntscript_keygruntscript_seq TO farmers;
+
+
+--
+-- Name: gruntscript; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE gruntscript FROM PUBLIC;
+REVOKE ALL ON TABLE gruntscript FROM farmer;
+GRANT ALL ON TABLE gruntscript TO farmer;
+GRANT ALL ON TABLE gruntscript TO farmers;
+
+
+--
+-- Name: history_keyhistory_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE history_keyhistory_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE history_keyhistory_seq FROM farmer;
+GRANT ALL ON SEQUENCE history_keyhistory_seq TO farmer;
+GRANT ALL ON SEQUENCE history_keyhistory_seq TO farmers;
+
+
+--
+-- Name: history; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE history FROM PUBLIC;
+REVOKE ALL ON TABLE history FROM farmer;
+GRANT ALL ON TABLE history TO farmer;
+GRANT ALL ON TABLE history TO farmers;
+
+
+--
+-- Name: hostdailystat_keyhostdailystat_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostdailystat_keyhostdailystat_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostdailystat_keyhostdailystat_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostdailystat_keyhostdailystat_seq TO farmer;
+GRANT ALL ON SEQUENCE hostdailystat_keyhostdailystat_seq TO farmers;
+
+
+--
+-- Name: hostdailystat; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostdailystat FROM PUBLIC;
+REVOKE ALL ON TABLE hostdailystat FROM farmer;
+GRANT ALL ON TABLE hostdailystat TO farmer;
+GRANT ALL ON TABLE hostdailystat TO farmers;
+
+
+--
+-- Name: hostgroupitem_keyhostgroupitem_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostgroupitem_keyhostgroupitem_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostgroupitem_keyhostgroupitem_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostgroupitem_keyhostgroupitem_seq TO farmer;
+GRANT ALL ON SEQUENCE hostgroupitem_keyhostgroupitem_seq TO farmers;
+
+
+--
+-- Name: hostgroupitem; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostgroupitem FROM PUBLIC;
+REVOKE ALL ON TABLE hostgroupitem FROM farmer;
+GRANT ALL ON TABLE hostgroupitem TO farmer;
+GRANT ALL ON TABLE hostgroupitem TO farmers;
+
+
+--
+-- Name: hostinterfacetype_keyhostinterfacetype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostinterfacetype_keyhostinterfacetype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostinterfacetype_keyhostinterfacetype_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostinterfacetype_keyhostinterfacetype_seq TO farmer;
+GRANT ALL ON SEQUENCE hostinterfacetype_keyhostinterfacetype_seq TO farmers;
+
+
+--
+-- Name: hostinterfacetype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostinterfacetype FROM PUBLIC;
+REVOKE ALL ON TABLE hostinterfacetype FROM farmer;
+GRANT ALL ON TABLE hostinterfacetype TO farmer;
+GRANT ALL ON TABLE hostinterfacetype TO farmers;
+
+
+--
+-- Name: hostload_keyhostload_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostload_keyhostload_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostload_keyhostload_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostload_keyhostload_seq TO farmer;
+GRANT ALL ON SEQUENCE hostload_keyhostload_seq TO farmers;
+
+
+--
+-- Name: hostload; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostload FROM PUBLIC;
+REVOKE ALL ON TABLE hostload FROM farmer;
+GRANT ALL ON TABLE hostload TO farmer;
+GRANT ALL ON TABLE hostload TO farmers;
+
+
+--
+-- Name: hostmapping_keyhostmapping_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostmapping_keyhostmapping_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostmapping_keyhostmapping_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostmapping_keyhostmapping_seq TO farmer;
+GRANT ALL ON SEQUENCE hostmapping_keyhostmapping_seq TO farmers;
+
+
+--
+-- Name: hostmapping; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostmapping FROM PUBLIC;
+REVOKE ALL ON TABLE hostmapping FROM farmer;
+GRANT ALL ON TABLE hostmapping TO farmer;
+GRANT ALL ON TABLE hostmapping TO farmers;
+
+
+--
+-- Name: hostport_keyhostport_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostport_keyhostport_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostport_keyhostport_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostport_keyhostport_seq TO farmer;
+GRANT ALL ON SEQUENCE hostport_keyhostport_seq TO farmers;
+
+
+--
+-- Name: hostport; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostport FROM PUBLIC;
+REVOKE ALL ON TABLE hostport FROM farmer;
+GRANT ALL ON TABLE hostport TO farmer;
+GRANT ALL ON TABLE hostport TO farmers;
+
+
+--
+-- Name: hostresource_keyhostresource_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostresource_keyhostresource_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostresource_keyhostresource_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostresource_keyhostresource_seq TO farmer;
+GRANT ALL ON SEQUENCE hostresource_keyhostresource_seq TO farmers;
+
+
+--
+-- Name: hostresource; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostresource FROM PUBLIC;
+REVOKE ALL ON TABLE hostresource FROM farmer;
+GRANT ALL ON TABLE hostresource TO farmer;
+GRANT ALL ON TABLE hostresource TO farmers;
+
+
+--
+-- Name: hosts_active; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hosts_active FROM PUBLIC;
+REVOKE ALL ON TABLE hosts_active FROM farmer;
+GRANT ALL ON TABLE hosts_active TO farmer;
+GRANT ALL ON TABLE hosts_active TO PUBLIC;
+GRANT ALL ON TABLE hosts_active TO farmers;
+
+
+--
+-- Name: hosts_ready; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hosts_ready FROM PUBLIC;
+REVOKE ALL ON TABLE hosts_ready FROM farmer;
+GRANT ALL ON TABLE hosts_ready TO farmer;
+GRANT ALL ON TABLE hosts_ready TO farmers;
+
+
+--
+-- Name: hosts_total; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hosts_total FROM PUBLIC;
+REVOKE ALL ON TABLE hosts_total FROM farmer;
+GRANT ALL ON TABLE hosts_total TO farmer;
+GRANT ALL ON TABLE hosts_total TO farmers;
+
+
+--
+-- Name: hostservice_keyhostservice_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostservice_keyhostservice_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostservice_keyhostservice_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostservice_keyhostservice_seq TO farmer;
+GRANT ALL ON SEQUENCE hostservice_keyhostservice_seq TO farmers;
+
+
+--
+-- Name: hostservice; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostservice FROM PUBLIC;
+REVOKE ALL ON TABLE hostservice FROM farmer;
+GRANT ALL ON TABLE hostservice TO farmer;
+GRANT ALL ON TABLE hostservice TO farmers;
+
+
+--
+-- Name: hostsoftware_keyhostsoftware_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hostsoftware_keyhostsoftware_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hostsoftware_keyhostsoftware_seq FROM farmer;
+GRANT ALL ON SEQUENCE hostsoftware_keyhostsoftware_seq TO farmer;
+GRANT ALL ON SEQUENCE hostsoftware_keyhostsoftware_seq TO farmers;
+
+
+--
+-- Name: hostsoftware; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hostsoftware FROM PUBLIC;
+REVOKE ALL ON TABLE hostsoftware FROM farmer;
+GRANT ALL ON TABLE hostsoftware TO farmer;
+GRANT ALL ON TABLE hostsoftware TO farmers;
+
+
+--
+-- Name: hoststatus_keyhoststatus_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE hoststatus_keyhoststatus_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE hoststatus_keyhoststatus_seq FROM farmer;
+GRANT ALL ON SEQUENCE hoststatus_keyhoststatus_seq TO farmer;
+GRANT ALL ON SEQUENCE hoststatus_keyhoststatus_seq TO farmers;
+
+
+--
+-- Name: hoststatus; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE hoststatus FROM PUBLIC;
+REVOKE ALL ON TABLE hoststatus FROM farmer;
+GRANT ALL ON TABLE hoststatus TO farmer;
+GRANT ALL ON TABLE hoststatus TO farmers;
+
+
+--
+-- Name: job3delight; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE job3delight FROM PUBLIC;
+REVOKE ALL ON TABLE job3delight FROM farmer;
+GRANT ALL ON TABLE job3delight TO farmer;
+GRANT ALL ON TABLE job3delight TO farmers;
+
+
+--
+-- Name: jobassignment_old; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobassignment_old FROM PUBLIC;
+REVOKE ALL ON TABLE jobassignment_old FROM farmer;
+GRANT ALL ON TABLE jobassignment_old TO farmer;
+GRANT ALL ON TABLE jobassignment_old TO farmers;
+
+
+--
+-- Name: jobassignment_keyjobassignment_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobassignment_keyjobassignment_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobassignment_keyjobassignment_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobassignment_keyjobassignment_seq TO farmer;
+GRANT ALL ON SEQUENCE jobassignment_keyjobassignment_seq TO farmers;
+
+
+--
+-- Name: jobassignment; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobassignment FROM PUBLIC;
+REVOKE ALL ON TABLE jobassignment FROM farmer;
+GRANT ALL ON TABLE jobassignment TO farmer;
+GRANT ALL ON TABLE jobassignment TO PUBLIC;
+GRANT ALL ON TABLE jobassignment TO farmers;
+
+
+--
+-- Name: jobassignmentstatus; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobassignmentstatus FROM PUBLIC;
+REVOKE ALL ON TABLE jobassignmentstatus FROM farmer;
+GRANT ALL ON TABLE jobassignmentstatus TO farmer;
+GRANT ALL ON TABLE jobassignmentstatus TO farmers;
+
+
+--
+-- Name: jobassignmentstatus_keyjobassignmentstatus_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobassignmentstatus_keyjobassignmentstatus_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobassignmentstatus_keyjobassignmentstatus_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobassignmentstatus_keyjobassignmentstatus_seq TO farmer;
+GRANT ALL ON SEQUENCE jobassignmentstatus_keyjobassignmentstatus_seq TO farmers;
+
+
+--
+-- Name: jobbatch; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobbatch FROM PUBLIC;
+REVOKE ALL ON TABLE jobbatch FROM farmer;
+GRANT ALL ON TABLE jobbatch TO farmer;
+GRANT ALL ON TABLE jobbatch TO farmers;
+
+
+--
+-- Name: jobcannedbatch_keyjobcannedbatch_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobcannedbatch_keyjobcannedbatch_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobcannedbatch_keyjobcannedbatch_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobcannedbatch_keyjobcannedbatch_seq TO farmer;
+GRANT ALL ON SEQUENCE jobcannedbatch_keyjobcannedbatch_seq TO farmers;
+
+
+--
+-- Name: jobcannedbatch; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobcannedbatch FROM PUBLIC;
+REVOKE ALL ON TABLE jobcannedbatch FROM farmer;
+GRANT ALL ON TABLE jobcannedbatch TO farmer;
+GRANT ALL ON TABLE jobcannedbatch TO farmers;
+
+
+--
+-- Name: jobcommandhistory_keyjobcommandhistory_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobcommandhistory_keyjobcommandhistory_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobcommandhistory_keyjobcommandhistory_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobcommandhistory_keyjobcommandhistory_seq TO farmer;
+GRANT ALL ON SEQUENCE jobcommandhistory_keyjobcommandhistory_seq TO farmers;
+
+
+--
+-- Name: jobcommandhistory; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobcommandhistory FROM PUBLIC;
+REVOKE ALL ON TABLE jobcommandhistory FROM farmer;
+GRANT ALL ON TABLE jobcommandhistory TO farmer;
+GRANT ALL ON TABLE jobcommandhistory TO farmers;
+
+
+--
+-- Name: jobenvironment; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobenvironment FROM PUBLIC;
+REVOKE ALL ON TABLE jobenvironment FROM farmer;
+GRANT ALL ON TABLE jobenvironment TO farmer;
+GRANT ALL ON TABLE jobenvironment TO PUBLIC;
+GRANT ALL ON TABLE jobenvironment TO farmers;
+
+
+--
+-- Name: jobenvironment_keyjobenvironment_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobenvironment_keyjobenvironment_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobenvironment_keyjobenvironment_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobenvironment_keyjobenvironment_seq TO farmer;
+GRANT ALL ON SEQUENCE jobenvironment_keyjobenvironment_seq TO farmers;
+
+
+--
+-- Name: joberror_keyjoberror_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE joberror_keyjoberror_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE joberror_keyjoberror_seq FROM farmer;
+GRANT ALL ON SEQUENCE joberror_keyjoberror_seq TO farmer;
+GRANT ALL ON SEQUENCE joberror_keyjoberror_seq TO farmers;
+
+
+--
+-- Name: joberror; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE joberror FROM PUBLIC;
+REVOKE ALL ON TABLE joberror FROM farmer;
+GRANT ALL ON TABLE joberror TO farmer;
+GRANT ALL ON TABLE joberror TO farmers;
+
+
+--
+-- Name: joberrorhandler_keyjoberrorhandler_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE joberrorhandler_keyjoberrorhandler_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE joberrorhandler_keyjoberrorhandler_seq FROM farmer;
+GRANT ALL ON SEQUENCE joberrorhandler_keyjoberrorhandler_seq TO farmer;
+GRANT ALL ON SEQUENCE joberrorhandler_keyjoberrorhandler_seq TO farmers;
+
+
+--
+-- Name: joberrorhandler; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE joberrorhandler FROM PUBLIC;
+REVOKE ALL ON TABLE joberrorhandler FROM farmer;
+GRANT ALL ON TABLE joberrorhandler TO farmer;
+GRANT ALL ON TABLE joberrorhandler TO farmers;
+
+
+--
+-- Name: joberrorhandlerscript_keyjoberrorhandlerscript_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE joberrorhandlerscript_keyjoberrorhandlerscript_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE joberrorhandlerscript_keyjoberrorhandlerscript_seq FROM farmer;
+GRANT ALL ON SEQUENCE joberrorhandlerscript_keyjoberrorhandlerscript_seq TO farmer;
+GRANT ALL ON SEQUENCE joberrorhandlerscript_keyjoberrorhandlerscript_seq TO farmers;
+
+
+--
+-- Name: joberrorhandlerscript; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE joberrorhandlerscript FROM PUBLIC;
+REVOKE ALL ON TABLE joberrorhandlerscript FROM farmer;
+GRANT ALL ON TABLE joberrorhandlerscript TO farmer;
+GRANT ALL ON TABLE joberrorhandlerscript TO farmers;
+
+
+--
+-- Name: jobfiltermessage; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobfiltermessage FROM PUBLIC;
+REVOKE ALL ON TABLE jobfiltermessage FROM farmer;
+GRANT ALL ON TABLE jobfiltermessage TO farmer;
+GRANT ALL ON TABLE jobfiltermessage TO PUBLIC;
+GRANT ALL ON TABLE jobfiltermessage TO farmers;
+
+
+--
+-- Name: jobfiltermessage_keyjobfiltermessage_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobfiltermessage_keyjobfiltermessage_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobfiltermessage_keyjobfiltermessage_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobfiltermessage_keyjobfiltermessage_seq TO farmer;
+GRANT ALL ON SEQUENCE jobfiltermessage_keyjobfiltermessage_seq TO farmers;
+
+
+--
+-- Name: jobfilterset; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobfilterset FROM PUBLIC;
+REVOKE ALL ON TABLE jobfilterset FROM farmer;
+GRANT ALL ON TABLE jobfilterset TO farmer;
+GRANT ALL ON TABLE jobfilterset TO PUBLIC;
+GRANT ALL ON TABLE jobfilterset TO farmers;
+
+
+--
+-- Name: jobfilterset_keyjobfilterset_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobfilterset_keyjobfilterset_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobfilterset_keyjobfilterset_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobfilterset_keyjobfilterset_seq TO farmer;
+GRANT ALL ON SEQUENCE jobfilterset_keyjobfilterset_seq TO farmers;
+
+
+--
+-- Name: jobfiltertype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobfiltertype FROM PUBLIC;
+REVOKE ALL ON TABLE jobfiltertype FROM farmer;
+GRANT ALL ON TABLE jobfiltertype TO farmer;
+GRANT ALL ON TABLE jobfiltertype TO PUBLIC;
+GRANT ALL ON TABLE jobfiltertype TO farmers;
+
+
+--
+-- Name: jobfiltertype_keyjobfiltertype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobfiltertype_keyjobfiltertype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobfiltertype_keyjobfiltertype_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobfiltertype_keyjobfiltertype_seq TO farmer;
+GRANT ALL ON SEQUENCE jobfiltertype_keyjobfiltertype_seq TO farmers;
+
+
+--
+-- Name: jobhistory_keyjobhistory_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobhistory_keyjobhistory_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobhistory_keyjobhistory_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobhistory_keyjobhistory_seq TO farmer;
+GRANT ALL ON SEQUENCE jobhistory_keyjobhistory_seq TO farmers;
+
+
+--
+-- Name: jobhistory; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobhistory FROM PUBLIC;
+REVOKE ALL ON TABLE jobhistory FROM farmer;
+GRANT ALL ON TABLE jobhistory TO farmer;
+GRANT ALL ON TABLE jobhistory TO farmers;
+
+
+--
+-- Name: jobhistorytype_keyjobhistorytype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobhistorytype_keyjobhistorytype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobhistorytype_keyjobhistorytype_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobhistorytype_keyjobhistorytype_seq TO farmer;
+GRANT ALL ON SEQUENCE jobhistorytype_keyjobhistorytype_seq TO farmers;
+
+
+--
+-- Name: jobhistorytype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobhistorytype FROM PUBLIC;
+REVOKE ALL ON TABLE jobhistorytype FROM farmer;
+GRANT ALL ON TABLE jobhistorytype TO farmer;
+GRANT ALL ON TABLE jobhistorytype TO farmers;
+
+
+--
+-- Name: jobmantra100; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmantra100 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmantra100 FROM farmer;
+GRANT ALL ON TABLE jobmantra100 TO farmer;
+GRANT ALL ON TABLE jobmantra100 TO farmers;
+
+
+--
+-- Name: jobmantra100_keyjobmantra100_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobmantra100_keyjobmantra100_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobmantra100_keyjobmantra100_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobmantra100_keyjobmantra100_seq TO farmer;
+GRANT ALL ON SEQUENCE jobmantra100_keyjobmantra100_seq TO farmers;
+
+
+--
+-- Name: jobmantra95; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmantra95 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmantra95 FROM farmer;
+GRANT ALL ON TABLE jobmantra95 TO farmer;
+GRANT ALL ON TABLE jobmantra95 TO farmers;
+
+
+--
+-- Name: jobmantra95_keyjobmantra95_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobmantra95_keyjobmantra95_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobmantra95_keyjobmantra95_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobmantra95_keyjobmantra95_seq TO farmer;
+GRANT ALL ON SEQUENCE jobmantra95_keyjobmantra95_seq TO farmers;
+
+
+--
+-- Name: jobmaya; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmaya FROM PUBLIC;
+REVOKE ALL ON TABLE jobmaya FROM farmer;
+GRANT ALL ON TABLE jobmaya TO farmer;
+GRANT ALL ON TABLE jobmaya TO farmers;
+
+
+--
+-- Name: jobmaya2008; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmaya2008 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmaya2008 FROM farmer;
+GRANT ALL ON TABLE jobmaya2008 TO farmer;
+GRANT ALL ON TABLE jobmaya2008 TO farmers;
+
+
+--
+-- Name: jobmaya2009; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmaya2009 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmaya2009 FROM farmer;
+GRANT ALL ON TABLE jobmaya2009 TO farmer;
+GRANT ALL ON TABLE jobmaya2009 TO farmers;
+
+
+--
+-- Name: jobmaya2011; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmaya2011 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmaya2011 FROM farmer;
+GRANT ALL ON TABLE jobmaya2011 TO farmer;
+GRANT ALL ON TABLE jobmaya2011 TO farmers;
+
+
+--
+-- Name: jobmaya7; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmaya7 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmaya7 FROM farmer;
+GRANT ALL ON TABLE jobmaya7 TO farmer;
+GRANT ALL ON TABLE jobmaya7 TO farmers;
+
+
+--
+-- Name: jobmaya8; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmaya8 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmaya8 FROM farmer;
+GRANT ALL ON TABLE jobmaya8 TO farmer;
+GRANT ALL ON TABLE jobmaya8 TO farmers;
+
+
+--
+-- Name: jobmaya85; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmaya85 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmaya85 FROM farmer;
+GRANT ALL ON TABLE jobmaya85 TO farmer;
+GRANT ALL ON TABLE jobmaya85 TO farmers;
+
+
+--
+-- Name: jobmentalray2009; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmentalray2009 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmentalray2009 FROM farmer;
+GRANT ALL ON TABLE jobmentalray2009 TO farmer;
+GRANT ALL ON TABLE jobmentalray2009 TO farmers;
+
+
+--
+-- Name: jobmentalray2011; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmentalray2011 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmentalray2011 FROM farmer;
+GRANT ALL ON TABLE jobmentalray2011 TO farmer;
+GRANT ALL ON TABLE jobmentalray2011 TO farmers;
+
+
+--
+-- Name: jobmentalray7; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmentalray7 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmentalray7 FROM farmer;
+GRANT ALL ON TABLE jobmentalray7 TO farmer;
+GRANT ALL ON TABLE jobmentalray7 TO farmers;
+
+
+--
+-- Name: jobmentalray8; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmentalray8 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmentalray8 FROM farmer;
+GRANT ALL ON TABLE jobmentalray8 TO farmer;
+GRANT ALL ON TABLE jobmentalray8 TO farmers;
+
+
+--
+-- Name: jobmentalray85; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmentalray85 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmentalray85 FROM farmer;
+GRANT ALL ON TABLE jobmentalray85 TO farmer;
+GRANT ALL ON TABLE jobmentalray85 TO farmers;
+
+
+--
+-- Name: jobnaiad; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobnaiad FROM PUBLIC;
+REVOKE ALL ON TABLE jobnaiad FROM farmer;
+GRANT ALL ON TABLE jobnaiad TO farmer;
+GRANT ALL ON TABLE jobnaiad TO PUBLIC;
+GRANT ALL ON TABLE jobnaiad TO farmers;
+
+
+--
+-- Name: jobnuke; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobnuke FROM PUBLIC;
+REVOKE ALL ON TABLE jobnuke FROM farmer;
+GRANT ALL ON TABLE jobnuke TO farmer;
+GRANT ALL ON TABLE jobnuke TO PUBLIC;
+GRANT ALL ON TABLE jobnuke TO farmers;
+
+
+--
+-- Name: jobnuke51; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobnuke51 FROM PUBLIC;
+REVOKE ALL ON TABLE jobnuke51 FROM farmer;
+GRANT ALL ON TABLE jobnuke51 TO farmer;
+GRANT ALL ON TABLE jobnuke51 TO farmers;
+
+
+--
+-- Name: jobnuke52; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobnuke52 FROM PUBLIC;
+REVOKE ALL ON TABLE jobnuke52 FROM farmer;
+GRANT ALL ON TABLE jobnuke52 TO farmer;
+GRANT ALL ON TABLE jobnuke52 TO farmers;
+
+
+--
+-- Name: joboutput_keyjoboutput_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE joboutput_keyjoboutput_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE joboutput_keyjoboutput_seq FROM farmer;
+GRANT ALL ON SEQUENCE joboutput_keyjoboutput_seq TO farmer;
+GRANT ALL ON SEQUENCE joboutput_keyjoboutput_seq TO farmers;
+
+
+--
+-- Name: joboutput; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE joboutput FROM PUBLIC;
+REVOKE ALL ON TABLE joboutput FROM farmer;
+GRANT ALL ON TABLE joboutput TO farmer;
+GRANT ALL ON TABLE joboutput TO farmers;
+
+
+--
+-- Name: jobrenderman_keyjob_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobrenderman_keyjob_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobrenderman_keyjob_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobrenderman_keyjob_seq TO farmer;
+GRANT ALL ON SEQUENCE jobrenderman_keyjob_seq TO farmers;
+
+
+--
+-- Name: jobribgen_keyjob_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobribgen_keyjob_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobribgen_keyjob_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobribgen_keyjob_seq TO farmer;
+GRANT ALL ON SEQUENCE jobribgen_keyjob_seq TO farmers;
+
+
+--
+-- Name: jobservice_keyjobservice_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobservice_keyjobservice_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobservice_keyjobservice_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobservice_keyjobservice_seq TO farmer;
+GRANT ALL ON SEQUENCE jobservice_keyjobservice_seq TO farmers;
+
+
+--
+-- Name: jobservice; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobservice FROM PUBLIC;
+REVOKE ALL ON TABLE jobservice FROM farmer;
+GRANT ALL ON TABLE jobservice TO farmer;
+GRANT ALL ON TABLE jobservice TO farmers;
+
+
+--
+-- Name: jobstat_keyjobstat_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobstat_keyjobstat_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobstat_keyjobstat_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobstat_keyjobstat_seq TO farmer;
+GRANT ALL ON SEQUENCE jobstat_keyjobstat_seq TO farmers;
+
+
+--
+-- Name: jobstat; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobstat FROM PUBLIC;
+REVOKE ALL ON TABLE jobstat FROM farmer;
+GRANT ALL ON TABLE jobstat TO farmer;
+GRANT ALL ON TABLE jobstat TO farmers;
+
+
+--
+-- Name: jobstateaction; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobstateaction FROM PUBLIC;
+REVOKE ALL ON TABLE jobstateaction FROM farmer;
+GRANT ALL ON TABLE jobstateaction TO farmer;
+GRANT ALL ON TABLE jobstateaction TO PUBLIC;
+GRANT ALL ON TABLE jobstateaction TO farmers;
+
+
+--
+-- Name: jobstateaction_keyjobstateaction_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobstateaction_keyjobstateaction_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobstateaction_keyjobstateaction_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobstateaction_keyjobstateaction_seq TO farmer;
+GRANT ALL ON SEQUENCE jobstateaction_keyjobstateaction_seq TO farmers;
+
+
+--
+-- Name: jobstatus_keyjobstatus_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobstatus_keyjobstatus_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobstatus_keyjobstatus_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobstatus_keyjobstatus_seq TO farmer;
+GRANT ALL ON SEQUENCE jobstatus_keyjobstatus_seq TO farmers;
+
+
+--
+-- Name: jobstatus; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobstatus FROM PUBLIC;
+REVOKE ALL ON TABLE jobstatus FROM farmer;
+GRANT ALL ON TABLE jobstatus TO farmer;
+GRANT ALL ON TABLE jobstatus TO PUBLIC;
+GRANT ALL ON TABLE jobstatus TO farmers;
+
+
+--
+-- Name: jobstatus_old; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobstatus_old FROM PUBLIC;
+REVOKE ALL ON TABLE jobstatus_old FROM farmer;
+GRANT ALL ON TABLE jobstatus_old TO farmer;
+GRANT ALL ON TABLE jobstatus_old TO farmers;
+
+
+--
+-- Name: jobtaskassignment_old; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobtaskassignment_old FROM PUBLIC;
+REVOKE ALL ON TABLE jobtaskassignment_old FROM farmer;
+GRANT ALL ON TABLE jobtaskassignment_old TO farmer;
+GRANT ALL ON TABLE jobtaskassignment_old TO farmers;
+
+
+--
+-- Name: jobtaskassignment_keyjobtaskassignment_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobtaskassignment_keyjobtaskassignment_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobtaskassignment_keyjobtaskassignment_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobtaskassignment_keyjobtaskassignment_seq TO farmer;
+GRANT ALL ON SEQUENCE jobtaskassignment_keyjobtaskassignment_seq TO farmers;
+
+
+--
+-- Name: jobtaskassignment; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobtaskassignment FROM PUBLIC;
+REVOKE ALL ON TABLE jobtaskassignment FROM farmer;
+GRANT ALL ON TABLE jobtaskassignment TO farmer;
+GRANT ALL ON TABLE jobtaskassignment TO PUBLIC;
+GRANT ALL ON TABLE jobtaskassignment TO farmers;
+
+
+--
+-- Name: jobtypemapping_keyjobtypemapping_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobtypemapping_keyjobtypemapping_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobtypemapping_keyjobtypemapping_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobtypemapping_keyjobtypemapping_seq TO farmer;
+GRANT ALL ON SEQUENCE jobtypemapping_keyjobtypemapping_seq TO farmers;
+
+
+--
+-- Name: jobtypemapping; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobtypemapping FROM PUBLIC;
+REVOKE ALL ON TABLE jobtypemapping FROM farmer;
+GRANT ALL ON TABLE jobtypemapping TO farmer;
+GRANT ALL ON TABLE jobtypemapping TO farmers;
+
+
+--
+-- Name: license_keylicense_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE license_keylicense_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE license_keylicense_seq FROM farmer;
+GRANT ALL ON SEQUENCE license_keylicense_seq TO farmer;
+GRANT ALL ON SEQUENCE license_keylicense_seq TO farmers;
+
+
+--
+-- Name: license; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE license FROM PUBLIC;
+REVOKE ALL ON TABLE license FROM farmer;
+GRANT ALL ON TABLE license TO farmer;
+GRANT ALL ON TABLE license TO PUBLIC;
+GRANT ALL ON TABLE license TO farmers;
+
+
+--
+-- Name: service_keyservice_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE service_keyservice_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE service_keyservice_seq FROM farmer;
+GRANT ALL ON SEQUENCE service_keyservice_seq TO farmer;
+GRANT ALL ON SEQUENCE service_keyservice_seq TO farmers;
+
+
+--
+-- Name: service; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE service FROM PUBLIC;
+REVOKE ALL ON TABLE service FROM farmer;
+GRANT ALL ON TABLE service TO farmer;
+GRANT ALL ON TABLE service TO farmers;
+
+
+--
+-- Name: license_usage; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE license_usage FROM PUBLIC;
+REVOKE ALL ON TABLE license_usage FROM farmer;
+GRANT ALL ON TABLE license_usage TO farmer;
+GRANT ALL ON TABLE license_usage TO PUBLIC;
+GRANT ALL ON TABLE license_usage TO farmers;
+
+
+--
+-- Name: license_usage_2; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE license_usage_2 FROM PUBLIC;
+REVOKE ALL ON TABLE license_usage_2 FROM farmer;
+GRANT ALL ON TABLE license_usage_2 TO farmer;
+GRANT ALL ON TABLE license_usage_2 TO PUBLIC;
+GRANT ALL ON TABLE license_usage_2 TO farmers;
+
+
+--
+-- Name: location_keylocation_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE location_keylocation_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE location_keylocation_seq FROM farmer;
+GRANT ALL ON SEQUENCE location_keylocation_seq TO farmer;
+GRANT ALL ON SEQUENCE location_keylocation_seq TO farmers;
+
+
+--
+-- Name: location; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE location FROM PUBLIC;
+REVOKE ALL ON TABLE location FROM farmer;
+GRANT ALL ON TABLE location TO farmer;
+GRANT ALL ON TABLE location TO farmers;
+
+
+--
+-- Name: mapping_keymapping_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE mapping_keymapping_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE mapping_keymapping_seq FROM farmer;
+GRANT ALL ON SEQUENCE mapping_keymapping_seq TO farmer;
+GRANT ALL ON SEQUENCE mapping_keymapping_seq TO farmers;
+
+
+--
+-- Name: mapping; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE mapping FROM PUBLIC;
+REVOKE ALL ON TABLE mapping FROM farmer;
+GRANT ALL ON TABLE mapping TO farmer;
+GRANT ALL ON TABLE mapping TO farmers;
+
+
+--
+-- Name: mappingtype_keymappingtype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE mappingtype_keymappingtype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE mappingtype_keymappingtype_seq FROM farmer;
+GRANT ALL ON SEQUENCE mappingtype_keymappingtype_seq TO farmer;
+GRANT ALL ON SEQUENCE mappingtype_keymappingtype_seq TO farmers;
+
+
+--
+-- Name: mappingtype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE mappingtype FROM PUBLIC;
+REVOKE ALL ON TABLE mappingtype FROM farmer;
+GRANT ALL ON TABLE mappingtype TO farmer;
+GRANT ALL ON TABLE mappingtype TO farmers;
+
+
+--
+-- Name: methodperms_keymethodperms_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE methodperms_keymethodperms_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE methodperms_keymethodperms_seq FROM farmer;
+GRANT ALL ON SEQUENCE methodperms_keymethodperms_seq TO farmer;
+GRANT ALL ON SEQUENCE methodperms_keymethodperms_seq TO farmers;
+
+
+--
+-- Name: methodperms; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE methodperms FROM PUBLIC;
+REVOKE ALL ON TABLE methodperms FROM farmer;
+GRANT ALL ON TABLE methodperms TO farmer;
+GRANT ALL ON TABLE methodperms TO farmers;
+
+
+--
+-- Name: notification_keynotification_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE notification_keynotification_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE notification_keynotification_seq FROM farmer;
+GRANT ALL ON SEQUENCE notification_keynotification_seq TO farmer;
+GRANT ALL ON SEQUENCE notification_keynotification_seq TO farmers;
+
+
+--
+-- Name: notification; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE notification FROM PUBLIC;
+REVOKE ALL ON TABLE notification FROM farmer;
+GRANT ALL ON TABLE notification TO farmer;
+GRANT ALL ON TABLE notification TO farmers;
+
+
+--
+-- Name: notificationdestination_keynotificationdestination_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE notificationdestination_keynotificationdestination_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE notificationdestination_keynotificationdestination_seq FROM farmer;
+GRANT ALL ON SEQUENCE notificationdestination_keynotificationdestination_seq TO farmer;
+GRANT ALL ON SEQUENCE notificationdestination_keynotificationdestination_seq TO farmers;
+
+
+--
+-- Name: notificationdestination; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE notificationdestination FROM PUBLIC;
+REVOKE ALL ON TABLE notificationdestination FROM farmer;
+GRANT ALL ON TABLE notificationdestination TO farmer;
+GRANT ALL ON TABLE notificationdestination TO farmers;
+
+
+--
+-- Name: notificationmethod_keynotificationmethod_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE notificationmethod_keynotificationmethod_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE notificationmethod_keynotificationmethod_seq FROM farmer;
+GRANT ALL ON SEQUENCE notificationmethod_keynotificationmethod_seq TO farmer;
+GRANT ALL ON SEQUENCE notificationmethod_keynotificationmethod_seq TO farmers;
+
+
+--
+-- Name: notificationmethod; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE notificationmethod FROM PUBLIC;
+REVOKE ALL ON TABLE notificationmethod FROM farmer;
+GRANT ALL ON TABLE notificationmethod TO farmer;
+GRANT ALL ON TABLE notificationmethod TO farmers;
+
+
+--
+-- Name: notificationroute_keynotificationuserroute_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE notificationroute_keynotificationuserroute_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE notificationroute_keynotificationuserroute_seq FROM farmer;
+GRANT ALL ON SEQUENCE notificationroute_keynotificationuserroute_seq TO farmer;
+GRANT ALL ON SEQUENCE notificationroute_keynotificationuserroute_seq TO farmers;
+
+
+--
+-- Name: notificationroute; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE notificationroute FROM PUBLIC;
+REVOKE ALL ON TABLE notificationroute FROM farmer;
+GRANT ALL ON TABLE notificationroute TO farmer;
+GRANT ALL ON TABLE notificationroute TO farmers;
+
+
+--
+-- Name: notify_keynotify_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE notify_keynotify_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE notify_keynotify_seq FROM farmer;
+GRANT ALL ON SEQUENCE notify_keynotify_seq TO farmer;
+GRANT ALL ON SEQUENCE notify_keynotify_seq TO farmers;
+
+
+--
+-- Name: notify; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE notify FROM PUBLIC;
+REVOKE ALL ON TABLE notify FROM farmer;
+GRANT ALL ON TABLE notify TO farmer;
+GRANT ALL ON TABLE notify TO farmers;
+
+
+--
+-- Name: notifymethod_keynotifymethod_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE notifymethod_keynotifymethod_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE notifymethod_keynotifymethod_seq FROM farmer;
+GRANT ALL ON SEQUENCE notifymethod_keynotifymethod_seq TO farmer;
+GRANT ALL ON SEQUENCE notifymethod_keynotifymethod_seq TO farmers;
+
+
+--
+-- Name: notifymethod; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE notifymethod FROM PUBLIC;
+REVOKE ALL ON TABLE notifymethod FROM farmer;
+GRANT ALL ON TABLE notifymethod TO farmer;
+GRANT ALL ON TABLE notifymethod TO farmers;
+
+
+--
+-- Name: notifysent_keynotifysent_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE notifysent_keynotifysent_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE notifysent_keynotifysent_seq FROM farmer;
+GRANT ALL ON SEQUENCE notifysent_keynotifysent_seq TO farmer;
+GRANT ALL ON SEQUENCE notifysent_keynotifysent_seq TO farmers;
+
+
+--
+-- Name: notifysent; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE notifysent FROM PUBLIC;
+REVOKE ALL ON TABLE notifysent FROM farmer;
+GRANT ALL ON TABLE notifysent TO farmer;
+GRANT ALL ON TABLE notifysent TO farmers;
+
+
+--
+-- Name: notifywho_keynotifywho_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE notifywho_keynotifywho_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE notifywho_keynotifywho_seq FROM farmer;
+GRANT ALL ON SEQUENCE notifywho_keynotifywho_seq TO farmer;
+GRANT ALL ON SEQUENCE notifywho_keynotifywho_seq TO farmers;
+
+
+--
+-- Name: notifywho; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE notifywho FROM PUBLIC;
+REVOKE ALL ON TABLE notifywho FROM farmer;
+GRANT ALL ON TABLE notifywho TO farmer;
+GRANT ALL ON TABLE notifywho TO farmers;
+
+
+--
+-- Name: package; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE package FROM PUBLIC;
+REVOKE ALL ON TABLE package FROM farmer;
+GRANT ALL ON TABLE package TO farmer;
+GRANT ALL ON TABLE package TO farmers;
+
+
+--
+-- Name: package_keypackage_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE package_keypackage_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE package_keypackage_seq FROM farmer;
+GRANT ALL ON SEQUENCE package_keypackage_seq TO farmer;
+GRANT ALL ON SEQUENCE package_keypackage_seq TO farmers;
+
+
+--
+-- Name: packageoutput; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE packageoutput FROM PUBLIC;
+REVOKE ALL ON TABLE packageoutput FROM farmer;
+GRANT ALL ON TABLE packageoutput TO farmer;
+GRANT ALL ON TABLE packageoutput TO farmers;
+
+
+--
+-- Name: packageoutput_keypackageoutput_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE packageoutput_keypackageoutput_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE packageoutput_keypackageoutput_seq FROM farmer;
+GRANT ALL ON SEQUENCE packageoutput_keypackageoutput_seq TO farmer;
+GRANT ALL ON SEQUENCE packageoutput_keypackageoutput_seq TO farmers;
+
+
+--
+-- Name: pathsynctarget_keypathsynctarget_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE pathsynctarget_keypathsynctarget_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE pathsynctarget_keypathsynctarget_seq FROM farmer;
+GRANT ALL ON SEQUENCE pathsynctarget_keypathsynctarget_seq TO farmer;
+GRANT ALL ON SEQUENCE pathsynctarget_keypathsynctarget_seq TO farmers;
+
+
+--
+-- Name: pathsynctarget; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE pathsynctarget FROM PUBLIC;
+REVOKE ALL ON TABLE pathsynctarget FROM farmer;
+GRANT ALL ON TABLE pathsynctarget TO farmer;
+GRANT ALL ON TABLE pathsynctarget TO farmers;
+
+
+--
+-- Name: pathtemplate_keypathtemplate_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE pathtemplate_keypathtemplate_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE pathtemplate_keypathtemplate_seq FROM farmer;
+GRANT ALL ON SEQUENCE pathtemplate_keypathtemplate_seq TO farmer;
+GRANT ALL ON SEQUENCE pathtemplate_keypathtemplate_seq TO farmers;
+
+
+--
+-- Name: pathtemplate; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE pathtemplate FROM PUBLIC;
+REVOKE ALL ON TABLE pathtemplate FROM farmer;
+GRANT ALL ON TABLE pathtemplate TO farmer;
+GRANT ALL ON TABLE pathtemplate TO farmers;
+
+
+--
+-- Name: pathtracker_keypathtracker_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE pathtracker_keypathtracker_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE pathtracker_keypathtracker_seq FROM farmer;
+GRANT ALL ON SEQUENCE pathtracker_keypathtracker_seq TO farmer;
+GRANT ALL ON SEQUENCE pathtracker_keypathtracker_seq TO farmers;
+
+
+--
+-- Name: pathtracker; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE pathtracker FROM PUBLIC;
+REVOKE ALL ON TABLE pathtracker FROM farmer;
+GRANT ALL ON TABLE pathtracker TO farmer;
+GRANT ALL ON TABLE pathtracker TO farmers;
+
+
+--
+-- Name: permission_keypermission_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE permission_keypermission_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE permission_keypermission_seq FROM farmer;
+GRANT ALL ON SEQUENCE permission_keypermission_seq TO farmer;
+GRANT ALL ON SEQUENCE permission_keypermission_seq TO farmers;
+
+
+--
+-- Name: permission; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE permission FROM PUBLIC;
+REVOKE ALL ON TABLE permission FROM farmer;
+GRANT ALL ON TABLE permission TO farmer;
+GRANT ALL ON TABLE permission TO farmers;
+
+
+--
+-- Name: pg_stat_statements; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE pg_stat_statements FROM PUBLIC;
+REVOKE ALL ON TABLE pg_stat_statements FROM postgres;
+GRANT ALL ON TABLE pg_stat_statements TO postgres;
+GRANT SELECT ON TABLE pg_stat_statements TO PUBLIC;
+
+
+--
+-- Name: phoneno_keyphoneno_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE phoneno_keyphoneno_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE phoneno_keyphoneno_seq FROM farmer;
+GRANT ALL ON SEQUENCE phoneno_keyphoneno_seq TO farmer;
+GRANT ALL ON SEQUENCE phoneno_keyphoneno_seq TO farmers;
+
+
+--
+-- Name: phoneno; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE phoneno FROM PUBLIC;
+REVOKE ALL ON TABLE phoneno FROM farmer;
+GRANT ALL ON TABLE phoneno TO farmer;
+GRANT ALL ON TABLE phoneno TO farmers;
+
+
+--
+-- Name: phonetype_keyphonetype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE phonetype_keyphonetype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE phonetype_keyphonetype_seq FROM farmer;
+GRANT ALL ON SEQUENCE phonetype_keyphonetype_seq TO farmer;
+GRANT ALL ON SEQUENCE phonetype_keyphonetype_seq TO farmers;
+
+
+--
+-- Name: phonetype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE phonetype FROM PUBLIC;
+REVOKE ALL ON TABLE phonetype FROM farmer;
+GRANT ALL ON TABLE phonetype TO farmer;
+GRANT ALL ON TABLE phonetype TO farmers;
+
+
+--
+-- Name: project; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE project FROM PUBLIC;
+REVOKE ALL ON TABLE project FROM farmer;
+GRANT ALL ON TABLE project TO farmer;
+GRANT ALL ON TABLE project TO farmers;
+
+
+--
+-- Name: project_slots_current; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE project_slots_current FROM PUBLIC;
+REVOKE ALL ON TABLE project_slots_current FROM farmer;
+GRANT ALL ON TABLE project_slots_current TO farmer;
+GRANT ALL ON TABLE project_slots_current TO PUBLIC;
+GRANT ALL ON TABLE project_slots_current TO farmers;
+
+
+--
+-- Name: project_slots_limits; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE project_slots_limits FROM PUBLIC;
+REVOKE ALL ON TABLE project_slots_limits FROM farmer;
+GRANT ALL ON TABLE project_slots_limits TO farmer;
+GRANT ALL ON TABLE project_slots_limits TO PUBLIC;
+GRANT ALL ON TABLE project_slots_limits TO farmers;
+
+
+--
+-- Name: projectresolution_keyprojectresolution_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE projectresolution_keyprojectresolution_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE projectresolution_keyprojectresolution_seq FROM farmer;
+GRANT ALL ON SEQUENCE projectresolution_keyprojectresolution_seq TO farmer;
+GRANT ALL ON SEQUENCE projectresolution_keyprojectresolution_seq TO farmers;
+
+
+--
+-- Name: projectresolution; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE projectresolution FROM PUBLIC;
+REVOKE ALL ON TABLE projectresolution FROM farmer;
+GRANT ALL ON TABLE projectresolution TO farmer;
+GRANT ALL ON TABLE projectresolution TO farmers;
+
+
+--
+-- Name: projectstatus_keyprojectstatus_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE projectstatus_keyprojectstatus_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE projectstatus_keyprojectstatus_seq FROM farmer;
+GRANT ALL ON SEQUENCE projectstatus_keyprojectstatus_seq TO farmer;
+GRANT ALL ON SEQUENCE projectstatus_keyprojectstatus_seq TO farmers;
+
+
+--
+-- Name: projectstatus; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE projectstatus FROM PUBLIC;
+REVOKE ALL ON TABLE projectstatus FROM farmer;
+GRANT ALL ON TABLE projectstatus TO farmer;
+GRANT ALL ON TABLE projectstatus TO farmers;
+
+
+--
+-- Name: projectstorage_keyprojectstorage_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE projectstorage_keyprojectstorage_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE projectstorage_keyprojectstorage_seq FROM farmer;
+GRANT ALL ON SEQUENCE projectstorage_keyprojectstorage_seq TO farmer;
+GRANT ALL ON SEQUENCE projectstorage_keyprojectstorage_seq TO farmers;
+
+
+--
+-- Name: projectstorage; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE projectstorage FROM PUBLIC;
+REVOKE ALL ON TABLE projectstorage FROM farmer;
+GRANT ALL ON TABLE projectstorage TO farmer;
+GRANT ALL ON TABLE projectstorage TO farmers;
+
+
+--
+-- Name: projecttempo; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE projecttempo FROM PUBLIC;
+REVOKE ALL ON TABLE projecttempo FROM farmer;
+GRANT ALL ON TABLE projecttempo TO farmer;
+GRANT ALL ON TABLE projecttempo TO farmers;
+
+
+--
+-- Name: queueorder; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE queueorder FROM PUBLIC;
+REVOKE ALL ON TABLE queueorder FROM farmer;
+GRANT ALL ON TABLE queueorder TO farmer;
+GRANT ALL ON TABLE queueorder TO farmers;
+
+
+--
+-- Name: rangefiletracker; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE rangefiletracker FROM PUBLIC;
+REVOKE ALL ON TABLE rangefiletracker FROM farmer;
+GRANT ALL ON TABLE rangefiletracker TO farmer;
+GRANT ALL ON TABLE rangefiletracker TO farmers;
+
+
+--
+-- Name: renderframe_keyrenderframe_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE renderframe_keyrenderframe_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE renderframe_keyrenderframe_seq FROM farmer;
+GRANT ALL ON SEQUENCE renderframe_keyrenderframe_seq TO farmer;
+GRANT ALL ON SEQUENCE renderframe_keyrenderframe_seq TO farmers;
+
+
+--
+-- Name: renderframe; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE renderframe FROM PUBLIC;
+REVOKE ALL ON TABLE renderframe FROM farmer;
+GRANT ALL ON TABLE renderframe TO farmer;
+GRANT ALL ON TABLE renderframe TO farmers;
+
+
+--
+-- Name: running_shots_averagetime; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE running_shots_averagetime FROM PUBLIC;
+REVOKE ALL ON TABLE running_shots_averagetime FROM farmer;
+GRANT ALL ON TABLE running_shots_averagetime TO farmer;
+GRANT ALL ON TABLE running_shots_averagetime TO PUBLIC;
+GRANT ALL ON TABLE running_shots_averagetime TO farmers;
+
+
+--
+-- Name: running_shots_averagetime_2; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE running_shots_averagetime_2 FROM PUBLIC;
+REVOKE ALL ON TABLE running_shots_averagetime_2 FROM farmer;
+GRANT ALL ON TABLE running_shots_averagetime_2 TO farmer;
+GRANT ALL ON TABLE running_shots_averagetime_2 TO PUBLIC;
+GRANT ALL ON TABLE running_shots_averagetime_2 TO farmers;
+
+
+--
+-- Name: running_shots_averagetime_3; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE running_shots_averagetime_3 FROM PUBLIC;
+REVOKE ALL ON TABLE running_shots_averagetime_3 FROM farmer;
+GRANT ALL ON TABLE running_shots_averagetime_3 TO farmer;
+GRANT ALL ON TABLE running_shots_averagetime_3 TO PUBLIC;
+GRANT ALL ON TABLE running_shots_averagetime_3 TO farmers;
+
+
+--
+-- Name: schedule_keyschedule_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE schedule_keyschedule_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE schedule_keyschedule_seq FROM farmer;
+GRANT ALL ON SEQUENCE schedule_keyschedule_seq TO farmer;
+GRANT ALL ON SEQUENCE schedule_keyschedule_seq TO farmers;
+
+
+--
+-- Name: schedule; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE schedule FROM PUBLIC;
+REVOKE ALL ON TABLE schedule FROM farmer;
+GRANT ALL ON TABLE schedule TO farmer;
+GRANT ALL ON TABLE schedule TO farmers;
+
+
+--
+-- Name: serverfileaction; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE serverfileaction FROM PUBLIC;
+REVOKE ALL ON TABLE serverfileaction FROM farmer;
+GRANT ALL ON TABLE serverfileaction TO farmer;
+GRANT ALL ON TABLE serverfileaction TO farmers;
+
+
+--
+-- Name: serverfileaction_keyserverfileaction_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE serverfileaction_keyserverfileaction_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE serverfileaction_keyserverfileaction_seq FROM farmer;
+GRANT ALL ON SEQUENCE serverfileaction_keyserverfileaction_seq TO farmer;
+GRANT ALL ON SEQUENCE serverfileaction_keyserverfileaction_seq TO farmers;
+
+
+--
+-- Name: serverfileactionstatus; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE serverfileactionstatus FROM PUBLIC;
+REVOKE ALL ON TABLE serverfileactionstatus FROM farmer;
+GRANT ALL ON TABLE serverfileactionstatus TO farmer;
+GRANT ALL ON TABLE serverfileactionstatus TO farmers;
+
+
+--
+-- Name: serverfileactionstatus_keyserverfileactionstatus_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE serverfileactionstatus_keyserverfileactionstatus_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE serverfileactionstatus_keyserverfileactionstatus_seq FROM farmer;
+GRANT ALL ON SEQUENCE serverfileactionstatus_keyserverfileactionstatus_seq TO farmer;
+GRANT ALL ON SEQUENCE serverfileactionstatus_keyserverfileactionstatus_seq TO farmers;
+
+
+--
+-- Name: serverfileactiontype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE serverfileactiontype FROM PUBLIC;
+REVOKE ALL ON TABLE serverfileactiontype FROM farmer;
+GRANT ALL ON TABLE serverfileactiontype TO farmer;
+GRANT ALL ON TABLE serverfileactiontype TO farmers;
+
+
+--
+-- Name: serverfileactiontype_keyserverfileactiontype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE serverfileactiontype_keyserverfileactiontype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE serverfileactiontype_keyserverfileactiontype_seq FROM farmer;
+GRANT ALL ON SEQUENCE serverfileactiontype_keyserverfileactiontype_seq TO farmer;
+GRANT ALL ON SEQUENCE serverfileactiontype_keyserverfileactiontype_seq TO farmers;
+
+
+--
+-- Name: sessions; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE sessions FROM PUBLIC;
+REVOKE ALL ON TABLE sessions FROM farmer;
+GRANT ALL ON TABLE sessions TO farmer;
+GRANT ALL ON TABLE sessions TO farmers;
+
+
+--
+-- Name: shot; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE shot FROM PUBLIC;
+REVOKE ALL ON TABLE shot FROM farmer;
+GRANT ALL ON TABLE shot TO farmer;
+GRANT ALL ON TABLE shot TO farmers;
+
+
+--
+-- Name: shotgroup; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE shotgroup FROM PUBLIC;
+REVOKE ALL ON TABLE shotgroup FROM farmer;
+GRANT ALL ON TABLE shotgroup TO farmer;
+GRANT ALL ON TABLE shotgroup TO farmers;
+
+
+--
+-- Name: slots_total; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE slots_total FROM PUBLIC;
+REVOKE ALL ON TABLE slots_total FROM farmer;
+GRANT ALL ON TABLE slots_total TO farmer;
+GRANT ALL ON TABLE slots_total TO PUBLIC;
+GRANT ALL ON TABLE slots_total TO farmers;
+
+
+--
+-- Name: software_keysoftware_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE software_keysoftware_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE software_keysoftware_seq FROM farmer;
+GRANT ALL ON SEQUENCE software_keysoftware_seq TO farmer;
+GRANT ALL ON SEQUENCE software_keysoftware_seq TO farmers;
+
+
+--
+-- Name: software; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE software FROM PUBLIC;
+REVOKE ALL ON TABLE software FROM farmer;
+GRANT ALL ON TABLE software TO farmer;
+GRANT ALL ON TABLE software TO farmers;
+
+
+--
+-- Name: status; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE status FROM PUBLIC;
+REVOKE ALL ON TABLE status FROM farmer;
+GRANT ALL ON TABLE status TO farmer;
+GRANT ALL ON TABLE status TO farmers;
+
+
+--
+-- Name: status_keystatus_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE status_keystatus_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE status_keystatus_seq FROM farmer;
+GRANT ALL ON SEQUENCE status_keystatus_seq TO farmer;
+GRANT ALL ON SEQUENCE status_keystatus_seq TO farmers;
+
+
+--
+-- Name: statusset_keystatusset_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE statusset_keystatusset_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE statusset_keystatusset_seq FROM farmer;
+GRANT ALL ON SEQUENCE statusset_keystatusset_seq TO farmer;
+GRANT ALL ON SEQUENCE statusset_keystatusset_seq TO farmers;
+
+
+--
+-- Name: statusset; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE statusset FROM PUBLIC;
+REVOKE ALL ON TABLE statusset FROM farmer;
+GRANT ALL ON TABLE statusset TO farmer;
+GRANT ALL ON TABLE statusset TO farmers;
+
+
+--
+-- Name: syslog_keysyslog_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE syslog_keysyslog_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE syslog_keysyslog_seq FROM farmer;
+GRANT ALL ON SEQUENCE syslog_keysyslog_seq TO farmer;
+GRANT ALL ON SEQUENCE syslog_keysyslog_seq TO farmers;
+
+
+--
+-- Name: syslog; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE syslog FROM PUBLIC;
+REVOKE ALL ON TABLE syslog FROM farmer;
+GRANT ALL ON TABLE syslog TO farmer;
+GRANT ALL ON TABLE syslog TO farmers;
+
+
+--
+-- Name: syslog_count_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE syslog_count_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE syslog_count_seq FROM farmer;
+GRANT ALL ON SEQUENCE syslog_count_seq TO farmer;
+GRANT ALL ON SEQUENCE syslog_count_seq TO farmers;
+
+
+--
+-- Name: syslogrealm_keysyslogrealm_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE syslogrealm_keysyslogrealm_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE syslogrealm_keysyslogrealm_seq FROM farmer;
+GRANT ALL ON SEQUENCE syslogrealm_keysyslogrealm_seq TO farmer;
+GRANT ALL ON SEQUENCE syslogrealm_keysyslogrealm_seq TO farmers;
+
+
+--
+-- Name: syslogrealm; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE syslogrealm FROM PUBLIC;
+REVOKE ALL ON TABLE syslogrealm FROM farmer;
+GRANT ALL ON TABLE syslogrealm TO farmer;
+GRANT ALL ON TABLE syslogrealm TO farmers;
+
+
+--
+-- Name: syslogseverity_keysyslogseverity_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE syslogseverity_keysyslogseverity_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE syslogseverity_keysyslogseverity_seq FROM farmer;
+GRANT ALL ON SEQUENCE syslogseverity_keysyslogseverity_seq TO farmer;
+GRANT ALL ON SEQUENCE syslogseverity_keysyslogseverity_seq TO farmers;
+
+
+--
+-- Name: syslogseverity; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE syslogseverity FROM PUBLIC;
+REVOKE ALL ON TABLE syslogseverity FROM farmer;
+GRANT ALL ON TABLE syslogseverity TO farmer;
+GRANT ALL ON TABLE syslogseverity TO farmers;
+
+
+--
+-- Name: task; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE task FROM PUBLIC;
+REVOKE ALL ON TABLE task FROM farmer;
+GRANT ALL ON TABLE task TO farmer;
+GRANT ALL ON TABLE task TO farmers;
+
+
+--
+-- Name: tasktype_keytasktype_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE tasktype_keytasktype_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE tasktype_keytasktype_seq FROM farmer;
+GRANT ALL ON SEQUENCE tasktype_keytasktype_seq TO farmer;
+GRANT ALL ON SEQUENCE tasktype_keytasktype_seq TO farmers;
+
+
+--
+-- Name: tasktype; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE tasktype FROM PUBLIC;
+REVOKE ALL ON TABLE tasktype FROM farmer;
+GRANT ALL ON TABLE tasktype TO farmer;
+GRANT ALL ON TABLE tasktype TO farmers;
+
+
+--
+-- Name: taskuser_keytaskuser_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE taskuser_keytaskuser_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE taskuser_keytaskuser_seq FROM farmer;
+GRANT ALL ON SEQUENCE taskuser_keytaskuser_seq TO farmer;
+GRANT ALL ON SEQUENCE taskuser_keytaskuser_seq TO farmers;
+
+
+--
+-- Name: taskuser; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE taskuser FROM PUBLIC;
+REVOKE ALL ON TABLE taskuser FROM farmer;
+GRANT ALL ON TABLE taskuser TO farmer;
+GRANT ALL ON TABLE taskuser TO farmers;
+
+
+--
+-- Name: thread_keythread_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE thread_keythread_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE thread_keythread_seq FROM farmer;
+GRANT ALL ON SEQUENCE thread_keythread_seq TO farmer;
+GRANT ALL ON SEQUENCE thread_keythread_seq TO farmers;
+
+
+--
+-- Name: thread; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE thread FROM PUBLIC;
+REVOKE ALL ON TABLE thread FROM farmer;
+GRANT ALL ON TABLE thread TO farmer;
+GRANT ALL ON TABLE thread TO farmers;
+
+
+--
+-- Name: threadcategory_keythreadcategory_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE threadcategory_keythreadcategory_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE threadcategory_keythreadcategory_seq FROM farmer;
+GRANT ALL ON SEQUENCE threadcategory_keythreadcategory_seq TO farmer;
+GRANT ALL ON SEQUENCE threadcategory_keythreadcategory_seq TO farmers;
+
+
+--
+-- Name: threadcategory; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE threadcategory FROM PUBLIC;
+REVOKE ALL ON TABLE threadcategory FROM farmer;
+GRANT ALL ON TABLE threadcategory TO farmer;
+GRANT ALL ON TABLE threadcategory TO farmers;
+
+
+--
+-- Name: threadnotify_keythreadnotify_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE threadnotify_keythreadnotify_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE threadnotify_keythreadnotify_seq FROM farmer;
+GRANT ALL ON SEQUENCE threadnotify_keythreadnotify_seq TO farmer;
+GRANT ALL ON SEQUENCE threadnotify_keythreadnotify_seq TO farmers;
+
+
+--
+-- Name: threadnotify; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE threadnotify FROM PUBLIC;
+REVOKE ALL ON TABLE threadnotify FROM farmer;
+GRANT ALL ON TABLE threadnotify TO farmer;
+GRANT ALL ON TABLE threadnotify TO farmers;
+
+
+--
+-- Name: thumbnail_keythumbnail_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE thumbnail_keythumbnail_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE thumbnail_keythumbnail_seq FROM farmer;
+GRANT ALL ON SEQUENCE thumbnail_keythumbnail_seq TO farmer;
+GRANT ALL ON SEQUENCE thumbnail_keythumbnail_seq TO farmers;
+
+
+--
+-- Name: thumbnail; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE thumbnail FROM PUBLIC;
+REVOKE ALL ON TABLE thumbnail FROM farmer;
+GRANT ALL ON TABLE thumbnail TO farmer;
+GRANT ALL ON TABLE thumbnail TO farmers;
+
+
+--
+-- Name: timesheet_keytimesheet_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE timesheet_keytimesheet_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE timesheet_keytimesheet_seq FROM farmer;
+GRANT ALL ON SEQUENCE timesheet_keytimesheet_seq TO farmer;
+GRANT ALL ON SEQUENCE timesheet_keytimesheet_seq TO farmers;
+
+
+--
+-- Name: timesheet; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE timesheet FROM PUBLIC;
+REVOKE ALL ON TABLE timesheet FROM farmer;
+GRANT ALL ON TABLE timesheet TO farmer;
+GRANT ALL ON TABLE timesheet TO farmers;
+
+
+--
+-- Name: timesheetcategory_keytimesheetcategory_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE timesheetcategory_keytimesheetcategory_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE timesheetcategory_keytimesheetcategory_seq FROM farmer;
+GRANT ALL ON SEQUENCE timesheetcategory_keytimesheetcategory_seq TO farmer;
+GRANT ALL ON SEQUENCE timesheetcategory_keytimesheetcategory_seq TO farmers;
+
+
+--
+-- Name: timesheetcategory; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE timesheetcategory FROM PUBLIC;
+REVOKE ALL ON TABLE timesheetcategory FROM farmer;
+GRANT ALL ON TABLE timesheetcategory TO farmer;
+GRANT ALL ON TABLE timesheetcategory TO farmers;
+
+
+--
+-- Name: tracker_keytracker_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE tracker_keytracker_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE tracker_keytracker_seq FROM farmer;
+GRANT ALL ON SEQUENCE tracker_keytracker_seq TO farmer;
+GRANT ALL ON SEQUENCE tracker_keytracker_seq TO farmers;
+
+
+--
+-- Name: tracker; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE tracker FROM PUBLIC;
+REVOKE ALL ON TABLE tracker FROM farmer;
+GRANT ALL ON TABLE tracker TO farmer;
+GRANT ALL ON TABLE tracker TO farmers;
+
+
+--
+-- Name: trackercategory_keytrackercategory_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE trackercategory_keytrackercategory_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE trackercategory_keytrackercategory_seq FROM farmer;
+GRANT ALL ON SEQUENCE trackercategory_keytrackercategory_seq TO farmer;
+GRANT ALL ON SEQUENCE trackercategory_keytrackercategory_seq TO farmers;
+
+
+--
+-- Name: trackercategory; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE trackercategory FROM PUBLIC;
+REVOKE ALL ON TABLE trackercategory FROM farmer;
+GRANT ALL ON TABLE trackercategory TO farmer;
+GRANT ALL ON TABLE trackercategory TO farmers;
+
+
+--
+-- Name: trackerlog_keytrackerlog_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE trackerlog_keytrackerlog_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE trackerlog_keytrackerlog_seq FROM farmer;
+GRANT ALL ON SEQUENCE trackerlog_keytrackerlog_seq TO farmer;
+GRANT ALL ON SEQUENCE trackerlog_keytrackerlog_seq TO farmers;
+
+
+--
+-- Name: trackerlog; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE trackerlog FROM PUBLIC;
+REVOKE ALL ON TABLE trackerlog FROM farmer;
+GRANT ALL ON TABLE trackerlog TO farmer;
+GRANT ALL ON TABLE trackerlog TO farmers;
+
+
+--
+-- Name: trackerqueue_keytrackerqueue_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE trackerqueue_keytrackerqueue_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE trackerqueue_keytrackerqueue_seq FROM farmer;
+GRANT ALL ON SEQUENCE trackerqueue_keytrackerqueue_seq TO farmer;
+GRANT ALL ON SEQUENCE trackerqueue_keytrackerqueue_seq TO farmers;
+
+
+--
+-- Name: trackerqueue; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE trackerqueue FROM PUBLIC;
+REVOKE ALL ON TABLE trackerqueue FROM farmer;
+GRANT ALL ON TABLE trackerqueue TO farmer;
+GRANT ALL ON TABLE trackerqueue TO farmers;
+
+
+--
+-- Name: trackerseverity_keytrackerseverity_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE trackerseverity_keytrackerseverity_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE trackerseverity_keytrackerseverity_seq FROM farmer;
+GRANT ALL ON SEQUENCE trackerseverity_keytrackerseverity_seq TO farmer;
+GRANT ALL ON SEQUENCE trackerseverity_keytrackerseverity_seq TO farmers;
+
+
+--
+-- Name: trackerseverity; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE trackerseverity FROM PUBLIC;
+REVOKE ALL ON TABLE trackerseverity FROM farmer;
+GRANT ALL ON TABLE trackerseverity TO farmer;
+GRANT ALL ON TABLE trackerseverity TO farmers;
+
+
+--
+-- Name: trackerstatus_keytrackerstatus_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE trackerstatus_keytrackerstatus_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE trackerstatus_keytrackerstatus_seq FROM farmer;
+GRANT ALL ON SEQUENCE trackerstatus_keytrackerstatus_seq TO farmer;
+GRANT ALL ON SEQUENCE trackerstatus_keytrackerstatus_seq TO farmers;
+
+
+--
+-- Name: trackerstatus; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE trackerstatus FROM PUBLIC;
+REVOKE ALL ON TABLE trackerstatus FROM farmer;
+GRANT ALL ON TABLE trackerstatus TO farmer;
+GRANT ALL ON TABLE trackerstatus TO farmers;
+
+
+--
+-- Name: user_service_current; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE user_service_current FROM PUBLIC;
+REVOKE ALL ON TABLE user_service_current FROM farmer;
+GRANT ALL ON TABLE user_service_current TO farmer;
+GRANT ALL ON TABLE user_service_current TO PUBLIC;
+GRANT ALL ON TABLE user_service_current TO farmers;
+
+
+--
+-- Name: userservice; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE userservice FROM PUBLIC;
+REVOKE ALL ON TABLE userservice FROM farmer;
+GRANT ALL ON TABLE userservice TO farmer;
+GRANT ALL ON TABLE userservice TO PUBLIC;
+GRANT ALL ON TABLE userservice TO farmers;
+
+
+--
+-- Name: user_service_limits; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE user_service_limits FROM PUBLIC;
+REVOKE ALL ON TABLE user_service_limits FROM farmer;
+GRANT ALL ON TABLE user_service_limits TO farmer;
+GRANT ALL ON TABLE user_service_limits TO PUBLIC;
+GRANT ALL ON TABLE user_service_limits TO farmers;
+
+
+--
+-- Name: user_slots_current; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE user_slots_current FROM PUBLIC;
+REVOKE ALL ON TABLE user_slots_current FROM farmer;
+GRANT ALL ON TABLE user_slots_current TO farmer;
+GRANT ALL ON TABLE user_slots_current TO PUBLIC;
+GRANT ALL ON TABLE user_slots_current TO farmers;
+
+
+--
+-- Name: user_slots_limits; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE user_slots_limits FROM PUBLIC;
+REVOKE ALL ON TABLE user_slots_limits FROM farmer;
+GRANT ALL ON TABLE user_slots_limits TO farmer;
+GRANT ALL ON TABLE user_slots_limits TO PUBLIC;
+GRANT ALL ON TABLE user_slots_limits TO farmers;
+
+
+--
+-- Name: userelement_keyuserelement_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE userelement_keyuserelement_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE userelement_keyuserelement_seq FROM farmer;
+GRANT ALL ON SEQUENCE userelement_keyuserelement_seq TO farmer;
+GRANT ALL ON SEQUENCE userelement_keyuserelement_seq TO farmers;
+
+
+--
+-- Name: userelement; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE userelement FROM PUBLIC;
+REVOKE ALL ON TABLE userelement FROM farmer;
+GRANT ALL ON TABLE userelement TO farmer;
+GRANT ALL ON TABLE userelement TO farmers;
+
+
+--
+-- Name: usermapping_keyusermapping_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE usermapping_keyusermapping_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE usermapping_keyusermapping_seq FROM farmer;
+GRANT ALL ON SEQUENCE usermapping_keyusermapping_seq TO farmer;
+GRANT ALL ON SEQUENCE usermapping_keyusermapping_seq TO farmers;
+
+
+--
+-- Name: usermapping; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE usermapping FROM PUBLIC;
+REVOKE ALL ON TABLE usermapping FROM farmer;
+GRANT ALL ON TABLE usermapping TO farmer;
+GRANT ALL ON TABLE usermapping TO farmers;
+
+
+--
+-- Name: userrole_keyuserrole_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE userrole_keyuserrole_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE userrole_keyuserrole_seq FROM farmer;
+GRANT ALL ON SEQUENCE userrole_keyuserrole_seq TO farmer;
+GRANT ALL ON SEQUENCE userrole_keyuserrole_seq TO farmers;
+
+
+--
+-- Name: userrole; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE userrole FROM PUBLIC;
+REVOKE ALL ON TABLE userrole FROM farmer;
+GRANT ALL ON TABLE userrole TO farmer;
+GRANT ALL ON TABLE userrole TO farmers;
+
+
+--
+-- Name: userservice_keyuserservice_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE userservice_keyuserservice_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE userservice_keyuserservice_seq FROM farmer;
+GRANT ALL ON SEQUENCE userservice_keyuserservice_seq TO farmer;
+GRANT ALL ON SEQUENCE userservice_keyuserservice_seq TO farmers;
+
+
+--
+-- Name: usrgrp_keyusrgrp_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE usrgrp_keyusrgrp_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE usrgrp_keyusrgrp_seq FROM farmer;
+GRANT ALL ON SEQUENCE usrgrp_keyusrgrp_seq TO farmer;
+GRANT ALL ON SEQUENCE usrgrp_keyusrgrp_seq TO farmers;
+
+
+--
+-- Name: usrgrp; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE usrgrp FROM PUBLIC;
+REVOKE ALL ON TABLE usrgrp FROM farmer;
+GRANT ALL ON TABLE usrgrp TO farmer;
+GRANT ALL ON TABLE usrgrp TO farmers;
+
+
+--
+-- Name: version; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE version FROM PUBLIC;
+REVOKE ALL ON TABLE version FROM farmer;
+GRANT ALL ON TABLE version TO farmer;
+GRANT ALL ON TABLE version TO farmers;
+
+
+--
+-- Name: version_keyversion_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE version_keyversion_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE version_keyversion_seq FROM farmer;
+GRANT ALL ON SEQUENCE version_keyversion_seq TO farmer;
+GRANT ALL ON SEQUENCE version_keyversion_seq TO farmers;
+
+
+--
+-- Name: versionfiletracker; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE versionfiletracker FROM PUBLIC;
+REVOKE ALL ON TABLE versionfiletracker FROM farmer;
+GRANT ALL ON TABLE versionfiletracker TO farmer;
+GRANT ALL ON TABLE versionfiletracker TO farmers;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: -; Owner: farmer
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE farmer REVOKE ALL ON TABLES  FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES FOR ROLE farmer REVOKE ALL ON TABLES  FROM farmer;
+ALTER DEFAULT PRIVILEGES FOR ROLE farmer GRANT ALL ON TABLES  TO farmer;
+ALTER DEFAULT PRIVILEGES FOR ROLE farmer GRANT ALL ON TABLES  TO PUBLIC;
+ALTER DEFAULT PRIVILEGES FOR ROLE farmer GRANT ALL ON TABLES  TO farmers;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: farmer
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE farmer IN SCHEMA public REVOKE ALL ON TABLES  FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES FOR ROLE farmer IN SCHEMA public REVOKE ALL ON TABLES  FROM farmer;
+ALTER DEFAULT PRIVILEGES FOR ROLE farmer IN SCHEMA public GRANT ALL ON TABLES  TO PUBLIC;
+ALTER DEFAULT PRIVILEGES FOR ROLE farmer IN SCHEMA public GRANT ALL ON TABLES  TO farmers;
 
 
 --
