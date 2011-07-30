@@ -26,6 +26,7 @@
  */
 
 #include <qatomic.h>
+#include <qbitarray.h>
 #include <qdatetime.h>
 #include <qstringlist.h>
 
@@ -115,7 +116,6 @@ bool Index::cacheEnabled() const
 RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 {
 	RecordList ret;
-	int status = NoInfo;
 	int entrySize = mSchema->columns().size();
 
 	if( args.isEmpty() || (args.size() % entrySize) )
@@ -123,55 +123,84 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 
 	int entryCount = args.size() / entrySize;
 
-	QList<int> needSelect;
-
+	QBitArray needSelect(entryCount,true);
+	int needSelectCount = entryCount;
+	
 	if( mUseCache ) {
 		QString ppc = mTable->schema()->projectPreloadColumn();
+		// Doubtful that this is cheaper than filling the list normally?
 		QList<QVariant> entryArgs = QVector<QVariant>(entrySize).toList();
+		// See if this index has a field that matches the project_preload
+		int useProjectPreload = ppc.isEmpty() ? 0 : -1;  // 1 if we checked and are using it, 0 if we checked and aren't
+		int projectPreloadColumn = 0;
+		int status = NoInfo;
+		
 		for( int entry=0; entry < entryCount; entry++ ) {
-
 			for( int a=0; a < entrySize; a++ )
 				entryArgs[a] = args[entry*entrySize + a];
 
 			RecordList entryRet = records( entryArgs, status );
 
-			if( status == RecordsFound )
+			if( status == RecordsFound ) {
 				ret += entryRet;
-	
+			}
+			
 			if( mTable->isPreloaded() ) {
+				// If the table is preloaded, and this entry isn't found, then set an empty entry.
 				setEmptyEntry( entryArgs );
-			} else {
-				// See if this index has a field that matches the project_preload
-				bool projectPreloaded = false;
-				if( !ppc.isEmpty() ){
+				status = RecordsFound;
+			}
+			
+			if( status == NoInfo && useProjectPreload != 0 ) {
+				// Check to see if we can use project preload
+				if( useProjectPreload < 0 ){
 					int i=0;
 					foreach( Field * f, mSchema->columns() )
 					{
 						QString fn = f->name();
 						// Now down to a single hack for the element table
 						if( fn == ppc || ( fn.toLower() == "fkeyelement" && ppc.toLower() == "fkeyproject" ) ) {
-							projectPreloaded = mTable->isProjectPreloaded( entryArgs[i].toUInt(), true );
+							useProjectPreload = 1;
+							projectPreloadColumn = i;
 							break;
 						}
 						++i;
 					}
+					if( useProjectPreload < 0 )
+						useProjectPreload = 0;
 				}
-				if( projectPreloaded ) {
-					ret = records( entryArgs, status );
+				
+				// If using project preload, ensure this project is loaded
+				if( useProjectPreload == 1 && mTable->isProjectPreloaded( entryArgs[projectPreloadColumn].toUInt(), true ) ) {
+					entryRet = records( entryArgs, status );
 					if( status == NoInfo )
 						setEmptyEntry( entryArgs );
+					else
+						ret += entryRet;
+					status = RecordsFound;
 				}
+			}
+			
+			if( status == RecordsFound ) {
+				needSelect[entry] = false;
+				needSelectCount--;
+				continue;
 			}
 		}
 	}
 
-	QString sel;
+	if( needSelectCount == 0 )
+		return ret;
+	
 	QList<QVariant> mod_args;
+	QString sel;
+	
 	if( entrySize == 1 && mSchema->columns()[0]->flag( Field::ForeignKey ) ) {
 		bool hasNull = false;
 		Field * f = mSchema->columns()[0];
 		QStringList ss;
 		for( int entry = 0; entry < entryCount; entry++ ) {
+			if( !needSelect[entry] ) continue;
 			if( args[entry].isNull() )
 				hasNull = true;
 			else
@@ -184,6 +213,7 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 		// Setup sql
 		QStringList entryFilters;
 		for( int entry = 0; entry < entryCount; entry++ ) {
+			if( !needSelect[entry] ) continue;
 			QStringList ss;
 			int column=0;
 			foreach( Field * f, mSchema->columns() ) {
@@ -216,10 +246,13 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 	if( mUseCache ) {
 		QList<QVariant> entryArgs = QVector<QVariant>(entrySize).toList();
 		for( int entry = 0; entry < entryCount; entry++ ) {
+			if( !needSelect[entry] ) continue;
 			for( int column = 0; column < entrySize; ++column )
 				entryArgs[column] = args[entry*entrySize + column];
-			if( ret.isEmpty() || records( entryArgs, status ).isEmpty() )
+			int status = NoInfo;
+			if( ret.isEmpty() || (records( entryArgs, status ).isEmpty() && status == NoInfo) ) {
 				setEmptyEntry( entryArgs );
+			}
 		}
 		mCacheIncoming = ciRestore;
 		mMutex.unlock();

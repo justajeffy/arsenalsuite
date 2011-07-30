@@ -282,13 +282,9 @@ protected:
 	
 	IndexList mIndexes;
 	bool mPreloaded;
-	QString mWhere;
 
 	int mSqlElapsed[4];
 	int mIndexElapsed[5];
-	
-	bool mSqlGenerated;
-	QString mSqlSelect;
 	
 	friend class Stone::UpdateManager;
 	friend class Stone::RecordUndoOperation;

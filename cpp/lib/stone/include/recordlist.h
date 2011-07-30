@@ -274,6 +274,7 @@ public:
 	template<class KEY> QMap<KEY,RecordList> groupedBy( const QString & column ) const { return groupedBy<KEY,RecordList>(column); }
 
 	template<class KEY,class LIST> QMap<KEY,LIST> groupedByForeignKey( const QString & column );
+	QMap<Record,RecordList> groupedByForeignKey( const QString & column ) { return groupedByForeignKey<Record,RecordList>(column); }
 	
 	/// Sorts the list according the the value in column.
 	RecordList sorted( const QString & column, bool asc = true ) const;
@@ -377,7 +378,8 @@ template<class KEY,class LIST> QMap<KEY,LIST> RecordList::groupedByForeignKey( c
 
 using Stone::RecordList;
 using Stone::RecordIter;
-
+using Stone::ImpIter;
+using Stone::ConstImpIter;
 
 Q_DECLARE_METATYPE(RecordList)
 

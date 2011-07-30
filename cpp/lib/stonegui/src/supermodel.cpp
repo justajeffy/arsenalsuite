@@ -615,6 +615,7 @@ SuperModel::SuperModel( QObject * parent )
 SuperModel::~SuperModel()
 {
 	delete mRootNode;
+    delete mGrouper;
 }
 
 ModelGrouper * SuperModel::grouper( bool autoCreate )

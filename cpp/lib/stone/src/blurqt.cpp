@@ -55,7 +55,7 @@
 #include "recordlist.h"
 #include "schema.h"
 
-IniConfig sConfig, sUserConfig;
+IniConfig * sConfig, * sUserConfig;
 static bool sUserConfigRead = false;
 static QString sConfigName, sLogFile;
 
@@ -181,9 +181,12 @@ void initConfig( const QString & configName, const QString & logfile )
 	sLogFile = logfile;
 	if( !sLogFile.isEmpty() && sLogFile.right(4) != ".log" )
 		sLogFile = sLogFile + ".log";
-	sConfigName = configName;
-	sConfig.setFileName( configName );
-	sConfig.readFromFile();
+	if( !sConfig ) {
+		sConfigName = configName;
+		sConfig = new IniConfig();
+		sConfig->setFileName( configName );
+		sConfig->readFromFile();
+	}
 	qRegisterMetaType<Record>("Record");
 	qRegisterMetaType<RecordList>("RecordList");
 	qRegisterMetaType<Interval>("Interval");
@@ -191,9 +194,12 @@ void initConfig( const QString & configName, const QString & logfile )
 
 void initUserConfig( const QString & fileName )
 {
-	sUserConfigRead = true;
-	sUserConfig.setFileName( fileName );
-	sUserConfig.readFromFile();
+	if( !sUserConfigRead ) {
+		sUserConfigRead = true;
+		sUserConfig = new IniConfig();
+		sUserConfig->setFileName( fileName );
+		sUserConfig->readFromFile();
+	}
 }
 
 static Multilog * mLog = 0;
@@ -202,21 +208,25 @@ void shutdown()
 {
 	FreezerCore::shutdown();
 //	Database::shutdown();
-	sConfig.writeToFile();
+	sConfig->writeToFile();
 	if( sUserConfigRead )
-		sUserConfig.writeToFile();
+		sUserConfig->writeToFile();
+	delete sConfig;
+	sConfig = 0;
+	delete sUserConfig;
+	sUserConfig = 0;
 	delete mLog;
 	mLog = 0;
 }
 
 IniConfig & config()
 {
-	return sConfig;
+	return *sConfig;
 }
 
 IniConfig & userConfig()
 {
-	return sUserConfig;
+	return *sUserConfig;
 }
 
 static bool sLoggingEnabled = true;
@@ -224,17 +234,17 @@ static bool sLoggingEnabled = true;
 Multilog * log()
 {
 	if( sLoggingEnabled && !mLog ) {
-		sConfig.pushSection( "Logging" );
-		sLoggingEnabled = sConfig.readBool( "Enabled", true );
+		sConfig->pushSection( "Logging" );
+		sLoggingEnabled = sConfig->readBool( "Enabled", true );
 		if( sLoggingEnabled ) {
 			mLog = new Multilog(
-			sLogFile.isEmpty() ? sConfig.readString( "File", sConfigName.replace(".ini","") + ".log" ) : sLogFile, // Filename
-			sConfig.readBool( "EchoStdOut", true ),
-			sConfig.readInt( "MaxSeverity", 5 ), // Only critical and important errors by default
-			sConfig.readInt( "MaxFiles", 10 ),
-			sConfig.readInt( "MaxSize", 1024 * 1024 ) ); // One megabyte
+			sLogFile.isEmpty() ? sConfig->readString( "File", sConfigName.replace(".ini","") + ".log" ) : sLogFile, // Filename
+			sConfig->readBool( "EchoStdOut", true ),
+			sConfig->readInt( "MaxSeverity", 5 ), // Only critical and important errors by default
+			sConfig->readInt( "MaxFiles", 10 ),
+			sConfig->readInt( "MaxSize", 1024 * 1024 ) ); // One megabyte
 		}
-		sConfig.popSection();
+		sConfig->popSection();
 	}
 	return mLog;
 }

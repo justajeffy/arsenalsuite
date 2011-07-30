@@ -53,8 +53,7 @@
 #undef LoadImage
 #endif
 
-JobTypeList JobListWidget::mJobTypeList;
-ProjectList JobListWidget::mProjectList;
+JobListWidget::SharedData * JobListWidget::mSharedData = 0;
 
 JobListWidget::JobListWidget( QWidget * parent )
 : FreezerView( parent )
@@ -73,11 +72,17 @@ JobListWidget::JobListWidget( QWidget * parent )
 , mTaskMenu( 0 )
 , mErrorMenu( 0 )
 {
+    if( !mSharedData )
+        mSharedData = new SharedData;
+    mSharedData->mRefCount++;
+
 	setupUi(this);
 }
 
 JobListWidget::~JobListWidget()
 {
+    if( mSharedData->mRefCount-- == 0 )
+        delete mSharedData;
 }
 
 QString JobListWidget::viewType() const
@@ -261,7 +266,7 @@ void JobListWidget::initializeViews()
 
         mJobFilter.allProjectsShown = ini.readBool( "AllProjectsShown", false );
         if( ini.keys().contains( "VisibleProjects" ) ) {
-            mJobFilter.visibleProjects = mProjectList.keyString().split(',',QString::SkipEmptyParts);
+            mJobFilter.visibleProjects = mSharedData->mProjectList.keyString().split(',',QString::SkipEmptyParts);
         } else {
             mJobFilter.hiddenProjects = ini.readString( "HiddenProjects", "" ).split(',',QString::SkipEmptyParts);
             if( mJobFilter.hiddenProjects.isEmpty() )
@@ -290,6 +295,7 @@ void JobListWidget::save( IniConfig & ini )
         ini.writeBool( "AllProjectsShown", mJobFilter.allProjectsShown );
         ini.writeBool( "ShowNonProjectJobs", mJobFilter.showNonProjectJobs );
         ini.writeString( "TypeToShow", mJobFilter.typeToShow.join(",") );
+        ini.writeString( "TypesHidden", (mSharedData->mJobTypeList - JobType::table()->records( mJobFilter.typeToShow.join(",") )).keyString() );
         ini.writeBool( "DependencyTreeEnabled", isDependencyTreeEnabled() );
         ini.writeBool( "Filter", FilterAction->isChecked() );
         // Save the splitter position by making a string of ints separated by commas
@@ -318,7 +324,17 @@ void JobListWidget::restore( IniConfig & ini )
 
 ProjectList JobListWidget::activeProjects()
 {
-	return mProjectList;
+    return mSharedData ? mSharedData->mProjectList : ProjectList();
+}
+
+JobTypeList JobListWidget::activeJobTypes()
+{
+    return mSharedData ? mSharedData->mJobTypeList : JobTypeList();
+}
+
+ServiceList JobListWidget::activeServices()
+{
+    return mSharedData ? mSharedData->mServiceList : ServiceList();
 }
 
 bool JobListWidget::isDependencyTreeEnabled() const
@@ -355,11 +371,16 @@ void JobListWidget::customEvent( QEvent * evt )
 			mJobTask = ((JobListTask*)evt);
 			JobModel * jm = (JobModel*)mJobTree->model();
 
-            JobList topLevelJobs = mJobTask->mReturn - mJobTask->mDependentJobs;
             JobList existing, toAdd;
             QModelIndexList toRemove;
-            QMap<Job,QModelIndex> existingMap;
+            QMap<int,QPair<QModelIndex,bool> > existingMap;
 
+            QTime t;
+            t.start();
+            JobList topLevelJobs = mJobTask->mReturn - mJobTask->mDependentJobs;
+            LOG_3( QString("Took %1 ms to subtract dependant jobs. %2 top level jobs").arg(t.elapsed()).arg(topLevelJobs.size()) );
+
+            t.start();
             ModelGrouper * grouper = jm->grouper();
             int topLevelDepth = 0;
             if( grouper && grouper->isGrouped() )
@@ -369,35 +390,48 @@ void JobListWidget::customEvent( QEvent * evt )
                 QModelIndex idx = *it;
                 if( topLevelDepth == it.depth() ) {
                     Job j = jm->getRecord(idx);
-                    existingMap[j] = idx;
+                    existingMap[j.key()] = qMakePair<QModelIndex,bool>(idx,false);
                 }
             }
+            LOG_3( QString("Took %1 ms to map existing jobs, %2 jobs mapped").arg(t.elapsed()).arg(existingMap.size()) );
+            t.start();
 
             foreach( Job j, topLevelJobs ) {
-                QMap<Job,QModelIndex>::Iterator it = existingMap.find(j);
+                QMap<int,QPair<QModelIndex,bool> >::Iterator it = existingMap.find(j.key());
                 if( it != existingMap.end() ) {
-                    existing += it.key();
-                    jm->updateIndex(it.value());
-                    existingMap.erase(it);
+                    existing += j;
+                    jm->updateIndex(it.value().first);
+                    it.value().second = true;
                 } else
                     toAdd += j;
             }
+            LOG_3( QString("Took %1 ms to update existing indexes").arg(t.elapsed()) );
+            t.start();
 
-            for( QMap<Job,QModelIndex>::Iterator it = existingMap.begin(); it != existingMap.end(); ++it )
-                toRemove += it.value();
-
+            for( QMap<int,QPair<QModelIndex,bool> >::Iterator it = existingMap.begin(); it != existingMap.end(); ++it )
+                if( !it.value().second )
+                    toRemove += it.value().first;
             jm->remove(toRemove);
+            LOG_3( QString("Took %1 ms to remove old jobs").arg(t.elapsed()) );
 
-            //LOG_5( "Appending " + QString::number(toAdd.size()) + " jobs to the list" );
+            t.start();
+            LOG_3( "Appending " + QString::number(toAdd.size()) + " jobs to the list" );
             jm->append( toAdd );
+
+            LOG_3( QString("Took %1 ms to append new jobs").arg(t.elapsed()) );
+            t.start();
 
             QMap<Record, JobServiceList> jobServicesByJob;
             if( mJobTask->mFetchJobServices ) {
                 jobServicesByJob = mJobTask->mJobServices.groupedBy<Record,JobServiceList,uint,Job>( "fkeyjob" );
                 //LOG_5( QString("Got %1 services for %2 jobs").arg(mJobTask->mJobServices.size()).arg(jobServicesByJob.size()) );
             }
+            LOG_3( QString("Took %1 ms to group services").arg(t.elapsed()) );
+            t.start();
 
 			QMap<uint,JobDepList> jobDepsByJob = mJobTask->mJobDeps.groupedBy<uint,JobDepList>("fkeyjob");
+            LOG_3( QString("Took %1 ms to group deps").arg(t.elapsed()) );
+            t.start();
 
             for( ModelIter it(jm,ModelIter::Filter(ModelIter::Recursive|ModelIter::DescendLoadedOnly)); it.isValid(); ++it ) {
                 Job j = jm->getRecord(*it);
@@ -408,14 +442,13 @@ void JobListWidget::customEvent( QEvent * evt )
                     if( mJobTask->mFetchJobServices ) {
                         // Update services
                         JobItem & ji = JobTranslator::data(*it);
-                        if( jobServicesByJob.contains( ji.job ) ) {
-                            ji.services = jobServicesByJob[j].services().services().join(",");
-                            //LOG_5( "Set Job " + j.name() + " services to " + ji.services );
-                        } else
-                            LOG_5( "No services found for " + j.name() );
+                        QMap<Record,JobServiceList>::iterator jsit = jobServicesByJob.find(ji.job);
+                        if( jsit != jobServicesByJob.end() )
+                            ji.services = jsit.value().services().services().join(",");
                     }
                 }
             }
+            LOG_3( QString("Took %1 ms to setup deps and services").arg(t.elapsed()) );
 
             // clear out existing toolTip info first
             clearChildrenToolTip(mJobTree->rootIndex());
@@ -534,13 +567,14 @@ void JobListWidget::customEvent( QEvent * evt )
 			// Only the first StaticJobListDataTask actual does the select and fills in these static structures
 			// any subsequent ones just ensure that the data is retreived before doing the rest of this logic
 			if( sdt->mHasData ) {
-				mJobTypeList = sdt->mJobTypes;
-				mProjectList = sdt->mProjects;
+                mSharedData->mJobTypeList = sdt->mJobTypes;
+                mSharedData->mProjectList = sdt->mProjects;
+                //mSharedData->mServiceList = sdt->mServices;
 			}
 
 			// Default to showing all of the services and job types
 			if( mJobFilter.typeToShow.isEmpty() )
-                mJobFilter.typeToShow = mJobTypeList.filter( "fkeyparentjobtype", QVariant(), false ).keyString().split(',',QString::SkipEmptyParts);
+                mJobFilter.typeToShow = mSharedData->mJobTypeList.filter( "fkeyparentjobtype", QVariant(), false ).keyString().split(',',QString::SkipEmptyParts);
 			else
                 mJobFilter.typeToShow = verifyKeyList( mJobFilter.typeToShow.join(","), JobType::table() ).split(',',QString::SkipEmptyParts);
 			// If we haven't retrieved the static data, then mJobTaskRunning indicates

@@ -231,6 +231,7 @@ protected:
 	QList<int> mChildrenFreeIndexList;
 	
 	struct ItemInfo {
+        ItemInfo() : dataOffset(0), index(0), translatorIndex(0) {}
 		// Offset into the mItemData bytearray
 		int dataOffset;
 
@@ -432,7 +433,6 @@ protected:
 	QStringList mHeaderData;
 	QList<SortColumnPair> mSortColumns;
 	bool mAutoSort, mAssumeChildren, mDisableChildLoading;
-    QTime mLastSort;
     ModelGrouper * mGrouper;
 
 	friend class ModelDataTranslator;

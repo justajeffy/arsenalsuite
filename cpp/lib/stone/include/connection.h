@@ -190,7 +190,7 @@ public:
 	virtual bool update( Table *, RecordImp * imp, Record * returnValues = 0 ) = 0;
 
 	/// deletes a list of primary key ids from a table
-	virtual int remove( Table *, const QStringList & keys ) = 0;
+	virtual int remove( Table *, const QString & keyList, QList<int> * rowsDeleted = 0 ) = 0;
 
 	/// Implement if providing Cap_Transactions
 	virtual bool beginTransaction() { return false; }

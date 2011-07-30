@@ -167,7 +167,7 @@ public:
 
 	virtual bool update( Table *, RecordImp * imp, Record * returnValues = 0 ) = 0;
 
-	virtual int remove( Table *, const QStringList & keys ) = 0;
+	virtual int remove( Table *, const QString &, QList<int> * rowsDeleted = 0 ) = 0;
 
 	virtual bool beginTransaction();
 	virtual bool commitTransaction();

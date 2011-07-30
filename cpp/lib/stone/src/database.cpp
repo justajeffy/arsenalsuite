@@ -80,7 +80,8 @@ Database::Database( Schema * schema, Connection * conn )
 Database::~Database()
 {
 	foreach( Table * t, tables() )
-		delete t;
+		if( !t->parent() )
+			delete t;
 }
 
 Connection * Database::connection() const

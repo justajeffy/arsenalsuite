@@ -115,7 +115,7 @@ void FreezerCore::addTask( ThreadTask * task )
 
 void FreezerCore::deliver( BackgroundThread * thread )
 {
-	mTaskMutex.lock();
+	//mTaskMutex.lock();
 	ThreadTask * task = thread->mTask;
 	if( task && !task->mCancel && task->mReciever ) {
 	//	printf( "Delivering task to object %p\n", task->mReciever );
@@ -126,7 +126,7 @@ void FreezerCore::deliver( BackgroundThread * thread )
 		delete task;
 	}
 	thread->mTask = 0;
-	mTaskMutex.unlock();
+	//mTaskMutex.unlock();
 }
 
 void FreezerCore::cancelObjectTasks( QObject * object )

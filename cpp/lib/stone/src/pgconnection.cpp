@@ -782,7 +782,7 @@ bool PGConnection::update( Table * table, RecordImp * imp, Record * returnValues
 	return false;
 }
 
-int PGConnection::remove( Table * table, const QStringList & keys )
+int PGConnection::remove( Table * table, const QString & keys, QList<int> * rowsDeleted )
 {
 	TableSchema * schema = table->schema();
 	TableSchema * base = schema;
@@ -793,9 +793,13 @@ int PGConnection::remove( Table * table, const QStringList & keys )
 	del += tableQuoted(base->tableName());
 	del += " WHERE ";
 	del += base->primaryKey();
-	del += " IN(" + keys.join(",") + ");";
+	del += " IN(" + keys + ") RETURNING " + base->primaryKey() + ";";
 	QSqlQuery q = exec( del, QList<QVariant>(), true /*retryLostConn*/, table );
 	if( !q.isActive() ) return -1;
+	if( rowsDeleted ) {
+		while( q.next() )
+			rowsDeleted->append( q.value(0).toInt() );
+	}
 	return q.numRowsAffected();
 }
 

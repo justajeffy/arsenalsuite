@@ -283,7 +283,7 @@ void JobTypeFilterMenu::slotAboutToShow()
         mJobTypeShowAll->setCheckable( true );
 		mJobTypeShowNone = new QAction( "Show None", this );
         mJobTypeShowNone->setCheckable( true );
-		JobTypeList jtl = mJobList->mJobTypeList.sorted( "jobType" );
+        JobTypeList jtl = mJobList->activeJobTypes().sorted( "jobType" );
 		foreach( JobType jt, jtl )
 		{
 			QImage img = jt.icon();
@@ -303,7 +303,7 @@ void JobTypeFilterMenu::slotAboutToShow()
 
 void JobTypeFilterMenu::updateActionStates()
 {
-    mJobTypeShowAll->setChecked( mJobList->mJobFilter.typeToShow.size() == mJobList->mJobTypeList.size() );
+    mJobTypeShowAll->setChecked( mJobList->mJobFilter.typeToShow.size() == mJobList->activeJobTypes().size() );
     mJobTypeShowAll->setEnabled( !mJobTypeShowAll->isChecked() );
     mJobTypeShowNone->setChecked( mJobList->mJobFilter.typeToShow.size() == 0 );
     mJobTypeShowNone->setEnabled( !mJobTypeShowNone->isChecked() );
@@ -316,7 +316,7 @@ void JobTypeFilterMenu::slotActionTriggered( QAction * act )
 {
 	if( act == mJobTypeShowAll ) {
 		mJobList->mJobFilter.typeToShow.clear();
-		foreach( JobType jt, mJobList->mJobTypeList )
+        foreach( JobType jt, mJobList->activeJobTypes().filter( "fkeyparentjobtype", QVariant(QVariant::Int) /*NULL*/ ) )
 			mJobList->mJobFilter.typeToShow += QString::number( jt.key() );
 	} else if( act == mJobTypeShowNone ) {
 		mJobList->mJobFilter.typeToShow.clear();
@@ -518,7 +518,7 @@ void HostServiceFilterMenu::slotAboutToShow()
 	if( !mActionsCreated ) {
 		mActionsCreated = true;
 
-		ServiceList sl = mHostList->mServiceList.sorted( "service" );
+        ServiceList sl = mHostList->mServiceList.sorted( "service" );
 		QStringList serviceList = mHostList->mServiceFilter.split(',');
 
 		mHostServiceShowAll = addAction( "Show All" );

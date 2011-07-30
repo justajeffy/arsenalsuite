@@ -28,7 +28,7 @@ public:
 
 	virtual bool update( Table *, RecordImp * imp, Record * returnVals = 0 );
 
-	virtual int remove( Table *, const QStringList & );
+	virtual int remove( Table *, const QString &, QList<int> * rowsDeleted = 0 );
 
 	virtual bool createIndex( IndexSchema * schema );
 	

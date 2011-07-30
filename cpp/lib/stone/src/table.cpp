@@ -97,8 +97,18 @@ void Table::setup()
 
 Table::~Table()
 {
+	clearIndexes();
+	foreach( Table * t, mChildren )
+		delete t;
 	foreach( Index * i, indexes() )
-		delete i;
+		if( i != mKeyIndex )
+			delete i;
+	mEmptyImp->deref();
+	mEmptyImp = 0;
+	if( mImpCount > 0 ) {
+		LOG_1( schema()->tableName() + " has " + QString::number( mImpCount ) + " references remaining" );
+	}
+	delete mKeyIndex;
 	mKeyIndex = 0;
 }
 
@@ -737,28 +747,45 @@ int Table::remove( const RecordList & const_list )
 {
 	RecordList rl( const_list );
 	rl = gatherToRemove( const_list );
-	QStringList keys;
+	
 	for( RecordIter it = rl.begin(); it != rl.end(); )
 	{
 		if( !(*it).key() || (it.imp()->mState & RecordImp::DELETED) ){
 			it = rl.remove( it );
 			continue;
 		}
-		keys += QString::number( (*it).key() );
-		it.imp()->mState = RecordImp::DELETED;
+		//it.imp()->mState = RecordImp::DELETED;
 		++it;
 	}
 
-	if( keys.isEmpty() )
-		return 0;
 
 	if( !mDatabase->ensureInsideTransaction() )
 		return -1;
 
 	mSchema->preRemove( rl );
 
-	int result = connection()->remove( this, keys );
+	QString keys = rl.keyString();
+
+	if( keys.isEmpty() )
+		return 0;
+	
+	QList<int> removed;
+	int result = connection()->remove( this, keys, &removed );
+	
 	if( result >= 0 ) {
+		QSet<int> removedSet;
+		int partialDelete = (result != rl.size());
+		if( partialDelete )
+			removedSet = removed.toSet();
+		for( RecordIter it = rl.begin(); it != rl.end(); ) {
+			// Remove the records that weren't removed in the db
+			if( partialDelete && !removedSet.contains((*it).key()) ) {
+				it = rl.remove(it);
+				continue;
+			}
+			it.imp()->mState = RecordImp::DELETED;
+			++it;
+		}
 		UpdateManager::instance()->recordsDeleted( this, rl );
 		recordsRemoved( rl );
 		mDatabase->recordsRemoved( rl, true );

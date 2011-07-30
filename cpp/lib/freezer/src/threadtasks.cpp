@@ -153,8 +153,8 @@ void JobListTask::run()
 	}
 
 	JobList jobsNeedingRefresh;
-	if( mFetchJobDeps ) {
-		JobList jobsNeedingDeps = mReturn.unique();
+    if( mFetchJobDeps && mReturn.size() ) {
+        JobList jobsNeedingDeps = mReturn;
 		Index * idx = JobDep::table()->indexFromField( "fkeyJob" );
         idx->cacheIncoming(true);
         mJobDeps = JobDep::table()->selectFrom( "jobdep_recursive('" + jobsNeedingDeps.keyString() + "') AS JobDep" );

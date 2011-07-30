@@ -77,6 +77,9 @@ public:
 
 	ProjectList activeProjects();
 
+    JobTypeList activeJobTypes();
+    ServiceList activeServices();
+
 	bool isDependencyTreeEnabled() const;
 
 	Job currentJob() const { return mCurrentJob; }
@@ -198,9 +201,16 @@ protected:
 
 	bool mStaticDataRetrieved;
 
-	// Static so that multiple instances of this view type can share this data
-	static JobTypeList mJobTypeList;
-	static ProjectList mProjectList;
+    struct SharedData {
+        int mRefCount;
+        JobTypeList mJobTypeList;
+        ProjectList mProjectList;
+        // List of services that are used by jobs
+        ServiceList mServiceList;
+    };
+
+    static SharedData * mSharedData;
+
 
 public:
 	QMenu * mJobMenu,
