@@ -63,6 +63,8 @@ private:
     QWidget     *widget;
 
     QMap<QModelIndex, bool> mRowChildrenVisited;
+
+    bool mRowFilterScheduled;
 };
 
 #endif // RECORD_FILTER_WIDGET_H

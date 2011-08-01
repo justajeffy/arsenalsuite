@@ -41,6 +41,7 @@
 
 RecordFilterWidget::RecordFilterWidget(QWidget * parent)
 : QScrollArea(parent)
+, mRowFilterScheduled(false)
 {
     setMaximumHeight(20);
 
@@ -125,19 +126,26 @@ void RecordFilterWidget::moveColumn(int, int, int)
 
 void RecordFilterWidget::textFilterChanged()
 {
+    if( mRowFilterScheduled) return;
+
     QLineEdit *filter = qobject_cast<QLineEdit*> (sender());
     if( mFilterIndexMap.contains(filter) ) {
         int column = mFilterIndexMap.value(filter);
         SuperModel * sm = (SuperModel *)(mTree->model());
         sm->setColumnFilter( column, filter->text() );
     }
-    QTimer::singleShot(300, this, SLOT(filterRows()));
+    QTimer::singleShot(500, this, SLOT(filterRows()));
+    mRowFilterScheduled = true;
 }
 
 void RecordFilterWidget::filterRows()
 {
+    QTime t;
+    t.start();
     mRowChildrenVisited.clear();
     filterChildren( mTree->rootIndex() );
+    //LOG_3( QString("Took %1 ms to filter rows").arg(t.elapsed()) );
+    mRowFilterScheduled = false;
 }
 
 /*
