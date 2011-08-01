@@ -13,6 +13,8 @@ SOURCES += \
 
 INCLUDEPATH+=../stone/include autocore autoimp base /usr/include/stone .
 
+DESTDIR=$$(DESTDIR)
+
 win32 {
 	LIBS+=-lMpr -lws2_32 -ladvapi32
 	PY_PATH=$$system("python -c \"from distutils.sysconfig import get_config_vars; print get_config_vars()['prefix']\"")
@@ -31,6 +33,9 @@ unix {
 	message(Python Version is $$PY_VERSION)
 	INCLUDEPATH+=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
 	LIBS+=-lpython$${PY_VERSION}
+    count ( DESTDIR, 1 ) {
+        INCLUDEPATH+=$${DESTDIR}/usr/include/python$${PY_VERSION}
+    }
 }
 
 DEFINES+=CLASSES_MAKE_DLL
