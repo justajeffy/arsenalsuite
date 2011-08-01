@@ -11,21 +11,26 @@ makensis_extra_options.append( '/DPYTHON_VERSION=%s' % sysconfig.get_python_vers
 nsis = NSISTarget( "pyqt_installer", path, "PyQt4.nsi", makensis_extra_options = makensis_extra_options, pre_deps = ["pyqt"] )
 
 class PyQtTarget(SipTarget):
-	def configure_command(self):
-		config = SipTarget.configure_command(self)
-		if self.has_arg("-verbose"):
-			config += " -w"
-		return config
-		
+    def configure_command(self):
+        if self.has_arg("verbose"):
+            self.config += " -w"
+
+        if "DESTDIR" in os.environ:
+            print "DESTDIR found, building without designer plugin"
+            python_version = "python" + sys.version[:3]
+            self.config += " -b %s/usr/bin" % os.environ['DESTDIR']
+            self.config += " -d %s/usr/lib/%s/site-packages" % (os.environ['DESTDIR'], python_version)
+            self.config += " -v %s/usr/share/sip" % os.environ['DESTDIR']
+            self.config += " --no-designer-plugin"
 
 pyqt = PyQtTarget("pyqt",path,False,None,["sip"] )
 
 if sys.platform=="linux2":
-	rpm = RPMTarget("pyqtrpm","pyqt",path,"../../../rpm/spec/pyqt.spec.template","1.0")
-	rpm.pre_deps = ["siprpm"]
+    rpm = RPMTarget("pyqtrpm","pyqt",path,"../../../rpm/spec/pyqt.spec.template","1.0")
+    rpm.pre_deps = ["siprpm"]
 
 pyqt.post_deps = [nsis]
 
 if __name__ == "__main__":
-	build()
+    build()
 
