@@ -37,6 +37,8 @@
 
 #include "iniconfig.h"
 #include "element.h"
+#include "project.h"
+#include "jobtype.h"
 
 struct ViewColors;
 
@@ -84,14 +86,11 @@ struct FREEZER_EXPORT JobFilter {
 	QStringList userList;
 
     // List of projects to hide, comma separated keys
-    QStringList visibleProjects;
+    ProjectList visibleProjects;
     bool showNonProjectJobs, allProjectsShown;
 
-	// List of projects to hide, comma separated keys
-	QStringList hiddenProjects;
-
 	// List of job types to show
-	QStringList typeToShow;
+    JobTypeList typesToShow;
 
 	// Elements ( shots ) to show
 	ElementList elementList;

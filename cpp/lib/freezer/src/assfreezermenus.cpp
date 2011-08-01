@@ -151,44 +151,33 @@ void ProjectFilterMenu::slotAboutToShow()
 void ProjectFilterMenu::slotActionTriggered( QAction * act )
 {
 	if( act == mProjectShowAll ) {
-		mJobList->mJobFilter.hiddenProjects.clear();
 		mJobList->mJobFilter.showNonProjectJobs = true;
+        mJobList->mJobFilter.visibleProjects = mJobList->activeProjects();
 	} else if( act == mProjectShowNone ) {
-		mJobList->mJobFilter.hiddenProjects.clear();
-		ProjectList projectList = mJobList->activeProjects();
-		foreach( Project p, projectList )
-			mJobList->mJobFilter.hiddenProjects += QString::number(p.key());
 		mJobList->mJobFilter.showNonProjectJobs = false;
+        mJobList->mJobFilter.visibleProjects.clear();
 	} else if( act == mProjectShowNonProject ) {
 		mJobList->mJobFilter.showNonProjectJobs = act->isChecked();
 	} else {
         bool show = act->isChecked();
-        if( !show && mJobList->mJobFilter.allProjectsShown ) {
-            mJobList->mJobFilter.allProjectsShown = false;
-            mJobList->mJobFilter.visibleProjects = mJobList->activeProjects().keyString().split(',');
-        }
-        QString project = QString::number(act->property("projectkey").toInt());
-        int i = mJobList->mJobFilter.visibleProjects.indexOf( project );
-        if( i < 0 )
-            mJobList->mJobFilter.visibleProjects += project;
+        int pkey = act->property("projectkey").toInt();
+        if( show )
+            mJobList->mJobFilter.visibleProjects += Project(pkey);
         else
-            mJobList->mJobFilter.visibleProjects.removeAt(i);
+            mJobList->mJobFilter.visibleProjects -= Project(pkey);
+
         if( mJobList->mJobFilter.visibleProjects.size() == mJobList->activeProjects().size() )
             mJobList->mJobFilter.allProjectsShown = true;
-	}
+    }
     updateActionStates();
     mJobList->refresh();
 }
 
 void ProjectFilterMenu::updateActionStates()
 {
-    mProjectShowAll->setChecked( mJobList->mJobFilter.allProjectsShown && mJobList->mJobFilter.showNonProjectJobs );
-    mProjectShowAll->setEnabled( !mProjectShowAll->isChecked() );
-    mProjectShowNone->setChecked( !mJobList->mJobFilter.allProjectsShown && !mJobList->mJobFilter.showNonProjectJobs && mJobList->mJobFilter.visibleProjects.isEmpty() );
-    mProjectShowNone->setCheckable( !mProjectShowNone->isChecked() );
     mProjectShowNonProject->setChecked( mJobList->mJobFilter.showNonProjectJobs );
     foreach( QAction * act, mProjectActions )
-        act->setChecked( mJobList->mJobFilter.allProjectsShown || mJobList->mJobFilter.visibleProjects.contains( QString::number( act->property("projectkey").toInt() ) ) );
+        act->setChecked( mJobList->mJobFilter.allProjectsShown || mJobList->mJobFilter.visibleProjects.keys().contains( act->property("projectkey").toInt() ) );
 }
 
 StatusFilterMenu::StatusFilterMenu(JobListWidget * jobList)
@@ -209,9 +198,9 @@ void StatusFilterMenu::slotAboutToShow()
 	{
 		mStatusActionsCreated = true;
 		mStatusShowAll = new QAction( "Show All", this );
-        mStatusShowAll->setCheckable( true );
+        mStatusShowAll->setCheckable( false );
 		mStatusShowNone = new QAction( "Show None", this );
-        mStatusShowNone->setCheckable( true );
+        mStatusShowNone->setCheckable( false );
 		for(int i=0;stats[i]; i++){
 			QString stat(stats[i]);
 			QAction * act = new QAction( stat, this );
@@ -230,10 +219,6 @@ void StatusFilterMenu::slotAboutToShow()
 
 void StatusFilterMenu::updateActionStates()
 {
-    mStatusShowAll->setChecked( mJobList->mJobFilter.statusToShow.size() == mStatusActions.size() );
-    mStatusShowAll->setEnabled( !mStatusShowAll->isChecked() );
-    mStatusShowNone->setChecked( mJobList->mJobFilter.statusToShow.size() == 0 );
-    mStatusShowNone->setEnabled( !mStatusShowNone->isChecked() );
     foreach( QAction * act, mStatusActions )
         act->setChecked( mJobList->mJobFilter.statusToShow.contains( act->text().toLower() ) );
 }
@@ -280,9 +265,7 @@ void JobTypeFilterMenu::slotAboutToShow()
 		mJobTypeActionsCreated = true;
 
 		mJobTypeShowAll = new QAction( "Show All", this );
-        mJobTypeShowAll->setCheckable( true );
 		mJobTypeShowNone = new QAction( "Show None", this );
-        mJobTypeShowNone->setCheckable( true );
         JobTypeList jtl = mJobList->activeJobTypes().sorted( "jobType" );
 		foreach( JobType jt, jtl )
 		{
@@ -303,30 +286,23 @@ void JobTypeFilterMenu::slotAboutToShow()
 
 void JobTypeFilterMenu::updateActionStates()
 {
-    mJobTypeShowAll->setChecked( mJobList->mJobFilter.typeToShow.size() == mJobList->activeJobTypes().size() );
-    mJobTypeShowAll->setEnabled( !mJobTypeShowAll->isChecked() );
-    mJobTypeShowNone->setChecked( mJobList->mJobFilter.typeToShow.size() == 0 );
-    mJobTypeShowNone->setEnabled( !mJobTypeShowNone->isChecked() );
-    foreach( QAction * act, mJobTypeActions ) {
-        act->setChecked( mJobList->mJobFilter.typeToShow.contains(QString::number(act->property("jobtypekey").toInt())) );
-    }
+    foreach( QAction * act, mJobTypeActions )
+        act->setChecked( mJobList->mJobFilter.typesToShow.keys().contains(act->property("jobtypekey").toInt()) );
 }
 
 void JobTypeFilterMenu::slotActionTriggered( QAction * act )
 {
 	if( act == mJobTypeShowAll ) {
-		mJobList->mJobFilter.typeToShow.clear();
-        foreach( JobType jt, mJobList->activeJobTypes().filter( "fkeyparentjobtype", QVariant(QVariant::Int) /*NULL*/ ) )
-			mJobList->mJobFilter.typeToShow += QString::number( jt.key() );
+		mJobList->mJobFilter.typesToShow.clear();
+		mJobList->mJobFilter.typesToShow = mJobList->activeJobTypes().filter( "fkeyparentjobtype", QVariant(QVariant::Int) /*NULL*/,false );
 	} else if( act == mJobTypeShowNone ) {
-		mJobList->mJobFilter.typeToShow.clear();
+		mJobList->mJobFilter.typesToShow.clear();
 	} else {
-        QString jtk = QString::number(act->property("jobtypekey").toInt());
-        int i = mJobList->mJobFilter.typeToShow.indexOf( jtk );
-        if( i < 0 )
-            mJobList->mJobFilter.typeToShow += jtk;
+        JobType jt = JobType(act->property("jobtypekey").toInt());
+        if(mJobList->mJobFilter.typesToShow.contains(jt))
+            mJobList->mJobFilter.typesToShow -= jt;
         else
-            mJobList->mJobFilter.typeToShow.removeAt(i);
+            mJobList->mJobFilter.typesToShow += jt;
     }
     updateActionStates();
     mJobList->refresh();

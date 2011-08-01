@@ -50,9 +50,6 @@ public:
 	// Job filters are ignored while this list is not empty
 	JobList jobList() const { return mJobList; }
 
-	/// don't show jobs with fkeyProject in hiddenProjects
-	void setHiddenProjects( ProjectList hiddenProjects );
-	
 	/// show jobs with fkeyElement in ElementList
 	void setElementList( ElementList );
 	
