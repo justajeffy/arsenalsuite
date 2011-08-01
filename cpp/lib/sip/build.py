@@ -17,10 +17,10 @@ class SipSipTarget(SipTarget):
     def configure_command(self):
         if "DESTDIR" in os.environ:
             python_version = "python" + sys.version[:3]
-            self.config += " -b %s/bin" % os.environ['DESTDIR']
-            self.config += " -d %s/lib/%s/site-packages" % (os.environ['DESTDIR'], python_version)
-            self.config += " -e %s/include/%s" % (os.environ['DESTDIR'], python_version)
-            self.config += " -v %s/share/sip" % os.environ['DESTDIR']
+            self.config += " -b %s/usr/bin" % os.environ['DESTDIR']
+            self.config += " -d %s/usr/lib/%s/site-packages" % (os.environ['DESTDIR'], python_version)
+            self.config += " -e %s/usr/include/%s" % (os.environ['DESTDIR'], python_version)
+            self.config += " -v %s/usr/share/sip" % os.environ['DESTDIR']
 
 #SipTarget("sip",path,False,plat)
 SipSipTarget("sip", path, False, plat)
