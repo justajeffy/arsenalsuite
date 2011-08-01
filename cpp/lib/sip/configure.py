@@ -393,17 +393,6 @@ def main(argv):
     global opts
 
     set_defaults()
-
-    if "DESTDIR" in os.environ:
-        argv.append("-b")
-        argv.append(os.environ["DESTDIR"] + default_sipbindir)
-        argv.append("-d")
-        argv.append(os.environ["DESTDIR"] + default_sipmoddir)
-        argv.append("-e")
-        argv.append(os.environ["DESTDIR"] + default_sipincdir)
-        argv.append("-v")
-        argv.append(os.environ["DESTDIR"] + default_sipsipdir)
-
     p = create_optparser()
     opts, args = p.parse_args()
 
