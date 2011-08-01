@@ -550,18 +550,8 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
 	priority = QString::number( job.priority() );
 	project = job.project().name();
 
-	//submitted = job.submittedts().toString();
-
-    /*
-	if( !job.endedts().isNull() ) {
-		ended = job.endedts().toString();
-	} else
-		ended = "---";
-    */
-
 	errorCnt = QString::number(jobStatus.errorCount());
 
-	//uint tat = jobStatus.tasksAverageTime();
 	avgTime = Interval(jobStatus.tasksAverageTime()).toString( Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
 
 	Interval tiq( job.submittedts(), job.endedts().isNull() ? QDateTime::currentDateTime() : job.endedts() );
@@ -575,13 +565,11 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
 	co = options.mJobColors->getColorOption(status);
 	avgMemory = memoryString(jobStatus.averageMemory());
 
-	uint ct = jobStatus.cputime() / 1000;
-	cpuTime.sprintf("%02i:%02i:%02i", (ct/3600)%60, (ct/60)%60, ct%60 );
+	cpuTime = Interval(jobStatus.cputime() / 1000).toString( Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
 
     bytesWrite = memoryString( jobStatus.bytesWrite()/1024 );
     bytesRead = memoryString( jobStatus.bytesRead()/1024 );
     diskOps = QString::number( jobStatus.opsWrite() + jobStatus.opsRead() );
-    //efficiency.sprintf("%3.2f %", (((jobStatus.cputime()/( jobStatus.totaltime() > 0 ? jobStatus.totaltime() : 1 ) )/(job.assignmentSlots() > 0 ? job.assignmentSlots() : 1) )*100));
     efficiency.sprintf("%3.2f %", jobStatus.efficiency()*100.00);
 }
 
@@ -671,6 +659,8 @@ int JobItem::compare( const QModelIndex & a, const QModelIndex & b, int col, boo
 		return (int)(100.0 * (jobStatus.health() - other.jobStatus.health()));
 	} else if( col == 8 )
 		return compareRetI( job.submittedts(), other.job.submittedts() );
+	else if( col == 3 )
+		return compareRetI( jobStatus.tasksCount(), other.jobStatus.tasksCount() );
 	else if( col == 5 )
 		return compareRetI( adjustedHostsOnJob(job.status(),jobStatus), adjustedHostsOnJob(other.job.status(),other.jobStatus) );
 	else if( col == 6 )
@@ -688,6 +678,14 @@ int JobItem::compare( const QModelIndex & a, const QModelIndex & b, int col, boo
 	}
     else if( col == 20 )
 		return compareRetI( jobStatus.averageMemory(), other.jobStatus.averageMemory() );
+    else if( col == 22 )
+		return compareRetI( jobStatus.bytesWrite(), other.jobStatus.bytesWrite() );
+    else if( col == 23 )
+		return compareRetI( jobStatus.bytesRead(), other.jobStatus.bytesRead() );
+    else if( col == 24 )
+		return compareRetI( (jobStatus.opsWrite()+jobStatus.opsRead()), (other.jobStatus.opsWrite()+other.jobStatus.opsRead()) );
+	else if( col == 25 )
+		return compareRetI( jobStatus.cputime(), other.jobStatus.cputime() );
 	return ItemBase::compare( a, b, col, asc );
 }
 
