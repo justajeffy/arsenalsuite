@@ -54,6 +54,7 @@ makefile = BurnerModuleMakefile(
 #	installs=installs,
 	static=1,
 	debug=sys.argv.count("-u"),
+    install_dir=os.path.join(config.sip_mod_dir,"blur"),
 	dir="sipBurner"
 )
 
