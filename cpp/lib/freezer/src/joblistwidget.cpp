@@ -368,6 +368,7 @@ void JobListWidget::customEvent( QEvent * evt )
 	switch( evt->type() ) {
 		case JOB_LIST:
 		{
+            JobList selection = mJobTree->selection();
 			mJobTask = ((JobListTask*)evt);
 			JobModel * jm = (JobModel*)mJobTree->model();
 
@@ -476,6 +477,7 @@ void JobListWidget::customEvent( QEvent * evt )
             mJobTree->mRecordFilterWidget->filterRows();
             LOG_3( QString("Took %1 ms to filter rows").arg(t.elapsed()) );
 
+            mJobTree->setSelection(selection);
 			break;
 		}
 		case FRAME_LIST:
