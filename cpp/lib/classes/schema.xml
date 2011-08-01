@@ -773,7 +773,7 @@
    <fkey indexDeleteMode="DoNothingOnDelete" indexName="Job" indexUseCache="true" table="Job" type="multi" hasIndex="true"/>
   </column>
   <column type="uint" methodName="Dep" name="fkeyDep">
-   <fkey indexDeleteMode="DoNothingOnDelete" indexName="Dep" indexUseCache="false" table="Job" type="multi" hasIndex="true"/>
+   <fkey indexDeleteMode="DoNothingOnDelete" indexName="Dep" indexUseCache="true" table="Job" type="multi" hasIndex="true"/>
   </column>
   <column type="uint" methodName="depType" name="depType"/>
   <index useCache="true" type="single" name="JobAndDep">
