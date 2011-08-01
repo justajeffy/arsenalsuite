@@ -256,23 +256,23 @@ void JobListWidget::initializeViews()
         mFrameSplitter->setSizes( frameSplitterInts );
 
         // Filter any empty entries.  And empty string split with ',' returns a string list with one empty entry
-        mJobFilter.typeToShow = ini.readString( "TypeToShow" ).split(',',QString::SkipEmptyParts);
-        mJobFilter.statusToShow =   ini.readString( "StatusToShow", "submit,verify,ready,holding,started,suspended,done" ).split(',',QString::SkipEmptyParts);
+        QStringList typesToShow = ini.readString( "TypeToShow" ).split(',',QString::SkipEmptyParts);
+        for( QStringList::Iterator it=typesToShow.begin(); it!=typesToShow.end(); ++it )
+            mJobFilter.typesToShow += JobType((*it).toInt());
 
-        mJobFilter.userList =       ini.readString( "UserList", "" ).split(',',QString::SkipEmptyParts);
+        mJobFilter.statusToShow =   ini.readString( "StatusToShow", "ready,holding,started,suspended,done" ).split(',',QString::SkipEmptyParts);
+
+        mJobFilter.userList = ini.readString( "UserList", "" ).split(',',QString::SkipEmptyParts);
         ShowMineAction->blockSignals(true);
         ShowMineAction->setChecked( !mJobFilter.userList.isEmpty() );
         ShowMineAction->blockSignals(false);
 
-        mJobFilter.allProjectsShown = ini.readBool( "AllProjectsShown", false );
-        if( ini.keys().contains( "VisibleProjects" ) ) {
-            mJobFilter.visibleProjects = mSharedData->mProjectList.keyString().split(',',QString::SkipEmptyParts);
-        } else {
-            mJobFilter.hiddenProjects = ini.readString( "HiddenProjects", "" ).split(',',QString::SkipEmptyParts);
-            if( mJobFilter.hiddenProjects.isEmpty() )
-                mJobFilter.allProjectsShown = true;
-        }
+        mJobFilter.allProjectsShown = ini.readBool( "AllProjectsShown", true );
+        QStringList visibleProjects = ini.readString( "VisibleProjects" ).split(',',QString::SkipEmptyParts);
+        for( QStringList::Iterator it=visibleProjects.begin(); it!=visibleProjects.end(); ++it )
+            mJobFilter.visibleProjects += Project((*it).toInt());
         mJobFilter.showNonProjectJobs = ini.readBool( "ShowNonProjectJobs", true );
+
         mJobFilter.mLimit = options.mLimit;
         mJobFilter.mDaysLimit = options.mDaysLimit;
         applyOptions();
@@ -290,12 +290,12 @@ void JobListWidget::save( IniConfig & ini )
         ini.writeInt("FrameTab", mFrameTabs->currentIndex());
         ini.writeString( "StatusToShow", mJobFilter.statusToShow.join(",") );
         ini.writeString( "UserList", mJobFilter.userList.join(",") );
-        ini.writeString( "VisibleProjects", mJobFilter.visibleProjects.join(",") );
+        ini.writeString( "VisibleProjects", mJobFilter.visibleProjects.keyString() );
         ini.removeKey( "HiddenProjects" );
         ini.writeBool( "AllProjectsShown", mJobFilter.allProjectsShown );
         ini.writeBool( "ShowNonProjectJobs", mJobFilter.showNonProjectJobs );
-        ini.writeString( "TypeToShow", mJobFilter.typeToShow.join(",") );
-        ini.writeString( "TypesHidden", (mSharedData->mJobTypeList - JobType::table()->records( mJobFilter.typeToShow.join(",") )).keyString() );
+        ini.writeString( "TypeToShow", mJobFilter.typesToShow.keyString() );
+        ini.writeString( "TypesHidden", (mSharedData->mJobTypeList - mJobFilter.typesToShow).keyString() );
         ini.writeBool( "DependencyTreeEnabled", isDependencyTreeEnabled() );
         ini.writeBool( "Filter", FilterAction->isChecked() );
         // Save the splitter position by making a string of ints separated by commas
@@ -450,12 +450,14 @@ void JobListWidget::customEvent( QEvent * evt )
             }
             LOG_3( QString("Took %1 ms to setup deps and services").arg(t.elapsed()) );
 
+            t.start();
             // clear out existing toolTip info first
             clearChildrenToolTip(mJobTree->rootIndex());
 
             // recursively set all rows
             //QTimer::singleShot(20, this, SLOT(setToolTips()));
             setToolTips();
+            LOG_3( QString("Took %1 ms to set tooltips").arg(t.elapsed()) );
 
             mJobTree->busyWidget()->stop();
 			mJobTaskRunning = false;
@@ -463,12 +465,16 @@ void JobListWidget::customEvent( QEvent * evt )
 			// since they selected jobs may have changed
 			jobListSelectionChanged();
 
+            /*
 			if( mQueuedJobRefresh ) {
 				mQueuedJobRefresh = false;
 				refresh();
 			}
+            */
 
+            t.start();
             mJobTree->mRecordFilterWidget->filterRows();
+            LOG_3( QString("Took %1 ms to filter rows").arg(t.elapsed()) );
 
 			break;
 		}
@@ -478,6 +484,7 @@ void JobListWidget::customEvent( QEvent * evt )
 			JobTaskList jtl = ((FrameListTask*)evt)->mReturn;
 			FrameItem::CurTime = ((FrameListTask*)evt)->mCurTime;
 
+            jtl.jobTaskAssignments().jobAssignments();
             QMap<QString, QString> stats;
 			foreach( JobTask jt, jtl )
 			{
@@ -573,10 +580,9 @@ void JobListWidget::customEvent( QEvent * evt )
 			}
 
 			// Default to showing all of the services and job types
-			if( mJobFilter.typeToShow.isEmpty() )
-                mJobFilter.typeToShow = mSharedData->mJobTypeList.filter( "fkeyparentjobtype", QVariant(), false ).keyString().split(',',QString::SkipEmptyParts);
-			else
-                mJobFilter.typeToShow = verifyKeyList( mJobFilter.typeToShow.join(","), JobType::table() ).split(',',QString::SkipEmptyParts);
+			if( mJobFilter.typesToShow.isEmpty() )
+                mJobFilter.typesToShow = mSharedData->mJobTypeList.filter( "fkeyparentjobtype", QVariant(QVariant::Int), false );
+
 			// If we haven't retrieved the static data, then mJobTaskRunning indicates
 			// that we need to refresh the job list.
 			if( mJobTaskRunning ) {
@@ -584,7 +590,7 @@ void JobListWidget::customEvent( QEvent * evt )
 				refresh();
 			}
 
-            mJobTree->mRecordFilterWidget->filterRows();
+            //mJobTree->mRecordFilterWidget->filterRows();
 
 			break;
 		}
@@ -784,13 +790,6 @@ void JobListWidget::applyOptions()
 void JobListWidget::setJobFilter( const JobFilter & jf )
 {
 	mJobFilter = jf;
-}
-
-void JobListWidget::setHiddenProjects( ProjectList hiddenProjects )
-{
-	mJobFilter.hiddenProjects.clear();
-	foreach( Project p, hiddenProjects )
-		mJobFilter.hiddenProjects += QString::number( p.key() );
 }
 
 void JobListWidget::setElementList( ElementList el )

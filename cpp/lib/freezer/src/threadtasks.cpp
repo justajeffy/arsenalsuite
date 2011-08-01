@@ -79,7 +79,7 @@ void JobListTask::run()
 		mReturn = mJobList.reloaded();
 	} else
 	// If we have a project list, and all projects are hidden, then there will be no items, so just clear the list
-    if( !(projectFilterShowingNone || mJobFilter.typeToShow.isEmpty() || mJobFilter.statusToShow.isEmpty()) )
+    if( !(projectFilterShowingNone || mJobFilter.typesToShow.isEmpty() || mJobFilter.statusToShow.isEmpty()) )
 	{
 		QStringList filters;
 		
@@ -88,31 +88,25 @@ void JobListTask::run()
 		//LOG_5( "Non-Project Jobs: " + QString(mJobFilter.showNonProjectJobs ? "true" : "false") );
 		//LOG_5( "User List: " + mJobFilter.userList.join(",") );
 
-		if( mJobFilter.statusToShow.size() > 0 && mJobFilter.statusToShow.size() != 9 )
+		if( mJobFilter.statusToShow.size() > 0 && mJobFilter.statusToShow.size() != 8 )
 			filters << "status IN ('" + mJobFilter.statusToShow.join("','") + "')";
 
 		if( mJobFilter.userList.size() > 0 )
 			filters << " fkeyUsr IN (" + mJobFilter.userList.join(",") + ")";
 
-		if( mJobFilter.hiddenProjects.size() > 0 || !mJobFilter.showNonProjectJobs ) {
-			QStringList projectKeys;
-			foreach( Project p, mProjects ) {
-				QString pkey(QString::number( p.key() ));
-				if( !mJobFilter.hiddenProjects.contains( pkey ) )
-					projectKeys.append( pkey );
-			}
-			if( mJobFilter.showNonProjectJobs )
-				projectKeys.append( "0" );
-			if( projectKeys.size() || mJobFilter.showNonProjectJobs ) {
-				QString where = "(";
-				if( projectKeys.size() )
-					where += " fkeyproject IN (" + projectKeys.join(",") + ")";
-				if( mJobFilter.showNonProjectJobs )
-					where += " OR fkeyproject is null";
-				where += ")";
-				filters << where;
-			}
-		}
+        if( !mJobFilter.allProjectsShown || !mJobFilter.showNonProjectJobs ) {
+            QString where = "(";
+            if( mJobFilter.visibleProjects.size() )
+                where += " fkeyproject IN (" + mJobFilter.visibleProjects.keyString() + ")";
+            if( mJobFilter.showNonProjectJobs ) {
+                if( mJobFilter.visibleProjects.size() )
+                    where += " OR";
+                where += " fkeyproject is null";
+            }
+            where += ")";
+            filters << where;
+        }
+
 		if( mJobFilter.elementList.size() > 0 )
 			filters << " fkeyelement IN (" + mJobFilter.elementList.keyString() + ")";
 
@@ -130,10 +124,9 @@ void JobListTask::run()
 		TableList tables;
 
 		CHECK_CANCEL
-		foreach( QString type, mJobFilter.typeToShow ) {
-			JobType jt( type.toUInt() );
+		foreach( JobType jt, mJobFilter.typesToShow ) {
 			if( !jt.isRecord() ) {
-				LOG_5( "JobType filter was not a valid record: " + type );
+				LOG_5( "JobType filter was not a valid record: " + jt.name() );
 				continue;
 			}
 			Table * tbl = Database::current()->tableByName( "job" + jt.name() );
@@ -178,6 +171,7 @@ void JobListTask::run()
 		if( mFetchJobServices )
 			mJobServices = JobService::select( "fkeyjob in (" + allJobs.keyString() + ")" );
 
+		CHECK_CANCEL
         if( mFetchUserServices ) {
             QSqlQuery q = Database::current()->exec( "SELECT * FROM user_service_current" );
             while( q.next() ) {
@@ -193,6 +187,7 @@ void JobListTask::run()
             }
         }
 
+		CHECK_CANCEL
         if( mFetchProjectSlots ) {
             QSqlQuery q = Database::current()->exec( "SELECT * FROM project_slots_current" );
             while( q.next() ) {
@@ -204,8 +199,8 @@ void JobListTask::run()
             }
         }
     }
-	jobsNeedingRefresh.clear();
-	allJobs.clear();
+	//jobsNeedingRefresh.clear();
+	//allJobs.clear();
 }
 
 HostListTask::HostListTask( QObject * rec, const QString & serviceFilter, bool loadHostServices )
