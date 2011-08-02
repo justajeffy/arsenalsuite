@@ -272,14 +272,16 @@ QPixmap ProgressDelegate::gradientCache(int height, const QChar & status) const
 
 QPixmap ProgressDelegate::taskProgressBar(int height, const QString & taskBitmap) const
 {
-    QPixmap progressBar(qMax(1, taskBitmap.size()), height);
+    // if the width is stupidly big chop it off
+    int width = qMin(16000, qMax(1, taskBitmap.size()));
+    QPixmap progressBar(width, height);
     progressBar.fill(mNewColor->fg);
     QPainter progressPainter;
     progressPainter.begin( &progressBar );
 
-    for (int x = 0; x < taskBitmap.size(); ++x) {
+    for (int x = 0; x < width; ++x)
         progressPainter.drawPixmap( x, 0, gradientCache(height, taskBitmap.at(x) ));
-    }
+
     return progressBar;
 }
 
