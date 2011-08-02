@@ -412,7 +412,11 @@ inline int ModelNode::rowCount()
 
 inline ModelNode::ItemInfo & ModelNode::rowToItemInfo(int row)
 {
-	return mItemInfoVector[row];
+    if( row < 0 || row > mItemInfoVector.size()-1 ) {
+        ItemInfo ii = ItemInfo();
+        return ii;
+    }
+    return mItemInfoVector[row];
 }
 
 inline ModelDataTranslator * ModelNode::_translator(int translatorIndex) const
