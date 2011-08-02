@@ -141,7 +141,6 @@ while True:
                 continue
 
         print "host %s looks fucked, returning tasks - slave last pulsed at %s" % (host.name(), status.slavePulse().toString())
-        continue
 
         lastPulseInterval = Interval(status.slavePulse(),selectStartTime)
         msg = QStringList()
