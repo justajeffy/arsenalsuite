@@ -122,6 +122,7 @@ debug:win32 {
 LIBS+=-L../../lib/stonegui -lstonegui
 LIBS+=-L../../lib/classes -lclasses
 LIBS+=-L../../lib/stone -lstone
+LIBS+=-lutil
 
 
 win32 {
