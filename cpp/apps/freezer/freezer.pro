@@ -48,6 +48,7 @@ unix{
 	LIBS+=-L../../lib/classes -lclasses
 	LIBS+=-L../../lib/stone -lstone
 	LIBS+=-L../../lib/absubmit -labsubmit
+	LIBS+=-lutil
 
 	unix: LIBS+=-L$$(MAGICK_ROOT)/lib
 	unix: LIBS+=-Wl,-rpath,$$(MAGICK_ROOT)/lib
