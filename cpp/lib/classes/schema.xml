@@ -886,6 +886,7 @@
   <column docs="Append an arbitrary string to the command line, useful for &quot;--[global var] n&quot; flags." type="QString" methodName="append" name="append"/>
   <column docs="File path to a cache file used to restart sims part way through a render." type="QString" methodName="restartCache" name="restartCache"/>
   <column type="uint" methodName="fullFrame" name="fullFrame"/>
+  <column pluralMethodName="forceRestart" type="bool" methodName="forceRestart" name="forcerestart"/>
  </table>
  <table useCodeGen="true" parent="Job" name="JobNuke" expireKeyCache="true" className="JobNuke">
   <column type="uint" methodName="frameStart" name="frameStart"/>
