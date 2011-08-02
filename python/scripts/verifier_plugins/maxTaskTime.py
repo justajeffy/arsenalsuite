@@ -12,22 +12,21 @@ def doThis(job):
     #if job.user().name() == "dan.bethell": return True
     #if job.user().name() == "alexander.samsonov": return True
 
+    job.setMaxTaskTime(0)
+
     if( job.jobType().name().contains("Mantra") ):
-        job.setMaxTaskTime(2 * 60 * 60)
         job.setMaxQuietTime(1 * 60 * 60)
         job.setPacketType('iterative')
         job.setAutoAdaptSlots(0)
     if( job.jobType().name() == "3Delight" ):
         job.setPacketSize(1)
         job.setAutoAdaptSlots(0)
-        job.setMaxTaskTime(4 * 60 * 60)
         job.setMinMemory( 512000*job.assignmentSlots())
         job.setMaxMemory(2000000*job.assignmentSlots())
         if not job.priority() == 29:
             job.setPacketType('iterative')
 
     if( job.jobType().name().contains( "Nuke" ) ):
-        job.setMaxTaskTime(1800)
         job.setMinMemory(6000000)
         job.setMaxMemory(8000000)
     if( job.jobType().name().contains( "Naiad" ) ):
