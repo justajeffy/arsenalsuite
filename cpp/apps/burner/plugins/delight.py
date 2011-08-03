@@ -14,6 +14,7 @@ class DelightBurner(JobBurner):
         self.frameList = []
         self.StartFrame = None
         self.EndFrame = None
+        self.JobAss = jobAss
 
         # Rendering /drd/jobs/hf2/global/rnd/surfdev/artur.vill/empland/houdini/ribs/empland.1191.rib
         if self.Job.fileName().endsWith("..rib"):
@@ -99,7 +100,7 @@ class DelightBurner(JobBurner):
         #args << "-P"
         #args << str(processes)
         args << "-t"
-        args << str(self.Job.assignmentSlots())
+        args << str(self.JobAss.assignSlots())
         args << "-stats2"
         args << "-init"
         if not self.Job.name().contains("_nonetcache"):
