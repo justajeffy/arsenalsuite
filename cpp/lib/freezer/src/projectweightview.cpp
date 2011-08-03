@@ -7,6 +7,9 @@
 
 #include "classes.h"
 #include "project.h"
+#include "user.h"
+#include "usergroup.h"
+#include "group.h"
 
 #include "projectweightview.h"
 
@@ -48,7 +51,7 @@ struct ProjectWeightItem : public RecordItemBase
 	bool setModelData ( const QModelIndex & idx, const QVariant & val,  int role = Qt::EditRole )
 	{
 		if( role == Qt::EditRole && idx.column() == 1 ) {
-			project.setAssburnerWeight( val.toDouble() );
+			project.setArsenalSlotReserve( val.toDouble() );
 			project.commit();
 			record.setValue( "assburnerWeight", val );
 			return true;
@@ -56,9 +59,23 @@ struct ProjectWeightItem : public RecordItemBase
 		return false;
 	}
 	Record getRecord() const { return record; }
-	Qt::ItemFlags flags( const QModelIndex & idx ) {
+	Qt::ItemFlags modelFlags( const QModelIndex & idx ) const {
+        bool isAdministrator = false;
+
+        User currentUser = User::currentUser();
+        if (currentUser.userGroups().size() > 0) {
+            UserGroupList groups = currentUser.userGroups();
+            for (UserGroupIter it = groups.begin(); it != groups.end(); ++it) {
+                if ((*it).group().name() == "RenderOps" || (*it).group().name() == "Admin") {
+                    isAdministrator = true;
+                    break;
+                }
+            }
+        }
+
+
 		Qt::ItemFlags ret( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
-		if( idx.column() == 1 )
+		if( idx.column() == 1 && isAdministrator )
 			ret = Qt::ItemFlags( ret | Qt::ItemIsEditable );
 		return ret;
 	}
