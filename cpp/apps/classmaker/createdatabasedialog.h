@@ -11,6 +11,7 @@ namespace Stone {
 class Database;
 class Schema;
 class TableSchema;
+class Table;
 }
 using namespace Stone;
 
@@ -26,6 +27,10 @@ public slots:
 	void editConnection();
 	void verify();
 	void create();
+    QString getNextMigrationFile();
+    void alterTableMigration( const QString& migrationFile, Table * table, QString * output );
+    void createTableMigration( const QString& migrationFile, TableSchema * tableSchema, QString * output );
+    void createTablesMigration( const QString& migrationFile, QString * output );
 	void updateConnectionLabel();
 
 protected:
@@ -33,6 +38,7 @@ protected:
 	Database * mDatabase;
 	TableSchema * mTableSchema;
 	Ui::CreateDatabaseDialogUI mUI;
+    QString mMigrationsDirectory;
 };
 
 #endif // CREATE_DATABASE_DIALOG_H
