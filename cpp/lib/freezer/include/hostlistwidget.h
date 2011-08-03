@@ -113,12 +113,14 @@ public:
 	QMenu * mHostMenu,
 	 * mTailServiceLogMenu,
 	 * mHostServiceFilterMenu,
-	 * mCannedBatchJobMenu;
+	 * mCannedBatchJobMenu,
+     * mHostPluginMenu;
 
 	friend class FreezerHostMenu;
 	friend class FreezerWidget;
 	friend class HostServiceFilterMenu;
 	friend class CannedBatchJobMenu;
+    friend class HostPluginMenu;
 	friend class TailServiceLogMenu;
 };
 

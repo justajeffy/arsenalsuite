@@ -586,6 +586,29 @@ void CannedBatchJobMenu::slotActionTriggered( QAction * action )
 	delete bsd;
 }
 
+HostPluginMenu::HostPluginMenu(HostListWidget * hostList)
+: HostListMenu(hostList, "Host Plugins")
+{}
+
+void HostPluginMenu::slotAboutToShow()
+{
+    clear();
+
+    foreach (HostViewerPlugin * hvp, HostViewerFactory::mHostViewerPlugins.values() ) {
+        QAction * action = new QAction( hvp->name(), this );
+        action->setIcon( QIcon(hvp->icon()) );
+        addAction( action );
+        mHostPluginActions[action] = hvp;
+    }
+}
+
+void HostPluginMenu::slotActionTriggered( QAction * action )
+{
+    if (!action) return;
+
+    if (mHostPluginActions.contains(action))
+        mHostPluginActions[action]->view( HostList(mHostList->mHostTree->selection()) );
+}
 
 TailServiceLogMenu::TailServiceLogMenu(HostListWidget * hostList)
 : HostListMenu( hostList, "Tail Service Log..." )
@@ -658,6 +681,7 @@ void FreezerHostMenu::slotAboutToShow()
 		//addAction( mHostList->ClientUpdateAction );
 		addAction( mHostList->SubmitBatchJobAction );
 		addMenu( mHostList->mCannedBatchJobMenu );
+        addMenu( mHostList->mHostPluginMenu );
 	}
 
 	if( User::hasPerms( "Host", false ) )

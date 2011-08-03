@@ -154,6 +154,17 @@ public:
 	void slotActionTriggered(QAction*);
 };
 
+class FREEZER_EXPORT HostPluginMenu : public HostListMenu
+{
+public:
+    HostPluginMenu(HostListWidget * hostList);
+
+    void slotAboutToShow();
+    void slotActionTriggered(QAction*);
+protected:
+    QMap<QAction *, HostViewerPlugin *> mHostPluginActions;
+};
+
 class FREEZER_EXPORT TailServiceLogMenu : public HostListMenu
 {
 public:

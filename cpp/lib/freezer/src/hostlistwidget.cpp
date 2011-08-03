@@ -116,6 +116,7 @@ HostListWidget::HostListWidget( QWidget * parent )
 	mTailServiceLogMenu = new TailServiceLogMenu( this );
 	mHostServiceFilterMenu = new HostServiceFilterMenu( this );
 	mCannedBatchJobMenu = new CannedBatchJobMenu( this );
+    mHostPluginMenu = new HostPluginMenu( this );
 
 	// Set defaults
 	IniConfig temp;
