@@ -174,6 +174,9 @@ public slots:
 	void handleSigInt();
 	void handleSigTerm();
 
+    /// Update memory usage of running and finished jobs
+    void setAvailableMemory();
+
 signals:
 	/// For the gui to show status.
 	void statusChange( const QString & status );
@@ -253,9 +256,6 @@ protected:
 
     /// tell the database we are still alive
 	void pulse();
-
-    /// Update memory usage of running and finished jobs
-    void setAvailableMemory();
 
     /// TODO: remove?
 	bool checkFusionRunning();

@@ -62,6 +62,11 @@ void IniConfig::setFileName(const QString & fileName)
 	mFile = fileName;
 }
 
+const QString & IniConfig::fileName() const
+{
+	return mFile;
+}
+
 void IniConfig::readFromFile( const QString & fileName, bool overwriteExisting )
 {
 	QString file = fileName;

@@ -381,7 +381,7 @@ void Slave::pulse()
 
 void Slave::setAvailableMemory()
 {
-    LOG_3("Slave::setAvailableMemory(): Updating available memory.");
+    LOG_3("Updating available memory.");
 
     int avail = mHostStatus.host().memory() * 1024;
 
@@ -394,6 +394,7 @@ void Slave::setAvailableMemory()
             mem_job_needs = burner->jobAssignment().job().jobStatus().averageMemory();
 
         avail -= mem_job_needs;
+        LOG_3(QString("Job %1 requires memory %2 available is %3").arg(burner->jobAssignment().job().key()).arg(mem_job_needs).arg(avail));
     }
 
     avail = qMax( avail, 0 );
