@@ -379,7 +379,7 @@ void JobListWidget::customEvent( QEvent * evt )
             QTime t;
             t.start();
             JobList topLevelJobs = mJobTask->mReturn - mJobTask->mDependentJobs;
-            LOG_3( QString("Took %1 ms to subtract dependant jobs. %2 top level jobs").arg(t.elapsed()).arg(topLevelJobs.size()) );
+            LOG_5( QString("Took %1 ms to subtract dependant jobs. %2 top level jobs").arg(t.elapsed()).arg(topLevelJobs.size()) );
 
             t.start();
             ModelGrouper * grouper = jm->grouper();
@@ -394,7 +394,7 @@ void JobListWidget::customEvent( QEvent * evt )
                     existingMap[j.key()] = qMakePair<QModelIndex,bool>(idx,false);
                 }
             }
-            LOG_3( QString("Took %1 ms to map existing jobs, %2 jobs mapped").arg(t.elapsed()).arg(existingMap.size()) );
+            LOG_5( QString("Took %1 ms to map existing jobs, %2 jobs mapped").arg(t.elapsed()).arg(existingMap.size()) );
             t.start();
 
             foreach( Job j, topLevelJobs ) {
@@ -406,20 +406,20 @@ void JobListWidget::customEvent( QEvent * evt )
                 } else
                     toAdd += j;
             }
-            LOG_3( QString("Took %1 ms to update existing indexes").arg(t.elapsed()) );
+            LOG_5( QString("Took %1 ms to update existing indexes").arg(t.elapsed()) );
             t.start();
 
             for( QMap<int,QPair<QModelIndex,bool> >::Iterator it = existingMap.begin(); it != existingMap.end(); ++it )
                 if( !it.value().second )
                     toRemove += it.value().first;
             jm->remove(toRemove);
-            LOG_3( QString("Took %1 ms to remove old jobs").arg(t.elapsed()) );
+            LOG_5( QString("Took %1 ms to remove old jobs").arg(t.elapsed()) );
 
             t.start();
-            LOG_3( "Appending " + QString::number(toAdd.size()) + " jobs to the list" );
+            LOG_5( "Appending " + QString::number(toAdd.size()) + " jobs to the list" );
             jm->append( toAdd );
 
-            LOG_3( QString("Took %1 ms to append new jobs").arg(t.elapsed()) );
+            LOG_5( QString("Took %1 ms to append new jobs").arg(t.elapsed()) );
             t.start();
 
             QMap<Record, JobServiceList> jobServicesByJob;
@@ -427,11 +427,11 @@ void JobListWidget::customEvent( QEvent * evt )
                 jobServicesByJob = mJobTask->mJobServices.groupedBy<Record,JobServiceList,uint,Job>( "fkeyjob" );
                 //LOG_5( QString("Got %1 services for %2 jobs").arg(mJobTask->mJobServices.size()).arg(jobServicesByJob.size()) );
             }
-            LOG_3( QString("Took %1 ms to group services").arg(t.elapsed()) );
+            LOG_5( QString("Took %1 ms to group services").arg(t.elapsed()) );
             t.start();
 
 			QMap<uint,JobDepList> jobDepsByJob = mJobTask->mJobDeps.groupedBy<uint,JobDepList>("fkeyjob");
-            LOG_3( QString("Took %1 ms to group deps").arg(t.elapsed()) );
+            LOG_5( QString("Took %1 ms to group deps").arg(t.elapsed()) );
             t.start();
 
             for( ModelIter it(jm,ModelIter::Filter(ModelIter::Recursive|ModelIter::DescendLoadedOnly)); it.isValid(); ++it ) {
@@ -449,7 +449,7 @@ void JobListWidget::customEvent( QEvent * evt )
                     }
                 }
             }
-            LOG_3( QString("Took %1 ms to setup deps and services").arg(t.elapsed()) );
+            LOG_5( QString("Took %1 ms to setup deps and services").arg(t.elapsed()) );
 
             t.start();
             // clear out existing toolTip info first
@@ -458,7 +458,7 @@ void JobListWidget::customEvent( QEvent * evt )
             // recursively set all rows
             //QTimer::singleShot(20, this, SLOT(setToolTips()));
             setToolTips();
-            LOG_3( QString("Took %1 ms to set tooltips").arg(t.elapsed()) );
+            LOG_5( QString("Took %1 ms to set tooltips").arg(t.elapsed()) );
 
             mJobTree->busyWidget()->stop();
 			mJobTaskRunning = false;
@@ -475,7 +475,7 @@ void JobListWidget::customEvent( QEvent * evt )
 
             t.start();
             mJobTree->mRecordFilterWidget->filterRows();
-            LOG_3( QString("Took %1 ms to filter rows").arg(t.elapsed()) );
+            LOG_5( QString("Took %1 ms to filter rows").arg(t.elapsed()) );
 
             mJobTree->setSelection(selection);
 			break;
