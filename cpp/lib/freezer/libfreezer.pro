@@ -42,6 +42,8 @@ SOURCES+= \
 	src/mainwindow.cpp \
 	src/projectweightdialog.cpp \
 	src/projectweightview.cpp \
+	src/projectreservedialog.cpp \
+	src/projectreserveview.cpp \
 	src/servicechecktree.cpp \
 	src/settingsdialog.cpp \
 	src/tabtoolbar.cpp \
@@ -88,6 +90,8 @@ HEADERS+= \
 	include/mainwindow.h \
 	include/projectweightdialog.h \
 	include/projectweightview.h \
+	include/projectreservedialog.h \
+	include/projectreserveview.h \
 	include/servicechecktree.h \
 	include/settingsdialog.h \
 	include/tabtoolbar.h \
@@ -115,6 +119,7 @@ INTERFACES+= \
 #	ui/jobshakesettingswidgetui.ui \
 #	ui/jobxsisettingswidgetui.ui \
 	ui/projectweightdialogui.ui \
+	ui/projectreservedialogui.ui \
 	ui/settingsdialogui.ui
 
 LIBS+=-L../absubmit -labsubmit

@@ -48,6 +48,7 @@
 #include "joblistwidget.h"
 #include "jobfilteredit.h"
 #include "projectweightdialog.h"
+#include "projectreservedialog.h"
 #include "settingsdialog.h"
 #include "threadtasks.h"
 #include "viewmanager.h"
@@ -86,6 +87,9 @@ MainWindow::MainWindow( QWidget * parent )
     ProjectWeightingAction = new QAction( "Project Weighting", this );
 	ProjectWeightingAction->setIcon( QIcon( ":/images/projectweighting" ) );
 
+    ProjectReserveAction = new QAction( "Project Reserves", this );
+	ProjectReserveAction->setIcon( QIcon( ":/images/projectweighting" ) );
+
 	ViewHostsAction = new QAction( "View Hosts", this );
 	ViewHostsAction->setCheckable( TRUE );
 	ViewHostsAction->setIcon( QIcon( ":/images/view_hosts") );
@@ -118,6 +122,7 @@ MainWindow::MainWindow( QWidget * parent )
 	connect( HostServiceMatrixAction, SIGNAL( triggered(bool) ), SLOT( openHostServiceMatrixWindow() ) );
 	connect( UserServiceMatrixAction, SIGNAL( triggered(bool) ), SLOT( openUserServiceMatrixWindow() ) );
 	connect( ProjectWeightingAction, SIGNAL( triggered(bool) ), SLOT( showProjectWeightDialog() ) );
+	connect( ProjectReserveAction, SIGNAL( triggered(bool) ), SLOT( showProjectReserveDialog() ) );
 	connect( HelpAboutAction, SIGNAL( triggered(bool) ), SLOT( showAbout() ) );
 	connect( FileExitAction, SIGNAL( triggered(bool) ), qApp, SLOT( quit() ) );
 	connect( FileSaveAction, SIGNAL( triggered(bool) ), this, SLOT( saveSettings() ) );
@@ -882,6 +887,7 @@ void MainWindow::populateToolsMenu()
         mToolsMenu->addAction( UserServiceMatrixAction );
 
     mToolsMenu->addAction( ProjectWeightingAction );
+    mToolsMenu->addAction( ProjectReserveAction );
 
     FreezerMenuFactory::instance()->aboutToShow(mToolsMenu);
 
@@ -947,6 +953,11 @@ void MainWindow::showJobView()
 void MainWindow::showProjectWeightDialog()
 {
 	(new ProjectWeightDialog(this))->show();
+}
+
+void MainWindow::showProjectReserveDialog()
+{
+	(new ProjectReserveDialog(this))->show();
 }
 
 bool MainWindow::autoRefreshEnabled() const
