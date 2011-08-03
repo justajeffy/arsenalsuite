@@ -22,6 +22,7 @@ class PyQtTarget(SipTarget):
             self.config += " -d %s/usr/lib/%s/site-packages" % (os.environ['DESTDIR'], python_version)
             self.config += " -v %s/usr/share/sip" % os.environ['DESTDIR']
             self.config += " --no-designer-plugin"
+            self.config += " --no-qsci-api"
 
 pyqt = PyQtTarget("pyqt",path,False,None,["sip"] )
 
