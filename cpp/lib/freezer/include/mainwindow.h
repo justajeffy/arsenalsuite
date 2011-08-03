@@ -113,6 +113,8 @@ public slots:
     void loadViewFromFile(bool notUsed=true);
     void loadViewFromFile(const QString &);
 
+    void saveSettings();
+
 signals:
     void currentViewChanged( FreezerView * );
 
@@ -164,6 +166,7 @@ private:
 
 	/* Actions */
 	QAction* FileExitAction;
+	QAction* FileSaveAction;
 	QAction* HelpAboutAction;
 
 	QAction* ViewHostsAction;
