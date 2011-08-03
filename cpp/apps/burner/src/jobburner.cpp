@@ -636,12 +636,12 @@ void JobBurner::checkMemory()
 			mJob.reload();
 			if( mJob.maxMemory() > 0 && mem > mJob.maxMemory() ) {
                 SystemMemInfo mi = systemMemoryInfo();
-                int usedMem = mi.freeMemory + mi.cachedMemory;
-                if( usedMem / mi.totalMemory < 0.11 ) {
-                    QString msg = QString("Process exceeded max memory of %1, with %2 of %3 used")
+                float freeMem = mi.freeMemory + mi.cachedMemory;
+                if( freeMem / (float)(mi.totalMemory) < 0.10 ) {
+                    QString msg = QString("Process exceeded max memory of %1 at %2, with %3 free")
                         .arg(mJob.maxMemory())
-                        .arg(usedMem)
-                        .arg(mi.totalMemory);
+                        .arg(mem)
+                        .arg(freeMem);
                     jobErrored( msg );
                 }
             }
@@ -650,6 +650,9 @@ void JobBurner::checkMemory()
 #ifdef USE_ACCOUNTING_INTERFACE
         updateAssignmentAccountingInfo();
 #endif
+
+        // update the Hosts available memory ( it might have gone down )
+        mSlave->setAvailableMemory();
 	}
 
 	// check 10 seconds in, and then every N seconds ( default 60 )
