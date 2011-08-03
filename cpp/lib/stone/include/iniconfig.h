@@ -57,6 +57,7 @@ public:
 	 *  This is the default file for both readFromFile and writeToFile
 	 */
 	void setFileName(const QString & fileName);
+    const QString & fileName() const;
 
 	/** Reads all values from the file, over-writes any existing entries in memory if overwriteExisting is true.
 	 *  If fileName is empty, uses the fileName last set with setFileName. */

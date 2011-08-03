@@ -70,6 +70,11 @@ MainWindow::MainWindow( QWidget * parent )
 	FileExitAction = new QAction( "&Quit", this );
 	FileExitAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_Q ) );
 	FileExitAction->setIcon( QIcon( "images/quit.png" ) );
+
+	FileSaveAction = new QAction( "&Save Settings", this );
+    FileSaveAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_S ) );
+	FileSaveAction->setIcon( QIcon( ":/images/saveview" ) );
+
 	HelpAboutAction = new QAction( "About...", this );
 
 	HostServiceMatrixAction = new QAction( "Host Service Matrix...", this );
@@ -115,6 +120,7 @@ MainWindow::MainWindow( QWidget * parent )
 	connect( ProjectWeightingAction, SIGNAL( triggered(bool) ), SLOT( showProjectWeightDialog() ) );
 	connect( HelpAboutAction, SIGNAL( triggered(bool) ), SLOT( showAbout() ) );
 	connect( FileExitAction, SIGNAL( triggered(bool) ), qApp, SLOT( quit() ) );
+	connect( FileSaveAction, SIGNAL( triggered(bool) ), this, SLOT( saveSettings() ) );
 	connect( SettingsAction, SIGNAL( triggered(bool) ), SLOT( showSettings() ) );
 	connect( DisplayPrefsAction, SIGNAL( triggered(bool) ), SLOT( showDisplayPrefs() ) );
 	connect( AdminAction, SIGNAL( triggered(bool) ), SLOT( enableAdmin() ) );
@@ -142,6 +148,7 @@ MainWindow::MainWindow( QWidget * parent )
 
 	QMenuBar * mb = menuBar();
 	mFileMenu = mb->addMenu( "&File" );
+	mFileMenu->addAction( FileSaveAction );
 	mFileMenu->addAction( FileExitAction );
 
 	mToolsMenu = mb->addMenu( "&Tools" );
@@ -180,7 +187,7 @@ MainWindow::MainWindow( QWidget * parent )
 
     QAction * mSaveViewToFileAction = mViewMenu->addAction( "Save View To &File" );
 	mSaveViewToFileAction->setIcon( QIcon( ":/images/saveview" ) );
-    mSaveViewToFileAction->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_S ) );
+    mSaveViewToFileAction->setShortcut( QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_S ) );
 
     QAction * mLoadViewFromFileAction = mViewMenu->addAction( "Load View fr&om File" );
 	mLoadViewFromFileAction->setIcon( QIcon( ":/images/loadview" ) );
@@ -278,11 +285,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent( QCloseEvent * ce )
 {
+    saveSettings();
+	QMainWindow::closeEvent(ce);
+}
+
+void MainWindow::saveSettings()
+{
 	IniConfig & ini = userConfig();
 	ini.pushSection( "MainWindow" );
 	ini.writeString( "FrameGeometry", QString("%1,%2,%3,%4").arg( pos().x() ).arg( pos().y() ).arg( size().width() ).arg( size().height() ) );
 	ini.popSection();
-	QMainWindow::closeEvent(ce);
 
 	options.mJobColors->writeColors();
 	options.mHostColors->writeColors();
@@ -308,6 +320,7 @@ void MainWindow::closeEvent( QCloseEvent * ce )
 	ini.popSection();
 
 	saveViews();
+    statusBar()->showMessage("Settings saved to "+ini.fileName());
 }
 
 bool MainWindow::event( QEvent * event )
