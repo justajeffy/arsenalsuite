@@ -752,12 +752,15 @@ class JobAssign:
             min = 0
             if( estimated_task != None ): min = estimated_task.memory_in_bytes/(1024*1024)
             if( min == 0 ): min = max(self.Job.minMemory(), self.Job.jobStatus().averageMemory())
-            hostStatus.setAvailableMemory( (hostStatus.availableMemory()*1024 - min) / 1024 )
-            #hostStatus.setColumnLiteral("availablememory","availablememory - %s" % (min / 1024) )
-            if( hostStatus.activeAssignmentCount() > 0 and hostStatus.availableMemory() <= 0 ):
+
+            avail = hostStatus.availableMemory()*1024
+            #if( hostStatus.activeAssignmentCount() > 0 and hostStatus.availableMemory() <= 0 ):
+            if( avail - min <= 0 ):
                 Database.current().rollbackTransaction();
                 print "Host %s does not have the memory required returning" % (hostStatus.host().name())
                 return 0
+            #hostStatus.setAvailableMemory( (hostStatus.availableMemory()*1024 - min) / 1024 )
+            hostStatus.setColumnLiteral("availablememory","availablememory - %s" % (min / 1024) )
             hostStatus.commit()
 
         tasks = JobTaskList()
