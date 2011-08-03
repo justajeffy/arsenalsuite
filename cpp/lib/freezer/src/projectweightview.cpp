@@ -79,7 +79,7 @@ ProjectWeightView::ProjectWeightView( QWidget * parent )
 void ProjectWeightView::refresh()
 {
 	RecordList records;
-	QSqlQuery q = Database::current()->exec( "SELECT project.keyelement, coalesce(assburnerweight,0), coalesce(tempo,0) FROM projecttempo RIGHT JOIN project ON projecttempo.fkeyproject=keyelement WHERE assburnerweight > 0 or fkeyprojectstatus=4" );
+	QSqlQuery q = Database::current()->exec( "select project.keyelement, project_slots_current.arsenalslotreserve, sum from project_slots_current join project on project.name=project_slots_current.name;" );
 	while( q.next() )
 		records.append( Record( new RecordImp( projectWeightTable(), q ) ) );
 	model()->setRootList( records );
