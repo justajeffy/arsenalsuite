@@ -276,6 +276,8 @@ static void writeClass( TableSchema * table, const QString & path )
 			methods += "}\n\n";
 			listMethodDefs += "\t" + f->listTypeString() + " " + lcf( pmeth ) + "() const;\n";
 			listMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + f->typeString() + " & );\n";
+            sipListMethodDefs += "\t" + f->listTypeString() + " " + lcf( pmeth ) + "() const /HoldGIL/;\n";
+            sipListMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + f->typeString() + " & );\n";
 			listMethods += f->listTypeString() + " t__List::" + lcf( pmeth ) + "() const\n{\n";
 			listMethods += "\t" + f->listTypeString() + " ret;\n";
 			listMethods += "\tif( d )\n";
