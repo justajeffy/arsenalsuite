@@ -77,6 +77,7 @@ public slots:
 	void autoRefresh();
 
 	void showProjectWeightDialog();
+	void showProjectReserveDialog();
 
 	void showHostView();
 	void showJobView();
@@ -178,6 +179,7 @@ private:
 	QAction* HostServiceMatrixAction;
 	QAction* UserServiceMatrixAction;
 	QAction* ProjectWeightingAction;
+	QAction* ProjectReserveAction;
 	QAction* AutoRefreshAction;
 
 	QAction * mNewJobViewAction;

@@ -11,22 +11,22 @@
 #include "usergroup.h"
 #include "group.h"
 
-#include "projectweightview.h"
+#include "projectreserveview.h"
 
-Table * projectWeightTable()
+Table * projectReserveTable()
 {
     static Table * ret = 0;
     if( !ret ) {
         TableSchema * schema = new TableSchema( classesSchema() );
         new Field( schema, "fkeyproject", "Project" );
-        new Field( schema, "assburnerWeight", Field::Double );
+        new Field( schema, "arsenalSlotReserve", Field::Double );
         new Field( schema, "currentAllocation", Field::Double );
         ret = schema->table();
     }
     return ret;
 }
 
-struct ProjectWeightItem : public RecordItemBase
+struct ProjectReserveItem : public RecordItemBase
 {
     Record record;
     Project project;
@@ -41,7 +41,7 @@ struct ProjectWeightItem : public RecordItemBase
                 case 0:
                     return project.name();
                 case 1:
-                    return record.getValue("assburnerWeight");
+                    return record.getValue("arsenalSlotReserve");
                 case 2:
                     return record.getValue("currentAllocation");
             }
@@ -51,9 +51,9 @@ struct ProjectWeightItem : public RecordItemBase
     bool setModelData ( const QModelIndex & idx, const QVariant & val,  int role = Qt::EditRole )
     {
         if( role == Qt::EditRole && idx.column() == 1 ) {
-            project.setAssburnerWeight( val.toDouble() );
+            project.setArsenalSlotReserve( val.toDouble() );
             project.commit();
-            record.setValue( "assburnerWeight", val );
+            record.setValue( "arsenalSlotReserve", val );
             return true;
         }
         return false;
@@ -73,7 +73,6 @@ struct ProjectWeightItem : public RecordItemBase
             }
         }
 
-
         Qt::ItemFlags ret( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
         if( idx.column() == 1 && isAdministrator )
             ret = Qt::ItemFlags( ret | Qt::ItemIsEditable );
@@ -81,24 +80,23 @@ struct ProjectWeightItem : public RecordItemBase
     }
 };
 
-typedef TemplateRecordDataTranslator<ProjectWeightItem> ProjectWeightTranslator;
+typedef TemplateRecordDataTranslator<ProjectReserveItem> ProjectReserveTranslator;
 
-ProjectWeightView::ProjectWeightView( QWidget * parent )
+ProjectReserveView::ProjectReserveView( QWidget * parent )
 : RecordTreeView( parent )
 {
     RecordSuperModel * model = new RecordSuperModel(this);
-    new ProjectWeightTranslator(model->treeBuilder());
-    model->setHeaderLabels( QStringList() << "Project" << "Weight" << "Current Allocation" );
+    new ProjectReserveTranslator(model->treeBuilder());
+    model->setHeaderLabels( QStringList() << "Project" << "Reserve" << "Current Allocation" );
     setModel( model );
     model->sort(1);
 }
 
-void ProjectWeightView::refresh()
+void ProjectReserveView::refresh()
 {
     RecordList records;
-    QSqlQuery q = Database::current()->exec( "SELECT project.keyelement, coalesce(assburnerweight,0), coalesce(tempo,0) FROM projecttempo RIGHT JOIN project ON projecttempo.fkeyproject=keyelement WHERE assburnerweight > 0 or fkeyprojectstatus=4" );
-    //QSqlQuery q = Database::current()->exec( "select project.keyelement, project_slots_current.arsenalslotreserve, sum from project_slots_current join project on project.name=project_slots_current.name;" );
+    QSqlQuery q = Database::current()->exec( "select project.keyelement, project_slots_current.arsenalslotreserve, sum from project_slots_current join project on project.name=project_slots_current.name;" );
     while( q.next() )
-        records.append( Record( new RecordImp( projectWeightTable(), q ) ) );
+        records.append( Record( new RecordImp( projectReserveTable(), q ) ) );
     model()->setRootList( records );
 }
