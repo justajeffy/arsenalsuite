@@ -22,69 +22,69 @@ CreateDatabaseDialog::CreateDatabaseDialog( Schema * schema, QWidget * parent )
 , mDatabase( new Database( schema, Connection::createFromIni( config(), "Database" ) ) )
 , mTableSchema( 0 )
 {
-	mUI.setupUi( this );
+    mUI.setupUi( this );
 
-	connect( mUI.mVerifyButton, SIGNAL( clicked() ), SLOT( verify() ) );
-	connect( mUI.mCreateButton, SIGNAL( clicked() ), SLOT( create() ) );
-	connect( mUI.mCloseButton, SIGNAL( clicked() ), SLOT( reject() ) );
-	connect( mUI.mEditConnectionButton, SIGNAL( clicked() ), SLOT( editConnection() ) );
+    connect( mUI.mVerifyButton, SIGNAL( clicked() ), SLOT( verify() ) );
+    connect( mUI.mCreateButton, SIGNAL( clicked() ), SLOT( create() ) );
+    connect( mUI.mCloseButton, SIGNAL( clicked() ), SLOT( reject() ) );
+    connect( mUI.mEditConnectionButton, SIGNAL( clicked() ), SLOT( editConnection() ) );
 
     mMigrationsDirectory = config().readString("MigrationsDirectory", ".");
 
-	updateConnectionLabel();
+    updateConnectionLabel();
 }
 
 void CreateDatabaseDialog::setTableSchema( TableSchema * tableSchema )
 {
-	mTableSchema = tableSchema;
+    mTableSchema = tableSchema;
 }
 
 void CreateDatabaseDialog::editConnection()
 {
-	ConfigDBDialog * cdb = new ConfigDBDialog( this );
-	if( cdb->exec() == QDialog::Accepted ) {
-		Connection * c = Connection::createFromIni( config(), "Database" );
-		c->checkConnection();
-		mDatabase->setConnection( c );
-		updateConnectionLabel();
-	}
-	delete cdb;
+    ConfigDBDialog * cdb = new ConfigDBDialog( this );
+    if( cdb->exec() == QDialog::Accepted ) {
+        Connection * c = Connection::createFromIni( config(), "Database" );
+        c->checkConnection();
+        mDatabase->setConnection( c );
+        updateConnectionLabel();
+    }
+    delete cdb;
 }
 
 void CreateDatabaseDialog::verify()
 {
-	QString output;
-	if( mTableSchema ) {
-		Table * table = mDatabase->tableFromSchema( mTableSchema );
-		table->verifyTable( false, &output );
-	} else {
-		mDatabase->verifyTables( &output );
-	}
-	mUI.mHistoryEdit->setText( output );
+    QString output;
+    if( mTableSchema ) {
+        Table * table = mDatabase->tableFromSchema( mTableSchema );
+        table->verifyTable( false, &output );
+    } else {
+        mDatabase->verifyTables( &output );
+    }
+    mUI.mHistoryEdit->setText( output );
 }
 
 void CreateDatabaseDialog::create()
 {
-	QString output;
+    QString output;
     QString newMigrationFile = getNextMigrationFile();
-	if( mTableSchema ) {
-		Table * table = mDatabase->tableFromSchema( mTableSchema );
-		if( table->exists() ) {
+    if( mTableSchema ) {
+        Table * table = mDatabase->tableFromSchema( mTableSchema );
+        if( table->exists() ) {
             alterTableMigration( newMigrationFile, table, &output);
-			table->verifyTable( true, &output );
+            table->verifyTable( true, &output );
         } else {
             createTableMigration( newMigrationFile, table->schema(), &output );
-			table->createTable( &output );
+            table->createTable( &output );
         }
-	} else {
+    } else {
         createTablesMigration( newMigrationFile, &output );
-		mDatabase->createTables( &output );
-	}
+        mDatabase->createTables( &output );
+    }
     if (output.size() > 0) 
         if (output.contains("CREATE") || output.contains("ALTER"))
             output = "Added to migrations file " + newMigrationFile + "\n" + output;
    
-	mUI.mHistoryEdit->setText( output );
+    mUI.mHistoryEdit->setText( output );
 }
 
 QString CreateDatabaseDialog::getNextMigrationFile()
@@ -202,17 +202,17 @@ void CreateDatabaseDialog::createTablesMigration( const QString& migrationFile, 
 
 void CreateDatabaseDialog::updateConnectionLabel()
 {
-	QString text;
+    QString text;
     if ( !mDatabase->connection() ) return;
     mDatabase->connection()->checkConnection();
-	IniConfig & cfg = config();
-	cfg.pushSection( "Database" );
-	if( mDatabase->connection()->isConnected() ) {
-		text = "Connected: ";
-	} else
-		text = "Connection Failed: ";
-	text += cfg.readString( "DatabaseName" ) + " on " + cfg.readString( "User" ) + ":" + cfg.readString( "Password" ).replace( QRegExp("."), "x" ) +
-		"@"  + cfg.readString( "Host" );
-	mUI.mConnectionStatus->setText( text );
-	cfg.popSection();
+    IniConfig & cfg = config();
+    cfg.pushSection( "Database" );
+    if( mDatabase->connection()->isConnected() ) {
+        text = "Connected: ";
+    } else
+        text = "Connection Failed: ";
+    text += cfg.readString( "DatabaseName" ) + " on " + cfg.readString( "User" ) + ":" + cfg.readString( "Password" ).replace( QRegExp("."), "x" ) +
+        "@"  + cfg.readString( "Host" );
+    mUI.mConnectionStatus->setText( text );
+    cfg.popSection();
 }

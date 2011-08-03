@@ -19,25 +19,25 @@ class CreateDatabaseDialog : public QDialog
 {
 Q_OBJECT
 public:
-	CreateDatabaseDialog( Schema * schema, QWidget * parent=0 );
+    CreateDatabaseDialog( Schema * schema, QWidget * parent=0 );
 
 public slots:
-	void setTableSchema( TableSchema * tableSchema );
+    void setTableSchema( TableSchema * tableSchema );
 
-	void editConnection();
-	void verify();
-	void create();
+    void editConnection();
+    void verify();
+    void create();
     QString getNextMigrationFile();
     void alterTableMigration( const QString& migrationFile, Table * table, QString * output );
     void createTableMigration( const QString& migrationFile, TableSchema * tableSchema, QString * output );
     void createTablesMigration( const QString& migrationFile, QString * output );
-	void updateConnectionLabel();
+    void updateConnectionLabel();
 
 protected:
-	Schema * mSchema;
-	Database * mDatabase;
-	TableSchema * mTableSchema;
-	Ui::CreateDatabaseDialogUI mUI;
+    Schema * mSchema;
+    Database * mDatabase;
+    TableSchema * mTableSchema;
+    Ui::CreateDatabaseDialogUI mUI;
     QString mMigrationsDirectory;
 };
 
