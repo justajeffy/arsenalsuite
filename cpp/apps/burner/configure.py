@@ -27,7 +27,7 @@ if sys.platform=="win32":
 	sip_bin = "..\\..\\lib\\sip\\sipgen\\sip.exe"
 else:
 	sip_bin = config.sip_bin
-sipgencmd = " ".join([sip_bin, "-c", "sipBurner", "-b", "sipBurner/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, qt_sip_flags, "sip/burner.sip"])
+sipgencmd = " ".join([sip_bin, "-c", "sipBurner", "-b", "sipBurner/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, "-I", config.sip_mod_dir, qt_sip_flags, "sip/burner.sip"])
 #print sipgencmd
 ret = os.system(sipgencmd)
 if ret:
