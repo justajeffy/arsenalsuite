@@ -109,8 +109,8 @@ isEmpty( PYTHON ) {
 unix {
 	PY_VERSION=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_version; print get_python_version()\"")
 	message(Python Version is $$PY_VERSION)
-	INCLUDEPATH+=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
-	INCLUDEPATH += ../sip/siplib/
+        INCLUDEPATH += ../sip/siplib/
+	INCLUDEPATH +=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
 	LIBS+=-lpython$${PY_VERSION}
 }
 
