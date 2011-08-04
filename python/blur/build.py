@@ -596,7 +596,8 @@ class RPMTarget(Target):
         Target.__init__(self,targetName,dir)
         self.SpecTemplate = specTemplate
         self.Version = version
-        self.Revision = GetRevision(dir)
+        #self.Revision = GetRevision(dir)
+        self.Revision = "DrD"
         self.PackageName = packageName
         self.BuiltRPMS = []
         self.InstallDone = False
@@ -617,18 +618,28 @@ class RPMTarget(Target):
         return Target.is_built(self)
     
     def build_run(self):
+        destDir = ""
+        buildRoot = ""
+        if "DESTDIR" in os.environ:
+            destDir = os.environ['DESTDIR']
+            buildRoot = "--buildroot %s" % destDir
         if not self.built:
-            tarball = '/usr/src/redhat/SOURCES/%s-%s-r%s.tgz' % (self.PackageName,self.Version,self.Revision)
-            specDest = '/usr/src/redhat/SPECS/%s.spec' % self.PackageName
+            tarball = destDir + '/usr/src/redhat/SOURCES/%s-%s-%s.tgz' % (self.PackageName,self.Version,self.Revision)
+            specDest = destDir + '/usr/src/redhat/SPECS/%s.spec' % self.PackageName
             dirName = os.path.split(self.dir)[1]
             
+            if not os.path.exists(destDir + '/usr/src/redhat/SOURCES/'):
+                os.makedirs(destDir + '/usr/src/redhat/SOURCES/')
+            if not os.path.exists(destDir + '/usr/src/redhat/SPECS/'):
+                os.makedirs(destDir + '/usr/src/redhat/SPECS/')
+
             if self.run_cmd('tar -C .. -czf %s %s' % (tarball,dirName))[0]:
                 raise "Unable to create rpm tarball"
             
             if self.run_cmd('cat %s | sed "s/\\$WCREV\\\\$/%s/" | sed "s/\\$VERSION\\\\$/%s/" > %s' % (self.SpecTemplate,self.Revision,self.Version,specDest) )[0]:
                 raise "Unable to process spec file template."
             
-            ret,output = self.run_cmd('rpmbuild -ba %s' % specDest)
+            ret,output = self.run_cmd('rpmbuild -ba %s %s' % (buildRoot, specDest))
             for line in output.splitlines():
                 res = re.match('Wrote: (.+)$',line)
                 if res:
