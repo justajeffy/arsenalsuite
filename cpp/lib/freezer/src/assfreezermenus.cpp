@@ -652,13 +652,19 @@ void FreezerHostMenu::slotAboutToShow()
 	clear();
 	addAction( mHostList->RefreshHostsAction );
 
-	HostList hl = mHostList->mHostTree->selection();
+    HostList hl = mHostList->mHostTree->selection();
+
+    // Move plugins to a separate sub menu
+    addMenu( mHostList->mHostPluginMenu );
+    // Dangerous having volatile plugins so close to where your mouse starts off in the contextual menu
+    /*
     foreach( HostViewerPlugin * hvp, HostViewerFactory::mHostViewerPlugins.values() ) {
         QAction * action = new QAction( hvp->name(), this );
         action->setIcon( QIcon(hvp->icon()) );
         addAction(action);
         mHostViewerActions[action] = hvp;
     }
+    */
 
 	addSeparator();
 	addAction( mHostList->HostOnlineAction );
@@ -681,7 +687,6 @@ void FreezerHostMenu::slotAboutToShow()
 		//addAction( mHostList->ClientUpdateAction );
 		addAction( mHostList->SubmitBatchJobAction );
 		addMenu( mHostList->mCannedBatchJobMenu );
-        addMenu( mHostList->mHostPluginMenu );
 	}
 
 	if( User::hasPerms( "Host", false ) )
