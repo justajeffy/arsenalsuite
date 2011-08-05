@@ -9,12 +9,20 @@
 #include <qobject.h>
 
 #include "stonegui.h"
+#include "supermodel.h"
 
-class SuperModel;
-class ModelDataTranslator;
-class StandardItem;
-template<class TYPE, class BASE> class TemplateDataTranslator;
-typedef TemplateDataTranslator<StandardItem,ModelDataTranslator> StandardTranslator;
+
+struct STONEGUI_EXPORT GroupItem : public StandardItem
+{
+	QString groupValue;
+	int groupColumn;
+	QVariant modelData( const QModelIndex & i, int role ) const;
+	bool setModelData( const QModelIndex & i, const QVariant & value, int role );
+	void recalculateGroupValues( const QModelIndex & self );
+	virtual QString calculateGroupValue( const QModelIndex & self, int column);
+};
+
+typedef TemplateDataTranslator<GroupItem,ModelDataTranslator> GroupTranslator;
 
 class STONEGUI_EXPORT ModelGrouper : public QObject
 {
@@ -90,8 +98,7 @@ protected:
 	void group( GroupMap & gm );
 	
 	SuperModel * mModel;
-	StandardTranslator * mStandardTranslator;
-	ModelDataTranslator * mCustomTranslator;
+	ModelDataTranslator * mTranslator;
 	int mGroupColumn;
 	bool mIsGrouped, mInsertingGroupItems, mUpdateScheduled;
 	QList<QPersistentModelIndex> mGroupItemsToUpdate, mItemsToRegroup;
