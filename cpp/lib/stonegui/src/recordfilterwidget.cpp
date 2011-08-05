@@ -140,8 +140,8 @@ void RecordFilterWidget::textFilterChanged()
 
 void RecordFilterWidget::filterRows()
 {
-    QTime t;
-    t.start();
+    //QTime t;
+    //t.start();
     mRowChildrenVisited.clear();
     filterChildren( mTree->rootIndex() );
     //LOG_3( QString("Took %1 ms to filter rows").arg(t.elapsed()) );
