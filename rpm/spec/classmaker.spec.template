@@ -1,0 +1,20 @@
+Summary: Classmaker
+Name: classmaker
+Version: 1.0
+Release: DrD
+License: GPL
+Group: Applications/Programming
+Distribution: CentOS
+Vendor: Dr. D Studios
+Packager: Aren Villanueva <aren.villanueva@drdstudios.com>
+BuildRoot:
+AutoReqProv: No
+
+%define _unpackaged_files_terminate_build 0
+
+%description
+test
+
+%files
+%defattr(-,root,root,-)
+/usr/local/bin/classmaker
