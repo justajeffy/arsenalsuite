@@ -288,7 +288,7 @@ void ModelNode::fixupChildParentRows( int startIndex )
 	
 	for( int i = startIndex; i < mRowCount; ++i ) {
 		int index = rowToItemInfo(i).index;
-		if( mChildren.size() <= index ) break;
+		if( mChildren.size() <= index ) continue;
 		ModelNode * mn = mChildren[index];
 		if( mn && mn != (ModelNode*)1 )
 			mn->mParentRow = i;
@@ -595,7 +595,7 @@ void ModelNode::rearrange( QVector<int> newRowPositions, QModelIndex parent )
 	}
 	for( int i = rc - 1; i>=0; --i ) {
 		int fromIndex = newRowPositions[i];
-		if( fromIndex != i && newItemInfoVector[i].dataOffset ) {
+		if( fromIndex != i ) { //&& newItemInfoVector[i].dataOffset ) {
 			for( int c = 0; c <= pic_last; ++c ) {
 				if( needColumnPIC[c] ) {
 					//LOG_1( QString("Generating index change for row %1, column %2, to row %3").arg(fromIndex).arg(c).arg(i) );

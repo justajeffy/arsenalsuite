@@ -6,11 +6,58 @@
 #include "modelgrouper.h"
 #include "supermodel.h"
 
+void GroupItem::recalculateGroupValues( const QModelIndex & self )
+{
+	QAbstractItemModel * model = const_cast<QAbstractItemModel*>(self.model());
+	for( int i = model->columnCount(self) - 1; i >= 0; --i ) {
+		QModelIndex ci = self.sibling(self.row(),i);
+		QString val = calculateGroupValue( self, i );
+		if( !val.isEmpty() )
+			setModelData( ci, val, Qt::DisplayRole );
+	}
+}
+
+QString GroupItem::calculateGroupValue( const QModelIndex & self, int column)
+{
+	if( column == groupColumn )
+		return QString( "%1 (%2 rows)" ).arg(groupValue).arg(self.model()->rowCount(self));
+	/*QAbstractItemModel * model = self.model();
+	for( int i = model->rowCount(self) - 1; i >= 0; --i ) {
+		QModelIndex ci = self.child(i,column);
+	}*/
+	return QString();
+}
+
+QVariant GroupItem::modelData( const QModelIndex & i, int role ) const
+{
+	if( role == ModelGrouper::GroupingColumn )
+		return groupColumn;
+	if( role == ModelGrouper::GroupingValue )
+		return groupValue;
+	return StandardItem::modelData(i,role);
+}
+
+bool GroupItem::setModelData( const QModelIndex & self, const QVariant & value, int role )
+{
+	if( role == ModelGrouper::GroupingUpdate ) {
+		recalculateGroupValues(self);
+		return true;
+	}	
+	if( role == ModelGrouper::GroupingColumn ) {
+		groupColumn = value.toInt();
+		return true;
+	}
+	if( role == ModelGrouper::GroupingValue ) {
+		groupValue = value.toString();
+		return true;
+	}
+	return StandardItem::setModelData(self,value,role);
+}
+
 ModelGrouper::ModelGrouper( SuperModel * model )
 : QObject( model )
 , mModel( model )
-, mStandardTranslator( 0 )
-, mCustomTranslator( 0 )
+, mTranslator( 0 )
 , mGroupColumn( 0 )
 , mIsGrouped( false )
 , mInsertingGroupItems( false )
@@ -41,24 +88,23 @@ QRegExp ModelGrouper::columnGroupRegex( int column ) const
 
 ModelDataTranslator * ModelGrouper::groupedItemTranslator() const
 {
-	if( !mCustomTranslator && !mStandardTranslator ) {
+	if( !mTranslator ) {
 		// I could make it mutable, but what fun would that be?
 		ModelGrouper * me = const_cast<ModelGrouper*>(this);
-		me->mStandardTranslator = new StandardTranslator(model()->treeBuilder());
+		me->mTranslator = new GroupTranslator(model()->treeBuilder());
 	}
-	return mCustomTranslator ? mCustomTranslator : mStandardTranslator;
+	return mTranslator;
 }
 
 void ModelGrouper::setGroupedItemTranslator( ModelDataTranslator * trans )
 {
-	if( trans == groupedItemTranslator() ) return;
+	if( trans == mTranslator ) return;
 	bool grouped = mIsGrouped;
 	if( grouped )
 		ungroup();
 	// Because all ModelDataTranslators are owned by the treeBuilder(mTranslators list),
 	// we don't have to do any memory management here
-	mStandardTranslator = 0;
-	mCustomTranslator = trans;
+	mTranslator = trans;
 	if( grouped )
 		groupByColumn(mGroupColumn);
 }
@@ -151,26 +197,25 @@ void ModelGrouper::group( GroupMap & grouped )
 		// Get persistent indexes for each group item, because regular ones may be invalidated by 
 		// the move call in the loop
 		for( ModelIter it(model()); it.isValid(); ++it )
-			persistentGroupIndexes.append( *it );
+			if( model()->translator(*it) == groupedItemTranslator() )
+				persistentGroupIndexes.append( *it );
 		foreach( QPersistentModelIndex idx, persistentGroupIndexes ) {
-			if( model()->translator(idx) == groupedItemTranslator() ) {
-				bool isEmptyGroup = model()->rowCount(idx) == 0;
-				QString groupVal = idx.sibling( idx.row(), mGroupColumn ).data( Qt::DisplayRole ).toString();
-				GroupMap::Iterator mapIt = grouped.find( groupVal );
-				if( mapIt != grouped.end() ) {
-					QModelIndexList toMove(fromPersist(mapIt.value()));
-					//LOG_5( QString("Moving indexes %1 to existing group item at index %2").arg(indexListToStr(toMove)).arg(indexToStr(idx)) );
-					model()->move( toMove, idx );
-					if( isEmptyGroup )
-						emit groupPopulated( idx );
-					if( mUpdateScheduled ) {
-						if( !mGroupItemsToUpdate.contains( idx ) )
-							mGroupItemsToUpdate.append(idx);
-					} else
-						// Tell the group item to update itself based on the added children
-						model()->setData( idx, QVariant(), GroupingUpdate );
-					grouped.erase( mapIt );
-				}
+			bool isEmptyGroup = model()->rowCount(idx) == 0;
+			QString groupVal = idx.sibling( idx.row(), mGroupColumn ).data( Qt::DisplayRole ).toString();
+			GroupMap::Iterator mapIt = grouped.find( groupVal );
+			if( mapIt != grouped.end() ) {
+				QModelIndexList toMove(fromPersist(mapIt.value()));
+				//LOG_5( QString("Moving indexes %1 to existing group item at index %2").arg(indexListToStr(toMove)).arg(indexToStr(idx)) );
+				model()->move( toMove, idx );
+				if( isEmptyGroup )
+					emit groupPopulated( idx );
+				if( mUpdateScheduled ) {
+					if( !mGroupItemsToUpdate.contains( idx ) )
+						mGroupItemsToUpdate.append(idx);
+				} else
+					// Tell the group item to update itself based on the added children
+					model()->setData( idx, QVariant(), GroupingUpdate );
+				grouped.erase( mapIt );
 			}
 		}
 		// Deal with any now-empty groups
@@ -207,17 +252,9 @@ void ModelGrouper::group( GroupMap & grouped )
 		i = 0;
 		for( QMap<QString, QList<QPersistentModelIndex> >::Iterator it = grouped.begin(); it != grouped.end(); ++it, ++i ) {
 			QModelIndex groupIndex = persistentGroupIndexes[i];
-			if( mStandardTranslator ) {
-				StandardItem & item = mStandardTranslator->data(groupIndex);
-				if( mGroupColumn != 0 )
-					item.setModelData( groupIndex.sibling(groupIndex.row(), mGroupColumn), QVariant( it.key() ), Qt::DisplayRole );
-				item.setModelData( groupIndex.sibling(groupIndex.row(), 0), QString( "%1 (%2 rows)" ).arg(it.key()).arg(model()->rowCount(groupIndex)), Qt::DisplayRole );
-			}
-			if( mCustomTranslator ) {
-				model()->setData( groupIndex, QVariant(mGroupColumn), GroupingColumn );
-				model()->setData( groupIndex, QVariant(it.key()), GroupingValue );
-				model()->setData( groupIndex, QVariant(), GroupingUpdate );
-			}
+			model()->setData( groupIndex, QVariant(mGroupColumn), GroupingColumn );
+			model()->setData( groupIndex, QVariant(it.key()), GroupingValue );
+			model()->setData( groupIndex, QVariant(), GroupingUpdate );
 			// Emit this here(as opposed to above) so that any slots can get the group value by calling groupValue(idx)
 			emit groupCreated( persistentGroupIndexes[i] );
 		}
@@ -327,10 +364,7 @@ void ModelGrouper::slotUpdate()
 	if( mGroupItemsToUpdate.size() ) {
 		foreach( QModelIndex i, mGroupItemsToUpdate )
 			if( i.isValid() ) {
-				if( !mStandardTranslator )
-					//mStandardTranslator->data(i).setModelData( i.sibling(i.row(), 0), QString( "%1 (%2 rows)" ).arg(it.key()).arg(model()->rowCount(groupIndex)), Qt::DisplayRole );
-				//else
-					model()->setData( i, QVariant(), GroupingUpdate );
+				model()->setData( i, QVariant(), GroupingUpdate );
 			}
 		mGroupItemsToUpdate.clear();
 	}
