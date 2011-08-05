@@ -8,7 +8,6 @@
 #include <qpair.h>
 #include <qstringlist.h>
 #include <qvector.h>
-#include <QTime>
 
 #include <stdio.h>
 #include <typeinfo>
@@ -16,15 +15,12 @@
 #include "stonegui.h"
 
 #include "modeliter.h"
-
 class QVariant;
-class QTime;
 
 class ModelDataTranslator;
 class ModelNode;
 class SuperModel;
 class ModelGrouper;
-
 
 // Sort column, sort direction
 typedef QPair<int,Qt::SortOrder> SortColumnPair;
@@ -61,8 +57,8 @@ public:
 	SuperModel * model() { return mModel; }
 
 	ModelDataTranslator * defaultTranslator();
-    void setDefaultTranslator( ModelDataTranslator * trans );
-
+	void setDefaultTranslator( ModelDataTranslator * trans );
+	
 protected:
 	void _loadChildren( const QModelIndex & parentIndex, SuperModel * model, ModelNode * node );
 	SuperModel * mModel;
@@ -164,9 +160,9 @@ struct STONEGUI_EXPORT StandardItem : public ItemBase
 		QVariant data;
 	};
 	QList<DataItem> mData;
-    int mFlags;
-    StandardItem();
-    Qt::ItemFlags modelFlags( const QModelIndex & ) { return Qt::ItemFlags(mFlags); }
+	int mFlags;
+	StandardItem();
+	Qt::ItemFlags modelFlags( const QModelIndex & ) { return Qt::ItemFlags(mFlags); }
 	int findItem(int column, int role) const;
 	QVariant modelData( const QModelIndex & idx, int role ) const;
 	bool setModelData( const QModelIndex &, const QVariant &, int );
@@ -198,7 +194,7 @@ public:
 	
 	int rowCount();
 
-    bool hasChildren( const QModelIndex & idx, bool insert = false, bool skipTreeBuilderCheck = false );
+	bool hasChildren( const QModelIndex & idx, bool insert = false, bool skipTreeBuilderCheck = false );
 	QVariant data( const QModelIndex & idx, int role );
 	bool setData( const QModelIndex & idx, const QVariant & value, int role );
 	Qt::ItemFlags flags( const QModelIndex & idx );
@@ -212,9 +208,10 @@ public:
 
 	ModelDataTranslator * translator(const QModelIndex & idx);
 	
+	void dump(int level);
 protected:
-    void fixupChildParentRows( int startIndex );
-
+	void fixupChildParentRows( int startIndex );
+	
 	void * itemData( const QModelIndex & );
 	void * _itemData( int dataIndex );
 	ModelDataTranslator * _translator(int translatorIndex) const;
@@ -231,7 +228,7 @@ protected:
 	QList<int> mChildrenFreeIndexList;
 	
 	struct ItemInfo {
-        ItemInfo() : dataOffset(0), index(0), translatorIndex(0) {}
+		ItemInfo() : dataOffset(0), index(0), translatorIndex(0) {}
 		// Offset into the mItemData bytearray
 		int dataOffset;
 
@@ -273,9 +270,9 @@ public:
 	SuperModel( QObject * parent );
 	~SuperModel();
 
-    ModelGrouper * grouper( bool autoCreate = true );
-    void setGrouper( ModelGrouper * grouper );
-
+	ModelGrouper * grouper( bool autoCreate = true );
+	void setGrouper( ModelGrouper * grouper );
+	
 	void setTreeBuilder( ModelTreeBuilder * treeBuilder );
 /*
  * BEGIN AbstractItemModel functions
@@ -296,16 +293,10 @@ public:
 	/// be loading the data on demand
 	int rowCount( const QModelIndex & parent = QModelIndex() ) const;
 
-    /// Same as above but will not load the children using the treeBuilder
-    int rowCountWithoutLoad( const QModelIndex & parent = QModelIndex() ) const;
-
 	/// O(1) - Constant Runtime
 	/// Runtime dependent on node->hasChildren call, which could 
 	/// be loading the data on demand
 	bool hasChildren( const QModelIndex & parent ) const;
-
-    /// Same as above but will not load the children using the treeBuilder
-    bool hasChildrenWithoutLoad( const QModelIndex & ) const;
 
 	int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
 	
@@ -327,11 +318,11 @@ public:
 
 	QModelIndex insert( const QModelIndex & par, int row, ModelDataTranslator * = 0 );
 
-    // If skipDataConstruction is true, it is up to the caller to properly initialize the data represented by each returned index
-    // Generally trans->construct( trans->dataPtr( idx ) ) is the proper method. To be safe it should be done before any other
-    // changes to the model, or any other code that is allowed to request data from the model be called.  Auto sorting will not be done
-    // if skipDataConstruction is true
-    QModelIndexList insert( const QModelIndex & par, int rowStart, int cnt, ModelDataTranslator * = 0, bool skipDataConstruction = false );
+	// If skipDataConstruction is true, it is up to the caller to properly initialize the data represented by each returned index
+	// Generally trans->construct( trans->dataPtr( idx ) ) is the proper method. To be safe it should be done before any other
+	// changes to the model, or any other code that is allowed to request data from the model be called.  Auto sorting will not be done
+	// if skipDataConstruction is true
+	QModelIndexList insert( const QModelIndex & par, int rowStart, int cnt, ModelDataTranslator * = 0, bool skipDataConstruction = false );
 
 	QModelIndexList move( QModelIndexList items, const QModelIndex & newParent = QModelIndex(), const QModelIndex & after = QModelIndex() );
 	
@@ -358,6 +349,8 @@ public:
  * END AbstractItemModel functions
  */
 
+	/// This returns true if the index has children or has been checked for children
+	/// by calling treebuilder hasChildren
 	bool childrenLoaded( const QModelIndex & );
 
 	void clearChildren( const QModelIndex & i );
@@ -397,8 +390,8 @@ public:
     QMap<uint, QString> mColumnFilterMap;
 
 signals:
-    void grouperChanged( ModelGrouper * grouper );
-
+	void grouperChanged( ModelGrouper * grouper );
+	
 protected:
 	/// O(1) - Constant Runtime
 	static inline ModelNode * indexToNode( const QModelIndex & idx )
@@ -419,6 +412,8 @@ protected:
 
 	ModelNode * rootNode() const;
 
+	void dump();
+	
 	mutable ModelNode * mRootNode;
 	ModelTreeBuilder * mTreeBuilder;
 	struct InsertClosureNode {
@@ -433,8 +428,8 @@ protected:
 	QStringList mHeaderData;
 	QList<SortColumnPair> mSortColumns;
 	bool mAutoSort, mAssumeChildren, mDisableChildLoading;
-    ModelGrouper * mGrouper;
-
+	ModelGrouper * mGrouper;
+	
 	friend class ModelDataTranslator;
 	friend class ModelNode;
 };

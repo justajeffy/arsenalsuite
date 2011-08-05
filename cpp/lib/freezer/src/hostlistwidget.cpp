@@ -2,7 +2,10 @@
 #include <qlayout.h>
 #include <qregexp.h>
 #include <qtoolbar.h>
+#include <qwebview.h>
+#include <qwebframe.h>
 
+#include "path.h"
 #include "database.h"
 #include "freezercore.h"
 #include "process.h"
@@ -30,7 +33,6 @@
 
 HostListWidget::HostListWidget( QWidget * parent )
 : FreezerView( parent )
-, mHostTree(0)
 , mServiceDataRetrieved( false )
 , mHostTaskRunning( false )
 , mQueuedHostRefresh( false )
@@ -40,6 +42,8 @@ HostListWidget::HostListWidget( QWidget * parent )
 , mHostServiceFilterMenu( 0 )
 , mCannedBatchJobMenu( 0 )
 {
+    setupUi(this);
+
 	RefreshHostsAction = new QAction( "Refresh Hosts", this );
 	RefreshHostsAction->setIcon( QIcon( ":/images/refresh" ) );
 	HostOnlineAction = new QAction( "Set Host(s) Status to Online", this );
@@ -90,12 +94,6 @@ HostListWidget::HostListWidget( QWidget * parent )
     connect( FilterAction, SIGNAL( triggered(bool) ), SLOT( toggleFilter(bool) ) );
     connect( FilterClearAction, SIGNAL( triggered(bool) ), SLOT( clearFilters() ) );
 
-	mHostTree = new RecordTreeView(this);
-	QLayout * vbox = new QVBoxLayout(this);
-	vbox->setMargin(0);
-	vbox->setSpacing(0);
-	vbox->addWidget(mHostTree);
-
 	/* ListView connections */
 	connect( mHostTree, SIGNAL( selectionChanged(RecordList) ), SLOT( hostListSelectionChanged() ) );
 
@@ -125,7 +123,31 @@ HostListWidget::HostListWidget( QWidget * parent )
 	IniConfig & ini = viewConfig();
     FilterAction->setChecked( ini.readBool( "Filter", true ) );
 
+    {
+        JobModel * jm = new JobModel( mJobTree );
+        jm->setAutoSort( false );
+        mJobTree->setModel( jm );
+        mJobTree->setItemDelegateForColumn( 2, new ProgressDelegate( mJobTree ) );
+        mJobTree->setDragEnabled( false );
+        mJobTree->setAcceptDrops( false );
+        mJobTree->setDropIndicatorShown(false);
+        setupJobView(mJobTree, ini);
+        mJobTree->setFont( options.jobFont );
+        options.mJobColors->apply(mJobTree);
+
+        QPalette p = mJobTree->palette();
+        ColorOption * co = options.mJobColors->getColorOption("default");
+        p.setColor(QPalette::Active, QPalette::AlternateBase, co->bg.darker(120));
+        p.setColor(QPalette::Inactive, QPalette::AlternateBase, co->bg.darker(120));
+        mJobTree->setPalette( p );
+
+        mJobTree->enableFilterWidget(false);
+        mJobTree->update();
+    }
+
 	FreezerCore::addTask( new StaticHostListDataTask( this ) );
+
+    mStatsHTML = readFullFile("resources/ganglia/index.html");
 }
 
 HostListWidget::~HostListWidget()
@@ -142,13 +164,24 @@ void HostListWidget::save( IniConfig & ini )
 	ini.writeString("ViewType","HostList");
 	ini.writeString("ServiceFilter", mServiceFilter);
 	ini.writeBool( "Filter", FilterAction->isChecked() );
+    QStringList sizes;
+    foreach( int i, mHostSplitter->sizes() ) sizes += QString::number(i);
+    ini.writeString( "HostSplitterPos", sizes.join(",") );
+
 	saveHostView(mHostTree,ini);
+	saveJobView(mJobTree,ini);
 	FreezerView::save(ini);
 }
 
 void HostListWidget::restore( IniConfig & ini )
 {
 	setupHostView(mHostTree,ini);
+    QStringList frameSplitterSizes = ini.readString( "HostSplitterPos","600,100,400" ).split(',');
+    QList<int> frameSplitterInts;
+    for( QStringList::Iterator it=frameSplitterSizes.begin(); it!=frameSplitterSizes.end(); ++it )
+    frameSplitterInts += (*it).toInt();
+    mHostSplitter->setSizes( frameSplitterInts );
+
 	FreezerView::restore(ini);
 }
 
@@ -177,11 +210,7 @@ void HostListWidget::customEvent( QEvent * evt )
             }
 
 			mHostTaskRunning = false;
-			if( mQueuedHostRefresh ) {
-				mQueuedHostRefresh = false;
-				refresh();
-			} else
-				clearStatusBar();
+            clearStatusBar();
 
 			mHostTree->mRecordFilterWidget->filterRows();
 
@@ -245,10 +274,33 @@ void HostListWidget::hostListSelectionChanged()
 	HostList hosts = mHostTree->selection();
 	if( hosts.size() == 1 ) {
 		setStatusBarMessage( hosts[0].name() + " Selected" );
-	} else if( hosts.size() )
+	} else if( hosts.size() ) {
 		setStatusBarMessage( QString::number( hosts.size() ) + " Hosts Selected" );
-	else
+	} else {
 		clearStatusBar();
+        return;
+    }
+
+    QString gangliaGroup = "Workstations";
+    if( hosts[0].name().startsWith("c0") )
+        gangliaGroup = "Blades";
+
+    QString loadimg = QString("http://ganglia/graph.php?g=load_report&z=medium&c=%2&h=%1.drd.int&m=load_one&r=hour&s=descending&hc=4&mc=2").arg(hosts[0].name()).arg(gangliaGroup);
+    QString memoryimg = QString("http://ganglia/graph.php?g=mem_report&z=medium&c=%2&h=%1.drd.int&m=load_one&r=hour&s=descending&hc=4&mc=2").arg(hosts[0].name()).arg(gangliaGroup);
+    QString cpuimg = QString("http://ganglia/graph.php?g=cpu_report&z=medium&c=%2&h=%1.drd.int&m=load_one&r=hour&s=descending&hc=4&mc=2").arg(hosts[0].name()).arg(gangliaGroup);
+    QString networkimg = QString("http://ganglia/graph.php?g=network_report&z=medium&c=%2&h=%1.drd.int&m=load_one&r=hour&s=descending&hc=4&mc=2").arg(hosts[0].name()).arg(gangliaGroup);
+    QString nfsimg = QString("http://ganglia/graph.php?g=nfs_report&z=medium&c=%2&h=%1.drd.int&m=load_one&r=hour&s=descending&hc=4&mc=2").arg(hosts[0].name()).arg(gangliaGroup);
+
+    QString html = mStatsHTML;
+    html.replace("%LOADAVGIMG%", loadimg);
+    html.replace("%MEMORYIMG%", memoryimg);
+    html.replace("%CPUIMG%", cpuimg);
+    html.replace("%NETWORKIMG%", networkimg);
+    html.replace("%NFSIMG%", nfsimg);
+
+    mStatsView->setHtml(html);
+
+    mJobTree->model()->updateRecords(Host::activeAssignments(mHostTree->selection()).jobs());
 }
 
 void HostListWidget::selectHosts( HostList hosts )

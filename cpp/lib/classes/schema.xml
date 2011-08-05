@@ -1018,6 +1018,16 @@
   <column type="uint" methodName="totaltime" name="totaltime"/>
   <column pluralMethodName="queueOrder" type="uint" methodName="queueOrder" name="queueorder"/>
   <column type="QString" methodName="taskBitmap" name="taskbitmap"/>
+  <column type="uint" methodName="skipReason" name="fkeyJobStatusSkipReason">
+   <fkey indexDeleteMode="DoNothingOnDelete" table="JobStatusSkipReason" type="multi" hasIndex="false"/>
+  </column>
+ </table>
+ <table useCodeGen="true" name="JobStatusSkipReason" expireKeyCache="false" className="JobStatusSkipReason">
+  <column type="uint" methodName="keyJobStatusSkipReason" name="keyJobStatusSkipReason" pkey="true"/>
+  <column displayName="true" type="QString" methodName="name" name="name"/>
+  <index useCache="true" type="single" name="Name">
+   <column name="name"/>
+  </index>
  </table>
  <table useCodeGen="true" name="JobTask" expireKeyCache="true" className="JobTask">
   <column type="uint" methodName="Host" name="fkeyHost">
@@ -1037,6 +1047,7 @@
    <fkey indexDeleteMode="DoNothingOnDelete" table="JobTaskAssignment" type="single" hasIndex="false"/>
   </column>
   <column type="uint" methodName="progress" name="progress"/>
+  <column type="uint" methodName="schedulePolicy" name="schedulepolicy"/>
   <index useCache="false" type="multi" name="JobAndHost">
    <column name="fkeyJob"/>
    <column name="fkeyHost"/>
