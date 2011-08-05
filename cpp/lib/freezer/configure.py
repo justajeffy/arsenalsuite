@@ -58,7 +58,7 @@ def doit():
             sip_bin = config.sip_bin
         if not os.path.exists("sipFreezer"):
             os.mkdir("sipFreezer")
-        ret = os.system(" ".join([sip_bin, "-c", "sipFreezer", "-b", "sipFreezer/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, config.pyqt_sip_flags, "sip/freezer.sip"]))
+        ret = os.system(" ".join([sip_bin, "-c", "sipFreezer", "-b", "sipFreezer/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, "-I", config.sip_mod_dir, config.pyqt_sip_flags, "sip/freezer.sip"]))
         if ret:
             sys.exit(ret%255)
     

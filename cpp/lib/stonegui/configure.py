@@ -57,7 +57,7 @@ def doit():
 			sip_bin = "..\\sip\\sipgen\\sip.exe"
 		else:
 			sip_bin = config.sip_bin
-		ret = os.system(" ".join([sip_bin, "-c", "sipStonegui", "-b", "sipStonegui/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, config.pyqt_sip_flags, "sip/stonegui.sip"]))
+		ret = os.system(" ".join([sip_bin, "-c", "sipStonegui", "-b", "sipStonegui/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, "-I", config.sip_mod_dir, config.pyqt_sip_flags, "sip/stonegui.sip"]))
 		if ret:
 			sys.exit(ret%255)
 

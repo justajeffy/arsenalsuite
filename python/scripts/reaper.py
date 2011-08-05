@@ -276,7 +276,7 @@ def reaper():
 
             # Notify about errors if needed
             if job.notifyOnError() and errorCount - lastErrorCount > errorStep:
-                notifyOnErrorSend(job,errorCount)
+                notifyOnErrorSend(job,errorCount,lastErrorCount)
                 js.setLastNotifiedErrorCount( errorCount )
 
             # now we set the status started unless it's new
@@ -345,12 +345,21 @@ def notifyOnCompleteSend(job):
         msg = job.notifyCompleteMessage()
     notifySend( notifyList = job.notifyOnComplete(), subject = msg, body = msg )
 
-def notifyOnErrorSend(job,errorCount):
+def notifyOnErrorSend(job,errorCount,lastErrorCount):
     if VERBOSE_DEBUG:
         print 'notifyOnErrorSend(): Job %s has errors.' % (job.name())
     msg = 'Job %s (%i) for user %s has %i errors.' % (job.name(), job.key(), job.user().name(), errorCount)
     if not job.notifyErrorMessage().isEmpty():
         msg = job.notifyErrorMessage()
+
+    jobErrors = job.jobErrors()
+    messages = []
+    for i in range (0, min(5, errorCount - lastErrorCount)):
+        messages.append(str(jobErrors[i].message()))
+
+    msg += "\bnThe last %d errors produced were:\n" % (min(5, errorCount - lastErrorCount))
+    msg += "\n\n".join(messages)
+
     notifySend( notifyList = job.notifyOnError(), body = msg, subject = msg, noEmail = True )
 
 def notifySend( notifyList, body, subject, noEmail = False ):

@@ -53,7 +53,7 @@ def doit():
 			sip_bin = config.sip_bin
 		if not os.path.exists("sipAbsubmit"):
 			os.mkdir("sipAbsubmit")
-		ret = os.system(" ".join([sip_bin, "-c", "sipAbsubmit", "-b", "sipAbsubmit/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, config.pyqt_sip_flags, "sip/absubmit.sip"]))
+		ret = os.system(" ".join([sip_bin, "-c", "sipAbsubmit", "-b", "sipAbsubmit/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, "-I", config.sip_mod_dir, config.pyqt_sip_flags, "sip/absubmit.sip"]))
 		if ret:
 			sys.exit(ret%255)
 	
