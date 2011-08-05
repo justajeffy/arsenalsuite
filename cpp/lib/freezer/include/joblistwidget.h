@@ -159,6 +159,11 @@ public slots:
 
     void setToolTips();
 
+    void refreshGraphsTab(JobTaskList) const;
+
+	/// called to populate the tab according to the selected jobs
+	void frameTabChanged();
+
 protected:
 	/// refreshes the job list from the database
 	void doRefresh();
