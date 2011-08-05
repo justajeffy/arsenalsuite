@@ -110,7 +110,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>717</width>
+                 <width>678</width>
                  <height>435</height>
                 </rect>
                </property>
@@ -226,6 +226,20 @@
                   <property name="frameShadow">
                    <enum>QFrame::Raised</enum>
                   </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_7">
+                   <property name="margin">
+                    <number>1</number>
+                   </property>
+                   <item>
+                    <widget class="QWebView" name="mDepsView">
+                     <property name="url">
+                      <url>
+                       <string>about:blank</string>
+                      </url>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </widget>
                 </item>
                </layout>
@@ -312,6 +326,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QWebView</class>
+   <extends>QWidget</extends>
+   <header>QtWebKit/QWebView</header>
+  </customwidget>
   <customwidget>
    <class>ImageView</class>
    <extends>QWidget</extends>
