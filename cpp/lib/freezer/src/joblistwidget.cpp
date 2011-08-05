@@ -177,7 +177,7 @@ void JobListWidget::initializeViews()
         mJobTabWidget->setTabText(2, "&History");
         mJobTabWidget->setTabText(4, "Job &Settings");
         connect( mJobTabWidget, SIGNAL( currentChanged( int ) ), SLOT( currentTabChanged() ) );
-
+        connect( mFrameTabs, SIGNAL( currentChanged( int ) ), SLOT( frameTabChanged() ) );
 
         {
             JobModel * jm = new JobModel( mJobTree );
@@ -368,7 +368,6 @@ void JobListWidget::customEvent( QEvent * evt )
 	switch( evt->type() ) {
 		case JOB_LIST:
 		{
-            JobList selection = mJobTree->selection();
 			mJobTask = ((JobListTask*)evt);
 			JobModel * jm = (JobModel*)mJobTree->model();
 
@@ -477,7 +476,6 @@ void JobListWidget::customEvent( QEvent * evt )
             mJobTree->mRecordFilterWidget->filterRows();
             LOG_5( QString("Took %1 ms to filter rows").arg(t.elapsed()) );
 
-            mJobTree->setSelection(selection);
 			break;
 		}
 		case FRAME_LIST:
@@ -486,58 +484,17 @@ void JobListWidget::customEvent( QEvent * evt )
 			JobTaskList jtl = ((FrameListTask*)evt)->mReturn;
 			FrameItem::CurTime = ((FrameListTask*)evt)->mCurTime;
 
-            jtl.jobTaskAssignments().jobAssignments();
-            QMap<QString, QString> stats;
-			foreach( JobTask jt, jtl )
-			{
-				if( minFrame==-1 || (int)jt.frameNumber() < minFrame )
-					minFrame = jt.frameNumber();
-				if( maxFrame==-1 || (int)jt.frameNumber() > maxFrame )
-					maxFrame = jt.frameNumber();
-
-                // If there is no end time use now
-                QDateTime end = jt.jobTaskAssignment().ended().isNull() ? QDateTime::currentDateTime() : jt.jobTaskAssignment().ended();
-
-                // Store the frame time if the task has started
-                int time = jt.jobTaskAssignment().started().isNull() ? 0 : jt.jobTaskAssignment().started().secsTo(end);
-
-                // Get Frame specific stats
-                QString frameNumber     = QString::number( (int)jt.frameNumber() );
-                QString frameMemory     = QString::number( jt.jobTaskAssignment().memory() / 1024 ); // MB
-                QString frameCpuTime    = QString::number( time * jt.jobTaskAssignment().jobAssignment().assignSlots() / 60 ); // Minutes
-                QString frameWallTime   = QString::number( time / 60 );
-                QString frameOpsRead    = QString::number( jt.jobTaskAssignment().jobAssignment().opsRead() );
-                QString frameOpsWrite   = QString::number( jt.jobTaskAssignment().jobAssignment().opsWrite() );
-                QString frameBytesRead  = QString::number( jt.jobTaskAssignment().jobAssignment().bytesRead() / 1024 ); // MB
-                QString frameBytesWrite = QString::number( jt.jobTaskAssignment().jobAssignment().bytesWrite() / 1024 );
-
-                // Fill the stats map
-                stats["memory_"     + jt.status()] += "[" + frameNumber + ","  + frameMemory     + "],";
-                stats["cputime_"    + jt.status()] += "[" + frameNumber + ","  + frameCpuTime    + "],";
-                stats["walltime_"   + jt.status()] += "[" + frameNumber + ","  + frameWallTime   + "],";
-                stats["opsread_"    + jt.status()] += "[" + frameNumber + ","  + frameOpsRead    + "],";
-                stats["opswrite_"   + jt.status()] += "[" + frameNumber + ",-" + frameOpsWrite   + "],";
-                stats["bytesread_"  + jt.status()] += "[" + frameNumber + ","  + frameBytesRead  + "],";
-                stats["byteswrite_" + jt.status()] += "[" + frameNumber + ",-" + frameBytesWrite + "],";
-			}
-
-
-            QString params = "{";
-            QMapIterator<QString, QString> stat(stats);
-            while (stat.hasNext()) {
-                stat.next();
-
-                params += "'" + stat.key() + "': " + "[" + stat.value() + "],";
-            }
-            params += "}";
-
-            // Plot the memory/time graphs
-            mGraphs->page()->mainFrame()->evaluateJavaScript(QString("plot(%1)").arg(params));
-
 			mFrameTree->model()->updateRecords( jtl );
-			//mTabToolBar->slotPause();
-			mImageView->setFrameRange( mCurrentJob.outputPath(), minFrame, maxFrame );
-			mFrameTask = 0;
+
+            if( mFrameTabs->currentWidget() == mFrameGraphTab ) {
+                refreshGraphsTab(jtl);
+            }
+
+            if( mFrameTabs->currentWidget() == mFrameImageTab ) {
+                //mTabToolBar->slotPause();
+                mImageView->setFrameRange( mCurrentJob.outputPath(), minFrame, maxFrame );
+                mFrameTask = 0;
+            }
 
             mFrameTree->mRecordFilterWidget->filterRows();
             mFrameTree->busyWidget()->stop();
@@ -613,6 +570,57 @@ void JobListWidget::customEvent( QEvent * evt )
 		default:
 			break;
 	}
+}
+
+void JobListWidget::refreshGraphsTab(JobTaskList jtl) const
+{
+    int minFrame = -1, maxFrame = -1;
+    jtl.jobTaskAssignments().jobAssignments();
+    QMap<QString, QString> stats;
+    foreach( JobTask jt, jtl )
+    {
+        if( minFrame==-1 || (int)jt.frameNumber() < minFrame )
+            minFrame = jt.frameNumber();
+        if( maxFrame==-1 || (int)jt.frameNumber() > maxFrame )
+            maxFrame = jt.frameNumber();
+
+        // If there is no end time use now
+        QDateTime end = jt.jobTaskAssignment().ended().isNull() ? QDateTime::currentDateTime() : jt.jobTaskAssignment().ended();
+
+        // Store the frame time if the task has started
+        int time = jt.jobTaskAssignment().started().isNull() ? 0 : jt.jobTaskAssignment().started().secsTo(end);
+
+        // Get Frame specific stats
+        QString frameNumber     = QString::number( (int)jt.frameNumber() );
+        QString frameMemory     = QString::number( jt.jobTaskAssignment().memory() / 1024 ); // MB
+        QString frameCpuTime    = QString::number( time * jt.jobTaskAssignment().jobAssignment().assignSlots() / 60 ); // Minutes
+        QString frameWallTime   = QString::number( time / 60 );
+        QString frameOpsRead    = QString::number( jt.jobTaskAssignment().jobAssignment().opsRead() );
+        QString frameOpsWrite   = QString::number( jt.jobTaskAssignment().jobAssignment().opsWrite() );
+        QString frameBytesRead  = QString::number( jt.jobTaskAssignment().jobAssignment().bytesRead() / 1024 ); // MB
+        QString frameBytesWrite = QString::number( jt.jobTaskAssignment().jobAssignment().bytesWrite() / 1024 );
+
+        // Fill the stats map
+        stats["memory_"     + jt.status()] += "[" + frameNumber + ","  + frameMemory     + "],";
+        stats["cputime_"    + jt.status()] += "[" + frameNumber + ","  + frameCpuTime    + "],";
+        stats["walltime_"   + jt.status()] += "[" + frameNumber + ","  + frameWallTime   + "],";
+        stats["opsread_"    + jt.status()] += "[" + frameNumber + ","  + frameOpsRead    + "],";
+        stats["opswrite_"   + jt.status()] += "[" + frameNumber + ",-" + frameOpsWrite   + "],";
+        stats["bytesread_"  + jt.status()] += "[" + frameNumber + ","  + frameBytesRead  + "],";
+        stats["byteswrite_" + jt.status()] += "[" + frameNumber + ",-" + frameBytesWrite + "],";
+    }
+
+    QString params = "{";
+    QMapIterator<QString, QString> stat(stats);
+    while (stat.hasNext()) {
+        stat.next();
+
+        params += "'" + stat.key() + "': " + "[" + stat.value() + "],";
+    }
+    params += "}";
+
+    // Plot the memory/time graphs
+    mGraphs->page()->mainFrame()->evaluateJavaScript(QString("plot(%1)").arg(params));
 }
 
 QMap<QString,QString> JobListWidget::userToolTipMap() const
@@ -970,6 +978,10 @@ void JobListWidget::currentTabChanged()
 	refreshCurrentTab();
 }
 
+void JobListWidget::frameTabChanged()
+{
+		refreshFrameList(false /*jobChanged*/);
+}
 void JobListWidget::clearErrors()
 {
     JobList jobs = mJobTree->selection();
