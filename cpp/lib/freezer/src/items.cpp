@@ -678,6 +678,8 @@ int JobItem::compare( const QModelIndex & a, const QModelIndex & b, int col, boo
 		Interval otiq( other.job.submittedts(), other.job.endedts().isNull() ? QDateTime::currentDateTime() : other.job.endedts() );
 		return compareRetI( tiq, otiq );
 	}
+    else if( col == 21 )
+		return compareRetI( jobStatus.efficiency(), other.jobStatus.efficiency() );
     else if( col == 20 )
 		return compareRetI( jobStatus.averageMemory(), other.jobStatus.averageMemory() );
     else if( col == 22 )
