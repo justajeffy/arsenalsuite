@@ -2,6 +2,8 @@
 #ifndef HOST_LIST_WIDGET_H
 #define HOST_LIST_WIDGET_H
 
+#include "ui_hostlistwidgetui.h"
+
 #include <qstring.h>
 
 #include "service.h"
@@ -17,7 +19,7 @@ class RecordTreeView;
 void clearHostErrorsAndSetOffline( HostList hosts, bool offline);
 QString verifyKeyList( const QString & list, Table * table );
 
-class FREEZER_EXPORT HostListWidget : public FreezerView
+class FREEZER_EXPORT HostListWidget : public FreezerView, public Ui::HostListWidgetUI
 {
 Q_OBJECT
 public:
@@ -47,7 +49,7 @@ public:
 	QAction* ShowHostErrorsAction;
 	QAction* ShowJobsAction;
 
-	RecordTreeView * mHostTree;
+	//RecordTreeView * mHostTree;
 
 	virtual QToolBar * toolBar( QMainWindow * );
 	virtual void populateViewMenu( QMenu * );
@@ -108,6 +110,8 @@ protected:
 	QToolBar * mToolBar;
 
     HostList mHostsToSelect;
+
+    QString mStatsHTML;
 
 public:
 	QMenu * mHostMenu,
