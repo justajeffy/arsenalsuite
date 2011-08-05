@@ -688,6 +688,8 @@ int JobItem::compare( const QModelIndex & a, const QModelIndex & b, int col, boo
 		return compareRetI( (jobStatus.opsWrite()+jobStatus.opsRead()), (other.jobStatus.opsWrite()+other.jobStatus.opsRead()) );
 	else if( col == 25 )
 		return compareRetI( jobStatus.cputime(), other.jobStatus.cputime() );
+    else if( col == 28 )
+        return compareRetI( job.suspendedts(), other.job.suspendedts() );
 	return ItemBase::compare( a, b, col, asc );
 }
 
