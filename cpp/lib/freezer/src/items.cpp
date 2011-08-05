@@ -544,13 +544,23 @@ QString memoryString( int kb )
 void JobItem::setup( const Record & r, const QModelIndex & idx ) {
 	job = r;
 	jobStatus = JobStatus::recordByJob(job);
+    if( !jobStatus.isRecord() ) {
+        jobStatus = JobStatus::recordByJob(job);
+        userName = job.user().name();
+        project = job.project().name();
+        //submitted = job.submittedts().toString();
+        type = job.jobType().name();
+        icon = ((JobModel*)idx.model())->jobTypeIcon(job.jobType());
+        if( job.wrangler().isRecord() ) {
+            icon = QPixmap("images/wrangled.png");
+        }
+    }
+
 	healthIsNull = jobStatus.getValue( "health" ).isNull();
     done = QString("%1 / %2").arg(jobStatus.tasksDone()).arg(jobStatus.tasksCount());
-	userName = job.user().name();
 	QString status = job.status();
 	hostsOnJob = QString::number( adjustedHostsOnJob(status,jobStatus) );
 	priority = QString::number( job.priority() );
-	project = job.project().name();
 
 	errorCnt = QString::number(jobStatus.errorCount());
 
@@ -559,11 +569,6 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
 	Interval tiq( job.submittedts(), job.endedts().isNull() ? QDateTime::currentDateTime() : job.endedts() );
 	timeInQueue = tiq.toString( Interval::Hours, Interval::Seconds, Interval::TrimMaximum | Interval::PadHours );
 
-	type = job.jobType().name();
-	icon = ((JobModel*)idx.model())->jobTypeIcon(job.jobType());
-    if( job.wrangler().isRecord() ) {
-        icon = QPixmap("images/wrangled.png");
-    }
 	co = options.mJobColors->getColorOption(status);
 	avgMemory = memoryString(jobStatus.averageMemory());
 
