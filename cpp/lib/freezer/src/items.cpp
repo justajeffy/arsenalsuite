@@ -276,11 +276,14 @@ QPixmap ProgressDelegate::taskProgressBar(int height, const QString & taskBitmap
     int width = qMin(16000, qMax(1, taskBitmap.size()));
     QPixmap progressBar(width, height);
     progressBar.fill(mNewColor->fg);
+    if( width==1 ) return progressBar;
+
     QPainter progressPainter;
     progressPainter.begin( &progressBar );
 
     for (int x = 0; x < width; ++x)
         progressPainter.drawPixmap( x, 0, gradientCache(height, taskBitmap.at(x) ));
+    progressPainter.end();
 
     return progressBar;
 }
@@ -543,12 +546,11 @@ QString memoryString( int kb )
 
 void JobItem::setup( const Record & r, const QModelIndex & idx ) {
 	job = r;
-	jobStatus = JobStatus::recordByJob(job);
+	//jobStatus = JobStatus::recordByJob(job);
     if( !jobStatus.isRecord() ) {
         jobStatus = JobStatus::recordByJob(job);
         userName = job.user().name();
         project = job.project().name();
-        //submitted = job.submittedts().toString();
         type = job.jobType().name();
         icon = ((JobModel*)idx.model())->jobTypeIcon(job.jobType());
         if( job.wrangler().isRecord() ) {
