@@ -1,0 +1,23 @@
+Summary: Stone GUI Library
+Name: stonegui
+Version: 1.0
+Release: DrD
+License: GPL
+Group: Libraries/Programming
+Distribution: CentOS
+Vendor: Dr. D Studios
+Packager: Aren Villanueva <aren.villanueva@drdstudios.com>
+BuildRoot:
+AutoReqProv: No
+
+%define _unpackaged_files_terminate_build 0
+
+%description
+test
+
+%files
+%defattr(-,root,root,-)
+/usr/local/lib/libstonegui.so
+/usr/local/lib/libstonegui.so.1
+/usr/local/lib/libstonegui.so.1.0
+/usr/local/lib/libstonegui.so.1.0.0
