@@ -106,6 +106,8 @@ void JobListWidget::initializeViews()
         mGraphs->load(startURL);
         mGraphLayout->addWidget(mGraphs);
 
+        //mDepsView->load(QUrl("resources/deps/index.html"));
+
         RefreshAction = new QAction( "Refresh Job(s)", this );
         RefreshAction->setIcon( QIcon( ":/images/refresh" ) );
 
@@ -875,8 +877,8 @@ void JobListWidget::currentJobChanged()
 void JobListWidget::refreshFrameList( bool jobChange )
 {
 	// Cancel the current task if there is one
-	if( mFrameTask )
-		mFrameTask->mCancel = true;
+	//if( mFrameTask )
+	//	mFrameTask->mCancel = true;
 	
 	if( jobChange )
 		mFrameTree->model()->setRootList( RecordList() );
