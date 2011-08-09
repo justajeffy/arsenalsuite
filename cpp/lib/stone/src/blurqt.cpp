@@ -277,6 +277,13 @@ QString getUserName()
 	return QString(buf);
 }
 
+QStringList getLoggedInUsers()
+{
+    QStringList outut;
+
+    return output;
+}
+
 #else
 
 #include <unistd.h>
@@ -289,6 +296,30 @@ QString getUserName()
 	if( !ps )
 		return QString::null;
 	return QString(ps->pw_name);
+}
+
+QStringList getLoggedInUsers()
+{
+    QProcess * proc = new QProcess();
+    QStringList arguments;
+    proc->start("who", arguments);
+
+    proc->waitForFinished();
+    QStringList output;
+    while (proc->canReadLine())
+        output.append(proc->readLine());
+
+    QStringList users;
+    for (QStringList::Iterator it = output.begin(); it != output.end(); ++it)
+    {
+        if (!(*it).contains(":0"))
+            output.erase(it);
+        QStringList parts = (*it).split(' ');
+        if (users.indexOf(parts[0]) == -1)
+            users.append(parts[0]);
+    }
+
+    return users;
 }
 
 #endif // Q_WS_WIN

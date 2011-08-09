@@ -33,6 +33,8 @@ Multilog * log();
 
 QString getUserName();
 
+QStringList getLoggedInUsers();
+
 void Log( const QString & message, int severity = 1, const QString & file = QString() );
 
 bool sendEmail( QStringList recipients, const QString & subject, const QString & body, const QString & sender, QStringList attachments = QStringList() );

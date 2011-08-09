@@ -233,6 +233,9 @@ protected slots:
 	void execPriorityMode();
 	void restoreDefaultMappings();
 
+    /// Called once every 5 minutes to update logged in users
+    void updateLoggedUsers();
+
 protected:
 	void handleStatusChange( const QString & status, const QString & oldStatus );
 
@@ -276,6 +279,8 @@ protected:
 	int mPulsePeriod, mLoopTime, mQuickLoopTime, mQuickLoopCount, mMemCheckPeriod;
 	Service mService;
 	QDateTime mLastPulse;
+
+    QTimer * mUserTimer;
 
 	Idle * mIdle;
 	int mIdleDelay;

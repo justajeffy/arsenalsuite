@@ -101,6 +101,9 @@ STONE_EXPORT Multilog * log();
 /** \brief Returns the userName of the current user */
 STONE_EXPORT QString getUserName();
 
+/** \brief Returns the usernames from where they are logged in are on the current machine */
+STONE_EXPORT QStringList getLoggedInUsers();
+
 /** \brief Logs a message to the default MultiLog instance */
 STONE_EXPORT void Log( const QString & message, int severity = 1, const QString & file = QString() );
 

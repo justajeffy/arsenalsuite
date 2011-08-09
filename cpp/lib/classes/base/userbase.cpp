@@ -44,6 +44,7 @@
 #include "usergroup.h"
 #include "userrole.h"
 #include "userrole.h"
+#include "host.h"
 
 AssetTypeList User::roles() const
 {
@@ -105,6 +106,20 @@ User User::currentUser()
 void User::setCurrentUser( const QString & username )
 {
 	sUserName = username;
+}
+
+bool User::isUserLoggedIn( const QString & username )
+{
+    User u;
+    u = User::recordByUserName(username.toLower());
+
+    if (u.isRecord()) {
+        Host h = u.host();
+        if (h.isRecord())
+            return h.userIsLoggedIn();
+    }
+
+    return false;
 }
 
 User User::activeByUserName( const QString & un )

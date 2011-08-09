@@ -143,6 +143,8 @@ void HostItem::setup( const Record & r, const QModelIndex &, bool loadJob ) {
 	pulse = convertTime( status.slavePulse().secsTo(now) );
 	co = HostColors ? HostColors->getColorOption(status.slaveStatus()) : 0;
 	services = QString();
+    if( host.userIsLoggedIn())
+        icon = QPixmap("images/wrangled.png");
 	if( loadJob )
 		_jobName = jobName();
 }
@@ -226,6 +228,8 @@ QVariant HostItem::modelData( const QModelIndex & i, int role ) const
     else if ( role == Qt::DecorationRole ) {
         if ( col == 17 )
             return QVariant( puppetIcon );
+        if ( col == 7 )
+            return icon;
     }
 
 	return QVariant();
