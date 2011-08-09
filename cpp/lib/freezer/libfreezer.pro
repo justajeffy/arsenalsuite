@@ -105,6 +105,7 @@ INTERFACES+= \
 	ui/hostservicematrixwindowui.ui \
 	ui/userservicematrixwindowui.ui \
 	ui/framenthdialogui.ui \
+    ui/hostlistwidgetui.ui \
 #	ui/jobaftereffectssettingswidgetui.ui \
 	ui/jobbatchsettingswidgetui.ui \
 	ui/jobenvironmentwindowui.ui \

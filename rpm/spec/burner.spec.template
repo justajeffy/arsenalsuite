@@ -1,9 +1,9 @@
-Summary: Classmaker
-Name: classmaker
+Summary: Burner Library
+Name: burner
 Version: 1.0
 Release: DrD
 License: GPL
-Group: Applications/Programming
+Group: Libraries/Programming
 Distribution: CentOS
 Vendor: Dr. D Studios
 Packager: Aren Villanueva <aren.villanueva@drdstudios.com>
@@ -13,8 +13,10 @@ AutoReqProv: No
 %define _unpackaged_files_terminate_build 0
 
 %description
-test
+The Arsenal Burner daemon.
 
 %files
 %defattr(-,root,root,-)
-/usr/local/bin/classmaker
+/usr/bin/abpsmon
+/usr/lib/python2.5/site-packages/blur/libBurner.a
+/usr/local/bin/burner
