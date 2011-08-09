@@ -2,6 +2,8 @@
 
 	static MappedRecord currentUser();
 	static void setCurrentUser( const QString & );
+
+    static bool isUserLoggedIn( const QString & );
 	
 	static MappedRecord activeByUserName( const QString & );
 
