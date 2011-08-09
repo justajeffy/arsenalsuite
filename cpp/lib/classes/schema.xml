@@ -474,6 +474,7 @@
    <fkey indexDeleteMode="DoNothingOnDelete" table="User" type="multi" hasIndex="false"/>
   </column>
   <column type="uint" methodName="maxMemory" name="maxMemory"/>
+  <column type="bool" methodName="userIsLoggedIn" name="userIsLoggedIn"/>
   <index useCache="true" type="single" name="Name">
    <column name="host"/>
   </index>

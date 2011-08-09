@@ -264,6 +264,13 @@ void Slave::startup()
 	else
 		online();
 
+    // Create a timer for logged in user checks
+    mUserTimer = new QTimer( this );
+    connect( mUserTimer, SIGNAL( timeout() ), SLOT( updateLoggedusers() ) );
+
+    // Set it to trigger every 5 mins
+    mUserTimer->start(300000);
+
 	LOG_5( "Slave::startup() done" );
 }
 
@@ -273,6 +280,11 @@ Slave::~Slave()
 	foreach( JobBurner * burner, (mActiveBurners + mBurnersToDelete) )
 		delete burner;
 	mActiveBurners.clear();
+    if( mUserTimer ){
+        mUserTimer->disconnect(this);
+        delete mUserTimer;
+        mUserTimer = 0;
+    }
 	if( mTimer ) {
 		mTimer->disconnect(this);
 		delete mTimer;
@@ -1209,5 +1221,22 @@ AccountingInfo Slave::parseTaskLoggerOutput( const QString & line )
 #endif
 
     return info;
+}
+
+void Slave::updateLoggedUsers()
+{
+    QStringList users = getLoggedInUsers();
+
+    for (QStringList::Iterator it = users.begin(); it != users.end(); ++it) {
+        User user = User::recordByUserName((*it));
+        if (user.isRecord()) {
+            if (user.host() == mHost){
+                mHost.setUserIsLoggedIn(true);
+                return;
+            }
+        }
+    }
+
+    mHost.setUserIsLoggedIn(false);
 }
 
