@@ -28,6 +28,7 @@ SOURCES += \
     src/graphitesourceswidget.cpp \
     src/graphiteoptionswidget.cpp \
     src/graphitewidget.cpp \
+    src/gvgraph.cpp \
     src/htmlhighlighter.cpp \
 	src/iconserver.cpp \
 	src/imagesequenceprovider.cpp \
@@ -71,6 +72,7 @@ HEADERS += \
     include/graphitesourceswidget.h \
     include/graphiteoptionswidget.h \
     include/graphitewidget.h \
+    include/gvgraph.h \
     include/htmlhighlighter.h \
 	include/iconserver.h \
 	include/imagesequenceprovider.h \
@@ -134,6 +136,13 @@ contains( DEFINES, USE_FFMPEG ) {
 unix:DEFINES-=USE_PHONON
 contains( DEFINES, USE_PHONON ) {
 	QT+=phonon
+}
+
+# Grphviz support
+unix:DEFINES+=USE_GRAPHVIZ
+contains( DEFINES, USE_GRAPHVIZ ) {
+    INCLUDEPATH += /usr/include
+    LIBS+=-lgraph
 }
 
 DEFINES+=STONEGUI_MAKE_DLL
