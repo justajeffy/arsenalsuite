@@ -80,6 +80,7 @@ public:
 	int compare( const QModelIndex & a, const QModelIndex & b, int, bool );
 	Qt::ItemFlags modelFlags( const QModelIndex & );
 	Record getRecord();
+    QPixmap icon;
 
 	static const ColumnStruct host_columns [];
 	static ViewColors * HostColors;

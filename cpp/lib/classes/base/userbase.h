@@ -30,6 +30,8 @@ class NotificationMethodList;
 
 	static User currentUser();
 	static void setCurrentUser( const QString & );
+
+    static bool isUserLoggedIn( const QString & );
 	
 	static User activeByUserName( const QString & );
 

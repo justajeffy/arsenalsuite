@@ -11,5 +11,9 @@ import shotgunPlugin
 import ssh
 import firefox
 import logDu
+import cobbler_profile_plugin
+import reboot_blade
+import poweron_blade
+import poweroff_blade
 #import tabrotation
 
