@@ -22,27 +22,17 @@ Q_OBJECT
 public:
 	HostServiceModel( QObject * parent = 0 );
 
-    HostService findHostService( const QModelIndex & idx );
-    Service serviceByColumn( int column ) const;
+	HostService findHostService( const Host & host, int column ) const;
+	HostService findHostService( const QModelIndex & ) const;
+	QVariant serviceData ( const Host &, int column, int role ) const;
 
-    void setHostList( HostList hosts );
-
-    void setHostFilter( const QString &, bool cs );
-
-    void updateHosts( HostList hosts );
-    void refreshIndexes( QModelIndexList indexes );
+	void setHostFilter( const QString & );
 
 public slots:
 	void updateServices();
 
-    void hostServicesAdded(RecordList);
-    void hostServicesRemoved(RecordList);
-    void hostServiceUpdated(Record up, Record);
-
 protected:
-    HostStatusList mStatuses;
-    HostServiceList mHostServices;
-    QMap<Host,HostServiceList> mHostServicesByHost;
+
 	ServiceList mServices;
 };
 
@@ -52,15 +42,9 @@ Q_OBJECT
 public:
 	HostServiceMatrix( QWidget * parent = 0 );
 
-    bool hostFilterCS() const { return mHostFilterCS; }
-    bool serviceFilterCS() const { return mServiceFilterCS; }
-
 public slots:
 	void setHostFilter( const QString & );
 	void setServiceFilter( const QString & );
-
-    void setHostFilterCS( bool cs );
-    void setServiceFilterCS( bool cs );
 
 	void slotShowMenu( const QPoint & pos, const QModelIndex & underMouse );
 
@@ -68,7 +52,6 @@ public slots:
 protected:
 
 	QString mHostFilter, mServiceFilter;
-    bool mHostFilterCS, mServiceFilterCS;
 	HostServiceModel * mModel;
 };
 
@@ -82,9 +65,7 @@ public slots:
 	void newService();
 
 protected:
-    virtual bool eventFilter( QObject * o, QEvent * e );
-
-	HostServiceMatrix * mView;
+	HostServiceMatrix * mView;	
 };
 
 #endif // HOST_SERVICE_MATRIX_H

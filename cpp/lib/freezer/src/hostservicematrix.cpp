@@ -1,6 +1,5 @@
 
 #include <qcombobox.h>
-#include <qevent.h>
 #include <qheaderview.h>
 #include <qinputdialog.h>
 #include <qmessagebox.h>
@@ -17,34 +16,6 @@ struct HostServiceItem : public RecordItem
 {
 	Host mHost;
 	HostStatus mHostStatus;
-    HostServiceList mHostServices;
-    QVector<HostService> mHostServiceByColumn;
-    HostServiceItem() {}
-    HostServiceItem( const Host & h, HostServiceList hsl, ServiceList services )
-    : mHostServiceByColumn(services.size())
-    {
-        mHost = h;
-        mHostStatus = mHost.hostStatus();
-        mHostServices = hsl;
-        foreach( HostService hs, hsl ) {
-            int col = services.findIndex( hs.service() );
-            if( col >= 0 )
-            mHostServiceByColumn[col] = hs;
-        }
-    }
-    HostService hostServiceByColumn( int col ) const {
-        if( col > 0 && (col-1) < mHostServiceByColumn.size() )
-            return mHostServiceByColumn[col-1];
-        return HostService();
-    }
-    QVariant serviceData( int column ) const
-    {
-        HostService hs = hostServiceByColumn( column );
-        if( hs.isRecord() )
-            return hs.enabled() ? "Enabled" : "Disabled";
-        return "No Service";
-    }
-
 	void setup( const Record & r, const QModelIndex & );
 	QVariant modelData ( const QModelIndex & index, int role ) const;
 	bool setModelData( const QModelIndex & idx, const QVariant & v, int role );
@@ -65,6 +36,7 @@ void HostServiceItem::setup( const Record & r, const QModelIndex & )
 {
 	mHost = r;
 	mHostStatus = mHost.hostStatus();
+	LOG_5( "Setting up host " + mHost.name() );
 }
 
 static int hsSortVal( const HostService & hs )
@@ -77,8 +49,9 @@ static int hsSortVal( const HostService & hs )
 int HostServiceItem::compare( const QModelIndex & a, const QModelIndex & b, int column, bool asc )
 {
 	if( column == 0 ) return ItemBase::compare( a, b, column, asc );
-    HostService hs = hostServiceByColumn( column );
-    HostService ohs = HostServiceTranslator::data(b).hostServiceByColumn( column );
+	HostServiceModel * m = model(a);
+	HostService hs = m->findHostService( mHost, column );
+	HostService ohs = m->findHostService( HostServiceTranslator::data(b).mHost, column );
 	return compareRetI( hsSortVal( hs ), hsSortVal( ohs ) );
 }
 
@@ -86,9 +59,10 @@ QVariant HostServiceItem::modelData( const QModelIndex & idx, int role ) const
 {
 	if( role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ForegroundRole ) {
 		if( idx.column() == 0 ) return mHost.name() + " [" + mHostStatus.slaveStatus() + "]";
+		HostServiceModel * m = model(idx);
 		if( role == Qt::EditRole )
-            return qVariantFromValue<Record>(hostServiceByColumn( idx.column() ));
-        QVariant d = serviceData( idx.column() );
+			return qVariantFromValue<Record>(m->findHostService( mHost, idx.column() ));
+		QVariant d = m->serviceData( mHost, idx.column(), role );
 		if( role == Qt::ForegroundRole ) {
 			QString txt = d.toString();
 			return (txt == "Enabled" ? Qt::green : (txt == "Disabled" ? Qt::red : Qt::black));
@@ -102,14 +76,10 @@ bool HostServiceItem::setModelData( const QModelIndex & idx, const QVariant & v,
 {
 	if( role == Qt::EditRole && idx.column() > 0 ) {
 		HostServiceModel * m = model(idx);
-		HostService hs = hostServiceByColumn( idx.column() );
+		HostService hs = m->findHostService( mHost, idx.column() );
 		switch( v.toInt() ) {
 			case 0:
 			case 1:
-                if( !hs.isRecord() ) {
-                    hs.setHost( mHost );
-                    hs.setService( m->serviceByColumn( idx.column() ) );
-                }
 				hs.setEnabled( v.toInt() == 0 );
 				hs.commit();
 				break;
@@ -137,103 +107,54 @@ HostServiceModel::HostServiceModel( QObject * parent )
 {
 	new HostServiceTranslator(treeBuilder());
 
-    connect( HostService::table(), SIGNAL( added(RecordList) ), SLOT( hostServicesAdded(RecordList) ) );
-    connect( HostService::table(), SIGNAL( removed(RecordList) ), SLOT( hostServicesRemoved(RecordList) ) );
-    connect( HostService::table(), SIGNAL( updated(Record,Record) ), SLOT( hostServiceUpdated(Record,Record) ) );
-
 	// Set HostService index to cache
 	updateServices();
 }
 
-void HostServiceModel::hostServicesAdded(RecordList rl)
-{
-    HostServiceList hsl(rl);
-    HostList hosts = hsl.hosts();
-    mHostServices += hsl;
-    mHostServicesByHost = mHostServices.groupedByForeignKey<Host,HostServiceList>("fkeyhost");
-    updateHosts(hosts);
-    }
-
-void HostServiceModel::hostServicesRemoved(RecordList rl)
-{
-    HostServiceList hsl(rl);
-    HostList hosts = hsl.hosts();
-    mHostServices -= hsl;
-    mHostServicesByHost = mHostServices.groupedByForeignKey<Host,HostServiceList>("fkeyhost");
-    updateHosts(hosts);
-}
-
-void HostServiceModel::hostServiceUpdated(Record up, Record)
-{
-    QModelIndex idx = findIndex(up);
-    dataChanged( idx.sibling( idx.row(), 0 ), idx.sibling( idx.row(), columnCount() - 1 ) );
-}
-
-
 void HostServiceModel::updateServices()
 {
-	//Index * i = HostService::table()->index( "HostAndService" );
-	//if( i ) i->setCacheEnabled( true );
-	//HostService::schema()->setPreloadEnabled( true );
-    mHostServices = HostService::select();
-    mHostServicesByHost = mHostServices.groupedByForeignKey<Host,HostServiceList>("fkeyhost");
+	Index * i = HostService::table()->index( "HostAndService" );
+	if( i ) i->setCacheEnabled( true );
+	HostService::schema()->setPreloadEnabled( true );
 	mServices = Service::select().sorted( "service" );
 	LOG_5( mServices.services().join(",") );
 	setHeaderLabels( QStringList() << "Host" << mServices.services() );
+	HostList hosts = Host::select();
 	// Keep the list in memory until the items can store each hoststatus record
-    mStatuses = HostStatus::select();
-
-    setHostList( Host::select() );
+	HostStatusList statuses = HostStatus::select();
+	LOG_5( "setRootList: Adding " + QString::number(hosts.size()) + " hosts" );
+	setRootList( hosts );
 }
 
-Service HostServiceModel::serviceByColumn( int column ) const
+HostService HostServiceModel::findHostService( const Host & host, int column ) const
 {
-    if( column < 0 || column >= (int)mServices.size() ) return Service();
-    return mServices[column];
+	column -= 1;
+	if( column < 0 || column >= (int)mServices.size() ) return HostService();
+	Service s = mServices[column];
+	HostService ret = HostService::recordByHostAndService( host, s );
+	if( !ret.isRecord() ) {
+		ret.setHost( host );
+		ret.setService( s );
+	}
+	return ret;
 }
 
-void HostServiceModel::setHostList( HostList hosts )
+HostService HostServiceModel::findHostService( const QModelIndex & idx ) const
 {
-    LOG_5( "Adding " + QString::number(hosts.size()) + " hosts" );
-    clear();
-    SuperModel::InsertClosure closure(this);
-    HostServiceTranslator * hst = (HostServiceTranslator*)treeBuilder()->defaultTranslator();
-    QModelIndexList ret = append( QModelIndex(), hosts.size(), hst );
-    for( int i=0; i < hosts.size(); ++i ) {
-        Host h = hosts[i];
-        LOG_5( "Host " + h.name() + " has services " + mHostServicesByHost[h].services().services().join(",") );
-        hst->data(ret[i]) = HostServiceItem( h, mHostServicesByHost[h], mServices );
-    }
+	return findHostService( getRecord(idx), idx.column() );
 }
 
-HostService HostServiceModel::findHostService( const QModelIndex & idx )
+QVariant HostServiceModel::serviceData ( const Host & host, int column, int ) const
 {
-    HostService hs;
-    if( idx.isValid() ) {
-        HostServiceItem & item = ((HostServiceTranslator*)treeBuilder()->defaultTranslator())->data(idx);
-        hs = item.hostServiceByColumn( idx.column() );
-        if( !hs.isRecord() ) {
-            hs.setHost( item.mHost );
-            hs.setService( serviceByColumn( idx.column() ) );
-        }
-    }
-    return hs;
+	HostService hs = findHostService( host, column );
+	if( hs.isRecord() )
+		return hs.enabled() ? "Enabled" : "Disabled";
+	return "No Service";
 }
 
-void HostServiceModel::updateHosts( HostList hosts )
+void HostServiceModel::setHostFilter( const QString & filter )
 {
-    refreshIndexes( findIndexes( hosts ) );
-}
-
-void HostServiceModel::refreshIndexes( QModelIndexList indexes )
-{
-    HostServiceTranslator * hst = (HostServiceTranslator*)treeBuilder()->defaultTranslator();
-    for( int i=0; i < indexes.size(); ++i ) {
-        QModelIndex idx = indexes[i];
-        HostServiceItem & item = hst->data(idx);
-        item = HostServiceItem( item.mHost, mHostServicesByHost[item.mHost], mServices );
-        dataChange( idx.sibling( idx.row(), 0 ), idx.sibling( idx.row(), columnCount()-1 ) );
-    }
+	setRootList( Host::select().filter( "name", QRegExp( filter ) ) );
 }
 
 class HostServiceDelegate : public RecordDelegate
@@ -282,8 +203,6 @@ public:
 
 HostServiceMatrix::HostServiceMatrix( QWidget * parent )
 : RecordTreeView( parent )
-, mHostFilterCS( false )
-, mServiceFilterCS( false )
 {
 	mModel = new HostServiceModel(this);
 	setModel( mModel );
@@ -300,33 +219,17 @@ HostServiceMatrix::HostServiceMatrix( QWidget * parent )
 void HostServiceMatrix::setHostFilter( const QString & filter )
 {
 	mHostFilter = filter;
-    QRegExp re( filter, mHostFilterCS ? Qt::CaseSensitive : Qt::CaseInsensitive );
-    for( ModelIter it(mModel); it.isValid(); ++it )
-        setRowHidden( (*it).row(), QModelIndex(), !Host(mModel->getRecord(*it)).name().contains( re ) );
-
+	mModel->setHostFilter( filter );
 }
 
 void HostServiceMatrix::setServiceFilter( const QString & filter )
 {
 	mServiceFilter = filter;
 	QHeaderView * h = header();
-    QRegExp re(filter, mServiceFilterCS ? Qt::CaseSensitive : Qt::CaseInsensitive);
+	QRegExp re(filter);
 	for( int i=1; i < h->count(); i++ )
 		h->setSectionHidden( i, !model()->headerData(i, Qt::Horizontal, Qt::DisplayRole ).toString().contains( re ) );
 }
-
-void HostServiceMatrix::setHostFilterCS( bool cs )
-{
-    mHostFilterCS = cs;
-    setHostFilter( mHostFilter );
-}
-
-void HostServiceMatrix::setServiceFilterCS( bool cs )
-{
-    mServiceFilterCS = cs;
-    setServiceFilter( mServiceFilter );
-}
-
 
 void HostServiceMatrix::updateServices()
 {
@@ -379,37 +282,6 @@ void HostServiceMatrix::slotShowMenu( const QPoint & pos, const QModelIndex & /*
 	}
 }
 
-bool HostServiceMatrixWindow::eventFilter( QObject * o, QEvent * e )
-{
-    if( o == mHostFilterEdit && e->type() == QEvent::ContextMenu ) {
-        QMenu * menu = mHostFilterEdit->createStandardContextMenu();
-        QAction * first = menu->actions()[0];
-        QAction * cs = new QAction( "Case Sensitive Filter", menu );
-        cs->setCheckable( true );
-        cs->setChecked( mView->hostFilterCS() );
-        menu->insertAction( first, cs );
-        menu->insertSeparator( first );
-        if( menu->exec(((QContextMenuEvent*)e)->globalPos()) == cs )
-            mView->setHostFilterCS( cs->isChecked() );
-        delete menu;
-        return true;
-    }
-    else if( o == mServiceFilterEdit && e->type() == QEvent::ContextMenu ) {
-        QMenu * menu = mServiceFilterEdit->createStandardContextMenu();
-        QAction * first = menu->actions()[0];
-        QAction * cs = new QAction( "Case Sensitive Filter", menu );
-        cs->setCheckable( true );
-        cs->setChecked( mView->serviceFilterCS() );
-        menu->insertAction( first, cs );
-        menu->insertSeparator( first );
-        if( menu->exec(((QContextMenuEvent*)e)->globalPos()) == cs )
-            mView->setServiceFilterCS( cs->isChecked() );
-        delete menu;
-        return true;
-    }
-    return false;
-}
-
 HostServiceMatrixWindow::HostServiceMatrixWindow( QWidget * parent )
 : QMainWindow( parent )
 {
@@ -420,8 +292,6 @@ HostServiceMatrixWindow::HostServiceMatrixWindow( QWidget * parent )
 	mView = new HostServiceMatrix( mCentralWidget );
 	mCentralWidget->layout()->addWidget(mView);
 	mView->show();
-    mHostFilterEdit->installEventFilter(this);
-    mServiceFilterEdit->installEventFilter(this);
 	connect( mHostFilterEdit, SIGNAL( textChanged( const QString & ) ), mView, SLOT( setHostFilter( const QString & ) ) );
 	connect( mServiceFilterEdit, SIGNAL( textChanged( const QString & ) ), mView, SLOT( setServiceFilter( const QString & ) ) );
 	QMenu * fileMenu = menuBar()->addMenu( "&File" );
