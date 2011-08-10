@@ -357,29 +357,37 @@ void JobSettingsWidget::extractNotifyUsers()
         QStringList parts = j.notifyOnError().split(',');
         for( QStringList::Iterator it = parts.begin(); it != parts.end(); ++it)
         {
-            QString methods = it->split(':')[1];
-            User user = User::recordByUserName(it->split(':')[0]);
-            if( methods.contains("e") )
-                if( !emailErrorList.contains(user) )
-                    emailErrorList.append(user);
+            QStringList userNotifyParts = it->split(':');
+            if( userNotifyParts.size() == 2 )
+            {
+                QString methods = userNotifyParts[1];
+                User user = User::recordByUserName(userNotifyParts[0]);
+                if( methods.contains("e") )
+                    if( !emailErrorList.contains(user) )
+                        emailErrorList.append(user);
 
-            if( methods.contains("j") )
-                if( !jabberErrorList.contains(user) )
-                    jabberErrorList.append(user);
+                if( methods.contains("j") )
+                    if( !jabberErrorList.contains(user) )
+                        jabberErrorList.append(user);
+            }
         }
 
         parts = j.notifyOnComplete().split(',');
         for( QStringList::Iterator it = parts.begin(); it != parts.end(); ++it)
         {
-            QString methods = it->split(':')[1];
-            User user = User::recordByUserName(it->split(':')[0]);
-            if( methods.contains("e") )
-                if( !emailCompleteList.contains(user) )
-                    emailCompleteList.append(user);
+            QStringList userNotifyParts = it->split(':');
+            if( userNotifyParts.size() == 2 )
+            {
+                QString methods = userNotifyParts[1];
+                User user = User::recordByUserName(userNotifyParts[0]);
+                if( methods.contains("e") )
+                    if( !emailCompleteList.contains(user) )
+                        emailCompleteList.append(user);
 
-            if( methods.contains("j") )
-                if( !jabberCompleteList.contains(user) )
-                    jabberCompleteList.append(user);
+                if( methods.contains("j") )
+                    if( !jabberCompleteList.contains(user) )
+                        jabberCompleteList.append(user);
+            }
         }
     }
 }
