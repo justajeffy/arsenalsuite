@@ -266,7 +266,7 @@ void Slave::startup()
 
     // Create a timer for logged in user checks
     mUserTimer = new QTimer( this );
-    connect( mUserTimer, SIGNAL( timeout() ), SLOT( updateLoggedusers() ) );
+    connect( mUserTimer, SIGNAL( timeout() ), SLOT( updateLoggedUsers() ) );
 
     // Set it to trigger every 5 mins
     mUserTimer->start(300000);
@@ -1225,6 +1225,7 @@ AccountingInfo Slave::parseTaskLoggerOutput( const QString & line )
 
 void Slave::updateLoggedUsers()
 {
+    LOG_5("Checking if user is logged in");
     QStringList users = getLoggedInUsers();
 
     for (QStringList::Iterator it = users.begin(); it != users.end(); ++it) {
@@ -1232,11 +1233,13 @@ void Slave::updateLoggedUsers()
         if (user.isRecord()) {
             if (user == mHost.user()){
                 mHost.setUserIsLoggedIn(true);
+                mHost.commit();
                 return;
             }
         }
     }
 
     mHost.setUserIsLoggedIn(false);
+    mHost.commit();
 }
 

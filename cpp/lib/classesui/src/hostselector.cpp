@@ -144,7 +144,7 @@ void HostItem::setup( const Record & r, const QModelIndex &, bool loadJob ) {
 	co = HostColors ? HostColors->getColorOption(status.slaveStatus()) : 0;
 	services = QString();
     if( host.userIsLoggedIn())
-        icon = QPixmap("images/wrangled.png");
+        icon = QPixmap("images/loggedin.png");
 	if( loadJob )
 		_jobName = jobName();
 }

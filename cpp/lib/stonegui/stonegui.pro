@@ -113,7 +113,7 @@ win32 {
 macx{
 	INCLUDEPATH += /Developer/SDKs/MacOSX10.5.sdk/usr/X11R6/include/
 	QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
-	LIBS+=-L../stone -lstone
+	LIBS+=-L../stone -lstone 
 }
 
 # FFmpeg support
@@ -142,7 +142,7 @@ contains( DEFINES, USE_PHONON ) {
 unix:DEFINES+=USE_GRAPHVIZ
 contains( DEFINES, USE_GRAPHVIZ ) {
     INCLUDEPATH += /usr/include
-    LIBS+=-lgraph
+    LIBS+=-lgraph -lgvc
 }
 
 DEFINES+=STONEGUI_MAKE_DLL
