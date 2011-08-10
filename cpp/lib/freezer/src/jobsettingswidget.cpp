@@ -18,6 +18,7 @@
 #include "jobsettingswidgetplugin.h"
 #include "jobenvironment.h"
 #include "jobenvironmentwindow.h"
+#include "usernotifydialog.h"
 
 JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 : QWidget( parent )
@@ -39,10 +40,16 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 
 	connect( mPacketSizeSpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
 	connect( mSlotsSpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
-	connect( mEmailErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
-	connect( mEmailCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
-	connect( mJabberErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
-	connect( mJabberCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+
+	//connect( mEmailErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+	//connect( mEmailCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+    connect( mEmailErrorListButton, SIGNAL( clicked() ), SLOT( showEmailErrorListWindow() ) );
+    connect( mJabberErrorListButton, SIGNAL( clicked() ), SLOT( showJabberErrorListWindow() ) );
+    //connect( mJabberErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+	//connect( mJabberCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+    connect( mEmailCompleteListButton, SIGNAL( clicked() ), SLOT( showEmailCompleteListWindow() ) );
+    connect( mJabberCompleteListButton, SIGNAL( clicked() ), SLOT( showJabberCompleteListWindow() ) );
+
 	connect( mUseAutoCheck, SIGNAL( stateChanged(int) ), SLOT( setAutoPacketSize(int) ) );
 	connect( mAllHostsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
 	connect( mHostListButton, SIGNAL( clicked() ), SLOT( showHostSelector() ) );
@@ -74,6 +81,9 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 		mApplyInstantSettings->hide();
 		mResetInstantSettings->hide();
 	}
+
+    // Store the user list once
+    mMainUserList = Employee::select();
 }
 
 JobSettingsWidget::~JobSettingsWidget()
@@ -258,6 +268,7 @@ void JobSettingsWidget::resetSettings()
 	} else
 		mPacketCombo->setCurrentIndex( -1 );
 
+   /*
 	QList<bool> errorEmail, errorJabber, completeEmail, completeJabber;
 	foreach( Job j, mSelectedJobs ) {
 		bool ee, ej, ce, cj;
@@ -273,6 +284,9 @@ void JobSettingsWidget::resetSettings()
 	checkBoxApplyMultiple( mEmailErrorsCheck, errorEmail );
 	checkBoxApplyMultiple( mJabberCompleteCheck, completeJabber );
 	checkBoxApplyMultiple( mEmailCompleteCheck, completeEmail );
+
+    */
+    extractNotifyUsers();
 
 	QStringList hostLists = mSelectedJobs.hostLists();
 	QList<bool> emptyLists;
@@ -330,6 +344,72 @@ QString updateOwnerNotifyString( const QString & original, User u, Qt::CheckStat
 	return ret.isEmpty() ? QString::null : ret;
 }
 
+void JobSettingsWidget::extractNotifyUsers()
+{
+    emailErrorList.clear();
+    jabberErrorList.clear();
+
+    emailCompleteList.clear();
+    jabberCompleteList.clear();
+
+    foreach( Job j, mSelectedJobs )
+    {
+        QStringList parts = j.notifyOnError().split(',');
+        for( QStringList::Iterator it = parts.begin(); it != parts.end(); ++it)
+        {
+            QString methods = it->split(':')[1];
+            User user = User::recordByUserName(it->split(':')[0]);
+            if( methods.contains("e") )
+                if( !emailErrorList.contains(user) )
+                    emailErrorList.append(user);
+
+            if( methods.contains("j") )
+                if( !jabberErrorList.contains(user) )
+                    jabberErrorList.append(user);
+        }
+
+        parts = j.notifyOnComplete().split(',');
+        for( QStringList::Iterator it = parts.begin(); it != parts.end(); ++it)
+        {
+            QString methods = it->split(':')[1];
+            User user = User::recordByUserName(it->split(':')[0]);
+            if( methods.contains("e") )
+                if( !emailCompleteList.contains(user) )
+                    emailCompleteList.append(user);
+
+            if( methods.contains("j") )
+                if( !jabberCompleteList.contains(user) )
+                    jabberCompleteList.append(user);
+        }
+    }
+}
+
+QString JobSettingsWidget::buildNotifyString( UserList emailList, UserList jabberList )
+{
+    QString notifyString;
+    QStringList parts;
+
+    for( UserIter user = emailList.begin(); user != emailList.end(); ++user )
+    {
+        parts += (*user).name() + ":e";
+    }
+
+    for( UserIter user = jabberList.begin(); user != jabberList.end(); ++user)
+    {
+        if( parts.contains((*user).name() + ":e"))
+        {
+            int index = parts.indexOf((*user).name() + ":e");
+            parts[index] += "j";
+        }
+        else
+            parts += (*user).name() + ":j";
+    }
+
+    notifyString = parts.join(",");
+
+    return notifyString;
+}
+
 void JobSettingsWidget::setAutoPacketSize(int checkState)
 {
 	Qt::CheckState cs = (Qt::CheckState)checkState;
@@ -385,9 +465,15 @@ void JobSettingsWidget::applySettings()
 	if( mAllHostsCheck->checkState() != Qt::PartiallyChecked && !mUpdatedHostList.isEmpty() )
 		mSelectedJobs.setHostLists( mAllHostsCheck->checkState() == Qt::Checked ? "" : mUpdatedHostList );
 
+    // Build the user strings
+    QString notifyOnErrorString = buildNotifyString(emailErrorList, jabberErrorList);
+    QString notifyOnCompleteString = buildNotifyString(emailCompleteList, jabberCompleteList);
+
 	foreach( Job j, mSelectedJobs ) {
-		j.setNotifyOnError( updateOwnerNotifyString( j.notifyOnError(), j.user(), mJabberErrorsCheck->checkState(), mEmailErrorsCheck->checkState() ) );
-		j.setNotifyOnComplete( updateOwnerNotifyString( j.notifyOnComplete(), j.user(), mJabberCompleteCheck->checkState(), mEmailCompleteCheck->checkState() ) );
+        //j.setNotifyOnError( updateOwnerNotifyString( j.notifyOnError(), j.user(), mJabberErrorsCheck->checkState(), mEmailErrorsCheck->checkState() ) );
+        j.setNotifyOnError( notifyOnErrorString );
+		//j.setNotifyOnComplete( updateOwnerNotifyString( j.notifyOnComplete(), j.user(), mJabberCompleteCheck->checkState(), mEmailCompleteCheck->checkState() ) );
+        j.setNotifyOnComplete( notifyOnCompleteString );
 		mSelectedJobs.update(j);
 	}
 
@@ -441,6 +527,50 @@ void JobSettingsWidget::showEnvironmentWindow()
     jew.setEnvironment( mSelectedJobs[0].environment().environment() );
     if( jew.exec() == QDialog::Accepted ) {
         mUpdatedEnvironment = jew.environment();
+        settingsChange();
+    }
+}
+
+void JobSettingsWidget::showEmailErrorListWindow()
+{
+    UserNotifyDialog und(this);
+    und.setMainUserList(mMainUserList);
+    und.setUsers(emailErrorList);
+    if( und.exec() == QDialog::Accepted ) {
+        emailErrorList = und.userList();
+        settingsChange();
+    }
+}
+
+void JobSettingsWidget::showJabberErrorListWindow()
+{
+    UserNotifyDialog und(this);
+    und.setMainUserList(mMainUserList);
+    und.setUsers(jabberErrorList);
+    if( und.exec() == QDialog::Accepted ) {
+        jabberErrorList = und.userList();
+        settingsChange();
+    }
+}
+
+void JobSettingsWidget::showEmailCompleteListWindow()
+{
+    UserNotifyDialog und(this);
+    und.setMainUserList(mMainUserList);
+    und.setUsers(emailCompleteList);
+    if( und.exec() == QDialog::Accepted ) {
+        emailCompleteList = und.userList();
+        settingsChange();
+    }
+}
+
+void JobSettingsWidget::showJabberCompleteListWindow()
+{
+    UserNotifyDialog und(this);
+    und.setMainUserList(mMainUserList);
+    und.setUsers(jabberCompleteList);
+    if( und.exec() == QDialog::Accepted ) {
+        jabberCompleteList = und.userList();
         settingsChange();
     }
 }
