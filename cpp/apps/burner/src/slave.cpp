@@ -1230,7 +1230,7 @@ void Slave::updateLoggedUsers()
     for (QStringList::Iterator it = users.begin(); it != users.end(); ++it) {
         User user = User::recordByUserName((*it));
         if (user.isRecord()) {
-            if (user.host() == mHost){
+            if (user == mHost.user()){
                 mHost.setUserIsLoggedIn(true);
                 return;
             }
