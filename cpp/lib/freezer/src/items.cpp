@@ -550,12 +550,7 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
     if( !jobStatus.isRecord() ) {
         jobStatus = JobStatus::recordByJob(job);
         userName = job.user().name();
-        project = job.project().name();
         type = job.jobType().name();
-        icon = ((JobModel*)idx.model())->jobTypeIcon(job.jobType());
-        if( job.wrangler().isRecord() ) {
-            icon = QPixmap("images/wrangled.png");
-        }
     }
 
 	healthIsNull = jobStatus.getValue( "health" ).isNull();
@@ -580,6 +575,12 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
     bytesRead = memoryString( jobStatus.bytesRead()/1024 );
     diskOps = QString::number( jobStatus.opsWrite() + jobStatus.opsRead() );
     efficiency.sprintf("%3.2f %", jobStatus.efficiency()*100.00);
+
+    project = job.project().name();
+    icon = ((JobModel*)idx.model())->jobTypeIcon(job.jobType());
+    if( job.wrangler().isRecord() ) {
+        icon = QPixmap("images/wrangled.png");
+    }
 }
 
 QVariant JobItem::modelData( const QModelIndex & i, int role ) const
