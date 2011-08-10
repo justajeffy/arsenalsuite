@@ -93,7 +93,7 @@ DEPENDPATH+=src include
 DEFINES+=STONE_MAKE_DLL
 
 win32 {
-	LIBS+=-lPsapi -lMpr -ladvapi32 -lshell32 -luser32 -lpdh -lUserenv
+	LIBS+=-lPsapi -lMpr -ladvapi32 -lshell32 -luser32 -lpdh -lUserenv -lnetapi32
 	LIBS+=-Lc:\IntelLib
 	PY_PATH=$$system("python -c \"from distutils.sysconfig import get_config_vars; print get_config_vars()['prefix']\"")
 	INCLUDEPATH+=$$system("python -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")

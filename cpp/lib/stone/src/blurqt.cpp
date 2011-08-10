@@ -30,6 +30,8 @@
 #ifdef Q_OS_WIN
 #include "windows.h"
 #include "shellapi.h"
+#include "lm.h"
+#include "lmerr.h"
 #endif
 
 #include "pyembed.h"
@@ -279,9 +281,37 @@ QString getUserName()
 
 QStringList getLoggedInUsers()
 {
-    QStringList outut;
+    LPWKSTA_USER_INFO_0 pBuff = NULL;
+    LPWKSTA_USER_INFO_0 pTmpBuf;
+    NET_API_STATUS nStatus;
 
-    return output;
+    DWORD dwEntriesRead = 0;
+    DWORD dwTotalEntries = 0;
+
+    nStatus = NetWkstaUserEnum(NULL, 0, (LPBYTE*)&pBuff, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, NULL);
+
+    QStringList users;
+
+    if ((nStatus == 0) || (nStatus == ERROR_MORE_DATA))
+    {
+        if ((pTmpBuf = pBuf) != NULL)
+        {
+            for (DWORD i = 0; i < dwEntriesRead; ++i)
+            {
+                if (pTmpBuf == NULL)
+                {
+                    // Spit out an error
+                    LOG_1("Error occurred when attempting to retrived logged in user list");
+                    break;
+                }
+
+                users.append(QString::fromWCharArray(pTmpBuf->wkui0_username));
+                ++pTmpBuff;
+            }
+        }
+    }
+
+    return users;
 }
 
 #else
