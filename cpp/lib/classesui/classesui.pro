@@ -61,6 +61,7 @@ SOURCES += \
 	src/userdialog.cpp \
 	src/userroledialog.cpp \
 	src/usertaskdialog.cpp \
+    src/usernotifydialog.cpp \
 	src/versiontrackerdialog.cpp
 
 HEADERS += \
@@ -119,6 +120,7 @@ HEADERS += \
 	include/userdialog.h \
 	include/usertaskdialog.h \
 	include/userroledialog.h \
+    include/usernotifydialog.h \
 	include/versiontrackerdialog.h
 
 FORMS += \
@@ -160,6 +162,7 @@ FORMS += \
 	ui/usertaskui.ui \
 	ui/userroleui.ui \
 	ui/userdialogui.ui \
+    ui/usernotifyui.ui \
 	ui/versiontrackerdialogui.ui
 
 INCLUDEPATH+=src include .out ../stone/include ../stone/.out

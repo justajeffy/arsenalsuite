@@ -194,16 +194,16 @@
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="mEmailErrorsCheck">
+                <widget class="QPushButton" name="mEmailErrorListButton">
                  <property name="text">
-                  <string>Errors</string>
+                  <string>Error</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="mEmailCompleteCheck">
+                <widget class="QPushButton" name="mEmailCompleteListButton">
                  <property name="text">
-                  <string>Completion</string>
+                  <string>Complete</string>
                  </property>
                 </widget>
                </item>
@@ -225,16 +225,16 @@
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="mJabberErrorsCheck">
+                <widget class="QPushButton" name="mJabberErrorListButton">
                  <property name="text">
-                  <string>Errors</string>
+                  <string>Error</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="mJabberCompleteCheck">
+                <widget class="QPushButton" name="mJabberCompleteListButton">
                  <property name="text">
-                  <string>Completion</string>
+                  <string>Complete</string>
                  </property>
                 </widget>
                </item>

@@ -12,6 +12,8 @@
 
 #include "jobtype.h"
 #include "job.h"
+#include "user.h"
+#include "employee.h"
 
 #include "afcommon.h"
 
@@ -56,6 +58,12 @@ public slots:
 	void showHostSelector();
 	void showEnvironmentWindow();
 
+    void showEmailErrorListWindow();
+    void showJabberErrorListWindow();
+
+    void showEmailCompleteListWindow();
+    void showJabberCompleteListWindow();
+
     void buildServiceTree();
     void saveServiceTree();
 
@@ -65,6 +73,8 @@ signals:
 protected:
 
 	void updateCustomJobSettingsWidget();
+    QString buildNotifyString(UserList emailList, UserList jabberList);
+    void extractNotifyUsers();
 
 	Mode mMode;
 	bool mChanges;
@@ -76,6 +86,14 @@ protected:
 	JobList mSelectedJobs;
 	RecordProxy * mSelectedJobsProxy;
 	QMap<QString, CustomJobSettingsWidget*> mCustomJobSettingsWidgetMap;
+
+    UserList jabberErrorList;
+    UserList emailErrorList;
+
+    UserList jabberCompleteList;
+    UserList emailCompleteList;
+
+    EmployeeList mMainUserList;
 };
 
 class FREEZER_EXPORT JobServiceBridge
