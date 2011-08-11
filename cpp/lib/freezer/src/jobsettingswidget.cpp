@@ -353,13 +353,16 @@ void JobSettingsWidget::extractNotifyUsers()
             {
                 QString methods = userNotifyParts[1];
                 User user = User::recordByUserName(userNotifyParts[0]);
-                if( methods.contains("e") )
-                    if( !emailErrorList.contains(user) )
-                        emailErrorList.append(user);
+                if( user.isRecord() )
+                {
+                    if( methods.contains("e") )
+                        if( !emailErrorList.contains(user) )
+                            emailErrorList.append(user);
 
-                if( methods.contains("j") )
-                    if( !jabberErrorList.contains(user) )
-                        jabberErrorList.append(user);
+                    if( methods.contains("j") )
+                        if( !jabberErrorList.contains(user) )
+                            jabberErrorList.append(user);
+                }
             }
         }
 
@@ -371,13 +374,16 @@ void JobSettingsWidget::extractNotifyUsers()
             {
                 QString methods = userNotifyParts[1];
                 User user = User::recordByUserName(userNotifyParts[0]);
-                if( methods.contains("e") )
-                    if( !emailCompleteList.contains(user) )
-                        emailCompleteList.append(user);
+                if( user.isRecord() )
+                {
+                    if( methods.contains("e") )
+                        if( !emailCompleteList.contains(user) )
+                            emailCompleteList.append(user);
 
-                if( methods.contains("j") )
-                    if( !jabberCompleteList.contains(user) )
-                        jabberCompleteList.append(user);
+                    if( methods.contains("j") )
+                        if( !jabberCompleteList.contains(user) )
+                            jabberCompleteList.append(user);
+                }
             }
         }
     }
