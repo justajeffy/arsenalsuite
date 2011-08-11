@@ -39,6 +39,10 @@
 #include "joblistwidget.h"
 #include "mainwindow.h"
 
+#include "user.h"
+#include "group.h"
+#include "usergroup.h"
+
 static FreezerMenuFactory * sMenuFactory = 0;
 
 FreezerMenuFactory * FreezerMenuFactory::instance()
@@ -373,6 +377,9 @@ void FreezerJobMenu::slotAboutToShow()
 
 	addAction("Set Job(s) Priority...", mJobList, SLOT(setJobPriority()) );
 	addAction( mJobList->ClearErrorsAction );
+    if( !User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) ) {
+        mJobList->ClearErrorsAction->setEnabled( false );
+    }
 
 	bool allDeps = !jobs.isEmpty();
 
@@ -960,6 +967,12 @@ void FreezerErrorMenu::slotAboutToShow()
 
 		mClearAll = addAction( "Clear All Errors" );
 		mClearAll->setEnabled( hasErrors );
+
+        if( !User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) ) {
+            mClearSelected->setEnabled( false );
+            mClearAll->setEnabled( false );
+        }
+
 		addSeparator();
 	}
 
