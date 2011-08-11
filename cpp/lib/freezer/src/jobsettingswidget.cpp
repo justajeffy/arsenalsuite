@@ -11,6 +11,8 @@
 #include "jobhistorytype.h"
 #include "jobservice.h"
 #include "user.h"
+#include "usergroup.h"
+#include "group.h"
 
 #include "hostselector.h"
 
@@ -268,24 +270,6 @@ void JobSettingsWidget::resetSettings()
 	} else
 		mPacketCombo->setCurrentIndex( -1 );
 
-   /*
-	QList<bool> errorEmail, errorJabber, completeEmail, completeJabber;
-	foreach( Job j, mSelectedJobs ) {
-		bool ee, ej, ce, cj;
-		getOwnerNotifyMethods( j.notifyOnError(), j.user(), ej, ee );
-		getOwnerNotifyMethods( j.notifyOnComplete(), j.user(), cj, ce );
-		errorEmail += ee;
-		errorJabber += ej;
-		completeEmail += ce;
-		completeJabber += cj;
-	}
-
-	checkBoxApplyMultiple( mJabberErrorsCheck, errorJabber );
-	checkBoxApplyMultiple( mEmailErrorsCheck, errorEmail );
-	checkBoxApplyMultiple( mJabberCompleteCheck, completeJabber );
-	checkBoxApplyMultiple( mEmailCompleteCheck, completeEmail );
-
-    */
     extractNotifyUsers();
 
 	QStringList hostLists = mSelectedJobs.hostLists();
@@ -306,6 +290,13 @@ void JobSettingsWidget::resetSettings()
 
 	mApplyInstantSettings->setEnabled(false);
 	mResetInstantSettings->setEnabled(false);
+
+    if( User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) ) {
+        mSlotsSpin->setEnabled(false);
+        mMinMemorySpin->setEnabled(false);
+        mMaxMemorySpin->setEnabled(false);
+        mMaxErrorsSpin->setEnabled(false);
+    }
 
 	mIgnoreChanges = false;
 }
