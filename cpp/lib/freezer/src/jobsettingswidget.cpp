@@ -291,7 +291,7 @@ void JobSettingsWidget::resetSettings()
 	mApplyInstantSettings->setEnabled(false);
 	mResetInstantSettings->setEnabled(false);
 
-    if( User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) ) {
+    if( !User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) ) {
         mSlotsSpin->setEnabled(false);
         mMinMemorySpin->setEnabled(false);
         mMaxMemorySpin->setEnabled(false);
