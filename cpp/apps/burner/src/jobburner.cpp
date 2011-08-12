@@ -614,17 +614,14 @@ void JobBurner::updateOutput()
 void JobBurner::checkMemory()
 {
 	if( mCmd ) {
-		LOG_5( "Checking memory for pid: " + QString::number(mCmdPid) );
+		//LOG_5( "Checking memory for pid: " + QString::number(mCmdPid) );
 		ProcessMemInfo pmi = processMemoryInfo( mCmdPid, /*recursive=*/ true );
 		uint mem = 0, maxMem = 0;
-		if( pmi.caps & ProcessMemInfo::MaxSize )
-			maxMem = pmi.maxSize;
 		if( pmi.caps & ProcessMemInfo::CurrentSize )
 			mem = pmi.currentSize;
-		maxMem = qMax(maxMem,mem);
-		maxMem = qMax(maxMem,mJobAssignment.maxMemory());
+		maxMem = qMax(mem,mJobAssignment.maxMemory());
 
-		LOG_3("process is using memory: "+QString::number(maxMem) + "Kb");
+		LOG_3("process "+QString::number(mCmdPid)+" is using memory: "+QString::number(maxMem) + "Kb");
 		mJobAssignment.setMaxMemory(maxMem);
 		if( !mCurrentTaskAssignments.isEmpty() ) {
 			mCurrentTaskAssignments.setMemories(mem);
