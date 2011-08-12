@@ -77,53 +77,6 @@ service = Service.ensureServiceExists('AB_manager')
 hostService = service.byHost(Host.currentHost(),True)
 hostService.enableUnique()
 
-# given a number of tasks and a stripe, how many tasks are in that subset
-# ie: a 92 frame render on 10s, how many is that?  10 as it turns out
-def calculateNumTasksForPartialRender( totalTasks, stripe ):
-    return (totalTasks + stripe - 1) / stripe
-
-# manages host sorting so that we pick best match first
-class HostSorter:
-    def __init__(self):
-        self.hostStatus = None
-        self.n_desired_slots = 0
-        self.n_unused_slots = 0
-    #         exactly the right number of slots is better than anything else, then comes too many slots, then comes too little slots
-    #         in the case of a tie from the above rule, then sort by available memory
-    def __cmp__( self, other ):
-        # favour exact # of slots match (accounts for 4 of 9 cases)
-        if(self.n_desired_slots == self.n_unused_slots and other.n_desired_slots != other.n_unused_slots):
-            return -1
-        if(self.n_desired_slots != self.n_unused_slots and other.n_desired_slots == other.n_unused_slots):
-            return 1
-        # favour too many over too few (accounts for 2 of 9 cases)
-        if(self.n_desired_slots < self.n_unused_slots and other.n_desired_slots > other.n_unused_slots):
-            return -1
-        if(self.n_desired_slots > self.n_unused_slots and other.n_desired_slots < other.n_unused_slots):
-            return 1
-        # if both are below, pick the one that is closest to the target (accounts for 1 case)
-        if(self.n_desired_slots < self.n_unused_slots and other.n_desired_slots < other.n_unused_slots):
-            if(self.n_unused_slots - self.n_desired_slots < other.n_unused_slots - other.n_desired_slots):
-                return -1
-            if(other.n_unused_slots - other.n_desired_slots < self.n_unused_slots - self.n_desired_slots):
-                return 1
-            # must be equally far below
-        # if both are above, pick the one that is closest to the target (accounts for 1 case)
-        if(self.n_desired_slots > self.n_unused_slots and other.n_desired_slots > other.n_unused_slots):
-            if(self.n_desired_slots - self.n_unused_slots < other.n_desired_slots - other.n_unused_slots):
-                return -1
-            if(other.n_desired_slots - other.n_unused_slots < self.n_desired_slots - self.n_unused_slots):
-                return 1
-            # must be equally far above
-        # the remaining case of 9 is where they have they are equivalent to the target (or are equally not near the target)
-        # so now we memory sort
-        if(self.hostStatus.availableMemory() < other.hostStatus.availableMemory()):
-            return -1
-        if(self.hostStatus.availableMemory() > other.hostStatus.availableMemory()):
-            return 1
-        # totally equal
-        return 0
-
 # Stores/Updates Config vars needed for manager
 class ManagerConfig:
     def update(self):
@@ -191,19 +144,6 @@ if not hasattr(__builtins__,'sorted'):
         alist.sort()
         return alist
 
-# Wraps a single task within a job
-class TaskRec:
-    def __init__(self):
-        self.jobtask = 0
-        self.status = 'new'
-        self.duration = 0
-        self.memory_in_bytes = 0
-    def interpolate(self, before, after):
-        frac = float(self.jobtask - before.jobtask) / float(after.jobtask - before.jobtask)
-        self.duration        = int(before.duration        * (1.0 - frac) + after.duration        * frac)
-        self.memory_in_bytes = int(before.memory_in_bytes * (1.0 - frac) + after.memory_in_bytes * frac)
-
-
 # Wraps a single job that needs tasks assigned
 class JobAssign:
     def __init__( self, job ):
@@ -217,7 +157,6 @@ class JobAssign:
         self.servicesRequired = ServiceList()
         self.preassignedHosts = None
         self.logString = ''
-        self.tasks_data = None
 
     def loadHosts( self ):
         if self._hostOk == None:
@@ -269,25 +208,6 @@ class JobAssign:
         else:
             memoryRequired = self.JobStatus.averageMemory()
 
-        # try to adjust the memory required down
-        max_mem_so_far_in_bytes = 0
-        if(self.Job.packetSize() == 1 and self.JobStatus.tasksDone() >= calculateNumTasksForPartialRender(self.JobStatus.tasksCount(), 10)):
-            task_detail = self.retrieveTasksData()
-            for t in task_detail:
-                if(t.memory_in_bytes > max_mem_so_far_in_bytes):
-                    max_mem_so_far_in_bytes = t.memory_in_bytes
-        # if there was a max then bump it by a Gb
-        if(max_mem_so_far_in_bytes > 0):
-            max_mem_so_far_in_bytes += 1024 * 1024 * 1024
-        # and now refine memoryRequired and just check that against host resources
-        if(max_mem_so_far_in_bytes > 0):
-            if max_mem_so_far_in_bytes / 1024 < (hostStatus.availableMemory() * 1000):
-                if memoryRequired > (hostStatus.availableMemory() * 1000):
-                    if VERBOSE_DEBUG: Log( 'AVOIDED Not enough memory %i measured max required, %i required, %i available on %s' % (max_mem_so_far_in_bytes/1024, memoryRequired, hostStatus.availableMemory() * 1000, hostStatus.host().name()) )
-            	if self.Job.maxMemory() > (hostStatus.host().memory()*1024):
-                    if VERBOSE_DEBUG: Log( 'AVOIDED Not enough memory %i measured max required, %i maximum, %i physical on %s' % (max_mem_so_far_in_bytes/1024, self.Job.maxMemory(), hostStatus.host().memory() * 1024, hostStatus.host().name()) )
-                return True
-
         if memoryRequired == 0:
             if VERBOSE_DEBUG: Log( 'Job has unknown memory requirements, not assigning.' )
             return False
@@ -301,7 +221,7 @@ class JobAssign:
             if VERBOSE_DEBUG: Log( 'Not enough memory, %i maximum, %i physical on %s' % (self.Job.maxMemory(), hostStatus.host().memory() * 1024, hostStatus.host().name()) )
             return False
 
-        # Only if workstation - to be safe for now
+        # Only if workstation - to be save for now
         #if hostStatus.host().name().startsWith("om"):
         #    if self.Job.maxMemory() > (hostStatus.availableMemory() * 1024):
         #        Log( 'Not enough memory on workstation.' )
@@ -313,21 +233,9 @@ class JobAssign:
     def hostOk( self, hostStatus, snapshot ):
         host = hostStatus.host()
 
-        n_unused_slots = FarmResourceSnapshot.hostsUnused.get(hostStatus, 0)
-        if n_unused_slots - self.Job.assignmentSlots() < 0:
-            auto_reduce_slots = False
-            # we've done a fair portion of the job, and it's average time is fairly quick, consider reducing slot count dynamically
-            # NB: we want average time of *done* items only and then should select only new packets with an estimated time that short
-            if(self.Job.packetSize() == 1 and self.JobStatus.tasksAverageTime() < 10*60*60 and self.JobStatus.tasksDone() >= calculateNumTasksForPartialRender(self.JobStatus.tasksCount(), 10)):
-                #Log('consider auto slot downgrade: ' + str(self.Job.key()) + "\t" + str(self.JobStatus.tasksAverageTime()) + "\t" + str(n_unused_slots) + "\t" + str(self.Job.assignmentSlots()))
-                # only do downgrade by 1/2 or better
-                if n_unused_slots >= self.Job.assignmentSlots() / 2:
-                    #Log( 'job will use %i instead of %i slots %i' % (n_unused_slots, self.Job.assignmentSlots(), self.Job.key()))
-                    auto_reduce_slots = True
-            
-            if not auto_reduce_slots:
-                if VERBOSE_DEBUG: Log( 'Job requires more slots (%s) than host (%s) has available (%s)' % (self.Job.assignmentSlots(), host.name(), n_unused_slots - self.Job.assignmentSlots() ) )
-                return False
+        if FarmResourceSnapshot.hostsUnused.get(hostStatus, 0) - self.Job.assignmentSlots() < 0:
+            if VERBOSE_DEBUG: Log( 'Job requires more slots (%s) than host (%s) has available (%s)' % (self.Job.assignmentSlots(), host.name(), FarmResourceSnapshot.hostsUnused.get(hostStatus, 0) - self.Job.assignmentSlots() ) )
+            return False
 
         if hostStatus.activeAssignmentCount() > 0:
             # Check exclusive bit
@@ -432,28 +340,26 @@ class JobAssign:
         tensRunning = self.JobStatus.tasksDone() + self.JobStatus.tasksAssigned() + self.JobStatus.tasksBusy()
         # if we have some done then include the cancelled ones in this sum as the job is at least partially good
         # and therefore should not get stuck trying to reach the 10% mark
-        fifd = 9999999999
         if( self.JobStatus.tasksDone() > 0):
-            tensRunning += self.JobStatus.tasksCancelled() + self.JobStatus.tasksSuspended()
-        if( tensRunning >= calculateNumTasksForPartialRender(self.JobStatus.tasksCount(), 10) ):
+            tensRunning += self.JobStatus.tasksCancelled()
+        if( float(tensRunning) / float(self.JobStatus.tasksCount()) >= 0.1 ):
             hasTensRunning = 1
-        else:
-            fifd = self.Job.submittedts().toTime_t()
 
         hasTensComplete = 1
         tensComplete = self.JobStatus.tasksDone()
         # if we have some done then include the cancelled ones in this sum as the job is at least partially good
         # and therefore should not get stuck trying to reach the 10% mark
         if( self.JobStatus.tasksDone() > 0):
-            tensComplete += self.JobStatus.tasksCancelled() + self.JobStatus.tasksSuspended()
-        if( tensComplete >= calculateNumTasksForPartialRender(self.JobStatus.tasksCount(), 10) ):
+            tensComplete += self.JobStatus.tasksCancelled()
+        if( float(tensComplete) / float(self.JobStatus.tasksCount()) >= 0.1 ):
             hasTensComplete = 0
 
         # bone sez... within a particular shot, prefer slower passes first
         # ideally this would also include the time from jobs that this job blocks so
         # that we favour doing stuff deep in the chain
         shotAvgTime = 999999 - self.JobStatus.tasksAverageTime()
-        sortKey = '%02d-%03d-%02d-%01d-%10d-%01d-%08d-%06d' % ( urgent, reserve_used, important, hasTensRunning, fifd, hasTensComplete, avgTime, shotAvgTime )
+
+        sortKey = '%02d-%03d-%02d-%01d-%01d-%08d-%06d' % ( urgent, reserve_used, important, hasTensRunning, hasTensComplete, avgTime, shotAvgTime )
         self.sortKey = sortKey
         return sortKey
 
@@ -513,72 +419,6 @@ class JobAssign:
         #return JobTask.select("keyjobtask IN (SELECT * FROM get_iterative_tasks(%i,%i,%i))" % (self.Job.key(),limit,stripe))
         return JobTask.select("keyjobtask IN (SELECT * FROM get_iterative_tasks_2(%i,%i,%i,%s))" % (self.Job.key(),limit,stripe,strictOnTens))
 
-    # NB: you only keep done/busy entries from here
-    def retrieveTasksData(self):
-
-        # don't fetch this over and over within a single scheduling interval
-        # just a snapshot will do for the estimates we wish to compute
-        if self.tasks_data != None:
-            return self.tasks_data
-
-        q = Database.current().exec_('select jobtask, status, started, ended, memory from jobtask join jobtaskassignment on fkeyjobtaskassignment=keyjobtaskassignment where fkeyjob=%i order by jobtask' % self.Job.key())
-        self.tasks_data = []
-        now = QDateTime.currentDateTime().toTime_t()
-        while q.next():
-            t = TaskRec()
-            t.jobtask  = q.value(0).toInt()[0]
-            t.status   = q.value(1).toString()
-            start_date = q.value(2).toDateTime().toTime_t()
-            end_date   = q.value(3).toDateTime().toTime_t()
-            t.memory_in_bytes = q.value(4).toInt()[0] * 1024    # convert kb in table into bytes
-            if(t.memory_in_bytes == 0):  # account for occasional job that uses no memory
-                t.memory_in_bytes = self.Job.minMemory() * 1024 # job memory is in Kb, as 0 is reported, assume no worse than min
-            if(t.status == 'done'):
-                t.duration = end_date - start_date
-                self.tasks_data.append(t)
-            if(t.status == 'busy'):
-                t.duration = now - start_date
-                self.tasks_data.append(t)
-
-        # second pass, if the busy entries have values less than the interpolated values from the done ones
-        # then bump up the busy ones to the estimate
-        for busy_t in self.tasks_data:
-            if(busy_t.status == 'busy'):
-                # find a 'done' frame both before and after the candidate frame
-                prev_done = None
-                next_done = None
-                for t in self.tasks_data:
-                    if(t.status != 'done'): # we only consider done during this kind of prev/next processing
-                        continue
-                    if(t.jobtask < busy_t.jobtask):
-                        prev_done = t
-                    if(next_done == None and t.jobtask > busy_t.jobtask):
-                        next_done = t
-                        break   # by now we have found any prev and won't be improving on next
-                    if(prev_done == None):
-                        if(next_done != None):
-                            if(busy_t.memory_in_bytes < next_done.memory_in_bytes):
-                                busy_t.memory_in_bytes = next_done.memory_in_bytes
-                            if(busy_t.duration < next_done.duration):
-                                busy_t.duration = next_done.duration
-                    else:
-                        if(next_done == None):
-                            if(busy_t.memory_in_bytes < prev_done.memory_in_bytes):
-                                busy_t.memory_in_bytes = prev_done.memory_in_bytes
-                            if(busy_t.duration < prev_done.duration):
-                                busy_t.duration = prev_done.duration
-                        else:
-                            proposed = TaskRec()
-                            proposed.jobtask = busy_t.jobtask
-                            proposed.status = busy_t.status
-                            proposed.interpolate(prev_done, next_done)
-                            if(busy_t.memory_in_bytes < proposed.memory_in_bytes):
-                                busy_t.memory_in_bytes = proposed.memory_in_bytes
-                            if(busy_t.duration < proposed.duration):
-                                busy_t.duration = proposed.duration
-
-        return self.tasks_data
-
     def assignHostFunc( self, hostStatus, totalHosts, totalTasks ):
         q = Database.current().exec_('SELECT * FROM assign_single_host_2(%s,%s,%s)' % (self.Job.key(), hostStatus.host().key(), self.Job.packetSize()))
         tasks = []
@@ -592,9 +432,6 @@ class JobAssign:
     def assignHost( self, hostStatus, totalHosts, totalTasks ):
         tasks = None
         packetSize = self.Job.packetSize()
-        n_slots_to_use = self.Job.assignmentSlots()
-
-        estimated_task = None
 
         self.logString = ' PT: '
         if self.Job.prioritizeOuterTasks() and not self.Job.outerTasksAssigned():
@@ -614,120 +451,16 @@ class JobAssign:
                 tasks = self.retrieveContinuousTasks(limit=packetSize)
             elif packetType == 'iterative':
                 strictOnTens = 'true'
-                tensRunning = self.JobStatus.tasksDone() + self.JobStatus.tasksAssigned() + self.JobStatus.tasksBusy() + self.JobStatus.tasksCancelled() + self.JobStatus.tasksSuspended()
-                if( tensRunning >= calculateNumTasksForPartialRender(self.JobStatus.tasksCount(), 10) ):
+                # shouldn't this also include tasksSuspended()?
+                tensRunning = self.JobStatus.tasksDone() + self.JobStatus.tasksAssigned() + self.JobStatus.tasksBusy() + self.JobStatus.tasksCancelled()
+                if( float(tensRunning) / float(self.JobStatus.tasksCount()) >= 0.1 ):
                     strictOnTens = 'false'
-
                 tasks = self.retrieveIterativeTasks(limit=packetSize,stripe=10,strictOnTens=strictOnTens)
-
-                # fiddle about... use interpolated estimates to choose a different packet
-                if(strictOnTens == 'false' and packetSize == 1 and tasks and len(tasks) == 1):
-
-                    # how many slots will we actually use (ie: if we selected a host with less slots it must be because it's fast and small)
-                    # if it's less than the normal amount then we restrict selection
-                    n_unused_slots = FarmResourceSnapshot.hostsUnused.get(hostStatus, 0)
-                    if(n_unused_slots < n_slots_to_use):
-                        n_slots_to_use = n_unused_slots
-
-                    task_detail = self.retrieveTasksData()
-                    tmp_tasks = self.Job.jobTasks()
-                    # note, tmp_tasks and task_detail might not have the same number of elements
-                    # this seems to happen when there are 'holding' tasks, in which case the task_detail is short
-                    avail_mem_on_host_in_bytes = hostStatus.availableMemory()*1024*1024
-                    # Log("TASK SIZES:  " + str(len(tmp_tasks)) + "\t" + str(len(task_detail)))
-                    # Log("HOST MEMORY: " + str(avail_mem_on_host_in_bytes))
-                    # Log( "CURRENT SEL: " + str(tasks[0].frameNumber()) + "\t" + tasks[0].status())
-                    # take a Gb off available to give interpolation a little wiggle room
-                    if(avail_mem_on_host_in_bytes < 1024 * 1024 * 1024):
-                        avail_mem_on_host_in_bytes = 0
-                    else:
-                        avail_mem_on_host_in_bytes -= 1024 * 1024 * 1024
-                    best_task = None
-                    n_reject_mem_0 = 0
-                    n_reject_mem = 0
-                    n_reject_time = 0
-                    n_no_proposed_best = 0
-                    n_new_avail = 0
-
-                    for tt in tmp_tasks:
-                        if(tt.status() == 'new'):
-                            n_new_avail += 1
-                            # find a 'done' frame both before and after the candidate frame
-                            prev_done = None
-                            next_done = None
-                            for t in task_detail:
-                                if(t.jobtask < tt.frameNumber()):
-                                    prev_done = t
-                                if(next_done == None and t.jobtask > tt.frameNumber()):
-                                    next_done = t
-                                    break   # by now we have found any prev and won't be improving on next
-                            proposed_best = None
-                            if(prev_done == None):
-                                if(next_done == None):
-                                    proposed_best = None   # still can't refine, none prev nor next
-                                else:
-                                    proposed_best = TaskRec() # assume it won't be any worse than the next done one (extrapolation is weak)
-                                    proposed_best.jobtask = tt.frameNumber()
-                                    proposed_best.status = tt.status()
-                                    proposed_best.memory_in_bytes = next_done.memory_in_bytes + 1024*1024*1024  # plus 1Gb for luck
-                                    proposed_best.duration = next_done.duration
-                            else:
-                                if(next_done == None):
-                                    proposed_best = TaskRec() # assume it won't be any worse than the previous done one (extrapolation is weak)
-                                    proposed_best.jobtask = tt.frameNumber()
-                                    proposed_best.status = tt.status()
-                                    proposed_best.memory_in_bytes = prev_done.memory_in_bytes + 1024*1024*1024  # plus 1Gb for luck
-                                    proposed_best.duration = prev_done.duration
-                                else:
-                                    proposed_best = TaskRec()
-                                    proposed_best.jobtask = tt.frameNumber()
-                                    proposed_best.status = tt.status()
-                                    proposed_best.interpolate(prev_done, next_done)
-                            # now see if this proposed task is a better fit than any yet encountered
-                            if(proposed_best != None):
-                                # only choose from packets that will fit into memory
-                                if(proposed_best.memory_in_bytes > 0 and proposed_best.memory_in_bytes < avail_mem_on_host_in_bytes):
-                                    # if there is a reduced number of slots on offer, only choose from packets that look like they'll be fairly quick
-                                    if(n_slots_to_use == self.Job.assignmentSlots() or proposed_best.duration < 10*60*60):
-                                        # ok, now take the slowest of the candidates identified so far
-                                        if(best_task == None or best_task.duration < proposed_best.duration):
-                                            best_task = proposed_best
-                                    else:
-                                        n_reject_time += 1
-                                else:
-                                    if(proposed_best.memory_in_bytes == 0):
-                                        n_reject_mem_0 += 1
-                                    else:
-                                        # print ("\tmem reject %i %i" % (proposed_best.memory_in_bytes, avail_mem_on_host_in_bytes))
-                                        n_reject_mem += 1
-                            else:
-                                n_no_proposed_best += 1
-
-                    # we chose a task, now modify the tasks collection
-                    if(best_task == None):
-                        #print ("No suggested task returned to assign: #memreject=%i/%i #timereject=%i #noproposedbest=%i #newavail=%i" % (n_reject_mem, n_reject_mem_0, n_reject_time, n_no_proposed_best, n_new_avail))
-                        return 0
-
-#                    if(n_slots_to_use != self.Job.assignmentSlots()):
-#                        Log( "SUGGESTED TASK: " + str(self.Job.key()) + ":" + str(best_task.jobtask) + " with " + str(n_slots_to_use) + " slots")
-
-                    for tt in tmp_tasks:
-                        if(tt.frameNumber() == best_task.jobtask):
-                            tasks.clear()
-                            tasks += tt
-                            estimated_task = best_task
-                            break
-
-                    if(estimated_task == None):
-                        # why would we not be able to find the task?
-                        Log( "FAILED TO FIND TASK: " + str(best_task.jobtask))
-                        return 0
-
             else: # sequential
                 tasks = self.retrieveSequentialTasks(limit=packetSize)
 
         if not tasks or tasks.isEmpty():
-            #print "No tasks returned to assign"
+            if VERBOSE_DEBUG: print "No tasks returned to assign"
             return 0
 
         jtal = JobTaskAssignmentList()
@@ -741,7 +474,6 @@ class JobAssign:
         ja.setJob( self.Job )
         ja.setJobAssignmentStatus( JobAssignmentStatus.recordByName( 'ready' ) )
         ja.setHost( hostStatus.host() )
-        ja.setAssignSlots( n_slots_to_use )
         ja.commit()
 
         jtal.setJobAssignments( ja )
@@ -749,18 +481,13 @@ class JobAssign:
 
         # deduct memory requirement from available so we don't over allocate the host
         if( hostStatus.host().os().startsWith("Linux") ):
-            min = 0
-            if( estimated_task != None ): min = estimated_task.memory_in_bytes/(1024*1024)
-            if( min == 0 ): min = max(self.Job.minMemory(), self.Job.jobStatus().averageMemory())
-
-            avail = hostStatus.availableMemory()*1024
-            #if( hostStatus.activeAssignmentCount() > 0 and hostStatus.availableMemory() <= 0 ):
-            if( avail - min <= 0 ):
+            min = self.Job.minMemory()
+            if( min == 0 ): min = self.Job.jobStatus().averageMemory()
+            hostStatus.setAvailableMemory( (hostStatus.availableMemory()*1024 - min) / 1024 )
+            if( hostStatus.activeAssignmentCount() > 0 and hostStatus.availableMemory() <= 0 ):
                 Database.current().rollbackTransaction();
                 print "Host %s does not have the memory required returning" % (hostStatus.host().name())
                 return 0
-            #hostStatus.setAvailableMemory( (hostStatus.availableMemory()*1024 - min) / 1024 )
-            hostStatus.setColumnLiteral("availablememory","availablememory - %s" % (min / 1024) )
             hostStatus.commit()
 
         tasks = JobTaskList()
@@ -1076,39 +803,6 @@ SELECT * from running_shots_averagetime_4
             else:
                 if VERBOSE_DEBUG: print "** hostOk is NOT ok!"
 
-        # BONE... sort the hosts from least available memory to most
-        # available memory, this will encourage takeup of hosts that
-        # have just enough ram and no more, thereby leaving room for
-        # others who need more
-        # TODO... actually sort with the following priority:
-        #         exactly the right number of slots is better than anything else, then comes too many slots, then comes too little slots
-        #         in the case of a tie from the above rule, then sort by available memory
-        tmp_ret = []
-        for h in ret:
-            hs = HostSorter()
-            hs.hostStatus = h
-            hs.n_desired_slots = jobAssign.Job.assignmentSlots()
-            hs.n_unused_slots = FarmResourceSnapshot.hostsUnused.get(h, 0)
-            tmp_ret.append(hs)
-        tmp_ret.sort()
-        ret = HostStatusList()
-        for h in tmp_ret:
-            ret += h.hostStatus
-
-        # ret = ret.sorted( "availablememory" )
-        if(False):  # validate that the sort went well
-            task_detail = jobAssign.retrieveTasksData()
-            mx_mem = 0
-            mn_mem = 1024 * 1024 * 1024 * 100
-            for t in task_detail:
-                if(t.memory_in_bytes > mx_mem): mx_mem = t.memory_in_bytes
-                if(t.memory_in_bytes < mn_mem): mn_mem = t.memory_in_bytes
-            mn_mem /= 1024 * 1024
-            mx_mem /= 1024 * 1024
-            print "HOSTS with ram in range %i %i for %i slots, job %i" % (mn_mem, mx_mem, jobAssign.Job.assignmentSlots(), jobAssign.Job.key())
-            for h in ret:
-                print ("\t%i\t%i\t%s" % (FarmResourceSnapshot.hostsUnused.get(h, 0), h.availableMemory(), h.host().name()))
-
         # Assign hosts with 0 jobs first
         #ret = ret.sorted( "activeassignmentcount" )
         return ret
@@ -1175,7 +869,7 @@ SELECT * from running_shots_averagetime_4
             del self.jobsByService[service]
         self.servicesNeeded.remove( service )
 
-    # Returns (assignedCount, tasksUnassigned, n_slots_used)
+    # Returns (assignedCount, tasksUnassigned)
     def assignSingleHost(self, jobAssign, hostStatus):
         job = jobAssign.Job
 
@@ -1195,20 +889,13 @@ SELECT * from running_shots_averagetime_4
             raise NonCriticalAssignmentError("Service %s out of licenses" % "something")
         self.reserveLicenses(jobAssign.servicesRequired)
 
-        # how many slots will we actually use (ie: if we selected a host with less slots it must be because it's fast and small)
-        n_slots_to_use = job.assignmentSlots()
-        n_unused_slots = FarmResourceSnapshot.hostsUnused.get(hostStatus, 0)
-        if(n_unused_slots < n_slots_to_use):
-            #Log('use ' + str(n_unused_slots) + " instead of " + str(n_slots_to_use) + " for job " + str(job.key()))
-            n_slots_to_use = n_unused_slots
-
         # check for project limits on total slot use
         key = job.project().name()
         if self.limitsByProject.has_key(key):
             if self.slotsByProject.has_key(key):
-                self.slotsByProject[key] = self.slotsByProject[key] + n_slots_to_use
+                self.slotsByProject[key] = self.slotsByProject[key] + job.assignmentSlots()
             else:
-                self.slotsByProject[key] = n_slots_to_use
+                self.slotsByProject[key] = job.assignmentSlots()
 
             if self.limitsByProject[key][0] > -1 and self.slotsByProject[key] > self.limitsByProject[key][0]:
                 raise NonCriticalAssignmentError("Project %s slot limit of %s reached" % (key, self.limitsByProject[key][0]))
@@ -1217,9 +904,9 @@ SELECT * from running_shots_averagetime_4
         key = job.user().name()
         if self.limitsByUser.has_key(key):
             if self.slotsByUser.has_key(key):
-                self.slotsByUser[key] = self.slotsByUser[key] + n_slots_to_use
+                self.slotsByUser[key] = self.slotsByUser[key] + job.assignmentSlots()
             else:
-                self.slotsByUser[key] = n_slots_to_use
+                self.slotsByUser[key] = job.assignmentSlots()
 
             if self.limitsByUser[key][0] > -1 and self.slotsByUser[key] > self.limitsByUser[key][0]:
                 raise NonCriticalAssignmentError("User %s slot limit of %s reached" % (key, self.limitsByUser[key][0]))
@@ -1230,9 +917,9 @@ SELECT * from running_shots_averagetime_4
 
             if self.limitsByUserAndService.has_key(key):
                 if self.slotsByUserAndService.has_key(key):
-                    self.slotsByUserAndService[key] = self.slotsByUserAndService[key] + n_slots_to_use
+                    self.slotsByUserAndService[key] = self.slotsByUserAndService[key] + job.assignmentSlots()
                 else:
-                    self.slotsByUserAndService[key] = n_slots_to_use
+                    self.slotsByUserAndService[key] = job.assignmentSlots()
 
                 #Log( "slotsByUserAndService: key %s, value %s" % (key,  self.slotsByUserAndService[key]))
                 #if self.limitsByUserAndService.has_key(key):
@@ -1246,10 +933,9 @@ SELECT * from running_shots_averagetime_4
         tasksAssigned = jobAssign.assignHost(hostStatus, len(self.hostsUnused), self.taskCountByServices(jobAssign.servicesRequired))
         if tasksAssigned < 1:
             #if VERBOSE_DEBUG: print "JobAssign.assignHost failed"
-            #Log( "JobAssign.assignHost failed" )
-            # BONE.... if we throw here then we only end up trying the first host, there may be others in the list that are better
-            #raise NonCriticalAssignmentError("Job out of tasks")
-            return (0,jobAssign.tasksUnassigned,0)
+            Log( "JobAssign.assignHost failed" )
+            raise NonCriticalAssignmentError("Job out of tasks")
+            return (0,jobAssign.tasksUnassigned)
 
         jobAssign.tasksUnassigned -= tasksAssigned
 
@@ -1259,9 +945,9 @@ SELECT * from running_shots_averagetime_4
             self.removeJob( job )
 
         # Host no longer ready
-        self.removeHostStatus(hostStatus, n_slots_to_use)
+        self.removeHostStatus(hostStatus, job.assignmentSlots())
 
-        return (tasksAssigned,jobAssign.tasksUnassigned,n_slots_to_use)
+        return (tasksAssigned,jobAssign.tasksUnassigned)
 
     def assignSingleJob(self,jobAssign):
         #print 'job %s has sortKey %s' % (jobAssign.Job.name(), jobAssign.key_even_by_priority())
@@ -1274,16 +960,16 @@ SELECT * from running_shots_averagetime_4
 
         hostStatuses = self.availableHosts( jobAssign )
         if hostStatuses.isEmpty():
-            # jobAssign.Job.setWhyNot("too fussy")
-            # print "*** No hosts available for job %i - returning" % jobAssign.Job.key()
+            if VERBOSE_DEBUG: print "*** No hosts available for this job - returning"
             return False
 
         assignedHosts = 0
         maxAssignedHosts = int(jobAssign.JobStatus.tasksCount() * config._ASSIGN_MAXHOSTS)
 
         # if less than 10% of a job is started, don't overrun 10%, for Darwin purposes
-        if jobAssign.JobStatus.tasksCount()-jobAssign.JobStatus.tasksUnassigned() < calculateNumTasksForPartialRender(jobAssign.JobStatus.tasksCount(),10):
-            maxAssignedHosts = calculateNumTasksForPartialRender(jobAssign.JobStatus.tasksCount(),10) - (jobAssign.JobStatus.tasksCount()-jobAssign.JobStatus.tasksUnassigned())
+        tenPercentComplete = float(jobAssign.JobStatus.tasksCount()-jobAssign.JobStatus.tasksUnassigned()) / float(jobAssign.JobStatus.tasksCount())
+        if tenPercentComplete < 0.1:
+            maxAssignedHosts = int(jobAssign.JobStatus.tasksCount() * 0.1) - (jobAssign.JobStatus.tasksCount()-jobAssign.JobStatus.tasksUnassigned())
 
         # Gather available hosts for this job
         if VERBOSE_DEBUG: print "Finding Hosts to Assign to %i tasks to Job %s, possible: %s" % (jobAssign.JobStatus.tasksUnassigned(), jobAssign.Job.name(), hostStatuses.size())
@@ -1292,13 +978,13 @@ SELECT * from running_shots_averagetime_4
         assignSuccess = False
         Database.current().beginTransaction()
         for hostStatus in hostStatuses:
-            tasksAssigned, tasksLeft, n_slots_used = self.assignSingleHost( jobAssign, hostStatus )
+            tasksAssigned, tasksLeft = self.assignSingleHost( jobAssign, hostStatus )
 
             # Return so that we can recalculate assignment priorities
             if tasksAssigned > 0:
                 assignSuccess = True
                 assignedHosts = assignedHosts + 1
-                self.slotAssignCount = self.slotAssignCount + n_slots_used
+                self.slotAssignCount = self.slotAssignCount + jobAssign.Job.assignmentSlots()
 
                 if ((float(self.slotAssignCount) / self.potentialSlotsAvailable)*100) > config._ASSIGN_SLOPPINESS:
                     Database.current().exec_("SELECT update_job_task_counts(%i)" % jobAssign.Job.key())
