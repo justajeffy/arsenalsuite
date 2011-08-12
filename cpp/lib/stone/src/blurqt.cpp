@@ -334,17 +334,20 @@ QStringList getLoggedInUsers()
     QStringList arguments;
     proc->start("who", arguments);
 
-    proc->waitForFinished();
     QStringList output;
+
+    bool ret = proc->waitForFinished(1000);
+    if( !ret ) return output;
+
     while (proc->canReadLine())
         output.append(proc->readLine());
 
     QStringList users;
-    for (QStringList::Iterator it = output.begin(); it != output.end(); ++it)
+    foreach( QString whoLine, output )
     {
-        if (!(*it).contains(":0"))
-            output.erase(it);
-        QStringList parts = (*it).split(' ');
+        if (!whoLine.contains(":0"))
+            continue;
+        QStringList parts = whoLine.split(' ');
         if (users.indexOf(parts[0]) == -1)
             users.append(parts[0]);
     }
