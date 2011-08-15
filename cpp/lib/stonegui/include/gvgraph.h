@@ -134,12 +134,13 @@ public:
      * \param font The font to use for the graph
      * \param node_size The size in pixels of each node
      */
-    GVGraph(QString name, QFont font=QFont(), qreal node_size=50);
+    GVGraph(QString name, QFont font=QFont(), qreal node_size=60);
     ~GVGraph();
 
     void setRootNode(const QString& name);
 
-    void applyLayout();
+    void applyLayout(const QString & );
+    void render(const QString & fileName);
 
     QRectF boundingRect() const;
 
@@ -148,6 +149,9 @@ public:
     void addNodes(const QStringList& names);
     void removeNode(const QString& name);
     void clearNodes();
+
+    bool setNodeAttr(const QString& source, const QString& attr, const QString & value);
+    bool setEdgeAttr(const QPair<QString, QString> &, const QString& attr, const QString & value);
 
     /// Add and remove edges
     void addEdge(const QString& source, const QString& target);
@@ -167,7 +171,6 @@ private:
     QMap<QString, Agnode_t*> _nodes;
     QMap<QPair<QString, QString>, Agedge_t*> _edges;
 };
-
 
 #endif // GL_UTIL_H
 

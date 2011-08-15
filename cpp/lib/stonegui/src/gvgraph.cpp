@@ -73,7 +73,7 @@ We will now see how to add and remove nodes. The node removal function takes car
 void GVGraph::addNode(const QString& name)
 {
     if(_nodes.contains(name))
-        removeNode(name);
+        return;
 
     _nodes.insert(name, _agnode(_graph, name));
 }
@@ -104,6 +104,20 @@ void GVGraph::clearNodes()
 
     for(int i=0; i<keys.size(); ++i)
         removeNode(keys.at(i));
+}
+
+bool GVGraph::setNodeAttr(const QString& name, const QString & attr, const QString & value)
+{
+    if( !_nodes.contains(name) ) return false;
+    _agset(_nodes[name], attr, value);
+    return true;
+}
+
+bool GVGraph::setEdgeAttr(const QPair<QString, QString> & name, const QString & attr, const QString & value)
+{
+    if( !_edges.contains(name) ) return false;
+    _agset(_edges[name], attr, value);
+    return true;
 }
 
 /***
@@ -162,10 +176,15 @@ void GVGraph::setFont(QFont font)
 /***
 Surprisingly, this is the very easy part of the job. Graphviz already has several implementations of common graph drawing algorithms, used for different kinds of graphs. In Graphviz, they are called layout, and the most known one is dot. It also is the one I'm using, but you may write additional methods in your class for calling different kinds of layouts – just be aware that some layouts require extra attributes, so you may also want to modify other parts of the class depending on what you need.
 ***/
-void GVGraph::applyLayout()
+void GVGraph::applyLayout(const QString & _layoutName)
 {
     gvFreeLayout(_context, _graph);
-    _gvLayout(_context, _graph, "dot");
+    _gvLayout(_context, _graph, _layoutName);
+}
+
+void GVGraph::render(const QString & fileName)
+{
+    _gvRender(_context, _graph, fileName);
 }
 
 /***
