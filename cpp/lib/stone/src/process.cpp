@@ -295,12 +295,13 @@ qint32 qpidToId( Q_PID qpid )
 
 #ifndef Q_OS_WIN // Win32 version in process_win.cpp
 
-static int parsePSDump( qint32 wantedPid, QString psDump, int depth=0)
+static int parsePSDump( qint32 wantedPid, const QString & psDump, int depth=0)
 {
 	int memory = 0;
+	QRegExp rx("(\\d+)\\s+(\\d+)\\s+(\\d+)");
+
 	QStringList lines = psDump.split("\n");
 	foreach( QString line, lines ) {
-		QRegExp rx("(\\d+)\\s+(\\d+)\\s+(\\d+)");
 		if( rx.indexIn(line,0) != -1 ) {
 			int pid  = rx.cap(1).toInt();
 			int ppid = rx.cap(2).toInt();
