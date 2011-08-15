@@ -242,8 +242,8 @@ def reaper():
                     suspendTitle = 'Job %s (%i) has been suspended(Timeout limit reached).' % (job.name(), job.key())
 
 
-            # If job is erroring check job and global error thresholds
-            if errorCount > job.maxErrors() or (done == 0 and errorCount > config.totalFailureThreshold):
+            # If job is erroring check job and global error thresholds. Immediately refresh the job data to check for an increase in max errors since the records are cached.
+            if ((errorCount > job.maxErrors()) and (job.reload()) and (errorCount > job.maxErrors())) or (done == 0 and errorCount > config.totalFailureThreshold):
                 suspend = True
                 suspendMsg = 'Job %s (%i) has been suspended.  The job has produced %i errors.' % (job.name(), job.key(), errorCount)
                 jobErrors = job.jobErrors()

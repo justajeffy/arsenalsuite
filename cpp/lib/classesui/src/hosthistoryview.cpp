@@ -142,13 +142,13 @@ void HostHistoryView::doRefresh()
 		where += "fkeyjob=?";
 		args << mJobFilter.key();
 	}
-	/*
+	
 	if ( mJobTaskFilter.isRecord() ) {
 		if( !where.isEmpty() ) where += " AND ";
-		where += "fkeyjobtask=?";
-		args << mJobTaskFilter.key();
+		where += "keyjobassignment=?";
+		args << mJobTaskFilter.jobTaskAssignment().jobAssignment().key();
 	}
-	*/
+	
 	where += " ORDER BY keyjobassignment DESC LIMIT " + QString::number( mLimit );
 	JobAssignmentList jal = JobAssignment::select( where, args );
 

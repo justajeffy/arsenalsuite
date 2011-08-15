@@ -742,7 +742,7 @@ void Slave::handleJobAssignmentChange( const JobAssignment & ja )
 	if( status == "ready" ) {
 		burn(ja);
 	}
-	else if( status == "cancelled" ) {
+	else if( status == "cancelled" || status == "suspended" ) {
 		foreach( JobBurner * burner, mActiveBurners ) {
 			if( burner->jobAssignment() == ja ) {
 				cleanupJobBurner(burner);
