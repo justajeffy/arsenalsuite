@@ -8,17 +8,18 @@
 
 #include "path.h"
 #include "process.h"
+#include "database.h"
 
 #include "host.h"
 #include "hostlistwidget.h"
 #include "hostservice.h"
 #include "jobassignment.h"
+#include "jobassignmentstatus.h"
 #include "jobcannedbatch.h"
 #include "jobbatch.h"
 #include "jobdep.h"
 #include "jobhistory.h"
 #include "jobhistorytype.h"
-#include "jobassignmentstatus.h"
 #include "jobtaskassignment.h"
 
 #include "jobviewerfactory.h"
@@ -843,6 +844,10 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
         mTasks.setJobTaskAssignments( JobTaskAssignment() );
         mTasks.commit();
 
+        //foreach( JobAssignment ass, mTasks.jobTaskAssignments().jobAssignments() ) {
+        //    Database::current()->exec("SELECT cancel_job_assignment("+QString::number(ass.key())+",'cancelled','new')");
+        //}
+
         JobList jobs = mTasks.jobs().unique();
         foreach( Job j, jobs ) {
             if( j.status() == "done" || j.status() == "deleted" ) {
@@ -864,10 +869,9 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
             QMessageBox::Yes, QMessageBox::Cancel ) != QMessageBox::Yes )
             return;
 
-        if( mJobList->currentJob().packetType() != "preassigned" )
-            mTasks.setHosts( Host() );
-        mTasks.setStatuses( "cancelled" );
-        mTasks.commit();
+        foreach( JobAssignment ass, mTasks.jobTaskAssignments().jobAssignments() ) {
+            Database::current()->exec("SELECT cancel_job_assignment("+QString::number(ass.key())+",'cancelled','cancelled')");
+        }
 
         mJobList->currentJob().addHistory(  "Cancel Frames: " + frameList.join(",") );
 
@@ -875,10 +879,9 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
         mJobList->setStatusBarMessage( "Frames marked as 'cancelled'" );
     }
     else if( action == mSuspendFramesAction ) {
-        if( mJobList->currentJob().packetType() != "preassigned" )
-            mTasks.setHosts( Host() );
-        mTasks.setStatuses( "suspended" );
-        mTasks.commit();
+        foreach( JobAssignment ass, mTasks.jobTaskAssignments().jobAssignments() ) {
+            Database::current()->exec("SELECT cancel_job_assignment("+QString::number(ass.key())+",'cancelled','suspended')");
+        }
         mJobList->currentJob().addHistory(  "Suspend Frames: " + frameList.join(",") );
         mJobList->setStatusBarMessage( QString::number( mTasks.size() ) + " frame" + QString(mTasks.size() > 1 ? "s" : "") + " suspended" );
     }
