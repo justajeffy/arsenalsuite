@@ -16,6 +16,7 @@ class FreezerView;
 class JobViewerPlugin;
 class HostViewerPlugin;
 class FrameViewerPlugin;
+class MultiFrameViewerPlugin;
 
 class FREEZER_EXPORT FreezerMenuPlugin
 {
@@ -203,6 +204,7 @@ protected:
     QMap<QAction *, JobViewerPlugin *> mJobViewerActions;
     QMap<QAction *, HostViewerPlugin *> mHostViewerActions;
     QMap<QAction *, FrameViewerPlugin *> mFrameViewerActions;
+    QMap<QAction *, MultiFrameViewerPlugin *> mMultiFrameViewerActions;
 };
 
 class FREEZER_EXPORT FreezerErrorMenu : public FreezerMenu

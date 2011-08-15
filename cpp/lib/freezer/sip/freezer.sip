@@ -14,6 +14,7 @@
 %Include jobviewerplugin.sip
 %Include hostviewerplugin.sip
 %Include frameviewerplugin.sip
+%Include multiframeviewerplugin.sip
 %Include framenthdialog.sip
 %Include mainwindow.sip
 

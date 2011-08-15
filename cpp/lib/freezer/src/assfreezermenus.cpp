@@ -27,6 +27,8 @@
 #include "hostviewerplugin.h"
 #include "frameviewerfactory.h"
 #include "frameviewerplugin.h"
+#include "multiframeviewerfactory.h"
+#include "multiframeviewerplugin.h"
 
 #include "recordpropvaltree.h"
 #include "remotetailwindow.h"
@@ -821,6 +823,15 @@ void FreezerTaskMenu::slotAboutToShow()
 		mCancelFramesAction = addAction( "Cancel Selected Frames" );
 		mCancelFramesAction->setEnabled( enabled );
 	}
+
+    addSeparator();
+    QMenu * multiTaskMenu = addMenu("Run on frames...");
+    foreach( MultiFrameViewerPlugin * mfvp, MultiFrameViewerFactory::mMultiFrameViewerPlugins.values() ) {
+        QAction * action = new QAction( mfvp->name(), this );
+        action->setIcon( QIcon(mfvp->icon()) );
+        multiTaskMenu->addAction( action );
+        mMultiFrameViewerActions[action] = mfvp;
+    }
 }
 
 void FreezerTaskMenu::slotActionTriggered( QAction * action )
@@ -910,7 +921,10 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
     } else if( mFrameViewerActions.contains(action) ) {
         JobTaskList jtl = mJobList->mFrameTree->selection();
 	    mFrameViewerActions[action]->view( jtl[0].jobTaskAssignment().jobAssignment() );
-	}
+	} else if( mMultiFrameViewerActions.contains(action) ) {
+        JobTaskList jtl = mJobList->mFrameTree->selection();
+        mMultiFrameViewerActions[action]->view( mTasks );
+    }
 }
 
 FreezerErrorMenu::FreezerErrorMenu(QWidget * parent, JobErrorList selection, JobErrorList all)

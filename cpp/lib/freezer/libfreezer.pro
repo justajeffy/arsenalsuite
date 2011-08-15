@@ -18,6 +18,7 @@ SOURCES+= \
 	src/hostservicematrix.cpp \
 	src/userservicematrix.cpp \
 	src/frameviewerplugin.cpp \
+    src/multiframeviewerplugin.cpp \
 	src/hostviewerplugin.cpp \
 	src/imagecache.cpp \
 	src/imageview.cpp \
@@ -64,6 +65,8 @@ HEADERS+= \
 	include/userservicematrix.h \
 	include/frameviewerplugin.h \
 	include/frameviewerfactory.h \
+    include/multiframeviewerplugin.h \
+    include/multiframeviewerfactory.h \
 	include/hostviewerplugin.h \
 	include/hostviewerfactory.h \
 	include/imagecache.h \
