@@ -15,5 +15,6 @@ import cobbler_profile_plugin
 import reboot_blade
 import poweron_blade
 import poweroff_blade
+import cancelFrameInChain
 #import tabrotation
 
