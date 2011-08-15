@@ -22,6 +22,7 @@
 #include "path.h"
 #include "process.h"
 
+
 #include "jobbatch.h"
 #include "jobcommandhistory.h"
 #include "jobhistory.h"
@@ -36,6 +37,7 @@
 #include "recordtreeview.h"
 #include "recordfilterwidget.h"
 #include "recordpropvaltree.h"
+#include "gvgraph.h"
 
 #include "assfreezermenus.h"
 #include "batchsubmitdialog.h"
@@ -491,11 +493,13 @@ void JobListWidget::customEvent( QEvent * evt )
             if( mFrameTabs->currentWidget() == mFrameGraphTab ) {
                 refreshGraphsTab(jtl);
             }
-
-            if( mFrameTabs->currentWidget() == mFrameImageTab ) {
+            else if( mFrameTabs->currentWidget() == mFrameImageTab ) {
                 //mTabToolBar->slotPause();
                 mImageView->setFrameRange( mCurrentJob.outputPath(), minFrame, maxFrame );
                 mFrameTask = 0;
+            }
+            else if( mFrameTabs->currentWidget() == mFrameDepsTab ) {
+                refreshDepsTab();
             }
 
             mFrameTree->mRecordFilterWidget->filterRows();
@@ -1232,3 +1236,40 @@ void JobListWidget::clearFilters()
 	mFrameTree->mRecordFilterWidget->clearFilters();
 	mErrorTree->mRecordFilterWidget->clearFilters();
 }
+
+void JobListWidget::refreshDepsTab()
+{
+    GVGraph * gvg = new GVGraph("test");
+	JobList sel = mJobTree->selection();
+	if( sel.isEmpty() ) return;
+
+    Index * idx = JobDep::table()->indexFromField( "fkeyJob" );
+    idx->cacheIncoming(true);
+    JobDepList deps = JobDep::table()->selectFrom( QString("(WITH RECURSIVE job_dep_rec AS ( SELECT jobdep.* from jobdep WHERE fkeyjob IN (%1) OR fkeydep IN (%1) UNION SELECT jd.* FROM job_dep_rec jdr, jobdep jd WHERE jd.fkeyjob=jdr.fkeydep OR jd.fkeydep=jdr.fkeydep) SELECT * FROM job_dep_rec) AS JobDep").arg(sel[0].key()) );
+    //JobDepList deps = JobDep::table()->selectFrom( QString("jobdep_recursive('%1') AS JobDep").arg(sel[0].key()) );
+    idx->cacheIncoming(false);
+
+    //gvg->setFont(QApplication::font());
+    
+    Job j = sel[0];
+
+    gvg->addNode(QString::number(j.key()));
+    gvg->setNodeAttr(QString::number(j.key()), "label", QString::number(j.key()));
+    gvg->setRootNode(QString::number(j.key()));
+
+    foreach( JobDep dep, deps ) {
+        gvg->addNode(QString::number(dep.job().key()));
+        gvg->setNodeAttr(QString::number(dep.job().key()), "label", QString::number(dep.job().key()));
+        gvg->addNode(QString::number(dep.dep().key()));
+        gvg->setNodeAttr(QString::number(dep.dep().key()), "label", QString::number(dep.dep().key()));
+        gvg->addEdge(QString::number(dep.dep().key()), QString::number(dep.job().key()));
+        if( dep.depType() == 2 )
+            gvg->setEdgeAttr(QPair<QString, QString>(QString::number(dep.dep().key()), QString::number(dep.job().key())), "style", "dashed" );
+    }
+    gvg->applyLayout("circo");
+    gvg->render("/tmp/gvg.png");
+    delete gvg;
+    mDepsView->load(QUrl("file:///tmp/gvg.png"));
+    mDepsView->setZoomFactor(1.0);
+}
+

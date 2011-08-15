@@ -161,6 +161,8 @@ public slots:
 
     void refreshGraphsTab(JobTaskList) const;
 
+    void refreshDepsTab();
+
 	/// called to populate the tab according to the selected jobs
 	void frameTabChanged();
 
