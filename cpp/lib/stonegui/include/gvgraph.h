@@ -134,7 +134,7 @@ public:
      * \param font The font to use for the graph
      * \param node_size The size in pixels of each node
      */
-    GVGraph(QString name, QFont font=QFont(), qreal node_size=60);
+    GVGraph(QString name, QFont font=QFont(), qreal node_size=72);
     ~GVGraph();
 
     void setRootNode(const QString& name);
