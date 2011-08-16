@@ -492,8 +492,14 @@ void JobBurner::jobErrored( const QString & msg, bool timeout, const QString & n
         LOG_3( "JobBurner: ERROR an error has already occurred" );
         return;
     }
+    mState = StateError;
 
-	mState = StateError;
+    // delay the actual error firing to grab any final output from the process
+    QTimer::singleShot(2000, this, SLOT(_jobErrored(msg, timeout, nextstate)));
+}
+
+void JobBurner::_jobErrored( const QString & msg, bool timeout, const QString & nextstate )
+{
 	// error will be logged by the slave that is monitoring this jobburner
 	JobError je = logError( mJob, msg, mCurrentTasks, timeout );
 
@@ -552,6 +558,11 @@ void JobBurner::cleanup()
 		mCurrentCopy = 0;
 	}
 
+	if( mCheckupTimer )
+		mCheckupTimer->stop();
+	if( mOutputTimer )
+		mOutputTimer->stop();
+
 	if( mCmd ) {
 		mCmd->disconnect( this );
 		// if it is Done let the process exit naturally
@@ -569,15 +580,11 @@ void JobBurner::cleanup()
 		}
 	}
 
-	if( mCheckupTimer )
-		mCheckupTimer->stop();
-
+	slotReadStdOut();
+	slotReadStdError();
 	updateOutput();
 
 	mJobAssignment.commit();
-
-	if( mOutputTimer )
-		mOutputTimer->stop();
 }
 
 void JobBurner::updateOutput()
@@ -635,6 +642,9 @@ void JobBurner::checkMemory()
                 SystemMemInfo mi = systemMemoryInfo();
                 float freeMem = mi.freeMemory + mi.cachedMemory;
                 if( freeMem / (float)(mi.totalMemory) < 0.10 ) {
+                    logMessage("process table at time of error: ");
+                    logMessage(backtick("ps auxwww"));
+
                     QString msg = QString("Process exceeded max memory of %1 at %2, with %3 free")
                         .arg(mJob.maxMemory())
                         .arg(mem)
@@ -663,9 +673,9 @@ void JobBurner::logMessage( const QString & msg, QProcess::ProcessChannel channe
 	QStringList lines = msg.split("\n");
 	foreach( QString line, lines ) {
 		if( line.trimmed().isEmpty() ) continue;
-		foreach( QRegExp re, mIgnoreREs )
-			if( line.contains( re ) )
-				continue;
+		//foreach( QRegExp re, mIgnoreREs )
+		//	if( line.contains( re ) )
+		//		continue;
 		QString log = ts + line + "\n";
 		if( mJob.loggingEnabled() ) {
 			if( channel == QProcess::StandardOutput )
