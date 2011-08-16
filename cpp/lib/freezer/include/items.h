@@ -34,6 +34,7 @@
 #include <qdatetime.h>
 #include <qitemdelegate.h>
 #include <qpainter.h>
+#include <qpicture.h>
 
 #include "blurqt.h"
 
@@ -238,6 +239,16 @@ public:
 
 	QSize sizeHint(const QStyleOptionViewItem &option,
                               const QModelIndex &index) const;
+};
+
+class FREEZER_EXPORT JobIconDelegate : public QItemDelegate
+{
+Q_OBJECT
+public:
+    JobIconDelegate( QObject * parent=0 ) : QItemDelegate( parent ) {}
+    ~JobIconDelegate() {}
+    virtual void paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+protected:
 };
 
 #endif // ITEMS_H
