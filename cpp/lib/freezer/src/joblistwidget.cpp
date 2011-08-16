@@ -1239,7 +1239,7 @@ void JobListWidget::clearFilters()
 
 void JobListWidget::refreshDepsTab()
 {
-    GVGraph * gvg = new GVGraph("test");
+    GVGraph * gvg = new GVGraph("test", QApplication::font(), 0.8);
 	JobList sel = mJobTree->selection();
 	if( sel.isEmpty() ) return;
 
@@ -1252,24 +1252,40 @@ void JobListWidget::refreshDepsTab()
     //gvg->setFont(QApplication::font());
     
     Job j = sel[0];
+    QString rootKey = QString::number(j.key());
 
     gvg->addNode(QString::number(j.key()));
-    gvg->setNodeAttr(QString::number(j.key()), "label", QString::number(j.key()));
+    gvg->setNodeAttr(QString::number(j.key()), "width", "0.8");
+    gvg->setNodeAttr(QString::number(j.key()), "height", "0.6");
+    gvg->setNodeAttr(QString::number(j.key()), "style", "filled");
+    gvg->setNodeAttr(QString::number(j.key()), "fillcolor", "#9BDDFF");
+    gvg->setNodeAttr(QString::number(j.key()), "peripheries", "2");
+
     gvg->setRootNode(QString::number(j.key()));
 
     foreach( JobDep dep, deps ) {
-        gvg->addNode(QString::number(dep.job().key()));
-        gvg->setNodeAttr(QString::number(dep.job().key()), "label", QString::number(dep.job().key()));
-        gvg->addNode(QString::number(dep.dep().key()));
-        gvg->setNodeAttr(QString::number(dep.dep().key()), "label", QString::number(dep.dep().key()));
-        gvg->addEdge(QString::number(dep.dep().key()), QString::number(dep.job().key()));
+        QString jobKey = QString::number(dep.job().key());
+        QString depKey = QString::number(dep.dep().key());
+
+        gvg->addNode(jobKey);
+        if( jobKey!=rootKey ) {
+            gvg->setNodeAttr(jobKey, "fillcolor", "#FFFFFF");
+            gvg->setNodeAttr(jobKey, "peripheries", "1");
+        }
+
+        gvg->addNode(depKey);
+        if( depKey!=rootKey ) {
+            gvg->setNodeAttr(depKey, "fillcolor", "#FFFFFF");
+            gvg->setNodeAttr(depKey, "peripheries", "1");
+        }
+
+        gvg->addEdge(depKey, jobKey);
         if( dep.depType() == 2 )
-            gvg->setEdgeAttr(QPair<QString, QString>(QString::number(dep.dep().key()), QString::number(dep.job().key())), "style", "dashed" );
+            gvg->setEdgeAttr(QPair<QString, QString>(depKey, jobKey), "style", "dashed" );
     }
-    gvg->applyLayout("circo");
+    gvg->applyLayout("dot");
     gvg->render("/tmp/gvg.png");
     delete gvg;
-    mDepsView->load(QUrl("file:///tmp/gvg.png"));
-    mDepsView->setZoomFactor(1.0);
+    mDepsLabel->setPixmap(QPixmap("/tmp/gvg.png"));
 }
 

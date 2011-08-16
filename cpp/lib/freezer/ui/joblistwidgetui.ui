@@ -226,17 +226,40 @@
                   <property name="frameShadow">
                    <enum>QFrame::Raised</enum>
                   </property>
-                  <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <layout class="QVBoxLayout" name="verticalLayout_5">
                    <property name="margin">
                     <number>1</number>
                    </property>
                    <item>
-                    <widget class="QWebView" name="mDepsView">
-                     <property name="url">
-                      <url>
-                       <string>about:blank</string>
-                      </url>
+                    <widget class="QScrollArea" name="scrollArea_2">
+                     <property name="widgetResizable">
+                      <bool>true</bool>
                      </property>
+                     <widget class="QWidget" name="scrollAreaWidgetContents">
+                      <property name="geometry">
+                       <rect>
+                        <x>0</x>
+                        <y>0</y>
+                        <width>487</width>
+                        <height>404</height>
+                       </rect>
+                      </property>
+                      <layout class="QVBoxLayout" name="verticalLayout_6">
+                       <property name="margin">
+                        <number>1</number>
+                       </property>
+                       <item>
+                        <widget class="QLabel" name="mDepsLabel">
+                         <property name="text">
+                          <string/>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
                     </widget>
                    </item>
                   </layout>
@@ -326,11 +349,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKit/QWebView</header>
-  </customwidget>
   <customwidget>
    <class>ImageView</class>
    <extends>QWidget</extends>
