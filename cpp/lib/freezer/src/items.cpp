@@ -33,6 +33,7 @@
 #include <qheaderview.h>
 #include <qmessagebox.h>
 #include <QPixmapCache>
+#include <qpicture.h>
 
 #include "blurqt.h"
 #include "database.h"
@@ -53,6 +54,8 @@
 #include "jobtype.h"
 #include "project.h"
 #include "service.h"
+#include "thread.h"
+#include "joberror.h"
 
 #include "afcommon.h"
 #include "items.h"
@@ -90,6 +93,7 @@ static const ColumnStruct job_columns [] =
 	{ "Queue Order", 		"QueueOrder", 	40, 	26,	false, false },	//26
 	{ "Shot Name", 		"ShotName", 	60, 	26,	false, true },	//27
     { "Suspended",          "Suspended",        140,    27, false, false}, //28
+    { "Notifications",              "Notifications",            80,     28, false, false}, //29
 	{ 0, 					0, 					0, 		0, 	false, false }
 };
 
@@ -363,6 +367,50 @@ QSize MultiLineDelegate::sizeHint(const QStyleOptionViewItem &option, const QMod
 	return fontMetrics.size( 0, text );
 }
 
+void JobIconDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
+{
+    if( index.isValid() && index.column() == 29 && JobTranslator::isType(index) ) {
+        Job j = JobTranslator::data(index).getRecord();
+        ThreadList threads = Thread::recordsByJob(j);
+        uint currentWidth = 0;
+        if( threads.size() ){
+            QPixmap noteIcon;
+            if( !QPixmapCache::find("images-note.png", noteIcon) )
+                noteIcon.load("images/note.png");
+                QPixmapCache::insert("images-note.png", noteIcon);
+
+            painter->drawPixmap( option.rect.x() + 1, option.rect.y() + 1, noteIcon);
+            currentWidth += 16;
+        }
+        if( j.wrangler().isRecord() )
+        {
+            QPixmap padlockIcon;
+            if( !QPixmapCache::find("images-wrangled.png", padlockIcon) )
+                padlockIcon.load("images/wrangled.png");
+                QPixmapCache::insert("images-wrangled.png", padlockIcon);
+
+            painter->drawPixmap( option.rect.x() + 1 + currentWidth, option.rect.y() + 1, padlockIcon);
+            currentWidth += 16;
+        }
+        
+        JobErrorList elist = JobError::recordsByJob(j);
+        foreach (JobError je, elist) {
+            if( je.cleared() ) {
+                QPixmap clearedErrorIcon;
+                if( !QPixmapCache::find("imageis-cleared_errors.png", clearedErrorIcon) )
+                    clearedErrorIcon.load("images/cleared_errors.png");
+                    QPixmapCache::insert("images-cleared_errors.png", clearedErrorIcon);
+
+                painter->drawPixmap( option.rect.x() + 1 + currentWidth, option.rect.y() + 1, clearedErrorIcon);
+                currentWidth += 16;
+                break;
+            }
+        }
+        return;
+    }
+    return QItemDelegate::paint( painter, option, index );
+}
+
 QVariant civ( const QColor & c )
 {
 	if( c.isValid() )
@@ -584,10 +632,6 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
         icon = img.isNull() ? QPixmap() : QPixmap::fromImage(img);
         QPixmapCache::insert(QString("jobtype-%1").arg(job.jobType().name()), icon);
     }
-
-    if( job.wrangler().isRecord() ) {
-        icon = QPixmap("images/wrangled.png");
-    }
 }
 
 QVariant JobItem::modelData( const QModelIndex & i, int role ) const
@@ -636,7 +680,7 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 	} else if( role == Qt::ToolTipRole && col == 16 && !healthIsNull ) {
 		return QString( "%1% Healthy" ).arg(int(jobStatus.health() * 100));
 	} else if( role == Qt::ToolTipRole ) {
-        if( col == 0 ) {
+        if( col == 29 ) {
             if( job.wrangler().isRecord() )
                 return "Job is currently being wrangled by: " + job.wrangler().name();
         } else if ( col == 4 ) {
@@ -646,9 +690,7 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
             if( projectToolTip.isEmpty() ) return QVariant();
                 return project + "\n" + projectToolTip;
         }
-    } else if( role == Qt::DecorationRole && col == 0 && job.wrangler().isRecord() ) {
-        return icon;
-    } else if( role == Qt::DecorationRole && col == 12 && !job.wrangler().isRecord() ) {
+    } else if( role == Qt::DecorationRole && col == 12) {
         return icon;
     }
     return QVariant();

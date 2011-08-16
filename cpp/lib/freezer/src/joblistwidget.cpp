@@ -188,6 +188,7 @@ void JobListWidget::initializeViews()
             jm->setAutoSort( true );
             mJobTree->setModel( jm );
             mJobTree->setItemDelegateForColumn( 2, new ProgressDelegate( mJobTree ) );
+            mJobTree->setItemDelegateForColumn( 29, new JobIconDelegate( mJobTree ) );
             mJobTree->setDragEnabled( true );
             mJobTree->setAcceptDrops( true );
             mJobTree->setDropIndicatorShown(true);
