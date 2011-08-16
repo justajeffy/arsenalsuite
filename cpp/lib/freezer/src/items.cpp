@@ -577,7 +577,14 @@ void JobItem::setup( const Record & r, const QModelIndex & idx ) {
     efficiency.sprintf("%3.2f %", jobStatus.efficiency()*100.00);
 
     project = job.project().name();
-    icon = ((JobModel*)idx.model())->jobTypeIcon(job.jobType());
+
+    icon = QPixmap();
+    if(!QPixmapCache::find(QString("jobtype-%1").arg(job.jobType().name()), &icon)) {
+        QImage img = QImage(QString("resources/icons/%1.png").arg(job.jobType().name())).scaled(16,16,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+        icon = img.isNull() ? QPixmap() : QPixmap::fromImage(img);
+        QPixmapCache::insert(QString("jobtype-%1").arg(job.jobType().name()), icon);
+    }
+
     if( job.wrangler().isRecord() ) {
         icon = QPixmap("images/wrangled.png");
     }
@@ -639,7 +646,9 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
             if( projectToolTip.isEmpty() ) return QVariant();
                 return project + "\n" + projectToolTip;
         }
-    } else if( role == Qt::DecorationRole && col == 0 ) {
+    } else if( role == Qt::DecorationRole && col == 0 && job.wrangler().isRecord() ) {
+        return icon;
+    } else if( role == Qt::DecorationRole && col == 12 && !job.wrangler().isRecord() ) {
         return icon;
     }
     return QVariant();
