@@ -50,6 +50,7 @@
 #include "joboutput.h"
 #include "joboutput.h"
 #include "jobstatus.h"
+#include "jobstatusskipreason.h"
 #include "jobservice.h"
 #include "jobtype.h"
 #include "project.h"
@@ -90,10 +91,11 @@ static const ColumnStruct job_columns [] =
 	{ "Disk Read", 		"DiskRead", 	40, 	23,	false, false },	//23
 	{ "Disk Ops", 		"DiskOps", 	40, 	24,	false, false },	//24
 	{ "CPU Time", 		"CPUTime", 	60, 	25,	false, true },	//25
-	{ "Queue Order", 		"QueueOrder", 	40, 	26,	false, false },	//26
-	{ "Shot Name", 		"ShotName", 	60, 	26,	false, true },	//27
-    { "Suspended",          "Suspended",        140,    27, false, false}, //28
-    { "Notifications",              "Notifications",            80,     28, false, false}, //29
+	{ "Queue Order", 	"QueueOrder",    40, 	26,	false, false },	//26
+	{ "Shot Name", 		"ShotName",      60, 	27,	false, true },	//27
+    { "Suspended",      "Suspended",    140,    28, true, false}, //28
+    { "Notifications",  "Notifications", 80,     29, true, false}, //29
+    { "Wait Reason",    "WaitReason",    80,     30, true, false}, //30
 	{ 0, 					0, 					0, 		0, 	false, false }
 };
 
@@ -382,6 +384,7 @@ void JobIconDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opt
             painter->drawPixmap( option.rect.x() + 1, option.rect.y() + 1, noteIcon);
             currentWidth += 16;
         }
+
         if( j.wrangler().isRecord() )
         {
             QPixmap padlockIcon;
@@ -392,12 +395,12 @@ void JobIconDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opt
             painter->drawPixmap( option.rect.x() + 1 + currentWidth, option.rect.y() + 1, padlockIcon);
             currentWidth += 16;
         }
-        
+
         JobErrorList elist = JobError::recordsByJob(j);
         foreach (JobError je, elist) {
             if( je.cleared() ) {
                 QPixmap clearedErrorIcon;
-                if( !QPixmapCache::find("imageis-cleared_errors.png", clearedErrorIcon) )
+                if( !QPixmapCache::find("images-cleared_errors.png", clearedErrorIcon) )
                     clearedErrorIcon.load("images/cleared_errors.png");
                     QPixmapCache::insert("images-cleared_errors.png", clearedErrorIcon);
 
@@ -667,6 +670,7 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			case 26: return jobStatus.queueOrder();
 			case 27: return job.shotName();
             case 28: return job.suspendedts().toString();
+			case 30: return jobStatus.skipReason().name();
 		}
 	} else if (role == Qt::TextColorRole )
 		return co ? civ(co->fg) : QVariant();
