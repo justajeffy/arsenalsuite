@@ -36,7 +36,7 @@ const qreal GVGraph::DotDefaultDPI=72.0;
 
 GVGraph::GVGraph(QString name, QFont font, qreal node_size) :
         _context(gvContext()),
-        _graph(_agopen(name, AGDIGRAPHSTRICT)) // Strict directed graph, see libgraph doc
+        _graph(_agopen(name, AGDIGRAPH)) // Strict directed graph, see libgraph doc
 {
     //Set graph attributes
     _agset(_graph, "overlap", "prism");
@@ -47,14 +47,16 @@ GVGraph::GVGraph(QString name, QFont font, qreal node_size) :
 
     //Set default attributes for the future nodes
     _agnodeattr(_graph, "fixedsize", "true");
-    _agnodeattr(_graph, "label", "");
-    _agnodeattr(_graph, "regular", "true");
+    _agnodeattr(_graph, "regular", "false");
+    _agnodeattr(_graph, "shape", "ellipse");
 
     //Divide the wanted width by the DPI to get the value in points
-    QString nodePtsWidth = QString::number(node_size / _agget(_graph, "dpi", "96,0").toDouble());
+    //QString nodePtsWidth = QString::number(node_size / _agget(_graph, "dpi", "96,0").toDouble());
+    //QString nodePtsHeight = QString::number((node_size*0.8) / _agget(_graph, "dpi", "96,0").toDouble());
 
     //GV uses , instead of . for the separator in floats
-    _agnodeattr(_graph, "width", nodePtsWidth.replace('.', ","));
+    //_agnodeattr(_graph, "width", nodePtsWidth.replace(".",","));
+    //_agnodeattr(_graph, "height", nodePtsHeight);
 
     setFont(font);
 }
