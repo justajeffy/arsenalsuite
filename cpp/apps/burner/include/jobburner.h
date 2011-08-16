@@ -244,6 +244,9 @@ protected slots:
     /// called by a timer to flush log output to disk
     void slotFlushOutput();
 
+	/// internally called by jobburner if an error is raised
+	void _jobErrored( const QString &, bool timeout=false, const QString & nextstate="new" );
+
 protected:
 	void deliverOutput( QProcess::ProcessChannel );
 	bool checkIgnoreLine( const QString & );
