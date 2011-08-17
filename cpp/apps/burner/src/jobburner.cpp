@@ -635,7 +635,11 @@ void JobBurner::checkMemory()
 			mCurrentTaskAssignments.commit();
 		}
 
-		if( mJob.maxMemory() > 0 && mem > mJob.maxMemory() ) {
+        uint memoryLimit = mJob.maxMemory();
+        if( mJobAssignment.assignMaxMemory() > 0 )
+            memoryLimit = mJobAssignment.assignMaxMemory();
+
+		if( memoryLimit > 0 && mem > memoryLimit ) {
 			// reload and check again in case they changed it
 			mJob.reload();
 			if( mJob.maxMemory() > 0 && mem > mJob.maxMemory() ) {
