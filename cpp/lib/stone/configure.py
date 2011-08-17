@@ -73,6 +73,12 @@ def doit():
     )
     installs = []
     sipfiles = []
+    scriptfiles = []
+
+    for s in glob.glob("../../../python/blur/*.py"):
+	scriptfiles.append(os.path.join("../../../python/blur", os.path.basename(s)))
+
+    installs.append([scriptfiles, os.path.join(config.sip_mod_dir, "blur")])
 
     for s in glob.glob("sip/*.sip"):
         sipfiles.append(os.path.join("sip", os.path.basename(s)))

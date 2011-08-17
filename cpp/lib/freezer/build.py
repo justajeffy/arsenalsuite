@@ -14,7 +14,7 @@ pcs = SipTarget("pyfreezerstatic",path,True)
 QMakeTarget("libfreezer",path,"libfreezer.pro",["classesui","absubmit"])
 
 if sys.platform=="linux2":
-	rpm = RPMTarget('freezerrpm','freezer',path,'../../../rpm/spec/libfreezer.spec.template','1.0',["classesrpm","libfreezer","freezer","pyfreezer"])
+	rpm = RPMTarget('freezerrpm','freezer',path,'../../../rpm/spec/freezer.spec.template','1.0',["classesrpm","libfreezer","freezer","pyfreezer"])
 #	rpm.pre_deps = ["libabsubmitrpm"]
 
 
