@@ -20,3 +20,6 @@ The Arsenal Burner daemon.
 /usr/bin/abpsmon
 /usr/lib/python2.5/site-packages/blur/libBurner.a
 /usr/local/bin/burner
+
+%clean
+

@@ -27,8 +27,8 @@ abpsmon = QMakeTarget("abpsmon",os.path.join(path,'psmon'), "psmon.pro", ["stone
 Target("burner",path, [abpsmon],[nsi])
 
 if sys.platform=="linux2":
-	rpm = RPMTarget('burnerrpm','burner',path,'../../../rpm/spec/burner.spec.template','1.0')
-	rpm.pre_deps = ['stoneguirpm','classesrpm','stonerpm']
+	rpm = RPMTarget('burnerrpm','burner',path,'../../../rpm/spec/burner.spec.template','1.0',["classesrpm","burner","pyburner"])
+#	rpm.pre_deps = ['stoneguirpm','classesrpm','stonerpm']
 
 if __name__ == "__main__":
 	build()

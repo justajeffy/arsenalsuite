@@ -26,7 +26,8 @@ class SipSipTarget(SipTarget):
 SipSipTarget("sip", path, False, plat)
 #SipTarget("sipstatic",path,True,plat)
 SipSipTarget("sipstatic", path, True, plat)
-RPMTarget('siprpm','sip',path,'../../../rpm/spec/sip.spec.template','1.0')
+if sys.platform=="linux2":
+    rpm = RPMTarget('siprpm','sip',path,'../../../rpm/spec/sip.spec.template','1.0',["sip","sipstatic"])
 
 if __name__=="__main__":
 	build()

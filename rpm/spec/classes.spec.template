@@ -346,3 +346,6 @@ Encapsulating classes for the Arsenal database tables in C++ and Python
 /usr/share/sip/blur/assetdialog.sip
 /usr/local/lib/libclasses.so.1.0.0
 /usr/local/lib/libclassesui.so.1.0.0
+
+%clean
+

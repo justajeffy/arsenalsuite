@@ -23,8 +23,8 @@ sst.pre_deps = ["stonegui"]
 Target = QMakeTarget("stonegui",path,"stonegui.pro",["stone"],post_deps)
 StaticTarget = QMakeTarget("stoneguistatic",path,"stonegui.pro",["stone"],[],True)
 
-if sys.platform=="linux2":
-	rpm = RPMTarget("stoneguirpm",'blur-stonegui',path,'../../../rpm/spec/stonegui.spec.template','1.0')
+#if sys.platform=="linux2":
+#	rpm = RPMTarget("stoneguirpm",'blur-stonegui',path,'../../../rpm/spec/stonegui.spec.template','1.0')
 
 if __name__ == "__main__":
 	build()

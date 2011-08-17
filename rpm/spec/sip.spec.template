@@ -23,3 +23,6 @@ test
 /usr/lib/python2.5/site-packages/sipdistutils.py
 /usr/lib/python2.5/site-packages/libsip.a
 /usr/include/python2.5/sip.h
+
+%clean
+

@@ -78,3 +78,6 @@ Database library for Arsenal
 /usr/share/sip/blur/fieldtextedit.sip
 /usr/local/lib/libstone.so.1.0.0
 /usr/local/lib/libstonegui.so.1.0.0
+
+%clean
+

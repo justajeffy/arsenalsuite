@@ -17,8 +17,8 @@ else:
 
 QMakeTarget("freezer",path,"freezer.pro",deps,[nsi])
 
-if sys.platform=="linux2":
-	rpm = RPMTarget('freezerrpm','freezer',path,'../../../rpm/spec/freezer.spec.template','1.0')
+#if sys.platform=="linux2":
+#	rpm = RPMTarget('freezerrpm','freezer',path,'../../../rpm/spec/freezer.spec.template','1.0')
 
 if __name__ == "__main__":
 	build()

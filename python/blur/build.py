@@ -586,14 +586,14 @@ class RPMTarget(Target):
         # 4. Parse the output from rpmbuild to generate a list of created rpms
         # 5(optional, depeding on install arg). Install the rpms, except for debug-info and source rpm
     """
-    def __init__(self,targetName,packageName,dir,specTemplate,version):
+    def __init__(self,targetName,packageName,dir,specTemplate,version,pre_deps):
         """  for targetName and dir refer to Target docs
         "    packageName is the name of the .tgz package ie  packageName-Version-rRevision.tgz
         "    specTemplate is the path to the spec template file, relative to the file the RPMTarget is
         "       constructed in
         "    version is the Version for the rpm, the revision is taken using GetRevision on dir
         """
-        Target.__init__(self,targetName,dir)
+        Target.__init__(self,targetName,dir,pre_deps)
         self.SpecTemplate = specTemplate
         self.Version = version
         #self.Revision = GetRevision(dir)
@@ -601,6 +601,7 @@ class RPMTarget(Target):
         self.PackageName = packageName
         self.BuiltRPMS = []
         self.InstallDone = False
+        self.pre_deps = pre_deps
     
     # Only buildable on linux, this should probably check for the existance
     # of rpmbuild and other required commands.
@@ -640,8 +641,12 @@ class RPMTarget(Target):
             
             if self.run_cmd('cat %s | sed "s/\\$WCREV\\\\$/%s/" | sed "s/\\$VERSION\\\\$/%s/" > %s' % (self.SpecTemplate,self.Revision,self.Version,specDest) )[0]:
                 raise "Unable to process spec file template."
-            if self.run_cmd('cat %s | sed "s/BuildRoot:.*$/BuildRoot: %s/" > %s' % (self.SpecTemplate,destDir.replace('/', '\/'),specDest) )[0]:
+            if self.run_cmd('sed -i "s/BuildRoot:.*$/BuildRoot: %s/" %s' % (destDir.replace('/', '\/'),specDest) )[0]:
                 raise "Unable to process spec file template."
+
+            pythonVersion = 'python%s' % sys.version[:3]
+            if self.run_cmd('sed -i "s/python2.5/%s/" %s' % (pythonVersion,specDest))[0]:
+		raise "Unable to process spec file template."
             
             ret,output = self.run_cmd('rpmbuild -bb %s %s' % (buildRoot, specDest))
             for line in output.splitlines():
