@@ -723,6 +723,8 @@
   <column pluralMethodName="opsRead" type="uint" methodName="opsRead" name="opsRead"/>
   <column pluralMethodName="opsWrite" type="uint" methodName="opsWrite" name="opsWrite"/>
   <column pluralMethodName="assignSlots" type="uint" methodName="assignSlots" name="assignslots"/>
+  <column type="uint" methodName="assignMaxMemory" name="assignMaxMemory"/>
+  <column type="uint" methodName="assignMinMemory" name="assignMinMemory"/>
  </table>
  <table preload="true" useCodeGen="true" name="JobAssignmentStatus" expireKeyCache="true" className="JobAssignmentStatus">
   <column type="uint" methodName="keyJobAssignmentStatus" name="keyJobAssignmentStatus" pkey="true"/>
