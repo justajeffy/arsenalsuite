@@ -11,17 +11,23 @@
                 colors[1]  = 'rgb(160, 196, 224)'; // Blue
                 colors[2]  = 'rgb(178, 66, 66)';   // Red
                 colors[3]  = 'rgb(63, 136, 63)';   // Green
+                colors[4]  = 'rgb(111, 169, 255)';   // Dark Blue
+                colors[5]  = 'rgb(181, 253, 249)'; // Light Blue
 
                 // Do something with the data    
                 $.plot($('#time'), [ 
-                    { data: stats['cputime_done'], label: "Done (CPU Time)", color: 0, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['cputime_busy'], label: "Busy (CPU Time)", color: 3, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['cputime_suspended'], label: "Suspended (CPU Time)", color: 2, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['cputime_cancelled'], label: "Cancelled (CPU Time)", color: 1, bars: { show: true, lineWidth: 1 } },
+                    { data: stats['cputime_done'], label: "Done (CPU Time)", color: colors[0], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['cputime_busy'], label: "Busy (CPU Time)", color: colors[3], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['cputime_suspended'], label: "Suspended (CPU Time)", color: colors[2], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['cputime_cancelled'], label: "Cancelled (CPU Time)", color: colors[1], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['cputime_holding'], label: "Holding (CPU Time)", color: colors[4], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['cputime_new'], label: "New (CPU Time)", color: colors[5], bars: { show: true, lineWidth: 1 } },
                     { data: stats['walltime_done'], label: "Done (Wallclock)", color: colors[0], bars: { show: true, lineWidth: 1 } },
                     { data: stats['walltime_busy'], label: "Busy (Wallclock)", color: colors[3], bars: { show: true, lineWidth: 1 } },
                     { data: stats['walltime_suspended'], label: "Suspended (Wallclock)", color: colors[2], bars: { show: true, lineWidth: 1 } },
-                    { data: stats['walltime_cancelled'], label: "Cancelled (Wallclock)", color: colors[1], bars: { show: true, lineWidth: 1 } }
+                    { data: stats['walltime_cancelled'], label: "Cancelled (Wallclock)", color: colors[1], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['walltime_holding'], label: "Holding (Wallclock)", color: colors[4], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['walltime_new'], label: "New (Wallclock)", color: colors[5], bars: { show: true, lineWidth: 1 } }
                 ], {
                     grid: {
                         hoverable: true
@@ -36,10 +42,12 @@
                 } );
 
                 $.plot($('#memory'), [ 
-                    { data: stats['memory_done'], label: "Done", color: 0, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['memory_busy'], label: "Busy", color: 3, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['memory_suspended'], label: "Suspended", color: 2, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['memory_cancelled'], label: "Cancelled", color: 1, bars: { show: true, lineWidth: 1 } },
+                    { data: stats['memory_done'], label: "Done", color: colors[0], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['memory_busy'], label: "Busy", color: colors[3], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['memory_suspended'], label: "Suspended", color: colors[2], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['memory_cancelled'], label: "Cancelled", color: colors[1], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['memory_holding'], label: "Holding", color: colors[4], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['memory_new'], label: "New", color: colors[5], bars: { show: true, lineWidth: 1 } }
                 ], {
                     grid: {
                         hoverable: true
@@ -54,14 +62,18 @@
                 });                
 
                 $.plot($('#ops'), [ 
-                    { data: stats['opsread_done'], label: "Done (Read)", color: 0, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['opsread_busy'], label: "Busy (Read)", color: 3, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['opsread_suspended'], label: "Suspended (Read)", color: 2, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['opsread_cancelled'], label: "Cancelled (Read)", color: 1, bars: { show: true, lineWidth: 1 } },
+                    { data: stats['opsread_done'], label: "Done (Read)", color: colors[0], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['opsread_busy'], label: "Busy (Read)", color: colors[3], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['opsread_suspended'], label: "Suspended (Read)", color: colors[2], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['opsread_cancelled'], label: "Cancelled (Read)", color: colors[1], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['opsread_holding'], label: "Holding (Read)", color: colors[4], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['opsread_new'], label: "New (Read)", color: colors[5], bars: { show: true, lineWidth: 1 } },
                     { data: stats['opswrite_done'], label: "Done (Write)", color: colors[0], bars: { show: true, lineWidth: 1 } },
                     { data: stats['opswrite_busy'], label: "Busy (Write)", color: colors[3], bars: { show: true, lineWidth: 1 } },
                     { data: stats['opswrite_suspended'], label: "Suspended (Write)", color: colors[2], bars: { show: true, lineWidth: 1 } },
-                    { data: stats['opswrite_cancelled'], label: "Cancelled (Write)", color: colors[1], bars: { show: true, lineWidth: 1 } }
+                    { data: stats['opswrite_cancelled'], label: "Cancelled (Write)", color: colors[1], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['opswrite_holding'], label: "Holding (Write)", color: colors[4], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['opswrite_new'], label: "New (Write)", color: colors[5], bars: { show: true, lineWidth: 1 } }
                 ], {
                     grid: {
                         hoverable: true
@@ -75,14 +87,18 @@
                 });
 
                 $.plot($('#bytes'), [ 
-                    { data: stats['bytesread_done'], label: "Done (Read)", color: 0, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['bytesread_busy'], label: "Busy (Read)", color: 3, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['bytesread_suspended'], label: "Suspended (Read)", color: 2, bars: { show: true, lineWidth: 1 } },
-                    { data: stats['bytesread_cancelled'], label: "Cancelled (Read)", color: 1, bars: { show: true, lineWidth: 1 } },
+                    { data: stats['bytesread_done'], label: "Done (Read)", color: colors[0], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['bytesread_busy'], label: "Busy (Read)", color: colors[3], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['bytesread_suspended'], label: "Suspended (Read)", color: colors[2], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['bytesread_cancelled'], label: "Cancelled (Read)", color: colors[1], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['bytesread_holding'], label: "Holding (Read)", color: colors[4], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['bytesread_new'], label: "New (Read)", color: colors[5], bars: { show: true, lineWidth: 1 } },
                     { data: stats['byteswrite_done'], label: "Done (Write)", color: colors[0], bars: { show: true, lineWidth: 1 } },
                     { data: stats['byteswrite_busy'], label: "Busy (Write)", color: colors[3], bars: { show: true, lineWidth: 1 } },
                     { data: stats['byteswrite_suspended'], label: "Suspended (Write)", color: colors[2], bars: { show: true, lineWidth: 1 } },
-                    { data: stats['byteswrite_cancelled'], label: "Cancelled (Write)", color: colors[1], bars: { show: true, lineWidth: 1 } }
+                    { data: stats['byteswrite_cancelled'], label: "Cancelled (Write)", color: colors[1], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['byteswrite_holding'], label: "Holding (Write)", color: colors[4], bars: { show: true, lineWidth: 1 } },
+                    { data: stats['byteswrite_new'], label: "New (Write)", color: colors[5], bars: { show: true, lineWidth: 1 } }
                 ], {
                     grid: {
                         hoverable: true
