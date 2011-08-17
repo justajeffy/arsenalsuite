@@ -80,7 +80,7 @@ class NaiadBurner(JobBurner):
         # if the frame is the first frame in the job, do NOT use the restartCache!
         frames = self.Job.jobTasks().frameNumbers()
         frames.sort()
-        if not self.Job.restartCache().isEmpty() and self.StartFrame != frames[0]:
+        if self.Job.forceRestart() or (not self.Job.restartCache().isEmpty() and self.StartFrame != frames[0]):
             self.logMessage("using restartCache %s" % self.Job.restartCache())
             restartParam = self.Job.restartCache()
             #restartParam.replace("####", "%04d" % int(int(self.StartFrame)-1))

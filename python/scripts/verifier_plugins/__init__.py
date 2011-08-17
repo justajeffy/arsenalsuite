@@ -46,3 +46,8 @@ try:
     reload(checkOnTens)
 except: traceback.print_exc()
 
+try:
+    import historicalSettings
+    reload(historicalSettings)
+except: traceback.print_exc()
+

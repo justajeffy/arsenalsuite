@@ -10,6 +10,7 @@ class MantraBurner(JobBurner):
     def __init__(self,jobAss,slave):
         JobBurner.__init__(self,jobAss,slave)
         self.Job = jobAss.job()
+        self.jobAss = jobAss
         self.Slave = slave
         self.CurrentFrame = None
         self.LastRenderedFrame = None
@@ -57,7 +58,7 @@ class MantraBurner(JobBurner):
         args << "-V"
         args << "2a"
         args << "-j"
-        args << str(self.Job.threads())
+        args << str(self.jobAss.assignSlots())
         if self.Job.outputPath().isEmpty():
             args << "-F"
             #args << self.burnFile().replace("..ifd", (".%s.ifd" % self.frameList[0]))
