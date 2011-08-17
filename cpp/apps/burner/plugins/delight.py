@@ -62,7 +62,7 @@ class DelightBurner(JobBurner):
 
     def environment(self):
         env = self.Job.environment().environment()
-        Log( "DelightBurner::environment(): %s" % env )
+        #Log( "DelightBurner::environment(): %s" % env )
         return env.split("\n")
 
     def buildCmdArgs(self):
