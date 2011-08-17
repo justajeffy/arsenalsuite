@@ -271,6 +271,7 @@ void JobSettingsWidget::resetSettings()
 		mPacketCombo->setCurrentIndex( -1 );
 
     extractNotifyUsers();
+    mNotifyChanged = false;
 
 	QStringList hostLists = mSelectedJobs.hostLists();
 	QList<bool> emptyLists;
@@ -470,17 +471,19 @@ void JobSettingsWidget::applySettings()
 	if( mAllHostsCheck->checkState() != Qt::PartiallyChecked && !mUpdatedHostList.isEmpty() )
 		mSelectedJobs.setHostLists( mAllHostsCheck->checkState() == Qt::Checked ? "" : mUpdatedHostList );
 
-    // Build the user strings
-    QString notifyOnErrorString = buildNotifyString(emailErrorList, jabberErrorList);
-    QString notifyOnCompleteString = buildNotifyString(emailCompleteList, jabberCompleteList);
+    if( mNotifyChanged ) {
+        // Build the user strings
+        QString notifyOnErrorString = buildNotifyString(emailErrorList, jabberErrorList);
+        QString notifyOnCompleteString = buildNotifyString(emailCompleteList, jabberCompleteList);
 
-	foreach( Job j, mSelectedJobs ) {
-        //j.setNotifyOnError( updateOwnerNotifyString( j.notifyOnError(), j.user(), mJabberErrorsCheck->checkState(), mEmailErrorsCheck->checkState() ) );
-        j.setNotifyOnError( notifyOnErrorString );
-		//j.setNotifyOnComplete( updateOwnerNotifyString( j.notifyOnComplete(), j.user(), mJabberCompleteCheck->checkState(), mEmailCompleteCheck->checkState() ) );
-        j.setNotifyOnComplete( notifyOnCompleteString );
-		mSelectedJobs.update(j);
-	}
+    	foreach( Job j, mSelectedJobs ) {
+            //j.setNotifyOnError( updateOwnerNotifyString( j.notifyOnError(), j.user(), mJabberErrorsCheck->checkState(), mEmailErrorsCheck->checkState() ) );
+            j.setNotifyOnError( notifyOnErrorString );
+    		//j.setNotifyOnComplete( updateOwnerNotifyString( j.notifyOnComplete(), j.user(), mJabberCompleteCheck->checkState(), mEmailCompleteCheck->checkState() ) );
+            j.setNotifyOnComplete( notifyOnCompleteString );
+    		mSelectedJobs.update(j);
+    	}
+    }
 
 	if( mPrioritySpin->changed() )
 		mSelectedJobs.setPriorities( mPrioritySpin->value() );
@@ -542,6 +545,7 @@ void JobSettingsWidget::showEmailErrorListWindow()
     und.setMainUserList(mMainUserList);
     und.setUsers(emailErrorList);
     if( und.exec() == QDialog::Accepted ) {
+        mNotifyChanged = true;
         emailErrorList = und.userList();
         settingsChange();
     }
@@ -553,6 +557,7 @@ void JobSettingsWidget::showJabberErrorListWindow()
     und.setMainUserList(mMainUserList);
     und.setUsers(jabberErrorList);
     if( und.exec() == QDialog::Accepted ) {
+        mNotifyChanged = true;
         jabberErrorList = und.userList();
         settingsChange();
     }
@@ -564,6 +569,7 @@ void JobSettingsWidget::showEmailCompleteListWindow()
     und.setMainUserList(mMainUserList);
     und.setUsers(emailCompleteList);
     if( und.exec() == QDialog::Accepted ) {
+        mNotifyChanged = true;
         emailCompleteList = und.userList();
         settingsChange();
     }
@@ -575,6 +581,7 @@ void JobSettingsWidget::showJabberCompleteListWindow()
     und.setMainUserList(mMainUserList);
     und.setUsers(jabberCompleteList);
     if( und.exec() == QDialog::Accepted ) {
+        mNotifyChanged = true;
         jabberCompleteList = und.userList();
         settingsChange();
     }
