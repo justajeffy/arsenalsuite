@@ -399,6 +399,9 @@ void Slave::setAvailableMemory()
 
     foreach( JobBurner * burner, mActiveBurners ) {
         int mem_job_needs = burner->jobAssignment().job().minMemory();
+        if( burner->jobAssignment().assignMinMemory() > 0 )
+            mem_job_needs = burner->jobAssignment().assignMinMemory();
+
         int mem_job_using = burner->jobAssignment().maxMemory();
 
         mem_job_needs = qMax( mem_job_needs, mem_job_using );
