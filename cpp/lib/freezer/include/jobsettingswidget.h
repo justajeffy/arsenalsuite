@@ -93,6 +93,8 @@ protected:
     UserList jabberCompleteList;
     UserList emailCompleteList;
 
+    bool mNotifyChanged;
+
     EmployeeList mMainUserList;
 };
 
