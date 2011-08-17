@@ -34,7 +34,6 @@ PyQt library
 /usr/lib/python2.5/site-packages/PyQt4/QtWebKit.so
 /usr/lib/python2.5/site-packages/PyQt4/QtXml.so
 /usr/lib/python2.5/site-packages/PyQt4/QtXmlPatterns.so
-/usr/lib/python2.5/site-packages/PyQt4/QtAssistant.so
 /usr/lib/python2.5/site-packages/PyQt4/QtDesigner.so
 /usr/lib/python2.5/site-packages/PyQt4/Qt.so
 /usr/lib/python2.5/site-packages/PyQt4/uic/driver.py
@@ -492,8 +491,6 @@ PyQt library
 /usr/share/sip/QtXmlPatterns/qsimplexmlnodemodel.sip
 /usr/share/sip/QtXmlPatterns/qxmlresultitems.sip
 /usr/share/sip/QtXmlPatterns/qabstractmessagehandler.sip
-/usr/share/sip/QtAssistant/QtAssistantmod.sip
-/usr/share/sip/QtAssistant/qassistantclient.sip
 /usr/share/sip/QtDesigner/propertysheet.sip
 /usr/share/sip/QtDesigner/qextensionmanager.sip
 /usr/share/sip/QtDesigner/formbuilder.sip
@@ -520,3 +517,6 @@ PyQt library
 /usr/share/sip/QtDesigner/qpydesignercustomwidgetplugin.sip
 /usr/share/sip/QtDesigner/qpydesignertaskmenuextension.sip
 /usr/share/sip/Qt/Qtmod.sip
+
+%clean
+

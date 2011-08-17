@@ -30,3 +30,6 @@ Main GUI implementation for Arsenal.
 /usr/share/sip/blur/jobsettingswidget.sip
 /usr/local/lib/libfreezer.so.1.0.0
 /usr/local/bin/af
+
+%clean
+

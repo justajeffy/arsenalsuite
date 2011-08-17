@@ -20,8 +20,8 @@ nsi = NSISTarget("classmaker_installer",path,"classmaker.nsi")
 
 QMakeTarget("classmaker",path,"classmaker.pro", pre_deps,[nsi])
 
-if sys.platform=="linux2":
-	rpm = RPMTarget('classmakerrpm','blur-classmaker',path,os.path.join(rpm_path,'classmaker.spec.template'),'1.0')
+#if sys.platform=="linux2":
+#	rpm = RPMTarget('classmakerrpm','blur-classmaker',path,os.path.join(rpm_path,'classmaker.spec.template'),'1.0')
 
 if __name__ == "__main__":
 	build()

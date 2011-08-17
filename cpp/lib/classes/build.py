@@ -40,8 +40,8 @@ if sys.platform != 'win32':
 QMakeTarget("classes",path,"classes.pro",pre_deps,post_deps)
 
 if sys.platform=="linux2":
-	rpm = RPMTarget('classesrpm','blur-classes',path,'../../../rpm/spec/classes.spec.template','1.0')
-	pyrpm = RPMTarget('pyclassesrpm','pyclasses',path,'../../../rpm/spec/pyclasses.spec.template','1.0')
+	rpm = RPMTarget('classesrpm','blur-classes',path,'../../../rpm/spec/classes.spec.template','1.0',["stonerpm", "classes","classesui","classmaker","pyclasses","pyclassesui"])
+#	pyrpm = RPMTarget('pyclassesrpm','pyclasses',path,'../../../rpm/spec/pyclasses.spec.template','1.0')
 
 if __name__ == "__main__":
 	build()

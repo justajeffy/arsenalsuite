@@ -27,8 +27,8 @@ class PyQtTarget(SipTarget):
 pyqt = PyQtTarget("pyqt",path,False,None,["sip"] )
 
 if sys.platform=="linux2":
-    rpm = RPMTarget("pyqtrpm","pyqt",path,"../../../rpm/spec/pyqt.spec.template","1.0")
-    rpm.pre_deps = ["siprpm"]
+    rpm = RPMTarget("pyqtrpm","pyqt",path,"../../../rpm/spec/pyqt.spec.template","1.0",["siprpm","pyqt"])
+#    rpm.pre_deps = ["siprpm","pyqt"]
 
 pyqt.post_deps = [nsis]
 
