@@ -26,6 +26,12 @@ def doThis(job):
                 job.setPacketType('continuous')
                 job.commit()
                 return True
+            elif prevFrame and frameNumber - prevFrame > 4:
+                print "checkOnTens - fives detected!"
+                job.setPriority(30)
+                job.setPacketType('continuous')
+                job.commit()
+                return True
             elif prevFrame:
                 # only compare the first two frames..
                 return True
