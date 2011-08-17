@@ -372,6 +372,9 @@ QSize MultiLineDelegate::sizeHint(const QStyleOptionViewItem &option, const QMod
 void JobIconDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     if( index.isValid() && index.column() == 29 && JobTranslator::isType(index) ) {
+        if( option.state & QStyle::State_Selected )
+            painter->fillRect(option.rect, option.palette.highlight());
+
         Job j = JobTranslator::data(index).getRecord();
         ThreadList threads = Thread::recordsByJob(j);
         uint currentWidth = 0;
