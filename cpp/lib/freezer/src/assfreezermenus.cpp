@@ -880,19 +880,36 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
             QMessageBox::Yes, QMessageBox::Cancel ) != QMessageBox::Yes )
             return;
 
+        // Reload the tasks just in case their assignment status has changed between the dialog popping up and the user pressing "yes"
+        mTasks.reload();
         foreach( JobAssignment ass, mTasks.jobTaskAssignments().jobAssignments() ) {
             Database::current()->exec("SELECT cancel_job_assignment("+QString::number(ass.key())+",'cancelled','cancelled')");
         }
 
+        foreach( JobTask task, mTasks ) {
+            if( task.status() == "new" )
+                task.setStatus("cancelled");
+                task.commit();
+        }
+
         mJobList->currentJob().addHistory(  "Cancel Frames: " + frameList.join(",") );
 
-        mJobList->refreshCurrentTab();
+        // mJobList->refreshCurrentTab();
         mJobList->setStatusBarMessage( "Frames marked as 'cancelled'" );
     }
     else if( action == mSuspendFramesAction ) {
+        // Reload the tasks in case the assignment status has changed.
+        mTasks.reload();
         foreach( JobAssignment ass, mTasks.jobTaskAssignments().jobAssignments() ) {
             Database::current()->exec("SELECT cancel_job_assignment("+QString::number(ass.key())+",'cancelled','suspended')");
         }
+
+        foreach( JobTask task, mTasks ) {
+            if( task.status() == "new" )
+                task.setStatus("suspended");
+                task.commit();
+        }
+
         mJobList->currentJob().addHistory(  "Suspend Frames: " + frameList.join(",") );
         mJobList->setStatusBarMessage( QString::number( mTasks.size() ) + " frame" + QString(mTasks.size() > 1 ? "s" : "") + " suspended" );
     }
