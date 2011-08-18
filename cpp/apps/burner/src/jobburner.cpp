@@ -486,20 +486,24 @@ JobError JobBurner::logError( const Job & j, const QString & msg, const JobTaskL
 
 void JobBurner::jobErrored( const QString & msg, bool timeout, const QString & nextstate )
 {
-	LOG_3( "JobBurner: Got Error: " + msg );
+	LOG_3( "Got Error: " + msg );
 	logMessage( "JobBurner: Got Error: " + msg );
     if( mState == StateError ) {
-        LOG_3( "JobBurner: ERROR an error has already occurred" );
+        LOG_3( "ERROR an error has already occurred" );
         return;
     }
     mState = StateError;
 
+	LOG_3( "firing error slot in 1000 msecs" );
     // delay the actual error firing to grab any final output from the process
-    QTimer::singleShot(2000, this, SLOT(_jobErrored(msg, timeout, nextstate)));
+    //QTimer::singleShot(1000, this, SLOT(slotJobErrored(msg, timeout, nextstate)));
+    sleep(1);
+    slotJobErrored(msg, timeout, nextstate);
 }
 
-void JobBurner::_jobErrored( const QString & msg, bool timeout, const QString & nextstate )
+void JobBurner::slotJobErrored( const QString & msg, bool timeout, const QString & nextstate )
 {
+    LOG_3( "JobBurner: ERROR! log error and cleanup" );
 	// error will be logged by the slave that is monitoring this jobburner
 	JobError je = logError( mJob, msg, mCurrentTasks, timeout );
 
@@ -510,11 +514,11 @@ void JobBurner::_jobErrored( const QString & msg, bool timeout, const QString & 
     mJobAssignment.commit();
 	Database::current()->exec("SELECT cancel_job_assignment(?,?,?)", VarList() << mJobAssignment.key() << "error" << nextstate );
 
-	emit errored( msg );
 	cleanup();
 	slotReadStdOut();
 	slotReadStdError();
 	updateOutput();
+	emit errored( msg );
 }
 
 void JobBurner::cancel()
@@ -530,7 +534,7 @@ void JobBurner::cancel()
 void JobBurner::jobFinished()
 {
     if( mState == StateError || mState == StateCancelled ) {
-        LOG_3( "JobBurner: ERROR an error has occurred, job can't be finished" );
+        logMessage( "JobBurner: ERROR an error has occurred, job can't be finished" );
         return;
     }
 
