@@ -482,7 +482,8 @@ void ThreadViewInternal::slotAddNote( const Record & record, const Thread & repl
 
 	AddNoteDialog * d = new AddNoteDialog( this );
 	d->setElement( el );
-	d->setJob( j );
+	//d->setJob( j );
+    d->setJobs( mJobs );
 	d->setReplyTo( replyTo );
 	d->exec();
 	delete d;

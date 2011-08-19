@@ -2,6 +2,8 @@
 #ifndef HOST_SERVICE_MATRIX_H
 #define HOST_SERVICE_MATRIX_H
 
+#include <qaction.h>
+
 #include "host.h"
 #include "hostservice.h"
 #include "hoststatus.h"
@@ -41,6 +43,7 @@ class FREEZER_EXPORT HostServiceMatrix : public RecordTreeView
 Q_OBJECT
 public:
 	HostServiceMatrix( QWidget * parent = 0 );
+    HostServiceModel * getModel() const;
 
 public slots:
 	void setHostFilter( const QString & );
@@ -61,11 +64,24 @@ Q_OBJECT
 public:
 	HostServiceMatrixWindow( QWidget * parent = 0 );
 
+    void refreshHostGroups();
+
 public slots:
+    void setShowMyGroupsOnly( bool );
+    void showOptionsMenu();
+    void performHostGroupRefresh();
+    void hostGroupChanged( const Record & hgr );
 	void newService();
 
+    void saveHostGroup();
+    void manageHostLists();
+
 protected:
-	HostServiceMatrix * mView;	
+	HostServiceMatrix * mView;
+    bool mHostGroupRefreshPending;
+    HostList hostList() const;
+
+    QAction * mShowMyGroupsOnlyAction, * mManageGroupsAction, * mSaveGroupAction;
 };
 
 #endif // HOST_SERVICE_MATRIX_H

@@ -241,15 +241,28 @@ def reaper():
                     suspendMsg = 'Job %s (%i) has been suspended.  The job has timed out on %i hosts.' % (job.name(), job.key(), timeoutCount)
                     suspendTitle = 'Job %s (%i) has been suspended(Timeout limit reached).' % (job.name(), job.key())
 
+            hasErrors = False
+            '''
+            # do we have a job that's got everything done except suspended frames?
+            if not (tasks - cancelled - done - unassigned) == busy:
+                if job.jobTasks().statuses().contains(QString("suspended")):
+                    suspend = True
+                    jobErrors = job.jobErrors()
+                    for error in jobErrors:
+                        if not error.cleared():
+                            hasErrors = True
+                            break
+            '''
 
             # If job is erroring check job and global error thresholds. Immediately refresh the job data to check for an increase in max errors since the records are cached.
-            if ((errorCount > job.maxErrors()) and (job.reload()) and (errorCount > job.maxErrors())) or (done == 0 and errorCount > config.totalFailureThreshold):
+            if ((errorCount > job.maxErrors()) and (job.reload()) and (errorCount > job.maxErrors())) or (done == 0 and errorCount > config.totalFailureThreshold) or (hasErrors):
                 suspend = True
                 suspendMsg = 'Job %s (%i) has been suspended.  The job has produced %i errors.' % (job.name(), job.key(), errorCount)
                 jobErrors = job.jobErrors()
                 messages = []
                 for i in range (0, min(5, len(jobErrors))):
-                    messages.append(str(jobErrors[i].message()))
+                    if not jobErrors[i].cleared():
+                        messages.append(str(jobErrors[i].message()).strip())
 
                 suspendMsg += "\nThe last %d errors produced were:\n" % (min(5, len(jobErrors)))
                 suspendMsg += "\n\n".join(messages)
@@ -355,7 +368,7 @@ def notifyOnErrorSend(job,errorCount,lastErrorCount):
     jobErrors = job.jobErrors()
     messages = []
     for i in range (0, min(5, errorCount - lastErrorCount)):
-        messages.append(str(jobErrors[i].message()))
+        messages.append(str(jobErrors[i].message()).strip())
 
     msg += "\bnThe last %d errors produced were:\n" % (min(5, errorCount - lastErrorCount))
     msg += "\n\n".join(messages)

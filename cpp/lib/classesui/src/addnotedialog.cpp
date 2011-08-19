@@ -134,7 +134,7 @@ void AddNoteDialog::setThread( const Thread & thread )
 	mThread = thread;
 	setSubject( mThread.topic() );
 	setElement( mThread.element() );
-	setJob( mThread.job() );
+	setJobs( ThreadList(mThread.job()) );
 	setBody( mThread.body() );
 	appendList( mThread.threadNotifies().users() );
     if( mThread.isRecord() )
@@ -339,9 +339,9 @@ void AddNoteDialog::setElement( const Element & element )
 	setNotifyList( assigned );
 }
 
-void AddNoteDialog::setJob( const Job & job )
+void AddNoteDialog::setJobs( const JobList & jobs )
 {
-    mJob = job;
+    mJobs = jobs;
 }
 
 void AddNoteDialog::setReplyTo( const Thread & thread )
@@ -364,61 +364,66 @@ void AddNoteDialog::accept()
 {
 	QStringList aurls = attachmentURLs();
 
-	mThread.setElement( mElement );
-	mThread.setJob( mJob );
-	mThread.setBody( mBody->toPlainText() );
-	mThread.setTopic( mSubject->text() );
-	mThread.setReply( mReplyThread );
-	mThread.setUser( User::currentUser() );
-	mThread.setTodoStatus( mTodoStatusCombo->currentIndex() );
-	mThread.setDateTime( QDateTime::currentDateTime() );
-	mThread.setHasAttachments( !aurls.isEmpty() );
+    foreach( Job mJob, mJobs){
+        Thread thread = mThread.copy();
 
-	Database::current()->beginTransaction( mThread.isRecord() ? "Edit Note" : "Add Note" );
-	mThread.commit();
+    	thread.setElement( mElement );
+    	thread.setJob( mJob );
+    	thread.setBody( mBody->toPlainText() );
+    	thread.setTopic( mSubject->text() );
+    	thread.setReply( mReplyThread );
+    	thread.setUser( User::currentUser() );
+    	thread.setTodoStatus( mTodoStatusCombo->currentIndex() );
+    	thread.setDateTime( QDateTime::currentDateTime() );
+    	thread.setHasAttachments( !aurls.isEmpty() );
 
-	// List of users to notify
-	UserList notifyList = usersToNotify();
-	ThreadNotifyList existing = ThreadNotify::recordsByThread( mThread );
+    	Database::current()->beginTransaction( thread.isRecord() ? "Edit Note" : "Add Note" );
+    	thread.commit();
 
-	// Remove the ones that already have thread notify records
-	notifyList -= existing.users();
+    	// List of users to notify
+    	UserList notifyList = usersToNotify();
+    	ThreadNotifyList existing = ThreadNotify::recordsByThread( thread );
+
+    	// Remove the ones that already have thread notify records
+    	notifyList -= existing.users();
 	
-	ThreadNotify tn;
-	tn.setThread( mThread );
-	tn.setRequiresSignoff( requireSignoff() );
-	foreach( User u, notifyList )
-	{
-		ThreadNotify cp = tn.copy();
-		cp.setUser( u );
-		cp.commit();
-	}
+    	ThreadNotify tn;
+    	tn.setThread( thread );
+    	tn.setRequiresSignoff( requireSignoff() );
+    	foreach( User u, notifyList )
+    	{
+    		ThreadNotify cp = tn.copy();
+    		cp.setUser( u );
+    		cp.commit();
+    	}
 
-	// Delete the ones that have been removed
-	foreach( ThreadNotify tn, existing ) {
-		if( !notifyList.contains( tn.user() ) )
-			tn.remove();
-	}
+    	// Delete the ones that have been removed
+    	foreach( ThreadNotify tn, existing ) {
+    		if( !notifyList.contains( tn.user() ) )
+    			tn.remove();
+    	}
 
-	Database::current()->commitTransaction();
+    	Database::current()->commitTransaction();
 
-	if( !aurls.isEmpty() ) {
-		QString attachPath( mThread.attachmentsPath() );
-		if( attachPath.isEmpty() ) {
-			mThread.setHasAttachments( false );
-			mThread.commit();
-			QMessageBox::critical( this, "Unable to copy attachments",
-				"The attachments could not be copied. Please notify IT." );
-		} else {
-			foreach( QString url, aurls )
-			{
-				if( !Stone::Path::copy( url, attachPath + QFileInfo(url).fileName() ) ){
-					QMessageBox::critical( this, "Unable to copy attachment",
-						"The attachment '" + url + "' could not be copied. Please notify IT." );
-				}
-			}
-		}
-	}
+    	if( !aurls.isEmpty() ) {
+    		QString attachPath( thread.attachmentsPath() );
+    		if( attachPath.isEmpty() ) {
+    			thread.setHasAttachments( false );
+    			thread.commit();
+    			QMessageBox::critical( this, "Unable to copy attachments",
+    				"The attachments could not be copied. Please notify IT." );
+    		} else {
+    			foreach( QString url, aurls )
+    			{
+    				if( !Stone::Path::copy( url, attachPath + QFileInfo(url).fileName() ) ){
+    					QMessageBox::critical( this, "Unable to copy attachment",
+    						"The attachment '" + url + "' could not be copied. Please notify IT." );
+    				}
+    			}
+    		}
+    	}
+        mThread = thread;
+    }
 	QDialog::accept();
 }
 

@@ -4,6 +4,9 @@
 #include <qinputdialog.h>
 #include <qmessagebox.h>
 #include <qmenu.h>
+#include <qtimer.h>
+
+#include "iniconfig.h"
 
 #include "hostservicematrix.h"
 #include "qvariantcmp.h"
@@ -11,6 +14,10 @@
 #include "syslogrealm.h"
 #include "syslogseverity.h"
 #include "user.h"
+#include "hostgroup.h"
+#include "hostlistsdialog.h"
+
+#include "ui_savelistdialogui.h"
 
 struct HostServiceItem : public RecordItem
 {
@@ -216,6 +223,11 @@ HostServiceMatrix::HostServiceMatrix( QWidget * parent )
 	connect( Service::table(), SIGNAL( updated(Record,Record) ), SLOT( updateServices() ) );
 }
 
+HostServiceModel * HostServiceMatrix::getModel() const
+{
+    return mModel;
+}
+
 void HostServiceMatrix::setHostFilter( const QString & filter )
 {
 	mHostFilter = filter;
@@ -284,6 +296,7 @@ void HostServiceMatrix::slotShowMenu( const QPoint & pos, const QModelIndex & /*
 
 HostServiceMatrixWindow::HostServiceMatrixWindow( QWidget * parent )
 : QMainWindow( parent )
+, mHostGroupRefreshPending(false)
 {
 	setupUi(this);
 
@@ -298,6 +311,159 @@ HostServiceMatrixWindow::HostServiceMatrixWindow( QWidget * parent )
 	fileMenu->addAction( "&New Service", this, SLOT( newService() ) );
 	fileMenu->addSeparator();
 	fileMenu->addAction( "&Close", this, SLOT( close() ) );
+
+    mShowMyGroupsOnlyAction = new QAction( "Show My Lists Only", this );
+    mShowMyGroupsOnlyAction->setCheckable( true );
+    IniConfig & cfg = userConfig();
+    cfg.pushSection( "HostSelector" );
+    mShowMyGroupsOnlyAction->setChecked( cfg.readBool( "ShowMyGroupsOnly", false ) );
+    cfg.popSection();
+
+    mManageGroupsAction = new QAction( "Manage My Lists", this );
+    mSaveGroupAction = new QAction( "Save Current List", this );
+
+    connect( mHostGroupCombo, SIGNAL( currentChanged( const Record & ) ), SLOT( hostGroupChanged( const Record & ) ) );
+    connect( mOptionsButton, SIGNAL( clicked() ), SLOT( showOptionsMenu() ) );
+    connect( mShowMyGroupsOnlyAction, SIGNAL( toggled(bool) ), SLOT( setShowMyGroupsOnly(bool) ) );
+    connect( mSaveGroupAction, SIGNAL( triggered() ), SLOT( saveHostGroup() ) );
+    connect( mManageGroupsAction, SIGNAL( triggered() ), SLOT( manageHostLists() ) );
+
+    mHostGroupCombo->setColumn( "name" );
+
+    refreshHostGroups();
+}
+
+void HostServiceMatrixWindow::saveHostGroup()
+{
+    QDialog * sld = new QDialog( this );
+    Ui::SaveListDialogUI ui;
+    ui.setupUi( sld );
+
+    ui.mNameCombo->addItems( HostGroup::recordsByUser( User::currentUser() ).filter( "name", QRegExp( "^.+$" ) ).sorted( "name" ).names() );
+    ui.mNameCombo->addItems( HostGroup::recordsByUser( User() ).filter( "name", QRegExp( "^.+$" ) ).sorted( "name" ).names() );
+
+    HostGroup cur_hg(mHostGroupCombo->current());
+    if( cur_hg.isRecord() ) {
+        int idx = ui.mNameCombo->findText( cur_hg.name() );
+        if( idx >= 0 )
+            ui.mNameCombo->setCurrentIndex( idx );
+
+        if( !cur_hg.user().isRecord() )
+            ui.mGlobalCheck->setChecked( true );
+    }
+
+    if( sld->exec() ) {
+        HostGroup hg = HostGroup::recordByNameAndUser( ui.mNameCombo->currentText(), ui.mGlobalCheck->isChecked() ? User() : User::currentUser() );
+        if( hg.isRecord() &&
+            QMessageBox::question( this, "Overwrite Host List?"
+                ,"This will overwrite the existing list: " + hg.name() + "\nAre you sure you want to continue?"
+                , QMessageBox::Yes, QMessageBox::No ) != QMessageBox::Yes
+            )
+            return;
+
+        //
+        // Commit the host group
+        hg.setName( ui.mNameCombo->currentText() );
+        hg.setUser( User::currentUser() );
+        hg.setPrivate_( !ui.mGlobalCheck->isChecked() );
+        hg.commit();
+
+        // Gather existing hostgroup items
+        QMap<Host,HostGroupItem> exist;
+        HostGroupItemList com;
+
+        HostGroupItemList hgl = HostGroupItem::recordsByHostGroup( hg );
+        foreach( HostGroupItem hgi, hgl )
+            exist[hgi.host()] = hgi;
+
+        // Commit the items
+        HostList hl = hostList();
+        foreach( Host h, hl ) {
+            HostGroupItem hgi;
+            if( exist.contains( h ) ) {
+                hgi = exist[h];
+                exist.remove( h );
+            }
+            hgi.setHostGroup(hg);
+            hgi.setHost(h);
+            com += hgi;
+        }
+        com.commit();
+
+        // Delete the old ones
+        HostGroupItemList toRemove;
+        for( QMap<Host,HostGroupItem>::Iterator it = exist.begin(); it != exist.end(); ++it )
+            toRemove += it.value();
+        toRemove.remove();
+    }
+    refreshHostGroups();
+}
+
+void HostServiceMatrixWindow::manageHostLists()
+{
+    HostListsDialog * hld = new HostListsDialog( this );
+    hld->show();
+    hld->exec();
+    delete hld;
+}
+
+HostList HostServiceMatrixWindow::hostList() const
+{
+    HostList hl = mView->getModel()->getRecords( ModelIter::collect( mView->getModel(), ModelIter::Selected ) );
+    LOG_1("Found " + QString::number( hl.size() ) + " selected hosts" );
+    return hl;
+}
+
+void HostServiceMatrixWindow::setShowMyGroupsOnly(bool toggle)
+{
+    IniConfig & cfg = userConfig();
+    cfg.pushSection( "HostSelector" );
+    cfg.writeBool( "ShowMyGroupsOnly", toggle );
+    cfg.popSection();
+    mShowMyGroupsOnlyAction->setChecked( toggle );
+    refreshHostGroups();
+}
+
+void HostServiceMatrixWindow::showOptionsMenu()
+{
+    QMenu * menu = new QMenu(this);
+    menu->addAction( mShowMyGroupsOnlyAction );
+    menu->addSeparator();
+    menu->addAction( mSaveGroupAction );
+    menu->addAction( mManageGroupsAction );
+    menu->exec( QCursor::pos() );
+    delete menu;
+}
+
+void HostServiceMatrixWindow::refreshHostGroups()
+{
+    if( !mHostGroupRefreshPending ) {
+        QTimer::singleShot( 0, this, SLOT( performHostGroupRefresh() ) );
+        mHostGroupRefreshPending = true;
+    }
+}
+
+void HostServiceMatrixWindow::performHostGroupRefresh()
+{
+    mHostGroupRefreshPending = false;
+
+    // Generate the default list (everything)
+    HostGroup hg;
+    hg.setName( "Default List" );
+    HostGroupList hostGroups = HostGroup::select( "fkeyusr=? or private is null or private=false", VarList() << User::currentUser().key() ).sorted( "name" );
+    if( mShowMyGroupsOnlyAction->isChecked() )
+        hostGroups = hostGroups.filter( "fkeyusr", User::currentUser().key() );
+    hostGroups.insert(hostGroups.begin(), hg);
+    mHostGroupCombo->setItems( hostGroups );
+}
+
+void HostServiceMatrixWindow::hostGroupChanged( const Record & hgr )
+{
+    HostServiceModel * temp = mView->getModel();
+    if( hgr.isRecord() )
+        temp->setRootList(HostGroup(hgr).hosts()); 
+    else if (HostGroup(hgr).name() == "Default List")
+        temp->setRootList(Host::select());
 }
 
 void HostServiceMatrixWindow::newService()
