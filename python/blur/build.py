@@ -245,9 +245,10 @@ class StaticTarget(Target):
         return self.cmd
 
     def build_run(self):
-        cmd = self.command()
-        if cmd and len(cmd):
-            self.run_cmd(cmd,shell=self.shell)
+	if self.has_arg('build'):
+	        cmd = self.command()
+	        if cmd and len(cmd):
+	            self.run_cmd(cmd,shell=self.shell)
 
 # Copies a single file
 class CopyTarget(Target):
@@ -271,6 +272,7 @@ class SipTarget(Target):
         self.CleanDone = False
         self.InstallDone = False
         self.config = ""
+        self.name=name
     
     def is_built(self):
         if self.has_arg('clean') and not self.CleanDone:
@@ -295,14 +297,16 @@ class SipTarget(Target):
             self.config += " -u"
         if self.has_arg("trace"):
             self.config += " -r"
-        self.configure_command()
-        self.run_cmd(self.config)
+	if self.has_arg('build') or (not os.path.exists(os.getcwd() + 'Makefile') and not self.name.startswith('py') ):
+            self.configure_command()
+            self.run_cmd(self.config)
         if self.has_arg('clean') and not self.CleanDone:
             self.run_make('clean')
             self.CleanDone = True
             self.built = False
             self.InstallDone = False
-        self.run_make()
+	if self.has_arg('build'):
+            self.run_make()
         if self.has_arg('install') and not self.InstallDone:
             cmd = 'install'
             try:
@@ -361,7 +365,7 @@ class QMakeTarget(Target):
     
     # Runs qmake, make clean(option), make, make install(option)
     def build_run(self):
-        if not self.ConfigDone:
+        if not self.ConfigDone and self.has_arg("build"):
             cmd = "qmake " + self.qmakeargs()
             self.run_cmd(cmd)
             self.ConfigDone = True
@@ -375,7 +379,7 @@ class QMakeTarget(Target):
             else:
                 self.run_make("compiler_uic_make_all")
             return
-        if not self.BuildDone:
+        if not self.BuildDone and self.has_arg("build"):
             self.run_make()
             self.BuildDone = True
         if not self.InstallDone and self.has_arg('install'):

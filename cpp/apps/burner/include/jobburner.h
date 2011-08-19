@@ -245,7 +245,7 @@ protected slots:
     void slotFlushOutput();
 
 	/// internally called by jobburner if an error is raised
-	void _jobErrored( const QString &, bool timeout=false, const QString & nextstate="new" );
+	void slotJobErrored( const QString &, bool timeout=false, const QString & nextstate="new" );
 
 protected:
 	void deliverOutput( QProcess::ProcessChannel );
