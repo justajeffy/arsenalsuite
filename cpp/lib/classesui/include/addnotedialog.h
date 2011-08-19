@@ -51,7 +51,7 @@ class CLASSESUI_EXPORT AddNoteDialog : public QDialog, public Ui::AddNoteDialogU
 	Thread thread() const;
 
 	void setElement( const Element & );
-	void setJob( const Job & );
+	void setJobs( const JobList & );
 	void setReplyTo( const Thread & );
 
 	void setSubject( const QString & subject );
@@ -89,7 +89,7 @@ public slots:
 
 protected:
 	Element mElement;
-	Job mJob;
+	JobList mJobs;
 	Thread mThread;
 	Thread mReplyThread;
 
