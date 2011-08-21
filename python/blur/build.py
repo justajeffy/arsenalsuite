@@ -97,6 +97,11 @@ class Target:
     def __repr__(self):
         return self.name
     
+    def check_arg_sanity(self):
+        if self.has_arg('install') and self.has_arg('clean') and not self.has_arg('build'):
+            print term.render("${RED}Asked to clean then install without building. Bailing out${NORMAL}")
+            sys.exit(1)
+
     # Returns true if this target has already been built
     # Some targets have different build steps, and can
     # return different values depending on the args
@@ -245,10 +250,13 @@ class StaticTarget(Target):
         return self.cmd
 
     def build_run(self):
-	if self.has_arg('build'):
-	        cmd = self.command()
-	        if cmd and len(cmd):
-	            self.run_cmd(cmd,shell=self.shell)
+        self.check_arg_sanity()
+
+        if self.has_arg('build'):
+            if not self.built:
+                cmd = self.command()
+                if cmd and len(cmd):
+                    self.run_cmd(cmd,shell=self.shell)
 
 # Copies a single file
 class CopyTarget(Target):
@@ -285,6 +293,8 @@ class SipTarget(Target):
         pass
     
     def build_run(self):
+        self.check_arg_sanity()
+
         if os.environ.has_key('PYTHON'):
             self.config = os.environ['PYTHON'] + " configure.py"
         else:
@@ -297,7 +307,7 @@ class SipTarget(Target):
             self.config += " -u"
         if self.has_arg("trace"):
             self.config += " -r"
-	if self.has_arg('build') or (not os.path.exists(os.getcwd() + 'Makefile') and not self.name.startswith('py') ):
+        if self.has_arg('build') or (not os.path.exists(os.getcwd() + 'Makefile') and not self.name.startswith('py') ):
             self.configure_command()
             self.run_cmd(self.config)
         if self.has_arg('clean') and not self.CleanDone:
@@ -305,8 +315,9 @@ class SipTarget(Target):
             self.CleanDone = True
             self.built = False
             self.InstallDone = False
-	if self.has_arg('build'):
+        if self.has_arg('build'):
             self.run_make()
+            self.built = True
         if self.has_arg('install') and not self.InstallDone:
             cmd = 'install'
             try:
@@ -365,6 +376,8 @@ class QMakeTarget(Target):
     
     # Runs qmake, make clean(option), make, make install(option)
     def build_run(self):
+        self.check_arg_sanity()
+
         if not self.ConfigDone and self.has_arg("build"):
             cmd = "qmake " + self.qmakeargs()
             self.run_cmd(cmd)
@@ -382,6 +395,7 @@ class QMakeTarget(Target):
         if not self.BuildDone and self.has_arg("build"):
             self.run_make()
             self.BuildDone = True
+            self.built = True
         if not self.InstallDone and self.has_arg('install'):
             self.run_make('install')
             self.InstallDone = True
@@ -650,7 +664,7 @@ class RPMTarget(Target):
 
             pythonVersion = 'python%s' % sys.version[:3]
             if self.run_cmd('sed -i "s/python2.5/%s/" %s' % (pythonVersion,specDest))[0]:
-		raise "Unable to process spec file template."
+                raise "Unable to process spec file template."
             
             ret,output = self.run_cmd('rpmbuild -bb %s %s' % (buildRoot, specDest))
             for line in output.splitlines():
