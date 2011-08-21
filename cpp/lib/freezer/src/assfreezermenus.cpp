@@ -887,7 +887,7 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
         }
 
         foreach( JobTask task, mTasks ) {
-            if( task.status() == "new" )
+            if( task.status() != "cancelled" )
                 task.setStatus("cancelled");
                 task.commit();
         }
@@ -905,7 +905,7 @@ void FreezerTaskMenu::slotActionTriggered( QAction * action )
         }
 
         foreach( JobTask task, mTasks ) {
-            if( task.status() == "new" )
+            if( task.status() != "suspended" )
                 task.setStatus("suspended");
                 task.commit();
         }
