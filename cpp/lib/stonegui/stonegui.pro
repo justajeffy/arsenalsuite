@@ -54,7 +54,8 @@ SOURCES += \
 	src/remotetailwindow.cpp \
 	src/imagesequencewidget.cpp \
 	src/undotoolbutton.cpp \
-	src/viewcolors.cpp
+	src/viewcolors.cpp \
+    src/richtexteditor.cpp
 
 HEADERS += \
 	include/actions.h \
@@ -98,7 +99,8 @@ HEADERS += \
 	include/remotetailwindow.h \
 	include/imagesequencewidget.h \
 	include/undotoolbutton.h \
-	include/viewcolors.h
+	include/viewcolors.h \
+    include/richtexteditor.h
 
 INCLUDEPATH+=include src .out ../stone/include ../stone/.out
 

@@ -99,6 +99,7 @@ ModelIter::Filter ModelIter::validateFilter( const Filter & f )
 	out |= excl( f, (DragEnabled|DragDisabled) );
 	out |= excl( f, (DropEnabled|DropDisabled) );
 	out |= excl( f, (Hidden|NotHidden) );
+    out |= excl( f, (Selected|Unselected) );
 	out |= (f & (Recursive|DescendOpenOnly));
 	return Filter(out);
 }
