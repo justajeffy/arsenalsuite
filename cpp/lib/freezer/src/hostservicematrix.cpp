@@ -409,8 +409,8 @@ void HostServiceMatrixWindow::manageHostLists()
 
 HostList HostServiceMatrixWindow::hostList() const
 {
-    HostList hl = mView->getModel()->getRecords( ModelIter::collect( mView->getModel(), ModelIter::Selected ) );
-    LOG_1("Found " + QString::number( hl.size() ) + " selected hosts" );
+    HostList hl = mView->getModel()->getRecords( ModelIter::collect( mView->getModel(), ModelIter::Selected, mView->selectionModel() ) );
+    LOG_5("Found " + QString::number( hl.size() ) + " selected hosts" );
     return hl;
 }
 
