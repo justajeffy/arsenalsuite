@@ -205,6 +205,12 @@ def reaper():
     # Terminal coloring filter
     colorFilter = re.compile("(\x1b|\x1B)\[[0-9];?[0-9]{0,}m")
 
+    # Log reaper in once to the jabber server
+    sender = config.jabberSystemUser +'@'+ config.jabberDomain +'/'+config.jabberSystemResource
+    password = str(config.jabberSystemPassword)
+    jabberBot = blur.jabber.farmBot(sender, password)
+    jabberBot.joinRoom('wrangler-notify@rooms.drd.im.dmz')
+
     while True:
         t1 = time.time()
         service.pulse()
@@ -248,16 +254,18 @@ def reaper():
                     suspendTitle = 'Job %s (%i) has been suspended(Timeout limit reached).' % (job.name(), job.key())
 
             hasErrors = False
-            '''
             # do we have a job that's got everything done except suspended frames?
-            if ((done + suspended) == tasks):
-                suspend = True
-                jobErrors = job.jobErrors()
-                for error in jobErrors:
-                    if not error.cleared():
-                        hasErrors = True
-                        break
-            '''
+            if ((done + cancelled + suspended) == tasks) and (suspended > 0):
+                js.reload()
+                cancelled = js.tasksCancelled()
+                suspended = js.tasksSuspended()
+                if ((done + cancelled + suspended) == tasks):
+                    suspend = True
+                    jobErrors = job.jobErrors()
+                    for error in jobErrors:
+                        if not error.cleared():
+                            hasErrors = True
+                            break
 
             # If job is erroring check job and global error thresholds. Immediately refresh the job data to check for an increase in max errors since the records are cached.
             if ((errorCount > job.maxErrors()) and (job.reload()) and (errorCount > job.maxErrors())) or (done == 0 and errorCount > config.totalFailureThreshold) or (hasErrors):
@@ -282,7 +290,7 @@ def reaper():
                 # notify them via email and jabber
                 if len(notifyList) == 0:
                     notifyList = job.user().name() + ':je'
-                notifySend(notifyList, suspendMsg, suspendTitle )
+                notifySend(jabberBot, notifyList, suspendMsg, suspendTitle )
                 continue
 
             # send error notifications
@@ -294,7 +302,7 @@ def reaper():
 
             # Notify about errors if needed
             if job.notifyOnError() and errorCount - lastErrorCount > errorStep:
-                notifyOnErrorSend(job,errorCount,lastErrorCount)
+                notifyOnErrorSend(jabberBot, job,errorCount,lastErrorCount)
                 js.setLastNotifiedErrorCount( errorCount )
 
             # now we set the status started unless it's new
@@ -308,7 +316,7 @@ def reaper():
             if done + cancelled >= tasks:
                 job.setColumnLiteral("endedts","now()")
                 if job.notifyOnComplete():
-                    notifyOnCompleteSend(job)
+                    notifyOnCompleteSend(jabberBot, job)
                 if job.deleteOnComplete():
                     job.setStatus( 'deleted' )
                 else:
@@ -356,15 +364,15 @@ def reaper():
         if VERBOSE_DEBUG: Log( "*** Reaping complete in %0.3f ms" % ((t2-t1) * 1000.0))
         time.sleep(1)
 
-def notifyOnCompleteSend(job):
+def notifyOnCompleteSend(jabberBot, job):
     if VERBOSE_DEBUG:
         print 'notifyOnCompleteSend(): Job %s is complete.' % (job.name())
     msg = 'Job %s (%i) is complete.' % (job.name(), job.key())
     if not job.notifyCompleteMessage().isEmpty():
         msg = job.notifyCompleteMessage()
-    notifySend( notifyList = job.notifyOnComplete(), subject = msg, body = msg )
+    notifySend( jabberBot, notifyList = job.notifyOnComplete(), subject = msg, body = msg )
 
-def notifyOnErrorSend(job,errorCount,lastErrorCount):
+def notifyOnErrorSend(jabberBot, job,errorCount,lastErrorCount):
     if VERBOSE_DEBUG:
         print 'notifyOnErrorSend(): Job %s has errors.' % (job.name())
     msg = 'Job %s (%i) for user %s has %i errors.' % (job.name(), job.key(), job.user().name(), errorCount)
@@ -380,25 +388,34 @@ def notifyOnErrorSend(job,errorCount,lastErrorCount):
     msg += "\nThe last %d errors produced were:\n" % (min(5, errorCount - lastErrorCount))
     msg += "\n".join(messages)
 
-    notifySend( notifyList = job.notifyOnError(), body = msg, subject = msg, noEmail = True )
+    notifySend(jabberBot,  notifyList = job.notifyOnError(), body = msg, subject = msg, noEmail = True )
 
-def notifySend( notifyList, body, subject, noEmail = False ):
+def notifySend(jabberBot, notifyList, body, subject, noEmail = False ):
+    if len(body) == 0:
+        return
+
     messages = body.split('\n')
     messages[len(messages)-1] += "\n"
     if VERBOSE_DEBUG:
         print 'NOTIFY: %s' % body
     for notify in str(notifyList).split(','):
+        sendType = 'chat'
         try:  # Incorrectly formatted notify entries are skipped
             recipient, method = notify.split(':')
             if 'e' in method and not noEmail:
                 blur.email.send(sender = 'no-reply@drdstudios.com', recipients = [recipient], subject = subject, body = body )
             if 'j' in method:
                 sender = config.jabberSystemUser +'@'+ config.jabberDomain +'/'+config.jabberSystemResource
-                recipient += '@'+config.jabberDomain
+                if not recipient.find('@') > -1:
+                    recipient += '@'+config.jabberDomain
+                else:
+                    sendType = 'groupchat'
+                    jabberBot.joinRoom(recipient)
                 if VERBOSE_DEBUG:
-                    print 'JABBER: %s %s %s' % (sender, config.jabberSystemPassword, recipient) 
+                    print 'JABBER: %s %s %s %s' % (sender, config.jabberSystemPassword, recipient, sendType)
                 for message in messages:
-                    blur.jabber.send(str(sender), str(config.jabberSystemPassword), str(recipient), ur'%s' % str(message) )
+#                    blur.jabber.send(str(sender), str(config.jabberSystemPassword), str(recipient), ur'%s' % str(message), sendType )
+                    jabberBot.send(str(recipient), ur'%s' % str(message), sendType)                    
         except:
             if VERBOSE_DEBUG:
                 print 'bad formatting in notifyList %s\n' % (notifyList)
