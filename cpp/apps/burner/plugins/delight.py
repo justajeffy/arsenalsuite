@@ -112,9 +112,9 @@ class DelightBurner(JobBurner):
         if not self.Job.name().contains("_notexmem"):
             tex_rx = QRegExp("_texmem=(\d+)")
             if( tex_rx.indexIn(self.Job.name()) > -1 ):
-                args << "/drd/software/ext/delight/texmem_%s" % str(tex_rx.cap(1))
+                args << "/drd/software/ext/delight/texmem_%s.rib" % str(tex_rx.cap(1))
             else:
-                args << "/drd/software/ext/delight/texmem_default"
+                args << "/drd/software/ext/delight/texmem_default.rib"
 
         if self.Job.fileName().endsWith("..rib"):
             for n in self.frameList:
