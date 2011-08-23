@@ -8,24 +8,25 @@ import blur.email, blur.jabber
 import sys, time, re, os
 from math import ceil
 import traceback
+import unicodedata
 
 try:
-	import popen2
+    import popen2
 except: pass
 
 if sys.argv.count('-daemonize'):
-	from blur.daemonize import createDaemon
-	createDaemon()
+    from blur.daemonize import createDaemon
+    createDaemon()
 
 reaperConfig = '/etc/reaper.ini'
 try:
-	pos = sys.argv.index('-config')
-	reaperConfig = sys.argv[pos+1]
+    pos = sys.argv.index('-config')
+    reaperConfig = sys.argv[pos+1]
 except: pass
 dbConfig = '/etc/db.ini'
 try:
-	pos = sys.argv.index('-dbconfig')
-	dbConfig = sys.argv[pos+1]
+    pos = sys.argv.index('-dbconfig')
+    dbConfig = sys.argv[pos+1]
 except: pass
 
 app = QCoreApplication(sys.argv)
@@ -44,155 +45,155 @@ classes_loader()
 VERBOSE_DEBUG = True
 
 if False and VERBOSE_DEBUG:
-	Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete | Database.EchoSelect )
+    Database.current().setEchoMode( Database.EchoUpdate | Database.EchoDelete | Database.EchoSelect )
 
 Database.current().connection().reconnect()
 
 # Stores/Updates Config vars needed for reaper
 class ReaperConfig:
-	def update(self):
-		self.managerDriveLetter = str(Config.getString('managerDriveLetter')).lower()
-		self.spoolDir = Config.getString('managerSpoolDir')
-		self.requiredSpoolSpacePercent = Config.getFloat('assburnerRequiredSpoolSpacePercent',10.0)
-		self.totalFailureThreshold = Config.getInt('assburnerTotalFailureErrorThreshold',30)
-		self.permissableMapDrives = Config.getString('assburnerPermissableMapDrives','G:,V:')
-		self.assburnerForkJobVerify = Config.getBool('assburnerForkJobVerify',True)
-		self.jabberDomain = Config.getString('jabberDomain','jabber.com')
-		self.jabberSystemUser = Config.getString('jabberSystemUser','farm')
-		self.jabberSystemPassword = Config.getString('jabberSystemPassword','farm')
-		self.jabberSystemResource = Config.getString('jabberSystemResource','Reaper')
+    def update(self):
+        self.managerDriveLetter = str(Config.getString('managerDriveLetter')).lower()
+        self.spoolDir = Config.getString('managerSpoolDir')
+        self.requiredSpoolSpacePercent = Config.getFloat('assburnerRequiredSpoolSpacePercent',10.0)
+        self.totalFailureThreshold = Config.getInt('assburnerTotalFailureErrorThreshold',30)
+        self.permissableMapDrives = Config.getString('assburnerPermissableMapDrives','G:,V:')
+        self.assburnerForkJobVerify = Config.getBool('assburnerForkJobVerify',True)
+        self.jabberDomain = Config.getString('jabberDomain','jabber.com')
+        self.jabberSystemUser = Config.getString('jabberSystemUser','farm')
+        self.jabberSystemPassword = Config.getString('jabberSystemPassword','farm')
+        self.jabberSystemResource = Config.getString('jabberSystemResource','Reaper')
 
 def execReturnStdout(cmd):
-	p = popen2.Popen3(cmd)
-	while True:
-		try:
-			p.wait()
-			break
-		except OSError:
-			print 'EINTR during popen2.wait, ignoring.'
-			pass
-	return p.fromchild.read()
+    p = popen2.Popen3(cmd)
+    while True:
+        try:
+            p.wait()
+            break
+        except OSError:
+            print 'EINTR during popen2.wait, ignoring.'
+            pass
+    return p.fromchild.read()
 
 def getLocalFilePath(job):
-	if config.spoolDir != "":
-		baseName = QFileInfo(job.fileName()).fileName()
-		userName = job.user().name()
-		userDir = config.spoolDir + "/" + userName + "/"
-		filePath = userDir + baseName
-		return str(filePath)
-	else: return str(job.fileName())
+    if config.spoolDir != "":
+        baseName = QFileInfo(job.fileName()).fileName()
+        userName = job.user().name()
+        userDir = config.spoolDir + "/" + userName + "/"
+        filePath = userDir + baseName
+        return str(filePath)
+    else: return str(job.fileName())
 
 def cleanupJob(job):
-	print "cleanupJob called on %s jobID: %i" % (job.name(), job.key())
-	if not job.user().isRecord():
-		print "Job::cleanup cannot clean up a job that isn't assigned a user!\n"
-		return
+    print "cleanupJob called on %s jobID: %i" % (job.name(), job.key())
+    if not job.user().isRecord():
+        print "Job::cleanup cannot clean up a job that isn't assigned a user!\n"
+        return
 
-	if job.uploadedFile():
-		filePath = getLocalFilePath(job)
-		filePathExtra = re.sub('(\.zip|\.max)','.txt',filePath)
+    if job.uploadedFile():
+        filePath = getLocalFilePath(job)
+        filePathExtra = re.sub('(\.zip|\.max)','.txt',filePath)
 
-		if config.spoolDir != "":
-			QFile.remove(filePath)
-			QFile.remove(filePathExtra)
+        if config.spoolDir != "":
+            QFile.remove(filePath)
+            QFile.remove(filePathExtra)
 
 def diskFree(path):
-	if len(path) < 1:
-		path = '/'
-	dfcmd = '/bin/df'
-	inp = []
-	for line in execReturnStdout('%s %s 2>&1' % (dfcmd, path)).splitlines():
-		line = line.strip()
-		if line.find('Filesystem') >= 0:
-			continue
-		inp.append(line)
-	parts = re.split('\s+',' '.join(inp))
-	device, blocks, usedblocks, freeblocks, percent_used, mountpoint = parts
-	percent_used = int(re.sub('\%','',percent_used))
-	return (blocks,usedblocks,freeblocks,percent_used)
+    if len(path) < 1:
+        path = '/'
+    dfcmd = '/bin/df'
+    inp = []
+    for line in execReturnStdout('%s %s 2>&1' % (dfcmd, path)).splitlines():
+        line = line.strip()
+        if line.find('Filesystem') >= 0:
+            continue
+        inp.append(line)
+    parts = re.split('\s+',' '.join(inp))
+    device, blocks, usedblocks, freeblocks, percent_used, mountpoint = parts
+    percent_used = int(re.sub('\%','',percent_used))
+    return (blocks,usedblocks,freeblocks,percent_used)
 
 # Usage: checkSpoolSpace( SpoolDir, RequiredPercent )
 # Returns: 1 for sufficient space, else 0
 def checkSpoolSpace(requiredPercent):
-	(blocks,usedblocks,freeblocks,percent_used) = diskFree(config.spoolDir)
-	if (100 - percent_used) >= requiredPercent: return True
-	print "checkSpoolSpace found required percent free disk space on %s insufficient (%i %% used)!" % (config.spoolDir, percent_used)
-	return False
+    (blocks,usedblocks,freeblocks,percent_used) = diskFree(config.spoolDir)
+    if (100 - percent_used) >= requiredPercent: return True
+    print "checkSpoolSpace found required percent free disk space on %s insufficient (%i %% used)!" % (config.spoolDir, percent_used)
+    return False
 
 def cleanupJobs():
-	if VERBOSE_DEBUG: print "cleanupJobs called, retrieving cleanable jobs"
-	jobsCleaned = 0
-	for job in retrieveCleanable():
-		print "Found cleanable Job: %s %i" % (job.name(), job.key() )
-		cleanupJob(job)
-		job.setCleaned(True)
-		job.commit()
-		jobsCleaned+=1
-	if VERBOSE_DEBUG: print "Job::cleanupJobs done, returning,", jobsCleaned
-	return jobsCleaned
+    if VERBOSE_DEBUG: print "cleanupJobs called, retrieving cleanable jobs"
+    jobsCleaned = 0
+    for job in retrieveCleanable():
+        print "Found cleanable Job: %s %i" % (job.name(), job.key() )
+        cleanupJob(job)
+        job.setCleaned(True)
+        job.commit()
+        jobsCleaned+=1
+    if VERBOSE_DEBUG: print "Job::cleanupJobs done, returning,", jobsCleaned
+    return jobsCleaned
 
 def ensureSpoolSpace(requiredPercent):
-	triedCleanup = False
-	while not checkSpoolSpace( requiredPercent ):
-		print "ensureSpoolSpace -- checkSpool indicates not enough free space, attemping to free space!"
-		if not triedCleanup:
-			triedCleanup = True
-			if cleanupJobs() > 0:
-				continue
-		jobs = Job.select("fkeyjobtype=9 and status='done' ORDER BY endedts asc limit 1")
-		#only auto-deleting max8 jobs for now, some batch jobs will be really old and ppl will want them saved 
-		#no matter what disk space they use
-		if not jobs.isEmpty():
-			job = jobs[0]
-			print "Setting Job %s to deleted and removing files to free disk space" % (job.name())
-			job.setStatus('deleted')
-			cleanupJob(job)
-			job.setCleaned(True)
-			job.commit()
-			notifylist = "it:e"
-			if job.user().isRecord():
-				notifylist += "," + job.user().name() + ":je" 
- 			notifySend( notifyList = notifylist, subject = 'Job auto-deleted: ' + job.name(),
-						body = "Your old max8 job was automatically deleted to free up space on the Assburner job spool. Job: " + job.name() )
-		else:
-			print "Failed to ensure proper spool space, no more done jobs to delete and cleanup."
-			return False
-	return True
+    triedCleanup = False
+    while not checkSpoolSpace( requiredPercent ):
+        print "ensureSpoolSpace -- checkSpool indicates not enough free space, attemping to free space!"
+        if not triedCleanup:
+            triedCleanup = True
+            if cleanupJobs() > 0:
+                continue
+        jobs = Job.select("fkeyjobtype=9 and status='done' ORDER BY endedts asc limit 1")
+        #only auto-deleting max8 jobs for now, some batch jobs will be really old and ppl will want them saved 
+        #no matter what disk space they use
+        if not jobs.isEmpty():
+            job = jobs[0]
+            print "Setting Job %s to deleted and removing files to free disk space" % (job.name())
+            job.setStatus('deleted')
+            cleanupJob(job)
+            job.setCleaned(True)
+            job.commit()
+            notifylist = "it:e"
+            if job.user().isRecord():
+                notifylist += "," + job.user().name() + ":je" 
+            notifySend( notifyList = notifylist, subject = 'Job auto-deleted: ' + job.name(),
+                        body = "Your old max8 job was automatically deleted to free up space on the Assburner job spool. Job: " + job.name() )
+        else:
+            print "Failed to ensure proper spool space, no more done jobs to delete and cleanup."
+            return False
+    return True
 
 def getSlotCount(job):
-	q = Database.current().exec_("""
+    q = Database.current().exec_("""
      SELECT sum(assignslots)
      FROM JobAssignment ja
      WHERE fkeyjob = %i
      AND fkeyjobassignmentstatus < 4""" % job.key())
 
-	if q.next():
-		return q.value(0).toInt()[0]
-	return 0
+    if q.next():
+        return q.value(0).toInt()[0]
+    return 0
 
 def getErrorCount(job):
-	q = Database.current().exec_("SELECT sum(count) FROM JobError WHERE cleared=false AND fkeyJob=%i" % (job.key()) )
-	if q.next():
-		return q.value(0).toInt()[0]
-	return 0
+    q = Database.current().exec_("SELECT sum(count) FROM JobError WHERE cleared=false AND fkeyJob=%i" % (job.key()) )
+    if q.next():
+        return q.value(0).toInt()[0]
+    return 0
 
 def getTimeoutCount(job):
-	q = Database.current().exec_("SELECT count(*) FROM JobError WHERE timeout=true AND cleared=false AND fkeyjob=%i GROUP BY fkeyhost" % job.key() )
-	if q.next():
-		return q.value(0).toInt()[0]
-	return 0
+    q = Database.current().exec_("SELECT count(*) FROM JobError WHERE timeout=true AND cleared=false AND fkeyjob=%i GROUP BY fkeyhost" % job.key() )
+    if q.next():
+        return q.value(0).toInt()[0]
+    return 0
 
 def retrieveReapable():
-	jobList = Job.select("status IN ('ready','started')")
-	if not jobList.isEmpty():
-		JobStatus.select("fkeyjob IN ("+jobList.keyString()+")")
-	return jobList
+    jobList = Job.select("status IN ('ready','started')")
+    if not jobList.isEmpty():
+        JobStatus.select("fkeyjob IN ("+jobList.keyString()+")")
+    return jobList
 
 def retrieveCleanable():
-	return Job.select("status IN ('deleted') AND (cleaned IS NULL OR cleaned=0)")
+    return Job.select("status IN ('deleted') AND (cleaned IS NULL OR cleaned=0)")
 
 def reaper():
-    #	Config: managerDriveLetter, managerSpoolDir, assburnerErrorStep
+    #   Config: managerDriveLetter, managerSpoolDir, assburnerErrorStep
     print "Reaper is starting up"
 
     errorStep = Config.getInt('assburnerErrorStep')
@@ -201,7 +202,11 @@ def reaper():
     if not errorStep or errorStep < 1:
         errorStep = 1
 
+    # Terminal coloring filter
+    colorFilter = re.compile("(\x1b|\x1B)\[[0-9];?[0-9]{0,}m")
+
     while True:
+        t1 = time.time()
         service.pulse()
         config.update()
         if config.spoolDir != "":
@@ -220,6 +225,7 @@ def reaper():
             done        = js.tasksDone()
             tasks       = js.tasksCount()
             cancelled   = js.tasksCancelled()
+            suspended   = js.tasksSuspended()
             assigned    = js.tasksAssigned()
             busy        = js.tasksBusy()
 
@@ -244,14 +250,13 @@ def reaper():
             hasErrors = False
             '''
             # do we have a job that's got everything done except suspended frames?
-            if not (tasks - cancelled - done - unassigned) == busy:
-                if job.jobTasks().statuses().contains(QString("suspended")):
-                    suspend = True
-                    jobErrors = job.jobErrors()
-                    for error in jobErrors:
-                        if not error.cleared():
-                            hasErrors = True
-                            break
+            if ((done + suspended) == tasks):
+                suspend = True
+                jobErrors = job.jobErrors()
+                for error in jobErrors:
+                    if not error.cleared():
+                        hasErrors = True
+                        break
             '''
 
             # If job is erroring check job and global error thresholds. Immediately refresh the job data to check for an increase in max errors since the records are cached.
@@ -262,10 +267,10 @@ def reaper():
                 messages = []
                 for i in range (0, min(5, len(jobErrors))):
                     if not jobErrors[i].cleared():
-                        messages.append(str(jobErrors[i].message()).strip())
+                        messages.append(colorFilter.sub("",str(jobErrors[i].message())).strip().encode('ascii','ignore'))
 
                 suspendMsg += "\nThe last %d errors produced were:\n" % (min(5, len(jobErrors)))
-                suspendMsg += "\n\n".join(messages)
+                suspendMsg += "\n".join(messages)
 
                 suspendTitle = 'Job %s (%i) suspended.' % (job.name(), job.key())
 
@@ -347,7 +352,8 @@ def reaper():
             job.commit()
             js.commit()
 
-        if VERBOSE_DEBUG: Log( "*** Reaping complete in (time)" )
+        t2 = time.time()
+        if VERBOSE_DEBUG: Log( "*** Reaping complete in %0.3f ms" % ((t2-t1) * 1000.0))
         time.sleep(1)
 
 def notifyOnCompleteSend(job):
@@ -367,30 +373,37 @@ def notifyOnErrorSend(job,errorCount,lastErrorCount):
 
     jobErrors = job.jobErrors()
     messages = []
+    colorFilter = re.compile("(\x1b|\x1B)\[[0-9];?[0-9]{0,}m")
     for i in range (0, min(5, errorCount - lastErrorCount)):
-        messages.append(str(jobErrors[i].message()).strip())
+        messages.append(colorFilter.sub("", str(jobErrors[i].message())).strip().encode('ascii','ignore'))
 
-    msg += "\bnThe last %d errors produced were:\n" % (min(5, errorCount - lastErrorCount))
-    msg += "\n\n".join(messages)
+    msg += "\nThe last %d errors produced were:\n" % (min(5, errorCount - lastErrorCount))
+    msg += "\n".join(messages)
 
     notifySend( notifyList = job.notifyOnError(), body = msg, subject = msg, noEmail = True )
 
 def notifySend( notifyList, body, subject, noEmail = False ):
-	for notify in str(notifyList).split(','):
-		try:  # Incorrectly formatted notify entries are skipped
-			recipient, method = notify.split(':')
-			if 'e' in method and not noEmail:
-				blur.email.send(sender = 'no-reply@drdstudios.com', recipients = [recipient], subject = subject, body = body )
-			if 'j' in method:
-				sender = config.jabberSystemUser +'@'+ config.jabberDomain +'/'+config.jabberSystemResource
-				recipient += '@'+config.jabberDomain
-				if VERBOSE_DEBUG:
-					print 'JABBER: %s %s %s %s\n' % (sender, config.jabberSystemPassword, recipient, body) 
-				blur.jabber.send(str(sender), str(config.jabberSystemPassword), str(recipient), str(body) )
-		except:
-			if VERBOSE_DEBUG:
-				print 'bad formatting in notifyList %s\n' % (notifyList)
-			pass
+    messages = body.split('\n')
+    messages[len(messages)-1] += "\n"
+    if VERBOSE_DEBUG:
+        print 'NOTIFY: %s' % body
+    for notify in str(notifyList).split(','):
+        try:  # Incorrectly formatted notify entries are skipped
+            recipient, method = notify.split(':')
+            if 'e' in method and not noEmail:
+                blur.email.send(sender = 'no-reply@drdstudios.com', recipients = [recipient], subject = subject, body = body )
+            if 'j' in method:
+                sender = config.jabberSystemUser +'@'+ config.jabberDomain +'/'+config.jabberSystemResource
+                recipient += '@'+config.jabberDomain
+                if VERBOSE_DEBUG:
+                    print 'JABBER: %s %s %s' % (sender, config.jabberSystemPassword, recipient) 
+                for message in messages:
+                    blur.jabber.send(str(sender), str(config.jabberSystemPassword), str(recipient), ur'%s' % str(message) )
+        except:
+            if VERBOSE_DEBUG:
+                print 'bad formatting in notifyList %s\n' % (notifyList)
+            pass
+    print # formatting
 
 config = ReaperConfig()
 config.update()
