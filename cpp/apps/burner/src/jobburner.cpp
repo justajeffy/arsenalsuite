@@ -984,14 +984,14 @@ AccountingInfo JobBurner::checkResourceUsage()
 
     QList<int> descendants = processChildrenIds( mCmdPid, true );
     foreach( int pid, descendants ) {
-        QString line = backtick("/drd/software/int/bin/lin64/tasklogger -d -p "+ QString::number(pid));
+        QString line = backtick("/usr/local/bin/tasklogger -d -p "+ QString::number(pid));
         AccountingInfo info = mSlave->parseTaskLoggerOutput(line);
         ret = sumAccountingData( ret, info );
     }
 
     // uh I'm not sure this is quite right. We don't want to sum all
     // children's wallclock time as they overlap, but is this right?
-    QString line = backtick("/drd/software/int/bin/lin64/tasklogger -d -p "+ QString::number(mCmdPid));
+    QString line = backtick("/usr/local/bin/tasklogger -d -p "+ QString::number(mCmdPid));
     AccountingInfo info = mSlave->parseTaskLoggerOutput(line);
     ret = sumAccountingData( ret, info );
     ret.realTime = info.realTime;
