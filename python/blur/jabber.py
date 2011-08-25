@@ -1,15 +1,11 @@
 
 import sys,os,xmpp
 
-# Logs into the sender jid's jabber server and authenticates
-# with password.
-# Sends a message to receiver with text as the contents
-# The message is type='chat' unless sendAsChat=False
-
 class farmBot:
-    def __init__(self, user, password):
+    def __init__(self, user, password, nick='Render Farm'):
         sender_jid = xmpp.protocol.JID(str(user))
         self.user = user
+        self.nick = nick
 
         self.client = xmpp.Client(sender_jid.getDomain(),debug=[])
         self.client.connect(secure=0,use_srv=False)
@@ -18,19 +14,24 @@ class farmBot:
         self.client.sendPresence(typ='available')
         self.rooms = []
 
+        self.client.RegisterHandler('message', self.message)
+
+    def process(self):
+        self.client.Process()
+
     def joinRoom(self, room):
-        self.client.sendPresence("%s/%s" % (room, self.user))
+        self.client.sendPresence("%s/%s" % (room, self.nick))
         if not room in self.rooms:
             self.rooms.append(room)
 
     def leaveRoom(self, room):
-        self.client.sendPresence("%s/%s" % (room, self.user), typ='unavailable')
+        self.client.sendPresence("%s/%s" % (room, self.nick), typ='unavailable')
         if room in self.rooms:
             self.rooms.remove(room)
 
     def logOut(self):
         for room in self.rooms:
-            self.client.sendPresence("%s/%s" % (room, self.user), typ='unavailable')
+            self.client.sendPresence("%s/%s" % (room, self.nick), typ='unavailable')
 
         self.client.sendPresence(typ='unavailable')
 
@@ -38,6 +39,9 @@ class farmBot:
         receiver_jid = xmpp.protocol.JID(str(receiver))
         self.client.send(xmpp.protocol.Message(str(receiver),str(text),typ=sendType))
 
+    # drop the message
+    def message(self, conn, mess):
+        pass
 
 # Legacy compat below
 
