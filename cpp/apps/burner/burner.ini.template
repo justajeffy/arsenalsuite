@@ -1,0 +1,52 @@
+[Assburner]
+AFPath=c:\blur\assfreezer\assfreezer.exe
+ClientLogFile=assburner.log
+LogCommand=cmd.exe /c C:\max5\assburner3\Tail-4.2.12\tail.exe %1
+OnlineAfterIdleMinutes=-1
+SpoolDirectory=c:\blur\assburner\spool
+ApplicationName=ArsenalBurner
+
+[BackgroundMode]
+CutoffTime=60
+Enabled=true
+
+[LogonSession]
+UseNewSession=true
+Username=magma
+Password=x
+Domain=bsi
+
+[Database]
+DatabaseDriver=QPSQL7
+Host=farmdb
+Port=6432
+DatabaseName=burner
+User=burner
+Password=hot
+Timeout=10
+SqlErrorEmailList=your.name@example.org
+
+[Display Prefs]
+Icon Size=16,16
+
+[Email]
+Server=smtp.example.org
+Domain=@example.org
+
+[Logging]
+EchoStdOut=true
+Enabled=true
+File=/tmp/ab.log
+MaxFiles=10
+MaxSeverity=3
+MaxSize=104857600
+
+[Update Server]
+Enabled=false
+ExecOfflineCommands=false
+Host=war.x
+LastTransactionFile=update_manager_transaction.last
+MaxAttempts=-1
+Port=25565
+RetryRate=1000
+
