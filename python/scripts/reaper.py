@@ -389,7 +389,7 @@ def notifyOnErrorSend(jabberBot, job,errorCount,lastErrorCount):
     jobErrors = job.jobErrors()
     messages = []
     colorFilter = re.compile("(\x1b|\x1B)\[[0-9];?[0-9]{0,}m")
-    for i in range (0, min(5, errorCount - lastErrorCount)):
+    for i in range ( 0, min( 5, max( errorCount - lastErrorCount, len(jobErrors) ) ) ):
         messages.append(colorFilter.sub("", str(jobErrors[i].message())).strip().encode('ascii','ignore'))
 
     msg += "\nThe last %d errors produced were:\n" % (min(5, errorCount - lastErrorCount))
