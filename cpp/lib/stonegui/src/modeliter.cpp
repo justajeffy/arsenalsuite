@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: modeliter.cpp 6486 2008-05-02 01:34:01Z newellm $
+ * $Id$
  */
 
 #include <Qt>
