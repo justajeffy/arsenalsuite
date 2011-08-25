@@ -92,7 +92,7 @@ void JobListTask::run()
 			filters << "status IN ('" + mJobFilter.statusToShow.join("','") + "')";
 
 		if( mJobFilter.userList.size() > 0 )
-			filters << " fkeyUsr IN (" + mJobFilter.userList.join(",") + ")";
+			filters << " (fkeyUsr IN (" + mJobFilter.userList.join(",") + ") or fkeywrangler IN(" + mJobFilter.userList.join(",") + ") )";
 
         if( !mJobFilter.allProjectsShown || !mJobFilter.showNonProjectJobs ) {
             QString where = "(";

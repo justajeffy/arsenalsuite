@@ -5,7 +5,7 @@ from PyQt4.QtSql import *
 from blur.Stone import *
 from blur.Classes import *
 import blur.email, blur.jabber
-import sys, time, re, os
+import sys, time, re, os, gc
 from math import ceil
 import traceback
 import unicodedata
@@ -209,9 +209,11 @@ def reaper():
     sender = config.jabberSystemUser +'@'+ config.jabberDomain +'/'+config.jabberSystemResource
     password = str(config.jabberSystemPassword)
     jabberBot = blur.jabber.farmBot(sender, password)
-    jabberBot.joinRoom('wrangler-notify@rooms.drd.im.dmz')
 
     while True:
+        # Process any incoming messages (discard them)
+        jabberBot.process()
+
         t1 = time.time()
         service.pulse()
         config.update()
@@ -328,6 +330,7 @@ def reaper():
                 # too. If so then it is good to go.
                 Database.current().exec_('SELECT update_job_hard_deps(%i)' % job.key())
 
+            '''
             if False and (float(done) / float(tasks) >= 0.10) and job.autoAdaptSlots() == 0 and job.assignmentSlots() == 8:
                 if js.averageMemory() < (job.maxMemory() / 6):
                     print "job %s has poor memory utilisation %s" % ( job.name(), js.averageMemory() )
@@ -356,12 +359,16 @@ def reaper():
                     job.setMaxMemory( int(job.maxMemory()/2) )
                     job.commit()
                     job.addHistory( "Assignment slots auto-adapted in half due to poor efficiency %s" % js.efficiency() )
+            '''
 
             job.commit()
             js.commit()
 
         t2 = time.time()
-        if VERBOSE_DEBUG: Log( "*** Reaping complete in %0.3f ms" % ((t2-t1) * 1000.0))
+        if VERBOSE_DEBUG: 
+            Log( "*** Reaping complete in %0.3f ms" % ((t2-t1) * 1000.0))
+            Log( "*** Objects in memory %d" % (len(gc.get_objects())) )
+            print # formatting
         time.sleep(1)
 
 def notifyOnCompleteSend(jabberBot, job):
@@ -370,7 +377,7 @@ def notifyOnCompleteSend(jabberBot, job):
     msg = 'Job %s (%i) is complete.' % (job.name(), job.key())
     if not job.notifyCompleteMessage().isEmpty():
         msg = job.notifyCompleteMessage()
-    notifySend( jabberBot, notifyList = job.notifyOnComplete(), subject = msg, body = msg )
+    notifySend( jabberBot, job.notifyOnComplete(), msg, msg )
 
 def notifyOnErrorSend(jabberBot, job,errorCount,lastErrorCount):
     if VERBOSE_DEBUG:
@@ -388,38 +395,35 @@ def notifyOnErrorSend(jabberBot, job,errorCount,lastErrorCount):
     msg += "\nThe last %d errors produced were:\n" % (min(5, errorCount - lastErrorCount))
     msg += "\n".join(messages)
 
-    notifySend(jabberBot,  notifyList = job.notifyOnError(), body = msg, subject = msg, noEmail = True )
+    notifySend(jabberBot,  job.notifyOnError(), msg, msg, True )
 
 def notifySend(jabberBot, notifyList, body, subject, noEmail = False ):
-    if len(body) == 0:
-        return
-
     messages = body.split('\n')
     messages[len(messages)-1] += "\n"
     if VERBOSE_DEBUG:
         print 'NOTIFY: %s' % body
+    sender = config.jabberSystemUser +'@'+ config.jabberDomain +'/'+config.jabberSystemResource
     for notify in str(notifyList).split(','):
         sendType = 'chat'
-        try:  # Incorrectly formatted notify entries are skipped
-            recipient, method = notify.split(':')
-            if 'e' in method and not noEmail:
-                blur.email.send(sender = 'no-reply@drdstudios.com', recipients = [recipient], subject = subject, body = body )
-            if 'j' in method:
-                sender = config.jabberSystemUser +'@'+ config.jabberDomain +'/'+config.jabberSystemResource
-                if not recipient.find('@') > -1:
-                    recipient += '@'+config.jabberDomain
-                else:
-                    sendType = 'groupchat'
-                    jabberBot.joinRoom(recipient)
-                if VERBOSE_DEBUG:
-                    print 'JABBER: %s %s %s %s' % (sender, config.jabberSystemPassword, recipient, sendType)
-                for message in messages:
-#                    blur.jabber.send(str(sender), str(config.jabberSystemPassword), str(recipient), ur'%s' % str(message), sendType )
-                    jabberBot.send(str(recipient), ur'%s' % str(message), sendType)                    
-        except:
+        if not len(notify.split(':')) == 2: # Incorrectly formatted notify entries are skipped
             if VERBOSE_DEBUG:
-                print 'bad formatting in notifyList %s\n' % (notifyList)
-            pass
+                print 'bad formatting in notifyList %s' % notify
+            continue
+
+        recipient, method = notify.split(':')
+        if 'e' in method and not noEmail:
+            blur.email.send(sender = 'no-reply@drdstudios.com', recipients = [recipient], subject = subject, body = body )
+        if 'j' in method:
+            if not recipient.find('@') > -1:
+                recipient += '@'+config.jabberDomain
+            else:
+                sendType = 'groupchat'
+                jabberBot.joinRoom(recipient)
+            if VERBOSE_DEBUG:
+                print 'JABBER: %s %s %s %s' % (sender, config.jabberSystemPassword, recipient, sendType)
+            for message in messages:
+                jabberBot.send(str(recipient), ur'%s' % str(message), sendType)
+
     print # formatting
 
 config = ReaperConfig()
