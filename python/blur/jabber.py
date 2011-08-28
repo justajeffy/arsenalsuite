@@ -3,41 +3,63 @@ import sys,os,xmpp
 
 class farmBot:
     def __init__(self, user, password, nick='Render Farm'):
-        sender_jid = xmpp.protocol.JID(str(user))
+        self.sender_jid = xmpp.protocol.JID(str(user))
         self.user = user
         self.nick = nick
+        self.password = password
 
-        self.client = xmpp.Client(sender_jid.getDomain(),debug=[])
-        self.client.connect(secure=0,use_srv=False)
-        self.client.auth(sender_jid.getNode(),str(password),sender_jid.getResource())
+        self.connected = False
 
-        self.client.sendPresence(typ='available')
         self.rooms = []
 
-        self.client.RegisterHandler('message', self.message)
+        self.client = xmpp.Client(self.sender_jid.getDomain(),debug=[])
+        self.disconnectHandler()
+
+    def disconnectHandler(self):
+        self.client.connect(secure=0,use_srv=False)
+        if self.client.isConnected():
+            self.client.auth(self.sender_jid.getNode(),str(self.password),self.sender_jid.getResource())
+            self.client.sendPresence(typ='available')
+
+            self.client.RegisterHandler('message', self.message)
+            self.client.RegisterDisconnectHandler( self.disconnectHandler )
+
+            if len(self.rooms) > 0:
+                del self.rooms
+
+            self.rooms = []
 
     def process(self):
+        if not self.client.isConnected():
+            self.disconnectHandler()
+            if not self.client.isConnected():
+                return
+
         self.client.Process()
 
     def joinRoom(self, room):
-        self.client.sendPresence("%s/%s" % (room, self.nick))
-        if not room in self.rooms:
-            self.rooms.append(room)
+        if self.client.isConnected():
+            self.client.sendPresence("%s/%s" % (room, self.nick))
+            if not room in self.rooms:
+                self.rooms.append(room)
 
     def leaveRoom(self, room):
-        self.client.sendPresence("%s/%s" % (room, self.nick), typ='unavailable')
-        if room in self.rooms:
-            self.rooms.remove(room)
+        if self.client.isConnected():
+            self.client.sendPresence("%s/%s" % (room, self.nick), typ='unavailable')
+            if room in self.rooms:
+                self.rooms.remove(room)
 
     def logOut(self):
-        for room in self.rooms:
-            self.client.sendPresence("%s/%s" % (room, self.nick), typ='unavailable')
+        if self.client.isConnected():
+            for room in self.rooms:
+                self.client.sendPresence("%s/%s" % (room, self.nick), typ='unavailable')
 
-        self.client.sendPresence(typ='unavailable')
+            self.client.sendPresence(typ='unavailable')
 
     def send(self, receiver, text, sendType='chat'):
-        receiver_jid = xmpp.protocol.JID(str(receiver))
-        self.client.send(xmpp.protocol.Message(str(receiver),str(text),typ=sendType))
+        if self.client.isConnected():
+            receiver_jid = xmpp.protocol.JID(str(receiver))
+            self.client.send(xmpp.protocol.Message(str(receiver),str(text),typ=sendType))
 
     # drop the message
     def message(self, conn, mess):
