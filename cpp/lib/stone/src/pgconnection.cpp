@@ -112,7 +112,7 @@ bool pgtypeIsCompat( const QString pg_type, uint enumType )
 	if( pg_type == "int4" )
 		return ( enumType==Field::UInt || enumType==Field::Int );
 	if( pg_type == "int8" )
-		return ( enumType==Field::UInt || enumType==Field::Int || enumType==Field::UInt8 );
+		return ( enumType==Field::UInt || enumType==Field::Int || enumType==Field::ULongLong );
 	if( pg_type == "numeric" )
 		return ( enumType==Field::Double || enumType==Field::Float );
 	if( pg_type == "float4" )
@@ -143,7 +143,7 @@ uint fieldTypeFromPgType( const QString & pg_type )
 	if( pg_type == "int2" || pg_type == "int4" )
 		return Field::Int;
 	if( pg_type == "int8" )
-		return Field::UInt8;
+		return Field::ULongLong;
 	if( pg_type == "numeric" )
 		return Field::Double;
 	if( pg_type == "float4" )
@@ -332,17 +332,19 @@ static QString tableQuoted( const QString & table )
 	return table;
 }
 
-QString PGConnection::getSqlFields( TableSchema * schema )
+QString PGConnection::getSqlFields( TableSchema * schema, const QString & _tableAlias )
 {
-	QHash<TableSchema*,QString>::iterator it = mSqlFields.find( schema );
+	bool hasAlias = !_tableAlias.isEmpty();
+	QString alias( tableQuoted(hasAlias ? _tableAlias : schema->tableName()) );
+	QHash<TableSchema*,QString>::iterator it = hasAlias ? mSqlFields.end() : mSqlFields.find( schema );
 	if( it == mSqlFields.end() ) {
 		QStringList fields;
 		foreach( Field * f, schema->columns() )
 			if( !f->flag( Field::NoDefaultSelect ) )
 				fields += f->name().toLower();
-		QString tableName = tableQuoted(schema->tableName());
-		QString sql = tableName + ".\"" + fields.join( "\", " + tableName + ".\"" ) + "\"";
-		mSqlFields.insert( schema, sql );
+		QString sql = alias + ".\"" + fields.join( "\", " + alias + ".\"" ) + "\"";
+		if( !hasAlias )
+			mSqlFields.insert( schema, sql );
 		return sql;
 	}
 	return it.value();
@@ -384,20 +386,23 @@ QList<RecordList> PGConnection::joinedSelect( const JoinedSelect & joined, QStri
 	QList<JoinCondition> joinConditions = joined.joinConditions();
 	QList<Table*> tables;
 	tables += joined.table();
-	foreach( JoinCondition jc, joinConditions )
-		if( !jc.ignoreResults )
-			tables += jc.table;
-	
 	QString query( "SELECT " );
-	
 	// Generate column list
 	QStringList fields;
-	foreach( Table * table, tables ) {
-		ret += RecordList();
-		fields += getSqlFields(table->schema());
-	}
-	query += fields.join(", ");
+
+	// Add initial table
+	ret += RecordList();
+	fields += getSqlFields(joined.table()->schema(), joined.alias());
 	
+	foreach( JoinCondition jc, joinConditions ) {
+		if( jc.ignoreResults )
+			continue;
+		tables += jc.table;
+		ret += RecordList();
+		fields += getSqlFields(jc.table->schema(), jc.alias);
+	}
+	
+	query += fields.join(", ");
 	query += " FROM ONLY " + tableQuoted(joined.table()->schema()->tableName());
 	
 	// Generate join list
@@ -748,7 +753,7 @@ bool PGConnection::update( Table * table, RecordImp * imp, Record * returnValues
 			up += "=" + imp->getColumn( f->pos() ).toString();
 			selectAfterUpdate = true;
 		} else
-			up += "="+f->placeholder();
+			up += "=" + f->placeholder();
 		needComma = true;
 	}
 	

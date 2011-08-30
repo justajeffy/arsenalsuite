@@ -138,7 +138,6 @@ Interval Interval::abs() const
 
 double Interval::operator/( const Interval & other ) const
 {
-	double ret = 0;
 	return asOrder(Microseconds) / double(other.asOrder(Microseconds));
 }
 
