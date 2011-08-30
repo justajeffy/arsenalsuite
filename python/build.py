@@ -30,7 +30,7 @@ if sys.platform=="linux2":
 	All_Targets.append( RPMTarget("renderhostcheckerrpm", 'render_host_checker', scripts_path, '../../rpm/spec/render_host_checker.spec.template','1.0') )
 	'''
 
-	All_Targets.append( Target('abscriptsrpms',scripts_path, ['energysaverrpm','managerrpm','notifierrpm','reaperrpm','reclaimtasksrpm','joberrorhandlerrpm','rrdstatscollectorrpm','unassigntasksrpm','renderhostcheckerrpm'] ) )
+	All_Targets.append( RPMTarget("abscriptsrpm","abscripts",scripts_path, "../../rpm/spec/abscripts.spec.template", "1.0", ['abscripts'] ) )
 	
 if __name__ == "__main__":
 	build()

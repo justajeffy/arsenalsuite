@@ -397,6 +397,20 @@ void ThreadViewInternal::setJobList( JobList jobs )
 	mMessageLabel->setPlainText("");
     mJobs = jobs;
 
+    // Update the threads for the jobs selected to ensure any new threads get displayed.
+    if( jobs.size() ) {
+        QList<unsigned int> keys = jobs.keys();
+
+        QStringList temp;
+        VarList vars;
+        for( unsigned int i=0; i<keys.size(); ++i ) {
+            vars << keys[i];
+            temp << "'?'";
+        }
+
+        ThreadList tl = Thread::select("fkeyjob in (" + temp.join(",") + ")", vars);
+    }
+
 	mThreadView->model()->setRootList( mJobs );
 	mThreadView->expandRecursive();
 }
