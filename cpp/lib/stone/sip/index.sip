@@ -22,6 +22,8 @@ public:
 
 	void cacheIncoming( bool ci );
 
+	MappedRecordList recordsByIndexMulti( const QList<QVariant> & args );
+
 	MappedRecordList recordsByIndex( const QList<QVariant> & args );
 	MappedRecordList recordsByIndex( const QVariant & arg );
 	MappedRecordList recordsByIndex( const QVariant & arg1, const QVariant & arg2 );

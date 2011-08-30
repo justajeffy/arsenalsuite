@@ -103,6 +103,12 @@ public:
 %End
 */
 
+	SIP_PYOBJECT __repr__();
+%MethodCode
+	return PyString_FromFormat("<%s @%p *%i (%s)>",
+			 sipSelf->ob_type->tp_name, sipCpp->imp(), sipCpp->key(), sipCpp->displayName().toLatin1().constData());
+%End
+
 	bool isValid() const;
 
 	bool isRecord() const;
