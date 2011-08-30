@@ -194,11 +194,13 @@ int RecordFilterWidget::filterChildren(const QModelIndex & parent)
     int numRows = sm->rowCount(parent);
     int visibleRows = numRows;
     int mapSize = mFilterMap.size();
+    int visibleChildren = 0;
     //LOG_3( "parent has "+QString::number(numRows)+" children" );
-    for ( int row = 0; row < numRows; row++ ) {
+    for ( int row = 0; row < numRows; ++row ) {
         mTree->setRowHidden(row, parent, false);
 
-        for ( int col = 0; col < mapSize; col++ ) {
+        bool removedRow = false;
+        for ( int col = 0; col < mapSize && !removedRow; col++ ) {
             QLineEdit *filter = qobject_cast<QLineEdit*> (mFilterMap[col]);
 
             if ( filter && filter->isVisible() && !filter->text().isEmpty() ) {
@@ -206,36 +208,47 @@ int RecordFilterWidget::filterChildren(const QModelIndex & parent)
                 QString cell = sm->data(index).toString();
                 QString filterText = filter->text();
 
-                int visibleChildren = 0;
+                visibleChildren = 0;
                 if ( !mRowChildrenVisited.contains(index) && sm->hasChildren(index) ) {
                     visibleChildren = filterChildren(index);
                     mRowChildrenVisited[index] = true;
                     //LOG_3( "child "+cell+" has children, filtering - "+QString::number(visibleChildren)+ " of its children are visible" );
                 }
+                // We get negative values in some circumstance. Account for it.
                 if ( visibleChildren == 0 ) {
-                    if( filterText.startsWith("!") ) {
-                        filterText = filterText.remove(0,1);
-                        if ( cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) ) {
-                            mTree->setRowHidden(row, parent, true);
-                            visibleRows--;
-                        }
-                    } else if ( filterText.startsWith(">") ) {
-                        filterText = filterText.remove(0,1);
-                        if( cell.toInt() <= filterText.toInt() ) {
-                            mTree->setRowHidden(row, parent, true);
-                            visibleRows--;
-                        }
-                    } else if ( filterText.startsWith("<") ) {
-                        filterText = filterText.remove(0,1);
-                        if( cell.toInt() >= filterText.toInt() ) {
-                            mTree->setRowHidden(row, parent, true);
-                            visibleRows--;
-                        }
-                    } else {
-                        if ( !cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) ) {
-                            mTree->setRowHidden(row, parent, true);
-                            visibleRows--;
-                        }
+                    // faster implementation
+                    switch (filterText.toStdString()[0])
+                    {
+                        case '!':
+                            filterText = filterText.remove(0,1);
+                            if ( cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) ) {
+                                mTree->setRowHidden(row, parent, true);
+                                visibleRows--;
+                                removedRow = true;
+                            }
+                            break;
+                        case '>':
+                            filterText = filterText.remove(0,1);
+                            if( cell.toInt() <= filterText.toInt() ) {
+                                mTree->setRowHidden(row, parent, true);
+                                visibleRows--;
+                                removedRow = true;
+                            }
+                            break;
+                        case '<':
+                            filterText = filterText.remove(0,1);
+                            if( cell.toInt() >= filterText.toInt() ) {
+                                mTree->setRowHidden(row, parent, true);
+                                visibleRows--;
+                                removedRow = true;
+                            }
+                            break;
+                        default:
+                            if ( !cell.contains(QRegExp(filterText, Qt::CaseInsensitive)) ) {
+                                mTree->setRowHidden(row, parent, true);
+                                visibleRows--;
+                                removedRow = true;
+                            }
                     }
                 }
 
@@ -246,9 +259,9 @@ int RecordFilterWidget::filterChildren(const QModelIndex & parent)
             }
 
         }
-
     }
-    return visibleRows;
+
+    return visibleRows + visibleChildren;
 }
 
 void RecordFilterWidget::clearFilters()
