@@ -82,9 +82,16 @@ class DelightBurner(JobBurner):
         if( not self.Job.renderdlCmd().isEmpty() ):
             renderdl_cmd = self.Job.renderdlCmd()
 
+        # if it's the middle frame in a render, strace it just for fun
+        frames = self.Job.jobTasks().frameNumbers()
+        frames.sort()
+        middleFrame = False
+        if( self.frameList[0] == frames[ ((frames[-1] - frames[0]) / 2) ] ):
+            middleFrame = True
+
         straceLog = self.Job.fileName().replace("..rib", (".%04d.strace" % self.frameList[0]))
         straceCmd = "strace -tt -F -e trace=file,read,write -o %s" % straceLog
-        if self.Job.name().contains("strace"):
+        if middleFrame or self.Job.name().contains("strace"):
             renderdl_cmd = straceCmd + " " + renderdl_cmd
 
         cmd = timeCmd + "/bin/su %s -c \"%s " % (self.Job.user().name(), renderdl_cmd)
@@ -101,7 +108,7 @@ class DelightBurner(JobBurner):
         #args << str(processes)
         args << "-t"
         args << str(self.JobAss.assignSlots())
-        args << "-stats2"
+        args << "-stats3"
         args << "-init"
         if not self.Job.name().contains("_nonetcache"):
             if Host.currentHost().name().startsWith("c0"):
