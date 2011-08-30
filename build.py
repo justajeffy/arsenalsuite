@@ -14,7 +14,7 @@ import blur.build
 blur.build.Config_Replacement_File = os.path.join(path,'config_replacements.ini')
 
 All_Targets.append( Target('allrpms',os.path.abspath(os.getcwd()),[
-		"stonerpm","classesrpm","freezerrpm","absubmitrpm", "burnerrpm"]) )
+		"stonerpm","classesrpm","freezerrpm","absubmitrpm", "burnerrpm", "abscriptsrpm"]) )
 
 if __name__ == "__main__":
 	build()
