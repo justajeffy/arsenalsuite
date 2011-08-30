@@ -762,7 +762,7 @@ ALTER FUNCTION public.get_iterative_tasks(_fkeyjob integer, max_tasks integer, s
 -- Name: get_iterative_tasks_2(integer, integer, integer, boolean); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strictontens boolean) RETURNS SETOF integer
+CREATE FUNCTION get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strict_stripe boolean) RETURNS SETOF integer
     LANGUAGE plpgsql COST 200 ROWS 100
     AS $$DECLARE
 	task RECORD;
@@ -801,8 +801,8 @@ BEGIN
 		END IF;
 	END LOOP;
 
-	-- if strictOnTens then exit after the first loop attempt
-	IF strictOnTens = TRUE THEN
+	-- if strict_stripe then exit after the first loop attempt
+	IF strict_stripe = TRUE THEN
 		EXIT;
 	END IF;
 	
@@ -811,7 +811,7 @@ BEGIN
 END;$$;
 
 
-ALTER FUNCTION public.get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strictontens boolean) OWNER TO postgres;
+ALTER FUNCTION public.get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strict_stripe boolean) OWNER TO postgres;
 
 --
 -- Name: get_iterative_tasks_debug(integer, integer, integer); Type: FUNCTION; Schema: public; Owner: farmer
@@ -916,8 +916,10 @@ DECLARE
     _ret RECORD;
 BEGIN
 
+-- NB: I have no need of averagemem, am returning average done instead -- could not figure out how to change 'psspresetret'
+
 SELECT INTO _ret job.slots, 
-js.averagememory, 
+js.averagedonetime,
 (select MAX(maxmemory) FROM jobassignment ja WHERE ja.fkeyjob = keyjob) as maxmemory
 FROM job
 JOIN jobstatus js on js.fkeyjob = keyjob
@@ -1472,7 +1474,7 @@ BEGIN
     IF (OLD.slavestatus != NEW.slavestatus) AND (NEW.slavestatus IN ('starting','stopping','restart')) THEN
         PERFORM return_slave_tasks_3(NEW.fkeyhost);
     END IF;
-    
+
     RETURN NEW;
 END;
 $$;
@@ -1842,6 +1844,11 @@ BEGIN
                 taskscompleted=iq.tasksdone
             FROM (select jobstatus.taskscount, jobstatus.tasksdone FROM jobstatus WHERE jobstatus.fkeyjob=NEW.keyjob) as iq
             WHERE keyjobstat=NEW.fkeyjobstat;
+            -- Clear the wait reason on done and deleted jobs.
+            UPDATE jobstatus
+            SET
+                fkeyjobstatusskipreason=0
+            WHERE jobstatus.fkeyjob=NEW.keyjob;
         END IF;
     END IF;
 
@@ -1854,9 +1861,13 @@ BEGIN
 	INSERT INTO jobenvironment (keyjobenvironment, environment) VALUES (DEFAULT, NEW.environment) RETURNING keyjobenvironment INTO NEW.fkeyjobenvironment;
     END IF;
 
-    -- Set the suspended timestamp if job gets suspended
+    -- Set the suspended timestamp if job gets suspended. Clear the wait reason as well.
     IF NEW.status IN ('suspended') THEN
         NEW.suspendedts = NOW();
+        UPDATE jobstatus
+        SET
+            fkeyjobstatusskipreason=0
+        WHERE jobstatus.fkeyjob=NEW.keyjob;
     END IF;
 
     -- Clear the suspended timestamp if the job is removed from suspension
@@ -1922,7 +1933,9 @@ CREATE FUNCTION jobassignment_insert() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
-	SELECT INTO NEW.assignslots slots FROM job WHERE keyjob = NEW.fkeyjob;
+	IF NEW.assignslots IS NULL THEN
+		SELECT INTO NEW.assignslots slots FROM job WHERE keyjob = NEW.fkeyjob;
+	END IF;
 	
 	PERFORM updateJobLicenseCounts( NEW.fkeyjob, 1 );
 
@@ -2597,7 +2610,7 @@ ALTER FUNCTION public.update_job_soft_deps(_keyjob integer) OWNER TO farmer;
 --
 
 CREATE FUNCTION update_job_stats(_keyjob integer) RETURNS void
-    LANGUAGE plpgsql
+    LANGUAGE plpgsql COST 1000
     AS $$
 DECLARE
         _totaltime bigint := 0;
@@ -2635,10 +2648,10 @@ SELECT INTO _avgdonetime AVG(date_part('epoch'::text, jobassignment.ended::times
 SELECT INTO _totaltime, _cputime, _byteswrite, _bytesread, _opswrite, _opsread
         extract(epoch from sum((coalesce(ended,now())-started)))::bigint,
         sum(usertime+systime),
-        sum(byteswrite),
-        sum(bytesread),
-        sum(opswrite),
-        sum(opsread)
+        avg(byteswrite)::bigint,
+        avg(bytesread)::bigint,
+        avg(opswrite)::bigint,
+        avg(opsread)::bigint
         FROM jobassignment ja
         WHERE fkeyjob = _keyjob AND fkeyjobassignmentstatus < 5;
 
@@ -2924,7 +2937,7 @@ ALTER TABLE public.job_keyjob_seq OWNER TO farmer;
 -- Name: job_keyjob_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('job_keyjob_seq', 1349504, true);
+SELECT pg_catalog.setval('job_keyjob_seq', 1, false);
 
 
 --
@@ -3296,7 +3309,7 @@ ALTER TABLE public.host_keyhost_seq OWNER TO farmer;
 -- Name: host_keyhost_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('host_keyhost_seq', 2541, true);
+SELECT pg_catalog.setval('host_keyhost_seq', 1, false);
 
 
 --
@@ -3353,7 +3366,8 @@ CREATE TABLE host (
     puppetpulse timestamp without time zone,
     maxassignments integer DEFAULT 2 NOT NULL,
     fkeyuser integer,
-    maxmemory integer
+    maxmemory integer,
+    userisloggedin boolean
 );
 
 
@@ -3442,7 +3456,8 @@ CREATE TABLE jobtask (
     label text,
     fkeyjoboutput integer,
     progress integer,
-    fkeyjobtaskassignment integer
+    fkeyjobtaskassignment integer,
+    schedulepolicy integer
 );
 
 
@@ -3466,7 +3481,7 @@ ALTER TABLE public.jobtype_keyjobtype_seq OWNER TO farmer;
 -- Name: jobtype_keyjobtype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('jobtype_keyjobtype_seq', 40, true);
+SELECT pg_catalog.setval('jobtype_keyjobtype_seq', 1, false);
 
 
 --
@@ -3587,7 +3602,7 @@ ALTER TABLE public.element_keyelement_seq OWNER TO farmer;
 -- Name: element_keyelement_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('element_keyelement_seq', 2356, true);
+SELECT pg_catalog.setval('element_keyelement_seq', 1, false);
 
 
 --
@@ -3941,7 +3956,7 @@ ALTER TABLE public.assettype_keyassettype_seq OWNER TO farmer;
 -- Name: assettype_keyassettype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('assettype_keyassettype_seq', 3, true);
+SELECT pg_catalog.setval('assettype_keyassettype_seq', 1, false);
 
 
 --
@@ -4239,7 +4254,7 @@ ALTER TABLE public.config_keyconfig_seq OWNER TO farmer;
 -- Name: config_keyconfig_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('config_keyconfig_seq', 33, true);
+SELECT pg_catalog.setval('config_keyconfig_seq', 1, false);
 
 
 --
@@ -4543,7 +4558,7 @@ ALTER TABLE public.elementstatus_keyelementstatus_seq OWNER TO farmer;
 -- Name: elementstatus_keyelementstatus_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('elementstatus_keyelementstatus_seq', 8, true);
+SELECT pg_catalog.setval('elementstatus_keyelementstatus_seq', 1, false);
 
 
 --
@@ -4620,7 +4635,7 @@ ALTER TABLE public.elementtype_keyelementtype_seq OWNER TO farmer;
 -- Name: elementtype_keyelementtype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('elementtype_keyelementtype_seq', 8, true);
+SELECT pg_catalog.setval('elementtype_keyelementtype_seq', 1, false);
 
 
 --
@@ -5292,7 +5307,7 @@ ALTER TABLE public.grp_keygrp_seq OWNER TO farmer;
 -- Name: grp_keygrp_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('grp_keygrp_seq', 2, true);
+SELECT pg_catalog.setval('grp_keygrp_seq', 1, false);
 
 
 --
@@ -5476,7 +5491,7 @@ ALTER TABLE public.hostinterfacetype_keyhostinterfacetype_seq OWNER TO farmer;
 -- Name: hostinterfacetype_keyhostinterfacetype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('hostinterfacetype_keyhostinterfacetype_seq', 3, true);
+SELECT pg_catalog.setval('hostinterfacetype_keyhostinterfacetype_seq', 1, false);
 
 
 --
@@ -5889,7 +5904,9 @@ CREATE TABLE jobassignment (
     efficiency double precision,
     opsread integer,
     opswrite integer,
-    assignslots integer
+    assignslots integer,
+    assignmaxmemory integer,
+    assignminmemory integer
 );
 
 
@@ -6104,7 +6121,7 @@ ALTER TABLE public.joberror_keyjoberror_seq OWNER TO farmer;
 -- Name: joberror_keyjoberror_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('joberror_keyjoberror_seq', 1225720, true);
+SELECT pg_catalog.setval('joberror_keyjoberror_seq', 1, false);
 
 
 --
@@ -6236,7 +6253,7 @@ ALTER SEQUENCE jobfiltermessage_keyjobfiltermessage_seq OWNED BY jobfiltermessag
 -- Name: jobfiltermessage_keyjobfiltermessage_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('jobfiltermessage_keyjobfiltermessage_seq', 93, true);
+SELECT pg_catalog.setval('jobfiltermessage_keyjobfiltermessage_seq', 128, true);
 
 
 --
@@ -6316,7 +6333,7 @@ ALTER SEQUENCE jobfiltertype_keyjobfiltertype_seq OWNED BY jobfiltertype.keyjobf
 -- Name: jobfiltertype_keyjobfiltertype_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('jobfiltertype_keyjobfiltertype_seq', 4, true);
+SELECT pg_catalog.setval('jobfiltertype_keyjobfiltertype_seq', 5, true);
 
 
 --
@@ -6724,7 +6741,8 @@ CREATE TABLE jobnaiad (
     threads integer,
     append text,
     restartcache text,
-    fullframe integer
+    fullframe integer,
+    forcerestart boolean DEFAULT false NOT NULL
 )
 INHERITS (job);
 
@@ -6861,7 +6879,7 @@ ALTER TABLE public.jobribgen_keyjob_seq OWNER TO farmer;
 -- Name: jobribgen_keyjob_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('jobribgen_keyjob_seq', 1, true);
+SELECT pg_catalog.setval('jobribgen_keyjob_seq', 1, false);
 
 
 --
@@ -7087,7 +7105,8 @@ CREATE TABLE jobstatus (
     totaltime bigint,
     queueorder smallint DEFAULT 0 NOT NULL,
     taskbitmap text,
-    averagedonetime integer DEFAULT 0
+    averagedonetime integer DEFAULT 0,
+    fkeyjobstatusskipreason integer
 );
 
 
@@ -7125,6 +7144,46 @@ CREATE TABLE jobstatus_old (
 
 
 ALTER TABLE public.jobstatus_old OWNER TO farmer;
+
+--
+-- Name: jobstatusskipreason; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobstatusskipreason (
+    keyjobstatusskipreason integer NOT NULL,
+    name text
+);
+
+
+ALTER TABLE public.jobstatusskipreason OWNER TO farmer;
+
+--
+-- Name: jobstatusskipreason_keyjobstatusskipreason_seq; Type: SEQUENCE; Schema: public; Owner: farmer
+--
+
+CREATE SEQUENCE jobstatusskipreason_keyjobstatusskipreason_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.jobstatusskipreason_keyjobstatusskipreason_seq OWNER TO farmer;
+
+--
+-- Name: jobstatusskipreason_keyjobstatusskipreason_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: farmer
+--
+
+ALTER SEQUENCE jobstatusskipreason_keyjobstatusskipreason_seq OWNED BY jobstatusskipreason.keyjobstatusskipreason;
+
+
+--
+-- Name: jobstatusskipreason_keyjobstatusskipreason_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
+--
+
+SELECT pg_catalog.setval('jobstatusskipreason_keyjobstatusskipreason_seq', 1, false);
+
 
 --
 -- Name: jobtaskassignment_old; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
@@ -7242,7 +7301,7 @@ ALTER TABLE public.license_keylicense_seq OWNER TO farmer;
 -- Name: license_keylicense_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('license_keylicense_seq', 30, true);
+SELECT pg_catalog.setval('license_keylicense_seq', 1, false);
 
 
 --
@@ -7281,7 +7340,7 @@ ALTER TABLE public.service_keyservice_seq OWNER TO farmer;
 -- Name: service_keyservice_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('service_keyservice_seq', 252, true);
+SELECT pg_catalog.setval('service_keyservice_seq', 1, false);
 
 
 --
@@ -7969,7 +8028,7 @@ ALTER TABLE public.permission_keypermission_seq OWNER TO farmer;
 -- Name: permission_keypermission_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('permission_keypermission_seq', 2, true);
+SELECT pg_catalog.setval('permission_keypermission_seq', 1, false);
 
 
 --
@@ -8760,7 +8819,7 @@ ALTER TABLE public.syslog_count_seq OWNER TO farmer;
 -- Name: syslog_count_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('syslog_count_seq', 4034, true);
+SELECT pg_catalog.setval('syslog_count_seq', 1, false);
 
 
 --
@@ -8781,7 +8840,7 @@ ALTER TABLE public.syslogrealm_keysyslogrealm_seq OWNER TO farmer;
 -- Name: syslogrealm_keysyslogrealm_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('syslogrealm_keysyslogrealm_seq', 6, true);
+SELECT pg_catalog.setval('syslogrealm_keysyslogrealm_seq', 1, false);
 
 
 --
@@ -8814,7 +8873,7 @@ ALTER TABLE public.syslogseverity_keysyslogseverity_seq OWNER TO farmer;
 -- Name: syslogseverity_keysyslogseverity_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('syslogseverity_keysyslogseverity_seq', 4, true);
+SELECT pg_catalog.setval('syslogseverity_keysyslogseverity_seq', 1, false);
 
 
 --
@@ -9120,7 +9179,7 @@ ALTER TABLE public.timesheetcategory_keytimesheetcategory_seq OWNER TO farmer;
 -- Name: timesheetcategory_keytimesheetcategory_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('timesheetcategory_keytimesheetcategory_seq', 179, true);
+SELECT pg_catalog.setval('timesheetcategory_keytimesheetcategory_seq', 1, false);
 
 
 --
@@ -9729,6 +9788,13 @@ ALTER TABLE jobstateaction ALTER COLUMN keyjobstateaction SET DEFAULT nextval('j
 
 
 --
+-- Name: keyjobstatusskipreason; Type: DEFAULT; Schema: public; Owner: farmer
+--
+
+ALTER TABLE jobstatusskipreason ALTER COLUMN keyjobstatusskipreason SET DEFAULT nextval('jobstatusskipreason_keyjobstatusskipreason_seq'::regclass);
+
+
+--
 -- Name: keypackage; Type: DEFAULT; Schema: public; Owner: farmer
 --
 
@@ -10051,8 +10117,8 @@ COPY config (keyconfig, config, value) FROM stdin;
 28	assburnerLoopTime	3000
 33	arsenalMaxAutoAdapts	1
 13	arsenalSortMethod	key_darwin
-31	arsenalAssignSloppiness	20.0
-32	arsenalAssignMaxHosts	0.2
+31	arsenalAssignSloppiness	5.0
+32	arsenalAssignMaxHosts	0.1
 \.
 
 
@@ -10304,6 +10370,7 @@ COPY grp (keygrp, grp, alias) FROM stdin;
 1	Admin	\N
 2	2D	\N
 3	RenderOps	\N
+4	RenderOps-Notify	\N
 \.
 
 
@@ -10327,7 +10394,7 @@ COPY history (keyhistory, date, fkeyelement, fkeyusr, history) FROM stdin;
 -- Data for Name: host; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY host (keyhost, backupbytes, cpus, description, diskusage, fkeyjob, host, manufacturer, model, os, rendertime, slavepluginlist, sn, version, renderrate, dutycycle, memory, mhtz, online, uid, slavepacketweight, framecount, viruscount, virustimestamp, errortempo, fkeyhost_backup, oldkey, abversion, laststatuschange, loadavg, allowmapping, allowsleep, fkeyjobtask, wakeonlan, architecture, loc_x, loc_y, loc_z, ostext, bootaction, fkeydiskimage, syncname, fkeylocation, cpuname, osversion, slavepulse, puppetpulse, maxassignments, fkeyuser, maxmemory) FROM stdin;
+COPY host (keyhost, backupbytes, cpus, description, diskusage, fkeyjob, host, manufacturer, model, os, rendertime, slavepluginlist, sn, version, renderrate, dutycycle, memory, mhtz, online, uid, slavepacketweight, framecount, viruscount, virustimestamp, errortempo, fkeyhost_backup, oldkey, abversion, laststatuschange, loadavg, allowmapping, allowsleep, fkeyjobtask, wakeonlan, architecture, loc_x, loc_y, loc_z, ostext, bootaction, fkeydiskimage, syncname, fkeylocation, cpuname, osversion, slavepulse, puppetpulse, maxassignments, fkeyuser, maxmemory, userisloggedin) FROM stdin;
 \.
 
 
@@ -10482,7 +10549,7 @@ COPY job3delight (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyu
 -- Data for Name: jobassignment; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobassignment (keyjobassignment, fkeyjob, fkeyjobassignmentstatus, fkeyhost, stdout, stderr, command, maxmemory, started, ended, fkeyjoberror, realtime, usertime, systime, iowait, bytesread, byteswrite, efficiency, opsread, opswrite, assignslots) FROM stdin;
+COPY jobassignment (keyjobassignment, fkeyjob, fkeyjobassignmentstatus, fkeyhost, stdout, stderr, command, maxmemory, started, ended, fkeyjoberror, realtime, usertime, systime, iowait, bytesread, byteswrite, efficiency, opsread, opswrite, assignslots, assignmaxmemory, assignminmemory) FROM stdin;
 \.
 
 
@@ -10577,77 +10644,89 @@ COPY joberrorhandlerscript (keyjoberrorhandlerscript, script) FROM stdin;
 --
 
 COPY jobfiltermessage (keyjobfiltermessage, fkeyjobfiltertype, fkeyjobfilterset, regex, comment, enabled) FROM stdin;
-83	2	1	S2069: the interface of shader	\N	t
-87	3	6	NameError: name 'left' is not defined	\N	t
-91	4	1	No space left on device	\N	t
-93	1	6	Error: maximum recursion depth exceeded	\N	f
-84	3	1	S2050: cannot find shader	\N	t
-88	2	2	No valid license available!	\N	t
-92	2	2	attempting to kill process	\N	t
-85	3	1	Cannot read image file .* File is not an image file	\N	t
-89	3	2	Foundry::Cache::CacheDiskSizeLockFailed	\N	t
-1	2	1	cannot open output file	\N	t
+7	3	1	Received signal	\N	t
+9	2	3	^Error:	\N	t
+26	5	1	Internal 3Delight Message code: 45 -> "Can't load requested shader", message severity: 2	 	t
+122	2	1	Got Error: dspy_tiff: cannot open output file '/tmp/null' (system\nerror: No such file or directory)	\N	t
+13	2	4	^Error:	\N	t
+14	2	4	^Unable to access file	\N	t
+15	2	4	CAUGHT SIGNAL SIGABRT	\N	t
+1	3	1	cannot open output file	\N	t
+101	3	6	bash: .* Segmentation fault	\N	t
+104	2	6	AttributeError: 'NoneType' object has no attribute 'acquire'	\N	t
+4	3	6	^renderdl: cannot open input file	\N	t
+126	3	6	AttributeError: .* '[^(set|acquire)]'	\N	t
+123	3	6	ERROR: unrecognized arguments:	\N	t
+124	3	6	IndexError: list index out of range	\N	t
+125	3	2	ERROR: .* Missing input channel	\N	t
+127	2	6	ImportError:	\N	t
 2	2	1	3DL SEVERE ERROR L2033	\N	t
-3	2	1	Command exited with non-zero status	\N	t
-4	2	1	^renderdl: cannot open input file	\N	t
+128	3	2	Shuffle_Input_Channels.in: .* is not a layer or channel name	\N	t
+3	3	1	Command exited with non-zero status	\N	t
 5	2	1	^3DL INFO L2374: no license available	\N	t
-6	1	1	Could not find file:	\N	t
-7	2	1	Received signal	\N	t
+6	2	1	Could not find file:	\N	t
 8	3	1	3DL ERROR R5030:	\N	t
-9	2	2	^Error:	\N	t
-10	3	2	Read-only file system	\N	t
-11	2	2	FOUNDRY LICENSE ERROR	\N	t
-13	2	3	^Error:	\N	t
-14	2	3	^Unable to access file	\N	t
-15	2	3	CAUGHT SIGNAL SIGABRT	\N	t
-16	3	4	dammit	\N	f
-17	3	4	exist	\N	t
-18	2	3	CAUGHT SIGNAL SIGSEGV	\N	t
-19	3	5	No NI file specified. Stop teasing Naiad	\N	t
-20	2	5	Error checking out license: LM-X Error	\N	t
 21	2	1	Transport endpoint is not connected:	\N	t
 22	3	1	3DL ERROR T2373: cannot read 3D texture file	\N	t
-23	2	1	R5030: error reading from point cloud file	\N	t
-25	2	5	Command exited with non-zero status	\N	t
-26	1	1	Internal 3Delight Message code: 45 -> "Can't load requested shader", message severity: 2	 	t
-27	2	2	Command exited with non-zero status	\N	t
+23	3	1	R5030: error reading from point cloud file	\N	t
 28	2	1	message contents: T2040	\N	t
-86	3	1	Cannot access the OTL source	\N	t
-90	4	1	Exception occurred in python burner: Please contact IT	\N	t
-30	2	1	TextureLoader: file doesn't exist /drd/jobs/hf2/tank/	\N	t
-31	1	2	R2086: incomplete (or invalid) parameters set for subsurface scattering	\N	t
-32	3	1	"Internal 3Delight Message code: 24 -> "Bad begin-end nesting", message severity: 2	\N	t
-33	2	1	^DRD ERROR: EXR is not complete	\N	t
-34	2	6	^DRD_ERROR: A rib file	\N	t
+102	3	6	tank.common.errors	\N	t
+30	3	1	TextureLoader: file doesn't exist /drd/jobs/hf2/tank/	\N	t
+103	2	6	Please check for a valid license server host	\N	t
+105	2	6	psycopg2.ProgrammingError	\N	t
+106	3	6	IOError:	\N	t
+107	4	6	No space left on device	\N	t
+108	2	6	AssertionError:	\N	t
+121	3	6	bash: .* command not found	\N	t
+18	2	4	CAUGHT SIGNAL SIGSEGV	\N	t
+19	3	2	No NI file specified. Stop teasing Naiad	\N	t
+20	2	2	Error checking out license: LM-X Error	\N	t
+25	2	2	Command exited with non-zero status	\N	t
+27	2	3	Command exited with non-zero status	\N	t
+31	1	3	R2086: incomplete (or invalid) parameters set for subsurface scattering	\N	t
+55	2	3	FLEXnet Licensing error	\N	t
 35	2	1	DRD_ERROR_RETRY	\N	t
-36	1	1	DRD_ERROR_FATAL	\N	t
-37	1	1	DRD_RIB_FATAL	\N	t
-38	3	1	^DRD ERROR: couldn't find file	\N	f
-39	2	1	^DRD ERROR: post_renderdl_frame command failed on file	\N	t
-40	3	1	3DL ERROR: .* Invalid char:	\N	t
-41	3	1	imdisplay-bin: Unable to open the mplay application	\N	t
-43	3	5	NAIAD ERROR	\N	t
-44	3	1	ERROR: File is empty	\N	t
-45	2	1	!!! CAUGHT SIGNAL	\N	t
-46	3	6	output: 'error: Cannot create folder	\N	t
-47	3	6	ERROR: Stopping on error	\N	t
-48	1	1	guide verts don't seem to match mesh	\N	t
-49	4	1	No space left on device.	\N	t
-50	3	6	Fatal error: Segmentation fault	\N	t
-51	1	2	Command exited with non-zero status 1	\N	t
-52	2	1	netcache: could not copy file from	\N	t
 53	3	1	code: 13 -> "Arbitrary program limit"	\N	f
 54	2	6	Hbatch job wouldn't run due to 'No License Found' error	\N	t
-55	2	2	FLEXnet Licensing error	\N	t
 56	3	1	T2028: netcache: lock file has disappeared	\N	t
+62	2	3	'No License Found'	\N	t
+16	3	4	dammit	\N	f
+17	3	4	exist	\N	f
+11	2	2	FOUNDRY LICENSE ERROR	\N	t
+10	3	1	Read-only file system	\N	t
 57	3	1	error message: R5022	\N	t
 58	3	1	Cannot find method "get_pointcloudname"	\N	t
 59	3	1	message contents: P1165	\N	f
 60	3	1	message contents: P1111	\N	t
 61	3	1	input in flex scanner failed	\N	t
-62	2	2	'No License Found'	\N	t
 63	3	6	3DL ERROR T2087	\N	t
 64	3	6	Batch script exited with result: 1	\N	t
+99	3	6	Expression recursion too deep	\N	t
+100	3	6	Error rendering child	\N	t
+49	5	1	No space left on device.	\N	t
+50	5	6	Fatal error: Segmentation fault	\N	t
+52	5	1	netcache: could not copy file from	\N	t
+32	3	1	"Internal 3Delight Message code: 24 -> "Bad begin-end nesting", message severity: 2	\N	t
+33	2	1	^DRD ERROR: EXR is not complete	\N	t
+34	2	6	^DRD_ERROR: A rib file	\N	t
+36	1	1	DRD_ERROR_FATAL	\N	t
+117	3	6	Cook error in input:	\N	t
+51	3	3	Command exited with non-zero status 1	\N	t
+79	3	4	AttributeError: 'NoneType' object has no attribute 'set'	\N	t
+88	2	3	No valid license available!	\N	t
+89	3	3	Foundry::Cache::CacheDiskSizeLockFailed	\N	t
+92	2	3	attempting to kill process	\N	t
+43	3	5	NAIAD ERROR	\N	t
+37	1	1	DRD_RIB_FATAL	\N	t
+38	2	1	DRD ERROR: couldn't find file	\N	f
+39	2	1	^DRD ERROR: post_renderdl_frame command failed on file	\N	t
+40	3	1	3DL ERROR: .* Invalid char:	\N	t
+41	3	1	imdisplay-bin: Unable to open the mplay application	\N	t
+44	3	1	ERROR: File is empty	\N	t
+45	3	1	!!! CAUGHT SIGNAL	\N	t
+46	3	6	output: 'error: Cannot create folder	\N	t
+47	3	6	ERROR: Stopping on error	\N	t
+48	1	1	guide verts don't seem to match mesh	\N	t
 67	3	1	Transport endpoint is not connected	\N	t
 68	3	1	'drd::VacuumError'	\N	t
 69	3	1	'drd::VacuumHDF5Error'	\N	t
@@ -10659,8 +10738,31 @@ COPY jobfiltermessage (keyjobfiltermessage, fkeyjobfiltertype, fkeyjobfilterset,
 76	2	1	message contents: A2066	\N	f
 77	3	1	message contents: A2057	\N	t
 78	3	1	CrowdCharacterProcedural.ERROR:	\N	t
-79	3	3	AttributeError: 'NoneType' object has no attribute 'set'	\N	t
 80	2	1	DRD_ERROR: bad block	\N	t
+83	3	1	S2069: the interface of shader	\N	t
+84	3	1	S2050: cannot find shader	\N	t
+85	3	1	Cannot read image file .* File is not an image file	\N	t
+86	3	1	Cannot access the OTL source	\N	t
+87	3	6	NameError: name 'left' is not defined	\N	t
+90	4	1	Exception occurred in python burner: Please contact IT	\N	t
+91	4	1	No space left on device	\N	t
+96	3	1	Received signal 11	\N	t
+109	3	6	TypeError:	\N	f
+110	3	6	Unable to initialize rendering module	\N	t
+112	2	6	DtexOpenFile error	\N	t
+115	3	6	maya_pipe.api.maya_roles.MayaRoleError:	\N	t
+111	3	3	IOError:	\N	t
+114	3	6	Read error: No such file or directory	\N	t
+120	3	6	yaml.parser.ParserError:	\N	t
+119	3	6	meme.core.exceptions	\N	t
+118	3	6	Asked for too-large .* input image	\N	t
+93	1	6	Error: maximum recursion depth exceeded	\N	f
+94	5	1	TESTING: VTimeVariable::getIndex	\N	t
+95	2	1	LZWDecode : Not enough data at scanline	\N	t
+97	2	6	Batch script exited with result: 3	\N	t
+98	2	1	3DL ERROR S2050	\N	t
+113	3	6	RuntimeError:	\N	t
+116	3	6	Invalid pickle location value. This argument must be used to store a file	\N	t
 \.
 
 
@@ -10687,6 +10789,7 @@ COPY jobfiltertype (keyjobfiltertype, name) FROM stdin;
 2	Error-TaskRetry
 3	Error-JobSuspend
 4	Error-HostOffline
+5	Ignore
 \.
 
 
@@ -10822,7 +10925,7 @@ COPY jobmentalray85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fk
 -- Data for Name: jobnaiad; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobnaiad (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, threads, append, restartcache, fullframe) FROM stdin;
+COPY jobnaiad (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, threads, append, restartcache, fullframe, forcerestart) FROM stdin;
 \.
 
 
@@ -10886,7 +10989,7 @@ COPY jobstateaction (keyjobstateaction, fkeyjob, oldstatus, newstatus, modified)
 -- Data for Name: jobstatus; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobstatus (keyjobstatus, hostsonjob, fkeyjob, tasksunassigned, taskscount, tasksdone, taskscancelled, taskssuspended, tasksassigned, tasksbusy, tasksaveragetime, health, joblastupdated, errorcount, lastnotifiederrorcount, averagememory, bytesread, byteswrite, cputime, efficiency, opsread, opswrite, totaltime, queueorder, taskbitmap, averagedonetime) FROM stdin;
+COPY jobstatus (keyjobstatus, hostsonjob, fkeyjob, tasksunassigned, taskscount, tasksdone, taskscancelled, taskssuspended, tasksassigned, tasksbusy, tasksaveragetime, health, joblastupdated, errorcount, lastnotifiederrorcount, averagememory, bytesread, byteswrite, cputime, efficiency, opsread, opswrite, totaltime, queueorder, taskbitmap, averagedonetime, fkeyjobstatusskipreason) FROM stdin;
 \.
 
 
@@ -10899,10 +11002,18 @@ COPY jobstatus_old (keyjobstatus, hostsonjob, fkeyjob, tasksunassigned, taskscou
 
 
 --
+-- Data for Name: jobstatusskipreason; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY jobstatusskipreason (keyjobstatusskipreason, name) FROM stdin;
+\.
+
+
+--
 -- Data for Name: jobtask; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobtask (keyjobtask, fkeyhost, fkeyjob, status, jobtask, label, fkeyjoboutput, progress, fkeyjobtaskassignment) FROM stdin;
+COPY jobtask (keyjobtask, fkeyhost, fkeyjob, status, jobtask, label, fkeyjoboutput, progress, fkeyjobtaskassignment, schedulepolicy) FROM stdin;
 \.
 
 
@@ -10940,13 +11051,13 @@ COPY jobtype (keyjobtype, jobtype, fkeyservice, icon) FROM stdin;
 30	Nuke51	32	\N
 31	Mantra95	33	\N
 32	Mantra100	33	\N
-33	3Delight	36	\N
 35	Nuke52	32	\N
 36	MentalRay2009	9	\N
 37	MentalRay2011	9	\N
 38	Maya2011	3	\N
 39	Naiad	46	\N
 40	Nuke	32	\N
+33	3Delight	36	\\x89504e470d0a1a0a0000000d49484452000000300000003008060000005702f987000000097048597300000b1300000b1301009a9c180000064f494441546881ed994b6c1cc51686bfaa7eccc3d3f68cc789337e5e27846089c7864584c50209242c58054456b0210b1e6205c2bc8222010b944848b0892205c412b16187c402090852042c500408ac9b183b8909ce5512dbf1f4744f77d55d743c763f26378278465ce5972c79aaab4f9fbfeb9c537f9d162740f30f86ecb6037f17b708741b6d09e4464729ecde0d42644f1082d2bdf75ed77861cf1e0cc7a1776a0a6b70b0ed3c61dbf4dc7d77e6357b7818bb566b7b6f9a80948cbcf20aff3a7c98e19919761d3d8acce7d30f9592d18307af4b60f0c00172e3e3385353e42726dace337b7b197ee9a5cc6b95871fc6d9bbf7c609988e830e02669f7c927f1f3880f67d0a939300188e43657a9acaf434b2548aad4e7e628281c71fc7d9bb1721e366fff3e9a7d47ffe79c3c6238f507ef0418cde5e0a77dc114d12027b6888ea638f51bcf3cec8976a95c2e424c5bbeec22c976f8c40b0bcccf9234790c52203fbf7939f98c0fbfd77ec5a8d5d478f6256ab188ec3f83bef200b85d65b1a7df34d5410e0dc771f23070fc6480c3efd34f99d3bb16b356e3b7e1cb352c11a1c64e7071f30fac61b00e4c6c7d9f1dc7368cf63f8e597e99d9ac2281631fbfa302b158465651230334701b35ca6ef8107d04a216c9bda0b2ff0e7f1e32c7ff92500ab274fb2e7934f00187af145ce1f394278e50acd3ffe60c7f3cf53bce79e962d61182004c333339c3f7c98abdf7f0f8077f62cb5679f8de65816e7de7e1bd568d0bc7891caf4340b870eb17af224c1952b342f5ebc3102c23010a689373fcfe9679e61fb534f31b07f3ff6f030ee6fbfb5e6f98b8b842b2b00588383e4c6c6607c1c80951327089797530fcbefda45fdd4a9d6efc6e9d3a86673e3ff460380d07511197997855408156ebf9d89f7df4798113761db84cbcb5cfdee3bfa1f7d14ae8546effdf763f6f703b0f6e38fac7cfd357f1e3bc6d2471f212d0bffc285d4c32e7ffe39d5279e8872474aca0f3db45120f42641a013e240a9b604522be0cecee2cdcd31f9d967a84603ffc205e667664008460f1de2b663c750ae8bf23c9a4b4b009c7ff75dc6de7a0b6f6e8edcd81897bff802e5ba9123eb7fc0d2871f32f2eaabecfef86394ebe2cdcfa3eaf5c8e7cd4e6abde174924c02a29d16324a258465115cbe1c675c2ea3c390707535758f5dab115cba84f2bccc8755f7eda3fecb2fb8bffe0a4250ddb78fdcd8188befbd775d27ff1281ad803d32c2e8ebaf83d608c3406bcdfc6baf115cbaf4976d7694005c2b12b60d80f67d7418fe2d7b6dcbe856418721da756f9abdff5f31f74fc12d02ddc62d02ddc62d02dd86d05a6b777696fa4f3f21f3799a4b4b7867cf6e4cb8a687bc8505643e1f1d540c23127a8b8be82088f43ea09b4d1022da6d0d2312685a47bbadd6ac7cf3cd4d276036ce9c61f9abaf227d2225c2b2f0cf9d8b4dd2611809b04d509e178dfd0fb5b8d5906ba74eb59cd04a61f4f5a53a1146a9d43a07b46ecce590b95cc71c6d0769384e7c4429ccbebef898d699876aa354da42d76e0cd2dabe3d3610aead6125fa30caf749ce039049f25d80b4b66d8b751054a3916e4229d57e05da35be3a04292c0ba3b77763446b8c62b175266e4d2c1452ad0d611818c56227fc6c0ba91b8d547828dfc71c18888de966136bdbb69481540e751852f97e2a64c2ab5753fd48edfb58d56ada40b70968cfc3709cd6310fa2b76d66386b24ab1360f4f4a4c2ad93905a6b741060562ab10bc2b25aadc3d6986160f4f4a48c74b39c4a00dd686027f3a05ec7dab12336a67d1f33230f64b70928cf8b1279534954ae8b9d2410869979d0cd448e56200810b95cec3b800ec3a8bc262484512ab5c45bcb886d677e43e8045ade69dfcf2e939bf70888f689e49810c88cdce8045a0494eba6cbe9da5aaa9caa7644bb14461b047c1fabbf3f9e079e8795d8d050aad595de0cc37152e1d60948b1eeb0522065fc4d2a852c95d2b2229f8fed1b1095d864d9ed04249b1252795ebaf2349b6959110499d5c8ec4218c5d65cb96e5a17d5ebd9a4b2ca6932b93b801801edfb98e5725c5e7b5e14f39b65f3fa012721a5653edf715921939f4475b399da6d65a1804cc6bc65a56bbf94c80ecb6b690f0dc53626e5ba295911aeada565c5faee9d40ea38bac5105a6badea75fcc54554b389901299cfb3fac30fac57a8f5834ce3cc1908c38d764910d0989b434889f67d200a396f61212aa9eb1d8b6bdfc956befdf6a613f82f03d53be0591e81e40000000049454e44ae426082
 \.
 
 
@@ -10964,12 +11075,10 @@ COPY jobtypemapping (keyjobtypemapping, fkeyjobtype, fkeymapping) FROM stdin;
 
 COPY license (keylicense, license, fkeyhost, fkeysoftware, total, reserved, inuse) FROM stdin;
 19	ocula	\N	\N	5	0	0
-15	fah	\N	\N	8	0	0
 18	vue	\N	\N	13	0	0
 20	mentalray	\N	\N	112	8	0
 24	rollingshutter	\N	\N	5	0	0
 21	rvio	\N	\N	20	0	0
-16	nuke_r	\N	\N	100	0	0
 14	hbatch	\N	\N	162	0	113
 28	fastlane	\N	\N	300	0	13
 25	tank	\N	\N	100	0	4
@@ -10978,6 +11087,9 @@ COPY license (keylicense, license, fkeyhost, fkeysoftware, total, reserved, inus
 23	mantra	\N	\N	800	0	13
 17	3delight	\N	\N	2000	0	0
 22	naiad	\N	\N	10	0	6
+16	nuke_r	\N	\N	122	0	0
+31	bl401_transfer	\N	\N	4	0	0
+15	fah	\N	\N	8	0	0
 \.
 
 
@@ -11279,8 +11391,12 @@ COPY service (keyservice, service, description, fkeylicense, enabled, forbiddenp
 9	MentalRay	\N	\N	t	\N	\N	\N	\N	\N
 35	fah	\N	\N	t	\N	t	\N	\N	\N
 43	Vue	\N	\N	t	\N	t	\N	\N	\N
-49	tank	\N	\N	t	\N	\N	\N	\N	\N
 55	fastlane	\N	\N	t	\N	t	\N	\N	\N
+253	GPU_offscreen	\N	\N	t	\N	\N	\N	\N	\N
+254	diframecache	\N	\N	t	\N	\N	\N	\N	\N
+49	tank	\N	25	t	\N	\N	\N	\N	\N
+255	bl401_transfer	\N	31	t	\N	\N	\N	\N	\N
+256	tankpublish	\N	\N	t	\N	\N	\N	\N	\N
 \.
 
 
@@ -12347,6 +12463,14 @@ ALTER TABLE ONLY jobstatus_old
 
 
 --
+-- Name: jobstatusskipreason_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY jobstatusskipreason
+    ADD CONSTRAINT jobstatusskipreason_pkey PRIMARY KEY (keyjobstatusskipreason);
+
+
+--
 -- Name: jobtask_pkey; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
@@ -13397,7 +13521,7 @@ CREATE INDEX x_jobstatus_queueorder ON jobstatus USING btree (queueorder);
 -- Name: x_jobtask_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
-CREATE INDEX x_jobtask_status ON jobtask USING btree (jobtask);
+CREATE INDEX x_jobtask_status ON jobtask USING btree (status);
 
 
 --
@@ -13488,7 +13612,7 @@ CREATE INDEX x_versionfiletracker_path ON versionfiletracker USING btree (path);
 -- Name: hoststatus_update_trigger; Type: TRIGGER; Schema: public; Owner: farmer
 --
 
-CREATE TRIGGER hoststatus_update_trigger BEFORE UPDATE ON hoststatus FOR EACH ROW EXECUTE PROCEDURE hoststatus_update();
+CREATE TRIGGER hoststatus_update_trigger AFTER UPDATE ON hoststatus FOR EACH ROW EXECUTE PROCEDURE hoststatus_update();
 
 
 --
@@ -16435,8 +16559,8 @@ GRANT ALL ON TABLE joberrorhandlerscript TO farmers;
 REVOKE ALL ON TABLE jobfiltermessage FROM PUBLIC;
 REVOKE ALL ON TABLE jobfiltermessage FROM farmer;
 GRANT ALL ON TABLE jobfiltermessage TO farmer;
-GRANT ALL ON TABLE jobfiltermessage TO PUBLIC;
 GRANT ALL ON TABLE jobfiltermessage TO farmers;
+GRANT ALL ON TABLE jobfiltermessage TO PUBLIC;
 
 
 --
@@ -16456,8 +16580,8 @@ GRANT ALL ON SEQUENCE jobfiltermessage_keyjobfiltermessage_seq TO farmers;
 REVOKE ALL ON TABLE jobfilterset FROM PUBLIC;
 REVOKE ALL ON TABLE jobfilterset FROM farmer;
 GRANT ALL ON TABLE jobfilterset TO farmer;
-GRANT ALL ON TABLE jobfilterset TO PUBLIC;
 GRANT ALL ON TABLE jobfilterset TO farmers;
+GRANT ALL ON TABLE jobfilterset TO PUBLIC;
 
 
 --
@@ -16477,8 +16601,8 @@ GRANT ALL ON SEQUENCE jobfilterset_keyjobfilterset_seq TO farmers;
 REVOKE ALL ON TABLE jobfiltertype FROM PUBLIC;
 REVOKE ALL ON TABLE jobfiltertype FROM farmer;
 GRANT ALL ON TABLE jobfiltertype TO farmer;
-GRANT ALL ON TABLE jobfiltertype TO PUBLIC;
 GRANT ALL ON TABLE jobfiltertype TO farmers;
+GRANT ALL ON TABLE jobfiltertype TO PUBLIC;
 
 
 --
@@ -16866,6 +16990,17 @@ GRANT ALL ON TABLE jobstatus_old TO farmers;
 
 
 --
+-- Name: jobstatusskipreason; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobstatusskipreason FROM PUBLIC;
+REVOKE ALL ON TABLE jobstatusskipreason FROM farmer;
+GRANT ALL ON TABLE jobstatusskipreason TO farmer;
+GRANT ALL ON TABLE jobstatusskipreason TO PUBLIC;
+GRANT ALL ON TABLE jobstatusskipreason TO farmers;
+
+
+--
 -- Name: jobtaskassignment_old; Type: ACL; Schema: public; Owner: farmer
 --
 
@@ -16933,8 +17068,8 @@ GRANT ALL ON SEQUENCE license_keylicense_seq TO farmers;
 REVOKE ALL ON TABLE license FROM PUBLIC;
 REVOKE ALL ON TABLE license FROM farmer;
 GRANT ALL ON TABLE license TO farmer;
-GRANT ALL ON TABLE license TO PUBLIC;
 GRANT ALL ON TABLE license TO farmers;
+GRANT ALL ON TABLE license TO PUBLIC;
 
 
 --
