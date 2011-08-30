@@ -261,8 +261,15 @@ void Slave::startup()
 		offline();
 	else if( mHostStatus.slaveStatus() == "client-update" )
 		clientUpdate();
-	else
-		online();
+	else {
+        if (mHostStatus.slaveStatus().isEmpty())
+            online();
+        else {
+            // Resume the state the host was in since last time.
+            LOG_3("Resuming previous status of " + mHostStatus.slaveStatus());
+            handleStatusChange(mHostStatus.slaveStatus(), "offline");
+        }
+    }
 
     // Create a timer for logged in user checks
     mUserTimer = new QTimer( this );
