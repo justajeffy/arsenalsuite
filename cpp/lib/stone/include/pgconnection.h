@@ -87,7 +87,7 @@ public:
 
 	bool checkVersion( int major, int minor ) const;
 protected:
-	QString getSqlFields(TableSchema*);
+	QString getSqlFields(TableSchema*, const QString & _tableAlias = QString());
 
 	QHash<TableSchema*,QString> mSqlFields;
 	int mVersionMajor, mVersionMinor;

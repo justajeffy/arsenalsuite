@@ -327,7 +327,7 @@ QString Field::defaultValueString() const
 		return QString("QDateTime::fromString(\"%1\")").arg(mDefault.toString());
 	else if( mType == Time )
 		return QString("QTime::fromString(\"%1\")").arg(mDefault.toString());
-	else if( mDefault.isNull() && (mType == UInt || mType == Int || mType == UInt8) )
+	else if( mDefault.isNull() && (mType == UInt || mType == Int || mType == ULongLong) )
 		return "0";
 	else if( mDefault.isNull() && (mType == Float || mType == Double ) )
 		return "0.0";
@@ -439,7 +439,7 @@ const char * Field::variantTypeStrings[] =
 	"Invalid",
 	"String",
 	"UInt",
-	"UInt8",
+	"ULongLong",
 	"Int",
 	"Date",
 	"DateTime",
@@ -459,7 +459,7 @@ const char * Field::listTypeStrings[] =
 	"Invalid",
 	"QStringList",
 	"QList<uint>",
-	"QList<Q_ULLONG>",
+	"QList<qulonglong>",
 	"QList<int>",
 	"QList<QDate>",
 	"QList<QDateTime>",
@@ -479,7 +479,7 @@ const char * Field::typeStrings[] =
 	"Invalid",
 	"QString",
 	"uint",
-	"Q_ULLONG",
+	"qulonglong",
 	"int",
 	"QDate",
 	"QDateTime",
@@ -536,8 +536,9 @@ QVariant Field::variantFromString( const QString & str, Type t )
 		case String:
 			return QVariant( str );
 		case UInt:
-		case UInt8:
 			return QVariant( str.toUInt() );
+		case ULongLong:
+			return QVariant( str.toULongLong() );
 		case Int:
 			return QVariant( str.toInt() );
 		case Date:

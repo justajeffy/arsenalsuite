@@ -17,6 +17,9 @@ JoinedSelect::JoinedSelect(Table * primaryTable, const QString & alias)
 {
 }
 
+QString JoinedSelect::alias() const
+{ return mAlias; }
+
 Table * JoinedSelect::table() const
 { return mTable; }
 

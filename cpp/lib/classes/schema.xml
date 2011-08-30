@@ -713,15 +713,15 @@
   <column reverseAccess="true" type="uint" methodName="JobError" name="fkeyJobError">
    <fkey indexDeleteMode="DoNothingOnDelete" indexName="JobError" indexUseCache="false" table="JobError" type="single" hasIndex="true"/>
   </column>
-  <column type="uint" methodName="realtime" name="realtime"/>
-  <column type="uint" methodName="usertime" name="usertime"/>
-  <column type="uint" methodName="systime" name="systime"/>
-  <column type="uint" methodName="iowait" name="iowait"/>
-  <column pluralMethodName="bytesRead" type="uint" methodName="bytesRead" name="bytesRead"/>
-  <column pluralMethodName="bytesWrite" type="uint" methodName="bytesWrite" name="bytesWrite"/>
+  <column type="ULongLong" methodName="realtime" name="realtime"/>
+  <column type="ULongLong" methodName="usertime" name="usertime"/>
+  <column type="ULongLong" methodName="systime" name="systime"/>
+  <column type="ULongLong" methodName="iowait" name="iowait"/>
+  <column pluralMethodName="bytesRead" type="ULongLong" methodName="bytesRead" name="bytesRead"/>
+  <column pluralMethodName="bytesWrite" type="ULongLong" methodName="bytesWrite" name="bytesWrite"/>
   <column type="float" methodName="efficiency" name="efficiency"/>
-  <column pluralMethodName="opsRead" type="uint" methodName="opsRead" name="opsRead"/>
-  <column pluralMethodName="opsWrite" type="uint" methodName="opsWrite" name="opsWrite"/>
+  <column pluralMethodName="opsRead" type="ULongLong" methodName="opsRead" name="opsRead"/>
+  <column pluralMethodName="opsWrite" type="ULongLong" methodName="opsWrite" name="opsWrite"/>
   <column pluralMethodName="assignSlots" type="uint" methodName="assignSlots" name="assignslots"/>
   <column type="uint" methodName="assignMaxMemory" name="assignMaxMemory"/>
   <column type="uint" methodName="assignMinMemory" name="assignMinMemory"/>
@@ -1013,12 +1013,12 @@
   <column type="uint" methodName="lastNotifiedErrorCount" name="lastNotifiedErrorCount"/>
   <column docs="Average memory used per task in kilobytes." type="uint" methodName="averageMemory" name="averageMemory"/>
   <column type="float" methodName="efficiency" name="efficiency"/>
-  <column type="uint" methodName="cputime" name="cputime"/>
-  <column type="uint" methodName="bytesWrite" name="bytesWrite"/>
-  <column type="uint" methodName="bytesRead" name="bytesRead"/>
-  <column type="uint" methodName="opsWrite" name="opsWrite"/>
-  <column type="uint" methodName="opsRead" name="opsRead"/>
-  <column type="uint" methodName="totaltime" name="totaltime"/>
+  <column type="ULongLong" methodName="cputime" name="cputime"/>
+  <column type="ULongLong" methodName="bytesWrite" name="bytesWrite"/>
+  <column type="ULongLong" methodName="bytesRead" name="bytesRead"/>
+  <column type="ULongLong" methodName="opsWrite" name="opsWrite"/>
+  <column type="ULongLong" methodName="opsRead" name="opsRead"/>
+  <column type="ULongLong" methodName="totaltime" name="totaltime"/>
   <column pluralMethodName="queueOrder" type="uint" methodName="queueOrder" name="queueorder"/>
   <column type="QString" methodName="taskBitmap" name="taskbitmap"/>
   <column type="uint" methodName="skipReason" name="fkeyJobStatusSkipReason">

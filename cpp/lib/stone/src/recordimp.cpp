@@ -413,10 +413,9 @@ RecordImp * RecordImp::copy()
 		if( table ) {
 			RecordImp * t = new RecordImp( table, mValues ? mValues->data() : 0 );
 			t->mState = (mState & COMMITTED) | MODIFIED;
-			if( mTable ) {
-				t->mModifiedBits = copyBitArray( mModifiedBits, schema->fieldCount() );
-				t->mLiterals = copyBitArray( mLiterals, schema->fieldCount() );
-			}
+			t->mModifiedBits = copyBitArray( mModifiedBits, schema->fieldCount() );
+			t->mLiterals = copyBitArray( mLiterals, schema->fieldCount() );
+			t->mNotSelectedBits = copyBitArray( mNotSelectedBits, schema->fieldCount() );
 			return t;
 		}
 	}
