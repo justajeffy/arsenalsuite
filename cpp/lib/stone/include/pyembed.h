@@ -87,7 +87,16 @@ STONE_EXPORT PyObject * sipWrapRecord( Record *, bool makeCopy = true, TableSche
 /// Wraps the recordlist object using the sip wrapper for RecordList, or for the RecordList subclass
 /// that corrosponds to records' table()->className().
 /// Returns a NEW reference if successfull, otherwise 0
-STONE_EXPORT PyObject * sipWrapRecordList( RecordList *, bool makeCopy = true, TableSchema * defaultType = 0 );
+/// If allowUpcasting=true, then the list will be checked and the returned type will be the
+/// highest common anscestor type.  For example a ProjectList will be returned even if defaultType is Element.
+/// If allowUpcasting=false then defaultType will always be used, or plain RecordList if defaultType is 0.
+STONE_EXPORT PyObject * sipWrapRecordList( RecordList *, bool makeCopy = true, TableSchema * defaultType = 0, bool allowUpcasting = true );
+
+STONE_EXPORT RecordList recordListFromPyList( PyObject * pyObject );
+
+/// Calls callable on each record and uses the return value as the key for dict insertion
+/// Each dict value is a RecordList class or subclass if defaultType is passed
+STONE_EXPORT PyObject * recordListGroupByCallable( RecordList * rl, PyObject * callable, TableSchema * defaultType = 0 );
 
 /// Returns true if the python object is a blur.Stone.Record class instance or subclass instance
 STONE_EXPORT bool isPythonRecordInstance( PyObject * pyObject );

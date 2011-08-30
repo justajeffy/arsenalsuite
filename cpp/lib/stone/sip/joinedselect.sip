@@ -105,6 +105,7 @@ public:
 	JoinedSelect(Table * primaryTable, QList<JoinCondition> joinConditions = QList<JoinCondition>());
 	JoinedSelect(Table * primaryTable, const QString & alias);
 
+	QString alias() const;
 	Table * table() const;
 	QList<JoinCondition> joinConditions() const;
 

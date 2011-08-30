@@ -86,7 +86,7 @@ class DelightBurner(JobBurner):
         frames = self.Job.jobTasks().frameNumbers()
         frames.sort()
         middleFrame = False
-        if( self.frameList[0] == frames[ ((frames[-1] - frames[0]) / 2) ] ):
+        if( len(frames) > 1 and self.StartFrame == frames[ len(frames)/2 ] ):
             middleFrame = True
 
         straceLog = self.Job.fileName().replace("..rib", (".%04d.strace" % self.frameList[0]))

@@ -237,7 +237,7 @@ Record & Record::setForeignKey( int column, const Record & other )
 	if( !t ) return *this;
 	Field * f = t->schema()->field( column );
 	if( !f ) return *this;
-	if( f->type() == Field::UInt || f->type() == Field::UInt8 || f->type() == Field::Int ) {
+	if( f->type() == Field::UInt || f->type() == Field::ULongLong || f->type() == Field::Int ) {
 		setValue( f, other.key() ? other.key() : qVariantFromValue<Record>(other) );
 	}
 	return *this;
@@ -249,7 +249,7 @@ Record & Record::setForeignKey( const QString & column, const Record & other )
 	if( !t ) return *this;
 	Field * f = t->schema()->field( column );
 	if( !f ) return *this;
-	if( f->type() == Field::UInt || f->type() == Field::UInt8 || f->type() == Field::Int ) {
+	if( f->type() == Field::UInt || f->type() == Field::ULongLong || f->type() == Field::Int ) {
 		setValue( f, other.key() ? other.key() : qVariantFromValue<Record>(other) );
 	}
 	return *this;
@@ -257,7 +257,7 @@ Record & Record::setForeignKey( const QString & column, const Record & other )
 
 Record & Record::setForeignKey( Field * f, const Record & other )
 {
-	if( f->type() == Field::UInt || f->type() == Field::UInt8 || f->type() == Field::Int ) {
+	if( f->type() == Field::UInt || f->type() == Field::ULongLong || f->type() == Field::Int ) {
 		setValue( f, other.key() ? other.key() : qVariantFromValue<Record>(other) );
 	}
 	return *this;
