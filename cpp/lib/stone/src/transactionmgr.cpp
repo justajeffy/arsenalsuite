@@ -128,8 +128,7 @@ void TransactionMgr::writeTransaction( uint transaction, const QByteArray & data
 		char * tmp = (char*)malloc( indexPos - indexSize );
 		mIndexFile->seek( indexSize );
 		mIndexFile->write( tmp, indexPos - indexSize );
-        free((char*)tmp);
-		//delete tmp;
+		delete tmp;
 	}
 	
 	// Write the index data
@@ -200,5 +199,4 @@ uint TransactionMgr::lastTransaction()
 	return mLastTransaction;
 }
 
-} //namespace
-
+} // namespace

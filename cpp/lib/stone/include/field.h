@@ -54,7 +54,7 @@ public:
 		Invalid=0,
 		String,
 		UInt,
-		UInt8,
+		ULongLong,
 		Int,
 		Date,
 		DateTime,

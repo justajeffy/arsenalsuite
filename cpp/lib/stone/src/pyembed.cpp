@@ -332,7 +332,7 @@ PyObject * sipWrapRecord( Record * r, bool makeCopy, TableSchema * defaultType )
 	return ret;
 }
 
-PyObject * sipWrapRecordList( RecordList * rl, bool makeCopy, TableSchema * defaultType )
+PyObject * sipWrapRecordList( RecordList * rl, bool makeCopy, TableSchema * defaultType, bool allowUpcasting )
 {
 	PyObject * ret = 0;
 	// First we convert to Record using sip methods
@@ -346,7 +346,7 @@ PyObject * sipWrapRecordList( RecordList * rl, bool makeCopy, TableSchema * defa
 		return 0;
 
 	TableSchema * tableSchema = 0;
-	if( !rl->isEmpty() ) { 
+	if( allowUpcasting && !rl->isEmpty() ) { 
 		Table * table = (*rl)[0].table();
 		if( table ) tableSchema = table->schema();
 		if( tableSchema ) {
@@ -391,9 +391,10 @@ PyObject * sipWrapRecordList( RecordList * rl, bool makeCopy, TableSchema * defa
 			PyObject * result = PyObject_CallObject( klass, tuple );
 			if( result ) {
 				if( PyObject_IsInstance( result, klass ) == 1 ) {
+					// result is returned, the original ret is decref'ed in the tuple
 					ret = result;
 				} else {
-					Py_INCREF( ret );
+					// Dont decref ret, it's owned by the tuple which is decref'ed below
 					Py_DECREF( result );
 				}
 			} else{
@@ -408,6 +409,70 @@ PyObject * sipWrapRecordList( RecordList * rl, bool makeCopy, TableSchema * defa
 			return 0;
 	} else LOG_1( "No cast module set for schema" );
 	return ret;
+}
+
+RecordList recordListFromPyList( PyObject * a0 )
+{
+	SIP_SSIZE_T numItems = PyList_GET_SIZE(a0);
+	RecordList ret;
+	
+	for (int i = 0; i < numItems; ++i)
+	{
+		ret += sipUnwrapRecord( PyList_GET_ITEM(a0,i) );
+	}
+	return ret;
+}
+
+PyObject * recordListGroupByCallable( RecordList * rl, PyObject * callable, TableSchema * defaultType )
+{
+	PyObject *d = PyDict_New();
+
+	if (!d)
+		return NULL;
+	
+	bool error = false;
+	sipTypeDef * rl_type = getRecordType( "blur.Stone", "RecordList" );
+	
+	foreach( Record r, *rl ) {
+		PyObject * py_r = sipWrapRecord( &r );
+		
+		// This should probably throw an exception
+		if( !py_r )
+			continue;
+			
+		// Tuple now holds only ref to py_r
+		PyObject * tuple = PyTuple_New(1);
+		PyTuple_SET_ITEM( tuple, 0, py_r );
+		
+		PyObject * key = PyObject_CallObject( callable, tuple );
+		Py_DECREF(tuple);
+		
+		if( !key ) {
+			error = true;
+			break;
+		}
+		
+		PyObject * entry = PyDict_GetItem( d, key );
+		if( entry ) {
+			if( getSipAPI()->api_can_convert_to_type(entry, rl_type, SIP_NOT_NONE | SIP_NO_CONVERTORS) ) {
+				int isErr = 0;
+				RecordList * rl = (RecordList*)getSipAPI()->api_convert_to_type( entry, rl_type, NULL, SIP_NOT_NONE | SIP_NO_CONVERTORS, 0, &isErr );
+				if( !isErr )
+					rl->append(r);
+			}
+		} else {
+			RecordList rl(r);
+			PyDict_SetItem( d, key, sipWrapRecordList( &rl, true, defaultType, /*allowUpcasting=*/ false ) );
+		}
+		Py_DECREF(key);
+	}
+	
+	if( error ) {
+		Py_DECREF(d);
+		d = 0;
+	}
+	
+	return d;
 }
 
 bool isPythonRecordInstance( PyObject * pyObject )
