@@ -280,6 +280,32 @@ RecordIter RecordList::at( uint pos ) const
 	return RecordIter( d->mList.begin() + pos );
 }
 
+RecordList RecordList::slice( int start, int end, int step )
+{
+	RecordList ret;
+	if( start < 0 )
+		start = size() - start;
+	if( end < 0 )
+		end = size() - end;
+	if( start == INT_MIN )
+		start = 0;
+	if( start == INT_MAX )
+		start = size();
+	if( end == INT_MIN )
+		end = 0;
+	if( end == INT_MAX )
+		end = size();
+	if( step == 0 || (step < 0 && start < end) || (step > 0 && start > end) )
+		return ret;
+	for( int i = start;; i+=step ) {
+		if( step > 0 && i >= end ) break;
+		if( step < 0 && i <= end ) break;
+		if( i >= 0 && i < size() )
+			ret.append((*this)[i]);
+	}
+	return ret;
+}
+
 RecordImp * RecordList::imp( uint pos ) const
 {
 	if( !d )
