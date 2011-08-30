@@ -223,7 +223,7 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 					check += " is NULL)";
 				} else {
 					check += "=?)";
-					mod_args += args;
+					mod_args += arg;
 				}
 				ss += check;
 				++column;
