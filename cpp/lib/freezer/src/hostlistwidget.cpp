@@ -300,7 +300,8 @@ void HostListWidget::hostListSelectionChanged()
 
     mStatsView->setHtml(html);
 
-    mJobTree->model()->updateRecords(Host::activeAssignments(mHostTree->selection()).jobs());
+    if( mHostTree->selection().size() < 10 )
+        mJobTree->model()->updateRecords(Host::activeAssignments(mHostTree->selection()).jobs());
 }
 
 void HostListWidget::selectHosts( HostList hosts )
