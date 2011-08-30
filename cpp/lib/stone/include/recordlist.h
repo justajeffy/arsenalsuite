@@ -130,6 +130,9 @@ public:
 	/// same as end().
 	RecordIter at( uint n ) const;
 
+	// slice( INT_MAX, INT_MIN, -1 ) returns the list backwards
+	RecordList slice( int start, int end = INT_MAX, int step = 1 );
+	
 	/// Returns the RecordImp * for the \param nth record
 	/// in this list.  Returns 0 if \param nth is out of range.
 	RecordImp * imp( uint nth ) const;
