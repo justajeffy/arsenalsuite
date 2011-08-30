@@ -214,7 +214,7 @@ int RecordFilterWidget::filterChildren(const QModelIndex & parent)
                     mRowChildrenVisited[index] = true;
                     //LOG_3( "child "+cell+" has children, filtering - "+QString::number(visibleChildren)+ " of its children are visible" );
                 }
-                // We get negative values in some circumstance. Account for it.
+
                 if ( visibleChildren == 0 ) {
                     // faster implementation
                     switch (filterText.toStdString()[0])
@@ -250,7 +250,8 @@ int RecordFilterWidget::filterChildren(const QModelIndex & parent)
                                 removedRow = true;
                             }
                     }
-                }
+                } else
+                    break;
 
                 sm->setColumnFilter( col, filterText );
             } else {
