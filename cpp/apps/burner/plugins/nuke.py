@@ -22,8 +22,8 @@ class NukeBurner(JobBurner):
         self.OutputsExpected = self.Job.jobOutputs().size()
         self.OutputsReported = 0
 
-        self.frameDone = QRegExp("^Writing .*\.(\d\d\d\d\d?)\.\w+ took")
-        self.frameStart = QRegExp("^Writing .*\.(\d\d\d\d\d?)\.\w+")
+        self.frameDone = QRegExp("^Writing .*\.(\d{4,})\.\w+ took")
+        self.frameStart = QRegExp("^Writing .*\.(\d{4,})\.\w+")
         self.jobDone = QRegExp("^Total render time:")
 
     def __del__(self):
