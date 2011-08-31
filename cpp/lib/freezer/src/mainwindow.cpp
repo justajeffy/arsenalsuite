@@ -230,7 +230,8 @@ MainWindow::MainWindow( QWidget * parent )
 		<< ColorOption( "copy", QColor(47,191,255) )
 		<< ColorOption( "restart" )
 		<< ColorOption( "client-update" )
-		<< ColorOption( "offline", QColor(125,122,156) );
+		<< ColorOption( "offline", QColor(125,122,156) )
+        << ColorOption( "maintenance", QColor(225,100,100) );
 
 	options.mHostColors->readColors();
 

@@ -254,6 +254,8 @@ char HostItem::getSortChar() const {
 	else if( stat=="offline" ) return 'o';
 	else if( stat=="no-pulse" ) return 'p';
 	else if( stat=="no-ping" ) return 'q';
+    else if( stat=="restarting" ) return 'r';
+    else if( stat=="maintenance" ) return 's';
 	else return 'z';
 }
 
