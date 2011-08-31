@@ -679,6 +679,7 @@ void FreezerHostMenu::slotAboutToShow()
 	addSeparator();
 	addAction( mHostList->HostOnlineAction );
 	addAction( mHostList->HostOfflineAction );
+    addAction( mHostList->HostOfflineWhenDoneAction );
 	addAction( mHostList->HostRestartAction );
 	addAction( mHostList->HostRestartWhenDoneAction );
 	addAction( mHostList->HostRebootAction );
