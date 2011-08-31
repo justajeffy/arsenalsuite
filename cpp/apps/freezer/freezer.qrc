@@ -4,6 +4,8 @@
         <file>images/host_online.png</file>
 		<file>images/host_offline.png</file>
         <file>images/host_restart.png</file>
+        <file>images/host_shutdown.png</file>
+        <file>images/host_maintenance.png</file>
         <file>images/imagecycler.png</file>
         <file>images/imagegallery.png</file>
         <file>images/kill.png</file>

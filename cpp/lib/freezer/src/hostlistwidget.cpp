@@ -64,6 +64,14 @@ HostListWidget::HostListWidget( QWidget * parent )
 	HostRebootWhenDoneAction = new QAction( "Reboot Host(s) When Done", this );
 	HostRebootWhenDoneAction->setIcon( QIcon( ":/images/host_reboot" ) );
 
+    HostShutdownAction = new QAction( "Shutdown Host(s) Now", this );
+    HostShutdownAction->setIcon( QIcon( ":/images/host_shutdown" ) );
+    HostShutdownWhenDoneAction = new QAction( "Shutdown Host(s) When Done", this );
+    HostShutdownWhenDoneAction->setIcon( QIcon( ":/images/host_shutdown" ) );
+
+    HostMaintenanceEnableAction = new QAction( "Place Host(s) in Maintenance", this );
+    HostMaintenanceEnableAction->setIcon( QIcon( ":/images/host_maintenance" ) );
+
 	VNCHostsAction = new QAction( "VNC Hosts", this );
 	VNCHostsAction->setIcon( QIcon( ":/images/vnc_hosts.png" ) );
 	ClientUpdateAction = new QAction( "Client Update", this );
@@ -93,6 +101,10 @@ HostListWidget::HostListWidget( QWidget * parent )
 	connect( HostRestartWhenDoneAction, SIGNAL( triggered(bool) ), SLOT( setHostsRestartWhenDone() ) );
 	connect( HostRebootAction, SIGNAL( triggered(bool) ), SLOT( setHostsReboot() ) );
 	connect( HostRebootWhenDoneAction, SIGNAL( triggered(bool) ), SLOT( setHostsRebootWhenDone() ) );
+    connect( HostShutdownAction, SIGNAL( triggered(bool) ), SLOT( setHostsShutdown() ) );
+    connect( HostShutdownWhenDoneAction, SIGNAL( triggered(bool) ), SLOT(setHostsShutdownWhenDone() ) );
+    connect( HostMaintenanceEnableAction, SIGNAL( triggered(bool) ), SLOT(setHostsMaintenanceEnable() ) );
+
 	connect( ClientUpdateAction, SIGNAL( triggered(bool) ), SLOT( setHostsClientUpdate() ) );
 	connect( VNCHostsAction, SIGNAL( triggered(bool) ), SLOT( vncHosts() ) );
 	connect( ShowJobsAction, SIGNAL(triggered(bool)), SLOT( showAssignedJobs() ) );
@@ -409,6 +421,25 @@ void HostListWidget::setHostsRebootWhenDone()
 		return;
 
 	Database::current()->exec( "UPDATE HostStatus SET slaveStatus = 'reboot-when-done' WHERE fkeyHost IN(" + hosts.keyString() + ");" );
+}
+
+void HostListWidget::setHostsShutdown()
+{
+    setHostsStatus("shutdown");
+}
+
+void HostListWidget::setHostsShutdownWhenDone()
+{
+    HostList hosts = mHostTree->selection();
+    if( hosts.size()==0 )
+        return;
+
+    Database::current()->exec( "UPDATE HostStatus SET slaveStatus = 'shutdown-when-done' WHERE fkeyHost IN(" + hosts.keyString() + ");" );
+}
+
+void HostListWidget::setHostsMaintenanceEnable()
+{
+    setHostsStatus("maintenance");
 }
 
 void HostListWidget::setHostsClientUpdate()

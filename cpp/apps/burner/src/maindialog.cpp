@@ -138,6 +138,7 @@ display disps [] =
 	{ "Copy", stop, "#DD8822", true },
 	{ "Assigned", stop, "#DD8822", true },
 	{ "Busy", stop, "#DD8822", true },
+    { "Maintenance", start, "#E16464", true },
 	{ "Error", start, "#000000", true },
 	{ 0, 0, 0, false }
 };

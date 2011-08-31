@@ -212,6 +212,9 @@ protected slots:
 	/// This reboots the host machine
 	void reboot();
 
+    /// This shuts the host machine down
+    void shutdown();
+
 	/// Shuts down the machine and sets the host's slaveStatus to 'sleeping'
 	void goToSleep();
 

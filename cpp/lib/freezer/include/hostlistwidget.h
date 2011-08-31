@@ -36,6 +36,9 @@ public:
 	QAction* HostRestartWhenDoneAction;
 	QAction* HostRebootAction;
 	QAction* HostRebootWhenDoneAction;
+    QAction* HostShutdownAction;
+    QAction* HostShutdownWhenDoneAction;
+    QAction* HostMaintenanceEnableAction;
 
 	QAction* RestartAction;
 	QAction* VNCHostsAction;
@@ -70,6 +73,12 @@ public slots:
 	void setHostsRestartWhenDone();
 	void setHostsReboot();
 	void setHostsRebootWhenDone();
+    void setHostsShutdown();
+    void setHostsShutdownWhenDone();
+
+    // Enable maintenance mode
+    void setHostsMaintenanceEnable();
+
 	/// selected hosts are told to update to the latest Burner client
 	void setHostsClientUpdate();
 

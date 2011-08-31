@@ -684,6 +684,9 @@ void FreezerHostMenu::slotAboutToShow()
 	addAction( mHostList->HostRestartWhenDoneAction );
 	addAction( mHostList->HostRebootAction );
 	addAction( mHostList->HostRebootWhenDoneAction );
+    addAction( mHostList->HostShutdownAction );
+    addAction( mHostList->HostShutdownWhenDoneAction );
+    addAction( mHostList->HostMaintenanceEnableAction );
 	addSeparator();
 
 	addAction( mHostList->ShowJobsAction );

@@ -265,9 +265,9 @@ void Slave::startup()
         if (mHostStatus.slaveStatus().isEmpty())
             online();
         else {
-            // Resume the state the host was in since last time.
+            // Resume the state the host was in.
             LOG_3("Slave::startup() Resuming previous status of " + mHostStatus.slaveStatus());
-            handleStatusChange(mHostStatus.slaveStatus(), "offline");
+            handleStatusChange(mHostStatus.slaveStatus(), "");
         }
     }
 
@@ -521,14 +521,14 @@ void Slave::handleStatusChange( const QString & status, const QString & oldStatu
     if ( status == "client-update" ){
         emit statusChange( "busy" );
         clientUpdate( oldStatus != "offline" );
-    } else if( status == "offline" || status == "stopping" ) {
+    } else if( status == "offline" || status == "stopping" || status == "maintenance" ) {
         // When we get set offline remotely, don't go online again
         // Until someone presses Start the burn, or until
         // we are set online remotely.  The idledelay
         // will be reset when we go online again
         mIdleDelay = -1;
         offline();
-    } else if( status == "starting" ) {
+    } else if( status == "starting" ) { 
         if( oldStatus != "ready" )
             online();
     } else if( status == "restart" ) {
@@ -550,7 +550,15 @@ void Slave::handleStatusChange( const QString & status, const QString & oldStatu
     } else if( status == "offline-when-done" ) {
         mHostStatus.reload();
         if( mHostStatus.activeAssignmentCount() == 0 )
-            offline();
+            emit statusChange( "offline ");
+        else
+            return;
+    } else if( status == "shutdown" ) {
+        shutdown();
+    } else if( status == "shutdown-when-done" ) {
+        mHostStatus.reload();
+        if( mHostStatus.activeAssignmentCount() == 0 )
+            shutdown();
         else
             return;
     } else if( status == "sleep" ) {
@@ -630,6 +638,30 @@ void Slave::reboot()
     // Since we're rebooting, set the status to starting instead.
     setStatus( "starting" , true );
     systemShutdown(/*reboot=*/true);
+#ifndef Q_OS_WIN
+    sleep(60);
+#endif
+}
+
+void Slave::shutdown()
+{
+    LOG_5("Slave::shutdown() called");
+
+    // Cleanup any current jobs
+    cleanup();
+
+    // Return any job assignments
+    LOG_5("Slave::reboot() calling mHostStatus.returnSlaveFrames()");
+    mHostStatus.returnSlaveFrames();
+    LOG_5("Slave::reboot() call to mHostStatus.returnSlaveFrames() done");
+
+    // Disconnect this, so that we dont set the status to maintenance
+    // the status will stay at restart
+    LOG_5("Slave::reboot() calling qApp->disconnect(this)");
+    qApp->disconnect( this );
+
+    setStatus( "offline" , true );
+    systemShutdown(/*reboot=*/false);
 #ifndef Q_OS_WIN
     sleep(60);
 #endif
@@ -822,7 +854,11 @@ void Slave::slotBurnFinished()
     }
     if( status() == "offline-when-done" ) {
         if( mHostStatus.activeAssignmentCount() == 0 )
-            offline();
+            emit statusChange( "offline" );
+    }
+    if( status() == "shutdown-when-done" ) {
+        if( mHostStatus.activeAssignmentCount() == 0 )
+            shutdown();
     }
 }
 
@@ -842,7 +878,11 @@ void Slave::slotError( const QString & /*msg*/ )
     }
     if( status() == "offline-when-done" ) {
         if( mHostStatus.activeAssignmentCount() == 0 )
-            offline();
+            emit statusChange( "offline" );
+    }
+    if( status() == "shutdown-when-done" ) {
+        if( mHostStatus.activeAssignmentCount() == 0 )
+            shutdown();
     }
 }
 
@@ -918,8 +958,8 @@ void Slave::reset( bool offline )
         reboot();
         return;
     }
-    if( status() == "offline-when-done") {
-        this->offline();
+    if( status() == "shutdown-when-done") {
+        shutdown();
         return;
     }
 
@@ -958,7 +998,10 @@ void Slave::reset( bool offline )
     // this inside the transaction.
     mHostStatus.returnSlaveFrames();
 
-    setStatus( offline ? "offline" : "ready", /*force=*/offline );
+    if( mHostStatus.slaveStatus() != "maintenance" )
+        setStatus( offline ? "offline" : "ready", /*force=*/offline );
+    else
+        emit statusChange( "maintenance" );
 
     if( offline && !mInOwnLogonSession && mHost.allowMapping() )
         restoreDefaultMappings();
