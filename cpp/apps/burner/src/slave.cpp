@@ -919,7 +919,7 @@ void Slave::reset( bool offline )
         return;
     }
     if( status() == "offline-when-done") {
-        offline();
+        this->offline();
         return;
     }
 
