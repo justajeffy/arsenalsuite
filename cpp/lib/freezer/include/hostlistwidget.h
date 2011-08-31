@@ -31,6 +31,7 @@ public:
 	QAction* RefreshHostsAction;
 	QAction* HostOnlineAction;
 	QAction* HostOfflineAction;
+    QAction* HostOfflineWhenDoneAction;
 	QAction* HostRestartAction;
 	QAction* HostRestartWhenDoneAction;
 	QAction* HostRebootAction;
@@ -63,6 +64,7 @@ public slots:
 	void setHostsOnline();
 	/// selected hosts are told to stop burning
 	void setHostsOffline();
+    void setHostsOfflineWhenDone();
 	/// selected hosts are told to exit, and the process monitor is responsible for restarting Burner
 	void setHostsRestart();
 	void setHostsRestartWhenDone();

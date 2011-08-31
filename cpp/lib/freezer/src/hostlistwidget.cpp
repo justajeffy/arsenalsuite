@@ -48,8 +48,12 @@ HostListWidget::HostListWidget( QWidget * parent )
 	RefreshHostsAction->setIcon( QIcon( ":/images/refresh" ) );
 	HostOnlineAction = new QAction( "Set Host(s) Status to Online", this );
 	HostOnlineAction->setIcon( QIcon( ":/images/host_online" ) );
+
 	HostOfflineAction = new QAction( "Set Host(s) Status to Offline", this );
 	HostOfflineAction->setIcon( QIcon( ":/images/host_offline" ) );
+    HostOfflineWhenDoneAction = new QAction( "Set Host(s) Status to Offline When Done", this );
+    HostOfflineWhenDoneAction->setIcon( QIcon( ":/images/host_offline" ) );
+
 	HostRestartAction = new QAction( "Restart Host(s) Now", this );
 	HostRestartAction->setIcon( QIcon( ":/images/host_restart" ) );
 	HostRestartWhenDoneAction = new QAction( "Restart Host(s) When Done", this );
@@ -84,6 +88,7 @@ HostListWidget::HostListWidget( QWidget * parent )
 	connect( RefreshHostsAction, SIGNAL( triggered(bool) ), SLOT( refresh() ) );
 	connect( HostOnlineAction, SIGNAL( triggered(bool) ), SLOT( setHostsOnline() ) );
 	connect( HostOfflineAction, SIGNAL( triggered(bool) ), SLOT( setHostsOffline() ) );
+    connect( HostOfflineWhenDoneAction, SIGNAL( triggered(bool) ), SLOT( setHostsOfflineWhenDone() ) );
 	connect( HostRestartAction, SIGNAL( triggered(bool) ), SLOT( setHostsRestart() ) );
 	connect( HostRestartWhenDoneAction, SIGNAL( triggered(bool) ), SLOT( setHostsRestartWhenDone() ) );
 	connect( HostRebootAction, SIGNAL( triggered(bool) ), SLOT( setHostsReboot() ) );
@@ -367,6 +372,15 @@ void HostListWidget::setHostsOnline()
 void HostListWidget::setHostsOffline()
 {
 	setHostsStatus("stopping");
+}
+
+void HostListWidget::setHostsOfflineWhenDone()
+{
+    HostList hosts = mHostTree->selection();
+    if( hosts.size()==0 )
+        return;
+
+    Database::current()->exec( "UPDATE HostStatus SET slaveStatus = 'offline-when-done' WHERE fkeyHost IN(" +hosts.keyString() + ");" );
 }
 
 void HostListWidget::setHostsRestart()
