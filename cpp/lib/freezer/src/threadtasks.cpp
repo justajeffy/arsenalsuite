@@ -104,7 +104,8 @@ void JobListTask::run()
                 where += " fkeyproject is null";
             }
             where += ")";
-            filters << where;
+            if( where != "()" )
+                filters << where;
         }
 
 		if( mJobFilter.elementList.size() > 0 )
