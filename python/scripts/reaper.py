@@ -18,12 +18,12 @@ if sys.argv.count('-daemonize'):
     from blur.daemonize import createDaemon
     createDaemon()
 
-reaperConfig = '/etc/reaper.ini'
+reaperConfig = '/etc/ab/reaper.ini'
 try:
     pos = sys.argv.index('-config')
     reaperConfig = sys.argv[pos+1]
 except: pass
-dbConfig = '/etc/db.ini'
+dbConfig = '/etc/ab/db.ini'
 try:
     pos = sys.argv.index('-dbconfig')
     dbConfig = sys.argv[pos+1]

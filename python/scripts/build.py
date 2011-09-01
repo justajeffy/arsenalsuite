@@ -8,7 +8,10 @@ if sys.platform != 'win32':
 else:
     abscriptInstallCmd = " " # to do
 
-abscriptTarget = StaticTarget("abscripts",path,abscriptInstallCmd,[],shell=True)
+managerIniTarget = IniConfigTarget("managerini",path + "/../scriptsini",'manager.ini.template','manager.ini')
+reaperIniTarget = IniConfigTarget("reaperini",path + "/../scriptsini",'reaper.ini.template','reaper.ini')
+verifierIniTarget = IniConfigTarget("verifierini",path + "/../scriptsini",'verifier.ini.template','verifier.ini')
+abscriptTarget = StaticTarget("abscripts",path,abscriptInstallCmd,['managerini','reaperini','verifierini'],shell=True)
 
 if __name__ == "__main__":
     build()

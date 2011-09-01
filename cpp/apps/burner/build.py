@@ -10,7 +10,16 @@ try:
     os.mkdir(sip_path)
 except: pass
 
-ini = IniConfigTarget("burnerini",path,'burner.ini.template','burner.ini')
+instPrefix = ""
+destDir = ""
+
+if "DESTDIR" in os.environ:
+    destDir = os.environ["DESTDIR"]
+
+if sys.platform=="linux2":
+    instPrefix = destDir + "/etc/ab/"
+
+ini = IniConfigTarget("burnerini",path,'burner.ini.template','burner.ini',instPrefix)
 nsi = NSISTarget("burnerinstaller",path,"burner.nsi")
 st = SipTarget("pyburner",path,True)
 #abgui = QMakeTarget("abgui","apps/assburner", "abgui.pro", ["stonegui","classes",svn])

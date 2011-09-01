@@ -17,3 +17,12 @@ done
 for file in $files; do
     cp -f $file $DESTDIR/usr/local/share/ab/$file
 done
+
+configFiles=$(find ../scriptsini -type f -iname "*.ini" | grep -Eo "\w+\.ini$")
+
+echo "Installing configuration files to $DESTDIR/etc/ab/"
+mkdir $DESTDIR/etc/ab 2> /dev/null
+
+for file in $configFiles; do
+    cp -f ../scriptsini/$file $DESTDIR/etc/ab/$file
+done

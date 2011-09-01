@@ -505,11 +505,12 @@ class WCRevTarget(Target):
 
 # Takes a template .ini file, and sets certain keys based the inputed IniConfig object
 class IniConfigTarget(Target):
-    def __init__(self,name,dir,template_ini,output_ini,config = None):
+    def __init__(self,name,dir,template_ini,output_ini,install_dir = None, config = None):
         Target.__init__(self,name,dir)
         self.TemplateIni = template_ini
         self.OutputIni = output_ini
         self.Config = config
+        self.InstallDir = install_dir
         
     def build_run(self):
         replacementsBySection = DefaultDict(dict)
@@ -548,6 +549,13 @@ class IniConfigTarget(Target):
             outLines.append(line)
         
         open(self.OutputIni,"w").write( ''.join(outLines) )
+        if self.has_arg('install') and not self.InstallDir == None:
+            if self.has_arg('verbose'):
+                print "${GREEN}Installing config file${NORMAL} %s" % (self.InstallDir + "/" + self.OutputIni)
+
+            if not os.path.exists(self.InstallDir):
+                os.makedirs(self.InstallDir)
+            shutil.copy2(self.OutputIni, self.InstallDir + "/" + self.OutputIni)
 
 # Copies a file, replacing part of the name with the
 # svn revisision number from revdir, which is relative

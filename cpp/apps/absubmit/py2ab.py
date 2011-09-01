@@ -107,7 +107,15 @@ def stop():
 
 initializePumpThread()
 print("py2ab(): initialize db connection")
-initConfig(os.environ['ABSUBMIT']+"/ab.ini", os.environ['TEMP']+"/pysubmit.log")
+if "ABSUBMIT" in os.environ:
+    try:
+        initConfig(os.environ['ABSUBMIT']+"/ab.ini", os.environ['TEMP']+"/pysubmit.log")
+    except:
+        initConfig(os.environ['ABSUBMIT']+"/burner.ini", os.environ['TEMP']+"/pysubmit.log")
+else:
+    if not os.name == "nt":
+        initConfig("/etc/ab/burner.ini", os.environ['TEMP']+"/pysubmit.log")
+
 classes_loader()
 args = sys.argv
 
