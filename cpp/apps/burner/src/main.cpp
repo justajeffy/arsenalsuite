@@ -245,11 +245,11 @@ int main(int argc, char * argv[])
 
 #ifdef Q_OS_WIN
 	initConfig( configFile, logFile );
-	initUserConfig( QDir::homePath() + "/.ab.ini" );
+	initUserConfig( QDir::homePath() + "/.burner.ini" );
 #else
 	initConfig( configFile );
-	config().readFromFile( "/etc/db.ini", false );
-	initUserConfig( QDir::homePath() + "/.ab.ini" );
+	config().readFromFile( "/etc/ab/burner.ini", false );
+	initUserConfig( QDir::homePath() + "/.burner.ini" );
 #endif
 
 	initStone( argc, argv );

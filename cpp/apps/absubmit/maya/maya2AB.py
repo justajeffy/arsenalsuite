@@ -316,7 +316,18 @@ def maya2ABSubmit():
 	global saveNeeded
 	pt.initializePumpThread()
 	app=qApp
-	initConfig(os.environ["ABSUBMIT"]+"/ab.ini","/tmp/mayasubmit.log")
+    if "ABSUBMIT" in os.environ:
+        try:
+        	initConfig(os.environ["ABSUBMIT"]+"/burner.ini","/tmp/mayasubmit.log")
+        except:
+            initConfig(os.environ["ABSUBMIT"]+"/ab.ini","/tmp/mayasubmit.log")
+    else:
+        if not os.name = 'nt':
+            initConfig("/etc/ab/burner.ini")
+        else:
+            print "Could not init"
+            sys.exit(-1)
+
 	classes_loader()
 	dialog = MayaRenderDialog()
 	dialog.initFields()

@@ -5,7 +5,16 @@ import os, sys
 path = os.path.dirname(os.path.abspath(__file__))
 rev_path = os.path.join(path,'../..')
 
-ini = IniConfigTarget("freezerini",path,'freezer.ini.template','freezer.ini')
+instPrefix = ""
+destDir = ""
+
+if "DESTDIR" in os.environ:
+    destDir = os.environ["DESTDIR"]
+
+if sys.platform=="linux2":
+    instPrefix = destDir + "/etc/ab/"
+
+ini = IniConfigTarget("freezerini",path,'freezer.ini.template','freezer.ini',instPrefix,"test.ini")
 nsi = NSISTarget("freezer_installer",path,"freezer.nsi")
 
 # Use Static python modules on windows

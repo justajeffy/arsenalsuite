@@ -272,6 +272,9 @@ int main( int argc, char * argv[] )
     signal(SIGABRT, oops_handler);
 	QApplication a(argc, argv);
 
+#ifndef Q_OS_WIN
+    initConfig( "/etc/ab/freezer.ini" );
+#endif
 	initConfig( "freezer.ini" );
 
 #ifdef Q_OS_WIN

@@ -9,12 +9,12 @@ if sys.argv.count('-daemonize'):
 	from blur.daemonize import createDaemon
 	createDaemon()
 
-recConfig = '/etc/reclaim_tasks.ini'
+recConfig = '/etc/ab/reclaim_tasks.ini'
 try:
 	pos = sys.argv.index('-config')
 	recConfig = sys.argv[pos+1]
 except: pass
-dbConfig = '/etc/db.ini'
+dbConfig = '/etc/ab/db.ini'
 try:
 	pos = sys.argv.index('-dbconfig')
 	dbConfig = sys.argv[pos+1]
