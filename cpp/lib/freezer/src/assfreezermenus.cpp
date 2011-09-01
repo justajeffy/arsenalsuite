@@ -160,11 +160,14 @@ void ProjectFilterMenu::slotActionTriggered( QAction * act )
 	if( act == mProjectShowAll ) {
 		mJobList->mJobFilter.showNonProjectJobs = true;
         mJobList->mJobFilter.visibleProjects = mJobList->activeProjects();
+        mJobList->mJobFilter.allProjectsShown = true;
 	} else if( act == mProjectShowNone ) {
 		mJobList->mJobFilter.showNonProjectJobs = false;
         mJobList->mJobFilter.visibleProjects.clear();
+        mJobList->mJobFilter.allProjectsShown = false;
 	} else if( act == mProjectShowNonProject ) {
 		mJobList->mJobFilter.showNonProjectJobs = act->isChecked();
+        mJobList->mJobFilter.allProjectsShown = false;
 	} else {
         bool show = act->isChecked();
         int pkey = act->property("projectkey").toInt();
@@ -175,6 +178,8 @@ void ProjectFilterMenu::slotActionTriggered( QAction * act )
 
         if( mJobList->mJobFilter.visibleProjects.size() == mJobList->activeProjects().size() )
             mJobList->mJobFilter.allProjectsShown = true;
+        else
+            mJobList->mJobFilter.allProjectsShown = false;
     }
     updateActionStates();
     mJobList->refresh();

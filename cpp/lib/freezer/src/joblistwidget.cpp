@@ -1068,10 +1068,8 @@ void JobListWidget::jobFilterChanged( const QString & jobFilter )
 void JobListWidget::frameSelected( const Record & frameRecord )
 {
 	JobTask frame(frameRecord);
-	if( frame.isRecord() ) {
-		int frameNumber = frame.frameNumber();
-		mImageView->setImageNumber( frameNumber );
-	}
+	if( frame.isRecord() )
+		mImageView->setImageNumber( frame.frameNumber() );
 }
 
 void JobListWidget::frameListSelectionChanged()
@@ -1240,9 +1238,10 @@ void JobListWidget::clearFilters()
 
 void JobListWidget::refreshDepsTab()
 {
-    GVGraph * gvg = new GVGraph("test", QApplication::font(), 0.8);
 	JobList sel = mJobTree->selection();
 	if( sel.isEmpty() ) return;
+
+    GVGraph * gvg = new GVGraph("test", QApplication::font(), 0.8);
 
     Index * idx = JobDep::table()->indexFromField( "fkeyJob" );
     idx->cacheIncoming(true);
