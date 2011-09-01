@@ -172,6 +172,13 @@ void initConfig( const QString & configName, const QString & logfile )
 		int argc = 0;
 		new QCoreApplication(argc, (char**)0);
 	}
+
+    QFile file( configName );
+    if( !file.exists() ) {
+        printf("Could not find %s\n", configName.toStdString().c_str());
+        return;
+    }
+
 #ifdef Q_OS_WIN
 	// Used for 64 bit dlls, won't show up under syswow64
 #ifdef Q_OS_WIN64

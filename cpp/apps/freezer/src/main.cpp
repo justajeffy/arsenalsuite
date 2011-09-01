@@ -272,10 +272,11 @@ int main( int argc, char * argv[] )
     signal(SIGABRT, oops_handler);
 	QApplication a(argc, argv);
 
+    initConfig( "freezer.ini" );
 #ifndef Q_OS_WIN
+    // Fallback if the config file does not exist in the current folder
     initConfig( "/etc/ab/freezer.ini" );
 #endif
-	initConfig( "freezer.ini" );
 
 #ifdef Q_OS_WIN
 	QString cp = "h:/public/" + getUserName() + "/Blur";
