@@ -713,15 +713,15 @@
   <column reverseAccess="true" type="uint" methodName="JobError" name="fkeyJobError">
    <fkey indexDeleteMode="DoNothingOnDelete" indexName="JobError" indexUseCache="false" table="JobError" type="single" hasIndex="true"/>
   </column>
-  <column type="ULongLong" methodName="realtime" name="realtime"/>
-  <column type="ULongLong" methodName="usertime" name="usertime"/>
-  <column type="ULongLong" methodName="systime" name="systime"/>
-  <column type="ULongLong" methodName="iowait" name="iowait"/>
-  <column pluralMethodName="bytesRead" type="ULongLong" methodName="bytesRead" name="bytesRead"/>
-  <column pluralMethodName="bytesWrite" type="ULongLong" methodName="bytesWrite" name="bytesWrite"/>
+  <column type="qulonglong" methodName="realtime" name="realtime"/>
+  <column type="qulonglong" methodName="usertime" name="usertime"/>
+  <column type="qulonglong" methodName="systime" name="systime"/>
+  <column type="qulonglong" methodName="iowait" name="iowait"/>
+  <column pluralMethodName="bytesRead" type="qulonglong" methodName="bytesRead" name="bytesRead"/>
+  <column pluralMethodName="bytesWrite" type="qulonglong" methodName="bytesWrite" name="bytesWrite"/>
   <column type="float" methodName="efficiency" name="efficiency"/>
-  <column pluralMethodName="opsRead" type="ULongLong" methodName="opsRead" name="opsRead"/>
-  <column pluralMethodName="opsWrite" type="ULongLong" methodName="opsWrite" name="opsWrite"/>
+  <column pluralMethodName="opsRead" type="qulonglong" methodName="opsRead" name="opsRead"/>
+  <column pluralMethodName="opsWrite" type="qulonglong" methodName="opsWrite" name="opsWrite"/>
   <column pluralMethodName="assignSlots" type="uint" methodName="assignSlots" name="assignslots"/>
   <column type="uint" methodName="assignMaxMemory" name="assignMaxMemory"/>
   <column type="uint" methodName="assignMinMemory" name="assignMinMemory"/>
@@ -770,21 +770,21 @@
   <column displayName="Sys" type="float" methodName="systime" name="systime"/>
   <column type="uint" methodName="iowait" name="iowait"/>
  </table>
- <table useCodeGen="true" name="JobDep" expireKeyCache="true" className="JobDep">
+ <table docs="Contains the dependency information for jobs and what type of dependency, hard or soft." useCodeGen="true" name="JobDep" expireKeyCache="true" className="JobDep">
   <column displayName="Key Job Dependency" type="uint" methodName="keyJobDep" name="keyJobDep" pkey="true"/>
   <column type="uint" methodName="Job" name="fkeyJob">
    <fkey indexDeleteMode="DoNothingOnDelete" indexName="Job" indexUseCache="true" table="Job" type="multi" hasIndex="true"/>
   </column>
-  <column type="uint" methodName="Dep" name="fkeyDep">
+  <column docs="Job key this job depends on." type="uint" methodName="Dep" name="fkeyDep">
    <fkey indexDeleteMode="DoNothingOnDelete" indexName="Dep" indexUseCache="true" table="Job" type="multi" hasIndex="true"/>
   </column>
-  <column type="uint" methodName="depType" name="depType"/>
+  <column docs="Dependency type. 1 = hard, 2 = soft." type="uint" methodName="depType" name="depType"/>
   <index useCache="true" type="single" name="JobAndDep">
    <column name="fkeyJob"/>
    <column name="fkeyDep"/>
   </index>
  </table>
- <table useCodeGen="true" name="JobEnvironment" expireKeyCache="true" className="JobEnvironment">
+ <table docs="Contains the environment variables used or specified when submitting a job. The farm will use these environment variables to reconstruct the appropriate environment for a job." useCodeGen="true" name="JobEnvironment" expireKeyCache="true" className="JobEnvironment">
   <column type="uint" methodName="keyJobEnvironment" name="keyJobEnvironment" pkey="true"/>
   <column type="QString" methodName="environment" name="environment"/>
  </table>
@@ -1013,12 +1013,12 @@
   <column type="uint" methodName="lastNotifiedErrorCount" name="lastNotifiedErrorCount"/>
   <column docs="Average memory used per task in kilobytes." type="uint" methodName="averageMemory" name="averageMemory"/>
   <column type="float" methodName="efficiency" name="efficiency"/>
-  <column type="ULongLong" methodName="cputime" name="cputime"/>
-  <column type="ULongLong" methodName="bytesWrite" name="bytesWrite"/>
-  <column type="ULongLong" methodName="bytesRead" name="bytesRead"/>
-  <column type="ULongLong" methodName="opsWrite" name="opsWrite"/>
-  <column type="ULongLong" methodName="opsRead" name="opsRead"/>
-  <column type="ULongLong" methodName="totaltime" name="totaltime"/>
+  <column type="qulonglong" methodName="cputime" name="cputime"/>
+  <column type="qulonglong" methodName="bytesWrite" name="bytesWrite"/>
+  <column type="qulonglong" methodName="bytesRead" name="bytesRead"/>
+  <column type="qulonglong" methodName="opsWrite" name="opsWrite"/>
+  <column type="qulonglong" methodName="opsRead" name="opsRead"/>
+  <column type="qulonglong" methodName="totaltime" name="totaltime"/>
   <column pluralMethodName="queueOrder" type="uint" methodName="queueOrder" name="queueorder"/>
   <column type="QString" methodName="taskBitmap" name="taskbitmap"/>
   <column type="uint" methodName="skipReason" name="fkeyJobStatusSkipReason">
