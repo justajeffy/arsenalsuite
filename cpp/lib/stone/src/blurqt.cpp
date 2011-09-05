@@ -165,7 +165,7 @@ QString stoneOptionsHelp()
 	return ret.join("\n");
 }
 
-void initConfig( const QString & configName, const QString & logfile )
+bool initConfig( const QString & configName, const QString & logfile )
 {
 	if( !QCoreApplication::instance() ) {
 		fprintf( stderr, "Calling initConfig before creating a QApplication object is not recommented\nCreating a QCoreApplication object now to avoid a crash\n" );
@@ -176,7 +176,7 @@ void initConfig( const QString & configName, const QString & logfile )
     QFile file( configName );
     if( !file.exists() ) {
         printf("Could not find %s\n", configName.toStdString().c_str());
-        return;
+        return false;
     }
 
 #ifdef Q_OS_WIN
@@ -199,6 +199,8 @@ void initConfig( const QString & configName, const QString & logfile )
 	qRegisterMetaType<Record>("Record");
 	qRegisterMetaType<RecordList>("RecordList");
 	qRegisterMetaType<Interval>("Interval");
+
+    return true;
 }
 
 void initUserConfig( const QString & fileName )

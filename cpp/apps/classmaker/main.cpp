@@ -47,7 +47,8 @@ int main( int argc, char * argv[] )
 #endif // Q_WS_X11
 	QApplication a( argc, argv, useGUI );
 
-	initConfig( "classmaker.ini" );
+	if( !initConfig( "classmaker.ini" ) )
+        return -1;
 
 	Schema * schema = 0;
 	QString fileName;

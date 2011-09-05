@@ -82,7 +82,7 @@ STONE_EXPORT void initStone( const QStringList & args );
 STONE_EXPORT QString stoneOptionsHelp();
 
 /** \brief Opens config file with 'configName' */
-STONE_EXPORT void initConfig( const QString & configName, const QString & logfile = QString() );
+STONE_EXPORT bool initConfig( const QString & configName, const QString & logfile = QString() );
 
 /** \brief Opens user's config file with 'userConfigName' */
 STONE_EXPORT void initUserConfig( const QString & userConfigFile );
