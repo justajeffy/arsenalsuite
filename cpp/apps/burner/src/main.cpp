@@ -170,7 +170,7 @@ int main(int argc, char * argv[])
 #ifdef Q_OS_WIN
 	QString configFile = "burner.ini";
 #else
-	QString configFile = "/etc/burner.ini";
+	QString configFile = "/etc/ab/burner.ini";
 #endif
 	for( int i = 1; i<argc; i++ ){
 		QString arg( argv[i] );
@@ -244,10 +244,12 @@ int main(int argc, char * argv[])
 		logFile = "burner_burn_" + QString::number( jobAssignmentKey ) + ".log";
 
 #ifdef Q_OS_WIN
-	initConfig( configFile, logFile );
+	if( !initConfig( configFile, logFile ) )
+        return -1;
 	initUserConfig( QDir::homePath() + "/.burner.ini" );
 #else
-	initConfig( configFile );
+	if( !initConfig( configFile ) )
+        return -1;
 	config().readFromFile( "/etc/ab/burner.ini", false );
 	initUserConfig( QDir::homePath() + "/.burner.ini" );
 #endif

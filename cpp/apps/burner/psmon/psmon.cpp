@@ -47,7 +47,8 @@ int main( int argc, char * argv [] )
 	if (!useGUI)
 		procArgs = " -nogui";
 
-	initConfig( "assburner.ini", "abpsmon.log" );
+	if( !initConfig( "assburner.ini", "abpsmon.log" ) )
+        return -1;
 
 	bool crashMailSent = false;
 	QDateTime started = QDateTime::currentDateTime();
