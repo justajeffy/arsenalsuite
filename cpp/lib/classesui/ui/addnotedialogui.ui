@@ -354,8 +354,9 @@
  </customwidgets>
  <tabstops>
   <tabstop>mSubject</tabstop>
-  <tabstop>mOKButton</tabstop>
-  <tabstop>mCancelButton</tabstop>
+  <tabstop>mTodoStatusCombo</tabstop>
+  <tabstop>mBody</tabstop>
+  <tabstop>mNotifyList</tabstop>
   <tabstop>mNotifyNew</tabstop>
   <tabstop>mNotifyDelete</tabstop>
   <tabstop>mNotifyClear</tabstop>
@@ -364,8 +365,10 @@
   <tabstop>mNotifyCoordinator</tabstop>
   <tabstop>mNotifyAssigned</tabstop>
   <tabstop>mSignoffCheck</tabstop>
+  <tabstop>mAttachmentList</tabstop>
   <tabstop>mAddAttachment</tabstop>
-  <tabstop>mTodoStatusCombo</tabstop>
+  <tabstop>mOKButton</tabstop>
+  <tabstop>mCancelButton</tabstop>
  </tabstops>
  <resources/>
  <connections>
