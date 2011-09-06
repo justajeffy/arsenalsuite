@@ -461,7 +461,10 @@ QVariant FrameItem::modelData( const QModelIndex & i, int role ) const {
 	} else if ( role == Qt::TextColorRole )
 		return co ? civ(co->fg) : QVariant();
 	else if( role == Qt::BackgroundColorRole )
-		return co ? civ(co->bg) : QVariant();
+        if( i.row() & 0x000001 )
+            return co ? civ(co->bg.darker(120)) : QVariant();
+        else
+    		return co ? civ(co->bg) : QVariant();
 	return QVariant();
 }
 
@@ -683,7 +686,10 @@ QVariant JobItem::modelData( const QModelIndex & i, int role ) const
 			ret.setRgbF( 1.0 - jobStatus.health(), jobStatus.health(), 0 );
 			return ret;
 		} else
-			return co ? civ(co->bg) : QVariant();
+            if (i.row() & 0x000001)
+                return co ? civ(co->bg.darker(120)) : QVariant();
+            else
+    			return co ? civ(co->bg) : QVariant();
 	} else if( role == Qt::ToolTipRole && col == 16 && !healthIsNull ) {
 		return QString( "%1% Healthy" ).arg(int(jobStatus.health() * 100));
 	} else if( role == Qt::ToolTipRole ) {
@@ -786,7 +792,7 @@ void GroupedJobItem::init( const QModelIndex & idx )
        }
        avgTime = (avgTimeInterval/qMax(1,jobs)).toDisplayString();
        slotsOnGroup = QString::number(slotCount);
-    colorOption = options.mJobColors->getColorOption("ready");
+    colorOption = options.mJobColors->getColorOption("group");
 }
 
 QVariant GroupedJobItem::modelData( const QModelIndex & i, int role ) const
@@ -803,8 +809,12 @@ QVariant GroupedJobItem::modelData( const QModelIndex & i, int role ) const
            return ((JobModel*)i.model())->jobTypeIcon(JobType::recordByName(groupValue));
        if ( role == Qt::TextColorRole )
            return colorOption ? civ(colorOption->fg) : QVariant();
-       if( role == Qt::BackgroundColorRole )
-           return colorOption ? civ(colorOption->bg) : QVariant();
+       if( role == Qt::BackgroundColorRole ) { 
+            if (i.row() & 0x000001)
+                return colorOption ? civ(colorOption->bg.darker(120)) : QVariant();
+            else
+               return colorOption ? civ(colorOption->bg) : QVariant();
+        }
 
        return ItemBase::modelData(i,role);
 }

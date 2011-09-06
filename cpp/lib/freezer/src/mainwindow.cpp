@@ -244,7 +244,8 @@ MainWindow::MainWindow( QWidget * parent )
 		<< ColorOption( "started", QColor(47,191,255) )
 		<< ColorOption( "suspended", QColor(164,141,199) )
 		<< ColorOption( "holding", QColor(164,141,199) )
-		<< ColorOption( "done", QColor(125,122,156) );
+		<< ColorOption( "done", QColor(125,122,156) )
+        << ColorOption( "group", fg, bg );
 	
 	options.mFrameColors = new ViewColors("FrameView");
 	options.mFrameColors->mColors

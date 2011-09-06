@@ -950,7 +950,8 @@ QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & d
 	bool stealObjects = true;
 	int currentDestRow = insertPos;
 	int totalMoved = 0;
-	dump();
+    // Temporarily commented out because of verbosity
+//	dump();
 	for( TransRowSpanMap::Iterator it = spansByTrans.begin(); it != spansByTrans.end(); ++it ) {
 		ModelDataTranslator * trans = it.key();
 		QList<RowSpan> & spanList = it.value();
