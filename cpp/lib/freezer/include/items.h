@@ -150,7 +150,7 @@ struct FREEZER_EXPORT GroupedJobItem : public ItemBase
 {
        QString avgTime, groupValue, slotsOnGroup;
        int groupColumn;
-    ColorOption * colorOption;
+       ColorOption * colorOption;
        void init( const QModelIndex & idx );
        QVariant modelData( const QModelIndex & i, int role ) const;
        Qt::ItemFlags modelFlags( const QModelIndex & );

@@ -519,6 +519,9 @@ void ExtTreeView::drawBranches ( QPainter * p, const QRect & rect, const QModelI
 	if (window()->isActiveWindow())
 		extraFlags |= QStyle::State_Active;
 
+    const QAbstractItemModel * modelItem = index.model();
+    QVariant bgColor = modelItem->data(index, Qt::BackgroundColorRole);
+
 	QModelIndex parent = index.parent();
 	int level = 0;
 	{
@@ -543,6 +546,15 @@ void ExtTreeView::drawBranches ( QPainter * p, const QRect & rect, const QModelI
 
 	QPlastiqueStyle * ps = qobject_cast<QPlastiqueStyle*>(QApplication::style());
 	if( ps ) {
+        if( bgColor.isValid() && bgColor.type() == QVariant::Color && qvariant_cast<QColor>(bgColor).isValid() )
+        {
+            p->save();
+            p->setPen(qvariant_cast<QColor>(bgColor));
+            p->setBrush(qvariant_cast<QColor>(bgColor));
+            p->drawRect(rect);
+            p->restore();
+        }
+
 		QRect primitive(rect.right(), rect.top(), indent, rect.height());
 	
 		QModelIndex current = parent;

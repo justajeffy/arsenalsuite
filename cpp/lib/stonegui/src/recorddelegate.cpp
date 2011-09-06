@@ -161,6 +161,7 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
 		painter->setBrush( qvariant_cast<QColor>(val) );
 		painter->drawRect( option.rect );
 	}
+
 	if( option.state & ExtTreeView::State_ShowGrid ) {
 		bool sel = option.state & QStyle::State_Selected;
 		painter->setPen( option.palette.color( QPalette::Dark ) );
@@ -171,7 +172,6 @@ void ExtDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & optio
 		}
 		painter->drawLine( index.column() == 0 ? 0 : option.rect.x(), option.rect.bottom(), option.rect.right(), option.rect.bottom() );
 	}
-
 	painter->restore();
 }
 
