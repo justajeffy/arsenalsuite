@@ -67,6 +67,7 @@ public:
 	QAction* FilterAction;
 	QAction* FilterClearAction;
 	QAction* ShowMineAction;
+    QAction* WhoAmIAction;
 	QAction* ClearErrorsAction;
 	QAction* DependencyTreeEnabledAction;
 	QAction* NewViewFromSelectionAction;
@@ -121,6 +122,9 @@ public slots:
 
 	/// toggles whether to only show jobs owned by current user
 	void showMine(bool);
+
+    /// Shows a dialog that allows a user to add users when they toggle "show my jobs"
+    void whoAmI();
 
 	/// selected jobs have all errors cleared
 	void clearErrors();
@@ -204,6 +208,10 @@ protected:
 	JobFilter mJobFilter;
 
 	bool mStaticDataRetrieved;
+
+    EmployeeList mMainUserList;
+    EmployeeList mCurrentlyImmitating;
+    bool mShowingMine;
 
     struct SharedData {
         int mRefCount;
