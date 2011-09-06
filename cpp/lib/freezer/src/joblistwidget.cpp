@@ -31,6 +31,8 @@
 #include "projectstatus.h"
 #include "service.h"
 #include "user.h"
+#include "group.h"
+#include "usergroup.h"
 
 #include "busywidget.h"
 #include "modelgrouper.h"
@@ -50,6 +52,8 @@
 #include "mainwindow.h"
 #include "tabtoolbar.h"
 #include "threadtasks.h"
+
+#include "usernotifydialog.h"
 
 #ifdef LoadImage
 #undef LoadImage
@@ -73,6 +77,7 @@ JobListWidget::JobListWidget( QWidget * parent )
 , mJobTypeFilterMenu( 0 )
 , mTaskMenu( 0 )
 , mErrorMenu( 0 )
+, mShowingMine( false )
 {
     if( !mSharedData )
         mSharedData = new SharedData;
@@ -126,6 +131,8 @@ void JobListWidget::initializeViews()
         ShowMineAction = new QAction( "View My Jobs", this );
         ShowMineAction->setCheckable( TRUE );
         ShowMineAction->setIcon( QIcon( ":/images/show_mine" ) );
+        WhoAmIAction = new QAction( "Who Am I?", this );
+        WhoAmIAction->setIcon( QIcon( ":/images/who_am_i" ) );
         ClearErrorsAction = new QAction( "Clear Job Errors", this );
         ShowClearedErrorsAction = new QAction( "Show Cleared Errors", this );
         ShowClearedErrorsAction->setCheckable(true);
@@ -159,6 +166,7 @@ void JobListWidget::initializeViews()
         connect( PauseAction, SIGNAL( triggered(bool) ), SLOT( pauseJobs() ) );
         connect( KillAction, SIGNAL( triggered(bool) ), SLOT( deleteJobs() ) );
         connect( ShowMineAction, SIGNAL( toggled(bool) ), SLOT( showMine(bool) ) );
+        connect( WhoAmIAction, SIGNAL( triggered(bool) ), SLOT( whoAmI() ) );
         connect( ShowOutputAction, SIGNAL( triggered(bool) ), SLOT( outputPathExplorer() ) );
         connect( ClearErrorsAction, SIGNAL( triggered(bool) ), SLOT( clearErrors() ) );
 
@@ -270,6 +278,7 @@ void JobListWidget::initializeViews()
         mJobFilter.userList = ini.readString( "UserList", "" ).split(',',QString::SkipEmptyParts);
         ShowMineAction->blockSignals(true);
         ShowMineAction->setChecked( !mJobFilter.userList.isEmpty() );
+        mShowingMine = ( !mJobFilter.userList.isEmpty() );
         ShowMineAction->blockSignals(false);
 
         mJobFilter.allProjectsShown = ini.readBool( "AllProjectsShown", true );
@@ -281,6 +290,9 @@ void JobListWidget::initializeViews()
         mJobFilter.mLimit = options.mLimit;
         mJobFilter.mDaysLimit = options.mDaysLimit;
         applyOptions();
+
+        // load this once
+        mMainUserList = Employee::select();
     }
 }
 
@@ -318,7 +330,8 @@ void JobListWidget::save( IniConfig & ini )
         QStringList sizes;
         foreach( int i, mFrameSplitter->sizes() ) sizes += QString::number(i);
         ini.writeString( "FrameSplitterPos", sizes.join(",") );
-    }
+
+   }
     FreezerView::save(ini);
 }
 
@@ -733,6 +746,7 @@ void JobListWidget::setChildrenToolTip( const QModelIndex & parent, const QMap<Q
 QToolBar * JobListWidget::toolBar( QMainWindow * mw )
 {
 	if( !mToolBar ) {
+        User currentUser = User::currentUser();
         initializeViews();
 		mToolBar = new QToolBar( mw );
 		mToolBar->addAction( RefreshAction );
@@ -745,6 +759,16 @@ QToolBar * JobListWidget::toolBar( QMainWindow * mw )
 		mToolBar->addAction( FilterAction );
 		mToolBar->addAction( FilterClearAction );
 		mToolBar->addAction( ShowMineAction );
+
+        if( currentUser.isRecord() ) {
+            UserGroupList ugl = currentUser.userGroups();
+            foreach( UserGroup ug, ugl)
+                if( ug.group() == Group::recordByName("RenderOps") ) {
+                    mToolBar->addAction( WhoAmIAction );
+                    break;
+                }
+        }
+
 		mToolBar->addSeparator();
 		mToolBar->addAction( DependencyTreeEnabledAction );
 	}
@@ -753,11 +777,13 @@ QToolBar * JobListWidget::toolBar( QMainWindow * mw )
 
 void JobListWidget::populateViewMenu( QMenu * viewMenu )
 {
+    User currentUser = User::currentUser();
     initializeViews();
 	viewMenu->addAction( DependencyTreeEnabledAction );
 	viewMenu->addAction( NewViewFromSelectionAction );
 	viewMenu->addSeparator();
 	viewMenu->addAction( ShowMineAction );
+
 	viewMenu->addAction( FilterAction );
 	viewMenu->addAction( FilterClearAction );
 	{
@@ -1055,8 +1081,37 @@ void JobListWidget::showMine(bool sm)
 	if( sm && u.isRecord() )
 		mJobFilter.userList += QString::number(u.key());
 
+    mShowingMine = sm;
+
 	/* Refresh the list */
 	refresh();
+}
+
+void JobListWidget::whoAmI()
+{
+    if( !mShowingMine )
+        return;
+
+    User u = User::currentUser();
+    mJobFilter.userList.clear();
+
+    if( u.isRecord() && !mCurrentlyImmitating.contains(u) )
+        mCurrentlyImmitating += u;
+
+    UserNotifyDialog und(this);
+    und.setMainUserList(mMainUserList);
+    und.setUsers(mCurrentlyImmitating);
+    if( und.exec() == QDialog::Accepted ) {
+        foreach( User su, und.userList() )
+            mJobFilter.userList += QString::number(su.key());
+        mCurrentlyImmitating = und.userList();
+    }
+
+    // Make sure the current user is always included even if they delete their name off the list. Prevents the filter from just selecting everyone
+    if( u.isRecord() && !mJobFilter.userList.contains(QString::number(u.key()) ) )
+        mJobFilter.userList += QString::number(u.key());
+
+    refresh();
 }
 
 void JobListWidget::jobFilterChanged( const QString & jobFilter )
