@@ -107,6 +107,8 @@ public slots:
 	void frameListSelectionChanged();
 	void frameSelected(const Record &);
 
+    void errorListSelectionChanged();
+
 	/// selected jobs are told to re-render all frames
 	void restartJobs();
 
