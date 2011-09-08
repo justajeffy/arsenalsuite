@@ -165,6 +165,7 @@ QString stoneOptionsHelp()
 	return ret.join("\n");
 }
 
+/// Initialises the stone library using a supplied configuration file. Returns if it was able to read the configuration file successfully
 bool initConfig( const QString & configName, const QString & logfile )
 {
 	if( !QCoreApplication::instance() ) {
@@ -173,6 +174,7 @@ bool initConfig( const QString & configName, const QString & logfile )
 		new QCoreApplication(argc, (char**)0);
 	}
 
+    // Check to see if we can open up the configuration file to begin with.
     QFile file( configName );
     if( !file.exists() ) {
         printf("Could not find %s\n", configName.toStdString().c_str());

@@ -54,6 +54,8 @@
 #include "threadtasks.h"
 
 #include "usernotifydialog.h"
+#include "joberrorswidgetfactory.h"
+#include "joberrorswidgetplugin.h"
 
 #ifdef LoadImage
 #undef LoadImage
@@ -175,6 +177,7 @@ void JobListWidget::initializeViews()
         connect( mFrameTree, SIGNAL( currentChanged( const Record & ) ), SLOT( frameSelected(const Record &) ) );
         connect( mFrameTree,  SIGNAL( selectionChanged(RecordList) ), SLOT( frameListSelectionChanged() ) );
         connect( mImageView, SIGNAL( frameStatusChange(int,int) ), SLOT( setFrameCacheStatus(int,int) ) );
+        connect( mErrorTree, SIGNAL( selectionChanged(RecordList) ), SLOT( errorListSelectionChanged() ) );
 
         mJobTree->setContextMenuPolicy( Qt::CustomContextMenu );
         mFrameTree->setContextMenuPolicy( Qt::CustomContextMenu );
@@ -293,6 +296,17 @@ void JobListWidget::initializeViews()
 
         // load this once
         mMainUserList = Employee::select();
+
+        // Don't show the panel if there's no plugins to begin with
+        if( JobErrorsWidgetFactory::mJobErrorsWidgetPlugins.size() == 0 )
+            mErrorPluginWidget->setVisible(false);
+        else {
+            // Initialise the widgets plugins in the errors tab
+            foreach( JobErrorsWidgetPlugin * jewp, JobErrorsWidgetFactory::mJobErrorsWidgetPlugins.values() )
+                jewp->initialize( mErrorPluginWidget );
+
+            mErrorPluginWidget->setVisible(true);
+        }
     }
 }
 
@@ -1015,6 +1029,18 @@ void JobListWidget::frameTabChanged()
 {
 		refreshFrameList(false /*jobChanged*/);
 }
+
+void JobListWidget::errorListSelectionChanged()
+{
+    if( JobErrorsWidgetFactory::mJobErrorsWidgetPlugins.size() )
+    {
+        JobErrorList errors = mErrorTree->selection();
+
+        foreach( JobErrorsWidgetPlugin * jewp, JobErrorsWidgetFactory::mJobErrorsWidgetPlugins.values() )
+            jewp->setJobErrors( errors );
+    }
+}
+
 void JobListWidget::clearErrors()
 {
     JobList jobs = mJobTree->selection();

@@ -81,7 +81,7 @@ STONE_EXPORT void initStone( const QStringList & args );
 /** \brief Returns a string representation of the options listed for the initStone function. */
 STONE_EXPORT QString stoneOptionsHelp();
 
-/** \brief Opens config file with 'configName' */
+/** \brief Opens config file with 'configName'. Returns false if it was unable to open the file. */
 STONE_EXPORT bool initConfig( const QString & configName, const QString & logfile = QString() );
 
 /** \brief Opens user's config file with 'userConfigName' */

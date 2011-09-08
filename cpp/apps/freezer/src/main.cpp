@@ -339,6 +339,7 @@ int main( int argc, char * argv[] )
 		FreezerCore::setDatabaseForThread( classesDb(), Connection::createFromIni( config(), "Database" ) );
 		
 		{
+            loadPythonPlugins();
 			MainWindow m;
 			IniConfig & cfg = userConfig();
 			cfg.pushSection( "MainWindow" );
@@ -355,7 +356,6 @@ int main( int argc, char * argv[] )
             if( !currentView.isEmpty() )
                 m.setCurrentView( currentView );
 			m.show();
-			loadPythonPlugins();
 			result = a.exec();
 			if( showTime ){
 				Database * tm = Database::current();
