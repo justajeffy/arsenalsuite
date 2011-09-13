@@ -57,6 +57,9 @@
 #include "joberrorswidgetfactory.h"
 #include "joberrorswidgetplugin.h"
 
+#include "jobframestabwidgetfactory.h"
+#include "jobframestabwidgetplugin.h"
+
 #ifdef LoadImage
 #undef LoadImage
 #endif
@@ -306,6 +309,11 @@ void JobListWidget::initializeViews()
                 jewp->initialize( mErrorPluginWidget );
 
             mErrorPluginWidget->setVisible(true);
+        }
+
+        // Initialise the frames tab plugins
+        foreach( JobFramesTabWidgetPlugin * jftwp, JobFramesTabWidgetFactory::mJobFramesTabWidgetPlugins.values() ) {
+            jftwp->initialize( mFrameTabs );
         }
     }
 }
@@ -913,8 +921,15 @@ void JobListWidget::currentJobChanged()
 	LOG_5( "JobListWidget::currentJobChanged: " + QString::number( mCurrentJob.key() ) );
 
 	QWidget * curTab = mJobTabWidget->currentWidget();
-	if( curTab==mFrameTab )
+	if( curTab==mFrameTab ) {
 		refreshFrameList(jobChange);
+        if( JobFramesTabWidgetFactory::mJobFramesTabWidgetPlugins.size() ) {
+            JobList jList = mJobTree->selection();
+
+            foreach( JobFramesTabWidgetPlugin * jftwp, JobFramesTabWidgetFactory::mJobFramesTabWidgetPlugins.values() )
+                jftwp->setJobList( jList );
+        }
+    }
     else if( curTab == mErrorsTab )
         refreshErrorList();
 }
@@ -1163,6 +1178,11 @@ void JobListWidget::frameListSelectionChanged()
 		setStatusBarMessage( mCurrentJob.name() + " " + QString::number( jtl.size() ) + " Frames Selected" );
 	} else
 		clearStatusBar();
+
+    if( JobFramesTabWidgetFactory::mJobFramesTabWidgetPlugins.size() ) {
+        foreach( JobFramesTabWidgetPlugin * jftwp, JobFramesTabWidgetFactory::mJobFramesTabWidgetPlugins.values() )
+            jftwp->setJobTaskList( jtl );
+    }
 }
 
 void JobListWidget::outputPathExplorer()

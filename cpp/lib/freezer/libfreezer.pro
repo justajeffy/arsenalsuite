@@ -41,6 +41,7 @@ SOURCES+= \
 #	src/jobxsisettingswidget.cpp \
 	src/jobviewerplugin.cpp \
     src/joberrorswidgetplugin.cpp \
+    src/jobframestabwidgetplugin.cpp \
 	src/mainwindow.cpp \
 	src/projectweightdialog.cpp \
 	src/projectweightview.cpp \
@@ -93,6 +94,8 @@ HEADERS+= \
 	include/jobviewerplugin.h \
     include/joberrorswidgetplugin.h \
     include/joberrorswidgetfactory.h \
+    include/jobframestabwidgetplugin.h \
+    include/jobframestabwidgetfactory.h \
 	include/mainwindow.h \
 	include/projectweightdialog.h \
 	include/projectweightview.h \
