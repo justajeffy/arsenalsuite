@@ -16,6 +16,7 @@
 %Include frameviewerplugin.sip
 %Include multiframeviewerplugin.sip
 %Include joberrorswidgetplugin.sip
+%Include jobframestabwidgetplugin.sip
 %Include framenthdialog.sip
 %Include mainwindow.sip
 
