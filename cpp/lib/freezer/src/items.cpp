@@ -380,9 +380,10 @@ void JobIconDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opt
         uint currentWidth = 0;
         if( threads.size() ){
             QPixmap noteIcon;
-            if( !QPixmapCache::find("images-note.png", noteIcon) )
+            if( !QPixmapCache::find("images-note.png", noteIcon) ) {
                 noteIcon.load("images/note.png");
                 QPixmapCache::insert("images-note.png", noteIcon);
+            }
 
             painter->drawPixmap( option.rect.x() + 1, option.rect.y() + 1, noteIcon);
             currentWidth += 16;
@@ -391,11 +392,38 @@ void JobIconDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opt
         if( j.wrangler().isRecord() )
         {
             QPixmap padlockIcon;
-            if( !QPixmapCache::find("images-wrangled.png", padlockIcon) )
+            if( !QPixmapCache::find("images-wrangled.png", padlockIcon) ) {
                 padlockIcon.load("images/wrangled.png");
                 QPixmapCache::insert("images-wrangled.png", padlockIcon);
+            }
 
             painter->drawPixmap( option.rect.x() + 1 + currentWidth, option.rect.y() + 1, padlockIcon);
+            currentWidth += 16;
+        }
+
+        // grab the job's toggled flags
+        unsigned int flags = j.toggleFlags();
+        // Job has been emailed
+        if( flags & 0x00000001 ) {
+            QPixmap emailedIcon;
+            if( !QPixmapCache::find("images-emailed.png", emailedIcon) ) {
+                emailedIcon.load("images/emailed.png");
+                QPixmapCache::insert("images-emailed.png", emailedIcon);
+            }
+
+            painter->drawPixmap( option.rect.x() + 1 + currentWidth, option.rect.y() + 1, emailedIcon);
+            currentWidth += 16;
+        }
+
+        // Job marked for deletion
+        if( flags & 0x00000010 ) {
+            QPixmap toDeleteIcon;
+            if( !QPixmapCache::find("images-todelete.png", toDeleteIcon) ) {
+                toDeleteIcon.load("images/todelete.png");
+                QPixmapCache::insert("images-todelete.png", toDeleteIcon);
+            }
+
+            painter->drawPixmap( option.rect.x() + 1 + currentWidth, option.rect.y() + 1, toDeleteIcon);
             currentWidth += 16;
         }
 

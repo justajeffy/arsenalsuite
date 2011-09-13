@@ -681,6 +681,7 @@
    <fkey indexDeleteMode="DoNothingOnDelete" table="JobEnvironment" type="multi" hasIndex="false"/>
   </column>
   <column type="QDateTime" methodName="suspendedts" name="suspendedts"/>
+  <column docs="Contains a bit set of flags toggled on the job." type="uint" methodName="toggleFlags" name="toggleFlags"/>
  </table>
  <table useCodeGen="true" parent="Job" name="Job3Delight" expireKeyCache="true" className="Job3Delight">
   <column type="uint" methodName="width" name="width"/>
