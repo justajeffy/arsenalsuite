@@ -6,6 +6,7 @@
 #include "jobhistorytype.h"
 #include "jobtask.h"
 #include "jobtable.h"
+#include "jobdep.h"
 #include "user.h"
 #include "group.h"
 #include "usergroup.h"
@@ -19,8 +20,22 @@ bool Job::updateJobStatuses( JobList jobs, const QString & jobStatus, bool reset
 
     if( resetTasks ) {
         foreach( Job j, jobs ) {
+            JobDepList jdl = JobDep::recordsByJob(j);
             JobTaskList jtl = j.jobTasks().filter("status", "cancelled",  /*keepMatches*/ false);
-            jtl.setStatuses("new");
+
+            bool isSoftDep = false;
+            foreach(JobDep jd, jdl){
+                if( jd.depType() == 2 ) {
+                    isSoftDep = true;
+                    break;
+                }
+            }
+
+            if( !isSoftDep )
+                jtl.setStatuses("new");
+            else
+                jtl.setStatuses("holding");
+
             jtl.setColumnLiteral("fkeyjoboutput","NULL");
             if( j.packetType() != "preassigned" )
                 jtl.setHosts(Host());
