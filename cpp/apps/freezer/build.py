@@ -14,7 +14,7 @@ if "DESTDIR" in os.environ:
 if sys.platform=="linux2":
     instPrefix = destDir + "/etc/ab/"
 
-ini = IniConfigTarget("freezerini",path,'freezer.ini.template','freezer.ini',instPrefix,"test.ini")
+ini = IniConfigTarget("freezerini",path,'freezer.ini.template','freezer.ini',instPrefix)
 nsi = NSISTarget("freezer_installer",path,"freezer.nsi")
 
 # Use Static python modules on windows
