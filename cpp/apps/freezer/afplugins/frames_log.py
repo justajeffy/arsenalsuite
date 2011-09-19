@@ -25,53 +25,20 @@ class FrameLogViewerPlugin(JobFramesTabWidgetPlugin):
 
         # Initialise the layout for the log tab
         self.verticalLayout = QVBoxLayout(self.tabWidget)
-        self.horizontalLayout = QHBoxLayout()
         
-        # Add a checkbox to toggle showing previous runs
-        self.showPreviousRuns = QCheckBox(self.tabWidget)
-        self.showPreviousRuns.setChecked(False)
-
-        # Add it's label as well
-        self.showPreviousRunsLabel = QLabel(self.tabWidget)
-        self.showPreviousRunsLabel.setText(QApplication.translate("ShowPreviousRunLogs", "Show previous run logs", None, QApplication.UnicodeUTF8))
-
-        # Finally add the spacer
-        self.showPreviousRunsSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
         # Add the QComboBox for the previous runs
         self.previousRunsDropDown = QComboBox(self.tabWidget)
-        self.previousRunsDropDown.hide()
 
         # Initialise the log viewer
         self.logviewer = QTextEdit(self.tabWidget)
         self.logviewer.setReadOnly(True)
 
         # Add the text editor to the layout and show the table.
-        self.horizontalLayout.addWidget(self.showPreviousRuns)
-        self.horizontalLayout.addWidget(self.showPreviousRunsLabel)
-        self.horizontalLayout.addItem(self.showPreviousRunsSpacer)
-        self.verticalLayout.addLayout(self.horizontalLayout)
         self.verticalLayout.addWidget(self.previousRunsDropDown)
         self.verticalLayout.addWidget(self.logviewer)
 
-        # Connect the combo box to the check box
-        QObject.connect(self.showPreviousRuns, SIGNAL('stateChanged(int)'), self.toggleComboBox)
-
-    # Slot to show and hide the combo box
-    def toggleComboBox(self, state):
-        if state == 2:
-            self.previousRunsDropDown.show()
-
-            # Connect the combo box to change the log view
-            QObject.connect(self.previousRunsDropDown, SIGNAL('currentIndexChanged(int)'), self.setLogView)
-
-            # Get the previous tasks
-            self.getPreviousTaskRun(self.wantedTask)
-        else:
-            self.previousRunsDropDown.hide()
-
-            # Disconnect the combo box
-            QObject.disconnect(self.previousRunsDropDown, SIGNAL('currentIndexChanged(int)'), self.setLogView)
+        # Connect the combo box to change the log view
+        QObject.connect(self.previousRunsDropDown, SIGNAL('currentIndexChanged(int)'), self.setLogView)
 
 
     # Called by freezer when you click on a job
@@ -87,9 +54,6 @@ class FrameLogViewerPlugin(JobFramesTabWidgetPlugin):
         # reset the job task assignments
         self.jobTaskAssignments = None
 
-        # clear the checkbox for showing extra logs
-        self.showPreviousRuns.setChecked(False)
-
         # This is a log viewer so we only take the first task
         wantedTask = jobTasks[0]
         if wantedTask.isRecord():
@@ -97,6 +61,7 @@ class FrameLogViewerPlugin(JobFramesTabWidgetPlugin):
             self.wantedTask = wantedTask
 
             self.setLogView(None)
+            self.getPreviousTaskRun(wantedTask)
 
     def setLogView(self, index):
         # We clear the log viewer only if a valid task has been selected
@@ -147,9 +112,9 @@ class FrameLogViewerPlugin(JobFramesTabWidgetPlugin):
             assignment = jta.jobAssignment()
             if assignment.isRecord():
                 if assignment.ended().toString() == "":
-                    self.previousRunsDropDown.addItem("Currently running..")
+                    self.previousRunsDropDown.addItem("Currently running.. - %s" % assignment.host().name())
                 else:
-                    self.previousRunsDropDown.addItem(assignment.ended().toString("dd/MM/yy - hh:mm:ss"))
+                    self.previousRunsDropDown.addItem("%s - %s" % (assignment.ended().toString("dd/MM/yy - hh:mm:ss"), assignment.host().name()))
 
 # Don't forget to register the widget with the factory or it won't show up in freezer
 JobFramesTabWidgetFactory.registerPlugin( FrameLogViewerPlugin() )
