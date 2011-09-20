@@ -8,8 +8,8 @@ public:
     virtual QString name();
     virtual QWidget* interface();
     virtual void initialize(QWidget* parent);
-    virtual void setJobTaskList(const JobTaskList &);
-    virtual void setJobList(const JobList &);
+    virtual void setJobTaskList(const JobTaskList &, int currentIndex);
+    virtual void setJobList(const JobList &, int currentIndex);
     virtual bool enabled( const JobList & );
     virtual bool enabled( const JobTaskList & );
 };

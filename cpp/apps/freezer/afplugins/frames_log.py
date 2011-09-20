@@ -13,6 +13,7 @@ class FrameLogViewerPlugin(JobFramesTabWidgetPlugin):
         JobFramesTabWidgetPlugin.__init__(self)
         self.wantedTask = None
         self.jobTaskAssignments = None
+        self.assignedTab = 0
 
     def name(self):
         return QString("Frames tab log viewer")
@@ -21,7 +22,7 @@ class FrameLogViewerPlugin(JobFramesTabWidgetPlugin):
     def initialize(self, parent):
         # Add a new tab
         self.tabWidget = QWidget()
-        parent.addTab(self.tabWidget, "Logs")
+        self.assignedTab = parent.addTab(self.tabWidget, "Logs")
 
         # Initialise the layout for the log tab
         self.verticalLayout = QVBoxLayout(self.tabWidget)
@@ -40,16 +41,21 @@ class FrameLogViewerPlugin(JobFramesTabWidgetPlugin):
         # Connect the combo box to change the log view
         QObject.connect(self.previousRunsDropDown, SIGNAL('currentIndexChanged(int)'), self.setLogView)
 
-
     # Called by freezer when you click on a job
-    def setJobList(self, jobList):
+    def setJobList(self, jobList, currentIndex):
         pass
 
     # Called by freezer when you click on a job task
-    def setJobTaskList(self, jobTasks):
+    def setJobTaskList(self, jobTasks, currentIndex):
+        if currentIndex != self.assignedTab:
+            return
+
         # If we haven't selected anything, then let's not do anything
         if jobTasks.size() == 0:
             return
+
+        # We clear the log viewer
+        self.logviewer.clear()
 
         # reset the job task assignments
         self.jobTaskAssignments = None
@@ -62,11 +68,11 @@ class FrameLogViewerPlugin(JobFramesTabWidgetPlugin):
 
             self.setLogView(None)
             self.getPreviousTaskRun(wantedTask)
+        else:
+            print "Received a task that isn't a record"
 
+    # Generate the contents of what should be in the log file viewer
     def setLogView(self, index):
-        # We clear the log viewer only if a valid task has been selected
-        self.logviewer.clear()
-
         # Grab the assignment from the task
         assignment = None
         if index != None and self.jobTaskAssignments != None:
