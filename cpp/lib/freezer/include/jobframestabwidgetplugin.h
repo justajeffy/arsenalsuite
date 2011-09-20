@@ -13,8 +13,8 @@ public:
     virtual QString name(){return QString();};
     virtual QWidget* interface(){return NULL;}
     virtual void initialize(QWidget* parent){}
-    virtual void setJobTaskList(const JobTaskList &){}
-    virtual void setJobList(const JobList &){}
+    virtual void setJobTaskList(const JobTaskList &, int currentTab){}
+    virtual void setJobList(const JobList &, int currentTab){}
     virtual bool enabled(const JobTaskList &){return true;};
     virtual bool enabled(const JobList &){return true;};
 };
