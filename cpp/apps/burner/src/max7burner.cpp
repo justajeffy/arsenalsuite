@@ -192,7 +192,7 @@ bool Max7Burner::checkup()
 	if( !JobBurner::checkup() )
 		return false;
 
-	// Kill 3dsmax.exe if these windows popup
+/*	// Kill 3dsmax.exe if these windows popup
 	QStringList titles, procs;
 	titles += "Microsoft Visual C++ Runtime Library";
 	titles += "DLL";
@@ -210,6 +210,7 @@ bool Max7Burner::checkup()
 	QString windowFound;
 	if( killWindows( titles, procs, &windowFound ) )
 		jobErrored( "M7B::checkup: Found window: " + windowFound + ", killed processes with names: " + procs.join(", ") );
+*/
 	return true;
 }
 

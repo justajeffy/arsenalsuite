@@ -641,6 +641,8 @@
    <fkey indexDeleteMode="DoNothingOnDelete" table="JobStat" type="single" hasIndex="false"/>
   </column>
   <column type="QString" methodName="userName" name="userName"/>
+  <column type="QString" methodName="domain" name="domain"/>
+  <column type="QString" methodName="password" name="password"/>
   <column type="float" methodName="currentMapServerWeight" name="currentMapServerWeight"/>
   <column type="bool" methodName="prioritizeOuterTasks" name="prioritizeOuterTasks"/>
   <column type="bool" methodName="outerTasksAssigned" name="outerTasksAssigned"/>
@@ -867,6 +869,52 @@
   <column type="QString" methodName="qualityFlag" name="qualityFlag"/>
   <column pluralMethodName="threads" type="uint" methodName="threads" name="threads"/>
   <column type="uint" methodName="renderQuality" name="renderQuality"/>
+ </table>
+ <table useCodeGen="true" parent="Job" name="JobMax" expireKeyCache="true" className="JobMax">
+  <column type="QString" methodName="camera" name="camera"/>
+  <column type="QString" methodName="elementFile" name="elementFile"/>
+  <column type="QString" methodName="fileOriginal" name="fileOriginal"/>
+  <column type="uint" methodName="flag_h" name="flag_h"/>
+  <column type="uint" methodName="flag_v" name="flag_v"/>
+  <column type="uint" methodName="flag_w" name="flag_w"/>
+  <column type="uint" methodName="flag_x2" name="flag_x2"/>
+  <column type="uint" methodName="flag_xa" name="flag_xa"/>
+  <column type="uint" methodName="flag_xc" name="flag_xc"/>
+  <column type="uint" methodName="flag_xd" name="flag_xd"/>
+  <column type="uint" methodName="flag_xe" name="flag_xe"/>
+  <column type="uint" methodName="flag_xf" name="flag_xf"/>
+  <column type="uint" methodName="flag_xh" name="flag_xh"/>
+  <column type="uint" methodName="flag_xk" name="flag_xk"/>
+  <column type="uint" methodName="flag_xn" name="flag_xn"/>
+  <column type="uint" methodName="flag_xo" name="flag_xo"/>
+  <column type="uint" methodName="flag_xp" name="flag_xp"/>
+  <column type="uint" methodName="flag_xv" name="flag_xv"/>
+  <column type="uint" methodName="frameEnd" name="frameEnd"/>
+  <column type="QString" methodName="frameList" name="frameList"/>
+  <column type="uint" methodName="frameStart" name="frameStart"/>
+  <column pluralMethodName="exrChannels" type="QString" methodName="exrChannels" name="exrChannels"/>
+  <column type="QString" methodName="exrAttributes" name="exrAttributes"/>
+  <column type="QString" methodName="startupScript" name="startupScript"/>
+  <column docs="This corrosponds to the MaxOpenExr enum, not the actual bit depth.&#xa;Values are &#xa;0 - &quot;Integer - 8 bits per channel&quot;&#xa;1 - &quot;Half Float - 16 bits per channel&quot;&#xa;2 - &quot;Float - 32 bits per channel&quot;" type="int" methodName="exrSaveBitDepth" name="exrSaveBitDepth"/>
+  <column type="QString" methodName="pluginIniPath" name="pluginIniPath"/>
+  <column type="uint" methodName="exrVersion" name="exrVersion"/>
+  <column type="uint" methodName="exrCompression" name="exrCompression"/>
+  <column type="bool" methodName="exrSaveScanline" name="exrSaveScanline"/>
+  <column type="uint" methodName="exrTileSize" name="exrTileSize"/>
+  <column type="bool" methodName="exrSaveRegion" name="exrSaveRegion"/>
+ </table>
+ <table useCodeGen="true" parent="JobMax" name="JobMax10" expireKeyCache="true" className="JobMax10"/>
+ <table useCodeGen="true" parent="JobMax" name="JobMax2009" expireKeyCache="true" className="JobMax2009"/>
+ <table useCodeGen="true" parent="JobMax" name="JobMax2010" expireKeyCache="true" className="JobMax2010"/>
+ <table useCodeGen="true" parent="Job" name="JobMaxScript" expireKeyCache="true" className="JobMaxScript">
+  <column type="QString" methodName="script" name="script"/>
+  <column type="uint" methodName="maxTime" name="maxTime"/>
+  <column type="QString" methodName="outputFiles" name="outputFiles"/>
+  <column type="bool" methodName="silent" name="silent"/>
+  <column type="QString" methodName="maxVersion" name="maxVersion"/>
+  <column type="bool" methodName="runMax64" name="runMax64"/>
+  <column type="bool" methodName="runPythonScript" name="runPythonScript"/>
+  <column type="bool" methodName="use3dsMaxCmd" name="use3dsMaxCmd"/>
  </table>
  <table docs="@brief A container class to be subclassed for specific versions of Maya and MentalRay for Maya." useCodeGen="true" parent="Job" name="JobMaya" expireKeyCache="true" className="JobMaya">
   <column type="int" methodName="frameStart" name="frameStart"/>

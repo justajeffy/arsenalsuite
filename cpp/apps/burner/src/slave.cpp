@@ -37,7 +37,9 @@
 #include <qtimer.h>
 #include <qsocketnotifier.h>
 
+#ifndef Q_OS_WIN
 #include <sys/socket.h>
+#endif
 
 #include "common.h"
 #include "idle.h"
@@ -104,6 +106,7 @@ Slave::Slave( bool gui, bool autoRegister, int jobAssignmentKey, QObject * paren
 {
     QTimer::singleShot( 10, this, SLOT( startup() ) );
 
+#ifndef Q_OS_WIN
     if (::socketpair(AF_UNIX, SOCK_STREAM, 0, sigintFd))
         qFatal("Couldn't create TERM socketpair");
 
@@ -115,8 +118,10 @@ Slave::Slave( bool gui, bool autoRegister, int jobAssignmentKey, QObject * paren
 
     snInt = new QSocketNotifier(sigintFd[1], QSocketNotifier::Read, this);
     connect(snInt, SIGNAL(activated(int)), this, SLOT(handleSigInt()));
+#endif
 }
 
+#ifndef Q_OS_WIN
 void Slave::intSignalHandler(int)
 {
     char a = '2';
@@ -150,6 +155,7 @@ void Slave::handleSigTerm()
     handleStatusChange( "offline", "stopping" );
     exit(0);
 }
+#endif
 
 void Slave::startup()
 {
