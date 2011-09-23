@@ -282,6 +282,8 @@ FieldList operator&(const FieldList & one, const FieldList & two);
 } //namespace
 
 using Stone::Field;
+using Stone::FieldList;
+using Stone::FieldIter;
 
 #endif // FIELD_H
 

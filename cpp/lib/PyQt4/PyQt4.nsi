@@ -187,8 +187,8 @@ Section "Extension modules" SecModules
     File .\QtTest\QtTest.pyd
     File .\QtMultimedia\QtMultimedia.pyd
     File .\phonon\phonon.pyd
-    File ..\pyqtwinmigrate\sipQtWinMigrate\QtWinMigrate.pyd
-    File ..\qscintilla\Python\QSci.pyd
+#    File ..\pyqtwinmigrate\sipQtWinMigrate\QtWinMigrate.pyd
+#    File ..\qscintilla\Python\QSci.pyd
 SectionEnd
 
 Section "Developer tools" SecTools

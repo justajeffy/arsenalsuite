@@ -177,7 +177,7 @@ bool initConfig( const QString & configName, const QString & logfile )
     // Check to see if we can open up the configuration file to begin with.
     QFile file( configName );
     if( !file.exists() ) {
-        printf("Could not find %s\n", configName.toStdString().c_str());
+        printf("Could not find %s\n", qPrintable(configName));
         return false;
     }
 
@@ -279,7 +279,7 @@ bool sendEmail( QStringList recipients, const QString & subject, const QString &
 	return success;
 }
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 
 QString getUserName()
 {
@@ -292,14 +292,14 @@ QString getUserName()
 
 QStringList getLoggedInUsers()
 {
-    LPWKSTA_USER_INFO_0 pBuff = NULL;
+    LPWKSTA_USER_INFO_0 pBuf = NULL;
     LPWKSTA_USER_INFO_0 pTmpBuf;
     NET_API_STATUS nStatus;
 
     DWORD dwEntriesRead = 0;
     DWORD dwTotalEntries = 0;
 
-    nStatus = NetWkstaUserEnum(NULL, 0, (LPBYTE*)&pBuff, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, NULL);
+    nStatus = NetWkstaUserEnum(NULL, 0, (LPBYTE*)&pBuf, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, NULL);
 
     QStringList users;
 
@@ -317,7 +317,7 @@ QStringList getLoggedInUsers()
                 }
 
                 users.append(QString::fromWCharArray(pTmpBuf->wkui0_username));
-                ++pTmpBuff;
+                ++pTmpBuf;
             }
         }
     }
