@@ -359,8 +359,10 @@ QStringList getLoggedInUsers()
         if (!whoLine.contains(":0"))
             continue;
         QStringList parts = whoLine.split(' ');
-        if (users.indexOf(parts[0]) == -1)
-            users.append(parts[0]);
+        if( parts[1] == ":0" ) {
+            if (users.indexOf(parts[0]) == -1)
+                users.append(parts[0]);
+        }
     }
 
     return users;
