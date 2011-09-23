@@ -262,12 +262,17 @@ void Slave::startup()
     else if( mHostStatus.slaveStatus() == "client-update" )
         clientUpdate();
     else {
-        if (mHostStatus.slaveStatus().isEmpty())
-            online();
-        else {
+        // Store the current status
+        QString currentStatus = mHostStatus.slaveStatus();
+
+        // We run the host through the online method first
+        online();
+
+        // Check if the old host status wasn't empty
+        if( !currentStatus.isEmpty() ){
             // Resume the state the host was in.
-            LOG_3("Slave::startup() Resuming previous status of " + mHostStatus.slaveStatus());
-            handleStatusChange(mHostStatus.slaveStatus(), "");
+            LOG_3("Slave::startup() Resuming previous status of " + currentStatus);
+            handleStatusChange(currentStatus, "");
         }
     }
 
@@ -515,6 +520,9 @@ void Slave::handleStatusChange( const QString & status, const QString & oldStatu
         mInsideLoop = false;
         return;
     }
+
+    // Check for a user logged in status upon change of status
+    updateLoggedUsers();
 
     LOG_3( "Got new status: " + status );
 
@@ -1299,6 +1307,9 @@ void Slave::updateLoggedUsers()
 {
     LOG_5("Checking if user is logged in");
     QStringList users = getLoggedInUsers();
+
+    foreach(QString user, users)
+        LOG_5(QString("User %1 is logged in").arg(user));
 
     for (QStringList::Iterator it = users.begin(); it != users.end(); ++it) {
         User user = User::recordByUserName((*it));
