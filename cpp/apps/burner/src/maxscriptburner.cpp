@@ -248,6 +248,7 @@ bool MaxScriptBurner::checkup()
 		return false;
 	}
 
+/* TODO: Merge killWindows implementation from blur's repo
 	// Kill 3dsmax.exe if these windows popup
 	QStringList titles, procs;
 	titles += "Microsoft Visual C++ Runtime Library";
@@ -266,7 +267,7 @@ bool MaxScriptBurner::checkup()
 		return false;
 	}
 	LOG_6( "killWindows Finished" );
-
+*/
 
 	LOG_6("MSB::checkup() done");
 	return true;

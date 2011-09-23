@@ -39,8 +39,6 @@ Section "install"
 	CreateShortCut "$QUICKLAUNCH\Burner.lnk" "$INSTDIR\burner.exe" ""
     SetOutPath $INSTDIR\plugins
     File /r "plugins\*.*"
-	; delete old burner3 dir!!!
-	RMDir /r "c:\max5\burner3"
 	; Delete everything from spool directory, then re-create it
 	RMDir /r "$INSTDIR\spool"
 	CreateDirectory "$INSTDIR\spool"

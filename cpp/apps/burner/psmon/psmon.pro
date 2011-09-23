@@ -7,7 +7,7 @@ UI_DIR         = .out
 INCLUDEPATH+=../../../lib/stone/include
 
 LIBS+=-L../../../lib/stone -lstone
-LIBS+=-lutil
+!win32:LIBS+=-lutil
 
 SOURCES += \
 	psmon.cpp
