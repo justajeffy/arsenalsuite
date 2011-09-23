@@ -31,7 +31,6 @@
 #include <algorithm>
 
 #include "blurqt.h"
-#include "field.h"
 #include "table.h"
 #include "tableschema.h"
 #include "recordlist.h"
@@ -307,6 +306,20 @@ RecordList RecordList::slice( int start, int end, int step )
 	return ret;
 }
 
+void RecordList::reverse()
+{
+	if( size() <= 1 ) return;
+	detach();
+	int i = 0, i2 = size() -1;
+	while( i < i2 ) {
+		RecordImp * tmp = d->mList[i];
+		d->mList[i] = d->mList[i2];
+		d->mList[i2] = tmp;
+		i++;
+		i2--;
+	}
+}
+
 RecordImp * RecordList::imp( uint pos ) const
 {
 	if( !d )
@@ -344,6 +357,18 @@ void RecordList::insert( RecordIter it, const Record & r )
 		detach();
 		it.make_valid( *this );
 		d->mList.insert( it.mIter, r.imp() );
+		r.imp()->ref();
+	}
+}
+
+void RecordList::insert( int pos, const Record & r )
+{
+	if( r.imp() ) {
+		if( pos < 0 ) pos = size() + pos;
+		if( pos > size() ) pos = size();
+		if( pos < 0 ) pos = 0;
+		detach();
+		d->mList.insert( pos, r.imp() );
 		r.imp()->ref();
 	}
 }
@@ -420,6 +445,16 @@ RecordIter RecordList::remove( const RecordIter & it )
 		return RecordIter( d->mList.erase( torem.mIter ) );
 	}
 	return end();
+}
+
+Record RecordList::pop( int i )
+{
+	if( i < 0 ) i = size() + i;
+	if( i < 0 || i > size() - 1 ) return Record();
+	detach();
+	Record ret( d->mList.takeAt(i) );
+	ret.imp()->deref();
+	return ret;
 }
 
 bool RecordList::contains( const Record & t ) const

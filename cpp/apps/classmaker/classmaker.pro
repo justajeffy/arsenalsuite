@@ -32,7 +32,8 @@ INCLUDEPATH+=/usr/include/stone /usr/include/stonegui
 
 LIBS+=-L../../lib/stonegui -lstonegui
 LIBS+=-L../../lib/stone/ -lstone
-LIBS+=-lutil
+
+unix:LIBS+=-lutil
 
 win32:LIBS += -lpsapi -lMpr
 macx:CONFIG-=app_bundle
