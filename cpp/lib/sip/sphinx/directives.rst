@@ -13,6 +13,65 @@ Some directives are used to specify handwritten code.  Handwritten code must
 not define names that start with the prefix ``sip``.
 
 
+Revised Directive Syntax
+------------------------
+
+.. versionadded:: 4.12
+
+The directive syntax used in the current version has some problems:
+
+- it is inconsistent in places
+
+- it can be problematic to parse
+
+- it is inflexible.
+
+SIP v4.12 introduced a revised directive syntax that addresses these problems
+and deprecates the old syntax.  Support for the old syntax will be removed in
+SIP v5.
+
+The revised syntax is:
+
+.. parsed-literal::
+
+    %Directive(arg = value, ...)
+    {
+        %Sub-directive
+        ...
+    };
+
+A directive may have a number of arguments enclosed in parentheses followed by
+a number of sub-directives enclosed in braces.  Individual arguments and
+sub-directives may be optional.
+
+Arguments may be specified in any order.  If no arguments are specified then
+the parentheses can be omitted.  If a directive has only one compulsory
+argument then its value may be specified after the directive name and instead
+of the parentheses.
+
+Sub-directives may be specified in any order.  If no sub-directives are
+specified then the braces can be omitted.
+
+If a directive is used to specify handwritten code then it may not have
+sub-directives.  In this case the syntax is:
+
+.. parsed-literal::
+
+    %Directive(arg = value, ...)
+        *code*
+    %End
+
+Ordinary C/C++ statements may also have sub-directives.  These will also be
+enclosed in braces.
+
+The documentation for each directive describes the revised syntax.  The older
+syntax should be used if compatibility with versions of SIP prior to v4.12 is
+required.
+
+
+List of Directives
+------------------
+
 .. directive:: %AccessCode
 
 .. parsed-literal::
@@ -21,25 +80,29 @@ not define names that start with the prefix ``sip``.
         *code*
     %End
 
-This directive is used immediately after the declaration of an instance of a
-wrapped class or structure, or a pointer to such an instance.  You use it to
-provide handwritten code that overrides the default behaviour.
+This sub-directive is used in the declaration of an instance of a wrapped class
+or structure, or a pointer to such an instance.  You use it to provide
+handwritten code that overrides the default behaviour.
 
 For example::
 
     class Klass;
 
-    Klass *klassInstance;
-    %AccessCode
-        // In this contrived example the C++ library we are wrapping defines
-        // klassInstance as Klass ** (which SIP doesn't support) so we
-        // explicitly dereference it.
-        if (klassInstance && *klassInstance)
-            return *klassInstance;
+    Klass *klassInstance
+    {
+        %AccessCode
+            // In this contrived example the C++ library we are wrapping
+            // defines klassInstance as Klass ** (which SIP doesn't support) so
+            // we explicitly dereference it.
+            if (klassInstance && *klassInstance)
+                return *klassInstance;
 
-        // This will get converted to None.
-        return 0;
-    %End
+            // This will get converted to None.
+            return 0;
+        %End
+    };
+
+.. seealso:: :directive:`%GetCode`, :directive:`%SetCode`
 
 
 .. directive:: %API
@@ -48,7 +111,7 @@ For example::
 
 .. parsed-literal::
 
-    %API *name* *version*
+    %API(name = *name*, version = *integer*)
 
 This directive is used to define an API and set its default version number.  A
 version number must be greater than or equal to 1.
@@ -57,7 +120,32 @@ See :ref:`ref-incompat-apis` for more detail.
 
 For example::
 
-    %API PyQt4 1
+    %API(name=PyQt4, version=1)
+
+
+.. directive:: %AutoPyName
+
+.. versionadded:: 4.12
+
+.. parsed-literal::
+
+    %AutoPyName(remove_leading = *string*)
+
+This is a sub-directive of the :directive:`%Module` directive used to specify a
+rule for automatically providing Python names for classes, enums, functions,
+methods, variables and exceptions.  The directive may be specified any number
+of times and each rule will be applied in turn.  Rules will not be applied if
+an item has been given an explicit Python name.
+
+``remove_leading`` is a string that will be removed from the beginning of any
+C++ or C name.
+
+For example::
+
+    %Module PyQt4.QtCore
+    {
+        %AutoPyName(remove_leading="Q")
+    }
 
 
 .. directive:: %BIGetBufferCode
@@ -257,6 +345,10 @@ PyObject \*sipSelf
 
 .. directive:: %CModule
 
+.. deprecated:: 4.12
+    Use the :directive:`%Module` directive with the ``language`` argument set
+    to ``"C"`` instead.
+
 .. parsed-literal::
 
     %CModule *name* [*version*]
@@ -276,7 +368,10 @@ For example::
 
 .. parsed-literal::
 
-    %CompositeModule *name*
+    %CompositeModule(name = *dotted-name*)
+    {
+        [:directive:`%Docstring`]
+    };
 
 A composite module is one that merges a number of related SIP generated
 modules.  For example, a module that merges the modules ``a_mod``, ``b_mod``
@@ -290,8 +385,11 @@ Clearly the individual modules should not define module-level objects with the
 same name.
 
 This directive is used to specify the name of a composite module.  Any
-subsequent :directive:`%CModule` or :directive:`%Module` directive is
-interpreted as defining a component module.
+subsequent :directive:`%Module` directive is interpreted as defining a
+component module.
+
+The optional :directive:`%Docstring` sub-directive is used to specify the
+module's docstring.
 
 For example::
 
@@ -300,21 +398,27 @@ For example::
     %Include QtGui/QtGuimod.sip
 
 The main purpose of a composite module is as a programmer convenience as they
-don't have to remember which which individual module an object is defined in.
+don't have to remember which individual module an object is defined in.
 
 
 .. directive:: %ConsolidatedModule
 
 .. parsed-literal::
 
-    %ConsolidatedModule *name*
+    %ConsolidatedModule(name = *dotted-name*)
+    {
+        [:directive:`%Docstring`]
+    };
 
 A consolidated module is one that consolidates the wrapper code of a number of
 SIP generated modules (refered to as component modules in this context).
 
 This directive is used to specify the name of a consolidated module.  Any
-subsequent :directive:`%CModule` or :directive:`%Module` directive is
-interpreted as defining a component module.
+subsequent :directive:`%Module` directive is interpreted as defining a
+component module.
+
+The optional :directive:`%Docstring` sub-directive is used to specify the
+module's docstring.
 
 For example::
 
@@ -456,14 +560,15 @@ const sipTypeDef \*sipType
     it can.
 
 sipWrapperType \*sipClass
+    .. deprecated:: 4.8
+        Use ``sipType`` instead.
+
     The handwritten code must set this to the SIP generated Python type object
     that corresponds to the class instance.  (The type object for class
     ``Klass`` is ``sipClass_Klass``.)  If the RTTI of the class instance isn't
     recognised then ``sipClass`` must be set to ``NULL``.  The code doesn't
     have to recognise the exact class, only the most specific sub-class that
     it can.
-
-    This is deprecated from SIP v4.8.  Instead you should use ``sipType``.
 
 The handwritten code must not explicitly return.
 
@@ -650,13 +755,13 @@ prevent recursive calls to the handwritten code.
     %End
 
 This directive is used to specify some arbitrary text that will be included at
-the start of all source files generated by SIP.  It is normally used to
-include copyright and licensing terms.
+the start of all source files generated by SIP.  It is normally used to include
+copyright and licensing terms.
 
 For example::
 
     %Copying
-    Copyright (c) 2009 Riverbank Computing Limited
+    Copyright (c) 2011 Riverbank Computing Limited
     %End
 
 
@@ -664,14 +769,15 @@ For example::
 
 .. parsed-literal::
 
-    %DefaultEncoding *string*
+    %DefaultEncoding(name = ["ASCII" | "Latin-1" | "UTF-8" | "None"])
 
 This directive is used to specify the default encoding used for ``char``,
-``const char``, ``char *`` or ``const char *`` values.  The encoding can be
-either ``"ASCII"``, ``"Latin-1"``, ``"UTF-8"`` or ``"None"``.  An encoding of
+``const char``, ``char *`` or ``const char *`` values.  An encoding of
 ``"None"`` means that the value is unencoded.  The default can be overridden
-for a particular value using the :aanno:`Encoding` annotation.  If the
-directive is not specified then ``"None"`` is used.
+for a particular value using the :aanno:`Encoding` annotation.
+    
+If the directive is not specified then the default encoding of the last
+imported module is used, if any.
 
 For example::
 
@@ -682,7 +788,7 @@ For example::
 
 .. parsed-literal::
 
-    %DefaultMetatype *dotted-name*
+    %DefaultMetatype(name = *dotted-name*)
 
 This directive is used to specify the Python type that should be used as the
 meta-type for any C/C++ data type defined in the same module, and by importing
@@ -704,7 +810,7 @@ For example::
 
 .. parsed-literal::
 
-    %DefaultSupertype *dotted-name*
+    %DefaultSupertype(name = *dotted-name*)
 
 This directive is used to specify the Python type that should be used as the
 super-type for any C/C++ data type defined in the same module that doesn't have
@@ -723,6 +829,9 @@ For example::
 
 
 .. directive:: %Doc
+
+.. deprecated:: 4.12
+    Use the :directive:`%Extract` directive instead.
 
 .. parsed-literal::
 
@@ -753,16 +862,16 @@ For example::
 
 .. directive:: %Docstring
 
+.. versionadded:: 4.10
+
 .. parsed-literal::
 
     %Docstring
         *text*
     %End
 
-.. versionadded:: 4.10
-
-This directive is used to specify explicit docstrings for classes, functions
-and methods.
+This directive is used to specify explicit docstrings for modules, classes,
+functions, methods and properties.
 
 The docstring of a class is made up of the docstring specified for the class
 itself, with the docstrings specified for each contructor appended.
@@ -802,10 +911,10 @@ directives that allow a block of handwritten code or text to be specified.
 
 .. parsed-literal::
 
-    %Exception *name* [(*base-exception)]
+    %Exception *name* [(*base-exception*)]
     {
-        [*header-code*]
-        *raise-code*
+        [:directive:`%TypeHeaderCode`]
+        :directive:`%RaiseCode`
     };
 
 This directive is used to define new Python exceptions, or to provide a stub
@@ -820,10 +929,10 @@ names of Python exceptions defined by this directive.
 the standard Python exceptions or one defined with a previous
 :directive:`%Exception` directive.
 
-*header-code* is the optional :directive:`%TypeHeaderCode` used to specify any
+The optional :directive:`%TypeHeaderCode` sub-directive is used to specify any
 external interface to the exception being defined.
 
-*raise-code* is the :directive:`%RaiseCode` used to specify the handwritten
+The :directive:`%RaiseCode` sub-directive is used to specify the handwritten
 code that converts a reference to the C++ exception to the Python exception.
 
 For example::
@@ -834,11 +943,11 @@ For example::
     #include <exception>
     %End
     %RaiseCode
-            const char *detail = sipExceptionRef.what();
+        const char *detail = sipExceptionRef.what();
 
-            SIP_BLOCK_THREADS
-            PyErr_SetString(sipException_std_exception, detail);
-            SIP_UNBLOCK_THREADS
+        SIP_BLOCK_THREADS
+        PyErr_SetString(sipException_std_exception, detail);
+        SIP_UNBLOCK_THREADS
     %End
     };
 
@@ -851,6 +960,9 @@ be caught by default if there is no ``throw`` clause.
 
 
 .. directive:: %ExportedDoc
+
+.. deprecated:: 4.12
+    Use the :directive:`%Extract` directive instead.
 
 .. parsed-literal::
 
@@ -891,14 +1003,52 @@ of types, that is placed in a header file that is included by all generated
 code for all modules.  It should not include function declarations because
 Python modules should not explicitly call functions in another Python module.
 
-See also :directive:`%ModuleCode` and :directive:`%ModuleHeaderCode`.
+.. seealso:: :directive:`%ModuleCode`, :directive:`%ModuleHeaderCode`
+
+
+.. directive:: %Extract
+
+.. versionadded:: 4.12
+
+.. parsed-literal::
+
+    %Extract(id = *name* [, order = *integer*])
+        *text*
+    %End
+
+This directive is used to specify part of an extract.  An extract is a
+collection of arbitrary text specified as one or more parts each having the
+same ``id``.  SIP places no interpretation on an identifier, or on the
+contents of the extract.  Extracts may be used for any purpose, e.g.
+documentation, tests etc.
+
+The part's optional ``order`` determines its position relative to the extract's
+other parts.  If the order is not specified then the part is appended to the
+extract.
+
+An extract is written to a file using the :option:`-X <sip -X>` command line
+option.
+
+For example::
+
+    %Extract example
+    This will be the last line because there is no explicit order.
+    %End
+
+    %Extract(id=example, order=20)
+    This will be the second line.
+    %End
+
+    %Extract(id=example, order=10)
+    This will be the first line.
+    %End
 
 
 .. directive:: %Feature
 
 .. parsed-literal::
 
-    %Feature *name*
+    %Feature(name = *name*)
 
 This directive is used to declare a feature.  Features (along with
 :directive:`%Platforms` and :directive:`%Timeline`) are used by the
@@ -906,8 +1056,8 @@ This directive is used to declare a feature.  Features (along with
 are processed or ignored.
 
 Features are mutually independent of each other - any combination of features
-may be enabled or disable.  By default all features are enabled.  The SIP
-``-x`` command line option is used to disable a feature.
+may be enabled or disable.  By default all features are enabled.  The
+:option:`-x <sip -x>` command line option is used to disable a feature.
 
 If a feature is enabled then SIP will automatically generate a corresponding C
 preprocessor symbol for use by handwritten code.  The symbol is the name of
@@ -1026,7 +1176,7 @@ The following simplified example is taken from PyQt's ``QCustomEvent`` class::
         *code*
     %End
 
-This directive is used after the declaration of a C++ class variable or C
+This sub-directive is used in the declaration of a C++ class variable or C
 structure member to specify handwritten code to convert it to a Python object.
 It is usually used to handle types that SIP cannot deal with automatically.
 
@@ -1057,29 +1207,40 @@ For example::
          * defines this as char buffer[100] which SIP cannot handle
          * automatically.
          */
-        char *buffer;
-    %GetCode
-            sipPy = PyString_FromStringAndSize(sipCpp->buffer, 100);
-    %End
-    %SetCode
-            char *ptr;
-            int length;
+        char *buffer
+        {
+            %GetCode
+                sipPy = PyString_FromStringAndSize(sipCpp->buffer, 100);
+            %End
 
-            if (PyString_AsStringAndSize(sipPy, &ptr, &length) == -1)
-                sipErr = 1;
-            else if (length != 100)
-            {
-                /*
-                 * Raise an exception because the length isn't exactly right.
-                 */
+            %SetCode
+                char *ptr;
+                int length;
 
-                PyErr_SetString(PyExc_ValueError, "an Entity.buffer must be exactly 100 bytes");
-                sipErr = 1;
-            }
-            else
-                memcpy(sipCpp->buffer, ptr, 100);
-    %End
+                if (PyString_AsStringAndSize(sipPy, &ptr, &length) == -1)
+                {
+                    sipErr = 1;
+                }
+                else if (length != 100)
+                {
+                    /*
+                     * Raise an exception because the length isn't exactly
+                     * right.
+                     */
+
+                    PyErr_SetString(PyExc_ValueError,
+                            "an Entity.buffer must be exactly 100 bytes");
+                    sipErr = 1;
+                }
+                else
+                {
+                    memcpy(sipCpp->buffer, ptr, 100);
+                }
+            %End
+        };
     }
+
+.. seealso:: :directive:`%AccessCode`, :directive:`%SetCode`
 
 
 .. directive:: %If
@@ -1135,42 +1296,13 @@ For example::
         // Process this if either V2_0 or V3_0 is enabled.
     %End
 
+    %If (SIP_4_13 - )
+        // SIP v4.13 and later will process this.
+    %End
+
     %If ( - )
         // Always process this.
     %End
-
-Note that this directive is not implemented as a preprocessor.  Only the
-following parts of a specification are affected by it:
-
-    - :directive:`%API`
-    - ``class``
-    - :directive:`%ConvertFromTypeCode`
-    - :directive:`%ConvertToSubClassCode`
-    - :directive:`%ConvertToTypeCode`
-    - ``enum``
-    - :directive:`%DefaultEncoding`
-    - :directive:`%DefaultMetatype`
-    - :directive:`%DefaultSupertype`
-    - :directive:`%ExportedHeaderCode`
-    - functions
-    - :directive:`%GCClearCode`
-    - :directive:`%GCTraverseCode`
-    - :directive:`%If`
-    - :directive:`%InitialisationCode`
-    - :directive:`%MappedType`
-    - :directive:`%MethodCode`
-    - :directive:`%ModuleCode`
-    - :directive:`%ModuleHeaderCode`
-    - ``namespace``
-    - :directive:`%PostInitialisationCode`
-    - :directive:`%PreInitialisationCode`
-    - ``struct``
-    - ``typedef``
-    - :directive:`%TypeCode`
-    - :directive:`%TypeHeaderCode`
-    - :directive:`%UnitCode`
-    - variables
-    - :directive:`%VirtualCatcherCode`
 
 Also note that the only way to specify the logical and of qualifiers is to use
 nested :directive:`%If` directives.
@@ -1180,17 +1312,19 @@ nested :directive:`%If` directives.
 
 .. parsed-literal::
 
-    %Import *filename*
+    %Import(name = *filename*)
 
 This directive is used to import the specification of another module.  This is
 needed if the current module makes use of any types defined in the imported
 module, e.g. as an argument to a function, or to sub-class.
 
-If *filename* cannot be opened then SIP prepends *filename* with the name of
-the directory containing the current specification file (i.e. the one
-containing the :directive:`%Import` directive) and tries again.  If this also
-fails then SIP prepends *filename* with each of the directories, in turn,
-specified by the ``-I`` command line option.
+If ``name`` cannot be opened then SIP prepends ``name`` with the name of the
+directory containing the current specification file (i.e. the one containing
+the :directive:`%Import` directive) and tries again.  If this also fails then
+SIP prepends ``name`` with each of the directories, in turn, specified by the
+:option:`-I <sip -I>` command line option.
+
+Directory separators must always be ``/``.
 
 For example::
 
@@ -1201,15 +1335,20 @@ For example::
 
 .. parsed-literal::
 
-    %Include *filename*
+    %Include(name = *filename* [, optional = [True | False]])
 
 This directive is used to include contents of another file as part of the
 specification of the current module.  It is the equivalent of the C
 preprocessor's ``#include`` directive and is used to structure a large module
 specification into manageable pieces.
 
-:directive:`%Include` follows the same search process as :directive:`%Import`
-when trying to open *filename*.
+:directive:`%Include` follows the same search process as the
+:directive:`%Import` directive when trying to open ``name``.
+
+if ``optional`` is set then SIP will silently continue processing if the file
+could not be opened.
+
+Directory separators must always be ``/``.
 
 For example::
 
@@ -1243,13 +1382,29 @@ For example::
 
 .. parsed-literal::
 
-    %License /*license-annotations*/
+    %License(type = *string*
+            [, licensee = *string*]
+            [, signature = *string*]
+            [, timestamp = *string*])
 
 This directive is used to specify the contents of an optional license
 dictionary.  The license dictionary is called :data:`__license__` and is stored
-in the module dictionary.  The elements of the dictionary are specified using
-the :lanno:`Licensee`, :lanno:`Signature`, :lanno:`Timestamp` and :lanno:`Type`
-annotations.  Only the :lanno:`Type` annotation is compulsory.
+in the module dictionary.
+
+``type`` is the type of the license and its value in the license dictionary is
+accessed using the ``"Type"`` key.  No restrictions are placed on the value.
+
+``licensee`` is the optional name of the licensee and its value in the license
+dictionary is accessed using the ``"Licensee"`` key.  No restrictions are
+placed on the value.
+
+``signature`` is the license's optional signature and its value in the license
+dictionary is accessed using the ``"Signature"`` key.  No restrictions are
+placed on the value.
+
+``timestamp`` is the license's optional timestamp and its value in the license
+dictionary is accessed using the ``"Timestamp"`` key.  No restrictions are
+placed on the value.
 
 Note that this directive isn't an attempt to impose any licensing restrictions
 on a module.  It is simply a method for easily embedding licensing information
@@ -1257,7 +1412,7 @@ in a module so that it is accessible to Python scripts.
 
 For example::
 
-    %License /Type="GPL"/
+    %License "GPL"
 
 
 .. directive:: %MappedType
@@ -1267,16 +1422,16 @@ For example::
     template<*type-list*>
     %MappedType *type*
     {
-        [*header-code*]
-        [*convert-to-code*]
-        [*convert-from-code*]
+        [:directive:`%TypeHeaderCode`]
+        [:directive:`%ConvertToTypeCode`]
+        [:directive:`%ConvertFromTypeCode`]
     };
 
     %MappedType *type*
     {
-        [*header-code*]
-        [*convert-to-code*]
-        [*convert-from-code*]
+        [:directive:`%TypeHeaderCode`]
+        [:directive:`%ConvertToTypeCode`]
+        [:directive:`%ConvertFromTypeCode`]
     };
 
 This directive is used to define an automatic mapping between a C or C++ type
@@ -1293,14 +1448,14 @@ Any explicit mapped type will be used in preference to any template that maps
 the same type, ie. a template will not be automatically instantiated if there
 is an explicit mapped type.
 
-*header-code* is the :directive:`%TypeHeaderCode` used to specify the library
-interface to the type being mapped.
+The optional :directive:`%TypeHeaderCode` sub-directive is used to specify the
+library interface to the type being mapped.
 
-*convert-to-code* is the :directive:`%ConvertToTypeCode` used to specify the
-handwritten code that converts a Python object to an instance of the mapped
+The optional :directive:`%ConvertToTypeCode` sub-directive is used to specify
+the handwritten code that converts a Python object to an instance of the mapped
 type.
 
-*convert-from-code* is the :directive:`%ConvertFromTypeCode` used to specify
+The optional :directive:`%ConvertFromTypeCode` sub-directive is used to specify
 the handwritten code that converts an instance of the mapped type to a Python
 object.
 
@@ -1393,7 +1548,7 @@ For example::
         // Return the Python list.
         return l;
     %End
-    }
+    };
 
 Using this we can use, for example, ``QList<QObject *>`` throughout the
 module's specification files (and in any module that imports this one).  The
@@ -1449,9 +1604,11 @@ variables are made available to the handwritten code:
 
 *type* a0
     There is a variable for each argument of the Python signature (excluding
-    any ``self`` argument) named ``a0``, ``a1``, etc.  The *type* of the
-    variable is the same as the type defined in the specification with the
-    following exceptions:
+    any ``self`` argument) named ``a0``, ``a1``, etc.  If
+    ``use_argument_names`` has been set in the :directive:`%Module` directive
+    then the name of the argument is the real name.  The *type* of the variable
+    is the same as the type defined in the specification with the following
+    exceptions:
 
     - if the argument is only used to return a value (e.g. it is an ``int *``
       without an :aanno:`In` annotation) then the type has one less level of
@@ -1466,6 +1623,10 @@ PyObject \*a0Wrapper
     This variable is made available only if the :aanno:`GetWrapper` annotation
     is specified for the corresponding argument.  The variable is a pointer to
     the Python object that wraps the argument.
+
+    If ``use_argument_names`` has been set in the :directive:`%Module`
+    directive then the name of the variable is the real name of the argument
+    with ``Wrapper`` appended.
 
 *type* \*sipCpp
     If the directive is used in the context of a class constructor then this
@@ -1605,31 +1766,55 @@ then the pattern should instead be::
 
 .. parsed-literal::
 
-    %Module *name* [*version*]
+    %Module(name = *dotted-name*
+            [, keyword_arguments = ["None" | "All" | "Optional"]]
+            [, language = *string*]
+            [, use_argument_names = [True | False]]
+            [, version = *integer*])
+    {
+        [:directive:`%AutoPyName`]
+        [:directive:`%Docstring`]
+    };
 
-This directive is used to identify that the library being wrapped is a C++
-library and to define the name of the module and it's optional version number.
+This directive is used to specify the name of a module and a number of other
+attributes.  ``name`` may contain periods to specify that the module is part of
+a Python package.
 
-The name may contain periods to specify that the module is part of a Python
-package.
+``keyword_arguments`` specifies the default level of support for Python keyword
+arguments.  See the :fanno:`KeywordArgs` annotation for an explaination of the
+possible values and their effect.  If it is not specified then the value
+implied by the (deprecated) :option:`-k <sip -k>` command line option is used.
 
-The optional version number is useful if you (or others) might create other
-modules that build on this module, i.e. if another module might
-:directive:`%Import` this module.  Under the covers, a module exports an API
-that is used by modules that :directive:`%Import` it and the API is given a
+``language`` specifies the implementation language of the library being
+wrapped.  Its value is either ``"C++"`` (the default) or ``"C"``.
+
+When providing handwritten code as part of either the :directive:`%MethodCode`
+or :directive:`%VirtualCatcherCode` directives the names of the arguments of
+the function or method are based on the number of the argument, i.e. the first
+argument is named ``a0``, the second ``a1`` and so on.  ``use_argument_names``
+is set to specify that the real name of the argument, if any, should be used
+instead.  It also affects the name of the variable created when the
+:aanno:`GetWrapper` argument annotation is used.
+
+``version`` is an optional version number that is useful if you (or others)
+might create other modules that build on this module, i.e. if another module
+might :directive:`%Import` this module.  Under the covers, a module exports an
+API that is used by modules that :directive:`%Import` it and the API is given a
 version number.  A module built on that module knows the version number of the
 API that it is expecting.  If, when the modules are imported at run-time, the
 version numbers do not match then a Python exception is raised.  The dependent
 module must then be re-built using the correct specification files for the base
 module.
 
-The version number should be incremented whenever a module is changed.  Some
-changes don't affect the exported API, but it is good practice to change the
-version number anyway.
+The optional :directive:`%AutoPyName` sub-directive is used to specify a rule
+for automatically providing Python names.
+
+The optional :directive:`%Docstring` sub-directive is used to specify the
+module's docstring.
 
 For example::
 
-    %Module qt 5
+    %Module(name=PyQt4.QtCore, version=5)
 
 
 .. directive:: %ModuleCode
@@ -1655,7 +1840,7 @@ For example::
     }
     %End
 
-See also :directive:`%ExportedHeaderCode` and :directive:`%ModuleHeaderCode`.
+.. seealso:: :directive:`%ExportedHeaderCode`, :directive:`%ModuleHeaderCode`
 
 
 .. directive:: %ModuleHeaderCode
@@ -1676,7 +1861,7 @@ For example::
     void dump_object(PyObject *o);
     %End
 
-See also :directive:`%ExportedHeaderCode` and :directive:`%ModuleCode`.
+.. seealso:: :directive:`%ExportedHeaderCode`, :directive:`%ModuleCode`
 
 
 .. directive:: %OptionalInclude
@@ -1684,6 +1869,10 @@ See also :directive:`%ExportedHeaderCode` and :directive:`%ModuleCode`.
 .. parsed-literal::
 
     %OptionalInclude *filename*
+
+.. deprecated:: 4.12
+    Use the :directive:`%Include` directive with the ``optional`` argument set
+    to ``True`` instead.
 
 This directive is identical to the :directive:`%Include` directive except that
 SIP silently continues processing if *filename* could not be opened.
@@ -1712,7 +1901,7 @@ The following variables are made available to the handwritten code:
 
 PyObject \*sipRes
     The handwritten code must set this to a tuple of the arguments that will
-    be passed to the type's __init__() method when the structure or class
+    be passed to the type's ``__init__()`` method when the structure or class
     instance is unpickled.  If there is an error then the code must raise an
     exception and set this to ``NULL``.
 
@@ -1749,8 +1938,8 @@ This directive is used to declare a set of platforms.  Platforms (along with
 are processed or ignored.
 
 Platforms are mutually exclusive - only one platform can be enabled at a time.
-By default all platforms are disabled.  The SIP ``-t`` command line option is
-used to enable a platform.
+By default all platforms are disabled.  The SIP :option:`-t <sip -t>` command
+line option is used to enable a platform.
 
 For example::
 
@@ -1811,6 +2000,41 @@ For example::
     %End
 
 
+.. directive:: %Property
+
+.. versionadded:: 4.12
+
+.. parsed-literal::
+
+    %Property(name = *name*, get = *name* [, set = *name*])
+    {
+        [:directive:`%Docstring`]
+    };
+
+This directive is used to define a Python property.  ``name`` is the name of
+the property.
+
+``get`` is the Python name of the getter method and must refer to a method in
+the same class.
+
+``set`` is the Python name of the optional setter method and must refer to a
+method in the same class.
+
+The optional :directive:`%Docstring` sub-directive is used to specify the
+property's docstring.
+
+For example::
+
+    class Klass
+    {
+    public:
+        int get_count() const;
+        void set_count();
+
+        %Property(name=count, get=get_count, set=set_count)
+    };
+
+
 .. directive:: %RaiseCode
 
 .. parsed-literal::
@@ -1851,7 +2075,7 @@ See the :directive:`%Exception` directive for an example.
         *code*
     %End
 
-This directive is used after the declaration of a C++ class variable or C
+This sub-directive is used in the declaration of a C++ class variable or C
 structure member to specify handwritten code to convert it from a Python
 object.  It is usually used to handle types that SIP cannot deal with
 automatically.
@@ -1877,7 +2101,7 @@ PyObject \*sipPyType
     (*not* the class in which it is defined).  It may be safely cast to a
     PyTypeObject \* or a sipWrapperType \*.
 
-See the :directive:`%GetCode` directive for an example.
+.. seealso:: :directive:`%AccessCode`, :directive:`%GetCode`
 
 
 .. directive:: %Timeline
@@ -1892,8 +2116,18 @@ are used by the :directive:`%If` directive to control whether or not parts of a
 specification are processed or ignored.
 
 Versions are mutually exclusive - only one version can be enabled at a time.
-By default all versions are disabled.  The SIP ``-t`` command line option is
-used to enable a version.
+By default all versions are disabled.  The SIP :option:`-t <sip -t>` command
+line option is used to enable a version.
+
+The :directive:`%Timeline` directive can be used any number of times in a
+module to allow multiple libraries to be wrapped in the same module.
+
+.. versionadded:: 4.12
+
+SIP automatically defines a timeline containing all versions of SIP since
+v4.12.  The name of the version is ``SIP_`` followed by the individual parts of
+the version number separated by an underscore.  SIP v4.12 is therefore
+``SIP_4_12`` and SIP v4.13.2 is ``SIP_4_13_2``.
 
 For example::
 
@@ -1907,8 +2141,9 @@ For example::
     void foo(int = 0);
     %End
 
-:directive:`%Timeline` can be used any number of times in a module to allow
-multiple libraries to be wrapped in the same module.
+    %If (- SIP_4_13)
+    void bar();
+    %End
 
 
 .. directive:: %TypeCode
@@ -1919,10 +2154,10 @@ multiple libraries to be wrapped in the same module.
         *code*
     %End
 
-This directive is used as part of the specification of a C structure or a C++
-class to specify handwritten code, typically the implementations of utility
-functions, that can be called by other handwritten code in the structure or
-class.
+This directive is used as part of the specification of a C structure, a C++
+class or a :directive:`%MappedType` directive to specify handwritten code,
+typically the implementations of utility functions, that can be called by other
+handwritten code in the structure or class.
 
 For example::
 
@@ -1982,9 +2217,24 @@ For example::
         *code*
     %End
 
-This directive is used to specify handwritten code that it included at the very
+This directive is used to specify handwritten code that is included at the very
 start of a generated compilation unit (ie. C or C++ source file).  It is
 typically used to ``#include`` a C++ precompiled header file.
+
+
+.. directive:: %UnitPostIncludeCode
+
+.. versionadded:: 4.11
+
+.. parsed-literal::
+
+    %UnitPostIncludeCode
+        *code*
+    %End
+
+This directive is used to specify handwritten code that is included following
+the ``#include`` of all header files in a generated compilation unit (ie. C or
+C++ source file).
 
 
 .. directive:: %VirtualCatcherCode
@@ -2027,8 +2277,10 @@ context of a method:
 
 *type* a0
     There is a variable for each argument of the C++ signature named ``a0``,
-    ``a1``, etc.  The *type* of the variable is the same as the type defined in
-    the specification.
+    ``a1``, etc.  If ``use_argument_names`` has been set in the
+    :directive:`%Module` directive then the name of the argument is the real
+    name.  The *type* of the variable is the same as the type defined in the
+    specification.
 
 int a0Key
     There is a variable for each argument of the C++ signature that has a type
@@ -2037,6 +2289,10 @@ int a0Key
     return ``'\0'`` terminated strings.  The variable would normally be passed
     to :cfunc:`sipParseResult()` using either the ``A`` or ``B`` format
     characters.
+
+    If ``use_argument_names`` has been set in the :directive:`%Module`
+    directive then the name of the variable is the real name of the argument
+    with ``Key`` appended.
 
 int sipIsErr
     The handwritten code should set this to a non-zero value, and raise an

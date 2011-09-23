@@ -1,3 +1,43 @@
+#############################################################################
+##
+## Copyright (C) 2011 Riverbank Computing Limited.
+## Copyright (C) 2006 Thorsten Marek.
+## All right reserved.
+##
+## This file is part of PyQt.
+##
+## You may use this file under the terms of the GPL v2 or the revised BSD
+## license as follows:
+##
+## "Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are
+## met:
+##   * Redistributions of source code must retain the above copyright
+##     notice, this list of conditions and the following disclaimer.
+##   * Redistributions in binary form must reproduce the above copyright
+##     notice, this list of conditions and the following disclaimer in
+##     the documentation and/or other materials provided with the
+##     distribution.
+##   * Neither the name of the Riverbank Computing Limited nor the names
+##     of its contributors may be used to endorse or promote products
+##     derived from this software without specific prior written
+##     permission.
+##
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+##
+#############################################################################
+
+
 import sys
 
 from PyQt4.uic.properties import Properties
@@ -6,6 +46,7 @@ from PyQt4.uic.Compiler import qtproxies
 from PyQt4.uic.Compiler.indenter import createCodeIndenter, getIndenter, \
         write_code
 from PyQt4.uic.Compiler.qobjectcreator import CompilerCreatorPolicy
+from PyQt4.uic.Compiler.misc import write_import
 
 
 class UICompiler(UIParser):
@@ -23,8 +64,20 @@ class UICompiler(UIParser):
     def createToplevelWidget(self, classname, widgetname):
         indenter = getIndenter()
         indenter.level = 0
+
         indenter.write("from PyQt4 import QtCore, QtGui")
         indenter.write("")
+
+        indenter.write("try:")
+        indenter.indent()
+        indenter.write("_fromUtf8 = QtCore.QString.fromUtf8")
+        indenter.dedent()
+        indenter.write("except AttributeError:")
+        indenter.indent()
+        indenter.write("_fromUtf8 = lambda s: s")
+        indenter.dedent()
+        indenter.write("")
+
         indenter.write("class Ui_%s(object):" % self.uiname)
         indenter.indent()
         indenter.write("def setupUi(self, %s):" % widgetname)
@@ -61,7 +114,7 @@ class UICompiler(UIParser):
         # reset() before returning.
         self._resources = self.resources
 
-    def compileUi(self, input_stream, output_stream):
+    def compileUi(self, input_stream, output_stream, from_imports):
         createCodeIndenter(output_stream)
         w = self.parse(input_stream)
 
@@ -71,7 +124,7 @@ class UICompiler(UIParser):
         self.factory._cpolicy._writeOutImports()
 
         for res in self._resources:
-            indenter.write("import %s" % res)
+            write_import(res, from_imports)
 
         return {"widgetname": str(w),
                 "uiclass" : w.uiclass,

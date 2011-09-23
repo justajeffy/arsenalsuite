@@ -32,7 +32,7 @@
 !endif
 
 # These will change with different releases.
-!define PYQT_VERSION        "4.7.0"
+!define PYQT_VERSION        "4.8.5-0"
 !define PYQT_LICENSE        "GPL"
 !define PYQT_LICENSE_LC     "gpl"
 !define PYQT_QT_VERS        "4.6.1"
@@ -179,13 +179,16 @@ Section "Extension modules" SecModules
     File .\QtSvg\QtSvg.pyd
     File .\QtXml\QtXml.pyd
     File .\QtWebKit\QtWebKit.pyd
-   # File .\QtXmlPatterns\QtXmlPatterns.pyd
+    File .\QtXmlPatterns\QtXmlPatterns.pyd
     File .\QtDesigner\QtDesigner.pyd
     File .\QtHelp\QtHelp.pyd
     File .\QtScript\QtScript.pyd
     File .\QtScriptTools\QtScriptTools.pyd
     File .\QtTest\QtTest.pyd
+    File .\QtMultimedia\QtMultimedia.pyd
     File .\phonon\phonon.pyd
+    File ..\pyqtwinmigrate\sipQtWinMigrate\QtWinMigrate.pyd
+    File ..\qscintilla\Python\QSci.pyd
 SectionEnd
 
 Section "Developer tools" SecTools
@@ -197,6 +200,13 @@ Section "Developer tools" SecTools
     File .\pylupdate\pylupdate4.exe
     File .\pyrcc\pyrcc4.exe
     File .\pyuic\pyuic4.bat
+
+!ifdef _64_BIT
+    SetOutPath "C:\windows\system32\blur64\designer\"
+!else
+    SetOutPath "C:\blur\common\designer\"
+!endif
+    File .\designer\release\pythonplugin.dll
 
     SetOutPath $INSTDIR\Lib\site-packages\PyQt4
     File /r .\pyuic\uic

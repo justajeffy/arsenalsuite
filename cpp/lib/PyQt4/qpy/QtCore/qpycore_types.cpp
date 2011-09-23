@@ -1,6 +1,6 @@
 // This contains the meta-type used by PyQt.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -36,6 +31,33 @@
 #include <QMetaObject>
 #include <QMetaType>
 #include <QPair>
+
+// Defining PYQT_QOBJECT_GUARD will enable code that tries to detect when a
+// QObject created by Qt (ie. where we don't have a generated virtual dtor) is
+// destroyed thus allowing us to raise an exception rather than crashing.
+// However, there are problems:
+//
+// 1. The obvious choice to implement this is QWeakPointer (for Qt v4.5 and
+//    later) or QPointer.  However they cannot be used across threads.  The
+//    code checks to see if QObject is in the current thread, but can't do
+//    anything about the QObject being moved to another thread later on.
+//
+// 2. A QObject dtor may invoke a Python reimplementation that causes the
+//    QObject to be wrapped.  QWeakPointer will fail an assertion if it is
+//    being created for a QObject that is being deleted (rather than the more
+//    sensible behaviour of creating a null QWeakPointer).
+//
+// For the moment we disable the code until we have a better solution.  (If you
+// connect the destroyed signal of a QObject then move the QObject to a
+// different thread, will the signal be delivered properly?)
+#if defined(PYQT_QOBJECT_GUARD)
+#include <QThread>
+#if QT_VERSION >= 0x040500
+#include <QWeakPointer>
+#else
+#include <QPointer>
+#endif
+#endif
 
 #include "qpycore_chimera.h"
 #include "qpycore_misc.h"
@@ -54,6 +76,11 @@ typedef int (*static_metacall_func)(sipTypeDef *, QMetaObject::Call, int,
 extern "C" {
 static int pyqtWrapperType_init(pyqtWrapperType *self, PyObject *args,
         PyObject *kwds);
+#if defined(PYQT_QOBJECT_GUARD)
+static PyObject *pyqtWrapperType_call(PyObject *type, PyObject *args,
+        PyObject *kwds);
+static void *qpointer_access_func(sipSimpleWrapper *w, AccessFuncOp op);
+#endif
 }
 
 static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt);
@@ -79,7 +106,11 @@ PyTypeObject qpycore_pyqtWrapperType_Type = {
     0,                      /* tp_as_sequence */
     0,                      /* tp_as_mapping */
     0,                      /* tp_hash */
+#if defined(PYQT_QOBJECT_GUARD)
+    pyqtWrapperType_call,   /* tp_call */
+#else
     0,                      /* tp_call */
+#endif
     0,                      /* tp_str */
     0,                      /* tp_getattro */
     0,                      /* tp_setattro */
@@ -162,6 +193,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
     QList<const QMetaObject *> enum_scopes;
     SIP_SSIZE_T pos = 0;
     PyObject *key, *value;
+    bool has_notify_signal = false;
 
     while (PyDict_Next(pytype->tp_dict, &pos, &key, &value))
     {
@@ -227,6 +259,14 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
 
                 if (mo && !enum_scopes.contains(mo))
                     enum_scopes.append(mo);
+
+                // See if the property has a notify signal so that we can
+                // allocate space for it in the meta-object.  We will check if
+                // it is valid later on.  If there is one property with a
+                // notify signal then a signal index is stored for all
+                // properties.
+                if (pp->pyqtprop_notify)
+                    has_notify_signal = true;
             }
             else if (PyType_IsSubtype(Py_TYPE(value), &qpycore_pyqtSignal_Type))
             {
@@ -238,7 +278,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
                 qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)value;
 
                 // Make sure the signal has a name.
-                qpycore_set_signal_name(ps, ascii_key);
+                qpycore_set_signal_name(ps, pytype->tp_name, ascii_key);
 
                 // Add all the overloads.
                 for (int ol = 0; ol < ps->overloads->size(); ++ol)
@@ -304,24 +344,38 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
 
         objects[enum_scopes.size()] = 0;
 
+#if QT_VERSION >= 0x040600
+        qo->ed.objects = objects;
+        qo->ed.static_metacall = 0;
+
+        qo->mo.d.extradata = &qo->ed;
+#else
         qo->mo.d.extradata = objects;
+#endif
     }
 
-    // Initialise the header section of the data table.  Qt v4.5 introduced
-    // revision 2 which added constructors.  However the design is broken in
-    // that the static meta-call function doesn't provide enough information to
-    // determine which Python sub-class of a Qt class is to be created.  So we
-    // stick with revision 1 (and don't allow pyqtSlot() to decorate __init__).
+    // Initialise the header section of the data table.  Note that Qt v4.5
+    // introduced revision 2 which added constructors.  However the design is
+    // broken in that the static meta-call function doesn't provide enough
+    // information to determine which Python sub-class of a Qt class is to be
+    // created.  So we stick with revision 1 (and don't allow pyqtSlot() to
+    // decorate __init__).
 
+#if QT_VERSION >= 0x040600
+    const int revision = 4;
+    const int header_size = 14;
+#else
     const int revision = 1;
     const int header_size = 10;
+#endif
 
     int data_len = header_size + qo->nr_signals * 5 + qo->pslots.count() * 5 + 
-            pprops.count() * 3 + 1;
+            pprops.count() * (has_notify_signal ? 4 : 3) + 1;
     uint *data = new uint[data_len];
     int g_offset = header_size;
     int s_offset = g_offset + qo->nr_signals * 5;
     int p_offset = s_offset + qo->pslots.count() * 5;
+    int n_offset = p_offset + pprops.count() * 3;
     int empty = 0;
 
     for (int i = 0; i < data_len; ++i)
@@ -347,6 +401,10 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         data[6] = pprops.count();
         data[7] = p_offset;
     }
+
+#if QT_VERSION >= 0x040600
+    data[13] = qo->nr_signals;
+#endif
 
     // Add the signals to the meta-object.
     for (int g = 0; g < qo->nr_signals; ++g)
@@ -399,6 +457,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
     }
 
     // Add the properties to the meta-object.
+    QList<uint> notify_signals;
     QMapIterator<uint, prop_data> it(pprops);
 
     for (int p = 0; it.hasNext(); ++p)
@@ -419,25 +478,46 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         qo->str_data.append(pp->pyqtprop_parsed_type->name());
         qo->str_data.append('\0');
 
-        // Add the property flags.
-        uint flags = pp->pyqtprop_flags;
+        // There are only 8 bits available for the type so use the special
+        // value if more are required.
+        uint metatype = pp->pyqtprop_parsed_type->metatype();
+        uint flags = 0;
+
+        if (metatype > 0xff)
+        {
+#if QT_VERSION >= 0x040600
+            metatype = 0;
+            flags |= 0x00000008;
+#else
+            // This is the old PyQt behaviour.  It may not be correct, but
+            // nobody has complained, and if it ain't broke...
+            metatype = 0xff;
+#endif
+        }
 
         // Enum or flag.
         if (pp->pyqtprop_parsed_type->isEnum() || pp->pyqtprop_parsed_type->isFlag())
+        {
+#if QT_VERSION >= 0x040600
+            metatype = 0;
+#endif
             flags |= 0x00000008;
+        }
 
-        if (pp->prop_get && PyCallable_Check(pp->prop_get))
+        flags |= metatype << 24;
+
+        if (pp->pyqtprop_get && PyCallable_Check(pp->pyqtprop_get))
             // Readable.
             flags |= 0x00000001;
 
-        if (pp->prop_set && PyCallable_Check(pp->prop_set))
+        if (pp->pyqtprop_set && PyCallable_Check(pp->pyqtprop_set))
         {
             // Writable.
             flags |= 0x00000002;
 
             // See if the name of the setter follows the Designer convention.
             // If so tell the UI compilers not to use setProperty().
-            PyObject *setter_name_obj = PyObject_GetAttr(pp->prop_set,
+            PyObject *setter_name_obj = PyObject_GetAttr(pp->pyqtprop_set,
                     qpycore_name_attr_name);
 
             if (setter_name_obj)
@@ -465,14 +545,32 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
             // Resetable.
             flags |= 0x00000004;
 
-        // There are only 8 bits available for the type so use the special
-        // value if more are required.
-        uint metatype = pp->pyqtprop_parsed_type->metatype();
+        if (pp->pyqtprop_notify)
+        {
+            qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)pp->pyqtprop_notify;
+            const QByteArray &sig = ps->master->overloads->at(ps->master_index)->signature;
+            int idx = psigs.indexOf(sig);
 
-        if (metatype > 0xff)
-            metatype = 0xff;
+            if (idx < 0)
+            {
+                PyErr_Format(PyExc_TypeError,
+                        "the notify signal '%s' was not defined in this class",
+                        sig.constData() + 1);
 
-        flags |= metatype << 24;
+                // Note that we leak the property name and definition.
+                return -1;
+            }
+
+            notify_signals.append(idx);
+            flags |= 0x00400000;
+        }
+        else
+        {
+            notify_signals.append(0);
+        }
+
+        // Add the property flags.
+        flags |= pp->pyqtprop_flags;
 
         data[p_offset + (p * 3) + 2] = flags;
 
@@ -482,6 +580,15 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
 
         // We've finished with the property name.
         Py_DECREF(pprop.first);
+    }
+
+    // Add the indices of the notify signals.
+    if (has_notify_signal)
+    {
+        QListIterator<uint> notify_it(notify_signals);
+
+        while (notify_it.hasNext())
+            data[n_offset++] = notify_it.next();
     }
 
     // Initialise the rest of the meta-object.
@@ -551,3 +658,93 @@ static const QMetaObject *get_qmetaobject(pyqtWrapperType *pyqt_wt)
     // It's a wrapped type.
     return reinterpret_cast<const QMetaObject *>(((pyqt4ClassTypeDef *)((sipWrapperType *)pyqt_wt)->type)->qt4_static_metaobject);
 }
+
+
+#if defined(PYQT_QOBJECT_GUARD)
+
+#if QT_VERSION < 0x040500
+// The guard for Qt generated QObjects.
+struct QObjectGuard
+{
+    QObjectGuard(void *addr) : guarded(reinterpret_cast<QObject *>(addr)), unguarded(addr) {}
+
+    QPointer<QObject> guarded;
+    void *unguarded;
+};
+#endif
+
+
+// Reimplemented to wrap any QObjects created internally by Qt so that we can
+// detect if they get destroyed.
+static PyObject *pyqtWrapperType_call(PyObject *type, PyObject *args, PyObject *kwds)
+{
+    PyObject *self = sipWrapperType_Type->tp_call(type, args, kwds);
+
+    // See if the object was created and it is a QObject sub-class.
+    if (self && PyObject_TypeCheck(self, sipTypeAsPyTypeObject(sipType_QObject)))
+    {
+        sipSimpleWrapper *w = (sipSimpleWrapper *)self;
+
+        // See if it is created internally by Qt and doesn't already have an
+        // access function (e.g. qApp).
+        if (!sipIsDerived(w) && !w->access_func)
+        {
+            QObject *qobj = reinterpret_cast<QObject *>(w->data);
+
+            // We can only guard objects in the same thread.
+            if (qobj->thread() == QThread::currentThread())
+            {
+#if QT_VERSION >= 0x040500
+                QWeakPointer<QObject> *guard = new QWeakPointer<QObject>(qobj);
+#else
+                QObjectGuard *guard = new QObjectGuard(w->data);
+#endif
+
+                w->data = guard;
+                w->access_func = qpointer_access_func;
+            }
+        }
+    }
+
+    return self;
+}
+
+
+// The access function for guarded QObject pointers.
+static void *qpointer_access_func(sipSimpleWrapper *w, AccessFuncOp op)
+{
+#if QT_VERSION >= 0x040500
+    QWeakPointer<QObject> *guard = reinterpret_cast<QWeakPointer<QObject> *>(w->data);
+#else
+    QObjectGuard *guard = reinterpret_cast<QObjectGuard *>(w->data);
+#endif
+    void *addr;
+
+    switch (op)
+    {
+    case UnguardedPointer:
+#if QT_VERSION >= 0x040500
+        addr = guard->data();
+#else
+        addr = guard->unguarded;
+#endif
+        break;
+
+    case GuardedPointer:
+#if QT_VERSION >= 0x040500
+        addr = guard->isNull() ? 0 : guard->data();
+#else
+        addr = (QObject *)guard->guarded;
+#endif
+        break;
+
+    case ReleaseGuard:
+        delete guard;
+        addr = 0;
+        break;
+    }
+
+    return addr;
+}
+
+#endif

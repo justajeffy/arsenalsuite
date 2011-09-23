@@ -45,7 +45,7 @@ specification files.
 
     .. versionadded:: 4.10
 
-    This is a C preprocessor macro that is set automatically by the build
+    This is a C preprocessor symbol that is defined automatically by the build
     system to specify that the generated code is being compiled with
     ``protected`` redefined as ``public``.  This allows handwritten code to
     determine if the generated helper functions for accessing protected C++
@@ -64,6 +64,14 @@ specification files.
     This is a C preprocessor macro that will restore the Python Global
     Interpreter Lock (GIL) to the state it was prior to the corresponding
     :cmacro:`SIP_BLOCK_THREADS`.
+
+
+.. cmacro:: SIP_USE_PYCAPSULE
+
+    .. versionadded:: 4.11
+
+    This is a C preprocessor symbol that is defined when ``PyCapsule`` objects
+    are being used rather than the (now deprecated) ``PyCObject`` objects.
 
 
 .. cmacro:: SIP_VERSION
@@ -217,6 +225,9 @@ specification files.
         ``Py_None``.
 
     ``B`` (wrapped instance) [*type* \*, :ctype:`sipWrapperType` \*, PyObject \*]
+        .. deprecated:: 4.8
+            Use ``N`` instead.
+
         Convert a new C structure or a new C++ class instance to a Python class
         instance object.  Ownership of the structure or instance is determined
         by the ``PyObject *`` argument.  If it is ``NULL`` and the instance has
@@ -226,10 +237,10 @@ specification files.
         ``PyObject *`` argument.  The Python class is influenced by any
         applicable :directive:`%ConvertToSubClassCode` code.
 
-        .. note::
-            This is deprecated from SIP v4.8.  Instead you should use ``N``.
-
     ``C`` (wrapped instance) [*type* \*, :ctype:`sipWrapperType` \*, PyObject \*]
+        .. deprecated:: 4.8
+            Use ``D`` instead.
+
         Convert a C structure or a C++ class instance to a Python class
         instance object.  If the structure or class instance has already been
         wrapped then the result is a new reference to the existing class
@@ -243,9 +254,6 @@ specification files.
         ``PyObject *`` argument via a call to :cfunc:`sipTransferTo()`.  The
         Python class is influenced by any applicable
         :directive:`%ConvertToSubClassCode` code.
-
-        .. note::
-            This is deprecated from SIP v4.8.  Instead you should use ``D``.
 
     ``D`` (wrapped instance) [*type* \*, const :ctype:`sipTypeDef` \*, PyObject \*]
         Convert a C structure, C++ class or mapped type instance to a Python
@@ -262,11 +270,11 @@ specification files.
         :directive:`%ConvertToSubClassCode` code.
 
     ``E`` (wrapped enum) [enum, PyTypeObject \*]
+        .. deprecated:: 4.8
+            Use ``F`` instead.
+
         Convert a named C/C++ ``enum`` to an instance of the corresponding
         Python named enum type.
-
-        .. note::
-            This is deprecated from SIP v4.8.  Instead you should use ``F``.
 
     ``F`` (wrapped enum) [enum, :ctype:`sipTypeDef` \*]
         Convert a named C/C++ ``enum`` to an instance of the corresponding
@@ -276,6 +284,16 @@ specification files.
         Convert a C/C++ wide character array and its length to a Python unicode
         object.  If the array is ``NULL`` then the length is ignored and the
         result is ``Py_None``.
+
+    ``L`` (integer) [char]
+        .. versionadded:: 4.12
+
+        Convert a C/C++ ``char`` to a Python integer.
+
+    ``M`` (long) [unsigned char]
+        .. versionadded:: 4.12
+
+        Convert a C/C++ ``unsigned char`` to a Python long.
 
     ``N`` (wrapped instance) [*type* \*, :ctype:`sipTypeDef` \*, PyObject \*]
         Convert a new C structure, C++ class or mapped type instance to a
@@ -335,6 +353,9 @@ specification files.
 
 .. cfunction:: int sipCanConvertToInstance(PyObject *obj, sipWrapperType *type, int flags)
 
+    .. deprecated:: 4.8
+        Use :cfunc:`sipCanConvertToType()` instead.
+
     This checks if a Python object can be converted to an instance of a C
     structure or C++ class.
 
@@ -348,12 +369,11 @@ specification files.
     :return:
         a non-zero value if the object can be converted.
 
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipCanConvertToType()`.
-
 
 .. cfunction:: int sipCanConvertToMappedType(PyObject *obj, const sipMappedType *mt, int flags)
+
+    .. deprecated:: 4.8
+        Use :cfunc:`sipCanConvertToType()` instead.
 
     This checks if a Python object can be converted to an instance of a C
     structure or C++ class which has been implemented as a mapped type.
@@ -366,10 +386,6 @@ specification files.
         this may be the :cmacro:`SIP_NOT_NONE` flag.
     :return:
         a non-zero value if the object can be converted.
-
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipCanConvertToType()`.
 
 
 .. cfunction:: int sipCanConvertToType(PyObject *obj, const sipTypeDef *td, int flags)
@@ -390,6 +406,11 @@ specification files.
 
 .. cfunction:: PyObject *sipClassName(PyObject *obj)
 
+    .. deprecated:: 4.8
+        Use the following instead:
+
+            PyString_FromString(obj->ob_type->tp_name)
+
     This gets the class name of a wrapped instance as a Python string.  It
     comes with a reference.
 
@@ -397,12 +418,6 @@ specification files.
         the wrapped instance.
     :return:
         the name of the instance's class.
-
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use the
-        following::
-
-            PyString_FromString(obj->ob_type->tp_name)
 
 
 .. cfunction:: PyObject *sipConvertFromConstVoidPtr(const void *cpp)
@@ -444,6 +459,9 @@ specification files.
 
 .. cfunction:: PyObject *sipConvertFromInstance(void *cpp, sipWrapperType *type, PyObject *transferObj)
 
+    .. deprecated:: 4.8
+        Use :cfunc:`sipConvertFromType()` instead.
+
     This converts a C structure or a C++ class instance to an instance of the
     corresponding generated Python type.
 
@@ -474,12 +492,11 @@ specification files.
     The Python type is influenced by any applicable
     :directive:`%ConvertToSubClassCode` code.
 
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipConvertFromType()`.
-
 
 .. cfunction:: PyObject *sipConvertFromMappedType(void *cpp, const sipMappedType *mt, PyObject *transferObj)
+
+    .. deprecated:: 4.8
+        Use :cfunc:`sipConvertFromType()` instead.
 
     This converts a C structure or a C++ class instance wrapped as a mapped
     type to an instance of the corresponding generated Python type.
@@ -501,12 +518,11 @@ specification files.
     Otherwise ownership is transferred to C/C++ and the instance associated
     with *transferObj* argument via a call to :cfunc:`sipTransferTo()`.
 
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipConvertFromType()`.
-
 
 .. cfunction:: PyObject *sipConvertFromNamedEnum(int eval, PyTypeObject *type)
+
+    .. deprecated:: 4.8
+        Use :cfunc:`sipConvertFromEnum()` instead.
 
     This converts a named C/C++ ``enum`` to an instance of the corresponding
     generated Python type.
@@ -518,12 +534,11 @@ specification files.
     :return:
         the Python object.
 
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipConvertFromEnum()`.
-
 
 .. cfunction:: PyObject *sipConvertFromNewInstance(void *cpp, sipWrapperType *type, PyObject *transferObj)
+
+    .. deprecated:: 4.8
+        Use :cfunc:`sipConvertFromNewType()` instead.
 
     This converts a new C structure or a C++ class instance to an instance of
     the corresponding generated Python type.
@@ -545,10 +560,6 @@ specification files.
     
     The Python type is influenced by any applicable
     :directive:`%ConvertToSubClassCode` code.
-
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipConvertFromNewType()`.
 
 
 .. cfunction:: PyObject *sipConvertFromNewType(void *cpp, const sipTypeDef *td, PyObject *transferObj)
@@ -656,6 +667,9 @@ specification files.
 
 .. cfunction:: void *sipConvertToInstance(PyObject *obj, sipWrapperType *type, PyObject *transferObj, int flags, int *state, int *iserr)
 
+    .. deprecated:: 4.8
+        Use :cfunc:`sipConvertToType()` instead.
+
     This converts a Python object to an instance of a C structure or C++ class
     assuming that a previous call to :cfunc:`sipCanConvertToInstance()` has
     been successful.
@@ -696,12 +710,11 @@ specification files.
     that share the same error flag so that it only needs to be tested once
     rather than after each call.)
 
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipConvertToType()`.
-
 
 .. cfunction:: void *sipConvertToMappedType(PyObject *obj, const sipMappedType *mt, PyObject *transferObj, int flags, int *state, int *iserr)
+
+    .. deprecated:: 4.8
+        Use :cfunc:`sipConvertToType()` instead.
 
     This converts a Python object to an instance of a C structure or C++
     class that is implemented as a mapped type assuming that a previous call to
@@ -741,10 +754,6 @@ specification files.
     isn't attempted in the first place.  (This allows several calls to be made
     that share the same error flag so that it only needs to be tested once
     rather than after each call.)
-
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipConvertToType()`
 
 
 .. cfunction:: void *sipConvertToType(PyObject *obj, const sipTypeDef *td, PyObject *transferObj, int flags, int *state, int *iserr)
@@ -820,6 +829,9 @@ specification files.
 
 .. cfunction:: sipWrapperType *sipFindClass(const char *type)
 
+    .. deprecated:: 4.8
+        Use :cfunc:`sipFindType()` instead.
+
     This returns a pointer to the :ref:`generated type object
     <ref-type-objects` corresponding to a C/C++ type.
 
@@ -829,12 +841,11 @@ specification files.
         the generated type object.  This will not change and may be saved in a
         static cache.  ``NULL`` is returned if the C/C++ type doesn't exist.
 
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipFindType()`.
-
 
 .. cfunction:: const sipMappedType *sipFindMappedType(const char *type)
+
+    .. deprecated:: 4.8
+        Use :cfunc:`sipFindType()` instead.
 
     This returns a pointer to an opaque structure describing a mapped type.
 
@@ -844,12 +855,11 @@ specification files.
         the opaque structure.  This will not change and may be saved in a
         static cache.  ``NULL`` is returned if the C/C++ type doesn't exist.
 
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipFindType()`.
-
 
 .. cfunction:: PyTypeObject *sipFindNamedEnum(const char *type)
+
+    .. deprecated:: 4.8
+        Use :cfunc:`sipFindType()` instead.
 
     This returns a pointer to the :ref:`generated Python type object
     <ref-enum-type-objects>` corresponding to a named C/C++ enum.
@@ -860,10 +870,6 @@ specification files.
         the generated Python type object.  This will not change and may be
         saved in a static cache.  ``NULL`` is returned if the C/C++ enum
         doesn't exist.
-
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipFindType()`.
 
 
 .. cfunction:: const sipTypeDef *sipFindType(const char *type)
@@ -880,6 +886,9 @@ specification files.
 
 .. cfunction:: void *sipForceConvertToInstance(PyObject *obj, sipWrapperType *type, PyObject *transferObj, int flags, int *state, int *iserr)
 
+    .. deprecated:: 4.8
+        Use :cfunc:`sipForceConvertToType()` instead.
+
     This converts a Python object to an instance of a C structure or C++ class
     by calling :cfunc:`sipCanConvertToInstance()` and, if it is successfull,
     calling :cfunc:`sipConvertToInstance()`.
@@ -887,12 +896,11 @@ specification files.
     See :cfunc:`sipConvertToInstance()` for a full description of the
     arguments.
 
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipForceConvertToType()`.
-
 
 .. cfunction:: void *sipForceConvertToMappedType(PyObject *obj, const sipMappedType *mt, PyObject *transferObj, int flags, int *state, int *iserr)
+
+    .. deprecated:: 4.8
+        Use :cfunc:`sipForceConvertToType()` instead.
 
     This converts a Python object to an instance of a C structure or C++ class
     which has been implemented as a mapped type by calling
@@ -901,10 +909,6 @@ specification files.
 
     See :cfunc:`sipConvertToMappedType()` for a full description of the
     arguments.
-
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipForceConvertToType()`.
 
 
 .. cfunction:: void *sipForceConvertToType(PyObject *obj, const sipTypeDef *td, PyObject *transferObj, int flags, int *state, int *iserr)
@@ -923,6 +927,19 @@ specification files.
 
     :param mem:
         the memory address.
+
+
+.. cfunction:: void *sipGetAddress(sipSimpleWrapper *obj)
+
+    .. versionadded:: 4.12
+
+    This returns the address of the C structure or C++ class instance wrapped
+    by a Python object.
+
+    :param obj:
+        the Python object.
+    :return:
+        the address of the C/C++ instance
 
 
 .. cfunction:: PyObject *sipGetPyObject(void *cppptr, const sipTypeDef *td)
@@ -956,6 +973,9 @@ specification files.
 
 .. cfunction:: PyObject *sipGetWrapper(void *cppptr, sipWrapperType *type)
 
+    .. deprecated:: 4.8
+        Use :cfunc:`sipGetPyObject()` instead.
+
     This returns a borrowed reference to the wrapped instance object for a C
     structure or C++ class instance.
     
@@ -967,10 +987,6 @@ specification files.
     :return:
         the Python object or ``NULL`` (and no exception is raised) if the
         C/C++ instance hasn't been wrapped.
-
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipGetPyObject()`.
 
 
 .. cfunction:: void *sipImportSymbol(const char *name)
@@ -989,6 +1005,8 @@ specification files.
 
 .. ctype:: sipIntTypeClassMap
 
+    .. deprecated:: 4.8
+
     This C structure is used with :cfunc:`sipMapIntToClass()` to define a
     mapping between integer based RTTI and :ref:`generated type objects
     <ref-type-objects>`.  The structure elements are as follows.
@@ -1000,9 +1018,6 @@ specification files.
     .. cmember:: sipWrapperType **pyType.
 
         A pointer to the corresponding generated type object.
-
-    .. note::
-        This is deprecated from SIP v4.8.
 
 
 .. cfunction:: int sipIsAPIEnabled(const char *name, int from, int to)
@@ -1048,6 +1063,8 @@ specification files.
 
 .. cfunction:: sipWrapperType *sipMapIntToClass(int type, const sipIntTypeClassMap *map, int maplen)
 
+    .. deprecated:: 4.8
+
     This can be used in :directive:`%ConvertToSubClassCode` code as a
     convenient way of converting integer based RTTI to the corresponding
     :ref:`generated type object <ref-type-objects>`.
@@ -1063,11 +1080,10 @@ specification files.
     :return:
         the corresponding type object, or ``NULL`` if *type* wasn't in *map*.
 
-    .. note::
-        This is deprecated from SIP v4.8.
-
 
 .. cfunction:: sipWrapperType *sipMapStringToClass(char *type, const sipStringTypeClassMap *map, int maplen)
+
+    .. deprecated:: 4.8
 
     This can be used in :directive:`%ConvertToSubClassCode` code as a
     convenient way of converting ``'\0'`` terminated string based RTTI to the
@@ -1083,9 +1099,6 @@ specification files.
         the number of entries in the table.
     :return:
         the corresponding type object, or ``NULL`` if *type* wasn't in *map*.
-
-    .. note::
-        This is deprecated from SIP v4.8.
 
 
 .. cfunction:: int sipParseResult(int *iserr, PyObject *method, PyObject *result, const char *format, ...)
@@ -1169,12 +1182,12 @@ specification files.
         Convert a Python long to a C/C++ ``unsigned long long``.
 
     ``s`` (string/bytes) [const char \*\*]
+        .. deprecated:: 4.8
+            Use ``B`` instead.
+
         Convert a Python v2 string object or a Python v3 bytes object to a
         C/C++ ``'\0'`` terminated string.  If the Python object is ``Py_None``
         then the string is ``NULL``.
-
-        .. note::
-            This is deprecated from SIP v4.8.  Instead you should use ``B``.
 
     ``t`` (long) [unsigned short \*]
         Convert a Python long to a C/C++ ``unsigned short``.
@@ -1212,6 +1225,9 @@ specification files.
         remains valid.
 
     ``Cf`` (wrapped class) [:ctype:`sipWrapperType` \*, int \*, void \*\*]
+        .. deprecated:: 4.8
+            Use ``Hf`` instead.
+
         Convert a Python object to a C structure or a C++ class instance and
         return its state as described in :cfunc:`sipConvertToInstance()`.
         ``f`` is a combination of the following flags encoded as an ASCII
@@ -1219,16 +1235,17 @@ specification files.
 
             0x01 disallows the conversion of ``Py_None`` to ``NULL``
 
-            0x02 implements the :fanno:`Factory` annotation
+            0x02 implements the :fanno:`Factory` and :fanno:`TransferBack`
+                 annotations
 
             0x04 suppresses the return of the state of the returned C/C++
                  instance.  Note that the ``int *`` used to return the state is
                  not passed if this flag is specified.
 
-        .. note::
-            This is deprecated from SIP v4.8.  Instead you should use ``Df``.
-
     ``Df`` (wrapped instance) [const :ctype:`sipTypeDef` \*, int \*, void \*\*]
+        .. deprecated:: 4.10.1
+            Use ``Hf`` instead.
+
         Convert a Python object to a C structure, C++ class or mapped type
         instance and return its state as described in
         :cfunc:`sipConvertToType()`.  ``f`` is a combination of the following
@@ -1237,17 +1254,18 @@ specification files.
 
             0x01 disallows the conversion of ``Py_None`` to ``NULL``
 
-            0x02 implements the :fanno:`Factory` annotation
+            0x02 implements the :fanno:`Factory` and :fanno:`TransferBack`
+                 annotations
 
             0x04 suppresses the return of the state of the returned C/C++
                  instance.  Note that the ``int *`` used to return the state is
                  not passed if this flag is specified.
 
     ``E`` (wrapped enum) [PyTypeObject \*, enum \*]
-        Convert a Python named enum type to the corresponding C/C++ ``enum``.
+        .. deprecated:: 4.8
+            Use ``F`` instead.
 
-        .. note::
-            This is deprecated from SIP v4.8.  Instead you should use ``F``.
+        Convert a Python named enum type to the corresponding C/C++ ``enum``.
 
     ``F`` (wrapped enum) [:ctype:`sipTypeDef` \*, enum \*]
         Convert a Python named enum type to the corresponding C/C++ ``enum``.
@@ -1257,6 +1275,29 @@ specification files.
         object to a C/C++ wide character array and its length.  If the Python
         object is ``Py_None`` then the array and length are ``NULL`` and zero
         respectively.
+
+    ``Hf`` (wrapped instance) [const :ctype:`sipTypeDef` \*, int \*, void \*\*]
+        Convert a Python object to a C structure, C++ class or mapped type
+        instance as described in :cfunc:`sipConvertToType()`.  ``f`` is a
+        combination of the following flags encoded as an ASCII character by
+        adding ``0`` to the combined value:
+
+            0x01 disallows the conversion of ``Py_None`` to ``NULL``
+
+            0x02 implements the :fanno:`Factory` and :fanno:`TransferBack`
+                 annotations
+
+            0x04 returns a copy of the C/C++ instance.
+
+    ``L`` (integer) [signed char \*]
+        .. versionadded:: 4.12
+
+        Convert a Python integer to a C/C++ ``signed char``.
+
+    ``M`` (long) [unsigned char \*]
+        .. versionadded:: 4.12
+
+        Convert a Python long to a C/C++ ``unsigned char``.
 
     ``N`` (object) [PyTypeObject \*, :PyObject \*\*]
         A Python object is checked to see if it is a certain type and then
@@ -1331,6 +1372,9 @@ specification files.
 
 .. cfunction:: void sipReleaseInstance(void *cpp, sipWrapperType *type, int state)
 
+    .. deprecated:: 4.8
+        Use :cfunc:`sipReleaseType()` instead.
+
     This destroys a wrapped C/C++ instance if it was a temporary instance.  It
     is called after a call to either :cfunc:`sipConvertToInstance()` or
     :cfunc:`sipForceConvertToInstance()`.
@@ -1342,12 +1386,11 @@ specification files.
     :param state:
         describes the state of the C/C++ instance.
 
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipReleaseType()`.
-
 
 .. cfunction:: void sipReleaseMappedType(void *cpp, const sipMappedType *mt, int state)
+
+    .. deprecated:: 4.8
+        Use :cfunc:`sipReleaseType()` instead.
 
     This destroys a wrapped C/C++ mapped type if it was a temporary instance.
     It is called after a call to either :cfunc:`sipConvertToMappedType()` or
@@ -1359,10 +1402,6 @@ specification files.
         the opaque structure returned by :cfunc:`sipFindMappedType()`.
     :param state:
         describes the state of the C/C++ instance.
-
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use
-        :cfunc:`sipReleaseType()`.
 
 
 .. cfunction:: void sipReleaseType(void *cpp, const sipTypeDef *td, int state)
@@ -1395,6 +1434,27 @@ specification files.
     is :class:`sip.simplewrapper`.  It is an extension of the ``PyObject``
     structure and so may be safely cast to it.
 
+    .. cmember:: void *data
+
+        This is initialised to the address of the C/C++ instance.  If an access
+        function is subsequently provided then it may be used for any purpose
+        by the access function.
+
+    .. cmember:: sipAccessFunc access_func
+
+        This is the address of an optional access function that is called, with
+        a pointer to this structure as its first argument.  If its second
+        argument is ``UnguardedPointer`` then it returns the address of the
+        C/C++ instance, even if it is known that its value is no longer valid.
+        If the second argument is ``GuardedPointer`` then it returns the
+        address of the C++ instance or ``0`` if it is known to be invalid.  If
+        the second argument is ``ReleaseGuard`` then the structure is being
+        deallocated and any dynamic resources used by the access function
+        should be released.  If there is no access function then the
+        :cmember:`sipSimpleWrapper.data` is used as the address of the C/C++
+        instance.  Typically a custom meta-type is used to set an access method
+        after the Python object has been created.
+
     .. cmember:: PyObject *user
 
         This can be used for any purpose by handwritten code and will
@@ -1410,6 +1470,8 @@ specification files.
 
 .. ctype:: sipStringTypeClassMap
 
+    .. deprecated:: 4.8
+
     This C structure is used with :cfunc:`sipMapStringToClass()` to define a
     mapping between ``'\0'`` terminated string based RTTI and
     :ref:`ref-type-objects`.  The structure elements are as follows.
@@ -1421,9 +1483,6 @@ specification files.
     .. cmember:: sipWrapperType **pyType.
 
         A pointer to the corresponding generated type object.
-
-    .. note::
-        This is deprecated from SIP v4.8.
 
 
 .. cfunction:: void sipTransferBack(PyObject *obj)
@@ -1572,18 +1631,17 @@ specification files.
 
 .. cfunction:: int sipWrapper_Check(PyObject *obj)
 
+    .. deprecated:: 4.8
+        Use the following instead:
+
+            PyObject_TypeCheck(obj, sipWrapper_Type)
+
     This checks if a Python object is a wrapped instance.
 
     :param obj:
         the Python object.
     :return:
         a non-zero value if the Python object is a wrapped instance.
-
-    .. note::
-        This is deprecated from SIP v4.8.  Instead you should use the
-        following::
-
-            PyObject_TypeCheck(obj, sipWrapper_Type)
 
 
 .. cvar:: PyTypeObject *sipWrapper_Type
@@ -1636,6 +1694,10 @@ The type structures of all imported types are available to handwritten code.
 Generated Type Objects
 ----------------------
 
+.. deprecated:: 4.8
+    Use the corresponding generated type structure (see
+    :ref:`ref-type-structures`) and :cfunc:`sipTypeAsPyTypeObject()` instead.
+
 SIP generates a :ctype:`sipWrapperType` type object for each C structure or
 C++ class being wrapped.
 
@@ -1643,16 +1705,15 @@ These objects are named with the structure or class name prefixed by
 ``sipClass_``.  For example, the type object for class ``Klass`` is
 ``sipClass_Klass``.
 
-.. note::
-    Using these names is deprecated from SIP v4.8.  Instead use the
-    corresponding generated type structure (see :ref:`ref-type-structures`) and
-    :cfunc:`sipTypeAsPyTypeObject()`.
-
 
 .. _ref-enum-type-objects:
 
 Generated Named Enum Type Objects
 ---------------------------------
+
+.. deprecated:: 4.8
+    Use the corresponding generated type structure (see
+    :ref:`ref-type-structures`) and :cfunc:`sipTypeAsPyTypeObject()` instead.
 
 SIP generates a type object for each named enum being wrapped.  These are
 PyTypeObject structures.  (Anonymous enums are wrapped as Python integers.)
@@ -1660,11 +1721,6 @@ PyTypeObject structures.  (Anonymous enums are wrapped as Python integers.)
 These objects are named with the fully qualified enum name (i.e. including any
 enclosing scope) prefixed by ``sipEnum_``.  For example, the type object for
 enum ``Enum`` defined in class ``Klass`` is ``sipEnum_Klass_Enum``.
-
-.. note::
-    Using these names is deprecated from SIP v4.8.  Instead use the
-    corresponding generated type structure (see :ref:`ref-type-structures`) and
-    :cfunc:`sipTypeAsPyTypeObject()`.
 
 
 .. _ref-derived-classes:

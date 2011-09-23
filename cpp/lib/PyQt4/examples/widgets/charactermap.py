@@ -1,27 +1,46 @@
 #!/usr/bin/env python
 
+
 #############################################################################
 ##
-## Copyright (C) 2004-2005 Trolltech AS. All rights reserved.
+## Copyright (C) 2010 Riverbank Computing Limited.
+## Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+## All rights reserved.
 ##
-## This file is part of the example classes of the Qt Toolkit.
+## This file is part of the examples of PyQt.
 ##
-## This file may be used under the terms of the GNU General Public
-## License version 2.0 as published by the Free Software Foundation
-## and appearing in the file LICENSE.GPL included in the packaging of
-## this file.  Please review the following information to ensure GNU
-## General Public Licensing requirements will be met:
-## http://www.trolltech.com/products/qt/opensource.html
+## $QT_BEGIN_LICENSE:BSD$
+## You may use this file under the terms of the BSD license as follows:
 ##
-## If you are unsure which license is appropriate for your use, please
-## review the following information:
-## http://www.trolltech.com/products/qt/licensing.html or contact the
-## sales department at sales@trolltech.com.
+## "Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are
+## met:
+##   * Redistributions of source code must retain the above copyright
+##     notice, this list of conditions and the following disclaimer.
+##   * Redistributions in binary form must reproduce the above copyright
+##     notice, this list of conditions and the following disclaimer in
+##     the documentation and/or other materials provided with the
+##     distribution.
+##   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
+##     the names of its contributors may be used to endorse or promote
+##     products derived from this software without specific prior written
+##     permission.
 ##
-## This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-## WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+## $QT_END_LICENSE$
 ##
 #############################################################################
+
 
 # Using the QString v1 API is easier than using the v2 API and code that runs
 # under both Python v2.x and v3.x.
@@ -50,6 +69,13 @@ class CharacterWidget(QtGui.QWidget):
         self.adjustSize()
         self.update()
 
+    def updateSize(self, fontSize):
+        fontSize, _ = fontSize.toInt()
+        self.displayFont.setPointSize(fontSize)
+        self.squareSize = max(24, QtGui.QFontMetrics(self.displayFont).xHeight() * 3)
+        self.adjustSize()
+        self.update() 
+
     def updateStyle(self, fontStyle):
         fontDatabase = QtGui.QFontDatabase()
         oldStrategy = self.displayFont.styleStrategy()
@@ -74,7 +100,7 @@ class CharacterWidget(QtGui.QWidget):
 
     def mouseMoveEvent(self, event):
         widgetPosition = self.mapFromGlobal(event.globalPos())
-        key = (widgetPosition.y() / self.squareSize) * self.columns + widgetPosition.x() / self.squareSize
+        key = (widgetPosition.y() // self.squareSize) * self.columns + widgetPosition.x() // self.squareSize
 
         text = QtCore.QString.fromLatin1("<p>Character: <span style=\"font-size: 24pt; font-family: %1\">").arg(self.displayFont.family()) + \
                 QtCore.QChar(key) + \
@@ -84,7 +110,7 @@ class CharacterWidget(QtGui.QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            self.lastKey = (event.y() / self.squareSize) * self.columns + event.x() / self.squareSize
+            self.lastKey = (event.y() // self.squareSize) * self.columns + event.x() // self.squareSize
             if QtCore.QChar(self.lastKey).category() != QtCore.QChar.NoCategory:
                 self.characterSelected.emit(QtCore.QString(QtCore.QChar(self.lastKey)))
             self.update()
@@ -159,6 +185,7 @@ class MainWindow(QtGui.QMainWindow):
         self.fontCombo.currentFontChanged.connect(self.findStyles)
         self.fontCombo.activated[str].connect(self.characterWidget.updateFont)
         self.styleCombo.activated[str].connect(self.characterWidget.updateStyle)
+        self.sizeCombo.currentIndexChanged[str].connect(self.characterWidget.updateSize)
         self.characterWidget.characterSelected.connect(self.insertCharacter)
         clipboardButton.clicked.connect(self.updateClipboard)
 

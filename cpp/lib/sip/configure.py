@@ -1,6 +1,6 @@
 # This script handles the SIP configuration and generates the Makefiles.
 #
-# Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 #
 # This file is part of SIP.
 #
@@ -25,8 +25,8 @@ import siputils
 
 
 # Initialise the globals.
-sip_version = 0x040a02
-sip_version_str = "4.10.2"
+sip_version = 0x040c04
+sip_version_str = "4.12.4-snapshot-bbe43a0bad78"
 py_version = sys.hexversion >> 8
 plat_py_site_dir = None
 plat_py_inc_dir = None
@@ -36,6 +36,7 @@ plat_sip_dir = None
 plat_bin_dir = None
 platform_specs = []
 src_dir = os.path.dirname(os.path.abspath(__file__))
+sip_module_base = None
 
 # Constants.
 DEFAULT_MACOSX_ARCH = 'i386 ppc'
@@ -74,18 +75,18 @@ build_macro_names = [
     "DEL_FILE",
     "EXTENSION_SHLIB", "EXTENSION_PLUGIN",
     "INCDIR", "INCDIR_X11", "INCDIR_OPENGL",
-    "LIBS_CORE", "LIBS_GUI", "LIBS_NETWORK", "LIBS_OPENGL",
+    "LIBS_CORE", "LIBS_GUI", "LIBS_NETWORK", "LIBS_OPENGL", "LIBS_WEBKIT",
     "LINK", "LINK_SHLIB", "AIX_SHLIB", "LINK_SHLIB_CMD",
     "LFLAGS", "LFLAGS_CONSOLE", "LFLAGS_CONSOLE_DLL", "LFLAGS_DEBUG",
     "LFLAGS_DLL",
     "LFLAGS_PLUGIN", "LFLAGS_RELEASE", "LFLAGS_SHLIB", "LFLAGS_SONAME",
     "LFLAGS_THREAD", "LFLAGS_WINDOWS", "LFLAGS_WINDOWS_DLL", "LFLAGS_OPENGL",
     "LIBDIR", "LIBDIR_X11", "LIBDIR_OPENGL",
-    "LIBS", "LIBS_CONSOLE", "LIBS_OPENGL", "LIBS_OPENGL", "LIBS_RT",
+    "LIBS", "LIBS_CONSOLE", "LIBS_RT",
     "LIBS_RTMT", "LIBS_THREAD", "LIBS_WINDOWS", "LIBS_X11",
     "MAKEFILE_GENERATOR",
     "MKDIR",
-    "RPATH",
+    "RPATH", "LFLAGS_RPATH",
     "AR", "RANLIB", "LIB", "STRIP"
 ]
 
@@ -174,8 +175,8 @@ def inform_user():
     """Tell the user the option values that are going to be used.
     """
     siputils.inform("The SIP code generator will be installed in %s." % opts.sipbindir)
-    siputils.inform("The SIP module will be installed in %s." % opts.sipmoddir)
-    siputils.inform("The SIP header file will be installed in %s." % opts.sipincdir)
+    siputils.inform("The %s module will be installed in %s." % (sip_module_base, opts.sipmoddir))
+    siputils.inform("The sip.h header file will be installed in %s." % opts.sipincdir)
     siputils.inform("The default directory to install .sip files in is %s." % opts.sipsipdir)
     siputils.inform("The platform/compiler configuration is %s." % opts.platform)
 
@@ -184,6 +185,9 @@ def inform_user():
 
     if opts.universal:
         siputils.inform("MacOS/X universal binaries will be created using %s." % opts.universal)
+
+    if opts.deployment_target:
+        siputils.inform("MacOS/X deployment target is %s." % opts.deployment_target)
 
 
 def set_platform_directories():
@@ -208,6 +212,41 @@ def set_platform_directories():
         plat_py_lib_dir = lib_dir + "/config"
         plat_bin_dir = sys.exec_prefix + "/bin"
         plat_sip_dir = sys.prefix + "/share/sip"
+
+
+def patch_files():
+    """Patch any files that need it."""
+
+    patched = (
+        ("siplib", "sip.h"),
+        ("siplib", "siplib.c"),
+        ("siplib", "siplib.sbf")
+    )
+
+    # The siplib directory may not exist if we are building away from the
+    # source directory.
+    try:
+        os.mkdir("siplib")
+    except OSError:
+        pass
+
+    for f in patched:
+        dst_fn = os.path.join(*f)
+        src_fn = os.path.join(src_dir, dst_fn + ".in")
+
+        siputils.inform("Creating %s..." % dst_fn)
+
+        dst = open(dst_fn, "w")
+        src = open(src_fn)
+
+        for line in src:
+            line = line.replace("@CFG_MODULE_NAME@", opts.sip_module)
+            line = line.replace("@CFG_MODULE_BASENAME@", sip_module_base)
+
+            dst.write(line)
+
+        dst.close()
+        src.close()
 
 
 def create_config(module, template, macros):
@@ -236,7 +275,8 @@ def create_config(module, template, macros):
         "py_conf_inc_dir":  plat_py_conf_inc_dir,
         "py_lib_dir":       plat_py_lib_dir,
         "universal":        opts.universal,
-        "arch":             opts.arch
+        "arch":             opts.arch,
+        "deployment_target":    opts.deployment_target
     }
 
     siputils.create_config_module(module, template, content, macros)
@@ -274,7 +314,8 @@ def create_makefiles(macros):
         console=1,
         warnings=0,
         universal=opts.universal,
-        arch=opts.arch
+        arch=opts.arch,
+        deployment_target=opts.deployment_target
     ).generate()
 
     sipconfig.inform("Creating sip module Makefile...")
@@ -290,7 +331,8 @@ def create_makefiles(macros):
         static=opts.static,
         debug=opts.debug,
         universal=opts.universal,
-        arch=opts.arch
+        arch=opts.arch,
+        deployment_target=opts.deployment_target
     )
 
     makefile.generate()
@@ -314,6 +356,9 @@ def create_optparser():
             "[default: %s]" % default_platform)
     p.add_option("-u", "--debug", action="store_true", default=False,
             help="build with debugging symbols")
+    p.add_option("--sip-module", action="store", default="sip", type="string",
+            metavar="NAME", dest="sip_module", help="the package.module name "
+            "of the sip module [default: sip]")
 
     if sys.platform == 'darwin':
         # Get the latest SDK to use as the default.
@@ -328,6 +373,10 @@ def create_optparser():
         g.add_option("--arch", action="append", default=[], dest="arch",
                 choices=["i386", "x86_64", "ppc"],
                 help="build for architecture ARCH")
+        g.add_option("--deployment-target", action="store", default='',
+                metavar="VERSION", dest="deployment_target",
+                help="set the value of the MACOSX_DEPLOYMENT_TARGET "
+                        "environment variable in generated Makefiles")
         g.add_option("-n", "--universal", action="store_true", default=False,
                 dest="universal",
                 help="build the SIP code generator and module as universal "
@@ -401,6 +450,7 @@ def main(argv):
         opts.universal = ''
         opts.arch = []
         opts.sdk = ''
+        opts.deployment_target = ''
 
     # Handle the query options.
     if opts.show_platforms or opts.show_build_macros:
@@ -440,11 +490,25 @@ def main(argv):
             args)
 
     if macros is None:
-        p.print_help()
+        siputils.error("Unsupported macro name specified. Use the --show-build-macros flag to see a list of supported macros.")
         sys.exit(2)
+
+    # Fix the name of the sip module.
+    global sip_module_base
+
+    module_path = opts.sip_module.split(".")
+    sip_module_base = module_path[-1]
+
+    if len(module_path) > 1:
+        del module_path[-1]
+        module_path.insert(0, opts.sipmoddir)
+        opts.sipmoddir = os.path.join(*module_path)
 
     # Tell the user what's been found.
     inform_user()
+
+    # Patch any files that need it.
+    patch_files()
 
     # Install the configuration module.
     create_config("sipconfig.py", os.path.join(src_dir, "siputils.py"),

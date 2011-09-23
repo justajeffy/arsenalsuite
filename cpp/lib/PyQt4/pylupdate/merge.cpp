@@ -50,6 +50,7 @@ void merge( const MetaTranslator *tor, const MetaTranslator *virginTor, MetaTran
     TML all = tor->messages();
     TML::Iterator it;
     outTor->setLanguageCode(tor->languageCode());
+    outTor->setSourceLanguageCode(tor->sourceLanguageCode());
 
     /*
       The types of all the messages from the vernacular translator

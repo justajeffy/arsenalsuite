@@ -1,6 +1,6 @@
 // This contains the implementation of the pyqtBoundSignal type.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -38,6 +33,7 @@
 #include "qpycore_misc.h"
 #include "qpycore_pyqtboundsignal.h"
 #include "qpycore_pyqtproxy.h"
+#include "qpycore_pyqtpyobject.h"
 #include "qpycore_pyqtsignal.h"
 #include "qpycore_sip.h"
 #include "qpycore_sip_helpers.h"
@@ -64,6 +60,12 @@ static PyObject *disconnect(qpycore_pyqtBoundSignal *bs, QObject *qrx,
         const char *slot);
 static QObject *get_receiver(Chimera::Signature *overload, PyObject *slot_obj,
         QByteArray &name);
+static QByteArray slot_signature_from_decorations(Chimera::Signature *signal,
+        PyObject *decorations, int nr_args);
+static QByteArray slot_signature_from_metaobject(Chimera::Signature *signal,
+        const QMetaObject *slot_mo, const QByteArray &slot_name, int nr_args);
+static QByteArray slot_signature(Chimera::Signature *signal,
+        const QByteArray &slot_name, int nr_args);
 
 
 // Doc-strings.
@@ -153,7 +155,7 @@ PyTypeObject qpycore_pyqtBoundSignal_Type = {
     0,                      /* tp_dictoffset */
     0,                      /* tp_init */
     0,                      /* tp_alloc */
-    0,                      /* tp_new */
+    PyType_GenericNew,      /* tp_new */
     0,                      /* tp_free */
     0,                      /* tp_is_gc */
     0,                      /* tp_bases */
@@ -181,9 +183,8 @@ static PyObject *pyqtBoundSignal_get_doc(PyObject *self, void *)
 static PyObject *pyqtBoundSignal_repr(PyObject *self)
 {
     qpycore_pyqtBoundSignal *bs = (qpycore_pyqtBoundSignal *)self;
-    qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)bs->unbound_signal;
 
-    QByteArray name = Chimera::Signature::name(ps->overloads->first()->signature);
+    QByteArray name = Chimera::Signature::name(bs->bound_overload->signature);
 
     return
 #if PY_MAJOR_VERSION >= 3
@@ -220,8 +221,7 @@ static void pyqtBoundSignal_dealloc(PyObject *self)
 
 // Create a bound signal.
 PyObject *qpycore_pyqtBoundSignal_New(PyObject *unbound_signal,
-        PyObject *bound_pyobject, QObject *bound_qobject,
-        Chimera::Signature *bound_overload)
+        PyObject *bound_pyobject, QObject *bound_qobject, int signal_index)
 {
     qpycore_pyqtBoundSignal *bs = (qpycore_pyqtBoundSignal *)PyType_GenericAlloc(&qpycore_pyqtBoundSignal_Type, 0);
 
@@ -232,7 +232,7 @@ PyObject *qpycore_pyqtBoundSignal_New(PyObject *unbound_signal,
 
         bs->bound_pyobject = bound_pyobject;
         bs->bound_qobject = bound_qobject;
-        bs->bound_overload = bound_overload;
+        bs->bound_overload = ((qpycore_pyqtSignal *)unbound_signal)->overloads->at(signal_index);
     }
 
     return (PyObject *)bs;
@@ -245,62 +245,15 @@ static PyObject *pyqtBoundSignal_mp_subscript(PyObject *self,
 {
     qpycore_pyqtBoundSignal *bs = (qpycore_pyqtBoundSignal *)self;
 
-    // Make sure the subscript is a tuple.
-    PyObject *args;
+    int idx = qpycore_signal_index((qpycore_pyqtSignal *)bs->unbound_signal,
+            subscript, "a bound signal type argument");
 
-    if (PyTuple_Check(subscript))
-    {
-        args = subscript;
-    }
-    else
-    {
-        args = PyTuple_New(1);
-
-        if (!args)
-            return 0;
-
-        PyTuple_SET_ITEM(args, 0, subscript);
-    }
-
-    Py_INCREF(subscript);
-
-    // Parse the subscript as a tuple of types.
-    Chimera::Signature *ss_signature = Chimera::parse(args, 0,
-            "a bound signal type argument");
-
-    Py_DECREF(args);
-
-    if (!ss_signature)
+    if (idx < 0)
         return 0;
-
-    // Search for an overload with this signature.
-    Chimera::Signature *new_overload = 0;
-    qpycore_pyqtSignal *unbound_signal = (qpycore_pyqtSignal *)bs->unbound_signal;
-
-    for (int i = 0; i < unbound_signal->overloads->size(); ++i)
-    {
-        Chimera::Signature *oload = unbound_signal->overloads->at(i);
-
-        if (oload->arguments() == ss_signature->signature)
-        {
-            new_overload = oload;
-            break;
-        }
-    }
-
-    delete ss_signature;
-
-    if (!new_overload)
-    {
-        PyErr_SetString(PyExc_KeyError,
-                "there is no matching overloaded signal");
-
-        return 0;
-    }
 
     // Create a new bound signal.
-    return qpycore_pyqtBoundSignal_New((PyObject *)unbound_signal,
-            bs->bound_pyobject, bs->bound_qobject, new_overload);
+    return qpycore_pyqtBoundSignal_New(bs->unbound_signal, bs->bound_pyobject,
+            bs->bound_qobject, idx);
 }
 
 
@@ -376,6 +329,9 @@ static PyObject *pyqtBoundSignal_connect(PyObject *self, PyObject *args,
     QByteArray rx_name;
     QObject *rx_qobj = get_receiver(bs->bound_overload, slot_obj, rx_name);
 
+    if (PyErr_Occurred())
+        return 0;
+
     if (!rx_name.isEmpty())
         return connect(bs, rx_qobj, rx_name.constData(), type);
 
@@ -411,13 +367,20 @@ static PyObject *pyqtBoundSignal_connect(PyObject *self, PyObject *args,
 static PyObject *connect(qpycore_pyqtBoundSignal *bs, QObject *qrx,
         const char *slot, Qt::ConnectionType type)
 {
-    if (!QObject::connect(bs->bound_qobject, bs->bound_overload->signature.constData(), qrx, slot, type))
+    bool ok;
+
+    Py_BEGIN_ALLOW_THREADS
+    ok = QObject::connect(bs->bound_qobject,
+            bs->bound_overload->signature.constData(), qrx, slot, type);
+    Py_END_ALLOW_THREADS
+
+    if (!ok)
     {
-        QByteArray tx_name = bs->bound_overload->name();
         QByteArray rx_name = Chimera::Signature::name(slot);
 
-        PyErr_Format(PyExc_TypeError, "connect() failed between '%s' and '%s'",
-                tx_name.constData() + 1, rx_name.constData() + 1);
+        PyErr_Format(PyExc_TypeError, "connect() failed between %s and %s()",
+                bs->bound_overload->py_signature.constData(),
+                rx_name.constData() + 1);
 
         return 0;
     }
@@ -475,6 +438,9 @@ static PyObject *pyqtBoundSignal_disconnect(PyObject *self, PyObject *args)
     QByteArray rx_name;
     QObject *rx_qobj = get_receiver(bs->bound_overload, slot_obj, rx_name);
 
+    if (PyErr_Occurred())
+        return 0;
+
     if (!rx_name.isEmpty())
         return disconnect(bs, rx_qobj, rx_name.constData());
 
@@ -502,7 +468,14 @@ static PyObject *pyqtBoundSignal_disconnect(PyObject *self, PyObject *args)
 static PyObject *disconnect(qpycore_pyqtBoundSignal *bs, QObject *qrx,
         const char *slot)
 {
-    if (!QObject::disconnect(bs->bound_qobject, bs->bound_overload->signature.constData(), qrx, slot))
+    bool ok;
+
+    Py_BEGIN_ALLOW_THREADS
+    ok = QObject::disconnect(bs->bound_qobject,
+            bs->bound_overload->signature.constData(), qrx, slot);
+    Py_END_ALLOW_THREADS
+
+    if (!ok)
     {
         QByteArray tx_name = bs->bound_overload->name();
 
@@ -550,13 +523,16 @@ static PyObject *pyqtBoundSignal_emit(PyObject *self, PyObject *args)
 
 
 // Get the receiver QObject from the slot (if there is one) and its signature
-// (if it wraps a Qt slot).
+// (if it wraps a Qt slot).  A Python exception will be raised if there was an
+// error.
 static QObject *get_receiver(Chimera::Signature *overload, PyObject *slot_obj,
         QByteArray &name)
 {
-    PyObject *rx_self;
+    PyObject *rx_self, *decorations;
     QByteArray rx_name;
-    QObject *rx_qobj = 0;
+    bool try_qt_slot;
+
+    decorations = 0;
 
     if (PyMethod_Check(slot_obj))
     {
@@ -565,53 +541,84 @@ static QObject *get_receiver(Chimera::Signature *overload, PyObject *slot_obj,
         PyObject *f = PyMethod_GET_FUNCTION(slot_obj);
         Q_ASSERT(PyFunction_Check(f));
 
-        PyObject *f_name_obj = ((PyFunctionObject*)f)->func_name;
+        PyObject *f_name_obj = ((PyFunctionObject *)f)->func_name;
         const char *f_name = sipString_AsASCIIString(&f_name_obj);
         Q_ASSERT(f_name);
 
         rx_name = f_name;
         Py_DECREF(f_name_obj);
+
+        // See if this has been decorated.
+        decorations = PyObject_GetAttr(f, qpycore_signature_attr_name);
+
+        if (decorations)
+        {
+            try_qt_slot = true;
+
+            // It's convenient to do this here as it's not going to disappear.
+            Py_DECREF(decorations);
+        }
+        else
+        {
+            try_qt_slot = false;
+        }
     }
     else if (PyCFunction_Check(slot_obj))
     {
         rx_self = PyCFunction_GET_SELF(slot_obj);
-
         rx_name = ((PyCFunctionObject *)slot_obj)->m_ml->ml_name;
+
+        // We actually want the C++ name which may (in theory) be completely
+        // different.  However this will cope with the exec_ case which is
+        // probably good enough.
+        if (rx_name.endsWith('_'))
+            rx_name.chop(1);
+
+        try_qt_slot = true;
     }
     else
     {
         rx_self = 0;
     }
+ 
+    if (!rx_self)
+        return 0;
 
-    if (rx_self)
+    int iserr = 0;
+    void *rx = sipForceConvertToType(rx_self, sipType_QObject, 0,
+            SIP_NO_CONVERTORS, 0, &iserr);
+
+    PyErr_Clear();
+
+    if (iserr)
+        return 0;
+
+    QObject *rx_qobj = reinterpret_cast<QObject *>(rx);
+
+    // If there might be a Qt slot that can handle the arguments (or a subset
+    // of them) then use it.  Otherwise we will fallback to using a proxy.
+    if (try_qt_slot)
     {
-        int iserr = 0;
-        void *rx = sipForceConvertToType(rx_self, sipType_QObject, 0,
-                SIP_NO_CONVERTORS, 0, &iserr);
-
-        if (!iserr)
+        for (int ol = overload->parsed_arguments.count(); ol >= 0; --ol)
         {
-            rx_qobj = reinterpret_cast<QObject *>(rx);
+            // If there are decorations then we compare the signal's signature
+            // against them so that we distinguish between Python types that
+            // are passed to Qt as PyQt_PyObject objects.  Qt will not make the
+            // distinction.  If there are no decorations then let Qt determine
+            // if a slot is available.
+            if (decorations)
+                name = slot_signature_from_decorations(overload, decorations,
+                        ol);
+            else
+                name = slot_signature_from_metaobject(overload,
+                        rx_qobj->metaObject(), rx_name, ol);
 
-            // Build the normalised signature that a Qt slot would have.  Note
-            // that this won't work if the slot is valid but has fewer
-            // arguments.
-            name = rx_name;
-            name.append(overload->arguments());
-
-            if (rx_qobj->metaObject()->indexOfSlot(name.constData()) >= 0)
+            if (!name.isEmpty())
             {
                 // Prepend the magic slot marker.
                 name.prepend('1');
+                break;
             }
-            else
-            {
-                name.clear();
-            }
-        }
-        else
-        {
-            PyErr_Clear();
         }
     }
 
@@ -619,20 +626,133 @@ static QObject *get_receiver(Chimera::Signature *overload, PyObject *slot_obj,
 }
 
 
-// Check that an object is a bound signal and return the bound QObject and the
-// signal signature.
-bool qpycore_pyqtsignal_get_parts(PyObject *sig_obj, QObject **qtx,
-        const char **sig)
+// Return the full name and signature of a Qt slot that a signal can be
+// connected to, taking the slot decorators into account.
+static QByteArray slot_signature_from_decorations(Chimera::Signature *signal,
+        PyObject *decorations, int nr_args)
 {
-    qpycore_pyqtBoundSignal *bs;
+    for (SIP_SSIZE_T i = 0; i < PyList_GET_SIZE(decorations); ++i)
+    {
+        Chimera::Signature *slot = Chimera::Signature::fromPyObject(
+                PyList_GET_ITEM(decorations, i));
 
-    if (!PyObject_TypeCheck(sig_obj, &qpycore_pyqtBoundSignal_Type))
-        return false;
+        if (slot->parsed_arguments.count() != nr_args)
+            continue;
 
-    bs = (qpycore_pyqtBoundSignal *)sig_obj;
+        int a;
 
-    *qtx = bs->bound_qobject;
-    *sig = bs->bound_overload->signature.constData();
+        for (a = 0; a < nr_args; ++a)
+        {
+            const Chimera *sig_arg = signal->parsed_arguments.at(a);
+            const Chimera *slot_arg = slot->parsed_arguments.at(a);
 
-    return true;
+            // The same type names must be compatible.
+            if (sig_arg->name() == slot_arg->name())
+                continue;
+
+            enum Match {
+                // The type is PyQt_PyObject because it was explicitly
+                // specified as such as a string.
+                MatchesAll,
+
+                // The type is PyQt_PyObject because it was specified as a type
+                // object that needed wrapping.
+                MatchesPyType,
+
+                // The type is something other than PyQt_PyObject.
+                MatchesName
+            };
+
+            Match sig_match, slot_match;
+
+            if (sig_arg->name() != "PyQt_PyObject")
+                sig_match = MatchesName;
+            else
+                sig_match = sig_arg->py_type() ? MatchesPyType : MatchesAll;
+
+            if (slot_arg->name() != "PyQt_PyObject")
+                slot_match = MatchesName;
+            else
+                slot_match = slot_arg->py_type() ? MatchesPyType : MatchesAll;
+
+            // They are incompatible unless one is called PyQt_PyObject.
+            if (sig_match == MatchesName || slot_match == MatchesName)
+                break;
+
+            // They are compatible if neither was a Python type.
+            if (sig_match == MatchesAll || slot_match == MatchesAll)
+                continue;
+
+            // The signal type can be a sub-type of the slot type.
+            if (!PyType_IsSubtype((PyTypeObject *)sig_arg->py_type(), (PyTypeObject *)slot_arg->py_type()))
+                break;
+        }
+
+        if (a == nr_args)
+            return slot_signature(signal, slot->name(), nr_args);
+    }
+
+    return QByteArray();
+}
+
+
+// Return the full name and signature of a Qt slot that a signal can be
+// connected to, taking the Qt meta-object into account.
+static QByteArray slot_signature_from_metaobject(Chimera::Signature *signal,
+        const QMetaObject *slot_mo, const QByteArray &slot_name, int nr_args)
+{
+    QByteArray slot_sig = slot_signature(signal, slot_name, nr_args);
+
+    if (slot_mo->indexOfSlot(slot_sig.constData()) < 0)
+        slot_sig.clear();
+
+    return slot_sig;
+}
+
+
+// Return the full name and signature of the Qt slot that a signal would be
+// connected to.
+static QByteArray slot_signature(Chimera::Signature *signal,
+        const QByteArray &slot_name, int nr_args)
+{
+    QByteArray slot_sig = slot_name;
+
+    slot_sig.append('(');
+
+    for (int a = 0; a < nr_args; ++a)
+    {
+        if (a != 0)
+            slot_sig.append(',');
+
+        slot_sig.append(signal->parsed_arguments.at(a)->name());
+    }
+
+    slot_sig.append(')');
+
+    return slot_sig;
+}
+
+
+// Check that an object is a signal and return the bound QObject (if requested)
+// and the signal signature.
+const char *qpycore_pyqtsignal_get_parts(PyObject *sig_obj, QObject **qtx)
+{
+    if (PyObject_TypeCheck(sig_obj, &qpycore_pyqtBoundSignal_Type))
+    {
+        qpycore_pyqtBoundSignal *bs = (qpycore_pyqtBoundSignal *)sig_obj;
+
+        if (qtx)
+            *qtx = bs->bound_qobject;
+
+        return bs->bound_overload->signature.constData();
+    }
+
+    if (PyObject_TypeCheck(sig_obj, &qpycore_pyqtSignal_Type) && !qtx)
+    {
+        qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)sig_obj;
+
+        return ps->overloads->at(ps->master_index)->signature.constData();
+    }
+
+    return 0;
 }

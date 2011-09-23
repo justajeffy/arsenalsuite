@@ -1,6 +1,6 @@
 // This implements the helper for QObject.pyqtConfigure().
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -45,6 +40,7 @@ int qpycore_pyqtconfigure(PyObject *self, QObject *qobj, PyObject *kwds)
     PyObject *name_obj, *value_obj;
     SIP_SSIZE_T pos = 0;
     const QMetaObject *mo = qobj->metaObject();
+    QByteArray unknown_name;
 
     while (PyDict_Next(kwds, &pos, &name_obj, &value_obj))
     {
@@ -131,13 +127,21 @@ int qpycore_pyqtconfigure(PyObject *self, QObject *qobj, PyObject *kwds)
             }
 
             if (unknown)
-            {
-                PyErr_Format(PyExc_AttributeError,
-                        "'%s' is not a Qt property or a signal",
-                        enc_name.constData());
-                return -1;
-            }
+                // Remember there is an exception but carry on with the
+                // remaining names.  This supports the use case where a name
+                // might not be valid in a particular context, but isn't a
+                // problem.
+                unknown_name = enc_name;
         }
+    }
+
+    if (!unknown_name.isEmpty())
+    {
+        PyErr_Format(PyExc_AttributeError,
+                "'%s' is not a Qt property or a signal",
+                unknown_name.constData());
+
+        return -1;
     }
 
     return 0;

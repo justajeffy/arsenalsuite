@@ -2,7 +2,7 @@
 # extension modules created with SIP.  It provides information about file
 # locations, version numbers etc., and provides some classes and functions.
 #
-# Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 #
 # This file is part of SIP.
 #
@@ -202,7 +202,7 @@ class Makefile:
     def __init__(self, configuration, console=0, qt=0, opengl=0, python=0,
                  threaded=0, warnings=1, debug=0, dir=None,
                  makefile="Makefile", installs=None, universal=None,
-                 arch=None):
+                 arch=None, deployment_target=None):
         """Initialise an instance of the target.  All the macros are left
         unchanged allowing scripts to manipulate them at will.
 
@@ -228,6 +228,8 @@ class Makefile:
         binary.  If it is None then the value is taken from the configuration.
         arch is the space separated MacOS/X architectures to build.  If it is
         None then it is taken from the configuration.
+        deployment_target MacOS/X deployment target.  If it is None then it is
+        taken from the configuration.
         """
         if qt:
             if not hasattr(configuration, "qt_version"):
@@ -273,6 +275,11 @@ class Makefile:
             self._arch = configuration.arch
         else:
             self._arch = arch
+
+        if deployment_target is None:
+            self._deployment_target = configuration.deployment_target
+        else:
+            self._deployment_target = deployment_target
 
         self._finalised = 0
 
@@ -449,7 +456,7 @@ class Makefile:
 
                 libs.append(self.platform_lib(py_lib))
 
-        if self.generator in ("MSVC", "MSVC.NET", "BMAKE"):
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD", "BMAKE"):
             if win_exceptions:
                 cflags_exceptions = "CFLAGS_EXCEPTIONS_ON"
                 cxxflags_exceptions = "CXXFLAGS_EXCEPTIONS_ON"
@@ -503,7 +510,7 @@ class Makefile:
             cxxflags_debug = "CXXFLAGS_RELEASE"
             lflags_debug = "LFLAGS_RELEASE"
 
-        if self.generator in ("MSVC", "MSVC.NET", "BMAKE"):
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD", "BMAKE"):
             if self._threaded:
                 cflags.extend(self.optional_list(cflags_mt))
                 cxxflags.extend(self.optional_list(cxxflags_mt))
@@ -543,6 +550,8 @@ class Makefile:
                     # Note that qmake doesn't define anything for QtHelp.
                     if mod == "QtCore":
                         defines.append("QT_CORE_LIB")
+                    elif mod == "QtDeclarative":
+                        defines.append("QT_DECLARATIVE_LIB")
                     elif mod == "QtGui":
                         defines.append("QT_GUI_LIB")
                     elif mod == "QtMultimedia":
@@ -582,12 +591,14 @@ class Makefile:
                     "QtCore":       "LIBS_CORE",
                     "QtGui":        "LIBS_GUI",
                     "QtNetwork":    "LIBS_NETWORK",
-                    "QtOpenGL":     "LIBS_OPENGL"
+                    "QtOpenGL":     "LIBS_OPENGL",
+                    "QtWebKit":     "LIBS_WEBKIT"
                 }
 
                 # For Windows: the dependencies between Qt libraries.
                 qdepmap = {
                     "QtAssistant":      ("QtNetwork", "QtGui", "QtCore"),
+                    "QtDeclarative":    ("QtNetwork", "QtGui", "QtCore"),
                     "QtGui":            ("QtCore", ),
                     "QtHelp":           ("QtSql", "QtGui", "QtCore"),
                     "QtMultimedia":     ("QtGui", "QtCore"),
@@ -655,7 +666,7 @@ class Makefile:
                 # Windows needs the version number appended if Qt is a DLL.
                 qt_lib = self.config.qt_lib
 
-                if self.generator in ("MSVC", "MSVC.NET", "BMAKE") and win_shared:
+                if self.generator in ("MSVC", "MSVC.NET", "MSBUILD", "BMAKE") and win_shared:
                     qt_lib = qt_lib + version_to_string(self.config.qt_version).replace(".", "")
 
                     if self.config.qt_edition == "non-commercial":
@@ -702,7 +713,7 @@ class Makefile:
             libs.extend(self.optional_list("LIBS_OPENGL"))
 
         if self._qt or self._opengl:
-            if self.config.qt_version < 0x040000 or "QtGui" in self._qt:
+            if self.config.qt_version < 0x040000 or self._opengl or "QtGui" in self._qt:
                 incdir.extend(self.optional_list("INCDIR_X11"))
                 libdir.extend(self.optional_list("LIBDIR_X11"))
                 libs.extend(self.optional_list("LIBS_X11"))
@@ -766,10 +777,11 @@ class Makefile:
                 lib = lib + "_debug"
 
         if sys.platform == "win32" and "shared" in self.config.qt_winconfig.split():
-            if (mname in ("QtCore", "QtDesigner", "QtGui", "QtHelp",
-                          "QtMultimedia", "QtNetwork", "QtOpenGL", "QtScript",
-                          "QtScriptTools", "QtSql", "QtSvg", "QtTest",
-                          "QtWebKit", "QtXml", "QtXmlPatterns", "phonon") or
+            if (mname in ("QtCore", "QtDeclarative", "QtDesigner", "QtGui",
+                          "QtHelp", "QtMultimedia", "QtNetwork", "QtOpenGL",
+                          "QtScript", "QtScriptTools", "QtSql", "QtSvg",
+                          "QtTest", "QtWebKit", "QtXml", "QtXmlPatterns",
+                          "phonon") or
                 (self.config.qt_version >= 0x040200 and mname == "QtAssistant")):
                 lib = lib + "4"
 
@@ -815,7 +827,11 @@ class Makefile:
         flags = []
         prefix = self.optional_string("RPATH")
 
-        if prefix:
+        if prefix == "":
+            # This was renamed in Qt v4.7.
+            prefix = self.optional_string("LFLAGS_RPATH")
+
+        if prefix != "":
             for r in rpaths:
                 flags.append(_quote(prefix + r))
 
@@ -827,7 +843,7 @@ class Makefile:
         clib is the library name in cannonical form.
         framework is set of the library is implemented as a MacOS framework.
         """
-        if self.generator in ("MSVC", "MSVC.NET", "BMAKE"):
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD", "BMAKE"):
             plib = clib + ".lib"
         elif sys.platform == "darwin" and framework:
             plib = "-framework " + clib
@@ -845,7 +861,7 @@ class Makefile:
         """
         prl_libs = []
 
-        if self.generator in ("MSVC", "MSVC.NET", "BMAKE"):
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD", "BMAKE"):
             prl_name = os.path.join(self.config.qt_lib_dir, clib + ".prl")
         elif sys.platform == "darwin" and framework:
             prl_name = os.path.join(self.config.qt_lib_dir, clib + ".framework", clib + ".prl")
@@ -933,7 +949,7 @@ class Makefile:
                 bdict[i] = ""
 
         # Generate the list of objects.
-        if self.generator in ("MSVC", "MSVC.NET", "BMAKE"):
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD", "BMAKE"):
             ext = ".obj"
         else:
             ext = ".o"
@@ -1014,6 +1030,9 @@ class Makefile:
 
         mfile is the file object.
         """
+        if self._deployment_target:
+            mfile.write("export MACOSX_DEPLOYMENT_TARGET = %s\n" % self._deployment_target)
+
         mfile.write("CC = %s\n" % self.required_string("CC"))
         mfile.write("CXX = %s\n" % self.required_string("CXX"))
         mfile.write("LINK = %s\n" % self.required_string("LINK"))
@@ -1031,7 +1050,7 @@ class Makefile:
 
         libs = []
 
-        if self.generator in ("MSVC", "MSVC.NET"):
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD"):
             libdir_prefix = "/LIBPATH:"
         else:
             libdir_prefix = "-L"
@@ -1068,7 +1087,7 @@ class Makefile:
         else:
             mfile.write(".SUFFIXES: .c .cpp .cc .cxx .C\n\n")
 
-        if self.generator in ("MSVC", "MSVC.NET"):
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD"):
             mfile.write("""
 {.}.cpp{}.obj::
 \t$(CXX) -c $(CXXFLAGS) $(CPPFLAGS) -Fo @<<
@@ -1128,10 +1147,6 @@ class Makefile:
 
 .c.o:
 \t$(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
-
-%.c: %.y
-
-%.c: %.l
 """)
 
     def generate_target_default(self, mfile):
@@ -1165,8 +1180,8 @@ class Makefile:
         strip is set if the files should be stripped after been installed.
         """
         # Help package builders.
-        #if self.generator == "UNIX":
-        #    dst = "$(DESTDIR)" + dst
+        if self.generator == "UNIX":
+            dst = "$(DESTDIR)" + dst
 
         mfile.write("\t@%s %s " % (self.chkdir, _quote(dst)))
 
@@ -1326,7 +1341,8 @@ class ModuleMakefile(Makefile):
     def __init__(self, configuration, build_file, install_dir=None, static=0,
                  console=0, qt=0, opengl=0, threaded=0, warnings=1, debug=0,
                  dir=None, makefile="Makefile", installs=None, strip=1,
-                 export_all=0, universal=None, arch=None):
+                 export_all=0, universal=None, arch=None,
+                 deployment_target=None):
         """Initialise an instance of a module Makefile.
 
         build_file is the file containing the target specific information.  If
@@ -1340,7 +1356,7 @@ class ModuleMakefile(Makefile):
         increases the size of the module and slows down module load times but
         may avoid problems with modules that use exceptions.  The default is 0.
         """
-        Makefile.__init__(self, configuration, console, qt, opengl, 1, threaded, warnings, debug, dir, makefile, installs, universal, arch)
+        Makefile.__init__(self, configuration, console, qt, opengl, 1, threaded, warnings, debug, dir, makefile, installs, universal, arch, deployment_target)
 
         self._build = self.parse_build_file(build_file)
         self._install_dir = install_dir
@@ -1514,7 +1530,7 @@ class ModuleMakefile(Makefile):
         mfile.write("\n")
 
         if self.static:
-            if self.generator in ("MSVC", "MSVC.NET", "BMAKE"):
+            if self.generator in ("MSVC", "MSVC.NET", "MSBUILD", "BMAKE"):
                 mfile.write("LIB = %s\n" % self.required_string("LIB"))
             elif self.generator == "MINGW":
                 mfile.write("AR = %s\n" % self.required_string("LIB"))
@@ -1550,6 +1566,7 @@ class ModuleMakefile(Makefile):
 
         if self.generator in ("MSVC", "MSVC.NET"):
             implib = 'py' + self._target + '.lib'
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD"):
             if self.static:
                 mfile.write("\t$(LIB) /OUT:$(TARGET) @<<\n")
                 mfile.write("\t  $(OFILES)\n")
@@ -1643,7 +1660,8 @@ class SIPModuleMakefile(ModuleMakefile):
     def __init__(self, configuration, build_file, install_dir=None, static=0,
                  console=0, qt=0, opengl=0, threaded=0, warnings=1, debug=0,
                  dir=None, makefile="Makefile", installs=None, strip=1,
-                 export_all=0, universal=None, arch=None, prot_is_public=0):
+                 export_all=0, universal=None, arch=None, prot_is_public=0,
+                 deployment_target=None):
         """Initialise an instance of a SIP generated module Makefile.
 
         prot_is_public is set if "protected" is to be redefined as "public".
@@ -1654,7 +1672,8 @@ class SIPModuleMakefile(ModuleMakefile):
         """
         ModuleMakefile.__init__(self, configuration, build_file, install_dir,
                 static, console, qt, opengl, threaded, warnings, debug, dir,
-                makefile, installs, strip, export_all, universal, arch)
+                makefile, installs, strip, export_all, universal, arch,
+                deployment_target)
 
         self._prot_is_public = prot_is_public
 
@@ -1676,14 +1695,14 @@ class ProgramMakefile(Makefile):
     def __init__(self, configuration, build_file=None, install_dir=None,
                  console=0, qt=0, opengl=0, python=0, threaded=0, warnings=1,
                  debug=0, dir=None, makefile="Makefile", installs=None,
-                 universal=None, arch=None):
+                 universal=None, arch=None, deployment_target=None):
         """Initialise an instance of a program Makefile.
 
         build_file is the file containing the target specific information.  If
         it is a dictionary instead then its contents are validated.
         install_dir is the directory the target will be installed in.
         """
-        Makefile.__init__(self, configuration, console, qt, opengl, python, threaded, warnings, debug, dir, makefile, installs, universal, arch)
+        Makefile.__init__(self, configuration, console, qt, opengl, python, threaded, warnings, debug, dir, makefile, installs, universal, arch, deployment_target)
 
         self._install_dir = install_dir
 
@@ -1731,7 +1750,7 @@ class ProgramMakefile(Makefile):
         if self.generator != "BMAKE":
             build.append(source)
 
-        if self.generator in ("MSVC", "MSVC.NET"):
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD"):
             build.append("-Fe")
             build.append("/link")
             libdir_prefix = "/LIBPATH:"
@@ -1784,7 +1803,7 @@ class ProgramMakefile(Makefile):
     def finalise(self):
         """Finalise the macros for a program Makefile.
         """
-        if self.generator in ("MSVC", "MSVC.NET"):
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD"):
             self.LFLAGS.append("/INCREMENTAL:NO")
 
         if self._manifest:
@@ -1841,7 +1860,7 @@ class ProgramMakefile(Makefile):
 
         mfile.write("\n$(TARGET): $(OFILES)\n")
 
-        if self.generator in ("MSVC", "MSVC.NET"):
+        if self.generator in ("MSVC", "MSVC.NET", "MSBUILD"):
             mfile.write("\t$(LINK) $(LFLAGS) /OUT:$(TARGET) @<<\n")
             mfile.write("\t  $(OFILES) $(LIBS)\n")
             mfile.write("<<\n")
@@ -2304,8 +2323,10 @@ def parse_build_macros(filename, names, overrides=None, properties=None):
         if line and line[0] != "#":
             assstart = line.find("+")
             if assstart > 0 and line[assstart + 1] == '=':
+                adding = True
                 assend = assstart + 1
             else:
+                adding = False
                 assstart = line.find("=")
                 assend = assstart
 
@@ -2315,6 +2336,11 @@ def parse_build_macros(filename, names, overrides=None, properties=None):
 
                 # Remove the escapes for any quotes.
                 rhs = rhs.replace(r'\"', '"').replace(r"\'", "'")
+
+                if adding and rhs != "":
+                    orig_rhs = raw.get(lhs)
+                    if orig_rhs is not None:
+                        rhs = orig_rhs + " " + rhs
 
                 raw[lhs] = rhs
 

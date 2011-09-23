@@ -1,6 +1,6 @@
 // This is the implementation of the Chimera class.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -38,6 +33,7 @@
 #include "qpycore_chimera.h"
 #include "qpycore_misc.h"
 #include "qpycore_pyqtpyobject.h"
+#include "qpycore_qpynullvariant.h"
 #include "qpycore_sip.h"
 #include "qpycore_types.h"
 
@@ -52,14 +48,31 @@ QHash<QByteArray, QList<const Chimera *> > Chimera::_previously_parsed;
 
 // Construct an invalid type.
 Chimera::Chimera()
-    : _type(0), _metatype(QMetaType::Void), _inexact(false), _is_flag(false)
+    : _type(0), _py_type(0), _metatype(QMetaType::Void), _inexact(false),
+      _is_flag(false)
 {
+}
+
+
+// Construct a copy.
+Chimera::Chimera(const Chimera &other)
+{
+    _type = other._type;
+
+    _py_type = other._py_type;
+    Py_XINCREF(_py_type);
+    
+    _metatype = other._metatype;
+    _inexact = other._inexact;
+    _is_flag = other._is_flag;
+    _name = other._name;
 }
 
 
 // Destroy the type.
 Chimera::~Chimera()
 {
+    Py_XDECREF(_py_type);
 }
 
 
@@ -105,6 +118,21 @@ const Chimera *Chimera::parse(PyObject *obj)
     }
 
     if (!parse_ok)
+    {
+        delete ct;
+        return 0;
+    }
+
+    return ct;
+}
+
+
+// Parse a C++ type name as a type.
+const Chimera *Chimera::parse(const QByteArray &name)
+{
+    Chimera *ct = new Chimera;
+
+    if (!ct->parse_cpp_type(name))
     {
         delete ct;
         return 0;
@@ -162,25 +190,63 @@ Chimera::Signature *Chimera::parse(const QByteArray &sig, const char *context)
 
         if (parsed_args.isEmpty())
         {
-            QList<QByteArray> args = args_str.split(',');
+            int i, arg_start, template_level;
 
-            for (QList<QByteArray>::const_iterator it = args.constBegin(); it != args.constEnd(); ++it)
+            i = arg_start = template_level = 0;
+
+            // Extract each argument allowing for commas in templates.
+            for (;;)
             {
-                Chimera *ct = new Chimera;
+                char ch = (i < args_str.size() ? args_str.at(i) : '\0');
+                QByteArray arg;
 
-                if (!ct->parse_cpp_type(*it))
+                switch (ch)
                 {
-                    delete ct;
-                    delete parsed_sig;
-                    qDeleteAll(parsed_args.constBegin(),
-                            parsed_args.constEnd());
+                case '<':
+                    ++template_level;
+                    break;
 
-                    raiseParseException(it->constData(), context);
+                case '>':
+                    --template_level;
+                    break;
 
-                    return 0;
+                case '\0':
+                    arg = args_str.mid(arg_start, i - arg_start);
+                    break;
+
+                case ',':
+                    if (template_level == 0)
+                    {
+                        arg = args_str.mid(arg_start, i - arg_start);
+                        arg_start = i + 1;
+                    }
+
+                    break;
                 }
 
-                parsed_args.append(ct);
+                if (!arg.isEmpty())
+                {
+                    Chimera *ct = new Chimera;
+
+                    if (!ct->parse_cpp_type(arg))
+                    {
+                        delete ct;
+                        delete parsed_sig;
+                        qDeleteAll(parsed_args.constBegin(),
+                                parsed_args.constEnd());
+
+                        raiseParseException(arg.constData(), context);
+
+                        return 0;
+                    }
+
+                    parsed_args.append(ct);
+
+                    if (ch == '\0')
+                        break;
+                }
+
+                ++i;
             }
 
             // Only parse once.
@@ -205,6 +271,7 @@ Chimera::Signature *Chimera::parse(PyObject *types, const char *name,
     Chimera::Signature *parsed_sig = new Chimera::Signature(name, false);
 
     parsed_sig->signature.append('(');
+    parsed_sig->py_signature.append('[');
 
     for (SIP_SSIZE_T i = 0; i < PyTuple_GET_SIZE(types); ++i)
     {
@@ -223,28 +290,52 @@ Chimera::Signature *Chimera::parse(PyObject *types, const char *name,
         parsed_sig->parsed_arguments.append(parsed_type);
 
         if (i > 0)
+        {
             parsed_sig->signature.append(',');
+            parsed_sig->py_signature.append(", ");
+        }
 
         parsed_sig->signature.append(parsed_type->name());
+
+        if (parsed_type->_py_type)
+            parsed_sig->py_signature.append(((PyTypeObject *)parsed_type->_py_type)->tp_name);
+        else
+            parsed_sig->py_signature.append(parsed_type->name());
     }
 
     parsed_sig->signature.append(')');
+    parsed_sig->py_signature.append(']');
 
     return parsed_sig;
 }
 
 
-// Raise an exception after parse() has failed.
-void Chimera::raiseParseException(PyObject *obj, const char *context)
+// Raise an exception after parse() of a Python type has failed.
+void Chimera::raiseParseException(PyObject *type, const char *context)
 {
-    raiseParseException(Py_TYPE(obj)->tp_name, context);
+    if (PyType_Check(type))
+    {
+        PyErr_Format(PyExc_TypeError,
+                "Python type '%s' is not supported as %s type",
+                ((PyTypeObject *)type)->tp_name, context);
+    }
+    else
+    {
+        const char *cpp_type_name = sipString_AsASCIIString(&type);
+
+        if (cpp_type_name)
+        {
+            raiseParseException(cpp_type_name, context);
+            Py_DECREF(type);
+        }
+    }
 }
 
 
-// Raise an exception after parse() has failed.
+// Raise an exception after parse() of a C++ type has failed.
 void Chimera::raiseParseException(const char *type, const char *context)
 {
-    PyErr_Format(PyExc_TypeError, "type '%s' is not supported as %s type",
+    PyErr_Format(PyExc_TypeError, "C++ type '%s' is not supported as %s type",
             type, context);
 }
 
@@ -271,12 +362,59 @@ bool Chimera::parse_py_type(PyTypeObject *type_obj)
         }
         else
         {
+            bool is_a_QObject = PyType_IsSubtype(type_obj, sipTypeAsPyTypeObject(sipType_QObject));
+
             // If there is no assignment helper then assume it is a
             // pointer-type.
             if (!get_assign_helper())
                 _name.append('*');
 
             _metatype = QMetaType::type(_name.constData());
+
+            // This will deal with cases where the registered type is a
+            // super-class and specifically allows for multiple inheritance.
+            // The problem we are solving is that we want a QGraphicsWidget to
+            // be handled as a QGraphicsItem (which Qt registers) rather than a
+            // QObject, specifically in the value passed as a QVariant to
+            // QGraphicsItem::itemChange().  This solution means that it will
+            // always be passed as a QGraphicsItem, even if there are
+            // circumstances where it should be passed as a QObject.  If we
+            // come across such a circumstance then we may need to remove this
+            // and implement a more specific solution in %MethodCode for the
+            // various itemChange() implementations.
+            if (_metatype == 0 && is_a_QObject)
+            {
+                PyObject *mro = type_obj->tp_mro;
+
+                Q_ASSERT(PyTuple_Check(mro));
+                Q_ASSERT(PyTuple_GET_SIZE(mro) >= 3);
+
+                for (SIP_SSIZE_T i = 1; i < PyTuple_GET_SIZE(mro) - 1; ++i)
+                {
+                    PyTypeObject *sc = (PyTypeObject *)PyTuple_GET_ITEM(mro, i);
+
+                    if (sc == sipSimpleWrapper_Type || sc == sipWrapper_Type)
+                        continue;
+
+                    QByteArray sc_name(sc->tp_name);
+
+                    // QObjects are always pointers.
+                    sc_name.append('*');
+
+                    _metatype = QMetaType::type(sc_name.constData());
+
+                    if (_metatype >= QMetaType::User)
+                    {
+                        _type = sipTypeFromPyTypeObject(sc);
+                        _name = sc_name;
+
+                        _py_type = (PyObject *)sc;
+                        Py_INCREF(_py_type);
+
+                        return true;
+                    }
+                }
+            }
 
             // If it is a user type then it must be a type that SIP knows
             // about but was registered by Qt.
@@ -286,7 +424,7 @@ bool Chimera::parse_py_type(PyTypeObject *type_obj)
                 {
                     _metatype = QMetaType::QWidgetStar;
                 }
-                else if (PyType_IsSubtype(type_obj, sipTypeAsPyTypeObject(sipType_QObject)))
+                else if (is_a_QObject)
                 {
                     _metatype = QMetaType::QObjectStar;
                 }
@@ -346,16 +484,6 @@ bool Chimera::parse_py_type(PyTypeObject *type_obj)
     {
         _metatype = QMetaType::Double;
     }
-    else if (type_obj == &PyList_Type)
-    {
-        _metatype = QMetaType::QVariantList;
-    }
-    else if (type_obj == &PyDict_Type)
-    {
-        // Strictly speaking a QVariantHash is a closer match to a Python dict,
-        // but that is only Qt v4.5 and later.
-        _metatype = QMetaType::QVariantMap;
-    }
 
     // Fallback to using a PyQt_PyObject.
     if (_metatype == QMetaType::Void)
@@ -364,6 +492,9 @@ bool Chimera::parse_py_type(PyTypeObject *type_obj)
     // If there is no name so far then use the meta-type name.
     if (_name.isEmpty())
         _name = QMetaType::typeName(_metatype);
+
+    _py_type = (PyObject *)type_obj;
+    Py_INCREF(_py_type);
 
     return true;
 }
@@ -377,54 +508,182 @@ void Chimera::set_flag()
 }
 
 
+// Update a C++ type so that any typedefs and registered ints are resolved.
+QByteArray Chimera::resolve_types(const QByteArray &type)
+{
+    // Split into a base type and a possible list of template arguments.
+    QByteArray resolved = type.simplified();
+
+    // Get the raw type, ie. without any "const", "&" or "*".
+    QByteArray raw_type;
+    int original_raw_start;
+
+    if (resolved.startsWith("const "))
+        original_raw_start = 6;
+    else
+        original_raw_start = 0;
+
+    raw_type = resolved.mid(original_raw_start);
+
+    while (raw_type.endsWith('&') || raw_type.endsWith('*') || raw_type.endsWith(' '))
+        raw_type.chop(1);
+
+    int original_raw_len = raw_type.size();
+
+    if (original_raw_len == 0)
+        return QByteArray();
+
+    // Get any template arguments.
+    QList<QByteArray> args;
+    int tstart = raw_type.indexOf('<');
+
+    if (tstart >= 0)
+    {
+        // Make sure the template arguments are terminated.
+        if (!raw_type.endsWith('>'))
+            return QByteArray();
+
+        // Split the template arguments taking nested templates into account.
+        int depth = 1, arg_start = tstart + 1;
+
+        for (int i = arg_start; i < raw_type.size(); ++i)
+        {
+            int arg_end = -1;
+            char ch = raw_type.at(i);
+
+            if (ch == '<')
+            {
+                ++depth;
+            }
+            else if (ch == '>')
+            {
+                --depth;
+
+                if (depth < 0)
+                    return QByteArray();
+
+                if (depth == 0)
+                    arg_end = i;
+            }
+            else if (ch == ',' && depth == 1)
+            {
+                arg_end = i;
+            }
+
+            if (arg_end >= 0)
+            {
+                QByteArray arg = resolve_types(raw_type.mid(arg_start, arg_end - arg_start));
+
+                if (arg.isEmpty())
+                    return QByteArray();
+
+                args.append(arg);
+
+                arg_start = arg_end + 1;
+            }
+        }
+
+        if (depth != 0)
+            return QByteArray();
+
+        // Remove the template arguments.
+        raw_type.truncate(tstart);
+    }
+
+    // Expand any typedef.
+    const char *base_type = sipResolveTypedef(raw_type.constData());
+
+    if (base_type)
+        raw_type = base_type;
+
+    // Do the same for any registered int types.
+    if (_registered_int_types.contains(raw_type))
+        raw_type = "int";
+
+    // Add any (now resolved) template arguments.
+    if (args.count() > 0)
+    {
+        raw_type.append('<');
+
+        for (QList<QByteArray>::const_iterator it = args.begin();;)
+        {
+            raw_type.append(*it);
+
+            if (++it == args.end())
+                break;
+
+            raw_type.append(',');
+        }
+
+        if (raw_type.endsWith('>'))
+            raw_type.append(' ');
+
+        raw_type.append('>');
+    }
+
+    // Replace the original raw type with the resolved one.
+    resolved.replace(original_raw_start, original_raw_len, raw_type);
+
+    return resolved;
+}
+
+
 // Parse the given C++ type name.
 bool Chimera::parse_cpp_type(const QByteArray &type)
 {
-    // Get the expanded, normalised name.
-    QByteArray norm_name = _name = type;
+    _name = type;
 
-    // Extract the raw type and resolve any typedef.
-    QByteArray raw_type;
-    int raw_start;
-    const char *base_type;
+    // Resolve any types.
+    QByteArray resolved = resolve_types(type);
 
-    raw_start = extract_raw_type(norm_name, raw_type);
-    base_type = sipResolveTypedef(raw_type.constData());
-
-    if (base_type)
-        norm_name.replace(raw_start, raw_type.size(), base_type);
-
-    // Do the same for any registered int types.
-    if (!_registered_int_types.isEmpty())
-    {
-        raw_start = extract_raw_type(norm_name, raw_type);
-
-        if (_registered_int_types.contains(raw_type))
-            norm_name.replace(raw_start, raw_type.size(), "int");
-    }
+    if (resolved.isEmpty())
+        return false;
 
     // See if the type is known to Qt.
-    _metatype = QMetaType::type(norm_name.constData());
+    _metatype = QMetaType::type(resolved.constData());
 
     // If not then use the PyQt_PyObject wrapper.
     if (_metatype == QMetaType::Void)
         _metatype = PyQt_PyObject::metatype;
 
     // See if the type (without a pointer) is known to SIP.
-    bool is_ptr = norm_name.endsWith('*');
+    bool is_ptr = resolved.endsWith('*');
 
     if (is_ptr)
     {
-        norm_name.chop(1);
+        resolved.chop(1);
 
-        if (norm_name.endsWith('*'))
-            return true;
+        if (resolved.endsWith('*'))
+            return false;
     }
 
-    _type = sipFindType(norm_name.constData());
+    _type = sipFindType(resolved.constData());
 
     if (!_type)
-        return true;
+    {
+        // This is the only fundamental pointer type recognised by Qt.
+        if (_metatype == QMetaType::VoidStar)
+            return true;
+
+        // This is 'int', 'bool', etc.
+        if (_metatype != PyQt_PyObject::metatype && !is_ptr)
+            return true;
+
+        if ((resolved == "char" || resolved == "const char") && is_ptr)
+        {
+            // This is a special value meaning a (hopefully) '\0' terminated
+            // string.
+            _metatype = -1;
+
+            return true;
+        }
+
+        // This is an explicit 'PyQt_PyObject'.
+        if (resolved == "PyQt_PyObject" && !is_ptr)
+            return true;
+
+        return false;
+    }
 
     if (sipTypeIsNamespace(_type))
         return false;
@@ -456,37 +715,6 @@ bool Chimera::parse_cpp_type(const QByteArray &type)
         _metatype = QMetaType::Int;
 
     return true;
-}
-
-
-// Extract the raw type from a normalised type name and return the start
-// position of the raw type in the original.
-int Chimera::extract_raw_type(const QByteArray &type, QByteArray &raw_type)
-{
-    // Find the start of the raw type.
-    int raw_start;
-
-    if (type.startsWith("const "))
-        raw_start = 6;
-    else
-        raw_start = 0;
-
-    // Find the length of the raw type, ie. before the start of any trailing
-    // indirection or reference.
-    int raw_len;
-
-    for (raw_len = type.size() - raw_start; raw_len >= 0; --raw_len)
-    {
-        char ch = type.at(raw_start + raw_len - 1);
-
-        if (ch != '&' && ch != '*')
-            break;
-    }
-
-    // Extract the raw type.
-    raw_type = type.mid(raw_start, raw_len);
-
-    return raw_start;
 }
 
 
@@ -591,12 +819,21 @@ bool Chimera::fromPyObject(PyObject *py, void *cpp) const
 
     case QMetaType::QVariantList:
         {
-            QVariantList ql;
+            QList<QObject *> qlo;
 
-            if (to_QVariantList(py, ql))
-                *reinterpret_cast<QVariantList *>(cpp) = ql;
+            if (to_QList_QObject(py, qlo))
+            {
+                *reinterpret_cast<QList<QObject *> *>(cpp) = qlo;
+            }
             else
-                iserr = 1;
+            {
+                QVariantList ql;
+
+                if (to_QVariantList(py, ql))
+                    *reinterpret_cast<QVariantList *>(cpp) = ql;
+                else
+                    iserr = 1;
+            }
 
             break;
         }
@@ -626,6 +863,20 @@ bool Chimera::fromPyObject(PyObject *py, void *cpp) const
             break;
         }
 #endif
+
+    case -1:
+        {
+            char **ptr = reinterpret_cast<char **>(cpp);
+
+            if (SIPBytes_Check(py))
+                *ptr = SIPBytes_AS_STRING(py);
+            else if (py == Py_None)
+                *ptr = 0;
+            else
+                iserr = 1;
+
+            break;
+        }
 
     default:
         if (_type)
@@ -695,12 +946,17 @@ sipAssignFunc Chimera::get_assign_helper() const
 
 
 // Convert a Python object to a QVariant.
-bool Chimera::fromPyObject(PyObject *py, QVariant *var) const
+bool Chimera::fromPyObject(PyObject *py, QVariant *var, bool strict) const
 {
     // Deal with the simple case of wrapping the Python object rather than
     // converting it.
     if (_type != sipType_QVariant && _metatype == PyQt_PyObject::metatype)
     {
+        // If the type was specified by a Python type (as opposed to
+        // 'PyQt_PyObject') then check the object is an instance of it.
+        if (_py_type && !PyObject_IsInstance(py, _py_type))
+            return false;
+
         *var = keep_as_pyobject(py);
         return true;
     }
@@ -875,16 +1131,26 @@ bool Chimera::fromPyObject(PyObject *py, QVariant *var) const
 
     case QMetaType::QVariantList:
         {
-            QVariantList ql;
+            QList<QObject *> qlo;
 
-            if (to_QVariantList(py, ql))
+            if (to_QList_QObject(py, qlo))
             {
-                *var = QVariant(ql);
+                *var = QVariant(QList_QObject_metatype(), &qlo);
                 metatype_used = QMetaType::Void;
             }
             else
             {
-                iserr = 1;
+                QVariantList ql;
+
+                if (to_QVariantList(py, ql))
+                {
+                    *var = QVariant(ql);
+                    metatype_used = QMetaType::Void;
+                }
+                else
+                {
+                    iserr = 1;
+                }
             }
 
             break;
@@ -898,6 +1164,10 @@ bool Chimera::fromPyObject(PyObject *py, QVariant *var) const
             {
                 *var = QVariant(qm);
                 metatype_used = QMetaType::Void;
+            }
+            else if (strict)
+            {
+                iserr = 1;
             }
             else
             {
@@ -923,16 +1193,24 @@ bool Chimera::fromPyObject(PyObject *py, QVariant *var) const
             }
             else
             {
-                // Assume the failure is because the key was the wrong type.
-                PyErr_Clear();
-
-                *var = keep_as_pyobject(py);
-                metatype_used = QMetaType::Void;
+                iserr = 1;
             }
 
             break;
         }
 #endif
+
+    case -1:
+        metatype_used = QMetaType::VoidStar;
+
+        if (SIPBytes_Check(py))
+            tmp_storage.tmp_void_ptr = SIPBytes_AS_STRING(py);
+        else if (py == Py_None)
+            tmp_storage.tmp_void_ptr = 0;
+        else
+            iserr = 1;
+
+        break;
 
     default:
         if (_type)
@@ -994,8 +1272,26 @@ QVariant Chimera::fromAnyPyObject(PyObject *py, int *is_err)
     {
         Chimera ct;
 
-        if (!ct.parse_py_type(Py_TYPE(py)) || !ct.fromPyObject(py, &variant))
+        if (ct.parse_py_type(Py_TYPE(py)))
+        {
+            // If the type is a list or dict then try and convert it to a
+            // QVariantList or QVariantMap respectively if possible.
+            if (Py_TYPE(py) == &PyList_Type)
+                ct._metatype = QMetaType::QVariantList;
+            else if (Py_TYPE(py) == &PyDict_Type)
+                ct._metatype = QMetaType::QVariantMap;
+
+            // The conversion is non-strict in case the type was a dict and we
+            // can't convert it to a QVariantMap.
+            if (!ct.fromPyObject(py, &variant, false))
+            {
+                *is_err = 1;
+            }
+        }
+        else
+        {
             *is_err = 1;
+        }
     }
 
     return variant;
@@ -1012,7 +1308,7 @@ PyObject *Chimera::toPyObject(const QVariant &var) const
         {
             PyErr_Format(PyExc_TypeError,
                     "unable to convert a QVariant of type %d to a QMetaType of type %d",
-                    _metatype, var.userType());
+                    var.userType(), _metatype);
 
             return 0;
         }
@@ -1035,6 +1331,34 @@ PyObject *Chimera::toPyObject(const QVariant &var) const
 
             return pyobj_wrapper.pyobject;
         }
+    }
+
+    // Handle QList<QObject *>.
+    int lo_metatype = QList_QObject_metatype();
+
+    if (lo_metatype != 0 && lo_metatype == var.userType())
+    {
+        const QList<QObject *> *cpp = reinterpret_cast<const QList<QObject *> *>(var.data());
+
+        PyObject *py_list = PyList_New(cpp->count());
+
+        if (!py_list)
+            return 0;
+
+        for (int i = 0; i < cpp->count(); ++i)
+        {
+            PyObject *obj = sipConvertFromType(cpp->at(i), sipType_QObject, 0);
+
+            if (!obj)
+            {
+                Py_DECREF(py_list);
+                return 0;
+            }
+
+            PyList_SET_ITEM(py_list, i, obj);
+        }
+
+        return py_list;
     }
 
     return toPyObject(const_cast<void *>(var.data()));
@@ -1099,8 +1423,16 @@ PyObject *Chimera::toPyObject(void *cpp) const
         break;
 
     case QMetaType::UInt:
-        py = SIPLong_FromLong(*reinterpret_cast<unsigned int *>(cpp));
-        break;
+        {
+            long ui = *reinterpret_cast<unsigned int *>(cpp);
+
+            if (ui < 0)
+                py = PyLong_FromUnsignedLong((unsigned long)ui);
+            else
+                py = SIPLong_FromLong(ui);
+
+            break;
+        }
 
     case QMetaType::Double:
         py = PyFloat_FromDouble(*reinterpret_cast<double *>(cpp));
@@ -1226,6 +1558,23 @@ PyObject *Chimera::toPyObject(void *cpp) const
         }
 #endif
 
+    case -1:
+        {
+            char *s = *reinterpret_cast<char **>(cpp);
+
+            if (s)
+            {
+                py = SIPBytes_FromString(s);
+            }
+            else
+            {
+                Py_INCREF(Py_None);
+                py = Py_None;
+            }
+
+            break;
+        }
+
     default:
         if (_type)
         {
@@ -1293,6 +1642,10 @@ PyObject *Chimera::toAnyPyObject(const QVariant &var)
         return Py_None;
     }
 
+    // Handle null variants for the v2 API.
+    if (var.isNull() && sipIsAPIEnabled("QVariant", 2, 0))
+        return qpycore_qpynullvariant_FromQVariant(var);
+
     const char *type_name = var.typeName();
     const sipTypeDef *td = sipFindType(type_name);
 
@@ -1321,6 +1674,52 @@ QVariant Chimera::keep_as_pyobject(PyObject *py)
 }
 
 
+// Get the metatype for QList<QObject *> or 0 if it hasn't been registered.
+int Chimera::QList_QObject_metatype()
+{
+    static int lo_metatype = 0;
+
+    // We look each time until we find it because QtDeclarative could register
+    // it at any time.
+    if (lo_metatype == 0)
+        lo_metatype = QMetaType::type("QList<QObject*>");
+
+    return lo_metatype;
+}
+
+
+// Convert a Python list object to a QList<QObject*> and return true if there
+// was no error.
+bool Chimera::to_QList_QObject(PyObject *py, QList<QObject *>&cpp) const
+{
+    // We only try to convert if QList<QObject *> is a registered metatype.
+    if (QList_QObject_metatype() == 0)
+        return false;
+
+    Q_ASSERT(PyList_CheckExact(py));
+
+    for (SIP_SSIZE_T i = 0; i < PyList_GET_SIZE(py); ++i)
+    {
+        PyObject *val_obj = PyList_GET_ITEM(py, i);
+
+        if (!val_obj)
+            return false;
+
+        int iserr = 0;
+
+        QObject *val = reinterpret_cast<QObject *>(sipForceConvertToType(
+                val_obj, sipType_QObject, 0, SIP_NO_CONVERTORS, 0, &iserr));
+
+        if (iserr)
+            return false;
+
+        cpp.append(val);
+    }
+
+    return true;
+}
+
+
 // Convert a Python list object to a QVariantList and return true if there was
 // no error.
 bool Chimera::to_QVariantList(PyObject *py, QVariantList &cpp) const
@@ -1337,7 +1736,7 @@ bool Chimera::to_QVariantList(PyObject *py, QVariantList &cpp) const
         int val_state, iserr = 0;
 
         QVariant *val = reinterpret_cast<QVariant *>(sipForceConvertToType(
-                val_obj, sipType_QVariant, NULL, SIP_NOT_NONE, &val_state,
+                val_obj, sipType_QVariant, 0, SIP_NOT_NONE, &val_state,
                 &iserr));
 
         if (iserr)

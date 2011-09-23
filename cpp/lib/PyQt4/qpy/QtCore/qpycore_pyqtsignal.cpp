@@ -1,6 +1,6 @@
 // This contains the implementation of the pyqtSignal type.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -47,17 +42,22 @@ static void pyqtSignal_dealloc(PyObject *self);
 static PyObject *pyqtSignal_descr_get(PyObject *self, PyObject *obj,
         PyObject *type);
 static int pyqtSignal_init(PyObject *self, PyObject *args, PyObject *kwd_args);
-static PyObject *pyqtSignal_new(PyTypeObject *type, PyObject *args,
-        PyObject *kwd_args);
 static PyObject *pyqtSignal_repr(PyObject *self);
+static PyObject *pyqtSignal_mp_subscript(PyObject *self, PyObject *subscript);
 static PyObject *pyqtSignal_get_doc(PyObject *self, void *);
 }
 
 static int add_overload(qpycore_pyqtSignal *ps, const char *name,
         PyObject *types);
-static int add_overload(qpycore_pyqtSignal *ps, const char *sig,
-        const char *docstring);
 static bool is_signal_name(const char *sig, const char *name, uint name_len);
+
+
+// Define the mapping methods.
+static PyMappingMethods pyqtSignal_as_mapping = {
+    0,                      /* mp_length */
+    pyqtSignal_mp_subscript,    /* mp_subscript */
+    0,                      /* mp_ass_subscript */
+};
 
 
 // The getters/setters.
@@ -92,7 +92,7 @@ PyTypeObject qpycore_pyqtSignal_Type = {
     pyqtSignal_repr,        /* tp_repr */
     0,                      /* tp_as_number */
     0,                      /* tp_as_sequence */
-    0,                      /* tp_as_mapping */
+    &pyqtSignal_as_mapping, /* tp_as_mapping */
     0,                      /* tp_hash */
     pyqtSignal_call,        /* tp_call */
     0,                      /* tp_str */
@@ -117,7 +117,7 @@ PyTypeObject qpycore_pyqtSignal_Type = {
     0,                      /* tp_dictoffset */
     pyqtSignal_init,        /* tp_init */
     0,                      /* tp_alloc */
-    pyqtSignal_new,         /* tp_new */
+    PyType_GenericNew,      /* tp_new */
     0,                      /* tp_free */
     0,                      /* tp_is_gc */
     0,                      /* tp_bases */
@@ -190,7 +190,8 @@ static PyObject *pyqtSignal_repr(PyObject *self)
 {
     qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)self;
 
-    QByteArray name = Chimera::Signature::name(ps->overloads->first()->signature);
+    QByteArray name = Chimera::Signature::name(
+            ps->overloads->at(ps->master_index)->signature);
 
     return
 #if PY_MAJOR_VERSION >= 3
@@ -216,8 +217,13 @@ static void pyqtSignal_dealloc(PyObject *self)
 
     if (ps->overloads)
     {
-        qDeleteAll(ps->overloads->constBegin(), ps->overloads->constEnd());
-        delete ps->overloads;
+        // If we are the master then we own any signatures.
+        if (ps->master == ps)
+        {
+            qDeleteAll(*ps->overloads);
+            delete ps->overloads;
+        }
+
         ps->overloads = 0;
     }
 
@@ -253,7 +259,7 @@ static PyObject *pyqtSignal_descr_get(PyObject *self, PyObject *obj,
 
     // Return the bound signal.
     return qpycore_pyqtBoundSignal_New(self, obj,
-            reinterpret_cast<QObject *>(qobject), ps->overloads->first());
+            reinterpret_cast<QObject *>(qobject), ps->master_index);
 }
 
 
@@ -261,6 +267,10 @@ static PyObject *pyqtSignal_descr_get(PyObject *self, PyObject *obj,
 static int pyqtSignal_init(PyObject *self, PyObject *args, PyObject *kwd_args)
 {
     qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)self;
+
+    // We are the signal master.
+    ps->master = ps;
+    ps->overloads = new QList<Chimera::Signature *>;
 
     // Get the keyword arguments.
     PyObject *name_obj = 0;
@@ -361,17 +371,104 @@ static int pyqtSignal_init(PyObject *self, PyObject *args, PyObject *kwd_args)
 }
 
 
-// The type new slot.
-static PyObject *pyqtSignal_new(PyTypeObject *type, PyObject *, PyObject *)
+// The mapping subscript slot.
+static PyObject *pyqtSignal_mp_subscript(PyObject *self, PyObject *subscript)
 {
-    qpycore_pyqtSignal *ps;
+    qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)self;
 
-    ps = (qpycore_pyqtSignal *)type->tp_alloc(type, 0);
+    int idx = qpycore_signal_index(ps->master, subscript,
+            "an unbound signal type argument");
 
-    if (ps)
-        ps->overloads = new QList<Chimera::Signature *>;
+    if (idx < 0)
+        return 0;
 
-    return (PyObject *)ps;
+    // Create a copy of the signal with only the overload requested.
+    PyObject *copy = PyType_GenericNew(Py_TYPE(ps), 0, 0);
+
+    if (copy)
+    {
+        qpycore_pyqtSignal *ps_copy = (qpycore_pyqtSignal *)copy;
+        ps_copy->master = ps->master;
+        ps_copy->master_index = idx;
+        ps_copy->overloads = ps->overloads;
+    }
+
+    return copy;
+}
+
+
+// Create a new signal instance.
+qpycore_pyqtSignal *qpycore_pyqtSignal_New()
+{
+    qpycore_pyqtSignal *sig;
+
+    sig = (qpycore_pyqtSignal *)PyType_GenericAlloc(&qpycore_pyqtSignal_Type, 0);
+
+    if (!sig)
+        return 0;
+
+    sig->master = sig;
+    sig->overloads = new QList<Chimera::Signature *>;
+
+    return sig;
+}
+
+
+// Find an overload that matches a subscript.
+int qpycore_signal_index(qpycore_pyqtSignal *ps, PyObject *subscript, const char *context)
+{
+    // Make sure the subscript is a tuple.
+    PyObject *args;
+
+    if (PyTuple_Check(subscript))
+    {
+        args = subscript;
+    }
+    else
+    {
+        args = PyTuple_New(1);
+
+        if (!args)
+            return -1;
+
+        PyTuple_SET_ITEM(args, 0, subscript);
+    }
+
+    Py_INCREF(subscript);
+
+    // Parse the subscript as a tuple of types.
+    Chimera::Signature *ss_signature = Chimera::parse(args, 0, context);
+
+    Py_DECREF(args);
+
+    if (!ss_signature)
+        return -1;
+
+    // Search for an overload with this signature.
+    int idx = -1;
+
+    for (int i = 0; i < ps->overloads->size(); ++i)
+    {
+        Chimera::Signature *oload = ps->overloads->at(i);
+
+        if (oload->arguments() == ss_signature->signature)
+        {
+            idx = i;
+            break;
+        }
+    }
+
+    delete ss_signature;
+
+    if (idx < 0)
+    {
+        PyErr_SetString(PyExc_KeyError,
+                "there is no matching overloaded signal");
+
+        return -1;
+    }
+
+    return idx;
 }
 
 
@@ -395,13 +492,15 @@ static int add_overload(qpycore_pyqtSignal *ps, const char *name,
 
 
 // Give a signal a name if it hasn't already got one.
-void qpycore_set_signal_name(qpycore_pyqtSignal *ps, const char *name)
+void qpycore_set_signal_name(qpycore_pyqtSignal *ps, const char *type_name, const char *name)
 {
     QList<Chimera::Signature *> *overloads = ps->overloads;
 
     for (int i = 0; i < overloads->size(); ++i)
     {
-        QByteArray &sig = overloads->at(i)->signature;
+        Chimera::Signature *overload = overloads->at(i);
+        QByteArray &sig = overload->signature;
+        QByteArray &py_sig = overload->py_signature;
 
         // If the signature already has a name then they all do and there is
         // nothing more to do.
@@ -410,6 +509,10 @@ void qpycore_set_signal_name(qpycore_pyqtSignal *ps, const char *name)
 
         sig.prepend(name);
         sig.prepend('2');
+
+        py_sig.prepend(name);
+        py_sig.prepend('.');
+        py_sig.prepend(type_name);
     }
 }
 
@@ -445,21 +548,16 @@ int qpycore_get_lazy_attr(const sipTypeDef *td, PyObject *dict)
             curr_name = sigs->signature;
             curr_name.truncate(curr_name.indexOf('('));
 
-            curr = (qpycore_pyqtSignal *)PyType_GenericAlloc(&qpycore_pyqtSignal_Type, 0);
+            curr = qpycore_pyqtSignal_New();
 
             if (!curr)
                 return -1;
 
             curr->non_signals = sigs->non_signals;
-            curr->overloads = new QList<Chimera::Signature *>;
         }
 
         // Add the new overload.
-        if (add_overload(curr, sigs->signature, sigs->docstring) < 0)
-        {
-            Py_DECREF((PyObject *)curr);
-            return -1;
-        }
+        qpycore_add_native_Qt_signal(curr, sigs->signature, sigs->docstring);
     }
     while ((++sigs)->signature);
 
@@ -469,22 +567,24 @@ int qpycore_get_lazy_attr(const sipTypeDef *td, PyObject *dict)
 
 
 // Add an overload when given a native Qt signature.
-static int add_overload(qpycore_pyqtSignal *ps, const char *sig,
+void qpycore_add_native_Qt_signal(qpycore_pyqtSignal *ps, const char *sig,
         const char *docstring)
 {
     QByteArray norm = QMetaObject::normalizedSignature(sig);
-    Chimera::Signature *parsed = Chimera::parse(norm, "a native Qt signal");
+    Chimera::Signature *parsed = Chimera::parse(norm, "");
 
-    // This should never fail.
-    if (!parsed)
-        return -1;
+    // At first glance the parse should never fail because the signature
+    // originates from the .sip file.  However it might if it includes a type
+    // that has been forward declared, but not yet defined.  The only example
+    // is the declaration of QWidget by QSignalMapper.  Therefore we quietly
+    // ignore any error.
+    if (parsed)
+    {
+        parsed->signature.prepend('2');
+        parsed->docstring = docstring;
 
-    parsed->signature.prepend('2');
-    parsed->docstring = docstring;
-
-    ps->overloads->append(parsed);
-
-    return 0;
+        ps->overloads->append(parsed);
+    }
 }
 
 

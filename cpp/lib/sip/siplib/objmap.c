@@ -2,7 +2,7 @@
  * This module implements a hash table class for mapping C/C++ addresses to the
  * corresponding wrapped Python object.
  *
- * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
  *
  * This file is part of SIP.
  *
@@ -41,6 +41,7 @@ static unsigned long hash_primes[] = {
 static sipHashEntry *newHashTable(unsigned long);
 static sipHashEntry *findHashEntry(sipObjectMap *,void *);
 static void reorganiseMap(sipObjectMap *om);
+static void *getUnguardedPointer(sipSimpleWrapper *w);
 
 
 /*
@@ -124,6 +125,10 @@ sipSimpleWrapper *sipOMFindObject(sipObjectMap *om, void *key,
         if (Py_REFCNT(sw) == 0)
             continue;
 
+        /* Ignore it if the C/C++ address is no longer valid. */
+        if (sip_api_get_address(sw) == NULL)
+            continue;
+
         /*
          * If this wrapped object is of the given type, or a sub-type of it,
          * then we assume it is the same C++ object.
@@ -141,13 +146,13 @@ sipSimpleWrapper *sipOMFindObject(sipObjectMap *om, void *key,
  */
 void sipOMAddObject(sipObjectMap *om, sipSimpleWrapper *val)
 {
-    sipHashEntry *he = findHashEntry(om, val->u.cppPtr);
+    sipHashEntry *he = findHashEntry(om, getUnguardedPointer(val));
 
     /*
      * If the bucket is in use then we appear to have several objects at the
      * same address.
      */
-    if (he -> first != NULL)
+    if (he->first != NULL)
     {
         /*
          * This can happen for three reasons.  A variable of one class can be
@@ -191,7 +196,7 @@ void sipOMAddObject(sipObjectMap *om, sipSimpleWrapper *val)
     /* See if the bucket was unused or stale. */
     if (he->key == NULL)
     {
-        he->key = val -> u.cppPtr;
+        he->key = getUnguardedPointer(val);
         om->unused--;
     }
     else
@@ -256,8 +261,18 @@ static void reorganiseMap(sipObjectMap *om)
  */
 int sipOMRemoveObject(sipObjectMap *om, sipSimpleWrapper *val)
 {
-    sipHashEntry *he = findHashEntry(om, val->u.cppPtr);
+    sipHashEntry *he;
     sipSimpleWrapper **swp;
+    void *addr;
+
+    /* Handle the trivial case. */
+    if (sipNotInMap(val))
+        return 0;
+
+    if ((addr = getUnguardedPointer(val)) == NULL)
+        return 0;
+
+    he = findHashEntry(om, addr);
 
     for (swp = &he->first; *swp != NULL; swp = &(*swp)->next)
         if (*swp == val)
@@ -279,4 +294,14 @@ int sipOMRemoveObject(sipObjectMap *om, sipSimpleWrapper *val)
         }
 
     return -1;
+}
+
+
+/*
+ * Return the unguarded pointer to a C/C++ instance, ie. the pointer was valid
+ * but may longer be.
+ */
+static void *getUnguardedPointer(sipSimpleWrapper *w)
+{
+    return (w->access_func != NULL) ? w->access_func(w, UnguardedPointer) : w->data;
 }

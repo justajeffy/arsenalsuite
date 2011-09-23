@@ -1,7 +1,7 @@
 /*
  * The SIP module interface.
  *
- * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
  *
  * This file is part of SIP.
  *
@@ -54,8 +54,8 @@ extern "C" {
 /*
  * Define the SIP version number.
  */
-#define SIP_VERSION         0x040a02
-#define SIP_VERSION_STR     "4.10.2"
+#define SIP_VERSION         0x040c04
+#define SIP_VERSION_STR     "4.12.4-snapshot-bbe43a0bad78"
 
 
 /*
@@ -67,6 +67,12 @@ extern "C" {
  * to 0.
  *
  * History:
+ *
+ * 8.1  Revised the sipVariableDef structure.
+ *      sip_api_get_address() is now part of the public API.
+ *
+ * 8.0  Changed the size of the sipSimpleWrapper structure.
+ *      Added sip_api_get_address().
  *
  * 7.1  Added the 'H' format character to sip_api_parse_result().
  *      Deprecated the 'D' format character of sip_api_parse_result().
@@ -168,8 +174,22 @@ extern "C" {
  *
  * 0.0  Original version.
  */
-#define SIP_API_MAJOR_NR    7
+#define SIP_API_MAJOR_NR    8
 #define SIP_API_MINOR_NR    1
+
+
+/* The name of the sip module. */
+#define SIP_MODULE_NAME     "sip"
+
+
+/*
+ * Qt includes this typedef and its meta-object system explicitly converts
+ * types to uint.  If these correspond to signal arguments then that conversion
+ * is exposed.  Therefore SIP generates code that uses it.  This definition is
+ * for the cases that SIP is generating non-Qt related bindings with compilers
+ * that don't include it themselves (i.e. MSVC).
+ */
+typedef unsigned int uint;
 
 
 /* Some compatibility stuff to help with handwritten code for SIP v3. */
@@ -208,6 +228,14 @@ extern "C" {
 #define SIPBytes_AS_STRING  PyBytes_AS_STRING
 #define SIPBytes_GET_SIZE   PyBytes_GET_SIZE
 
+#if PY_MINOR_VERSION >= 1
+#define SIP_USE_PYCAPSULE
+#endif
+
+#if PY_MINOR_VERSION < 2
+#define SIP_SUPPORT_PYCOBJECT
+#endif
+
 #else
 
 #define SIPLong_FromLong    PyInt_FromLong
@@ -218,6 +246,12 @@ extern "C" {
 #define SIPBytes_FromStringAndSize  PyString_FromStringAndSize
 #define SIPBytes_AS_STRING  PyString_AS_STRING
 #define SIPBytes_GET_SIZE   PyString_GET_SIZE
+
+#if PY_MINOR_VERSION >= 7
+#define SIP_USE_PYCAPSULE
+#endif
+
+#define SIP_SUPPORT_PYCOBJECT
 
 #endif
 
@@ -262,6 +296,51 @@ typedef int sip_gilstate_t;
 
 
 /*
+ * Some convenient function pointers.
+ */
+
+/*
+ * The operation an access function is being asked to perform.
+ */
+typedef enum
+{
+    UnguardedPointer,   /* Return the unguarded pointer. */
+    GuardedPointer,     /* Return the guarded pointer, ie. 0 if it has gone. */
+    ReleaseGuard        /* Release the guard, if any. */
+} AccessFuncOp;
+
+struct _sipSimpleWrapper;
+struct _sipTypeDef;
+
+typedef void *(*sipInitFunc)(struct _sipSimpleWrapper *, PyObject *,
+        PyObject *, PyObject **, PyObject **, PyObject **);
+typedef void *(*sipAccessFunc)(struct _sipSimpleWrapper *, AccessFuncOp);
+typedef int (*sipTraverseFunc)(void *, visitproc, void *);
+typedef int (*sipClearFunc)(void *);
+#if PY_MAJOR_VERSION >= 3
+typedef int (*sipGetBufferFunc)(PyObject *, void *, Py_buffer *, int);
+typedef void (*sipReleaseBufferFunc)(PyObject *, void *, Py_buffer *);
+#else
+typedef SIP_SSIZE_T (*sipBufferFunc)(PyObject *, void *, SIP_SSIZE_T, void **);
+typedef SIP_SSIZE_T (*sipSegCountFunc)(PyObject *, void *, SIP_SSIZE_T *);
+#endif
+typedef void (*sipDeallocFunc)(struct _sipSimpleWrapper *);
+typedef void *(*sipCastFunc)(void *, const struct _sipTypeDef *);
+typedef const struct _sipTypeDef *(*sipSubClassConvertFunc)(void **);
+typedef int (*sipConvertToFunc)(PyObject *, void **, int *, PyObject *);
+typedef PyObject *(*sipConvertFromFunc)(void *, PyObject *);
+typedef int (*sipVirtHandlerFunc)(void *, PyObject *, ...);
+typedef void (*sipAssignFunc)(void *, SIP_SSIZE_T, const void *);
+typedef void *(*sipArrayFunc)(SIP_SSIZE_T);
+typedef void *(*sipCopyFunc)(const void *, SIP_SSIZE_T);
+typedef void (*sipReleaseFunc)(void *, int);
+typedef PyObject *(*sipPickleFunc)(void *);
+typedef int (*sipAttrGetterFunc)(const struct _sipTypeDef *, PyObject *);
+typedef PyObject *(*sipVariableGetterFunc)(void *, PyObject *);
+typedef int (*sipVariableSetterFunc)(void *, PyObject *, PyObject *);
+
+
+/*
  * The meta-type of a wrapper type.
  */
 typedef struct _sipWrapperType {
@@ -288,13 +367,14 @@ typedef struct _sipWrapperType {
 typedef struct _sipSimpleWrapper {
     PyObject_HEAD
 
-    union {
-        /* C/C++ object pointer. */
-        void *cppPtr;
+    /*
+     * The data, initially a pointer to the C/C++ object, as interpreted by the
+     * access function.
+     */
+    void *data;
 
-        /* Access function. */
-        void *(*afPtr)();
-    } u;
+    /* The optional access function. */
+    sipAccessFunc access_func;
 
     /* Object flags. */
     int flags;
@@ -348,36 +428,6 @@ typedef struct _sipEnumTypeObject {
     /* The generated type structure. */
     struct _sipTypeDef *type;
 } sipEnumTypeObject;
-
-
-/*
- * Some convenient function pointers.
- */
-typedef void *(*sipInitFunc)(sipSimpleWrapper *, PyObject *, PyObject *,
-        PyObject **, PyObject **, PyObject **);
-typedef int (*sipTraverseFunc)(void *, visitproc, void *);
-typedef int (*sipClearFunc)(void *);
-#if PY_MAJOR_VERSION >= 3
-typedef int (*sipGetBufferFunc)(PyObject *, void *, Py_buffer *, int);
-typedef void (*sipReleaseBufferFunc)(PyObject *, void *, Py_buffer *);
-#else
-typedef SIP_SSIZE_T (*sipBufferFunc)(PyObject *, void *, SIP_SSIZE_T, void **);
-typedef SIP_SSIZE_T (*sipSegCountFunc)(PyObject *, void *, SIP_SSIZE_T *);
-#endif
-typedef void (*sipDeallocFunc)(sipSimpleWrapper *);
-typedef void *(*sipCastFunc)(void *, const struct _sipTypeDef *);
-typedef const struct _sipTypeDef *(*sipSubClassConvertFunc)(void **);
-typedef int (*sipConvertToFunc)(PyObject *, void **, int *, PyObject *);
-typedef PyObject *(*sipConvertFromFunc)(void *, PyObject *);
-typedef int (*sipVirtHandlerFunc)(void *, PyObject *, ...);
-typedef void (*sipAssignFunc)(void *, SIP_SSIZE_T, const void *);
-typedef void *(*sipArrayFunc)(SIP_SSIZE_T);
-typedef void *(*sipCopyFunc)(const void *, SIP_SSIZE_T);
-typedef void (*sipReleaseFunc)(void *, int);
-typedef PyObject *(*sipPickleFunc)(void *);
-typedef int (*sipAttrGetterFunc)(const struct _sipTypeDef *, PyObject *);
-typedef PyObject *(*sipVariableGetterFunc)(void *, PyObject *);
-typedef int (*sipVariableSetterFunc)(void *, PyObject *, PyObject *);
 
 
 /*
@@ -554,6 +604,7 @@ typedef enum {
 #endif
     iter_slot,          /* __iter__ */
     next_slot,          /* __next__ */
+    setattr_slot,       /* __setattr__, __delattr__ */
 } sipPySlotType;
 
 
@@ -597,9 +648,49 @@ typedef struct _sipTypedefDef {
 
 
 /*
- * The information describing a variable.
+ * The information describing a variable or property.
  */
+
+typedef enum
+{
+    PropertyVariable,       /* A property. */
+    InstanceVariable,       /* An instance variable. */
+    ClassVariable           /* A class (i.e. static) variable. */
+} sipVariableType;
+
 typedef struct _sipVariableDef {
+    /* The type of variable. */
+    sipVariableType vd_type;
+
+    /* The name. */
+    const char *vd_name;
+
+    /*
+     * The getter.  If this is a variable (rather than a property) then the
+     * actual type is sipVariableGetterFunc.
+     */
+    PyMethodDef *vd_getter;
+
+    /*
+     * The setter.  If this is a variable (rather than a property) then the
+     * actual type is sipVariableSetterFunc.  It is NULL if the property cannot
+     * be set or the variable is const.
+     */
+    PyMethodDef *vd_setter;
+
+    /* The property deleter. */
+    PyMethodDef *vd_deleter;
+
+    /* The docstring. */
+    const char *vd_docstring;
+} sipVariableDef;
+
+
+/*
+ * The information describing a variable.  This is deprecated from v8.1 of the
+ * API and should be removed in v9.0.
+ */
+typedef struct _sipVariableDef_8 {
     /* The variable name. */
     const char *vd_name;
 
@@ -611,7 +702,7 @@ typedef struct _sipVariableDef {
 
     /* This is set if the variable is static. */
     int vd_is_static;
-} sipVariableDef;
+} sipVariableDef_8;
 
 
 /*
@@ -1359,9 +1450,12 @@ typedef struct _sipAPIDef {
             PyObject *sipKwdArgs, const char **kwdlist, PyObject **unused,
             const char *fmt, ...);
     void (*api_add_exception)(sipErrorState es, PyObject **parseErrp);
+    /*
+     * The following are part of the public API.
+     */
+    void *(*api_get_address)(struct _sipSimpleWrapper *w);
 
     sipExportedModuleDef * (*api_find_module)(const char * name);
-
 } sipAPIDef;
 
 
@@ -1446,6 +1540,7 @@ typedef struct _sipQtAPI {
 #define SIP_TYPE_SCC        0x0010  /* If the type is subject to sub-class convertors. */
 #define SIP_TYPE_ALLOW_NONE 0x0020  /* If the type can handle None. */
 #define SIP_TYPE_STUB       0x0040  /* If the type is a stub. */
+#define SIP_TYPE_NONLAZY    0x0080  /* If the type has a non-lazy method. */
 
 
 /*
@@ -1460,9 +1555,13 @@ typedef struct _sipQtAPI {
 
 #define sipIsExactWrappedType(wt)   (sipTypeAsPyTypeObject((wt)->type) == (PyTypeObject *)(wt))
 
-#define sipConvertFromSliceObject(o,len,start,stop,step,slen) \
+#if PY_VERSION_HEX >= 0x03020000
+#define sipConvertFromSliceObject   PySlice_GetIndicesEx
+#else
+#define sipConvertFromSliceObject(o, len, start, stop, step, slen) \
         PySlice_GetIndicesEx((PySliceObject *)(o), (len), (start), (stop), \
                 (step), (slen))
+#endif
 
 
 /*
@@ -1479,6 +1578,7 @@ typedef struct _sipQtAPI {
 #define sipTypeAllowNone(td)    ((td)->td_flags & SIP_TYPE_ALLOW_NONE)
 #define sipTypeIsStub(td)   ((td)->td_flags & SIP_TYPE_STUB)
 #define sipTypeSetStub(td)  ((td)->td_flags |= SIP_TYPE_STUB)
+#define sipTypeHasNonlazyMethod(td) ((td)->td_flags & SIP_TYPE_NONLAZY)
 
 /*
  * Get various names from the string pool for various data types.

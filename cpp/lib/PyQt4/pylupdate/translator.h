@@ -42,7 +42,15 @@
 #include <qtranslator.h>
 
 class TranslatorPrivate;
+
+#if !defined(QT_BEGIN_NAMESPACE)
+#define QT_BEGIN_NAMESPACE
+#define QT_END_NAMESPACE
+#endif
+
+QT_BEGIN_NAMESPACE
 template <typename T> class QList;
+QT_END_NAMESPACE
 
 class TranslatorMessage
 {

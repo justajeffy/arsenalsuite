@@ -292,12 +292,16 @@ public:
 	/// Runtime dependent on childNode->rowCount call, which could 
 	/// be loading the data on demand
 	int rowCount( const QModelIndex & parent = QModelIndex() ) const;
+	/// Same as above but will not load the children using the treeBuilder
+	int rowCountWithoutLoad( const QModelIndex & parent = QModelIndex() ) const;
 
 	/// O(1) - Constant Runtime
 	/// Runtime dependent on node->hasChildren call, which could 
 	/// be loading the data on demand
 	bool hasChildren( const QModelIndex & parent ) const;
-
+	/// Same as above but will not load the children using the treeBuilder
+	bool hasChildrenWithoutLoad( const QModelIndex & ) const;
+	
 	int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
 	
 	QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;

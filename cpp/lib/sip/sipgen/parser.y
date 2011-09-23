@@ -1,7 +1,7 @@
 /*
  * The SIP parser.
  *
- * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
  *
  * This file is part of SIP.
  *
@@ -40,6 +40,8 @@ static int sectionFlags;                /* The current section flags. */
 static int currentOverIsVirt;           /* Set if the overload is virtual. */
 static int currentCtorIsExplicit;       /* Set if the ctor is explicit. */
 static int currentIsStatic;             /* Set if the current is static. */
+static int currentIsSignal;             /* Set if the current is Q_SIGNAL. */
+static int currentIsSlot;               /* Set if the current is Q_SLOT. */
 static int currentIsTemplate;           /* Set if the current is a template. */
 static char *previousFile;              /* The file just parsed. */
 static parserContext currentContext;    /* The current context. */
@@ -50,11 +52,13 @@ static int sectFlagsStack[MAX_NESTED_SCOPE];    /* The section flags stack. */
 static int currentScopeIdx;             /* The scope stack index. */
 static int currentTimelineOrder;        /* The current timeline order. */
 static classList *currentSupers;        /* The current super-class list. */
-static int defaultKwdArgs;              /* Support keyword arguments by default. */
+static KwArgs defaultKwArgs;            /* The default keyword arguments support. */
 static int makeProtPublic;              /* Treat protected items as public. */
+static int parsingCSignature;           /* An explicit C/C++ signature is being parsed. */
 
 
-static const char *getPythonName(optFlags *optflgs, const char *cname);
+static const char *getPythonName(moduleDef *mod, optFlags *optflgs,
+        const char *cname);
 static classDef *findClass(sipSpec *pt, ifaceFileType iftype,
         apiVersionRangeDef *api_range, scopedNameDef *fqname);
 static classDef *findClassWithInterface(sipSpec *pt, ifaceFileDef *iff);
@@ -67,33 +71,38 @@ static enumDef *newEnum(sipSpec *pt, moduleDef *mod, mappedTypeDef *mt_scope,
         char *name, optFlags *of, int flags);
 static void instantiateClassTemplate(sipSpec *pt, moduleDef *mod, classDef *scope, scopedNameDef *fqname, classTmplDef *tcd, templateDef *td);
 static void newTypedef(sipSpec *, moduleDef *, char *, argDef *, optFlags *);
-static void newVar(sipSpec *, moduleDef *, char *, int, argDef *, optFlags *,
-        codeBlock *, codeBlock *, codeBlock *);
-static void newCtor(char *, int, signatureDef *, optFlags *, codeBlock *,
-        throwArgs *, signatureDef *, int, codeBlock *);
+static void newVar(sipSpec *pt, moduleDef *mod, char *name, int isstatic,
+        argDef *type, optFlags *of, codeBlock *acode, codeBlock *gcode,
+        codeBlock *scode, int section);
+static void newCtor(moduleDef *, char *, int, signatureDef *, optFlags *,
+        codeBlock *, throwArgs *, signatureDef *, int, codeBlock *);
 static void newFunction(sipSpec *, moduleDef *, classDef *, mappedTypeDef *,
-        int, int, int, char *, signatureDef *, int, int, optFlags *,
+        int, int, int, int, int, char *, signatureDef *, int, int, optFlags *,
         codeBlock *, codeBlock *, throwArgs *, signatureDef *, codeBlock *);
-static optFlag *findOptFlag(optFlags *,char *,flagType);
+static optFlag *findOptFlag(optFlags *flgs, const char *name);
+static optFlag *getOptFlag(optFlags *flgs, const char *name, flagType ft);
 static memberDef *findFunction(sipSpec *, moduleDef *, classDef *,
         mappedTypeDef *, const char *, int, int, int);
 static void checkAttributes(sipSpec *, moduleDef *, classDef *,
         mappedTypeDef *, const char *, int);
-static void newModule(FILE *fp, char *filename);
+static void newModule(FILE *fp, const char *filename);
 static moduleDef *allocModule();
-static void parseFile(FILE *fp, char *name, moduleDef *prevmod, int optional);
+static void parseFile(FILE *fp, const char *name, moduleDef *prevmod,
+        int optional);
 static void handleEOF(void);
 static void handleEOM(void);
 static qualDef *findQualifier(const char *name);
+static const char *getInt(const char *cp, int *ip);
 static scopedNameDef *text2scopedName(ifaceFileDef *scope, char *text);
 static scopedNameDef *scopeScopedName(ifaceFileDef *scope,
         scopedNameDef *name);
 static void pushScope(classDef *);
 static void popScope(void);
 static classDef *currentScope(void);
-static void newQualifier(moduleDef *,int,int,char *,qualType);
-static void newImport(char *filename);
-static int timePeriod(char *,char *);
+static void newQualifier(moduleDef *, int, int, const char *, qualType);
+static qualDef *allocQualifier(moduleDef *, int, int, const char *, qualType);
+static void newImport(const char *filename);
+static int timePeriod(const char *lname, const char *uname);
 static int platOrFeature(char *,int);
 static int isNeeded(qualDef *);
 static int notSkipping(void);
@@ -124,11 +133,14 @@ static void instantiateTemplateEnums(sipSpec *pt, classTmplDef *tcd,
 static void instantiateTemplateVars(sipSpec *pt, classTmplDef *tcd,
         templateDef *td, classDef *cd, ifaceFileList **used,
         scopedNameDef *type_names, scopedNameDef *type_values);
+static void instantiateTemplateTypedefs(sipSpec *pt, classTmplDef *tcd,
+        templateDef *td, classDef *cd);
 static overDef *instantiateTemplateOverloads(sipSpec *pt, overDef *tod,
         memberDef *tmethods, memberDef *methods, classTmplDef *tcd,
         templateDef *td, classDef *cd, ifaceFileList **used,
         scopedNameDef *type_names, scopedNameDef *type_values);
 static void resolveAnyTypedef(sipSpec *pt, argDef *ad);
+static void addTypedef(sipSpec *pt, typedefDef *tdd);
 static void addVariable(sipSpec *pt, varDef *vd);
 static void applyTypeFlags(moduleDef *mod, argDef *ad, optFlags *flags);
 static argType convertEncoding(const char *encoding);
@@ -137,9 +149,22 @@ static apiVersionRangeDef *convertAPIRange(moduleDef *mod, nameDef *name,
         int from, int to);
 static char *convertFeaturedString(char *fs);
 static scopedNameDef *text2scopePart(char *text);
-static int usesKeywordArgs(optFlags *optflgs, signatureDef *sd);
+static KwArgs keywordArgs(moduleDef *mod, optFlags *optflgs, signatureDef *sd,
+        int need_name);
 static char *strip(char *s);
 static int isEnabledFeature(const char *name);
+static void addProperty(sipSpec *pt, moduleDef *mod, classDef *cd,
+        const char *name, const char *get, const char *set,
+        codeBlock *docstring);
+static moduleDef *configureModule(sipSpec *pt, moduleDef *module,
+        const char *filename, const char *name, int version, int c_module,
+        KwArgs kwargs, int use_arg_names, codeBlock *docstring);
+static void addAutoPyName(moduleDef *mod, const char *remove_leading);
+static KwArgs convertKwArgs(const char *kwargs);
+static void checkAnnos(optFlags *annos, const char *valid[]);
+static void checkNoAnnos(optFlags *annos, const char *msg);
+static void appendCodeBlock(codeBlockList **headp, codeBlock *cb);
+static void handleKeepReference(optFlags *optflgs, argDef *ad, moduleDef *mod);
 %}
 
 %union {
@@ -161,14 +186,33 @@ static int isEnabledFeature(const char *name);
     int             boolean;
     exceptionDef    exceptionbase;
     classDef        *klass;
+    apiCfg          api;
+    autoPyNameCfg   autopyname;
+    compModuleCfg   compmodule;
+    consModuleCfg   consmodule;
+    defEncodingCfg  defencoding;
+    defMetatypeCfg  defmetatype;
+    defSupertypeCfg defsupertype;
+    exceptionCfg    exception;
+    extractCfg      extract;
+    featureCfg      feature;
+    licenseCfg      license;
+    importCfg       import;
+    includeCfg      include;
+    moduleCfg       module;
+    pluginCfg       plugin;
+    propertyCfg     property;
+    variableCfg     variable;
 }
 
 %token          TK_API
+%token          TK_AUTOPYNAME
 %token          TK_DEFENCODING
 %token          TK_PLUGIN
 %token          TK_DOCSTRING
 %token          TK_DOC
 %token          TK_EXPORTEDDOC
+%token          TK_EXTRACT
 %token          TK_MAKEFILE
 %token          TK_ACCESSCODE
 %token          TK_GETCODE
@@ -177,6 +221,7 @@ static int isEnabledFeature(const char *name);
 %token          TK_INITCODE
 %token          TK_POSTINITCODE
 %token          TK_UNITCODE
+%token          TK_UNITPOSTINCLUDECODE
 %token          TK_MODCODE
 %token          TK_TYPECODE
 %token          TK_PREPYCODE
@@ -185,9 +230,9 @@ static int isEnabledFeature(const char *name);
 %token <codeb>  TK_CODELINE
 %token          TK_IF
 %token          TK_END
-%token <text>   TK_NAME
-%token <text>   TK_PATHNAME
-%token <text>   TK_STRING
+%token <text>   TK_NAME_VALUE
+%token <text>   TK_PATH_VALUE
+%token <text>   TK_STRING_VALUE
 %token          TK_VIRTUALCATCHERCODE
 %token          TK_VIRTERRORHANDLER
 %token          TK_TRAVERSECODE
@@ -219,7 +264,9 @@ static int isEnabledFeature(const char *name);
 %token          TK_PROTECTED
 %token          TK_PRIVATE
 %token          TK_SIGNALS
+%token          TK_SIGNAL_METHOD
 %token          TK_SLOTS
+%token          TK_SLOT_METHOD
 %token          TK_BOOL
 %token          TK_SHORT
 %token          TK_INT
@@ -251,18 +298,19 @@ static int isEnabledFeature(const char *name);
 %token          TK_SIPRXDIS
 %token          TK_SIPSLOTCON
 %token          TK_SIPSLOTDIS
-%token <number> TK_NUMBER
-%token <real>   TK_REAL
+%token          TK_SIPSSIZET
+%token <number> TK_NUMBER_VALUE
+%token <real>   TK_REAL_VALUE
 %token          TK_TYPEDEF
 %token          TK_NAMESPACE
 %token          TK_TIMELINE
 %token          TK_PLATFORMS
 %token          TK_FEATURE
 %token          TK_LICENSE
-%token <qchar>  TK_QCHAR
-%token          TK_TRUE
-%token          TK_FALSE
-%token          TK_NULL
+%token <qchar>  TK_QCHAR_VALUE
+%token          TK_TRUE_VALUE
+%token          TK_FALSE_VALUE
+%token          TK_NULL_VALUE
 %token          TK_OPERATOR
 %token          TK_THROW
 %token          TK_QOBJECT
@@ -273,6 +321,23 @@ static int isEnabledFeature(const char *name);
 %token          TK_ELLIPSIS
 %token          TK_DEFMETATYPE
 %token          TK_DEFSUPERTYPE
+%token          TK_PROPERTY
+
+%token          TK_GET
+%token          TK_ID
+%token          TK_KWARGS
+%token          TK_LANGUAGE
+%token          TK_LICENSEE
+%token          TK_NAME
+%token          TK_OPTIONAL
+%token          TK_ORDER
+%token          TK_REMOVELEADING
+%token          TK_SET
+%token          TK_SIGNATURE
+%token          TK_TIMESTAMP
+%token          TK_TYPE
+%token          TK_USEARGNAMES
+%token          TK_VERSION
 
 %type <memArg>          argvalue
 %type <memArg>          argtype
@@ -300,10 +365,7 @@ static int isEnabledFeature(const char *name);
 %type <codeb>           optaccesscode
 %type <codeb>           optgetcode
 %type <codeb>           optsetcode
-%type <codeb>           exphdrcode
-%type <codeb>           modhdrcode
 %type <codeb>           typehdrcode
-%type <codeb>           opttypehdrcode
 %type <codeb>           travcode
 %type <codeb>           clearcode
 %type <codeb>           getbufcode
@@ -313,7 +375,6 @@ static int isEnabledFeature(const char *name);
 %type <codeb>           segcountcode
 %type <codeb>           charbufcode
 %type <codeb>           picklecode
-%type <codeb>           modcode
 %type <codeb>           typecode
 %type <codeb>           codeblock
 %type <codeb>           codelines
@@ -337,10 +398,90 @@ static int isEnabledFeature(const char *name);
 %type <fcall>           exprlist
 %type <boolean>         qualifiers
 %type <boolean>         oredqualifiers
-%type <boolean>         modlang
 %type <boolean>         optclassbody
+%type <boolean>         bool_value
 %type <exceptionbase>   baseexception
 %type <klass>           class
+
+%type <api>             api_args
+%type <api>             api_arg_list
+%type <api>             api_arg
+
+%type <autopyname>      autopyname_args
+%type <autopyname>      autopyname_arg_list
+%type <autopyname>      autopyname_arg
+
+%type <compmodule>      compmodule_args
+%type <compmodule>      compmodule_arg_list
+%type <compmodule>      compmodule_arg
+%type <compmodule>      compmodule_body
+%type <compmodule>      compmodule_body_directives
+%type <compmodule>      compmodule_body_directive
+
+%type <consmodule>      consmodule_args
+%type <consmodule>      consmodule_arg_list
+%type <consmodule>      consmodule_arg
+%type <consmodule>      consmodule_body
+%type <consmodule>      consmodule_body_directives
+%type <consmodule>      consmodule_body_directive
+
+%type <defencoding>     defencoding_args
+%type <defencoding>     defencoding_arg_list
+%type <defencoding>     defencoding_arg
+
+%type <defmetatype>     defmetatype_args
+%type <defmetatype>     defmetatype_arg_list
+%type <defmetatype>     defmetatype_arg
+
+%type <defsupertype>    defsupertype_args
+%type <defsupertype>    defsupertype_arg_list
+%type <defsupertype>    defsupertype_arg
+
+%type <exception>       exception_body
+%type <exception>       exception_body_directives
+%type <exception>       exception_body_directive
+
+%type <extract>         extract_args
+%type <extract>         extract_arg_list
+%type <extract>         extract_arg
+
+%type <feature>         feature_args
+%type <feature>         feature_arg_list
+%type <feature>         feature_arg
+
+%type <import>          import_args
+%type <import>          import_arg_list
+%type <import>          import_arg
+
+%type <include>         include_args
+%type <include>         include_arg_list
+%type <include>         include_arg
+
+%type <license>         license_args
+%type <license>         license_arg_list
+%type <license>         license_arg
+
+%type <module>          module_args
+%type <module>          module_arg_list
+%type <module>          module_arg
+%type <module>          module_body
+%type <module>          module_body_directives
+%type <module>          module_body_directive
+
+%type <plugin>          plugin_args
+%type <plugin>          plugin_arg_list
+%type <plugin>          plugin_arg
+
+%type <property>        property_args
+%type <property>        property_arg_list
+%type <property>        property_arg
+%type <property>        property_body
+%type <property>        property_body_directives
+%type <property>        property_body_directive
+
+%type <variable>        variable_body
+%type <variable>        variable_body_directives
+%type <variable>        variable_body_directive
 
 %%
 
@@ -383,25 +524,18 @@ modstatement:   module
     |   defencoding
     |   defmetatype
     |   defsupertype
-    |   exphdrcode {
-            if (notSkipping())
-                appendCodeBlock(&currentSpec->exphdrcode, $1);
-        }
-    |   modhdrcode {
-            if (notSkipping())
-                appendCodeBlock(&currentModule->hdrcode, $1);
-        }
-    |   modcode {
-            if (notSkipping())
-                appendCodeBlock(&currentModule->cppcode, $1);
-        }
+    |   exphdrcode
+    |   modhdrcode
+    |   modcode
     |   preinitcode
     |   initcode
     |   postinitcode
     |   unitcode
+    |   unitpostinccode
     |   prepycode
     |   doc
     |   exporteddoc
+    |   extract
     |   makefile
     |   mappedtype
     |   mappedtypetmpl
@@ -433,35 +567,94 @@ nsstatement:    ifstart
         }
     ;
 
-defencoding:    TK_DEFENCODING TK_STRING {
+defencoding:    TK_DEFENCODING defencoding_args {
             if (notSkipping())
             {
-                if ((currentModule->encoding = convertEncoding($2)) == no_type)
-                    yyerror("The value of %DefaultEncoding must be one of \"ASCII\", \"Latin-1\", \"UTF-8\" or \"None\"");
+                if ((currentModule->encoding = convertEncoding($2.name)) == no_type)
+                    yyerror("The %DefaultEncoding name must be one of \"ASCII\", \"Latin-1\", \"UTF-8\" or \"None\"");
             }
         }
     ;
 
-plugin:     TK_PLUGIN TK_NAME {
-            appendString(&currentSpec->plugins, $2);
+defencoding_args:   TK_STRING_VALUE {
+            resetLexerState();
+
+            $$.name = $1;
+        }
+    |   '(' defencoding_arg_list ')' {
+            $$ = $2;
         }
     ;
 
-api:    TK_API TK_NAME TK_NUMBER {
+defencoding_arg_list:   defencoding_arg
+    |   defencoding_arg_list ',' defencoding_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_NAME: $$.name = $3.name; break;
+            }
+        }
+    ;
+
+defencoding_arg:    TK_NAME '=' TK_STRING_VALUE {
+            $$.token = TK_NAME;
+
+            $$.name = $3;
+        }
+    ;
+
+plugin:     TK_PLUGIN plugin_args {
+            /* Note that %Plugin is internal in SIP v4. */
+
+            if (notSkipping())
+                appendString(&currentSpec->plugins, $2.name);
+        }
+    ;
+
+plugin_args:    TK_NAME_VALUE {
+            resetLexerState();
+
+            $$.name = $1;
+        }
+    |   '(' plugin_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+plugin_arg_list:    plugin_arg
+    |   plugin_arg_list ',' plugin_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_NAME: $$.name = $3.name; break;
+            }
+        }
+    ;
+
+plugin_arg: TK_NAME '=' TK_NAME_VALUE {
+            $$.token = TK_NAME;
+
+            $$.name = $3;
+        }
+    ;
+
+api:    TK_API api_args {
             if (notSkipping())
             {
                 apiVersionRangeDef *avd;
 
-                if (findAPI(currentSpec, $2) != NULL)
+                if (findAPI(currentSpec, $2.name) != NULL)
                     yyerror("The API name in the %API directive has already been defined");
 
-                if ($3 < 1)
+                if ($2.version < 1)
                     yyerror("The version number in the %API directive must be greater than or equal to 1");
 
                 avd = sipMalloc(sizeof (apiVersionRangeDef));
 
-                avd->api_name = cacheName(currentSpec, $2);
-                avd->from = $3;
+                avd->api_name = cacheName(currentSpec, $2.name);
+                avd->from = $2.version;
                 avd->to = -1;
 
                 avd->next = currentModule->api_versions;
@@ -473,16 +666,66 @@ api:    TK_API TK_NAME TK_NUMBER {
         }
     ;
 
-exception:  TK_EXCEPTION scopedname baseexception optflags '{' opttypehdrcode raisecode '}' ';' {
+api_args:   TK_NAME_VALUE TK_NUMBER_VALUE {
+            resetLexerState();
+
+            deprecated("%API name and version number should be specified using the 'name' and 'version' arguments");
+
+            $$.name = $1;
+            $$.version = $2;
+        }
+    |   '(' api_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+api_arg_list:   api_arg
+    |   api_arg_list ',' api_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_NAME: $$.name = $3.name; break;
+            case TK_VERSION: $$.version = $3.version; break;
+            }
+        }
+    ;
+
+api_arg:    TK_NAME '=' TK_NAME_VALUE {
+            $$.token = TK_NAME;
+
+            $$.name = $3;
+            $$.version = 0;
+        }
+    |   TK_VERSION '=' TK_NUMBER_VALUE {
+            $$.token = TK_VERSION;
+
+            $$.name = NULL;
+            $$.version = $3;
+        }
+    ;
+
+exception:  TK_EXCEPTION scopedname baseexception optflags exception_body {
             if (notSkipping())
             {
+                static const char *annos[] = {
+                    "Default",
+                    "PyName",
+                    NULL
+                };
+
                 exceptionDef *xd;
                 const char *pyname;
+
+                checkAnnos(&$4, annos);
 
                 if (currentSpec->genc)
                     yyerror("%Exception not allowed in a C module");
 
-                pyname = getPythonName(&$4, scopedNameTail($2));
+                if ($5.raise_code == NULL)
+                    yyerror("%Exception must have a %RaiseCode sub-directive");
+
+                pyname = getPythonName(currentModule, &$4, scopedNameTail($2));
 
                 checkAttributes(currentSpec, currentModule, NULL, NULL,
                         pyname, FALSE);
@@ -497,13 +740,13 @@ exception:  TK_EXCEPTION scopedname baseexception optflags '{' opttypehdrcode ra
 
                 /* Complete the definition. */
                 xd->iff->module = currentModule;
-                xd->iff->hdrcode = $6;
+                appendCodeBlock(&xd->iff->hdrcode, $5.type_header_code);
                 xd->pyname = pyname;
                 xd->bibase = $3.bibase;
                 xd->base = $3.base;
-                xd->raisecode = $7;
+                appendCodeBlock(&xd->raisecode, $5.raise_code);
 
-                if (findOptFlag(&$4, "Default", bool_flag) != NULL)
+                if (getOptFlag(&$4, "Default", bool_flag) != NULL)
                     currentModule->defexception = xd;
 
                 if (xd->bibase != NULL || xd->base != NULL)
@@ -590,6 +833,55 @@ baseexception:  {
         }
     ;
 
+exception_body: '{' exception_body_directives '}' ';' {
+            $$ = $2;
+        }
+    ;
+
+exception_body_directives:  exception_body_directive
+    |   exception_body_directives exception_body_directive {
+            $$ = $1;
+
+            switch ($2.token)
+            {
+            case TK_RAISECODE: $$.raise_code = $2.raise_code; break;
+            case TK_TYPEHEADERCODE: $$.type_header_code = $2.type_header_code; break;
+            }
+        }
+    ;
+
+exception_body_directive:  ifstart {
+            $$.token = TK_IF;
+        }
+    |   ifend {
+            $$.token = TK_END;
+        }
+    |   raisecode {
+            if (notSkipping())
+            {
+                $$.token = TK_RAISECODE;
+                $$.raise_code = $1;
+            }
+            else
+            {
+                $$.token = 0;
+                $$.raise_code = NULL;
+            }
+        }
+    |   typehdrcode {
+            if (notSkipping())
+            {
+                $$.token = TK_TYPEHEADERCODE;
+                $$.type_header_code = $1;
+            }
+            else
+            {
+                $$.token = 0;
+                $$.type_header_code = NULL;
+            }
+        }
+    ;
+
 raisecode:  TK_RAISECODE codeblock {
             $$ = $2;
         }
@@ -597,32 +889,54 @@ raisecode:  TK_RAISECODE codeblock {
 
 mappedtype: TK_MAPPEDTYPE basetype optflags {
             if (notSkipping())
+            {
+                static const char *annos[] = {
+                    "AllowNone",
+                    "API",
+                    "DocType",
+                    "NoRelease",
+                    "PyName",
+                    NULL
+                };
+
+                checkAnnos(&$3, annos);
+
                 currentMappedType = newMappedType(currentSpec, &$2, &$3);
+            }
         } mtdefinition
     ;
 
 mappedtypetmpl: template TK_MAPPEDTYPE basetype optflags {
-            int a;
-
-            if (currentSpec->genc)
-                yyerror("%MappedType templates not allowed in a C module");
-
-            /* Check the template arguments are basic types or simple names. */
-            for (a = 0; a < $1.nrArgs; ++a)
-            {
-                argDef *ad = &$1.args[a];
-
-                if (ad->atype == defined_type && ad->u.snd->next != NULL)
-                    yyerror("%MappedType template arguments must be simple names");
-            }
-
-            if ($3.atype != template_type)
-                yyerror("%MappedType template must map a template type");
-
             if (notSkipping())
             {
+                static const char *annos[] = {
+                    "DocType",
+                    NULL
+                };
+
+                int a;
                 mappedTypeTmplDef *mtt;
                 ifaceFileDef *iff;
+
+                checkAnnos(&$4, annos);
+
+                if (currentSpec->genc)
+                    yyerror("%MappedType templates not allowed in a C module");
+
+                /*
+                 * Check the template arguments are basic types or simple
+                 * names.
+                 */
+                for (a = 0; a < $1.nrArgs; ++a)
+                {
+                    argDef *ad = &$1.args[a];
+
+                    if (ad->atype == defined_type && ad->u.snd->next != NULL)
+                        yyerror("%MappedType template arguments must be simple names");
+                }
+
+                if ($3.atype != template_type)
+                    yyerror("%MappedType template must map a template type");
 
                 /* Check a template hasn't already been provided. */
                 for (mtt = currentSpec->mappedtypetemplates; mtt != NULL; mtt = mtt->next)
@@ -665,37 +979,43 @@ mtdefinition:   '{' mtbody '}' ';' {
         }
     ;
 
-mtbody:     mtline
+mtbody: mtline
     |   mtbody mtline
     ;
 
-mtline:     typehdrcode {
+mtline: ifstart
+    |   ifend
+    |   typehdrcode {
             if (notSkipping())
                 appendCodeBlock(&currentMappedType->iff->hdrcode, $1);
+        }
+    |   typecode {
+            if (notSkipping())
+                appendCodeBlock(&currentMappedType->typecode, $1);
         }
     |   TK_FROMTYPE codeblock {
             if (notSkipping())
             {
-                if (currentMappedType -> convfromcode != NULL)
+                if (currentMappedType->convfromcode != NULL)
                     yyerror("%MappedType has more than one %ConvertFromTypeCode directive");
 
-                currentMappedType -> convfromcode = $2;
+                appendCodeBlock(&currentMappedType->convfromcode, $2);
             }
         }
     |   TK_TOTYPE codeblock {
             if (notSkipping())
             {
-                if (currentMappedType -> convtocode != NULL)
+                if (currentMappedType->convtocode != NULL)
                     yyerror("%MappedType has more than one %ConvertToTypeCode directive");
 
-                currentMappedType -> convtocode = $2;
+                appendCodeBlock(&currentMappedType->convtocode, $2);
             }
         }
     |   enum
     |   mtfunction
     ;
 
-mtfunction: TK_STATIC cpptype TK_NAME '(' arglist ')' optconst optexceptions optflags optsig ';' optdocstring methodcode {
+mtfunction: TK_STATIC cpptype TK_NAME_VALUE '(' arglist ')' optconst optexceptions optflags optsig ';' optdocstring methodcode {
             if (notSkipping())
             {
                 applyTypeFlags(currentModule, &$2, &$9);
@@ -703,13 +1023,13 @@ mtfunction: TK_STATIC cpptype TK_NAME '(' arglist ')' optconst optexceptions opt
                 $5.result = $2;
 
                 newFunction(currentSpec, currentModule, NULL,
-                        currentMappedType, 0, TRUE, FALSE, $3, &$5, $7, FALSE,
-                        &$9, $13, NULL, $8, $10, $12);
+                        currentMappedType, 0, TRUE, FALSE, FALSE, FALSE, $3,
+                        &$5, $7, FALSE, &$9, $13, NULL, $8, $10, $12);
             }
         }
     ;
 
-namespace:  TK_NAMESPACE TK_NAME {
+namespace:  TK_NAMESPACE TK_NAME_VALUE {
             if (currentSpec -> genc)
                 yyerror("namespace definition not allowed in a C module");
 
@@ -730,7 +1050,7 @@ namespace:  TK_NAMESPACE TK_NAME {
 
                 sectionFlags = 0;
             }
-        } '{' nsbody '}' ';' {
+        } optnsbody ';' {
             if (notSkipping())
             {
                 if (inMainModule())
@@ -746,34 +1066,40 @@ namespace:  TK_NAMESPACE TK_NAME {
         }
     ;
 
+optnsbody:
+    |   '{' nsbody '}'
+    ;
+
 nsbody:     nsstatement
     |   nsbody nsstatement
     ;
 
 platforms:  TK_PLATFORMS {
-            qualDef *qd;
+            if (notSkipping())
+            {
+                qualDef *qd;
 
-            for (qd = currentModule -> qualifiers; qd != NULL; qd = qd -> next)
-                if (qd -> qtype == platform_qualifier)
-                    yyerror("%Platforms has already been defined for this module");
+                for (qd = currentModule->qualifiers; qd != NULL; qd = qd->next)
+                    if (qd->qtype == platform_qualifier)
+                        yyerror("%Platforms has already been defined for this module");
+            }
         }
         '{' platformlist '}' {
-            qualDef *qd;
-            int nrneeded;
+            if (notSkipping())
+            {
+                qualDef *qd;
+                int nrneeded;
 
-            /*
-             * Check that exactly one platform in the set was
-             * requested.
-             */
+                /* Check that exactly one platform in the set was requested. */
+                nrneeded = 0;
 
-            nrneeded = 0;
+                for (qd = currentModule->qualifiers; qd != NULL; qd = qd->next)
+                    if (qd->qtype == platform_qualifier && isNeeded(qd))
+                        ++nrneeded;
 
-            for (qd = currentModule -> qualifiers; qd != NULL; qd = qd -> next)
-                if (qd -> qtype == platform_qualifier && isNeeded(qd))
-                    ++nrneeded;
-
-            if (nrneeded > 1)
-                yyerror("No more than one of these %Platforms must be specified with the -t flag");
+                if (nrneeded > 1)
+                    yyerror("No more than one of these %Platforms must be specified with the -t flag");
+            }
         }
     ;
 
@@ -781,18 +1107,48 @@ platformlist:   platform
     |   platformlist platform
     ;
 
-virterrorhandler:    TK_VIRTERRORHANDLER TK_NAME {
+virterrorhandler:    TK_VIRTERRORHANDLER TK_NAME_VALUE {
             currentModule->virterrorhandler = $2;
         }
     ;
 
-platform:   TK_NAME {
+platform:   TK_NAME_VALUE {
             newQualifier(currentModule,-1,-1,$1,platform_qualifier);
         }
     ;
 
-feature:    TK_FEATURE TK_NAME {
-            newQualifier(currentModule,-1,-1,$2,feature_qualifier);
+feature:    TK_FEATURE feature_args {
+            if (notSkipping())
+                newQualifier(currentModule, -1, -1, $2.name,
+                        feature_qualifier);
+        }
+    ;
+
+feature_args:   TK_NAME_VALUE {
+            resetLexerState();
+
+            $$.name = $1;
+        }
+    |   '(' feature_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+feature_arg_list:   feature_arg
+    |   feature_arg_list ',' feature_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_NAME: $$.name = $3.name; break;
+            }
+        }
+    ;
+
+feature_arg:    TK_NAME '=' TK_NAME_VALUE {
+            $$.token = TK_NAME;
+
+            $$.name = $3;
         }
     ;
 
@@ -800,24 +1156,25 @@ timeline:   TK_TIMELINE {
             currentTimelineOrder = 0;
         }
         '{' qualifierlist '}' {
-            qualDef *qd;
-            int nrneeded;
+            if (notSkipping())
+            {
+                qualDef *qd;
+                int nrneeded;
 
-            /*
-             * Check that exactly one time slot in the set was
-             * requested.
-             */
+                /*
+                 * Check that exactly one time slot in the set was requested.
+                 */
+                nrneeded = 0;
 
-            nrneeded = 0;
+                for (qd = currentModule->qualifiers; qd != NULL; qd = qd->next)
+                    if (qd->qtype == time_qualifier && isNeeded(qd))
+                        ++nrneeded;
 
-            for (qd = currentModule -> qualifiers; qd != NULL; qd = qd -> next)
-                if (qd -> qtype == time_qualifier && isNeeded(qd))
-                    ++nrneeded;
+                if (nrneeded > 1)
+                    yyerror("At most one of this %Timeline must be specified with the -t flag");
 
-            if (nrneeded > 1)
-                yyerror("At most one of this %Timeline must be specified with the -t flag");
-
-            currentModule -> nrtimelines++;
+                currentModule->nrtimelines++;
+            }
         }
     ;
 
@@ -825,8 +1182,9 @@ qualifierlist:  qualifiername
     |   qualifierlist qualifiername
     ;
 
-qualifiername:  TK_NAME {
-            newQualifier(currentModule,currentModule -> nrtimelines,currentTimelineOrder++,$1,time_qualifier);
+qualifiername:  TK_NAME_VALUE {
+            newQualifier(currentModule, currentModule->nrtimelines,
+                    currentTimelineOrder++, $1, time_qualifier);
         }
     ;
 
@@ -843,23 +1201,23 @@ ifstart:    TK_IF '(' qualifiers ')' {
         }
     ;
 
-oredqualifiers: TK_NAME {
+oredqualifiers: TK_NAME_VALUE {
             $$ = platOrFeature($1,FALSE);
         }
-    |   '!' TK_NAME {
+    |   '!' TK_NAME_VALUE {
             $$ = platOrFeature($2,TRUE);
         }
-    |   oredqualifiers TK_LOGICAL_OR TK_NAME {
+    |   oredqualifiers TK_LOGICAL_OR TK_NAME_VALUE {
             $$ = (platOrFeature($3,FALSE) || $1);
         }
-    |   oredqualifiers TK_LOGICAL_OR '!' TK_NAME {
+    |   oredqualifiers TK_LOGICAL_OR '!' TK_NAME_VALUE {
             $$ = (platOrFeature($4,TRUE) || $1);
         }
     ;
 
 qualifiers: oredqualifiers
     |   optname '-' optname {
-            $$ = timePeriod($1,$3);
+            $$ = timePeriod($1, $3);
         }
     ;
 
@@ -869,124 +1227,513 @@ ifend:      TK_END {
         }
     ;
 
-license:    TK_LICENSE optflags {
+license:    TK_LICENSE license_args optflags {
             optFlag *of;
 
-            if ($2.nrFlags == 0)
-                yyerror("%License details not specified");
+            if ($3.nrFlags != 0)
+                deprecated("%License annotations are deprecated, use arguments instead");
 
-            if ((of = findOptFlag(&$2,"Type",string_flag)) == NULL)
-                yyerror("%License type not specified");
+            if ($2.type == NULL)
+                if ((of = getOptFlag(&$3, "Type", string_flag)) != NULL)
+                    $2.type = of->fvalue.sval;
 
-            currentModule -> license = sipMalloc(sizeof (licenseDef));
+            if ($2.licensee == NULL)
+                if ((of = getOptFlag(&$3, "Licensee", string_flag)) != NULL)
+                    $2.licensee = of->fvalue.sval;
 
-            currentModule -> license -> type = of -> fvalue.sval;
+            if ($2.signature == NULL)
+                if ((of = getOptFlag(&$3, "Signature", string_flag)) != NULL)
+                    $2.signature = of->fvalue.sval;
 
-            currentModule -> license -> licensee = 
-                ((of = findOptFlag(&$2,"Licensee",string_flag)) != NULL)
-                    ? of -> fvalue.sval : NULL;
+            if ($2.timestamp == NULL)
+                if ((of = getOptFlag(&$3, "Timestamp", string_flag)) != NULL)
+                    $2.timestamp = of->fvalue.sval;
 
-            currentModule -> license -> timestamp = 
-                ((of = findOptFlag(&$2,"Timestamp",string_flag)) != NULL)
-                    ? of -> fvalue.sval : NULL;
+            if ($2.type == NULL)
+                yyerror("%License must have a 'type' argument");
 
-            currentModule -> license -> sig = 
-                ((of = findOptFlag(&$2,"Signature",string_flag)) != NULL)
-                    ? of -> fvalue.sval : NULL;
+            if (notSkipping())
+            {
+                currentModule->license = sipMalloc(sizeof (licenseDef));
+
+                currentModule->license->type = $2.type;
+                currentModule->license->licensee = $2.licensee;
+                currentModule->license->sig = $2.signature;
+                currentModule->license->timestamp = $2.timestamp;
+            }
         }
     ;
 
-defmetatype:TK_DEFMETATYPE dottedname {
+license_args:   {
+            resetLexerState();
+
+            $$.type = NULL;
+            $$.licensee = NULL;
+            $$.signature = NULL;
+            $$.timestamp = NULL;
+        }
+    |   TK_STRING_VALUE {
+            $$.type = $1;
+            $$.licensee = NULL;
+            $$.signature = NULL;
+            $$.timestamp = NULL;
+        }
+    |   '(' license_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+license_arg_list:   license_arg
+    |   license_arg_list ',' license_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_TYPE: $$.type = $3.type; break;
+            case TK_LICENSEE: $$.licensee = $3.licensee; break;
+            case TK_SIGNATURE: $$.signature = $3.signature; break;
+            case TK_TIMESTAMP: $$.timestamp = $3.timestamp; break;
+            }
+        }
+    ;
+
+license_arg:    TK_TYPE '=' TK_STRING_VALUE {
+            $$.token = TK_NAME;
+
+            $$.type = $3;
+            $$.licensee = NULL;
+            $$.signature = NULL;
+            $$.timestamp = NULL;
+        }
+    |   TK_LICENSEE '=' TK_STRING_VALUE {
+            $$.token = TK_LICENSEE;
+
+            $$.type = NULL;
+            $$.licensee = $3;
+            $$.signature = NULL;
+            $$.timestamp = NULL;
+        }
+    |   TK_SIGNATURE '=' TK_STRING_VALUE {
+            $$.token = TK_SIGNATURE;
+
+            $$.type = NULL;
+            $$.licensee = NULL;
+            $$.signature = $3;
+            $$.timestamp = NULL;
+        }
+    |   TK_TIMESTAMP '=' TK_STRING_VALUE {
+            $$.token = TK_TIMESTAMP;
+
+            $$.type = NULL;
+            $$.licensee = NULL;
+            $$.signature = NULL;
+            $$.timestamp = $3;
+        }
+    ;
+
+defmetatype:    TK_DEFMETATYPE defmetatype_args {
             if (notSkipping())
             {
                 if (currentModule->defmetatype != NULL)
                     yyerror("%DefaultMetatype has already been defined for this module");
 
-                currentModule->defmetatype = cacheName(currentSpec, $2);
+                currentModule->defmetatype = cacheName(currentSpec, $2.name);
             }
         }
     ;
 
-defsupertype:   TK_DEFSUPERTYPE dottedname {
+defmetatype_args:   dottedname {
+            resetLexerState();
+
+            $$.name = $1;
+        }
+    |   '(' defmetatype_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+defmetatype_arg_list:   defmetatype_arg
+    |   defmetatype_arg_list ',' defmetatype_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_NAME: $$.name = $3.name; break;
+            }
+        }
+    ;
+
+defmetatype_arg:    TK_NAME '=' dottedname {
+            $$.token = TK_NAME;
+
+            $$.name = $3;
+        }
+    ;
+
+defsupertype:   TK_DEFSUPERTYPE defsupertype_args {
             if (notSkipping())
             {
                 if (currentModule->defsupertype != NULL)
                     yyerror("%DefaultSupertype has already been defined for this module");
 
-                currentModule->defsupertype = cacheName(currentSpec, $2);
+                currentModule->defsupertype = cacheName(currentSpec, $2.name);
             }
         }
     ;
 
-consmodule: TK_CONSMODULE dottedname {
-            /* Make sure this is the first mention of a module. */
-            if (currentSpec->module != currentModule)
-                yyerror("A %ConsolidatedModule cannot be %Imported");
+defsupertype_args:  dottedname {
+            resetLexerState();
 
-            if (currentModule->fullname != NULL)
-                yyerror("%ConsolidatedModule must appear before any %Module or %CModule directive");
-
-            setModuleName(currentSpec, currentModule, $2);
-            setIsConsolidated(currentModule);
+            $$.name = $1;
+        }
+    |   '(' defsupertype_arg_list ')' {
+            $$ = $2;
         }
     ;
 
-compmodule: TK_COMPOMODULE dottedname {
-            /* Make sure this is the first mention of a module. */
-            if (currentSpec->module != currentModule)
-                yyerror("A %CompositeModule cannot be %Imported");
+defsupertype_arg_list:  defsupertype_arg
+    |   defsupertype_arg_list ',' defsupertype_arg {
+            $$ = $1;
 
-            if (currentModule->fullname != NULL)
-                yyerror("%CompositeModule must appear before any %Module or %CModule directive");
-
-            setModuleName(currentSpec, currentModule, $2);
-            setIsComposite(currentModule);
-        }
-    ;
-
-module:     modlang dottedname optnumber {
-            /* Check the module hasn't already been defined. */
-
-            moduleDef *mod;
-
-            for (mod = currentSpec->modules; mod != NULL; mod = mod->next)
-                if (mod->fullname != NULL && strcmp(mod->fullname->text, $2) == 0)
-                    yyerror("Module is already defined");
-
-            /*
-             * If we are in a container module then create a component module
-             * and make it current.
-             */
-            if (isContainer(currentModule) || currentModule->container != NULL)
+            switch ($3.token)
             {
-                mod = allocModule();
-
-                mod->file = currentContext.filename;
-                mod->container = (isContainer(currentModule) ? currentModule : currentModule->container);
-
-                currentModule = mod;
+            case TK_NAME: $$.name = $3.name; break;
             }
-
-            setModuleName(currentSpec, currentModule, $2);
-            currentModule->version = $3;
-
-            if (currentSpec->genc < 0)
-                currentSpec->genc = $1;
-            else if (currentSpec->genc != $1)
-                yyerror("Cannot mix C and C++ modules");
         }
     ;
 
-modlang:    TK_MODULE {
-            $$ = FALSE;
-        }
-    |   TK_CMODULE {
-            $$ = TRUE;
+defsupertype_arg:   TK_NAME '=' dottedname {
+            $$.token = TK_NAME;
+
+            $$.name = $3;
         }
     ;
 
-dottedname: TK_NAME
-    |   TK_PATHNAME {
+consmodule: TK_CONSMODULE consmodule_args consmodule_body {
+            if (notSkipping())
+            {
+                /* Make sure this is the first mention of a module. */
+                if (currentSpec->module != currentModule)
+                    yyerror("A %ConsolidatedModule cannot be %Imported");
+
+                if (currentModule->fullname != NULL)
+                    yyerror("%ConsolidatedModule must appear before any %Module or %CModule directive");
+
+                setModuleName(currentSpec, currentModule, $2.name);
+                appendCodeBlock(&currentModule->docstring, $3.docstring);
+
+                setIsConsolidated(currentModule);
+            }
+        }
+    ;
+
+consmodule_args:    dottedname {
+            resetLexerState();
+
+            $$.name = $1;
+        }
+    |   '(' consmodule_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+consmodule_arg_list:    consmodule_arg
+    |   consmodule_arg_list ',' consmodule_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_NAME: $$.name = $3.name; break;
+            }
+        }
+    ;
+
+consmodule_arg: TK_NAME '=' dottedname {
+            $$.token = TK_NAME;
+
+            $$.name = $3;
+        }
+    ;
+
+consmodule_body:    {
+            $$.token = 0;
+            $$.docstring = NULL;
+        }
+    |   '{' consmodule_body_directives '}' ';' {
+            $$ = $2;
+        }
+    ;
+
+consmodule_body_directives: consmodule_body_directive
+    |   consmodule_body_directives consmodule_body_directive {
+            $$ = $1;
+
+            switch ($2.token)
+            {
+            case TK_DOCSTRING: $$.docstring = $2.docstring; break;
+            }
+        }
+    ;
+
+consmodule_body_directive:  ifstart {
+            $$.token = TK_IF;
+        }
+    |   ifend {
+            $$.token = TK_END;
+        }
+    |   docstring {
+            if (notSkipping())
+            {
+                $$.token = TK_DOCSTRING;
+                $$.docstring = $1;
+            }
+            else
+            {
+                $$.token = 0;
+                $$.docstring = NULL;
+            }
+        }
+    ;
+
+compmodule: TK_COMPOMODULE compmodule_args compmodule_body {
+            if (notSkipping())
+            {
+                /* Make sure this is the first mention of a module. */
+                if (currentSpec->module != currentModule)
+                    yyerror("A %CompositeModule cannot be %Imported");
+
+                if (currentModule->fullname != NULL)
+                    yyerror("%CompositeModule must appear before any %Module directive");
+
+                setModuleName(currentSpec, currentModule, $2.name);
+                appendCodeBlock(&currentModule->docstring, $3.docstring);
+
+                setIsComposite(currentModule);
+            }
+        }
+    ;
+
+compmodule_args:    dottedname {
+            resetLexerState();
+
+            $$.name = $1;
+        }
+    |   '(' compmodule_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+compmodule_arg_list:    compmodule_arg
+    |   compmodule_arg_list ',' compmodule_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_NAME: $$.name = $3.name; break;
+            }
+        }
+    ;
+
+compmodule_arg: TK_NAME '=' dottedname {
+            $$.token = TK_NAME;
+
+            $$.name = $3;
+        }
+    ;
+
+compmodule_body:    {
+            $$.token = 0;
+            $$.docstring = NULL;
+        }
+    |   '{' compmodule_body_directives '}' ';' {
+            $$ = $2;
+        }
+    ;
+
+compmodule_body_directives: compmodule_body_directive
+    |   compmodule_body_directives compmodule_body_directive {
+            $$ = $1;
+
+            switch ($2.token)
+            {
+            case TK_DOCSTRING: $$.docstring = $2.docstring; break;
+            }
+        }
+    ;
+
+compmodule_body_directive:  ifstart {
+            $$.token = TK_IF;
+        }
+    |   ifend {
+            $$.token = TK_END;
+        }
+    |   docstring {
+            if (notSkipping())
+            {
+                $$.token = TK_DOCSTRING;
+                $$.docstring = $1;
+            }
+            else
+            {
+                $$.token = 0;
+                $$.docstring = NULL;
+            }
+        }
+    ;
+
+module: TK_MODULE module_args module_body {
+            if ($2.name == NULL)
+                yyerror("%Module must have a 'name' argument");
+
+            if (notSkipping())
+                currentModule = configureModule(currentSpec, currentModule,
+                        currentContext.filename, $2.name, $2.version,
+                        $2.c_module, $2.kwargs, $2.use_arg_names,
+                        $3.docstring);
+        }
+    |   TK_CMODULE dottedname optnumber {
+            deprecated("%CModule is deprecated, use %Module and the 'language' argument instead");
+
+            if (notSkipping())
+                currentModule = configureModule(currentSpec, currentModule,
+                        currentContext.filename, $2, $3, TRUE, defaultKwArgs,
+                        FALSE, NULL);
+        }
+    ;
+
+module_args:    dottedname optnumber {
+            resetLexerState();
+
+            if ($2 >= 0)
+                deprecated("%Module version number should be specified using the 'version' argument");
+
+            $$.c_module = FALSE;
+            $$.kwargs = defaultKwArgs;
+            $$.name = $1;
+            $$.use_arg_names = FALSE;
+            $$.version = $2;
+        }
+    |   '(' module_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+module_arg_list:    module_arg
+    |   module_arg_list ',' module_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_KWARGS: $$.kwargs = $3.kwargs; break;
+            case TK_LANGUAGE: $$.c_module = $3.c_module; break;
+            case TK_NAME: $$.name = $3.name; break;
+            case TK_USEARGNAMES: $$.use_arg_names = $3.use_arg_names; break;
+            case TK_VERSION: $$.version = $3.version; break;
+            }
+        }
+    ;
+
+module_arg: TK_KWARGS '=' TK_STRING_VALUE {
+            $$.token = TK_KWARGS;
+
+            $$.c_module = FALSE;
+            $$.kwargs = convertKwArgs($3);
+            $$.name = NULL;
+            $$.use_arg_names = FALSE;
+            $$.version = -1;
+        }
+    |   TK_LANGUAGE '=' TK_STRING_VALUE {
+            $$.token = TK_LANGUAGE;
+
+            if (strcmp($3, "C++") == 0)
+                $$.c_module = FALSE;
+            else if (strcmp($3, "C") == 0)
+                $$.c_module = TRUE;
+            else
+                yyerror("%Module 'language' argument must be either \"C++\" or \"C\"");
+
+            $$.kwargs = defaultKwArgs;
+            $$.name = NULL;
+            $$.use_arg_names = FALSE;
+            $$.version = -1;
+        }
+    |   TK_NAME '=' dottedname {
+            $$.token = TK_NAME;
+
+            $$.c_module = FALSE;
+            $$.kwargs = defaultKwArgs;
+            $$.name = $3;
+            $$.use_arg_names = FALSE;
+            $$.version = -1;
+        }
+    |   TK_USEARGNAMES '=' bool_value {
+            $$.token = TK_USEARGNAMES;
+
+            $$.c_module = FALSE;
+            $$.kwargs = defaultKwArgs;
+            $$.name = NULL;
+            $$.use_arg_names = $3;
+            $$.version = -1;
+        }
+    |   TK_VERSION '=' TK_NUMBER_VALUE {
+            if ($3 < 0)
+                yyerror("%Module 'version' argument cannot be negative");
+
+            $$.token = TK_VERSION;
+
+            $$.c_module = FALSE;
+            $$.kwargs = defaultKwArgs;
+            $$.name = NULL;
+            $$.use_arg_names = FALSE;
+            $$.version = $3;
+        }
+    ;
+
+module_body:    {
+            $$.token = 0;
+            $$.docstring = NULL;
+        }
+    |   '{' module_body_directives '}' ';' {
+            $$ = $2;
+        }
+    ;
+
+module_body_directives: module_body_directive
+    |   module_body_directives module_body_directive {
+            $$ = $1;
+
+            switch ($2.token)
+            {
+            case TK_DOCSTRING: $$.docstring = $2.docstring; break;
+            }
+        }
+    ;
+
+module_body_directive:  ifstart {
+            $$.token = TK_IF;
+        }
+    |   ifend {
+            $$.token = TK_END;
+        }
+    |   autopyname {
+            $$.token = TK_AUTOPYNAME;
+        }
+    |   docstring {
+            if (notSkipping())
+            {
+                $$.token = TK_DOCSTRING;
+                $$.docstring = $1;
+            }
+            else
+            {
+                $$.token = 0;
+                $$.docstring = NULL;
+            }
+        }
+    ;
+
+dottedname: TK_NAME_VALUE
+    |   TK_PATH_VALUE {
             /*
              * The grammar design is a bit broken and this is the easiest way
              * to allow periods in names.
@@ -1005,21 +1752,94 @@ dottedname: TK_NAME
 optnumber:  {
             $$ = -1;
         }
-    |   TK_NUMBER
+    |   TK_NUMBER_VALUE
     ;
 
-include:    TK_INCLUDE TK_PATHNAME {
-            parseFile(NULL, $2, NULL, FALSE);
+include:    TK_INCLUDE include_args {
+            if ($2.name == NULL)
+                yyerror("%Include must have a 'name' argument");
+
+            if (notSkipping())
+                parseFile(NULL, $2.name, NULL, $2.optional);
         }
     ;
 
-optinclude: TK_OPTINCLUDE TK_PATHNAME {
-            parseFile(NULL, $2, NULL, TRUE);
+include_args:   TK_PATH_VALUE {
+            resetLexerState();
+
+            $$.name = $1;
+            $$.optional = FALSE;
+        }
+    |   '(' include_arg_list ')' {
+            $$ = $2;
         }
     ;
 
-import:     TK_IMPORT TK_PATHNAME {
-            newImport($2);
+include_arg_list:   include_arg
+    |   include_arg_list ',' include_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_NAME: $$.name = $3.name; break;
+            case TK_OPTIONAL: $$.optional = $3.optional; break;
+            }
+        }
+    ;
+
+include_arg:    TK_NAME '=' TK_PATH_VALUE {
+            $$.token = TK_NAME;
+
+            $$.name = $3;
+            $$.optional = FALSE;
+        }
+    |   TK_OPTIONAL '=' bool_value {
+            $$.token = TK_OPTIONAL;
+
+            $$.name = NULL;
+            $$.optional = $3;
+        }
+    ;
+
+optinclude: TK_OPTINCLUDE TK_PATH_VALUE {
+            deprecated("%OptionalInclude is deprecated, use %Include and the 'optional' argument instead");
+
+            if (notSkipping())
+                parseFile(NULL, $2, NULL, TRUE);
+        }
+    ;
+
+import:     TK_IMPORT import_args {
+            if (notSkipping())
+                newImport($2.name);
+        }
+    ;
+
+import_args:    TK_PATH_VALUE {
+            resetLexerState();
+
+            $$.name = $1;
+        }
+    |   '(' import_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+import_arg_list:    import_arg
+    |   import_arg_list ',' import_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_NAME: $$.name = $3.name; break;
+            }
+        }
+    ;
+
+import_arg: TK_NAME '=' TK_PATH_VALUE {
+            $$.token = TK_NAME;
+
+            $$.name = $3;
         }
     ;
 
@@ -1048,29 +1868,26 @@ optsetcode: {
     ;
 
 copying:    TK_COPYING codeblock {
-            appendCodeBlock(&currentModule->copying, $2);
+            if (notSkipping())
+                appendCodeBlock(&currentModule->copying, $2);
         }
     ;
 
 exphdrcode: TK_EXPHEADERCODE codeblock {
-            $$ = $2;
+            if (notSkipping())
+                appendCodeBlock(&currentSpec->exphdrcode, $2);
         }
     ;
 
 modhdrcode: TK_MODHEADERCODE codeblock {
-            $$ = $2;
+            if (notSkipping())
+                appendCodeBlock(&currentModule->hdrcode, $2);
         }
     ;
 
 typehdrcode:    TK_TYPEHEADERCODE codeblock {
             $$ = $2;
         }
-    ;
-
-opttypehdrcode: {
-            $$ = NULL;
-        }
-    |   typehdrcode
     ;
 
 travcode:   TK_TRAVERSECODE codeblock {
@@ -1119,7 +1936,8 @@ picklecode: TK_PICKLECODE codeblock {
     ;
 
 modcode:    TK_MODCODE codeblock {
-            $$ = $2;
+            if (notSkipping())
+                appendCodeBlock(&currentModule->cppcode, $2);
         }
     ;
 
@@ -1152,29 +1970,109 @@ unitcode:   TK_UNITCODE codeblock {
         }
     ;
 
+unitpostinccode:    TK_UNITPOSTINCLUDECODE codeblock {
+            if (notSkipping())
+                appendCodeBlock(&currentModule->unitpostinccode, $2);
+        }
+    ;
+
 prepycode:  TK_PREPYCODE codeblock {
-            /*
-             * This is a no-op and is retained for compatibility
-             * until the last use of it (by SIP v3) can be removed
-             * from PyQt.
-             */
+            /* Deprecated. */
         }
     ;
 
 doc:        TK_DOC codeblock {
-            if (inMainModule())
-                appendCodeBlock(&currentSpec -> docs,$2);
+            if (notSkipping() && inMainModule())
+                appendCodeBlock(&currentSpec->docs, $2);
         }
     ;
 
 exporteddoc:    TK_EXPORTEDDOC codeblock {
-            appendCodeBlock(&currentSpec -> docs,$2);
+            if (notSkipping())
+                appendCodeBlock(&currentSpec->docs, $2);
         }
     ;
 
-makefile:   TK_MAKEFILE TK_PATHNAME optfilename codeblock {
-            if (inMainModule())
-                yywarning("%Makefile is ignored, please use the -b flag instead");
+autopyname: TK_AUTOPYNAME autopyname_args {
+            if (notSkipping())
+                addAutoPyName(currentModule, $2.remove_leading);
+        }
+    ;
+
+autopyname_args:    '(' autopyname_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+autopyname_arg_list:    autopyname_arg
+    |   autopyname_arg_list ',' autopyname_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_REMOVELEADING: $$.remove_leading = $3.remove_leading; break;
+            }
+        }
+    ;
+
+autopyname_arg: TK_REMOVELEADING '=' TK_STRING_VALUE {
+            $$.token = TK_REMOVELEADING;
+
+            $$.remove_leading = $3;
+        }
+    ;
+
+extract:    TK_EXTRACT extract_args codeblock {
+            if ($2.id == NULL)
+                yyerror("%Extract must have an 'id' argument");
+
+            if (notSkipping())
+                addExtractPart(currentSpec, $2.id, $2.order, $3);
+        }
+    ;
+
+extract_args:   TK_NAME_VALUE {
+            resetLexerState();
+
+            $$.id = $1;
+            $$.order = -1;
+        }
+    |   '(' extract_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+extract_arg_list:   extract_arg
+    |   extract_arg_list ',' extract_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_ID: $$.id = $3.id; break;
+            case TK_ORDER: $$.order = $3.order; break;
+            }
+        }
+    ;
+
+extract_arg:    TK_ID '=' TK_NAME_VALUE {
+            $$.token = TK_ID;
+
+            $$.id = $3;
+            $$.order = -1;
+        }
+    |   TK_ORDER '=' TK_NUMBER_VALUE {
+            $$.token = TK_ORDER;
+
+            if ($3 < 0)
+                yyerror("The 'order' of an %Extract directive must not be negative");
+
+            $$.id = NULL;
+            $$.order = $3;
+        }
+    ;
+
+makefile:   TK_MAKEFILE TK_PATH_VALUE optfilename codeblock {
+            /* Deprecated. */
         }
     ;
 
@@ -1196,6 +2094,13 @@ codelines:  TK_CODELINE
 enum:       TK_ENUM optname optflags {
             if (notSkipping())
             {
+                const char *annos[] = {
+                    "PyName",
+                    NULL
+                };
+
+                checkAnnos(&$3, annos);
+
                 if (sectionFlags != 0 && (sectionFlags & ~(SECT_IS_PUBLIC | SECT_IS_PROT)) != 0)
                     yyerror("Class enums must be in the public or protected sections");
 
@@ -1208,7 +2113,7 @@ enum:       TK_ENUM optname optflags {
 optfilename:    {
             $$ = NULL;
         }
-    |   TK_PATHNAME {
+    |   TK_PATH_VALUE {
             $$ = $1;
         }
     ;
@@ -1216,7 +2121,7 @@ optfilename:    {
 optname:    {
             $$ = NULL;
         }
-    |   TK_NAME {
+    |   TK_NAME_VALUE {
             $$ = $1;
         }
     ;
@@ -1231,15 +2136,23 @@ enumbody:   enumline
 
 enumline:   ifstart
     |   ifend
-    |   TK_NAME optenumassign optflags optcomma {
+    |   TK_NAME_VALUE optenumassign optflags optcomma {
             if (notSkipping())
             {
+                const char *annos[] = {
+                    "PyName",
+                    NULL
+                };
+
                 enumMemberDef *emd, **tail;
+
+                checkAnnos(&$3, annos);
 
                 /* Note that we don't use the assigned value. */
                 emd = sipMalloc(sizeof (enumMemberDef));
 
-                emd -> pyname = cacheName(currentSpec, getPythonName(&$3, $1));
+                emd -> pyname = cacheName(currentSpec,
+                        getPythonName(currentModule, &$3, $1));
                 emd -> cname = $1;
                 emd -> ed = currentEnum;
                 emd -> next = NULL;
@@ -1358,8 +2271,16 @@ scopedname: scopepart
         }
     ;
 
-scopepart:  TK_NAME {
+scopepart:  TK_NAME_VALUE {
             $$ = text2scopePart($1);
+        }
+    ;
+
+bool_value: TK_TRUE_VALUE {
+            $$ = TRUE;
+        }
+    |   TK_FALSE_VALUE {
+            $$ = FALSE;
         }
     ;
 
@@ -1382,31 +2303,27 @@ simplevalue:    scopedname {
             $$.vtype = fcall_value;
             $$.u.fcd = fcd;
         }
-    |   TK_REAL {
+    |   TK_REAL_VALUE {
             $$.vtype = real_value;
             $$.u.vreal = $1;
         }
-    |   TK_NUMBER {
+    |   TK_NUMBER_VALUE {
             $$.vtype = numeric_value;
             $$.u.vnum = $1;
         }
-    |   TK_TRUE {
+    |   bool_value {
             $$.vtype = numeric_value;
-            $$.u.vnum = 1;
+            $$.u.vnum = $1;
         }
-    |   TK_FALSE {
-            $$.vtype = numeric_value;
-            $$.u.vnum = 0;
-        }
-    |   TK_NULL {
+    |   TK_NULL_VALUE {
             $$.vtype = numeric_value;
             $$.u.vnum = 0;
         }
-    |   TK_STRING {
+    |   TK_STRING_VALUE {
             $$.vtype = string_value;
             $$.u.vstr = $1;
         }
-    |   TK_QCHAR {
+    |   TK_QCHAR_VALUE {
             $$.vtype = qchar_value;
             $$.u.vqchar = $1;
         }
@@ -1441,18 +2358,38 @@ exprlist:   {
         }
     ;
 
-typedef:    TK_TYPEDEF cpptype TK_NAME optflags ';' {
+typedef:    TK_TYPEDEF cpptype TK_NAME_VALUE optflags ';' {
             if (notSkipping())
             {
+                const char *annos[] = {
+                    "DocType",
+                    "Encoding",
+                    "NoTypeName",
+                    "PyInt",
+                    NULL
+                };
+
+                checkAnnos(&$4, annos);
+
                 applyTypeFlags(currentModule, &$2, &$4);
                 newTypedef(currentSpec, currentModule, $3, &$2, &$4);
             }
         }
-    |   TK_TYPEDEF cpptype '(' deref TK_NAME ')' '(' cpptypelist ')' optflags ';' {
+    |   TK_TYPEDEF cpptype '(' deref TK_NAME_VALUE ')' '(' cpptypelist ')' optflags ';' {
             if (notSkipping())
             {
+                const char *annos[] = {
+                    "DocType",
+                    "Encoding",
+                    "NoTypeName",
+                    "PyInt",
+                    NULL
+                };
+
                 signatureDef *sig;
                 argDef ftype;
+
+                checkAnnos(&$10, annos);
 
                 applyTypeFlags(currentModule, &$2, &$10);
 
@@ -1482,6 +2419,24 @@ struct:     TK_STRUCT scopedname {
         } superclasses optflags {
             if (notSkipping())
             {
+                const char *annos[] = {
+                    "Abstract",
+                    "AllowNone",
+                    "API",
+                    "DelayDtor",
+                    "Deprecated",
+                    "External",
+                    "Metatype",
+                    "NoDefaultCtors",
+                    "PyName",
+                    "PyQt4Flags",
+                    "PyQt4NoQMetaObject",
+                    "Supertype",
+                    NULL
+                };
+
+                checkAnnos(&$5, annos);
+
                 if (currentSpec->genc && currentSupers != NULL)
                     yyerror("Super-classes not allowed in a C module struct");
 
@@ -1534,6 +2489,24 @@ class:  TK_CLASS scopedname {
         } superclasses optflags {
             if (notSkipping())
             {
+                const char *annos[] = {
+                    "Abstract",
+                    "AllowNone",
+                    "API",
+                    "DelayDtor",
+                    "Deprecated",
+                    "External",
+                    "Metatype",
+                    "NoDefaultCtors",
+                    "PyName",
+                    "PyQt4Flags",
+                    "PyQt4NoQMetaObject",
+                    "Supertype",
+                    NULL
+                };
+
+                checkAnnos(&$5, annos);
+
                 defineClass($2, currentSupers, &$5);
                 sectionFlags = SECT_IS_PRIVATE;
             }
@@ -1610,15 +2583,10 @@ classline:  ifstart
     |   exception
     |   typedef
     |   enum
+    |   property
     |   docstring {
             if (notSkipping())
-            {
-                classDef *scope = currentScope();
-
-                /* Make sure this is before any ctor docstrings. */
-                $1->next = scope->docstring;
-                scope->docstring = $1;
-            }
+                appendCodeBlock(&currentScope()->docstring, $1);
         }
     |   typecode {
             if (notSkipping())
@@ -1636,7 +2604,7 @@ classline:  ifstart
                 if (scope->travcode != NULL)
                     yyerror("%GCTraverseCode already given for class");
 
-                scope->travcode = $1;
+                appendCodeBlock(&scope->travcode, $1);
             }
         }
     |   clearcode {
@@ -1647,7 +2615,7 @@ classline:  ifstart
                 if (scope->clearcode != NULL)
                     yyerror("%GCClearCode already given for class");
 
-                scope->clearcode = $1;
+                appendCodeBlock(&scope->clearcode, $1);
             }
         }
     |   getbufcode {
@@ -1658,7 +2626,7 @@ classline:  ifstart
                 if (scope->getbufcode != NULL)
                     yyerror("%BIGetBufferCode already given for class");
 
-                scope->getbufcode = $1;
+                appendCodeBlock(&scope->getbufcode, $1);
             }
         }
     |   releasebufcode {
@@ -1669,7 +2637,7 @@ classline:  ifstart
                 if (scope->releasebufcode != NULL)
                     yyerror("%BIReleaseBufferCode already given for class");
 
-                scope->releasebufcode = $1;
+                appendCodeBlock(&scope->releasebufcode, $1);
             }
         }
     |   readbufcode {
@@ -1680,7 +2648,7 @@ classline:  ifstart
                 if (scope->readbufcode != NULL)
                     yyerror("%BIGetReadBufferCode already given for class");
 
-                scope->readbufcode = $1;
+                appendCodeBlock(&scope->readbufcode, $1);
             }
         }
     |   writebufcode {
@@ -1691,7 +2659,7 @@ classline:  ifstart
                 if (scope->writebufcode != NULL)
                     yyerror("%BIGetWriteBufferCode already given for class");
 
-                scope->writebufcode = $1;
+                appendCodeBlock(&scope->writebufcode, $1);
             }
         }
     |   segcountcode {
@@ -1702,7 +2670,7 @@ classline:  ifstart
                 if (scope->segcountcode != NULL)
                     yyerror("%BIGetSegCountCode already given for class");
 
-                scope->segcountcode = $1;
+                appendCodeBlock(&scope->segcountcode, $1);
             }
         }
     |   charbufcode {
@@ -1713,7 +2681,7 @@ classline:  ifstart
                 if (scope->charbufcode != NULL)
                     yyerror("%BIGetCharBufferCode already given for class");
 
-                scope->charbufcode = $1;
+                appendCodeBlock(&scope->charbufcode, $1);
             }
         }
     |   picklecode {
@@ -1724,7 +2692,7 @@ classline:  ifstart
                 if (scope->picklecode != NULL)
                     yyerror("%PickleCode already given for class");
 
-                scope->picklecode = $1;
+                appendCodeBlock(&scope->picklecode, $1);
             }
         }
     |   ctor
@@ -1738,7 +2706,7 @@ classline:  ifstart
                 if (scope->convtosubcode != NULL)
                     yyerror("Class has more than one %ConvertToSubClassCode directive");
 
-                scope->convtosubcode = $2;
+                appendCodeBlock(&scope->convtosubcode, $2);
             }
         }
     |   TK_TOTYPE codeblock {
@@ -1749,7 +2717,7 @@ classline:  ifstart
                 if (scope->convtocode != NULL)
                     yyerror("Class has more than one %ConvertToTypeCode directive");
 
-                scope->convtocode = $2;
+                appendCodeBlock(&scope->convtocode, $2);
             }
         }
     |   TK_PUBLIC optslot ':' {
@@ -1782,6 +2750,100 @@ classline:  ifstart
         }
     ;
 
+property:   TK_PROPERTY property_args property_body {
+            if ($2.name == NULL)
+                yyerror("A %Property directive must have a 'name' argument");
+
+            if ($2.get == NULL)
+                yyerror("A %Property directive must have a 'get' argument");
+
+            if (notSkipping())
+                addProperty(currentSpec, currentModule, currentScope(),
+                        $2.name, $2.get, $2.set, $3.docstring);
+        }
+    ;
+
+property_args:  '(' property_arg_list ')' {
+            $$ = $2;
+        }
+    ;
+
+property_arg_list:  property_arg
+    |   property_arg_list ',' property_arg {
+            $$ = $1;
+
+            switch ($3.token)
+            {
+            case TK_GET: $$.get = $3.get; break;
+            case TK_NAME: $$.name = $3.name; break;
+            case TK_SET: $$.set = $3.set; break;
+            }
+        }
+    ;
+
+property_arg:   TK_GET '=' TK_NAME_VALUE {
+            $$.token = TK_GET;
+
+            $$.get = $3;
+            $$.name = NULL;
+            $$.set = NULL;
+        }
+    |   TK_NAME '=' TK_NAME_VALUE {
+            $$.token = TK_NAME;
+
+            $$.get = NULL;
+            $$.name = $3;
+            $$.set = NULL;
+        }
+    |   TK_SET '=' TK_NAME_VALUE {
+            $$.token = TK_SET;
+
+            $$.get = NULL;
+            $$.name = NULL;
+            $$.set = $3;
+        }
+    ;
+
+property_body:  {
+            $$.token = 0;
+            $$.docstring = NULL;
+        }
+    |   '{' property_body_directives '}' ';' {
+            $$ = $2;
+        }
+    ;
+
+property_body_directives:   property_body_directive
+    |   property_body_directives property_body_directive {
+            $$ = $1;
+
+            switch ($2.token)
+            {
+            case TK_DOCSTRING: $$.docstring = $2.docstring; break;
+            }
+        }
+    ;
+
+property_body_directive:    ifstart {
+            $$.token = TK_IF;
+        }
+    |   ifend {
+            $$.token = TK_END;
+        }
+    |   docstring {
+            if (notSkipping())
+            {
+                $$.token = TK_DOCSTRING;
+                $$.docstring = $1;
+            }
+            else
+            {
+                $$.token = 0;
+                $$.docstring = NULL;
+            }
+        }
+    ;
+
 optslot:    {
             $$ = 0;
         }
@@ -1790,12 +2852,20 @@ optslot:    {
         }
     ;
 
-dtor:       optvirtual '~' TK_NAME '(' ')' optexceptions optabstract optflags ';' methodcode virtualcatchercode {
+dtor:       optvirtual '~' TK_NAME_VALUE '(' ')' optexceptions optabstract optflags ';' methodcode virtualcatchercode {
             /* Note that we allow non-virtual dtors in C modules. */
 
             if (notSkipping())
             {
+                const char *annos[] = {
+                    "HoldGIL",
+                    "ReleaseGIL",
+                    NULL
+                };
+
                 classDef *cd = currentScope();
+
+                checkAnnos(&$8, annos);
 
                 if (strcmp(classBaseName(cd),$3) != 0)
                     yyerror("Destructor doesn't have the same name as its class");
@@ -1806,8 +2876,8 @@ dtor:       optvirtual '~' TK_NAME '(' ')' optexceptions optabstract optflags ';
                 if (currentSpec -> genc && $10 == NULL)
                     yyerror("Destructor in C modules must include %MethodCode");
 
-                cd -> dealloccode = $10;
-                cd -> dtorcode = $11;
+                appendCodeBlock(&cd->dealloccode, $10);
+                appendCodeBlock(&cd->dtorcode, $11);
                 cd -> dtorexceptions = $6;
 
                 /*
@@ -1848,11 +2918,27 @@ ctor:       TK_EXPLICIT {currentCtorIsExplicit = TRUE;} simplector
     |   simplector
     ;
 
-simplector: TK_NAME '(' arglist ')' optexceptions optflags optctorsig ';' optdocstring methodcode {
+simplector: TK_NAME_VALUE '(' arglist ')' optexceptions optflags optctorsig ';' optdocstring methodcode {
             /* Note that we allow ctors in C modules. */
 
             if (notSkipping())
             {
+                const char *annos[] = {
+                    "API",
+                    "Default",
+                    "Deprecated",
+                    "HoldGIL",
+                    "KeywordArgs",
+                    "NoDerived",
+                    "PostHook",
+                    "PreHook",
+                    "ReleaseGIL",
+                    "Transfer",
+                    NULL
+                };
+
+                checkAnnos(&$6, annos);
+
                 if (currentSpec -> genc)
                 {
                     if ($10 == NULL && $3.nrArgs != 0)
@@ -1865,7 +2951,7 @@ simplector: TK_NAME '(' arglist ')' optexceptions optflags optctorsig ';' optdoc
                 if ((sectionFlags & (SECT_IS_PUBLIC | SECT_IS_PROT | SECT_IS_PRIVATE)) == 0)
                     yyerror("Constructor must be in the public, private or protected sections");
 
-                newCtor($1, sectionFlags, &$3, &$6, $10, $5, $7,
+                newCtor(currentModule, $1, sectionFlags, &$3, &$6, $10, $5, $7,
                         currentCtorIsExplicit, $9);
             }
 
@@ -1878,21 +2964,29 @@ simplector: TK_NAME '(' arglist ')' optexceptions optflags optctorsig ';' optdoc
 optctorsig: {
             $$ = NULL;
         }
-    |   '[' '(' arglist ')' ']' {
+    |   '[' {
+            parsingCSignature = TRUE;
+        } '(' arglist ')' ']' {
             $$ = sipMalloc(sizeof (signatureDef));
 
-            *$$ = $3;
+            *$$ = $4;
+
+            parsingCSignature = FALSE;
         }
     ;
 
 optsig: {
             $$ = NULL;
         }
-    |   '[' cpptype '(' arglist ')' ']' {
+    |   '[' {
+            parsingCSignature = TRUE;
+        } cpptype '(' arglist ')' ']' {
             $$ = sipMalloc(sizeof (signatureDef));
 
-            *$$ = $4;
-            $$ -> result = $2;
+            *$$ = $5;
+            $$->result = $3;
+
+            parsingCSignature = FALSE;
         }
     ;
 
@@ -1904,7 +2998,7 @@ optvirtual: {
         }
     ;
 
-function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract optflags optsig ';' optdocstring methodcode virtualcatchercode {
+function:   cpptype TK_NAME_VALUE '(' arglist ')' optconst optexceptions optabstract optflags optsig ';' optdocstring methodcode virtualcatchercode {
             if (notSkipping())
             {
                 applyTypeFlags(currentModule, &$1, &$9);
@@ -1912,11 +3006,14 @@ function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract o
                 $4.result = $1;
 
                 newFunction(currentSpec, currentModule, currentScope(), NULL,
-                        sectionFlags, currentIsStatic, currentOverIsVirt, $2,
-                        &$4, $6, $8, &$9, $13, $14, $7, $10, $12);
+                        sectionFlags, currentIsStatic, currentIsSignal,
+                        currentIsSlot, currentOverIsVirt, $2, &$4, $6, $8, &$9,
+                        $13, $14, $7, $10, $12);
             }
 
             currentIsStatic = FALSE;
+            currentIsSignal = FALSE;
+            currentIsSlot = FALSE;
             currentOverIsVirt = FALSE;
         }
     |   cpptype TK_OPERATOR '=' '(' cpptype ')' ';' {
@@ -1935,12 +3032,21 @@ function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract o
             }
 
             currentIsStatic = FALSE;
+            currentIsSignal = FALSE;
+            currentIsSlot = FALSE;
             currentOverIsVirt = FALSE;
         }
     |   cpptype TK_OPERATOR operatorname '(' arglist ')' optconst optexceptions optabstract optflags optsig ';' methodcode virtualcatchercode {
             if (notSkipping())
             {
                 classDef *cd = currentScope();
+
+                /*
+                 * If the scope is a namespace then make sure the operator is
+                 * handled as a global.
+                 */
+                if (cd != NULL && cd->iff->type == namespace_iface)
+                    cd = NULL;
 
                 applyTypeFlags(currentModule, &$1, &$10);
 
@@ -1956,11 +3062,14 @@ function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract o
                 $5.result = $1;
 
                 newFunction(currentSpec, currentModule, cd, NULL,
-                        sectionFlags, currentIsStatic, currentOverIsVirt, $3,
-                        &$5, $7, $9, &$10, $13, $14, $8, $11, NULL);
+                        sectionFlags, currentIsStatic, currentIsSignal,
+                        currentIsSlot, currentOverIsVirt, $3, &$5, $7, $9,
+                        &$10, $13, $14, $8, $11, NULL);
             }
 
             currentIsStatic = FALSE;
+            currentIsSignal = FALSE;
+            currentIsSlot = FALSE;
             currentOverIsVirt = FALSE;
         }
     |   TK_OPERATOR cpptype '(' arglist ')' optconst optexceptions optabstract optflags optsig ';' methodcode virtualcatchercode {
@@ -1982,6 +3091,9 @@ function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract o
 
                 case bool_type:
                 case cbool_type:
+                case byte_type:
+                case sbyte_type:
+                case ubyte_type:
                 case short_type:
                 case ushort_type:
                 case int_type:
@@ -2013,8 +3125,9 @@ function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract o
                     $4.result = $2;
 
                     newFunction(currentSpec, currentModule, scope, NULL,
-                            sectionFlags, currentIsStatic, currentOverIsVirt,
-                            sname, &$4, $6, $8, &$9, $12, $13, $7, $10, NULL);
+                            sectionFlags, currentIsStatic, currentIsSignal,
+                            currentIsSlot, currentOverIsVirt, sname, &$4, $6,
+                            $8, &$9, $12, $13, $7, $10, NULL);
                 }
                 else
                 {
@@ -2034,6 +3147,8 @@ function:   cpptype TK_NAME '(' arglist ')' optconst optexceptions optabstract o
             }
 
             currentIsStatic = FALSE;
+            currentIsSignal = FALSE;
+            currentIsSlot = FALSE;
             currentOverIsVirt = FALSE;
         }
     ;
@@ -2080,7 +3195,7 @@ optconst:   {
 optabstract:    {
             $$ = 0;
         }
-    |   '=' TK_NUMBER {
+    |   '=' TK_NUMBER_VALUE {
             if ($2 != 0)
                 yyerror("Abstract virtual function '= 0' expected");
 
@@ -2113,11 +3228,11 @@ flaglist:   flag {
         }
     ;
 
-flag:   TK_NAME {
+flag:   TK_NAME_VALUE {
             $$.ftype = bool_flag;
             $$.fname = $1;
         }
-    |   TK_NAME '=' flagvalue {
+    |   TK_NAME_VALUE '=' flagvalue {
             $$ = $3;
             $$.fname = $1;
         }
@@ -2127,7 +3242,7 @@ flagvalue:  dottedname {
             $$.ftype = (strchr($1, '.') != NULL) ? dotted_name_flag : name_flag;
             $$.fvalue.sval = $1;
         }
-    |   TK_NAME ':' optnumber '-' optnumber {
+    |   TK_NAME_VALUE ':' optnumber '-' optnumber {
             apiVersionRangeDef *avd;
             int from, to;
 
@@ -2150,11 +3265,11 @@ flagvalue:  dottedname {
             $$.fvalue.aval = convertAPIRange(currentModule, avd->api_name,
                     from, to);
         }
-    |   TK_STRING {
+    |   TK_STRING_VALUE {
             $$.ftype = string_flag;
             $$.fvalue.sval = convertFeaturedString($1);
         }
-    |   TK_NUMBER {
+    |   TK_NUMBER_VALUE {
             $$.ftype = integer_flag;
             $$.fvalue.ival = $1;
         }
@@ -2274,6 +3389,8 @@ rawarglist: {
     ;
 
 argvalue:   TK_SIPSIGNAL optname optflags optassign {
+            checkNoAnnos(&$3, "SIP_SIGNAL has no annotations");
+
             $$.atype = signal_type;
             $$.argflags = ARG_IS_CONST;
             $$.nrderefs = 0;
@@ -2283,6 +3400,8 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             currentSpec -> sigslots = TRUE;
         }
     |   TK_SIPSLOT optname optflags optassign {
+            checkNoAnnos(&$3, "SIP_SLOT has no annotations");
+
             $$.atype = slot_type;
             $$.argflags = ARG_IS_CONST;
             $$.nrderefs = 0;
@@ -2292,6 +3411,8 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             currentSpec -> sigslots = TRUE;
         }
     |   TK_SIPANYSLOT optname optflags optassign {
+            checkNoAnnos(&$3, "SIP_ANYSLOT has no annotations");
+
             $$.atype = anyslot_type;
             $$.argflags = ARG_IS_CONST;
             $$.nrderefs = 0;
@@ -2301,17 +3422,26 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             currentSpec -> sigslots = TRUE;
         }
     |   TK_SIPRXCON optname optflags {
+            const char *annos[] = {
+                "SingleShot",
+                NULL
+            };
+
+            checkAnnos(&$3, annos);
+
             $$.atype = rxcon_type;
             $$.argflags = 0;
             $$.nrderefs = 0;
             $$.name = cacheName(currentSpec, $2);
 
-            if (findOptFlag(&$3, "SingleShot", bool_flag) != NULL)
+            if (getOptFlag(&$3, "SingleShot", bool_flag) != NULL)
                 $$.argflags |= ARG_SINGLE_SHOT;
 
             currentSpec -> sigslots = TRUE;
         }
     |   TK_SIPRXDIS optname optflags {
+            checkNoAnnos(&$3, "SIP_RXOBJ_DIS has no annotations");
+
             $$.atype = rxdis_type;
             $$.argflags = 0;
             $$.nrderefs = 0;
@@ -2320,6 +3450,8 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             currentSpec -> sigslots = TRUE;
         }
     |   TK_SIPSLOTCON '(' arglist ')' optname optflags {
+            checkNoAnnos(&$6, "SIP_SLOT_CON has no annotations");
+
             $$.atype = slotcon_type;
             $$.argflags = ARG_IS_CONST;
             $$.nrderefs = 0;
@@ -2334,6 +3466,8 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             currentSpec -> sigslots = TRUE;
         }
     |   TK_SIPSLOTDIS '(' arglist ')' optname optflags {
+            checkNoAnnos(&$6, "SIP_SLOT_DIS has no annotations");
+
             $$.atype = slotdis_type;
             $$.argflags = ARG_IS_CONST;
             $$.nrderefs = 0;
@@ -2348,6 +3482,8 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
             currentSpec -> sigslots = TRUE;
         }
     |   TK_QOBJECT optname optflags {
+            checkNoAnnos(&$3, "SIP_QOBJECT has no annotations");
+
             $$.atype = qobject_type;
             $$.argflags = 0;
             $$.nrderefs = 0;
@@ -2359,50 +3495,153 @@ argvalue:   TK_SIPSIGNAL optname optflags optassign {
         }
     ;
 
-varmember:  TK_STATIC {currentIsStatic = TRUE;} varmem
+varmember:
+        TK_SIGNAL_METHOD {currentIsSignal = TRUE;} simple_varmem
+    |   TK_SLOT_METHOD {currentIsSlot = TRUE;} simple_varmem
+    |   simple_varmem
+    ;
+
+simple_varmem:
+        TK_STATIC {currentIsStatic = TRUE;} varmem
     |   varmem
     ;
 
-varmem:     member
+varmem:
+        member
     |   variable
     ;
 
-member:     TK_VIRTUAL {currentOverIsVirt = TRUE;} function
+member:
+        TK_VIRTUAL {currentOverIsVirt = TRUE;} function
     |   function
     ;
 
-variable:   cpptype TK_NAME optflags ';' optaccesscode optgetcode optsetcode {
+variable:   cpptype TK_NAME_VALUE optflags variable_body ';' optaccesscode optgetcode optsetcode {
             if (notSkipping())
             {
-                /* Check the section. */
+                const char *annos[] = {
+                    "DocType",
+                    "Encoding",
+                    "PyInt",
+                    "PyName",
+                    NULL
+                };
 
-                if (sectionFlags != 0)
+                checkAnnos(&$3, annos);
+
+                if ($6 != NULL)
                 {
-                    if ((sectionFlags & SECT_IS_PUBLIC) == 0)
-                        yyerror("Class variables must be in the public section");
+                    if ($4.access_code != NULL)
+                        yyerror("%AccessCode already defined");
 
-                    if (!currentIsStatic && $5 != NULL)
-                        yyerror("%AccessCode cannot be specified for non-static class variables");
+                    $4.access_code = $6;
+
+                    deprecated("%AccessCode should be used a sub-directive");
                 }
 
-                if (currentIsStatic && currentSpec -> genc)
-                    yyerror("Cannot have static members in a C structure");
-
-                applyTypeFlags(currentModule, &$1, &$3);
-
-                if ($6 != NULL || $7 != NULL)
+                if ($7 != NULL)
                 {
-                    if ($5 != NULL)
-                        yyerror("Cannot mix %AccessCode and %GetCode or %SetCode");
+                    if ($4.get_code != NULL)
+                        yyerror("%GetCode already defined");
 
-                    if (currentScope() == NULL)
-                        yyerror("Cannot specify %GetCode or %SetCode for global variables");
+                    $4.get_code = $7;
+
+                    deprecated("%GetCode should be used a sub-directive");
                 }
 
-                newVar(currentSpec,currentModule,$2,currentIsStatic,&$1,&$3,$5,$6,$7);
+                if ($8 != NULL)
+                {
+                    if ($4.set_code != NULL)
+                        yyerror("%SetCode already defined");
+
+                    $4.set_code = $8;
+
+                    deprecated("%SetCode should be used a sub-directive");
+                }
+
+                newVar(currentSpec, currentModule, $2, currentIsStatic, &$1,
+                        &$3, $4.access_code, $4.get_code, $4.set_code,
+                        sectionFlags);
             }
 
             currentIsStatic = FALSE;
+        }
+    ;
+
+variable_body:  {
+            $$.token = 0;
+            $$.access_code = NULL;
+            $$.get_code = NULL;
+            $$.set_code = NULL;
+        }
+    |   '{' variable_body_directives '}' {
+            $$ = $2;
+        }
+    ;
+
+variable_body_directives:   variable_body_directive
+    |   variable_body_directives variable_body_directive {
+            $$ = $1;
+
+            switch ($2.token)
+            {
+            case TK_ACCESSCODE: $$.access_code = $2.access_code; break;
+            case TK_GETCODE: $$.get_code = $2.get_code; break;
+            case TK_SETCODE: $$.set_code = $2.set_code; break;
+            }
+        }
+    ;
+
+variable_body_directive:    ifstart {
+            $$.token = TK_IF;
+        }
+    |   ifend {
+            $$.token = TK_END;
+        }
+    |   TK_ACCESSCODE codeblock {
+            if (notSkipping())
+            {
+                $$.token = TK_ACCESSCODE;
+                $$.access_code = $2;
+            }
+            else
+            {
+                $$.token = 0;
+                $$.access_code = NULL;
+            }
+
+            $$.get_code = NULL;
+            $$.set_code = NULL;
+        }
+    |   TK_GETCODE codeblock {
+            if (notSkipping())
+            {
+                $$.token = TK_GETCODE;
+                $$.get_code = $2;
+            }
+            else
+            {
+                $$.token = 0;
+                $$.get_code = NULL;
+            }
+
+            $$.access_code = NULL;
+            $$.set_code = NULL;
+        }
+    |   TK_SETCODE codeblock {
+            if (notSkipping())
+            {
+                $$.token = TK_SETCODE;
+                $$.set_code = $2;
+            }
+            else
+            {
+                $$.token = 0;
+                $$.set_code = NULL;
+            }
+
+            $$.access_code = NULL;
+            $$.get_code = NULL;
         }
     ;
 
@@ -2415,53 +3654,81 @@ cpptype:    TK_CONST basetype deref optref {
             $$ = $1;
             $$.nrderefs += $2;
             $$.argflags |= $3;
+
+            /* PyObject * is a synonym for SIP_PYOBJECT. */
+            if ($1.atype == defined_type && strcmp($1.u.snd->name, "PyObject") == 0 && $1.u.snd->next == NULL && $2 == 1 && $3 == 0)
+            {
+                $$.atype = pyobject_type;
+                $$.nrderefs = 0;
+            }
         }
     ;
 
 argtype:    cpptype optname optflags {
+            const char *annos[] = {
+                "AllowNone",
+                "Array",
+                "ArraySize",
+                "Constrained",
+                "DocType",
+                "DocValue",
+                "Encoding",
+                "GetWrapper",
+                "In",
+                "KeepReference",
+                "NoCopy",
+                "Out",
+                "PyInt",
+                "ResultSize",
+                "Transfer",
+                "TransferBack",
+                "TransferThis",
+                NULL
+            };
+
+            optFlag *of;
+
+            checkAnnos(&$3, annos);
+
             $$ = $1;
             $$.name = cacheName(currentSpec, $2);
+
+            handleKeepReference(&$3, &$$, currentModule);
 
             if (getAllowNone(&$3))
                 $$.argflags |= ARG_ALLOW_NONE;
 
-            if (findOptFlag(&$3,"GetWrapper",bool_flag) != NULL)
+            if (getOptFlag(&$3,"GetWrapper",bool_flag) != NULL)
                 $$.argflags |= ARG_GET_WRAPPER;
 
-            if (findOptFlag(&$3,"Array",bool_flag) != NULL)
+            if (getOptFlag(&$3,"Array",bool_flag) != NULL)
                 $$.argflags |= ARG_ARRAY;
 
-            if (findOptFlag(&$3,"ArraySize",bool_flag) != NULL)
+            if (getOptFlag(&$3,"ArraySize",bool_flag) != NULL)
                 $$.argflags |= ARG_ARRAY_SIZE;
 
             if (getTransfer(&$3))
                 $$.argflags |= ARG_XFERRED;
 
-            if (findOptFlag(&$3,"TransferThis",bool_flag) != NULL)
+            if (getOptFlag(&$3,"TransferThis",bool_flag) != NULL)
                 $$.argflags |= ARG_THIS_XFERRED;
 
-            if (findOptFlag(&$3,"TransferBack",bool_flag) != NULL)
+            if (getOptFlag(&$3,"TransferBack",bool_flag) != NULL)
                 $$.argflags |= ARG_XFERRED_BACK;
 
-            if (findOptFlag(&$3, "KeepReference", bool_flag) != NULL)
-            {
-                $$.argflags |= ARG_KEEP_REF;
-                $$.key = currentModule->next_key++;
-            }
-
-            if (findOptFlag(&$3,"In",bool_flag) != NULL)
+            if (getOptFlag(&$3,"In",bool_flag) != NULL)
                 $$.argflags |= ARG_IN;
 
-            if (findOptFlag(&$3,"Out",bool_flag) != NULL)
+            if (getOptFlag(&$3,"Out",bool_flag) != NULL)
                 $$.argflags |= ARG_OUT;
 
-            if (findOptFlag(&$3, "ResultSize", bool_flag) != NULL)
+            if (getOptFlag(&$3, "ResultSize", bool_flag) != NULL)
                 $$.argflags |= ARG_RESULT_SIZE;
 
-            if (findOptFlag(&$3, "NoCopy", bool_flag) != NULL)
+            if (getOptFlag(&$3, "NoCopy", bool_flag) != NULL)
                 $$.argflags |= ARG_NO_COPY;
 
-            if (findOptFlag(&$3,"Constrained",bool_flag) != NULL)
+            if (getOptFlag(&$3,"Constrained",bool_flag) != NULL)
             {
                 $$.argflags |= ARG_CONSTRAINED;
 
@@ -2639,6 +3906,10 @@ basetype:   scopedname {
             memset(&$$, 0, sizeof (argDef));
             $$.atype = pytype_type;
         }
+    |   TK_SIPSSIZET {
+            memset(&$$, 0, sizeof (argDef));
+            $$.atype = ssize_type;
+        }
     |   TK_ELLIPSIS {
             memset(&$$, 0, sizeof (argDef));
             $$.atype = ellipsis_type;
@@ -2714,7 +3985,7 @@ exceptionlist:  {
  * Parse the specification.
  */
 void parse(sipSpec *spec, FILE *fp, char *filename, stringList *tsl,
-        stringList *xfl, int kwdArgs, int protHack)
+        stringList *xfl, KwArgs kwArgs, int protHack)
 {
     classTmplDef *tcd;
 
@@ -2736,6 +4007,7 @@ void parse(sipSpec *spec, FILE *fp, char *filename, stringList *tsl,
     spec->sigslots = FALSE;
     spec->genc = -1;
     spec->plugins = NULL;
+    spec->extracts = NULL;
 
     currentSpec = spec;
     neededQualifiers = tsl;
@@ -2745,12 +4017,14 @@ void parse(sipSpec *spec, FILE *fp, char *filename, stringList *tsl,
     currentOverIsVirt = FALSE;
     currentCtorIsExplicit = FALSE;
     currentIsStatic = FALSE;
+    currentIsSignal = FALSE;
+    currentIsSlot = FALSE;
     currentIsTemplate = FALSE;
     previousFile = NULL;
     skipStackPtr = 0;
     currentScopeIdx = 0;
     sectionFlags = 0;
-    defaultKwdArgs = kwdArgs;
+    defaultKwArgs = kwArgs;
     makeProtPublic = protHack;
 
     newModule(fp, filename);
@@ -2829,7 +4103,7 @@ void appendToClassList(classList **clp,classDef *cd)
 /*
  * Create a new module for the current specification and make it current.
  */
-static void newModule(FILE *fp, char *filename)
+static void newModule(FILE *fp, const char *filename)
 {
     moduleDef *mod;
 
@@ -2858,7 +4132,7 @@ static moduleDef *allocModule()
     newmod->encoding = no_type;
     newmod->qobjclass = -1;
     newmod->nrvirthandlers = -1;
-    newmod->next_key = 1;
+    newmod->next_key = -2;
 
     /*
      * The consolidated module support needs these to be in order that they
@@ -2876,7 +4150,8 @@ static moduleDef *allocModule()
 /*
  * Switch to parsing a new file.
  */
-static void parseFile(FILE *fp, char *name, moduleDef *prevmod, int optional)
+static void parseFile(FILE *fp, const char *name, moduleDef *prevmod,
+        int optional)
 {
     parserContext pc;
 
@@ -3148,7 +4423,7 @@ static classDef *newClass(sipSpec *pt, ifaceFileType iftype,
 {
     int flags;
     classDef *cd, *scope;
-    codeBlock *hdrcode;
+    codeBlockList *hdrcode;
 
     if (sectionFlags & SECT_IS_PRIVATE)
         yyerror("Classes, structs and namespaces must be in the public or protected sections");
@@ -3194,7 +4469,7 @@ static classDef *newClass(sipSpec *pt, ifaceFileType iftype,
     if (currentIsTemplate)
         setIsTemplateClass(cd);
 
-    appendCodeBlock(&cd->iff->hdrcode, hdrcode);
+    appendCodeBlockList(&cd->iff->hdrcode, hdrcode);
 
     /* See if it is a namespace extender. */
     if (iftype == namespace_iface)
@@ -3231,27 +4506,27 @@ static void finishClass(sipSpec *pt, moduleDef *mod, classDef *cd,
     optFlag *flg;
 
     /* Get the Python name and see if it is different to the C++ name. */
-    pyname = getPythonName(of, classBaseName(cd));
+    pyname = getPythonName(mod, of, classBaseName(cd));
 
     cd->pyname = NULL;
     checkAttributes(pt, mod, cd->ecd, NULL, pyname, FALSE);
     cd->pyname = cacheName(pt, pyname);
 
-    if ((flg = findOptFlag(of, "Metatype", dotted_name_flag)) != NULL)
+    if ((flg = getOptFlag(of, "Metatype", dotted_name_flag)) != NULL)
         cd->metatype = cacheName(pt, flg->fvalue.sval);
 
-    if ((flg = findOptFlag(of, "Supertype", dotted_name_flag)) != NULL)
+    if ((flg = getOptFlag(of, "Supertype", dotted_name_flag)) != NULL)
         cd->supertype = cacheName(pt, flg->fvalue.sval);
 
-    if ((flg = findOptFlag(of, "PyQt4Flags", integer_flag)) != NULL)
+    if ((flg = getOptFlag(of, "PyQt4Flags", integer_flag)) != NULL)
         cd->pyqt4_flags = flg->fvalue.ival;
 
-    if (findOptFlag(of, "PyQt4NoQMetaObject", bool_flag) != NULL)
+    if (getOptFlag(of, "PyQt4NoQMetaObject", bool_flag) != NULL)
         setPyQt4NoQMetaObject(cd);
 
     if (isOpaque(cd))
     {
-        if (findOptFlag(of, "External", bool_flag) != NULL)
+        if (getOptFlag(of, "External", bool_flag) != NULL)
             setIsExternal(cd);
     }
     else
@@ -3259,7 +4534,7 @@ static void finishClass(sipSpec *pt, moduleDef *mod, classDef *cd,
         int seq_might, seq_not;
         memberDef *md;
 
-        if (findOptFlag(of, "NoDefaultCtors", bool_flag) != NULL)
+        if (getOptFlag(of, "NoDefaultCtors", bool_flag) != NULL)
             setNoDefaultCtors(cd);
 
         if (cd -> ctors == NULL)
@@ -3309,7 +4584,7 @@ static void finishClass(sipSpec *pt, moduleDef *mod, classDef *cd,
         if (cd->convtocode != NULL && getAllowNone(of))
             setClassHandlesNone(cd);
 
-        if (findOptFlag(of,"Abstract",bool_flag) != NULL)
+        if (getOptFlag(of,"Abstract",bool_flag) != NULL)
         {
             setIsAbstractClass(cd);
             setIsIncomplete(cd);
@@ -3320,16 +4595,17 @@ static void finishClass(sipSpec *pt, moduleDef *mod, classDef *cd,
         if (!isDtor(cd))
             setIsPublicDtor(cd);
 
-        if (findOptFlag(of, "DelayDtor", bool_flag) != NULL)
+        if (getOptFlag(of, "DelayDtor", bool_flag) != NULL)
         {
             setIsDelayedDtor(cd);
             setHasDelayedDtors(mod);
         }
 
-        if ((flg = findOptFlag(of,"VirtualErrorHandler",opt_name_flag)) != NULL)
+        if ((flg = getOptFlag(of,"VirtualErrorHandler",opt_name_flag)) != NULL)
         {
             cd->virterrorhandler = flg->fvalue.sval;
         }
+
 
         /*
          * There are subtle differences between the add and concat methods and
@@ -3521,9 +4797,9 @@ static mappedTypeDef *newMappedType(sipSpec *pt, argDef *ad, optFlags *of)
     mtd = allocMappedType(pt, ad);
 
     if (cname != NULL)
-        mtd->pyname = cacheName(pt, getPythonName(of, cname));
+        mtd->pyname = cacheName(pt, getPythonName(currentModule, of, cname));
 
-    if (findOptFlag(of, "NoRelease", bool_flag) != NULL)
+    if (getOptFlag(of, "NoRelease", bool_flag) != NULL)
         setNoRelease(mtd);
 
     if (getAllowNone(of))
@@ -3549,7 +4825,7 @@ static mappedTypeDef *newMappedType(sipSpec *pt, argDef *ad, optFlags *of)
 
 
 /*
- * Allocate, intialise and return a mapped type structure.
+ * Allocate, initialise and return a mapped type structure.
  */
 mappedTypeDef *allocMappedType(sipSpec *pt, argDef *type)
 {
@@ -3598,7 +4874,7 @@ static enumDef *newEnum(sipSpec *pt, moduleDef *mod, mappedTypeDef *mt_scope,
 
     if (name != NULL)
     {
-        ed->pyname = cacheName(pt, getPythonName(of, name));
+        ed->pyname = cacheName(pt, getPythonName(mod, of, name));
         checkAttributes(pt, mod, c_scope, mt_scope, ed->pyname->text, FALSE);
 
         ed->fqcname = text2scopedName(scope, name);
@@ -3638,10 +4914,17 @@ static enumDef *newEnum(sipSpec *pt, moduleDef *mod, mappedTypeDef *mt_scope,
         ed->cname = NULL;
     }
 
-    if (flags & SECT_IS_PROT && makeProtPublic)
+    if (flags & SECT_IS_PROT)
     {
-        flags &= ~SECT_IS_PROT;
-        flags |= SECT_IS_PUBLIC;
+        if (makeProtPublic)
+        {
+            flags &= ~SECT_IS_PROT;
+            flags |= SECT_IS_PUBLIC;
+        }
+        else if (c_scope != NULL)
+        {
+            setHasShadow(c_scope);
+        }
     }
 
     ed->enumflags = flags;
@@ -3720,6 +5003,17 @@ void appendTypeStrings(scopedNameDef *ename, signatureDef *patt, signatureDef *s
             else
                 val = type2string(sad);
 
+            /* We do want const. */
+            if (isConstArg(sad))
+            {
+                char *const_val = sipStrdup("const ");
+
+                append(&const_val, val);
+                free(val);
+
+                val = const_val;
+            }
+
             appendScopedName(values, text2scopePart(val));
         }
         else if (pad->atype == template_type)
@@ -3796,10 +5090,12 @@ static char *type2string(argDef *ad)
             on_heap = TRUE;
             break;
 
+        case ubyte_type:
         case ustring_type:
             s = "unsigned char";
             break;
 
+        case byte_type:
         case ascii_string_type:
         case latin1_string_type:
         case utf8_string_type:
@@ -3807,6 +5103,7 @@ static char *type2string(argDef *ad)
             s = "char";
             break;
 
+        case sbyte_type:
         case sstring_type:
             s = "signed char";
             break;
@@ -3824,7 +5121,7 @@ static char *type2string(argDef *ad)
             break;
 
         case uint_type:
-            s = "unsigned int";
+            s = "uint";
             break;
 
         case int_type:
@@ -3974,6 +5271,8 @@ static void instantiateClassTemplate(sipSpec *pt, moduleDef *mod,
             (scope != NULL ? scope->iff->api_range : NULL), NULL);
     cd->iff->module = mod;
 
+    appendCodeBlockList(&cd->iff->hdrcode, tcd->cd->iff->hdrcode);
+
     /* Make a copy of the used list and add the enclosing scope. */
     used = &cd->iff->used;
 
@@ -3982,7 +5281,7 @@ static void instantiateClassTemplate(sipSpec *pt, moduleDef *mod,
 
     /* Include any scope header code. */
     if (scope != NULL)
-        appendCodeBlock(&cd->iff->hdrcode, scope->iff->hdrcode);
+        appendCodeBlockList(&cd->iff->hdrcode, scope->iff->hdrcode);
 
     if (inMainModule())
     {
@@ -3997,6 +5296,9 @@ static void instantiateClassTemplate(sipSpec *pt, moduleDef *mod,
 
     /* Handle the variables. */
     instantiateTemplateVars(pt, tcd, td, cd, used, type_names, type_values);
+
+    /* Handle the typedefs. */
+    instantiateTemplateTypedefs(pt, tcd, td, cd);
 
     /* Handle the ctors. */
     cd->ctors = NULL;
@@ -4285,6 +5587,38 @@ static void instantiateTemplateVars(sipSpec *pt, classTmplDef *tcd,
 
 
 /*
+ * Instantiate the typedefs of a template class.
+ */
+static void instantiateTemplateTypedefs(sipSpec *pt, classTmplDef *tcd,
+        templateDef *td, classDef *cd)
+{
+    typedefDef *tdd;
+
+    for (tdd = pt->typedefs; tdd != NULL; tdd = tdd->next)
+    {
+        typedefDef *new_tdd;
+
+        if (tdd->ecd != tcd->cd)
+            continue;
+
+        new_tdd = sipMalloc(sizeof (typedefDef));
+
+        /* Start with a shallow copy. */
+        *new_tdd = *tdd;
+
+        new_tdd->fqname = text2scopedName(cd->iff,
+                scopedNameTail(new_tdd->fqname));
+        new_tdd->ecd = cd;
+        new_tdd->module = cd->iff->module;
+
+        templateType(&new_tdd->type, tcd, td, cd);
+
+        addTypedef(pt, new_tdd);
+    }
+}
+
+
+/*
  * Replace any template arguments in a signature.
  */
 static void templateSignature(signatureDef *sd, int result, classTmplDef *tcd, templateDef *td, classDef *ncd)
@@ -4358,20 +5692,45 @@ static void templateType(argDef *ad, classTmplDef *tcd, templateDef *td, classDe
 /*
  * Replace any template arguments in a literal code block.
  */
-codeBlock *templateCode(sipSpec *pt, ifaceFileList **used, codeBlock *ocb,
-        scopedNameDef *names, scopedNameDef *values)
+codeBlockList *templateCode(sipSpec *pt, ifaceFileList **used,
+        codeBlockList *ocbl, scopedNameDef *names, scopedNameDef *values)
 {
-    codeBlock *ncb = NULL, **tail = &ncb;
+    codeBlockList *ncbl = NULL;
 
-    while (ocb != NULL)
+    while (ocbl != NULL)
     {
-        char *at = ocb->frag;
+        char *at = ocbl->block->frag;
+        int start_of_line = TRUE;
 
         do
         {
-            char *first = NULL;
+            char *from = at, *first = NULL;
             codeBlock *cb;
             scopedNameDef *nam, *val, *nam_first, *val_first;
+
+            /*
+             * Don't do any substitution in lines that appear to be
+             * preprocessor directives.  This prevents #include'd file names
+             * being broken.
+             */
+            if (start_of_line)
+            {
+                /* Strip leading whitespace. */
+                while (isspace(*from))
+                    ++from;
+
+                if (*from == '#')
+                {
+                    /* Skip to the end of the line. */
+                    do
+                        ++from;
+                    while (*from != '\n' && *from != '\0');
+                }
+                else
+                {
+                    start_of_line = FALSE;
+                }
+            }
 
             /*
              * Go through the rest of this fragment looking for each of the
@@ -4384,7 +5743,7 @@ codeBlock *templateCode(sipSpec *pt, ifaceFileList **used, codeBlock *ocb,
             {
                 char *cp;
 
-                if ((cp = strstr(at, nam->name)) != NULL)
+                if ((cp = strstr(from, nam->name)) != NULL)
                     if (first == NULL || first > cp)
                     {
                         nam_first = nam;
@@ -4399,17 +5758,15 @@ codeBlock *templateCode(sipSpec *pt, ifaceFileList **used, codeBlock *ocb,
             /* Create the new fragment. */
             cb = sipMalloc(sizeof (codeBlock));
 
-            if (at == ocb->frag)
+            if (at == ocbl->block->frag)
             {
-                cb->filename = ocb->filename;
-                cb->linenr = ocb->linenr;
+                cb->filename = ocbl->block->filename;
+                cb->linenr = ocbl->block->linenr;
             }
             else
                 cb->filename = NULL;
 
-            cb->next = NULL;
-            *tail = cb;
-            tail = &cb->next;
+            appendCodeBlock(&ncbl, cb);
 
             /* See if anything was found. */
             if (first == NULL)
@@ -4435,7 +5792,8 @@ codeBlock *templateCode(sipSpec *pt, ifaceFileList **used, codeBlock *ocb,
 
                 /*
                  * If the context in which the text is used is in the name of a
-                 * SIP generated object then translate any "::" scoping to "_".
+                 * SIP generated object then translate any "::" scoping to "_"
+                 * and remove any const.
                  */
                 for (gn = gen_names; *gn != NULL; ++gn)
                     if (search_back(first, at, *gn))
@@ -4457,6 +5815,9 @@ codeBlock *templateCode(sipSpec *pt, ifaceFileList **used, codeBlock *ocb,
                 {
                     char gch;
 
+                    if (strlen(sp) > 6 && strncmp(sp, "const ", 6) == 0)
+                        sp += 6;
+
                     while ((gch = *sp++) != '\0')
                         if (gch == ':' && *sp == ':')
                         {
@@ -4473,14 +5834,17 @@ codeBlock *templateCode(sipSpec *pt, ifaceFileList **used, codeBlock *ocb,
 
                 /* Move past the replaced text. */
                 at = first + strlen(nam_first->name);
+
+                if (*at == '\n')
+                    start_of_line = TRUE;
             }
         }
         while (at != NULL && *at != '\0');
 
-        ocb = ocb->next;
+        ocbl = ocbl->next;
     }
 
-    return ncb;
+    return ncbl;
 }
 
 
@@ -4592,7 +5956,7 @@ static int foundInScope(scopedNameDef *fq_name, scopedNameDef *rel_name)
 static void newTypedef(sipSpec *pt, moduleDef *mod, char *name, argDef *type,
         optFlags *optflgs)
 {
-    typedefDef *td, **tdp;
+    typedefDef *td;
     scopedNameDef *fqname;
     classDef *scope;
 
@@ -4616,24 +5980,6 @@ static void newTypedef(sipSpec *pt, moduleDef *mod, char *name, argDef *type,
             }
     }
 
-    /*
-     * Check it doesn't already exist and find the position in the sorted list
-     * where it should be put.
-     */
-    for (tdp = &pt->typedefs; *tdp != NULL; tdp = &(*tdp)->next)
-    {
-        int res = compareScopedNames((*tdp)->fqname, fqname);
-
-        if (res == 0)
-        {
-            fatalScopedName(fqname);
-            fatal(" already defined\n");
-        }
-
-        if (res > 0)
-            break;
-    }
-
     td = sipMalloc(sizeof (typedefDef));
 
     td->tdflags = 0;
@@ -4642,13 +5988,42 @@ static void newTypedef(sipSpec *pt, moduleDef *mod, char *name, argDef *type,
     td->module = mod;
     td->type = *type;
 
-    td->next = *tdp;
-    *tdp = td;
-
-    if (findOptFlag(optflgs, "NoTypeName", bool_flag) != NULL)
+    if (getOptFlag(optflgs, "NoTypeName", bool_flag) != NULL)
         setNoTypeName(td);
 
-    mod->nrtypedefs++;
+    addTypedef(pt, td);
+}
+
+
+/*
+ * Add a typedef to the list so that the list remains sorted.
+ */
+static void addTypedef(sipSpec *pt, typedefDef *tdd)
+{
+    typedefDef **tdp;
+
+    /*
+     * Check it doesn't already exist and find the position in the sorted list
+     * where it should be put.
+     */
+    for (tdp = &pt->typedefs; *tdp != NULL; tdp = &(*tdp)->next)
+    {
+        int res = compareScopedNames((*tdp)->fqname, tdd->fqname);
+
+        if (res == 0)
+        {
+            fatalScopedName(tdd->fqname);
+            fatal(" already defined\n");
+        }
+
+        if (res > 0)
+            break;
+    }
+
+    tdd->next = *tdp;
+    *tdp = tdd;
+
+    tdd->module->nrtypedefs++;
 }
 
 
@@ -4731,13 +6106,39 @@ int sameTemplateSignature(signatureDef *tmpl_sd, signatureDef *args_sd,
 /*
  * Create a new variable.
  */
-static void newVar(sipSpec *pt,moduleDef *mod,char *name,int isstatic,
-           argDef *type,optFlags *of,codeBlock *acode,codeBlock *gcode,
-           codeBlock *scode)
+static void newVar(sipSpec *pt, moduleDef *mod, char *name, int isstatic,
+        argDef *type, optFlags *of, codeBlock *acode, codeBlock *gcode,
+        codeBlock *scode, int section)
 {
     varDef *var;
     classDef *escope = currentScope();
-    nameDef *nd = cacheName(pt,getPythonName(of,name));
+    nameDef *nd;
+
+    /* Check the section. */
+    if (section != 0)
+    {
+        if ((section & SECT_IS_PUBLIC) == 0)
+            yyerror("Class variables must be in the public section");
+
+        if (!isstatic && acode != NULL)
+            yyerror("%AccessCode cannot be specified for non-static class variables");
+    }
+
+    if (isstatic && pt->genc)
+        yyerror("Cannot have static members in a C structure");
+
+    if (gcode != NULL || scode != NULL)
+    {
+        if (acode != NULL)
+            yyerror("Cannot mix %AccessCode and %GetCode or %SetCode");
+
+        if (escope == NULL)
+            yyerror("Cannot specify %GetCode or %SetCode for global variables");
+    }
+
+    applyTypeFlags(mod, type, of);
+
+    nd = cacheName(pt, getPythonName(mod, of, name));
 
     if (inMainModule())
         setIsUsedName(nd);
@@ -4753,9 +6154,9 @@ static void newVar(sipSpec *pt,moduleDef *mod,char *name,int isstatic,
     var->module = mod;
     var->varflags = 0;
     var->type = *type;
-    var->accessfunc = acode;
-    var->getcode = gcode;
-    var->setcode = scode;
+    appendCodeBlock(&var->accessfunc, acode);
+    appendCodeBlock(&var->getcode, gcode);
+    appendCodeBlock(&var->setcode, scode);
 
     if (isstatic || (escope != NULL && escope->iff->type == namespace_iface))
         setIsStaticVar(var);
@@ -4767,9 +6168,10 @@ static void newVar(sipSpec *pt,moduleDef *mod,char *name,int isstatic,
 /*
  * Create a new ctor.
  */
-static void newCtor(char *name, int sectFlags, signatureDef *args,
-        optFlags *optflgs, codeBlock *methodcode, throwArgs *exceptions,
-        signatureDef *cppsig, int explicit, codeBlock *docstring)
+static void newCtor(moduleDef *mod, char *name, int sectFlags,
+        signatureDef *args, optFlags *optflgs, codeBlock *methodcode,
+        throwArgs *exceptions, signatureDef *cppsig, int explicit,
+        codeBlock *docstring)
 {
     ctorDef *ct, **ctp;
     classDef *cd = currentScope();
@@ -4799,7 +6201,7 @@ static void newCtor(char *name, int sectFlags, signatureDef *args,
     ct->pysig = *args;
     ct->cppsig = (cppsig != NULL ? cppsig : &ct->pysig);
     ct->exceptions = exceptions;
-    ct->methodcode = methodcode;
+    appendCodeBlock(&ct->methodcode, methodcode);
 
     if (!isPrivateCtor(ct))
         setCanCreate(cd);
@@ -4823,10 +6225,10 @@ static void newCtor(char *name, int sectFlags, signatureDef *args,
     if (getDeprecated(optflgs))
         setIsDeprecatedCtor(ct);
 
-    if (!isPrivateCtor(ct) && usesKeywordArgs(optflgs, &ct->pysig))
-        setUseKeywordArgsCtor(ct);
+    if (!isPrivateCtor(ct))
+        ct->kwargs = keywordArgs(mod, optflgs, &ct->pysig, FALSE);
 
-    if (findOptFlag(optflgs, "NoDerived", bool_flag) != NULL)
+    if (getOptFlag(optflgs, "NoDerived", bool_flag) != NULL)
     {
         if (cppsig != NULL)
             yyerror("The /NoDerived/ annotation cannot be used with a C++ signature");
@@ -4837,7 +6239,7 @@ static void newCtor(char *name, int sectFlags, signatureDef *args,
         ct->cppsig = NULL;
     }
 
-    if (findOptFlag(optflgs, "Default", bool_flag) != NULL)
+    if (getOptFlag(optflgs, "Default", bool_flag) != NULL)
     {
         if (cd->defctor != NULL)
             yyerror("A constructor with the /Default/ annotation has already been defined");
@@ -4857,15 +6259,46 @@ static void newCtor(char *name, int sectFlags, signatureDef *args,
  * Create a new function.
  */
 static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
-        mappedTypeDef *mt_scope, int sflags, int isstatic, int isvirt,
-        char *name, signatureDef *sig, int isconst, int isabstract,
-        optFlags *optflgs, codeBlock *methodcode, codeBlock *vcode,
-        throwArgs *exceptions, signatureDef *cppsig, codeBlock *docstring)
+        mappedTypeDef *mt_scope, int sflags, int isstatic, int issignal,
+        int isslot, int isvirt, char *name, signatureDef *sig, int isconst,
+        int isabstract, optFlags *optflgs, codeBlock *methodcode,
+        codeBlock *vcode, throwArgs *exceptions, signatureDef *cppsig,
+        codeBlock *docstring)
 {
+    static const char *annos[] = {
+        "__len__",
+        "API",
+        "AutoGen",
+        "Deprecated",
+        "DocType",
+        "Encoding",
+        "Factory",
+        "HoldGIL",
+        "KeywordArgs",
+        "KeepReference",
+        "NewThread",
+        "NoArgParser",
+        "NoCopy",
+        "Numeric",
+        "PostHook",
+        "PreHook",
+        "PyInt",
+        "PyName",
+        "RaisesPyException",
+        "ReleaseGIL",
+        "Transfer",
+        "TransferBack",
+        "TransferThis",
+        NULL
+    };
+
+    const char *pyname;
     int factory, xferback, no_arg_parser;
     overDef *od, **odp, **headp;
     optFlag *of;
     virtHandlerDef *vhd;
+
+    checkAnnos(optflgs, annos);
 
     /* Extra checks for a C module. */
     if (pt->genc)
@@ -4887,8 +6320,33 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
     else
         headp = &mod->overs;
 
+    /*
+     * See if the function has a non-lazy method.  These are methods that
+     * Python expects to see defined in the type before any instance of the
+     * type is created.
+     */
+    if (c_scope != NULL)
+    {
+        static const char *lazy[] = {
+            "__getattribute__",
+            "__getattr__",
+            "__enter__",
+            "__exit__",
+            NULL
+        };
+
+        const char **l;
+
+        for (l = lazy; *l != NULL; ++l)
+            if (strcmp(name, *l) == 0)
+            {
+                setHasNonlazyMethod(c_scope);
+                break;
+            }
+    }
+
     /* See if it is a factory method. */
-    if (findOptFlag(optflgs, "Factory", bool_flag) != NULL)
+    if (getOptFlag(optflgs, "Factory", bool_flag) != NULL)
         factory = TRUE;
     else
     {
@@ -4904,7 +6362,7 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
     }
 
     /* See if the result is to be returned to Python ownership. */
-    xferback = (findOptFlag(optflgs, "TransferBack", bool_flag) != NULL);
+    xferback = (getOptFlag(optflgs, "TransferBack", bool_flag) != NULL);
 
     if (factory && xferback)
         yyerror("/TransferBack/ and /Factory/ cannot both be specified");
@@ -4915,13 +6373,24 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
 
     /* Set the overload flags. */
 
-    if (sflags & SECT_IS_PROT && makeProtPublic)
+    if ((sflags & SECT_IS_PROT) && makeProtPublic)
     {
         sflags &= ~SECT_IS_PROT;
         sflags |= SECT_IS_PUBLIC | OVER_REALLY_PROT;
     }
 
-    od -> overflags = sflags;
+    od->overflags = sflags;
+
+    if (issignal)
+    {
+        resetIsSlot(od);
+        setIsSignal(od);
+    }
+    else if (isslot)
+    {
+        resetIsSignal(od);
+        setIsSlot(od);
+    }
 
     if (factory)
         setIsFactory(od);
@@ -4932,8 +6401,11 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
     if (getTransfer(optflgs))
         setIsResultTransferred(od);
 
-    if (findOptFlag(optflgs, "TransferThis", bool_flag) != NULL)
+    if (getOptFlag(optflgs, "TransferThis", bool_flag) != NULL)
         setIsThisTransferredMeth(od);
+
+    if (methodcode == NULL && getOptFlag(optflgs, "RaisesPyException", bool_flag) != NULL)
+        setRaisesPyException(od);
 
     if (isProtected(od))
         setHasShadow(c_scope);
@@ -4971,13 +6443,13 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
         setIsAbstract(od);
     }
 
-    if ((of = findOptFlag(optflgs, "AutoGen", opt_name_flag)) != NULL)
+    if ((of = getOptFlag(optflgs, "AutoGen", opt_name_flag)) != NULL)
     {
         if (of->fvalue.sval == NULL || isEnabledFeature(of->fvalue.sval))
             setIsAutoGen(od);
     }
 
-    of = findOptFlag(optflgs,"VirtualErrorHandler",opt_name_flag);
+    of = getOptFlag(optflgs,"VirtualErrorHandler",opt_name_flag);
     od->virterrorhandler = 0;
 
     if (isvirt)
@@ -4994,9 +6466,9 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
         vhd->vhflags = 0;
         vhd->pysig = &od->pysig;
         vhd->cppsig = (cppsig != NULL ? cppsig : &od->pysig);
-        vhd->virtcode = vcode;
+        appendCodeBlock(&vhd->virtcode, vcode);
         od->virterrorhandler = ((of && of -> fvalue.sval) ? of -> fvalue.sval : 0);
-
+ 
         if( od->virterrorhandler ) {
             printf( "VirtualErrorHandler set to %s\n", od->virterrorhandler );
         }
@@ -5018,11 +6490,14 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
 
         if (of && !of -> fvalue.sval)
             yyerror("%VirtualErrorHandler annotation must provide the name of the handler");
-   }
+    }
     else
     {
         if (vcode != NULL)
             yyerror("%VirtualCatcherCode provided for non-virtual function");
+
+        if (of != NULL)
+            yyerror("%VirtualErrorHandler provided for non-virtual function");
 
         vhd = NULL;
     }
@@ -5031,10 +6506,10 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
     od->pysig = *sig;
     od->cppsig = (cppsig != NULL ? cppsig : &od->pysig);
     od->exceptions = exceptions;
-    od->methodcode = methodcode;
+    appendCodeBlock(&od->methodcode, methodcode);
     od->virthandler = vhd;
 
-    no_arg_parser = (findOptFlag(optflgs, "NoArgParser", bool_flag) != NULL);
+    no_arg_parser = (getOptFlag(optflgs, "NoArgParser", bool_flag) != NULL);
 
     if (no_arg_parser)
     {
@@ -5042,12 +6517,18 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
             yyerror("%MethodCode must be supplied if /NoArgParser/ is specified");
     }
 
-    if (findOptFlag(optflgs, "NoCopy", bool_flag) != NULL)
+    if (getOptFlag(optflgs, "NoCopy", bool_flag) != NULL)
         setNoCopy(&od->pysig.result);
 
-    od->common = findFunction(pt, mod, c_scope, mt_scope,
-            getPythonName(optflgs, name), (methodcode != NULL), sig->nrArgs,
-            no_arg_parser);
+    handleKeepReference(optflgs, &od->pysig.result, mod);
+
+    pyname = getPythonName(mod, optflgs, name);
+
+    od->common = findFunction(pt, mod, c_scope, mt_scope, pyname,
+            (methodcode != NULL), sig->nrArgs, no_arg_parser);
+    
+    if (strcmp(pyname, "__delattr__") == 0)
+        setIsDelattr(od);
 
     if (docstring != NULL)
         appendCodeBlock(&od->common->docstring, docstring);
@@ -5057,11 +6538,11 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
     if (od->api_range == NULL)
         setNotVersioned(od->common);
 
-    if (findOptFlag(optflgs, "Numeric", bool_flag) != NULL)
+    if (getOptFlag(optflgs, "Numeric", bool_flag) != NULL)
         setIsNumeric(od->common);
 
     /* Methods that run in new threads must be virtual. */
-    if (findOptFlag(optflgs, "NewThread", bool_flag) != NULL)
+    if (getOptFlag(optflgs, "NewThread", bool_flag) != NULL)
     {
         argDef *res;
 
@@ -5090,13 +6571,55 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
     if (getDeprecated(optflgs))
         setIsDeprecated(od);
 
-    if (!isPrivate(od) && !isSignal(od) && od->common->slot == no_slot && usesKeywordArgs(optflgs, &od->pysig))
+    if (!isPrivate(od) && !isSignal(od) && (od->common->slot == no_slot || od->common->slot == call_slot))
     {
-        setUseKeywordArgs(od);
-        setUseKeywordArgsFunction(od->common);
+        od->kwargs = keywordArgs(mod, optflgs, &od->pysig, isProtected(od));
+
+        if (od->kwargs != NoKwArgs)
+            setUseKeywordArgs(od->common);
     }
 
-    od -> next = NULL;
+    /* See if we want to auto-generate a __len__() method. */
+    if (getOptFlag(optflgs, "__len__", bool_flag) != NULL)
+    {
+        overDef *len;
+
+        len = sipMalloc(sizeof (overDef));
+
+        len->cppname = "__len__";
+        len->overflags = SECT_IS_PUBLIC;
+        len->pysig.result.atype = ssize_type;
+        len->pysig.nrArgs = 0;
+        len->cppsig = &len->pysig;
+
+        len->common = findFunction(pt, mod, c_scope, mt_scope, len->cppname,
+                TRUE, 0, FALSE);
+
+        if ((len->methodcode = od->methodcode) == NULL)
+        {
+            char *buf = sipStrdup("            sipRes = (SIP_SSIZE_T)sipCpp->");
+            codeBlock *code;
+
+            append(&buf, od->cppname);
+            append(&buf, "();\n");
+
+            code = sipMalloc(sizeof (codeBlock));
+
+            code->frag = buf;
+            code->filename = "Auto-generated";
+            code->linenr = 1;
+
+            appendCodeBlock(&len->methodcode, code);
+        }
+
+        len->next = NULL;
+
+        od->next = len;
+    }
+    else
+    {
+        od->next = NULL;
+    }
 
     /* Append to the list. */
     for (odp = headp; *odp != NULL; odp = &(*odp)->next)
@@ -5109,15 +6632,27 @@ static void newFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
 /*
  * Return the Python name based on the C/C++ name and any /PyName/ annotation.
  */
-static const char *getPythonName(optFlags *optflgs, const char *cname)
+static const char *getPythonName(moduleDef *mod, optFlags *optflgs,
+        const char *cname)
 {
     const char *pname;
     optFlag *of;
+    autoPyNameDef *apnd;
 
-    if ((of = findOptFlag(optflgs, "PyName", name_flag)) != NULL)
-        pname = of->fvalue.sval;
-    else
-        pname = cname;
+    /* Use the explicit name if given. */
+    if ((of = getOptFlag(optflgs, "PyName", name_flag)) != NULL)
+        return of->fvalue.sval;
+
+    /* Apply any automatic naming rules. */
+    pname = cname;
+
+    for (apnd = mod->autopyname; apnd != NULL; apnd = apnd->next)
+    {
+        size_t len = strlen(apnd->remove_leading);
+
+        if (strncmp(pname, apnd->remove_leading, len) == 0)
+            pname += len;
+    }
 
     return pname;
 }
@@ -5228,6 +6763,8 @@ static memberDef *findFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
         {"__index__", index_slot, TRUE, 0},
         {"__iter__", iter_slot, TRUE, 0},
         {"__next__", next_slot, TRUE, 0},
+        {"__setattr__", setattr_slot, TRUE, 2},
+        {"__delattr__", delattr_slot, TRUE, 1},
         {NULL}
     };
 
@@ -5272,6 +6809,16 @@ static memberDef *findFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
     else
         flist = &mod->othfuncs;
 
+    /* __delattr__ is implemented as __setattr__. */
+    if (st == delattr_slot)
+    {
+        if (inMainModule())
+            setIsUsedName(cacheName(pt, pname));
+
+        st = setattr_slot;
+        pname = "__setattr__";
+    }
+
     for (md = *flist; md != NULL; md = md->next)
         if (strcmp(md->pyname->text, pname) == 0 && md->module == mod)
             break;
@@ -5299,7 +6846,7 @@ static memberDef *findFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
         yyerror("Another overload has already been defined that is annotated as /NoArgParser/");
 
     /* Global operators are a subset. */
-    if (mt_scope == NULL && c_scope == NULL && st != no_slot && st != neg_slot && st != pos_slot && !isNumberSlot(md) && !isRichCompareSlot(md))
+    if (mt_scope == NULL && c_scope == NULL && st != no_slot && st != neg_slot && st != pos_slot && !isNumberSlot(md) && !isInplaceNumberSlot(md) && !isRichCompareSlot(md))
         yyerror("Global operators must be either numeric or comparison operators");
 
     return md;
@@ -5307,41 +6854,66 @@ static memberDef *findFunction(sipSpec *pt, moduleDef *mod, classDef *c_scope,
 
 
 /*
- * Search a set of flags for a particular one and check its type.
+ * Search a set of flags for a particular one.
  */
-static optFlag *findOptFlag(optFlags *flgs,char *name,flagType ft)
+static optFlag *findOptFlag(optFlags *flgs, const char *name)
 {
     int f;
 
-    for (f = 0; f < flgs -> nrFlags; ++f)
+    for (f = 0; f < flgs->nrFlags; ++f)
     {
-        optFlag *of = &flgs -> flags[f];
+        optFlag *of = &flgs->flags[f];
 
-        if (strcmp(of -> fname,name) == 0)
-        {
-            /*
-             * An optional name can look like a boolean or a name.
-             */
-
-            if (ft == opt_name_flag)
-            {
-                if (of -> ftype == bool_flag)
-                {
-                    of -> ftype = opt_name_flag;
-                    of -> fvalue.sval = NULL;
-                }
-                else if (of -> ftype == name_flag)
-                    of -> ftype = opt_name_flag;
-            }
-
-            if (ft != of -> ftype)
-                yyerror("Optional flag has a value of the wrong type");
-
+        if (strcmp(of->fname, name) == 0)
             return of;
-        }
     }
 
     return NULL;
+}
+
+
+/*
+ * Search a set of flags for a particular one and check its type.
+ */
+static optFlag *getOptFlag(optFlags *flgs, const char *name, flagType ft)
+{
+    optFlag *of = findOptFlag(flgs, name);
+
+    if (of != NULL)
+    {
+        /* An optional name can look like a boolean or a name. */
+        if (ft == opt_name_flag)
+        {
+            if (of->ftype == bool_flag)
+            {
+                of->ftype = opt_name_flag;
+                of->fvalue.sval = NULL;
+            }
+            else if (of->ftype == name_flag)
+            {
+                of->ftype = opt_name_flag;
+            }
+        }
+
+        /* An optional integer can look like a boolean or an integer. */
+        if (ft == opt_integer_flag)
+        {
+            if (of->ftype == bool_flag)
+            {
+                of->ftype = opt_integer_flag;
+                of->fvalue.ival = -1;
+            }
+            else if (of->ftype == integer_flag)
+            {
+                of->ftype = opt_integer_flag;
+            }
+        }
+
+        if (ft != of->ftype)
+            yyerror("Annotation has a value of the wrong type");
+    }
+
+    return of;
 }
 
 
@@ -5465,19 +7037,57 @@ static void checkAttributes(sipSpec *pt, moduleDef *mod, classDef *py_c_scope,
             if (xd->pyname != NULL && strcmp(xd->pyname, attr) == 0)
                 yyerror("There is already an exception with the same Python name");
     }
+
+    /* Check the properties. */
+    if (py_c_scope != NULL)
+    {
+        propertyDef *pd;
+
+        for (pd = py_c_scope->properties; pd != NULL; pd = pd->next)
+            if (strcmp(pd->name->text, attr) == 0)
+                yyerror("There is already a property with the same name");
+    }
 }
 
 
 /*
- * Append a code block to a list of them.  Append is needed to give the
- * specifier easy control over the order of the documentation.
+ * Append a code block to a list of them.
  */
-void appendCodeBlock(codeBlock **headp, codeBlock *new)
+static void appendCodeBlock(codeBlockList **headp, codeBlock *cb)
 {
-    while (*headp != NULL)
-        headp = &(*headp)->next;
+    codeBlockList *cbl;
 
-    *headp = new;
+    /* Handle the trivial case. */
+    if (cb == NULL)
+        return;
+
+    /* Find the end of the list. */
+    while (*headp != NULL)
+    {
+        /* Ignore if the block is already in the list. */
+        if ((*headp)->block == cb)
+            return;
+
+        headp = &(*headp)->next;
+    }
+
+    cbl = sipMalloc(sizeof (codeBlockList));
+    cbl->block = cb;
+
+    *headp = cbl;
+}
+
+
+/*
+ * Append a code block list to an existing list.
+ */
+void appendCodeBlockList(codeBlockList **headp, codeBlockList *cbl)
+{
+    while (cbl != NULL)
+    {
+        appendCodeBlock(headp, cbl->block);
+        cbl = cbl->next;
+    }
 }
 
 
@@ -5537,7 +7147,50 @@ static qualDef *findQualifier(const char *name)
                 return qd;
     }
 
+    /* Qualifiers corresponding to the SIP version are created on the fly. */
+    if (name[0] == 'S' && name[1] == 'I' && name[2] == 'P' && name[3] == '_')
+    {
+        const char *cp = &name[3];
+        int major, minor, patch;
+
+        cp = getInt(cp, &major);
+        cp = getInt(cp, &minor);
+        cp = getInt(cp, &patch);
+
+        if (*cp != '\0')
+            yyerror("Unexpected character after SIP version number");
+
+        return allocQualifier(currentModule, -1,
+                (major << 16) | (minor << 8) | patch, name, time_qualifier);
+    }
+
     return NULL;
+}
+
+
+/*
+ * Get an integer from string.
+ */
+static const char *getInt(const char *cp, int *ip)
+{
+    /* Handle the default value. */
+    *ip = 0;
+
+    if (*cp == '\0')
+        return cp;
+
+    /* There must be a leading underscore. */
+    if (*cp++ != '_')
+        yyerror("An underscore must separate the parts of a SIP version number");
+
+    while (isdigit(*cp))
+    {
+        *ip *= 10;
+        *ip += *cp - '0';
+        ++cp;
+    }
+
+    return cp;
 }
 
 
@@ -5701,7 +7354,7 @@ static int notSkipping()
 /*
  * Return the value of an expression involving a time period.
  */
-static int timePeriod(char *lname,char *uname)
+static int timePeriod(const char *lname, const char *uname)
 {
     int this, line;
     qualDef *qd, *lower, *upper;
@@ -5709,62 +7362,71 @@ static int timePeriod(char *lname,char *uname)
 
     if (lname == NULL)
         lower = NULL;
-    else if ((lower = findQualifier(lname)) == NULL || lower -> qtype != time_qualifier)
+    else if ((lower = findQualifier(lname)) == NULL || lower->qtype != time_qualifier)
         yyerror("Lower bound is not a time version");
 
     if (uname == NULL)
         upper = NULL;
-    else if ((upper = findQualifier(uname)) == NULL || upper -> qtype != time_qualifier)
+    else if ((upper = findQualifier(uname)) == NULL || upper->qtype != time_qualifier)
         yyerror("Upper bound is not a time version");
 
     /* Sanity checks on the bounds. */
-
     if (lower == NULL && upper == NULL)
         yyerror("Lower and upper bounds cannot both be omitted");
 
     if (lower != NULL && upper != NULL)
     {
-        if (lower -> module != upper -> module || lower -> line != upper -> line)
+        if (lower->module != upper->module || lower->line != upper->line)
             yyerror("Lower and upper bounds are from different timelines");
 
         if (lower == upper)
             yyerror("Lower and upper bounds must be different");
 
-        if (lower -> order > upper -> order)
+        if (lower->order > upper->order)
             yyerror("Later version specified as lower bound");
     }
 
     /* Go through each slot in the relevant timeline. */
-
     if (lower != NULL)
     {
-        mod = lower -> module;
-        line = lower -> line;
+        mod = lower->module;
+        line = lower->line;
     }
     else
     {
-        mod = upper -> module;
-        line = upper -> line;
+        mod = upper->module;
+        line = upper->line;
+    }
+
+    /* Handle the SIP version number pseudo-timeline. */
+    if (line < 0)
+    {
+        if (lower != NULL && lower->order > SIP_VERSION)
+            return FALSE;
+
+        if (upper != NULL && upper->order <= SIP_VERSION)
+            return FALSE;
+
+        return TRUE;
     }
 
     this = FALSE;
 
-    for (qd = mod -> qualifiers; qd != NULL; qd = qd -> next)
+    for (qd = mod->qualifiers; qd != NULL; qd = qd->next)
     {
-        if (qd -> qtype != time_qualifier || qd -> line != line)
+        if (qd->qtype != time_qualifier || qd->line != line)
             continue;
 
-        if (lower != NULL && qd -> order < lower -> order)
+        if (lower != NULL && qd->order < lower->order)
             continue;
 
-        if (upper != NULL && qd -> order >= upper -> order)
+        if (upper != NULL && qd->order >= upper->order)
             continue;
 
         /*
-         * This is within the required range so if it is also needed
-         * then the expression is true.
+         * This is within the required range so if it is also needed then the
+         * expression is true.
          */
-
         if (isNeeded(qd))
         {
             this = TRUE;
@@ -5851,31 +7513,44 @@ static classDef *currentScope(void)
 /*
  * Create a new qualifier.
  */
-static void newQualifier(moduleDef *mod, int line, int order, char *name,
+static void newQualifier(moduleDef *mod, int line, int order, const char *name,
         qualType qt)
 {
-    qualDef *qd;
-
     /* Check it doesn't already exist. */
-
     if (findQualifier(name) != NULL)
         yyerror("Version is already defined");
 
+    allocQualifier(mod, line, order, name, qt);
+}
+
+
+/*
+ * Allocate a new qualifier.
+ */
+static qualDef *allocQualifier(moduleDef *mod, int line, int order,
+        const char *name, qualType qt)
+{
+    qualDef *qd;
+
     qd = sipMalloc(sizeof (qualDef));
+
     qd->name = name;
     qd->qtype = qt;
     qd->module = mod;
     qd->line = line;
     qd->order = order;
-    qd->next = mod -> qualifiers;
+    qd->next = mod->qualifiers;
+
     mod->qualifiers = qd;
+
+    return qd;
 }
 
 
 /*
  * Create a new imported module.
  */
-static void newImport(char *filename)
+static void newImport(const char *filename)
 {
     moduleDef *from, *mod;
     moduleListDef *mld;
@@ -5918,12 +7593,12 @@ static void getHooks(optFlags *optflgs,char **pre,char **post)
 {
     optFlag *of;
 
-    if ((of = findOptFlag(optflgs,"PreHook",name_flag)) != NULL)
+    if ((of = getOptFlag(optflgs,"PreHook",name_flag)) != NULL)
         *pre = of -> fvalue.sval;
     else
         *pre = NULL;
 
-    if ((of = findOptFlag(optflgs,"PostHook",name_flag)) != NULL)
+    if ((of = getOptFlag(optflgs,"PostHook",name_flag)) != NULL)
         *post = of -> fvalue.sval;
     else
         *post = NULL;
@@ -5935,7 +7610,7 @@ static void getHooks(optFlags *optflgs,char **pre,char **post)
  */
 static int getTransfer(optFlags *optflgs)
 {
-    return (findOptFlag(optflgs, "Transfer", bool_flag) != NULL);
+    return (getOptFlag(optflgs, "Transfer", bool_flag) != NULL);
 }
 
 
@@ -5944,7 +7619,7 @@ static int getTransfer(optFlags *optflgs)
  */
 static int getReleaseGIL(optFlags *optflgs)
 {
-    return (findOptFlag(optflgs, "ReleaseGIL", bool_flag) != NULL);
+    return (getOptFlag(optflgs, "ReleaseGIL", bool_flag) != NULL);
 }
 
 
@@ -5953,7 +7628,7 @@ static int getReleaseGIL(optFlags *optflgs)
  */
 static int getHoldGIL(optFlags *optflgs)
 {
-    return (findOptFlag(optflgs, "HoldGIL", bool_flag) != NULL);
+    return (getOptFlag(optflgs, "HoldGIL", bool_flag) != NULL);
 }
 
 
@@ -5962,7 +7637,7 @@ static int getHoldGIL(optFlags *optflgs)
  */
 static int getDeprecated(optFlags *optflgs)
 {
-    return (findOptFlag(optflgs, "Deprecated", bool_flag) != NULL);
+    return (getOptFlag(optflgs, "Deprecated", bool_flag) != NULL);
 }
 
 
@@ -5971,7 +7646,7 @@ static int getDeprecated(optFlags *optflgs)
  */
 static int getAllowNone(optFlags *optflgs)
 {
-    return (findOptFlag(optflgs, "AllowNone", bool_flag) != NULL);
+    return (getOptFlag(optflgs, "AllowNone", bool_flag) != NULL);
 }
 
 
@@ -5980,7 +7655,7 @@ static int getAllowNone(optFlags *optflgs)
  */
 static const char *getDocType(optFlags *optflgs)
 {
-    optFlag *of = findOptFlag(optflgs, "DocType", string_flag);
+    optFlag *of = getOptFlag(optflgs, "DocType", string_flag);
 
     if (of == NULL)
         return NULL;
@@ -5994,7 +7669,7 @@ static const char *getDocType(optFlags *optflgs)
  */
 static const char *getDocValue(optFlags *optflgs)
 {
-    optFlag *of = findOptFlag(optflgs, "DocValue", string_flag);
+    optFlag *of = getOptFlag(optflgs, "DocValue", string_flag);
 
     if (of == NULL)
         return NULL;
@@ -6129,11 +7804,21 @@ static void applyTypeFlags(moduleDef *mod, argDef *ad, optFlags *flags)
 {
     ad->doctype = getDocType(flags);
 
+    if (getOptFlag(flags, "PyInt", bool_flag) != NULL)
+    {
+        if (ad->atype == string_type)
+            ad->atype = byte_type;
+        else if (ad->atype == sstring_type)
+            ad->atype = sbyte_type;
+        else if (ad->atype == ustring_type)
+            ad->atype = ubyte_type;
+    }
+
     if (ad->atype == string_type && !isArray(ad) && !isReference(ad))
     {
         optFlag *of;
 
-        if ((of = findOptFlag(flags, "Encoding", string_flag)) == NULL)
+        if ((of = getOptFlag(flags, "Encoding", string_flag)) == NULL)
         {
             if (mod->encoding != no_type)
                 ad->atype = mod->encoding;
@@ -6143,6 +7828,24 @@ static void applyTypeFlags(moduleDef *mod, argDef *ad, optFlags *flags)
         else if ((ad->atype = convertEncoding(of->fvalue.sval)) == no_type)
             yyerror("The value of the /Encoding/ annotation must be one of \"ASCII\", \"Latin-1\", \"UTF-8\" or \"None\"");
     }
+}
+
+
+/*
+ * Return the keyword argument support converted from a string.
+ */
+static KwArgs convertKwArgs(const char *kwargs)
+{
+    if (strcmp(kwargs, "None") == 0)
+        return NoKwArgs;
+
+    if (strcmp(kwargs, "All") == 0)
+        return AllKwArgs;
+
+    if (strcmp(kwargs, "Optional") == 0)
+        return OptionalKwArgs;
+
+    yyerror("The style of keyword argument support must be one of \"All\", \"Optional\" or \"None\"");
 }
 
 
@@ -6175,7 +7878,7 @@ static apiVersionRangeDef *getAPIRange(optFlags *optflgs)
 {
     optFlag *of;
 
-    if ((of = findOptFlag(optflgs, "API", api_range_flag)) == NULL)
+    if ((of = getOptFlag(optflgs, "API", api_range_flag)) == NULL)
         return NULL;
 
     return of->fvalue.aval;
@@ -6220,23 +7923,54 @@ static apiVersionRangeDef *convertAPIRange(moduleDef *mod, nameDef *name,
 
 
 /*
- * Return TRUE if a signature with annotations uses keyword arguments.
+ * Return the style of keyword argument support for a signature.
  */
-static int usesKeywordArgs(optFlags *optflgs, signatureDef *sd)
+static KwArgs keywordArgs(moduleDef *mod, optFlags *optflgs, signatureDef *sd,
+        int need_name)
 {
-    int kwd_args_anno, no_kwd_args_anno;
+    KwArgs kwargs;
+    optFlag *ka_anno, *no_ka_anno;
 
-    kwd_args_anno = (findOptFlag(optflgs, "KeywordArgs", bool_flag) != NULL);
-    no_kwd_args_anno = (findOptFlag(optflgs, "NoKeywordArgs", bool_flag) != NULL);
+    /* Get the default. */
+    kwargs = mod->kwargs;
 
     /*
-     * An ellipsis cannot be used with keyword arguments.  Only complain if it
-     * has been explicitly requested.
+     * Get the possible annotations allowing /KeywordArgs/ to have different
+     * types of values.
      */
-    if (kwd_args_anno && sd->nrArgs > 0 && sd->args[sd->nrArgs - 1].atype == ellipsis_type)
-        yyerror("/KeywordArgs/ cannot be specified for calls with a variable number of arguments");
+    ka_anno = findOptFlag(optflgs, "KeywordArgs");
+    no_ka_anno = getOptFlag(optflgs, "NoKeywordArgs", bool_flag);
 
-    if ((defaultKwdArgs || kwd_args_anno) && !no_kwd_args_anno)
+    if (no_ka_anno != NULL)
+    {
+        if (ka_anno != NULL)
+            yyerror("/KeywordArgs/ and /NoKeywordArgs/ cannot both be specified");
+
+        deprecated("/NoKeywordArgs/ is deprecated, use /KeywordArgs=\"None\" instead");
+
+        kwargs = NoKwArgs;
+    }
+    else if (ka_anno != NULL)
+    {
+        /* A string value is the non-deprecated type. */
+        if (ka_anno->ftype == string_flag)
+        {
+            kwargs = convertKwArgs(ka_anno->fvalue.sval);
+        }
+        else
+        {
+            deprecated("/KeywordArgs/ is deprecated, use /KeywordArgs=\"All\" instead");
+
+            /* Get it again to check the type. */
+            ka_anno = getOptFlag(optflgs, "KeywordArgs", bool_flag);
+        }
+    }
+
+    /* An ellipsis cannot be used with keyword arguments. */
+    if (sd->nrArgs > 0 && sd->args[sd->nrArgs - 1].atype == ellipsis_type)
+        kwargs = NoKwArgs;
+
+    if (kwargs != NoKwArgs)
     {
         int a, is_name = FALSE;
 
@@ -6245,19 +7979,25 @@ static int usesKeywordArgs(optFlags *optflgs, signatureDef *sd)
          */
         for (a = 0; a < sd->nrArgs; ++a)
         {
-            nameDef *nd = sd->args[a].name;
+            argDef *ad = &sd->args[a];
 
-            if (sd->args[a].name != NULL)
+            if (kwargs == OptionalKwArgs && ad->defval == NULL)
+                continue;
+
+            if (ad->name != NULL)
             {
-                setIsUsedName(nd);
+                if (need_name || inMainModule())
+                    setIsUsedName(ad->name);
+
                 is_name = TRUE;
             }
         }
 
-        return is_name;
+        if (!is_name)
+            kwargs = NoKwArgs;
     }
 
-    return FALSE;
+    return kwargs;
 }
 
 
@@ -6326,4 +8066,152 @@ static int isEnabledFeature(const char *name)
         yyerror("No such feature");
 
     return !excludedFeature(excludedQualifiers, qd);
+}
+
+
+/*
+ * Add a property definition to a class.
+ */
+static void addProperty(sipSpec *pt, moduleDef *mod, classDef *cd,
+        const char *name, const char *get, const char *set,
+        codeBlock *docstring)
+{
+    propertyDef *pd;
+
+    checkAttributes(pt, mod, cd, NULL, name, FALSE);
+
+    pd = sipMalloc(sizeof (propertyDef));
+
+    pd->name = cacheName(pt, name);
+    pd->get = get;
+    pd->set = set;
+    appendCodeBlock(&pd->docstring, docstring);
+    pd->next = cd->properties;
+
+    cd->properties = pd;
+
+    if (inMainModule())
+        setIsUsedName(pd->name);
+}
+
+
+/*
+ * Configure a module and return the (possibly new) current module.
+ */
+static moduleDef *configureModule(sipSpec *pt, moduleDef *module,
+        const char *filename, const char *name, int version, int c_module,
+        KwArgs kwargs, int use_arg_names, codeBlock *docstring)
+{
+    moduleDef *mod;
+
+    /* Check the module hasn't already been defined. */
+    for (mod = pt->modules; mod != NULL; mod = mod->next)
+        if (mod->fullname != NULL && strcmp(mod->fullname->text, name) == 0)
+            yyerror("Module is already defined");
+
+    /*
+     * If we are in a container module then create a component module and make
+     * it current.
+     */
+    if (isContainer(module) || module->container != NULL)
+    {
+        mod = allocModule();
+
+        mod->file = filename;
+        mod->container = (isContainer(module) ? module : module->container);
+
+        module = mod;
+    }
+
+    setModuleName(pt, module, name);
+    module->kwargs = kwargs;
+    module->version = version;
+    appendCodeBlock(&module->docstring, docstring);
+
+    if (use_arg_names)
+        setUseArgNames(module);
+
+    if (pt->genc < 0)
+        pt->genc = c_module;
+    else if (pt->genc != c_module)
+        yyerror("Cannot mix C and C++ modules");
+
+    return module;
+}
+
+
+/*
+ * Add a Python naming rule to a module.
+ */
+static void addAutoPyName(moduleDef *mod, const char *remove_leading)
+{
+    autoPyNameDef *apnd, **apndp;
+
+    for (apndp = &mod->autopyname; *apndp != NULL; apndp = &(*apndp)->next)
+        ;
+
+    apnd = sipMalloc(sizeof (autoPyNameDef));
+    apnd->remove_leading = remove_leading;
+    apnd->next = *apndp;
+
+    *apndp = apnd;
+}
+
+
+/*
+ * Check that no invalid or unknown annotations are given.
+ */
+static void checkAnnos(optFlags *annos, const char *valid[])
+{
+    if (parsingCSignature && annos->nrFlags != 0)
+    {
+        deprecated("Annotations should not be used in explicit C/C++ signatures");
+    }
+    else
+    {
+        int i;
+
+        for (i = 0; i < annos->nrFlags; i++)
+        {
+            const char **name;
+
+            for (name = valid; *name != NULL; ++name)
+                if (strcmp(*name, annos->flags[i].fname) == 0)
+                    break;
+
+            if (*name == NULL)
+                deprecated("Annotation is invalid");
+        }
+    }
+}
+
+
+/*
+ * Check that no annotations were given.
+ */
+static void checkNoAnnos(optFlags *annos, const char *msg)
+{
+    if (annos->nrFlags != 0)
+        deprecated(msg);
+}
+
+
+/*
+ * Handle any /KeepReference/ annotation for a type.
+ */
+static void handleKeepReference(optFlags *optflgs, argDef *ad, moduleDef *mod)
+{
+    optFlag *of;
+
+    if ((of = getOptFlag(optflgs, "KeepReference", opt_integer_flag)) != NULL)
+    {
+        setKeepReference(ad);
+
+        if ((ad->key = of->fvalue.ival) < -1)
+            yyerror("/KeepReference/ key cannot be negative");
+
+        /* If there was no explicit key then auto-allocate one. */
+        if (ad->key == -1)
+            ad->key = mod->next_key--;
+    }
 }
