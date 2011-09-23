@@ -12,6 +12,7 @@ nsis = NSISTarget( "pyqt_installer", path, "PyQt4.nsi", makensis_extra_options =
 
 class PyQtTarget(SipTarget):
     def configure_command(self):
+        SipTarget.configure_command(self)
         if self.has_arg("verbose"):
             self.config += " -w"
 

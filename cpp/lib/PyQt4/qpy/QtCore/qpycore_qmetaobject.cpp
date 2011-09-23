@@ -1,6 +1,6 @@
 // This is the support code for QMetaObject.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -40,7 +35,11 @@
 
 // Forward declarations.
 static PyObject *ArgumentStorage_New(PyObject *type, PyObject *data);
+#if defined(SIP_USE_PYCAPSULE)
+extern "C" {static void ArgumentStorage_delete(PyObject *cap);}
+#else
 extern "C" {static void ArgumentStorage_delete(void *stv);}
+#endif
 
 
 // Register a number of named types and integer types for Q_FLAGS and Q_ENUMS.
@@ -77,8 +76,13 @@ PyObject *qpycore_ArgumentFactory(PyObject *type, PyObject *data)
         return 0;
     }
 
+#if defined(SIP_USE_PYCAPSULE)
+    Chimera::Storage *st = reinterpret_cast<Chimera::Storage *>(
+            PyCapsule_GetPointer(as_obj, NULL));
+#else
     Chimera::Storage *st = reinterpret_cast<Chimera::Storage *>(
             PyCObject_AsVoidPtr(as_obj));
+#endif
 
     QGenericArgument *arg = new QGenericArgument(
             st->type()->name().constData(), st->address());
@@ -112,8 +116,13 @@ PyObject *qpycore_ReturnFactory(PyObject *type)
         return 0;
     }
 
+#if defined(SIP_USE_PYCAPSULE)
+    Chimera::Storage *st = reinterpret_cast<Chimera::Storage *>(
+            PyCapsule_GetPointer(as_obj, NULL));
+#else
     Chimera::Storage *st = reinterpret_cast<Chimera::Storage *>(
             PyCObject_AsVoidPtr(as_obj));
+#endif
 
     QGenericReturnArgument *arg = new QGenericReturnArgument(
             st->type()->name().constData(), st->address());
@@ -141,13 +150,31 @@ PyObject *qpycore_ReturnFactory(PyObject *type)
 PyObject *qpycore_ReturnValue(PyObject *gra_obj)
 {
     PyObject *as_obj = ((sipSimpleWrapper *)gra_obj)->user;
+
+#if defined(SIP_USE_PYCAPSULE)
+    Chimera::Storage *st = reinterpret_cast<Chimera::Storage *>(
+            PyCapsule_GetPointer(as_obj, NULL));
+#else
     Chimera::Storage *st = reinterpret_cast<Chimera::Storage *>(
             PyCObject_AsVoidPtr(as_obj));
+#endif
 
     return st->toPyObject();
 }
 
 
+#if defined(SIP_USE_PYCAPSULE)
+// The PyCapsule destructor for the ArgumentStorage type.
+static void ArgumentStorage_delete(PyObject *cap)
+{
+    Chimera::Storage *st = reinterpret_cast<Chimera::Storage *>(
+            PyCapsule_GetPointer(cap, NULL));
+    const Chimera *ct = st->type();
+
+    delete st;
+    delete ct;
+}
+#else
 // The PyCObject destructor for the ArgumentStorage type.
 static void ArgumentStorage_delete(void *stv)
 {
@@ -157,9 +184,10 @@ static void ArgumentStorage_delete(void *stv)
     delete st;
     delete ct;
 }
+#endif
 
 
-// Returns a Python object wrapping a ArgumentStorage instance.
+// Returns a Python object wrapping an ArgumentStorage instance.
 static PyObject *ArgumentStorage_New(PyObject *type, PyObject *data)
 {
     const Chimera *ct = Chimera::parse(type);
@@ -181,10 +209,17 @@ static PyObject *ArgumentStorage_New(PyObject *type, PyObject *data)
     }
 
     // Convert to a Python object.
+#if defined(SIP_USE_PYCAPSULE)
+    PyObject *as_obj = PyCapsule_New(st, NULL, ArgumentStorage_delete);
+#else
     PyObject *as_obj = PyCObject_FromVoidPtr(st, ArgumentStorage_delete);
+#endif
 
     if (!as_obj)
-        ArgumentStorage_delete(st);
+    {
+        delete st;
+        delete ct;
+    }
 
     return as_obj;
 }

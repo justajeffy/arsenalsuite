@@ -1,7 +1,7 @@
 # This is the qmake project file for the QPy support code for the QtCore
 # module.
 #
-# Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 # 
 # This file is part of PyQt.
 # 
@@ -17,13 +17,8 @@
 # GPL Exception version 1.1, which can be found in the file
 # GPL_EXCEPTION.txt in this package.
 # 
-# Please review the following information to ensure GNU General
-# Public Licensing requirements will be met:
-# http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-# you are unsure which license is appropriate for your use, please
-# review the following information:
-# http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-# or contact the sales department at sales@riverbankcomputing.com.
+# If you are unsure which license is appropriate for your use, please
+# contact the sales department at sales@riverbankcomputing.com.
 # 
 # This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 # WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -45,6 +40,7 @@ CONFIG(debug, debug|release) {
 win32: INCLUDEPATH += .
 
 SOURCES   = \
+            qpycore_qabstracteventdispatcher.cpp \
             qpycore_chimera.cpp \
             qpycore_chimera_signature.cpp \
             qpycore_chimera_storage.cpp \
@@ -53,6 +49,7 @@ SOURCES   = \
             qpycore_post_init.cpp \
             qpycore_pyqtboundsignal.cpp \
             qpycore_pyqtconfigure.cpp \
+            qpycore_pyqtmethodproxy.cpp \
             qpycore_pyqtproperty.cpp \
             qpycore_pyqtproxy.cpp \
             qpycore_pyqtpyobject.cpp \
@@ -60,7 +57,10 @@ SOURCES   = \
             qpycore_pyqtslot.cpp \
             qpycore_qmetaobject.cpp \
             qpycore_qmetaobject_helpers.cpp \
+            qpycore_qobject_getattr.cpp \
             qpycore_qobject_helpers.cpp \
+            qpycore_qpynullvariant.cpp \
+            qpycore_qsettings_value.cpp \
             qpycore_qstring.cpp \
             qpycore_qstringlist.cpp \
             qpycore_sip_helpers.cpp \
@@ -71,12 +71,15 @@ HEADERS   = \
             qpycore_api.h \
             qpycore_chimera.h \
             qpycore_misc.h \
+            qpycore_namespace.h \
             qpycore_pyqtboundsignal.h \
             qpycore_pyqtproperty.h \
             qpycore_pyqtproxy.h \
             qpycore_pyqtpyobject.h \
             qpycore_pyqtsignal.h \
+            qpycore_pyqtmethodproxy.h \
             qpycore_qobject_helpers.h \
+            qpycore_qpynullvariant.h \
             qpycore_sip.h \
             qpycore_sip_helpers.h \
             qpycore_types.h

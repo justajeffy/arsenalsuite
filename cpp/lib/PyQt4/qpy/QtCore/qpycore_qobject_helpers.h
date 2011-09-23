@@ -1,6 +1,6 @@
 // This defines the interfaces of the helpers for QObject.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -36,10 +31,13 @@
 
 #include <QMetaObject>
 
+#include "qpycore_namespace.h"
 #include "qpycore_sip.h"
 
 
+QT_BEGIN_NAMESPACE
 class QObject;
+QT_END_NAMESPACE
 
 
 const QMetaObject *qpycore_qobject_metaobject(sipSimpleWrapper *pySelf,
@@ -48,6 +46,7 @@ int qpycore_qobject_qt_metacall(sipSimpleWrapper *pySelf, sipTypeDef *base,
         QMetaObject::Call _c, int _id, void **_a);
 int qpycore_qobject_qt_metacast(sipSimpleWrapper *pySelf, sipTypeDef *base,
         const char *_clname);
+QObject *qpycore_qobject_sender(QObject *obj);
 int qpycore_qobject_receivers(QObject *obj, const char *signal, int nr);
 int qpycore_qobject_kw_handler(PyObject *obj, QObject *qobj, PyObject *kwds);
 

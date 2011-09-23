@@ -740,11 +740,29 @@ int SuperModel::rowCount( const QModelIndex & parent ) const
 	return ret;
 }
 
+int SuperModel::rowCountWithoutLoad( const QModelIndex & parent ) const
+{
+	if( !parent.isValid() ) return rootNode() ? rootNode()->rowCount() : 0;
+	ModelNode * node = indexToNode(parent);
+	// This line skips the loading by calling hasChildren with skipTreeBuilderCheck=true
+	ModelNode * childNode = node->hasChildren(parent,false,true) ? node->child(parent) : 0;
+	int ret = (childNode ? childNode->rowCount() : 0);
+	return ret;
+}
+
+
 bool SuperModel::hasChildren( const QModelIndex & parent ) const
 {
 	if( !parent.isValid() ) return rootNode()->rowCount() > 0;
 	ModelNode * node = indexToNode(parent);
 	return node->hasChildren(parent);
+}
+
+bool SuperModel::hasChildrenWithoutLoad( const QModelIndex & parent ) const
+{
+	if( !parent.isValid() ) return rootNode()->rowCount() > 0;
+	ModelNode * node = indexToNode(parent);
+	return node->hasChildren(parent,false,true);
 }
 
 bool SuperModel::childrenLoaded( const QModelIndex & parent )

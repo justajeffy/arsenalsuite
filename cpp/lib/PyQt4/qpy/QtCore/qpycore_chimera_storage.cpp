@@ -1,6 +1,6 @@
 // This is the implementation of the Chimera::Storage class.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -84,13 +79,18 @@ Chimera::Storage::~Storage()
 // Return the address of the storage.
 void *Chimera::Storage::address()
 {
-    if (!isPointerType())
-        return _value_storage.data();
+    if (isPointerType())
+    {
+        if (_parsed_type->name().endsWith('*'))
+            return &_ptr_storage;
 
-    if (_parsed_type->name().endsWith('*'))
-        return &_ptr_storage;
+        return _ptr_storage;
+    }
 
-    return _ptr_storage;
+    if (_parsed_type->typeDef() == sipType_QVariant)
+        return &_value_storage;
+
+    return _value_storage.data();
 }
 
 

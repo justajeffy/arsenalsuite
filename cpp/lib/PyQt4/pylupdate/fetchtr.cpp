@@ -165,6 +165,8 @@ static int getToken()
             } while ( isalnum(yyCh) || yyCh == '_' );
             yyIdent[yyIdentLen] = '\0';
 
+            bool might_be_str = false;
+
             switch ( yyIdent[0] ) {
                 case 'N':
                     if ( strcmp(yyIdent + 1, "one") == 0 )
@@ -193,15 +195,30 @@ static int getToken()
                     break;
                 case 'f':
                     /*
-                                  QTranslator::findMessage() has the same parameters as
-                                  QApplication::translate().
-                                   */
+                     * QTranslator::findMessage() has the same parameters as
+                     * QApplication::translate().
+                     */
                     if ( strcmp(yyIdent + 1, "indMessage") == 0 )
                         return Tok_translate;
                     break;
                 case 'r':
                     if ( strcmp(yyIdent + 1, "eturn") == 0 )
                         return Tok_return;
+
+                    /* Drop through. */
+
+                case 'R':
+                    if (yyIdent[1] == '\0')
+                        might_be_str = true;
+                    break;
+                case 'b':
+                case 'B':
+                case 'u':
+                case 'U':
+                    if (yyIdent[1] == '\0')
+                        might_be_str = true;
+                    else if ((yyIdent[1] == 'r' || yyIdent[1] == 'R') && yyIdent[2] == '\0')
+                        might_be_str = true;
                     break;
                 case 't':
                     if ( strcmp(yyIdent + 1, "r") == 0 ) {
@@ -225,8 +242,19 @@ static int getToken()
                     }
                     break;
             }
-            return Tok_Ident;
-        } else {
+
+            /*
+             * Handle the standard Python v2 and v3 string prefixes by simply
+             * ignoring them.
+             */
+
+            if (!might_be_str)
+                return Tok_Ident;
+
+            if (yyCh != '"' && yyCh != '\'')
+                return Tok_Ident;
+        }
+        {
             switch ( yyCh ) {
                 case '#':
                     do {

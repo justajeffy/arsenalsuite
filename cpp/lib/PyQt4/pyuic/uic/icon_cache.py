@@ -1,24 +1,55 @@
-"""Maintain a cache of icons.
+#############################################################################
+##
+## Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+## 
+## This file is part of PyQt.
+## 
+## This file may be used under the terms of the GNU General Public
+## License versions 2.0 or 3.0 as published by the Free Software
+## Foundation and appearing in the files LICENSE.GPL2 and LICENSE.GPL3
+## included in the packaging of this file.  Alternatively you may (at
+## your option) use any later version of the GNU General Public
+## License if such license has been publicly approved by Riverbank
+## Computing Limited (or its successors, if any) and the KDE Free Qt
+## Foundation. In addition, as a special exception, Riverbank gives you
+## certain additional rights. These rights are described in the Riverbank
+## GPL Exception version 1.1, which can be found in the file
+## GPL_EXCEPTION.txt in this package.
+## 
+## If you are unsure which license is appropriate for your use, please
+## contact the sales department at sales@riverbankcomputing.com.
+## 
+## This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+## WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+##
+#############################################################################
 
-If an icon is used more than once by a GUI then ensure that only one copy is
-created.
-"""
+
+import os.path
 
 
 class IconCache(object):
-    """A cache of icons."""
+    """Maintain a cache of icons.  If an icon is used more than once by a GUI
+    then ensure that only one copy is created.
+    """
 
     def __init__(self, object_factory, qtgui_module):
         """Initialise the cache."""
 
         self._object_factory = object_factory
         self._qtgui_module = qtgui_module
+        self._base_dir = ''
         self._cache = []
+
+    def set_base_dir(self, base_dir):
+        """ Set the base directory to be used for all relative filenames. """
+
+        self._base_dir = base_dir
 
     def get_icon(self, iconset):
         """Return an icon described by the given iconset tag."""
 
-        iset = _IconSet(iconset)
+        iset = _IconSet(iconset, self._base_dir)
 
         try:
             idx = self._cache.index(iset)
@@ -47,11 +78,11 @@ class IconCache(object):
 class _IconSet(object):
     """An icon set, ie. the mode and state and the pixmap used for each."""
 
-    def __init__(self, iconset):
+    def __init__(self, iconset, base_dir):
         """Initialise the icon set from an XML tag."""
 
         # Set the pre-Qt v4.4 fallback (ie. with no roles).
-        self._fallback = iconset.text.replace("\\", "\\\\")
+        self._fallback = self._file_name(iconset.text, base_dir)
         self._use_fallback = True
 
         # Parse the icon set.
@@ -60,13 +91,24 @@ class _IconSet(object):
         for i in iconset:
             file_name = i.text
             if file_name is not None:
-                file_name = file_name.replace("\\", "\\\\")
+                file_name = self._file_name(file_name, base_dir)
 
             self._roles[i.tag] = file_name
             self._use_fallback = False
 
         # There is no real icon yet.
         self.icon = None
+
+    @staticmethod
+    def _file_name(fname, base_dir):
+        """ Convert a relative filename if we have a base directory. """
+
+        fname = fname.replace("\\", "\\\\")
+
+        if base_dir != '' and fname[0] != ':' and not os.path.isabs(fname):
+            fname = os.path.join(base_dir, fname)
+
+        return fname
 
     def set_icon(self, icon, qtgui_module):
         """Save the icon and set its attributes."""

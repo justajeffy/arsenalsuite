@@ -1,4 +1,44 @@
-__all__ = ("compileUi", "loadUiType", "loadUi")
+#############################################################################
+##
+## Copyright (C) 2011 Riverbank Computing Limited.
+## Copyright (C) 2006 Thorsten Marek.
+## All right reserved.
+##
+## This file is part of PyQt.
+##
+## You may use this file under the terms of the GPL v2 or the revised BSD
+## license as follows:
+##
+## "Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are
+## met:
+##   * Redistributions of source code must retain the above copyright
+##     notice, this list of conditions and the following disclaimer.
+##   * Redistributions in binary form must reproduce the above copyright
+##     notice, this list of conditions and the following disclaimer in
+##     the documentation and/or other materials provided with the
+##     distribution.
+##   * Neither the name of the Riverbank Computing Limited nor the names
+##     of its contributors may be used to endorse or promote products
+##     derived from this software without specific prior written
+##     permission.
+##
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+##
+#############################################################################
+
+
+__all__ = ("compileUi", "compileUiDir", "loadUiType", "loadUi", "widgetPluginPath")
 
 from PyQt4.uic.Compiler import indenter, compiler
 
@@ -98,8 +138,8 @@ def compileUiDir(dir, recurse=False, map=None, **compileUi_args):
                 compile_ui(dir, ui)
 
 
-def compileUi(uifile, pyfile, execute=False, indent=4, pyqt3_wrapper=False):
-    """compileUi(uifile, pyfile, execute=False, indent=4, pyqt3_wrapper=False)
+def compileUi(uifile, pyfile, execute=False, indent=4, pyqt3_wrapper=False, from_imports=False):
+    """compileUi(uifile, pyfile, execute=False, indent=4, pyqt3_wrapper=False, from_imports=False)
 
     Creates a Python module from a Qt Designer .ui file.
     
@@ -111,6 +151,8 @@ def compileUi(uifile, pyfile, execute=False, indent=4, pyqt3_wrapper=False):
     tab is used.  The default is 4.
     pyqt3_wrapper is optionally set to generate extra code that allows the code
     to be used as it would be with PyQt v3.
+    from_imports is optionally set to generate import statements that are
+    relative to '.'.
     """
 
     from time import ctime
@@ -125,7 +167,7 @@ def compileUi(uifile, pyfile, execute=False, indent=4, pyqt3_wrapper=False):
 
     pyfile.write(_header % (uifname, ctime(), PYQT_VERSION_STR))
 
-    winfo = compiler.UICompiler().compileUi(uifile, pyfile)
+    winfo = compiler.UICompiler().compileUi(uifile, pyfile, from_imports)
 
     if pyqt3_wrapper:
         indenter.write_code(_pyqt3_wrapper_code % winfo)
@@ -134,13 +176,15 @@ def compileUi(uifile, pyfile, execute=False, indent=4, pyqt3_wrapper=False):
         indenter.write_code(_display_code % winfo)
 
 
-def loadUiType(uifile):
+def loadUiType(uifile, from_imports=False):
     """loadUiType(uifile) -> (form class, base class)
 
     Load a Qt Designer .ui file and return the generated form class and the Qt
     base class.
 
     uifile is a file name or file-like object containing the .ui file.
+    from_imports is optionally set to use import statements that are relative
+    to '.'.
     """
 
     import sys
@@ -153,7 +197,7 @@ def loadUiType(uifile):
         from PyQt4.uic.port_v2.string_io import StringIO
 
     code_string = StringIO()
-    winfo = compiler.UICompiler().compileUi(uifile, code_string)
+    winfo = compiler.UICompiler().compileUi(uifile, code_string, from_imports)
 
     ui_globals = {}
     exec(code_string.getvalue(), ui_globals)

@@ -34,10 +34,9 @@
 
 #include "metatranslator.h"
 
-#include <qapplication.h>
+#include <qcoreapplication.h>
 #include <qbytearray.h>
 #include <qfile.h>
-#include <qmessagebox.h>
 #include <qtextcodec.h>
 #include <qtextstream.h>
 #include <qxml.h>
@@ -72,12 +71,14 @@ public:
     virtual bool characters( const QString& ch );
     virtual bool fatalError( const QXmlParseException& exception );
     QString language() const { return m_language; }
+    QString sourceLanguage() const { return m_sourceLanguage; }
 
 private:
     MetaTranslator *tor;
     MetaTranslatorMessage::Type type;
     bool inMessage;
     QString m_language;
+    QString m_sourceLanguage;
     QString context;
     QString source;
     QString comment;
@@ -114,6 +115,7 @@ bool TsHandler::startElement( const QString& /* namespaceURI */,
     } else {
         if ( qName == QString("TS") ) {
             m_language = atts.value(QLatin1String("language"));
+            m_sourceLanguage = atts.value(QLatin1String("sourcelanguage"));
         } else if ( qName == QString("context") ) {
             context.truncate( 0 );
             source.truncate( 0 );
@@ -214,11 +216,7 @@ bool TsHandler::fatalError( const QXmlParseException& exception )
         msg.sprintf( "Parse error at line %d, column %d (%s).",
                      exception.lineNumber(), exception.columnNumber(),
                      exception.message().toLatin1().data() );
-        if ( qApp == 0 )
-            fprintf( stderr, "XML error: %s\n", msg.toLatin1().data() );
-        else
-            QMessageBox::information(0,
-                                      QObject::tr("Qt Linguist"), msg );
+        fprintf( stderr, "XML error: %s\n", msg.toLatin1().data() );
     }
     return false;
 }
@@ -399,6 +397,7 @@ bool MetaTranslator::load( const QString& filename )
     reader.setErrorHandler( 0 );
 
     m_language = hand->language();
+    m_sourceLanguage = hand->sourceLanguage();
     makeFileNamesAbsolute(QFileInfo(filename).absoluteDir());
 
     delete hand;
@@ -418,9 +417,10 @@ bool MetaTranslator::save( const QString& filename ) const
     //### The xml prolog allows processors to easily detect the correct encoding
     t << "<?xml version=\"1.0\"";
     t << " encoding=\"utf-8\"";
-    t << "?>\n<!DOCTYPE TS><TS version=\"1.1\"";
+    t << "?>\n<!DOCTYPE TS><TS version=\"2.0\"";
     if (!languageCode().isEmpty() && languageCode() != QLatin1String("C"))
-        t << " language=\"" << languageCode() << "\"";
+        t << " language=\"" << languageCode() << "\"" <<\
+            " sourcelanguage=\"" << sourceLanguageCode() << "\"";
     t << ">\n";
     if ( codecName != "ISO-8859-1" )
         t << "<defaultcodec>" << codecName << "</defaultcodec>\n";
@@ -585,9 +585,19 @@ QString MetaTranslator::languageCode() const
     return m_language;
 }
 
+QString MetaTranslator::sourceLanguageCode() const
+{
+    return m_sourceLanguage;
+}
+
 void MetaTranslator::setLanguageCode(const QString &languageCode)
 {
     m_language = languageCode;
+}
+
+void MetaTranslator::setSourceLanguageCode(const QString &languageCode)
+{
+    m_sourceLanguage = languageCode;
 }
 
 bool MetaTranslator::contains( const char *context, const char *sourceText,

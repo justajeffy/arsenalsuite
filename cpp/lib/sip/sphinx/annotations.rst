@@ -8,9 +8,9 @@ Annotations can either be :ref:`argument annotations <ref-arg-annos>`,
 :ref:`class annotations <ref-class-annos>`, :ref:`mapped type annotations
 <ref-mapped-type-annos>`, :ref:`enum annotations <ref-enum-annos>`,
 :ref:`exception annotations <ref-exception-annos>`, :ref:`function annotations
-<ref-function-annos>`, :ref:`license annotations <ref-license-annos>`,
-:ref:`typedef annotations <ref-typedef-annos>` or :ref:`variable annotations
-<ref-variable-annos>` depending on the context in which they can be used.
+<ref-function-annos>`, :ref:`typedef annotations <ref-typedef-annos>` or
+:ref:`variable annotations <ref-variable-annos>` depending on the context in
+which they can be used.
 
 Annotations are placed between forward slashes (``/``).  Multiple annotations
 are comma separated within the slashes.
@@ -23,6 +23,10 @@ Annotations can have one of the following types:
 
 *boolean*
     This type of annotation has no value and is implicitly true.
+
+*integer*
+    This type of annotation is an integer.  In some cases the value is
+    optional.
 
 *name*
     The value is a name that is compatible with a C/C++ identifier.  In some
@@ -193,14 +197,18 @@ Argument Annotations
 
 .. argument-annotation:: KeepReference
 
-    This boolean annotation is used to specify that a reference to the
+    This optional integer annotation is used to specify that a reference to the
     corresponding argument should be kept to ensure that the object is not
     garbage collected.  If the method is called again with a new argument then
     the reference to the previous argument is discarded.  Note that ownership
     of the argument is not changed.
 
+    If a value is specified then it defines the argument's key.  Arguments of
+    different constructors or methods that have the same key are assumed to
+    refer to the same value.
 
-.. function-annotation:: NoCopy
+
+.. argument-annotation:: NoCopy
 
     .. versionadded:: 4.10.1
 
@@ -231,14 +239,22 @@ Argument Annotations
     Both :aanno:`In` and :aanno:`Out` may be specified for the same argument.
 
 
+.. argument-annotation:: PyInt
+
+    .. versionadded:: 4.12
+
+    This boolean annotation is used with ``char``, ``signed char`` and
+    ``unsigned char`` arguments to specify that they should be interpreted as
+    integers rather than strings of one character.
+
+
 .. argument-annotation:: ResultSize
 
     This boolean annotation is used with functions or methods that return a
     ``void *`` or ``const void *``.  It identifies an argument that defines the
     size of the block of memory whose address is being returned.  This allows
     the ``sip.voidptr`` object that wraps the address to support the Python
-    buffer protocol and allows the memory to be read and updated when wrapped
-    by the Python ``buffer()`` builtin.
+    buffer protocol.
 
 
 .. argument-annotation:: SingleShot
@@ -416,6 +432,8 @@ Class Annotations
     avoid name clashes with other objects (e.g. enums, exceptions, functions)
     that have the same name in the same C++ scope.
 
+    .. seealso:: :directive:`%AutoPyName`
+
 
 .. class-annotation:: Supertype
 
@@ -457,8 +475,8 @@ Mapped Type Annotations
 
     .. versionadded:: 4.10
 
-    This string annotation specifies the name of the type as it will appear in
-    any generated docstrings.
+    This string annotation serves the same purpose as the :aanno:`DocType`
+    argument annotation when applied to the mapped type being defined.
 
 
 .. mapped-type-annotation:: NoRelease
@@ -483,6 +501,8 @@ Enum Annotations
     (e.g. classes, exceptions, functions) that have the same name in the same
     C++ scope.
 
+    .. seealso:: :directive:`%AutoPyName`
+
 
 .. _ref-exception-annos:
 
@@ -502,6 +522,8 @@ Exception Annotations
     when an exception name is the same as a Python keyword.  It may also be
     used to avoid name clashes with other objects (e.g. classes, enums,
     functions) that have the same name.
+
+    .. seealso:: :directive:`%AutoPyName`
 
 
 .. _ref-function-annos:
@@ -548,9 +570,16 @@ Function Annotations
 
     .. versionadded:: 4.10
 
-    This string annotation specifies the name of the type of the returned value
-    as it will appear in any generated docstrings.  It is usually used with
-    values of type :stype:`SIP_PYOBJECT` to provide a more specific type.
+    This string annotation serves the same purpose as the :aanno:`DocType`
+    argument annotation when applied to the type of the value returned by the
+    function.
+
+
+.. function-annotation:: Encoding
+
+    This string annotation serves the same purpose as the :aanno:`Encoding`
+    argument annotation when applied to the type of the value returned by the
+    function.
 
 
 .. function-annotation:: Factory
@@ -569,15 +598,46 @@ Function Annotations
     See :ref:`ref-gil` and the :fanno:`ReleaseGIL` annotation.
 
 
+.. function-annotation:: KeepReference
+
+    .. versionadded:: 4.12.2
+
+    This optional integer annotation serves the same purpose as the
+    :aanno:`KeepReference` argument annotation when applied to the type of the
+    value returned by the function.
+
+
 .. function-annotation:: KeywordArgs
 
     .. versionadded:: 4.10
 
-    This boolean annotation specifies that the argument parser generated for
-    this function will support passing the parameters using Python's keyword
-    argument syntax.  Keyword arguments cannot be used for functions that have
-    unnamed arguments or use an ellipsis to designate that the function has a
-    variable number of arguments.
+    This string annotation specifies the level of support the argument parser
+    generated for this function will provide for passing the parameters using
+    Python's keyword argument syntax.  The value of the annotation can be
+    either ``"None"`` meaning that keyword arguments are not supported,
+    ``"All"`` meaning that all named arguments can be passed as keyword
+    arguments, or ``"Optional"`` meaning that all named optional arguments
+    (i.e. those with a default value) can be passed as keyword arguments.
+
+    If the annotation is not used then the value specified by the
+    ``keyword_arguments`` argument of the :directive:`%Module` directive is
+    used.
+
+    Keyword arguments cannot be used for functions that use an ellipsis to
+    designate that the function has a variable number of arguments.
+
+    .. deprecated:: 4.12
+        It can also be used as a boolean annotation which is the equivalent of
+        specifiying a value of ``"All"``.
+
+
+.. function-annotation:: __len__
+
+    .. versionadded:: 4.10.3
+
+    This boolean annotation specifies that a ``__len__()`` method should be
+    automatically generated that will use the method being annotated to compute
+    the value that the ``__len__()`` method will return.
 
 
 .. function-annotation:: NewThread
@@ -621,13 +681,16 @@ Function Annotations
 
     .. versionadded:: 4.10
 
+    .. deprecated:: 4.12
+        Use the :fanno:`KeywordArgs` annotation with a value of ``"None"``.
+
     This boolean annotation specifies that the argument parser generated for
     this function will not support passing the parameters using Python's
     keyword argument syntax.  In other words, the argument parser will only
-    support only normal positional arguments.  This annotation is useful when
-    the default setting of allowing keyword arguments has been changed via the
-    command line, but you would still like certain functions to only support
-    positional arguments.
+    support normal positional arguments.  This annotation is useful when the
+    default setting of allowing keyword arguments has been changed via the
+    command line or the :directive:`%Module` directive, but you would still
+    like certain functions to only support positional arguments.
 
 
 .. function-annotation:: Numeric
@@ -668,6 +731,27 @@ Function Annotations
     when a function or method name is the same as a Python keyword.  It may
     also be used to avoid name clashes with other objects (e.g. classes, enums,
     exceptions) that have the same name in the same C++ scope.
+
+    .. seealso:: :directive:`%AutoPyName`
+
+
+.. function-annotation:: PyInt
+
+    .. versionadded:: 4.12
+
+    This boolean annotation serves the same purpose as the :aanno:`PyInt`
+    argument annotation when applied to the type of the value returned by the
+    function.
+
+
+.. function-annotation:: RaisesPyException
+
+    .. versionadded:: 4.12.1
+
+    This boolean annotation specifies that the function raises a Python
+    exception to indicate that an error occurred.  Any current exception is
+    cleared before the function is called.  It is ignored if the
+    :directive:`%MethodCode` directive is used.
 
 
 .. function-annotation:: ReleaseGIL
@@ -715,47 +799,24 @@ Function Annotations
     See :ref:`ref-object-ownership` for more detail.
 
 
-.. _ref-license-annos:
-
-License Annotations
--------------------
-
-.. license-annotation:: Licensee
-
-    This optional string annotation specifies the license's licensee.  No
-    restrictions are placed on the contents of the string.
-
-    See the :directive:`%License` directive.
-
-
-.. license-annotation:: Signature
-
-    This optional string annotation specifies the license's signature.  No
-    restrictions are placed on the contents of the string.
-
-    See the :directive:`%License` directive.
-
-
-.. license-annotation:: Timestamp
-
-    This optional string annotation specifies the license's timestamp.  No
-    restrictions are placed on the contents of the string.
-
-    See the :directive:`%License` directive.
-
-
-.. license-annotation:: Type
-
-    This string annotation specifies the license's type.  No restrictions are
-    placed on the contents of the string.
-
-    See the :directive:`%License` directive.
-
-
 .. _ref-typedef-annos:
 
 Typedef Annotations
 -------------------
+
+.. typedef-annotation:: DocType
+
+    .. versionadded:: 4.10
+
+    This string annotation serves the same purpose as the :aanno:`DocType`
+    argument annotation when applied to the mapped type being defined.
+
+
+.. typedef-annotation:: Encoding
+
+    This string annotation serves the same purpose as the :aanno:`Encoding`
+    argument annotation when applied to the mapped type being defined.
+
 
 .. typedef-annotation:: NoTypeName
 
@@ -773,6 +834,14 @@ Typedef Annotations
     code instead.
 
 
+.. typedef-annotation:: PyInt
+
+    .. versionadded:: 4.12
+
+    This boolean annotation serves the same purpose as the :aanno:`PyInt`
+    argument annotation when applied to the type being defined.
+
+
 .. _ref-variable-annos:
 
 Variable Annotations
@@ -782,9 +851,22 @@ Variable Annotations
 
     .. versionadded:: 4.10
 
-    This string annotation specifies the name of the type of the variable as it
-    will appear in any generated docstrings.  It is usually used with variables
-    of type :stype:`SIP_PYOBJECT` to provide a more specific type.
+    This string annotation serves the same purpose as the :aanno:`DocType`
+    argument annotation when applied to the type of the variable being defined.
+
+
+.. variable-annotation:: Encoding
+
+    This string annotation serves the same purpose as the :aanno:`Encoding`
+    argument annotation when applied to the type of the variable being defined.
+
+
+.. variable-annotation:: PyInt
+
+    .. versionadded:: 4.12
+
+    This boolean annotation serves the same purpose as the :aanno:`PyInt`
+    argument annotation when applied to the type of the variable being defined.
 
 
 .. variable-annotation:: PyName
@@ -794,3 +876,5 @@ Variable Annotations
     when a variable name is the same as a Python keyword.  It may also be used
     to avoid name clashes with other objects (e.g. classes, functions) that
     have the same name in the same C++ scope.
+
+    .. seealso:: :directive:`%AutoPyName`

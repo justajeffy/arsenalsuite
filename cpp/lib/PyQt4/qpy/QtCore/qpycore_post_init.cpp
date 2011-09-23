@@ -1,6 +1,6 @@
 // This is the post-initialisation support code for the QtCore module.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -34,6 +29,7 @@
 #include <QMutex>
 
 #include "qpycore_pyqtboundsignal.h"
+#include "qpycore_pyqtmethodproxy.h"
 #include "qpycore_pyqtproperty.h"
 #include "qpycore_pyqtproxy.h"
 #include "qpycore_pyqtpyobject.h"
@@ -56,10 +52,7 @@ void qpycore_post_init(PyObject *module_dict)
                 (PyObject *)&qpycore_pyqtWrapperType_Type) < 0)
         Py_FatalError("PyQt4.QtCore: Failed to set pyqtWrapperType type");
 
-
     // Initialise the pyqtProperty type and add it to the module dictionary.
-    qpycore_pyqtProperty_Type.tp_base = &PyProperty_Type;
-
     if (PyType_Ready(&qpycore_pyqtProperty_Type) < 0)
         Py_FatalError("PyQt4.QtCore: Failed to initialise pyqtProperty type");
 
@@ -75,12 +68,13 @@ void qpycore_post_init(PyObject *module_dict)
                 (PyObject *)&qpycore_pyqtSignal_Type) < 0)
         Py_FatalError("PyQt4.QtCore: Failed to set pyqtSignal type");
 
-    // Initialise the pyqtBoundSignal type.  Don't add it to the module
-    // dictionary as we don't want it to be explicitly invoked.
-    qpycore_pyqtBoundSignal_Type.tp_new = PyType_GenericNew;
-
+    // Initialise the private pyqtBoundSignal type.
     if (PyType_Ready(&qpycore_pyqtBoundSignal_Type) < 0)
         Py_FatalError("PyQt4.QtCore: Failed to initialise pyqtBoundSignal type");
+
+    // Initialise the private pyqtMethodProxy type.
+    if (PyType_Ready(&qpycore_pyqtMethodProxy_Type) < 0)
+        Py_FatalError("PyQt4.QtCore: Failed to initialise pyqtMethodProxy type");
 
     // Register the C++ type that wraps Python objects.
     PyQt_PyObject::metatype = qRegisterMetaType<PyQt_PyObject>("PyQt_PyObject");

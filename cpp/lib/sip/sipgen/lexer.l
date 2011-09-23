@@ -1,7 +1,7 @@
 /*
  * The SIP lexer.
  *
- * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
  *
  * This file is part of SIP.
  *
@@ -49,44 +49,57 @@ static struct inputFile {
 static int currentFile = -1;            /* Index of the current input file. */
 static char codeLine[MAX_CODE_LINE_LENGTH + 2]; /* The current code line. */
 static int codeIdx = -1;                /* Index of next code character. */
+static int parenDepth = 0;              /* The current depth of (...). */
 
 static FILE *openFile(const char *);
 static void fatallex(char *);
 %}
 
+%option stack
+
 %x code
 %x ccomment
+%s directive
+%s directive_start
 
 %%
 
-^[ \t]*%API                 {return TK_API;}
-^[ \t]*%DefaultEncoding     {return TK_DEFENCODING;}
-^[ \t]*%Plugin              {return TK_PLUGIN;}
-^[ \t]*%Include             {return TK_INCLUDE;}
-^[ \t]*%OptionalInclude     {return TK_OPTINCLUDE;}
-^[ \t]*%Import              {return TK_IMPORT;}
-^[ \t]*%Module              {return TK_MODULE;}
+^[ \t]*%API                 {BEGIN directive_start; return TK_API;}
+^[ \t]*%AutoPyName          {BEGIN directive_start; return TK_AUTOPYNAME;}
 ^[ \t]*%CModule             {return TK_CMODULE;}
-^[ \t]*%ConsolidatedModule  {return TK_CONSMODULE;}
-^[ \t]*%CompositeModule     {return TK_COMPOMODULE;}
-^[ \t]*%Timeline            {return TK_TIMELINE;}
-^[ \t]*%Platforms           {return TK_PLATFORMS;}
-^[ \t]*%Feature             {return TK_FEATURE;}
-^[ \t]*%License             {return TK_LICENSE;}
-^[ \t]*%MappedType          {return TK_MAPPEDTYPE;}
-^[ \t]*%Exception           {return TK_EXCEPTION;}
-^[ \t]*%If                  {return TK_IF;}
-^[ \t]*%DefaultMetatype     {return TK_DEFMETATYPE;}
-^[ \t]*%DefaultSupertype    {return TK_DEFSUPERTYPE;}
+^[ \t]*%CompositeModule     {BEGIN directive_start; return TK_COMPOMODULE;}
+^[ \t]*%ConsolidatedModule  {BEGIN directive_start; return TK_CONSMODULE;}
+^[ \t]*%DefaultEncoding     {BEGIN directive_start; return TK_DEFENCODING;}
+^[ \t]*%DefaultMetatype     {BEGIN directive_start; return TK_DEFMETATYPE;}
+^[ \t]*%DefaultSupertype    {BEGIN directive_start; return TK_DEFSUPERTYPE;}
 <INITIAL>^[ \t]*%End        {return TK_END;}
+<directive_start>^[ \t]*%End    {BEGIN INITIAL; return TK_END;}
+^[ \t]*%Exception           {return TK_EXCEPTION;}
+^[ \t]*%Feature             {BEGIN directive_start; return TK_FEATURE;}
+^[ \t]*%If                  {return TK_IF;}
+^[ \t]*%Import              {BEGIN directive_start; return TK_IMPORT;}
+^[ \t]*%Include             {BEGIN directive_start; return TK_INCLUDE;}
+^[ \t]*%License             {BEGIN directive_start; return TK_LICENSE;}
+^[ \t]*%MappedType          {return TK_MAPPEDTYPE;}
+^[ \t]*%Module              {BEGIN directive_start; return TK_MODULE;}
+^[ \t]*%OptionalInclude     {return TK_OPTINCLUDE;}
+^[ \t]*%Platforms           {return TK_PLATFORMS;}
+^[ \t]*%Plugin              {BEGIN directive_start; return TK_PLUGIN;}
+^[ \t]*%Property            {BEGIN directive_start; return TK_PROPERTY;}
+^[ \t]*%Timeline            {return TK_TIMELINE;}
 ^[ \t]*%VirtualErrorHandler {return TK_VIRTERRORHANDLER; }
+
 class                       {return TK_CLASS;}
 struct                      {return TK_STRUCT;}
 public                      {return TK_PUBLIC;}
 protected                   {return TK_PROTECTED;}
 private                     {return TK_PRIVATE;}
 signals                     {return TK_SIGNALS;}
+Q_SIGNALS                   {return TK_SIGNALS;}
+Q_SIGNAL                    {return TK_SIGNAL_METHOD;}
 slots                       {return TK_SLOTS;}
+Q_SLOTS                     {return TK_SLOTS;}
+Q_SLOT                      {return TK_SLOT_METHOD;}
 char                        {return TK_CHAR;}
 wchar_t                     {return TK_WCHAR_T;}
 bool                        {return TK_BOOL;}
@@ -102,9 +115,9 @@ signed                      {return TK_SIGNED;}
 unsigned                    {return TK_UNSIGNED;}
 const                       {return TK_CONST;}
 static                      {return TK_STATIC;}
-true                        {return TK_TRUE;}
-false                       {return TK_FALSE;}
-NULL                        {return TK_NULL;}
+true                        {return TK_TRUE_VALUE;}
+false                       {return TK_FALSE_VALUE;}
+NULL                        {return TK_NULL_VALUE;}
 typedef                     {return TK_TYPEDEF;}
 namespace                   {return TK_NAMESPACE;}
 operator                    {return TK_OPERATOR;}
@@ -127,59 +140,109 @@ SIP_RXOBJ_CON               {return TK_SIPRXCON;}
 SIP_RXOBJ_DIS               {return TK_SIPRXDIS;}
 SIP_SLOT_CON                {return TK_SIPSLOTCON;}
 SIP_SLOT_DIS                {return TK_SIPSLOTDIS;}
+SIP_SSIZE_T                 {return TK_SIPSSIZET;}
 SIP_QOBJECT                 {return TK_QOBJECT;}
 \.\.\.                      {return TK_ELLIPSIS;}
 
+<directive>get              {return TK_GET;}
+<directive>id               {return TK_ID;}
+<directive>keyword_arguments    {return TK_KWARGS;}
+<directive>language         {return TK_LANGUAGE;}
+<directive>licensee         {return TK_LICENSEE;}
+<directive>name             {return TK_NAME;}
+<directive>optional         {return TK_OPTIONAL;}
+<directive>order            {return TK_ORDER;}
+<directive>remove_leading   {return TK_REMOVELEADING;}
+<directive>set              {return TK_SET;}
+<directive>signature        {return TK_SIGNATURE;}
+<directive>timestamp        {return TK_TIMESTAMP;}
+<directive>type             {return TK_TYPE;}
+<directive>use_argument_names   {return TK_USEARGNAMES;}
+<directive>version          {return TK_VERSION;}
 
-[ \t\r] {           /* Ignore whitespace. */
+<directive>True             {return TK_TRUE_VALUE;}
+<directive>False            {return TK_FALSE_VALUE;}
+
+
+[ \t\r] {
+    /* Ignore whitespace. */
     ;
 }
 
-\n {                /* Maintain the line number. */
+<directive_start>\( {
+    /*
+     * Maintain the parenthesis depth so that we don't enter the 'code' state
+     * until any arguments have been parsed.
+     */
+    ++parenDepth;
+
+    BEGIN directive;
+
+    return '(';
+}
+
+<directive>\) {
+    /* Maintain the parenthesis depth. */
+    --parenDepth;
+
+    BEGIN INITIAL;
+
+    return ')';
+}
+
+\n {
+    /* Maintain the line number. */
     ++inputFileStack[currentFile].lineno;
 
-    if (codeIdx == 0)
+    if (codeIdx == 0 && parenDepth == 0)
     {
         BEGIN code;
     }
 }
 
-\/\/.* {            /* Ignore C++ style comments. */
+\/\/.* {
+    /* Ignore C++ style comments. */
     ;
 }
 
 
--?[0-9]+ {          /* A signed decimal number. */
+-?[0-9]+ {
+    /* A signed decimal number. */
     yylval.number = strtol(yytext,NULL,0);
-    return TK_NUMBER;
+    return TK_NUMBER_VALUE;
 }
 
 
--?(([0-9]+)|([0-9]*\.[0-9]*)([eE][-+]?[0-9]+)?)[fF]? {/* A floating point number. */
+-?(([0-9]+)|([0-9]*\.[0-9]*)([eE][-+]?[0-9]+)?)[fF]? {
+    /* A floating point number. */
     yylval.real = strtod(yytext,NULL);
-    return TK_REAL;
+    return TK_REAL_VALUE;
 }
 
 
-0x[0-9a-fA-F]+ {        /* An unsigned hexadecimal number. */
+0x[0-9a-fA-F]+ {
+    /* An unsigned hexadecimal number. */
     yylval.number = strtol(yytext,NULL,16);
-    return TK_NUMBER;
+    return TK_NUMBER_VALUE;
 }
 
 
-[_A-Za-z][_A-Za-z0-9]* {    /* An identifier name. */
+[_A-Za-z][_A-Za-z0-9]* {
+    /* An identifier name. */
     yylval.text = sipStrdup(yytext);
-    return TK_NAME;
+    return TK_NAME_VALUE;
 }
 
 
-[._A-Za-z][._/A-Za-z0-9\-]*[._A-Za-z0-9] {  /* A relative pathname. */
+[._A-Za-z][._/A-Za-z0-9\-]*[._A-Za-z0-9] {
+    /* A relative pathname. */
     yylval.text = sipStrdup(yytext);
-    return TK_PATHNAME;
+    return TK_PATH_VALUE;
 }
 
 
-\"[^"\n]*["\n] {        /* A double-quoted string. */
+\"[^"\n]*["\n] {
+    /* A double-quoted string. */
     char *dp, *sp;
 
     /* Copy the string without the quotes. */
@@ -199,206 +262,266 @@ SIP_QOBJECT                 {return TK_QOBJECT;}
 
     *dp = '\0';
 
-    return TK_STRING;
+    return TK_STRING_VALUE;
 }
 
 
-\'[^'\n]*['\n] {        /* A single-quoted character. */
+\'[^'\n]*['\n] {
+    /* A single-quoted character. */
     if (strlen(yytext) != 3)
         fatallex("Exactly one character expected between single quotes");
 
     yylval.qchar = yytext[1];
 
-    return TK_QCHAR;
+    return TK_QCHAR_VALUE;
 }
 
 
-\/\* {              /* Ignore C-style comments. */
-    BEGIN ccomment;
+\/\* {
+    /* Ignore C-style comments. */
+    yy_push_state(ccomment);
 }
 <ccomment>\n {
     ++inputFileStack[currentFile].lineno;
 }
 <ccomment>\*\/ {
-    BEGIN INITIAL;
+    yy_pop_state();
 }
 <ccomment>. {
     ;
 }
 
 
-^%Copying {         /* The software license. */
+^[ \t]*%Copying {
+    /* The software license. */
     codeIdx = 0;
     return TK_COPYING;
 }
 
-^%ConvertFromTypeCode {     /* The start of a from-type code block. */
+^[ \t]*%ConvertFromTypeCode {
+    /* The start of a from-type code block. */
     codeIdx = 0;
     return TK_FROMTYPE;
 }
 
-^%ConvertToTypeCode {       /* The start of a to-type code block. */
+^[ \t]*%ConvertToTypeCode {
+    /* The start of a to-type code block. */
     codeIdx = 0;
     return TK_TOTYPE;
 }
 
-^%ConvertToSubClassCode {   /* The start of a to-sub-class code block. */
+^[ \t]*%ConvertToSubClassCode {
+    /* The start of a to-sub-class code block. */
     codeIdx = 0;
     return TK_TOSUBCLASS;
 }
 
-^%ExportedHeaderCode {      /* The start of an exported header code block. */
+^[ \t]*%ExportedHeaderCode {
+    /* The start of an exported header code block. */
     codeIdx = 0;
     return TK_EXPHEADERCODE;
 }
 
-^%ModuleHeaderCode {        /* The start of a module header code block. */
+^[ \t]*%Extract {
+    /* The start of part of an extract. */
+    codeIdx = 0;
+
+    BEGIN directive_start;
+
+    return TK_EXTRACT;
+}
+
+^[ \t]*%ModuleHeaderCode {
+    /* The start of a module header code block. */
     codeIdx = 0;
     return TK_MODHEADERCODE;
 }
 
-^%TypeHeaderCode {      /* The start of a type header code block. */
+^[ \t]*%TypeHeaderCode {
+    /* The start of a type header code block. */
     codeIdx = 0;
     return TK_TYPEHEADERCODE;
 }
 
-^%PreInitialisationCode {   /* The start of a pre-initialisation code block. */
+^[ \t]*%PreInitialisationCode {
+    /* The start of a pre-initialisation code block. */
     codeIdx = 0;
     return TK_PREINITCODE;
 }
 
-^%InitialisationCode {      /* The start of an initialisation code block. */
+^[ \t]*%InitialisationCode {
+    /* The start of an initialisation code block. */
     codeIdx = 0;
     return TK_INITCODE;
 }
 
-^%PostInitialisationCode {  /* The start of a post-initialisation code block. */
+^[ \t]*%PostInitialisationCode {
+    /* The start of a post-initialisation code block. */
     codeIdx = 0;
     return TK_POSTINITCODE;
 }
 
-^%UnitCode {            /* The start of a unit code block. */
+^[ \t]*%UnitCode {
+    /* The start of a unit code block. */
     codeIdx = 0;
     return TK_UNITCODE;
 }
 
-^%ModuleCode {          /* The start of a module code block. */
+^[ \t]*%UnitPostIncludeCode {
+    /* The start of a unit post-include code block. */
+    codeIdx = 0;
+    return TK_UNITPOSTINCLUDECODE;
+}
+
+^[ \t]*%ModuleCode {
+    /* The start of a module code block. */
     codeIdx = 0;
     return TK_MODCODE;
 }
 
-^%TypeCode {            /* The start of a type code block. */
+^[ \t]*%TypeCode {
+    /* The start of a type code block. */
     codeIdx = 0;
     return TK_TYPECODE;
 }
 
-^%MethodCode {          /* The start of a C++ method code block. */
+^[ \t]*%MethodCode {
+    /* The start of a C++ method code block. */
     codeIdx = 0;
     return TK_METHODCODE;
 }
 
-^%VirtualCatcherCode {      /* The start of a C++ virtual code block. */
+^[ \t]*%VirtualCatcherCode {
+    /* The start of a C++ virtual code block. */
     codeIdx = 0;
     return TK_VIRTUALCATCHERCODE;
 }
 
-^%GCTraverseCode {      /* The start of a traverse code block. */
+^[ \t]*%GCTraverseCode {
+    /* The start of a traverse code block. */
     codeIdx = 0;
     return TK_TRAVERSECODE;
 }
 
-^%GCClearCode {         /* The start of a clear code block. */
+^[ \t]*%GCClearCode {
+    /* The start of a clear code block. */
     codeIdx = 0;
     return TK_CLEARCODE;
 }
 
-^%BIGetBufferCode {     /* The start of a get buffer code block. */
+^[ \t]*%BIGetBufferCode {
+    /* The start of a get buffer code block. */
     codeIdx = 0;
     return TK_GETBUFFERCODE;
 }
 
-^%BIReleaseBufferCode {     /* The start of a release buffer code block. */
+^[ \t]*%BIReleaseBufferCode {
+    /* The start of a release buffer code block. */
     codeIdx = 0;
     return TK_RELEASEBUFFERCODE;
 }
 
-^%BIGetReadBufferCode {     /* The start of a read buffer code block. */
+^[ \t]*%BIGetReadBufferCode {
+    /* The start of a read buffer code block. */
     codeIdx = 0;
     return TK_READBUFFERCODE;
 }
 
-^%BIGetWriteBufferCode {    /* The start of a write buffer code block. */
+^[ \t]*%BIGetWriteBufferCode {
+    /* The start of a write buffer code block. */
     codeIdx = 0;
     return TK_WRITEBUFFERCODE;
 }
 
-^%BIGetSegCountCode {       /* The start of a segment count code block. */
+^[ \t]*%BIGetSegCountCode {
+    /* The start of a segment count code block. */
     codeIdx = 0;
     return TK_SEGCOUNTCODE;
 }
 
-^%BIGetCharBufferCode {     /* The start of a char buffer code block. */
+^[ \t]*%BIGetCharBufferCode {
+    /* The start of a char buffer code block. */
     codeIdx = 0;
     return TK_CHARBUFFERCODE;
 }
 
-^%PickleCode {         /* The start of a pickle code block. */
+^[ \t]*%PickleCode {
+    /* The start of a pickle code block. */
     codeIdx = 0;
     return TK_PICKLECODE;
 }
 
-^%PrePythonCode {       /* The start of a pre-Python code block. */
+^[ \t]*%PrePythonCode {
+    /* The start of a pre-Python code block. */
+    deprecated("%PrePythonCode is deprecated");
+
     codeIdx = 0;
     return TK_PREPYCODE;
 }
 
-^%RaiseCode {           /* The start of a raise exception code block. */
+^[ \t]*%RaiseCode {
+    /* The start of a raise exception code block. */
     codeIdx = 0;
     return TK_RAISECODE;
 }
 
-^%Docstring {           /* The start of a docstring block. */
+^[ \t]*%Docstring {
+    /* The start of a docstring block. */
     codeIdx = 0;
     return TK_DOCSTRING;
 }
 
-^%Doc {             /* The start of a documentation block. */
+^[ \t]*%Doc {
+    /* The start of a documentation block. */
+    deprecated("%Doc is deprecated, use %Extract instead");
+
     codeIdx = 0;
     return TK_DOC;
 }
 
-^%ExportedDoc {         /* The start of an exported documentation block. */
+^[ \t]*%ExportedDoc {
+    /* The start of an exported documentation block. */
+    deprecated("%ExportedDoc is deprecated, use %Extract instead");
+
     codeIdx = 0;
     return TK_EXPORTEDDOC;
 }
 
-^%Makefile {            /* The start of a Makefile code block. */
+^[ \t]*%Makefile {
+    /* The start of a Makefile code block. */
+    deprecated("%Makefile is deprecated");
+
     codeIdx = 0;
     return TK_MAKEFILE;
 }
 
-^%AccessCode {          /* The start of an access code block. */
+^[ \t]*%AccessCode {
+    /* The start of an access code block. */
     codeIdx = 0;
     return TK_ACCESSCODE;
 }
 
-^%GetCode {         /* The start of a get code block. */
+^[ \t]*%GetCode {
+    /* The start of a get code block. */
     codeIdx = 0;
     return TK_GETCODE;
 }
 
-^%SetCode {         /* The start of a set code block. */
+^[ \t]*%SetCode {
+    /* The start of a set code block. */
     codeIdx = 0;
     return TK_SETCODE;
 }
 
-<code>^%End {           /* The end of a code block. */
+<code>^[ \t]*%End {
+    /* The end of a code block. */
     BEGIN INITIAL;
     codeIdx = -1;
     return TK_END;
 }
 
-<code>\n {          /* The end of a code line . */
+<code>\n {
+    /* The end of a code line . */
     struct inputFile *ifp;
 
     codeLine[codeIdx] = '\n';
@@ -409,22 +532,23 @@ SIP_QOBJECT                 {return TK_QOBJECT;}
 
     yylval.codeb = sipMalloc(sizeof (codeBlock));
 
-    yylval.codeb -> frag = sipStrdup(codeLine);
-    yylval.codeb -> linenr = ifp -> lineno++;
-    yylval.codeb -> filename = sipStrdup(ifp -> name);
-    yylval.codeb -> next = NULL;
+    yylval.codeb->frag = sipStrdup(codeLine);
+    yylval.codeb->linenr = ifp->lineno++;
+    yylval.codeb->filename = sipStrdup(ifp->name);
 
     return TK_CODELINE;
 }
 
-<code>. {           /* The contents of a code line. */
+<code>. {
+    /* The contents of a code line. */
     if (codeIdx == MAX_CODE_LINE_LENGTH)
         fatallex("Line is too long");
 
     codeLine[codeIdx++] = yytext[0];
 }
 
-. {             /* Anything else is returned as is. */
+. {
+    /* Anything else is returned as is. */
     return yytext[0];
 }
 
@@ -606,10 +730,19 @@ void yyerror(char *s)
  */
 void yywarning(char *s)
 {
-    warning("%s:%d: %s\n",
-        inputFileStack[currentFile].name,
-        inputFileStack[currentFile].lineno,
-        s);
+    warning(ParserWarning, "%s:%d: %s\n", inputFileStack[currentFile].name,
+            inputFileStack[currentFile].lineno, s);
+}
+
+
+/*
+ * Handle deprecation warnings.
+ */
+void deprecated(const char *msg)
+{
+    warning(DeprecationWarning, "%s:%d: %s\n",
+            inputFileStack[currentFile].name,
+            inputFileStack[currentFile].lineno, msg);
 }
 
 
@@ -622,4 +755,15 @@ static void fatallex(char *s)
         inputFileStack[currentFile].name,
         inputFileStack[currentFile].lineno,
         s);
+}
+
+
+/*
+ * Reset the lexer state to INITIAL.  This is used by directives that allow an
+ * argument to be given without parentheses to get out of the 'directive_start'
+ * state before an opening parenthesis is seen in another context.
+ */
+void resetLexerState()
+{
+    BEGIN INITIAL;
 }

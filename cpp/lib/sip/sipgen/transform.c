@@ -1,7 +1,7 @@
 /*
  * The parse tree transformation module for SIP.
  *
- * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
  *
  * This file is part of SIP.
  *
@@ -65,6 +65,7 @@ static void resolvePySigTypes(sipSpec *,moduleDef *,classDef *,overDef *,signatu
 static void resolveVariableType(sipSpec *,varDef *);
 static void fatalNoDefinedType(scopedNameDef *);
 static void getBaseType(sipSpec *,moduleDef *,classDef *,argDef *);
+static void resolveType(sipSpec *,moduleDef *,classDef *,argDef *, int);
 static void searchClassScope(sipSpec *,classDef *,scopedNameDef *,argDef *);
 static void searchMappedTypes(sipSpec *,moduleDef *,scopedNameDef *,argDef *);
 static void searchEnums(sipSpec *,scopedNameDef *,argDef *);
@@ -88,6 +89,8 @@ static void resolveInstantiatedClassTemplate(sipSpec *pt, argDef *type);
 static void setStringPoolOffsets(sipSpec *pt);
 static const char *templateString(const char *src, scopedNameDef *names,
         scopedNameDef *values);
+static mappedTypeDef *copyTemplateType(mappedTypeDef *mtd, argDef *ad);
+static void checkProperties(classDef *cd);
 
 
 /*
@@ -281,9 +284,12 @@ void transform(sipSpec *pt)
             cd->iff->ifacenr = cd->real->iff->ifacenr;
     }
 
-    /* Mark classes that can have an assignment helper. */
+    /* Additional class specific checks. */
     for (cd = pt->classes; cd != NULL; cd = cd->next)
+    {
         checkAssignmentHelper(pt, cd);
+        checkProperties(cd);
+    }
 
     setStringPoolOffsets(pt);
 }
@@ -514,8 +520,13 @@ static void checkAssignmentHelper(sipSpec *pt, classDef *cd)
         if (ct->cppsig == NULL || !isPublicCtor(ct))
             continue;
 
-        if (ct->cppsig->nrArgs == 0)
+        if (ct->cppsig->nrArgs == 0 || ct->cppsig->args[0].defval != NULL)
+        {
+            /*
+             * The ctor either has no arguments or all arguments have defaults.
+             */
             pub_def_ctor = TRUE;
+        }
         else if (ct->cppsig->nrArgs == 1)
         {
             argDef *ad = &ct->cppsig->args[0];
@@ -634,13 +645,6 @@ static void moveClassCasts(sipSpec *pt, moduleDef *mod, classDef *cd)
             /* Previous error checking means this will always work. */
             dcd = findAltClassImplementation(pt, al->arg.u.mtd);
 
-        /*
-         * If the destination class is in a different module then use
-         * a proxy.
-         */
-        if (dcd->iff->module != mod)
-            dcd = getProxy(mod, dcd);
-
         /* Create the new ctor. */
         ct = sipMalloc(sizeof (ctorDef));
 
@@ -657,6 +661,16 @@ static void moveClassCasts(sipSpec *pt, moduleDef *mod, classDef *cd)
         ad->nrderefs = al->arg.nrderefs;
         ad->defval = NULL;
         ad->u.cd = cd;
+
+        /*
+         * If the destination class is in a different module then use
+         * a proxy.
+         */
+        if (dcd->iff->module != mod)
+        {
+            ifaceFileIsUsed(&mod->used, ad);
+            dcd = getProxy(mod, dcd);
+        }
 
         ifaceFileIsUsed(&dcd->iff->used, ad);
 
@@ -880,8 +894,11 @@ static void moveGlobalSlot(sipSpec *pt, moduleDef *mod, memberDef *gmd)
 
         *odhead = od;
 
-        /* Remove the first argument of comparison operators. */
-        if (isRichCompareSlot(md))
+        /*
+         * Remove the first argument of inplace numeric operators and
+         * comparison operators.
+         */
+        if (isInplaceNumberSlot(md) || isRichCompareSlot(md))
         {
             /* Remember if the argument was a pointer. */
             if (arg0->nrderefs > 0)
@@ -890,6 +907,10 @@ static void moveGlobalSlot(sipSpec *pt, moduleDef *mod, memberDef *gmd)
             *arg0 = *arg1;
             od->pysig.nrArgs = 1;
         }
+
+        /* Remove the only argument of unary operators. */
+        if (isZeroArgSlot(md))
+            od->pysig.nrArgs = 0;
     }
 }
 
@@ -1331,7 +1352,8 @@ static void transformTypedefs(sipSpec *pt, moduleDef *mod)
 
     for (td = pt->typedefs; td != NULL; td = td->next)
         if (td->module == mod)
-            getBaseType(pt, td->module, td->ecd, &td->type);
+            if (td->ecd == NULL || !isTemplateClass(td->ecd))
+                getBaseType(pt, td->module, td->ecd, &td->type);
 }
 
 
@@ -1370,14 +1392,23 @@ static void transformCtors(sipSpec *pt, classDef *cd)
 
         /*
          * Now check that the Python signature doesn't conflict with an
-         * earlier one.
+         * earlier one.  If there is %MethodCode then assume that it will
+         * handle any potential conflicts.
          */
-        for (prev = cd->ctors; prev != ct; prev = prev->next)
-            if (samePythonSignature(&prev->pysig, &ct->pysig))
+        if (ct->methodcode == NULL)
+        {
+            for (prev = cd->ctors; prev != ct; prev = prev->next)
             {
-                fatalScopedName(classFQCName(cd));
-                fatal(" has ctors with the same Python signature\n");
+                if (prev->methodcode != NULL)
+                    continue;
+
+                if (samePythonSignature(&prev->pysig, &ct->pysig))
+                {
+                    fatalScopedName(classFQCName(cd));
+                    fatal(" has ctors with the same Python signature\n");
+                }
             }
+        }
 
         if (isDeprecatedClass(cd))
             setIsDeprecatedCtor(ct);
@@ -1517,35 +1548,42 @@ static void transformScopeOverloads(sipSpec *pt, classDef *c_scope,
 
         /*
          * Now check that the Python signature doesn't conflict with an earlier
-         * one.
+         * one.  If there is %MethodCode then assume that it will handle any
+         * potential conflicts.
          */
-        for (prev = overs; prev != od; prev = prev->next)
+        if (od->methodcode == NULL)
         {
-            if (prev->common != od->common)
-                continue;
-
-            /* They can only conflict if one is unversioned. */
-            if (prev->api_range != NULL && od->api_range != NULL)
-                continue;
-
-            if (samePythonSignature(&prev->pysig, &od->pysig))
+            for (prev = overs; prev != od; prev = prev->next)
             {
-                ifaceFileDef *iff;
+                if (prev->common != od->common)
+                    continue;
 
-                if (mt_scope != NULL)
-                    iff = mt_scope->iff;
-                else if (c_scope != NULL)
-                    iff = c_scope->iff;
-                else
-                    iff = NULL;
+                if (prev->methodcode != NULL)
+                    continue;
 
-                if (iff != NULL)
+                /* They can only conflict if one is unversioned. */
+                if (prev->api_range != NULL && od->api_range != NULL)
+                    continue;
+
+                if (samePythonSignature(&prev->pysig, &od->pysig))
                 {
-                    fatalScopedName(iff->fqcname);
-                    fatal("::");
-                }
+                    ifaceFileDef *iff;
 
-                fatal("%s() has overloaded functions with the same Python signature\n", od->common->pyname->text);
+                    if (mt_scope != NULL)
+                        iff = mt_scope->iff;
+                    else if (c_scope != NULL)
+                        iff = c_scope->iff;
+                    else
+                        iff = NULL;
+
+                    if (iff != NULL)
+                    {
+                        fatalScopedName(iff->fqcname);
+                        fatal("::");
+                    }
+
+                    fatal("%s() has overloaded functions with the same Python signature\n", od->common->pyname->text);
+                }
             }
         }
 
@@ -1618,13 +1656,7 @@ static void getVisibleMembers(sipSpec *pt, classDef *cd)
                 for (od = mrocd->overs; od != NULL; od = od->next)
                     if (od->common == md)
                     {
-                        /*
-                         * Mark classes as abstract if they have abstract virtual methods.
-                         * but only if the method is directly in the class, not inherited,
-                         * because the abstract method may already be implemented in a
-                         * derived class.
-                         */
-                        if (isAbstract(od) && mrocd == cd)
+                        if (isAbstract(od))
                             setIsAbstractClass(cd);
 
                         ifaceFilesAreUsedByOverload(&cd->iff->used, od);
@@ -1805,7 +1837,7 @@ static void resolveMappedTypeTypes(sipSpec *pt, mappedTypeDef *mt)
 
         /* Leave templates as they are. */
         if (ad->atype != template_type)
-            getBaseType(pt, mt->iff->module, NULL, ad);
+            resolveType(pt, mt->iff->module, NULL, ad, TRUE);
     }
 
     /* Make sure that the signature result won't cause problems. */
@@ -1859,7 +1891,7 @@ static void resolveFuncTypes(sipSpec *pt, moduleDef *mod, classDef *c_scope,
     {
         int a;
 
-        getBaseType(pt,mod, c_scope, &od->cppsig->result);
+        getBaseType(pt, mod, c_scope, &od->cppsig->result);
 
         for (a = 0; a < od->cppsig->nrArgs; ++a)
             getBaseType(pt, mod, c_scope, &od->cppsig->args[a]);
@@ -1868,9 +1900,16 @@ static void resolveFuncTypes(sipSpec *pt, moduleDef *mod, classDef *c_scope,
     /* Handle the Python signature. */
     resolvePySigTypes(pt, mod, c_scope, od, &od->pysig, isSignal(od));
 
-    /* These slots must return int. */
     res = &od->pysig.result;
 
+    /* These slots must return SIP_SSIZE_T (or int - deprecated). */
+    if (isSSizeReturnSlot(od->common))
+        if ((res->atype != ssize_type && res->atype != int_type) || res->nrderefs != 0 ||
+            isReference(res) || isConstArg(res))
+            fatal("%s slots must return SIP_SSIZE_T\n",
+                    od->common->pyname->text);
+
+    /* These slots must return int. */
     if (isIntReturnSlot(od->common))
         if (res->atype != int_type || res->nrderefs != 0 ||
             isReference(res) || isConstArg(res))
@@ -1950,7 +1989,7 @@ static void resolvePySigTypes(sipSpec *pt, moduleDef *mod, classDef *scope,
                     fatal("::");
                 }
 
-                fatal("%s() unsupported signal argument type\n");
+                fatal("%s() unsupported signal argument type\n", od->cppname);
             }
         }
         else if (!supportedType(scope,od,ad,TRUE) && (od -> cppsig == &od -> pysig || od -> methodcode == NULL || (isVirtual(od) && od -> virthandler -> virtcode == NULL)))
@@ -2016,6 +2055,9 @@ static void resolveVariableType(sipSpec *pt, varDef *vd)
     case enum_type:
     case bool_type:
     case cbool_type:
+    case byte_type:
+    case sbyte_type:
+    case ubyte_type:
     case ushort_type:
     case short_type:
     case uint_type:
@@ -2025,6 +2067,7 @@ static void resolveVariableType(sipSpec *pt, varDef *vd)
     case long_type:
     case ulonglong_type:
     case longlong_type:
+    case ssize_type:
     case pyobject_type:
     case pytuple_type:
     case pylist_type:
@@ -2145,6 +2188,9 @@ static int supportedType(classDef *cd,overDef *od,argDef *ad,int outputs)
     case enum_type:
     case bool_type:
     case cbool_type:
+    case byte_type:
+    case sbyte_type:
+    case ubyte_type:
     case ushort_type:
     case short_type:
     case uint_type:
@@ -2154,6 +2200,7 @@ static int supportedType(classDef *cd,overDef *od,argDef *ad,int outputs)
     case long_type:
     case ulonglong_type:
     case longlong_type:
+    case ssize_type:
     case pyobject_type:
     case pytuple_type:
     case pylist_type:
@@ -2163,6 +2210,12 @@ static int supportedType(classDef *cd,overDef *od,argDef *ad,int outputs)
     case pytype_type:
         if (isReference(ad))
         {
+            if (isConstArg(ad))
+            {
+                ensureInput(cd, od, ad);
+                return TRUE;
+            }
+
             if (ad -> nrderefs == 0 && outputs)
             {
                 defaultOutput(ad);
@@ -2429,12 +2482,14 @@ int sameSignature(signatureDef *sd1,signatureDef *sd2,int strict)
             (t) == latin1_string_type || (t) == utf8_string_type)
 #define pyAsFloat(t)    ((t) == cfloat_type || (t) == float_type || \
             (t) == cdouble_type || (t) == double_type)
-#define pyAsInt(t)  ((t) == bool_type || \
+#define pyAsInt(t)  ((t) == bool_type || (t) == ssize_type || \
+            (t) == byte_type || (t) == sbyte_type || (t) == ubyte_type || \
             (t) == short_type || (t) == ushort_type || \
             (t) == cint_type || (t) == int_type || (t) == uint_type)
 #define pyAsLong(t) ((t) == long_type || (t) == longlong_type)
 #define pyAsULong(t)    ((t) == ulong_type || (t) == ulonglong_type)
 #define pyAsAuto(t) ((t) == bool_type || \
+            (t) == byte_type || (t) == sbyte_type || (t) == ubyte_type || \
             (t) == short_type || (t) == ushort_type || \
             (t) == int_type || (t) == uint_type || \
             (t) == float_type || (t) == double_type)
@@ -2523,6 +2578,12 @@ int sameBaseType(argDef *a1, argDef *a2)
         if (a1->atype == defined_type && a2->atype == mapped_type)
             return compareScopedNames(a1->u.snd, a2->u.mtd->iff->fqcname) == 0;
 
+        if (a1->atype == enum_type && a2->atype == defined_type)
+            return compareScopedNames(a1->u.ed->fqcname, a2->u.snd) == 0;
+
+        if (a1->atype == defined_type && a2->atype == enum_type)
+            return compareScopedNames(a1->u.snd, a2->u.ed->fqcname) == 0;
+
         return FALSE;
     }
 
@@ -2560,8 +2621,16 @@ int sameBaseType(argDef *a1, argDef *a2)
                 return FALSE;
 
             for (a = 0; a < td1->types.nrArgs; ++a)
-                if (!sameBaseType(&td1->types.args[a], &td2->types.args[a]))
+            {
+                argDef *td1ad = &td1->types.args[a];
+                argDef *td2ad = &td2->types.args[a];
+
+                if (td1ad->nrderefs != td2ad->nrderefs)
                     return FALSE;
+
+                if (!sameBaseType(td1ad, td2ad))
+                    return FALSE;
+            }
 
             break;
         }
@@ -2612,7 +2681,6 @@ static int samePythonSignature(signatureDef *sd1, signatureDef *sd2)
     }
 
     return (a1 < 0 && a2 < 0);
-
 }
 
 
@@ -2773,6 +2841,16 @@ static void scopeDefaultValue(sipSpec *pt,classDef *cd,argDef *ad)
 static void getBaseType(sipSpec *pt, moduleDef *mod, classDef *c_scope,
         argDef *type)
 {
+    resolveType(pt, mod, c_scope, type, FALSE);
+}
+
+
+/*
+ * Resolve a type if possible.
+ */
+static void resolveType(sipSpec *pt, moduleDef *mod, classDef *c_scope,
+        argDef *type, int allow_defined)
+{
     /* Loop until we've got to a base type. */
     while (type->atype == defined_type)
     {
@@ -2796,7 +2874,15 @@ static void getBaseType(sipSpec *pt, moduleDef *mod, classDef *c_scope,
             searchClasses(pt, mod, snd, type);
 
         if (type->atype == no_type)
+        {
+            if (allow_defined)
+            {
+                type->atype = defined_type;
+                return;
+            }
+
             fatalNoDefinedType(snd);
+        }
     }
 
     /* Get the base type of any slot arguments. */
@@ -2892,9 +2978,14 @@ static mappedTypeDef *instantiateMappedTypeTemplate(sipSpec *pt, moduleDef *mod,
 
     mtd->doctype = templateString(mtt->mt->doctype, type_names, type_values);
 
-    appendCodeBlock(&mtd->iff->hdrcode, templateCode(pt, &mtd->iff->used, mtt->mt->iff->hdrcode, type_names, type_values));
-    mtd->convfromcode = templateCode(pt, &mtd->iff->used, mtt->mt->convfromcode, type_names, type_values);
-    mtd->convtocode = templateCode(pt, &mtd->iff->used, mtt->mt->convtocode, type_names, type_values);
+    appendCodeBlockList(&mtd->iff->hdrcode,
+            templateCode(pt, &mtd->iff->used, mtt->mt->iff->hdrcode,
+                    type_names, type_values));
+
+    mtd->convfromcode = templateCode(pt, &mtd->iff->used,
+            mtt->mt->convfromcode, type_names, type_values);
+    mtd->convtocode = templateCode(pt, &mtd->iff->used, mtt->mt->convtocode,
+            type_names, type_values);
 
     mtd->next = pt->mappedtypes;
     pt->mappedtypes = mtd;
@@ -2904,6 +2995,8 @@ static mappedTypeDef *instantiateMappedTypeTemplate(sipSpec *pt, moduleDef *mod,
 
     if (type_values != NULL)
         freeScopedName(type_values);
+
+    mtd = copyTemplateType(mtd, type);
 
     return mtd;
 }
@@ -3058,6 +3151,8 @@ static void searchMappedTypes(sipSpec *pt, moduleDef *context,
                     continue;
             }
 
+            mtd = copyTemplateType(mtd, ad);
+
             /* Copy the type. */
             ad->atype = mapped_type;
             ad->u.mtd = mtd;
@@ -3071,6 +3166,50 @@ static void searchMappedTypes(sipSpec *pt, moduleDef *context,
         ad->u.snd = oname;
         ad->atype = no_type;
     }
+}
+
+
+/*
+ * If a mapped type is based on a template then create a copy that keeps the
+ * original types of the template arguments.
+ */
+static mappedTypeDef *copyTemplateType(mappedTypeDef *mtd, argDef *ad)
+{
+    int a;
+    signatureDef *src, *dst;
+    mappedTypeDef *mtd_copy;
+
+    /* There is no need to do anything for non-template types. */
+    if (mtd->type.atype != template_type)
+        return mtd;
+
+    /* Retain the original types if there are any. */
+    mtd_copy = mtd;
+    src = &ad->u.td->types;
+
+    for (a = 0; a < src->nrArgs; ++a)
+    {
+        typedefDef *tdd = src->args[a].original_type;
+
+        if (tdd != NULL)
+        {
+            /*
+             * Create the copy now that we know it is needed and if it hasn't
+             * already been done.
+             */
+            if (mtd_copy == mtd)
+            {
+                mtd_copy = sipMalloc(sizeof (mappedTypeDef));
+                *mtd_copy = *mtd;
+
+                dst = &mtd_copy->type.u.td->types;
+            }
+
+            dst->args[a].original_type = tdd;
+        }
+    }
+
+    return mtd_copy;
 }
 
 
@@ -3434,4 +3573,39 @@ static int generatingCodeForModule(sipSpec *pt, moduleDef *mod)
         return (pt->module == mod->container);
 
     return (pt->module == mod);
+}
+
+
+/*
+ * Check that any properties are valid.
+ */
+static void checkProperties(classDef *cd)
+{
+    propertyDef *pd;
+
+    for (pd = cd->properties; pd != NULL; pd = pd->next)
+    {
+        if (findMethod(cd, pd->get) == NULL)
+            fatal("Property %s.%s has no get method %s()\n", cd->pyname->text,
+                    pd->name->text, pd->get);
+
+        if (pd->set != NULL && findMethod(cd, pd->set) == NULL)
+            fatal("Property %s.%s has no set method %s()\n", cd->pyname->text,
+                    pd->name->text, pd->set);
+    }
+}
+
+
+/*
+ * Return the method of a class with a given name.
+ */
+memberDef *findMethod(classDef *cd, const char *name)
+{
+    memberDef *md;
+
+    for (md = cd->members; md != NULL; md = md->next)
+        if (strcmp(md->pyname->text, name) == 0)
+            break;
+
+    return md;
 }

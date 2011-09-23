@@ -42,7 +42,14 @@
 #include <qlocale.h>
 #include <qdir.h>
 
+#if !defined(QT_BEGIN_NAMESPACE)
+#define QT_BEGIN_NAMESPACE
+#define QT_END_NAMESPACE
+#endif
+
+QT_BEGIN_NAMESPACE
 class QTextCodec;
+QT_END_NAMESPACE
 
 class MetaTranslatorMessage : public TranslatorMessage
 {
@@ -117,8 +124,10 @@ public:
     QString toUnicode( const char *str, bool utf8 ) const;
 
     QString languageCode() const;
+    QString sourceLanguageCode() const;
     static void languageAndCountry(const QString &languageCode, QLocale::Language *lang, QLocale::Country *country);
     void setLanguageCode(const QString &languageCode);
+    void setSourceLanguageCode(const QString &languageCode);
     QList<MetaTranslatorMessage> messages() const;
     QList<MetaTranslatorMessage> translatedMessages() const;
     static int grammaticalNumerus(QLocale::Language language, QLocale::Country country);
@@ -142,6 +151,7 @@ private:
                             // 'pt'         portuguese, assumes portuguese from portugal
                             // 'pt_BR'      Brazilian portuguese (ISO 639-1 language code)
                             // 'por_BR'     Brazilian portuguese (ISO 639-2 language code)
+    QString m_sourceLanguage;
 };
 
 /*
