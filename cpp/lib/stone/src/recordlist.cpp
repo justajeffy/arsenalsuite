@@ -31,6 +31,7 @@
 #include <algorithm>
 
 #include "blurqt.h"
+#include "field.h"
 #include "table.h"
 #include "tableschema.h"
 #include "recordlist.h"
