@@ -30,12 +30,13 @@
 #include <qtreeview.h>
 #include <qscrollarea.h>
 
+#include "stonegui.h"
 #include "recordtreeview.h"
 
 class QWidget;
 class QGridLayout;
 
-class STONE_EXPORT RecordFilterWidget : public QScrollArea
+class STONEGUI_EXPORT RecordFilterWidget : public QScrollArea
 {
 Q_OBJECT
 

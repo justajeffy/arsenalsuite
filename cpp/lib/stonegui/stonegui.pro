@@ -28,7 +28,6 @@ SOURCES += \
     src/graphitesourceswidget.cpp \
     src/graphiteoptionswidget.cpp \
     src/graphitewidget.cpp \
-    src/gvgraph.cpp \
     src/htmlhighlighter.cpp \
 	src/iconserver.cpp \
 	src/imagesequenceprovider.cpp \
@@ -73,7 +72,6 @@ HEADERS += \
     include/graphitesourceswidget.h \
     include/graphiteoptionswidget.h \
     include/graphitewidget.h \
-    include/gvgraph.h \
     include/htmlhighlighter.h \
 	include/iconserver.h \
 	include/imagesequenceprovider.h \
@@ -143,6 +141,8 @@ contains( DEFINES, USE_PHONON ) {
 # Grphviz support
 unix:DEFINES+=USE_GRAPHVIZ
 contains( DEFINES, USE_GRAPHVIZ ) {
+    INCLUDES += gvgraph.h
+    SOURCES += gvgraph.cpp
     INCLUDEPATH += /usr/include
     LIBS+=-lgraph -lgvc
 }

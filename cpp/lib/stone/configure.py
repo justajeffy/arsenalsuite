@@ -75,8 +75,11 @@ def doit():
     sipfiles = []
     scriptfiles = []
 
-    for s in glob.glob("../../../python/blur/*.py"):
-	scriptfiles.append(os.path.join("../../../python/blur", os.path.basename(s)))
+    scriptfilesprefix = "../../../python/blur"
+    for s in glob.glob(scriptfilesprefix + "/*.py"):
+        if sys.platform == "win32":
+	    scriptfilesprefix = scriptfilesprefix.replace("/","\\")
+	scriptfiles.append(os.path.join(scriptfilesprefix, os.path.basename(s)))
 
     installs.append([scriptfiles, os.path.join(config.sip_mod_dir, "blur")])
 
