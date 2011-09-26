@@ -14,7 +14,7 @@ SOURCES += \
 	src/main.cpp
 
 LIBS += -L../../lib/classes -lclasses -L../../lib/stone -lstone -L../../lib/absubmit -labsubmit
-LIBS += -lutil
+!win32:LIBS += -lutil
 win32:LIBS += -lpsapi -lMpr
 unix:!macx:LIBS += -Wl,-rpath .
 macx:CONFIG-=app_bundle

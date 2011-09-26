@@ -3,18 +3,20 @@
 
 #include "jobtask.h"
 
+#include "afcommon.h"
+
 class QAction;
 class JobTaskList;
 
-class MultiFrameViewerPlugin
+class FREEZER_EXPORT MultiFrameViewerPlugin
 {
 public:
     MultiFrameViewerPlugin(){}
 	virtual ~MultiFrameViewerPlugin(){}
-    virtual QString name(){return QString();};
-    virtual QString icon(){return QString();};
-    virtual void view(JobTaskList){};
-    virtual bool enabled(JobTaskList){return true;};
+    virtual QString name(){return QString();}
+    virtual QString icon(){return QString();}
+    virtual void view(JobTaskList){}
+    virtual bool enabled(JobTaskList){return true;}
 };
 
 #endif // MULTI_FRAME_VIEWER_PLUGIN_H
