@@ -78,6 +78,7 @@ void JobListTask::run()
 	if( mJobList.size() ) {
 		mReturn = mJobList.reloaded();
 	} else
+
 	// If we have a project list, and all projects are hidden, then there will be no items, so just clear the list
     if( !(projectFilterShowingNone || mJobFilter.typesToShow.isEmpty() || mJobFilter.statusToShow.isEmpty()) )
 	{

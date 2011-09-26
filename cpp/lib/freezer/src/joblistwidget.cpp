@@ -927,7 +927,7 @@ void JobListWidget::currentJobChanged()
             JobList jList = mJobTree->selection();
 
             foreach( JobFramesTabWidgetPlugin * jftwp, JobFramesTabWidgetFactory::mJobFramesTabWidgetPlugins.values() )
-                jftwp->setJobList( jList );
+                jftwp->setJobList( jList, mFrameTabs->currentIndex() );
         }
     }
     else if( curTab == mErrorsTab )
@@ -1181,7 +1181,7 @@ void JobListWidget::frameListSelectionChanged()
 
     if( JobFramesTabWidgetFactory::mJobFramesTabWidgetPlugins.size() ) {
         foreach( JobFramesTabWidgetPlugin * jftwp, JobFramesTabWidgetFactory::mJobFramesTabWidgetPlugins.values() )
-            jftwp->setJobTaskList( jtl );
+            jftwp->setJobTaskList( jtl, mFrameTabs->currentIndex() );
     }
 }
 
