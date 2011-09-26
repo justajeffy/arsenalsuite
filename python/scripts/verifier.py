@@ -5,7 +5,7 @@ from PyQt4.QtSql import *
 from blur.Stone import *
 from blur.Classes import *
 import blur.email, blur.jabber
-import sys, time, re, os
+import sys, time, re, os, gc
 from math import ceil
 import traceback
 from verifier_plugin_factory import *
@@ -163,15 +163,6 @@ def checkNewJob(job):
         print "Job missing fkeyUsr"
         return False
 
-    fileName = str(job.fileName())
-    if fileName and len(fileName):
-        filePathExtra = ''
-
-        if config.spoolDir != "":
-            if job.uploadedFile() and not config.managerDriveLetter in fileName.lower():
-                print "Job submission not finished, still has local fileName %s" % (job.fileName())
-                return False
-
     if job.table().schema().field( 'frameStart' ) and job.table().schema().field( 'frameEnd' ):
         minMaxFrames = Database.current().exec_('SELECT min(jobtask), max(jobtask) from JobTask WHERE fkeyjob=%i' % job.key())
         if minMaxFrames.next():
@@ -192,7 +183,9 @@ def checkNewJob(job):
         function = VerifierPluginFactory().sVerifierPlugins[key]
         result = False
         try: result = function(job)
-        except: result = True
+        except:
+            traceback.print_exc()
+            result = True
         if not result: return False
 
     createJobStat(job)
@@ -249,9 +242,11 @@ def verifier():
                             newJobCheckers[pid] = job
                 else:
                     checkNewJob(job)
-                continue
 
-        if VERBOSE_DEBUG: print "Sleeping for 5 seconds"
+        if VERBOSE_DEBUG: 
+            print "Sleeping for 5 seconds"
+
+        print "Objects in memory %d" % ( len( gc.get_objects() ) )
         time.sleep(5)
 
 def createJobStat( mJob ):
