@@ -4,10 +4,12 @@
 #include <qmap.h>
 #include <qstring.h>
 
+#include "afcommon.h"
+
 class QWidget;
 class JobErrorsWidgetPlugin;
 
-class JobErrorsWidgetFactory
+class FREEZER_EXPORT JobErrorsWidgetFactory
 {
 public:
 	static void registerPlugin( JobErrorsWidgetPlugin * );

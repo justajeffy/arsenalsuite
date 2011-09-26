@@ -11,10 +11,12 @@
 #include <qmap.h>
 #include <qstring.h>
 
+#include "afcommon.h"
+
 class QWidget;
 class JobViewerPlugin;
 
-class JobViewerFactory
+class FREEZER_EXPORT JobViewerFactory
 {
 public:
 	static void registerPlugin( JobViewerPlugin * );

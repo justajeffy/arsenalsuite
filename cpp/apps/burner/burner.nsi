@@ -4,8 +4,6 @@
 !define MUI_PRODUCT "Burner"
 !define MUI_VERSION "v1.3.X"
 
-!define QTDIR "C:\Qt\4.1.0\"
-
 
 Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 
@@ -13,7 +11,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 
 ; Name of resulting executable installer
 OutFile "ab_install_${PLATFORM}.exe"
-InstallDir "C:\blur\burner\"
+InstallDir "C:\arsenalsuite\burner\"
 
 Page directory
 Page instfiles

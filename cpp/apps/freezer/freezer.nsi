@@ -6,15 +6,13 @@
 !define MUI_PRODUCT "Freezer"
 !define MUI_VERSION "v1.0.X"
 
-!define QTDIR "C:\Qt\4.1.0\"
-
 Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 
 !include "MUI.nsh"
 
 ; Name of resulting executable installer
 OutFile "af_install_${PLATFORM}.exe"
-InstallDir "C:\\blur\\freezer\\"
+InstallDir "C:\\arsenalsuite\\freezer\\"
 
 !define MUI_FINISHPAGE
 !define MUI_FINISHPAGE_NOREBOOTSUPPORT
@@ -39,14 +37,14 @@ InstallDir "C:\\blur\\freezer\\"
 !insertmacro MUI_PAGE_INSTFILES ; File installation page
 
 Section "install"
-	Processes::KillProcess "freezer.exe"
+	Processes::KillProcess "af.exe"
 	# nuke old freezer installs, if any
 	RMDir /r "C:\freezer\*.*"
 	RMDIR /r "C:\freezer"
 	Delete "$DESKTOP\short*freezer*lnk"
 	Delete "$QUICKLAUNCH\short*freezer*lnk"
 	SetOutPath $INSTDIR
-	File freezer.exe
+	File af.exe
   	CreateShortCut "$DESKTOP\Freezer 1.0.lnk" "$INSTDIR\freezer.exe" ""
 	CreateShortcut "$QUICKLAUNCH\Freezer 1.0.lnk" "$INSTDIR\freezer.exe" ""
 	File freezer.ini

@@ -16,12 +16,12 @@ destDir = ""
 if "DESTDIR" in os.environ:
     destDir = os.environ["DESTDIR"]
 elif sys.platform=="win32":
-	destDir = "C:\\"
+	destDir = "C:/"
 	
 if sys.platform=="linux2":
     instPrefix = destDir + "/etc/ab/"
 elif sys.platform=="win32":
-    instPrefix = destDir + "blur\\burner\\"
+    instPrefix = destDir + "arsenalsuite/burner/"
    
 ini = IniConfigTarget("burnerini",path,'burner.ini.template','burner.ini',instPrefix)
 nsi = NSISTarget("burnerinstaller",path,"burner.nsi")

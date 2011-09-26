@@ -10,10 +10,14 @@ destDir = ""
 
 if "DESTDIR" in os.environ:
     destDir = os.environ["DESTDIR"]
-
+elif sys.platform=='win32':
+	destDir = "c:/"
+	
 if sys.platform=="linux2":
     instPrefix = destDir + "/etc/ab/"
-
+else:
+	instPrefix = destDir + "/arsenalsuite/freezer/"
+	
 ini = IniConfigTarget("freezerini",path,'freezer.ini.template','freezer.ini',instPrefix)
 nsi = NSISTarget("freezer_installer",path,"freezer.nsi")
 
