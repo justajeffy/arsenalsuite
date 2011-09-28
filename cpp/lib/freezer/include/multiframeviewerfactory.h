@@ -4,10 +4,12 @@
 #include <qmap.h>
 #include <qstring.h>
 
+#include "afcommon.h"
+
 class QWidget;
 class MultiFrameViewerPlugin;
 
-class MultiFrameViewerFactory
+class FREEZER_EXPORT MultiFrameViewerFactory
 {
 public:
 	static void registerPlugin( MultiFrameViewerPlugin * );

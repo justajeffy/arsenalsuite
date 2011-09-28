@@ -4,8 +4,6 @@
 !define MUI_PRODUCT "Burner"
 !define MUI_VERSION "v1.3.X"
 
-!define QTDIR "C:\Qt\4.1.0\"
-
 
 Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 
@@ -13,7 +11,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 
 ; Name of resulting executable installer
 OutFile "ab_install_${PLATFORM}.exe"
-InstallDir "C:\blur\burner\"
+InstallDir "C:\arsenalsuite\burner\"
 
 Page directory
 Page instfiles
@@ -39,8 +37,6 @@ Section "install"
 	CreateShortCut "$QUICKLAUNCH\Burner.lnk" "$INSTDIR\burner.exe" ""
     SetOutPath $INSTDIR\plugins
     File /r "plugins\*.*"
-	; delete old burner3 dir!!!
-	RMDir /r "c:\max5\burner3"
 	; Delete everything from spool directory, then re-create it
 	RMDir /r "$INSTDIR\spool"
 	CreateDirectory "$INSTDIR\spool"

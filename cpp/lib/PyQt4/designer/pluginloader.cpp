@@ -2,7 +2,7 @@
  * This is the Qt Designer plugin that collects all the Python plugins it can
  * find as a widget collection to Designer.
  *
- * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
  * 
  * This file is part of PyQt.
  * 
@@ -18,13 +18,8 @@
  * GPL Exception version 1.1, which can be found in the file
  * GPL_EXCEPTION.txt in this package.
  * 
- * Please review the following information to ensure GNU General
- * Public Licensing requirements will be met:
- * http://trolltech.com/products/qt/licenses/licensing/opensource/. If
- * you are unsure which license is appropriate for your use, please
- * review the following information:
- * http://trolltech.com/products/qt/licenses/licensing/licensingoverview
- * or contact the sales department at sales@riverbankcomputing.com.
+ * If you are unsure which license is appropriate for your use, please
+ * contact the sales department at sales@riverbankcomputing.com.
  * 
  * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
  * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -43,6 +38,7 @@
 #include <QLibrary>
 #include <QLibraryInfo>
 #include <QStringList>
+#include <QVector>
 
 #include "../qpy/QtDesigner/qpydesignercustomwidgetplugin.h"
 
@@ -183,6 +179,21 @@ PyCustomWidgets::PyCustomWidgets(QObject *parent) : QObject(parent)
 #if PY_MAJOR_VERSION >= 3
         // This is a copy of qpycore_PyObject_FromQString().
 
+#if defined(Py_UNICODE_WIDE)
+#if QT_VERSION >= 0x040200
+        QVector<uint> ucs4 = dir.toUcs4();
+
+        PyObject *dobj = PyUnicode_FromUnicode(NULL, ucs4.size());
+
+        if (!dobj)
+        {
+            PyErr_Print();
+            continue;
+        }
+
+        memcpy(PyUnicode_AS_UNICODE(dobj), ucs4.constData(),
+                ucs4.size() * sizeof (Py_UNICODE));
+#else
         PyObject *dobj = PyUnicode_FromUnicode(0, dir.length());
 
         if (!dobj)
@@ -194,7 +205,20 @@ PyCustomWidgets::PyCustomWidgets(QObject *parent) : QObject(parent)
         Py_UNICODE *pyu = PyUnicode_AS_UNICODE(dobj);
 
         for (int i = 0; i < dir.length(); ++i)
-            *pyu++ = dir.at(i).unicode();
+            *pyu++ = (dir.at(i)).unicode();
+#endif
+#else
+        PyObject *dobj = PyUnicode_FromUnicode(0, dir.length());
+
+        if (!dobj)
+        {
+            PyErr_Print();
+            continue;
+        }
+
+        memcpy(PyUnicode_AS_UNICODE(dobj), dir.utf16(),
+                dir.length() * sizeof (Py_UNICODE));
+#endif
 #else
         PyObject *dobj = PyString_FromString(dir.toAscii().constData());
 

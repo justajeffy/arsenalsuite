@@ -217,7 +217,7 @@ int RecordFilterWidget::filterChildren(const QModelIndex & parent)
 
                 if ( visibleChildren == 0 ) {
                     // faster implementation
-                    switch (filterText.toStdString()[0])
+                    switch (filterText[0].toAscii())
                     {
                         case '!':
                             filterText = filterText.remove(0,1);

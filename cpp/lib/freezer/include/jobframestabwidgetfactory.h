@@ -4,10 +4,12 @@
 #include <qmap.h>
 #include <qstring.h>
 
+#include "afcommon.h"
+
 class QWidget;
 class JobFramesTabWidgetPlugin;
 
-class JobFramesTabWidgetFactory
+class FREEZER_EXPORT JobFramesTabWidgetFactory
 {
 public:
 	static void registerPlugin( JobFramesTabWidgetPlugin * );

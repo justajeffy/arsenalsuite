@@ -131,7 +131,8 @@ static bool winEventFilter( void * message, long * result )
 	}
 	return false;
 }
-#endif // Q_OS_WIN
+
+#else
 
 static int setup_unix_signal_handlers()
 {
@@ -153,6 +154,8 @@ static int setup_unix_signal_handlers()
  
     return 0;
 }
+
+#endif // !Q_OS_WIN
 
 int main(int argc, char * argv[])
 {
@@ -341,7 +344,9 @@ int main(int argc, char * argv[])
 		delete md;
 	} else {
 		LOG_3( "starting event loop" );
+#ifndef Q_OS_WIN
 		setup_unix_signal_handlers();
+#endif
 		res = a->exec();
 		LOG_5( "::main: a->exec() returned " + QString(res) );
 	}

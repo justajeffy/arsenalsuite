@@ -4,10 +4,12 @@
 #include <qmap.h>
 #include <qstring.h>
 
+#include "afcommon.h"
+
 class QWidget;
 class FrameViewerPlugin;
 
-class FrameViewerFactory
+class FREEZER_EXPORT FrameViewerFactory
 {
 public:
 	static void registerPlugin( FrameViewerPlugin * );

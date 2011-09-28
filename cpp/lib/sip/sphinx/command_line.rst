@@ -44,6 +44,9 @@ The full set of command line options is:
 
 .. cmdoption:: -d <FILE>
 
+    .. deprecated:: 4.12
+        Use the :option:`-X <sip -X>` option instead.
+
     The name of the documentation file to generate.  Documentation is included
     in specification files using the :directive:`%Doc` and
     :directive:`%ExportedDoc` directives.  By default the file is not
@@ -65,8 +68,8 @@ The full set of command line options is:
 
     The directory is added to the list of directories searched when looking for
     a specification file given in an :directive:`%Include` or
-    :directive:`%Import` directive.  This option may be given any number of
-    times.
+    :directive:`%Import` directive.  Directory separators must always be ``/``.
+    This option may be given any number of times.
 
 .. cmdoption:: -j <NUMBER>
 
@@ -78,6 +81,10 @@ The full set of command line options is:
 .. cmdoption:: -k
 
     .. versionadded:: 4.10
+
+    .. deprecated:: 4.12
+        Use the ``keyword_arguments="All"`` :directive:`%Module` directive
+        argument instead.
 
     All functions and methods will, by default, support passing parameters
     using the Python keyword argument syntax.
@@ -122,6 +129,13 @@ The full set of command line options is:
     to generate code for.  This option may be given any number of times so long
     as the tags do not conflict.
 
+.. cmdoption:: -T
+
+    By default the generated C and C++ source and header files include a
+    timestamp specifying when they were generated.  This option disables the
+    timestamp so that the contents of the generated files remain constant for a
+    particular version of SIP.
+
 .. cmdoption:: -w
 
     The display of warning messages is enabled.  By default warning messages
@@ -131,6 +145,13 @@ The full set of command line options is:
 
     The feature (declared using the :directive:`%Feature` directive) is
     disabled.
+
+.. cmdoption:: -X <ID:FILE>
+
+    .. versionadded:: 4.12
+
+    The extract (defined with the :directive:`%Extract` directive) with the
+    identifier ``ID`` is written to the file ``FILE``.
 
 .. cmdoption:: -z <FILE>
 

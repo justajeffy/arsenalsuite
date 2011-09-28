@@ -1,27 +1,46 @@
 #!/usr/bin/env python
 
-############################################################################
+
+#############################################################################
 ##
-## Copyright (C) 2005-2005 Trolltech AS. All rights reserved.
+## Copyright (C) 2010 Riverbank Computing Limited.
+## Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+## All rights reserved.
 ##
-## This file is part of the example classes of the Qt Toolkit.
+## This file is part of the examples of PyQt.
 ##
-## This file may be used under the terms of the GNU General Public
-## License version 2.0 as published by the Free Software Foundation
-## and appearing in the file LICENSE.GPL included in the packaging of
-## this file.  Please review the following information to ensure GNU
-## General Public Licensing requirements will be met:
-## http://www.trolltech.com/products/qt/opensource.html
+## $QT_BEGIN_LICENSE:BSD$
+## You may use this file under the terms of the BSD license as follows:
 ##
-## If you are unsure which license is appropriate for your use, please
-## review the following information:
-## http://www.trolltech.com/products/qt/licensing.html or contact the
-## sales department at sales@trolltech.com.
+## "Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are
+## met:
+##   * Redistributions of source code must retain the above copyright
+##     notice, this list of conditions and the following disclaimer.
+##   * Redistributions in binary form must reproduce the above copyright
+##     notice, this list of conditions and the following disclaimer in
+##     the documentation and/or other materials provided with the
+##     distribution.
+##   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
+##     the names of its contributors may be used to endorse or promote
+##     products derived from this software without specific prior written
+##     permission.
 ##
-## This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-## WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+## $QT_END_LICENSE$
 ##
-############################################################################
+#############################################################################
+
 
 import sys
 
@@ -39,18 +58,39 @@ import textures_rc
 
 
 class GLWidget(QtOpenGL.QGLWidget):
+
     clicked = QtCore.pyqtSignal()
 
-    sharedObject = 0
-    refCount = 0
+    PROGRAM_VERTEX_ATTRIBUTE, PROGRAM_TEXCOORD_ATTRIBUTE = range(2)
+
+    vsrc = """
+attribute highp vec4 vertex;
+attribute mediump vec4 texCoord;
+varying mediump vec4 texc;
+uniform mediump mat4 matrix;
+void main(void)
+{
+    gl_Position = matrix * vertex;
+    texc = texCoord;
+}
+"""
+
+    fsrc = """
+uniform sampler2D texture;
+varying mediump vec4 texc;
+void main(void)
+{
+    gl_FragColor = texture2D(texture, texc.st);
+}
+"""
 
     coords = (
-        ( ( +1, -1, -1 ), ( -1, -1, -1 ), ( -1, +1, -1 ), ( +1, +1, -1 ) ),
-        ( ( +1, +1, -1 ), ( -1, +1, -1 ), ( -1, +1, +1 ), ( +1, +1, +1 ) ),
-        ( ( +1, -1, +1 ), ( +1, -1, -1 ), ( +1, +1, -1 ), ( +1, +1, +1 ) ),
-        ( ( -1, -1, -1 ), ( -1, -1, +1 ), ( -1, +1, +1 ), ( -1, +1, -1 ) ),
-        ( ( +1, -1, +1 ), ( -1, -1, +1 ), ( -1, -1, -1 ), ( +1, -1, -1 ) ),
-        ( ( -1, -1, +1 ), ( +1, -1, +1 ), ( +1, +1, +1 ), ( -1, +1, +1 ) )
+        (( +1, -1, -1 ), ( -1, -1, -1 ), ( -1, +1, -1 ), ( +1, +1, -1 )),
+        (( +1, +1, -1 ), ( -1, +1, -1 ), ( -1, +1, +1 ), ( +1, +1, +1 )),
+        (( +1, -1, +1 ), ( +1, -1, -1 ), ( +1, +1, -1 ), ( +1, +1, +1 )),
+        (( -1, -1, -1 ), ( -1, -1, +1 ), ( -1, +1, +1 ), ( -1, +1, -1 )),
+        (( +1, -1, +1 ), ( -1, -1, +1 ), ( -1, -1, -1 ), ( +1, -1, -1 )),
+        (( -1, -1, +1 ), ( +1, -1, +1 ), ( +1, +1, +1 ), ( -1, +1, +1 ))
     )
 
     def __init__(self, parent=None, shareWidget=None):
@@ -64,18 +104,7 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.clearColor = QtGui.QColor()
         self.lastPos = QtCore.QPoint()
 
-    def __del__(self):
-        # If the application is terminating then the order in which things get
-        # garbage collected can cause exceptions to be raised.  Therefore we
-        # access the class variables via the instance's __class__ attribute and
-        # ignore some exceptions.
-        self.__class__.refCount -= 1
-        if self.__class__.refCount == 0:
-            try:
-                self.makeCurrent()
-            except RuntimeError:
-                pass
-            glDeleteLists(self.__class__.sharedObject, 1)
+        self.program = None
 
     def minimumSizeHint(self):
         return QtCore.QSize(50, 50)
@@ -94,35 +123,56 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.updateGL()
 
     def initializeGL(self):
-        if not GLWidget.sharedObject:
-            GLWidget.sharedObject = self.makeObject()
-        GLWidget.refCount += 1
+        self.makeObject()
 
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
-        glEnable(GL_TEXTURE_2D)
+
+        vshader = QtOpenGL.QGLShader(QtOpenGL.QGLShader.Vertex, self)
+        vshader.compileSourceCode(self.vsrc)
+
+        fshader = QtOpenGL.QGLShader(QtOpenGL.QGLShader.Fragment, self)
+        fshader.compileSourceCode(self.fsrc)
+
+        self.program = QtOpenGL.QGLShaderProgram(self)
+        self.program.addShader(vshader)
+        self.program.addShader(fshader)
+        self.program.bindAttributeLocation('vertex',
+                self.PROGRAM_VERTEX_ATTRIBUTE)
+        self.program.bindAttributeLocation('texCoord',
+                self.PROGRAM_TEXCOORD_ATTRIBUTE)
+        self.program.link()
+
+        self.program.bind()
+        self.program.setUniformValue('texture', 0)
+
+        self.program.enableAttributeArray(self.PROGRAM_VERTEX_ATTRIBUTE)
+        self.program.enableAttributeArray(self.PROGRAM_TEXCOORD_ATTRIBUTE)
+        self.program.setAttributeArray(self.PROGRAM_VERTEX_ATTRIBUTE,
+                self.vertices)
+        self.program.setAttributeArray(self.PROGRAM_TEXCOORD_ATTRIBUTE,
+                self.texCoords)
 
     def paintGL(self):
         self.qglClearColor(self.clearColor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glLoadIdentity()
-        glTranslated(0.0, 0.0, -10.0)
-        glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
-        glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
-        glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
-        glCallList(GLWidget.sharedObject)
+
+        m = QtGui.QMatrix4x4()
+        m.ortho(-0.5, 0.5, 0.5, -0.5, 4.0, 15.0)
+        m.translate(0.0, 0.0, -10.0)
+        m.rotate(self.xRot / 16.0, 1.0, 0.0, 0.0)
+        m.rotate(self.yRot / 16.0, 0.0, 1.0, 0.0)
+        m.rotate(self.zRot / 16.0, 0.0, 0.0, 1.0)
+
+        self.program.setUniformValue('matrix', m)
+
+        for i in range(6):
+            glBindTexture(GL_TEXTURE_2D, self.textures[i])
+            glDrawArrays(GL_TRIANGLE_FAN, i * 4, 4)
 
     def resizeGL(self, width, height):
         side = min(width, height)
-        if side < 0:
-            return
-
         glViewport((width - side) / 2, (height - side) / 2, side, side)
-
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(-0.5, +0.5, +0.5, -0.5, 4.0, 15.0)
-        glMatrixMode(GL_MODELVIEW)
 
     def mousePressEvent(self, event):
         self.lastPos = event.pos()
@@ -142,25 +192,20 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.clicked.emit()
 
     def makeObject(self):
-        dlist = glGenLists(1)
-        glNewList(dlist, GL_COMPILE)
+        self.textures = []
+        self.texCoords = []
+        self.vertices = []
 
         for i in range(6):
-            self.bindTexture(QtGui.QPixmap(':/images/side%d.png' % (i + 1)))
+            self.textures.append(
+                    self.bindTexture(
+                            QtGui.QPixmap(':/images/side%d.png' % (i + 1))))
 
-            glBegin(GL_QUADS)
             for j in range(4):
-                tx = {False: 0, True: 1}[j == 0 or j == 3]
-                ty = {False: 0, True: 1}[j == 0 or j == 1]
-                glTexCoord2d(tx, ty)
-                glVertex3d(0.2 * GLWidget.coords[i][j][0],
-                           0.2 * GLWidget.coords[i][j][1],
-                           0.2 * GLWidget.coords[i][j][2])
+                self.texCoords.append(((j == 0 or j == 3), (j == 0 or j == 1)))
 
-            glEnd()
-
-        glEndList()
-        return dlist
+                x, y, z = self.coords[i][j]
+                self.vertices.append((0.2 * x, 0.2 * y, 0.2 * z))
 
 
 class Window(QtGui.QWidget):
@@ -174,23 +219,24 @@ class Window(QtGui.QWidget):
         self.glWidgets = []
 
         for i in range(Window.NumRows):
-            self.glWidgets.append([])
-            for j in range(Window.NumColumns):
-                self.glWidgets[i].append(None)
-        
-        for i in range(Window.NumRows):
+            row = []
+
             for j in range(Window.NumColumns):
                 clearColor = QtGui.QColor()
                 clearColor.setHsv(((i * Window.NumColumns) + j) * 255
                                   / (Window.NumRows * Window.NumColumns - 1),
                                   255, 63)
 
-                self.glWidgets[i][j] = GLWidget(self, self.glWidgets[0][0])
-                self.glWidgets[i][j].setClearColor(clearColor)
-                self.glWidgets[i][j].rotateBy(+42 * 16, +42 * 16, -21 * 16)
-                mainLayout.addWidget(self.glWidgets[i][j], i, j)
+                widget = GLWidget(None, None)
+                widget.setClearColor(clearColor)
+                widget.rotateBy(+42 * 16, +42 * 16, -21 * 16)
+                mainLayout.addWidget(widget, i, j)
 
-                self.glWidgets[i][j].clicked.connect(self.setCurrentGlWidget)
+                widget.clicked.connect(self.setCurrentGlWidget)
+
+                row.append(widget)
+
+            self.glWidgets.append(row)
 
         self.setLayout(mainLayout)
 

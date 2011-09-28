@@ -39,7 +39,10 @@
 #include "recordtreeview.h"
 #include "recordfilterwidget.h"
 #include "recordpropvaltree.h"
+
+#ifdef USE_GRAPHVIZ
 #include "gvgraph.h"
+#endif
 
 #include "assfreezermenus.h"
 #include "batchsubmitdialog.h"
@@ -1342,6 +1345,7 @@ void JobListWidget::refreshDepsTab()
 	JobList sel = mJobTree->selection();
 	if( sel.isEmpty() ) return;
 
+#ifdef USE_GRAPHVIZ
     GVGraph * gvg = new GVGraph("test", QApplication::font(), 0.8);
 
     Index * idx = JobDep::table()->indexFromField( "fkeyJob" );
@@ -1388,5 +1392,6 @@ void JobListWidget::refreshDepsTab()
     gvg->render("/tmp/gvg.png");
     delete gvg;
     mDepsLabel->setPixmap(QPixmap("/tmp/gvg.png"));
+#endif
 }
 

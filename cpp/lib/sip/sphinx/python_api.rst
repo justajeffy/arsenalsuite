@@ -69,6 +69,19 @@ can be used by applications.
         ``True`` if the C/C++ instance has been deleted.
 
 
+.. function:: ispycreated(obj) -> bool
+
+    .. versionadded:: 4.12.1
+
+    This checks if the C++ instance or C structure was created by Python.  If
+    it was then it is possible to call a C++ instance's protected methods.
+
+    :param obj:
+        the Python object.
+    :return:
+        ``True`` if the C/C++ instance was created by Python.
+
+
 .. function:: ispyowned(obj) -> bool
 
     This checks if the C++ instance or C structure is owned by Python.
@@ -128,6 +141,14 @@ can be used by applications.
     disabled.
 
 
+.. class:: simplewrapper
+
+    This is an alternative type object than can be used as the base type of an
+    instance wrapped by SIP.  Objects using this are smaller than those that
+    use the default :class:`sip.wrapper` type but do not support the concept of
+    object ownership.
+
+
 .. data:: SIP_VERSION
 
     This is a Python integer object that represents the SIP version number as
@@ -167,9 +188,8 @@ can be used by applications.
 
     This is the type object for the type SIP uses to represent a C/C++
     ``void *``.  It may have a size associated with the address in which case
-    the Python buffer protocol is supported.  This means that the memory can
-    be treated as a mutable array of bytes when wrapped with the ``buffer()``
-    builtin.  The type has the following methods.
+    the Python buffer interface is supported.  The type has the following
+    methods.
 
     .. method:: __init__(address[, size=-1[, writeable=True]])
 
@@ -191,6 +211,24 @@ can be used by applications.
         :return:
             the integer address.
 
+    .. method:: __getitem__(idx) -> item
+
+        .. versionadded:: 4.12
+
+        This returns the item at a given index.  An exception will be raised if
+        the address does not have an associated size.  It behaves like a Python
+        ``memoryview`` object.
+
+        :param idx:
+            is the index which may either be an integer, an object that
+            implements ``__index__()`` or a slice object.
+        :return:
+            the item.  If the index is an integer then the item will be a
+            Python v2 string object or a Python v3 bytes object containing the
+            single byte at that index.  If the index is a slice object then the
+            item will be a new :class:`voidptr` object defining the subset of
+            the memory corresponding to the slice.
+
     .. method:: __hex__() -> string
 
         This returns the address as a hexadecimal string.
@@ -198,12 +236,37 @@ can be used by applications.
         :return:
             the hexadecimal string address.
 
+    .. method:: __len__() -> integer
+
+        .. versionadded:: 4.12
+
+        This returns the size associated with the address.
+        
+        :return:
+            the associated size.  An exception will be raised if there is none.
+
+    .. method:: __setitem__(idx, item)
+
+        .. versionadded:: 4.12
+
+        This updates the memory at a given index.  An exception will be raised
+        if the address does not have an associated size or is not writable.  It
+        behaves like a Python ``memoryview`` object.
+
+        :param idx:
+            is the index which may either be an integer, an object that
+            implements ``__index__()`` or a slice object.
+        :param item:
+            is the data that will update the memory defined by the index.  It
+            must implement the buffer interface and be the same size as the
+            data that is being updated.
+
     .. method:: ascapsule() -> capsule
 
         .. versionadded:: 4.10
 
         This returns the address as an unnamed Python Capsule.  This requires
-        Python v3.1 or later.
+        Python v3.1 or later or Python v2.7 or later.
 
         :return:
             the Capsule.
@@ -211,7 +274,7 @@ can be used by applications.
     .. method:: ascobject() -> cObject
 
         This returns the address as a Python CObject.  This is deprecated with
-        Python v3.1 or later.
+        Python v3.1 and is not supported with Python v3.2 and later.
 
         :return:
             the CObject.
@@ -274,7 +337,9 @@ can be used by applications.
 
 .. class:: wrapper
 
-    This is the type object of the base type of all instances wrapped by SIP.
+    This is the type object of the default base type of all instances wrapped
+    by SIP.  The :canno:`Supertype` class annotation can be used to specify a
+    different base type for a class.
 
 
 .. class:: wrappertype

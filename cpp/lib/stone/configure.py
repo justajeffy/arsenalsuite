@@ -75,16 +75,19 @@ def doit():
     sipfiles = []
     scriptfiles = []
 
-    for s in glob.glob("../../../python/blur/*.py"):
-	scriptfiles.append(os.path.join("../../../python/blur", os.path.basename(s)))
+    scriptfilesprefix = "../../../python/blur"
+    for s in glob.glob(scriptfilesprefix + "/*.py"):
+        if sys.platform == "win32":
+	    scriptfilesprefix = scriptfilesprefix.replace("/","\\")
+	scriptfiles.append(os.path.join(scriptfilesprefix, os.path.basename(s)))
 
     installs.append([scriptfiles, os.path.join(config.sip_mod_dir, "blur")])
 
     for s in glob.glob("sip/*.sip"):
         sipfiles.append(os.path.join("sip", os.path.basename(s)))
 
-    installs.append([sipfiles, os.path.join(config.sip_mod_dir, "blur")])
-#    installs.append([sipfiles, os.path.join(config.default_sip_dir, "blur")])
+   # installs.append([sipfiles, os.path.join(config.sip_mod_dir, "blur")])
+    installs.append([sipfiles, os.path.join(config.default_sip_dir, "blur")])
 
     # Use the sip mod directory instead in order to adhere to the DESTDIR settings
     installs.append(["stoneconfig.py", config.sip_mod_dir])

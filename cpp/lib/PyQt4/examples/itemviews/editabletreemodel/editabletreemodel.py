@@ -1,27 +1,46 @@
 #!/usr/bin/env python
 
-############################################################################
+
+#############################################################################
 ##
-## Copyright (C) 2005-2005 Trolltech AS. All rights reserved.
+## Copyright (C) 2010 Riverbank Computing Limited.
+## Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+## All rights reserved.
 ##
-## This file is part of the example classes of the Qt Toolkit.
+## This file is part of the examples of PyQt.
 ##
-## This file may be used under the terms of the GNU General Public
-## License version 2.0 as published by the Free Software Foundation
-## and appearing in the file LICENSE.GPL included in the packaging of
-## this file.  Please review the following information to ensure GNU
-## General Public Licensing requirements will be met:
-## http://www.trolltech.com/products/qt/opensource.html
+## $QT_BEGIN_LICENSE:BSD$
+## You may use this file under the terms of the BSD license as follows:
 ##
-## If you are unsure which license is appropriate for your use, please
-## review the following information:
-## http://www.trolltech.com/products/qt/licensing.html or contact the
-## sales department at sales@trolltech.com.
+## "Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are
+## met:
+##   * Redistributions of source code must retain the above copyright
+##     notice, this list of conditions and the following disclaimer.
+##   * Redistributions in binary form must reproduce the above copyright
+##     notice, this list of conditions and the following disclaimer in
+##     the documentation and/or other materials provided with the
+##     distribution.
+##   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
+##     the names of its contributors may be used to endorse or promote
+##     products derived from this software without specific prior written
+##     permission.
 ##
-## This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-## WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+## $QT_END_LICENSE$
 ##
-############################################################################
+#############################################################################
+
 
 # This is only needed for Python v2 but is harmless for Python v3.
 import sip
@@ -198,7 +217,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         self.endRemoveColumns()
 
         if self.rootItem.columnCount() == 0:
-            self.removeRows(0, rowCount())
+            self.removeRows(0, self.rowCount())
 
         return success
 
@@ -294,7 +313,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         file.close()
 
         self.view.setModel(model)
-        for column in range(model.columnCount(QtCore.QModelIndex())):
+        for column in range(model.columnCount()):
             self.view.resizeColumnToContents(column)
 
         self.exitAction.triggered.connect(QtGui.qApp.quit)
@@ -324,7 +343,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         for column in range(model.columnCount(index)):
             child = model.index(0, column, index)
             model.setData(child, "[No data]", QtCore.Qt.EditRole)
-            if not model.headerData(column, QtCore.Qt.Horizontal).isValid():
+            if model.headerData(column, QtCore.Qt.Horizontal) is None:
                 model.setHeaderData(column, QtCore.Qt.Horizontal,
                         "[No header]", QtCore.Qt.EditRole)
 
@@ -332,12 +351,11 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
                 QtGui.QItemSelectionModel.ClearAndSelect)
         self.updateActions()
 
-    def insertColumn(self, parent=QtCore.QModelIndex()):
+    def insertColumn(self):
         model = self.view.model()
         column = self.view.selectionModel().currentIndex().column()
 
-        # Insert a column in the parent item.
-        changed = model.insertColumn(column + 1, parent)
+        changed = model.insertColumn(column + 1)
         if changed:
             model.setHeaderData(column + 1, QtCore.Qt.Horizontal,
                     "[No header]", QtCore.Qt.EditRole)
@@ -359,14 +377,12 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
             child = model.index(index.row()+1, column, index.parent())
             model.setData(child, "[No data]", QtCore.Qt.EditRole)
 
-    def removeColumn(self, parent=QtCore.QModelIndex()):
+    def removeColumn(self):
         model = self.view.model()
         column = self.view.selectionModel().currentIndex().column()
 
-        # Insert columns in each child of the parent item.
-        changed = model.removeColumn(column, parent)
-
-        if not parent.isValid() and changed:
+        changed = model.removeColumn(column)
+        if changed:
             self.updateActions()
 
         return changed

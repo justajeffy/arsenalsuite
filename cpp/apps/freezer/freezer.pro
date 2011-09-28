@@ -65,9 +65,9 @@ unix{
 win32 {
 	LIBS+=-L../../lib/freezer/sipFreezer -lpyFreezer
 	LIBS+=-L../../lib/classes/sipClasses -lpyClasses
-	LIBS+=-L../../lib/classes/sipClassesui -lpyClassesui
+	LIBS+=-L../../lib/classesui/sipClassesui -lpyClassesui
 	LIBS+=-L../../lib/stone/sipStone -lpyStone
-	LIBS+=-L../../lib/stone/sipStonegui -lpyStonegui
+	LIBS+=-L../../lib/stonegui/sipStonegui -lpyStonegui
 	LIBS+=-L../../lib/absubmit/sipAbsubmit -lpyAbsubmit
 	LIBS+=-L../../lib/sip/siplib -lsip
 }

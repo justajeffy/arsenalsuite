@@ -1,7 +1,7 @@
 // This defines the API provided by this library.  It must not be explicitly
 // included by the library itself.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -17,13 +17,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -37,74 +32,75 @@
 #include <QString>
 #include <QVariant>
 
+#include "qpycore_namespace.h"
 #include "qpycore_shared.h"
 
 
+QT_BEGIN_NAMESPACE
+class QAbstractEventDispatcher;
 class QObject;
+class QSettings;
+QT_END_NAMESPACE
 
 
 // Support for pyqtSlot() and pyqtSignature().
 PyObject *qpycore_pyqtslot(PyObject *args, PyObject *kwds);
 PyObject *qpycore_pyqtsignature(PyObject *args, PyObject *kwds);
 
-
 // Support for pyqtConfigure().
 int qpycore_pyqtconfigure(PyObject *self, QObject *qobj, PyObject *kwds);
-
 
 // Support for converting between PyObject and QString.
 PyObject *qpycore_PyObject_FromQString(const QString &qstr);
 QString qpycore_PyObject_AsQString(PyObject *obj);
 const char *qpycore_encode(PyObject **s, QCoreApplication::Encoding encoding);
 
-
 // Support for converting between PyObject and QStringList.
 PyObject *qpycore_PyObject_FromQStringList(const QStringList &qstrlst);
 QStringList qpycore_PySequence_AsQStringList(PyObject *obj);
 int qpycore_PySequence_Check_QStringList(PyObject *obj);
 
-
 // Support for converting between PyObject and QVariant.
 PyObject *qpycore_PyObject_FromQVariant(const QVariant &qvar);
 QVariant qpycore_PyObject_AsQVariant(PyObject *obj, int *is_err);
 
-
 // Support for Q_FLAGS and Q_ENUMS.
 PyObject *qpycore_register_int_types(PyObject *type_names);
-
 
 // Support for creating QGenericArgument and QGenericReturnArgument instances.
 PyObject *qpycore_ArgumentFactory(PyObject *type, PyObject *data);
 PyObject *qpycore_ReturnFactory(PyObject *type);
 PyObject *qpycore_ReturnValue(PyObject *gra);
 
+// Support for QObject.__getattr__().
+PyObject *qpycore_qobject_getattr(QObject *qobj, PyObject *py_qobj,
+        const char *name);
 
 // Support for QObject.staticMetaObject %GetCode.
 PyObject *qpycore_qobject_staticmetaobject(PyObject *type_obj);
 
-
-// Support for QObject.sender().
-QObject *qpycore_qobject_sender();
-
-
 // Support for emitting signals.
 bool qpycore_qobject_emit(QObject *qtx, const char *sig, PyObject *sigargs);
 
+// Support for QAbstractEventDispatcher.setEventFilter().
+PyObject *qpycore_qabstracteventdispatcher_seteventfilter(
+        QAbstractEventDispatcher *disp, PyObject *filter);
 
-// Support for QMetaObject::connectSlotsByName.
+// Support for QMetaObject.connectSlotsByName().
 void qpycore_qmetaobject_connectslotsbyname(QObject *qobj,
         PyObject *qobj_wrapper);
 
-// Support for signals.
-bool qpycore_pyqtsignal_get_parts(PyObject *sig_obj, QObject **qtx,
-        const char **sig);
+// Support for QSettings.value().
+PyObject *qpycore_qsettings_value(const QSettings *qset, const QString &key,
+        const QVariant &defaultValue, PyObject *type);
 
+// Support for QPyNullVariant.
+QVariant *qpycore_qpynullvariant(PyObject *type);
 
 // Utilities.
 #if PY_MAJOR_VERSION >= 3
 void qpycore_Unicode_ConcatAndDel(PyObject **string, PyObject *newpart);
 #endif
-
 
 // Initialisation.
 void qpycore_init();

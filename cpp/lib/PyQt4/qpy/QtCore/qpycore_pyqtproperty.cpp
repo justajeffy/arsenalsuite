@@ -1,6 +1,6 @@
 // This is the implementation of pyqtProperty.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -33,21 +28,34 @@
 
 #include "qpycore_chimera.h"
 #include "qpycore_pyqtproperty.h"
+#include "qpycore_pyqtsignal.h"
 
 
 // Forward declarations.
 extern "C" {
+static PyObject *pyqtProperty_getter(PyObject *self, PyObject *getter);
+static PyObject *pyqtProperty_setter(PyObject *self, PyObject *setter);
+static PyObject *pyqtProperty_deleter(PyObject *self, PyObject *deleter);
+static PyObject *pyqtProperty_reset(PyObject *self, PyObject *reset);
+static PyObject *pyqtProperty_descr_get(PyObject *self, PyObject *obj,
+        PyObject *);
+static int pyqtProperty_descr_set(PyObject *self, PyObject *obj,
+        PyObject *value);
+static PyObject *pyqtProperty_call(PyObject *self, PyObject *args,
+        PyObject *kwds);
 static void pyqtProperty_dealloc(PyObject *self);
 static int pyqtProperty_init(PyObject *self, PyObject *args, PyObject *kwds);
 static int pyqtProperty_traverse(PyObject *self, visitproc visit, void *arg);
 }
+
+static qpycore_pyqtProperty *clone(qpycore_pyqtProperty *orig);
 
 
 // Doc-strings.
 PyDoc_STRVAR(pyqtProperty_doc,
 "pyqtProperty(type, fget=None, fset=None, freset=None, fdel=None, doc=None,\n"
 "        designable=True, scriptable=True, stored=True, user=False,\n"
-"        constant=False, final=False) -> property attribute\n"
+"        constant=False, final=False, notify=None) -> property attribute\n"
 "\n"
 "type is the type of the property.  It is either a type object or a string\n"
 "that is the name of a C++ type.\n"
@@ -59,18 +67,46 @@ PyDoc_STRVAR(pyqtProperty_doc,
 "user sets the USER flag.\n"
 "constant sets the CONSTANT flag.\n"
 "final sets the FINAL flag.\n"
+"notify is the NOTIFY signal.\n"
 "The other parameters are the same as those required by the standard Python\n"
 "property type.  Properties defined using pyqtProperty behave as both Python\n"
-"and Qt properties.");
+"and Qt properties."
+"\n"
+"Decorators can be used to define new properties or to modify existing ones.");
+
+PyDoc_STRVAR(getter_doc, "Descriptor to change the getter on a property.");
+PyDoc_STRVAR(setter_doc, "Descriptor to change the setter on a property.");
+PyDoc_STRVAR(deleter_doc, "Descriptor to change the deleter on a property.");
+PyDoc_STRVAR(reset_doc, "Descriptor to change the reset on a property.");
 
 
 // Define the attributes.
 static PyMemberDef pyqtProperty_members[] = {
-    {const_cast<char *>("freset"), T_OBJECT,
-            offsetof(qpycore_pyqtProperty, pyqtprop_reset), READONLY, 0},
     {const_cast<char *>("type"), T_OBJECT,
             offsetof(qpycore_pyqtProperty, pyqtprop_type), READONLY, 0},
+    {const_cast<char *>("fget"), T_OBJECT,
+            offsetof(qpycore_pyqtProperty, pyqtprop_get), READONLY, 0},
+    {const_cast<char *>("fset"), T_OBJECT,
+            offsetof(qpycore_pyqtProperty, pyqtprop_set), READONLY, 0},
+    {const_cast<char *>("fdel"), T_OBJECT,
+            offsetof(qpycore_pyqtProperty, pyqtprop_del), READONLY, 0},
+    {const_cast<char *>("freset"), T_OBJECT,
+            offsetof(qpycore_pyqtProperty, pyqtprop_reset), READONLY, 0},
+    {const_cast<char *>("__doc__"), T_OBJECT,
+            offsetof(qpycore_pyqtProperty, pyqtprop_doc), READONLY, 0},
     {0, 0, 0, 0, 0}
+};
+
+
+// Define the methods.
+static PyMethodDef pyqtProperty_methods[] = {
+    {"getter", pyqtProperty_getter, METH_O, getter_doc},
+    {"read", pyqtProperty_getter, METH_O, getter_doc},
+    {"setter", pyqtProperty_setter, METH_O, setter_doc},
+    {"write", pyqtProperty_setter, METH_O, setter_doc},
+    {"deleter", pyqtProperty_deleter, METH_O, deleter_doc},
+    {"reset", pyqtProperty_reset, METH_O, reset_doc},
+    {0, 0, 0, 0}
 };
 
 
@@ -90,9 +126,9 @@ PyTypeObject qpycore_pyqtProperty_Type = {
     0,
     0,
     0,
+    pyqtProperty_call,
     0,
-    0,
-    0,
+    PyObject_GenericGetAttr,
     0,
     0,
     Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_BASETYPE,
@@ -103,18 +139,18 @@ PyTypeObject qpycore_pyqtProperty_Type = {
     0,
     0,
     0,
-    0,
+    pyqtProperty_methods,
     pyqtProperty_members,
     0,
     0,
     0,
-    0,
-    0,
+    pyqtProperty_descr_get,
+    pyqtProperty_descr_set,
     0,
     pyqtProperty_init,
-    0,
-    0,
-    0,
+    PyType_GenericAlloc,
+    PyType_GenericNew,
+    PyObject_GC_Del,
     0,
     0,
     0,
@@ -129,7 +165,8 @@ PyTypeObject qpycore_pyqtProperty_Type = {
 
 
 // This is the sequence number to allocate to the next PyQt property to be
-// defined.
+// defined.  This ensures that properties appear in the QMetaObject in the same
+// order that they are defined in Python.
 static uint pyqtprop_sequence_nr = 0;
 
 
@@ -138,12 +175,72 @@ static void pyqtProperty_dealloc(PyObject *self)
 {
     qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)self;
 
+    PyObject_GC_UnTrack(self);
+
+    Py_XDECREF(pp->pyqtprop_get);
+    Py_XDECREF(pp->pyqtprop_set);
+    Py_XDECREF(pp->pyqtprop_del);
+    Py_XDECREF(pp->pyqtprop_doc);
     Py_XDECREF(pp->pyqtprop_reset);
+    Py_XDECREF(pp->pyqtprop_notify);
     Py_XDECREF(pp->pyqtprop_type);
 
     delete pp->pyqtprop_parsed_type;
 
-    PyProperty_Type.tp_dealloc(self);
+    Py_TYPE(self)->tp_free(self);
+}
+
+
+// The descriptor getter.
+static PyObject *pyqtProperty_descr_get(PyObject *self, PyObject *obj,
+        PyObject *)
+{
+    qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)self;
+
+    if (!obj || obj == Py_None)
+    {
+        Py_INCREF(self);
+        return self;
+    }
+
+    if (!pp->pyqtprop_get)
+    {
+        PyErr_SetString(PyExc_AttributeError, "unreadable attribute");
+        return 0;
+    }
+
+    return PyObject_CallFunction(pp->pyqtprop_get, const_cast<char *>("(O)"),
+            obj);
+}
+
+
+// The descriptor setter.
+static int pyqtProperty_descr_set(PyObject *self, PyObject *obj,
+        PyObject *value)
+{
+    qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)self;
+    PyObject *func, *res;
+
+    func = (value ? pp->pyqtprop_set : pp->pyqtprop_del);
+
+    if (!func)
+    {
+        PyErr_SetString(PyExc_AttributeError,
+                (value ? "can't set attribute" : "can't delete attribute"));
+        return -1;
+    }
+
+    if (value)
+        res = PyObject_CallFunction(func, const_cast<char *>("(OO)"), obj,
+                value);
+    else
+        res = PyObject_CallFunction(func, const_cast<char *>("(O)"), obj);
+
+    if (!res)
+        return -1;
+
+    Py_DECREF(res);
+    return 0;
 }
 
 
@@ -153,9 +250,49 @@ static int pyqtProperty_traverse(PyObject *self, visitproc visit, void *arg)
     qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)self;
     int vret;
 
+    if (pp->pyqtprop_get)
+    {
+        vret = visit(pp->pyqtprop_get, arg);
+
+        if (vret != 0)
+            return vret;
+    }
+
+    if (pp->pyqtprop_set)
+    {
+        vret = visit(pp->pyqtprop_set, arg);
+
+        if (vret != 0)
+            return vret;
+    }
+
+    if (pp->pyqtprop_del)
+    {
+        vret = visit(pp->pyqtprop_del, arg);
+
+        if (vret != 0)
+            return vret;
+    }
+
+    if (pp->pyqtprop_doc)
+    {
+        vret = visit(pp->pyqtprop_doc, arg);
+
+        if (vret != 0)
+            return vret;
+    }
+
     if (pp->pyqtprop_reset)
     {
         vret = visit(pp->pyqtprop_reset, arg);
+
+        if (vret != 0)
+            return vret;
+    }
+
+    if (pp->pyqtprop_notify)
+    {
+        vret = visit(pp->pyqtprop_notify, arg);
 
         if (vret != 0)
             return vret;
@@ -169,31 +306,37 @@ static int pyqtProperty_traverse(PyObject *self, visitproc visit, void *arg)
             return vret;
     }
 
-    return PyProperty_Type.tp_traverse(self, visit, arg);
+    return 0;
 }
 
 
 // The pyqtProperty init function.
 static int pyqtProperty_init(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    PyObject *type, *get = 0, *set = 0, *reset = 0, *del = 0, *doc = 0;
-    int designable = -1, scriptable = 1, stored = 1, user = 0, constant = 0,
-            final = 0;
+    PyObject *type, *get = 0, *set = 0, *reset = 0, *del = 0, *doc = 0,
+            *notify = 0;
+    int scriptable = 1, stored = 1, user = 0, constant = 0, final = 0;
+#if QT_VERSION >= 0x040600
+    int designable = 1;
+#else
+    int designable = -1;
+#endif
     static const char *kwlist[] = {"type", "fget", "fset", "freset", "fdel",
             "doc", "designable", "scriptable", "stored", "user", "constant",
-            "final", 0};
+            "final", "notify", 0};
     qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)self;
 
     pp->pyqtprop_sequence = pyqtprop_sequence_nr++;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds,
 #if PY_VERSION_HEX >= 0x02050000
-            "O|OOOOOiiiiii:pyqtProperty",
+            "O|OOOOOiiiiiiO!:pyqtProperty",
 #else
-            const_cast<char *>("O|OOOOOiiiiii:pyqtProperty"),
+            const_cast<char *>("O|OOOOOiiiiiiO!:pyqtProperty"),
 #endif
             const_cast<char **>(kwlist), &type, &get, &set, &reset, &del, &doc,
-            &designable, &scriptable, &stored, &user, &constant, &final))
+            &designable, &scriptable, &stored, &user, &constant, &final,
+            &qpycore_pyqtSignal_Type, &notify))
         return -1;
 
     if (get == Py_None)
@@ -208,10 +351,15 @@ static int pyqtProperty_init(PyObject *self, PyObject *args, PyObject *kwds)
     if (reset == Py_None)
         reset = 0;
 
+    if (notify == Py_None)
+        notify = 0;
+
+#if QT_VERSION < 0x040600
     // The default value of designable depends on whether the property is
     // writable.
     if (designable < 0)
         designable = (set != 0);
+#endif
 
     // Parse the type.
     const Chimera *ptype = Chimera::parse(type);
@@ -229,6 +377,7 @@ static int pyqtProperty_init(PyObject *self, PyObject *args, PyObject *kwds)
     Py_XINCREF(del);
     Py_XINCREF(doc);
     Py_XINCREF(reset);
+    Py_XINCREF(notify);
     Py_INCREF(type);
 
     /* If no docstring was given and the getter has one, then use it. */
@@ -246,17 +395,21 @@ static int pyqtProperty_init(PyObject *self, PyObject *args, PyObject *kwds)
             doc = get_doc;
         }
         else
+        {
             PyErr_Clear();
+        }
     }
 
-    pp->prop_get = get;
-    pp->prop_set = set;
-    pp->prop_del = del;
-    pp->prop_doc = doc;
+    pp->pyqtprop_get = get;
+    pp->pyqtprop_set = set;
+    pp->pyqtprop_del = del;
+    pp->pyqtprop_doc = doc;
     pp->pyqtprop_reset = reset;
+    pp->pyqtprop_notify = notify;
     pp->pyqtprop_type = type;
 
-    unsigned flags = 0;
+    // ResolveEditable is always set.
+    unsigned flags = 0x00080000;
 
     if (designable)
         flags |= 0x00001000;
@@ -279,4 +432,155 @@ static int pyqtProperty_init(PyObject *self, PyObject *args, PyObject *kwds)
     pp->pyqtprop_flags = flags;
 
     return 0;
+}
+
+
+// Calling the property is a shorthand way of changing the getter.
+static PyObject *pyqtProperty_call(PyObject *self, PyObject *args,
+        PyObject *kwds)
+{
+    PyObject *get;
+    static const char *kwlist[] = {"fget", 0};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds,
+#if PY_VERSION_HEX >= 0x02050000
+            "O:pyqtProperty",
+#else
+            const_cast<char *>("O:pyqtProperty"),
+#endif
+            const_cast<char **>(kwlist), &get))
+        return 0;
+
+    return pyqtProperty_getter(self, get);
+}
+
+
+// Return a copy of the property with a different getter.
+static PyObject *pyqtProperty_getter(PyObject *self, PyObject *getter)
+{
+    qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)self;
+
+    pp = clone(pp);
+
+    if (pp)
+    {
+        Py_XDECREF(pp->pyqtprop_get);
+
+        if (getter == Py_None)
+            getter = 0;
+        else
+            Py_INCREF(getter);
+
+        pp->pyqtprop_get = getter;
+    }
+
+    return (PyObject *)pp;
+}
+
+
+// Return a copy of the property with a different setter.
+static PyObject *pyqtProperty_setter(PyObject *self, PyObject *setter)
+{
+    qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)self;
+
+    pp = clone(pp);
+
+    if (pp)
+    {
+        Py_XDECREF(pp->pyqtprop_set);
+
+        if (setter == Py_None)
+            setter = 0;
+        else
+            Py_INCREF(setter);
+
+        pp->pyqtprop_set = setter;
+    }
+
+    return (PyObject *)pp;
+}
+
+
+// Return a copy of the property with a different deleter.
+static PyObject *pyqtProperty_deleter(PyObject *self, PyObject *deleter)
+{
+    qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)self;
+
+    pp = clone(pp);
+
+    if (pp)
+    {
+        Py_XDECREF(pp->pyqtprop_del);
+
+        if (deleter == Py_None)
+            deleter = 0;
+        else
+            Py_INCREF(deleter);
+
+        pp->pyqtprop_del = deleter;
+    }
+
+    return (PyObject *)pp;
+}
+
+
+// Return a copy of the property with a different reset.
+static PyObject *pyqtProperty_reset(PyObject *self, PyObject *reset)
+{
+    qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)self;
+
+    pp = clone(pp);
+
+    if (pp)
+    {
+        Py_XDECREF(pp->pyqtprop_reset);
+
+        if (reset == Py_None)
+            reset = 0;
+        else
+            Py_INCREF(reset);
+
+        pp->pyqtprop_reset = reset;
+    }
+
+    return (PyObject *)pp;
+}
+
+
+// Create a clone of a property.
+static qpycore_pyqtProperty *clone(qpycore_pyqtProperty *orig)
+{
+    qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)PyType_GenericNew(
+            Py_TYPE(orig), 0, 0);
+
+    if (pp)
+    {
+        pp->pyqtprop_get = orig->pyqtprop_get;
+        Py_XINCREF(pp->pyqtprop_get);
+
+        pp->pyqtprop_set = orig->pyqtprop_set;
+        Py_XINCREF(pp->pyqtprop_set);
+
+        pp->pyqtprop_del = orig->pyqtprop_del;
+        Py_XINCREF(pp->pyqtprop_del);
+
+        pp->pyqtprop_doc = orig->pyqtprop_doc;
+        Py_XINCREF(pp->pyqtprop_doc);
+
+        pp->pyqtprop_reset = orig->pyqtprop_reset;
+        Py_XINCREF(pp->pyqtprop_reset);
+
+        pp->pyqtprop_notify = orig->pyqtprop_notify;
+        Py_XINCREF(pp->pyqtprop_notify);
+
+        pp->pyqtprop_type = orig->pyqtprop_type;
+        Py_XINCREF(pp->pyqtprop_type);
+
+        pp->pyqtprop_parsed_type = new Chimera(*orig->pyqtprop_parsed_type);
+
+        pp->pyqtprop_flags = orig->pyqtprop_flags;
+        pp->pyqtprop_sequence = orig->pyqtprop_sequence;
+    }
+
+    return pp;
 }

@@ -35,28 +35,32 @@ class ModelTest(QtCore.QObject):
         self.model = sip.cast(_model, QtCore.QAbstractItemModel)
         self.insert = []
         self.remove = []
+        self.changing = []
         self.fetchingMore = False
         assert(self.model)
 
-        self.connect( self.model, QtCore.SIGNAL("columnsAboutToBeInserted(const QtCore.QModelIndex&, int, int)"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("columnsAboutToBeRemoved(const QtCore.QModelIndex&, int, int)"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("columnsBeInserted(const QtCore.QModelIndex&, int, int)"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("columnsRemoved(const QtCore.QModelIndex&, int, int)"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("dataChanged(const QtCore.QModelIndex&, const QtCore.QModelIndex&)"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("headerDataChanged(Qt::Orientation, int, int)"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("layoutAboutToBeChanged()"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("layoutChanged()"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("modelReset()"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("rowsAboutToBeInserted(const QtCore.QModelIndex&, int, int)"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("rowsAboutToBeRemoved(const QtCore.QModelIndex&, int, int)"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("rowsBeInserted(const QtCore.QModelIndex&, int, int)"), self.runAllTests)
-        self.connect( self.model, QtCore.SIGNAL("rowsRemoved(const QtCore.QModelIndex&, int, int)"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("columnsAboutToBeInserted(const QModelIndex&, int, int)"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("columnsAboutToBeRemoved(const QModelIndex&, int, int)"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("columnsInserted(const QModelIndex&, int, int)"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("columnsRemoved(const QModelIndex&, int, int)"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("dataChanged(const QModelIndex&, const QModelIndex&)"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("headerDataChanged(Qt::Orientation, int, int)"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("layoutAboutToBeChanged()"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("layoutChanged()"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("modelReset()"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("rowsAboutToBeInserted(const QModelIndex&, int, int)"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("rowsAboutToBeRemoved(const QModelIndex&, int, int)"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("rowsInserted(const QModelIndex&, int, int)"), self.runAllTests)
+        self.connect(self.model, QtCore.SIGNAL("rowsRemoved(const QModelIndex&, int, int)"), self.runAllTests)
 
         # Special checks for inserting/removing
-        self.connect( self.model, QtCore.SIGNAL("rowsAboutToBeInserted(const QtCore.QModelIndex&, int, int)"), self.rowsAboutToBeInserted)
-        self.connect( self.model, QtCore.SIGNAL("rowsAboutToBeRemoved(const QtCore.QModelIndex&, int, int)"), self.rowsAboutToBeRemoved)
-        self.connect( self.model, QtCore.SIGNAL("rowsBeInserted(const QtCore.QModelIndex&, int, int)"), self.rowsInserted)
-        self.connect( self.model, QtCore.SIGNAL("rowsRemoved(const QtCore.QModelIndex&, int, int)"), self.rowsRemoved)
+        self.connect(self.model, QtCore.SIGNAL("layoutAboutToBeChanged()"), self.layoutAboutToBeChanged )
+        self.connect(self.model, QtCore.SIGNAL("layoutChanged()"), self.layoutChanged )
+
+        self.connect(self.model, QtCore.SIGNAL("rowsAboutToBeInserted(const QModelIndex&, int, int)"), self.rowsAboutToBeInserted)
+        self.connect(self.model, QtCore.SIGNAL("rowsAboutToBeRemoved(const QModelIndex&, int, int)"), self.rowsAboutToBeRemoved)
+        self.connect(self.model, QtCore.SIGNAL("rowsInserted(const QModelIndex&, int, int)"), self.rowsInserted)
+        self.connect(self.model, QtCore.SIGNAL("rowsRemoved(const QModelIndex&, int, int)"), self.rowsRemoved)
         self.runAllTests()
 
     def nonDestructiveBasicTest(self):
@@ -262,10 +266,7 @@ class ModelTest(QtCore.QObject):
         variant = self.model.data(self.model.index(0,0,QtCore.QModelIndex()), QtCore.Qt.TextAlignmentRole)
         if variant.isValid():
             alignment = variant.toInt()[0]
-            assert( alignment == QtCore.Qt.AlignLeft or
-                alignment == QtCore.Qt.AlignRight or
-                alignment == QtCore.Qt.AlignHCenter or
-                alignment == QtCore.Qt.AlignJustify)
+            assert( alignment == (alignment & int(QtCore.Qt.AlignHorizontal_Mask | QtCore.Qt.AlignVertical_Mask)))
 
         # General Purpose roles that should return a QColor
         variant = self.model.data(self.model.index(0,0,QtCore.QModelIndex()), QtCore.Qt.BackgroundColorRole)
@@ -302,26 +303,26 @@ class ModelTest(QtCore.QObject):
         c = {}
         c['parent'] = parent
         c['oldSize'] = self.model.rowCount(parent)
-        c['last'] = self.model.data(model.index(start-1, 0, parent))
-        c['next'] = self.model.data(model.index(start, 0, parent))
-        insert.append(c)
+        c['last'] = self.model.data(self.model.index(start-1, 0, parent))
+        c['next'] = self.model.data(self.model.index(start, 0, parent))
+        self.insert.append(c)
 
     def rowsInserted(self, parent, start, end):
         """
         Confirm that what was said was going to happen actually did
         """
-        c = insert.pop()
+        c = self.insert.pop()
         assert(c['parent'] == parent)
         assert(c['oldSize'] + (end - start + 1) == self.model.rowCount(parent))
-        assert(c['last'] == self.model.data(model.index(start-1, 0, c['parent'])))
+        assert(c['last'] == self.model.data(self.model.index(start-1, 0, c['parent'])))
 
-        # if c['next'] != self.model.data(model.index(end+1, 0, c['parent'])):
+        # if c['next'] != self.model.data(self.model.index(end+1, 0, c['parent'])):
         #   qDebug << start << end
         #   for i in range(0, self.model.rowCount(QtCore.QModelIndex())):
         #       qDebug << self.model.index(i, 0).data().toString()
-        #   qDebug() << c['next'] << self.model.data(model.index(end+1, 0, c['parent']))
+        #   qDebug() << c['next'] << self.model.data(self.model.index(end+1, 0, c['parent']))
 
-        assert(c['next'] == self.model.data(model.index(end+1, 0, c['parent'])))
+        assert(c['next'] == self.model.data(self.model.index(end+1, 0, c['parent'])))
 
     def rowsAboutToBeRemoved(self, parent, start, end):
         """
@@ -330,19 +331,29 @@ class ModelTest(QtCore.QObject):
         c = {}
         c['parent'] = parent
         c['oldSize'] = self.model.rowCount(parent)
-        c['last'] = self.model.data(model.index(start-1, 0, parent))
-        c['next'] = self.model.data(model.index(end+1, 0, parent))
-        remove.append(c)
+        c['last'] = self.model.data(self.model.index(start-1, 0, parent))
+        c['next'] = self.model.data(self.model.index(end+1, 0, parent))
+        self.remove.append(c)
 
     def rowsRemoved(self, parent, start, end):
         """
         Confirm that what was said was going to happen actually did
         """
-        c = remove.pop()
+        c = self.remove.pop()
         assert(c['parent'] == parent)
         assert(c['oldSize'] - (end - start + 1) == self.model.rowCount(parent))
-        assert(c['last'] == self.model.data(model.index(start-1, 0, c['parent'])))
-        assert(c['next'] == self.model.data(model.index(start, 0, c['parent'])))
+        assert(c['last'] == self.model.data(self.model.index(start-1, 0, c['parent'])))
+        assert(c['next'] == self.model.data(self.model.index(start, 0, c['parent'])))
+
+    def layoutAboutToBeChanged(self):
+        for i in range(0, max(0, min(self.model.rowCount(), 100))):
+            self.changing.append(QtCore.QPersistentModelIndex(self.model.index(i, 0)))
+
+    def layoutChanged(self):
+        for c in self.changing:
+            assert(c == self.model.index(c.row(), c.column(), c.parent()))
+
+        self.changing = []
 
     def checkChildren(self, parent, depth = 0):
         """
@@ -409,7 +420,7 @@ class ModelTest(QtCore.QObject):
                 assert( a == b )
 
                 # Some basic checking on the index that is returned
-                assert( index.model() == self.model )
+                assert( index.model() == self._model )
                 assert( index.row() == r )
                 assert( index.column() == c )
                 # While you can technically return a QtCore.QVariant usually this is a sign
@@ -442,5 +453,3 @@ class ModelTest(QtCore.QObject):
                 # Make sure that after testing the children that the index doesn't change
                 newIdx = self.model.index(r,c,parent)
                 assert(index == newIdx)
-
-

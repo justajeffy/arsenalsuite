@@ -152,13 +152,13 @@ public:
 
     The most common use of Translator is to: load a translator file
     created with \l{Qt Linguist Manual}, install it using
-    QApplication::installTranslator(), and use it via QObject::tr().
+    QCoreApplication::installTranslator(), and use it via QObject::tr().
     For example:
 
     \code
     int main(int argc, char ** argv)
     {
-        QApplication app(argc, argv);
+        QCoreApplication app(argc, argv);
 
         Translator translator(0);
         translator.load("french.qm", ".");
@@ -182,7 +182,7 @@ public:
     files are sometimes referred to as "message files".
 
     It is possible to lookup a translation using findMessage() (as
-    tr() and QApplication::translate() do) and contains(), to insert a
+    tr() and QCoreApplication::translate() do) and contains(), to insert a
     new translation messsage using insert(), and to remove one using
     remove().
 
@@ -239,8 +239,9 @@ public:
     do not work. The functions that do work with stripped files are
     explicitly documented as such.
 
-    \sa TranslatorMessage QApplication::installTranslator()
-    QApplication::removeTranslator() QObject::tr() QApplication::translate()
+    \sa TranslatorMessage QCoreApplication::installTranslator()
+    QCoreApplication::removeTranslator() QObject::tr()
+    QCoreApplication::translate()
 */
 
 /*!

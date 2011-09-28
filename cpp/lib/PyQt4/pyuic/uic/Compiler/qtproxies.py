@@ -1,3 +1,43 @@
+#############################################################################
+##
+## Copyright (C) 2011 Riverbank Computing Limited.
+## Copyright (C) 2006 Thorsten Marek.
+## All right reserved.
+##
+## This file is part of PyQt.
+##
+## You may use this file under the terms of the GPL v2 or the revised BSD
+## license as follows:
+##
+## "Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are
+## met:
+##   * Redistributions of source code must retain the above copyright
+##     notice, this list of conditions and the following disclaimer.
+##   * Redistributions in binary form must reproduce the above copyright
+##     notice, this list of conditions and the following disclaimer in
+##     the documentation and/or other materials provided with the
+##     distribution.
+##   * Neither the name of the Riverbank Computing Limited nor the names
+##     of its contributors may be used to endorse or promote products
+##     derived from this software without specific prior written
+##     permission.
+##
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+##
+#############################################################################
+
+
 import sys
 import re
 
@@ -6,10 +46,10 @@ from PyQt4.uic.Compiler.misc import Literal, moduleMember
 
 if sys.hexversion >= 0x03000000:
     from PyQt4.uic.port_v3.proxy_base import ProxyBase
-    from PyQt4.uic.port_v3.encode_utf8 import encode_utf8
+    from PyQt4.uic.port_v3.as_string import as_string
 else:
     from PyQt4.uic.port_v2.proxy_base import ProxyBase
-    from PyQt4.uic.port_v2.encode_utf8 import encode_utf8
+    from PyQt4.uic.port_v2.as_string import as_string
 
 
 i18n_strings = []
@@ -17,23 +57,15 @@ i18n_context = ""
 
 def i18n_print(string):
     i18n_strings.append(string)
-    
-def obj_to_argument(obj):
-    if isinstance(obj, str):
-        arg = '"' + escape(obj) + '"'
-    else:
-        arg = str(obj)
 
-    return arg
-    
 def i18n_void_func(name):
     def _printer(self, *args):
-        i18n_print("%s.%s(%s)" % (self, name, ", ".join(map(obj_to_argument, args))))
+        i18n_print("%s.%s(%s)" % (self, name, ", ".join(map(as_string, args))))
     return _printer
 
 def i18n_func(name):
     def _printer(self, rname, *args):
-        i18n_print("%s = %s.%s(%s)" % (rname, self, name, ", ".join(map(obj_to_argument, args))))
+        i18n_print("%s = %s.%s(%s)" % (rname, self, name, ", ".join(map(as_string, args))))
         return Literal(rname)
 
     return _printer
@@ -46,22 +78,18 @@ def strict_getattr(module, clsname):
         return cls
     
 
-_esc_regex = re.compile(r"(\"|\'|\\)")
-
-def escape(text):
-    # This escapes any escaped single or double quote or backslash.
-    x = _esc_regex.sub(r"\\\1", text)
-
-    # This replaces any '\n' with an escaped version and a real line break.
-    return re.sub(r'\n', r'\\n"\n"', x)
-
-
 class i18n_string(object):
-    def __init__(self, string):
+    def __init__(self, string, disambig):
         self.string = string
+        self.disambig = disambig
 
     def __str__(self):
-        return "QtGui.QApplication.translate(\"%s\", \"%s\", None, QtGui.QApplication.UnicodeUTF8)" % (i18n_context, escape(encode_utf8(self.string)))
+        if self.disambig is None:
+            disambig = "None"
+        else:
+            disambig = as_string(self.disambig, encode=False)
+
+        return 'QtGui.QApplication.translate("%s", %s, %s, QtGui.QApplication.UnicodeUTF8)' % (i18n_context, as_string(self.string, encode=False), disambig)
 
 
 # Classes with this flag will be handled as literal values. If functions are
@@ -87,7 +115,7 @@ class ProxyClassMember(object):
     def __call__(self, *args):
         func_call = "%s.%s(%s)" % (self.proxy,
                                    self.function_name,
-                                   ", ".join(map(obj_to_argument, args)))
+                                   ", ".join(map(as_string, args)))
         if self.flags & AS_ARGUMENT:
             self.proxy._uic_name = func_call
             return self.proxy
@@ -146,7 +174,7 @@ class LiteralProxyClass(ProxyClass):
     def __init__(self, *args):
         self._uic_name = "%s(%s)" % \
                      (moduleMember(self.module, self.__class__.__name__),
-                      ", ".join(map(obj_to_argument, args)))
+                      ", ".join(map(as_string, args)))
         
 
 class ProxyNamespace(ProxyBase):
@@ -199,25 +227,15 @@ class QtCore(ProxyNamespace):
             ProxyClassMember(cls, "connect", 0)(*args)
         connect = classmethod(connect)
 
-_qwidgets = (
-    "QAbstractItemView",
-    "QCalendarWidget", "QColumnView", "QCommandLinkButton",
-    "QDateEdit", "QDateTimeEdit", "QDial", "QDialog", "QDialogButtonBox",
-    "QDockWidget", "QDoubleSpinBox",
-    "QFrame",
-    "QGraphicsView", "QGroupBox",
-    "QLabel", "QLCDNumber", "QLineEdit", "QListView",
-    "QMainWindow", "QMdiArea", "QMenuBar",
-    "QPlainTextEdit", "QProgressBar",
-    "QScrollArea", "QScrollBar", "QSlider", "QSpinBox", "QSplitter",
-    "QStackedWidget", "QStatusBar",
-    "QTextBrowser", "QTextEdit", "QTimeEdit", "QToolBar",
-    "QWizard", "QWizardPage")
+# These sub-class QWidget but aren't themselves sub-classed.
+_qwidgets = ("QCalendarWidget", "QDialogButtonBox", "QDockWidget", "QGroupBox",
+        "QLineEdit", "QMainWindow", "QMenuBar", "QProgressBar", "QStatusBar",
+        "QToolBar", "QWizardPage")
 
 class QtGui(ProxyNamespace):
     class QApplication(QtCore.QObject):
-        def translate(uiname, text, context, encoding):
-            return i18n_string(text or "")
+        def translate(uiname, text, disambig, encoding):
+            return i18n_string(text or "", disambig)
         translate = staticmethod(translate)
 
     class QIcon(ProxyClass): pass
@@ -225,6 +243,7 @@ class QtGui(ProxyNamespace):
     class QLinearGradient(ProxyClass): pass
     class QRadialGradient(ProxyClass): pass
     class QBrush(ProxyClass): pass
+    class QPainter(ProxyClass): pass
     class QPalette(ProxyClass): pass
     class QFont(ProxyClass): pass
     class QSpacerItem(ProxyClass): pass
@@ -254,41 +273,89 @@ class QtGui(ProxyNamespace):
             sp._uic_name = "%s.sizePolicy()" % self
             return sp
 
-    class QHeaderView(ProxyClass): pass
+    class QDialog(QWidget): pass
+    class QAbstractPrintDialog(QDialog): pass
+    class QColorDialog(QDialog): pass
+    class QFileDialog(QDialog): pass
+    class QFontDialog(QDialog): pass
+    class QInputDialog(QDialog): pass
+    class QMessageBox(QDialog): pass
+    class QPageSetupDialog(QDialog): pass
+    class QWizard(QDialog): pass
 
-    class QListWidgetItem(ProxyClass): pass
+    class QAbstractSlider(QWidget): pass
+    class QDial(QAbstractSlider): pass
+    class QScrollBar(QAbstractSlider): pass
+    class QSlider(QAbstractSlider): pass
 
-    class QListWidget(QWidget):
-        isSortingEnabled = i18n_func("isSortingEnabled")
-        setSortingEnabled = i18n_void_func("setSortingEnabled")
+    class QMenu(QWidget):
+        def menuAction(self):
+            return Literal("%s.menuAction()" % self)
 
-        def item(self, row):
-            return QtGui.QListWidgetItem("%s.item(%i)" % (self, row), False,
-                    (), noInstantiation=True)
+    class QTabWidget(QWidget):
+        def addTab(self, *args):
+            text = args[-1]
 
-    class QTreeView(QWidget):
-        def header(self):
-            return QtGui.QHeaderView("%s.header()" % self,
+            if isinstance(text, i18n_string):
+                i18n_print("%s.setTabText(%s.indexOf(%s), %s)" % \
+                        (self._uic_name, self._uic_name, args[0], text))
+                args = args[:-1] + ("", )
+
+            ProxyClassMember(self, "addTab", 0)(*args)
+
+        def indexOf(self, page):
+            return Literal("%s.indexOf(%s)" % (self, page))
+
+    class QComboBox(QWidget): pass
+    class QFontComboBox(QComboBox): pass
+
+    class QAbstractSpinBox(QWidget): pass
+    class QDoubleSpinBox(QAbstractSpinBox): pass
+    class QSpinBox(QAbstractSpinBox): pass
+
+    class QDateTimeEdit(QAbstractSpinBox): pass
+    class QDateEdit(QDateTimeEdit): pass
+    class QTimeEdit(QDateTimeEdit): pass
+
+    class QFrame(QWidget): pass
+    class QLabel(QFrame): pass
+    class QLCDNumber(QFrame): pass
+    class QSplitter(QFrame): pass
+    class QStackedWidget(QFrame): pass
+
+    class QToolBox(QFrame):
+        def addItem(self, *args):
+            text = args[-1]
+
+            if isinstance(text, i18n_string):
+                i18n_print("%s.setItemText(%s.indexOf(%s), %s)" % \
+                        (self._uic_name, self._uic_name, args[0], text))
+                args = args[:-1] + ("", )
+
+            ProxyClassMember(self, "addItem", 0)(*args)
+
+        def indexOf(self, page):
+            return Literal("%s.indexOf(%s)" % (self, page))
+
+        def layout(self):
+            return QtGui.QLayout("%s.layout()" % self,
                     False, (), noInstantiation=True)
 
-    class QTreeWidgetItem(ProxyClass):
-        def child(self, index):
-            return QtGui.QTreeWidgetItem("%s.child(%i)" % (self, index),
-                    False, (), noInstantiation=True)
+    class QAbstractScrollArea(QFrame): pass
+    class QGraphicsView(QAbstractScrollArea): pass
+    class QMdiArea(QAbstractScrollArea): pass
+    class QPlainTextEdit(QAbstractScrollArea): pass
+    class QScrollArea(QAbstractScrollArea): pass
 
-    class QTreeWidget(QTreeView):
-        isSortingEnabled = i18n_func("isSortingEnabled")
-        setSortingEnabled = i18n_void_func("setSortingEnabled")
+    class QTextEdit(QAbstractScrollArea): pass
+    class QTextBrowser(QTextEdit): pass
 
-        def headerItem(self):
-            return QtGui.QWidget("%s.headerItem()" % self, False, (),
-                    noInstantiation=True)
+    class QAbstractItemView(QAbstractScrollArea): pass
+    class QColumnView(QAbstractItemView): pass
+    class QHeaderView(QAbstractItemView): pass
+    class QListView(QAbstractItemView): pass
 
-        def topLevelItem(self, index):
-            return QtGui.QTreeWidgetItem("%s.topLevelItem(%i)" % (self, index),
-                    False, (), noInstantiation=True)
-
-    class QTableView(QWidget):
+    class QTableView(QAbstractItemView):
         def horizontalHeader(self):
             return QtGui.QHeaderView("%s.horizontalHeader()" % self,
                     False, (), noInstantiation=True)
@@ -296,6 +363,21 @@ class QtGui(ProxyNamespace):
         def verticalHeader(self):
             return QtGui.QHeaderView("%s.verticalHeader()" % self,
                     False, (), noInstantiation=True)
+
+    class QTreeView(QAbstractItemView):
+        def header(self):
+            return QtGui.QHeaderView("%s.header()" % self,
+                    False, (), noInstantiation=True)
+
+    class QListWidgetItem(ProxyClass): pass
+
+    class QListWidget(QListView):
+        isSortingEnabled = i18n_func("isSortingEnabled")
+        setSortingEnabled = i18n_void_func("setSortingEnabled")
+
+        def item(self, row):
+            return QtGui.QListWidgetItem("%s.item(%i)" % (self, row), False,
+                    (), noInstantiation=True)
 
     class QTableWidgetItem(ProxyClass): pass
 
@@ -315,38 +397,30 @@ class QtGui(ProxyNamespace):
             return QtGui.QTableWidgetItem("%s.verticalHeaderItem(%i)" % (self, row),
                     False, (), noInstantiation=True)
 
-    class QMenu(QWidget):
-        def menuAction(self):
-            return Literal("%s.menuAction()" % self)
+    class QTreeWidgetItem(ProxyClass):
+        def child(self, index):
+            return QtGui.QTreeWidgetItem("%s.child(%i)" % (self, index),
+                    False, (), noInstantiation=True)
 
-    class QTabWidget(QWidget):
-        def addTab(self, *args):
-            i18n_print("%s.setTabText(%s.indexOf(%s), %s)" % \
-                       (self._uic_name, self._uic_name, args[0], args[-1]))
-            pargs = args[:-1] + ("",)
-            ProxyClassMember(self, "addTab", 0)(*pargs)
+    class QTreeWidget(QTreeView):
+        isSortingEnabled = i18n_func("isSortingEnabled")
+        setSortingEnabled = i18n_void_func("setSortingEnabled")
 
-        def indexOf(self, page):
-            return Literal("%s.indexOf(%s)" % (self, page))
+        def headerItem(self):
+            return QtGui.QWidget("%s.headerItem()" % self, False, (),
+                    noInstantiation=True)
 
-    class QToolBox(QWidget):
-        def addItem(self, *args):
-            i18n_print("%s.setItemText(%s.indexOf(%s), %s)" % \
-                       (self._uic_name, self._uic_name, args[0], args[-1]))
-            pargs = args[:-1] + ("",)
-            ProxyClassMember(self, "addItem", 0)(*pargs)
+        def topLevelItem(self, index):
+            return QtGui.QTreeWidgetItem("%s.topLevelItem(%i)" % (self, index),
+                    False, (), noInstantiation=True)
 
-        def indexOf(self, page):
-            return Literal("%s.indexOf(%s)" % (self, page))
-
-    class QComboBox(QWidget): pass
-    class QFontComboBox(QComboBox): pass
-    
     class QAbstractButton(QWidget): pass
     class QCheckBox(QAbstractButton): pass
-    class QPushButton(QAbstractButton): pass
     class QRadioButton(QAbstractButton): pass
     class QToolButton(QAbstractButton): pass
+
+    class QPushButton(QAbstractButton): pass
+    class QCommandLinkButton(QPushButton): pass
 
     # Add all remaining classes.
     for _class in _qwidgets:
