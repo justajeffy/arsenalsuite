@@ -20,58 +20,58 @@ should not be used in Symbian.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="PrintDialogOption-enum" />QAbstractPrintDialog.PrintDialogOption</h3><p>Used to specify which parts of the print dialog should be
 visible.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractPrintDialog.None</tt></td>
-<td class=" topAlign"><tt>0x0000</tt></td>
+<td class="topAlign"><tt>0x0000</tt></td>
 <td class="topAlign">None of the options are enabled.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractPrintDialog.PrintToFile</tt></td>
-<td class=" topAlign"><tt>0x0001</tt></td>
+<td class="topAlign"><tt>0x0001</tt></td>
 <td class="topAlign">The print to file option is enabled.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractPrintDialog.PrintSelection</tt></td>
-<td class=" topAlign"><tt>0x0002</tt></td>
+<td class="topAlign"><tt>0x0002</tt></td>
 <td class="topAlign">The print selection option is enabled.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractPrintDialog.PrintPageRange</tt></td>
-<td class=" topAlign"><tt>0x0004</tt></td>
+<td class="topAlign"><tt>0x0004</tt></td>
 <td class="topAlign">The page range selection option is
 enabled.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractPrintDialog.PrintShowPageSize</tt></td>
-<td class=" topAlign"><tt>0x0008</tt></td>
+<td class="topAlign"><tt>0x0008</tt></td>
 <td class="topAlign">Show the page size + margins page only if this
 is enabled.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractPrintDialog.PrintCollateCopies</tt></td>
-<td class=" topAlign"><tt>0x0010</tt></td>
+<td class="topAlign"><tt>0x0010</tt></td>
 <td class="topAlign">The collate copies option is enabled</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractPrintDialog.PrintCurrentPage</tt></td>
-<td class=" topAlign"><tt>0x0040</tt></td>
+<td class="topAlign"><tt>0x0040</tt></td>
 <td class="topAlign">The print current page option is enabled</td>
 </tr>
 </table>
 <p>This value is obsolete and does nothing since Qt 4.5:</p>
 <table class="valuelist">
-<tr class="even">
+<tr class="even" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -79,7 +79,7 @@ is enabled.</td>
 <tr>
 <td class="topAlign">
 <tt>QAbstractPrintDialog.DontUseSheet</tt></td>
-<td class=" topAlign"><tt>0x0020</tt></td>
+<td class="topAlign"><tt>0x0020</tt></td>
 <td class="topAlign">In previous versions of Qt, <a href="qabstractprintdialog.html#exec">exec_</a>() the print dialog would
 create a sheet by default the dialog was given a parent. This is no
 longer supported in Qt 4.5. If you want to use sheets, use <a href="qprintdialog.html#open">QPrintDialog.open</a>() instead.</td>
@@ -91,36 +91,36 @@ combination of PrintDialogOption values.</p>
 
 <h3 class="fn"><a name="PrintRange-enum" />QAbstractPrintDialog.PrintRange</h3><p>Used to specify the print range selection option.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractPrintDialog.AllPages</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">All pages should be printed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractPrintDialog.Selection</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Only the selection should be printed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractPrintDialog.PageRange</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The specified page range should be
 printed.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractPrintDialog.CurrentPage</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Only the currently visible page should be
 printed.</td>
 </tr>
 </table>
-<p>See also <a href="qprinter.html#PrintRange-enum">QPrinter.PrintRange</a>.</p>
+<p><b>See also</b> <a href="qprinter.html#PrintRange-enum">QPrinter.PrintRange</a>.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QAbstractPrintDialog" />QAbstractPrintDialog.__init__ (<i>self</i>, <a href="qprinter.html">QPrinter</a>&#160;<i>printer</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs an abstract print dialog for <i>printer</i> with
 <i>parent</i> as parent widget.</p>
 
@@ -146,7 +146,7 @@ value is set to 1.</p>
 
 
 <h3 class="fn"><a name="printRange" /><a href="qabstractprintdialog.html#PrintRange-enum">PrintRange</a> QAbstractPrintDialog.printRange (<i>self</i>)</h3><p>Returns the print range.</p>
-<p>See also <a href="qabstractprintdialog.html#setPrintRange">setPrintRange</a>().</p>
+<p><b>See also</b> <a href="qabstractprintdialog.html#setPrintRange">setPrintRange</a>().</p>
 
 
 <h3 class="fn"><a name="setEnabledOptions" />QAbstractPrintDialog.setEnabledOptions (<i>self</i>, <a href="qabstractprintdialog-printdialogoptions.html">PrintDialogOptions</a>&#160;<i>options</i>)</h3><h3 class="fn"><a name="setFromTo" />QAbstractPrintDialog.setFromTo (<i>self</i>, int&#160;<i>fromPage</i>, int&#160;<i>toPage</i>)</h3><p>Sets the range in the print dialog to be from <i>from</i> to
@@ -167,9 +167,9 @@ print dialog.</p>
 
 
 <h3 class="fn"><a name="setPrintRange" />QAbstractPrintDialog.setPrintRange (<i>self</i>, <a href="qabstractprintdialog.html#PrintRange-enum">PrintRange</a>&#160;<i>range</i>)</h3><p>Sets the print range option in to be <i>range</i>.</p>
-<p>See also <a href="qabstractprintdialog.html#printRange">printRange</a>().</p>
+<p><b>See also</b> <a href="qabstractprintdialog.html#printRange">printRange</a>().</p>
 
 
 <h3 class="fn"><a name="toPage" />int QAbstractPrintDialog.toPage (<i>self</i>)</h3><p>Returns the last page to be printed. By default, this value is
 set to 0.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

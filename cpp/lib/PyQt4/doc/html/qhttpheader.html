@@ -17,15 +17,15 @@ directly using QHttpHeader.</p>
 consists of a name followed by a colon, a single space, and the
 field value. (See RFC 1945.) Field names are case-insensitive. A
 typical header field looks like this:</p>
-<pre class="highlightedCode brush: cpp">
- content-type: text/html
+<pre class="cpp">
+ content<span class="operator">-</span>type: text<span class="operator">/</span>html
 </pre>
 <p>In the API the header field name is called the "key" and the
 content is called the "value". You can get and set a header field's
 value by using its key with <a href="qhttpheader.html#value">value</a>() and <a href="qhttpheader.html#setValue">setValue</a>(), e.g.</p>
-<pre class="highlightedCode brush: cpp">
- header.setValue("content-type", "text/html");
- QString contentType = header.value("content-type");
+<pre class="cpp">
+ header<span class="operator">.</span><a href="qhttpheader.html#setValue">setValue</a>(<span class="string">"content-type"</span><span class="operator">,</span> <span class="string">"text/html"</span>);
+ <span class="type"><a href="qstring.html">QString</a></span> contentType <span class="operator">=</span> header<span class="operator">.</span><a href="qhttpheader.html#value">value</a>(<span class="string">"content-type"</span>);
 </pre>
 <p>Some fields are so common that getters and setters are provided
 for them as a convenient alternative to using <a href="qhttpheader.html#value">value</a>() and <a href="qhttpheader.html#setValue">setValue</a>(), e.g. <a href="qhttpheader.html#contentLength">contentLength</a>() and <a href="qhttpheader.html#contentType">contentType</a>(), <a href="qhttpheader.html#setContentLength">setContentLength</a>() and
@@ -55,28 +55,29 @@ has this <i>key</i>, an empty string list is returned.</p>
 
 <h3 class="fn"><a name="contentLength" />int QHttpHeader.contentLength (<i>self</i>)</h3><p>Returns the value of the special HTTP header field
 <tt>content-length</tt>.</p>
-<p>See also <a href="qhttpheader.html#setContentLength">setContentLength</a>() and
+<p><b>See also</b> <a href="qhttpheader.html#setContentLength">setContentLength</a>() and
 <a href="qhttpheader.html#hasContentLength">hasContentLength</a>().</p>
 
 
 <h3 class="fn"><a name="contentType" />QString QHttpHeader.contentType (<i>self</i>)</h3><p>Returns the value of the special HTTP header field
 <tt>content-type</tt>.</p>
-<p>See also <a href="qhttpheader.html#setContentType">setContentType</a>() and <a href="qhttpheader.html#hasContentType">hasContentType</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#setContentType">setContentType</a>() and <a href="qhttpheader.html#hasContentType">hasContentType</a>().</p>
 
 
 <h3 class="fn"><a name="hasContentLength" />bool QHttpHeader.hasContentLength (<i>self</i>)</h3><p>Returns true if the header has an entry for the special HTTP
 header field <tt>content-length</tt>; otherwise returns false.</p>
-<p>See also <a href="qhttpheader.html#contentLength">contentLength</a>() and <a href="qhttpheader.html#setContentLength">setContentLength</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#contentLength">contentLength</a>() and <a href="qhttpheader.html#setContentLength">setContentLength</a>().</p>
 
 
 <h3 class="fn"><a name="hasContentType" />bool QHttpHeader.hasContentType (<i>self</i>)</h3><p>Returns true if the header has an entry for the special HTTP
 header field <tt>content-type</tt>; otherwise returns false.</p>
-<p>See also <a href="qhttpheader.html#contentType">contentType</a>() and <a href="qhttpheader.html#setContentType">setContentType</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#contentType">contentType</a>() and <a href="qhttpheader.html#setContentType">setContentType</a>().</p>
 
 
 <h3 class="fn"><a name="hasKey" />bool QHttpHeader.hasKey (<i>self</i>, QString&#160;<i>key</i>)</h3><p>Returns true if the HTTP header has an entry with the given
 <i>key</i>; otherwise returns false.</p>
-<p>See also <a href="qhttpheader.html#value">value</a>(), <a href="qhttpheader.html#setValue">setValue</a>(), and <a href="qhttpheader.html#keys">keys</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#value">value</a>(),
+<a href="qhttpheader.html#setValue">setValue</a>(), and <a href="qhttpheader.html#keys">keys</a>().</p>
 
 
 <h3 class="fn"><a name="isValid" />bool QHttpHeader.isValid (<i>self</i>)</h3><p>Returns true if the HTTP header is valid; otherwise returns
@@ -86,7 +87,7 @@ invalid if it was created by parsing a malformed string.</p>
 
 
 <h3 class="fn"><a name="keys" />QStringList QHttpHeader.keys (<i>self</i>)</h3><p>Returns a list of the keys in the HTTP header.</p>
-<p>See also <a href="qhttpheader.html#hasKey">hasKey</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#hasKey">hasKey</a>().</p>
 
 
 <h3 class="fn"><a name="majorVersion" />int QHttpHeader.majorVersion (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the major protocol-version of the HTTP header.</p>
@@ -101,18 +102,18 @@ header.</p>
 
 <h3 class="fn"><a name="removeValue" />QHttpHeader.removeValue (<i>self</i>, QString&#160;<i>key</i>)</h3><p>Removes the entry with the key <i>key</i> from the HTTP
 header.</p>
-<p>See also <a href="qhttpheader.html#value">value</a>() and
+<p><b>See also</b> <a href="qhttpheader.html#value">value</a>() and
 <a href="qhttpheader.html#setValue">setValue</a>().</p>
 
 
 <h3 class="fn"><a name="setContentLength" />QHttpHeader.setContentLength (<i>self</i>, int&#160;<i>len</i>)</h3><p>Sets the value of the special HTTP header field
 <tt>content-length</tt> to <i>len</i>.</p>
-<p>See also <a href="qhttpheader.html#contentLength">contentLength</a>() and <a href="qhttpheader.html#hasContentLength">hasContentLength</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#contentLength">contentLength</a>() and <a href="qhttpheader.html#hasContentLength">hasContentLength</a>().</p>
 
 
 <h3 class="fn"><a name="setContentType" />QHttpHeader.setContentType (<i>self</i>, QString&#160;<i>type</i>)</h3><p>Sets the value of the special HTTP header field
 <tt>content-type</tt> to <i>type</i>.</p>
-<p>See also <a href="qhttpheader.html#contentType">contentType</a>() and <a href="qhttpheader.html#hasContentType">hasContentType</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#contentType">contentType</a>() and <a href="qhttpheader.html#hasContentType">hasContentType</a>().</p>
 
 
 <h3 class="fn"><a name="setValid" />QHttpHeader.setValid (<i>self</i>, bool)</h3><h3 class="fn"><a name="setValue" />QHttpHeader.setValue (<i>self</i>, QString&#160;<i>key</i>, QString&#160;<i>value</i>)</h3><p>Sets the value of the entry with the <i>key</i> to
@@ -121,12 +122,13 @@ header.</p>
 <i>key</i> and <i>value</i> is created. If an entry with the
 <i>key</i> already exists, the first value is discarded and
 replaced with the given <i>value</i>.</p>
-<p>See also <a href="qhttpheader.html#value">value</a>(), <a href="qhttpheader.html#hasKey">hasKey</a>(), and <a href="qhttpheader.html#removeValue">removeValue</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#value">value</a>(),
+<a href="qhttpheader.html#hasKey">hasKey</a>(), and <a href="qhttpheader.html#removeValue">removeValue</a>().</p>
 
 
 <h3 class="fn"><a name="setValues" />QHttpHeader.setValues (<i>self</i>, list-of-tuple-of-QString-QString&#160;<i>values</i>)</h3><p>Sets the header entries to be the list of key value pairs in
 <i>values</i>.</p>
-<p>See also <a href="qhttpheader.html#values">values</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#values">values</a>().</p>
 
 
 <h3 class="fn"><a name="toString" />QString QHttpHeader.toString (<i>self</i>)</h3><p>Returns a string representation of the HTTP header.</p>
@@ -137,12 +139,11 @@ format: key, colon, space, value, "\r\n".</p>
 
 <h3 class="fn"><a name="value" />QString QHttpHeader.value (<i>self</i>, QString&#160;<i>key</i>)</h3><p>Returns the first value for the entry with the given <i>key</i>.
 If no entry has this <i>key</i>, an empty string is returned.</p>
-<p>See also <a href="qhttpheader.html#setValue">setValue</a>(),
-<a href="qhttpheader.html#removeValue">removeValue</a>(), <a href="qhttpheader.html#hasKey">hasKey</a>(), and <a href="qhttpheader.html#keys">keys</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#setValue">setValue</a>(), <a href="qhttpheader.html#removeValue">removeValue</a>(), <a href="qhttpheader.html#hasKey">hasKey</a>(), and <a href="qhttpheader.html#keys">keys</a>().</p>
 
 
 <h3 class="fn"><a name="values" />list-of-tuple-of-QString-QString QHttpHeader.values (<i>self</i>)</h3><p>Returns all the entries in the header.</p>
-<p>See also <a href="qhttpheader.html#setValues">setValues</a>().</p>
+<p><b>See also</b> <a href="qhttpheader.html#setValues">setValues</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

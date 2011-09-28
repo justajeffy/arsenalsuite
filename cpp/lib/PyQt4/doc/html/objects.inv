@@ -1,6 +1,6 @@
 # Sphinx inventory version 1
 # Project: PyQt
-# Version: 4.8.5
+# Version: 4.8.6
 PyQt4.pyqtconfig mod build_system.html
 PyQt4.uic mod designer.html
 PyQt4.pyqtconfig.QtWebKitModuleMakefile class build_system.html

@@ -14,10 +14,10 @@ embedded into Qt applications that use Qt Script. The debugger
 enables the application user to inspect the state of the script
 environment and control script execution.</p>
 <p>To attach the debugger to a script engine, call the <a href="qscriptenginedebugger.html#attachTo">attachTo</a>() function.</p>
-<pre class="highlightedCode brush: cpp">
-     QScriptEngine engine;
-     QScriptEngineDebugger debugger;
-     debugger.attachTo(&amp;engine);
+<pre class="cpp">
+     <span class="type"><a href="qscriptengine.html">QScriptEngine</a></span> engine;
+     <span class="type">QScriptEngineDebugger</span> debugger;
+     debugger<span class="operator">.</span><a href="qscriptenginedebugger.html#attachTo">attachTo</a>(<span class="operator">&amp;</span>engine);
 </pre>
 <p>Once the debugger has been attached to a script engine, you can
 proceed to evaluate scripts as usual, e.g. by calling <a href="qscriptengine.html#evaluate">QScriptEngine.evaluate</a>(). The
@@ -27,9 +27,9 @@ is also possible to interrupt script evaluation at an arbitrary
 time by triggering the <a href="qscriptenginedebugger.html#DebuggerAction-enum">InterruptAction</a>.
 For instance, to start the debugger when script evaluation starts,
 you trigger the action before you begin to <a href="qscriptengine.html#evaluate">evaluate()</a> the script.</p>
-<pre class="highlightedCode brush: cpp">
-      debugger-&gt;action(QScriptEngineDebugger.InterruptAction)-&gt;trigger();
-      engine-&gt;evaluate(contents, fileName);
+<pre class="cpp">
+      debugger<span class="operator">-</span><span class="operator">&gt;</span>action(<span class="type">QScriptEngineDebugger</span><span class="operator">.</span>InterruptAction)<span class="operator">-</span><span class="operator">&gt;</span>trigger();
+      engine<span class="operator">-</span><span class="operator">&gt;</span>evaluate(contents<span class="operator">,</span> fileName);
 </pre>
 <p>By default, the <a href="qscriptenginedebugger.html#standardWindow">standard debugger
 window</a> is shown when evaluation is suspended. This can be
@@ -71,8 +71,8 @@ event loop of the script. In the following snippet, the call to
 causes the debugger to be triggered, and the function call does not
 return until the user has finished interacting with the
 debugger.</p>
-<pre class="highlightedCode brush: cpp">
-     engine.evaluate("debugger");
+<pre class="cpp">
+     engine<span class="operator">.</span>evaluate(<span class="string">"debugger"</span>);
 </pre>
 <p>When the Qt Script debugger is running, the C++ application
 itself is not "frozen". This means that it is possible that more
@@ -110,7 +110,7 @@ connected to any widget. Please see the <a href="qtscriptdebugger-manual.html">Q
 Command Reference</a> for a detailed description of these
 actions.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -118,97 +118,97 @@ actions.</p>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.InterruptAction</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Suspends script execution as soon as the next
 script statement is reached.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.ContinueAction</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Gives the execution control back to the script
 engine.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.StepIntoAction</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Performs a step action.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.StepOverAction</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Performs a next action.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.StepOutAction</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Executes the script until the current function
 returns.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.RunToCursorAction</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">Continues execution to the selected line
 (which contains the cursor) in the <a href="qscriptenginedebugger.html#DebuggerWidget-enum">CodeWidget</a>.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.RunToNewScriptAction</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">Returns control to the script engine until a
 new script is executed.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.ToggleBreakpointAction</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">Toggles a breakpoint at the selected line in
 the <a href="qscriptenginedebugger.html#DebuggerWidget-enum">CodeWidget</a>.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.ClearDebugOutputAction</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">Clears the contents of the <a href="qscriptenginedebugger.html#DebuggerWidget-enum">DebugOutputWidget</a>.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.ClearErrorLogAction</tt></td>
-<td class=" topAlign"><tt>9</tt></td>
+<td class="topAlign"><tt>9</tt></td>
 <td class="topAlign">Clears the contents of the <a href="qscriptenginedebugger.html#DebuggerWidget-enum">ErrorLogWidget</a>.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.ClearConsoleAction</tt></td>
-<td class=" topAlign"><tt>10</tt></td>
+<td class="topAlign"><tt>10</tt></td>
 <td class="topAlign">Clears the contents of the <a href="qscriptenginedebugger.html#DebuggerWidget-enum">ConsoleWidget</a>.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.FindInScriptAction</tt></td>
-<td class=" topAlign"><tt>11</tt></td>
+<td class="topAlign"><tt>11</tt></td>
 <td class="topAlign">Displays the <a href="qscriptenginedebugger.html#DebuggerWidget-enum">CodeFinderWidget</a>.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.FindNextInScriptAction</tt></td>
-<td class=" topAlign"><tt>12</tt></td>
+<td class="topAlign"><tt>12</tt></td>
 <td class="topAlign">Finds next occurrence in the <a href="qscriptenginedebugger.html#DebuggerWidget-enum">CodeWidget</a>.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.FindPreviousInScriptAction</tt></td>
-<td class=" topAlign"><tt>13</tt></td>
+<td class="topAlign"><tt>13</tt></td>
 <td class="topAlign">Finds previous occurrence in the <a href="qscriptenginedebugger.html#DebuggerWidget-enum">CodeWidget</a>.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.GoToLineAction</tt></td>
-<td class=" topAlign"><tt>14</tt></td>
+<td class="topAlign"><tt>14</tt></td>
 <td class="topAlign">Shows the "Go to Line" dialog.</td>
 </tr>
 </table>
@@ -216,7 +216,7 @@ the <a href="qscriptenginedebugger.html#DebuggerWidget-enum">CodeWidget</a>.</td
 
 <h3 class="fn"><a name="DebuggerState-enum" />QScriptEngineDebugger.DebuggerState</h3><p>This enum specifies the current state of the debugger.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -224,14 +224,14 @@ the <a href="qscriptenginedebugger.html#DebuggerWidget-enum">CodeWidget</a>.</td
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.RunningState</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The debugger is running. (Script evaluation is
 allowed.)</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.SuspendedState</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The debugger has suspended script
 evaluation.</td>
 </tr>
@@ -242,7 +242,7 @@ evaluation.</td>
 <h3 class="fn"><a name="DebuggerWidget-enum" />QScriptEngineDebugger.DebuggerWidget</h3><p>This enum decides the widget that the <a href="qscriptenginedebugger.html#widget">widget</a>() function should
 retrieve. We treat these widgets in more detail in the <a href="qtscriptdebugger-manual.html">Qt Script Debugger Manual</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -250,61 +250,61 @@ retrieve. We treat these widgets in more detail in the <a href="qtscriptdebugger
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.ConsoleWidget</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Provides a command-line interface to the
 debugger.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.StackWidget</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Shows a backtrace of the script's execution
 state.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.ScriptsWidget</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Displays a list of currently loaded
 scripts.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.LocalsWidget</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Shows the local variables of the current stack
 frame.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.CodeWidget</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Displays the code of the current script.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.CodeFinderWidget</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">Provides a widget that can search for text in
 the script shown in the CodeWidget.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.BreakpointsWidget</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">Shows breakpoints that have been set.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.DebugOutputWidget</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">Contains output from the <tt>print()</tt>
 script function.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineDebugger.ErrorLogWidget</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">Shows error messages that have been
 generated.</td>
 </tr>
@@ -322,19 +322,19 @@ enum.</p>
 toolbars, and menus. It is also convenient if you, for example,
 wish to spice things up with your own groovy icons. The code
 example below shows how to add actions to a <a href="qtoolbar.html">QToolBar</a>.</p>
-<pre class="highlightedCode brush: cpp">
-     QAction *continueAction = debugger-&gt;action(QScriptEngineDebugger.ContinueAction);
-     QAction *stepOverAction = debugger-&gt;action(QScriptEngineDebugger.StepOverAction);
-     QAction *stepIntoAction = debugger-&gt;action(QScriptEngineDebugger.StepIntoAction);
+<pre class="cpp">
+     <span class="type"><a href="qaction.html">QAction</a></span> <span class="operator">*</span>continueAction <span class="operator">=</span> debugger<span class="operator">-</span><span class="operator">&gt;</span>action(<span class="type"><a href="qscriptenginedebugger.html">QScriptEngineDebugger</a></span><span class="operator">.</span>ContinueAction);
+     <span class="type"><a href="qaction.html">QAction</a></span> <span class="operator">*</span>stepOverAction <span class="operator">=</span> debugger<span class="operator">-</span><span class="operator">&gt;</span>action(<span class="type"><a href="qscriptenginedebugger.html">QScriptEngineDebugger</a></span><span class="operator">.</span>StepOverAction);
+     <span class="type"><a href="qaction.html">QAction</a></span> <span class="operator">*</span>stepIntoAction <span class="operator">=</span> debugger<span class="operator">-</span><span class="operator">&gt;</span>action(<span class="type"><a href="qscriptenginedebugger.html">QScriptEngineDebugger</a></span><span class="operator">.</span>StepIntoAction);
 
-     QToolBar *toolBar = new QToolBar;
-     toolBar-&gt;addAction(continueAction);
+     <span class="type"><a href="qtoolbar.html">QToolBar</a></span> <span class="operator">*</span>toolBar <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qtoolbar.html">QToolBar</a></span>;
+     toolBar<span class="operator">-</span><span class="operator">&gt;</span>addAction(continueAction);
 </pre>
 <p>Note that <a href="qscriptenginedebugger.html">QScriptEngineDebugger</a> has already
 added the actions to its <a href="qscriptenginedebugger.html#DebuggerWidget-enum">standard
 widgets</a> and <a href="qscriptenginedebugger.html#standardWindow">standard
 window</a>.</p>
-<p>See also <a href="qscriptenginedebugger.html#widget">widget</a>(), <a href="qscriptenginedebugger.html#createStandardMenu">createStandardMenu</a>(),
+<p><b>See also</b> <a href="qscriptenginedebugger.html#widget">widget</a>(), <a href="qscriptenginedebugger.html#createStandardMenu">createStandardMenu</a>(),
 <a href="qscriptenginedebugger.html#createStandardToolBar">createStandardToolBar</a>(),
 and <a href="qscriptenginedebugger.html#standardWindow">standardWindow</a>().</p>
 
@@ -345,44 +345,44 @@ monitor the engine. While the debugger is attached, you should not
 change the agent; however, if you do have to perform additional
 monitoring, you must set a proxy agent that forwards all events to
 the debugger's agent.</p>
-<p>See also <a href="qscriptenginedebugger.html#detach">detach</a>().</p>
+<p><b>See also</b> <a href="qscriptenginedebugger.html#detach">detach</a>().</p>
 
 
 <h3 class="fn"><a name="autoShowStandardWindow" />bool QScriptEngineDebugger.autoShowStandardWindow (<i>self</i>)</h3><p>Returns whether the standard debugger window is automatically
 shown when evaluation is suspended.</p>
 <p>The default is true.</p>
-<p>See also <a href="qscriptenginedebugger.html#setAutoShowStandardWindow">setAutoShowStandardWindow</a>().</p>
+<p><b>See also</b> <a href="qscriptenginedebugger.html#setAutoShowStandardWindow">setAutoShowStandardWindow</a>().</p>
 
 
 <h3 class="fn"><a name="createStandardMenu" /><a href="qmenu.html">QMenu</a> QScriptEngineDebugger.createStandardMenu (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Creates a standard debugger menu with the given <i>parent</i>.
 Returns the new menu object.</p>
-<p>See also <a href="qscriptenginedebugger.html#createStandardToolBar">createStandardToolBar</a>().</p>
+<p><b>See also</b> <a href="qscriptenginedebugger.html#createStandardToolBar">createStandardToolBar</a>().</p>
 
 
 <h3 class="fn"><a name="createStandardToolBar" /><a href="qtoolbar.html">QToolBar</a> QScriptEngineDebugger.createStandardToolBar (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Creates a standard debugger toolbar with the given
 <i>parent</i>. Returns the new toolbar object.</p>
-<p>See also <a href="qscriptenginedebugger.html#createStandardMenu">createStandardMenu</a>().</p>
+<p><b>See also</b> <a href="qscriptenginedebugger.html#createStandardMenu">createStandardMenu</a>().</p>
 
 
 <h3 class="fn"><a name="detach" />QScriptEngineDebugger.detach (<i>self</i>)</h3><p>Detaches from the current script engine, if any.</p>
-<p>See also <a href="qscriptenginedebugger.html#attachTo">attachTo</a>().</p>
+<p><b>See also</b> <a href="qscriptenginedebugger.html#attachTo">attachTo</a>().</p>
 
 
 <h3 class="fn"><a name="setAutoShowStandardWindow" />QScriptEngineDebugger.setAutoShowStandardWindow (<i>self</i>, bool&#160;<i>autoShow</i>)</h3><p>Sets whether the standard debugger window is automatically shown
 when evaluation is suspended. If <i>autoShow</i> is true, the
 window will be automatically shown, otherwise it will not.</p>
-<p>See also <a href="qscriptenginedebugger.html#autoShowStandardWindow">autoShowStandardWindow</a>().</p>
+<p><b>See also</b> <a href="qscriptenginedebugger.html#autoShowStandardWindow">autoShowStandardWindow</a>().</p>
 
 
 <h3 class="fn"><a name="standardWindow" /><a href="qmainwindow.html">QMainWindow</a> QScriptEngineDebugger.standardWindow (<i>self</i>)</h3><p>Returns a main window with a standard configuration of the
 debugger's components.</p>
-<p>See also <a href="qscriptenginedebugger.html#createStandardMenu">createStandardMenu</a>()
+<p><b>See also</b> <a href="qscriptenginedebugger.html#createStandardMenu">createStandardMenu</a>()
 and <a href="qscriptenginedebugger.html#createStandardToolBar">createStandardToolBar</a>().</p>
 
 
 <h3 class="fn"><a name="state" /><a href="qscriptenginedebugger.html#DebuggerState-enum">DebuggerState</a> QScriptEngineDebugger.state (<i>self</i>)</h3><p>Returns the current state of the debugger.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qscriptenginedebugger.html#evaluationResumed">evaluationResumed</a>()
+<p><b>See also</b> <a href="qscriptenginedebugger.html#evaluationResumed">evaluationResumed</a>()
 and <a href="qscriptenginedebugger.html#evaluationSuspended">evaluationSuspended</a>().</p>
 
 
@@ -395,27 +395,27 @@ widgets with this function. For instance, the code example below
 shows how to set up a layout containing a <a href="qscriptenginedebugger.html#DebuggerWidget-enum">code window</a>
 and a <a href="qscriptenginedebugger.html#DebuggerWidget-enum">stack
 widget</a>.</p>
-<pre class="highlightedCode brush: cpp">
-     QWidget *codeWindow = debugger-&gt;widget(QScriptEngineDebugger.CodeWidget);
-     QWidget *stackWidget = debugger-&gt;widget(QScriptEngineDebugger.StackWidget);
+<pre class="cpp">
+     <span class="type"><a href="qwidget.html">QWidget</a></span> <span class="operator">*</span>codeWindow <span class="operator">=</span> debugger<span class="operator">-</span><span class="operator">&gt;</span>widget(<span class="type"><a href="qscriptenginedebugger.html">QScriptEngineDebugger</a></span><span class="operator">.</span>CodeWidget);
+     <span class="type"><a href="qwidget.html">QWidget</a></span> <span class="operator">*</span>stackWidget <span class="operator">=</span> debugger<span class="operator">-</span><span class="operator">&gt;</span>widget(<span class="type"><a href="qscriptenginedebugger.html">QScriptEngineDebugger</a></span><span class="operator">.</span>StackWidget);
 
-     QLayout *layout = new QHBoxLayout;
-     layout-&gt;addWidget(codeWindow);
-     layout-&gt;addWidget(stackWidget);
+     <span class="type"><a href="qlayout.html">QLayout</a></span> <span class="operator">*</span>layout <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qhboxlayout.html">QHBoxLayout</a></span>;
+     layout<span class="operator">-</span><span class="operator">&gt;</span>addWidget(codeWindow);
+     layout<span class="operator">-</span><span class="operator">&gt;</span>addWidget(stackWidget);
 </pre>
 <p>Note that you need to set <a href="qscriptenginedebugger.html#setAutoShowStandardWindow">setAutoShowStandardWindow</a>()
 to false; if not, the standard window will be shown regardless.</p>
-<p>See also <a href="qscriptenginedebugger.html#action">action</a>(), <a href="qscriptenginedebugger.html#standardWindow">standardWindow</a>(),
+<p><b>See also</b> <a href="qscriptenginedebugger.html#action">action</a>(), <a href="qscriptenginedebugger.html#standardWindow">standardWindow</a>(),
 and <a href="qscriptenginedebugger.html#setAutoShowStandardWindow">setAutoShowStandardWindow</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="evaluationResumed" />void evaluationResumed ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the debugger has resumed script
 evaluation (e.g. the user gave the "continue" command).</p>
-<p>See also <a href="qscriptenginedebugger.html#evaluationSuspended">evaluationSuspended</a>().</p>
+<p><b>See also</b> <a href="qscriptenginedebugger.html#evaluationSuspended">evaluationSuspended</a>().</p>
 
 
 <h3 class="fn"><a name="evaluationSuspended" />void evaluationSuspended ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the debugger has suspended script
 evaluation for whatever reason (e.g. due to an uncaught script
 exception, or due to a breakpoint being triggered).</p>
-<p>See also <a href="qscriptenginedebugger.html#evaluationResumed">evaluationResumed</a>().</p>
+<p><b>See also</b> <a href="qscriptenginedebugger.html#evaluationResumed">evaluationResumed</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

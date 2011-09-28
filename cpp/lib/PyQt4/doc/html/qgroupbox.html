@@ -29,47 +29,35 @@ frame.</p>
 are often <a href="qcheckbox.html">QCheckBox</a>es or <a href="qradiobutton.html">QRadioButton</a>s but can be any widgets). The
 following example shows how we can set up a QGroupBox with a
 layout:</p>
-<pre class="highlightedCode brush: cpp">
-     QGroupBox *groupBox = new QGroupBox(tr("Exclusive Radio Buttons"));
+<pre class="cpp">
+     <span class="type">QGroupBox</span> <span class="operator">*</span>groupBox <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QGroupBox</span>(tr(<span class="string">"Exclusive Radio Buttons"</span>));
 
-     QRadioButton *radio1 = new QRadioButton(tr("&amp;Radio button 1"));
-     QRadioButton *radio2 = new QRadioButton(tr("R&amp;adio button 2"));
-     QRadioButton *radio3 = new QRadioButton(tr("Ra&amp;dio button 3"));
+     <span class="type"><a href="qradiobutton.html">QRadioButton</a></span> <span class="operator">*</span>radio1 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qradiobutton.html">QRadioButton</a></span>(tr(<span class="string">"&amp;Radio button 1"</span>));
+     <span class="type"><a href="qradiobutton.html">QRadioButton</a></span> <span class="operator">*</span>radio2 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qradiobutton.html">QRadioButton</a></span>(tr(<span class="string">"R&amp;adio button 2"</span>));
+     <span class="type"><a href="qradiobutton.html">QRadioButton</a></span> <span class="operator">*</span>radio3 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qradiobutton.html">QRadioButton</a></span>(tr(<span class="string">"Ra&amp;dio button 3"</span>));
 
-     radio1-&gt;setChecked(true);
+     radio1<span class="operator">-</span><span class="operator">&gt;</span>setChecked(<span class="keyword">true</span>);
 
-     QVBoxLayout *vbox = new QVBoxLayout;
-     vbox-&gt;addWidget(radio1);
-     vbox-&gt;addWidget(radio2);
-     vbox-&gt;addWidget(radio3);
-     vbox-&gt;addStretch(1);
-     groupBox-&gt;setLayout(vbox);
+     <span class="type"><a href="qvboxlayout.html">QVBoxLayout</a></span> <span class="operator">*</span>vbox <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qvboxlayout.html">QVBoxLayout</a></span>;
+     vbox<span class="operator">-</span><span class="operator">&gt;</span>addWidget(radio1);
+     vbox<span class="operator">-</span><span class="operator">&gt;</span>addWidget(radio2);
+     vbox<span class="operator">-</span><span class="operator">&gt;</span>addWidget(radio3);
+     vbox<span class="operator">-</span><span class="operator">&gt;</span>addStretch(<span class="number">1</span>);
+     groupBox<span class="operator">-</span><span class="operator">&gt;</span>setLayout(vbox);
 </pre>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Screenshot of a Windows XP style group box" src="images/windowsxp-groupbox.png" /></p>
-</td>
-<td>
-<p><img alt="Screenshot of a Macintosh style group box" src="images/macintosh-groupbox.png" /></p>
-</td>
-<td>
-<p><img alt="Screenshot of a Plastique style group box" src="images/plastique-groupbox.png" /></p>
-</td>
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img alt="Screenshot of a Windows XP style group box" src="images/windowsxp-groupbox.png" /></td>
+<td><img alt="Screenshot of a Macintosh style group box" src="images/macintosh-groupbox.png" /></td>
+<td><img alt="Screenshot of a Plastique style group box" src="images/plastique-groupbox.png" /></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>A <a href="gallery-windowsxp.html">Windows XP style</a> group
-box.</p>
-</td>
-<td>
-<p>A <a href="gallery-macintosh.html">Macintosh style</a> group
-box.</p>
-</td>
-<td>
-<p>A <a href="gallery-plastique.html">Plastique style</a> group
-box.</p>
-</td>
+<tr class="even" valign="top">
+<td>A <a href="gallery-windowsxp.html">Windows XP style</a> group
+box.</td>
+<td>A <a href="gallery-macintosh.html">Macintosh style</a> group
+box.</td>
+<td>A <a href="gallery-plastique.html">Plastique style</a> group
+box.</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QGroupBox" />QGroupBox.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a group box widget with the given <i>parent</i> but
@@ -95,7 +83,7 @@ with no title.</p>
 <h3 class="fn"><a name="initStyleOption" />QGroupBox.initStyleOption (<i>self</i>, <a href="qstyleoptiongroupbox.html">QStyleOptionGroupBox</a>&#160;<i>option</i>)</h3><p>Initialize <i>option</i> with the values from this <a href="qgroupbox.html">QGroupBox</a>. This method is useful for
 subclasses when they need a <a href="qstyleoptiongroupbox.html">QStyleOptionGroupBox</a>, but don't
 want to fill in all the information themselves.</p>
-<p>See also <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
+<p><b>See also</b> <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
 
 
 <h3 class="fn"><a name="isCheckable" />bool QGroupBox.isCheckable (<i>self</i>)</h3><h3 class="fn"><a name="isChecked" />bool QGroupBox.isChecked (<i>self</i>)</h3><h3 class="fn"><a name="isFlat" />bool QGroupBox.isFlat (<i>self</i>)</h3><h3 class="fn"><a name="minimumSizeHint" /><a href="qsize.html">QSize</a> QGroupBox.minimumSizeHint (<i>self</i>)</h3><p>Reimplemented from <a href="qwidget.html#minimumSizeHint-prop">QWidget.minimumSizeHint</a>().</p>
@@ -123,12 +111,11 @@ button), or when the shortcut key is typed, Notably, this signal is
 <p>If the check box is checked <i>checked</i> is true; it is false
 if the check box is unchecked.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qgroupbox.html#checkable-prop">checkable</a>,
-<a href="qgroupbox.html#toggled">toggled</a>(), and <a href="qgroupbox.html#checked-prop">checked</a>.</p>
+<p><b>See also</b> <a href="qgroupbox.html#checkable-prop">checkable</a>, <a href="qgroupbox.html#toggled">toggled</a>(), and <a href="qgroupbox.html#checked-prop">checked</a>.</p>
 
 
 <h3 class="fn"><a name="toggled" />void toggled (bool)</h3><p>This is the default overload of this signal.</p><p>If the group box is checkable, this signal is emitted when the
 check box is toggled. <i>on</i> is true if the check box is
 checked; otherwise it is false.</p>
-<p>See also <a href="qgroupbox.html#checkable-prop">checkable</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qgroupbox.html#checkable-prop">checkable</a>.</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

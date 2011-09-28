@@ -22,13 +22,13 @@ time.</p>
 <p>The typical use-case for the class is to determine how much time
 was spent in a slow operation. The simplest example of such a case
 is for debugging purposes, as in the following example:</p>
-<pre class="highlightedCode brush: cpp">
-     QElapsedTimer timer;
-     timer.start();
+<pre class="cpp">
+     <span class="type">QElapsedTimer</span> timer;
+     timer<span class="operator">.</span>start();
 
      slowOperation1();
 
-     qDebug() &lt;&lt; "The slow operation took" &lt;&lt; timer.elapsed() &lt;&lt; "milliseconds";
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"The slow operation took"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> timer<span class="operator">.</span>elapsed() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"milliseconds"</span>;
 </pre>
 <p>In this example, the timer is started by a call to <a href="qelapsedtimer.html#start">start</a>() and the elapsed timer is
 calculated by the <a href="qelapsedtimer.html#elapsed">elapsed</a>() function.</p>
@@ -38,15 +38,15 @@ This is useful when the execution must complete within a certain
 time period, but several steps are needed. The
 <tt>waitFor</tt>-type functions in <a href="qiodevice.html">QIODevice</a> and its subclasses are good examples
 of such need. In that case, the code could be as follows:</p>
-<pre class="highlightedCode brush: cpp">
- void executeSlowOperations(int timeout)
+<pre class="cpp">
+ <span class="type">void</span> executeSlowOperations(<span class="type">int</span> timeout)
  {
-     QElapsedTimer timer;
-     timer.start();
+     <span class="type">QElapsedTimer</span> timer;
+     timer<span class="operator">.</span>start();
      slowOperation1();
 
-     int remainingTime = timeout - timer.elapsed();
-     if (remainingTime &gt; 0)
+     <span class="type">int</span> remainingTime <span class="operator">=</span> timeout <span class="operator">-</span> timer<span class="operator">.</span>elapsed();
+     <span class="keyword">if</span> (remainingTime <span class="operator">&gt;</span> <span class="number">0</span>)
          slowOperation2(remainingTime);
  }
 </pre>
@@ -54,13 +54,13 @@ of such need. In that case, the code could be as follows:</p>
 specific timeslice. For this, QElapsedTimer provides the <a href="qelapsedtimer.html#hasExpired">hasExpired</a>() convenience
 function, which can be used to determine if a certain number of
 milliseconds has already elapsed:</p>
-<pre class="highlightedCode brush: cpp">
- void executeOperationsForTime(int ms)
+<pre class="cpp">
+ <span class="type">void</span> executeOperationsForTime(<span class="type">int</span> ms)
  {
-     QElapsedTimer timer;
-     timer.start();
+     <span class="type">QElapsedTimer</span> timer;
+     timer<span class="operator">.</span>start();
 
-     while (!timer.hasExpired(ms))
+     <span class="keyword">while</span> (<span class="operator">!</span>timer<span class="operator">.</span>hasExpired(ms))
          slowOperation1();
  }
 </pre>
@@ -106,37 +106,38 @@ change during the lifetime of a program. It is provided so that
 other non-Qt implementations, to guarantee that the same reference
 clock is being used.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QElapsedTimer.SystemTime</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The human-readable system time. This clock is
 not monotonic.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QElapsedTimer.MonotonicClock</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The system's monotonic clock, usually found in
 Unix systems. This clock is monotonic and does not overflow.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QElapsedTimer.TickCounter</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The system's tick counter, used on Windows and
 Symbian systems. This clock may overflow.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QElapsedTimer.MachAbsoluteTime</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The Mach kernel's absolute time (Mac OS X).
-This clock is monotonic and does not overflow.<a id="systemtime" name="systemtime" /></td>
+This clock is monotonic and does not overflow.</td>
 </tr>
 </table>
-<h4>SystemTime</h4>
+<a id="systemtime" name="systemtime" />
+<h5>SystemTime</h5>
 <p>The system time clock is purely the real time, expressed in
 milliseconds since Jan 1, 1970 at 0:00 UTC. It's equivalent to the
 value returned by the C and POSIX <tt>time</tt> function, with the
@@ -144,14 +145,14 @@ milliseconds added. This clock type is currently only used on Unix
 systems that do not support monotonic clocks (see below).</p>
 <p>This is the only non-monotonic clock that <a href="qelapsedtimer.html">QElapsedTimer</a> may use.</p>
 <a id="monotonicclock" name="monotonicclock" />
-<h4>MonotonicClock</h4>
+<h5>MonotonicClock</h5>
 <p>This is the system's monotonic clock, expressed in milliseconds
 since an arbitrary point in the past. This clock type is used on
 Unix systems which support POSIX monotonic clocks
 (<tt>_POSIX_MONOTONIC_CLOCK</tt>).</p>
 <p>This clock does not overflow.</p>
 <a id="tickcounter" name="tickcounter" />
-<h4>TickCounter</h4>
+<h5>TickCounter</h5>
 <p>The tick counter clock type is based on the system's or the
 processor's tick counter, multiplied by the duration of a tick.
 This clock type is used on Windows and Symbian platforms.</p>
@@ -171,23 +172,22 @@ constant HAL.ENanoTickPeriod. When comparing values between
 processes, it's necessary to divide the value by the tick duration
 and mask off the high 32 bits.</p>
 <a id="machabsolutetime" name="machabsolutetime" />
-<h4>MachAbsoluteTime</h4>
+<h5>MachAbsoluteTime</h5>
 <p>This clock type is based on the absolute time presented by Mach
 kernels, such as that found on Mac OS X. This clock type is
 presented separately from MonotonicClock since Mac OS X is also a
 Unix system and may support a POSIX monotonic clock with values
 differing from the Mach absolute time.</p>
 <p>This clock is monotonic and does not overflow.</p>
-<p>See also <a href="qelapsedtimer.html#clockType">clockType</a>()
-and <a href="qelapsedtimer.html#isMonotonic">isMonotonic</a>().</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#clockType">clockType</a>() and <a href="qelapsedtimer.html#isMonotonic">isMonotonic</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QElapsedTimer" />QElapsedTimer.__init__ (<i>self</i>)</h3><h3 class="fn"><a name="QElapsedTimer-2" />QElapsedTimer.__init__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>)</h3><h3 class="fn"><a name="clockType" /><a href="qelapsedtimer.html#ClockType-enum">ClockType</a> QElapsedTimer.clockType ()</h3><p>Returns the clock type that this <a href="qelapsedtimer.html">QElapsedTimer</a> implementation uses.</p>
-<p>See also <a href="qelapsedtimer.html#isMonotonic">isMonotonic</a>().</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#isMonotonic">isMonotonic</a>().</p>
 
 
 <h3 class="fn"><a name="elapsed" />int QElapsedTimer.elapsed (<i>self</i>)</h3><p>Returns the number of milliseconds since this <a href="qelapsedtimer.html">QElapsedTimer</a> was last started. Calling
 this function in a <a href="qelapsedtimer.html">QElapsedTimer</a>
 that was invalidated will result in undefined results.</p>
-<p>See also <a href="qelapsedtimer.html#start">start</a>(),
+<p><b>See also</b> <a href="qelapsedtimer.html#start">start</a>(),
 <a href="qelapsedtimer.html#restart">restart</a>(), <a href="qelapsedtimer.html#hasExpired">hasExpired</a>(), and <a href="qelapsedtimer.html#invalidate">invalidate</a>().</p>
 
 
@@ -196,7 +196,7 @@ that was invalidated will result in undefined results.</p>
 milliseconds have elapsed). The value of <i>timeout</i> can be -1
 to indicate that this timer does not expire, in which case this
 function will always return false.</p>
-<p>See also <a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
 
 
 <h3 class="fn"><a name="invalidate" />QElapsedTimer.invalidate (<i>self</i>)</h3><p>Marks this <a href="qelapsedtimer.html">QElapsedTimer</a> object
@@ -204,21 +204,19 @@ as invalid.</p>
 <p>An invalid object can be checked with <a href="qelapsedtimer.html#isValid">isValid</a>(). Calculations of timer
 elapsed since invalid data are undefined and will likely produce
 bizarre results.</p>
-<p>See also <a href="qelapsedtimer.html#isValid">isValid</a>(),
-<a href="qelapsedtimer.html#start">start</a>(), and <a href="qelapsedtimer.html#restart">restart</a>().</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#isValid">isValid</a>(), <a href="qelapsedtimer.html#start">start</a>(), and <a href="qelapsedtimer.html#restart">restart</a>().</p>
 
 
 <h3 class="fn"><a name="isMonotonic" />bool QElapsedTimer.isMonotonic ()</h3><p>Returns true if this is a monotonic clock, false otherwise. See
 the information on the different clock types to understand which
 ones are monotonic.</p>
-<p>See also <a href="qelapsedtimer.html#clockType">clockType</a>()
-and <a href="qelapsedtimer.html#ClockType-enum">QElapsedTimer.ClockType</a>.</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#clockType">clockType</a>() and <a href="qelapsedtimer.html#ClockType-enum">QElapsedTimer.ClockType</a>.</p>
 
 
 <h3 class="fn"><a name="isValid" />bool QElapsedTimer.isValid (<i>self</i>)</h3><p>Returns true if this object was invalidated by a call to
 <a href="qelapsedtimer.html#invalidate">invalidate</a>() and has
 not been restarted since.</p>
-<p>See also <a href="qelapsedtimer.html#invalidate">invalidate</a>(), <a href="qelapsedtimer.html#start">start</a>(), and <a href="qelapsedtimer.html#restart">restart</a>().</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#invalidate">invalidate</a>(), <a href="qelapsedtimer.html#start">start</a>(), and <a href="qelapsedtimer.html#restart">restart</a>().</p>
 
 
 <h3 class="fn"><a name="msecsSinceReference" />int QElapsedTimer.msecsSinceReference (<i>self</i>)</h3><p>Returns the number of milliseconds between last time this
@@ -229,8 +227,7 @@ and its reference clock's start.</p>
 clock. For that clock type, this number is the number of
 milliseconds since January 1st, 1970 at 0:00 UTC (that is, it is
 the Unix time expressed in milliseconds).</p>
-<p>See also <a href="qelapsedtimer.html#clockType">clockType</a>()
-and <a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#clockType">clockType</a>() and <a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
 
 
 <h3 class="fn"><a name="msecsTo" />int QElapsedTimer.msecsTo (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>other</i>)</h3><p>Returns the number of milliseconds between this <a href="qelapsedtimer.html">QElapsedTimer</a> and <i>other</i>. If
@@ -239,8 +236,8 @@ will be positive. If it was started later, the returned value will
 be negative.</p>
 <p>The return value is undefined if this object or <i>other</i>
 were invalidated.</p>
-<p>See also <a href="qelapsedtimer.html#secsTo">secsTo</a>() and
-<a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#secsTo">secsTo</a>()
+and <a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
 
 
 <h3 class="fn"><a name="restart" />int QElapsedTimer.restart (<i>self</i>)</h3><p>Restarts the timer and returns the time elapsed since the
@@ -252,19 +249,19 @@ avoiding the need to obtain the clock value twice.</p>
 calibrate a parameter to a slow operation (for example, an
 iteration count) so that this operation takes at least 250
 milliseconds:</p>
-<pre class="highlightedCode brush: cpp">
-     QElapsedTimer timer;
+<pre class="cpp">
+     <span class="type"><a href="qelapsedtimer.html">QElapsedTimer</a></span> timer;
 
-     int count = 1;
-     timer.start();
-     do {
-         count *= 2;
+     <span class="type">int</span> count <span class="operator">=</span> <span class="number">1</span>;
+     timer<span class="operator">.</span>start();
+     <span class="keyword">do</span> {
+         count <span class="operator">*</span><span class="operator">=</span> <span class="number">2</span>;
          slowOperation2(count);
-     } while (timer.restart() &lt; 250);
+     } <span class="keyword">while</span> (timer<span class="operator">.</span>restart() <span class="operator">&lt;</span> <span class="number">250</span>);
 
-     return count;
+     <span class="keyword">return</span> count;
 </pre>
-<p>See also <a href="qelapsedtimer.html#start">start</a>(),
+<p><b>See also</b> <a href="qelapsedtimer.html#start">start</a>(),
 <a href="qelapsedtimer.html#invalidate">invalidate</a>(), and
 <a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
 
@@ -275,26 +272,23 @@ will be positive. If it was started later, the returned value will
 be negative.</p>
 <p>The return value is undefined if this object or <i>other</i>
 were invalidated.</p>
-<p>See also <a href="qelapsedtimer.html#msecsTo">msecsTo</a>() and
-<a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#msecsTo">msecsTo</a>() and <a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
 
 
 <h3 class="fn"><a name="start" />QElapsedTimer.start (<i>self</i>)</h3><p>Starts this timer. Once started, a timer value can be checked
 with <a href="qelapsedtimer.html#elapsed">elapsed</a>() or <a href="qelapsedtimer.html#msecsSinceReference">msecsSinceReference</a>().</p>
 <p>Normally, a timer is started just before a lengthy operation,
 such as:</p>
-<pre class="highlightedCode brush: cpp">
-     QElapsedTimer timer;
-     timer.start();
+<pre class="cpp">
+     <span class="type"><a href="qelapsedtimer.html">QElapsedTimer</a></span> timer;
+     timer<span class="operator">.</span>start();
 
      slowOperation1();
 
-     qDebug() &lt;&lt; "The slow operation took" &lt;&lt; timer.elapsed() &lt;&lt; "milliseconds";
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"The slow operation took"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> timer<span class="operator">.</span>elapsed() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"milliseconds"</span>;
 </pre>
 <p>Also, starting a timer makes it valid again.</p>
-<p>See also <a href="qelapsedtimer.html#restart">restart</a>(),
-<a href="qelapsedtimer.html#invalidate">invalidate</a>(), and
-<a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#restart">restart</a>(), <a href="qelapsedtimer.html#invalidate">invalidate</a>(), and <a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QElapsedTimer.__eq__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ge__" />bool QElapsedTimer.__ge__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>v2</i>)</h3><h3 class="fn"><a name="__lt__" />bool QElapsedTimer.__lt__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>v2</i>)</h3><h3 class="fn"><a name="__ne__" />bool QElapsedTimer.__ne__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QElapsedTimer.__eq__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ge__" />bool QElapsedTimer.__ge__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>v2</i>)</h3><h3 class="fn"><a name="__lt__" />bool QElapsedTimer.__lt__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>v2</i>)</h3><h3 class="fn"><a name="__ne__" />bool QElapsedTimer.__ne__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

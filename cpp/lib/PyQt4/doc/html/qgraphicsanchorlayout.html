@@ -20,15 +20,15 @@ calling <a href="qgraphicsanchorlayout.html#addAnchor">addAnchor</a>(), <a href=
 that are anchored are automatically added to the layout, and if
 items are removed, all their anchors will be automatically
 removed.</p>
-<div style="float: left; margin-right: 2em">
+<div class="float-left">
 <p><img alt="Using an anchor layout to align simple colored widgets." src="images/simpleanchorlayout-example.png" /></p>
 </div>
 <p>Anchors are always set up between edges of an item, where the
 "center" is also considered to be an edge. Consider the following
 example:</p>
-<pre class="highlightedCode brush: cpp">
-     layout-&gt;addAnchor(b, Qt.AnchorLeft, a, Qt.AnchorRight);
-     layout-&gt;addAnchor(b, Qt.AnchorTop, a, Qt.AnchorBottom);
+<pre class="cpp">
+ layout<span class="operator">-</span><span class="operator">&gt;</span>addAnchor(b<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>AnchorLeft<span class="operator">,</span> a<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>AnchorRight);
+ layout<span class="operator">-</span><span class="operator">&gt;</span>addAnchor(b<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>AnchorTop<span class="operator">,</span> a<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>AnchorBottom);
 </pre>
 <p>Here, the right edge of item <tt>a</tt> is anchored to the left
 edge of item <tt>b</tt> and the bottom edge of item <tt>a</tt> is
@@ -40,8 +40,8 @@ function provides a simpler way of anchoring the corners of two
 widgets than the two individual calls to <a href="qgraphicsanchorlayout.html#addAnchor">addAnchor</a>() shown in the
 code above. Here, we see how a widget can be anchored to the
 top-left corner of the enclosing layout:</p>
-<pre class="highlightedCode brush: cpp">
-     layout-&gt;addCornerAnchors(a, Qt.TopLeftCorner, layout, Qt.TopLeftCorner);
+<pre class="cpp">
+ layout<span class="operator">-</span><span class="operator">&gt;</span>addCornerAnchors(a<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>TopLeftCorner<span class="operator">,</span> layout<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>TopLeftCorner);
 </pre>
 <p>In cases where anchors are used to match the widths or heights
 of widgets, it is convenient to use the <a href="qgraphicsanchorlayout.html#addAnchors">addAnchors</a>() function.
@@ -103,7 +103,7 @@ method.</p>
 <p>Calling this function where <i>firstItem</i> or
 <i>secondItem</i> are ancestors of the layout have undefined
 behaviour.</p>
-<p>See also <a href="qgraphicsanchorlayout.html#addAnchors">addAnchors</a>() and
+<p><b>See also</b> <a href="qgraphicsanchorlayout.html#addAnchors">addAnchors</a>() and
 <a href="qgraphicsanchorlayout.html#addCornerAnchors">addCornerAnchors</a>().</p>
 
 
@@ -113,15 +113,15 @@ has the same size as <i>secondItem</i> in the dimensions specified
 by <i>orientations</i>.</p>
 <p>For example, the following example anchors the left and right
 edges of two items to match their widths:</p>
-<pre class="highlightedCode brush: cpp">
-     layout-&gt;addAnchor(b, Qt.AnchorLeft, c, Qt.AnchorLeft);
-     layout-&gt;addAnchor(b, Qt.AnchorRight, c, Qt.AnchorRight);
+<pre class="cpp">
+ layout-&gt;addAnchor(b, Qt.AnchorLeft, c, Qt.AnchorLeft);
+ layout-&gt;addAnchor(b, Qt.AnchorRight, c, Qt.AnchorRight);
 </pre>
 <p>This can also be achieved using the following line of code:</p>
-<pre class="highlightedCode brush: cpp">
-     layout-&gt;addAnchors(b, c, Qt.Horizontal);
+<pre class="cpp">
+ layout<span class="operator">-</span><span class="operator">&gt;</span>addAnchors(b<span class="operator">,</span> c<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>Horizontal);
 </pre>
-<p>See also <a href="qgraphicsanchorlayout.html#addAnchor">addAnchor</a>() and <a href="qgraphicsanchorlayout.html#addCornerAnchors">addCornerAnchors</a>().</p>
+<p><b>See also</b> <a href="qgraphicsanchorlayout.html#addAnchor">addAnchor</a>() and <a href="qgraphicsanchorlayout.html#addCornerAnchors">addCornerAnchors</a>().</p>
 
 
 <h3 class="fn"><a name="addCornerAnchors" />QGraphicsAnchorLayout.addCornerAnchors (<i>self</i>, <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a>&#160;<i>firstItem</i>, <a href="qt.html#Corner-enum">Qt.Corner</a>&#160;<i>firstCorner</i>, <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a>&#160;<i>secondItem</i>, <a href="qt.html#Corner-enum">Qt.Corner</a>&#160;<i>secondCorner</i>)</h3><p>The <i>firstItem</i> argument has it's ownership transferred to Qt.</p><p>The <i>secondItem</i> argument has it's ownership transferred to Qt.</p><p>Creates two anchors between <i>firstItem</i> and
@@ -130,13 +130,13 @@ edges of two items to match their widths:</p>
 another one for the vertical edge.</p>
 <p>This is a convenience function, since anchoring corners can be
 expressed as anchoring two edges. For instance:</p>
-<pre class="highlightedCode brush: cpp">
-     layout-&gt;addAnchor(a, Qt.AnchorTop, layout, Qt.AnchorTop);
-     layout-&gt;addAnchor(a, Qt.AnchorLeft, layout, Qt.AnchorLeft);
+<pre class="cpp">
+ layout-&gt;addAnchor(a, Qt.AnchorTop, layout, Qt.AnchorTop);
+ layout-&gt;addAnchor(a, Qt.AnchorLeft, layout, Qt.AnchorLeft);
 </pre>
 <p>This can also be achieved with the following line of code:</p>
-<pre class="highlightedCode brush: cpp">
-     layout-&gt;addCornerAnchors(a, Qt.TopLeftCorner, layout, Qt.TopLeftCorner);
+<pre class="cpp">
+ layout<span class="operator">-</span><span class="operator">&gt;</span>addCornerAnchors(a<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>TopLeftCorner<span class="operator">,</span> layout<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>TopLeftCorner);
 </pre>
 <p>If there is already an anchor between the edge pairs, it will be
 replaced by the anchors that this function specifies.</p>
@@ -144,7 +144,7 @@ replaced by the anchors that this function specifies.</p>
 to the layout if they are not part of the layout. This means that
 <a href="qgraphicsanchorlayout.html#count">count</a>() can increase
 by up to 2.</p>
-<p>See also <a href="qgraphicsanchorlayout.html#addAnchor">addAnchor</a>() and <a href="qgraphicsanchorlayout.html#addAnchors">addAnchors</a>().</p>
+<p><b>See also</b> <a href="qgraphicsanchorlayout.html#addAnchor">addAnchor</a>() and <a href="qgraphicsanchorlayout.html#addAnchors">addAnchors</a>().</p>
 
 
 <h3 class="fn"><a name="anchor" /><a href="qgraphicsanchor.html">QGraphicsAnchor</a> QGraphicsAnchorLayout.anchor (<i>self</i>, <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a>&#160;<i>firstItem</i>, <a href="qt.html#AnchorPoint-enum">Qt.AnchorPoint</a>&#160;<i>firstEdge</i>, <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a>&#160;<i>secondItem</i>, <a href="qt.html#AnchorPoint-enum">Qt.AnchorPoint</a>&#160;<i>secondEdge</i>)</h3><p>Returns the anchor between the anchor points defined by
@@ -158,7 +158,7 @@ return 0.</p>
 
 <h3 class="fn"><a name="horizontalSpacing" />float QGraphicsAnchorLayout.horizontalSpacing (<i>self</i>)</h3><p>Returns the default horizontal spacing for the anchor
 layout.</p>
-<p>See also <a href="qgraphicsanchorlayout.html#verticalSpacing">verticalSpacing</a>()
+<p><b>See also</b> <a href="qgraphicsanchorlayout.html#verticalSpacing">verticalSpacing</a>()
 and <a href="qgraphicsanchorlayout.html#setHorizontalSpacing">setHorizontalSpacing</a>().</p>
 
 
@@ -173,7 +173,7 @@ and <a href="qgraphicsanchorlayout.html#setHorizontalSpacing">setHorizontalSpaci
 Ownership of the item is transferred to the caller.</p>
 <p>Removing an item will also remove any of the anchors associated
 with it.</p>
-<p>See also <a href="qgraphicsanchorlayout.html#itemAt">itemAt</a>() and <a href="qgraphicsanchorlayout.html#count">count</a>().</p>
+<p><b>See also</b> <a href="qgraphicsanchorlayout.html#itemAt">itemAt</a>() and <a href="qgraphicsanchorlayout.html#count">count</a>().</p>
 
 
 <h3 class="fn"><a name="setGeometry" />QGraphicsAnchorLayout.setGeometry (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rect</i>)</h3><p>Reimplemented from <a href="qgraphicslayoutitem.html#setGeometry">QGraphicsLayoutItem.setGeometry</a>().</p>
@@ -181,7 +181,7 @@ with it.</p>
 
 <h3 class="fn"><a name="setHorizontalSpacing" />QGraphicsAnchorLayout.setHorizontalSpacing (<i>self</i>, float&#160;<i>spacing</i>)</h3><p>Sets the default horizontal spacing for the anchor layout to
 <i>spacing</i>.</p>
-<p>See also <a href="qgraphicsanchorlayout.html#horizontalSpacing">horizontalSpacing</a>(),
+<p><b>See also</b> <a href="qgraphicsanchorlayout.html#horizontalSpacing">horizontalSpacing</a>(),
 <a href="qgraphicsanchorlayout.html#setVerticalSpacing">setVerticalSpacing</a>(),
 and <a href="qgraphicsanchorlayout.html#setSpacing">setSpacing</a>().</p>
 
@@ -194,13 +194,13 @@ anchor, it will use the default spacing.</p>
 does not support negative spacings. Setting a negative value will
 unset the previous spacing and make the layout use the spacing
 provided by the current widget style.</p>
-<p>See also <a href="qgraphicsanchorlayout.html#setHorizontalSpacing">setHorizontalSpacing</a>()
+<p><b>See also</b> <a href="qgraphicsanchorlayout.html#setHorizontalSpacing">setHorizontalSpacing</a>()
 and <a href="qgraphicsanchorlayout.html#setVerticalSpacing">setVerticalSpacing</a>().</p>
 
 
 <h3 class="fn"><a name="setVerticalSpacing" />QGraphicsAnchorLayout.setVerticalSpacing (<i>self</i>, float&#160;<i>spacing</i>)</h3><p>Sets the default vertical spacing for the anchor layout to
 <i>spacing</i>.</p>
-<p>See also <a href="qgraphicsanchorlayout.html#verticalSpacing">verticalSpacing</a>(),
+<p><b>See also</b> <a href="qgraphicsanchorlayout.html#verticalSpacing">verticalSpacing</a>(),
 <a href="qgraphicsanchorlayout.html#setHorizontalSpacing">setHorizontalSpacing</a>(),
 and <a href="qgraphicsanchorlayout.html#setSpacing">setSpacing</a>().</p>
 
@@ -209,6 +209,6 @@ and <a href="qgraphicsanchorlayout.html#setSpacing">setSpacing</a>().</p>
 
 
 <h3 class="fn"><a name="verticalSpacing" />float QGraphicsAnchorLayout.verticalSpacing (<i>self</i>)</h3><p>Returns the default vertical spacing for the anchor layout.</p>
-<p>See also <a href="qgraphicsanchorlayout.html#horizontalSpacing">horizontalSpacing</a>()
+<p><b>See also</b> <a href="qgraphicsanchorlayout.html#horizontalSpacing">horizontalSpacing</a>()
 and <a href="qgraphicsanchorlayout.html#setVerticalSpacing">setVerticalSpacing</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

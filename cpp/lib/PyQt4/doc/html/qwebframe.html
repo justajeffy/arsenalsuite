@@ -46,29 +46,29 @@ signal.</p>
 <a href="qwebframe.html#render">render()</a>. The layers can be
 OR-ed together from the following list:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QWebFrame.ContentsLayer</tt></td>
-<td class=" topAlign"><tt>0x10</tt></td>
+<td class="topAlign"><tt>0x10</tt></td>
 <td class="topAlign">The web content of the frame</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QWebFrame.ScrollBarLayer</tt></td>
-<td class=" topAlign"><tt>0x20</tt></td>
+<td class="topAlign"><tt>0x20</tt></td>
 <td class="topAlign">The scrollbars of the frame</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QWebFrame.PanIconLayer</tt></td>
-<td class=" topAlign"><tt>0x40</tt></td>
+<td class="topAlign"><tt>0x40</tt></td>
 <td class="topAlign">The icon used when panning the frame</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QWebFrame.AllLayers</tt></td>
-<td class=" topAlign"><tt>0xff</tt></td>
+<td class="topAlign"><tt>0xff</tt></td>
 <td class="topAlign">Includes all the above layers</td>
 </tr>
 </table>
@@ -88,7 +88,7 @@ does nothing.</p>
 
 <h3 class="fn"><a name="baseUrl" /><a href="qurl.html">QUrl</a> QWebFrame.baseUrl (<i>self</i>)</h3><h3 class="fn"><a name="childFrames" />list-of-QWebFrame QWebFrame.childFrames (<i>self</i>)</h3><p>Returns a list of all frames that are direct children of this
 frame.</p>
-<p>See also <a href="qwebframe.html#parentFrame">parentFrame</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#parentFrame">parentFrame</a>().</p>
 
 
 <h3 class="fn"><a name="contentsSize" /><a href="qsize.html">QSize</a> QWebFrame.contentsSize (<i>self</i>)</h3><h3 class="fn"><a name="documentElement" /><a href="qwebelement.html">QWebElement</a> QWebFrame.documentElement (<i>self</i>)</h3><p>Returns the document element of this frame.</p>
@@ -100,7 +100,7 @@ content of the frame.</p>
 <h3 class="fn"><a name="evaluateJavaScript" />QVariant QWebFrame.evaluateJavaScript (<i>self</i>, QString&#160;<i>scriptSource</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>QVariant evaluateJavaScript(const QString&amp;)</tt>.</p><p>Evaluates the JavaScript defined by <i>scriptSource</i> using
 this frame as context and returns the result of the last executed
 statement.</p>
-<p>See also <a href="qwebframe.html#addToJavaScriptWindowObject">addToJavaScriptWindowObject</a>()
+<p><b>See also</b> <a href="qwebframe.html#addToJavaScriptWindowObject">addToJavaScriptWindowObject</a>()
 and <a href="qwebframe.html#javaScriptWindowObjectCleared">javaScriptWindowObjectCleared</a>().</p>
 
 
@@ -113,7 +113,7 @@ list is returned.</p>
 <p><a href="http://www.w3.org/TR/REC-CSS2/selector.html#q1">Standard CSS2
 selector</a> syntax is used for the query.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qwebelement.html#findAll">QWebElement.findAll</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#findAll">QWebElement.findAll</a>().</p>
 
 
 <h3 class="fn"><a name="findFirstElement" /><a href="qwebelement.html">QWebElement</a> QWebFrame.findFirstElement (<i>self</i>, QString&#160;<i>selectorQuery</i>)</h3><p>Returns the first element in the frame's document that matches
@@ -122,7 +122,7 @@ matching element, a null element is returned.</p>
 <p><a href="http://www.w3.org/TR/REC-CSS2/selector.html#q1">Standard CSS2
 selector</a> syntax is used for the query.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qwebelement.html#findFirst">QWebElement.findFirst</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#findFirst">QWebElement.findFirst</a>().</p>
 
 
 <h3 class="fn"><a name="frameName" />QString QWebFrame.frameName (<i>self</i>)</h3><p>The name of this frame as defined by the parent frame.</p>
@@ -139,7 +139,7 @@ frame.</p>
 <h3 class="fn"><a name="icon" /><a href="qicon.html">QIcon</a> QWebFrame.icon (<i>self</i>)</h3><h3 class="fn"><a name="load" />QWebFrame.load (<i>self</i>, <a href="qurl.html">QUrl</a>&#160;<i>url</i>)</h3><p>Loads <i>url</i> into this frame.</p>
 <p><b>Note:</b> The view remains the same until enough data has
 arrived to display the new <i>url</i>.</p>
-<p>See also <a href="qwebframe.html#url-prop">setUrl</a>(),
+<p><b>See also</b> <a href="qwebframe.html#url-prop">setUrl</a>(),
 <a href="qwebframe.html#setHtml">setHtml</a>(), and <a href="qwebframe.html#setContent">setContent</a>().</p>
 
 
@@ -149,46 +149,38 @@ method specified in <i>operation</i>.</p>
 operations.</p>
 <p><b>Note:</b> The view remains the same until enough data has
 arrived to display the new content.</p>
-<p>See also <a href="qwebframe.html#url-prop">setUrl</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#url-prop">setUrl</a>().</p>
 
 
 <h3 class="fn"><a name="metaData" />dict-of-QString-list-of-QString QWebFrame.metaData (<i>self</i>)</h3><p>Returns the meta data in this frame as a <a href="qmultimap.html">QMultiMap</a></p>
 <p>The meta data consists of the name and content attributes of the
 of the <tt>&lt;meta&gt;</tt> tags in the HTML document.</p>
 <p>For example:</p>
-<pre class="highlightedCode brush: cpp">
- &lt;html&gt;
-     &lt;head&gt;
-         &lt;meta name="description" content="This document is a tutorial about Qt development"&gt;
-         &lt;meta name="keywords" content="Qt, WebKit, Programming"&gt;
-     &lt;/head&gt;
-     ...
- &lt;/html&gt;
+<pre class="cpp">
+ <span class="operator">&lt;</span>html<span class="operator">&gt;</span>
+     <span class="operator">&lt;</span>head<span class="operator">&gt;</span>
+         <span class="operator">&lt;</span>meta name<span class="operator">=</span><span class="string">"description"</span> content<span class="operator">=</span><span class="string">"This document is a tutorial about Qt development"</span><span class="operator">&gt;</span>
+         <span class="operator">&lt;</span>meta name<span class="operator">=</span><span class="string">"keywords"</span> content<span class="operator">=</span><span class="string">"Qt, WebKit, Programming"</span><span class="operator">&gt;</span>
+     <span class="operator">&lt;</span><span class="operator">/</span>head<span class="operator">&gt;</span>
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ <span class="operator">&lt;</span><span class="operator">/</span>html<span class="operator">&gt;</span>
 </pre>
 <p>Given the above HTML code the metaData() function will return a
 map with two entries:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Key</th>
 <th>Value</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>"description"</p>
-</td>
-<td>
-<p>"This document is a tutorial about Qt development"</p>
-</td>
+<tr class="odd" valign="top">
+<td>"description"</td>
+<td>"This document is a tutorial about Qt development"</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>"keywords"</p>
-</td>
-<td>
-<p>"Qt, WebKit, Programming"</p>
-</td>
+<tr class="even" valign="top">
+<td>"keywords"</td>
+<td>"Qt, WebKit, Programming"</td>
 </tr>
 </table>
 <p>This function returns a multi map to support multiple meta tags
@@ -202,7 +194,7 @@ with the same attribute name.</p>
 <h3 class="fn"><a name="parentFrame" /><a href="qwebframe.html">QWebFrame</a> QWebFrame.parentFrame (<i>self</i>)</h3><p>Returns the parent frame of this frame, or 0 if the frame is the
 web pages main frame.</p>
 <p>This is equivalent to qobject_cast&lt;<a href="qwebframe.html">QWebFrame</a>*&gt;(frame-&gt;<a href="qobject.html#parent">parent</a>()).</p>
-<p>See also <a href="qwebframe.html#childFrames">childFrames</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#childFrames">childFrames</a>().</p>
 
 
 <h3 class="fn"><a name="pos" /><a href="qpoint.html">QPoint</a> QWebFrame.pos (<i>self</i>)</h3><p>Returns the position of the frame relative to it's parent
@@ -210,11 +202,11 @@ frame.</p>
 
 
 <h3 class="fn"><a name="print" />QWebFrame.print (<i>self</i>, <a href="qprinter.html">QPrinter</a>&#160;<i>printer</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void print(QPrinter *) const</tt>.</p><p>Prints the frame to the given <i>printer</i>.</p>
-<p>See also <a href="qwebframe.html#render">render</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#render">render</a>().</p>
 
 
 <h3 class="fn"><a name="print" />QWebFrame.print_ (<i>self</i>, <a href="qprinter.html">QPrinter</a>&#160;<i>printer</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void print(QPrinter *) const</tt>.</p><p>Prints the frame to the given <i>printer</i>.</p>
-<p>See also <a href="qwebframe.html#render">render</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#render">render</a>().</p>
 
 
 <h3 class="fn"><a name="render" />QWebFrame.render (<i>self</i>, <a href="qpainter.html">QPainter</a>&#160;<i>painter</i>, <a href="qregion.html">QRegion</a>&#160;<i>clip</i>)</h3><p>Render the frame into <i>painter</i>.</p>
@@ -227,7 +219,7 @@ frame.</p>
 <h3 class="fn"><a name="render-3" />QWebFrame.render (<i>self</i>, <a href="qpainter.html">QPainter</a>, <a href="qwebframe.html#RenderLayer-enum">RenderLayer</a>&#160;<i>layer</i>, <a href="qregion.html">QRegion</a>&#160;<i>clip</i>&#160;=&#160;QRegion())</h3><p>Render the <i>layer</i> of the frame using <i>painter</i>
 clipping to <i>clip</i>.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qwebframe.html#print">print_</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#print">print_</a>().</p>
 
 
 <h3 class="fn"><a name="renderTreeDump" />QString QWebFrame.renderTreeDump (<i>self</i>)</h3><p>Returns a dump of the rendering tree. This is mainly useful for
@@ -237,7 +229,7 @@ debugging html.</p>
 <h3 class="fn"><a name="requestedUrl" /><a href="qurl.html">QUrl</a> QWebFrame.requestedUrl (<i>self</i>)</h3><h3 class="fn"><a name="scroll" />QWebFrame.scroll (<i>self</i>, int, int)</h3><p>Scrolls the frame <i>dx</i> pixels to the right and <i>dy</i>
 pixels downward. Both <i>dx</i> and <i>dy</i> may be negative.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qwebframe.html#scrollPosition-prop">QWebFrame.scrollPosition</a>.</p>
+<p><b>See also</b> <a href="qwebframe.html#scrollPosition-prop">QWebFrame.scrollPosition</a>.</p>
 
 
 <h3 class="fn"><a name="scrollBarGeometry" /><a href="qrect.html">QRect</a> QWebFrame.scrollBarGeometry (<i>self</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>&#160;<i>orientation</i>)</h3><p>Returns the geometry for the scrollbar with orientation
@@ -249,24 +241,24 @@ pixels downward. Both <i>dx</i> and <i>dy</i> may be negative.</p>
 <h3 class="fn"><a name="scrollBarMaximum" />int QWebFrame.scrollBarMaximum (<i>self</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>&#160;<i>orientation</i>)</h3><p>Returns the maximum value for the scrollbar with orientation
 <i>orientation</i>, or 0 if no scrollbar is found for
 <i>orientation</i>.</p>
-<p>See also <a href="qwebframe.html#scrollBarMinimum">scrollBarMinimum</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#scrollBarMinimum">scrollBarMinimum</a>().</p>
 
 
 <h3 class="fn"><a name="scrollBarMinimum" />int QWebFrame.scrollBarMinimum (<i>self</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>&#160;<i>orientation</i>)</h3><p>Returns the minimum value for the scrollbar with orientation
 <i>orientation</i>.</p>
 <p>The minimum value is always 0.</p>
-<p>See also <a href="qwebframe.html#scrollBarMaximum">scrollBarMaximum</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#scrollBarMaximum">scrollBarMaximum</a>().</p>
 
 
 <h3 class="fn"><a name="scrollBarPolicy" /><a href="qt.html#ScrollBarPolicy-enum">Qt.ScrollBarPolicy</a> QWebFrame.scrollBarPolicy (<i>self</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>&#160;<i>orientation</i>)</h3><p>Returns the scrollbar policy for the scrollbar defined by
 <i>orientation</i>.</p>
-<p>See also <a href="qwebframe.html#setScrollBarPolicy">setScrollBarPolicy</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#setScrollBarPolicy">setScrollBarPolicy</a>().</p>
 
 
 <h3 class="fn"><a name="scrollBarValue" />int QWebFrame.scrollBarValue (<i>self</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>&#160;<i>orientation</i>)</h3><p>Returns the current value for the scrollbar with orientation
 <i>orientation</i>, or 0 if no scrollbar is found for
 <i>orientation</i>.</p>
-<p>See also <a href="qwebframe.html#setScrollBarValue">setScrollBarValue</a>(),
+<p><b>See also</b> <a href="qwebframe.html#setScrollBarValue">setScrollBarValue</a>(),
 <a href="qwebframe.html#scrollBarMinimum">scrollBarMinimum</a>(),
 and <a href="qwebframe.html#scrollBarMaximum">scrollBarMaximum</a>().</p>
 
@@ -289,13 +281,13 @@ to <i>baseUrl</i>.</p>
 loaded asynchronously.</p>
 <p><b>Note:</b> This method will not affect session or global
 history for the frame.</p>
-<p>See also <a href="qwebframe.html#toHtml">toHtml</a>() and
+<p><b>See also</b> <a href="qwebframe.html#toHtml">toHtml</a>() and
 <a href="qwebframe.html#setHtml">setHtml</a>().</p>
 
 
 <h3 class="fn"><a name="setFocus" />QWebFrame.setFocus (<i>self</i>)</h3><p>Gives keyboard input focus to this frame.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qwebframe.html#focus-prop">hasFocus</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#focus-prop">hasFocus</a>().</p>
 
 
 <h3 class="fn"><a name="setHtml" />QWebFrame.setHtml (<i>self</i>, QString&#160;<i>html</i>, <a href="qurl.html">QUrl</a>&#160;<i>baseUrl</i>&#160;=&#160;QUrl())</h3><p>Sets the content of this frame to <i>html</i>. <i>baseUrl</i> is
@@ -316,13 +308,13 @@ the HTML script tag. It is also possible for the encoding to be
 specified by web server.</p>
 <p><b>Note:</b> This method will not affect session or global
 history for the frame.</p>
-<p>See also <a href="qwebframe.html#toHtml">toHtml</a>() and
+<p><b>See also</b> <a href="qwebframe.html#toHtml">toHtml</a>() and
 <a href="qwebframe.html#setContent">setContent</a>().</p>
 
 
 <h3 class="fn"><a name="setScrollBarPolicy" />QWebFrame.setScrollBarPolicy (<i>self</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>&#160;<i>orientation</i>, <a href="qt.html#ScrollBarPolicy-enum">Qt.ScrollBarPolicy</a>&#160;<i>policy</i>)</h3><p>Sets the scrollbar policy for the scrollbar defined by
 <i>orientation</i> to <i>policy</i>.</p>
-<p>See also <a href="qwebframe.html#scrollBarPolicy">scrollBarPolicy</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#scrollBarPolicy">scrollBarPolicy</a>().</p>
 
 
 <h3 class="fn"><a name="setScrollBarValue" />QWebFrame.setScrollBarValue (<i>self</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>&#160;<i>orientation</i>, int&#160;<i>value</i>)</h3><p>Sets the current <i>value</i> for the scrollbar with orientation
@@ -330,40 +322,40 @@ history for the frame.</p>
 <p>The scrollbar forces the <i>value</i> to be within the legal
 range: minimum &lt;= value &lt;= maximum.</p>
 <p>Changing the value also updates the thumb position.</p>
-<p>See also <a href="qwebframe.html#scrollBarValue">scrollBarValue</a>(), <a href="qwebframe.html#scrollBarMinimum">scrollBarMinimum</a>(), and
+<p><b>See also</b> <a href="qwebframe.html#scrollBarValue">scrollBarValue</a>(), <a href="qwebframe.html#scrollBarMinimum">scrollBarMinimum</a>(), and
 <a href="qwebframe.html#scrollBarMaximum">scrollBarMaximum</a>().</p>
 
 
 <h3 class="fn"><a name="setScrollPosition" />QWebFrame.setScrollPosition (<i>self</i>, <a href="qpoint.html">QPoint</a>&#160;<i>pos</i>)</h3><h3 class="fn"><a name="setTextSizeMultiplier" />QWebFrame.setTextSizeMultiplier (<i>self</i>, float&#160;<i>factor</i>)</h3><p>Sets the value of the multiplier used to scale the text in a Web
 frame to the <i>factor</i> specified.</p>
-<p>See also <a href="qwebframe.html#textSizeMultiplier">textSizeMultiplier</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#textSizeMultiplier">textSizeMultiplier</a>().</p>
 
 
 <h3 class="fn"><a name="setUrl" />QWebFrame.setUrl (<i>self</i>, <a href="qurl.html">QUrl</a>&#160;<i>url</i>)</h3><h3 class="fn"><a name="setZoomFactor" />QWebFrame.setZoomFactor (<i>self</i>, float&#160;<i>factor</i>)</h3><h3 class="fn"><a name="textSizeMultiplier" />float QWebFrame.textSizeMultiplier (<i>self</i>)</h3><p>Returns the value of the multiplier used to scale the text in a
 Web frame.</p>
-<p>See also <a href="qwebframe.html#setTextSizeMultiplier">setTextSizeMultiplier</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#setTextSizeMultiplier">setTextSizeMultiplier</a>().</p>
 
 
 <h3 class="fn"><a name="title" />QString QWebFrame.title (<i>self</i>)</h3><h3 class="fn"><a name="toHtml" />QString QWebFrame.toHtml (<i>self</i>)</h3><p>Returns the frame's content as HTML, enclosed in HTML and BODY
 tags.</p>
-<p>See also <a href="qwebframe.html#setHtml">setHtml</a>() and
-<a href="qwebframe.html#toPlainText">toPlainText</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#setHtml">setHtml</a>()
+and <a href="qwebframe.html#toPlainText">toPlainText</a>().</p>
 
 
 <h3 class="fn"><a name="toPlainText" />QString QWebFrame.toPlainText (<i>self</i>)</h3><p>Returns the content of this frame converted to plain text,
 completely stripped of all HTML formatting.</p>
-<p>See also <a href="qwebframe.html#toHtml">toHtml</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#toHtml">toHtml</a>().</p>
 
 
 <h3 class="fn"><a name="url" /><a href="qurl.html">QUrl</a> QWebFrame.url (<i>self</i>)</h3><h3 class="fn"><a name="zoomFactor" />float QWebFrame.zoomFactor (<i>self</i>)</h3><hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="contentsSizeChanged" />void contentsSizeChanged (const QSize&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the frame's contents size changes to
 <i>size</i>.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qwebframe.html#contentsSize-prop">contentsSize</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#contentsSize-prop">contentsSize</a>().</p>
 
 
 <h3 class="fn"><a name="iconChanged" />void iconChanged ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the icon ("favicon") associated with
 the frame has been loaded.</p>
-<p>See also <a href="qwebframe.html#icon-prop">icon</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#icon-prop">icon</a>().</p>
 
 
 <h3 class="fn"><a name="initialLayoutCompleted" />void initialLayoutCompleted ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the frame is laid out the first
@@ -385,22 +377,22 @@ URLs.</p>
 <i>ok</i> will indicate whether the load was successful or any
 error occurred.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qwebframe.html#loadStarted">loadStarted</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#loadStarted">loadStarted</a>().</p>
 
 
 <h3 class="fn"><a name="loadStarted" />void loadStarted ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when a new load of this frame is
 started.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qwebframe.html#loadFinished">loadFinished</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#loadFinished">loadFinished</a>().</p>
 
 
 <h3 class="fn"><a name="pageChanged" />void pageChanged ()</h3><p>This is the default overload of this signal.</p><h3 class="fn"><a name="titleChanged" />void titleChanged (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the title of the frame changes.
 The <i>title</i> string specifies the new title.</p>
-<p>See also <a href="qwebframe.html#title-prop">title</a>().</p>
+<p><b>See also</b> <a href="qwebframe.html#title-prop">title</a>().</p>
 
 
 <h3 class="fn"><a name="urlChanged" />void urlChanged (const QUrl&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted with the URL of the frame when the
 frame's title is received. The new URL is specified by
 <i>url</i>.</p>
-<p>See also <a href="qwebframe.html#url-prop">url</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qwebframe.html#url-prop">url</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

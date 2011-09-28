@@ -148,9 +148,13 @@ public:
     void emit_signal(const PyQt_PyObject &args) {emit pysignal(args);}
 
     static PyQtShortcircuitSignalProxy *find(QObject *tx, const char *sig);
+    static PyQtShortcircuitSignalProxy *shortcircuitSignal(QObject *obj);
 
 signals:
     void pysignal(const PyQt_PyObject &);
+
+private:
+    static bool no_shortcircuit_signals;
 };
 
 

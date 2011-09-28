@@ -51,75 +51,75 @@ mapping. Finally, the <a href="qpaintdevice.html#colorCount">colorCount</a>() fu
 the number of different colors available for the paint device.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="PaintDeviceMetric-enum" />QPaintDevice.PaintDeviceMetric</h3><p>Describes the various metrics of a paint device.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPaintDevice.PdmWidth</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The width of the paint device in default
 coordinate system units (e.g. pixels for <a href="qpixmap.html">QPixmap</a> and <a href="qwidget.html">QWidget</a>).
 See also <a href="qpaintdevice.html#width">width</a>().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPaintDevice.PdmHeight</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The height of the paint device in default
 coordinate system units (e.g. pixels for <a href="qpixmap.html">QPixmap</a> and <a href="qwidget.html">QWidget</a>).
 See also <a href="qpaintdevice.html#height">height</a>().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPaintDevice.PdmWidthMM</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The width of the paint device in millimeters.
 See also <a href="qpaintdevice.html#widthMM">widthMM</a>().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPaintDevice.PdmHeightMM</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The height of the paint device in millimeters.
 See also <a href="qpaintdevice.html#heightMM">heightMM</a>().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPaintDevice.PdmNumColors</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The number of different colors available for
 the paint device. See also <a href="qpaintdevice.html#colorCount">colorCount</a>().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPaintDevice.PdmDepth</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">The bit depth (number of bit planes) of the
 paint device. See also <a href="qpaintdevice.html#depth">depth</a>().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPaintDevice.PdmDpiX</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">The horizontal resolution of the device in
 dots per inch. See also <a href="qpaintdevice.html#logicalDpiX">logicalDpiX</a>().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPaintDevice.PdmDpiY</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">The vertical resolution of the device in dots
 per inch. See also <a href="qpaintdevice.html#logicalDpiY">logicalDpiY</a>().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPaintDevice.PdmPhysicalDpiX</tt></td>
-<td class=" topAlign"><tt>9</tt></td>
+<td class="topAlign"><tt>9</tt></td>
 <td class="topAlign">The horizontal resolution of the device in
 dots per inch. See also <a href="qpaintdevice.html#physicalDpiX">physicalDpiX</a>().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPaintDevice.PdmPhysicalDpiY</tt></td>
-<td class=" topAlign"><tt>10</tt></td>
+<td class="topAlign"><tt>10</tt></td>
 <td class="topAlign">The vertical resolution of the device in dots
 per inch. See also <a href="qpaintdevice.html#physicalDpiY">physicalDpiY</a>().</td>
 </tr>
 </table>
-<p>See also <a href="qpaintdevice.html#metric">metric</a>().</p>
+<p><b>See also</b> <a href="qpaintdevice.html#metric">metric</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QPaintDevice" />QPaintDevice.__init__ (<i>self</i>)</h3><p>Constructs a paint device. This constructor can be invoked only
 from subclasses of <a href="qpaintdevice.html">QPaintDevice</a>.</p>
 
@@ -137,13 +137,13 @@ device.</p>
 <h3 class="fn"><a name="height" />int QPaintDevice.height (<i>self</i>)</h3><p>Returns the height of the paint device in default coordinate
 system units (e.g. pixels for <a href="qpixmap.html">QPixmap</a>
 and <a href="qwidget.html">QWidget</a>).</p>
-<p>See also <a href="qpaintdevice.html#heightMM">heightMM</a>().</p>
+<p><b>See also</b> <a href="qpaintdevice.html#heightMM">heightMM</a>().</p>
 
 
 <h3 class="fn"><a name="heightMM" />int QPaintDevice.heightMM (<i>self</i>)</h3><p>Returns the height of the paint device in millimeters. Due to
 platform limitations it may not be possible to use this function to
 determine the actual physical size of a widget on the screen.</p>
-<p>See also <a href="qpaintdevice.html#height">height</a>().</p>
+<p><b>See also</b> <a href="qpaintdevice.html#height">height</a>().</p>
 
 
 <h3 class="fn"><a name="logicalDpiX" />int QPaintDevice.logicalDpiX (<i>self</i>)</h3><p>Returns the horizontal resolution of the device in dots per
@@ -152,7 +152,7 @@ usually the same as could be computed from <a href="qpaintdevice.html#widthMM">w
 <p>Note that if the logicalDpiX() doesn't equal the <a href="qpaintdevice.html#physicalDpiX">physicalDpiX</a>(), the
 corresponding <a href="qpaintengine.html">QPaintEngine</a> must
 handle the resolution mapping.</p>
-<p>See also <a href="qpaintdevice.html#logicalDpiY">logicalDpiY</a>() and <a href="qpaintdevice.html#physicalDpiX">physicalDpiX</a>().</p>
+<p><b>See also</b> <a href="qpaintdevice.html#logicalDpiY">logicalDpiY</a>() and <a href="qpaintdevice.html#physicalDpiX">physicalDpiX</a>().</p>
 
 
 <h3 class="fn"><a name="logicalDpiY" />int QPaintDevice.logicalDpiY (<i>self</i>)</h3><p>Returns the vertical resolution of the device in dots per inch,
@@ -161,12 +161,12 @@ the same as could be computed from <a href="qpaintdevice.html#heightMM">heightMM
 <p>Note that if the logicalDpiY() doesn't equal the <a href="qpaintdevice.html#physicalDpiY">physicalDpiY</a>(), the
 corresponding <a href="qpaintengine.html">QPaintEngine</a> must
 handle the resolution mapping.</p>
-<p>See also <a href="qpaintdevice.html#logicalDpiX">logicalDpiX</a>() and <a href="qpaintdevice.html#physicalDpiY">physicalDpiY</a>().</p>
+<p><b>See also</b> <a href="qpaintdevice.html#logicalDpiX">logicalDpiX</a>() and <a href="qpaintdevice.html#physicalDpiY">physicalDpiY</a>().</p>
 
 
 <h3 class="fn"><a name="metric" />int QPaintDevice.metric (<i>self</i>, <a href="qpaintdevice.html#PaintDeviceMetric-enum">PaintDeviceMetric</a>&#160;<i>metric</i>)</h3><p>Returns the metric information for the given paint device
 <i>metric</i>.</p>
-<p>See also <a href="qpaintdevice.html#PaintDeviceMetric-enum">PaintDeviceMetric</a>.</p>
+<p><b>See also</b> <a href="qpaintdevice.html#PaintDeviceMetric-enum">PaintDeviceMetric</a>.</p>
 
 
 <h3 class="fn"><a name="numColors" />int QPaintDevice.numColors (<i>self</i>)</h3><p>This function is deprecated.</p>
@@ -186,7 +186,7 @@ device.</p>
 someone has called <a href="qpainter.html#begin">QPainter.begin</a>() but not yet called
 <a href="qpainter.html#end">QPainter.end</a>() for this device;
 otherwise returns false.</p>
-<p>See also <a href="qpainter.html#isActive">QPainter.isActive</a>().</p>
+<p><b>See also</b> <a href="qpainter.html#isActive">QPainter.isActive</a>().</p>
 
 
 <h3 class="fn"><a name="physicalDpiX" />int QPaintDevice.physicalDpiX (<i>self</i>)</h3><p>Returns the horizontal resolution of the device in dots per
@@ -196,7 +196,7 @@ refers to the resolution used by the actual paint engine.</p>
 <p>Note that if the physicalDpiX() doesn't equal the <a href="qpaintdevice.html#logicalDpiX">logicalDpiX</a>(), the
 corresponding <a href="qpaintengine.html">QPaintEngine</a> must
 handle the resolution mapping.</p>
-<p>See also <a href="qpaintdevice.html#physicalDpiY">physicalDpiY</a>() and <a href="qpaintdevice.html#logicalDpiX">logicalDpiX</a>().</p>
+<p><b>See also</b> <a href="qpaintdevice.html#physicalDpiY">physicalDpiY</a>() and <a href="qpaintdevice.html#logicalDpiX">logicalDpiX</a>().</p>
 
 
 <h3 class="fn"><a name="physicalDpiY" />int QPaintDevice.physicalDpiY (<i>self</i>)</h3><p>Returns the horizontal resolution of the device in dots per
@@ -206,17 +206,17 @@ refers to the resolution used by the actual paint engine.</p>
 <p>Note that if the physicalDpiY() doesn't equal the <a href="qpaintdevice.html#logicalDpiY">logicalDpiY</a>(), the
 corresponding <a href="qpaintengine.html">QPaintEngine</a> must
 handle the resolution mapping.</p>
-<p>See also <a href="qpaintdevice.html#physicalDpiX">physicalDpiX</a>() and <a href="qpaintdevice.html#logicalDpiY">logicalDpiY</a>().</p>
+<p><b>See also</b> <a href="qpaintdevice.html#physicalDpiX">physicalDpiX</a>() and <a href="qpaintdevice.html#logicalDpiY">logicalDpiY</a>().</p>
 
 
 <h3 class="fn"><a name="width" />int QPaintDevice.width (<i>self</i>)</h3><p>Returns the width of the paint device in default coordinate
 system units (e.g. pixels for <a href="qpixmap.html">QPixmap</a>
 and <a href="qwidget.html">QWidget</a>).</p>
-<p>See also <a href="qpaintdevice.html#widthMM">widthMM</a>().</p>
+<p><b>See also</b> <a href="qpaintdevice.html#widthMM">widthMM</a>().</p>
 
 
 <h3 class="fn"><a name="widthMM" />int QPaintDevice.widthMM (<i>self</i>)</h3><p>Returns the width of the paint device in millimeters. Due to
 platform limitations it may not be possible to use this function to
 determine the actual physical size of a widget on the screen.</p>
-<p>See also <a href="qpaintdevice.html#width">width</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qpaintdevice.html#width">width</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

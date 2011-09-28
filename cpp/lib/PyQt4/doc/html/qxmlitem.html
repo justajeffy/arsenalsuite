@@ -15,7 +15,7 @@ value.</p>
 evaluate to a sequence of items, where each item is either an XML
 node or an atomic value. The query in the following snippet
 evaluates to sequence of five items.</p>
-<pre class="highlightedCode brush: cpp">
+<pre class="cpp">
  &lt;aNode/&gt;,
  xs:base64Binary("FFFF"),
  current-date(),
@@ -47,23 +47,23 @@ constructed instance.</p>
 
 <h3 class="fn"><a name="QXmlItem-3" />QXmlItem.__init__ (<i>self</i>, <a href="qxmlnodemodelindex.html">QXmlNodeModelIndex</a>&#160;<i>node</i>)</h3><p>Constructs a node <a href="qxmlitem.html">QXmlItem</a> that is a
 copy of <i>node</i>.</p>
-<p>See also <a href="qxmlitem.html#isNode">isNode</a>().</p>
+<p><b>See also</b> <a href="qxmlitem.html#isNode">isNode</a>().</p>
 
 
 <h3 class="fn"><a name="QXmlItem-4" />QXmlItem.__init__ (<i>self</i>, QVariant&#160;<i>atomicValue</i>)</h3><p>Constructs an atomic value <a href="qxmlitem.html">QXmlItem</a>
 with <i>atomicValue</i>.</p>
-<p>See also <a href="qxmlitem.html#isAtomicValue">isAtomicValue</a>().</p>
+<p><b>See also</b> <a href="qxmlitem.html#isAtomicValue">isAtomicValue</a>().</p>
 
 
 <h3 class="fn"><a name="isAtomicValue" />bool QXmlItem.isAtomicValue (<i>self</i>)</h3><p>Returns true if this item is an atomic value. Returns false if
 it is a node or null.</p>
-<p>See also <a href="qxmlitem.html#isNull">isNull</a>() and
+<p><b>See also</b> <a href="qxmlitem.html#isNull">isNull</a>() and
 <a href="qxmlitem.html#isNode">isNode</a>().</p>
 
 
 <h3 class="fn"><a name="isNode" />bool QXmlItem.isNode (<i>self</i>)</h3><p>Returns true if this item is a Node. Returns false if it is an
 atomic value or null.</p>
-<p>See also <a href="qxmlitem.html#isNull">isNull</a>() and
+<p><b>See also</b> <a href="qxmlitem.html#isNull">isNull</a>() and
 <a href="qxmlitem.html#isAtomicValue">isAtomicValue</a>().</p>
 
 
@@ -76,14 +76,14 @@ of <a href="qxmlitem.html">QXmlItem</a> are null.</p>
 atomic value, it is converted to an appropriate <a href="qvariant.html">QVariant</a> and returned. If this <a href="qxmlitem.html">QXmlItem</a> is not an atomic value, the return
 value is a default constructed <a href="qvariant.html">QVariant</a>. You can call <a href="qxmlitem.html#isAtomicValue">isAtomicValue</a>() to test whether
 the item is an atomic value.</p>
-<p>See also <a href="qxmlitem.html#isAtomicValue">isAtomicValue</a>().</p>
+<p><b>See also</b> <a href="qxmlitem.html#isAtomicValue">isAtomicValue</a>().</p>
 
 
 <h3 class="fn"><a name="toNodeModelIndex" /><a href="qxmlnodemodelindex.html">QXmlNodeModelIndex</a> QXmlItem.toNodeModelIndex (<i>self</i>)</h3><p>If this <a href="qxmlitem.html">QXmlItem</a> represents a node,
 it returns the item as a <a href="qxmlnodemodelindex.html">QXmlNodeModelIndex</a>. If this <a href="qxmlitem.html">QXmlItem</a> is not a node, the return value is
 undefined. You can call <a href="qxmlitem.html#isNode">isNode</a>()
 to test whether the item is a node.</p>
-<p>See also <a href="qxmlitem.html#isNode">isNode</a>().</p>
+<p><b>See also</b> <a href="qxmlitem.html#isNode">isNode</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

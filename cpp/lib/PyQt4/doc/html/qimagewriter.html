@@ -34,14 +34,14 @@ format plugins that support writing.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="ImageWriterError-enum" />QImageWriter.ImageWriterError</h3><p>This enum describes errors that can occur when writing images
 with <a href="qimagewriter.html">QImageWriter</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QImageWriter.DeviceError</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign"><a href="qimagewriter.html">QImageWriter</a>
 encountered a device error when writing the image data. Consult
 your device for more details on what went wrong.</td>
@@ -49,13 +49,13 @@ your device for more details on what went wrong.</td>
 <tr>
 <td class="topAlign">
 <tt>QImageWriter.UnsupportedFormatError</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Qt does not support the requested image
 format.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QImageWriter.UnknownError</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">An unknown error occurred. If you get this
 value after calling <a href="qimagewriter.html#write">write</a>(),
 it is most likely caused by a bug in <a href="qimagewriter.html">QImageWriter</a>.</td>
@@ -82,45 +82,46 @@ the image format by inspecting the extension of
 <h3 class="fn"><a name="canWrite" />bool QImageWriter.canWrite (<i>self</i>)</h3><p>Returns true if <a href="qimagewriter.html">QImageWriter</a> can
 write the image; i.e., the image format is supported and the
 assigned device is open for reading.</p>
-<p>See also <a href="qimagewriter.html#write">write</a>(), <a href="qimagewriter.html#setDevice">setDevice</a>(), and <a href="qimagewriter.html#setFormat">setFormat</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#write">write</a>(),
+<a href="qimagewriter.html#setDevice">setDevice</a>(), and <a href="qimagewriter.html#setFormat">setFormat</a>().</p>
 
 
 <h3 class="fn"><a name="compression" />int QImageWriter.compression (<i>self</i>)</h3><p>Returns the compression of the image.</p>
-<p>See also <a href="qimagewriter.html#setCompression">setCompression</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#setCompression">setCompression</a>().</p>
 
 
 <h3 class="fn"><a name="description" />QString QImageWriter.description (<i>self</i>)</h3><h3 class="fn"><a name="device" /><a href="qiodevice.html">QIODevice</a> QImageWriter.device (<i>self</i>)</h3><p>Returns the device currently assigned to <a href="qimagewriter.html">QImageWriter</a>, or 0 if no device has been
 assigned.</p>
-<p>See also <a href="qimagewriter.html#setDevice">setDevice</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="error" /><a href="qimagewriter.html#ImageWriterError-enum">ImageWriterError</a> QImageWriter.error (<i>self</i>)</h3><p>Returns the type of error that last occurred.</p>
-<p>See also <a href="qimagewriter.html#ImageWriterError-enum">ImageWriterError</a> and
+<p><b>See also</b> <a href="qimagewriter.html#ImageWriterError-enum">ImageWriterError</a> and
 <a href="qimagewriter.html#errorString">errorString</a>().</p>
 
 
 <h3 class="fn"><a name="errorString" />QString QImageWriter.errorString (<i>self</i>)</h3><p>Returns a human readable description of the last error that
 occurred.</p>
-<p>See also <a href="qimagewriter.html#error">error</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#error">error</a>().</p>
 
 
 <h3 class="fn"><a name="fileName" />QString QImageWriter.fileName (<i>self</i>)</h3><p>If the currently assigned device is a <a href="qfile.html">QFile</a>, or if <a href="qimagewriter.html#setFileName">setFileName</a>() has been called,
 this function returns the name of the file <a href="qimagewriter.html">QImageWriter</a> writes to. Otherwise (i.e., if
 no device has been assigned or the device is not a <a href="qfile.html">QFile</a>), an empty <a href="qstring.html">QString</a> is returned.</p>
-<p>See also <a href="qimagewriter.html#setFileName">setFileName</a>() and <a href="qimagewriter.html#setDevice">setDevice</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#setFileName">setFileName</a>() and <a href="qimagewriter.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="format" /><a href="qbytearray.html">QByteArray</a> QImageWriter.format (<i>self</i>)</h3><p>Returns the format <a href="qimagewriter.html">QImageWriter</a>
 uses for writing images.</p>
-<p>See also <a href="qimagewriter.html#setFormat">setFormat</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#setFormat">setFormat</a>().</p>
 
 
 <h3 class="fn"><a name="gamma" />float QImageWriter.gamma (<i>self</i>)</h3><p>Returns the gamma level of the image.</p>
-<p>See also <a href="qimagewriter.html#setGamma">setGamma</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#setGamma">setGamma</a>().</p>
 
 
 <h3 class="fn"><a name="quality" />int QImageWriter.quality (<i>self</i>)</h3><p>Returns the quality level of the image.</p>
-<p>See also <a href="qimagewriter.html#setQuality">setQuality</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#setQuality">setQuality</a>().</p>
 
 
 <h3 class="fn"><a name="setCompression" />QImageWriter.setCompression (<i>self</i>, int&#160;<i>compression</i>)</h3><p>This is an image format specific function that set the
@@ -129,7 +130,7 @@ setting the compression, this value is ignored.</p>
 <p>The value range of <i>compression</i> depends on the image
 format. For example, the "tiff" format supports two values, 0(no
 compression) and 1(LZW-compression).</p>
-<p>See also <a href="qimagewriter.html#compression">compression</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#compression">compression</a>().</p>
 
 
 <h3 class="fn"><a name="setDescription" />QImageWriter.setDescription (<i>self</i>, QString&#160;<i>description</i>)</h3><h3 class="fn"><a name="setDevice" />QImageWriter.setDevice (<i>self</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>device</i>)</h3><p>Sets <a href="qimagewriter.html">QImageWriter</a>'s device to
@@ -141,28 +142,27 @@ device in <a href="qiodevice.html#OpenModeFlag-enum">QIODevice.WriteOnly</a> mod
 calling open(). Note that this does not work for certain devices,
 such as <a href="qprocess.html">QProcess</a>, <a href="qtcpsocket.html">QTcpSocket</a> and <a href="qudpsocket.html">QUdpSocket</a>, where more logic is required to
 open the device.</p>
-<p>See also <a href="qimagewriter.html#device">device</a>() and
-<a href="qimagewriter.html#setFileName">setFileName</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#device">device</a>()
+and <a href="qimagewriter.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="setFileName" />QImageWriter.setFileName (<i>self</i>, QString&#160;<i>fileName</i>)</h3><p>Sets the file name of <a href="qimagewriter.html">QImageWriter</a> to <i>fileName</i>.
 Internally, <a href="qimagewriter.html">QImageWriter</a> will
 create a <a href="qfile.html">QFile</a> and open it in <a href="qiodevice.html#OpenModeFlag-enum">QIODevice.WriteOnly</a> mode,
 and use this file when writing images.</p>
-<p>See also <a href="qimagewriter.html#fileName">fileName</a>() and
-<a href="qimagewriter.html#setDevice">setDevice</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#fileName">fileName</a>() and <a href="qimagewriter.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="setFormat" />QImageWriter.setFormat (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>format</i>)</h3><p>Sets the format <a href="qimagewriter.html">QImageWriter</a>
 will use when writing images, to <i>format</i>. <i>format</i> is a
 case insensitive text string. Example:</p>
-<pre class="highlightedCode brush: cpp">
- QImageWriter writer;
- writer.setFormat("png"); <span class="comment">// same as writer.setFormat("PNG");</span>
+<pre class="cpp">
+ <span class="type"><a href="qimagewriter.html">QImageWriter</a></span> writer;
+ writer<span class="operator">.</span>setFormat(<span class="string">"png"</span>); <span class="comment">// same as writer.setFormat("PNG");</span>
 </pre>
 <p>You can call <a href="qimagewriter.html#supportedImageFormats">supportedImageFormats</a>()
 for the full list of formats <a href="qimagewriter.html">QImageWriter</a> supports.</p>
-<p>See also <a href="qimagewriter.html#format">format</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#format">format</a>().</p>
 
 
 <h3 class="fn"><a name="setGamma" />QImageWriter.setGamma (<i>self</i>, float&#160;<i>gamma</i>)</h3><p>This is an image format specific function that sets the gamma
@@ -171,8 +171,8 @@ support setting the gamma level, this value is ignored.</p>
 <p>The value range of <i>gamma</i> depends on the image format. For
 example, the "png" format supports a gamma range from 0.0 to
 1.0.</p>
-<p>See also <a href="qimagewriter.html#gamma">gamma</a>() and
-<a href="qimagewriter.html#quality">quality</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#gamma">gamma</a>()
+and <a href="qimagewriter.html#quality">quality</a>().</p>
 
 
 <h3 class="fn"><a name="setQuality" />QImageWriter.setQuality (<i>self</i>, int&#160;<i>quality</i>)</h3><p>This is an image format specific function that sets the quality
@@ -182,17 +182,17 @@ support setting the quality, this value is ignored.</p>
 For example, the "jpeg" format supports a quality range from 0 (low
 quality, high compression) to 100 (high quality, low
 compression).</p>
-<p>See also <a href="qimagewriter.html#quality">quality</a>().</p>
+<p><b>See also</b> <a href="qimagewriter.html#quality">quality</a>().</p>
 
 
 <h3 class="fn"><a name="setText" />QImageWriter.setText (<i>self</i>, QString&#160;<i>key</i>, QString&#160;<i>text</i>)</h3><p>Sets the image text associated with the key <i>key</i> to
 <i>text</i>. This is useful for storing copyright information or
 other information about the image. Example:</p>
-<pre class="highlightedCode brush: cpp">
- QImage image("some/image.jpeg");
- QImageWriter writer("images/outimage.png", "png");
- writer.setText("Author", "John Smith");
- writer.write(image);
+<pre class="cpp">
+ <span class="type"><a href="qimage.html">QImage</a></span> image(<span class="string">"some/image.jpeg"</span>);
+ <span class="type"><a href="qimagewriter.html">QImageWriter</a></span> writer(<span class="string">"images/outimage.png"</span><span class="operator">,</span> <span class="string">"png"</span>);
+ writer<span class="operator">.</span>setText(<span class="string">"Author"</span><span class="operator">,</span> <span class="string">"John Smith"</span>);
+ writer<span class="operator">.</span><a href="qimagewriter.html#write">write</a>(image);
 </pre>
 <p>If you want to store a single block of data (e.g., a comment),
 you can pass an empty key, or use a generic key like
@@ -201,87 +201,55 @@ you can pass an empty key, or use a generic key like
 calling <a href="qimagewriter.html#write">write</a>().</p>
 <p>Support for this option is implemented through <a href="qimageiohandler.html#ImageOption-enum">QImageIOHandler.Description</a>.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qimage.html#setText">QImage.setText</a>() and
-<a href="qimagereader.html#text">QImageReader.text</a>().</p>
+<p><b>See also</b> <a href="qimage.html#setText">QImage.setText</a>() and <a href="qimagereader.html#text">QImageReader.text</a>().</p>
 
 
 <h3 class="fn"><a name="supportedImageFormats" />list-of-QByteArray QImageWriter.supportedImageFormats ()</h3><p>Returns the list of image formats supported by <a href="qimagewriter.html">QImageWriter</a>.</p>
 <p>By default, Qt can write the following formats:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Format</th>
 <th>Description</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>BMP</p>
-</td>
-<td>
-<p>Windows Bitmap</p>
-</td>
+<tr class="odd" valign="top">
+<td>BMP</td>
+<td>Windows Bitmap</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>JPG</p>
-</td>
-<td>
-<p>Joint Photographic Experts Group</p>
-</td>
+<tr class="even" valign="top">
+<td>JPG</td>
+<td>Joint Photographic Experts Group</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>JPEG</p>
-</td>
-<td>
-<p>Joint Photographic Experts Group</p>
-</td>
+<tr class="odd" valign="top">
+<td>JPEG</td>
+<td>Joint Photographic Experts Group</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>PNG</p>
-</td>
-<td>
-<p>Portable Network Graphics</p>
-</td>
+<tr class="even" valign="top">
+<td>PNG</td>
+<td>Portable Network Graphics</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>PPM</p>
-</td>
-<td>
-<p>Portable Pixmap</p>
-</td>
+<tr class="odd" valign="top">
+<td>PPM</td>
+<td>Portable Pixmap</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>TIFF</p>
-</td>
-<td>
-<p>Tagged Image File Format</p>
-</td>
+<tr class="even" valign="top">
+<td>TIFF</td>
+<td>Tagged Image File Format</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>XBM</p>
-</td>
-<td>
-<p>X11 Bitmap</p>
-</td>
+<tr class="odd" valign="top">
+<td>XBM</td>
+<td>X11 Bitmap</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>XPM</p>
-</td>
-<td>
-<p>X11 Pixmap</p>
-</td>
+<tr class="even" valign="top">
+<td>XPM</td>
+<td>X11 Pixmap</td>
 </tr>
 </table>
 <p>Reading and writing SVG files is supported through Qt's <a href="qtsvg.html">SVG Module</a>.</p>
-<p>See also <a href="qimagewriter.html#setFormat">setFormat</a>(),
-<a href="qimagereader.html#supportedImageFormats">QImageReader.supportedImageFormats</a>(),
+<p>Note that the <a href="qapplication.html">QApplication</a>
+instance must be created before this function is called.</p>
+<p><b>See also</b> <a href="qimagewriter.html#setFormat">setFormat</a>(), <a href="qimagereader.html#supportedImageFormats">QImageReader.supportedImageFormats</a>(),
 and <a href="qimageioplugin.html">QImageIOPlugin</a>.</p>
 
 
@@ -290,16 +258,16 @@ returns false.</p>
 <p>Different image formats support different options. Call this
 function to determine whether a certain option is supported by the
 current format. For example, the PNG format allows you to embed
-text into the image's metadata (see <a href="qdeclarativeexamples.html#text">text</a>()).</p>
-<pre class="highlightedCode brush: cpp">
- QImageWriter writer(fileName);
- if (writer.supportsOption(QImageIOHandler.Description))
-     writer.setText("Author", "John Smith");
+text into the image's metadata (see text()).</p>
+<pre class="cpp">
+ <span class="type"><a href="qimagewriter.html">QImageWriter</a></span> writer(fileName);
+ <span class="keyword">if</span> (writer<span class="operator">.</span>supportsOption(<span class="type"><a href="qimageiohandler.html">QImageIOHandler</a></span><span class="operator">.</span>Description))
+     writer<span class="operator">.</span><a href="qimagewriter.html#setText">setText</a>(<span class="string">"Author"</span><span class="operator">,</span> <span class="string">"John Smith"</span>);
 </pre>
 <p>Options can be tested after the writer has been associated with
 a format.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qimagereader.html#supportsOption">QImageReader.supportsOption</a>()
+<p><b>See also</b> <a href="qimagereader.html#supportsOption">QImageReader.supportsOption</a>()
 and <a href="qimagewriter.html#setFormat">setFormat</a>().</p>
 
 
@@ -308,6 +276,5 @@ name. Returns true on success; otherwise returns false. If the
 operation fails, you can call <a href="qimagewriter.html#error">error</a>() to find the type of error
 that occurred, or <a href="qimagewriter.html#errorString">errorString</a>() to get a human
 readable description of the error.</p>
-<p>See also <a href="qimagewriter.html#canWrite">canWrite</a>(),
-<a href="qimagewriter.html#error">error</a>(), and <a href="qimagewriter.html#errorString">errorString</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qimagewriter.html#canWrite">canWrite</a>(), <a href="qimagewriter.html#error">error</a>(), and <a href="qimagewriter.html#errorString">errorString</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

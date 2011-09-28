@@ -22,26 +22,26 @@ editor. The signal's arguments are the property that changed and
 its new value.</p>
 <p>For example, when implementing a custom widget plugin, you can
 connect the signal to a custom slot:</p>
-<pre class="highlightedCode brush: cpp">
-         QDesignerPropertyEditorInterface *propertyEditor = 0;
-         propertyEditor = formEditor-&gt;propertyEditor();
+<pre class="cpp">
+         <span class="type">QDesignerPropertyEditorInterface</span> <span class="operator">*</span>propertyEditor <span class="operator">=</span> <span class="number">0</span>;
+         propertyEditor <span class="operator">=</span> formEditor<span class="operator">-</span><span class="operator">&gt;</span>propertyEditor();
 
-         connect(propertyEditor, SIGNAL(propertyChanged(QString, QVariant)),
-                 this, SLOT(checkProperty(QString, QVariant)));
+         <a href="qobject.html#connect">connect</a>(propertyEditor<span class="operator">,</span> SIGNAL(propertyChanged(<span class="type"><a href="qstring.html">QString</a></span><span class="operator">,</span> <span class="type"><a href="qvariant.html">QVariant</a></span>))<span class="operator">,</span>
+                 <span class="keyword">this</span><span class="operator">,</span> SLOT(checkProperty(<span class="type"><a href="qstring.html">QString</a></span><span class="operator">,</span> <span class="type"><a href="qvariant.html">QVariant</a></span>)));
 </pre>
 <p>Then the custom slot can check if the new value is within the
 range we want when a specified property, belonging to a particular
 widget, changes:</p>
-<pre class="highlightedCode brush: cpp">
-         void checkProperty(QString property, QVariant value) {
-             QDesignerPropertyEditorInterface *propertyEditor = 0;
-             propertyEditor = formEditor-&gt;propertyEditor();
+<pre class="cpp">
+         <span class="type">void</span> checkProperty(<span class="type"><a href="qstring.html">QString</a></span> property<span class="operator">,</span> <span class="type"><a href="qvariant.html">QVariant</a></span> value) {
+             <span class="type">QDesignerPropertyEditorInterface</span> <span class="operator">*</span>propertyEditor <span class="operator">=</span> <span class="number">0</span>;
+             propertyEditor <span class="operator">=</span> formEditor<span class="operator">-</span><span class="operator">&gt;</span>propertyEditor();
 
-             QObject *object = propertyeditor-&gt;object();
-             MyCustomWidget *widget = qobject_cast&lt;MyCustomWidget&gt;(object);
+             <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>object <span class="operator">=</span> propertyeditor<span class="operator">-</span><span class="operator">&gt;</span>object();
+             MyCustomWidget <span class="operator">*</span>widget <span class="operator">=</span> qobject_cast<span class="operator">&lt;</span>MyCustomWidget<span class="operator">&gt;</span>(object);
 
-             if (widget &amp;&amp; property == aProperty &amp;&amp; value != expectedValue)
-                 {...}
+             <span class="keyword">if</span> (widget <span class="operator">&amp;</span><span class="operator">&amp;</span> property <span class="operator">=</span><span class="operator">=</span> aProperty <span class="operator">&amp;</span><span class="operator">&amp;</span> value <span class="operator">!</span><span class="operator">=</span> expectedValue)
+                 {<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>}
          }
 </pre>
 <p>The QDesignerPropertyEditorInterface class is not intended to be
@@ -78,22 +78,22 @@ object.</p>
 
 <h3 class="fn"><a name="currentPropertyName" />QString QDesignerPropertyEditorInterface.currentPropertyName (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the name of the currently selected property in the
 property editor.</p>
-<p>See also <a href="qdesignerpropertyeditorinterface.html#setPropertyValue">setPropertyValue</a>().</p>
+<p><b>See also</b> <a href="qdesignerpropertyeditorinterface.html#setPropertyValue">setPropertyValue</a>().</p>
 
 
 <h3 class="fn"><a name="isReadOnly" />bool QDesignerPropertyEditorInterface.isReadOnly (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns true if the property editor is write protected;
 otherwise false.</p>
-<p>See also <a href="qdesignerpropertyeditorinterface.html#setReadOnly">setReadOnly</a>().</p>
+<p><b>See also</b> <a href="qdesignerpropertyeditorinterface.html#setReadOnly">setReadOnly</a>().</p>
 
 
 <h3 class="fn"><a name="object" /><a href="qobject.html">QObject</a> QDesignerPropertyEditorInterface.object (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the currently selected object in <i>Qt Designer</i>'s
 workspace.</p>
-<p>See also <a href="qdesignerpropertyeditorinterface.html#setObject">setObject</a>().</p>
+<p><b>See also</b> <a href="qdesignerpropertyeditorinterface.html#setObject">setObject</a>().</p>
 
 
 <h3 class="fn"><a name="setObject" />QDesignerPropertyEditorInterface.setObject (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>object</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setObject(QObject *)</tt>.</p><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Changes the currently selected object in <i>Qt Designer</i>'s
 workspace, to <i>object</i>.</p>
-<p>See also <a href="qdesignerpropertyeditorinterface.html#object">object</a>().</p>
+<p><b>See also</b> <a href="qdesignerpropertyeditorinterface.html#object">object</a>().</p>
 
 
 <h3 class="fn"><a name="setPropertyValue" />QDesignerPropertyEditorInterface.setPropertyValue (<i>self</i>, QString&#160;<i>name</i>, QVariant&#160;<i>value</i>, bool&#160;<i>changed</i>&#160;=&#160;True)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setPropertyValue(const QString&amp;,const QVariant&amp;,bool = 1)</tt>.</p><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets the value of the property specified by <i>name</i> to
@@ -101,17 +101,17 @@ workspace, to <i>object</i>.</p>
 <p>In addition, the property is marked as <i>changed</i> in the
 property editor, i.e. its value is different from the default
 value.</p>
-<p>See also <a href="qdesignerpropertyeditorinterface.html#currentPropertyName">currentPropertyName</a>()
+<p><b>See also</b> <a href="qdesignerpropertyeditorinterface.html#currentPropertyName">currentPropertyName</a>()
 and <a href="qdesignerpropertyeditorinterface.html#propertyChanged">propertyChanged</a>().</p>
 
 
 <h3 class="fn"><a name="setReadOnly" />QDesignerPropertyEditorInterface.setReadOnly (<i>self</i>, bool&#160;<i>readOnly</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setReadOnly(bool)</tt>.</p><p>This method is abstract and should be reimplemented in any sub-class.</p><p>If <i>readOnly</i> is true, the property editor is made write
 protected; otherwise the write protection is removed.</p>
-<p>See also <a href="qdesignerpropertyeditorinterface.html#isReadOnly">isReadOnly</a>().</p>
+<p><b>See also</b> <a href="qdesignerpropertyeditorinterface.html#isReadOnly">isReadOnly</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="propertyChanged" />void propertyChanged (const QString&amp;,const QVariant&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever a property changes in the
 property editor. The property that changed and its new value are
 specified by <i>name</i> and <i>value</i> respectively.</p>
-<p>See also <a href="qdesignerpropertyeditorinterface.html#setPropertyValue">setPropertyValue</a>().</p>
+<p><b>See also</b> <a href="qdesignerpropertyeditorinterface.html#setPropertyValue">setPropertyValue</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -121,7 +121,8 @@ the <b>OK</b> and <b>Cancel</b> buttons it contains.</p>
 objects.</p>
 <p>Setting <i>parent</i> to 0 constructs an object with no parent.
 If the object is a widget, it will become a top-level window.</p>
-<p>See also <a href="qobject.html#parent">parent</a>(), <a href="qobject.html#findChild">findChild</a>(), and <a href="qobject.html#findChildren">findChildren</a>().</p>
+<p><b>See also</b> <a href="qobject.html#parent">parent</a>(),
+<a href="qobject.html#findChild">findChild</a>(), and <a href="qobject.html#findChildren">findChildren</a>().</p>
 
 
 <h3 class="fn"><a name="blockSignals" />bool QObject.blockSignals (<i>self</i>, bool&#160;<i>b</i>)</h3><p>If <i>block</i> is true, signals emitted by this object are
@@ -131,7 +132,7 @@ to it). If <i>block</i> is false, no such blocking will occur.</p>
 <p>Note that the <a href="qobject.html#destroyed">destroyed</a>()
 signal will be emitted even if the signals for this object have
 been blocked.</p>
-<p>See also <a href="qobject.html#signalsBlocked">signalsBlocked</a>().</p>
+<p><b>See also</b> <a href="qobject.html#signalsBlocked">signalsBlocked</a>().</p>
 
 
 <h3 class="fn"><a name="childEvent" />QObject.childEvent (<i>self</i>, <a href="qchildevent.html">QChildEvent</a>)</h3><p>This event handler can be reimplemented in a subclass to receive
@@ -157,13 +158,13 @@ omitted if a child is removed immediately after it is added. If a
 child is polished several times during construction and
 destruction, you may receive several child polished events for the
 same child, each time with a different virtual table.</p>
-<p>See also <a href="qobject.html#event">event</a>().</p>
+<p><b>See also</b> <a href="qobject.html#event">event</a>().</p>
 
 
 <h3 class="fn"><a name="children" />list-of-QObject QObject.children (<i>self</i>)</h3><p>Returns a list of child objects. The <a href="qobject.html#QObjectList-typedef">QObjectList</a> class is defined
 in the <tt>&lt;QObject&gt;</tt> header file as the following:</p>
-<pre class="highlightedCode brush: cpp">
- typedef QList&lt;QObject*&gt; QObjectList;
+<pre class="qml">
+ <span class="keyword">typedef</span> <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qobject.html">QObject</a></span><span class="operator">*</span><span class="operator">&gt;</span> <span class="type"><a href="qobject.html#QObjectList-typedef">QObjectList</a></span>;
 </pre>
 <p>The first child added is the <a href="qlist.html#first">first</a> object in the list and the last child
 added is the <a href="qlist.html#last">last</a> object in the list,
@@ -171,8 +172,7 @@ i.e. new children are appended at the end.</p>
 <p>Note that the list order changes when <a href="qwidget.html">QWidget</a> children are <a href="qwidget.html#raise">raised</a> or <a href="qwidget.html#lower">lowered</a>. A widget that is raised becomes
 the last object in the list, and a widget that is lowered becomes
 the first object in the list.</p>
-<p>See also <a href="qobject.html#findChild">findChild</a>(),
-<a href="qobject.html#findChildren">findChildren</a>(), <a href="qobject.html#parent">parent</a>(), and <a href="qobject.html#setParent">setParent</a>().</p>
+<p><b>See also</b> <a href="qobject.html#findChild">findChild</a>(), <a href="qobject.html#findChildren">findChildren</a>(), <a href="qobject.html#parent">parent</a>(), and <a href="qobject.html#setParent">setParent</a>().</p>
 
 
 <h3 class="fn"><a name="connect" />bool QObject.connect (<a href="qobject.html">QObject</a>, SIGNAL(), <a href="qobject.html">QObject</a>, SLOT(), <a href="qt.html#ConnectionType-enum">Qt.ConnectionType</a>&#160;=&#160;Qt.AutoConnection)</h3><p>Creates a connection of the given <i>type</i> from the
@@ -182,42 +182,42 @@ succeeds; otherwise returns false.</p>
 <p>You must use the <tt>SIGNAL()</tt> and <tt>SLOT()</tt> macros
 when specifying the <i>signal</i> and the <i>method</i>, for
 example:</p>
-<pre class="highlightedCode brush: cpp">
- QLabel *label = new QLabel;
- QScrollBar *scrollBar = new QScrollBar;
- QObject.connect(scrollBar, SIGNAL(valueChanged(int)),
-                  label,  SLOT(setNum(int)));
+<pre class="cpp">
+ <span class="type"><a href="qlabel.html">QLabel</a></span> <span class="operator">*</span>label <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlabel.html">QLabel</a></span>;
+ <span class="type"><a href="qscrollbar.html">QScrollBar</a></span> <span class="operator">*</span>scrollBar <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qscrollbar.html">QScrollBar</a></span>;
+ <span class="type"><a href="qobject.html">QObject</a></span><span class="operator">.</span>connect(scrollBar<span class="operator">,</span> SIGNAL(valueChanged(<span class="type">int</span>))<span class="operator">,</span>
+                  label<span class="operator">,</span>  SLOT(setNum(<span class="type">int</span>)));
 </pre>
 <p>This example ensures that the label always displays the current
 scroll bar value. Note that the signal and slots parameters must
 not contain any variable names, only the type. E.g. the following
 would not work and return false:</p>
-<pre class="highlightedCode brush: cpp">
-<span class="comment"> // WRONG</span>
- QObject.connect(scrollBar, SIGNAL(valueChanged(int value)),
-                  label, SLOT(setNum(int value)));
+<pre class="cpp">
+ <span class="comment">// WRONG</span>
+ <span class="type"><a href="qobject.html">QObject</a></span><span class="operator">.</span>connect(scrollBar<span class="operator">,</span> SIGNAL(valueChanged(<span class="type">int</span> value))<span class="operator">,</span>
+                  label<span class="operator">,</span> SLOT(setNum(<span class="type">int</span> value)));
 </pre>
 <p>A signal can also be connected to another signal:</p>
-<pre class="highlightedCode brush: cpp">
- class MyWidget : public QWidget
+<pre class="cpp">
+ <span class="keyword">class</span> MyWidget : <span class="keyword">public</span> <span class="type"><a href="qwidget.html">QWidget</a></span>
  {
      Q_OBJECT
 
- public:
+ <span class="keyword">public</span>:
      MyWidget();
 
- signals:
-     void buttonClicked();
+ <span class="keyword">signals</span>:
+     <span class="type">void</span> buttonClicked();
 
- private:
-     QPushButton *myButton;
+ <span class="keyword">private</span>:
+     <span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span>myButton;
  };
 
- MyWidget.MyWidget()
+ MyWidget<span class="operator">.</span>MyWidget()
  {
-     myButton = new QPushButton(this);
-     connect(myButton, SIGNAL(clicked()),
-             this, SIGNAL(buttonClicked()));
+     myButton <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>(<span class="keyword">this</span>);
+     connect(myButton<span class="operator">,</span> SIGNAL(clicked())<span class="operator">,</span>
+             <span class="keyword">this</span><span class="operator">,</span> SIGNAL(buttonClicked()));
  }
 </pre>
 <p>In this example, the <tt>MyWidget</tt> constructor relays a
@@ -249,15 +249,14 @@ must be of types that are known to Qt's meta-object system, because
 Qt needs to copy the arguments to store them in an event behind the
 scenes. If you try to use a queued connection and get the error
 message</p>
-<pre class="highlightedCode brush: cpp">
- QObject.connect: Cannot queue arguments of type 'MyType'
- (Make sure 'MyType' is registered using qRegisterMetaType().)
+<pre class="cpp">
+ <span class="type"><a href="qobject.html">QObject</a></span><span class="operator">.</span>connect: Cannot queue arguments of type <span class="char">'MyType'</span>
+ (Make sure <span class="char">'MyType'</span> is registered <span class="keyword">using</span> <a href="qmetatype.html#qRegisterMetaType">qRegisterMetaType</a>()<span class="operator">.</span>)
 </pre>
 <p>call <a href="qmetatype.html#qRegisterMetaType">qRegisterMetaType</a>() to
 register the data type before you establish the connection.</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#thread-safe">thread-safe</a>.</p>
-<p>See also <a href="qobject.html#disconnect">disconnect</a>(),
-<a href="qobject.html#sender">sender</a>(), and <a href="qmetatype.html#qRegisterMetaType">qRegisterMetaType</a>().</p>
+<p><b>See also</b> <a href="qobject.html#disconnect">disconnect</a>(), <a href="qobject.html#sender">sender</a>(), and <a href="qmetatype.html#qRegisterMetaType">qRegisterMetaType</a>().</p>
 
 
 <h3 class="fn"><a name="connect-2" />bool QObject.connect (<a href="qobject.html">QObject</a>, SIGNAL(), callable, <a href="qt.html#ConnectionType-enum">Qt.ConnectionType</a>&#160;=&#160;Qt.AutoConnection)</h3><p>This function overloads <a href="qobject.html#connect">connect</a>().</p>
@@ -269,7 +268,7 @@ object's <i>method</i>.</p>
 connections emit two signals. You can break a connection using
 <a href="qobject.html#disconnect">disconnect</a>().</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#thread-safe">thread-safe</a>.</p>
-<p>See also <a href="qobject.html#disconnect">disconnect</a>().</p>
+<p><b>See also</b> <a href="qobject.html#disconnect">disconnect</a>().</p>
 
 
 <h3 class="fn"><a name="connect-3" />bool QObject.connect (<i>self</i>, <a href="qobject.html">QObject</a>, SIGNAL(), SLOT(), <a href="qt.html#ConnectionType-enum">Qt.ConnectionType</a>&#160;=&#160;Qt.AutoConnection)</h3><h3 class="fn"><a name="connectNotify" />QObject.connectNotify (<i>self</i>, SIGNAL()&#160;<i>signal</i>)</h3><p>This virtual function is called when something has been
@@ -277,8 +276,8 @@ connected to <i>signal</i> in this object.</p>
 <p>If you want to compare <i>signal</i> with a specific signal, use
 <a href="qlatin1string.html">QLatin1String</a> and the
 <tt>SIGNAL()</tt> macro as follows:</p>
-<pre class="highlightedCode brush: cpp">
- if (QLatin1String(signal) == SIGNAL(valueChanged(int))) {
+<pre class="cpp">
+ <span class="keyword">if</span> (QLatin1String(signal) <span class="operator">=</span><span class="operator">=</span> SIGNAL(valueChanged(<span class="type">int</span>))) {
      <span class="comment">// signal is valueChanged(int)</span>
  }
 </pre>
@@ -289,7 +288,7 @@ on the result of the <tt>SIGNAL()</tt> macro.</p>
 principle of modularity. However, it might be useful when you need
 to perform expensive initialization only if something is connected
 to a signal.</p>
-<p>See also <a href="qobject.html#connect">connect</a>() and
+<p><b>See also</b> <a href="qobject.html#connect">connect</a>() and
 <a href="qobject.html#disconnectNotify">disconnectNotify</a>().</p>
 
 
@@ -298,7 +297,8 @@ custom events. Custom events are user-defined events with a type
 value at least as large as the <a href="qevent.html#Type-enum">QEvent.User</a> item of the <a href="qevent.html#Type-enum">QEvent.Type</a> enum, and is typically a
 <a href="qevent.html">QEvent</a> subclass. The event is passed in
 the <i>event</i> parameter.</p>
-<p>See also <a href="qobject.html#event">event</a>() and <a href="qevent.html">QEvent</a>.</p>
+<p><b>See also</b> <a href="qobject.html#event">event</a>() and
+<a href="qevent.html">QEvent</a>.</p>
 
 
 <h3 class="fn"><a name="deleteLater" />QObject.deleteLater (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void deleteLater()</tt>.</p><p>Schedules this object for deletion.</p>
@@ -313,8 +313,8 @@ the event loop from which deleteLater() was called.</p>
 <p><b>Note:</b> It is safe to call this function more than once;
 when the first deferred deletion event is delivered, any pending
 events for the object are removed from the event queue.</p>
-<p>See also <a href="qobject.html#destroyed">destroyed</a>() and
-<a href="qpointer.html">QPointer</a>.</p>
+<p><b>See also</b> <a href="qobject.html#destroyed">destroyed</a>()
+and <a href="qpointer.html">QPointer</a>.</p>
 
 
 <h3 class="fn"><a name="disconnect" />bool QObject.disconnect (<a href="qobject.html">QObject</a>, SIGNAL(), <a href="qobject.html">QObject</a>, SLOT())</h3><p>Disconnects <i>signal</i> in object <i>sender</i> from
@@ -326,28 +326,28 @@ involved are destroyed.</p>
 examples demonstrate.</p>
 <ol class="1">
 <li>Disconnect everything connected to an object's signals:
-<pre class="highlightedCode brush: cpp">
- disconnect(myObject, 0, 0, 0);
+<pre class="cpp">
+ disconnect(myObject<span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span>);
 </pre>
 <p>equivalent to the non-static overloaded function</p>
-<pre class="highlightedCode brush: cpp">
- myObject-&gt;disconnect();
+<pre class="cpp">
+ myObject<span class="operator">-</span><span class="operator">&gt;</span>disconnect();
 </pre></li>
 <li>Disconnect everything connected to a specific signal:
-<pre class="highlightedCode brush: cpp">
- disconnect(myObject, SIGNAL(mySignal()), 0, 0);
+<pre class="cpp">
+ disconnect(myObject<span class="operator">,</span> SIGNAL(mySignal())<span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span>);
 </pre>
 <p>equivalent to the non-static overloaded function</p>
-<pre class="highlightedCode brush: cpp">
- myObject-&gt;disconnect(SIGNAL(mySignal()));
+<pre class="cpp">
+ myObject<span class="operator">-</span><span class="operator">&gt;</span>disconnect(SIGNAL(mySignal()));
 </pre></li>
 <li>Disconnect a specific receiver:
-<pre class="highlightedCode brush: cpp">
- disconnect(myObject, 0, myReceiver, 0);
+<pre class="cpp">
+ disconnect(myObject<span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> myReceiver<span class="operator">,</span> <span class="number">0</span>);
 </pre>
 <p>equivalent to the non-static overloaded function</p>
-<pre class="highlightedCode brush: cpp">
- myObject-&gt;disconnect(myReceiver);
+<pre class="cpp">
+ myObject<span class="operator">-</span><span class="operator">&gt;</span>disconnect(myReceiver);
 </pre></li>
 </ol>
 <p>0 may be used as a wildcard, meaning "any signal", "any
@@ -367,7 +367,7 @@ disconnected, and all other slots are left alone. The <i>method</i>
 must be 0 if <i>receiver</i> is left out, so you cannot disconnect
 a specifically-named slot on all objects.</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#thread-safe">thread-safe</a>.</p>
-<p>See also <a href="qobject.html#connect">connect</a>().</p>
+<p><b>See also</b> <a href="qobject.html#connect">connect</a>().</p>
 
 
 <h3 class="fn"><a name="disconnect-2" />bool QObject.disconnect (<a href="qobject.html">QObject</a>, SIGNAL(), callable)</h3><p>This function overloads <a href="qobject.html#disconnect">disconnect</a>().</p>
@@ -386,8 +386,7 @@ signal.</p>
 <p><b>Warning:</b> This function violates the object-oriented
 principle of modularity. However, it might be useful for optimizing
 access to expensive resources.</p>
-<p>See also <a href="qobject.html#disconnect">disconnect</a>() and
-<a href="qobject.html#connectNotify">connectNotify</a>().</p>
+<p><b>See also</b> <a href="qobject.html#disconnect">disconnect</a>() and <a href="qobject.html#connectNotify">connectNotify</a>().</p>
 
 
 <h3 class="fn"><a name="dumpObjectInfo" />QObject.dumpObjectInfo (<i>self</i>)</h3><p>Dumps information about signal connections, etc. for this object
@@ -395,14 +394,14 @@ to the debug output.</p>
 <p>This function is useful for debugging, but does nothing if the
 library has been compiled in release mode (i.e. without debugging
 information).</p>
-<p>See also <a href="qobject.html#dumpObjectTree">dumpObjectTree</a>().</p>
+<p><b>See also</b> <a href="qobject.html#dumpObjectTree">dumpObjectTree</a>().</p>
 
 
 <h3 class="fn"><a name="dumpObjectTree" />QObject.dumpObjectTree (<i>self</i>)</h3><p>Dumps a tree of children to the debug output.</p>
 <p>This function is useful for debugging, but does nothing if the
 library has been compiled in release mode (i.e. without debugging
 information).</p>
-<p>See also <a href="qobject.html#dumpObjectInfo">dumpObjectInfo</a>().</p>
+<p><b>See also</b> <a href="qobject.html#dumpObjectInfo">dumpObjectInfo</a>().</p>
 
 
 <h3 class="fn"><a name="dynamicPropertyNames" />list-of-QByteArray QObject.dynamicPropertyNames (<i>self</i>)</h3><p>Returns the names of all properties that were dynamically added
@@ -414,7 +413,7 @@ to the object using <a href="qobject.html#setProperty">setProperty</a>().</p>
 return true if the event <i>e</i> was recognized and processed.</p>
 <p>The event() function can be reimplemented to customize the
 behavior of an object.</p>
-<p>See also <a href="qobject.html#installEventFilter">installEventFilter</a>(),
+<p><b>See also</b> <a href="qobject.html#installEventFilter">installEventFilter</a>(),
 <a href="qobject.html#timerEvent">timerEvent</a>(), <a href="qcoreapplication.html#sendEvent">QApplication.sendEvent</a>(),
 <a href="qcoreapplication.html#postEvent">QApplication.postEvent</a>(),
 and <a href="qwidget.html#event">QWidget.event</a>().</p>
@@ -426,40 +425,40 @@ filter for the <i>watched</i> object.</p>
 the <i>event</i> out, i.e. stop it being handled further, return
 true; otherwise return false.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- class MainWindow : public QMainWindow
+<pre class="cpp">
+ <span class="keyword">class</span> MainWindow : <span class="keyword">public</span> <span class="type"><a href="qmainwindow.html">QMainWindow</a></span>
  {
- public:
+ <span class="keyword">public</span>:
      MainWindow();
 
- protected:
-     bool eventFilter(QObject *obj, QEvent *ev);
+ <span class="keyword">protected</span>:
+     <span class="type">bool</span> eventFilter(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>obj<span class="operator">,</span> <span class="type"><a href="qevent.html">QEvent</a></span> <span class="operator">*</span>ev);
 
- private:
-     QTextEdit *textEdit;
+ <span class="keyword">private</span>:
+     <span class="type"><a href="qtextedit.html">QTextEdit</a></span> <span class="operator">*</span>textEdit;
  };
 
- MainWindow.MainWindow()
+ MainWindow<span class="operator">.</span>MainWindow()
  {
-     textEdit = new QTextEdit;
+     textEdit <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qtextedit.html">QTextEdit</a></span>;
      setCentralWidget(textEdit);
 
-     textEdit-&gt;installEventFilter(this);
+     textEdit<span class="operator">-</span><span class="operator">&gt;</span>installEventFilter(<span class="keyword">this</span>);
  }
 
- bool MainWindow.eventFilter(QObject *obj, QEvent *event)
+ <span class="type">bool</span> MainWindow<span class="operator">.</span>eventFilter(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>obj<span class="operator">,</span> <span class="type"><a href="qevent.html">QEvent</a></span> <span class="operator">*</span>event)
  {
-     if (obj == textEdit) {
-         if (event-&gt;type() == QEvent.KeyPress) {
-             QKeyEvent *keyEvent = static_cast&lt;QKeyEvent*&gt;(event);
-             qDebug() &lt;&lt; "Ate key press" &lt;&lt; keyEvent-&gt;key();
-             return true;
-         } else {
-             return false;
+     <span class="keyword">if</span> (obj <span class="operator">=</span><span class="operator">=</span> textEdit) {
+         <span class="keyword">if</span> (event<span class="operator">-</span><span class="operator">&gt;</span>type() <span class="operator">=</span><span class="operator">=</span> <span class="type"><a href="qevent.html">QEvent</a></span><span class="operator">.</span>KeyPress) {
+             <span class="type"><a href="qkeyevent.html">QKeyEvent</a></span> <span class="operator">*</span>keyEvent <span class="operator">=</span> <span class="keyword">static_cast</span><span class="operator">&lt;</span><span class="type"><a href="qkeyevent.html">QKeyEvent</a></span><span class="operator">*</span><span class="operator">&gt;</span>(event);
+             <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Ate key press"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> keyEvent<span class="operator">-</span><span class="operator">&gt;</span>key();
+             <span class="keyword">return</span> <span class="keyword">true</span>;
+         } <span class="keyword">else</span> {
+             <span class="keyword">return</span> <span class="keyword">false</span>;
          }
-     } else {
+     } <span class="keyword">else</span> {
          <span class="comment">// pass the event on to the parent class</span>
-         return QMainWindow.eventFilter(obj, event);
+         <span class="keyword">return</span> <span class="type"><a href="qmainwindow.html">QMainWindow</a></span><span class="operator">.</span>eventFilter(obj<span class="operator">,</span> event);
      }
  }
 </pre>
@@ -469,7 +468,7 @@ have reimplemented eventFilter() for its own internal purposes.</p>
 <p><b>Warning:</b> If you delete the receiver object in this
 function, be sure to return true. Otherwise, Qt will forward the
 event to the deleted object and the program might crash.</p>
-<p>See also <a href="qobject.html#installEventFilter">installEventFilter</a>().</p>
+<p><b>See also</b> <a href="qobject.html#installEventFilter">installEventFilter</a>().</p>
 
 
 <h3 class="fn"><a name="findChild" />QObject QObject.findChild (<i>self</i>, type&#160;<i>type</i>, QString&#160;<i>name</i>&#160;=&#160;QString())</h3><p>Returns the child of this object that can be cast into type T
@@ -481,19 +480,18 @@ direct ancestor is returned. If there are several direct ancestors,
 it is undefined which one will be returned. In that case, <a href="qobject.html#findChildren">findChildren</a>() should be used.</p>
 <p>This example returns a child <a href="qpushbutton.html">QPushButton</a> of <tt>parentWidget</tt> named
 <tt>"button1"</tt>:</p>
-<pre class="highlightedCode brush: cpp">
- QPushButton *button = parentWidget-&gt;findChild&lt;QPushButton *&gt;("button1");
+<pre class="cpp">
+ <span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span>button <span class="operator">=</span> parentWidget<span class="operator">-</span><span class="operator">&gt;</span>findChild<span class="operator">&lt;</span><span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span><span class="operator">&gt;</span>(<span class="string">"button1"</span>);
 </pre>
 <p>This example returns a <a href="qlistwidget.html">QListWidget</a> child of
 <tt>parentWidget</tt>:</p>
-<pre class="highlightedCode brush: cpp">
- QListWidget *list = parentWidget-&gt;findChild&lt;QListWidget *&gt;();
+<pre class="cpp">
+ <span class="type"><a href="qlistwidget.html">QListWidget</a></span> <span class="operator">*</span>list <span class="operator">=</span> parentWidget<span class="operator">-</span><span class="operator">&gt;</span>findChild<span class="operator">&lt;</span><span class="type"><a href="qlistwidget.html">QListWidget</a></span> <span class="operator">*</span><span class="operator">&gt;</span>();
 </pre>
 <p><b>Warning:</b> This function is not available with MSVC 6. Use
 <a href="qobject.html#qFindChild">qFindChild</a>() instead if you
 need to support that version of the compiler.</p>
-<p>See also <a href="qobject.html#findChildren">findChildren</a>()
-and <a href="qobject.html#qFindChild">qFindChild</a>().</p>
+<p><b>See also</b> <a href="qobject.html#findChildren">findChildren</a>() and <a href="qobject.html#qFindChild">qFindChild</a>().</p>
 
 
 <h3 class="fn"><a name="findChild-2" />QObject QObject.findChild (<i>self</i>, tuple&#160;<i>types</i>, QString&#160;<i>name</i>&#160;=&#160;QString())</h3><h3 class="fn"><a name="findChildren" />list-of-QObject QObject.findChildren (<i>self</i>, type&#160;<i>type</i>, QString&#160;<i>name</i>&#160;=&#160;QString())</h3><p>Returns all children of this object with the given <i>name</i>
@@ -502,19 +500,19 @@ objects. Omitting the <i>name</i> argument causes all object names
 to be matched. The search is performed recursively.</p>
 <p>The following example shows how to find a list of child <a href="qwidget.html">QWidget</a>s of the specified <tt>parentWidget</tt>
 named <tt>widgetname</tt>:</p>
-<pre class="highlightedCode brush: cpp">
- QList&lt;QWidget *&gt; widgets = parentWidget.findChildren&lt;QWidget *&gt;("widgetname");
+<pre class="cpp">
+ <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qwidget.html">QWidget</a></span> <span class="operator">*</span><span class="operator">&gt;</span> widgets <span class="operator">=</span> parentWidget<span class="operator">.</span>findChildren<span class="operator">&lt;</span><span class="type"><a href="qwidget.html">QWidget</a></span> <span class="operator">*</span><span class="operator">&gt;</span>(<span class="string">"widgetname"</span>);
 </pre>
 <p>This example returns all <tt>QPushButton</tt>s that are children
 of <tt>parentWidget</tt>:</p>
-<pre class="highlightedCode brush: cpp">
- QList&lt;QPushButton *&gt; allPButtons = parentWidget.findChildren&lt;QPushButton *&gt;();
+<pre class="cpp">
+ <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span><span class="operator">&gt;</span> allPButtons <span class="operator">=</span> parentWidget<span class="operator">.</span>findChildren<span class="operator">&lt;</span><span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span><span class="operator">&gt;</span>();
 </pre>
 <p><b>Warning:</b> This function is not available with MSVC 6. Use
 <a href="qobject.html#qFindChildren">qFindChildren</a>() instead if
 you need to support that version of the compiler.</p>
-<p>See also <a href="qobject.html#findChild">findChild</a>() and
-<a href="qobject.html#qFindChildren">qFindChildren</a>().</p>
+<p><b>See also</b> <a href="qobject.html#findChild">findChild</a>()
+and <a href="qobject.html#qFindChildren">qFindChildren</a>().</p>
 
 
 <h3 class="fn"><a name="findChildren-2" />list-of-QObject QObject.findChildren (<i>self</i>, tuple&#160;<i>types</i>, QString&#160;<i>name</i>&#160;=&#160;QString())</h3><p>This function overloads <a href="qobject.html#findChildren">findChildren</a>().</p>
@@ -533,28 +531,27 @@ subclass that inherits <i>className</i>; otherwise returns
 false.</p>
 <p>A class is considered to inherit itself.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QTimer *timer = new QTimer;         <span class="comment">// QTimer inherits QObject</span>
- timer-&gt;inherits("QTimer");          <span class="comment">// returns true</span>
- timer-&gt;inherits("QObject");         <span class="comment">// returns true</span>
- timer-&gt;inherits("QAbstractButton"); <span class="comment">// returns false</span>
+<pre class="cpp">
+ <span class="type"><a href="qtimer.html">QTimer</a></span> <span class="operator">*</span>timer <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qtimer.html">QTimer</a></span>;         <span class="comment">// QTimer inherits QObject</span>
+ timer<span class="operator">-</span><span class="operator">&gt;</span>inherits(<span class="string">"QTimer"</span>);          <span class="comment">// returns true</span>
+ timer<span class="operator">-</span><span class="operator">&gt;</span>inherits(<span class="string">"QObject"</span>);         <span class="comment">// returns true</span>
+ timer<span class="operator">-</span><span class="operator">&gt;</span>inherits(<span class="string">"QAbstractButton"</span>); <span class="comment">// returns false</span>
 
-<span class="comment"> // QVBoxLayout inherits QObject and QLayoutItem</span>
- QVBoxLayout *layout = new QVBoxLayout;
- layout-&gt;inherits("QObject");        <span class="comment">// returns true</span>
- layout-&gt;inherits("QLayoutItem");    <span class="comment">// returns true (even though QLayoutItem is not a QObject)</span>
+ <span class="comment">// QVBoxLayout inherits QObject and QLayoutItem</span>
+ <span class="type"><a href="qvboxlayout.html">QVBoxLayout</a></span> <span class="operator">*</span>layout <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qvboxlayout.html">QVBoxLayout</a></span>;
+ layout<span class="operator">-</span><span class="operator">&gt;</span>inherits(<span class="string">"QObject"</span>);        <span class="comment">// returns true</span>
+ layout<span class="operator">-</span><span class="operator">&gt;</span>inherits(<span class="string">"QLayoutItem"</span>);    <span class="comment">// returns true (even though QLayoutItem is not a QObject)</span>
 </pre>
 <p>If you need to determine whether an object is an instance of a
 particular class for the purpose of casting it, consider using
 qobject_cast&lt;Type *&gt;(object) instead.</p>
-<p>See also <a href="qobject.html#metaObject">metaObject</a>() and
-<a href="qobject.html#qobject_cast">qobject_cast</a>().</p>
+<p><b>See also</b> <a href="qobject.html#metaObject">metaObject</a>() and <a href="qobject.html#qobject_cast">qobject_cast</a>().</p>
 
 
 <h3 class="fn"><a name="installEventFilter" />QObject.installEventFilter (<i>self</i>, <a href="qobject.html">QObject</a>)</h3><p>Installs an event filter <i>filterObj</i> on this object. For
 example:</p>
-<pre class="highlightedCode brush: cpp">
- monitoredObj-&gt;installEventFilter(filterObj);
+<pre class="cpp">
+ monitoredObj<span class="operator">-</span><span class="operator">&gt;</span>installEventFilter(filterObj);
 </pre>
 <p>An event filter is an object that receives all events that are
 sent to this object. The filter can either stop the event or
@@ -566,36 +563,36 @@ must return false.</p>
 filter that was installed last is activated first.</p>
 <p>Here's a <tt>KeyPressEater</tt> class that eats the key presses
 of its monitored objects:</p>
-<pre class="highlightedCode brush: cpp">
- class KeyPressEater : public QObject
+<pre class="cpp">
+ <span class="keyword">class</span> KeyPressEater : <span class="keyword">public</span> <span class="type"><a href="qobject.html">QObject</a></span>
  {
      Q_OBJECT
-     ...
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 
- protected:
-     bool eventFilter(QObject *obj, QEvent *event);
+ <span class="keyword">protected</span>:
+     <span class="type">bool</span> eventFilter(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>obj<span class="operator">,</span> <span class="type"><a href="qevent.html">QEvent</a></span> <span class="operator">*</span>event);
  };
 
- bool KeyPressEater.eventFilter(QObject *obj, QEvent *event)
+ <span class="type">bool</span> KeyPressEater<span class="operator">.</span>eventFilter(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>obj<span class="operator">,</span> <span class="type"><a href="qevent.html">QEvent</a></span> <span class="operator">*</span>event)
  {
-     if (event-&gt;type() == QEvent.KeyPress) {
-         QKeyEvent *keyEvent = static_cast&lt;QKeyEvent *&gt;(event);
-         qDebug("Ate key press %d", keyEvent-&gt;key());
-         return true;
-     } else {
+     <span class="keyword">if</span> (event<span class="operator">-</span><span class="operator">&gt;</span>type() <span class="operator">=</span><span class="operator">=</span> <span class="type"><a href="qevent.html">QEvent</a></span><span class="operator">.</span>KeyPress) {
+         <span class="type"><a href="qkeyevent.html">QKeyEvent</a></span> <span class="operator">*</span>keyEvent <span class="operator">=</span> <span class="keyword">static_cast</span><span class="operator">&lt;</span><span class="type"><a href="qkeyevent.html">QKeyEvent</a></span> <span class="operator">*</span><span class="operator">&gt;</span>(event);
+         <a href="qtcore.html#qDebug">qDebug</a>(<span class="string">"Ate key press %d"</span><span class="operator">,</span> keyEvent<span class="operator">-</span><span class="operator">&gt;</span>key());
+         <span class="keyword">return</span> <span class="keyword">true</span>;
+     } <span class="keyword">else</span> {
          <span class="comment">// standard event processing</span>
-         return QObject.eventFilter(obj, event);
+         <span class="keyword">return</span> <span class="type"><a href="qobject.html">QObject</a></span><span class="operator">.</span>eventFilter(obj<span class="operator">,</span> event);
      }
  }
 </pre>
 <p>And here's how to install it on two widgets:</p>
-<pre class="highlightedCode brush: cpp">
- KeyPressEater *keyPressEater = new KeyPressEater(this);
- QPushButton *pushButton = new QPushButton(this);
- QListView *listView = new QListView(this);
+<pre class="cpp">
+ KeyPressEater <span class="operator">*</span>keyPressEater <span class="operator">=</span> <span class="keyword">new</span> KeyPressEater(<span class="keyword">this</span>);
+ <span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span>pushButton <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>(<span class="keyword">this</span>);
+ <span class="type"><a href="qlistview.html">QListView</a></span> <span class="operator">*</span>listView <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlistview.html">QListView</a></span>(<span class="keyword">this</span>);
 
- pushButton-&gt;installEventFilter(keyPressEater);
- listView-&gt;installEventFilter(keyPressEater);
+ pushButton<span class="operator">-</span><span class="operator">&gt;</span>installEventFilter(keyPressEater);
+ listView<span class="operator">-</span><span class="operator">&gt;</span>installEventFilter(keyPressEater);
 </pre>
 <p>The <a href="qshortcut.html">QShortcut</a> class, for example,
 uses this technique to intercept shortcut key presses.</p>
@@ -609,7 +606,7 @@ function does nothing. If either <i>filterObj</i> or this object
 are moved to a different thread after calling this function, the
 event filter will not be called until both objects have the same
 thread affinity again (it is <i>not</i> removed).</p>
-<p>See also <a href="qobject.html#removeEventFilter">removeEventFilter</a>(), <a href="qobject.html#eventFilter">eventFilter</a>(), and <a href="qobject.html#event">event</a>().</p>
+<p><b>See also</b> <a href="qobject.html#removeEventFilter">removeEventFilter</a>(), <a href="qobject.html#eventFilter">eventFilter</a>(), and <a href="qobject.html#event">event</a>().</p>
 
 
 <h3 class="fn"><a name="isWidgetType" />bool QObject.isWidgetType (<i>self</i>)</h3><p>Returns true if the object is a widget; otherwise returns
@@ -622,8 +619,7 @@ much faster.</p>
 <h3 class="fn"><a name="killTimer" />QObject.killTimer (<i>self</i>, int&#160;<i>id</i>)</h3><p>Kills the timer with timer identifier, <i>id</i>.</p>
 <p>The timer identifier is returned by <a href="qobject.html#startTimer">startTimer</a>() when a timer event is
 started.</p>
-<p>See also <a href="qobject.html#timerEvent">timerEvent</a>() and
-<a href="qobject.html#startTimer">startTimer</a>().</p>
+<p><b>See also</b> <a href="qobject.html#timerEvent">timerEvent</a>() and <a href="qobject.html#startTimer">startTimer</a>().</p>
 
 
 <h3 class="fn"><a name="metaObject" /><a href="qmetaobject.html">QMetaObject</a> QObject.metaObject (<i>self</i>)</h3><p>Returns a pointer to the meta-object of this object.</p>
@@ -637,13 +633,13 @@ the meta-object.</p>
 <p>If you have no pointer to an actual object instance but still
 want to access the meta-object of a class, you can use <a href="qobject.html#staticMetaObject-var">staticMetaObject</a>.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QObject *obj = new QPushButton;
- obj-&gt;metaObject()-&gt;className();             <span class="comment">// returns "QPushButton"</span>
+<pre class="cpp">
+ <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>obj <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>;
+ obj<span class="operator">-</span><span class="operator">&gt;</span>metaObject()<span class="operator">-</span><span class="operator">&gt;</span><a href="qobject-qt3.html#className">className</a>();             <span class="comment">// returns "QPushButton"</span>
 
- QPushButton.staticMetaObject.className();  <span class="comment">// returns "QPushButton"</span>
+ <span class="type"><a href="qpushbutton.html">QPushButton</a></span><span class="operator">.</span>staticMetaObject<span class="operator">.</span><a href="qobject-qt3.html#className">className</a>();  <span class="comment">// returns "QPushButton"</span>
 </pre>
-<p>See also <a href="qobject.html#staticMetaObject-var">staticMetaObject</a>.</p>
+<p><b>See also</b> <a href="qobject.html#staticMetaObject-var">staticMetaObject</a>.</p>
 
 
 <h3 class="fn"><a name="moveToThread" />QObject.moveToThread (<i>self</i>, <a href="qthread.html">QThread</a>&#160;<i>thread</i>)</h3><p>Changes the thread affinity for this object and its children.
@@ -654,8 +650,8 @@ retrieve a pointer to the current application, and then use
 <a href="qobject.html#thread">QApplication.thread</a>() to
 retrieve the thread in which the application lives. For
 example:</p>
-<pre class="highlightedCode brush: cpp">
- myObject-&gt;moveToThread(QApplication.instance()-&gt;thread());
+<pre class="cpp">
+ myObject<span class="operator">-</span><span class="operator">&gt;</span>moveToThread(<span class="type"><a href="qapplication.html">QApplication</a></span><span class="operator">.</span>instance()<span class="operator">-</span><span class="operator">&gt;</span>thread());
 </pre>
 <p>If <i>targetThread</i> is zero, all event processing for this
 object and its children stops.</p>
@@ -674,20 +670,19 @@ current thread must be same as the current thread affinity. In
 other words, this function can only "push" an object from the
 current thread to another thread, it cannot "pull" an object from
 any arbitrary thread to the current thread.</p>
-<p>See also <a href="qobject.html#thread">thread</a>().</p>
+<p><b>See also</b> <a href="qobject.html#thread">thread</a>().</p>
 
 
 <h3 class="fn"><a name="objectName" />QString QObject.objectName (<i>self</i>)</h3><h3 class="fn"><a name="parent" /><a href="qobject.html">QObject</a> QObject.parent (<i>self</i>)</h3><p>Returns a pointer to the parent object.</p>
-<p>See also <a href="qobject.html#setParent">setParent</a>() and
-<a href="qobject.html#children">children</a>().</p>
+<p><b>See also</b> <a href="qobject.html#setParent">setParent</a>()
+and <a href="qobject.html#children">children</a>().</p>
 
 
 <h3 class="fn"><a name="property" />QVariant QObject.property (<i>self</i>, str&#160;<i>name</i>)</h3><p>Returns the value of the object's <i>name</i> property.</p>
 <p>If no such property exists, the returned variant is invalid.</p>
 <p>Information about all available properties is provided through
 the <a href="qobject.html#metaObject">metaObject</a>() and <a href="qobject.html#dynamicPropertyNames">dynamicPropertyNames</a>().</p>
-<p>See also <a href="qobject.html#setProperty">setProperty</a>(),
-<a href="qvariant.html#isValid">QVariant.isValid</a>(), <a href="qobject.html#metaObject">metaObject</a>(), and <a href="qobject.html#dynamicPropertyNames">dynamicPropertyNames</a>().</p>
+<p><b>See also</b> <a href="qobject.html#setProperty">setProperty</a>(), <a href="qvariant.html#isValid">QVariant.isValid</a>(), <a href="qobject.html#metaObject">metaObject</a>(), and <a href="qobject.html#dynamicPropertyNames">dynamicPropertyNames</a>().</p>
 
 
 <h3 class="fn"><a name="pyqtConfigure" />QObject.pyqtConfigure (<i>self</i>, object)</h3><h3 class="fn"><a name="receivers" />int QObject.receivers (<i>self</i>, SIGNAL()&#160;<i>signal</i>)</h3><p>Returns the number of receivers connected to the
@@ -698,11 +693,11 @@ number of receivers is the same as the number of connections made
 from this signal.</p>
 <p>When calling this function, you can use the <tt>SIGNAL()</tt>
 macro to pass a specific signal:</p>
-<pre class="highlightedCode brush: cpp">
- if (receivers(SIGNAL(valueChanged(QByteArray))) &gt; 0) {
-     QByteArray data;
-     get_the_value(&amp;data);       <span class="comment">// expensive operation</span>
-     emit valueChanged(data);
+<pre class="cpp">
+ <span class="keyword">if</span> (receivers(SIGNAL(valueChanged(<span class="type"><a href="qbytearray.html">QByteArray</a></span>))) <span class="operator">&gt;</span> <span class="number">0</span>) {
+     <span class="type"><a href="qbytearray.html">QByteArray</a></span> data;
+     get_the_value(<span class="operator">&amp;</span>data);       <span class="comment">// expensive operation</span>
+     <span class="keyword">emit</span> valueChanged(data);
  }
 </pre>
 <p>As the code snippet above illustrates, you can use this function
@@ -720,7 +715,7 @@ installed.</p>
 this object is destroyed.</p>
 <p>It is always safe to remove an event filter, even during event
 filter activation (i.e. from the <a href="qobject.html#eventFilter">eventFilter</a>() function).</p>
-<p>See also <a href="qobject.html#installEventFilter">installEventFilter</a>(),
+<p><b>See also</b> <a href="qobject.html#installEventFilter">installEventFilter</a>(),
 <a href="qobject.html#eventFilter">eventFilter</a>(), and <a href="qobject.html#event">event</a>().</p>
 
 
@@ -739,11 +734,12 @@ slot.</p>
 function is not valid when the slot is called via a <a href="qt.html#ConnectionType-enum">Qt.DirectConnection</a> from a
 thread different from this object's thread. Do not use this
 function in this type of scenario.</p>
-<p>See also <a href="qsignalmapper.html">QSignalMapper</a>.</p>
+<p><b>See also</b> <a href="qsignalmapper.html">QSignalMapper</a>.</p>
 
 
 <h3 class="fn"><a name="setObjectName" />QObject.setObjectName (<i>self</i>, QString&#160;<i>name</i>)</h3><h3 class="fn"><a name="setParent" />QObject.setParent (<i>self</i>, <a href="qobject.html">QObject</a>)</h3><p>The <i>QObject</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Makes the object a child of <i>parent</i>.</p>
-<p>See also <a href="qobject.html#parent">parent</a>() and <a href="qwidget.html#setParent">QWidget.setParent</a>().</p>
+<p><b>See also</b> <a href="qobject.html#parent">parent</a>() and
+<a href="qwidget.html#setParent">QWidget.setParent</a>().</p>
 
 
 <h3 class="fn"><a name="setProperty" />bool QObject.setProperty (<i>self</i>, str&#160;<i>name</i>, QVariant&#160;<i>value</i>)</h3><p>Sets the value of the object's <i>name</i> property to
@@ -761,14 +757,14 @@ property causes a <a href="qdynamicpropertychangeevent.html">QDynamicPropertyCha
 to be sent to the object.</p>
 <p><b>Note:</b> Dynamic properties starting with "_q_" are reserved
 for internal purposes.</p>
-<p>See also <a href="qobject.html#property">property</a>(),
+<p><b>See also</b> <a href="qobject.html#property">property</a>(),
 <a href="qobject.html#metaObject">metaObject</a>(), and <a href="qobject.html#dynamicPropertyNames">dynamicPropertyNames</a>().</p>
 
 
 <h3 class="fn"><a name="signalsBlocked" />bool QObject.signalsBlocked (<i>self</i>)</h3><p>Returns true if signals are blocked; otherwise returns
 false.</p>
 <p>Signals are not blocked by default.</p>
-<p>See also <a href="qobject.html#blockSignals">blockSignals</a>().</p>
+<p><b>See also</b> <a href="qobject.html#blockSignals">blockSignals</a>().</p>
 
 
 <h3 class="fn"><a name="startTimer" />int QObject.startTimer (<i>self</i>, int&#160;<i>interval</i>)</h3><p>Starts a timer and returns a timer identifier, or returns zero
@@ -784,29 +780,29 @@ events.</p>
 <p>If multiple timers are running, the <a href="qtimerevent.html#timerId">QTimerEvent.timerId</a>() can be used
 to find out which timer was activated.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- class MyObject : public QObject
+<pre class="cpp">
+ <span class="keyword">class</span> MyObject : <span class="keyword">public</span> <span class="type"><a href="qobject.html">QObject</a></span>
  {
      Q_OBJECT
 
- public:
-     MyObject(QObject *parent = 0);
+ <span class="keyword">public</span>:
+     MyObject(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>parent <span class="operator">=</span> <span class="number">0</span>);
 
- protected:
-     void timerEvent(QTimerEvent *event);
+ <span class="keyword">protected</span>:
+     <span class="type">void</span> timerEvent(<span class="type"><a href="qtimerevent.html">QTimerEvent</a></span> <span class="operator">*</span>event);
  };
 
- MyObject.MyObject(QObject *parent)
-     : QObject(parent)
+ MyObject<span class="operator">.</span>MyObject(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>parent)
+     : <span class="type"><a href="qobject.html">QObject</a></span>(parent)
  {
-     startTimer(50);     <span class="comment">// 50-millisecond timer</span>
-     startTimer(1000);   <span class="comment">// 1-second timer</span>
-     startTimer(60000);  <span class="comment">// 1-minute timer</span>
+     startTimer(<span class="number">50</span>);     <span class="comment">// 50-millisecond timer</span>
+     startTimer(<span class="number">1000</span>);   <span class="comment">// 1-second timer</span>
+     startTimer(<span class="number">60000</span>);  <span class="comment">// 1-minute timer</span>
  }
 
- void MyObject.timerEvent(QTimerEvent *event)
+ <span class="type">void</span> MyObject<span class="operator">.</span><a href="qobject.html#timerEvent">timerEvent</a>(<span class="type"><a href="qtimerevent.html">QTimerEvent</a></span> <span class="operator">*</span>event)
  {
-     qDebug() &lt;&lt; "Timer ID:" &lt;&lt; event-&gt;timerId();
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Timer ID:"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> event<span class="operator">-</span><span class="operator">&gt;</span>timerId();
  }
 </pre>
 <p>Note that <a href="qtimer.html">QTimer</a>'s accuracy depends on
@@ -819,12 +815,11 @@ programming interface with single-shot timers and timer signals
 instead of events. There is also a <a href="qbasictimer.html">QBasicTimer</a> class that is more lightweight
 than <a href="qtimer.html">QTimer</a> and less clumsy than using
 timer IDs directly.</p>
-<p>See also <a href="qobject.html#timerEvent">timerEvent</a>(),
-<a href="qobject.html#killTimer">killTimer</a>(), and <a href="qtimer.html#singleShot">QTimer.singleShot</a>().</p>
+<p><b>See also</b> <a href="qobject.html#timerEvent">timerEvent</a>(), <a href="qobject.html#killTimer">killTimer</a>(), and <a href="qtimer.html#singleShot">QTimer.singleShot</a>().</p>
 
 
 <h3 class="fn"><a name="thread" /><a href="qthread.html">QThread</a> QObject.thread (<i>self</i>)</h3><p>Returns the thread in which the object lives.</p>
-<p>See also <a href="qobject.html#moveToThread">moveToThread</a>().</p>
+<p><b>See also</b> <a href="qobject.html#moveToThread">moveToThread</a>().</p>
 
 
 <h3 class="fn"><a name="timerEvent" />QObject.timerEvent (<i>self</i>, <a href="qtimerevent.html">QTimerEvent</a>)</h3><p>This event handler can be reimplemented in a subclass to receive
@@ -833,8 +828,7 @@ timer events for the object.</p>
 interface to the timer functionality, and also more general
 information about timers. The timer event is passed in the
 <i>event</i> parameter.</p>
-<p>See also <a href="qobject.html#startTimer">startTimer</a>(),
-<a href="qobject.html#killTimer">killTimer</a>(), and <a href="qobject.html#event">event</a>().</p>
+<p><b>See also</b> <a href="qobject.html#startTimer">startTimer</a>(), <a href="qobject.html#killTimer">killTimer</a>(), and <a href="qobject.html#event">event</a>().</p>
 
 
 <h3 class="fn"><a name="tr" />QString QObject.tr (<i>self</i>, str&#160;<i>sourceText</i>, str&#160;<i>disambiguation</i>&#160;=&#160;None, int&#160;<i>n</i>&#160;=&#160;-1)</h3><p>Returns a translated version of <i>sourceText</i>, optionally
@@ -842,10 +836,10 @@ based on a <i>disambiguation</i> string and value of <i>n</i> for
 strings containing plurals; otherwise returns <i>sourceText</i>
 itself if no appropriate translated string is available.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- void MainWindow.createMenus()
+<pre class="cpp">
+ <span class="type">void</span> MainWindow<span class="operator">.</span>createMenus()
  {
-     fileMenu = menuBar()-&gt;addMenu(tr("&amp;File"));
+     fileMenu <span class="operator">=</span> menuBar()<span class="operator">-</span><span class="operator">&gt;</span>addMenu(tr(<span class="string">"&amp;File"</span>));
      ...
 </pre>
 <p>If the same <i>sourceText</i> is used in different roles within
@@ -853,11 +847,11 @@ the same context, an additional identifying string may be passed in
 <i>disambiguation</i> (0 by default). In Qt 4.4 and earlier, this
 was the preferred way to pass comments to translators.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- MyWindow.MyWindow()
+<pre class="cpp">
+ MyWindow<span class="operator">.</span>MyWindow()
  {
-     QLabel *senderLabel = new QLabel(tr("Name:"));
-     QLabel *recipientLabel = new QLabel(tr("Name:", "recipient"));
+     <span class="type"><a href="qlabel.html">QLabel</a></span> <span class="operator">*</span>senderLabel <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlabel.html">QLabel</a></span>(tr(<span class="string">"Name:"</span>));
+     <span class="type"><a href="qlabel.html">QLabel</a></span> <span class="operator">*</span>recipientLabel <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlabel.html">QLabel</a></span>(tr(<span class="string">"Name:"</span><span class="operator">,</span> <span class="string">"recipient"</span>));
      ...
 </pre>
 <p>See <a href="i18n-source-translation.html">Writing Source Code
@@ -869,7 +863,8 @@ are installed <i>before</i> calling this method. Installing or
 removing translators while performing translations is not
 supported. Doing so will probably result in crashes or other
 undesirable behavior.</p>
-<p>See also <a href="qobject.html#trUtf8">trUtf8</a>(), <a href="qcoreapplication.html#translate">QApplication.translate</a>(),
+<p><b>See also</b> <a href="qobject.html#trUtf8">trUtf8</a>(),
+<a href="qcoreapplication.html#translate">QApplication.translate</a>(),
 <a href="qtextcodec.html#setCodecForTr">QTextCodec.setCodecForTr</a>(),
 and <a href="internationalization.html">Internationalization with
 Qt</a>.</p>
@@ -891,18 +886,17 @@ undesirable behavior.</p>
 <p><b>Warning:</b> For portability reasons, we recommend that you
 use escape sequences for specifying non-ASCII characters in string
 literals to trUtf8(). For example:</p>
-<pre class="highlightedCode brush: cpp">
- label-&gt;setText(tr("F\374r \310lise"));
+<pre class="cpp">
+ label<span class="operator">-</span><span class="operator">&gt;</span>setText(<a href="qobject.html#tr">tr</a>(<span class="string">"F\374r \310lise"</span>));
 </pre>
-<p>See also <a href="qobject.html#tr">tr</a>(), <a href="qcoreapplication.html#translate">QApplication.translate</a>(),
+<p><b>See also</b> <a href="qobject.html#tr">tr</a>(), <a href="qcoreapplication.html#translate">QApplication.translate</a>(),
 and <a href="internationalization.html">Internationalization with
 Qt</a>.</p>
 <h3 class="fn"><a name="__getattr__" />object QObject.__getattr__ (<i>self</i>, str&#160;<i>name</i>)</h3><hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="destroyed" />void destroyed (QObject * = 0)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted immediately before the object <i>obj</i>
 is destroyed, and can not be blocked.</p>
 <p>All the objects's children are destroyed immediately after this
 signal is emitted.</p>
-<p>See also <a href="qobject.html#deleteLater">deleteLater</a>()
-and <a href="qpointer.html">QPointer</a>.</p>
+<p><b>See also</b> <a href="qobject.html#deleteLater">deleteLater</a>() and <a href="qpointer.html">QPointer</a>.</p>
 
 
 <hr /><h2>Member Documentation</h2><h3 class="fn"><a name="staticMetaObject-var" /><a href="qmetaobject.html">QMetaObject</a> staticMetaObject</h3><p>This member should be treated as a constant.</p><p>This variable stores the meta-object for the class.</p>
@@ -917,11 +911,11 @@ the meta-object.</p>
 <p>If you have a pointer to an object, you can use <a href="qobject.html#metaObject">metaObject</a>() to retrieve the
 meta-object associated with that object.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QPushButton.staticMetaObject.className();  <span class="comment">// returns "QPushButton"</span>
+<pre class="cpp">
+ <span class="type"><a href="qpushbutton.html">QPushButton</a></span><span class="operator">.</span>staticMetaObject<span class="operator">.</span><a href="qobject-qt3.html#className">className</a>();  <span class="comment">// returns "QPushButton"</span>
 
- QObject *obj = new QPushButton;
- obj-&gt;metaObject()-&gt;className();             <span class="comment">// returns "QPushButton"</span>
+ <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>obj <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>;
+ obj<span class="operator">-</span><span class="operator">&gt;</span><a href="qobject.html#metaObject">metaObject</a>()<span class="operator">-</span><span class="operator">&gt;</span><a href="qobject-qt3.html#className">className</a>();             <span class="comment">// returns "QPushButton"</span>
 </pre>
-<p>See also <a href="qobject.html#metaObject">metaObject</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qobject.html#metaObject">metaObject</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

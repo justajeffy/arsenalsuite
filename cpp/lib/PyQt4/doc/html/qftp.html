@@ -35,10 +35,10 @@ whether the command finished with an error.</p>
 <p>In some cases, you might want to execute a sequence of commands,
 e.g. if you want to connect and login to a FTP server. This is
 simply achieved:</p>
-<pre class="highlightedCode brush: cpp">
- QFtp *ftp = new QFtp(parent);
- ftp-&gt;connectToHost("ftp.qt.nokia.com");
- ftp-&gt;login();
+<pre class="cpp">
+ <span class="type">QFtp</span> <span class="operator">*</span>ftp <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QFtp</span>(parent);
+ ftp<span class="operator">-</span><span class="operator">&gt;</span><a href="qftp.html#connectToHost">connectToHost</a>(<span class="string">"ftp.qt.nokia.com"</span>);
+ ftp<span class="operator">-</span><span class="operator">&gt;</span><a href="qftp.html#login">login</a>();
 </pre>
 <p>In this case two FTP commands have been scheduled. When the last
 scheduled command has finished, a <a href="qftp.html#done">done</a>() signal is emitted with a bool argument
@@ -51,43 +51,43 @@ signals are emitted for them.</p>
 additional signals to report their results.</p>
 <p>Example: If you want to download the INSTALL file from the Qt
 FTP server, you would write this:</p>
-<pre class="highlightedCode brush: cpp">
- ftp-&gt;connectToHost("ftp.qt.nokia.com");   <span class="comment">// id == 1</span>
- ftp-&gt;login();                             <span class="comment">// id == 2</span>
- ftp-&gt;cd("qt");                            <span class="comment">// id == 3</span>
- ftp-&gt;get("INSTALL");                      <span class="comment">// id == 4</span>
- ftp-&gt;close();                             <span class="comment">// id == 5</span>
+<pre class="cpp">
+ ftp<span class="operator">-</span><span class="operator">&gt;</span><a href="qftp.html#connectToHost">connectToHost</a>(<span class="string">"ftp.qt.nokia.com"</span>);   <span class="comment">// id == 1</span>
+ ftp<span class="operator">-</span><span class="operator">&gt;</span><a href="qftp.html#login">login</a>();                             <span class="comment">// id == 2</span>
+ ftp<span class="operator">-</span><span class="operator">&gt;</span><a href="qftp.html#cd">cd</a>(<span class="string">"qt"</span>);                            <span class="comment">// id == 3</span>
+ ftp<span class="operator">-</span><span class="operator">&gt;</span><a href="qftp.html#get">get</a>(<span class="string">"INSTALL"</span>);                      <span class="comment">// id == 4</span>
+ ftp<span class="operator">-</span><span class="operator">&gt;</span><a href="qftp.html#close">close</a>();                             <span class="comment">// id == 5</span>
 </pre>
 <p>For this example the following sequence of signals is emitted
 (with small variations, depending on network traffic, etc.):</p>
-<pre class="highlightedCode brush: cpp">
- start(1)
- stateChanged(HostLookup)
- stateChanged(Connecting)
- stateChanged(Connected)
- finished(1, false)
+<pre class="cpp">
+ start(<span class="number">1</span>)
+ <a href="qftp.html#stateChanged">stateChanged</a>(HostLookup)
+ <a href="qftp.html#stateChanged">stateChanged</a>(Connecting)
+ <a href="qftp.html#stateChanged">stateChanged</a>(Connected)
+ finished(<span class="number">1</span><span class="operator">,</span> <span class="keyword">false</span>)
 
- start(2)
- stateChanged(LoggedIn)
- finished(2, false)
+ start(<span class="number">2</span>)
+ <a href="qftp.html#stateChanged">stateChanged</a>(LoggedIn)
+ finished(<span class="number">2</span><span class="operator">,</span> <span class="keyword">false</span>)
 
- start(3)
- finished(3, false)
+ start(<span class="number">3</span>)
+ finished(<span class="number">3</span><span class="operator">,</span> <span class="keyword">false</span>)
 
- start(4)
- dataTransferProgress(0, 3798)
- dataTransferProgress(2896, 3798)
- readyRead()
- dataTransferProgress(3798, 3798)
- readyRead()
- finished(4, false)
+ start(<span class="number">4</span>)
+ <a href="qftp.html#dataTransferProgress">dataTransferProgress</a>(<span class="number">0</span><span class="operator">,</span> <span class="number">3798</span>)
+ <a href="qftp.html#dataTransferProgress">dataTransferProgress</a>(<span class="number">2896</span><span class="operator">,</span> <span class="number">3798</span>)
+ <a href="qftp.html#readyRead">readyRead</a>()
+ <a href="qftp.html#dataTransferProgress">dataTransferProgress</a>(<span class="number">3798</span><span class="operator">,</span> <span class="number">3798</span>)
+ <a href="qftp.html#readyRead">readyRead</a>()
+ finished(<span class="number">4</span><span class="operator">,</span> <span class="keyword">false</span>)
 
- start(5)
- stateChanged(Closing)
- stateChanged(Unconnected)
- finished(5, false)
+ start(<span class="number">5</span>)
+ <a href="qftp.html#stateChanged">stateChanged</a>(Closing)
+ <a href="qftp.html#stateChanged">stateChanged</a>(Unconnected)
+ finished(<span class="number">5</span><span class="operator">,</span> <span class="keyword">false</span>)
 
- done(false)
+ <a href="qftp.html#done">done</a>(<span class="keyword">false</span>)
 </pre>
 <p>The <a href="qftp.html#dataTransferProgress">dataTransferProgress</a>() signal
 in the above example is useful if you want to show a <a href="qprogressbar.html">progress bar</a> to inform the user about the
@@ -97,17 +97,17 @@ with the <a href="qftp.html#bytesAvailable">bytesAvailable</a>()
 function and it can be read with the <a href="qftp.html#read">read</a>() or <a href="qftp.html#readAll">readAll</a>() function.</p>
 <p>If the login fails for the above example, the signals would look
 like this:</p>
-<pre class="highlightedCode brush: cpp">
- start(1)
- stateChanged(HostLookup)
- stateChanged(Connecting)
- stateChanged(Connected)
- finished(1, false)
+<pre class="cpp">
+ start(<span class="number">1</span>)
+ <a href="qftp.html#stateChanged">stateChanged</a>(HostLookup)
+ <a href="qftp.html#stateChanged">stateChanged</a>(Connecting)
+ <a href="qftp.html#stateChanged">stateChanged</a>(Connected)
+ finished(<span class="number">1</span><span class="operator">,</span> <span class="keyword">false</span>)
 
- start(2)
- finished(2, true)
+ start(<span class="number">2</span>)
+ finished(<span class="number">2</span><span class="operator">,</span> <span class="keyword">true</span>)
 
- done(true)
+ <a href="qftp.html#done">done</a>(<span class="keyword">true</span>)
 </pre>
 <p>You can then get details about the error with the <a href="qftp.html#error">error</a>() and <a href="qftp.html#errorString">errorString</a>() functions.</p>
 <p>For file transfer, QFtp can use both active or passive mode, and
@@ -135,183 +135,182 @@ this case you can simply check in the slot connected to the start()
 signal if the <a href="qftp.html#currentCommand">currentCommand</a>() is
 <tt>List</tt>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.None</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">No command is being executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.SetTransferMode</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">set the <a href="qftp.html#TransferMode-enum">transfer</a> mode.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.SetProxy</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">switch proxying on or off.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.ConnectToHost</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign"><a href="qftp.html#connectToHost">connectToHost</a>() is being
 executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Login</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign"><a href="qftp.html#login">login</a>() is being
 executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Close</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign"><a href="qftp.html#close">close</a>() is being
 executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.List</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign"><a href="qftp.html#list">list</a>() is being
 executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Cd</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign"><a href="qftp.html#cd">cd</a>() is being
 executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Get</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign"><a href="qftp.html#get">get</a>() is being
 executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Put</tt></td>
-<td class=" topAlign"><tt>9</tt></td>
+<td class="topAlign"><tt>9</tt></td>
 <td class="topAlign"><a href="qftp.html#put">put</a>() is being
 executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Remove</tt></td>
-<td class=" topAlign"><tt>10</tt></td>
+<td class="topAlign"><tt>10</tt></td>
 <td class="topAlign"><a href="qftp.html#remove">remove</a>() is
 being executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Mkdir</tt></td>
-<td class=" topAlign"><tt>11</tt></td>
+<td class="topAlign"><tt>11</tt></td>
 <td class="topAlign"><a href="qftp.html#mkdir">mkdir</a>() is being
 executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Rmdir</tt></td>
-<td class=" topAlign"><tt>12</tt></td>
+<td class="topAlign"><tt>12</tt></td>
 <td class="topAlign"><a href="qftp.html#rmdir">rmdir</a>() is being
 executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Rename</tt></td>
-<td class=" topAlign"><tt>13</tt></td>
+<td class="topAlign"><tt>13</tt></td>
 <td class="topAlign"><a href="qftp.html#rename">rename</a>() is
 being executed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.RawCommand</tt></td>
-<td class=" topAlign"><tt>14</tt></td>
+<td class="topAlign"><tt>14</tt></td>
 <td class="topAlign"><a href="qftp.html#rawCommand">rawCommand</a>() is being executed.</td>
 </tr>
 </table>
-<p>See also <a href="qftp.html#currentCommand">currentCommand</a>().</p>
+<p><b>See also</b> <a href="qftp.html#currentCommand">currentCommand</a>().</p>
 
 
 <h3 class="fn"><a name="Error-enum" />QFtp.Error</h3><p>This enum identifies the error that occurred.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.NoError</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">No error occurred.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.HostNotFound</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The host name lookup failed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.ConnectionRefused</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The server refused the connection.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.NotConnected</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Tried to send a command, but there is no
 connection to a server.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.UnknownError</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">An error other than those specified above
 occurred.</td>
 </tr>
 </table>
-<p>See also <a href="qftp.html#error">error</a>().</p>
+<p><b>See also</b> <a href="qftp.html#error">error</a>().</p>
 
 
 <h3 class="fn"><a name="State-enum" />QFtp.State</h3><p>This enum defines the connection state:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Unconnected</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">There is no connection to the host.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.HostLookup</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">A host name lookup is in progress.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Connecting</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">An attempt to connect to the host is in
 progress.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Connected</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Connection to the host has been achieved.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.LoggedIn</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Connection and user login have been
 achieved.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Closing</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The connection is closing down, but it is not
 yet closed. (The state will be <tt>Unconnected</tt> when the
 connection is closed.)</td>
 </tr>
 </table>
-<p>See also <a href="qftp.html#stateChanged">stateChanged</a>() and
-<a href="qftp.html#state">state</a>().</p>
+<p><b>See also</b> <a href="qftp.html#stateChanged">stateChanged</a>() and <a href="qftp.html#state">state</a>().</p>
 
 
 <h3 class="fn"><a name="TransferMode-enum" />QFtp.TransferMode</h3><p>FTP works with two socket connections; one for commands and
@@ -321,20 +320,20 @@ initiated by either the client or the server.</p>
 <p>This enum defines whether the client (Passive mode) or the
 server (Active mode) should set up the data connection.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Passive</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The client connects to the server to transmit
 its data.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Active</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The server connects to the client to transmit
 its data.</td>
 </tr>
@@ -344,20 +343,20 @@ its data.</td>
 <h3 class="fn"><a name="TransferType-enum" />QFtp.TransferType</h3><p>This enum identifies the data transfer type used with get and
 put commands.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Binary</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The data will be transferred in Binary
 mode.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFtp.Ascii</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The data will be transferred in Ascii mode and
 new line characters will be converted to the local format.</td>
 </tr>
@@ -388,12 +387,12 @@ abort(), there won't be any scheduled commands and the <a href="qftp.html#done">
 has occurred. For these servers the <a href="qftp.html#commandFinished">commandFinished</a>() signal has its
 error flag set to <tt>false</tt>, even though the command did not
 complete successfully.</p>
-<p>See also <a href="qftp.html#clearPendingCommands">clearPendingCommands</a>().</p>
+<p><b>See also</b> <a href="qftp.html#clearPendingCommands">clearPendingCommands</a>().</p>
 
 
 <h3 class="fn"><a name="bytesAvailable" />int QFtp.bytesAvailable (<i>self</i>)</h3><p>Returns the number of bytes that can be read from the data
 socket at the moment.</p>
-<p>See also <a href="qftp.html#get">get</a>(), <a href="qftp.html#readyRead">readyRead</a>(), <a href="qftp.html#read">read</a>(), and <a href="qftp.html#readAll">readAll</a>().</p>
+<p><b>See also</b> <a href="qftp.html#get">get</a>(), <a href="qftp.html#readyRead">readyRead</a>(), <a href="qftp.html#read">read</a>(), and <a href="qftp.html#readAll">readAll</a>().</p>
 
 
 <h3 class="fn"><a name="cd" />int QFtp.cd (<i>self</i>, QString&#160;<i>directory</i>)</h3><p>Changes the working directory of the server to <i>dir</i>.</p>
@@ -403,14 +402,13 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 <p>When the command is started the <a href="qftp.html#commandStarted">commandStarted</a>() signal is emitted.
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#commandStarted">commandStarted</a>()
-and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
+<p><b>See also</b> <a href="qftp.html#commandStarted">commandStarted</a>() and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
 
 <h3 class="fn"><a name="clearPendingCommands" />QFtp.clearPendingCommands (<i>self</i>)</h3><p>Deletes all pending commands from the list of scheduled
 commands. This does not affect the command that is being executed.
 If you want to stop this as well, use <a href="qftp.html#abort">abort</a>().</p>
-<p>See also <a href="qftp.html#hasPendingCommands">hasPendingCommands</a>() and
+<p><b>See also</b> <a href="qftp.html#hasPendingCommands">hasPendingCommands</a>() and
 <a href="qftp.html#abort">abort</a>().</p>
 
 
@@ -424,9 +422,7 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 <p>When the command is started the <a href="qftp.html#commandStarted">commandStarted</a>() signal is emitted.
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#stateChanged">stateChanged</a>(),
-<a href="qftp.html#commandStarted">commandStarted</a>(), and
-<a href="qftp.html#commandFinished">commandFinished</a>().</p>
+<p><b>See also</b> <a href="qftp.html#stateChanged">stateChanged</a>(), <a href="qftp.html#commandStarted">commandStarted</a>(), and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
 
 <h3 class="fn"><a name="connectToHost" />int QFtp.connectToHost (<i>self</i>, QString&#160;<i>host</i>, int&#160;<i>port</i>&#160;=&#160;21)</h3><p>Connects to the FTP server <i>host</i> using port
@@ -441,14 +437,12 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 <p>When the command is started the <a href="qftp.html#commandStarted">commandStarted</a>() signal is emitted.
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#stateChanged">stateChanged</a>(),
-<a href="qftp.html#commandStarted">commandStarted</a>(), and
-<a href="qftp.html#commandFinished">commandFinished</a>().</p>
+<p><b>See also</b> <a href="qftp.html#stateChanged">stateChanged</a>(), <a href="qftp.html#commandStarted">commandStarted</a>(), and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
 
 <h3 class="fn"><a name="currentCommand" /><a href="qftp.html#Command-enum">Command</a> QFtp.currentCommand (<i>self</i>)</h3><p>Returns the command type of the FTP command being executed or
 <tt>None</tt> if there is no command being executed.</p>
-<p>See also <a href="qftp.html#currentId">currentId</a>().</p>
+<p><b>See also</b> <a href="qftp.html#currentId">currentId</a>().</p>
 
 
 <h3 class="fn"><a name="currentDevice" /><a href="qiodevice.html">QIODevice</a> QFtp.currentDevice (<i>self</i>)</h3><p>Returns the <a href="qiodevice.html">QIODevice</a> pointer that
@@ -458,12 +452,12 @@ does not use an IO device, this function returns 0.</p>
 <p>This function can be used to delete the <a href="qiodevice.html">QIODevice</a> in the slot connected to the
 <a href="qftp.html#commandFinished">commandFinished</a>()
 signal.</p>
-<p>See also <a href="qftp.html#get">get</a>() and <a href="qftp.html#put">put</a>().</p>
+<p><b>See also</b> <a href="qftp.html#get">get</a>() and <a href="qftp.html#put">put</a>().</p>
 
 
 <h3 class="fn"><a name="currentId" />int QFtp.currentId (<i>self</i>)</h3><p>Returns the identifier of the FTP command that is being executed
 or 0 if there is no command being executed.</p>
-<p>See also <a href="qftp.html#currentCommand">currentCommand</a>().</p>
+<p><b>See also</b> <a href="qftp.html#currentCommand">currentCommand</a>().</p>
 
 
 <h3 class="fn"><a name="error" /><a href="qftp.html#Error-enum">Error</a> QFtp.error (<i>self</i>)</h3><p>Returns the last error that occurred. This is useful to find out
@@ -511,7 +505,8 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
 <p><a href="qftp.html#commandFinished">commandFinished</a>()</p>
-<p>See also <a href="qftp.html#readyRead">readyRead</a>(), <a href="qftp.html#dataTransferProgress">dataTransferProgress</a>(), and
+<p><b>See also</b> <a href="qftp.html#readyRead">readyRead</a>(),
+<a href="qftp.html#dataTransferProgress">dataTransferProgress</a>(), and
 <a href="qftp.html#commandStarted">commandStarted</a>().</p>
 
 
@@ -519,7 +514,7 @@ emitted.</p>
 yet been executed; otherwise returns false.</p>
 <p>The command that is being executed is <i>not</i> considered as a
 scheduled command.</p>
-<p>See also <a href="qftp.html#clearPendingCommands">clearPendingCommands</a>(),
+<p><b>See also</b> <a href="qftp.html#clearPendingCommands">clearPendingCommands</a>(),
 <a href="qftp.html#currentId">currentId</a>(), and <a href="qftp.html#currentCommand">currentCommand</a>().</p>
 
 
@@ -534,7 +529,9 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 <p>When the command is started the <a href="qftp.html#commandStarted">commandStarted</a>() signal is emitted.
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#listInfo">listInfo</a>(), <a href="qftp.html#commandStarted">commandStarted</a>(), and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
+<p><b>See also</b> <a href="qftp.html#listInfo">listInfo</a>(),
+<a href="qftp.html#commandStarted">commandStarted</a>(), and
+<a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
 
 <h3 class="fn"><a name="login" />int QFtp.login (<i>self</i>, QString&#160;<i>user</i>&#160;=&#160;QString(), QString&#160;<i>password</i>&#160;=&#160;QString())</h3><p>Logs in to the FTP server with the username <i>user</i> and the
@@ -548,8 +545,7 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 <p>When the command is started the <a href="qftp.html#commandStarted">commandStarted</a>() signal is emitted.
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#commandStarted">commandStarted</a>()
-and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
+<p><b>See also</b> <a href="qftp.html#commandStarted">commandStarted</a>() and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
 
 <h3 class="fn"><a name="mkdir" />int QFtp.mkdir (<i>self</i>, QString&#160;<i>dir</i>)</h3><p>Creates a directory called <i>dir</i> on the server.</p>
@@ -559,8 +555,7 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 <p>When the command is started the <a href="qftp.html#commandStarted">commandStarted</a>() signal is emitted.
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#commandStarted">commandStarted</a>()
-and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
+<p><b>See also</b> <a href="qftp.html#commandStarted">commandStarted</a>() and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
 
 <h3 class="fn"><a name="put" />int QFtp.put (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>data</i>, QString&#160;<i>file</i>, <a href="qftp.html#TransferType-enum">TransferType</a>&#160;<i>type</i>&#160;=&#160;QFtp.Binary)</h3><p>Reads the data from the IO device <i>dev</i>, and writes it to
@@ -589,7 +584,7 @@ When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>(
 emitted.</p>
 <p>Since this function takes a copy of the <i>data</i>, you can
 discard your own copy when this function returns.</p>
-<p>See also <a href="qftp.html#dataTransferProgress">dataTransferProgress</a>(),
+<p><b>See also</b> <a href="qftp.html#dataTransferProgress">dataTransferProgress</a>(),
 <a href="qftp.html#commandStarted">commandStarted</a>(), and
 <a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
@@ -605,18 +600,18 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 <p>When the command is started the <a href="qftp.html#commandStarted">commandStarted</a>() signal is emitted.
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#rawCommandReply">rawCommandReply</a>(), <a href="qftp.html#commandStarted">commandStarted</a>(), and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
+<p><b>See also</b> <a href="qftp.html#rawCommandReply">rawCommandReply</a>(), <a href="qftp.html#commandStarted">commandStarted</a>(), and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
 
 <h3 class="fn"><a name="read" />str QFtp.read (<i>self</i>, int&#160;<i>maxlen</i>)</h3><p>Reads <i>maxlen</i> bytes from the data socket into <i>data</i>
 and returns the number of bytes read. Returns -1 if an error
 occurred.</p>
-<p>See also <a href="qftp.html#get">get</a>(), <a href="qftp.html#readyRead">readyRead</a>(), <a href="qftp.html#bytesAvailable">bytesAvailable</a>(), and <a href="qftp.html#readAll">readAll</a>().</p>
+<p><b>See also</b> <a href="qftp.html#get">get</a>(), <a href="qftp.html#readyRead">readyRead</a>(), <a href="qftp.html#bytesAvailable">bytesAvailable</a>(), and <a href="qftp.html#readAll">readAll</a>().</p>
 
 
 <h3 class="fn"><a name="readAll" /><a href="qbytearray.html">QByteArray</a> QFtp.readAll (<i>self</i>)</h3><p>Reads all the bytes available from the data socket and returns
 them.</p>
-<p>See also <a href="qftp.html#get">get</a>(), <a href="qftp.html#readyRead">readyRead</a>(), <a href="qftp.html#bytesAvailable">bytesAvailable</a>(), and <a href="qftp.html#read">read</a>().</p>
+<p><b>See also</b> <a href="qftp.html#get">get</a>(), <a href="qftp.html#readyRead">readyRead</a>(), <a href="qftp.html#bytesAvailable">bytesAvailable</a>(), and <a href="qftp.html#read">read</a>().</p>
 
 
 <h3 class="fn"><a name="remove" />int QFtp.remove (<i>self</i>, QString&#160;<i>file</i>)</h3><p>Deletes the file called <i>file</i> from the server.</p>
@@ -626,8 +621,7 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 <p>When the command is started the <a href="qftp.html#commandStarted">commandStarted</a>() signal is emitted.
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#commandStarted">commandStarted</a>()
-and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
+<p><b>See also</b> <a href="qftp.html#commandStarted">commandStarted</a>() and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
 
 <h3 class="fn"><a name="rename" />int QFtp.rename (<i>self</i>, QString&#160;<i>oldname</i>, QString&#160;<i>newname</i>)</h3><p>Renames the file called <i>oldname</i> to <i>newname</i> on the
@@ -638,8 +632,7 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 <p>When the command is started the <a href="qftp.html#commandStarted">commandStarted</a>() signal is emitted.
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#commandStarted">commandStarted</a>()
-and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
+<p><b>See also</b> <a href="qftp.html#commandStarted">commandStarted</a>() and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
 
 <h3 class="fn"><a name="rmdir" />int QFtp.rmdir (<i>self</i>, QString&#160;<i>dir</i>)</h3><p>Removes the directory called <i>dir</i> from the server.</p>
@@ -649,8 +642,7 @@ function returns a unique identifier which is passed by <a href="qftp.html#comma
 <p>When the command is started the <a href="qftp.html#commandStarted">commandStarted</a>() signal is emitted.
 When it is finished the <a href="qftp.html#commandFinished">commandFinished</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#commandStarted">commandStarted</a>()
-and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
+<p><b>See also</b> <a href="qftp.html#commandStarted">commandStarted</a>() and <a href="qftp.html#commandFinished">commandFinished</a>().</p>
 
 
 <h3 class="fn"><a name="setProxy" />int QFtp.setProxy (<i>self</i>, QString&#160;<i>host</i>, int&#160;<i>port</i>)</h3><p>Enables use of the FTP proxy on host <i>host</i> and port
@@ -663,25 +655,26 @@ this.</p>
 
 <h3 class="fn"><a name="setTransferMode" />int QFtp.setTransferMode (<i>self</i>, <a href="qftp.html#TransferMode-enum">TransferMode</a>&#160;<i>mode</i>)</h3><p>Sets the current FTP transfer mode to <i>mode</i>. The default
 is <a href="qftp.html#TransferMode-enum">QFtp.Passive</a>.</p>
-<p>See also <a href="qftp.html#TransferMode-enum">QFtp.TransferMode</a>.</p>
+<p><b>See also</b> <a href="qftp.html#TransferMode-enum">QFtp.TransferMode</a>.</p>
 
 
 <h3 class="fn"><a name="state" /><a href="qftp.html#State-enum">State</a> QFtp.state (<i>self</i>)</h3><p>Returns the current state of the object. When the state changes,
 the <a href="qftp.html#stateChanged">stateChanged</a>() signal is
 emitted.</p>
-<p>See also <a href="qftp.html#State-enum">State</a> and <a href="qftp.html#stateChanged">stateChanged</a>().</p>
+<p><b>See also</b> <a href="qftp.html#State-enum">State</a> and
+<a href="qftp.html#stateChanged">stateChanged</a>().</p>
 
 
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="commandFinished" />void commandFinished (int,bool)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when processing the command identified by
 <i>id</i> has finished. <i>error</i> is true if an error occurred
 during the processing; otherwise <i>error</i> is false.</p>
-<p>See also <a href="qftp.html#commandStarted">commandStarted</a>(), <a href="qftp.html#done">done</a>(), <a href="qftp.html#error">error</a>(),
+<p><b>See also</b> <a href="qftp.html#commandStarted">commandStarted</a>(), <a href="qftp.html#done">done</a>(), <a href="qftp.html#error">error</a>(),
 and <a href="qftp.html#errorString">errorString</a>().</p>
 
 
 <h3 class="fn"><a name="commandStarted" />void commandStarted (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when processing the command identified by
 <i>id</i> starts.</p>
-<p>See also <a href="qftp.html#commandFinished">commandFinished</a>() and <a href="qftp.html#done">done</a>().</p>
+<p><b>See also</b> <a href="qftp.html#commandFinished">commandFinished</a>() and <a href="qftp.html#done">done</a>().</p>
 
 
 <h3 class="fn"><a name="dataTransferProgress" />void dataTransferProgress (qint64,qint64)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted in response to a <a href="qftp.html#get">get</a>() or <a href="qftp.html#put">put</a>()
@@ -697,25 +690,25 @@ progress bar shows a busy indicator if the total is 0).</p>
 <p><b>Warning:</b> <i>done</i> and <i>total</i> are not necessarily
 the size in bytes, since for large files these values might need to
 be "scaled" to avoid overflow.</p>
-<p>See also <a href="qftp.html#get">get</a>(), <a href="qftp.html#put">put</a>(), and <a href="qprogressbar.html">QProgressBar</a>.</p>
+<p><b>See also</b> <a href="qftp.html#get">get</a>(), <a href="qftp.html#put">put</a>(), and <a href="qprogressbar.html">QProgressBar</a>.</p>
 
 
 <h3 class="fn"><a name="done" />void done (bool)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the last pending command has
 finished; (it is emitted after the last command's <a href="qftp.html#commandFinished">commandFinished</a>() signal).
 <i>error</i> is true if an error occurred during the processing;
 otherwise <i>error</i> is false.</p>
-<p>See also <a href="qftp.html#commandFinished">commandFinished</a>(), <a href="qftp.html#error">error</a>(), and <a href="qftp.html#errorString">errorString</a>().</p>
+<p><b>See also</b> <a href="qftp.html#commandFinished">commandFinished</a>(), <a href="qftp.html#error">error</a>(), and <a href="qftp.html#errorString">errorString</a>().</p>
 
 
 <h3 class="fn"><a name="listInfo" />void listInfo (const QUrlInfo&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted for each directory entry the <a href="qftp.html#list">list</a>() command finds. The details of the entry
 are stored in <i>i</i>.</p>
-<p>See also <a href="qftp.html#list">list</a>().</p>
+<p><b>See also</b> <a href="qftp.html#list">list</a>().</p>
 
 
 <h3 class="fn"><a name="rawCommandReply" />void rawCommandReply (int,const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted in response to the <a href="qftp.html#rawCommand">rawCommand</a>() function. <i>replyCode</i>
 is the 3 digit reply code and <i>detail</i> is the text that
 follows the reply code.</p>
-<p>See also <a href="qftp.html#rawCommand">rawCommand</a>().</p>
+<p><b>See also</b> <a href="qftp.html#rawCommand">rawCommand</a>().</p>
 
 
 <h3 class="fn"><a name="readyRead" />void readyRead ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted in response to a <a href="qftp.html#get">get</a>() command when there is new data to
@@ -727,7 +720,7 @@ emitted; instead the data is written directly to the device.</p>
 as soon as it becomes available. If you are only interested in the
 complete data, just connect to the <a href="qftp.html#commandFinished">commandFinished</a>() signal and read
 the data then instead.</p>
-<p>See also <a href="qftp.html#get">get</a>(), <a href="qftp.html#read">read</a>(), <a href="qftp.html#readAll">readAll</a>(), and <a href="qftp.html#bytesAvailable">bytesAvailable</a>().</p>
+<p><b>See also</b> <a href="qftp.html#get">get</a>(), <a href="qftp.html#read">read</a>(), <a href="qftp.html#readAll">readAll</a>(), and <a href="qftp.html#bytesAvailable">bytesAvailable</a>().</p>
 
 
 <h3 class="fn"><a name="stateChanged" />void stateChanged (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the state of the connection changes.
@@ -736,6 +729,5 @@ one of the <a href="qftp.html#State-enum">State</a> values.</p>
 <p>It is usually emitted in response to a <a href="qftp.html#connectToHost">connectToHost</a>() or <a href="qftp.html#close">close</a>() command, but it can also be emitted
 "spontaneously", e.g. when the server closes the connection
 unexpectedly.</p>
-<p>See also <a href="qftp.html#connectToHost">connectToHost</a>(),
-<a href="qftp.html#close">close</a>(), <a href="qftp.html#state">state</a>(), and <a href="qftp.html#State-enum">State</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qftp.html#connectToHost">connectToHost</a>(), <a href="qftp.html#close">close</a>(), <a href="qftp.html#state">state</a>(), and <a href="qftp.html#State-enum">State</a>.</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

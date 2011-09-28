@@ -17,9 +17,9 @@ context.</p>
 established for the <tt>script</tt> property; i.e. <tt>script</tt>
 would be assigned the value obtained from running <tt>myObj.value =
 Math.max(myValue, 100)</tt></p>
-<pre class="highlightedCode brush: cpp">
- MyType {
-     script: myObj.value = Math.max(myValue, 100)
+<pre class="qml">
+ <span class="type">MyType</span> {
+     <span class="name">script</span>: <span class="name">myObj</span>.<span class="name">value</span> <span class="operator">=</span> <span class="name">Math</span>.<span class="name">max</span>(<span class="name">myValue</span>, <span class="number">100</span>)
  }
 </pre>
 <p>If instead the property had a type of QDeclarativeScriptString,
@@ -27,9 +27,9 @@ the script itself -- <i>myObj.value = Math.max(myValue, 100)</i> --
 would be passed to the <tt>script</tt> property and the class could
 choose how to handle it. Typically, the class will evaluate the
 script at some later time using a <a href="qdeclarativeexpression.html">QDeclarativeExpression</a>.</p>
-<pre class="highlightedCode brush: cpp">
- QDeclarativeExpression expr(scriptString.context(), scriptString.script(), scriptStr.scopeObject());
- expr.value();
+<pre class="cpp">
+ <span class="type"><a href="qdeclarativeexpression.html">QDeclarativeExpression</a></span> expr(scriptString<span class="operator">.</span>context()<span class="operator">,</span> scriptString<span class="operator">.</span>script()<span class="operator">,</span> scriptStr<span class="operator">.</span>scopeObject());
+ expr<span class="operator">.</span>value();
 </pre><hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QDeclarativeScriptString" />QDeclarativeScriptString.__init__ (<i>self</i>)</h3><p>Constructs an empty instance.</p>
 
 
@@ -37,27 +37,27 @@ script at some later time using a <a href="qdeclarativeexpression.html">QDeclara
 
 
 <h3 class="fn"><a name="context" /><a href="qdeclarativecontext.html">QDeclarativeContext</a> QDeclarativeScriptString.context (<i>self</i>)</h3><p>Returns the context for the script.</p>
-<p>See also <a href="qdeclarativescriptstring.html#setContext">setContext</a>().</p>
+<p><b>See also</b> <a href="qdeclarativescriptstring.html#setContext">setContext</a>().</p>
 
 
 <h3 class="fn"><a name="scopeObject" /><a href="qobject.html">QObject</a> QDeclarativeScriptString.scopeObject (<i>self</i>)</h3><p>Returns the scope object for the script.</p>
-<p>See also <a href="qdeclarativescriptstring.html#setScopeObject">setScopeObject</a>().</p>
+<p><b>See also</b> <a href="qdeclarativescriptstring.html#setScopeObject">setScopeObject</a>().</p>
 
 
 <h3 class="fn"><a name="script" />QString QDeclarativeScriptString.script (<i>self</i>)</h3><p>Returns the script text.</p>
-<p>See also <a href="qdeclarativescriptstring.html#setScript">setScript</a>().</p>
+<p><b>See also</b> <a href="qdeclarativescriptstring.html#setScript">setScript</a>().</p>
 
 
 <h3 class="fn"><a name="setContext" />QDeclarativeScriptString.setContext (<i>self</i>, <a href="qdeclarativecontext.html">QDeclarativeContext</a>)</h3><p>Sets the <i>context</i> for the script.</p>
-<p>See also <a href="qdeclarativescriptstring.html#context">context</a>().</p>
+<p><b>See also</b> <a href="qdeclarativescriptstring.html#context">context</a>().</p>
 
 
 <h3 class="fn"><a name="setScopeObject" />QDeclarativeScriptString.setScopeObject (<i>self</i>, <a href="qobject.html">QObject</a>)</h3><p>Sets the scope <i>object</i> for the script.</p>
-<p>See also <a href="qdeclarativescriptstring.html#scopeObject">scopeObject</a>().</p>
+<p><b>See also</b> <a href="qdeclarativescriptstring.html#scopeObject">scopeObject</a>().</p>
 
 
 <h3 class="fn"><a name="setScript" />QDeclarativeScriptString.setScript (<i>self</i>, QString)</h3><p>Sets the <i>script</i> text.</p>
-<p>See also <a href="qdeclarativescriptstring.html#script">script</a>().</p>
+<p><b>See also</b> <a href="qdeclarativescriptstring.html#script">script</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

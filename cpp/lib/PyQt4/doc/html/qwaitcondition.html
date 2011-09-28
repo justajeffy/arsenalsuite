@@ -18,22 +18,22 @@ selected condition or <a href="qwaitcondition.html#wakeAll">wakeAll</a>() to wak
 <p>For example, let's suppose that we have three tasks that should
 be performed whenever the user presses a key. Each task could be
 split into a thread, each of which would have a <a href="qthread.html#run">run()</a> body like this:</p>
-<pre class="highlightedCode brush: cpp">
+<pre class="cpp">
  forever {
-     mutex.lock();
-     keyPressed.wait(&amp;mutex);
+     mutex<span class="operator">.</span>lock();
+     keyPressed<span class="operator">.</span>wait(<span class="operator">&amp;</span>mutex);
      do_something();
-     mutex.unlock();
+     mutex<span class="operator">.</span>unlock();
  }
 </pre>
 <p>Here, the <tt>keyPressed</tt> variable is a global variable of
 type QWaitCondition.</p>
 <p>A fourth thread would read key presses and wake the other three
 threads up every time it receives one, like this:</p>
-<pre class="highlightedCode brush: cpp">
+<pre class="cpp">
  forever {
      getchar();
-     keyPressed.wakeAll();
+     keyPressed<span class="operator">.</span>wakeAll();
  }
 </pre>
 <p>The order in which the three threads are woken up is undefined.
@@ -43,34 +43,34 @@ waiting on the condition variable) and so the task will not be
 performed for that key press. This issue can be solved using a
 counter and a <a href="qmutex.html">QMutex</a> to guard it. For
 example, here's the new code for the worker threads:</p>
-<pre class="highlightedCode brush: cpp">
+<pre class="cpp">
  forever {
-     mutex.lock();
-     keyPressed.wait(&amp;mutex);
-     ++count;
-     mutex.unlock();
+     mutex<span class="operator">.</span>lock();
+     keyPressed<span class="operator">.</span>wait(<span class="operator">&amp;</span>mutex);
+     <span class="operator">+</span><span class="operator">+</span>count;
+     mutex<span class="operator">.</span>unlock();
 
      do_something();
 
-     mutex.lock();
-     --count;
-     mutex.unlock();
+     mutex<span class="operator">.</span>lock();
+     <span class="operator">-</span><span class="operator">-</span>count;
+     mutex<span class="operator">.</span>unlock();
  }
 </pre>
 <p>Here's the code for the fourth thread:</p>
-<pre class="highlightedCode brush: cpp">
+<pre class="cpp">
  forever {
      getchar();
 
-     mutex.lock();
+     mutex<span class="operator">.</span>lock();
      <span class="comment">// Sleep until there are no busy worker threads</span>
-     while (count &gt; 0) {
-         mutex.unlock();
-         sleep(1);
-         mutex.lock();
+     <span class="keyword">while</span> (count <span class="operator">&gt;</span> <span class="number">0</span>) {
+         mutex<span class="operator">.</span>unlock();
+         sleep(<span class="number">1</span>);
+         mutex<span class="operator">.</span>lock();
      }
-     keyPressed.wakeAll();
-     mutex.unlock();
+     keyPressed<span class="operator">.</span>wakeAll();
+     mutex<span class="operator">.</span>unlock();
  }
 </pre>
 <p>The mutex is necessary because the results of two threads
@@ -103,8 +103,7 @@ the wait timed out.</li>
 <p>The mutex will be returned to the same locked state. This
 function is provided to allow the atomic transition from the locked
 state to the wait state.</p>
-<p>See also <a href="qwaitcondition.html#wakeOne">wakeOne</a>() and
-<a href="qwaitcondition.html#wakeAll">wakeAll</a>().</p>
+<p><b>See also</b> <a href="qwaitcondition.html#wakeOne">wakeOne</a>() and <a href="qwaitcondition.html#wakeAll">wakeAll</a>().</p>
 
 
 <h3 class="fn"><a name="wait-2" />bool QWaitCondition.wait (<i>self</i>, <a href="qreadwritelock.html">QReadWriteLock</a>&#160;<i>readWriteLock</i>, int&#160;<i>msecs</i>&#160;=&#160;ULONG_MAX)</h3><p>Releases the locked <i>readWriteLock</i> and waits on the wait
@@ -127,14 +126,13 @@ the wait timed out.</li>
 state. This function is provided to allow the atomic transition
 from the locked state to the wait state.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qwaitcondition.html#wakeOne">wakeOne</a>() and
-<a href="qwaitcondition.html#wakeAll">wakeAll</a>().</p>
+<p><b>See also</b> <a href="qwaitcondition.html#wakeOne">wakeOne</a>() and <a href="qwaitcondition.html#wakeAll">wakeAll</a>().</p>
 
 
 <h3 class="fn"><a name="wakeAll" />QWaitCondition.wakeAll (<i>self</i>)</h3><p>Wakes all threads waiting on the wait condition. The order in
 which the threads are woken up depends on the operating system's
 scheduling policies and cannot be controlled or predicted.</p>
-<p>See also <a href="qwaitcondition.html#wakeOne">wakeOne</a>().</p>
+<p><b>See also</b> <a href="qwaitcondition.html#wakeOne">wakeOne</a>().</p>
 
 
 <h3 class="fn"><a name="wakeOne" />QWaitCondition.wakeOne (<i>self</i>)</h3><p>Wakes one thread waiting on the wait condition. The thread that
@@ -143,5 +141,5 @@ and cannot be controlled or predicted.</p>
 <p>If you want to wake up a specific thread, the solution is
 typically to use different wait conditions and have different
 threads wait on different conditions.</p>
-<p>See also <a href="qwaitcondition.html#wakeAll">wakeAll</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qwaitcondition.html#wakeAll">wakeAll</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

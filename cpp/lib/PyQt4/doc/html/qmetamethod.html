@@ -24,43 +24,43 @@ conventions used in C++.</p>
 </tr>
 <tr>
 <td class="topAlign"><tt>QMetaMethod.Private</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QMetaMethod.Protected</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QMetaMethod.Public</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 </tr>
 </table>
 
 
 <h3 class="fn"><a name="MethodType-enum" />QMetaMethod.MethodType</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QMetaMethod.Method</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The function is a plain member function.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QMetaMethod.Signal</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The function is a signal.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QMetaMethod.Slot</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The function is a slot.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QMetaMethod.Constructor</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The function is a constructor.</td>
 </tr>
 </table>
@@ -68,7 +68,7 @@ conventions used in C++.</p>
 protected, or public).</p>
 <p>Signals are always protected, meaning that you can only emit
 them from the class or from a subclass.</p>
-<p>See also <a href="qmetamethod.html#methodType">methodType</a>().</p>
+<p><b>See also</b> <a href="qmetamethod.html#methodType">methodType</a>().</p>
 
 
 <h3 class="fn"><a name="invoke" />object QMetaMethod.invoke (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>object</i>, <a href="qt.html#ConnectionType-enum">Qt.ConnectionType</a>&#160;<i>connectionType</i>, <a href="qgenericreturnargument.html">QGenericReturnArgument</a>&#160;<i>returnValue</i>, <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value0</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value1</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value2</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value3</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value4</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value5</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value6</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value7</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value8</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value9</i>&#160;=&#160;QGenericArgument(0,0))</h3><p>Invokes this method on the object <i>object</i>. Returns true if
@@ -101,34 +101,34 @@ reference of that type; <a href="qmetaobject.html#Q_RETURN_ARG">Q_RETURN_ARG</a>
 name and a non-const reference.</p>
 <p>To asynchronously invoke the <a href="qabstractbutton.html#animateClick">animateClick()</a> slot on a
 <a href="qpushbutton.html">QPushButton</a>:</p>
-<pre class="highlightedCode brush: cpp">
- int methodIndex = pushButton-&gt;metaObject()-&gt;indexOfMethod("animateClick()");
- QMetaMethod method = metaObject-&gt;method(methodIndex);
- method.invoke(pushButton, Qt.QueuedConnection);
+<pre class="cpp">
+ <span class="type">int</span> methodIndex <span class="operator">=</span> pushButton<span class="operator">-</span><span class="operator">&gt;</span>metaObject()<span class="operator">-</span><span class="operator">&gt;</span>indexOfMethod(<span class="string">"animateClick()"</span>);
+ <span class="type"><a href="qmetamethod.html">QMetaMethod</a></span> method <span class="operator">=</span> metaObject<span class="operator">-</span><span class="operator">&gt;</span>method(methodIndex);
+ method<span class="operator">.</span>invoke(pushButton<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>QueuedConnection);
 </pre>
 <p>With asynchronous method invocations, the parameters must be of
 types that are known to Qt's meta-object system, because Qt needs
 to copy the arguments to store them in an event behind the scenes.
 If you try to use a queued connection and get the error message</p>
-<pre class="highlightedCode brush: cpp">
- QMetaMethod.invoke: Unable to handle unregistered datatype 'MyType'
+<pre class="cpp">
+ <span class="type"><a href="qmetamethod.html">QMetaMethod</a></span><span class="operator">.</span>invoke: Unable to handle unregistered datatype <span class="char">'MyType'</span>
 </pre>
 <p>call <a href="qmetatype.html#qRegisterMetaType">qRegisterMetaType</a>() to
 register the data type before you call QMetaMethod.invoke().</p>
 <p>To synchronously invoke the <tt>compute(QString, int,
 double)</tt> slot on some arbitrary object <tt>obj</tt> retrieve
 its return value:</p>
-<pre class="highlightedCode brush: cpp">
- QString retVal;
- QByteArray normalizedSignature = QMetaObject.normalizedSignature("compute(QString, int, double)");
- int methodIndex = obj-&gt;metaObject()-&gt;indexOfMethod(normalizedSignature);
- QMetaMethod method = metaObject-&gt;method(methodIndex);
- method.invoke(obj,
-               Qt.DirectConnection,
-               Q_RETURN_ARG(QString, retVal),
-               Q_ARG(QString, "sqrt"),
-               Q_ARG(int, 42),
-               Q_ARG(double, 9.7));
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> retVal;
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> normalizedSignature <span class="operator">=</span> <span class="type"><a href="qmetaobject.html">QMetaObject</a></span><span class="operator">.</span>normalizedSignature(<span class="string">"compute(QString, int, double)"</span>);
+ <span class="type">int</span> methodIndex <span class="operator">=</span> obj<span class="operator">-</span><span class="operator">&gt;</span>metaObject()<span class="operator">-</span><span class="operator">&gt;</span>indexOfMethod(normalizedSignature);
+ <span class="type"><a href="qmetamethod.html">QMetaMethod</a></span> method <span class="operator">=</span> metaObject<span class="operator">-</span><span class="operator">&gt;</span>method(methodIndex);
+ method<span class="operator">.</span>invoke(obj<span class="operator">,</span>
+               <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>DirectConnection<span class="operator">,</span>
+               Q_RETURN_ARG(<span class="type"><a href="qstring.html">QString</a></span><span class="operator">,</span> retVal)<span class="operator">,</span>
+               Q_ARG(<span class="type"><a href="qstring.html">QString</a></span><span class="operator">,</span> <span class="string">"sqrt"</span>)<span class="operator">,</span>
+               Q_ARG(<span class="type">int</span><span class="operator">,</span> <span class="number">42</span>)<span class="operator">,</span>
+               Q_ARG(<span class="type">double</span><span class="operator">,</span> <span class="number">9.7</span>));
 </pre>
 <p><a href="qmetaobject.html#normalizedSignature">QMetaObject.normalizedSignature</a>()
 is used here to ensure that the format of the signature is what
@@ -140,8 +140,10 @@ arguments: <i>object</i> must be an instance of the class of the
 <a href="qmetaobject.html">QMetaObject</a> of which this <a href="qmetamethod.html">QMetaMethod</a> has been constructed with. The
 arguments must have the same type as the ones expected by the
 method, else, the behaviour is undefined.</p>
-<p>See also <a href="qmetaobject.html#Q_ARG">Q_ARG</a>(), <a href="qmetaobject.html#Q_RETURN_ARG">Q_RETURN_ARG</a>(), <a href="qmetatype.html#qRegisterMetaType">qRegisterMetaType</a>(), and
-<a href="qmetaobject.html#invokeMethod">QMetaObject.invokeMethod</a>().</p>
+<p><b>See also</b> <a href="qmetaobject.html#Q_ARG">Q_ARG</a>(),
+<a href="qmetaobject.html#Q_RETURN_ARG">Q_RETURN_ARG</a>(),
+<a href="qmetatype.html#qRegisterMetaType">qRegisterMetaType</a>(),
+and <a href="qmetaobject.html#invokeMethod">QMetaObject.invokeMethod</a>().</p>
 
 
 <h3 class="fn"><a name="invoke-2" />object QMetaMethod.invoke (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>object</i>, <a href="qgenericreturnargument.html">QGenericReturnArgument</a>&#160;<i>returnValue</i>, <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value0</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value1</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value2</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value3</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value4</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value5</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value6</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value7</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value8</i>&#160;=&#160;QGenericArgument(0,0), <a href="qgenericargument.html">QGenericArgument</a>&#160;<i>value9</i>&#160;=&#160;QGenericArgument(0,0))</h3><p>This function overloads <a href="qmetamethod.html#invoke">invoke</a>().</p>
@@ -165,20 +167,20 @@ ignores return values.</p>
 
 
 <h3 class="fn"><a name="methodType" /><a href="qmetamethod.html#MethodType-enum">MethodType</a> QMetaMethod.methodType (<i>self</i>)</h3><p>Returns the type of this method (signal, slot, or method).</p>
-<p>See also <a href="qmetamethod.html#access">access</a>().</p>
+<p><b>See also</b> <a href="qmetamethod.html#access">access</a>().</p>
 
 
 <h3 class="fn"><a name="parameterNames" />list-of-QByteArray QMetaMethod.parameterNames (<i>self</i>)</h3><p>Returns a list of parameter names.</p>
-<p>See also <a href="qmetamethod.html#parameterTypes">parameterTypes</a>() and <a href="qmetamethod.html#signature">signature</a>().</p>
+<p><b>See also</b> <a href="qmetamethod.html#parameterTypes">parameterTypes</a>() and <a href="qmetamethod.html#signature">signature</a>().</p>
 
 
 <h3 class="fn"><a name="parameterTypes" />list-of-QByteArray QMetaMethod.parameterTypes (<i>self</i>)</h3><p>Returns a list of parameter types.</p>
-<p>See also <a href="qmetamethod.html#parameterNames">parameterNames</a>() and <a href="qmetamethod.html#signature">signature</a>().</p>
+<p><b>See also</b> <a href="qmetamethod.html#parameterNames">parameterNames</a>() and <a href="qmetamethod.html#signature">signature</a>().</p>
 
 
 <h3 class="fn"><a name="signature" />str QMetaMethod.signature (<i>self</i>)</h3><p>Returns the signature of this method (e.g.,
 <tt>setValue(double)</tt>).</p>
-<p>See also <a href="qmetamethod.html#parameterTypes">parameterTypes</a>() and <a href="qmetamethod.html#parameterNames">parameterNames</a>().</p>
+<p><b>See also</b> <a href="qmetamethod.html#parameterTypes">parameterTypes</a>() and <a href="qmetamethod.html#parameterNames">parameterNames</a>().</p>
 
 
 <h3 class="fn"><a name="tag" />str QMetaMethod.tag (<i>self</i>)</h3><p>Returns the tag associated with this method.</p>
@@ -189,4 +191,4 @@ possible to add extra information about a method. For the moment,
 
 <h3 class="fn"><a name="typeName" />str QMetaMethod.typeName (<i>self</i>)</h3><p>Returns the return type of this method, or an empty string if
 the return type is <i>void</i>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

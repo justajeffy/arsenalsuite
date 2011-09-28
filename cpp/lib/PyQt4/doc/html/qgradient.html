@@ -21,24 +21,18 @@ point.</li>
 <p>A gradient's type can be retrieved using the <a href="qgradient.html#type">type</a>() function. Each of the types is
 represented by a subclass of QGradient:</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/qgradient-linear.png" /></p>
-</td>
-<td>
-<p><img src="images/qgradient-radial.png" /></p>
-</td>
-<td>
-<p><img src="images/qgradient-conical.png" /></p>
-</td>
-</tr>
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th><a href="qlineargradient.html">QLinearGradient</a></th>
 <th><a href="qradialgradient.html">QRadialGradient</a></th>
 <th><a href="qconicalgradient.html">QConicalGradient</a></th>
 </tr>
 </thead>
+<tr class="odd" valign="top">
+<td><img src="images/qgradient-linear.png" /></td>
+<td><img src="images/qgradient-radial.png" /></td>
+<td><img src="images/qgradient-conical.png" /></td>
+</tr>
 </table>
 <p>The colors in a gradient are defined using stop points of the
 <a href="qgradient.html#QGradientStop-typedef">QGradientStop</a>
@@ -53,19 +47,19 @@ points have been specified, a gradient of black at 0 to white at 1
 is used.</p>
 <p>A diagonal linear gradient from black at (100, 100) to white at
 (200, 200) could be specified like this:</p>
-<pre class="highlightedCode brush: cpp">
-     QLinearGradient linearGrad(QPointF(100, 100), QPointF(200, 200));
-     linearGrad.setColorAt(0, Qt.black);
-     linearGrad.setColorAt(1, Qt.white);
+<pre class="cpp">
+     <span class="type"><a href="qlineargradient.html">QLinearGradient</a></span> linearGrad(<span class="type"><a href="qpointf.html">QPointF</a></span>(<span class="number">100</span><span class="operator">,</span> <span class="number">100</span>)<span class="operator">,</span> <span class="type"><a href="qpointf.html">QPointF</a></span>(<span class="number">200</span><span class="operator">,</span> <span class="number">200</span>));
+     linearGrad<span class="operator">.</span>setColorAt(<span class="number">0</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>black);
+     linearGrad<span class="operator">.</span>setColorAt(<span class="number">1</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>white);
 </pre>
 <p>A gradient can have an arbitrary number of stop points. The
 following would create a radial gradient starting with red in the
 center, blue and then green on the edges:</p>
-<pre class="highlightedCode brush: cpp">
-     QRadialGradient radialGrad(QPointF(100, 100), 100);
-     radialGrad.setColorAt(0, Qt.red);
-     radialGrad.setColorAt(0.5, Qt.blue);
-     radialGrad.setColorAt(1, Qt.green);
+<pre class="cpp">
+     <span class="type"><a href="qradialgradient.html">QRadialGradient</a></span> radialGrad(<span class="type"><a href="qpointf.html">QPointF</a></span>(<span class="number">100</span><span class="operator">,</span> <span class="number">100</span>)<span class="operator">,</span> <span class="number">100</span>);
+     radialGrad<span class="operator">.</span>setColorAt(<span class="number">0</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>red);
+     radialGrad<span class="operator">.</span>setColorAt(<span class="number">0.5</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>blue);
+     radialGrad<span class="operator">.</span>setColorAt(<span class="number">1</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>green);
 </pre>
 <p>It is possible to repeat or reflect the gradient outside its
 area by specifiying the <a href="qgradient.html#Spread-enum">spread
@@ -75,27 +69,15 @@ The currently set <a href="qgradient.html#Spread-enum">spread
 method</a> can be retrieved using the <a href="qgradient.html#spread">spread</a>() function. The <a href="qgradient.html#Spread-enum">QGradient.Spread</a> enum defines
 three different methods:</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/qradialgradient-pad.png" /></p>
-</td>
-<td>
-<p><img src="images/qradialgradient-repeat.png" /></p>
-</td>
-<td>
-<p><img src="images/qradialgradient-reflect.png" /></p>
-</td>
+<tr class="odd" valign="top">
+<td><img src="images/qradialgradient-pad.png" /></td>
+<td><img src="images/qradialgradient-repeat.png" /></td>
+<td><img src="images/qradialgradient-reflect.png" /></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qgradient.html#Spread-enum">PadSpread</a></p>
-</td>
-<td>
-<p><a href="qgradient.html#Spread-enum">RepeatSpread</a></p>
-</td>
-<td>
-<p><a href="qgradient.html#Spread-enum">ReflectSpread</a></p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qgradient.html#Spread-enum">PadSpread</a></td>
+<td><a href="qgradient.html#Spread-enum">RepeatSpread</a></td>
+<td><a href="qgradient.html#Spread-enum">ReflectSpread</a></td>
 </tr>
 </table>
 <p>Note that the <a href="qgradient.html#setSpread">setSpread</a>()
@@ -116,21 +98,21 @@ coordinates. To retrieve the currently set <a href="qgradient.html#CoordinateMod
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="CoordinateMode-enum" />QGradient.CoordinateMode</h3><p>This enum specifies how gradient coordinates map to the paint
 device on which the gradient is used.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGradient.LogicalMode</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">This is the default mode. The gradient
 coordinates are specified logical space just like the object
 coordinates.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGradient.StretchToDeviceMode</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">In this mode the gradient coordinates are
 relative to the bounding rectangle of the paint device, with (0,0)
 in the top left corner, and (1,1) in the bottom right corner of the
@@ -138,7 +120,7 @@ paint device.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGradient.ObjectBoundingMode</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">In this mode the gradient coordinates are
 relative to the bounding rectangle of the object being drawn, with
 (0,0) in the top left corner, and (1,1) in the bottom right corner
@@ -151,112 +133,111 @@ of the object's bounding rectangle.</td>
 <h3 class="fn"><a name="Spread-enum" />QGradient.Spread</h3><p>Specifies how the area outside the gradient area should be
 filled.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGradient.PadSpread</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The area is filled with the closest stop
 color. This is the default.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGradient.RepeatSpread</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The gradient is repeated outside the gradient
 area.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGradient.ReflectSpread</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The gradient is reflected outside the gradient
 area.</td>
 </tr>
 </table>
-<p>See also <a href="qgradient.html#spread">spread</a>() and
+<p><b>See also</b> <a href="qgradient.html#spread">spread</a>() and
 <a href="qgradient.html#setSpread">setSpread</a>().</p>
 
 
 <h3 class="fn"><a name="Type-enum" />QGradient.Type</h3><p>Specifies the type of gradient.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGradient.LinearGradient</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Interpolates colors between start and end
 points (<a href="qlineargradient.html">QLinearGradient</a>).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGradient.RadialGradient</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Interpolate colors between a focal point and
 end points on a circle surrounding it (<a href="qradialgradient.html">QRadialGradient</a>).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGradient.ConicalGradient</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Interpolate colors around a center point
 (<a href="qconicalgradient.html">QConicalGradient</a>).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGradient.NoGradient</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">No gradient is used.</td>
 </tr>
 </table>
-<p>See also <a href="qgradient.html#type">type</a>().</p>
+<p><b>See also</b> <a href="qgradient.html#type">type</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QGradient" />QGradient.__init__ (<i>self</i>)</h3><h3 class="fn"><a name="QGradient-2" />QGradient.__init__ (<i>self</i>, <a href="qgradient.html">QGradient</a>)</h3><h3 class="fn"><a name="coordinateMode" /><a href="qgradient.html#CoordinateMode-enum">CoordinateMode</a> QGradient.coordinateMode (<i>self</i>)</h3><p>Returns the coordinate mode of this gradient. The default mode
 is <a href="qgradient.html#CoordinateMode-enum">LogicalMode</a>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qgradient.html#setCoordinateMode">setCoordinateMode</a>().</p>
+<p><b>See also</b> <a href="qgradient.html#setCoordinateMode">setCoordinateMode</a>().</p>
 
 
 <h3 class="fn"><a name="setColorAt" />QGradient.setColorAt (<i>self</i>, float&#160;<i>pos</i>, <a href="qcolor.html">QColor</a>&#160;<i>color</i>)</h3><p>Creates a stop point at the given <i>position</i> with the given
 <i>color</i>. The given <i>position</i> must be in the range 0 to
 1.</p>
-<p>See also <a href="qgradient.html#setStops">setStops</a>() and
-<a href="qgradient.html#stops">stops</a>().</p>
+<p><b>See also</b> <a href="qgradient.html#setStops">setStops</a>()
+and <a href="qgradient.html#stops">stops</a>().</p>
 
 
 <h3 class="fn"><a name="setCoordinateMode" />QGradient.setCoordinateMode (<i>self</i>, <a href="qgradient.html#CoordinateMode-enum">CoordinateMode</a>&#160;<i>mode</i>)</h3><p>Sets the coordinate mode of this gradient to <i>mode</i>. The
 default mode is <a href="qgradient.html#CoordinateMode-enum">LogicalMode</a>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qgradient.html#coordinateMode">coordinateMode</a>().</p>
+<p><b>See also</b> <a href="qgradient.html#coordinateMode">coordinateMode</a>().</p>
 
 
 <h3 class="fn"><a name="setSpread" />QGradient.setSpread (<i>self</i>, <a href="qgradient.html#Spread-enum">Spread</a>&#160;<i>aspread</i>)</h3><p>Specifies the spread <i>method</i> that should be used for this
 gradient.</p>
 <p>Note that this function only has effect for linear and radial
 gradients.</p>
-<p>See also <a href="qgradient.html#spread">spread</a>().</p>
+<p><b>See also</b> <a href="qgradient.html#spread">spread</a>().</p>
 
 
 <h3 class="fn"><a name="setStops" />QGradient.setStops (<i>self</i>, list-of-tuple-of-float-QColor&#160;<i>stops</i>)</h3><p>Replaces the current set of stop points with the given
 <i>stopPoints</i>. The positions of the points must be in the range
 0 to 1, and must be sorted with the lowest point first.</p>
-<p>See also <a href="qgradient.html#setColorAt">setColorAt</a>()
-and <a href="qgradient.html#stops">stops</a>().</p>
+<p><b>See also</b> <a href="qgradient.html#setColorAt">setColorAt</a>() and <a href="qgradient.html#stops">stops</a>().</p>
 
 
 <h3 class="fn"><a name="spread" /><a href="qgradient.html#Spread-enum">Spread</a> QGradient.spread (<i>self</i>)</h3><p>Returns the spread method use by this gradient. The default is
 <a href="qgradient.html#Spread-enum">PadSpread</a>.</p>
-<p>See also <a href="qgradient.html#setSpread">setSpread</a>().</p>
+<p><b>See also</b> <a href="qgradient.html#setSpread">setSpread</a>().</p>
 
 
 <h3 class="fn"><a name="stops" />list-of-tuple-of-float-QColor QGradient.stops (<i>self</i>)</h3><p>Returns the stop points for this gradient.</p>
 <p>If no stop points have been specified, a gradient of black at 0
 to white at 1 is used.</p>
-<p>See also <a href="qgradient.html#setStops">setStops</a>() and
-<a href="qgradient.html#setColorAt">setColorAt</a>().</p>
+<p><b>See also</b> <a href="qgradient.html#setStops">setStops</a>()
+and <a href="qgradient.html#setColorAt">setColorAt</a>().</p>
 
 
 <h3 class="fn"><a name="type" /><a href="qgradient.html#Type-enum">Type</a> QGradient.type (<i>self</i>)</h3><p>Returns the type of gradient.</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QGradient.__eq__ (<i>self</i>, <a href="qgradient.html">QGradient</a>&#160;<i>gradient</i>)</h3><h3 class="fn"><a name="__ne__" />bool QGradient.__ne__ (<i>self</i>, <a href="qgradient.html">QGradient</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QGradient.__eq__ (<i>self</i>, <a href="qgradient.html">QGradient</a>&#160;<i>gradient</i>)</h3><h3 class="fn"><a name="__ne__" />bool QGradient.__ne__ (<i>self</i>, <a href="qgradient.html">QGradient</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

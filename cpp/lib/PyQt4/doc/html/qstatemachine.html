@@ -47,20 +47,20 @@ explicitly. The <a href="qstatemachine.html#stopped">stopped</a>()
 signal is emitted in this case.</p>
 <p>The following snippet shows a state machine that will finish
 when a button is clicked:</p>
-<pre class="highlightedCode brush: cpp">
- QPushButton button;
+<pre class="cpp">
+ <span class="type"><a href="qpushbutton.html">QPushButton</a></span> button;
 
- QStateMachine machine;
- QState *s1 = new QState();
- s1-&gt;assignProperty(&amp;button, "text", "Click me");
+ <span class="type">QStateMachine</span> machine;
+ <span class="type"><a href="qstate.html">QState</a></span> <span class="operator">*</span>s1 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qstate.html">QState</a></span>();
+ s1<span class="operator">-</span><span class="operator">&gt;</span><a href="qstate.html#assignProperty">assignProperty</a>(<span class="operator">&amp;</span>button<span class="operator">,</span> <span class="string">"text"</span><span class="operator">,</span> <span class="string">"Click me"</span>);
 
- QFinalState *s2 = new QFinalState();
- s1-&gt;addTransition(&amp;button, SIGNAL(clicked()), s2);
+ <span class="type"><a href="qfinalstate.html">QFinalState</a></span> <span class="operator">*</span>s2 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qfinalstate.html">QFinalState</a></span>();
+ s1<span class="operator">-</span><span class="operator">&gt;</span><a href="qstate.html#addTransition">addTransition</a>(<span class="operator">&amp;</span>button<span class="operator">,</span> SIGNAL(clicked())<span class="operator">,</span> s2);
 
- machine.addState(s1);
- machine.addState(s2);
- machine.setInitialState(s1);
- machine.start();
+ machine<span class="operator">.</span><a href="qstatemachine.html#addState">addState</a>(s1);
+ machine<span class="operator">.</span><a href="qstatemachine.html#addState">addState</a>(s2);
+ machine<span class="operator">.</span><a href="qstate.html#initialState-prop">setInitialState</a>(s1);
+ machine<span class="operator">.</span><a href="qstatemachine.html#start">start</a>();
 </pre>
 <p>This code example uses <a href="qstate.html">QState</a>, which
 inherits <a href="qabstractstate.html">QAbstractState</a>. The
@@ -87,20 +87,20 @@ returned by <a href="qstatemachine.html#error">error</a>(), the
 error message returned by <a href="qstatemachine.html#errorString-prop">errorString</a>(), and enter
 an error state based on the context of the error.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QStateMachine.NoError</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">No error has occurred.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QStateMachine.NoInitialStateError</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The machine has entered a <a href="qstate.html">QState</a> with children which does not have an
 initial state set. The context of this error is the state which is
 missing an initial state.</td>
@@ -108,7 +108,7 @@ missing an initial state.</td>
 <tr>
 <td class="topAlign">
 <tt>QStateMachine.NoDefaultStateInHistoryStateError</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The machine has entered a <a href="qhistorystate.html">QHistoryState</a> which does not have a
 default state set. The context of this error is the <a href="qhistorystate.html">QHistoryState</a> which is missing a default
 state.</td>
@@ -116,7 +116,7 @@ state.</td>
 <tr>
 <td class="topAlign">
 <tt>QStateMachine.NoCommonAncestorForTransitionError</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The machine has selected a transition whose
 source and targets are not part of the same tree of states, and
 thus are not part of the same state machine. Commonly, this could
@@ -125,7 +125,7 @@ to any machine. The context of this error is the source state of
 the transition.</td>
 </tr>
 </table>
-<p>See also <a href="qstate.html#errorState-prop">setErrorState</a>().</p>
+<p><b>See also</b> <a href="qstate.html#errorState-prop">setErrorState</a>().</p>
 
 
 <h3 class="fn"><a name="EventPriority-enum" />QStateMachine.EventPriority</h3><p>This enum type specifies the priority of an event posted to the
@@ -133,19 +133,19 @@ state machine using <a href="qstatemachine.html#postEvent">postEvent</a>().</p>
 <p>Events of high priority are processed before events of normal
 priority.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QStateMachine.NormalPriority</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The event has normal priority.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QStateMachine.HighPriority</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The event has high priority.</td>
 </tr>
 </table>
@@ -164,7 +164,7 @@ a value for a property has already been saved by the state machine,
 it will not be overwritten until the property has been successfully
 restored.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -172,18 +172,18 @@ restored.</p>
 <tr>
 <td class="topAlign">
 <tt>QStateMachine.DontRestoreProperties</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The state machine should not save the initial
 values of properties and restore them later.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QStateMachine.RestoreProperties</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The state machine should save the initial
 values of properties and restore them later.</td>
 </tr>
 </table>
-<p>See also <a href="qstatemachine.html#globalRestorePolicy-prop">QStateMachine.globalRestorePolicy</a>
+<p><b>See also</b> <a href="qstatemachine.html#globalRestorePolicy-prop">QStateMachine.globalRestorePolicy</a>
 and <a href="qstate.html#assignProperty">QState.assignProperty</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QStateMachine" />QStateMachine.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a new state machine with the given <i>parent</i>.</p>
 
@@ -196,7 +196,7 @@ transition.</p>
 becomes a top-level state.</p>
 <p>If the state is already in a different machine, it will first be
 removed from its old machine, and then added to this machine.</p>
-<p>See also <a href="qstatemachine.html#removeState">removeState</a>() and <a href="qstate.html#initialState-prop">setInitialState</a>().</p>
+<p><b>See also</b> <a href="qstatemachine.html#removeState">removeState</a>() and <a href="qstate.html#initialState-prop">setInitialState</a>().</p>
 
 
 <h3 class="fn"><a name="cancelDelayedEvent" />bool QStateMachine.cancelDelayedEvent (<i>self</i>, int&#160;<i>id</i>)</h3><p>Cancels the delayed event identified by the given <i>id</i>. The
@@ -204,7 +204,7 @@ id should be a value returned by a call to <a href="qstatemachine.html#postDelay
 Returns true if the event was successfully cancelled, otherwise
 returns false.</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#thread-safe">thread-safe</a>.</p>
-<p>See also <a href="qstatemachine.html#postDelayedEvent">postDelayedEvent</a>().</p>
+<p><b>See also</b> <a href="qstatemachine.html#postDelayedEvent">postDelayedEvent</a>().</p>
 
 
 <h3 class="fn"><a name="clearError" />QStateMachine.clearError (<i>self</i>)</h3><p>Clears the error string and error code of the state machine.</p>
@@ -255,7 +255,7 @@ processing. The state machine takes ownership of the event and
 deletes it once it has been processed.</p>
 <p>You can only post events when the state machine is running.</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#thread-safe">thread-safe</a>.</p>
-<p>See also <a href="qstatemachine.html#cancelDelayedEvent">cancelDelayedEvent</a>()
+<p><b>See also</b> <a href="qstatemachine.html#cancelDelayedEvent">cancelDelayedEvent</a>()
 and <a href="qstatemachine.html#postEvent">postEvent</a>().</p>
 
 
@@ -267,7 +267,7 @@ posted. The state machine takes ownership of the event and deletes
 it once it has been processed.</p>
 <p>You can only post events when the state machine is running.</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#thread-safe">thread-safe</a>.</p>
-<p>See also <a href="qstatemachine.html#postDelayedEvent">postDelayedEvent</a>().</p>
+<p><b>See also</b> <a href="qstatemachine.html#postDelayedEvent">postDelayedEvent</a>().</p>
 
 
 <h3 class="fn"><a name="removeDefaultAnimation" />QStateMachine.removeDefaultAnimation (<i>self</i>, <a href="qabstractanimation.html">QAbstractAnimation</a>&#160;<i>animation</i>)</h3><p>Removes <i>animation</i> from the list of default
@@ -276,7 +276,7 @@ animations.</p>
 
 <h3 class="fn"><a name="removeState" />QStateMachine.removeState (<i>self</i>, <a href="qabstractstate.html">QAbstractState</a>&#160;<i>state</i>)</h3><p>The <i>state</i> argument</p><p>Removes the given <i>state</i> from this state machine. The
 state machine releases ownership of the state.</p>
-<p>See also <a href="qstatemachine.html#addState">addState</a>().</p>
+<p><b>See also</b> <a href="qstatemachine.html#addState">addState</a>().</p>
 
 
 <h3 class="fn"><a name="setAnimated" />QStateMachine.setAnimated (<i>self</i>, bool&#160;<i>enabled</i>)</h3><h3 class="fn"><a name="setGlobalRestorePolicy" />QStateMachine.setGlobalRestorePolicy (<i>self</i>, <a href="qstatemachine.html#RestorePolicy-enum">RestorePolicy</a>&#160;<i>restorePolicy</i>)</h3><h3 class="fn"><a name="start" />QStateMachine.start (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void start()</tt>.</p><p>Starts this state machine. The machine will reset its
@@ -287,21 +287,19 @@ entered, the machine will emit the <a href="qstate.html#finished">finished</a>()
 event loop, such as the main application event loop started with
 <a href="qcoreapplication.html#exec">QCoreApplication.exec</a>()
 or <a href="qapplication.html#exec">QApplication.exec</a>().</p>
-<p>See also <a href="qstatemachine.html#started">started</a>(),
-<a href="qstate.html#finished">finished</a>(), <a href="qstatemachine.html#stop">stop</a>(), and <a href="qstate.html#initialState-prop">initialState</a>().</p>
+<p><b>See also</b> <a href="qstatemachine.html#started">started</a>(), <a href="qstate.html#finished">finished</a>(), <a href="qstatemachine.html#stop">stop</a>(), and <a href="qstate.html#initialState-prop">initialState</a>().</p>
 
 
 <h3 class="fn"><a name="stop" />QStateMachine.stop (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void stop()</tt>.</p><p>Stops this state machine. The state machine will stop processing
 events and then emit the <a href="qstatemachine.html#stopped">stopped</a>() signal.</p>
-<p>See also <a href="qstatemachine.html#stopped">stopped</a>() and
-<a href="qstatemachine.html#start">start</a>().</p>
+<p><b>See also</b> <a href="qstatemachine.html#stopped">stopped</a>() and <a href="qstatemachine.html#start">start</a>().</p>
 
 
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="started" />void started ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the state machine has entered its
 initial state (<a href="qstate.html#initialState-prop">QStateMachine.initialState</a>).</p>
-<p>See also <a href="qstate.html#finished">QStateMachine.finished</a>() and <a href="qstatemachine.html#start">QStateMachine.start</a>().</p>
+<p><b>See also</b> <a href="qstate.html#finished">QStateMachine.finished</a>() and <a href="qstatemachine.html#start">QStateMachine.start</a>().</p>
 
 
 <h3 class="fn"><a name="stopped" />void stopped ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the state machine has stopped.</p>
-<p>See also <a href="qstatemachine.html#stop">QStateMachine.stop</a>() and <a href="qstate.html#finished">QStateMachine.finished</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qstatemachine.html#stop">QStateMachine.stop</a>() and <a href="qstate.html#finished">QStateMachine.finished</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

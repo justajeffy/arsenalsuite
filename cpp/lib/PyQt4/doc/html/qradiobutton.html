@@ -32,37 +32,25 @@ with <a href="qabstractbutton.html#icon-prop">setIcon</a>(). The
 text can be set in the constructor or with <a href="qabstractbutton.html#text-prop">setText</a>(). A shortcut key can
 be specified by preceding the preferred character with an ampersand
 in the text. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QRadioButton *button = new QRadioButton("Search from the &amp;cursor", this);
+<pre class="cpp">
+ <span class="type">QRadioButton</span> <span class="operator">*</span>button <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QRadioButton</span>(<span class="string">"Search from the &amp;cursor"</span><span class="operator">,</span> <span class="keyword">this</span>);
 </pre>
 <p>In this example the shortcut is <i>Alt+c</i>. See the <a href="qshortcut.html#mnemonic">QShortcut</a> documentation for details
 (to display an actual ampersand, use '&amp;&amp;').</p>
 <p>Important inherited members: <a href="qabstractbutton.html#text-prop">text</a>(), <a href="qabstractbutton.html#text-prop">setText</a>(), <a href="qabstractbutton.html#text-prop">text</a>(), <a href="qabstractbutton.html#down-prop">setDown</a>(), <a href="qabstractbutton.html#down-prop">isDown</a>(), <a href="qabstractbutton.html#autoRepeat-prop">autoRepeat</a>(), <a href="qabstractbutton.html#group">group</a>(), <a href="qabstractbutton.html#autoRepeat-prop">setAutoRepeat</a>(),
 <a href="qabstractbutton.html#toggle">toggle</a>(), <a href="qabstractbutton.html#pressed">pressed</a>(), <a href="qabstractbutton.html#released">released</a>(), <a href="qabstractbutton.html#clicked">clicked</a>(), and <a href="qabstractbutton.html#toggled">toggled</a>().</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Screenshot of a Plastique radio button" src="images/plastique-radiobutton.png" /></p>
-</td>
-<td>
-<p>A radio button shown in the <a href="gallery-plastique.html">Plastique widget style</a>.</p>
-</td>
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img alt="Screenshot of a Plastique radio button" src="images/plastique-radiobutton.png" /></td>
+<td>A radio button shown in the <a href="gallery-plastique.html">Plastique widget style</a>.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><img alt="Screenshot of a Windows XP radio button" src="images/windows-radiobutton.png" /></p>
-</td>
-<td>
-<p>A radio button shown in the <a href="gallery-windowsxp.html">Windows XP widget style</a>.</p>
-</td>
+<tr class="even" valign="top">
+<td><img alt="Screenshot of a Windows XP radio button" src="images/windows-radiobutton.png" /></td>
+<td>A radio button shown in the <a href="gallery-windowsxp.html">Windows XP widget style</a>.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><img alt="Screenshot of a Macintosh radio button" src="images/macintosh-radiobutton.png" /></p>
-</td>
-<td>
-<p>A radio button shown in the <a href="gallery-macintosh.html">Macintosh widget style</a>.</p>
-</td>
+<tr class="odd" valign="top">
+<td><img alt="Screenshot of a Macintosh radio button" src="images/macintosh-radiobutton.png" /></td>
+<td>A radio button shown in the <a href="gallery-macintosh.html">Macintosh widget style</a>.</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QRadioButton" />QRadioButton.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a radio button with the given <i>parent</i>, but with
@@ -84,7 +72,7 @@ no text or pixmap.</p>
 <h3 class="fn"><a name="initStyleOption" />QRadioButton.initStyleOption (<i>self</i>, <a href="qstyleoptionbutton.html">QStyleOptionButton</a>&#160;<i>button</i>)</h3><p>Initialize <i>option</i> with the values from this <a href="qradiobutton.html">QRadioButton</a>. This method is useful for
 subclasses when they need a <a href="qstyleoptionbutton.html">QStyleOptionButton</a>, but don't want to
 fill in all the information themselves.</p>
-<p>See also <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
+<p><b>See also</b> <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
 
 
 <h3 class="fn"><a name="mouseMoveEvent" />QRadioButton.mouseMoveEvent (<i>self</i>, <a href="qmouseevent.html">QMouseEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#mouseMoveEvent">QWidget.mouseMoveEvent</a>().</p>
@@ -94,4 +82,4 @@ fill in all the information themselves.</p>
 
 
 <h3 class="fn"><a name="sizeHint" /><a href="qsize.html">QSize</a> QRadioButton.sizeHint (<i>self</i>)</h3><p>Reimplemented from <a href="qwidget.html#sizeHint-prop">QWidget.sizeHint</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

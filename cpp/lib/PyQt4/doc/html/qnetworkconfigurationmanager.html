@@ -44,7 +44,7 @@ via <a href="qnetworkconfigurationmanager.html#allConfigurations">allConfigurati
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Capability-enum" />QNetworkConfigurationManager.Capability</h3><p>Specifies the system capabilities of the bearer API. The
 possible values are:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -52,7 +52,7 @@ possible values are:</p>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfigurationManager.CanStartAndStopInterfaces</tt></td>
-<td class=" topAlign"><tt>0x00000001</tt></td>
+<td class="topAlign"><tt>0x00000001</tt></td>
 <td class="topAlign">Network sessions and their underlying access
 points can be started and stopped. If this flag is not set <a href="qnetworksession.html">QNetworkSession</a> can only monitor but not
 influence the state of access points. On some platforms this
@@ -62,7 +62,7 @@ platform specific and may not always be available.</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfigurationManager.DirectConnectionRouting</tt></td>
-<td class=" topAlign"><tt>0x00000002</tt></td>
+<td class="topAlign"><tt>0x00000002</tt></td>
 <td class="topAlign">Network sessions and their sockets can be
 bound to a particular network interface. Any packet that passes
 through the socket goes to the specified network interface and thus
@@ -74,7 +74,7 @@ platform specific and may not always be available.</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfigurationManager.SystemSessionSupport</tt></td>
-<td class=" topAlign"><tt>0x00000004</tt></td>
+<td class="topAlign"><tt>0x00000004</tt></td>
 <td class="topAlign">If this flag is set the underlying platform
 ensures that a network interface is not shut down until the last
 network session has been <a href="qnetworksession.html#close">closed()</a>. This works across
@@ -87,7 +87,7 @@ capability.</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfigurationManager.ApplicationLevelRoaming</tt></td>
-<td class=" topAlign"><tt>0x00000008</tt></td>
+<td class="topAlign"><tt>0x00000008</tt></td>
 <td class="topAlign">The system gives applications control over the
 systems roaming behavior. Applications can initiate roaming (in
 case the current link is not suitable) and are consulted if the
@@ -96,7 +96,7 @@ system has identified a more suitable access point.</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfigurationManager.ForcedRoaming</tt></td>
-<td class=" topAlign"><tt>0x00000010</tt></td>
+<td class="topAlign"><tt>0x00000010</tt></td>
 <td class="topAlign">The system disconnects an existing access
 point and reconnects via a more suitable one. The application does
 not have any control over this process and has to reconnect its
@@ -105,14 +105,14 @@ active sockets.</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfigurationManager.DataStatistics</tt></td>
-<td class=" topAlign"><tt>0x00000020</tt></td>
+<td class="topAlign"><tt>0x00000020</tt></td>
 <td class="topAlign">If this flag is set <a href="qnetworksession.html">QNetworkSession</a> can provide statistics
 about transmitted and received data.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfigurationManager.NetworkSessionRequired</tt></td>
-<td class=" topAlign"><tt>0x00000040</tt></td>
+<td class="topAlign"><tt>0x00000040</tt></td>
 <td class="topAlign">If this flag is set the platform requires that
 a network session is created before network operations can be
 performed.</td>
@@ -122,6 +122,9 @@ performed.</td>
 combination of Capability values.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QNetworkConfigurationManager" />QNetworkConfigurationManager.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qnetworkconfigurationmanager.html">QNetworkConfigurationManager</a>
 with the given <i>parent</i>.</p>
+<p>Note that to ensure a valid list of current configurations
+immediately available, updating is done during construction which
+causes some delay.</p>
 
 
 <h3 class="fn"><a name="allConfigurations" />list-of-QNetworkConfiguration QNetworkConfigurationManager.allConfigurations (<i>self</i>, <a href="qnetworkconfiguration-stateflags.html">QNetworkConfiguration.StateFlags</a>&#160;<i>flags</i>&#160;=&#160;0)</h3><p>Returns the list of configurations which comply with the given
@@ -157,7 +160,7 @@ as the system reports any changes.</p>
 
 <h3 class="fn"><a name="configurationFromIdentifier" /><a href="qnetworkconfiguration.html">QNetworkConfiguration</a> QNetworkConfigurationManager.configurationFromIdentifier (<i>self</i>, QString&#160;<i>identifier</i>)</h3><p>Returns the <a href="qnetworkconfiguration.html">QNetworkConfiguration</a> for
 <i>identifier</i>; otherwise returns an invalid <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>.</p>
-<p>See also <a href="qnetworkconfiguration.html#identifier">QNetworkConfiguration.identifier</a>().</p>
+<p><b>See also</b> <a href="qnetworkconfiguration.html#identifier">QNetworkConfiguration.identifier</a>().</p>
 
 
 <h3 class="fn"><a name="defaultConfiguration" /><a href="qnetworkconfiguration.html">QNetworkConfiguration</a> QNetworkConfigurationManager.defaultConfiguration (<i>self</i>)</h3><p>Returns the default configuration to be used. This function
@@ -166,22 +169,22 @@ configuration.</p>
 <p>In some cases it may be required to call <a href="qnetworkconfigurationmanager.html#updateConfigurations">updateConfigurations</a>()
 and wait for the <a href="qnetworkconfigurationmanager.html#updateCompleted">updateCompleted</a>()
 signal before calling this function.</p>
-<p>See also <a href="qnetworkconfigurationmanager.html#allConfigurations">allConfigurations</a>().</p>
+<p><b>See also</b> <a href="qnetworkconfigurationmanager.html#allConfigurations">allConfigurations</a>().</p>
 
 
 <h3 class="fn"><a name="isOnline" />bool QNetworkConfigurationManager.isOnline (<i>self</i>)</h3><p>Returns true if the system is considered to be connected to
 another device via an active network interface; otherwise returns
 false.</p>
 <p>This is equivalent to the following code snippet:</p>
-<pre class="highlightedCode brush: cpp">
- QNetworkConfigurationManager mgr;
- QList&lt;QNetworkConfiguration&gt; activeConfigs = mgr.allConfigurations(QNetworkConfiguration.Active)
- if (activeConfigs.count() &gt; 0)
-     Q_ASSERT(mgr.isOnline())
- else
-     Q_ASSERT(!mgr.isOnline())
+<pre class="cpp">
+ <span class="type"><a href="qnetworkconfigurationmanager.html">QNetworkConfigurationManager</a></span> mgr;
+ <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qnetworkconfiguration.html">QNetworkConfiguration</a></span><span class="operator">&gt;</span> activeConfigs <span class="operator">=</span> mgr<span class="operator">.</span><a href="qnetworkconfigurationmanager.html#allConfigurations">allConfigurations</a>(<span class="type"><a href="qnetworkconfiguration.html">QNetworkConfiguration</a></span><span class="operator">.</span>Active)
+ <span class="keyword">if</span> (activeConfigs<span class="operator">.</span>count() <span class="operator">&gt;</span> <span class="number">0</span>)
+     <a href="qtcore.html#Q_ASSERT">Q_ASSERT</a>(mgr<span class="operator">.</span>isOnline())
+ <span class="keyword">else</span>
+     <a href="qtcore.html#Q_ASSERT">Q_ASSERT</a>(<span class="operator">!</span>mgr<span class="operator">.</span>isOnline())
 </pre>
-<p>See also <a href="qnetworkconfigurationmanager.html#onlineStateChanged">onlineStateChanged</a>().</p>
+<p><b>See also</b> <a href="qnetworkconfigurationmanager.html#onlineStateChanged">onlineStateChanged</a>().</p>
 
 
 <h3 class="fn"><a name="updateConfigurations" />QNetworkConfigurationManager.updateConfigurations (<i>self</i>)</h3><p>Initiates an update of all configurations. This may be used to
@@ -198,7 +201,7 @@ signals.</p>
 <p>If a configuration state changes as a result of this update all
 existing <a href="qnetworkconfiguration.html">QNetworkConfiguration</a> instances
 are updated automatically.</p>
-<p>See also <a href="qnetworkconfigurationmanager.html#allConfigurations">allConfigurations</a>().</p>
+<p><b>See also</b> <a href="qnetworkconfigurationmanager.html#allConfigurations">allConfigurations</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="configurationAdded" />void configurationAdded (const QNetworkConfiguration&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever a new network configuration is
 added to the system. The new configuration is specified by
 <i>config</i>.</p>
@@ -224,4 +227,4 @@ returns a list with at least one entry.</p>
 completed. Such an update can be initiated via <a href="qnetworkconfigurationmanager.html#updateConfigurations">updateConfigurations</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

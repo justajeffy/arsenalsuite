@@ -40,23 +40,23 @@ can set the reader to use your own subclasses with <a href="qxmlreader.html#setE
 and <a href="qxmlreader.html#setDeclHandler">setDeclHandler</a>().
 The parse itself is started with a call to <a href="qxmlreader.html#parse">parse</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QXmlReader" />QXmlReader.__init__ (<i>self</i>)</h3><h3 class="fn"><a name="QXmlReader-2" />QXmlReader.__init__ (<i>self</i>, <a href="qxmlreader.html">QXmlReader</a>)</h3><h3 class="fn"><a name="contentHandler" /><a href="qxmlcontenthandler.html">QXmlContentHandler</a> QXmlReader.contentHandler (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the content handler or 0 if none was set.</p>
-<p>See also <a href="qxmlreader.html#setContentHandler">setContentHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#setContentHandler">setContentHandler</a>().</p>
 
 
 <h3 class="fn"><a name="declHandler" /><a href="qxmldeclhandler.html">QXmlDeclHandler</a> QXmlReader.declHandler (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the declaration handler or 0 if none was set.</p>
-<p>See also <a href="qxmlreader.html#setDeclHandler">setDeclHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#setDeclHandler">setDeclHandler</a>().</p>
 
 
 <h3 class="fn"><a name="DTDHandler" /><a href="qxmldtdhandler.html">QXmlDTDHandler</a> QXmlReader.DTDHandler (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the DTD handler or 0 if none was set.</p>
-<p>See also <a href="qxmlreader.html#setDTDHandler">setDTDHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#setDTDHandler">setDTDHandler</a>().</p>
 
 
 <h3 class="fn"><a name="entityResolver" /><a href="qxmlentityresolver.html">QXmlEntityResolver</a> QXmlReader.entityResolver (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the entity resolver or 0 if none was set.</p>
-<p>See also <a href="qxmlreader.html#setEntityResolver">setEntityResolver</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#setEntityResolver">setEntityResolver</a>().</p>
 
 
 <h3 class="fn"><a name="errorHandler" /><a href="qxmlerrorhandler.html">QXmlErrorHandler</a> QXmlReader.errorHandler (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the error handler or 0 if none is set.</p>
-<p>See also <a href="qxmlreader.html#setErrorHandler">setErrorHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#setErrorHandler">setErrorHandler</a>().</p>
 
 
 <h3 class="fn"><a name="feature" />(bool, bool&#160;<i>ok</i>) QXmlReader.feature (<i>self</i>, QString&#160;<i>name</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>If the reader has the feature called <i>name</i>, the feature's
@@ -65,24 +65,22 @@ undefined.</p>
 <p>If <i>ok</i> is not 0: <tt>*</tt><i>ok</i> is set to true if the
 reader has the feature called <i>name</i>; otherwise
 <tt>*</tt><i>ok</i> is set to false.</p>
-<p>See also <a href="qxmlreader.html#setFeature">setFeature</a>()
-and <a href="qxmlreader.html#hasFeature">hasFeature</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#setFeature">setFeature</a>() and <a href="qxmlreader.html#hasFeature">hasFeature</a>().</p>
 
 
 <h3 class="fn"><a name="hasFeature" />bool QXmlReader.hasFeature (<i>self</i>, QString&#160;<i>name</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns <tt>true</tt> if the reader has the feature called
 <i>name</i>; otherwise returns false.</p>
-<p>See also <a href="qxmlreader.html#feature">feature</a>() and
-<a href="qxmlreader.html#setFeature">setFeature</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#feature">feature</a>()
+and <a href="qxmlreader.html#setFeature">setFeature</a>().</p>
 
 
 <h3 class="fn"><a name="hasProperty" />bool QXmlReader.hasProperty (<i>self</i>, QString&#160;<i>name</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns true if the reader has the property <i>name</i>;
 otherwise returns false.</p>
-<p>See also <a href="qxmlreader.html#property">property</a>() and
-<a href="qxmlreader.html#setProperty">setProperty</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#property">property</a>() and <a href="qxmlreader.html#setProperty">setProperty</a>().</p>
 
 
 <h3 class="fn"><a name="lexicalHandler" /><a href="qxmllexicalhandler.html">QXmlLexicalHandler</a> QXmlReader.lexicalHandler (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the lexical handler or 0 if none was set.</p>
-<p>See also <a href="qxmlreader.html#setLexicalHandler">setLexicalHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#setLexicalHandler">setLexicalHandler</a>().</p>
 
 
 <h3 class="fn"><a name="parse" />bool QXmlReader.parse (<i>self</i>, <a href="qxmlinputsource.html">QXmlInputSource</a>&#160;<i>input</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Reads an XML document from <i>input</i> and parses it. Returns
@@ -95,43 +93,41 @@ undefined.</p>
 <p>If <i>ok</i> is not 0: if the reader has the <i>name</i>
 property <tt>*</tt><i>ok</i> is set to true; otherwise
 <tt>*</tt><i>ok</i> is set to false.</p>
-<p>See also <a href="qxmlreader.html#setProperty">setProperty</a>()
-and <a href="qxmlreader.html#hasProperty">hasProperty</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#setProperty">setProperty</a>() and <a href="qxmlreader.html#hasProperty">hasProperty</a>().</p>
 
 
 <h3 class="fn"><a name="setContentHandler" />QXmlReader.setContentHandler (<i>self</i>, <a href="qxmlcontenthandler.html">QXmlContentHandler</a>&#160;<i>handler</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets the content handler to <i>handler</i>.</p>
-<p>See also <a href="qxmlreader.html#contentHandler">contentHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#contentHandler">contentHandler</a>().</p>
 
 
 <h3 class="fn"><a name="setDeclHandler" />QXmlReader.setDeclHandler (<i>self</i>, <a href="qxmldeclhandler.html">QXmlDeclHandler</a>&#160;<i>handler</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets the declaration handler to <i>handler</i>.</p>
-<p>See also <a href="qxmlreader.html#declHandler">declHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#declHandler">declHandler</a>().</p>
 
 
 <h3 class="fn"><a name="setDTDHandler" />QXmlReader.setDTDHandler (<i>self</i>, <a href="qxmldtdhandler.html">QXmlDTDHandler</a>&#160;<i>handler</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets the DTD handler to <i>handler</i>.</p>
-<p>See also <a href="qxmlreader.html#DTDHandler">DTDHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#DTDHandler">DTDHandler</a>().</p>
 
 
 <h3 class="fn"><a name="setEntityResolver" />QXmlReader.setEntityResolver (<i>self</i>, <a href="qxmlentityresolver.html">QXmlEntityResolver</a>&#160;<i>handler</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets the entity resolver to <i>handler</i>.</p>
-<p>See also <a href="qxmlreader.html#entityResolver">entityResolver</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#entityResolver">entityResolver</a>().</p>
 
 
 <h3 class="fn"><a name="setErrorHandler" />QXmlReader.setErrorHandler (<i>self</i>, <a href="qxmlerrorhandler.html">QXmlErrorHandler</a>&#160;<i>handler</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets the error handler to <i>handler</i>. Clears the error
 handler if <i>handler</i> is 0.</p>
-<p>See also <a href="qxmlreader.html#errorHandler">errorHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#errorHandler">errorHandler</a>().</p>
 
 
 <h3 class="fn"><a name="setFeature" />QXmlReader.setFeature (<i>self</i>, QString&#160;<i>name</i>, bool&#160;<i>value</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets the feature called <i>name</i> to the given <i>value</i>.
 If the reader doesn't have the feature nothing happens.</p>
-<p>See also <a href="qxmlreader.html#feature">feature</a>() and
-<a href="qxmlreader.html#hasFeature">hasFeature</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#feature">feature</a>()
+and <a href="qxmlreader.html#hasFeature">hasFeature</a>().</p>
 
 
 <h3 class="fn"><a name="setLexicalHandler" />QXmlReader.setLexicalHandler (<i>self</i>, <a href="qxmllexicalhandler.html">QXmlLexicalHandler</a>&#160;<i>handler</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets the lexical handler to <i>handler</i>.</p>
-<p>See also <a href="qxmlreader.html#lexicalHandler">lexicalHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlreader.html#lexicalHandler">lexicalHandler</a>().</p>
 
 
 <h3 class="fn"><a name="setProperty" />QXmlReader.setProperty (<i>self</i>, QString&#160;<i>name</i>, sip.voidptr&#160;<i>value</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets the property <i>name</i> to <i>value</i>. If the reader
 doesn't have the property nothing happens.</p>
-<p>See also <a href="qxmlreader.html#property">property</a>() and
-<a href="qxmlreader.html#hasProperty">hasProperty</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qxmlreader.html#property">property</a>() and <a href="qxmlreader.html#hasProperty">hasProperty</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

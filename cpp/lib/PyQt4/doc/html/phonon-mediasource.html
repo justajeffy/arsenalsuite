@@ -26,15 +26,15 @@ functions are dependent on the <a href="phonon-mediasource.html#type">type</a>()
 sources. It's constructors are implicit, so one can, for instance,
 send an URL or filename directly to the constructors of the
 <a href="phonon-mediaobject.html">MediaObject</a>.</p>
-<pre class="highlightedCode brush: cpp">
+<pre class="cpp">
  MediaObject m;
- QString fileName("/home/foo/bar.ogg");
- QUrl url("http://www.example.com/stream.mp3");
- QBuffer *someBuffer;
- m.setCurrentSource(fileName);
- m.setCurrentSource(url);
- m.setCurrentSource(someBuffer);
- m.setCurrentSource(Phonon.Cd);
+ <span class="type"><a href="qstring.html">QString</a></span> <a href="phonon-mediasource.html#fileName">fileName</a>(<span class="string">"/home/foo/bar.ogg"</span>);
+ <span class="type"><a href="qurl.html">QUrl</a></span> <a href="phonon-mediasource.html#url">url</a>(<span class="string">"http://www.example.com/stream.mp3"</span>);
+ <span class="type"><a href="qbuffer.html">QBuffer</a></span> <span class="operator">*</span>someBuffer;
+ m<span class="operator">.</span>setCurrentSource(fileName);
+ m<span class="operator">.</span>setCurrentSource(url);
+ m<span class="operator">.</span>setCurrentSource(someBuffer);
+ m<span class="operator">.</span>setCurrentSource(Phonon<span class="operator">.</span>Cd);
 </pre>
 <p>A MediaSource object cannot be reused for another multimedia
 source. It is possible to play the same source again, and also stop
@@ -47,49 +47,49 @@ locations. Support for other sources, such as CD/DVD, are planned
 for the future.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Type-enum" />MediaSource.Type</h3><p>Identifies the type of media described by the <a href="phonon-mediasource.html">MediaSource</a> object.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.MediaSource.Invalid</tt></td>
-<td class=" topAlign"><tt>-1</tt></td>
+<td class="topAlign"><tt>-1</tt></td>
 <td class="topAlign">The <a href="phonon-mediasource.html">MediaSource</a> object does not describe
 any valid source.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.MediaSource.LocalFile</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The <a href="phonon-mediasource.html">MediaSource</a> object describes a local
 file.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.MediaSource.Url</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The <a href="phonon-mediasource.html">MediaSource</a> object describes an URL,
 which can be either a local file or a file on the network.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.MediaSource.Disc</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The <a href="phonon-mediasource.html">MediaSource</a> object describes a disc,
 e.g., a CD.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.MediaSource.Stream</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The <a href="phonon-mediasource.html">MediaSource</a> object describes a data
 stream. This is the type used for <a href="qiodevice.html">QIODevice</a>s. Note that a stream opened with a
 <a href="qurl.html">QUrl</a>, will still be of the Url type.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.MediaSource.Empty</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The media source doesn't have a source.</td>
 </tr>
 </table>
-<p>See also <a href="phonon-mediasource.html#type">MediaSource.type</a>().</p>
+<p><b>See also</b> <a href="phonon-mediasource.html#type">MediaSource.type</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="MediaSource" />MediaSource.__init__ (<i>self</i>, QString&#160;<i>fileName</i>)</h3><p>Creates a <a href="phonon-mediasource.html">MediaSource</a>
 object for the file specified by <i>fileName</i>. You can also use
 this constructor with <a href="resources.html">Qt resources</a></p>
@@ -100,7 +100,7 @@ object for a the URL specified by <i>url</i>.</p>
 <p>If the multimedia content you would like to play back is on a
 remote network location, you should use this constructor; though,
 it also possible to specify an URL to a local file.</p>
-<p>See also <a href="qurl.html">QUrl</a>.</p>
+<p><b>See also</b> <a href="qurl.html">QUrl</a>.</p>
 
 
 <h3 class="fn"><a name="MediaSource-4" />MediaSource.__init__ (<i>self</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>ioDevice</i>)</h3><p>Creates a <a href="phonon-mediasource.html">MediaSource</a>
@@ -115,22 +115,22 @@ portable way.</p>
 
 <h3 class="fn"><a name="MediaSource-5" />MediaSource.__init__ (<i>self</i>, <a href="phonon-mediasource.html">MediaSource</a>&#160;<i>rhs</i>)</h3><h3 class="fn"><a name="autoDelete" />bool MediaSource.autoDelete (<i>self</i>)</h3><p>Returns the setting of the auto-delete option. The default is
 false.</p>
-<p>See also <a href="phonon-mediasource.html#setAutoDelete">setAutoDelete</a>().</p>
+<p><b>See also</b> <a href="phonon-mediasource.html#setAutoDelete">setAutoDelete</a>().</p>
 
 
 <h3 class="fn"><a name="deviceName" />QString MediaSource.deviceName (<i>self</i>)</h3><p>Returns the device name of the <a href="phonon-mediasource.html">MediaSource</a> if <a href="phonon-mediasource.html#type">type</a>() == Disc; otherwise
 returns QString().</p>
-<p>See also <a href="phonon-mediasource.html#type">type</a>().</p>
+<p><b>See also</b> <a href="phonon-mediasource.html#type">type</a>().</p>
 
 
 <h3 class="fn"><a name="discType" /><a href="phonon.html#DiscType-enum">DiscType</a> MediaSource.discType (<i>self</i>)</h3><p>Returns the disc type of the <a href="phonon-mediasource.html">MediaSource</a> if <a href="phonon-mediasource.html#type">type</a>() == Disc; otherwise
 returns <a href="phonon.html#DiscType-enum">NoDisc</a>.</p>
-<p>See also <a href="phonon-mediasource.html#type">type</a>().</p>
+<p><b>See also</b> <a href="phonon-mediasource.html#type">type</a>().</p>
 
 
 <h3 class="fn"><a name="fileName" />QString MediaSource.fileName (<i>self</i>)</h3><p>Returns the file name of the <a href="phonon-mediasource.html">MediaSource</a> if <a href="phonon-mediasource.html#type">type</a>() == <a href="phonon-mediasource.html#Type-enum">LocalFile</a>; otherwise,
 returns QString().</p>
-<p>See also <a href="phonon-mediasource.html#type">type</a>().</p>
+<p><b>See also</b> <a href="phonon-mediasource.html#type">type</a>().</p>
 
 
 <h3 class="fn"><a name="setAutoDelete" />MediaSource.setAutoDelete (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>If <i>enable</i> is true, the media source will take ownership
@@ -141,17 +141,17 @@ responsible for deletion of this object.</p>
 only access the stream or device as long as you keep the media
 source object around. As long as you keep the media source wrapping
 the stream or device, the object will not get deleted.</p>
-<p>See also <a href="phonon-mediasource.html#autoDelete">autoDelete</a>().</p>
+<p><b>See also</b> <a href="phonon-mediasource.html#autoDelete">autoDelete</a>().</p>
 
 
 <h3 class="fn"><a name="type" /><a href="phonon-mediasource.html#Type-enum">Type</a> MediaSource.type (<i>self</i>)</h3><p>Returns the type of the <a href="phonon-mediasource.html">MediaSource</a> (depends on the
 constructor that was used).</p>
-<p>See also <a href="phonon-mediasource.html#Type-enum">Type</a>.</p>
+<p><b>See also</b> <a href="phonon-mediasource.html#Type-enum">Type</a>.</p>
 
 
 <h3 class="fn"><a name="url" /><a href="qurl.html">QUrl</a> MediaSource.url (<i>self</i>)</h3><p>Returns the URL of the <a href="phonon-mediasource.html">MediaSource</a> if <a href="phonon-mediasource.html#type">type</a>() == URL or <a href="phonon-mediasource.html#type">type</a>() == <a href="phonon-mediasource.html#Type-enum">LocalFile</a>; otherwise
 returns <a href="porting4.html#qurl">QUrl</a>().</p>
-<p>See also <a href="phonon-mediasource.html#type">type</a>().</p>
+<p><b>See also</b> <a href="phonon-mediasource.html#type">type</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool MediaSource.__eq__ (<i>self</i>, <a href="phonon-mediasource.html">MediaSource</a>&#160;<i>rhs</i>)</h3><h3 class="fn"><a name="__ne__" />bool MediaSource.__ne__ (<i>self</i>, <a href="phonon-mediasource.html">MediaSource</a>&#160;<i>rhs</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool MediaSource.__eq__ (<i>self</i>, <a href="phonon-mediasource.html">MediaSource</a>&#160;<i>rhs</i>)</h3><h3 class="fn"><a name="__ne__" />bool MediaSource.__ne__ (<i>self</i>, <a href="phonon-mediasource.html">MediaSource</a>&#160;<i>rhs</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

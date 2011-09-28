@@ -28,19 +28,19 @@ widget is displayed on the screen. This is illustrated in the
 following code snippet in which a splash screen is displayed and
 some initialization tasks are performed before the application's
 main window is shown:</p>
-<pre class="highlightedCode brush: cpp">
- int main(int argc, char *argv[])
+<pre class="cpp">
+ <span class="type">int</span> main(<span class="type">int</span> argc<span class="operator">,</span> <span class="type">char</span> <span class="operator">*</span>argv<span class="operator">[</span><span class="operator">]</span>)
  {
-     QApplication app(argc, argv);
-     QPixmap pixmap(":/splash.png");
-     QSplashScreen splash(pixmap);
-     splash.show();
-     app.processEvents();
+     <span class="type"><a href="qapplication.html">QApplication</a></span> app(argc<span class="operator">,</span> argv);
+     <span class="type"><a href="qpixmap.html">QPixmap</a></span> pixmap(<span class="string">":/splash.png"</span>);
+     <span class="type">QSplashScreen</span> splash(pixmap);
+     splash<span class="operator">.</span>show();
+     app<span class="operator">.</span>processEvents();
      ...
-     QMainWindow window;
-     window.show();
-     splash.finish(&amp;window);
-     return app.exec();
+     <span class="type"><a href="qmainwindow.html">QMainWindow</a></span> window;
+     window<span class="operator">.</span>show();
+     splash<span class="operator">.</span>finish(<span class="operator">&amp;</span>window);
+     <span class="keyword">return</span> app<span class="operator">.</span>exec();
  }
 </pre>
 <p>The user can hide the splash screen by clicking on it with the
@@ -51,20 +51,20 @@ to receive the mouse clicks.</p>
 <p>It is sometimes useful to update the splash screen with
 messages, for example, announcing connections established or
 modules loaded as the application starts up:</p>
-<pre class="highlightedCode brush: cpp">
- QPixmap pixmap(":/splash.png");
- QSplashScreen *splash = new QSplashScreen(pixmap);
- splash-&gt;show();
+<pre class="cpp">
+ <span class="type"><a href="qpixmap.html">QPixmap</a></span> <a href="qsplashscreen.html#pixmap">pixmap</a>(<span class="string">":/splash.png"</span>);
+ <span class="type">QSplashScreen</span> <span class="operator">*</span>splash <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QSplashScreen</span>(pixmap);
+ splash<span class="operator">-</span><span class="operator">&gt;</span><a href="qwidget.html#show">show</a>();
 
- ... <span class="comment">// Loading some items</span>
- splash-&gt;showMessage("Loaded modules");
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span> <span class="comment">// Loading some items</span>
+ splash<span class="operator">-</span><span class="operator">&gt;</span><a href="qsplashscreen.html#showMessage">showMessage</a>(<span class="string">"Loaded modules"</span>);
 
- qApp-&gt;processEvents();
+ qApp<span class="operator">-</span><span class="operator">&gt;</span>processEvents();
 
- ... <span class="comment">// Establishing connections</span>
- splash-&gt;showMessage("Established connections");
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span> <span class="comment">// Establishing connections</span>
+ splash<span class="operator">-</span><span class="operator">&gt;</span><a href="qsplashscreen.html#showMessage">showMessage</a>(<span class="string">"Established connections"</span>);
 
- qApp-&gt;processEvents();
+ qApp<span class="operator">-</span><span class="operator">&gt;</span>processEvents();
 </pre>
 <p>QSplashScreen supports this with the <a href="qsplashscreen.html#showMessage">showMessage</a>() function. If you
 wish to do your own drawing you can get a pointer to the pixmap
@@ -85,7 +85,7 @@ proper desktop() as the <i>parent</i>.</p>
 
 
 <h3 class="fn"><a name="clearMessage" />QSplashScreen.clearMessage (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void clearMessage()</tt>.</p><p>Removes the message being displayed on the splash screen</p>
-<p>See also <a href="qsplashscreen.html#showMessage">showMessage</a>().</p>
+<p><b>See also</b> <a href="qsplashscreen.html#showMessage">showMessage</a>().</p>
 
 
 <h3 class="fn"><a name="drawContents" />QSplashScreen.drawContents (<i>self</i>, <a href="qpainter.html">QPainter</a>&#160;<i>painter</i>)</h3><p>Draw the contents of the splash screen using painter
@@ -108,7 +108,7 @@ on itself.</p>
 
 <h3 class="fn"><a name="pixmap" /><a href="qpixmap.html">QPixmap</a> QSplashScreen.pixmap (<i>self</i>)</h3><p>Returns the pixmap that is used in the splash screen. The image
 does not have any of the text drawn by <a href="qsplashscreen.html#showMessage">showMessage</a>() calls.</p>
-<p>See also <a href="qsplashscreen.html#setPixmap">setPixmap</a>().</p>
+<p><b>See also</b> <a href="qsplashscreen.html#setPixmap">setPixmap</a>().</p>
 
 
 <h3 class="fn"><a name="repaint" />QSplashScreen.repaint (<i>self</i>)</h3><p>This overrides <a href="qwidget.html#repaint">QWidget.repaint</a>(). It differs from the
@@ -119,7 +119,7 @@ present.</p>
 
 <h3 class="fn"><a name="setPixmap" />QSplashScreen.setPixmap (<i>self</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>)</h3><p>Sets the pixmap that will be used as the splash screen's image
 to <i>pixmap</i>.</p>
-<p>See also <a href="qsplashscreen.html#pixmap">pixmap</a>().</p>
+<p><b>See also</b> <a href="qsplashscreen.html#pixmap">pixmap</a>().</p>
 
 
 <h3 class="fn"><a name="showMessage" />QSplashScreen.showMessage (<i>self</i>, QString&#160;<i>message</i>, int&#160;<i>alignment</i>&#160;=&#160;Qt.AlignLeft, <a href="qcolor.html">QColor</a>&#160;<i>color</i>&#160;=&#160;Qt.black)</h3><p>This method is also a Qt slot with the C++ signature <tt>void showMessage(const QString&amp;,int = Qt.AlignLeft,const QColor&amp; = Qt.black)</tt>.</p><p>Draws the <i>message</i> text onto the splash screen with color
@@ -131,12 +131,11 @@ call <a href="qcoreapplication.html">QCoreApplication</a>'s
 after the call to showMessage(). You usually want this to make sure
 that the message is kept up to date with what your application is
 doing (e.g., loading files).</p>
-<p>See also <a href="qt.html#AlignmentFlag-enum">Qt.Alignment</a>
-and <a href="qsplashscreen.html#clearMessage">clearMessage</a>().</p>
+<p><b>See also</b> <a href="qt.html#AlignmentFlag-enum">Qt.Alignment</a> and <a href="qsplashscreen.html#clearMessage">clearMessage</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="messageChanged" />void messageChanged (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the message on the splash screen
 changes. <i>message</i> is the new message and is a null-string
 when the message has been removed.</p>
-<p>See also <a href="qsplashscreen.html#showMessage">showMessage</a>() and <a href="qsplashscreen.html#clearMessage">clearMessage</a>().</p>
+<p><b>See also</b> <a href="qsplashscreen.html#showMessage">showMessage</a>() and <a href="qsplashscreen.html#clearMessage">clearMessage</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

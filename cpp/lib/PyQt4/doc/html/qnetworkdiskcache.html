@@ -23,30 +23,30 @@ cache will use on the system to 50MB.</p>
 <p>Note you have to set the cache directory before it will
 work.</p>
 <p>A network disk cache can be enabled by:</p>
-<pre class="highlightedCode brush: cpp">
- QNetworkAccessManager *manager = new QNetworkAccessManager(this);
- QNetworkDiskCache *diskCache = new QNetworkDiskCache(this);
- diskCache-&gt;setCacheDirectory("cacheDir");
- manager-&gt;setCache(diskCache);
+<pre class="cpp">
+ <span class="type"><a href="qnetworkaccessmanager.html">QNetworkAccessManager</a></span> <span class="operator">*</span>manager <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qnetworkaccessmanager.html">QNetworkAccessManager</a></span>(<span class="keyword">this</span>);
+ <span class="type">QNetworkDiskCache</span> <span class="operator">*</span>diskCache <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QNetworkDiskCache</span>(<span class="keyword">this</span>);
+ diskCache<span class="operator">-</span><span class="operator">&gt;</span><a href="qnetworkdiskcache.html#setCacheDirectory">setCacheDirectory</a>(<span class="string">"cacheDir"</span>);
+ manager<span class="operator">-</span><span class="operator">&gt;</span>setCache(diskCache);
 </pre>
 <p>When sending requests, to control the preference of when to use
 the cache and when to use the network, consider the following:</p>
-<pre class="highlightedCode brush: cpp">
-<span class="comment"> // do a normal request (preferred from network, as this is the default)</span>
- QNetworkRequest request(QUrl(QString("http://qt.nokia.com")));
- manager-&gt;get(request);
+<pre class="cpp">
+ <span class="comment">// do a normal request (preferred from network, as this is the default)</span>
+ <span class="type"><a href="qnetworkrequest.html">QNetworkRequest</a></span> request(<span class="type"><a href="qurl.html">QUrl</a></span>(<span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"http://qt.nokia.com"</span>)));
+ manager<span class="operator">-</span><span class="operator">&gt;</span>get(request);
 
-<span class="comment"> // do a request preferred from cache</span>
- QNetworkRequest request2(QUrl(QString("http://qt.nokia.com")));
- request2.setAttribute(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.PreferCache);
- manager-&gt;get(request2);
+ <span class="comment">// do a request preferred from cache</span>
+ <span class="type"><a href="qnetworkrequest.html">QNetworkRequest</a></span> request2(<span class="type"><a href="qurl.html">QUrl</a></span>(<span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"http://qt.nokia.com"</span>)));
+ request2<span class="operator">.</span>setAttribute(<span class="type"><a href="qnetworkrequest.html">QNetworkRequest</a></span><span class="operator">.</span>CacheLoadControlAttribute<span class="operator">,</span> <span class="type"><a href="qnetworkrequest.html">QNetworkRequest</a></span><span class="operator">.</span>PreferCache);
+ manager<span class="operator">-</span><span class="operator">&gt;</span>get(request2);
 </pre>
 <p>To check whether the response came from the cache or from the
 network, the following can be applied:</p>
-<pre class="highlightedCode brush: cpp">
- void replyFinished(QNetworkReply *reply) {
-     QVariant fromCache = reply-&gt;attribute(QNetworkRequest.SourceIsFromCacheAttribute);
-     qDebug() &lt;&lt; "page from cache?" &lt;&lt; fromCache.toBool();
+<pre class="cpp">
+ <span class="type">void</span> replyFinished(<span class="type"><a href="qnetworkreply.html">QNetworkReply</a></span> <span class="operator">*</span>reply) {
+     <span class="type"><a href="qvariant.html">QVariant</a></span> fromCache <span class="operator">=</span> reply<span class="operator">-</span><span class="operator">&gt;</span>attribute(<span class="type"><a href="qnetworkrequest.html">QNetworkRequest</a></span><span class="operator">.</span>SourceIsFromCacheAttribute);
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"page from cache?"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> fromCache<span class="operator">.</span>toBool();
  }
 </pre><hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QNetworkDiskCache" />QNetworkDiskCache.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Creates a new disk cache. The <i>parent</i> argument is passed
 to <a href="qabstractnetworkcache.html">QAbstractNetworkCache</a>'s
@@ -54,7 +54,7 @@ constructor.</p>
 
 
 <h3 class="fn"><a name="cacheDirectory" />QString QNetworkDiskCache.cacheDirectory (<i>self</i>)</h3><p>Returns the location where cached files will be stored.</p>
-<p>See also <a href="qnetworkdiskcache.html#setCacheDirectory">setCacheDirectory</a>().</p>
+<p><b>See also</b> <a href="qnetworkdiskcache.html#setCacheDirectory">setCacheDirectory</a>().</p>
 
 
 <h3 class="fn"><a name="cacheSize" />int QNetworkDiskCache.cacheSize (<i>self</i>)</h3><p>Reimplemented from <a href="qabstractnetworkcache.html#cacheSize">QAbstractNetworkCache.cacheSize</a>().</p>
@@ -79,7 +79,7 @@ application knows about that <a href="qnetworkdiskcache.html">QNetworkDiskCache<
 example the number of times a cache is accessed.</p>
 <p>Note: <a href="qnetworkdiskcache.html#cacheSize">cacheSize</a>()
 calls expire if the current cache size is unknown.</p>
-<p>See also <a href="qnetworkdiskcache.html#maximumCacheSize">maximumCacheSize</a>()
+<p><b>See also</b> <a href="qnetworkdiskcache.html#maximumCacheSize">maximumCacheSize</a>()
 and <a href="qnetworkdiskcache.html#fileMetaData">fileMetaData</a>().</p>
 
 
@@ -93,7 +93,7 @@ invalid.</p>
 
 
 <h3 class="fn"><a name="maximumCacheSize" />int QNetworkDiskCache.maximumCacheSize (<i>self</i>)</h3><p>Returns the current maximum size for the disk cache.</p>
-<p>See also <a href="qnetworkdiskcache.html#setMaximumCacheSize">setMaximumCacheSize</a>().</p>
+<p><b>See also</b> <a href="qnetworkdiskcache.html#setMaximumCacheSize">setMaximumCacheSize</a>().</p>
 
 
 <h3 class="fn"><a name="metaData" /><a href="qnetworkcachemetadata.html">QNetworkCacheMetaData</a> QNetworkDiskCache.metaData (<i>self</i>, <a href="qurl.html">QUrl</a>&#160;<i>url</i>)</h3><p>Reimplemented from <a href="qabstractnetworkcache.html#metaData">QAbstractNetworkCache.metaData</a>().</p>
@@ -111,15 +111,15 @@ invalid.</p>
 create this directory if it does not exists.</p>
 <p>Prepared cache items will be stored in the new cache directory
 when they are inserted.</p>
-<p>See also <a href="qnetworkdiskcache.html#cacheDirectory">cacheDirectory</a>() and
+<p><b>See also</b> <a href="qnetworkdiskcache.html#cacheDirectory">cacheDirectory</a>() and
 <a href="qdesktopservices.html#StandardLocation-enum">QDesktopServices.CacheLocation</a>.</p>
 
 
 <h3 class="fn"><a name="setMaximumCacheSize" />QNetworkDiskCache.setMaximumCacheSize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Sets the maximum size of the disk cache to be <i>size</i>.</p>
 <p>If the new size is smaller then the current cache size then the
 cache will call <a href="qnetworkdiskcache.html#expire">expire</a>().</p>
-<p>See also <a href="qnetworkdiskcache.html#maximumCacheSize">maximumCacheSize</a>().</p>
+<p><b>See also</b> <a href="qnetworkdiskcache.html#maximumCacheSize">maximumCacheSize</a>().</p>
 
 
 <h3 class="fn"><a name="updateMetaData" />QNetworkDiskCache.updateMetaData (<i>self</i>, <a href="qnetworkcachemetadata.html">QNetworkCacheMetaData</a>&#160;<i>metaData</i>)</h3><p>Reimplemented from <a href="qabstractnetworkcache.html#updateMetaData">QAbstractNetworkCache.updateMetaData</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -46,28 +46,28 @@ document format by inspecting the extension of <i>fileName</i>.</p>
 
 
 <h3 class="fn"><a name="codec" /><a href="qtextcodec.html">QTextCodec</a> QTextDocumentWriter.codec (<i>self</i>)</h3><p>Returns the codec that is currently assigned to the writer.</p>
-<p>See also <a href="qtextdocumentwriter.html#setCodec">setCodec</a>().</p>
+<p><b>See also</b> <a href="qtextdocumentwriter.html#setCodec">setCodec</a>().</p>
 
 
 <h3 class="fn"><a name="device" /><a href="qiodevice.html">QIODevice</a> QTextDocumentWriter.device (<i>self</i>)</h3><p>Returns the device currently assigned, or 0 if no device has
 been assigned.</p>
-<p>See also <a href="qtextdocumentwriter.html#setDevice">setDevice</a>().</p>
+<p><b>See also</b> <a href="qtextdocumentwriter.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="fileName" />QString QTextDocumentWriter.fileName (<i>self</i>)</h3><p>If the currently assigned device is a <a href="qfile.html">QFile</a>, or if <a href="qtextdocumentwriter.html#setFileName">setFileName</a>() has been
 called, this function returns the name of the file to be written
 to. In all other cases, it returns an empty string.</p>
-<p>See also <a href="qtextdocumentwriter.html#setFileName">setFileName</a>() and
+<p><b>See also</b> <a href="qtextdocumentwriter.html#setFileName">setFileName</a>() and
 <a href="qtextdocumentwriter.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="format" /><a href="qbytearray.html">QByteArray</a> QTextDocumentWriter.format (<i>self</i>)</h3><p>Returns the format used for writing documents.</p>
-<p>See also <a href="qtextdocumentwriter.html#setFormat">setFormat</a>().</p>
+<p><b>See also</b> <a href="qtextdocumentwriter.html#setFormat">setFormat</a>().</p>
 
 
 <h3 class="fn"><a name="setCodec" />QTextDocumentWriter.setCodec (<i>self</i>, <a href="qtextcodec.html">QTextCodec</a>&#160;<i>codec</i>)</h3><p>Sets the codec for this stream to <i>codec</i>. The codec is
 used for encoding any data that is written. By default, <a href="qtextdocumentwriter.html">QTextDocumentWriter</a> uses UTF-8.</p>
-<p>See also <a href="qtextdocumentwriter.html#codec">codec</a>().</p>
+<p><b>See also</b> <a href="qtextdocumentwriter.html#codec">codec</a>().</p>
 
 
 <h3 class="fn"><a name="setDevice" />QTextDocumentWriter.setDevice (<i>self</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>device</i>)</h3><p>Sets the writer's device to the <i>device</i> specified. If a
@@ -79,64 +79,51 @@ calling open().</p>
 <p><b>Note:</b> This will not work for certain devices, such as
 <a href="qprocess.html">QProcess</a>, <a href="qtcpsocket.html">QTcpSocket</a> and <a href="qudpsocket.html">QUdpSocket</a>, where some configuration is
 required before the device can be opened.</p>
-<p>See also <a href="qtextdocumentwriter.html#device">device</a>()
-and <a href="qtextdocumentwriter.html#setFileName">setFileName</a>().</p>
+<p><b>See also</b> <a href="qtextdocumentwriter.html#device">device</a>() and <a href="qtextdocumentwriter.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="setFileName" />QTextDocumentWriter.setFileName (<i>self</i>, QString&#160;<i>fileName</i>)</h3><p>Sets the name of the file to be written to <i>fileName</i>.
 Internally, <a href="qtextdocumentwriter.html">QTextDocumentWriter</a> will create a
 <a href="qfile.html">QFile</a> and open it in <a href="qiodevice.html#OpenModeFlag-enum">QIODevice.WriteOnly</a> mode,
 and use this file when writing the document.</p>
-<p>See also <a href="qtextdocumentwriter.html#fileName">fileName</a>() and <a href="qtextdocumentwriter.html#setDevice">setDevice</a>().</p>
+<p><b>See also</b> <a href="qtextdocumentwriter.html#fileName">fileName</a>() and <a href="qtextdocumentwriter.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="setFormat" />QTextDocumentWriter.setFormat (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>format</i>)</h3><p>Sets the format used to write documents to the <i>format</i>
 specified. <i>format</i> is a case insensitive text string. For
 example:</p>
-<pre class="highlightedCode brush: cpp">
-         QTextDocumentWriter writer;
-         writer.setFormat("odf"); <span class="comment">// same as writer.setFormat("ODF");</span>
+<pre class="cpp">
+         <span class="type"><a href="qtextdocumentwriter.html">QTextDocumentWriter</a></span> writer;
+         writer<span class="operator">.</span>setFormat(<span class="string">"odf"</span>); <span class="comment">// same as writer.setFormat("ODF");</span>
 </pre>
 <p>You can call <a href="qtextdocumentwriter.html#supportedDocumentFormats">supportedDocumentFormats</a>()
 for the full list of formats <a href="qtextdocumentwriter.html">QTextDocumentWriter</a> supports.</p>
-<p>See also <a href="qtextdocumentwriter.html#format">format</a>().</p>
+<p><b>See also</b> <a href="qtextdocumentwriter.html#format">format</a>().</p>
 
 
 <h3 class="fn"><a name="supportedDocumentFormats" />list-of-QByteArray QTextDocumentWriter.supportedDocumentFormats ()</h3><p>Returns the list of document formats supported by <a href="qtextdocumentwriter.html">QTextDocumentWriter</a>.</p>
 <p>By default, Qt can write the following formats:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Format</th>
 <th>Description</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>plaintext</p>
-</td>
-<td>
-<p>Plain text</p>
-</td>
+<tr class="odd" valign="top">
+<td>plaintext</td>
+<td>Plain text</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>HTML</p>
-</td>
-<td>
-<p>HyperText Markup Language</p>
-</td>
+<tr class="even" valign="top">
+<td>HTML</td>
+<td>HyperText Markup Language</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>ODF</p>
-</td>
-<td>
-<p>OpenDocument Format</p>
-</td>
+<tr class="odd" valign="top">
+<td>ODF</td>
+<td>OpenDocument Format</td>
 </tr>
 </table>
-<p>See also <a href="qtextdocumentwriter.html#setFormat">setFormat</a>().</p>
+<p><b>See also</b> <a href="qtextdocumentwriter.html#setFormat">setFormat</a>().</p>
 
 
 <h3 class="fn"><a name="write" />bool QTextDocumentWriter.write (<i>self</i>, <a href="qtextdocument.html">QTextDocument</a>&#160;<i>document</i>)</h3><p>Writes the given <i>document</i> to the assigned device or file
@@ -146,4 +133,4 @@ and returns true if successful; otherwise returns false.</p>
 <h3 class="fn"><a name="write-2" />bool QTextDocumentWriter.write (<i>self</i>, <a href="qtextdocumentfragment.html">QTextDocumentFragment</a>&#160;<i>fragment</i>)</h3><p>Writes the document fragment specified by <i>fragment</i> to the
 assigned device or file and returns true if successful; otherwise
 returns false.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

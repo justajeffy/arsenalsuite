@@ -49,7 +49,7 @@ respective function descriptions for further details.</p>
 application wants to be restarted by the session manager. The
 current values are:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -57,14 +57,14 @@ current values are:</p>
 <tr>
 <td class="topAlign">
 <tt>QSessionManager.RestartIfRunning</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">If the application is still running when the
 session is shut down, it wants to be restarted at the start of the
 next session.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSessionManager.RestartAnyway</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The application wants to be started at the
 start of the next session, no matter what. (This is useful for
 utilities that run just after startup and then quit.)</td>
@@ -72,13 +72,13 @@ utilities that run just after startup and then quit.)</td>
 <tr>
 <td class="topAlign">
 <tt>QSessionManager.RestartImmediately</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The application wants to be started
 immediately whenever it is not running.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSessionManager.RestartNever</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The application does not want to be restarted
 automatically.</td>
 </tr>
@@ -92,7 +92,7 @@ that occur. Session managers may give error interaction requests
 higher priority, which means that it is more likely that an error
 interaction is permitted. However, you are still not guaranteed
 that the session manager will allow interaction.</p>
-<p>See also <a href="qsessionmanager.html#allowsInteraction">allowsInteraction</a>(),
+<p><b>See also</b> <a href="qsessionmanager.html#allowsInteraction">allowsInteraction</a>(),
 <a href="qsessionmanager.html#release">release</a>(), and <a href="qsessionmanager.html#cancel">cancel</a>().</p>
 
 
@@ -113,29 +113,29 @@ interaction phase, you must tell the session manager that this has
 happened by calling <a href="qsessionmanager.html#cancel">cancel</a>().</p>
 <p>Here's an example of how an application's <a href="qapplication.html#commitData">QApplication.commitData</a>() might
 be implemented:</p>
-<pre class="highlightedCode brush: cpp">
- void MyApplication.commitData(QSessionManager&amp; manager)
+<pre class="cpp">
+ <span class="type">void</span> MyApplication<span class="operator">.</span>commitData(<span class="type"><a href="qsessionmanager.html">QSessionManager</a></span><span class="operator">&amp;</span> manager)
  {
-     if (manager.allowsInteraction()) {
-         int ret = QMessageBox.warning(
-                     mainWindow,
-                     tr("My Application"),
-                     tr("Save changes to document?"),
-                     QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel);
+     <span class="keyword">if</span> (manager<span class="operator">.</span>allowsInteraction()) {
+         <span class="type">int</span> ret <span class="operator">=</span> <span class="type"><a href="qmessagebox.html">QMessageBox</a></span><span class="operator">.</span>warning(
+                     mainWindow<span class="operator">,</span>
+                     tr(<span class="string">"My Application"</span>)<span class="operator">,</span>
+                     tr(<span class="string">"Save changes to document?"</span>)<span class="operator">,</span>
+                     <span class="type"><a href="qmessagebox.html">QMessageBox</a></span><span class="operator">.</span>Save <span class="operator">|</span> <span class="type"><a href="qmessagebox.html">QMessageBox</a></span><span class="operator">.</span>Discard <span class="operator">|</span> <span class="type"><a href="qmessagebox.html">QMessageBox</a></span><span class="operator">.</span>Cancel);
 
-         switch (ret) {
-         case QMessageBox.Save:
-             manager.release();
-             if (!saveDocument())
-                 manager.cancel();
-             break;
-         case QMessageBox.Discard:
-             break;
-         case QMessageBox.Cancel:
-         default:
-             manager.cancel();
+         <span class="keyword">switch</span> (ret) {
+         <span class="keyword">case</span> <span class="type"><a href="qmessagebox.html">QMessageBox</a></span><span class="operator">.</span>Save:
+             manager<span class="operator">.</span>release();
+             <span class="keyword">if</span> (<span class="operator">!</span>saveDocument())
+                 manager<span class="operator">.</span>cancel();
+             <span class="keyword">break</span>;
+         <span class="keyword">case</span> <span class="type"><a href="qmessagebox.html">QMessageBox</a></span><span class="operator">.</span>Discard:
+             <span class="keyword">break</span>;
+         <span class="keyword">case</span> <span class="type"><a href="qmessagebox.html">QMessageBox</a></span><span class="operator">.</span>Cancel:
+         <span class="keyword">default</span>:
+             manager<span class="operator">.</span>cancel();
          }
-     } else {
+     } <span class="keyword">else</span> {
          <span class="comment">// we did not get permission to interact, then</span>
          <span class="comment">// do something reasonable instead</span>
      }
@@ -144,36 +144,36 @@ be implemented:</p>
 <p>If an error occurred within the application while saving its
 data, you may want to try <a href="qsessionmanager.html#allowsErrorInteraction">allowsErrorInteraction</a>()
 instead.</p>
-<p>See also <a href="qapplication.html#commitData">QApplication.commitData</a>(),
+<p><b>See also</b> <a href="qapplication.html#commitData">QApplication.commitData</a>(),
 <a href="qsessionmanager.html#release">release</a>(), and <a href="qsessionmanager.html#cancel">cancel</a>().</p>
 
 
 <h3 class="fn"><a name="cancel" />QSessionManager.cancel (<i>self</i>)</h3><p>Tells the session manager to cancel the shutdown process.
 Applications should not call this function without asking the user
 first.</p>
-<p>See also <a href="qsessionmanager.html#allowsInteraction">allowsInteraction</a>()
+<p><b>See also</b> <a href="qsessionmanager.html#allowsInteraction">allowsInteraction</a>()
 and <a href="qsessionmanager.html#allowsErrorInteraction">allowsErrorInteraction</a>().</p>
 
 
 <h3 class="fn"><a name="discardCommand" />QStringList QSessionManager.discardCommand (<i>self</i>)</h3><p>Returns the currently set discard command.</p>
 <p>To iterate over the list, you can use the <a href="containers.html#foreach">foreach</a> pseudo-keyword:</p>
-<pre class="highlightedCode brush: cpp">
- foreach (const QString &amp;command, mySession.discardCommand())
+<pre class="cpp">
+ <a href="qtcore.html#foreach">foreach</a> (<span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>command<span class="operator">,</span> mySession<span class="operator">.</span>discardCommand())
      do_something(command);
 </pre>
-<p>See also <a href="qsessionmanager.html#setDiscardCommand">setDiscardCommand</a>(),
+<p><b>See also</b> <a href="qsessionmanager.html#setDiscardCommand">setDiscardCommand</a>(),
 <a href="qsessionmanager.html#restartCommand">restartCommand</a>(),
 and <a href="qsessionmanager.html#setRestartCommand">setRestartCommand</a>().</p>
 
 
 <h3 class="fn"><a name="isPhase2" />bool QSessionManager.isPhase2 (<i>self</i>)</h3><p>Returns true if the session manager is currently performing a
 second session management phase; otherwise returns false.</p>
-<p>See also <a href="qsessionmanager.html#requestPhase2">requestPhase2</a>().</p>
+<p><b>See also</b> <a href="qsessionmanager.html#requestPhase2">requestPhase2</a>().</p>
 
 
 <h3 class="fn"><a name="release" />QSessionManager.release (<i>self</i>)</h3><p>Releases the session manager's interaction semaphore after an
 interaction phase.</p>
-<p>See also <a href="qsessionmanager.html#allowsInteraction">allowsInteraction</a>()
+<p><b>See also</b> <a href="qsessionmanager.html#allowsInteraction">allowsInteraction</a>()
 and <a href="qsessionmanager.html#allowsErrorInteraction">allowsErrorInteraction</a>().</p>
 
 
@@ -190,28 +190,28 @@ tasks.</p>
 <p><b>Note:</b> If another application has requested a second phase
 it may get called before, simultaneously with, or after your
 application's second phase.</p>
-<p>See also <a href="qsessionmanager.html#isPhase2">isPhase2</a>().</p>
+<p><b>See also</b> <a href="qsessionmanager.html#isPhase2">isPhase2</a>().</p>
 
 
 <h3 class="fn"><a name="restartCommand" />QStringList QSessionManager.restartCommand (<i>self</i>)</h3><p>Returns the currently set restart command.</p>
 <p>To iterate over the list, you can use the <a href="containers.html#foreach">foreach</a> pseudo-keyword:</p>
-<pre class="highlightedCode brush: cpp">
- foreach (const QString &amp;command, mySession.restartCommand())
+<pre class="cpp">
+ <a href="qtcore.html#foreach">foreach</a> (<span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>command<span class="operator">,</span> mySession<span class="operator">.</span>restartCommand())
      do_something(command);
 </pre>
-<p>See also <a href="qsessionmanager.html#setRestartCommand">setRestartCommand</a>()
+<p><b>See also</b> <a href="qsessionmanager.html#setRestartCommand">setRestartCommand</a>()
 and <a href="qsessionmanager.html#restartHint">restartHint</a>().</p>
 
 
 <h3 class="fn"><a name="restartHint" /><a href="qsessionmanager.html#RestartHint-enum">RestartHint</a> QSessionManager.restartHint (<i>self</i>)</h3><p>Returns the application's current restart hint. The default is
 <tt>RestartIfRunning</tt>.</p>
-<p>See also <a href="qsessionmanager.html#setRestartHint">setRestartHint</a>().</p>
+<p><b>See also</b> <a href="qsessionmanager.html#setRestartHint">setRestartHint</a>().</p>
 
 
 <h3 class="fn"><a name="sessionId" />QString QSessionManager.sessionId (<i>self</i>)</h3><p>Returns the identifier of the current session.</p>
 <p>If the application has been restored from an earlier session,
 this identifier is the same as it was in the earlier session.</p>
-<p>See also <a href="qsessionmanager.html#sessionKey">sessionKey</a>() and <a href="qapplication.html#sessionId">QApplication.sessionId</a>().</p>
+<p><b>See also</b> <a href="qsessionmanager.html#sessionKey">sessionKey</a>() and <a href="qapplication.html#sessionId">QApplication.sessionId</a>().</p>
 
 
 <h3 class="fn"><a name="sessionKey" />QString QSessionManager.sessionKey (<i>self</i>)</h3><p>Returns the session key in the current session.</p>
@@ -219,11 +219,11 @@ this identifier is the same as it was in the earlier session.</p>
 this key is the same as it was when the previous session ended.</p>
 <p>The session key changes with every call of commitData() or
 saveState().</p>
-<p>See also <a href="qsessionmanager.html#sessionId">sessionId</a>() and <a href="qapplication.html#sessionKey">QApplication.sessionKey</a>().</p>
+<p><b>See also</b> <a href="qsessionmanager.html#sessionId">sessionId</a>() and <a href="qapplication.html#sessionKey">QApplication.sessionKey</a>().</p>
 
 
 <h3 class="fn"><a name="setDiscardCommand" />QSessionManager.setDiscardCommand (<i>self</i>, QStringList)</h3><p>Sets the discard command to the given <i>list</i>.</p>
-<p>See also <a href="qsessionmanager.html#discardCommand">discardCommand</a>() and
+<p><b>See also</b> <a href="qsessionmanager.html#discardCommand">discardCommand</a>() and
 <a href="qsessionmanager.html#setRestartCommand">setRestartCommand</a>().</p>
 
 
@@ -243,8 +243,8 @@ state records are kept in the session manager.</p>
 <h3 class="fn"><a name="setRestartCommand" />QSessionManager.setRestartCommand (<i>self</i>, QStringList)</h3><p>If the session manager is capable of restoring sessions it will
 execute <i>command</i> in order to restore the application. The
 command defaults to</p>
-<pre class="highlightedCode brush: cpp">
- appname -session id
+<pre class="cpp">
+ appname <span class="operator">-</span>session id
 </pre>
 <p>The <tt>-session</tt> option is mandatory; otherwise <a href="qapplication.html">QApplication</a> cannot tell whether it has
 been restored or what the current session identifier is. See
@@ -257,7 +257,7 @@ This is usually a very bad idea because command lines are often
 limited to a few hundred bytes. Instead, use <a href="qsettings.html">QSettings</a>, temporary files, or a database for
 this purpose. By marking the data with the unique <a href="qsessionmanager.html#sessionId">sessionId</a>(), you will be able
 to restore the application in a future session.</p>
-<p>See also <a href="qsessionmanager.html#restartCommand">restartCommand</a>(),
+<p><b>See also</b> <a href="qsessionmanager.html#restartCommand">restartCommand</a>(),
 <a href="qsessionmanager.html#setDiscardCommand">setDiscardCommand</a>(),
 and <a href="qsessionmanager.html#setRestartHint">setRestartHint</a>().</p>
 
@@ -270,5 +270,5 @@ or may not respect them.</p>
 <p>We recommend setting the restart hint in <a href="qapplication.html#saveState">QApplication.saveState</a>() because
 most session managers perform a checkpoint shortly after an
 application's startup.</p>
-<p>See also <a href="qsessionmanager.html#restartHint">restartHint</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qsessionmanager.html#restartHint">restartHint</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

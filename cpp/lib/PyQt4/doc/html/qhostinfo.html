@@ -23,14 +23,14 @@ arguments and returns an ID. You can abort the lookup by calling
 <a href="qhostinfo.html#abortHostLookup">abortHostLookup</a>() with
 the lookup ID.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-<span class="comment"> // To find the IP address of qt.nokia.com</span>
- QHostInfo.lookupHost("qt.nokia.com",
-                       this, SLOT(printResults(QHostInfo)));
+<pre class="cpp">
+ <span class="comment">// To find the IP address of qt.nokia.com</span>
+ <span class="type">QHostInfo</span><span class="operator">.</span><a href="qhostinfo.html#lookupHost">lookupHost</a>(<span class="string">"qt.nokia.com"</span><span class="operator">,</span>
+                       <span class="keyword">this</span><span class="operator">,</span> SLOT(printResults(<span class="type">QHostInfo</span>)));
 
-<span class="comment"> // To find the host name for 4.2.2.1</span>
- QHostInfo.lookupHost("4.2.2.1",
-                       this, SLOT(printResults(QHostInfo)));
+ <span class="comment">// To find the host name for 4.2.2.1</span>
+ <span class="type">QHostInfo</span><span class="operator">.</span><a href="qhostinfo.html#lookupHost">lookupHost</a>(<span class="string">"4.2.2.1"</span><span class="operator">,</span>
+                       <span class="keyword">this</span><span class="operator">,</span> SLOT(printResults(<span class="type">QHostInfo</span>)));
 </pre>
 <p>The slot is invoked when the results are ready. (If you use Qt
 for Embedded Linux and disabled multithreading support by defining
@@ -43,8 +43,8 @@ was looked up.</p>
 returns the type of error that occurred. <a href="qhostinfo.html#errorString">errorString</a>() gives a
 human-readable description of the lookup error.</p>
 <p>If you want a blocking lookup, use the <a href="qhostinfo.html#fromName">QHostInfo.fromName</a>() function:</p>
-<pre class="highlightedCode brush: cpp">
- QHostInfo info = QHostInfo.fromName("qt.nokia.com");
+<pre class="cpp">
+ <span class="type">QHostInfo</span> info <span class="operator">=</span> <span class="type">QHostInfo</span><span class="operator">.</span><a href="qhostinfo.html#fromName">fromName</a>(<span class="string">"qt.nokia.com"</span>);
 </pre>
 <p>QHostInfo supports Internationalized Domain Names (IDNs) through
 the IDNA and Punycode standards.</p>
@@ -60,31 +60,32 @@ improvements.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="HostInfoError-enum" />QHostInfo.HostInfoError</h3><p>This enum describes the various errors that can occur when
 trying to resolve a host name.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QHostInfo.NoError</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The lookup was successful.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QHostInfo.HostNotFound</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">No IP addresses were found for the host.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QHostInfo.UnknownError</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">An unknown error occurred.</td>
 </tr>
 </table>
-<p>See also <a href="qhostinfo.html#error">error</a>() and <a href="qhostinfo.html#setError">setError</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#error">error</a>() and
+<a href="qhostinfo.html#setError">setError</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QHostInfo" />QHostInfo.__init__ (<i>self</i>, int&#160;<i>id</i>&#160;=&#160;-1)</h3><p>Constructs an empty host info object with lookup ID
 <i>id</i>.</p>
-<p>See also <a href="qhostinfo.html#lookupId">lookupId</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#lookupId">lookupId</a>().</p>
 
 
 <h3 class="fn"><a name="QHostInfo-2" />QHostInfo.__init__ (<i>self</i>, <a href="qhostinfo.html">QHostInfo</a>&#160;<i>d</i>)</h3><p>Constructs a copy of <i>other</i>.</p>
@@ -92,34 +93,33 @@ trying to resolve a host name.</p>
 
 <h3 class="fn"><a name="abortHostLookup" />QHostInfo.abortHostLookup (int&#160;<i>lookupId</i>)</h3><p>Aborts the host lookup with the ID <i>id</i>, as returned by
 <a href="qhostinfo.html#lookupHost">lookupHost</a>().</p>
-<p>See also <a href="qhostinfo.html#lookupHost">lookupHost</a>()
-and <a href="qhostinfo.html#lookupId">lookupId</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#lookupHost">lookupHost</a>() and <a href="qhostinfo.html#lookupId">lookupId</a>().</p>
 
 
 <h3 class="fn"><a name="addresses" />list-of-QHostAddress QHostInfo.addresses (<i>self</i>)</h3><p>Returns the list of IP addresses associated with <a href="qhostinfo.html#hostName">hostName</a>(). This list may be
 empty.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QHostInfo info;
- ...
- if (!info.addresses().isEmpty()) {
-     QHostAddress address = info.addresses().first();
+<pre class="cpp">
+ <span class="type"><a href="qhostinfo.html">QHostInfo</a></span> info;
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ <span class="keyword">if</span> (<span class="operator">!</span>info<span class="operator">.</span>addresses()<span class="operator">.</span>isEmpty()) {
+     <span class="type"><a href="qhostaddress.html">QHostAddress</a></span> address <span class="operator">=</span> info<span class="operator">.</span>addresses()<span class="operator">.</span>first();
      <span class="comment">// use the first IP address</span>
  }
 </pre>
-<p>See also <a href="qhostinfo.html#setAddresses">setAddresses</a>(), <a href="qhostinfo.html#hostName">hostName</a>(), and <a href="qhostinfo.html#error">error</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#setAddresses">setAddresses</a>(), <a href="qhostinfo.html#hostName">hostName</a>(), and <a href="qhostinfo.html#error">error</a>().</p>
 
 
 <h3 class="fn"><a name="error" /><a href="qhostinfo.html#HostInfoError-enum">HostInfoError</a> QHostInfo.error (<i>self</i>)</h3><p>Returns the type of error that occurred if the host name lookup
 failed; otherwise returns <a href="qhostinfo.html#HostInfoError-enum">NoError</a>.</p>
-<p>See also <a href="qhostinfo.html#setError">setError</a>() and
-<a href="qhostinfo.html#errorString">errorString</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#setError">setError</a>()
+and <a href="qhostinfo.html#errorString">errorString</a>().</p>
 
 
 <h3 class="fn"><a name="errorString" />QString QHostInfo.errorString (<i>self</i>)</h3><p>If the lookup failed, this function returns a human readable
 description of the error; otherwise "Unknown error" is
 returned.</p>
-<p>See also <a href="qhostinfo.html#setErrorString">setErrorString</a>() and <a href="qhostinfo.html#error">error</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#setErrorString">setErrorString</a>() and <a href="qhostinfo.html#error">error</a>().</p>
 
 
 <h3 class="fn"><a name="fromName" /><a href="qhostinfo.html">QHostInfo</a> QHostInfo.fromName (QString&#160;<i>name</i>)</h3><p>Looks up the IP address(es) for the given host <i>name</i>. The
@@ -131,23 +131,22 @@ host name, <a href="qhostinfo.html">QHostInfo</a> will search for
 the domain name for the IP (i.e., <a href="qhostinfo.html">QHostInfo</a> will perform a <i>reverse</i>
 lookup). On success, the returned <a href="qhostinfo.html">QHostInfo</a> will contain both the resolved
 domain name and IP addresses for the host name.</p>
-<p>See also <a href="qhostinfo.html#lookupHost">lookupHost</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#lookupHost">lookupHost</a>().</p>
 
 
 <h3 class="fn"><a name="hostName" />QString QHostInfo.hostName (<i>self</i>)</h3><p>Returns the name of the host whose IP addresses were looked
 up.</p>
-<p>See also <a href="qhostinfo.html#setHostName">setHostName</a>()
-and <a href="qhostinfo.html#localHostName">localHostName</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#setHostName">setHostName</a>() and <a href="qhostinfo.html#localHostName">localHostName</a>().</p>
 
 
 <h3 class="fn"><a name="localDomainName" />QString QHostInfo.localDomainName ()</h3><p>Returns the DNS domain of this machine.</p>
 <p>Note: DNS domains are not related to domain names found in
 Windows networks.</p>
-<p>See also <a href="qhostinfo.html#hostName">hostName</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#hostName">hostName</a>().</p>
 
 
 <h3 class="fn"><a name="localHostName" />QString QHostInfo.localHostName ()</h3><p>Returns the host name of this machine.</p>
-<p>See also <a href="qhostinfo.html#hostName">hostName</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#hostName">hostName</a>().</p>
 
 
 <h3 class="fn"><a name="lookupHost" />int QHostInfo.lookupHost (QString&#160;<i>name</i>, <a href="qobject.html">QObject</a>&#160;<i>receiver</i>, SLOT(QHostInfo)SLOT()&#160;<i>member</i>)</h3><p>Looks up the IP address(es) associated with host name
@@ -157,23 +156,23 @@ the lookup is ready, the slot or signal <i>member</i> in
 the results of the lookup.</p>
 <p>The lookup is performed by a single function call, for
 example:</p>
-<pre class="highlightedCode brush: cpp">
- QHostInfo.lookupHost("www.kde.org",
-                       this, SLOT(lookedUp(QHostInfo)));
+<pre class="cpp">
+ <span class="type"><a href="qhostinfo.html">QHostInfo</a></span><span class="operator">.</span>lookupHost(<span class="string">"www.kde.org"</span><span class="operator">,</span>
+                       <span class="keyword">this</span><span class="operator">,</span> SLOT(lookedUp(<span class="type"><a href="qhostinfo.html">QHostInfo</a></span>)));
 </pre>
 <p>The implementation of the slot prints basic information about
 the addresses returned by the lookup, or reports an error if it
 failed:</p>
-<pre class="highlightedCode brush: cpp">
- void MyWidget.lookedUp(const QHostInfo &amp;host)
+<pre class="cpp">
+ <span class="type">void</span> MyWidget<span class="operator">.</span>lookedUp(<span class="keyword">const</span> <span class="type"><a href="qhostinfo.html">QHostInfo</a></span> <span class="operator">&amp;</span>host)
  {
-     if (host.error() != QHostInfo.NoError) {
-         qDebug() &lt;&lt; "Lookup failed:" &lt;&lt; host.errorString();
-         return;
+     <span class="keyword">if</span> (host<span class="operator">.</span>error() <span class="operator">!</span><span class="operator">=</span> <span class="type"><a href="qhostinfo.html">QHostInfo</a></span><span class="operator">.</span>NoError) {
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Lookup failed:"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> host<span class="operator">.</span>errorString();
+         <span class="keyword">return</span>;
      }
 
-     foreach (const QHostAddress &amp;address, host.addresses())
-         qDebug() &lt;&lt; "Found address:" &lt;&lt; address.toString();
+     foreach (<span class="keyword">const</span> <span class="type"><a href="qhostaddress.html">QHostAddress</a></span> <span class="operator">&amp;</span>address<span class="operator">,</span> host<span class="operator">.</span>addresses())
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Found address:"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> address<span class="operator">.</span>toString();
  }
 </pre>
 <p>If you pass a literal IP address to <i>name</i> instead of a
@@ -181,42 +180,41 @@ host name, <a href="qhostinfo.html">QHostInfo</a> will search for
 the domain name for the IP (i.e., <a href="qhostinfo.html">QHostInfo</a> will perform a <i>reverse</i>
 lookup). On success, the resulting <a href="qhostinfo.html">QHostInfo</a> will contain both the resolved
 domain name and IP addresses for the host name. Example:</p>
-<pre class="highlightedCode brush: cpp">
- QHostInfo.lookupHost("4.2.2.1",
-                       this, SLOT(lookedUp(QHostInfo)));
+<pre class="cpp">
+ <span class="type"><a href="qhostinfo.html">QHostInfo</a></span><span class="operator">.</span>lookupHost(<span class="string">"4.2.2.1"</span><span class="operator">,</span>
+                       <span class="keyword">this</span><span class="operator">,</span> SLOT(lookedUp(<span class="type"><a href="qhostinfo.html">QHostInfo</a></span>)));
 </pre>
 <p><b>Note:</b> There is no guarantee on the order the signals will
 be emitted if you start multiple requests with lookupHost().</p>
-<p>See also <a href="qhostinfo.html#abortHostLookup">abortHostLookup</a>(), <a href="qhostinfo.html#addresses">addresses</a>(), <a href="qhostinfo.html#error">error</a>(), and <a href="qhostinfo.html#fromName">fromName</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#abortHostLookup">abortHostLookup</a>(), <a href="qhostinfo.html#addresses">addresses</a>(), <a href="qhostinfo.html#error">error</a>(), and <a href="qhostinfo.html#fromName">fromName</a>().</p>
 
 
 <h3 class="fn"><a name="lookupHost-2" />int QHostInfo.lookupHost (QString&#160;<i>name</i>, callable&#160;<i>receiver</i>)</h3><h3 class="fn"><a name="lookupId" />int QHostInfo.lookupId (<i>self</i>)</h3><p>Returns the ID of this lookup.</p>
-<p>See also <a href="qhostinfo.html#setLookupId">setLookupId</a>(),
-<a href="qhostinfo.html#abortHostLookup">abortHostLookup</a>(), and
+<p><b>See also</b> <a href="qhostinfo.html#setLookupId">setLookupId</a>(), <a href="qhostinfo.html#abortHostLookup">abortHostLookup</a>(), and
 <a href="qhostinfo.html#hostName">hostName</a>().</p>
 
 
 <h3 class="fn"><a name="setAddresses" />QHostInfo.setAddresses (<i>self</i>, list-of-QHostAddress&#160;<i>addresses</i>)</h3><p>Sets the list of addresses in this <a href="qhostinfo.html">QHostInfo</a> to <i>addresses</i>.</p>
-<p>See also <a href="qhostinfo.html#addresses">addresses</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#addresses">addresses</a>().</p>
 
 
 <h3 class="fn"><a name="setError" />QHostInfo.setError (<i>self</i>, <a href="qhostinfo.html#HostInfoError-enum">HostInfoError</a>&#160;<i>error</i>)</h3><p>Sets the error type of this <a href="qhostinfo.html">QHostInfo</a> to <i>error</i>.</p>
-<p>See also <a href="qhostinfo.html#error">error</a>() and <a href="qhostinfo.html#errorString">errorString</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#error">error</a>() and
+<a href="qhostinfo.html#errorString">errorString</a>().</p>
 
 
 <h3 class="fn"><a name="setErrorString" />QHostInfo.setErrorString (<i>self</i>, QString&#160;<i>errorString</i>)</h3><p>Sets the human readable description of the error that occurred
 to <i>str</i> if the lookup failed.</p>
-<p>See also <a href="qhostinfo.html#errorString">errorString</a>()
-and <a href="qhostinfo.html#setError">setError</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#errorString">errorString</a>() and <a href="qhostinfo.html#setError">setError</a>().</p>
 
 
 <h3 class="fn"><a name="setHostName" />QHostInfo.setHostName (<i>self</i>, QString&#160;<i>name</i>)</h3><p>Sets the host name of this <a href="qhostinfo.html">QHostInfo</a> to <i>hostName</i>.</p>
-<p>See also <a href="qhostinfo.html#hostName">hostName</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#hostName">hostName</a>().</p>
 
 
 <h3 class="fn"><a name="setLookupId" />QHostInfo.setLookupId (<i>self</i>, int&#160;<i>id</i>)</h3><p>Sets the ID of this lookup to <i>id</i>.</p>
-<p>See also <a href="qhostinfo.html#lookupId">lookupId</a>() and
-<a href="qhostinfo.html#lookupHost">lookupHost</a>().</p>
+<p><b>See also</b> <a href="qhostinfo.html#lookupId">lookupId</a>()
+and <a href="qhostinfo.html#lookupHost">lookupHost</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

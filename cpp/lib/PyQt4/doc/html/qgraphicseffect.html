@@ -33,12 +33,12 @@ renders the item in shades of any given color</li>
 the item with an opacity</li>
 </ul>
 <table class="generic">
-<tr class="odd topAlign">
+<tr class="odd" valign="top">
 <td colspan="2">
 <p class="centerAlign"><img src="images/graphicseffect-plain.png" /></p>
 </td>
 </tr>
-<tr class="even topAlign">
+<tr class="even" valign="top">
 <td>
 <p class="centerAlign"><img src="images/graphicseffect-blur.png" /></p>
 </td>
@@ -46,7 +46,7 @@ the item with an opacity</li>
 <p class="centerAlign"><img src="images/graphicseffect-colorize.png" /></p>
 </td>
 </tr>
-<tr class="odd topAlign">
+<tr class="odd" valign="top">
 <td>
 <p class="centerAlign"><img src="images/graphicseffect-opacity.png" /></p>
 </td>
@@ -81,32 +81,32 @@ parameters have changed.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="ChangeFlag-enum" />QGraphicsEffect.ChangeFlag</h3><p>This enum describes what has changed in
 QGraphicsEffectSource.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsEffect.SourceAttached</tt></td>
-<td class=" topAlign"><tt>0x1</tt></td>
+<td class="topAlign"><tt>0x1</tt></td>
 <td class="topAlign">The effect is installed on a source.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsEffect.SourceDetached</tt></td>
-<td class=" topAlign"><tt>0x2</tt></td>
+<td class="topAlign"><tt>0x2</tt></td>
 <td class="topAlign">The effect is uninstalled on a source.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsEffect.SourceBoundingRectChanged</tt></td>
-<td class=" topAlign"><tt>0x4</tt></td>
+<td class="topAlign"><tt>0x4</tt></td>
 <td class="topAlign">The bounding rect of the source has
 changed.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsEffect.SourceInvalidated</tt></td>
-<td class=" topAlign"><tt>0x8</tt></td>
+<td class="topAlign"><tt>0x8</tt></td>
 <td class="topAlign">The visual appearance of the source has
 changed.</td>
 </tr>
@@ -118,28 +118,28 @@ combination of ChangeFlag values.</p>
 <h3 class="fn"><a name="PixmapPadMode-enum" />QGraphicsEffect.PixmapPadMode</h3><p>This enum describes how the pixmap returned from sourcePixmap
 should be padded.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsEffect.NoPad</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The pixmap should not receive any additional
 padding.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsEffect.PadToTransparentBorder</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The pixmap should be padded to ensure it has a
 completely transparent border.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsEffect.PadToEffectiveBoundingRect</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The pixmap should be padded to match the
 effective bounding rectangle of the effect.</td>
 </tr>
@@ -151,7 +151,7 @@ specified <i>parent</i>.</p>
 <h3 class="fn"><a name="boundingRect" /><a href="qrectf.html">QRectF</a> QGraphicsEffect.boundingRect (<i>self</i>)</h3><p>Returns the effective bounding rectangle for this effect, i.e.,
 the bounding rectangle of the source in device coordinates,
 adjusted by any margins applied by the effect itself.</p>
-<p>See also <a href="qgraphicseffect.html#boundingRectFor">boundingRectFor</a>() and
+<p><b>See also</b> <a href="qgraphicseffect.html#boundingRectFor">boundingRectFor</a>() and
 <a href="qgraphicseffect.html#updateBoundingRect">updateBoundingRect</a>().</p>
 
 
@@ -160,7 +160,7 @@ the provided <i>rect</i> in the device coordinates. When writing
 you own custom effect, you must call <a href="qgraphicseffect.html#updateBoundingRect">updateBoundingRect</a>()
 whenever any parameters are changed that may cause this this
 function to return a different value.</p>
-<p>See also <a href="qgraphicseffect.html#sourceBoundingRect">sourceBoundingRect</a>().</p>
+<p><b>See also</b> <a href="qgraphicseffect.html#sourceBoundingRect">sourceBoundingRect</a>().</p>
 
 
 <h3 class="fn"><a name="draw" />QGraphicsEffect.draw (<i>self</i>, <a href="qpainter.html">QPainter</a>&#160;<i>painter</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>This pure virtual function draws the effect and is called
@@ -168,24 +168,24 @@ whenever the source needs to be drawn.</p>
 <p>Reimplement this function in a <a href="qgraphicseffect.html">QGraphicsEffect</a> subclass to provide the
 effect's drawing implementation, using <i>painter</i>.</p>
 <p>For example:</p>
-<pre class="highlightedCode brush: cpp">
- MyGraphicsEffect.draw(QPainter *painter)
+<pre class="cpp">
+ MyGraphicsEffect<span class="operator">.</span>draw(<span class="type"><a href="qpainter.html">QPainter</a></span> <span class="operator">*</span>painter)
  {
-     ...
-     QPoint offset;
-     if (sourceIsPixmap()) {
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+     <span class="type"><a href="qpoint.html">QPoint</a></span> offset;
+     <span class="keyword">if</span> (sourceIsPixmap()) {
          <span class="comment">// No point in drawing in device coordinates (pixmap will be scaled anyways).</span>
-         const QPixmap pixmap = sourcePixmap(Qt.LogicalCoordinates, &amp;offset);
-         ...
-         painter-&gt;drawPixmap(offset, pixmap);
-     } else {
+         <span class="keyword">const</span> <span class="type"><a href="qpixmap.html">QPixmap</a></span> pixmap <span class="operator">=</span> sourcePixmap(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>LogicalCoordinates<span class="operator">,</span> <span class="operator">&amp;</span>offset);
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+         painter<span class="operator">-</span><span class="operator">&gt;</span>drawPixmap(offset<span class="operator">,</span> pixmap);
+     } <span class="keyword">else</span> {
          <span class="comment">// Draw pixmap in device coordinates to avoid pixmap scaling;</span>
-         const QPixmap pixmap = sourcePixmap(Qt.DeviceCoordinates, &amp;offset);
-         painter-&gt;setWorldTransform(QTransform());
-         ...
-         painter-&gt;drawPixmap(offset, pixmap);
+         <span class="keyword">const</span> <span class="type"><a href="qpixmap.html">QPixmap</a></span> pixmap <span class="operator">=</span> sourcePixmap(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>DeviceCoordinates<span class="operator">,</span> <span class="operator">&amp;</span>offset);
+         painter<span class="operator">-</span><span class="operator">&gt;</span>setWorldTransform(<span class="type"><a href="qtransform.html">QTransform</a></span>());
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+         painter<span class="operator">-</span><span class="operator">&gt;</span>drawPixmap(offset<span class="operator">,</span> pixmap);
      }
-     ...
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
 <p>This function should not be called explicitly by the user, since
@@ -195,18 +195,18 @@ it is meant for reimplementation purposes only.</p>
 <h3 class="fn"><a name="drawSource" />QGraphicsEffect.drawSource (<i>self</i>, <a href="qpainter.html">QPainter</a>&#160;<i>painter</i>)</h3><p>Draws the source directly using the given <i>painter</i>.</p>
 <p>This function should only be called from <a href="qgraphicseffect.html#draw">QGraphicsEffect.draw</a>().</p>
 <p>For example:</p>
-<pre class="highlightedCode brush: cpp">
- MyGraphicsOpacityEffect.draw(QPainter *painter)
+<pre class="cpp">
+ MyGraphicsOpacityEffect<span class="operator">.</span><a href="qgraphicseffect.html#draw">draw</a>(<span class="type"><a href="qpainter.html">QPainter</a></span> <span class="operator">*</span>painter)
  {
      <span class="comment">// Fully opaque; draw directly without going through a pixmap.</span>
-     if (qFuzzyCompare(m_opacity, 1)) {
+     <span class="keyword">if</span> (<a href="qquaternion.html#qFuzzyCompare">qFuzzyCompare</a>(m_opacity<span class="operator">,</span> <span class="number">1</span>)) {
          drawSource(painter);
-         return;
+         <span class="keyword">return</span>;
      }
-     ...
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
-<p>See also <a href="qgraphicseffect.html#draw">QGraphicsEffect.draw</a>().</p>
+<p><b>See also</b> <a href="qgraphicseffect.html#draw">QGraphicsEffect.draw</a>().</p>
 
 
 <h3 class="fn"><a name="isEnabled" />bool QGraphicsEffect.isEnabled (<i>self</i>)</h3><h3 class="fn"><a name="setEnabled" />QGraphicsEffect.setEnabled (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setEnabled(bool)</tt>.</p><h3 class="fn"><a name="sourceBoundingRect" /><a href="qrectf.html">QRectF</a> QGraphicsEffect.sourceBoundingRect (<i>self</i>, <a href="qt.html#CoordinateSystem-enum">Qt.CoordinateSystem</a>&#160;<i>system</i>&#160;=&#160;Qt.LogicalCoordinates)</h3><p>Returns the bounding rectangle of the source mapped to the given
@@ -215,7 +215,7 @@ it is meant for reimplementation purposes only.</p>
 of <a href="qgraphicseffect.html#draw">QGraphicsEffect.draw</a>()
 will give undefined results, as there is no device context
 available.</p>
-<p>See also <a href="qgraphicseffect.html#draw">draw</a>().</p>
+<p><b>See also</b> <a href="qgraphicseffect.html#draw">draw</a>().</p>
 
 
 <h3 class="fn"><a name="sourceChanged" />QGraphicsEffect.sourceChanged (<i>self</i>, <a href="qgraphicseffect-changeflags.html">ChangeFlags</a>&#160;<i>flags</i>)</h3><p>This virtual function is called by <a href="qgraphicseffect.html">QGraphicsEffect</a> to notify the effect
@@ -245,14 +245,14 @@ rectangle when <i>system</i> is <a href="qt.html#CoordinateSystem-enum">Qt.Devic
 of <a href="qgraphicseffect.html#draw">QGraphicsEffect.draw</a>()
 will give undefined results, as there is no device context
 available.</p>
-<p>See also <a href="qgraphicseffect.html#draw">draw</a>() and
-<a href="qgraphicseffect.html#boundingRect">boundingRect</a>().</p>
+<p><b>See also</b> <a href="qgraphicseffect.html#draw">draw</a>()
+and <a href="qgraphicseffect.html#boundingRect">boundingRect</a>().</p>
 
 
 <h3 class="fn"><a name="update" />QGraphicsEffect.update (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void update()</tt>.</p><p>Schedules a redraw of the effect. Call this function whenever
 the effect needs to be redrawn. This function does not trigger a
 redraw of the source.</p>
-<p>See also <a href="qgraphicseffect.html#updateBoundingRect">updateBoundingRect</a>().</p>
+<p><b>See also</b> <a href="qgraphicseffect.html#updateBoundingRect">updateBoundingRect</a>().</p>
 
 
 <h3 class="fn"><a name="updateBoundingRect" />QGraphicsEffect.updateBoundingRect (<i>self</i>)</h3><p>This function notifies the effect framework when the effect's
@@ -262,13 +262,13 @@ cause the virtual <a href="qgraphicseffect.html#boundingRectFor">boundingRectFor
 function to return a different value.</p>
 <p>This function will call <a href="qgraphicseffect.html#update">update</a>() if this is
 necessary.</p>
-<p>See also <a href="qgraphicseffect.html#boundingRectFor">boundingRectFor</a>(),
+<p><b>See also</b> <a href="qgraphicseffect.html#boundingRectFor">boundingRectFor</a>(),
 <a href="qgraphicseffect.html#boundingRect">boundingRect</a>(), and
 <a href="qgraphicseffect.html#sourceBoundingRect">sourceBoundingRect</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="enabledChanged" />void enabledChanged (bool)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the effect is enabled or
 disabled. The <i>enabled</i> parameter holds the effects's new
 enabled state.</p>
-<p>See also <a href="qgraphicseffect.html#enabled-prop">isEnabled</a>().</p>
+<p><b>See also</b> <a href="qgraphicseffect.html#enabled-prop">isEnabled</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

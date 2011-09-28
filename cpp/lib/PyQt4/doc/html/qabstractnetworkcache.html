@@ -22,14 +22,14 @@ instantiated.</p>
 <h3 class="fn"><a name="cacheSize" />int QAbstractNetworkCache.cacheSize (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the current size taken up by the cache. Depending upon
 the cache implementation this might be disk or memory size.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractnetworkcache.html#clear">clear</a>().</p>
+<p><b>See also</b> <a href="qabstractnetworkcache.html#clear">clear</a>().</p>
 
 
 <h3 class="fn"><a name="clear" />QAbstractNetworkCache.clear (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void clear()</tt>.</p><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Removes all items from the cache. Unless there was failures
 clearing the cache <a href="qabstractnetworkcache.html#cacheSize">cacheSize</a>() should
 return 0 after a call to clear.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractnetworkcache.html#cacheSize">cacheSize</a>() and <a href="qabstractnetworkcache.html#remove">remove</a>().</p>
+<p><b>See also</b> <a href="qabstractnetworkcache.html#cacheSize">cacheSize</a>() and <a href="qabstractnetworkcache.html#remove">remove</a>().</p>
 
 
 <h3 class="fn"><a name="data" /><a href="qiodevice.html">QIODevice</a> QAbstractNetworkCache.data (<i>self</i>, <a href="qurl.html">QUrl</a>&#160;<i>url</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the data associated with <i>url</i>.</p>
@@ -38,7 +38,7 @@ return 0 after a call to clear.</p>
 <p>If there is no cache for <i>url</i>, the url is invalid, or if
 there is an internal cache error 0 is returned.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractnetworkcache.html#metaData">metaData</a>() and <a href="qabstractnetworkcache.html#prepare">prepare</a>().</p>
+<p><b>See also</b> <a href="qabstractnetworkcache.html#metaData">metaData</a>() and <a href="qabstractnetworkcache.html#prepare">prepare</a>().</p>
 
 
 <h3 class="fn"><a name="insert" />QAbstractNetworkCache.insert (<i>self</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>device</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Inserts the data in <i>device</i> and the prepared meta data
@@ -47,7 +47,7 @@ data should be retrievable using <a href="qabstractnetworkcache.html#data">data<
 <p>To cancel a prepared inserted call <a href="qabstractnetworkcache.html#remove">remove</a>() on the metadata's
 url.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractnetworkcache.html#prepare">prepare</a>() and <a href="qabstractnetworkcache.html#remove">remove</a>().</p>
+<p><b>See also</b> <a href="qabstractnetworkcache.html#prepare">prepare</a>() and <a href="qabstractnetworkcache.html#remove">remove</a>().</p>
 
 
 <h3 class="fn"><a name="metaData" /><a href="qnetworkcachemetadata.html">QNetworkCacheMetaData</a> QAbstractNetworkCache.metaData (<i>self</i>, <a href="qurl.html">QUrl</a>&#160;<i>url</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the meta data for the url <i>url</i>.</p>
@@ -55,7 +55,7 @@ url.</p>
 valid <a href="qnetworkcachemetadata.html">QNetworkCacheMetaData</a> is
 returned.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractnetworkcache.html#updateMetaData">updateMetaData</a>()
+<p><b>See also</b> <a href="qabstractnetworkcache.html#updateMetaData">updateMetaData</a>()
 and <a href="qabstractnetworkcache.html#data">data</a>().</p>
 
 
@@ -69,15 +69,14 @@ it is inserted or removed.</p>
 <p>To cancel a prepared inserted call <a href="qabstractnetworkcache.html#remove">remove</a>() on the metadata's
 url.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractnetworkcache.html#remove">remove</a>(), <a href="qabstractnetworkcache.html#updateMetaData">updateMetaData</a>(),
+<p><b>See also</b> <a href="qabstractnetworkcache.html#remove">remove</a>(), <a href="qabstractnetworkcache.html#updateMetaData">updateMetaData</a>(),
 and <a href="qabstractnetworkcache.html#insert">insert</a>().</p>
 
 
 <h3 class="fn"><a name="remove" />bool QAbstractNetworkCache.remove (<i>self</i>, <a href="qurl.html">QUrl</a>&#160;<i>url</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Removes the cache entry for <i>url</i>, returning true if
 success otherwise false.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractnetworkcache.html#clear">clear</a>()
-and <a href="qabstractnetworkcache.html#prepare">prepare</a>().</p>
+<p><b>See also</b> <a href="qabstractnetworkcache.html#clear">clear</a>() and <a href="qabstractnetworkcache.html#prepare">prepare</a>().</p>
 
 
 <h3 class="fn"><a name="updateMetaData" />QAbstractNetworkCache.updateMetaData (<i>self</i>, <a href="qnetworkcachemetadata.html">QNetworkCacheMetaData</a>&#160;<i>metaData</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Updates the cache meta date for the metaData's url to
@@ -85,5 +84,5 @@ and <a href="qabstractnetworkcache.html#prepare">prepare</a>().</p>
 <p>If the cache does not contains a cache item for the url then no
 action is taken.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractnetworkcache.html#metaData">metaData</a>() and <a href="qabstractnetworkcache.html#prepare">prepare</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qabstractnetworkcache.html#metaData">metaData</a>() and <a href="qabstractnetworkcache.html#prepare">prepare</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

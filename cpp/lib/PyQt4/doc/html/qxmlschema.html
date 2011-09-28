@@ -16,14 +16,14 @@ Schema files that can be used further for validation of XML
 instance documents via <a href="qxmlschemavalidator.html">QXmlSchemaValidator</a>.</p>
 <p>The following example shows how to load a XML Schema file from
 the network and test whether it is a valid schema document:</p>
-<pre class="highlightedCode brush: cpp">
-     QUrl url("http://www.schema-example.org/myschema.xsd");
+<pre class="cpp">
+     <span class="type"><a href="qurl.html">QUrl</a></span> url(<span class="string">"http://www.schema-example.org/myschema.xsd"</span>);
 
-     QXmlSchema schema;
-     if (schema.load(url) == true)
-         qDebug() &lt;&lt; "schema is valid";
-     else
-         qDebug() &lt;&lt; "schema is invalid";
+     <span class="type">QXmlSchema</span> schema;
+     <span class="keyword">if</span> (schema<span class="operator">.</span>load(url) <span class="operator">=</span><span class="operator">=</span> <span class="keyword">true</span>)
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"schema is valid"</span>;
+     <span class="keyword">else</span>
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"schema is invalid"</span>;
 </pre>
 <a id="xml-schema-version" name="xml-schema-version" />
 <h3>XML Schema Version</h3>
@@ -48,16 +48,16 @@ loaded from the <i>source</i> URI.</p>
 <p>If the schema <a href="qxmlschema.html#isValid">is invalid</a>,
 <tt>false</tt> is returned and the behavior is undefined.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QUrl url("http://www.schema-example.org/myschema.xsd");
+<pre class="cpp">
+     <span class="type"><a href="qurl.html">QUrl</a></span> url(<span class="string">"http://www.schema-example.org/myschema.xsd"</span>);
 
-     QXmlSchema schema;
-     if (schema.load(url) == true)
-         qDebug() &lt;&lt; "schema is valid";
-     else
-         qDebug() &lt;&lt; "schema is invalid";
+     <span class="type"><a href="qxmlschema.html">QXmlSchema</a></span> schema;
+     <span class="keyword">if</span> (schema<span class="operator">.</span>load(url) <span class="operator">=</span><span class="operator">=</span> <span class="keyword">true</span>)
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"schema is valid"</span>;
+     <span class="keyword">else</span>
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"schema is invalid"</span>;
 </pre>
-<p>See also <a href="qxmlschema.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qxmlschema.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="load-2" />bool QXmlSchema.load (<i>self</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>source</i>, <a href="qurl.html">QUrl</a>&#160;<i>documentUri</i>&#160;=&#160;QUrl())</h3><p>Sets this <a href="qxmlschema.html">QXmlSchema</a> to a schema
@@ -72,19 +72,19 @@ and for message reporting.</p>
 <p>If the schema <a href="qxmlschema.html#isValid">is invalid</a>,
 <tt>false</tt> is returned and the behavior is undefined.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QFile file("myschema.xsd");
-     file.open(QIODevice.ReadOnly);
+<pre class="cpp">
+     <span class="type"><a href="qfile.html">QFile</a></span> file(<span class="string">"myschema.xsd"</span>);
+     file<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>ReadOnly);
 
-     QXmlSchema schema;
-     schema.load(&amp;file, QUrl.fromLocalFile(file.fileName()));
+     <span class="type"><a href="qxmlschema.html">QXmlSchema</a></span> schema;
+     schema<span class="operator">.</span>load(<span class="operator">&amp;</span>file<span class="operator">,</span> <span class="type"><a href="qurl.html">QUrl</a></span><span class="operator">.</span>fromLocalFile(file<span class="operator">.</span>fileName()));
 
-     if (schema.isValid())
-         qDebug() &lt;&lt; "schema is valid";
-     else
-         qDebug() &lt;&lt; "schema is invalid";
+     <span class="keyword">if</span> (schema<span class="operator">.</span>isValid())
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"schema is valid"</span>;
+     <span class="keyword">else</span>
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"schema is invalid"</span>;
 </pre>
-<p>See also <a href="qxmlschema.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qxmlschema.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="load-3" />bool QXmlSchema.load (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>data</i>, <a href="qurl.html">QUrl</a>&#160;<i>documentUri</i>&#160;=&#160;QUrl())</h3><p>Sets this <a href="qxmlschema.html">QXmlSchema</a> to a schema
@@ -98,31 +98,31 @@ undefined.</p>
 <p>If the schema <a href="qxmlschema.html#isValid">is invalid</a>,
 <tt>false</tt> is returned and the behavior is undefined.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QByteArray data( "&lt;?xml version=\"1.0\" encoding=\"UTF-8\"?&gt;"
-                      "&lt;xsd:schema"
-                      "        xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
-                      "        xmlns=\"http://qt.nokia.com/xmlschematest\""
-                      "        targetNamespace=\"http://qt.nokia.com/xmlschematest\""
-                      "        version=\"1.0\""
-                      "        elementFormDefault=\"qualified\"&gt;"
-                      "&lt;/xsd:schema&gt;" );
+<pre class="cpp">
+     <span class="type"><a href="qbytearray.html">QByteArray</a></span> data( <span class="string">"&lt;?xml version=\"1.0\" encoding=\"UTF-8\"?&gt;"</span>
+                      <span class="string">"&lt;xsd:schema"</span>
+                      <span class="string">"        xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""</span>
+                      <span class="string">"        xmlns=\"http://qt.nokia.com/xmlschematest\""</span>
+                      <span class="string">"        targetNamespace=\"http://qt.nokia.com/xmlschematest\""</span>
+                      <span class="string">"        version=\"1.0\""</span>
+                      <span class="string">"        elementFormDefault=\"qualified\"&gt;"</span>
+                      <span class="string">"&lt;/xsd:schema&gt;"</span> );
 
-     QXmlSchema schema;
-     schema.load(data);
+     <span class="type"><a href="qxmlschema.html">QXmlSchema</a></span> schema;
+     schema<span class="operator">.</span>load(data);
 
-     if (schema.isValid())
-         qDebug() &lt;&lt; "schema is valid";
-     else
-         qDebug() &lt;&lt; "schema is invalid";
+     <span class="keyword">if</span> (schema<span class="operator">.</span>isValid())
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"schema is valid"</span>;
+     <span class="keyword">else</span>
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"schema is invalid"</span>;
 </pre>
-<p>See also <a href="qxmlschema.html#isValid">isValid</a>() and
-<a href="qxmlschema.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qxmlschema.html#isValid">isValid</a>()
+and <a href="qxmlschema.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="messageHandler" /><a href="qabstractmessagehandler.html">QAbstractMessageHandler</a> QXmlSchema.messageHandler (<i>self</i>)</h3><p>Returns the message handler that handles compile and validation
 messages for this <a href="qxmlschema.html">QXmlSchema</a>.</p>
-<p>See also <a href="qxmlschema.html#setMessageHandler">setMessageHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlschema.html#setMessageHandler">setMessageHandler</a>().</p>
 
 
 <h3 class="fn"><a name="namePool" /><a href="qxmlnamepool.html">QXmlNamePool</a> QXmlSchema.namePool (<i>self</i>)</h3><p>Returns the name pool used by this <a href="qxmlschema.html">QXmlSchema</a> for constructing <a href="qxmlname.html">names</a>. There is no setter for the name pool,
@@ -130,7 +130,7 @@ because mixing name pools causes errors due to name confusion.</p>
 
 
 <h3 class="fn"><a name="networkAccessManager" /><a href="qnetworkaccessmanager.html">QNetworkAccessManager</a> QXmlSchema.networkAccessManager (<i>self</i>)</h3><p>Returns the network manager, or 0 if it has not been set.</p>
-<p>See also <a href="qxmlschema.html#setNetworkAccessManager">setNetworkAccessManager</a>().</p>
+<p><b>See also</b> <a href="qxmlschema.html#setNetworkAccessManager">setNetworkAccessManager</a>().</p>
 
 
 <h3 class="fn"><a name="setMessageHandler" />QXmlSchema.setMessageHandler (<i>self</i>, <a href="qabstractmessagehandler.html">QAbstractMessageHandler</a>&#160;<i>handler</i>)</h3><p>Changes the <a href="qabstractmessagehandler.html">message
@@ -146,61 +146,45 @@ colors.</p>
 the arguments are as follows:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>message() argument</th>
 <th>Semantics</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><a href="qtcore.html#QtMsgType-enum">QtMsgType</a> type</p>
-</td>
-<td>
-<p>Only <a href="qtcore.html#QtMsgType-enum">QtWarningMsg</a> and
-<a href="qtcore.html#QtMsgType-enum">QtFatalMsg</a> are used. The
-former identifies a warning, while the latter identifies an
-error.</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qtcore.html#QtMsgType-enum">QtMsgType</a> type</td>
+<td>Only <a href="qtcore.html#QtMsgType-enum">QtWarningMsg</a>
+and <a href="qtcore.html#QtMsgType-enum">QtFatalMsg</a> are used.
+The former identifies a warning, while the latter identifies an
+error.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>const <a href="qstring.html">QString</a> &amp; description</p>
-</td>
-<td>
-<p>An XHTML document which is the actual message. It is translated
-into the current language.</p>
-</td>
+<tr class="even" valign="top">
+<td>const <a href="qstring.html">QString</a> &amp; description</td>
+<td>An XHTML document which is the actual message. It is translated
+into the current language.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>const <a href="qurl.html">QUrl</a> &amp;identifier</p>
-</td>
-<td>
-<p>Identifies the error with a URI, where the fragment is the error
-code, and the rest of the URI is the error namespace.</p>
-</td>
+<tr class="odd" valign="top">
+<td>const <a href="qurl.html">QUrl</a> &amp;identifier</td>
+<td>Identifies the error with a URI, where the fragment is the
+error code, and the rest of the URI is the error namespace.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>const <a href="qsourcelocation.html">QSourceLocation</a> &amp;
-sourceLocation</p>
-</td>
-<td>
-<p>Identifies where the error occurred.</p>
-</td>
+<tr class="even" valign="top">
+<td>const <a href="qsourcelocation.html">QSourceLocation</a> &amp;
+sourceLocation</td>
+<td>Identifies where the error occurred.</td>
 </tr>
 </table>
-<p>See also <a href="qxmlschema.html#messageHandler">messageHandler</a>().</p>
+<p><b>See also</b> <a href="qxmlschema.html#messageHandler">messageHandler</a>().</p>
 
 
 <h3 class="fn"><a name="setNetworkAccessManager" />QXmlSchema.setNetworkAccessManager (<i>self</i>, <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a>&#160;<i>networkmanager</i>)</h3><p>Sets the network manager to <i>manager</i>. <a href="qxmlschema.html">QXmlSchema</a> does not take ownership of
 <i>manager</i>.</p>
-<p>See also <a href="qxmlschema.html#networkAccessManager">networkAccessManager</a>().</p>
+<p><b>See also</b> <a href="qxmlschema.html#networkAccessManager">networkAccessManager</a>().</p>
 
 
 <h3 class="fn"><a name="setUriResolver" />QXmlSchema.setUriResolver (<i>self</i>, <a href="qabstracturiresolver.html">QAbstractUriResolver</a>&#160;<i>resolver</i>)</h3><p>Sets the URI resolver to <i>resolver</i>. <a href="qxmlschema.html">QXmlSchema</a> does not take ownership of
 <i>resolver</i>.</p>
-<p>See also <a href="qxmlschema.html#uriResolver">uriResolver</a>().</p>
+<p><b>See also</b> <a href="qxmlschema.html#uriResolver">uriResolver</a>().</p>
 
 
 <h3 class="fn"><a name="uriResolver" /><a href="qabstracturiresolver.html">QAbstractUriResolver</a> QXmlSchema.uriResolver (<i>self</i>)</h3><p>Returns the schema's URI resolver. If no URI resolver has been
@@ -214,5 +198,5 @@ valid ones.</p>
 <a href="qabstracturiresolver.html#resolve">QAbstractUriResolver.resolve</a>()
 the absolute URI is the URI mandated by the schema specification,
 and the relative URI is the URI specified by the user.</p>
-<p>See also <a href="qxmlschema.html#setUriResolver">setUriResolver</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qxmlschema.html#setUriResolver">setUriResolver</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

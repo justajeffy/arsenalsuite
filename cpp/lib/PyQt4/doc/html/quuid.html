@@ -33,68 +33,36 @@ contains the variant field in its three most significant bits. In
 the table, 'x' means <i>don't care</i>.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>msb0</th>
 <th>msb1</th>
 <th>msb2</th>
 <th>Variant</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>0</p>
-</td>
-<td>
-<p>x</p>
-</td>
-<td>
-<p>x</p>
-</td>
-<td>
-<p>NCS (Network Computing System)</p>
-</td>
+<tr class="odd" valign="top">
+<td>0</td>
+<td>x</td>
+<td>x</td>
+<td>NCS (Network Computing System)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>1</p>
-</td>
-<td>
-<p>0</p>
-</td>
-<td>
-<p>x</p>
-</td>
-<td>
-<p>DCE (Distributed Computing Environment)</p>
-</td>
+<tr class="even" valign="top">
+<td>1</td>
+<td>0</td>
+<td>x</td>
+<td>DCE (Distributed Computing Environment)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>1</p>
-</td>
-<td>
-<p>1</p>
-</td>
-<td>
-<p>0</p>
-</td>
-<td>
-<p>Microsoft (GUID)</p>
-</td>
+<tr class="odd" valign="top">
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>Microsoft (GUID)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>1</p>
-</td>
-<td>
-<p>1</p>
-</td>
-<td>
-<p>1</p>
-</td>
-<td>
-<p>Reserved for future expansion</p>
-</td>
+<tr class="even" valign="top">
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>Reserved for future expansion</td>
 </tr>
 </table>
 <a id="version-field" name="version-field" />
@@ -108,7 +76,7 @@ parameter <tt>w2</tt>, which becomes <tt>QUuid.data3</tt> and
 contains the version field in its four most significant bits.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>msb0</th>
 <th>msb1</th>
 <th>msb2</th>
@@ -116,73 +84,33 @@ contains the version field in its four most significant bits.</p>
 <th>Version</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>0</p>
-</td>
-<td>
-<p>0</p>
-</td>
-<td>
-<p>0</p>
-</td>
-<td>
-<p>1</p>
-</td>
-<td>
-<p>Time</p>
-</td>
+<tr class="odd" valign="top">
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>Time</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>0</p>
-</td>
-<td>
-<p>0</p>
-</td>
-<td>
-<p>1</p>
-</td>
-<td>
-<p>0</p>
-</td>
-<td>
-<p>Embedded POSIX</p>
-</td>
+<tr class="even" valign="top">
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>Embedded POSIX</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>0</p>
-</td>
-<td>
-<p>0</p>
-</td>
-<td>
-<p>1</p>
-</td>
-<td>
-<p>1</p>
-</td>
-<td>
-<p>Name</p>
-</td>
+<tr class="odd" valign="top">
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>Name</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>0</p>
-</td>
-<td>
-<p>1</p>
-</td>
-<td>
-<p>0</p>
-</td>
-<td>
-<p>0</p>
-</td>
-<td>
-<p>Random</p>
-</td>
+<tr class="even" valign="top">
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>Random</td>
 </tr>
 </table>
 <p>The field layouts for the DCE versions listed in the table above
@@ -206,37 +134,37 @@ function. They can be converted to a string with <a href="quuid.html#toString">t
 in the variant field determines the layout of the 128-bit
 value.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QUuid.VarUnknown</tt></td>
-<td class=" topAlign"><tt>-1</tt></td>
+<td class="topAlign"><tt>-1</tt></td>
 <td class="topAlign">Variant is unknown</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QUuid.NCS</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Reserved for NCS (Network Computing System)
 backward compatibility</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QUuid.DCE</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Distributed Computing Environment, the scheme
 used by <a href="quuid.html">QUuid</a></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QUuid.Microsoft</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">Reserved for Microsoft backward compatibility
 (GUID)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QUuid.Reserved</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">Reserved for future definition</td>
 </tr>
 </table>
@@ -245,38 +173,38 @@ used by <a href="quuid.html">QUuid</a></td>
 <h3 class="fn"><a name="Version-enum" />QUuid.Version</h3><p>This enum defines the values used in the <a href="quuid.html#version-field">version field</a> of the UUID. The
 version field is meaningful only if the value in the <a href="quuid.html#variant-field">variant field</a> is <a href="quuid.html#Variant-enum">QUuid.DCE</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QUuid.VerUnknown</tt></td>
-<td class=" topAlign"><tt>-1</tt></td>
+<td class="topAlign"><tt>-1</tt></td>
 <td class="topAlign">Version is unknown</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QUuid.Time</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Time-based, by using timestamp, clock
 sequence, and MAC network card address (if available) for the node
 sections</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QUuid.EmbeddedPOSIX</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">DCE Security version, with embedded POSIX
 UUIDs</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QUuid.Name</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Name-based, by using values from a name for
 all sections</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QUuid.Random</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Random-based, by using random numbers for all
 sections</td>
 </tr>
@@ -289,9 +217,9 @@ sections</td>
 <i>l</i>, <i>w1</i>, <i>w2</i>, <i>b1</i>, <i>b2</i>, <i>b3</i>,
 <i>b4</i>, <i>b5</i>, <i>b6</i>, <i>b7</i>, <i>b8</i>.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-<span class="comment"> // {67C8770B-44F1-410A-AB9A-F9B5446F13EE}</span>
- QUuid IID_MyInterface(0x67c8770b, 0x44f1, 0x410a, 0xab, 0x9a, 0xf9, 0xb5, 0x44, 0x6f, 0x13, 0xee)
+<pre class="cpp">
+ <span class="comment">// {67C8770B-44F1-410A-AB9A-F9B5446F13EE}</span>
+ <span class="type"><a href="quuid.html">QUuid</a></span> IID_MyInterface(<span class="number">0x67c8770b</span><span class="operator">,</span> <span class="number">0x44f1</span><span class="operator">,</span> <span class="number">0x410a</span><span class="operator">,</span> <span class="number">0xab</span><span class="operator">,</span> <span class="number">0x9a</span><span class="operator">,</span> <span class="number">0xf9</span><span class="operator">,</span> <span class="number">0xb5</span><span class="operator">,</span> <span class="number">0x44</span><span class="operator">,</span> <span class="number">0x6f</span><span class="operator">,</span> <span class="number">0x13</span><span class="operator">,</span> <span class="number">0xee</span>)
 </pre>
 
 
@@ -303,7 +231,7 @@ normal to include them. If the conversion fails, a null UUID is
 created. See <a href="quuid.html#toString">toString</a>() for an
 explanation of how the five hex fields map to the public data
 members in <a href="quuid.html">QUuid</a>.</p>
-<p>See also <a href="quuid.html#toString">toString</a>() and
+<p><b>See also</b> <a href="quuid.html#toString">toString</a>() and
 <a href="quuid.html#QUuid">QUuid</a>().</p>
 
 
@@ -319,7 +247,8 @@ to be unique.</p>
 <p>On a Windows platform, a GUID is generated, which almost
 certainly <i>will</i> be unique, on this or any other system,
 networked or not.</p>
-<p>See also <a href="quuid.html#variant">variant</a>() and <a href="quuid.html#version">version</a>().</p>
+<p><b>See also</b> <a href="quuid.html#variant">variant</a>() and
+<a href="quuid.html#version">version</a>().</p>
 
 
 <h3 class="fn"><a name="isNull" />bool QUuid.isNull (<i>self</i>)</h3><p>Returns true if this is the null UUID
@@ -335,50 +264,30 @@ public data members in <a href="quuid.html">QUuid</a> as
 follows:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Field #</th>
 <th>Source</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>1</p>
-</td>
-<td>
-<p>data1</p>
-</td>
+<tr class="odd" valign="top">
+<td>1</td>
+<td>data1</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>2</p>
-</td>
-<td>
-<p>data2</p>
-</td>
+<tr class="even" valign="top">
+<td>2</td>
+<td>data2</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>3</p>
-</td>
-<td>
-<p>data3</p>
-</td>
+<tr class="odd" valign="top">
+<td>3</td>
+<td>data3</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>4</p>
-</td>
-<td>
-<p>data4[0] .. data4[1]</p>
-</td>
+<tr class="even" valign="top">
+<td>4</td>
+<td>data4[0] .. data4[1]</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>5</p>
-</td>
-<td>
-<p>data4[2] .. data4[7]</p>
-</td>
+<tr class="odd" valign="top">
+<td>5</td>
+<td>data4[2] .. data4[7]</td>
 </tr>
 </table>
 
@@ -388,13 +297,13 @@ return value is <a href="quuid.html#Variant-enum">QUuid.DCE</a>,
 call <a href="quuid.html#version">version</a>() to see which layout
 it uses. The null UUID is considered to be of an unknown
 variant.</p>
-<p>See also <a href="quuid.html#version">version</a>().</p>
+<p><b>See also</b> <a href="quuid.html#version">version</a>().</p>
 
 
 <h3 class="fn"><a name="version" /><a href="quuid.html#Version-enum">Version</a> QUuid.version (<i>self</i>)</h3><p>Returns the <a href="quuid.html#version-field">version field</a>
 of the UUID, if the UUID's <a href="quuid.html#variant-field">variant field</a> is <a href="quuid.html#Variant-enum">QUuid.DCE</a>. Otherwise it returns
 <a href="quuid.html#Version-enum">QUuid.VerUnknown</a>.</p>
-<p>See also <a href="quuid.html#variant">variant</a>().</p>
+<p><b>See also</b> <a href="quuid.html#variant">variant</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QUuid.__eq__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>orig</i>)</h3><h3 class="fn"><a name="__ge__" />bool QUuid.__ge__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__gt__" />bool QUuid.__gt__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__le__" />bool QUuid.__le__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__lt__" />bool QUuid.__lt__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QUuid.__ne__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>orig</i>)</h3><h3 class="fn"><a name="__repr__" />str QUuid.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QUuid.__eq__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>orig</i>)</h3><h3 class="fn"><a name="__ge__" />bool QUuid.__ge__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__gt__" />bool QUuid.__gt__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__le__" />bool QUuid.__le__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__lt__" />bool QUuid.__lt__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QUuid.__ne__ (<i>self</i>, <a href="quuid.html">QUuid</a>&#160;<i>orig</i>)</h3><h3 class="fn"><a name="__repr__" />str QUuid.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

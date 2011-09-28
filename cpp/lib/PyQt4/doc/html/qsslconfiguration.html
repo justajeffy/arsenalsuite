@@ -45,10 +45,10 @@ setSslConfiguration on a modified QSslConfiguration object to
 achieve that. The following example illustrates how to change the
 protocol to TLSv1 in a <a href="qsslsocket.html">QSslSocket</a>
 object:</p>
-<pre class="highlightedCode brush: cpp">
- QSslConfiguration config = sslSocket.sslConfiguration();
- config.setProtocol(QSsl.TlsV1);
- sslSocket.setSslConfiguration(config);
+<pre class="cpp">
+ <span class="type">QSslConfiguration</span> config <span class="operator">=</span> sslSocket<span class="operator">.</span>sslConfiguration();
+ config<span class="operator">.</span><a href="qsslconfiguration.html#setProtocol">setProtocol</a>(<span class="type"><a href="qssl.html">QSsl</a></span><span class="operator">.</span>TlsV1);
+ sslSocket<span class="operator">.</span>setSslConfiguration(config);
 </pre>
 <p><a href="qsslsocket.html">QSslSocket</a>, <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a>, <a href="qsslsocket.html#sslConfiguration">QSslSocket.sslConfiguration</a>(),
 <a href="qsslsocket.html#setSslConfiguration">QSslSocket.setSslConfiguration</a>()</p>
@@ -68,7 +68,7 @@ phase to validate the peer's certificate. It can be modified prior
 to the handshake with <a href="qsslconfiguration.html#setCaCertificates">setCaCertificates</a>(),
 or with <a href="qsslsocket.html">QSslSocket</a>'s <a href="qsslsocket.html#addCaCertificate">addCaCertificate()</a> and
 <a href="qsslsocket.html#addCaCertificates">addCaCertificates()</a>.</p>
-<p>See also <a href="qsslconfiguration.html#setCaCertificates">setCaCertificates</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#setCaCertificates">setCaCertificates</a>().</p>
 
 
 <h3 class="fn"><a name="ciphers" />list-of-QSslCipher QSslConfiguration.ciphers (<i>self</i>)</h3><p>Returns this connection's current cryptographic cipher suite.
@@ -86,7 +86,7 @@ cipher for this socket by calling <a href="qsslconfiguration.html#setCiphers">se
 of the supported ciphers. You can revert to using the entire set by
 calling <a href="qsslconfiguration.html#setCiphers">setCiphers</a>() with the list
 returned by <a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>().</p>
-<p>See also <a href="qsslconfiguration.html#setCiphers">setCiphers</a>() and <a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#setCiphers">setCiphers</a>() and <a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>().</p>
 
 
 <h3 class="fn"><a name="defaultConfiguration" /><a href="qsslconfiguration.html">QSslConfiguration</a> QSslConfiguration.defaultConfiguration ()</h3><p>Returns the default SSL configuration to be used in new SSL
@@ -99,7 +99,7 @@ connections.</p>
 <li>the cipher list equal to the list of the SSL libraries'
 supported SSL ciphers</li>
 </ul>
-<p>See also <a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>()
+<p><b>See also</b> <a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>()
 and <a href="qsslconfiguration.html#setDefaultConfiguration">setDefaultConfiguration</a>().</p>
 
 
@@ -107,7 +107,7 @@ and <a href="qsslconfiguration.html#setDefaultConfiguration">setDefaultConfigura
 <p>A <a href="qsslconfiguration.html">QSslConfiguration</a> object
 is null if it has been default-constructed and no setter methods
 have been called.</p>
-<p>See also <a href="qsslconfiguration.html#setProtocol">setProtocol</a>(), <a href="qsslconfiguration.html#setLocalCertificate">setLocalCertificate</a>(),
+<p><b>See also</b> <a href="qsslconfiguration.html#setProtocol">setProtocol</a>(), <a href="qsslconfiguration.html#setLocalCertificate">setLocalCertificate</a>(),
 <a href="qsslconfiguration.html#setPrivateKey">setPrivateKey</a>(),
 <a href="qsslconfiguration.html#setCiphers">setCiphers</a>(), and
 <a href="qsslconfiguration.html#setCaCertificates">setCaCertificates</a>().</p>
@@ -115,7 +115,7 @@ have been called.</p>
 
 <h3 class="fn"><a name="localCertificate" /><a href="qsslcertificate.html">QSslCertificate</a> QSslConfiguration.localCertificate (<i>self</i>)</h3><p>Returns the certificate to be presented to the peer during the
 SSL handshake process.</p>
-<p>See also <a href="qsslconfiguration.html#setLocalCertificate">setLocalCertificate</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#setLocalCertificate">setLocalCertificate</a>().</p>
 
 
 <h3 class="fn"><a name="peerCertificate" /><a href="qsslcertificate.html">QSslCertificate</a> QSslConfiguration.peerCertificate (<i>self</i>)</h3><p>Returns the peer's digital certificate (i.e., the immediate
@@ -137,7 +137,7 @@ certificate, or it can mean there is no connection.</p>
 <p>If you want to check the peer's complete chain of certificates,
 use <a href="qsslconfiguration.html#peerCertificateChain">peerCertificateChain</a>()
 to get them all at once.</p>
-<p>See also <a href="qsslconfiguration.html#peerCertificateChain">peerCertificateChain</a>(),
+<p><b>See also</b> <a href="qsslconfiguration.html#peerCertificateChain">peerCertificateChain</a>(),
 <a href="qsslsocket.html#sslErrors">QSslSocket.sslErrors</a>(),
 <a href="qsslsocket.html#ignoreSslErrors">QSslSocket.ignoreSslErrors</a>(),
 <a href="qnetworkreply.html#sslErrors">QNetworkReply.sslErrors</a>(), and
@@ -162,7 +162,7 @@ failed, or it can mean the host you are connected to doesn't have a
 certificate, or it can mean there is no connection.</p>
 <p>If you want to get only the peer's immediate certificate, use
 <a href="qsslconfiguration.html#peerCertificate">peerCertificate</a>().</p>
-<p>See also <a href="qsslconfiguration.html#peerCertificate">peerCertificate</a>(),
+<p><b>See also</b> <a href="qsslconfiguration.html#peerCertificate">peerCertificate</a>(),
 <a href="qsslsocket.html#sslErrors">QSslSocket.sslErrors</a>(),
 <a href="qsslsocket.html#ignoreSslErrors">QSslSocket.ignoreSslErrors</a>(),
 <a href="qnetworkreply.html#sslErrors">QNetworkReply.sslErrors</a>(), and
@@ -176,7 +176,7 @@ the whole certificate chain should be checked.</p>
 <p>The certificates are checked in issuing order, starting with the
 peer's own certificate, then its issuer's certificate, and so
 on.</p>
-<p>See also <a href="qsslconfiguration.html#setPeerVerifyDepth">setPeerVerifyDepth</a>()
+<p><b>See also</b> <a href="qsslconfiguration.html#setPeerVerifyDepth">setPeerVerifyDepth</a>()
 and <a href="qsslconfiguration.html#peerVerifyMode">peerVerifyMode</a>().</p>
 
 
@@ -186,17 +186,17 @@ or a server requesting a certificate from the client), and whether
 it should require that this certificate is valid.</p>
 <p>The default mode is AutoVerifyPeer, which tells <a href="qsslsocket.html">QSslSocket</a> to use VerifyPeer for clients,
 QueryPeer for clients.</p>
-<p>See also <a href="qsslconfiguration.html#setPeerVerifyMode">setPeerVerifyMode</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#setPeerVerifyMode">setPeerVerifyMode</a>().</p>
 
 
 <h3 class="fn"><a name="privateKey" /><a href="qsslkey.html">QSslKey</a> QSslConfiguration.privateKey (<i>self</i>)</h3><p>Returns the <a href="qsslkey.html">SSL key</a> assigned to this
 connection or a null key if none has been assigned yet.</p>
-<p>See also <a href="qsslconfiguration.html#setPrivateKey">setPrivateKey</a>() and
+<p><b>See also</b> <a href="qsslconfiguration.html#setPrivateKey">setPrivateKey</a>() and
 <a href="qsslconfiguration.html#localCertificate">localCertificate</a>().</p>
 
 
 <h3 class="fn"><a name="protocol" /><a href="qssl.html#SslProtocol-enum">QSsl.SslProtocol</a> QSslConfiguration.protocol (<i>self</i>)</h3><p>Returns the protocol setting for this SSL configuration.</p>
-<p>See also <a href="qsslconfiguration.html#setProtocol">setProtocol</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#setProtocol">setProtocol</a>().</p>
 
 
 <h3 class="fn"><a name="sessionCipher" /><a href="qsslcipher.html">QSslCipher</a> QSslConfiguration.sessionCipher (<i>self</i>)</h3><p>Returns the socket's cryptographic <a href="qsslcipher.html">cipher</a>, or a null cipher if the connection
@@ -207,9 +207,7 @@ transmitted through the socket.</p>
 ordered list of ciphers from which the handshake phase will
 eventually select the session cipher. This ordered list must be in
 place before the handshake phase begins.</p>
-<p>See also <a href="qsslconfiguration.html#ciphers">ciphers</a>(),
-<a href="qsslconfiguration.html#setCiphers">setCiphers</a>(), and
-<a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#ciphers">ciphers</a>(), <a href="qsslconfiguration.html#setCiphers">setCiphers</a>(), and <a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>().</p>
 
 
 <h3 class="fn"><a name="setCaCertificates" />QSslConfiguration.setCaCertificates (<i>self</i>, list-of-QSslCertificate&#160;<i>certificates</i>)</h3><p>Sets this socket's CA certificate database to be
@@ -217,7 +215,7 @@ place before the handshake phase begins.</p>
 the SSL handshake. The CA certificate database is used by the
 socket during the handshake phase to validate the peer's
 certificate.</p>
-<p>See also <a href="qsslconfiguration.html#caCertificates">caCertificates</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#caCertificates">caCertificates</a>().</p>
 
 
 <h3 class="fn"><a name="setCiphers" />QSslConfiguration.setCiphers (<i>self</i>, list-of-QSslCipher&#160;<i>ciphers</i>)</h3><p>Sets the cryptographic cipher suite for this socket to
@@ -225,14 +223,13 @@ certificate.</p>
 list returned by supportedCiphers().</p>
 <p>Restricting the cipher suite must be done before the handshake
 phase, where the session cipher is chosen.</p>
-<p>See also <a href="qsslconfiguration.html#ciphers">ciphers</a>()
-and <a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#ciphers">ciphers</a>() and <a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>().</p>
 
 
 <h3 class="fn"><a name="setDefaultConfiguration" />QSslConfiguration.setDefaultConfiguration (<a href="qsslconfiguration.html">QSslConfiguration</a>&#160;<i>configuration</i>)</h3><p>Sets the default SSL configuration to be used in new SSL
 connections to be <i>configuration</i>. Existing connections are
 not affected by this call.</p>
-<p>See also <a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>()
+<p><b>See also</b> <a href="qsslsocket.html#supportedCiphers">QSslSocket.supportedCiphers</a>()
 and <a href="qsslconfiguration.html#defaultConfiguration">defaultConfiguration</a>().</p>
 
 
@@ -246,7 +243,7 @@ the local user's identity against its list of Certification
 Authorities. In most cases, such as in HTTP web browsing, only
 servers identify to the clients, so the client does not send a
 certificate.</p>
-<p>See also <a href="qsslconfiguration.html#localCertificate">localCertificate</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#localCertificate">localCertificate</a>().</p>
 
 
 <h3 class="fn"><a name="setPeerVerifyDepth" />QSslConfiguration.setPeerVerifyDepth (<i>self</i>, int&#160;<i>depth</i>)</h3><p>Sets the maximum number of certificates in the peer's
@@ -257,7 +254,7 @@ checked.</p>
 <p>The certificates are checked in issuing order, starting with the
 peer's own certificate, then its issuer's certificate, and so
 on.</p>
-<p>See also <a href="qsslconfiguration.html#peerVerifyDepth">peerVerifyDepth</a>() and
+<p><b>See also</b> <a href="qsslconfiguration.html#peerVerifyDepth">peerVerifyDepth</a>() and
 <a href="qsslconfiguration.html#setPeerVerifyMode">setPeerVerifyMode</a>().</p>
 
 
@@ -269,7 +266,7 @@ client), and whether it should require that this certificate is
 valid.</p>
 <p>The default mode is AutoVerifyPeer, which tells <a href="qsslsocket.html">QSslSocket</a> to use VerifyPeer for clients,
 QueryPeer for clients.</p>
-<p>See also <a href="qsslconfiguration.html#peerVerifyMode">peerVerifyMode</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#peerVerifyMode">peerVerifyMode</a>().</p>
 
 
 <h3 class="fn"><a name="setPrivateKey" />QSslConfiguration.setPrivateKey (<i>self</i>, <a href="qsslkey.html">QSslKey</a>&#160;<i>key</i>)</h3><p>Sets the connection's private <a href="qsslkey.html">key</a> to
@@ -279,14 +276,14 @@ servers that must prove their identity to SSL peers.</p>
 creating an SSL server socket. If you are creating an SSL client
 socket, the key and local certificate are required if your client
 must identify itself to an SSL server.</p>
-<p>See also <a href="qsslconfiguration.html#privateKey">privateKey</a>() and <a href="qsslconfiguration.html#setLocalCertificate">setLocalCertificate</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#privateKey">privateKey</a>() and <a href="qsslconfiguration.html#setLocalCertificate">setLocalCertificate</a>().</p>
 
 
 <h3 class="fn"><a name="setProtocol" />QSslConfiguration.setProtocol (<i>self</i>, <a href="qssl.html#SslProtocol-enum">QSsl.SslProtocol</a>&#160;<i>protocol</i>)</h3><p>Sets the protocol setting for this configuration to be
 <i>protocol</i>.</p>
 <p>Setting the protocol once the connection has already been
 established has no effect.</p>
-<p>See also <a href="qsslconfiguration.html#protocol">protocol</a>().</p>
+<p><b>See also</b> <a href="qsslconfiguration.html#protocol">protocol</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QSslConfiguration.__eq__ (<i>self</i>, <a href="qsslconfiguration.html">QSslConfiguration</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QSslConfiguration.__ne__ (<i>self</i>, <a href="qsslconfiguration.html">QSslConfiguration</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QSslConfiguration.__eq__ (<i>self</i>, <a href="qsslconfiguration.html">QSslConfiguration</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QSslConfiguration.__ne__ (<i>self</i>, <a href="qsslconfiguration.html">QSslConfiguration</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

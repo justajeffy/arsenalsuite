@@ -179,7 +179,14 @@ class UIParser(object):
         if is_attribute:
             setattr(self.toplevelWidget, name, obj)
         return obj
-    
+
+    def hasProperty(self, elem, name):
+        for prop in elem.findall('property'):
+            if prop.attrib['name'] == name:
+                return True
+
+        return False
+
     def createWidget(self, elem):
         self.column_counter = 0
         self.row_counter = 0
@@ -208,8 +215,11 @@ class UIParser(object):
         self.stack.push(self.setupObject(widget_class, parent, elem))
 
         if isinstance(self.stack.topwidget, QtGui.QTableWidget):
-            self.stack.topwidget.setColumnCount(len(elem.findall("column")))
-            self.stack.topwidget.setRowCount(len(elem.findall("row")))
+            if not self.hasProperty(elem, 'columnCount'):
+                self.stack.topwidget.setColumnCount(len(elem.findall("column")))
+
+            if not self.hasProperty(elem, 'rowCount'):
+                self.stack.topwidget.setRowCount(len(elem.findall("row")))
 
         self.traverseWidgetTree(elem)
         widget = self.stack.popWidget()
@@ -480,6 +490,12 @@ class UIParser(object):
                 if value > 0:
                     setter(idx, value)
 
+    def disableSorting(self, w):
+        if self.item_nr == 0:
+            self.sorting_enabled = self.factory.invoke("__sortingEnabled",
+                    w.isSortingEnabled)
+            w.setSortingEnabled(False)
+
     def handleItem(self, elem):
         if self.stack.topIsLayout():
             elem[0].attrib["grid-position"] = gridPosition(elem)
@@ -499,42 +515,10 @@ class UIParser(object):
                 w.setItemText(self.item_nr, text)
 
             elif isinstance(w, QtGui.QListWidget):
-                text = self.wprops.getProperty(elem, "text")
-                icon = self.wprops.getProperty(elem, "icon")
-                flags = self.wprops.getProperty(elem, "flags")
-                check_state = self.wprops.getProperty(elem, "checkState")
-                background = self.wprops.getProperty(elem, "background")
-                foreground = self.wprops.getProperty(elem, "foreground")
-
-                if icon or flags or check_state:
-                    item_name = "item"
-                else:
-                    item_name = None
-
-                item = self.factory.createQObject("QListWidgetItem", item_name,
-                        (w, ), False)
-
-                if self.item_nr == 0:
-                    self.sorting_enabled = self.factory.invoke("__sortingEnabled", w.isSortingEnabled)
-                    w.setSortingEnabled(False)
-
-                if text:
-                    w.item(self.item_nr).setText(text)
-
-                if icon:
-                    item.setIcon(icon)
-
-                if flags:
-                    item.setFlags(flags)
-
-                if check_state:
-                    item.setCheckState(check_state)
-
-                if background:
-                    item.setBackground(background)
-
-                if foreground:
-                    item.setForeground(foreground)
+                self.disableSorting(w)
+                item = self.createWidgetItem('QListWidgetItem', elem, w.item,
+                        self.item_nr)
+                w.addItem(item)
 
             elif isinstance(w, QtGui.QTreeWidget):
                 if self.itemstack:
@@ -561,119 +545,176 @@ class UIParser(object):
                     titm = titm.child(nr_in_parent)
 
                 column = -1
-                for prop in elem.findall("property"):
+                for prop in elem.findall('property'):
                     c_prop = self.wprops.convert(prop)
-                    c_prop_name = prop.attrib["name"]
+                    c_prop_name = prop.attrib['name']
 
-                    if c_prop_name == "text":
+                    if c_prop_name == 'text':
                         column += 1
                         if c_prop:
                             titm.setText(column, c_prop)
-                    elif c_prop_name == "icon":
+                    elif c_prop_name == 'statusTip':
+                        item.setStatusTip(column, c_prop)
+                    elif c_prop_name == 'toolTip':
+                        item.setToolTip(column, c_prop)
+                    elif c_prop_name == 'whatsThis':
+                        item.setWhatsThis(column, c_prop)
+                    elif c_prop_name == 'font':
+                        item.setFont(column, c_prop)
+                    elif c_prop_name == 'icon':
                         item.setIcon(column, c_prop)
-                    elif c_prop_name == "flags":
-                        item.setFlags(c_prop)
-                    elif c_prop_name == "checkState":
-                        item.setCheckState(column, c_prop)
-                    elif c_prop_name == "background":
+                    elif c_prop_name == 'background':
                         item.setBackground(column, c_prop)
-                    elif c_prop_name == "foreground":
+                    elif c_prop_name == 'foreground':
                         item.setForeground(column, c_prop)
+                    elif c_prop_name == 'flags':
+                        item.setFlags(c_prop)
+                    elif c_prop_name == 'checkState':
+                        item.setCheckState(column, c_prop)
 
                 self.traverseWidgetTree(elem)
                 _, self.item_nr = self.itemstack.pop()
 
             elif isinstance(w, QtGui.QTableWidget):
-                text = self.wprops.getProperty(elem, "text")
-                icon = self.wprops.getProperty(elem, "icon")
-                flags = self.wprops.getProperty(elem, "flags")
-                check_state = self.wprops.getProperty(elem, "checkState")
-                background = self.wprops.getProperty(elem, "background")
-                foreground = self.wprops.getProperty(elem, "foreground")
+                row = int(elem.attrib['row'])
+                col = int(elem.attrib['column'])
 
-                item = self.factory.createQObject("QTableWidgetItem", "item",
-                        (), False)
-
-                if self.item_nr == 0:
-                    self.sorting_enabled = self.factory.invoke("__sortingEnabled", w.isSortingEnabled)
-                    w.setSortingEnabled(False)
-
-                row = int(elem.attrib["row"])
-                col = int(elem.attrib["column"])
-
-                if icon:
-                    item.setIcon(icon)
-
-                if flags:
-                    item.setFlags(flags)
-
-                if check_state:
-                    item.setCheckState(check_state)
-
-                if background:
-                    item.setBackground(background)
-
-                if foreground:
-                    item.setForeground(foreground)
-
+                self.disableSorting(w)
+                item = self.createWidgetItem('QTableWidgetItem', elem, w.item,
+                        row, col)
                 w.setItem(row, col, item)
-
-                if text:
-                    # Text is translated so we don't have access to the item
-                    # attribute when generating code so we must get it from the
-                    # widget after it has been set.
-                    w.item(row, col).setText(text)
 
             self.item_nr += 1
 
     def addAction(self, elem):
         self.actions.append((self.stack.topwidget, elem.attrib["name"]))
 
+    @staticmethod
+    def any_i18n(*args):
+        """ Return True if any argument appears to be an i18n string. """
+
+        for a in args:
+            if a is not None and not isinstance(a, str):
+                return True
+
+        return False
+
+    def createWidgetItem(self, item_type, elem, getter, *getter_args):
+        """ Create a specific type of widget item. """
+
+        item = self.factory.createQObject(item_type, "item", (), False)
+        props = self.wprops
+
+        # Note that not all types of widget items support the full set of
+        # properties.
+
+        text = props.getProperty(elem, 'text')
+        status_tip = props.getProperty(elem, 'statusTip')
+        tool_tip = props.getProperty(elem, 'toolTip')
+        whats_this = props.getProperty(elem, 'whatsThis')
+
+        if self.any_i18n(text, status_tip, tool_tip, whats_this):
+            self.factory.invoke("item", getter, getter_args)
+
+        if text:
+            item.setText(text)
+
+        if status_tip:
+            item.setStatusTip(status_tip)
+
+        if tool_tip:
+            item.setToolTip(tool_tip)
+
+        if whats_this:
+            item.setWhatsThis(whats_this)
+
+        text_alignment = props.getProperty(elem, 'textAlignment')
+        if text_alignment:
+            item.setTextAlignment(text_alignment)
+
+        font = props.getProperty(elem, 'font')
+        if font:
+            item.setFont(font)
+
+        icon = props.getProperty(elem, 'icon')
+        if icon:
+            item.setIcon(icon)
+
+        background = props.getProperty(elem, 'background')
+        if background:
+            item.setBackground(background)
+
+        foreground = props.getProperty(elem, 'foreground')
+        if foreground:
+            item.setForeground(foreground)
+
+        flags = props.getProperty(elem, 'flags')
+        if flags:
+            item.setFlags(flags)
+
+        check_state = props.getProperty(elem, 'checkState')
+        if check_state:
+            item.setCheckState(check_state)
+
+        return item
+
     def addHeader(self, elem):
         w = self.stack.topwidget
 
         if isinstance(w, QtGui.QTreeWidget):
-            text = self.wprops.getProperty(elem, "text")
-            icon = self.wprops.getProperty(elem, "icon")
+            props = self.wprops
+            col = self.column_counter
 
+            text = props.getProperty(elem, 'text')
             if text:
-                w.headerItem().setText(self.column_counter, text)
+                w.headerItem().setText(col, text)
 
+            status_tip = props.getProperty(elem, 'statusTip')
+            if status_tip:
+                w.headerItem().setStatusTip(col, status_tip)
+
+            tool_tip = props.getProperty(elem, 'toolTip')
+            if tool_tip:
+                w.headerItem().setToolTip(col, tool_tip)
+
+            whats_this = props.getProperty(elem, 'whatsThis')
+            if whats_this:
+                w.headerItem().setWhatsThis(col, whats_this)
+
+            text_alignment = props.getProperty(elem, 'textAlignment')
+            if text_alignment:
+                w.headerItem().setTextAlignment(col, text_alignment)
+
+            font = props.getProperty(elem, 'font')
+            if font:
+                w.headerItem().setFont(col, font)
+
+            icon = props.getProperty(elem, 'icon')
             if icon:
-                w.headerItem().setIcon(self.column_counter, icon)
+                w.headerItem().setIcon(col, icon)
+
+            background = props.getProperty(elem, 'background')
+            if background:
+                w.headerItem().setBackground(col, background)
+
+            foreground = props.getProperty(elem, 'foreground')
+            if foreground:
+                w.headerItem().setForeground(col, foreground)
 
             self.column_counter += 1
 
         elif isinstance(w, QtGui.QTableWidget):
-            if len(elem) == 0:
-                return
-
-            text = self.wprops.getProperty(elem, "text")
-            icon = self.wprops.getProperty(elem, "icon")
-
-            item = self.factory.createQObject("QTableWidgetItem", "item",
-                        (), False)
-
-            if elem.tag == "column":
-                w.setHorizontalHeaderItem(self.column_counter, item)
-
-                if text:
-                    w.horizontalHeaderItem(self.column_counter).setText(text)
-
-                if icon:
-                    item.setIcon(icon)
-
-                self.column_counter += 1
-            elif elem.tag == "row":
-                w.setVerticalHeaderItem(self.row_counter, item)
-
-                if text:
-                    w.verticalHeaderItem(self.row_counter).setText(text)
-
-                if icon:
-                    item.setIcon(icon)
-
-                self.row_counter += 1
+            if len(elem) != 0:
+                if elem.tag == 'column':
+                    item = self.createWidgetItem('QTableWidgetItem', elem,
+                            w.horizontalHeaderItem, self.column_counter)
+                    w.setHorizontalHeaderItem(self.column_counter, item)
+                    self.column_counter += 1
+                elif elem.tag == 'row':
+                    item = self.createWidgetItem('QTableWidgetItem', elem,
+                            w.verticalHeaderItem, self.row_counter)
+                    w.setVerticalHeaderItem(self.row_counter, item)
+                    self.row_counter += 1
 
     def createAction(self, elem):
         self.setupObject("QAction", self.currentActionGroup or self.toplevelWidget,

@@ -41,25 +41,24 @@ is optimized by the use of implicit data sharing. For more
 information, see the <a href="implicit-sharing.html#implicit-data-sharing">Implicit Data
 Sharing</a> documentation.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QBitmap" />QBitmap.__init__ (<i>self</i>)</h3><p>Constructs a null bitmap.</p>
-<p>See also <a href="qpixmap.html#isNull">QPixmap.isNull</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#isNull">QPixmap.isNull</a>().</p>
 
 
 <h3 class="fn"><a name="QBitmap-2" />QBitmap.__init__ (<i>self</i>, <a href="qpixmap.html">QPixmap</a>)</h3><p>Constructs a bitmap that is a copy of the given
 <i>pixmap</i>.</p>
 <p>If the pixmap has a depth greater than 1, the resulting bitmap
 will be dithered automatically.</p>
-<p>See also <a href="qpixmap.html#depth">QPixmap.depth</a>(),
-<a href="qbitmap.html#fromImage">fromImage</a>(), and <a href="qbitmap.html#fromData">fromData</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#depth">QPixmap.depth</a>(), <a href="qbitmap.html#fromImage">fromImage</a>(), and <a href="qbitmap.html#fromData">fromData</a>().</p>
 
 
 <h3 class="fn"><a name="QBitmap-3" />QBitmap.__init__ (<i>self</i>, int&#160;<i>w</i>, int&#160;<i>h</i>)</h3><p>Constructs a bitmap with the given <i>width</i> and
 <i>height</i>. The pixels inside are uninitialized.</p>
-<p>See also <a href="qbitmap.html#clear">clear</a>().</p>
+<p><b>See also</b> <a href="qbitmap.html#clear">clear</a>().</p>
 
 
 <h3 class="fn"><a name="QBitmap-4" />QBitmap.__init__ (<i>self</i>, <a href="qsize.html">QSize</a>)</h3><p>Constructs a bitmap with the given <i>size</i>. The pixels in
 the bitmap are uninitialized.</p>
-<p>See also <a href="qbitmap.html#clear">clear</a>().</p>
+<p><b>See also</b> <a href="qbitmap.html#clear">clear</a>().</p>
 
 
 <h3 class="fn"><a name="QBitmap-5" />QBitmap.__init__ (<i>self</i>, QString&#160;<i>fileName</i>, str&#160;<i>format</i>&#160;=&#160;None)</h3><p>Constructs a bitmap from the file specified by the given
@@ -69,8 +68,7 @@ format, the bitmap becomes a null bitmap.</p>
 to the <a href="qpixmap.html#load">QPixmap.load</a>() function. If
 the file format uses more than 1 bit per pixel, the resulting
 bitmap will be dithered automatically.</p>
-<p>See also <a href="qpixmap.html#isNull">QPixmap.isNull</a>() and
-<a href="qimagereader.html#imageFormat">QImageReader.imageFormat</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#isNull">QPixmap.isNull</a>() and <a href="qimagereader.html#imageFormat">QImageReader.imageFormat</a>().</p>
 
 
 <h3 class="fn"><a name="QBitmap-6" />QBitmap.__init__ (<i>self</i>, QVariant&#160;<i>variant</i>)</h3><h3 class="fn"><a name="QBitmap-7" />QBitmap.__init__ (<i>self</i>, <a href="qbitmap.html">QBitmap</a>)</h3><h3 class="fn"><a name="clear" />QBitmap.clear (<i>self</i>)</h3><p>Clears the bitmap, setting all its bits to <a href="qt.html#GlobalColor-enum">Qt.color0</a>.</p>
@@ -84,17 +82,17 @@ either <a href="qimage.html#Format-enum">QImage.Format_Mono</a> or
 <a href="qimage.html#Format-enum">QImage.Format_MonoLSB</a>. Use
 <a href="qimage.html#Format-enum">QImage.Format_Mono</a> to
 specify data on the XBM format.</p>
-<p>See also <a href="qbitmap.html#fromImage">fromImage</a>().</p>
+<p><b>See also</b> <a href="qbitmap.html#fromImage">fromImage</a>().</p>
 
 
 <h3 class="fn"><a name="fromImage" /><a href="qbitmap.html">QBitmap</a> QBitmap.fromImage (<a href="qimage.html">QImage</a>&#160;<i>image</i>, <a href="qt-imageconversionflags.html">Qt.ImageConversionFlags</a>&#160;<i>flags</i>&#160;=&#160;Qt.AutoColor)</h3><p>Returns a copy of the given <i>image</i> converted to a bitmap
 using the specified image conversion <i>flags</i>.</p>
-<p>See also <a href="qbitmap.html#fromData">fromData</a>().</p>
+<p><b>See also</b> <a href="qbitmap.html#fromData">fromData</a>().</p>
 
 
 <h3 class="fn"><a name="transformed" /><a href="qbitmap.html">QBitmap</a> QBitmap.transformed (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><p>Returns a copy of this bitmap, transformed according to the
 given <i>matrix</i>.</p>
-<p>See also <a href="qpixmap.html#transformed">QPixmap.transformed</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#transformed">QPixmap.transformed</a>().</p>
 
 
-<h3 class="fn"><a name="transformed-2" /><a href="qbitmap.html">QBitmap</a> QBitmap.transformed (<i>self</i>, <a href="qtransform.html">QTransform</a>&#160;<i>matrix</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="transformed-2" /><a href="qbitmap.html">QBitmap</a> QBitmap.transformed (<i>self</i>, <a href="qtransform.html">QTransform</a>&#160;<i>matrix</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

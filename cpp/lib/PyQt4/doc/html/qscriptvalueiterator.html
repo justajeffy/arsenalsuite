@@ -15,13 +15,13 @@ for <a href="qscriptvalue.html">QScriptValue</a>.</p>
 construction, the iterator is located at the very beginning of the
 sequence of properties. Here's how to iterate over all the
 properties of a <a href="qscriptvalue.html">QScriptValue</a>:</p>
-<pre class="highlightedCode brush: cpp">
- QScriptValue object;
- ...
- QScriptValueIterator it(object);
- while (it.hasNext()) {
-     it.next();
-     qDebug() &lt;&lt; it.name() &lt;&lt; ": " &lt;&lt; it.value().toString();
+<pre class="cpp">
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> object;
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ <span class="type">QScriptValueIterator</span> it(object);
+ <span class="keyword">while</span> (it<span class="operator">.</span>hasNext()) {
+     it<span class="operator">.</span>next();
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> it<span class="operator">.</span>name() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">": "</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> it<span class="operator">.</span>value()<span class="operator">.</span>toString();
  }
 </pre>
 <p>The <a href="qscriptvalueiterator.html#next">next</a>() advances
@@ -33,15 +33,15 @@ modify the value of a property, use <a href="qscriptvalueiterator.html#setValue"
 <p>Note that QScriptValueIterator only iterates over the <a href="qscriptvalue.html">QScriptValue</a>'s own properties; i.e. it does
 not follow the prototype chain. You can use a loop like this to
 follow the prototype chain:</p>
-<pre class="highlightedCode brush: cpp">
- QScriptValue obj = ...; <span class="comment">// the object to iterate over</span>
- while (obj.isObject()) {
-     QScriptValueIterator it(obj);
-     while (it.hasNext()) {
-         it.next();
-         qDebug() &lt;&lt; it.name();
+<pre class="cpp">
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> obj <span class="operator">=</span> <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>; <span class="comment">// the object to iterate over</span>
+ <span class="keyword">while</span> (obj<span class="operator">.</span>isObject()) {
+     <span class="type">QScriptValueIterator</span> it(obj);
+     <span class="keyword">while</span> (it<span class="operator">.</span>hasNext()) {
+         it<span class="operator">.</span>next();
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> it<span class="operator">.</span>name();
      }
-     obj = obj.prototype();
+     obj <span class="operator">=</span> obj<span class="operator">.</span>prototype();
  }
 </pre>
 <p>Note that QScriptValueIterator will not automatically skip over
@@ -49,12 +49,12 @@ properties that have the <a href="qscriptvalue.html#PropertyFlag-enum">QScriptVa
 flag set; that flag only affects iteration in script code. If you
 want, you can skip over such properties with code like the
 following:</p>
-<pre class="highlightedCode brush: cpp">
- while (it.hasNext()) {
-     it.next();
-     if (it.flags() &amp; QScriptValue.SkipInEnumeration)
-         continue;
-     qDebug() &lt;&lt; "found enumerated property:" &lt;&lt; it.name();
+<pre class="cpp">
+ <span class="keyword">while</span> (it<span class="operator">.</span>hasNext()) {
+     it<span class="operator">.</span>next();
+     <span class="keyword">if</span> (it<span class="operator">.</span>flags() <span class="operator">&amp;</span> <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span><span class="operator">.</span>SkipInEnumeration)
+         <span class="keyword">continue</span>;
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"found enumerated property:"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> it<span class="operator">.</span>name();
  }
 </pre><hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QScriptValueIterator" />QScriptValueIterator.__init__ (<i>self</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>value</i>)</h3><p>Constructs an iterator for traversing <i>object</i>. The
 iterator is set to be at the front of the sequence of properties
@@ -64,42 +64,40 @@ iterator is set to be at the front of the sequence of properties
 <h3 class="fn"><a name="flags" /><a href="qscriptvalue-propertyflags.html">QScriptValue.PropertyFlags</a> QScriptValueIterator.flags (<i>self</i>)</h3><p>Returns the flags of the last property that was jumped over
 using <a href="qscriptvalueiterator.html#next">next</a>() or
 <a href="qscriptvalueiterator.html#previous">previous</a>().</p>
-<p>See also <a href="qscriptvalueiterator.html#value">value</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#value">value</a>().</p>
 
 
 <h3 class="fn"><a name="hasNext" />bool QScriptValueIterator.hasNext (<i>self</i>)</h3><p>Returns true if there is at least one item ahead of the iterator
 (i.e. the iterator is <i>not</i> at the back of the property
 sequence); otherwise returns false.</p>
-<p>See also <a href="qscriptvalueiterator.html#next">next</a>() and
-<a href="qscriptvalueiterator.html#hasPrevious">hasPrevious</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#next">next</a>() and <a href="qscriptvalueiterator.html#hasPrevious">hasPrevious</a>().</p>
 
 
 <h3 class="fn"><a name="hasPrevious" />bool QScriptValueIterator.hasPrevious (<i>self</i>)</h3><p>Returns true if there is at least one item behind the iterator
 (i.e. the iterator is <i>not</i> at the front of the property
 sequence); otherwise returns false.</p>
-<p>See also <a href="qscriptvalueiterator.html#previous">previous</a>() and <a href="qscriptvalueiterator.html#hasNext">hasNext</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#previous">previous</a>() and <a href="qscriptvalueiterator.html#hasNext">hasNext</a>().</p>
 
 
 <h3 class="fn"><a name="name" />QString QScriptValueIterator.name (<i>self</i>)</h3><p>Returns the name of the last property that was jumped over using
 <a href="qscriptvalueiterator.html#next">next</a>() or <a href="qscriptvalueiterator.html#previous">previous</a>().</p>
-<p>See also <a href="qscriptvalueiterator.html#value">value</a>()
-and <a href="qscriptvalueiterator.html#flags">flags</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#value">value</a>() and <a href="qscriptvalueiterator.html#flags">flags</a>().</p>
 
 
 <h3 class="fn"><a name="next" />QScriptValueIterator.next (<i>self</i>)</h3><p>Advances the iterator by one position.</p>
 <p>Calling this function on an iterator located at the back of the
 container leads to undefined results.</p>
-<p>See also <a href="qscriptvalueiterator.html#hasNext">hasNext</a>(), <a href="qscriptvalueiterator.html#previous">previous</a>(), and <a href="qscriptvalueiterator.html#name">name</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#hasNext">hasNext</a>(), <a href="qscriptvalueiterator.html#previous">previous</a>(), and <a href="qscriptvalueiterator.html#name">name</a>().</p>
 
 
 <h3 class="fn"><a name="previous" />QScriptValueIterator.previous (<i>self</i>)</h3><p>Moves the iterator back by one position.</p>
 <p>Calling this function on an iterator located at the front of the
 container leads to undefined results.</p>
-<p>See also <a href="qscriptvalueiterator.html#hasPrevious">hasPrevious</a>(), <a href="qscriptvalueiterator.html#next">next</a>(), and <a href="qscriptvalueiterator.html#name">name</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#hasPrevious">hasPrevious</a>(), <a href="qscriptvalueiterator.html#next">next</a>(), and <a href="qscriptvalueiterator.html#name">name</a>().</p>
 
 
 <h3 class="fn"><a name="remove" />QScriptValueIterator.remove (<i>self</i>)</h3><p>Removes the last property that was jumped over using <a href="qscriptvalueiterator.html#next">next</a>() or <a href="qscriptvalueiterator.html#previous">previous</a>().</p>
-<p>See also <a href="qscriptvalueiterator.html#setValue">setValue</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#setValue">setValue</a>().</p>
 
 
 <h3 class="fn"><a name="scriptName" /><a href="qscriptstring.html">QScriptString</a> QScriptValueIterator.scriptName (<i>self</i>)</h3><p>Returns the name of the last property that was jumped over using
@@ -110,24 +108,22 @@ container leads to undefined results.</p>
 <h3 class="fn"><a name="setValue" />QScriptValueIterator.setValue (<i>self</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>value</i>)</h3><p>Sets the <i>value</i> of the last property that was jumped over
 using <a href="qscriptvalueiterator.html#next">next</a>() or
 <a href="qscriptvalueiterator.html#previous">previous</a>().</p>
-<p>See also <a href="qscriptvalueiterator.html#value">value</a>()
-and <a href="qscriptvalueiterator.html#name">name</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#value">value</a>() and <a href="qscriptvalueiterator.html#name">name</a>().</p>
 
 
 <h3 class="fn"><a name="toBack" />QScriptValueIterator.toBack (<i>self</i>)</h3><p>Moves the iterator to the back of the <a href="qscriptvalue.html">QScriptValue</a> (after the last property).</p>
-<p>See also <a href="qscriptvalueiterator.html#toFront">toFront</a>() and <a href="qscriptvalueiterator.html#previous">previous</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#toFront">toFront</a>() and <a href="qscriptvalueiterator.html#previous">previous</a>().</p>
 
 
 <h3 class="fn"><a name="toFront" />QScriptValueIterator.toFront (<i>self</i>)</h3><p>Moves the iterator to the front of the <a href="qscriptvalue.html">QScriptValue</a> (before the first
 property).</p>
-<p>See also <a href="qscriptvalueiterator.html#toBack">toBack</a>()
-and <a href="qscriptvalueiterator.html#next">next</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#toBack">toBack</a>() and <a href="qscriptvalueiterator.html#next">next</a>().</p>
 
 
 <h3 class="fn"><a name="value" /><a href="qscriptvalue.html">QScriptValue</a> QScriptValueIterator.value (<i>self</i>)</h3><p>Returns the value of the last property that was jumped over
 using <a href="qscriptvalueiterator.html#next">next</a>() or
 <a href="qscriptvalueiterator.html#previous">previous</a>().</p>
-<p>See also <a href="qscriptvalueiterator.html#setValue">setValue</a>() and <a href="qscriptvalueiterator.html#name">name</a>().</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html#setValue">setValue</a>() and <a href="qscriptvalueiterator.html#name">name</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

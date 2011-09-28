@@ -27,11 +27,11 @@ with <a href="qtextline.html#setPosition">setPosition</a>().</p>
 <tr>
 <td class="topAlign">
 <tt>QTextLine.CursorBetweenCharacters</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextLine.CursorOnCharacter</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 </tr>
 </table>
 
@@ -43,19 +43,19 @@ with <a href="qtextline.html#setPosition">setPosition</a>().</p>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextLine.Leading</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextLine.Trailing</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QTextLine" />QTextLine.__init__ (<i>self</i>)</h3><p>Creates an invalid line.</p>
 
 
 <h3 class="fn"><a name="QTextLine-2" />QTextLine.__init__ (<i>self</i>, <a href="qtextline.html">QTextLine</a>)</h3><h3 class="fn"><a name="ascent" />float QTextLine.ascent (<i>self</i>)</h3><p>Returns the line's ascent.</p>
-<p>See also <a href="qtextline.html#descent">descent</a>() and
-<a href="qtextline.html#height">height</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#descent">descent</a>()
+and <a href="qtextline.html#height">height</a>().</p>
 
 
 <h3 class="fn"><a name="cursorToX" />(float, int&#160;<i>cursorPos</i>) QTextLine.cursorToX (<i>self</i>, int&#160;<i>cursorPos</i>, <a href="qtextline.html#Edge-enum">Edge</a>&#160;<i>edge</i>&#160;=&#160;QTextLine.Leading)</h3><p>Converts the cursor position <i>cursorPos</i> to the
@@ -64,11 +64,11 @@ corresponding x position inside the line, taking account of the
 <p>If <i>cursorPos</i> is not a valid cursor position, the nearest
 valid cursor position will be used instead, and cpos will be
 modified to point to this valid cursor position.</p>
-<p>See also <a href="qtextline.html#xToCursor">xToCursor</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#xToCursor">xToCursor</a>().</p>
 
 
 <h3 class="fn"><a name="descent" />float QTextLine.descent (<i>self</i>)</h3><p>Returns the line's descent.</p>
-<p>See also <a href="qtextline.html#ascent">ascent</a>() and
+<p><b>See also</b> <a href="qtextline.html#ascent">ascent</a>() and
 <a href="qtextline.html#height">height</a>().</p>
 
 
@@ -79,7 +79,8 @@ use.</p>
 
 <h3 class="fn"><a name="height" />float QTextLine.height (<i>self</i>)</h3><p>Returns the line's height. This is equal to <a href="qtextline.html#ascent">ascent</a>() + <a href="qtextline.html#descent">descent</a>() + 1 if leading is not
 included. If leading is included, this equals to <a href="qtextline.html#ascent">ascent</a>() + <a href="qtextline.html#descent">descent</a>() + <a href="qtextline.html#leading">leading</a>() + 1.</p>
-<p>See also <a href="qtextline.html#ascent">ascent</a>(), <a href="qtextline.html#descent">descent</a>(), <a href="qtextline.html#leading">leading</a>(), and <a href="qtextline.html#setLeadingIncluded">setLeadingIncluded</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#ascent">ascent</a>(),
+<a href="qtextline.html#descent">descent</a>(), <a href="qtextline.html#leading">leading</a>(), and <a href="qtextline.html#setLeadingIncluded">setLeadingIncluded</a>().</p>
 
 
 <h3 class="fn"><a name="horizontalAdvance" />float QTextLine.horizontalAdvance (<i>self</i>)</h3><p>Returns the horizontal advance of the text. The advance of the
@@ -97,14 +98,15 @@ false.</p>
 
 <h3 class="fn"><a name="leading" />float QTextLine.leading (<i>self</i>)</h3><p>Returns the line's leading.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qtextline.html#ascent">ascent</a>(), <a href="qtextline.html#descent">descent</a>(), and <a href="qtextline.html#height">height</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#ascent">ascent</a>(),
+<a href="qtextline.html#descent">descent</a>(), and <a href="qtextline.html#height">height</a>().</p>
 
 
 <h3 class="fn"><a name="leadingIncluded" />bool QTextLine.leadingIncluded (<i>self</i>)</h3><p>Returns true if positive leading is included into the line's
 height; otherwise returns false.</p>
 <p>By default, leading is not included.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qtextline.html#setLeadingIncluded">setLeadingIncluded</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#setLeadingIncluded">setLeadingIncluded</a>().</p>
 
 
 <h3 class="fn"><a name="lineNumber" />int QTextLine.lineNumber (<i>self</i>)</h3><p>Returns the position of the line in the text engine.</p>
@@ -121,11 +123,11 @@ the line break position.</p>
 
 <h3 class="fn"><a name="position" /><a href="qpointf.html">QPointF</a> QTextLine.position (<i>self</i>)</h3><p>Returns the line's position relative to the text layout's
 position.</p>
-<p>See also <a href="qtextline.html#setPosition">setPosition</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#setPosition">setPosition</a>().</p>
 
 
 <h3 class="fn"><a name="rect" /><a href="qrectf.html">QRectF</a> QTextLine.rect (<i>self</i>)</h3><p>Returns the line's bounding rectangle.</p>
-<p>See also <a href="qtextline.html#x">x</a>(), <a href="qtextline.html#y">y</a>(), <a href="qtextline.html#textLength">textLength</a>(), and <a href="qtextline.html#width">width</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#x">x</a>(), <a href="qtextline.html#y">y</a>(), <a href="qtextline.html#textLength">textLength</a>(), and <a href="qtextline.html#width">width</a>().</p>
 
 
 <h3 class="fn"><a name="setLeadingIncluded" />QTextLine.setLeadingIncluded (<i>self</i>, bool&#160;<i>included</i>)</h3><p>Includes positive leading into the line's height if
@@ -134,7 +136,7 @@ position.</p>
 <p>Note that negative leading is ignored, it must be handled in the
 code using the text lines by letting the lines overlap.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qtextline.html#leadingIncluded">leadingIncluded</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#leadingIncluded">leadingIncluded</a>().</p>
 
 
 <h3 class="fn"><a name="setLineWidth" />QTextLine.setLineWidth (<i>self</i>, float&#160;<i>width</i>)</h3><p>Lays out the line with the given <i>width</i>. The line is
@@ -160,11 +162,11 @@ is used as reference width for alignment.</p>
 
 
 <h3 class="fn"><a name="setPosition" />QTextLine.setPosition (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>pos</i>)</h3><p>Moves the line to position <i>pos</i>.</p>
-<p>See also <a href="qtextline.html#position">position</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#position">position</a>().</p>
 
 
 <h3 class="fn"><a name="textLength" />int QTextLine.textLength (<i>self</i>)</h3><p>Returns the length of the text in the line.</p>
-<p>See also <a href="qtextline.html#naturalTextWidth">naturalTextWidth</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#naturalTextWidth">naturalTextWidth</a>().</p>
 
 
 <h3 class="fn"><a name="textStart" />int QTextLine.textStart (<i>self</i>)</h3><p>Returns the start of the line from the beginning of the string
@@ -173,20 +175,21 @@ passed to the <a href="qtextlayout.html">QTextLayout</a>.</p>
 
 <h3 class="fn"><a name="width" />float QTextLine.width (<i>self</i>)</h3><p>Returns the line's width as specified by the layout()
 function.</p>
-<p>See also <a href="qtextline.html#naturalTextWidth">naturalTextWidth</a>(), <a href="qtextline.html#x">x</a>(), <a href="qtextline.html#y">y</a>(),
+<p><b>See also</b> <a href="qtextline.html#naturalTextWidth">naturalTextWidth</a>(), <a href="qtextline.html#x">x</a>(), <a href="qtextline.html#y">y</a>(),
 <a href="qtextline.html#textLength">textLength</a>(), and <a href="qtextline.html#rect">rect</a>().</p>
 
 
 <h3 class="fn"><a name="x" />float QTextLine.x (<i>self</i>)</h3><p>Returns the line's x position.</p>
-<p>See also <a href="qtextline.html#rect">rect</a>(), <a href="qtextline.html#y">y</a>(), <a href="qtextline.html#textLength">textLength</a>(), and <a href="qtextline.html#width">width</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#rect">rect</a>(),
+<a href="qtextline.html#y">y</a>(), <a href="qtextline.html#textLength">textLength</a>(), and <a href="qtextline.html#width">width</a>().</p>
 
 
 <h3 class="fn"><a name="xToCursor" />int QTextLine.xToCursor (<i>self</i>, float&#160;<i>x</i>, <a href="qtextline.html#CursorPosition-enum">CursorPosition</a>&#160;<i>edge</i>&#160;=&#160;QTextLine.CursorBetweenCharacters)</h3><p>Converts the x-coordinate <i>x</i>, to the nearest matching
 cursor position, depending on the cursor position type,
 <i>cpos</i>.</p>
-<p>See also <a href="qtextline.html#cursorToX">cursorToX</a>().</p>
+<p><b>See also</b> <a href="qtextline.html#cursorToX">cursorToX</a>().</p>
 
 
 <h3 class="fn"><a name="y" />float QTextLine.y (<i>self</i>)</h3><p>Returns the line's y position.</p>
-<p>See also <a href="qtextline.html#x">x</a>(), <a href="qtextline.html#rect">rect</a>(), <a href="qtextline.html#textLength">textLength</a>(), and <a href="qtextline.html#width">width</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qtextline.html#x">x</a>(), <a href="qtextline.html#rect">rect</a>(), <a href="qtextline.html#textLength">textLength</a>(), and <a href="qtextline.html#width">width</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

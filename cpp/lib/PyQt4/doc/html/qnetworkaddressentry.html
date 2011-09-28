@@ -34,12 +34,12 @@ concept of broadcast has been abandoned in that system in favor of
 multicast. In particular, the group of hosts corresponding to all
 the nodes in the local network can be reached by the "all-nodes"
 special multicast group (address FF02.1).</p>
-<p>See also <a href="qnetworkaddressentry.html#setBroadcast">setBroadcast</a>().</p>
+<p><b>See also</b> <a href="qnetworkaddressentry.html#setBroadcast">setBroadcast</a>().</p>
 
 
 <h3 class="fn"><a name="ip" /><a href="qhostaddress.html">QHostAddress</a> QNetworkAddressEntry.ip (<i>self</i>)</h3><p>This function returns one IPv4 or IPv6 address found, that was
 found in a network interface.</p>
-<p>See also <a href="qnetworkaddressentry.html#setIp">setIp</a>().</p>
+<p><b>See also</b> <a href="qnetworkaddressentry.html#setIp">setIp</a>().</p>
 
 
 <h3 class="fn"><a name="netmask" /><a href="qhostaddress.html">QHostAddress</a> QNetworkAddressEntry.netmask (<i>self</i>)</h3><p>Returns the netmask associated with the IP address. The netmask
@@ -49,7 +49,7 @@ where the number of bits set to 1 is equal to the prefix length.
 For a prefix length of 64 bits (the most common value), the netmask
 will be expressed as a <a href="qhostaddress.html">QHostAddress</a>
 holding the address FFFF:FFFF:FFFF:FFFF.</p>
-<p>See also <a href="qnetworkaddressentry.html#setNetmask">setNetmask</a>() and
+<p><b>See also</b> <a href="qnetworkaddressentry.html#setNetmask">setNetmask</a>() and
 <a href="qnetworkaddressentry.html#prefixLength">prefixLength</a>().</p>
 
 
@@ -62,24 +62,24 @@ representing addresses.</p>
 determined (i.e., <a href="qnetworkaddressentry.html#netmask">netmask</a>() returns a null
 QHostAddress()).</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qnetworkaddressentry.html#setPrefixLength">setPrefixLength</a>()
+<p><b>See also</b> <a href="qnetworkaddressentry.html#setPrefixLength">setPrefixLength</a>()
 and <a href="qnetworkaddressentry.html#netmask">netmask</a>().</p>
 
 
 <h3 class="fn"><a name="setBroadcast" />QNetworkAddressEntry.setBroadcast (<i>self</i>, <a href="qhostaddress.html">QHostAddress</a>&#160;<i>newBroadcast</i>)</h3><p>Sets the broadcast IP address of this <a href="qnetworkaddressentry.html">QNetworkAddressEntry</a> object to
 <i>newBroadcast</i>.</p>
-<p>See also <a href="qnetworkaddressentry.html#broadcast">broadcast</a>().</p>
+<p><b>See also</b> <a href="qnetworkaddressentry.html#broadcast">broadcast</a>().</p>
 
 
 <h3 class="fn"><a name="setIp" />QNetworkAddressEntry.setIp (<i>self</i>, <a href="qhostaddress.html">QHostAddress</a>&#160;<i>newIp</i>)</h3><p>Sets the IP address the <a href="qnetworkaddressentry.html">QNetworkAddressEntry</a> object
 contains to <i>newIp</i>.</p>
-<p>See also <a href="qnetworkaddressentry.html#ip">ip</a>().</p>
+<p><b>See also</b> <a href="qnetworkaddressentry.html#ip">ip</a>().</p>
 
 
 <h3 class="fn"><a name="setNetmask" />QNetworkAddressEntry.setNetmask (<i>self</i>, <a href="qhostaddress.html">QHostAddress</a>&#160;<i>newNetmask</i>)</h3><p>Sets the netmask that this <a href="qnetworkaddressentry.html">QNetworkAddressEntry</a> object
 contains to <i>newNetmask</i>. Setting the netmask also sets the
 prefix length to match the new netmask.</p>
-<p>See also <a href="qnetworkaddressentry.html#netmask">netmask</a>() and <a href="qnetworkaddressentry.html#setPrefixLength">setPrefixLength</a>().</p>
+<p><b>See also</b> <a href="qnetworkaddressentry.html#netmask">netmask</a>() and <a href="qnetworkaddressentry.html#setPrefixLength">setPrefixLength</a>().</p>
 
 
 <h3 class="fn"><a name="setPrefixLength" />QNetworkAddressEntry.setPrefixLength (<i>self</i>, int&#160;<i>length</i>)</h3><p>Sets the prefix length of this IP address to <i>length</i>. The
@@ -89,8 +89,8 @@ addresses. Setting to any invalid value is equivalent to setting to
 -1, which means "no prefix length".</p>
 <p>Setting the prefix length also sets the netmask (see <a href="qnetworkaddressentry.html#netmask">netmask</a>()).</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qnetworkaddressentry.html#prefixLength">prefixLength</a>() and
+<p><b>See also</b> <a href="qnetworkaddressentry.html#prefixLength">prefixLength</a>() and
 <a href="qnetworkaddressentry.html#setNetmask">setNetmask</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QNetworkAddressEntry.__eq__ (<i>self</i>, <a href="qnetworkaddressentry.html">QNetworkAddressEntry</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QNetworkAddressEntry.__ne__ (<i>self</i>, <a href="qnetworkaddressentry.html">QNetworkAddressEntry</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QNetworkAddressEntry.__eq__ (<i>self</i>, <a href="qnetworkaddressentry.html">QNetworkAddressEntry</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QNetworkAddressEntry.__ne__ (<i>self</i>, <a href="qnetworkaddressentry.html">QNetworkAddressEntry</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
