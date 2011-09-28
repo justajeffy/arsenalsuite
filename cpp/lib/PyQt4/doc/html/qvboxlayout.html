@@ -12,23 +12,23 @@ body { background: #ffffff; color: black; }
 <p>This class is used to construct vertical box layout objects. See
 <a href="qboxlayout.html">QBoxLayout</a> for details.</p>
 <p>The simplest use of the class is like this:</p>
-<pre class="highlightedCode brush: cpp">
-     QWidget *window = new QWidget;
-     QPushButton *button1 = new QPushButton("One");
-     QPushButton *button2 = new QPushButton("Two");
-     QPushButton *button3 = new QPushButton("Three");
-     QPushButton *button4 = new QPushButton("Four");
-     QPushButton *button5 = new QPushButton("Five");
+<pre class="cpp">
+     <span class="type"><a href="qwidget.html">QWidget</a></span> <span class="operator">*</span>window <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qwidget.html">QWidget</a></span>;
+     <span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span>button1 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>(<span class="string">"One"</span>);
+     <span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span>button2 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>(<span class="string">"Two"</span>);
+     <span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span>button3 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>(<span class="string">"Three"</span>);
+     <span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span>button4 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>(<span class="string">"Four"</span>);
+     <span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span>button5 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>(<span class="string">"Five"</span>);
 
-     QVBoxLayout *layout = new QVBoxLayout;
-     layout-&gt;addWidget(button1);
-     layout-&gt;addWidget(button2);
-     layout-&gt;addWidget(button3);
-     layout-&gt;addWidget(button4);
-     layout-&gt;addWidget(button5);
+     <span class="type">QVBoxLayout</span> <span class="operator">*</span>layout <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QVBoxLayout</span>;
+     layout<span class="operator">-</span><span class="operator">&gt;</span>addWidget(button1);
+     layout<span class="operator">-</span><span class="operator">&gt;</span>addWidget(button2);
+     layout<span class="operator">-</span><span class="operator">&gt;</span>addWidget(button3);
+     layout<span class="operator">-</span><span class="operator">&gt;</span>addWidget(button4);
+     layout<span class="operator">-</span><span class="operator">&gt;</span>addWidget(button5);
 
-     window-&gt;setLayout(layout);
-     window-&gt;show();
+     window<span class="operator">-</span><span class="operator">&gt;</span>setLayout(layout);
+     window<span class="operator">-</span><span class="operator">&gt;</span>show();
 </pre>
 <p>First, we create the widgets we want in the layout. Then, we
 create the QVBoxLayout object and add the widgets into the layout.
@@ -45,4 +45,4 @@ layout.</p>
 <i>parent</i>.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

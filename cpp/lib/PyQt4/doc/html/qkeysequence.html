@@ -41,11 +41,11 @@ and zero or more modifiers, such as <a href="qt.html#Modifier-enum">Qt.SHIFT</a>
 <p>For example, <b>Ctrl P</b> might be a sequence used as a
 shortcut for printing a document, and can be specified in any of
 the following ways:</p>
-<pre class="highlightedCode brush: cpp">
- QKeySequence(QKeySequence.Print);
- QKeySequence(tr("Ctrl+P"));
- QKeySequence(tr("Ctrl+p"));
- QKeySequence(Qt.CTRL + Qt.Key_P);
+<pre class="cpp">
+ <span class="type">QKeySequence</span>(<span class="type">QKeySequence</span><span class="operator">.</span>Print);
+ <span class="type">QKeySequence</span>(tr(<span class="string">"Ctrl+P"</span>));
+ <span class="type">QKeySequence</span>(tr(<span class="string">"Ctrl+p"</span>));
+ <span class="type">QKeySequence</span>(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>CTRL <span class="operator">+</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>Key_P);
 </pre>
 <p>Note that, for letters, the case used in the specification
 string does not matter. In the above examples, the user does not
@@ -86,7 +86,7 @@ on Mac OS X, the <b>Ctrl</b> value corresponds to the
 value corresponds to the <b>Control</b> keys.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th><a href="qkeysequence.html#StandardKey-enum">StandardKey</a></th>
 <th>Windows</th>
 <th>Mac OS X</th>
@@ -95,1293 +95,525 @@ value corresponds to the <b>Control</b> keys.</p>
 <th>S60</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">HelpContents</a></p>
-</td>
-<td>
-<p>F1</p>
-</td>
-<td>
-<p>Ctrl+?</p>
-</td>
-<td>
-<p>F1</p>
-</td>
-<td>
-<p>F1</p>
-</td>
-<td>
-<p>F2</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">HelpContents</a></td>
+<td>F1</td>
+<td>Ctrl+?</td>
+<td>F1</td>
+<td>F1</td>
+<td>F2</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">WhatsThis</a></p>
-</td>
-<td>
-<p>Shift+F1</p>
-</td>
-<td>
-<p>Shift+F1</p>
-</td>
-<td>
-<p>Shift+F1</p>
-</td>
-<td>
-<p>Shift+F1</p>
-</td>
-<td>
-<p>Shift+F1</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">WhatsThis</a></td>
+<td>Shift+F1</td>
+<td>Shift+F1</td>
+<td>Shift+F1</td>
+<td>Shift+F1</td>
+<td>Shift+F1</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Open</p>
-</td>
-<td>
-<p>Ctrl+O</p>
-</td>
-<td>
-<p>Ctrl+O</p>
-</td>
-<td>
-<p>Ctrl+O</p>
-</td>
-<td>
-<p>Ctrl+O</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Open</td>
+<td>Ctrl+O</td>
+<td>Ctrl+O</td>
+<td>Ctrl+O</td>
+<td>Ctrl+O</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Close</p>
-</td>
-<td>
-<p>Ctrl+F4, Ctrl+W</p>
-</td>
-<td>
-<p>Ctrl+W, Ctrl+F4</p>
-</td>
-<td>
-<p>Ctrl+W</p>
-</td>
-<td>
-<p>Ctrl+W</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td>Close</td>
+<td>Ctrl+F4, Ctrl+W</td>
+<td>Ctrl+W, Ctrl+F4</td>
+<td>Ctrl+W</td>
+<td>Ctrl+W</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Save</p>
-</td>
-<td>
-<p>Ctrl+S</p>
-</td>
-<td>
-<p>Ctrl+S</p>
-</td>
-<td>
-<p>Ctrl+S</p>
-</td>
-<td>
-<p>Ctrl+S</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Save</td>
+<td>Ctrl+S</td>
+<td>Ctrl+S</td>
+<td>Ctrl+S</td>
+<td>Ctrl+S</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Quit</p>
-</td>
+<tr class="even" valign="top">
+<td>Quit</td>
 <td />
-<td>
-<p>Ctrl+Q</p>
-</td>
-<td>
-<p>Qtrl+Q</p>
-</td>
-<td>
-<p>Qtrl+Q</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<td>Ctrl+Q</td>
+<td>Qtrl+Q</td>
+<td>Qtrl+Q</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SaveAs</a></p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SaveAs</a></td>
 <td />
-<td>
-<p>Ctrl+Shift+S</p>
-</td>
+<td>Ctrl+Shift+S</td>
 <td />
-<td>
-<p>Ctrl+Shift+S</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<td>Ctrl+Shift+S</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>New</p>
-</td>
-<td>
-<p>Ctrl+N</p>
-</td>
-<td>
-<p>Ctrl+N</p>
-</td>
-<td>
-<p>Ctrl+N</p>
-</td>
-<td>
-<p>Ctrl+N</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td>New</td>
+<td>Ctrl+N</td>
+<td>Ctrl+N</td>
+<td>Ctrl+N</td>
+<td>Ctrl+N</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Delete</p>
-</td>
-<td>
-<p>Del</p>
-</td>
-<td>
-<p>Del, Meta+D</p>
-</td>
-<td>
-<p>Del, Ctrl+D</p>
-</td>
-<td>
-<p>Del, Ctrl+D</p>
-</td>
-<td>
-<p>Del</p>
-</td>
+<tr class="odd" valign="top">
+<td>Delete</td>
+<td>Del</td>
+<td>Del, Meta+D</td>
+<td>Del, Ctrl+D</td>
+<td>Del, Ctrl+D</td>
+<td>Del</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Cut</p>
-</td>
-<td>
-<p>Ctrl+X, Shift+Del</p>
-</td>
-<td>
-<p>Ctrl+X</p>
-</td>
-<td>
-<p>Ctrl+X, F20, Shift+Del</p>
-</td>
-<td>
-<p>Ctrl+X, F20, Shift+Del</p>
-</td>
-<td>
-<p>Ctrl+X</p>
-</td>
+<tr class="even" valign="top">
+<td>Cut</td>
+<td>Ctrl+X, Shift+Del</td>
+<td>Ctrl+X</td>
+<td>Ctrl+X, F20, Shift+Del</td>
+<td>Ctrl+X, F20, Shift+Del</td>
+<td>Ctrl+X</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Copy</p>
-</td>
-<td>
-<p>Ctrl+C, Ctrl+Ins</p>
-</td>
-<td>
-<p>Ctrl+C</p>
-</td>
-<td>
-<p>Ctrl+C, F16, Ctrl+Ins</p>
-</td>
-<td>
-<p>Ctrl+C, F16, Ctrl+Ins</p>
-</td>
-<td>
-<p>Ctrl+C</p>
-</td>
+<tr class="odd" valign="top">
+<td>Copy</td>
+<td>Ctrl+C, Ctrl+Ins</td>
+<td>Ctrl+C</td>
+<td>Ctrl+C, F16, Ctrl+Ins</td>
+<td>Ctrl+C, F16, Ctrl+Ins</td>
+<td>Ctrl+C</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Paste</p>
-</td>
-<td>
-<p>Ctrl+V, Shift+Ins</p>
-</td>
-<td>
-<p>Ctrl+V</p>
-</td>
-<td>
-<p>Ctrl+V, F18, Shift+Ins</p>
-</td>
-<td>
-<p>Ctrl+V, F18, Shift+Ins</p>
-</td>
-<td>
-<p>Ctrl+V</p>
-</td>
+<tr class="even" valign="top">
+<td>Paste</td>
+<td>Ctrl+V, Shift+Ins</td>
+<td>Ctrl+V</td>
+<td>Ctrl+V, F18, Shift+Ins</td>
+<td>Ctrl+V, F18, Shift+Ins</td>
+<td>Ctrl+V</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Preferences</p>
-</td>
+<tr class="odd" valign="top">
+<td>Preferences</td>
 <td />
-<td>
-<p>Ctrl+,</p>
-</td>
+<td>Ctrl+,</td>
 <td />
 <td />
-<td>
-<p>(none)</p>
-</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Undo</p>
-</td>
-<td>
-<p>Ctrl+Z, Alt+Backspace</p>
-</td>
-<td>
-<p>Ctrl+Z</p>
-</td>
-<td>
-<p>Ctrl+Z, F14</p>
-</td>
-<td>
-<p>Ctrl+Z, F14</p>
-</td>
-<td>
-<p>Ctrl+Z</p>
-</td>
+<tr class="even" valign="top">
+<td>Undo</td>
+<td>Ctrl+Z, Alt+Backspace</td>
+<td>Ctrl+Z</td>
+<td>Ctrl+Z, F14</td>
+<td>Ctrl+Z, F14</td>
+<td>Ctrl+Z</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Redo</p>
-</td>
-<td>
-<p>Ctrl+Y, Shift+Ctrl+Z, Alt+Shift+Backspace</p>
-</td>
-<td>
-<p>Ctrl+Shift+Z, Ctrl+Y</p>
-</td>
-<td>
-<p>Ctrl+Shift+Z</p>
-</td>
-<td>
-<p>Ctrl+Shift+Z</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Redo</td>
+<td>Ctrl+Y, Shift+Ctrl+Z, Alt+Shift+Backspace</td>
+<td>Ctrl+Shift+Z, Ctrl+Y</td>
+<td>Ctrl+Shift+Z</td>
+<td>Ctrl+Shift+Z</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Back</p>
-</td>
-<td>
-<p>Alt+Left, Backspace</p>
-</td>
-<td>
-<p>Ctrl+[</p>
-</td>
-<td>
-<p>Alt+Left</p>
-</td>
-<td>
-<p>Alt+Left</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td>Back</td>
+<td>Alt+Left, Backspace</td>
+<td>Ctrl+[</td>
+<td>Alt+Left</td>
+<td>Alt+Left</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Forward</p>
-</td>
-<td>
-<p>Alt+Right, Shift+Backspace</p>
-</td>
-<td>
-<p>Ctrl+]</p>
-</td>
-<td>
-<p>Alt+Right</p>
-</td>
-<td>
-<p>Alt+Right</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Forward</td>
+<td>Alt+Right, Shift+Backspace</td>
+<td>Ctrl+]</td>
+<td>Alt+Right</td>
+<td>Alt+Right</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Refresh</p>
-</td>
-<td>
-<p>F5</p>
-</td>
-<td>
-<p>F5</p>
-</td>
-<td>
-<p>F5</p>
-</td>
-<td>
-<p>Ctrl+R, F5</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td>Refresh</td>
+<td>F5</td>
+<td>F5</td>
+<td>F5</td>
+<td>Ctrl+R, F5</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">ZoomIn</a></p>
-</td>
-<td>
-<p>Ctrl+Plus</p>
-</td>
-<td>
-<p>Ctrl+Plus</p>
-</td>
-<td>
-<p>Ctrl+Plus</p>
-</td>
-<td>
-<p>Ctrl+Plus</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">ZoomIn</a></td>
+<td>Ctrl+Plus</td>
+<td>Ctrl+Plus</td>
+<td>Ctrl+Plus</td>
+<td>Ctrl+Plus</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">ZoomOut</a></p>
-</td>
-<td>
-<p>Ctrl+Minus</p>
-</td>
-<td>
-<p>Ctrl+Minus</p>
-</td>
-<td>
-<p>Ctrl+Minus</p>
-</td>
-<td>
-<p>Ctrl+Minus</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">ZoomOut</a></td>
+<td>Ctrl+Minus</td>
+<td>Ctrl+Minus</td>
+<td>Ctrl+Minus</td>
+<td>Ctrl+Minus</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Print</p>
-</td>
-<td>
-<p>Ctrl+P</p>
-</td>
-<td>
-<p>Ctrl+P</p>
-</td>
-<td>
-<p>Ctrl+P</p>
-</td>
-<td>
-<p>Ctrl+P</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Print</td>
+<td>Ctrl+P</td>
+<td>Ctrl+P</td>
+<td>Ctrl+P</td>
+<td>Ctrl+P</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">AddTab</a></p>
-</td>
-<td>
-<p>Ctrl+T</p>
-</td>
-<td>
-<p>Ctrl+T</p>
-</td>
-<td>
-<p>Ctrl+Shift+N, Ctrl+T</p>
-</td>
-<td>
-<p>Ctrl+T</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">AddTab</a></td>
+<td>Ctrl+T</td>
+<td>Ctrl+T</td>
+<td>Ctrl+Shift+N, Ctrl+T</td>
+<td>Ctrl+T</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">NextChild</a></p>
-</td>
-<td>
-<p>Ctrl+Tab, Forward, Ctrl+F6</p>
-</td>
-<td>
-<p>Ctrl+}, Forward, Ctrl+Tab</p>
-</td>
-<td>
-<p>Ctrl+Tab, Forward, Ctrl+Comma</p>
-</td>
-<td>
-<p>Ctrl+Tab, Forward</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">NextChild</a></td>
+<td>Ctrl+Tab, Forward, Ctrl+F6</td>
+<td>Ctrl+}, Forward, Ctrl+Tab</td>
+<td>Ctrl+Tab, Forward, Ctrl+Comma</td>
+<td>Ctrl+Tab, Forward</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">PreviousChild</a></p>
-</td>
-<td>
-<p>Ctrl+Shift+Tab, Back, Ctrl+Shift+F6</p>
-</td>
-<td>
-<p>Ctrl+{, Back, Ctrl+Shift+Tab</p>
-</td>
-<td>
-<p>Ctrl+Shift+Tab, Back, Ctrl+Period</p>
-</td>
-<td>
-<p>Ctrl+Shift+Tab, Back</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">PreviousChild</a></td>
+<td>Ctrl+Shift+Tab, Back, Ctrl+Shift+F6</td>
+<td>Ctrl+{, Back, Ctrl+Shift+Tab</td>
+<td>Ctrl+Shift+Tab, Back, Ctrl+Period</td>
+<td>Ctrl+Shift+Tab, Back</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Find</p>
-</td>
-<td>
-<p>Ctrl+F</p>
-</td>
-<td>
-<p>Ctrl+F</p>
-</td>
-<td>
-<p>Ctrl+F</p>
-</td>
-<td>
-<p>Ctrl+F</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Find</td>
+<td>Ctrl+F</td>
+<td>Ctrl+F</td>
+<td>Ctrl+F</td>
+<td>Ctrl+F</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">FindNext</a></p>
-</td>
-<td>
-<p>F3, Ctrl+G</p>
-</td>
-<td>
-<p>Ctrl+G</p>
-</td>
-<td>
-<p>F3</p>
-</td>
-<td>
-<p>Ctrl+G, F3</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">FindNext</a></td>
+<td>F3, Ctrl+G</td>
+<td>Ctrl+G</td>
+<td>F3</td>
+<td>Ctrl+G, F3</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">FindPrevious</a></p>
-</td>
-<td>
-<p>Shift+F3, Ctrl+Shift+G</p>
-</td>
-<td>
-<p>Ctrl+Shift+G</p>
-</td>
-<td>
-<p>Shift+F3</p>
-</td>
-<td>
-<p>Ctrl+Shift+G, Shift+F3</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">FindPrevious</a></td>
+<td>Shift+F3, Ctrl+Shift+G</td>
+<td>Ctrl+Shift+G</td>
+<td>Shift+F3</td>
+<td>Ctrl+Shift+G, Shift+F3</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Replace</p>
-</td>
-<td>
-<p>Ctrl+H</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>Ctrl+R</p>
-</td>
-<td>
-<p>Ctrl+H</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td>Replace</td>
+<td>Ctrl+H</td>
+<td>(none)</td>
+<td>Ctrl+R</td>
+<td>Ctrl+H</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectAll</a></p>
-</td>
-<td>
-<p>Ctrl+A</p>
-</td>
-<td>
-<p>Ctrl+A</p>
-</td>
-<td>
-<p>Ctrl+A</p>
-</td>
-<td>
-<p>Ctrl+A</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectAll</a></td>
+<td>Ctrl+A</td>
+<td>Ctrl+A</td>
+<td>Ctrl+A</td>
+<td>Ctrl+A</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Bold</p>
-</td>
-<td>
-<p>Ctrl+B</p>
-</td>
-<td>
-<p>Ctrl+B</p>
-</td>
-<td>
-<p>Ctrl+B</p>
-</td>
-<td>
-<p>Ctrl+B</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td>Bold</td>
+<td>Ctrl+B</td>
+<td>Ctrl+B</td>
+<td>Ctrl+B</td>
+<td>Ctrl+B</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Italic</p>
-</td>
-<td>
-<p>Ctrl+I</p>
-</td>
-<td>
-<p>Ctrl+I</p>
-</td>
-<td>
-<p>Ctrl+I</p>
-</td>
-<td>
-<p>Ctrl+I</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Italic</td>
+<td>Ctrl+I</td>
+<td>Ctrl+I</td>
+<td>Ctrl+I</td>
+<td>Ctrl+I</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Underline</p>
-</td>
-<td>
-<p>Ctrl+U</p>
-</td>
-<td>
-<p>Ctrl+U</p>
-</td>
-<td>
-<p>Ctrl+U</p>
-</td>
-<td>
-<p>Ctrl+U</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td>Underline</td>
+<td>Ctrl+U</td>
+<td>Ctrl+U</td>
+<td>Ctrl+U</td>
+<td>Ctrl+U</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToNextChar</a></p>
-</td>
-<td>
-<p>Right</p>
-</td>
-<td>
-<p>Right</p>
-</td>
-<td>
-<p>Right</p>
-</td>
-<td>
-<p>Right</p>
-</td>
-<td>
-<p>Right</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToNextChar</a></td>
+<td>Right</td>
+<td>Right</td>
+<td>Right</td>
+<td>Right</td>
+<td>Right</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToPreviousChar</a></p>
-</td>
-<td>
-<p>Left</p>
-</td>
-<td>
-<p>Left</p>
-</td>
-<td>
-<p>Left</p>
-</td>
-<td>
-<p>Left</p>
-</td>
-<td>
-<p>Left</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToPreviousChar</a></td>
+<td>Left</td>
+<td>Left</td>
+<td>Left</td>
+<td>Left</td>
+<td>Left</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToNextWord</a></p>
-</td>
-<td>
-<p>Ctrl+Right</p>
-</td>
-<td>
-<p>Alt+Right</p>
-</td>
-<td>
-<p>Ctrl+Right</p>
-</td>
-<td>
-<p>Ctrl+Right</p>
-</td>
-<td>
-<p>Ctrl+Right</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToNextWord</a></td>
+<td>Ctrl+Right</td>
+<td>Alt+Right</td>
+<td>Ctrl+Right</td>
+<td>Ctrl+Right</td>
+<td>Ctrl+Right</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToPreviousWord</a></p>
-</td>
-<td>
-<p>Ctrl+Left</p>
-</td>
-<td>
-<p>Alt+Left</p>
-</td>
-<td>
-<p>Ctrl+Left</p>
-</td>
-<td>
-<p>Ctrl+Left</p>
-</td>
-<td>
-<p>Ctrl+Left</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToPreviousWord</a></td>
+<td>Ctrl+Left</td>
+<td>Alt+Left</td>
+<td>Ctrl+Left</td>
+<td>Ctrl+Left</td>
+<td>Ctrl+Left</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToNextLine</a></p>
-</td>
-<td>
-<p>Down</p>
-</td>
-<td>
-<p>Down</p>
-</td>
-<td>
-<p>Down</p>
-</td>
-<td>
-<p>Down</p>
-</td>
-<td>
-<p>Down</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToNextLine</a></td>
+<td>Down</td>
+<td>Down</td>
+<td>Down</td>
+<td>Down</td>
+<td>Down</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToPreviousLine</a></p>
-</td>
-<td>
-<p>Up</p>
-</td>
-<td>
-<p>Up</p>
-</td>
-<td>
-<p>Up</p>
-</td>
-<td>
-<p>Up</p>
-</td>
-<td>
-<p>Up</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToPreviousLine</a></td>
+<td>Up</td>
+<td>Up</td>
+<td>Up</td>
+<td>Up</td>
+<td>Up</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToNextPage</a></p>
-</td>
-<td>
-<p>PgDown</p>
-</td>
-<td>
-<p>PgDown, Alt+PgDown, Meta+Down, Meta+PgDown</p>
-</td>
-<td>
-<p>PgDown</p>
-</td>
-<td>
-<p>PgDown</p>
-</td>
-<td>
-<p>PgDown</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToNextPage</a></td>
+<td>PgDown</td>
+<td>PgDown, Alt+PgDown, Meta+Down, Meta+PgDown</td>
+<td>PgDown</td>
+<td>PgDown</td>
+<td>PgDown</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToPreviousPage</a></p>
-</td>
-<td>
-<p>PgUp</p>
-</td>
-<td>
-<p>PgUp, Alt+PgUp, Meta+Up, Meta+PgUp</p>
-</td>
-<td>
-<p>PgUp</p>
-</td>
-<td>
-<p>PgUp</p>
-</td>
-<td>
-<p>PgUp</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToPreviousPage</a></td>
+<td>PgUp</td>
+<td>PgUp, Alt+PgUp, Meta+Up, Meta+PgUp</td>
+<td>PgUp</td>
+<td>PgUp</td>
+<td>PgUp</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToStartOfLine</a></p>
-</td>
-<td>
-<p>Home</p>
-</td>
-<td>
-<p>Ctrl+Left, Meta+Left</p>
-</td>
-<td>
-<p>Home</p>
-</td>
-<td>
-<p>Home</p>
-</td>
-<td>
-<p>Home</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToStartOfLine</a></td>
+<td>Home</td>
+<td>Ctrl+Left, Meta+Left</td>
+<td>Home</td>
+<td>Home</td>
+<td>Home</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToEndOfLine</a></p>
-</td>
-<td>
-<p>End</p>
-</td>
-<td>
-<p>Ctrl+Right, Meta+Right</p>
-</td>
-<td>
-<p>End</p>
-</td>
-<td>
-<p>End</p>
-</td>
-<td>
-<p>End</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToEndOfLine</a></td>
+<td>End</td>
+<td>Ctrl+Right, Meta+Right</td>
+<td>End</td>
+<td>End</td>
+<td>End</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToStartOfBlock</a></p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>Alt+Up, Meta+A</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToStartOfBlock</a></td>
+<td>(none)</td>
+<td>Alt+Up, Meta+A</td>
+<td>(none)</td>
+<td>(none)</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToEndOfBlock</a></p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>Alt+Down, Meta+E</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToEndOfBlock</a></td>
+<td>(none)</td>
+<td>Alt+Down, Meta+E</td>
+<td>(none)</td>
+<td>(none)</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToStartOfDocument</a></p>
-</td>
-<td>
-<p>Ctrl+Home</p>
-</td>
-<td>
-<p>Ctrl+Up, Home</p>
-</td>
-<td>
-<p>Ctrl+Home</p>
-</td>
-<td>
-<p>Ctrl+Home</p>
-</td>
-<td>
-<p>Ctrl+Home</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToStartOfDocument</a></td>
+<td>Ctrl+Home</td>
+<td>Ctrl+Up, Home</td>
+<td>Ctrl+Home</td>
+<td>Ctrl+Home</td>
+<td>Ctrl+Home</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">MoveToEndOfDocument</a></p>
-</td>
-<td>
-<p>Ctrl+End</p>
-</td>
-<td>
-<p>Ctrl+Down, End</p>
-</td>
-<td>
-<p>Ctrl+End</p>
-</td>
-<td>
-<p>Ctrl+End</p>
-</td>
-<td>
-<p>Ctrl+End</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">MoveToEndOfDocument</a></td>
+<td>Ctrl+End</td>
+<td>Ctrl+Down, End</td>
+<td>Ctrl+End</td>
+<td>Ctrl+End</td>
+<td>Ctrl+End</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectNextChar</a></p>
-</td>
-<td>
-<p>Shift+Right</p>
-</td>
-<td>
-<p>Shift+Right</p>
-</td>
-<td>
-<p>Shift+Right</p>
-</td>
-<td>
-<p>Shift+Right</p>
-</td>
-<td>
-<p>Shift+Right</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectNextChar</a></td>
+<td>Shift+Right</td>
+<td>Shift+Right</td>
+<td>Shift+Right</td>
+<td>Shift+Right</td>
+<td>Shift+Right</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectPreviousChar</a></p>
-</td>
-<td>
-<p>Shift+Left</p>
-</td>
-<td>
-<p>Shift+Left</p>
-</td>
-<td>
-<p>Shift+Left</p>
-</td>
-<td>
-<p>Shift+Left</p>
-</td>
-<td>
-<p>Shift+Left</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectPreviousChar</a></td>
+<td>Shift+Left</td>
+<td>Shift+Left</td>
+<td>Shift+Left</td>
+<td>Shift+Left</td>
+<td>Shift+Left</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectNextWord</a></p>
-</td>
-<td>
-<p>Ctrl+Shift+Right</p>
-</td>
-<td>
-<p>Alt+Shift+Right</p>
-</td>
-<td>
-<p>Ctrl+Shift+Right</p>
-</td>
-<td>
-<p>Ctrl+Shift+Right</p>
-</td>
-<td>
-<p>Ctrl+Shift+Right</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectNextWord</a></td>
+<td>Ctrl+Shift+Right</td>
+<td>Alt+Shift+Right</td>
+<td>Ctrl+Shift+Right</td>
+<td>Ctrl+Shift+Right</td>
+<td>Ctrl+Shift+Right</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectPreviousWord</a></p>
-</td>
-<td>
-<p>Ctrl+Shift+Left</p>
-</td>
-<td>
-<p>Alt+Shift+Left</p>
-</td>
-<td>
-<p>Ctrl+Shift+Left</p>
-</td>
-<td>
-<p>Ctrl+Shift+Left</p>
-</td>
-<td>
-<p>Ctrl+Shift+Left</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectPreviousWord</a></td>
+<td>Ctrl+Shift+Left</td>
+<td>Alt+Shift+Left</td>
+<td>Ctrl+Shift+Left</td>
+<td>Ctrl+Shift+Left</td>
+<td>Ctrl+Shift+Left</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectNextLine</a></p>
-</td>
-<td>
-<p>Shift+Down</p>
-</td>
-<td>
-<p>Shift+Down</p>
-</td>
-<td>
-<p>Shift+Down</p>
-</td>
-<td>
-<p>Shift+Down</p>
-</td>
-<td>
-<p>Shift+Down</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectNextLine</a></td>
+<td>Shift+Down</td>
+<td>Shift+Down</td>
+<td>Shift+Down</td>
+<td>Shift+Down</td>
+<td>Shift+Down</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectPreviousLine</a></p>
-</td>
-<td>
-<p>Shift+Up</p>
-</td>
-<td>
-<p>Shift+Up</p>
-</td>
-<td>
-<p>Shift+Up</p>
-</td>
-<td>
-<p>Shift+Up</p>
-</td>
-<td>
-<p>Shift+Up</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectPreviousLine</a></td>
+<td>Shift+Up</td>
+<td>Shift+Up</td>
+<td>Shift+Up</td>
+<td>Shift+Up</td>
+<td>Shift+Up</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectNextPage</a></p>
-</td>
-<td>
-<p>Shift+PgDown</p>
-</td>
-<td>
-<p>Shift+PgDown</p>
-</td>
-<td>
-<p>Shift+PgDown</p>
-</td>
-<td>
-<p>Shift+PgDown</p>
-</td>
-<td>
-<p>Shift+PgDown</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectNextPage</a></td>
+<td>Shift+PgDown</td>
+<td>Shift+PgDown</td>
+<td>Shift+PgDown</td>
+<td>Shift+PgDown</td>
+<td>Shift+PgDown</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectPreviousPage</a></p>
-</td>
-<td>
-<p>Shift+PgUp</p>
-</td>
-<td>
-<p>Shift+PgUp</p>
-</td>
-<td>
-<p>Shift+PgUp</p>
-</td>
-<td>
-<p>Shift+PgUp</p>
-</td>
-<td>
-<p>Shift+PgUp</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectPreviousPage</a></td>
+<td>Shift+PgUp</td>
+<td>Shift+PgUp</td>
+<td>Shift+PgUp</td>
+<td>Shift+PgUp</td>
+<td>Shift+PgUp</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectStartOfLine</a></p>
-</td>
-<td>
-<p>Shift+Home</p>
-</td>
-<td>
-<p>Ctrl+Shift+Left</p>
-</td>
-<td>
-<p>Shift+Home</p>
-</td>
-<td>
-<p>Shift+Home</p>
-</td>
-<td>
-<p>Shift+Home</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectStartOfLine</a></td>
+<td>Shift+Home</td>
+<td>Ctrl+Shift+Left</td>
+<td>Shift+Home</td>
+<td>Shift+Home</td>
+<td>Shift+Home</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectEndOfLine</a></p>
-</td>
-<td>
-<p>Shift+End</p>
-</td>
-<td>
-<p>Ctrl+Shift+Right</p>
-</td>
-<td>
-<p>Shift+End</p>
-</td>
-<td>
-<p>Shift+End</p>
-</td>
-<td>
-<p>Shift+End</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectEndOfLine</a></td>
+<td>Shift+End</td>
+<td>Ctrl+Shift+Right</td>
+<td>Shift+End</td>
+<td>Shift+End</td>
+<td>Shift+End</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectStartOfBlock</a></p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>Alt+Shift+Up, Meta+Shift+A</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectStartOfBlock</a></td>
+<td>(none)</td>
+<td>Alt+Shift+Up, Meta+Shift+A</td>
+<td>(none)</td>
+<td>(none)</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectEndOfBlock</a></p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>Alt+Shift+Down, Meta+Shift+E</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectEndOfBlock</a></td>
+<td>(none)</td>
+<td>Alt+Shift+Down, Meta+Shift+E</td>
+<td>(none)</td>
+<td>(none)</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectStartOfDocument</a></p>
-</td>
-<td>
-<p>Ctrl+Shift+Home</p>
-</td>
-<td>
-<p>Ctrl+Shift+Up, Shift+Home</p>
-</td>
-<td>
-<p>Ctrl+Shift+Home</p>
-</td>
-<td>
-<p>Ctrl+Shift+Home</p>
-</td>
-<td>
-<p>Ctrl+Shift+Home</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectStartOfDocument</a></td>
+<td>Ctrl+Shift+Home</td>
+<td>Ctrl+Shift+Up, Shift+Home</td>
+<td>Ctrl+Shift+Home</td>
+<td>Ctrl+Shift+Home</td>
+<td>Ctrl+Shift+Home</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">SelectEndOfDocument</a></p>
-</td>
-<td>
-<p>Ctrl+Shift+End</p>
-</td>
-<td>
-<p>Ctrl+Shift+Down, Shift+End</p>
-</td>
-<td>
-<p>Ctrl+Shift+End</p>
-</td>
-<td>
-<p>Ctrl+Shift+End</p>
-</td>
-<td>
-<p>Ctrl+Shift+End</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">SelectEndOfDocument</a></td>
+<td>Ctrl+Shift+End</td>
+<td>Ctrl+Shift+Down, Shift+End</td>
+<td>Ctrl+Shift+End</td>
+<td>Ctrl+Shift+End</td>
+<td>Ctrl+Shift+End</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">DeleteStartOfWord</a></p>
-</td>
-<td>
-<p>Ctrl+Backspace</p>
-</td>
-<td>
-<p>Alt+Backspace</p>
-</td>
-<td>
-<p>Ctrl+Backspace</p>
-</td>
-<td>
-<p>Ctrl+Backspace</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">DeleteStartOfWord</a></td>
+<td>Ctrl+Backspace</td>
+<td>Alt+Backspace</td>
+<td>Ctrl+Backspace</td>
+<td>Ctrl+Backspace</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">DeleteEndOfWord</a></p>
-</td>
-<td>
-<p>Ctrl+Del</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>Ctrl+Del</p>
-</td>
-<td>
-<p>Ctrl+Del</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">DeleteEndOfWord</a></td>
+<td>Ctrl+Del</td>
+<td>(none)</td>
+<td>Ctrl+Del</td>
+<td>Ctrl+Del</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">DeleteEndOfLine</a></p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
-<td>
-<p>Ctrl+K</p>
-</td>
-<td>
-<p>Ctrl+K</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">DeleteEndOfLine</a></td>
+<td>(none)</td>
+<td>(none)</td>
+<td>Ctrl+K</td>
+<td>Ctrl+K</td>
+<td>(none)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">InsertParagraphSeparator</a></p>
-</td>
-<td>
-<p>Enter</p>
-</td>
-<td>
-<p>Enter</p>
-</td>
-<td>
-<p>Enter</p>
-</td>
-<td>
-<p>Enter</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">InsertParagraphSeparator</a></td>
+<td>Enter</td>
+<td>Enter</td>
+<td>Enter</td>
+<td>Enter</td>
+<td>(none)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qkeysequence.html#StandardKey-enum">InsertLineSeparator</a></p>
-</td>
-<td>
-<p>Shift+Enter</p>
-</td>
-<td>
-<p>Meta+Enter</p>
-</td>
-<td>
-<p>Shift+Enter</p>
-</td>
-<td>
-<p>Shift+Enter</p>
-</td>
-<td>
-<p>(none)</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qkeysequence.html#StandardKey-enum">InsertLineSeparator</a></td>
+<td>Shift+Enter</td>
+<td>Meta+Enter</td>
+<td>Shift+Enter</td>
+<td>Shift+Enter</td>
+<td>(none)</td>
 </tr>
 </table>
 <p>Note that, since the key sequences used for the standard
@@ -1441,22 +673,22 @@ constructor, or by passing a human-readable string of
 comma-separated key sequences.</p>
 <p>For example, the key sequence, <b>Ctrl X</b> followed by <b>Ctrl
 C</b>, can be specified using either of the following ways:</p>
-<pre class="highlightedCode brush: cpp">
- QKeySequence(tr("Ctrl+X, Ctrl+C"));
- QKeySequence(Qt.CTRL + Qt.Key_X, Qt.CTRL + Qt.Key_C);
+<pre class="cpp">
+ <span class="type">QKeySequence</span>(tr(<span class="string">"Ctrl+X, Ctrl+C"</span>));
+ <span class="type">QKeySequence</span>(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>CTRL <span class="operator">+</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>Key_X<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>CTRL <span class="operator">+</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>Key_C);
 </pre>
 <p><b>Warning:</b> A <a href="qapplication.html">QApplication</a>
 instance must have been constructed before a QKeySequence is
 created; otherwise, your application may crash.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="SequenceFormat-enum" />QKeySequence.SequenceFormat</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.NativeText</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The key sequence as a platform specific
 string. This means that it will be shown translated and on the Mac
 it will resemble a key sequence from the menu bar. This enum is
@@ -1464,7 +696,7 @@ best used when you want to display the string to the user.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.PortableText</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The key sequence is given in a "portable"
 format, suitable for reading and writing to a file. In many cases,
 it will look similar to the native text on Windows and X11.</td>
@@ -1473,26 +705,26 @@ it will look similar to the native text on Windows and X11.</td>
 
 
 <h3 class="fn"><a name="SequenceMatch-enum" />QKeySequence.SequenceMatch</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.NoMatch</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The key sequences are different; not even
 partially matching.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.PartialMatch</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The key sequences match partially, but are not
 the same.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.ExactMatch</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The key sequences are the same.</td>
 </tr>
 </table>
@@ -1503,351 +735,351 @@ assign platform dependent keyboard shortcuts to a <a href="qaction.html">QAction
 <p>Note that the key bindings are platform dependent. The currently
 bound shortcuts can be queried using <a href="qkeysequence.html#keyBindings">keyBindings</a>().</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.AddTab</tt></td>
-<td class=" topAlign"><tt>19</tt></td>
+<td class="topAlign"><tt>19</tt></td>
 <td class="topAlign">Add new tab.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Back</tt></td>
-<td class=" topAlign"><tt>13</tt></td>
+<td class="topAlign"><tt>13</tt></td>
 <td class="topAlign">Navigate back.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Bold</tt></td>
-<td class=" topAlign"><tt>27</tt></td>
+<td class="topAlign"><tt>27</tt></td>
 <td class="topAlign">Bold text.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Close</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Close document/tab.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Copy</tt></td>
-<td class=" topAlign"><tt>9</tt></td>
+<td class="topAlign"><tt>9</tt></td>
 <td class="topAlign">Copy.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Cut</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">Cut.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Delete</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">Delete.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.DeleteEndOfLine</tt></td>
-<td class=" topAlign"><tt>60</tt></td>
+<td class="topAlign"><tt>60</tt></td>
 <td class="topAlign">Delete end of line.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.DeleteEndOfWord</tt></td>
-<td class=" topAlign"><tt>59</tt></td>
+<td class="topAlign"><tt>59</tt></td>
 <td class="topAlign">Delete word from the end of the cursor.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.DeleteStartOfWord</tt></td>
-<td class=" topAlign"><tt>58</tt></td>
+<td class="topAlign"><tt>58</tt></td>
 <td class="topAlign">Delete the beginning of a word up to the
 cursor.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Find</tt></td>
-<td class=" topAlign"><tt>22</tt></td>
+<td class="topAlign"><tt>22</tt></td>
 <td class="topAlign">Find in document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.FindNext</tt></td>
-<td class=" topAlign"><tt>23</tt></td>
+<td class="topAlign"><tt>23</tt></td>
 <td class="topAlign">Find next result.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.FindPrevious</tt></td>
-<td class=" topAlign"><tt>24</tt></td>
+<td class="topAlign"><tt>24</tt></td>
 <td class="topAlign">Find previous result.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Forward</tt></td>
-<td class=" topAlign"><tt>14</tt></td>
+<td class="topAlign"><tt>14</tt></td>
 <td class="topAlign">Navigate forward.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.HelpContents</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Open help contents.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QKeySequence.InsertLineSeparator</tt></td>
-<td class=" topAlign"><tt>62</tt></td>
+<td class="topAlign"><tt>62</tt></td>
 <td class="topAlign">Insert a new line.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QKeySequence.InsertParagraphSeparator</tt></td>
-<td class=" topAlign"><tt>61</tt></td>
+<td class="topAlign"><tt>61</tt></td>
 <td class="topAlign">Insert a new paragraph.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Italic</tt></td>
-<td class=" topAlign"><tt>28</tt></td>
+<td class="topAlign"><tt>28</tt></td>
 <td class="topAlign">Italic text.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToEndOfBlock</tt></td>
-<td class=" topAlign"><tt>41</tt></td>
+<td class="topAlign"><tt>41</tt></td>
 <td class="topAlign">Move cursor to end of block. This shortcut is
 only used on the OS X.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QKeySequence.MoveToEndOfDocument</tt></td>
-<td class=" topAlign"><tt>43</tt></td>
+<td class="topAlign"><tt>43</tt></td>
 <td class="topAlign">Move cursor to end of document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToEndOfLine</tt></td>
-<td class=" topAlign"><tt>39</tt></td>
+<td class="topAlign"><tt>39</tt></td>
 <td class="topAlign">Move cursor to end of line.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToNextChar</tt></td>
-<td class=" topAlign"><tt>30</tt></td>
+<td class="topAlign"><tt>30</tt></td>
 <td class="topAlign">Move cursor to next character.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToNextLine</tt></td>
-<td class=" topAlign"><tt>34</tt></td>
+<td class="topAlign"><tt>34</tt></td>
 <td class="topAlign">Move cursor to next line.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToNextPage</tt></td>
-<td class=" topAlign"><tt>36</tt></td>
+<td class="topAlign"><tt>36</tt></td>
 <td class="topAlign">Move cursor to next page.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToNextWord</tt></td>
-<td class=" topAlign"><tt>32</tt></td>
+<td class="topAlign"><tt>32</tt></td>
 <td class="topAlign">Move cursor to next word.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToPreviousChar</tt></td>
-<td class=" topAlign"><tt>31</tt></td>
+<td class="topAlign"><tt>31</tt></td>
 <td class="topAlign">Move cursor to previous character.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToPreviousLine</tt></td>
-<td class=" topAlign"><tt>35</tt></td>
+<td class="topAlign"><tt>35</tt></td>
 <td class="topAlign">Move cursor to previous line.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToPreviousPage</tt></td>
-<td class=" topAlign"><tt>37</tt></td>
+<td class="topAlign"><tt>37</tt></td>
 <td class="topAlign">Move cursor to previous page.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToPreviousWord</tt></td>
-<td class=" topAlign"><tt>33</tt></td>
+<td class="topAlign"><tt>33</tt></td>
 <td class="topAlign">Move cursor to previous word.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToStartOfBlock</tt></td>
-<td class=" topAlign"><tt>40</tt></td>
+<td class="topAlign"><tt>40</tt></td>
 <td class="topAlign">Move cursor to start of a block. This shortcut
 is only used on OS X.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QKeySequence.MoveToStartOfDocument</tt></td>
-<td class=" topAlign"><tt>42</tt></td>
+<td class="topAlign"><tt>42</tt></td>
 <td class="topAlign">Move cursor to start of document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.MoveToStartOfLine</tt></td>
-<td class=" topAlign"><tt>38</tt></td>
+<td class="topAlign"><tt>38</tt></td>
 <td class="topAlign">Move cursor to start of line.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.New</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">Create new document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.NextChild</tt></td>
-<td class=" topAlign"><tt>20</tt></td>
+<td class="topAlign"><tt>20</tt></td>
 <td class="topAlign">Navigate to next tab or child window.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Open</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Open document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Paste</tt></td>
-<td class=" topAlign"><tt>10</tt></td>
+<td class="topAlign"><tt>10</tt></td>
 <td class="topAlign">Paste.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Preferences</tt></td>
-<td class=" topAlign"><tt>64</tt></td>
+<td class="topAlign"><tt>64</tt></td>
 <td class="topAlign">Open the preferences dialog.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.PreviousChild</tt></td>
-<td class=" topAlign"><tt>21</tt></td>
+<td class="topAlign"><tt>21</tt></td>
 <td class="topAlign">Navigate to previous tab or child window.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Print</tt></td>
-<td class=" topAlign"><tt>18</tt></td>
+<td class="topAlign"><tt>18</tt></td>
 <td class="topAlign">Print document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Quit</tt></td>
-<td class=" topAlign"><tt>65</tt></td>
+<td class="topAlign"><tt>65</tt></td>
 <td class="topAlign">Quit the application.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Redo</tt></td>
-<td class=" topAlign"><tt>12</tt></td>
+<td class="topAlign"><tt>12</tt></td>
 <td class="topAlign">Redo.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Refresh</tt></td>
-<td class=" topAlign"><tt>15</tt></td>
+<td class="topAlign"><tt>15</tt></td>
 <td class="topAlign">Refresh or reload current document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Replace</tt></td>
-<td class=" topAlign"><tt>25</tt></td>
+<td class="topAlign"><tt>25</tt></td>
 <td class="topAlign">Find and replace.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SaveAs</tt></td>
-<td class=" topAlign"><tt>63</tt></td>
+<td class="topAlign"><tt>63</tt></td>
 <td class="topAlign">Save document after prompting the user for a
 file name.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Save</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">Save document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectAll</tt></td>
-<td class=" topAlign"><tt>26</tt></td>
+<td class="topAlign"><tt>26</tt></td>
 <td class="topAlign">Select all text.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectEndOfBlock</tt></td>
-<td class=" topAlign"><tt>55</tt></td>
+<td class="topAlign"><tt>55</tt></td>
 <td class="topAlign">Extend selection to the end of a text block.
 This shortcut is only used on OS X.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QKeySequence.SelectEndOfDocument</tt></td>
-<td class=" topAlign"><tt>57</tt></td>
+<td class="topAlign"><tt>57</tt></td>
 <td class="topAlign">Extend selection to end of document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectEndOfLine</tt></td>
-<td class=" topAlign"><tt>53</tt></td>
+<td class="topAlign"><tt>53</tt></td>
 <td class="topAlign">Extend selection to end of line.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectNextChar</tt></td>
-<td class=" topAlign"><tt>44</tt></td>
+<td class="topAlign"><tt>44</tt></td>
 <td class="topAlign">Extend selection to next character.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectNextLine</tt></td>
-<td class=" topAlign"><tt>48</tt></td>
+<td class="topAlign"><tt>48</tt></td>
 <td class="topAlign">Extend selection to next line.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectNextPage</tt></td>
-<td class=" topAlign"><tt>50</tt></td>
+<td class="topAlign"><tt>50</tt></td>
 <td class="topAlign">Extend selection to next page.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectNextWord</tt></td>
-<td class=" topAlign"><tt>46</tt></td>
+<td class="topAlign"><tt>46</tt></td>
 <td class="topAlign">Extend selection to next word.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectPreviousChar</tt></td>
-<td class=" topAlign"><tt>45</tt></td>
+<td class="topAlign"><tt>45</tt></td>
 <td class="topAlign">Extend selection to previous character.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectPreviousLine</tt></td>
-<td class=" topAlign"><tt>49</tt></td>
+<td class="topAlign"><tt>49</tt></td>
 <td class="topAlign">Extend selection to previous line.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectPreviousPage</tt></td>
-<td class=" topAlign"><tt>51</tt></td>
+<td class="topAlign"><tt>51</tt></td>
 <td class="topAlign">Extend selection to previous page.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectPreviousWord</tt></td>
-<td class=" topAlign"><tt>47</tt></td>
+<td class="topAlign"><tt>47</tt></td>
 <td class="topAlign">Extend selection to previous word.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectStartOfBlock</tt></td>
-<td class=" topAlign"><tt>54</tt></td>
+<td class="topAlign"><tt>54</tt></td>
 <td class="topAlign">Extend selection to the start of a text block.
 This shortcut is only used on OS X.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QKeySequence.SelectStartOfDocument</tt></td>
-<td class=" topAlign"><tt>56</tt></td>
+<td class="topAlign"><tt>56</tt></td>
 <td class="topAlign">Extend selection to start of document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.SelectStartOfLine</tt></td>
-<td class=" topAlign"><tt>52</tt></td>
+<td class="topAlign"><tt>52</tt></td>
 <td class="topAlign">Extend selection to start of line.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Underline</tt></td>
-<td class=" topAlign"><tt>29</tt></td>
+<td class="topAlign"><tt>29</tt></td>
 <td class="topAlign">Underline text.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.Undo</tt></td>
-<td class=" topAlign"><tt>11</tt></td>
+<td class="topAlign"><tt>11</tt></td>
 <td class="topAlign">Undo.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.UnknownKey</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Unbound key.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.WhatsThis</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Activate whats this.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.ZoomIn</tt></td>
-<td class=" topAlign"><tt>16</tt></td>
+<td class="topAlign"><tt>16</tt></td>
 <td class="topAlign">Zoom in.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QKeySequence.ZoomOut</tt></td>
-<td class=" topAlign"><tt>17</tt></td>
+<td class="topAlign"><tt>17</tt></td>
 <td class="topAlign">Zoom out.</td>
 </tr>
 </table>
@@ -1865,10 +1097,10 @@ commas, e.g. "Alt+X,Ctrl+S,Q".</p>
 <p><i>key</i> should be in <a href="qkeysequence.html#SequenceFormat-enum">NativeText</a> format.</p>
 <p>This constructor is typically used with <a href="qobject.html#tr">tr</a>(), so that shortcut keys can be replaced
 in translations:</p>
-<pre class="highlightedCode brush: cpp">
- QMenu *file = new QMenu(this);
- file-&gt;addAction(tr("&amp;Open..."), this, SLOT(open()),
-                   QKeySequence(tr("Ctrl+O", "File|Open")));
+<pre class="cpp">
+ <span class="type"><a href="qmenu.html">QMenu</a></span> <span class="operator">*</span>file <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qmenu.html">QMenu</a></span>(<span class="keyword">this</span>);
+ file<span class="operator">-</span><span class="operator">&gt;</span>addAction(tr(<span class="string">"&amp;Open..."</span>)<span class="operator">,</span> <span class="keyword">this</span><span class="operator">,</span> SLOT(open())<span class="operator">,</span>
+                   <span class="type"><a href="qkeysequence.html">QKeySequence</a></span>(tr(<span class="string">"Ctrl+O"</span><span class="operator">,</span> <span class="string">"File|Open"</span>)));
 </pre>
 <p>Note the "File|Open" translator comment. It is by no means
 necessary, but it provides some context for the human
@@ -1877,7 +1109,7 @@ translator.</p>
 
 <h3 class="fn"><a name="QKeySequence-3" />QKeySequence.__init__ (<i>self</i>, QString&#160;<i>key</i>, <a href="qkeysequence.html#SequenceFormat-enum">SequenceFormat</a>&#160;<i>format</i>)</h3><p>Creates a key sequence from the <i>key</i> string based on
 <i>format</i>.</p>
-<p>This function was introduced in Qt 4.x.</p>
+<p>This function was introduced in Qt 4.7.</p>
 
 
 <h3 class="fn"><a name="QKeySequence-4" />QKeySequence.__init__ (<i>self</i>, int&#160;<i>k1</i>, int&#160;<i>key2</i>&#160;=&#160;0, int&#160;<i>key3</i>&#160;=&#160;0, int&#160;<i>key4</i>&#160;=&#160;0)</h3><p>Constructs a key sequence with up to 4 keys <i>k1</i>,
@@ -1897,7 +1129,7 @@ translator.</p>
 <h3 class="fn"><a name="fromString" /><a href="qkeysequence.html">QKeySequence</a> QKeySequence.fromString (QString&#160;<i>str</i>, <a href="qkeysequence.html#SequenceFormat-enum">SequenceFormat</a>&#160;<i>format</i>&#160;=&#160;QKeySequence.PortableText)</h3><p>Return a <a href="qkeysequence.html">QKeySequence</a> from the
 string <i>str</i> based on <i>format</i>.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qkeysequence.html#toString">toString</a>().</p>
+<p><b>See also</b> <a href="qkeysequence.html#toString">toString</a>().</p>
 
 
 <h3 class="fn"><a name="isDetached" />bool QKeySequence.isDetached (<i>self</i>)</h3><h3 class="fn"><a name="isEmpty" />bool QKeySequence.isEmpty (<i>self</i>)</h3><p>Returns true if the key sequence is empty; otherwise returns
@@ -1930,7 +1162,7 @@ found.</p>
 mnemonics</a> in English. At the time of writing, Microsoft and
 Open Group do not appear to have issued equivalent recommendations
 for other languages.</p>
-<p>See also <a href="qtcore.html#qt_set_sequence_auto_mnemonic">qt_set_sequence_auto_mnemonic</a>().</p>
+<p><b>See also</b> <a href="qtcore.html#qt_set_sequence_auto_mnemonic">qt_set_sequence_auto_mnemonic</a>().</p>
 
 
 <h3 class="fn"><a name="toString" />QString QKeySequence.toString (<i>self</i>, <a href="qkeysequence.html#SequenceFormat-enum">SequenceFormat</a>&#160;<i>format</i>&#160;=&#160;QKeySequence.PortableText)</h3><p>Return a string representation of the key sequence, based on
@@ -1944,7 +1176,7 @@ returned.</p>
 <p>On Mac OS X, the string returned resembles the sequence that is
 shown in the menu bar.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qkeysequence.html#fromString">fromString</a>().</p>
+<p><b>See also</b> <a href="qkeysequence.html#fromString">fromString</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QKeySequence.__eq__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ge__" />bool QKeySequence.__ge__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__getitem__" />int QKeySequence.__getitem__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__gt__" />bool QKeySequence.__gt__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__int__" />int QKeySequence.__int__ (<i>self</i>)</h3><h3 class="fn"><a name="__le__" />bool QKeySequence.__le__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__len__" /> QKeySequence.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__lt__" />bool QKeySequence.__lt__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>ks</i>)</h3><h3 class="fn"><a name="__ne__" />bool QKeySequence.__ne__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QKeySequence.__eq__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ge__" />bool QKeySequence.__ge__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__getitem__" />int QKeySequence.__getitem__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__gt__" />bool QKeySequence.__gt__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__int__" />int QKeySequence.__int__ (<i>self</i>)</h3><h3 class="fn"><a name="__le__" />bool QKeySequence.__le__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__len__" /> QKeySequence.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__lt__" />bool QKeySequence.__lt__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>ks</i>)</h3><h3 class="fn"><a name="__ne__" />bool QKeySequence.__ne__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

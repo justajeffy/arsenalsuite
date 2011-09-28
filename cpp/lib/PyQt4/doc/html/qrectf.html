@@ -19,9 +19,9 @@ rendering.</p>
 height integers, or from a <a href="qpoint.html">QPoint</a> and a
 <a href="qsize.html">QSize</a>. The following code creates two
 identical rectangles.</p>
-<pre class="highlightedCode brush: cpp">
- QRectF r1(100, 200, 11, 16);
- QRectF r2(QPoint(100, 200), QSize(11, 16));
+<pre class="cpp">
+ <span class="type">QRectF</span> r1(<span class="number">100</span><span class="operator">,</span> <span class="number">200</span><span class="operator">,</span> <span class="number">11</span><span class="operator">,</span> <span class="number">16</span>);
+ <span class="type">QRectF</span> r2(<span class="type"><a href="qpoint.html">QPoint</a></span>(<span class="number">100</span><span class="operator">,</span> <span class="number">200</span>)<span class="operator">,</span> <span class="type"><a href="qsize.html">QSize</a></span>(<span class="number">11</span><span class="operator">,</span> <span class="number">16</span>));
 </pre>
 <p>There is also a third constructor creating a QRectF from a
 <a href="qrect.html">QRect</a>, and a corresponding <a href="qrectf.html#toRect">toRect</a>() function that returns a <a href="qrect.html">QRect</a> object based on the values of this rectangle
@@ -51,21 +51,13 @@ false). The QRectF class also provides the <a href="qrectf.html#intersected">int
 the intersection rectangle, and the <a href="qrectf.html#united">united</a>() function which returns the
 rectangle that encloses the given rectangle and this:</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/qrect-intersect.png" /></p>
-</td>
-<td>
-<p><img src="images/qrect-unite.png" /></p>
-</td>
+<tr class="odd" valign="top">
+<td><img src="images/qrect-intersect.png" /></td>
+<td><img src="images/qrect-unite.png" /></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qrectf.html#intersected">intersected</a>()</p>
-</td>
-<td>
-<p><a href="qrectf.html#united">united</a>()</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qrectf.html#intersected">intersected</a>()</td>
+<td><a href="qrectf.html#united">united</a>()</td>
 </tr>
 </table>
 <p>The <a href="qrectf.html#isEmpty">isEmpty</a>() function returns
@@ -93,37 +85,21 @@ rendering with a pen with an odd number of pixels, the spare pixel
 will be rendered to the right and below the mathematical rectangle
 as in the one pixel case.</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/qrect-diagram-zero.png" /></p>
-</td>
-<td>
-<p><img src="images/qrectf-diagram-one.png" /></p>
-</td>
+<tr class="odd" valign="top">
+<td><img src="images/qrect-diagram-zero.png" /></td>
+<td><img src="images/qrectf-diagram-one.png" /></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Logical representation</p>
-</td>
-<td>
-<p>One pixel wide pen</p>
-</td>
+<tr class="even" valign="top">
+<td>Logical representation</td>
+<td>One pixel wide pen</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><img src="images/qrectf-diagram-two.png" /></p>
-</td>
-<td>
-<p><img src="images/qrectf-diagram-three.png" /></p>
-</td>
+<tr class="odd" valign="top">
+<td><img src="images/qrectf-diagram-two.png" /></td>
+<td><img src="images/qrectf-diagram-three.png" /></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Two pixel wide pen</p>
-</td>
-<td>
-<p>Three pixel wide pen</p>
-</td>
+<tr class="even" valign="top">
+<td>Two pixel wide pen</td>
+<td>Three pixel wide pen</td>
 </tr>
 </table>
 <a id="coordinates" name="coordinates" />
@@ -153,64 +129,62 @@ extracts the rectangle's top-left corner, width and height. Use the
 <a href="qrectf.html#setCoords">setCoords</a>() and <a href="qrectf.html#setRect">setRect</a>() function to manipulate the
 rectangle's coordinates and dimensions in one go.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QRectF" />QRectF.__init__ (<i>self</i>)</h3><p>Constructs a null rectangle.</p>
-<p>See also <a href="qrectf.html#isNull">isNull</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#isNull">isNull</a>().</p>
 
 
 <h3 class="fn"><a name="QRectF-2" />QRectF.__init__ (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>atopLeft</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>asize</i>)</h3><p>Constructs a rectangle with the given <i>topLeft</i> corner and
 the given <i>size</i>.</p>
-<p>See also <a href="qrectf.html#setTopLeft">setTopLeft</a>() and
-<a href="qrectf.html#setSize">setSize</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setTopLeft">setTopLeft</a>() and <a href="qrectf.html#setSize">setSize</a>().</p>
 
 
 <h3 class="fn"><a name="QRectF-3" />QRectF.__init__ (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>atopLeft</i>, <a href="qpointf.html">QPointF</a>&#160;<i>abottomRight</i>)</h3><p>Constructs a rectangle with the given <i>topLeft</i> and
 <i>bottomRight</i> corners.</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qrectf.html#setTopLeft">setTopLeft</a>() and
-<a href="qrectf.html#setBottomRight">setBottomRight</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setTopLeft">setTopLeft</a>() and <a href="qrectf.html#setBottomRight">setBottomRight</a>().</p>
 
 
 <h3 class="fn"><a name="QRectF-4" />QRectF.__init__ (<i>self</i>, float&#160;<i>aleft</i>, float&#160;<i>atop</i>, float&#160;<i>awidth</i>, float&#160;<i>aheight</i>)</h3><p>Constructs a rectangle with (<i>x</i>, <i>y</i>) as its top-left
 corner and the given <i>width</i> and <i>height</i>.</p>
-<p>See also <a href="qrectf.html#setRect">setRect</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setRect">setRect</a>().</p>
 
 
 <h3 class="fn"><a name="QRectF-5" />QRectF.__init__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><p>Constructs a <a href="qrectf.html">QRectF</a> rectangle from the
 given <a href="qrect.html">QRect</a> <i>rectangle</i>.</p>
-<p>See also <a href="qrectf.html#toRect">toRect</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#toRect">toRect</a>().</p>
 
 
 <h3 class="fn"><a name="QRectF-6" />QRectF.__init__ (<i>self</i>, <a href="qrectf.html">QRectF</a>)</h3><h3 class="fn"><a name="adjust" />QRectF.adjust (<i>self</i>, float&#160;<i>xp1</i>, float&#160;<i>yp1</i>, float&#160;<i>xp2</i>, float&#160;<i>yp2</i>)</h3><p>Adds <i>dx1</i>, <i>dy1</i>, <i>dx2</i> and <i>dy2</i>
 respectively to the existing coordinates of the rectangle.</p>
-<p>See also <a href="qrectf.html#adjusted">adjusted</a>() and
-<a href="qrectf.html#setRect">setRect</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#adjusted">adjusted</a>()
+and <a href="qrectf.html#setRect">setRect</a>().</p>
 
 
 <h3 class="fn"><a name="adjusted" /><a href="qrectf.html">QRectF</a> QRectF.adjusted (<i>self</i>, float&#160;<i>xp1</i>, float&#160;<i>yp1</i>, float&#160;<i>xp2</i>, float&#160;<i>yp2</i>)</h3><p>Returns a new rectangle with <i>dx1</i>, <i>dy1</i>, <i>dx2</i>
 and <i>dy2</i> added respectively to the existing coordinates of
 this rectangle.</p>
-<p>See also <a href="qrectf.html#adjust">adjust</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#adjust">adjust</a>().</p>
 
 
 <h3 class="fn"><a name="bottom" />float QRectF.bottom (<i>self</i>)</h3><p>Returns the y-coordinate of the rectangle's bottom edge.</p>
-<p>See also <a href="qrectf.html#setBottom">setBottom</a>(),
+<p><b>See also</b> <a href="qrectf.html#setBottom">setBottom</a>(),
 <a href="qrectf.html#bottomLeft">bottomLeft</a>(), and <a href="qrectf.html#bottomRight">bottomRight</a>().</p>
 
 
 <h3 class="fn"><a name="bottomLeft" /><a href="qpointf.html">QPointF</a> QRectF.bottomLeft (<i>self</i>)</h3><p>Returns the position of the rectangle's bottom-left corner.</p>
-<p>See also <a href="qrectf.html#setBottomLeft">setBottomLeft</a>(), <a href="qrectf.html#bottom">bottom</a>(), and <a href="qrectf.html#left">left</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setBottomLeft">setBottomLeft</a>(), <a href="qrectf.html#bottom">bottom</a>(), and <a href="qrectf.html#left">left</a>().</p>
 
 
 <h3 class="fn"><a name="bottomRight" /><a href="qpointf.html">QPointF</a> QRectF.bottomRight (<i>self</i>)</h3><p>Returns the position of the rectangle's bottom-right corner.</p>
-<p>See also <a href="qrectf.html#setBottomRight">setBottomRight</a>(), <a href="qrectf.html#bottom">bottom</a>(), and <a href="qrectf.html#right">right</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setBottomRight">setBottomRight</a>(), <a href="qrectf.html#bottom">bottom</a>(), and <a href="qrectf.html#right">right</a>().</p>
 
 
 <h3 class="fn"><a name="center" /><a href="qpointf.html">QPointF</a> QRectF.center (<i>self</i>)</h3><p>Returns the center point of the rectangle.</p>
-<p>See also <a href="qrectf.html#moveCenter">moveCenter</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#moveCenter">moveCenter</a>().</p>
 
 
 <h3 class="fn"><a name="contains" />bool QRectF.contains (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Returns true if the given <i>point</i> is inside or on the edge
 of the rectangle; otherwise returns false.</p>
-<p>See also <a href="qrectf.html#intersects">intersects</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#intersects">intersects</a>().</p>
 
 
 <h3 class="fn"><a name="contains-2" />bool QRectF.contains (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><p>This is an overloaded function.</p>
@@ -226,19 +200,19 @@ rectangle; otherwise returns false.</p>
 <h3 class="fn"><a name="getCoords" />(float&#160;<i>xp1</i>, float&#160;<i>yp1</i>, float&#160;<i>xp2</i>, float&#160;<i>yp2</i>) QRectF.getCoords (<i>self</i>)</h3><p>Extracts the position of the rectangle's top-left corner to
 *<i>x1</i> and *<i>y1</i>, and the position of the bottom-right
 corner to *<i>x2</i> and *<i>y2</i>.</p>
-<p>See also <a href="qrectf.html#setCoords">setCoords</a>() and
-<a href="qrectf.html#getRect">getRect</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setCoords">setCoords</a>()
+and <a href="qrectf.html#getRect">getRect</a>().</p>
 
 
 <h3 class="fn"><a name="getRect" />(float&#160;<i>ax</i>, float&#160;<i>ay</i>, float&#160;<i>aaw</i>, float&#160;<i>aah</i>) QRectF.getRect (<i>self</i>)</h3><p>Extracts the position of the rectangle's top-left corner to
 *<i>x</i> and *<i>y</i>, and its dimensions to *<i>width</i> and
 *<i>height</i>.</p>
-<p>See also <a href="qrectf.html#setRect">setRect</a>() and
+<p><b>See also</b> <a href="qrectf.html#setRect">setRect</a>() and
 <a href="qrectf.html#getCoords">getCoords</a>().</p>
 
 
 <h3 class="fn"><a name="height" />float QRectF.height (<i>self</i>)</h3><p>Returns the height of the rectangle.</p>
-<p>See also <a href="qrectf.html#setHeight">setHeight</a>(),
+<p><b>See also</b> <a href="qrectf.html#setHeight">setHeight</a>(),
 <a href="qrectf.html#width">width</a>(), and <a href="qrectf.html#size">size</a>().</p>
 
 
@@ -247,15 +221,14 @@ corner to *<i>x2</i> and *<i>y2</i>.</p>
 to <tt>r &amp; s</tt>.</p>
 <p class="centerAlign"><img src="images/qrect-intersect.png" /></p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qrectf.html#intersects">intersects</a>(),
-<a href="qrectf.html#united">united</a>(), and <a href="qrectf.html#operator-and-eq">operator&amp;=</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#intersects">intersects</a>(), <a href="qrectf.html#united">united</a>(), and <a href="qrectf.html#operator-and-eq">operator&amp;=</a>().</p>
 
 
 <h3 class="fn"><a name="intersects" />bool QRectF.intersects (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><p>Returns true if this rectangle intersects with the given
 <i>rectangle</i> (i.e. there is a non-empty area of overlap between
 them), otherwise returns false.</p>
 <p>The intersection rectangle can be retrieved using the <a href="qrectf.html#intersected">intersected</a>() function.</p>
-<p>See also <a href="qrectf.html#contains">contains</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#contains">contains</a>().</p>
 
 
 <h3 class="fn"><a name="isEmpty" />bool QRectF.isEmpty (<i>self</i>)</h3><p>Returns true if the rectangle is empty, otherwise returns
@@ -265,14 +238,15 @@ false.</p>
 empty rectangle is not valid (i.e., isEmpty() == !<a href="qrectf.html#isValid">isValid</a>()).</p>
 <p>Use the <a href="qrectf.html#normalized">normalized</a>()
 function to retrieve a rectangle where the corners are swapped.</p>
-<p>See also <a href="qrectf.html#isNull">isNull</a>(), <a href="qrectf.html#isValid">isValid</a>(), and <a href="qrectf.html#normalized">normalized</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#isNull">isNull</a>(),
+<a href="qrectf.html#isValid">isValid</a>(), and <a href="qrectf.html#normalized">normalized</a>().</p>
 
 
 <h3 class="fn"><a name="isNull" />bool QRectF.isNull (<i>self</i>)</h3><p>Returns true if the rectangle is a null rectangle, otherwise
 returns false.</p>
 <p>A null rectangle has both the width and the height set to 0. A
 null rectangle is also empty, and hence not valid.</p>
-<p>See also <a href="qrectf.html#isEmpty">isEmpty</a>() and
+<p><b>See also</b> <a href="qrectf.html#isEmpty">isEmpty</a>() and
 <a href="qrectf.html#isValid">isValid</a>().</p>
 
 
@@ -283,52 +257,56 @@ false.</p>
 that non-trivial operations like intersections are not defined for
 invalid rectangles. A valid rectangle is not empty (i.e., isValid()
 == !<a href="qrectf.html#isEmpty">isEmpty</a>()).</p>
-<p>See also <a href="qrectf.html#isNull">isNull</a>(), <a href="qrectf.html#isEmpty">isEmpty</a>(), and <a href="qrectf.html#normalized">normalized</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#isNull">isNull</a>(),
+<a href="qrectf.html#isEmpty">isEmpty</a>(), and <a href="qrectf.html#normalized">normalized</a>().</p>
 
 
 <h3 class="fn"><a name="left" />float QRectF.left (<i>self</i>)</h3><p>Returns the x-coordinate of the rectangle's left edge.
 Equivalent to <a href="qrectf.html#x">x</a>().</p>
-<p>See also <a href="qrectf.html#setLeft">setLeft</a>(), <a href="qrectf.html#topLeft">topLeft</a>(), and <a href="qrectf.html#bottomLeft">bottomLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setLeft">setLeft</a>(),
+<a href="qrectf.html#topLeft">topLeft</a>(), and <a href="qrectf.html#bottomLeft">bottomLeft</a>().</p>
 
 
 <h3 class="fn"><a name="moveBottom" />QRectF.moveBottom (<i>self</i>, float&#160;<i>pos</i>)</h3><p>Moves the rectangle vertically, leaving the rectangle's bottom
 edge at the given <i>y</i> coordinate. The rectangle's size is
 unchanged.</p>
-<p>See also <a href="qrectf.html#bottom">bottom</a>(), <a href="qrectf.html#setBottom">setBottom</a>(), and <a href="qrectf.html#moveTop">moveTop</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#bottom">bottom</a>(),
+<a href="qrectf.html#setBottom">setBottom</a>(), and <a href="qrectf.html#moveTop">moveTop</a>().</p>
 
 
 <h3 class="fn"><a name="moveBottomLeft" />QRectF.moveBottomLeft (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Moves the rectangle, leaving the bottom-left corner at the given
 <i>position</i>. The rectangle's size is unchanged.</p>
-<p>See also <a href="qrectf.html#setBottomLeft">setBottomLeft</a>(), <a href="qrectf.html#moveBottom">moveBottom</a>(), and <a href="qrectf.html#moveLeft">moveLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setBottomLeft">setBottomLeft</a>(), <a href="qrectf.html#moveBottom">moveBottom</a>(), and <a href="qrectf.html#moveLeft">moveLeft</a>().</p>
 
 
 <h3 class="fn"><a name="moveBottomRight" />QRectF.moveBottomRight (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Moves the rectangle, leaving the bottom-right corner at the
 given <i>position</i>. The rectangle's size is unchanged.</p>
-<p>See also <a href="qrectf.html#setBottomRight">setBottomRight</a>(), <a href="qrectf.html#moveBottom">moveBottom</a>(), and <a href="qrectf.html#moveRight">moveRight</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setBottomRight">setBottomRight</a>(), <a href="qrectf.html#moveBottom">moveBottom</a>(), and <a href="qrectf.html#moveRight">moveRight</a>().</p>
 
 
 <h3 class="fn"><a name="moveCenter" />QRectF.moveCenter (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Moves the rectangle, leaving the center point at the given
 <i>position</i>. The rectangle's size is unchanged.</p>
-<p>See also <a href="qrectf.html#center">center</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#center">center</a>().</p>
 
 
 <h3 class="fn"><a name="moveLeft" />QRectF.moveLeft (<i>self</i>, float&#160;<i>pos</i>)</h3><p>Moves the rectangle horizontally, leaving the rectangle's left
 edge at the given <i>x</i> coordinate. The rectangle's size is
 unchanged.</p>
-<p>See also <a href="qrectf.html#left">left</a>(), <a href="qrectf.html#setLeft">setLeft</a>(), and <a href="qrectf.html#moveRight">moveRight</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#left">left</a>(), <a href="qrectf.html#setLeft">setLeft</a>(), and <a href="qrectf.html#moveRight">moveRight</a>().</p>
 
 
 <h3 class="fn"><a name="moveRight" />QRectF.moveRight (<i>self</i>, float&#160;<i>pos</i>)</h3><p>Moves the rectangle horizontally, leaving the rectangle's right
 edge at the given <i>x</i> coordinate. The rectangle's size is
 unchanged.</p>
-<p>See also <a href="qrectf.html#right">right</a>(), <a href="qrectf.html#setRight">setRight</a>(), and <a href="qrectf.html#moveLeft">moveLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#right">right</a>(),
+<a href="qrectf.html#setRight">setRight</a>(), and <a href="qrectf.html#moveLeft">moveLeft</a>().</p>
 
 
 <h3 class="fn"><a name="moveTo" />QRectF.moveTo (<i>self</i>, float&#160;<i>ax</i>, float&#160;<i>ay</i>)</h3><p>Moves the rectangle, leaving the top-left corner at the given
 position (<i>x</i>, <i>y</i>). The rectangle's size is
 unchanged.</p>
-<p>See also <a href="qrectf.html#translate">translate</a>() and
-<a href="qrectf.html#moveTopLeft">moveTopLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#translate">translate</a>()
+and <a href="qrectf.html#moveTopLeft">moveTopLeft</a>().</p>
 
 
 <h3 class="fn"><a name="moveTo-2" />QRectF.moveTo (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>This is an overloaded function.</p>
@@ -339,19 +317,17 @@ unchanged.</p>
 <h3 class="fn"><a name="moveTop" />QRectF.moveTop (<i>self</i>, float&#160;<i>pos</i>)</h3><p>Moves the rectangle vertically, leaving the rectangle's top line
 at the given <i>y</i> coordinate. The rectangle's size is
 unchanged.</p>
-<p>See also <a href="qrectf.html#top">top</a>(), <a href="qrectf.html#setTop">setTop</a>(), and <a href="qrectf.html#moveBottom">moveBottom</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#top">top</a>(), <a href="qrectf.html#setTop">setTop</a>(), and <a href="qrectf.html#moveBottom">moveBottom</a>().</p>
 
 
 <h3 class="fn"><a name="moveTopLeft" />QRectF.moveTopLeft (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Moves the rectangle, leaving the top-left corner at the given
 <i>position</i>. The rectangle's size is unchanged.</p>
-<p>See also <a href="qrectf.html#setTopLeft">setTopLeft</a>(),
-<a href="qrectf.html#moveTop">moveTop</a>(), and <a href="qrectf.html#moveLeft">moveLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setTopLeft">setTopLeft</a>(), <a href="qrectf.html#moveTop">moveTop</a>(), and <a href="qrectf.html#moveLeft">moveLeft</a>().</p>
 
 
 <h3 class="fn"><a name="moveTopRight" />QRectF.moveTopRight (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Moves the rectangle, leaving the top-right corner at the given
 <i>position</i>. The rectangle's size is unchanged.</p>
-<p>See also <a href="qrectf.html#setTopRight">setTopRight</a>(),
-<a href="qrectf.html#moveTop">moveTop</a>(), and <a href="qrectf.html#moveRight">moveRight</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setTopRight">setTopRight</a>(), <a href="qrectf.html#moveTop">moveTop</a>(), and <a href="qrectf.html#moveRight">moveRight</a>().</p>
 
 
 <h3 class="fn"><a name="normalized" /><a href="qrectf.html">QRectF</a> QRectF.normalized (<i>self</i>)</h3><p>Returns a normalized rectangle; i.e., a rectangle that has a
@@ -359,148 +335,152 @@ non-negative width and height.</p>
 <p>If <a href="qrectf.html#width">width</a>() &lt; 0 the function
 swaps the left and right corners, and it swaps the top and bottom
 corners if <a href="qrectf.html#height">height</a>() &lt; 0.</p>
-<p>See also <a href="qrectf.html#isValid">isValid</a>() and
+<p><b>See also</b> <a href="qrectf.html#isValid">isValid</a>() and
 <a href="qrectf.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="right" />float QRectF.right (<i>self</i>)</h3><p>Returns the x-coordinate of the rectangle's right edge.</p>
-<p>See also <a href="qrectf.html#setRight">setRight</a>(), <a href="qrectf.html#topRight">topRight</a>(), and <a href="qrectf.html#bottomRight">bottomRight</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setRight">setRight</a>(),
+<a href="qrectf.html#topRight">topRight</a>(), and <a href="qrectf.html#bottomRight">bottomRight</a>().</p>
 
 
 <h3 class="fn"><a name="setBottom" />QRectF.setBottom (<i>self</i>, float&#160;<i>pos</i>)</h3><p>Sets the bottom edge of the rectangle to the given <i>y</i>
 coordinate. May change the height, but will never change the top
 edge of the rectangle.</p>
-<p>See also <a href="qrectf.html#bottom">bottom</a>() and <a href="qrectf.html#moveBottom">moveBottom</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#bottom">bottom</a>() and
+<a href="qrectf.html#moveBottom">moveBottom</a>().</p>
 
 
 <h3 class="fn"><a name="setBottomLeft" />QRectF.setBottomLeft (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Set the bottom-left corner of the rectangle to the given
 <i>position</i>. May change the size, but will never change the
 top-right corner of the rectangle.</p>
-<p>See also <a href="qrectf.html#bottomLeft">bottomLeft</a>() and
-<a href="qrectf.html#moveBottomLeft">moveBottomLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#bottomLeft">bottomLeft</a>() and <a href="qrectf.html#moveBottomLeft">moveBottomLeft</a>().</p>
 
 
 <h3 class="fn"><a name="setBottomRight" />QRectF.setBottomRight (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Set the bottom-right corner of the rectangle to the given
 <i>position</i>. May change the size, but will never change the
 top-left corner of the rectangle.</p>
-<p>See also <a href="qrectf.html#bottomRight">bottomRight</a>() and
-<a href="qrectf.html#moveBottomRight">moveBottomRight</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#bottomRight">bottomRight</a>() and <a href="qrectf.html#moveBottomRight">moveBottomRight</a>().</p>
 
 
 <h3 class="fn"><a name="setCoords" />QRectF.setCoords (<i>self</i>, float&#160;<i>xp1</i>, float&#160;<i>yp1</i>, float&#160;<i>xp2</i>, float&#160;<i>yp2</i>)</h3><p>Sets the coordinates of the rectangle's top-left corner to
 (<i>x1</i>, <i>y1</i>), and the coordinates of its bottom-right
 corner to (<i>x2</i>, <i>y2</i>).</p>
-<p>See also <a href="qrectf.html#getCoords">getCoords</a>() and
-<a href="qrectf.html#setRect">setRect</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#getCoords">getCoords</a>()
+and <a href="qrectf.html#setRect">setRect</a>().</p>
 
 
 <h3 class="fn"><a name="setHeight" />QRectF.setHeight (<i>self</i>, float&#160;<i>ah</i>)</h3><p>Sets the height of the rectangle to the given <i>height</i>. The
 bottom edge is changed, but not the top one.</p>
-<p>See also <a href="qrectf.html#height">height</a>() and <a href="qrectf.html#setSize">setSize</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#height">height</a>() and
+<a href="qrectf.html#setSize">setSize</a>().</p>
 
 
 <h3 class="fn"><a name="setLeft" />QRectF.setLeft (<i>self</i>, float&#160;<i>pos</i>)</h3><p>Sets the left edge of the rectangle to the given <i>x</i>
 coordinate. May change the width, but will never change the right
 edge of the rectangle.</p>
 <p>Equivalent to <a href="qrectf.html#setX">setX</a>().</p>
-<p>See also <a href="qrectf.html#left">left</a>() and <a href="qrectf.html#moveLeft">moveLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#left">left</a>() and
+<a href="qrectf.html#moveLeft">moveLeft</a>().</p>
 
 
 <h3 class="fn"><a name="setRect" />QRectF.setRect (<i>self</i>, float&#160;<i>ax</i>, float&#160;<i>ay</i>, float&#160;<i>aaw</i>, float&#160;<i>aah</i>)</h3><p>Sets the coordinates of the rectangle's top-left corner to
 (<i>x</i>, <i>y</i>), and its size to the given <i>width</i> and
 <i>height</i>.</p>
-<p>See also <a href="qrectf.html#getRect">getRect</a>() and
+<p><b>See also</b> <a href="qrectf.html#getRect">getRect</a>() and
 <a href="qrectf.html#setCoords">setCoords</a>().</p>
 
 
 <h3 class="fn"><a name="setRight" />QRectF.setRight (<i>self</i>, float&#160;<i>pos</i>)</h3><p>Sets the right edge of the rectangle to the given <i>x</i>
 coordinate. May change the width, but will never change the left
 edge of the rectangle.</p>
-<p>See also <a href="qrectf.html#right">right</a>() and <a href="qrectf.html#moveRight">moveRight</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#right">right</a>() and
+<a href="qrectf.html#moveRight">moveRight</a>().</p>
 
 
 <h3 class="fn"><a name="setSize" />QRectF.setSize (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s</i>)</h3><p>Sets the size of the rectangle to the given <i>size</i>. The
 top-left corner is not moved.</p>
-<p>See also <a href="qrectf.html#size">size</a>(), <a href="qrectf.html#setWidth">setWidth</a>(), and <a href="qrectf.html#setHeight">setHeight</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#size">size</a>(), <a href="qrectf.html#setWidth">setWidth</a>(), and <a href="qrectf.html#setHeight">setHeight</a>().</p>
 
 
 <h3 class="fn"><a name="setTop" />QRectF.setTop (<i>self</i>, float&#160;<i>pos</i>)</h3><p>Sets the top edge of the rectangle to the given <i>y</i>
 coordinate. May change the height, but will never change the bottom
 edge of the rectangle.</p>
 <p>Equivalent to <a href="qrectf.html#setY">setY</a>().</p>
-<p>See also <a href="qrectf.html#top">top</a>() and <a href="qrectf.html#moveTop">moveTop</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#top">top</a>() and <a href="qrectf.html#moveTop">moveTop</a>().</p>
 
 
 <h3 class="fn"><a name="setTopLeft" />QRectF.setTopLeft (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Set the top-left corner of the rectangle to the given
 <i>position</i>. May change the size, but will never change the
 bottom-right corner of the rectangle.</p>
-<p>See also <a href="qrectf.html#topLeft">topLeft</a>() and
+<p><b>See also</b> <a href="qrectf.html#topLeft">topLeft</a>() and
 <a href="qrectf.html#moveTopLeft">moveTopLeft</a>().</p>
 
 
 <h3 class="fn"><a name="setTopRight" />QRectF.setTopRight (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Set the top-right corner of the rectangle to the given
 <i>position</i>. May change the size, but will never change the
 bottom-left corner of the rectangle.</p>
-<p>See also <a href="qrectf.html#topRight">topRight</a>() and
-<a href="qrectf.html#moveTopRight">moveTopRight</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#topRight">topRight</a>()
+and <a href="qrectf.html#moveTopRight">moveTopRight</a>().</p>
 
 
 <h3 class="fn"><a name="setWidth" />QRectF.setWidth (<i>self</i>, float&#160;<i>aw</i>)</h3><p>Sets the width of the rectangle to the given <i>width</i>. The
 right edge is changed, but not the left one.</p>
-<p>See also <a href="qrectf.html#width">width</a>() and <a href="qrectf.html#setSize">setSize</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#width">width</a>() and
+<a href="qrectf.html#setSize">setSize</a>().</p>
 
 
 <h3 class="fn"><a name="setX" />QRectF.setX (<i>self</i>, float&#160;<i>pos</i>)</h3><p>Sets the left edge of the rectangle to the given <i>x</i>
 coordinate. May change the width, but will never change the right
 edge of the rectangle.</p>
 <p>Equivalent to <a href="qrectf.html#setLeft">setLeft</a>().</p>
-<p>See also <a href="qrectf.html#x">x</a>(), <a href="qrectf.html#setY">setY</a>(), and <a href="qrectf.html#setTopLeft">setTopLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#x">x</a>(), <a href="qrectf.html#setY">setY</a>(), and <a href="qrectf.html#setTopLeft">setTopLeft</a>().</p>
 
 
 <h3 class="fn"><a name="setY" />QRectF.setY (<i>self</i>, float&#160;<i>pos</i>)</h3><p>Sets the top edge of the rectangle to the given <i>y</i>
 coordinate. May change the height, but will never change the bottom
 edge of the rectangle.</p>
 <p>Equivalent to <a href="qrectf.html#setTop">setTop</a>().</p>
-<p>See also <a href="qrectf.html#y">y</a>(), <a href="qrectf.html#setX">setX</a>(), and <a href="qrectf.html#setTopLeft">setTopLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#y">y</a>(), <a href="qrectf.html#setX">setX</a>(), and <a href="qrectf.html#setTopLeft">setTopLeft</a>().</p>
 
 
 <h3 class="fn"><a name="size" /><a href="qsizef.html">QSizeF</a> QRectF.size (<i>self</i>)</h3><p>Returns the size of the rectangle.</p>
-<p>See also <a href="qrectf.html#setSize">setSize</a>(), <a href="qrectf.html#width">width</a>(), and <a href="qrectf.html#height">height</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setSize">setSize</a>(),
+<a href="qrectf.html#width">width</a>(), and <a href="qrectf.html#height">height</a>().</p>
 
 
 <h3 class="fn"><a name="toAlignedRect" /><a href="qrect.html">QRect</a> QRectF.toAlignedRect (<i>self</i>)</h3><p>Returns a <a href="qrect.html">QRect</a> based on the values of
 this rectangle that is the smallest possible integer rectangle that
 completely contains this rectangle.</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qrectf.html#toRect">toRect</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#toRect">toRect</a>().</p>
 
 
 <h3 class="fn"><a name="top" />float QRectF.top (<i>self</i>)</h3><p>Returns the y-coordinate of the rectangle's top edge. Equivalent
 to <a href="qrectf.html#y">y</a>().</p>
-<p>See also <a href="qrectf.html#setTop">setTop</a>(), <a href="qrectf.html#topLeft">topLeft</a>(), and <a href="qrectf.html#topRight">topRight</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setTop">setTop</a>(),
+<a href="qrectf.html#topLeft">topLeft</a>(), and <a href="qrectf.html#topRight">topRight</a>().</p>
 
 
 <h3 class="fn"><a name="topLeft" /><a href="qpointf.html">QPointF</a> QRectF.topLeft (<i>self</i>)</h3><p>Returns the position of the rectangle's top-left corner.</p>
-<p>See also <a href="qrectf.html#setTopLeft">setTopLeft</a>(),
-<a href="qrectf.html#top">top</a>(), and <a href="qrectf.html#left">left</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setTopLeft">setTopLeft</a>(), <a href="qrectf.html#top">top</a>(), and <a href="qrectf.html#left">left</a>().</p>
 
 
 <h3 class="fn"><a name="topRight" /><a href="qpointf.html">QPointF</a> QRectF.topRight (<i>self</i>)</h3><p>Returns the position of the rectangle's top-right corner.</p>
-<p>See also <a href="qrectf.html#setTopRight">setTopRight</a>(),
-<a href="qrectf.html#top">top</a>(), and <a href="qrectf.html#right">right</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setTopRight">setTopRight</a>(), <a href="qrectf.html#top">top</a>(), and <a href="qrectf.html#right">right</a>().</p>
 
 
 <h3 class="fn"><a name="toRect" /><a href="qrect.html">QRect</a> QRectF.toRect (<i>self</i>)</h3><p>Returns a <a href="qrect.html">QRect</a> based on the values of
 this rectangle. Note that the coordinates in the returned rectangle
 are rounded to the nearest integer.</p>
-<p>See also <a href="qrectf.html#QRectF">QRectF</a>() and <a href="qrectf.html#toAlignedRect">toAlignedRect</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#QRectF">QRectF</a>() and
+<a href="qrectf.html#toAlignedRect">toAlignedRect</a>().</p>
 
 
 <h3 class="fn"><a name="translate" />QRectF.translate (<i>self</i>, float&#160;<i>dx</i>, float&#160;<i>dy</i>)</h3><p>Moves the rectangle <i>dx</i> along the x-axis and <i>dy</i>
 along the y-axis, relative to the current position. Positive values
 move the rectangle to the right and downwards.</p>
-<p>See also <a href="qrectf.html#moveTopLeft">moveTopLeft</a>(),
-<a href="qrectf.html#moveTo">moveTo</a>(), and <a href="qrectf.html#translated">translated</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#moveTopLeft">moveTopLeft</a>(), <a href="qrectf.html#moveTo">moveTo</a>(), and <a href="qrectf.html#translated">translated</a>().</p>
 
 
 <h3 class="fn"><a name="translate-2" />QRectF.translate (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>This is an overloaded function.</p>
@@ -513,7 +493,7 @@ relative to the current position.</p>
 along the x axis and <i>dy</i> along the y axis, relative to the
 current position. Positive values move the rectangle to the right
 and down.</p>
-<p>See also <a href="qrectf.html#translate">translate</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#translate">translate</a>().</p>
 
 
 <h3 class="fn"><a name="translated-2" /><a href="qrectf.html">QRectF</a> QRectF.translated (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>This is an overloaded function.</p>
@@ -527,21 +507,22 @@ relative to the current position.</p>
 <i>rectangle</i>.</p>
 <p class="centerAlign"><img src="images/qrect-unite.png" /></p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qrectf.html#intersected">intersected</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#intersected">intersected</a>().</p>
 
 
 <h3 class="fn"><a name="width" />float QRectF.width (<i>self</i>)</h3><p>Returns the width of the rectangle.</p>
-<p>See also <a href="qrectf.html#setWidth">setWidth</a>(), <a href="qrectf.html#height">height</a>(), and <a href="qrectf.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setWidth">setWidth</a>(),
+<a href="qrectf.html#height">height</a>(), and <a href="qrectf.html#size">size</a>().</p>
 
 
 <h3 class="fn"><a name="x" />float QRectF.x (<i>self</i>)</h3><p>Returns the x-coordinate of the rectangle's left edge.
 Equivalent to <a href="qrectf.html#left">left</a>().</p>
-<p>See also <a href="qrectf.html#setX">setX</a>(), <a href="qrectf.html#y">y</a>(), and <a href="qrectf.html#topLeft">topLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setX">setX</a>(), <a href="qrectf.html#y">y</a>(), and <a href="qrectf.html#topLeft">topLeft</a>().</p>
 
 
 <h3 class="fn"><a name="y" />float QRectF.y (<i>self</i>)</h3><p>Returns the y-coordinate of the rectangle's top edge. Equivalent
 to <a href="qrectf.html#top">top</a>().</p>
-<p>See also <a href="qrectf.html#setY">setY</a>(), <a href="qrectf.html#x">x</a>(), and <a href="qrectf.html#topLeft">topLeft</a>().</p>
+<p><b>See also</b> <a href="qrectf.html#setY">setY</a>(), <a href="qrectf.html#x">x</a>(), and <a href="qrectf.html#topLeft">topLeft</a>().</p>
 
 
-<h3 class="fn"><a name="__and__" /><a href="qrectf.html">QRectF</a> QRectF.__and__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__bool__" />int QRectF.__bool__ (<i>self</i>)</h3><h3 class="fn"><a name="__contains__" />int QRectF.__contains__ (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><h3 class="fn"><a name="__contains__-2" />int QRectF.__contains__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__eq__" />bool QRectF.__eq__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r2</i>)</h3><h3 class="fn"><a name="__iand__" /><a href="qrectf.html">QRectF</a> QRectF.__iand__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__ior__" /><a href="qrectf.html">QRectF</a> QRectF.__ior__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__ne__" />bool QRectF.__ne__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r2</i>)</h3><h3 class="fn"><a name="__or__" /><a href="qrectf.html">QRectF</a> QRectF.__or__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__repr__" />str QRectF.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__and__" /><a href="qrectf.html">QRectF</a> QRectF.__and__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__bool__" />int QRectF.__bool__ (<i>self</i>)</h3><h3 class="fn"><a name="__contains__" />int QRectF.__contains__ (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><h3 class="fn"><a name="__contains__-2" />int QRectF.__contains__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__eq__" />bool QRectF.__eq__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r2</i>)</h3><h3 class="fn"><a name="__iand__" /><a href="qrectf.html">QRectF</a> QRectF.__iand__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__ior__" /><a href="qrectf.html">QRectF</a> QRectF.__ior__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__ne__" />bool QRectF.__ne__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r2</i>)</h3><h3 class="fn"><a name="__or__" /><a href="qrectf.html">QRectF</a> QRectF.__or__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__repr__" />str QRectF.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

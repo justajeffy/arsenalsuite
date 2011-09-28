@@ -320,7 +320,7 @@ QObject *qpycore_qobject_sender(QObject *obj)
         return obj;
 
     // See if it is a short-circuit signal proxy.
-    PyQtShortcircuitSignalProxy *ssp = qobject_cast<PyQtShortcircuitSignalProxy *>(PyQtProxy::last_sender);
+    PyQtShortcircuitSignalProxy *ssp = PyQtShortcircuitSignalProxy::shortcircuitSignal(PyQtProxy::last_sender);
 
     if (ssp)
         return ssp->parent();
@@ -350,7 +350,7 @@ int qpycore_qobject_receivers(QObject *obj, const char *signal, int nr)
         return nr;
 
     // See if it is a short-circuit signal proxy.
-    PyQtShortcircuitSignalProxy *ssp = qobject_cast<PyQtShortcircuitSignalProxy *>(qtx);
+    PyQtShortcircuitSignalProxy *ssp = PyQtShortcircuitSignalProxy::shortcircuitSignal(qtx);
 
     if (ssp)
         return ssp->getReceivers(signal);

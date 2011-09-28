@@ -30,7 +30,7 @@ or <a href="qmetaproperty.html">QMetaProperty</a> by calling
 <a href="qscriptcontextinfo.html#functionMetaIndex">functionMetaIndex</a>().</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="FunctionType-enum" />QScriptContextInfo.FunctionType</h3><p>This enum specifies the type of function being called.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -38,27 +38,27 @@ or <a href="qmetaproperty.html">QMetaProperty</a> by calling
 <tr>
 <td class="topAlign">
 <tt>QScriptContextInfo.ScriptFunction</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The function is a Qt Script function, i.e. it
 was defined through a call to <a href="qscriptengine.html#evaluate">QScriptEngine.evaluate</a>().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QScriptContextInfo.QtFunction</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The function is a Qt function (a signal, slot
 or method).</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptContextInfo.QtPropertyFunction</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The function is a Qt property getter or
 setter.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptContextInfo.NativeFunction</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The function is a built-in Qt Script function,
 or it was defined through a call to <a href="qscriptengine.html#newFunction">QScriptEngine.newFunction</a>().</td>
 </tr>
@@ -76,21 +76,21 @@ in a previously created <a href="qscriptcontextinfo.html">QScriptContextInfo</a>
 
 
 <h3 class="fn"><a name="QScriptContextInfo-3" />QScriptContextInfo.__init__ (<i>self</i>)</h3><p>Constructs a null <a href="qscriptcontextinfo.html">QScriptContextInfo</a>.</p>
-<p>See also <a href="qscriptcontextinfo.html#isNull">isNull</a>().</p>
+<p><b>See also</b> <a href="qscriptcontextinfo.html#isNull">isNull</a>().</p>
 
 
 <h3 class="fn"><a name="columnNumber" />int QScriptContextInfo.columnNumber (<i>self</i>)</h3><h3 class="fn"><a name="fileName" />QString QScriptContextInfo.fileName (<i>self</i>)</h3><p>Returns the name of the file where the code being executed was
 defined, if available; otherwise returns an empty string.</p>
 <p>For Qt Script code, this function returns the fileName argument
 that was passed to <a href="qscriptengine.html#evaluate">QScriptEngine.evaluate</a>().</p>
-<p>See also <a href="qscriptcontextinfo.html#lineNumber">lineNumber</a>() and <a href="qscriptcontextinfo.html#functionName">functionName</a>().</p>
+<p><b>See also</b> <a href="qscriptcontextinfo.html#lineNumber">lineNumber</a>() and <a href="qscriptcontextinfo.html#functionName">functionName</a>().</p>
 
 
 <h3 class="fn"><a name="functionEndLineNumber" />int QScriptContextInfo.functionEndLineNumber (<i>self</i>)</h3><p>Returns the line number where the definition of the called
 function ends, or -1 if the line number is not available.</p>
 <p>The ending line number is only available if the <a href="qscriptcontextinfo.html#functionType">functionType</a>() is
 <a href="qscriptcontextinfo.html#FunctionType-enum">ScriptFunction</a>.</p>
-<p>See also <a href="qscriptcontextinfo.html#functionStartLineNumber">functionStartLineNumber</a>().</p>
+<p><b>See also</b> <a href="qscriptcontextinfo.html#functionStartLineNumber">functionStartLineNumber</a>().</p>
 
 
 <h3 class="fn"><a name="functionMetaIndex" />int QScriptContextInfo.functionMetaIndex (<i>self</i>)</h3><p>Returns the meta index of the called function, or -1 if the meta
@@ -103,7 +103,7 @@ meta index can be passed to <a href="qmetaobject.html#method">QMetaObject.method
 corresponding method definition; for <a href="qscriptcontextinfo.html#FunctionType-enum">QtPropertyFunction</a>,
 the meta index can be passed to <a href="qmetaobject.html#property">QMetaObject.property</a>() to obtain
 the corresponding property definition.</p>
-<p>See also <a href="qscriptcontext.html#thisObject">QScriptContext.thisObject</a>().</p>
+<p><b>See also</b> <a href="qscriptcontext.html#thisObject">QScriptContext.thisObject</a>().</p>
 
 
 <h3 class="fn"><a name="functionName" />QString QScriptContextInfo.functionName (<i>self</i>)</h3><p>Returns the name of the called function, or an empty string if
@@ -112,25 +112,25 @@ the name is not available.</p>
 this function always returns the name of the property; you can use
 <a href="qscriptcontext.html#argumentCount">QScriptContext.argumentCount</a>()
 to differentiate between reads and writes.</p>
-<p>See also <a href="qscriptcontextinfo.html#fileName">fileName</a>() and <a href="qscriptcontextinfo.html#functionType">functionType</a>().</p>
+<p><b>See also</b> <a href="qscriptcontextinfo.html#fileName">fileName</a>() and <a href="qscriptcontextinfo.html#functionType">functionType</a>().</p>
 
 
 <h3 class="fn"><a name="functionParameterNames" />QStringList QScriptContextInfo.functionParameterNames (<i>self</i>)</h3><p>Returns the names of the formal parameters of the called
 function, or an empty <a href="qstringlist.html">QStringList</a> if
 the parameter names are not available.</p>
-<p>See also <a href="qscriptcontext.html#argument">QScriptContext.argument</a>().</p>
+<p><b>See also</b> <a href="qscriptcontext.html#argument">QScriptContext.argument</a>().</p>
 
 
 <h3 class="fn"><a name="functionStartLineNumber" />int QScriptContextInfo.functionStartLineNumber (<i>self</i>)</h3><p>Returns the line number where the definition of the called
 function starts, or -1 if the line number is not available.</p>
 <p>The starting line number is only available if the <a href="qscriptcontextinfo.html#functionType">functionType</a>() is
 <a href="qscriptcontextinfo.html#FunctionType-enum">ScriptFunction</a>.</p>
-<p>See also <a href="qscriptcontextinfo.html#functionEndLineNumber">functionEndLineNumber</a>()
+<p><b>See also</b> <a href="qscriptcontextinfo.html#functionEndLineNumber">functionEndLineNumber</a>()
 and <a href="qscriptcontextinfo.html#fileName">fileName</a>().</p>
 
 
 <h3 class="fn"><a name="functionType" /><a href="qscriptcontextinfo.html#FunctionType-enum">FunctionType</a> QScriptContextInfo.functionType (<i>self</i>)</h3><p>Returns the type of the called function.</p>
-<p>See also <a href="qscriptcontextinfo.html#functionName">functionName</a>() and
+<p><b>See also</b> <a href="qscriptcontextinfo.html#functionName">functionName</a>() and
 <a href="qscriptcontext.html#callee">QScriptContext.callee</a>().</p>
 
 
@@ -142,13 +142,13 @@ not contain any information.</p>
 executed, or -1 if the line number is not available.</p>
 <p>The line number is only available if Qt Script code is being
 executed.</p>
-<p>See also <a class="compat" href="qscriptcontextinfo-qt3.html#columnNumber">columnNumber</a>() and <a href="qscriptcontextinfo.html#fileName">fileName</a>().</p>
+<p><b>See also</b> <a class="compat" href="qscriptcontextinfo-qt3.html#columnNumber">columnNumber</a>() and <a href="qscriptcontextinfo.html#fileName">fileName</a>().</p>
 
 
 <h3 class="fn"><a name="scriptId" />int QScriptContextInfo.scriptId (<i>self</i>)</h3><p>Returns the ID of the script where the code being executed was
 defined, or -1 if the ID is not available (i.e. a native function
 is being executed).</p>
-<p>See also <a href="qscriptengineagent.html#scriptLoad">QScriptEngineAgent.scriptLoad</a>().</p>
+<p><b>See also</b> <a href="qscriptengineagent.html#scriptLoad">QScriptEngineAgent.scriptLoad</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QScriptContextInfo.__eq__ (<i>self</i>, <a href="qscriptcontextinfo.html">QScriptContextInfo</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QScriptContextInfo.__ne__ (<i>self</i>, <a href="qscriptcontextinfo.html">QScriptContextInfo</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QScriptContextInfo.__eq__ (<i>self</i>, <a href="qscriptcontextinfo.html">QScriptContextInfo</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QScriptContextInfo.__ne__ (<i>self</i>, <a href="qscriptcontextinfo.html">QScriptContextInfo</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -16,14 +16,14 @@ event loop.</p>
 event loop. From within the event loop, calling <a href="qeventloop.html#exit">exit</a>() will force <a href="qeventloop.html#exec">exec_</a>() to return.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="ProcessEventsFlag-enum" />QEventLoop.ProcessEventsFlag</h3><p>This enum controls the types of events processed by the <a href="qeventloop.html#processEvents">processEvents</a>() functions.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QEventLoop.AllEvents</tt></td>
-<td class=" topAlign"><tt>0x00</tt></td>
+<td class="topAlign"><tt>0x00</tt></td>
 <td class="topAlign">All events. Note that <a href="qevent.html#Type-enum">DeferredDelete</a> events are processed
 specially. See <a href="qobject.html#deleteLater">QObject.deleteLater</a>() for more
 details.</td>
@@ -31,7 +31,7 @@ details.</td>
 <tr>
 <td class="topAlign">
 <tt>QEventLoop.ExcludeUserInputEvents</tt></td>
-<td class=" topAlign"><tt>0x01</tt></td>
+<td class="topAlign"><tt>0x01</tt></td>
 <td class="topAlign">Do not process user input events, such as
 ButtonPress and KeyPress. Note that the events are not discarded;
 they will be delivered the next time <a href="qeventloop.html#processEvents">processEvents</a>() is called
@@ -40,7 +40,7 @@ without the ExcludeUserInputEvents flag.</td>
 <tr>
 <td class="topAlign">
 <tt>QEventLoop.ExcludeSocketNotifiers</tt></td>
-<td class=" topAlign"><tt>0x02</tt></td>
+<td class="topAlign"><tt>0x02</tt></td>
 <td class="topAlign">Do not process socket notifier events. Note
 that the events are not discarded; they will be delivered the next
 time <a href="qeventloop.html#processEvents">processEvents</a>() is
@@ -48,19 +48,19 @@ called without the ExcludeSocketNotifiers flag.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QEventLoop.WaitForMoreEvents</tt></td>
-<td class=" topAlign"><tt>0x04</tt></td>
+<td class="topAlign"><tt>0x04</tt></td>
 <td class="topAlign">Wait for events if no pending events are
 available.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QEventLoop.DeferredDeletion</tt></td>
-<td class=" topAlign"><tt>0x10</tt></td>
+<td class="topAlign"><tt>0x10</tt></td>
 <td class="topAlign">deprecated - do not use.</td>
 </tr>
 </table>
 <p>The ProcessEventsFlags type is a typedef for <a href="qflags.html">QFlags</a>&lt;ProcessEventsFlag&gt;. It stores an OR
 combination of ProcessEventsFlag values.</p>
-<p>See also <a href="qeventloop.html#processEvents">processEvents</a>().</p>
+<p><b>See also</b> <a href="qeventloop.html#processEvents">processEvents</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QEventLoop" />QEventLoop.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs an event loop object with the given
 <i>parent</i>.</p>
 
@@ -79,7 +79,7 @@ exec(), because modal widgets use their own local event loop.</p>
 a special function whenever there are no pending events), use a
 <a href="qtimer.html">QTimer</a> with 0 timeout. More sophisticated
 idle processing schemes can be achieved using <a href="qeventloop.html#processEvents">processEvents</a>().</p>
-<p>See also <a href="qcoreapplication.html#quit">QApplication.quit</a>(), <a href="qeventloop.html#exit">exit</a>(), and <a href="qeventloop.html#processEvents">processEvents</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#quit">QApplication.quit</a>(), <a href="qeventloop.html#exit">exit</a>(), and <a href="qeventloop.html#processEvents">processEvents</a>().</p>
 
 
 <h3 class="fn"><a name="exit" />QEventLoop.exit (<i>self</i>, int&#160;<i>returnCode</i>&#160;=&#160;0)</h3><p>Tells the event loop to exit with a return code.</p>
@@ -91,13 +91,14 @@ non-zero value indicates an error.</p>
 <p>Note that unlike the C library function of the same name, this
 function <i>does</i> return to the caller -- it is event processing
 that stops.</p>
-<p>See also <a href="qcoreapplication.html#quit">QCoreApplication.quit</a>(), <a href="qeventloop.html#quit">quit</a>(), and <a href="qeventloop.html#exec">exec_</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#quit">QCoreApplication.quit</a>(), <a href="qeventloop.html#quit">quit</a>(), and <a href="qeventloop.html#exec">exec_</a>().</p>
 
 
 <h3 class="fn"><a name="isRunning" />bool QEventLoop.isRunning (<i>self</i>)</h3><p>Returns true if the event loop is running; otherwise returns
 false. The event loop is considered running from the time when
 <a href="qeventloop.html#exec">exec_</a>() is called until <a href="qeventloop.html#exit">exit</a>() is called.</p>
-<p>See also <a href="qeventloop.html#exec">exec_</a>() and <a href="qeventloop.html#exit">exit</a>().</p>
+<p><b>See also</b> <a href="qeventloop.html#exec">exec_</a>() and
+<a href="qeventloop.html#exit">exit</a>().</p>
 
 
 <h3 class="fn"><a name="processEvents" />bool QEventLoop.processEvents (<i>self</i>, <a href="qeventloop-processeventsflags.html">ProcessEventsFlags</a>&#160;<i>flags</i>&#160;=&#160;QEventLoop.AllEvents)</h3><p>Processes pending events that match <i>flags</i> until there are
@@ -128,10 +129,10 @@ makes no sense and will be ignored.</li>
 
 <h3 class="fn"><a name="quit" />QEventLoop.quit (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void quit()</tt>.</p><p>Tells the event loop to exit normally.</p>
 <p>Same as exit(0).</p>
-<p>See also <a href="qcoreapplication.html#quit">QCoreApplication.quit</a>() and
+<p><b>See also</b> <a href="qcoreapplication.html#quit">QCoreApplication.quit</a>() and
 <a href="qeventloop.html#exit">exit</a>().</p>
 
 
 <h3 class="fn"><a name="wakeUp" />QEventLoop.wakeUp (<i>self</i>)</h3><p>Wakes up the event loop.</p>
-<p>See also <a href="qabstracteventdispatcher.html#wakeUp">QAbstractEventDispatcher.wakeUp</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qabstracteventdispatcher.html#wakeUp">QAbstractEventDispatcher.wakeUp</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

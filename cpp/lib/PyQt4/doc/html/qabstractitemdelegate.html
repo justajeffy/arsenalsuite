@@ -26,25 +26,25 @@ case for a package management program.</p>
 <p>We create the <tt>WidgetDelegate</tt> class, which inherits from
 <a href="qstyleditemdelegate.html">QStyledItemDelegate</a>. We do
 the drawing in the <a href="qabstractitemdelegate.html#paint">paint</a>() function:</p>
-<pre class="highlightedCode brush: cpp">
- void WidgetDelegate.paint(QPainter *painter, const QStyleOptionViewItem &amp;option,
-                            const QModelIndex &amp;index) const
+<pre class="cpp">
+ <span class="type">void</span> WidgetDelegate<span class="operator">.</span><a href="qabstractitemdelegate.html#paint">paint</a>(<span class="type"><a href="qpainter.html">QPainter</a></span> <span class="operator">*</span>painter<span class="operator">,</span> <span class="keyword">const</span> <span class="type"><a href="qstyleoptionviewitem.html">QStyleOptionViewItem</a></span> <span class="operator">&amp;</span>option<span class="operator">,</span>
+                            <span class="keyword">const</span> <span class="type"><a href="qmodelindex.html">QModelIndex</a></span> <span class="operator">&amp;</span>index) <span class="keyword">const</span>
  {
-     if (index.column() == 1) {
-         int progress = index.data().toInt();
+     <span class="keyword">if</span> (index<span class="operator">.</span>column() <span class="operator">=</span><span class="operator">=</span> <span class="number">1</span>) {
+         <span class="type">int</span> progress <span class="operator">=</span> index<span class="operator">.</span>data()<span class="operator">.</span>toInt();
 
-         QStyleOptionProgressBar progressBarOption;
-         progressBarOption.rect = option.rect;
-         progressBarOption.minimum = 0;
-         progressBarOption.maximum = 100;
-         progressBarOption.progress = progress;
-         progressBarOption.text = QString.number(progress) + "%";
-         progressBarOption.textVisible = true;
+         <span class="type"><a href="qstyleoptionprogressbar.html">QStyleOptionProgressBar</a></span> progressBarOption;
+         progressBarOption<span class="operator">.</span>rect <span class="operator">=</span> option<span class="operator">.</span>rect;
+         progressBarOption<span class="operator">.</span>minimum <span class="operator">=</span> <span class="number">0</span>;
+         progressBarOption<span class="operator">.</span>maximum <span class="operator">=</span> <span class="number">100</span>;
+         progressBarOption<span class="operator">.</span>progress <span class="operator">=</span> progress;
+         progressBarOption<span class="operator">.</span>text <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>number(progress) <span class="operator">+</span> <span class="string">"%"</span>;
+         progressBarOption<span class="operator">.</span>textVisible <span class="operator">=</span> <span class="keyword">true</span>;
 
-         QApplication.style()-&gt;drawControl(QStyle.CE_ProgressBar,
-                                            &amp;progressBarOption, painter);
-     } else
-         QStyledItemDelegate.paint(painter, option, index);
+         <span class="type"><a href="qapplication.html">QApplication</a></span><span class="operator">.</span>style()<span class="operator">-</span><span class="operator">&gt;</span>drawControl(<span class="type"><a href="qstyle.html">QStyle</a></span><span class="operator">.</span>CE_ProgressBar<span class="operator">,</span>
+                                            <span class="operator">&amp;</span>progressBarOption<span class="operator">,</span> painter);
+     } <span class="keyword">else</span>
+         <span class="type"><a href="qstyleditemdelegate.html">QStyledItemDelegate</a></span><span class="operator">.</span>paint(painter<span class="operator">,</span> option<span class="operator">,</span> index);
 </pre>
 <p>Notice that we use a <a href="qstyleoptionprogressbar.html">QStyleOptionProgressBar</a> and
 initialize its members. We can then use the current <a href="qstyle.html">QStyle</a> to draw it.</p>
@@ -62,14 +62,14 @@ reimplementing <a href="qabstractitemdelegate.html#editorEvent">editorEvent</a>(
 give to the model and view components to make editing data in a
 model a comfortable experience for the user.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemDelegate.NoHint</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">There is no recommended action to be
 performed.</td>
 </tr>
@@ -77,7 +77,7 @@ performed.</td>
 <p>These hints let the delegate influence the behavior of the
 view:</p>
 <table class="valuelist">
-<tr class="even">
+<tr class="even" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -85,14 +85,14 @@ view:</p>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemDelegate.EditNextItem</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The view should use the delegate to open an
 editor on the next item in the view.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemDelegate.EditPreviousItem</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The view should use the delegate to open an
 editor on the previous item in the view.</td>
 </tr>
@@ -103,7 +103,7 @@ previous differently.</p>
 cache data, such as those that manipulate data locally in order to
 increase performance or conserve network bandwidth.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -111,14 +111,14 @@ increase performance or conserve network bandwidth.</p>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemDelegate.SubmitModelCache</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">If the model caches data, it should write out
 cached data to the underlying data store.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemDelegate.RevertModelCache</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">If the model caches data, it should discard
 cached data and replace it with data from the underlying data
 store.</td>
@@ -140,7 +140,7 @@ you will need to reimplement this function.</p>
 <p>The returned editor widget should have <a href="qt.html#FocusPolicy-enum">Qt.StrongFocus</a>; otherwise, <a href="qmouseevent.html">QMouseEvent</a>s received by the widget will
 propagate to the view. The view's background will shine through
 unless the editor paints its own background (e.g., with <a href="qwidget.html#autoFillBackground-prop">setAutoFillBackground()</a>).</p>
-<p>See also <a href="qabstractitemdelegate.html#setModelData">setModelData</a>() and
+<p><b>See also</b> <a href="qabstractitemdelegate.html#setModelData">setModelData</a>() and
 <a href="qabstractitemdelegate.html#setEditorData">setEditorData</a>().</p>
 
 
@@ -167,7 +167,7 @@ obtained using the index had the required role.</p>
 were handled successfully, the relevant popup may be shown
 depending on the user's system configuration.</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qhelpevent.html">QHelpEvent</a>.</p>
+<p><b>See also</b> <a href="qhelpevent.html">QHelpEvent</a>.</p>
 
 
 <h3 class="fn"><a name="paint" />QAbstractItemDelegate.paint (<i>self</i>, <a href="qpainter.html">QPainter</a>&#160;<i>painter</i>, <a href="qstyleoptionviewitem.html">QStyleOptionViewItem</a>&#160;<i>option</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>This pure abstract function must be reimplemented if you want to
@@ -182,14 +182,14 @@ item at the given <i>index</i>. Note that the index contains
 information about the model being used.</p>
 <p>The base implementation does nothing. If you want custom editing
 you will need to reimplement this function.</p>
-<p>See also <a href="qabstractitemdelegate.html#setModelData">setModelData</a>().</p>
+<p><b>See also</b> <a href="qabstractitemdelegate.html#setModelData">setModelData</a>().</p>
 
 
 <h3 class="fn"><a name="setModelData" />QAbstractItemDelegate.setModelData (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>editor</i>, <a href="qabstractitemmodel.html">QAbstractItemModel</a>&#160;<i>model</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Sets the data for the item at the given <i>index</i> in the
 <i>model</i> to the contents of the given <i>editor</i>.</p>
 <p>The base implementation does nothing. If you want custom editing
 you will need to reimplement this function.</p>
-<p>See also <a href="qabstractitemdelegate.html#setEditorData">setEditorData</a>().</p>
+<p><b>See also</b> <a href="qabstractitemdelegate.html#setEditorData">setEditorData</a>().</p>
 
 
 <h3 class="fn"><a name="sizeHint" /><a href="qsize.html">QSize</a> QAbstractItemDelegate.sizeHint (<i>self</i>, <a href="qstyleoptionviewitem.html">QStyleOptionViewItem</a>&#160;<i>option</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>This pure abstract function must be reimplemented if you want to
@@ -213,7 +213,7 @@ to these components what action should be performed next to provide
 a comfortable editing experience for the user. For example, if
 <tt>EditNextItem</tt> is specified, the view should use a delegate
 to open an editor on the next item in the model.</p>
-<p>See also <a href="qabstractitemdelegate.html#EndEditHint-enum">EndEditHint</a>.</p>
+<p><b>See also</b> <a href="qabstractitemdelegate.html#EndEditHint-enum">EndEditHint</a>.</p>
 
 
 <h3 class="fn"><a name="commitData" />void commitData (QWidget *)</h3><p>This is the default overload of this signal.</p><p>This signal must be emitted when the <i>editor</i> widget has
@@ -228,4 +228,4 @@ necessary.</p>
 <p>This function was introduced in Qt 4.4.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

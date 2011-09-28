@@ -39,23 +39,23 @@ composed of objects of our own classes <tt>molecule</tt> and
 subclass will know how to traverse this non-XML structure and
 present it through the <a href="http://www.w3.org/TR/xpath-datamodel/">XPath Data Model
 interface</a>.</p>
-<pre class="highlightedCode brush: cpp">
- QFile queryFile(argv[1]);
- QFile chemistryData(argv[2]);
- QString moleculeName = argv[3];
+<pre class="cpp">
+ <span class="type"><a href="qfile.html">QFile</a></span> queryFile(argv<span class="operator">[</span><span class="number">1</span><span class="operator">]</span>);
+ <span class="type"><a href="qfile.html">QFile</a></span> chemistryData(argv<span class="operator">[</span><span class="number">2</span><span class="operator">]</span>);
+ <span class="type"><a href="qstring.html">QString</a></span> moleculeName <span class="operator">=</span> argv<span class="operator">[</span><span class="number">3</span><span class="operator">]</span>;
 
- QXmlQuery query;
- query.setQuery(&amp;queryFile, QUrl.fromLocalFile(queryFile.fileName()));
+ <span class="type"><a href="qxmlquery.html">QXmlQuery</a></span> query;
+ query<span class="operator">.</span>setQuery(<span class="operator">&amp;</span>queryFile<span class="operator">,</span> <span class="type"><a href="qurl.html">QUrl</a></span><span class="operator">.</span>fromLocalFile(queryFile<span class="operator">.</span>fileName()));
 
- ChemistryNodeModel myNodeModel(query.namePool(), chemistryData);
- QXmlNodeModelIndex startNode = myNodeModel.nodeFor(moleculeName);
- query.bindVariable("queryRoot", startNode);
+ ChemistryNodeModel myNodeModel(query<span class="operator">.</span>namePool()<span class="operator">,</span> chemistryData);
+ <span class="type"><a href="qxmlnodemodelindex.html">QXmlNodeModelIndex</a></span> startNode <span class="operator">=</span> myNodeModel<span class="operator">.</span>nodeFor(moleculeName);
+ query<span class="operator">.</span>bindVariable(<span class="string">"queryRoot"</span><span class="operator">,</span> startNode);
 
- QFile out;
- out.open(stdout, QIODevice.WriteOnly);
+ <span class="type"><a href="qfile.html">QFile</a></span> out;
+ out<span class="operator">.</span>open(stdout<span class="operator">,</span> <span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>WriteOnly);
 
- QXmlSerializer serializer(query, &amp;out);
- query.evaluateTo(&amp;serializer);
+ <span class="type"><a href="qxmlserializer.html">QXmlSerializer</a></span> serializer(query<span class="operator">,</span> <span class="operator">&amp;</span>out);
+ query<span class="operator">.</span>evaluateTo(<span class="operator">&amp;</span>serializer);
 </pre>
 <p>The application first creates an instance of <a href="qxmlquery.html">QXmlQuery</a> and calls <a href="qxmlquery.html#setQuery">setQuery()</a> to read <tt>queryFile</tt>
 containing the <a href="xmlprocessing.html">XQuery</a> we want to
@@ -133,32 +133,32 @@ implementing thread-safety include <a href="qreadlocker.html">QReadLocker</a> an
 Example</a> for a demonstration.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="SimpleAxis-enum" />QAbstractXmlNodeModel.SimpleAxis</h3><p>Four axes that each contain one node only.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractXmlNodeModel.Parent</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The parent of the context node</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractXmlNodeModel.FirstChild</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The first child of the context node</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractXmlNodeModel.PreviousSibling</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The previous child of the context node</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractXmlNodeModel.NextSibling</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The next child of the context node</td>
 </tr>
 </table>
@@ -191,7 +191,7 @@ or text node is the base URI of the node's parent element.</li>
 </ul>
 <p>The implementation guarantees to return a valid <a href="qurl.html">QUrl</a>, or a default constructed <a href="qurl.html">QUrl</a>. If a node has no base URI, as in the case
 where a comment has no parent, a default constructed <a href="qurl.html">QUrl</a> is returned.</p>
-<p>See also <a href="http://www.w3.org/TR/xpath-datamodel/#dm-base-uri">XQuery 1.0 and
+<p><b>See also</b> <a href="http://www.w3.org/TR/xpath-datamodel/#dm-base-uri">XQuery 1.0 and
 XPath 2.0 Data Model (XDM), 5.2 base-uri Accessor</a>.</p>
 
 
@@ -206,7 +206,7 @@ is returned. If <i>ni1</i> precedes <i>ni2</i> in document order,
 is returned. If <i>ni1</i> follows <i>ni2</i> in document order,
 <a href="qxmlnodemodelindex.html#DocumentOrder-enum">QXmlNodeModelIndex.Follows</a>
 is returned.</p>
-<p>See also <a href="http://www.w3.org/TR/xpath-datamodel/#document-order">XQuery 1.0
+<p><b>See also</b> <a href="http://www.w3.org/TR/xpath-datamodel/#document-order">XQuery 1.0
 and XPath 2.0 Data Model (XDM), 2.4 Document Order</a>.</p>
 
 
@@ -244,7 +244,7 @@ constructed <a href="qurl.html">QUrl</a>. The latter signals that
 no document URI is available for the document node.</li>
 <li>For all other nodes, return a default constructed <a href="qurl.html">QUrl</a>.</li>
 </ul>
-<p>See also <a href="http://www.w3.org/TR/xpath-datamodel/#dm-document-uri">XQuery 1.0
+<p><b>See also</b> <a href="http://www.w3.org/TR/xpath-datamodel/#dm-document-uri">XQuery 1.0
 and XPath 2.0 Data Model (XDM), 5.4 document-uri Accessor</a>,
 <a href="qurl.html#isValid">QUrl.isValid</a>(), and <a href="qurl.html#isRelative">QUrl.isRelative</a>().</p>
 
@@ -265,7 +265,7 @@ However, the reserved name <tt>xml:id</tt> is sufficient.</p>
 <p>In <i>id</i>, the <tt>namespace URI</tt> and the <tt>prefix</tt>
 are undefined, and the <tt>local name</tt> is the ID that should be
 looked up.</p>
-<p>See also <a href="http://www.w3.org/TR/xpath-functions/#func-id">XQuery 1.0 and
+<p><b>See also</b> <a href="http://www.w3.org/TR/xpath-functions/#func-id">XQuery 1.0 and
 XPath 2.0 Functions and Operators, 15.5.2 fn:id</a>.</p>
 
 
@@ -273,7 +273,7 @@ XPath 2.0 Functions and Operators, 15.5.2 fn:id</a>.</p>
 <i>ni</i>. The caller guarantees that <i>ni</i> is not null and
 that it identifies a node in this node model. This function maps to
 the <tt>dm:node-kind()</tt> accessor.</p>
-<p>See also <a href="http://www.w3.org/TR/xpath-datamodel/#dm-node-kind">XQuery 1.0 and
+<p><b>See also</b> <a href="http://www.w3.org/TR/xpath-datamodel/#dm-node-kind">XQuery 1.0 and
 XPath 2.0 Data Model (XDM), 5.10 node-kind Accessor</a>.</p>
 
 
@@ -286,7 +286,7 @@ that is being used for evaluating queries using this <a href="qabstractxmlnodemo
 <p>This function maps to the <tt>dm:node-name()</tt> accessor.</p>
 <p>If <i>ni</i> is a processing instruction, a <a href="qxmlname.html">QXmlName</a> is returned with the local name as the
 target name and the namespace URI and prefix both empty.</p>
-<p>See also <a href="http://www.w3.org/TR/xpath-datamodel/#dm-node-name">XQuery 1.0 and
+<p><b>See also</b> <a href="http://www.w3.org/TR/xpath-datamodel/#dm-node-name">XQuery 1.0 and
 XPath 2.0 Data Model (XDM), 5.11 node-name Accessor</a> and
 <a href="qxmlname.html">QXmlName</a>.</p>
 
@@ -320,19 +320,19 @@ nodes.</li>
 </ul>
 <p>A typical implementation performs a <tt>switch</tt> on the value
 of <i>axis</i>:</p>
-<pre class="highlightedCode brush: cpp">
- QXmlNodeModelIndex MyTreeModel.nextFromSimpleAxis(SimpleAxis axis, const QXmlNodeModelIndex &amp;origin) const
+<pre class="cpp">
+ <span class="type"><a href="qxmlnodemodelindex.html">QXmlNodeModelIndex</a></span> MyTreeModel<span class="operator">.</span>nextFromSimpleAxis(SimpleAxis axis<span class="operator">,</span> <span class="keyword">const</span> <span class="type"><a href="qxmlnodemodelindex.html">QXmlNodeModelIndex</a></span> <span class="operator">&amp;</span>origin) <span class="keyword">const</span>
  {
    <span class="comment">// Convert the QXmlNodeModelIndex to a value that is specific to what we represent.</span>
-   const MyValue value = toMyValue(ni);
+   <span class="keyword">const</span> MyValue value <span class="operator">=</span> toMyValue(ni);
 
-   switch(axis)
+   <span class="keyword">switch</span>(axis)
    {
-       case Parent:
-           return toNodeIndex(value.parent());
-       case FirstChild:
-       case PreviousSibling:
-       case NextSibling:
+       <span class="keyword">case</span> Parent:
+           <span class="keyword">return</span> toNodeIndex(value<span class="operator">.</span>parent());
+       <span class="keyword">case</span> FirstChild:
+       <span class="keyword">case</span> PreviousSibling:
+       <span class="keyword">case</span> NextSibling:
            <span class="comment">// and so on</span>
    }
  }
@@ -352,7 +352,7 @@ in the schema.</p>
 <p>In <i>idref</i>, the <tt>namespace URI</tt> and the
 <tt>prefix</tt> are undefined, and the <tt>local name</tt> is the
 ID that should be looked up.</p>
-<p>See also <a href="http://www.w3.org/TR/xpath-functions/#func-idref">XQuery 1.0 and
+<p><b>See also</b> <a href="http://www.w3.org/TR/xpath-functions/#func-idref">XQuery 1.0 and
 XPath 2.0 Functions and Operators, 15.5.3 fn:idref</a>.</p>
 
 
@@ -388,7 +388,7 @@ childrens' childrens' text nodes, and so forth.</li>
 <li>For document nodes, the concatenation of all text nodes in the
 document.</li>
 </ul>
-<p>See also <a href="http://www.w3.org/TR/xpath-datamodel/#dm-string-value">XQuery 1.0
+<p><b>See also</b> <a href="http://www.w3.org/TR/xpath-datamodel/#dm-string-value">XQuery 1.0
 and XPath 2.0 Data Model (XDM), 5.13 string-value Accessor</a>.</p>
 
 
@@ -405,4 +405,4 @@ a lexical representation of typedValue()(this is guaranteed by
 <p>If the return <a href="qvariant.html">QVariant</a> is a default
 constructed variant, it signals that <i>node</i> has no typed
 value.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

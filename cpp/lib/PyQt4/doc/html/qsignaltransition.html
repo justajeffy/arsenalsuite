@@ -20,31 +20,31 @@ Framework</a>.</p>
 transition conditional; the event object passed to <a href="qsignaltransition.html#eventTest">eventTest</a>() will be a
 <a href="qstatemachine-signalevent.html">QStateMachine.SignalEvent</a>
 object. Example:</p>
-<pre class="highlightedCode brush: cpp">
- class CheckedTransition : public QSignalTransition
+<pre class="cpp">
+ <span class="keyword">class</span> CheckedTransition : <span class="keyword">public</span> <span class="type">QSignalTransition</span>
  {
- public:
-     CheckedTransition(QCheckBox *check)
-         : QSignalTransition(check, SIGNAL(stateChanged(int))) {}
- protected:
-     bool eventTest(QEvent *e) {
-         if (!QSignalTransition.eventTest(e))
-             return false;
-         QStateMachine.SignalEvent *se = static_cast&lt;QStateMachine.SignalEvent*&gt;(e);
-         return (se-&gt;arguments().at(0).toInt() == Qt.Checked);
+ <span class="keyword">public</span>:
+     CheckedTransition(<span class="type"><a href="qcheckbox.html">QCheckBox</a></span> <span class="operator">*</span>check)
+         : <span class="type">QSignalTransition</span>(check<span class="operator">,</span> SIGNAL(stateChanged(<span class="type">int</span>))) {}
+ <span class="keyword">protected</span>:
+     <span class="type">bool</span> eventTest(<span class="type"><a href="qevent.html">QEvent</a></span> <span class="operator">*</span>e) {
+         <span class="keyword">if</span> (<span class="operator">!</span><span class="type">QSignalTransition</span><span class="operator">.</span>eventTest(e))
+             <span class="keyword">return</span> <span class="keyword">false</span>;
+         <span class="type"><a href="qstatemachine.html">QStateMachine</a></span><span class="operator">.</span>SignalEvent <span class="operator">*</span>se <span class="operator">=</span> <span class="keyword">static_cast</span><span class="operator">&lt;</span><span class="type"><a href="qstatemachine.html">QStateMachine</a></span><span class="operator">.</span>SignalEvent<span class="operator">*</span><span class="operator">&gt;</span>(e);
+         <span class="keyword">return</span> (se<span class="operator">-</span><span class="operator">&gt;</span>arguments()<span class="operator">.</span>at(<span class="number">0</span>)<span class="operator">.</span>toInt() <span class="operator">=</span><span class="operator">=</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>Checked);
      }
  };
 
- ...
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 
- QCheckBox *check = new QCheckBox();
- check-&gt;setTristate(true);
+ <span class="type"><a href="qcheckbox.html">QCheckBox</a></span> <span class="operator">*</span>check <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qcheckbox.html">QCheckBox</a></span>();
+ check<span class="operator">-</span><span class="operator">&gt;</span>setTristate(<span class="keyword">true</span>);
 
- QState *s1 = new QState();
- QState *s2 = new QState();
- CheckedTransition *t1 = new CheckedTransition(check);
- t1-&gt;setTargetState(s2);
- s1-&gt;addTransition(t1);
+ <span class="type"><a href="qstate.html">QState</a></span> <span class="operator">*</span>s1 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qstate.html">QState</a></span>();
+ <span class="type"><a href="qstate.html">QState</a></span> <span class="operator">*</span>s2 <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qstate.html">QState</a></span>();
+ CheckedTransition <span class="operator">*</span>t1 <span class="operator">=</span> <span class="keyword">new</span> CheckedTransition(check);
+ t1<span class="operator">-</span><span class="operator">&gt;</span><a href="qabstracttransition.html#targetState-prop">setTargetState</a>(s2);
+ s1<span class="operator">-</span><span class="operator">&gt;</span>addTransition(t1);
 </pre><hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QSignalTransition" />QSignalTransition.__init__ (<i>self</i>, <a href="qstate.html">QState</a>&#160;<i>sourceState</i>&#160;=&#160;None)</h3><p>Constructs a new signal transition with the given
 <i>sourceState</i>.</p>
 
@@ -65,4 +65,4 @@ transition, and returns false otherwise.</p>
 
 
 <h3 class="fn"><a name="onTransition" />QSignalTransition.onTransition (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qabstracttransition.html#onTransition">QAbstractTransition.onTransition</a>().</p>
-<h3 class="fn"><a name="senderObject" /><a href="qobject.html">QObject</a> QSignalTransition.senderObject (<i>self</i>)</h3><h3 class="fn"><a name="setSenderObject" />QSignalTransition.setSenderObject (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>sender</i>)</h3><h3 class="fn"><a name="setSignal" />QSignalTransition.setSignal (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>signal</i>)</h3><h3 class="fn"><a name="signal" /><a href="qbytearray.html">QByteArray</a> QSignalTransition.signal (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="senderObject" /><a href="qobject.html">QObject</a> QSignalTransition.senderObject (<i>self</i>)</h3><h3 class="fn"><a name="setSenderObject" />QSignalTransition.setSenderObject (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>sender</i>)</h3><h3 class="fn"><a name="setSignal" />QSignalTransition.setSignal (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>signal</i>)</h3><h3 class="fn"><a name="signal" /><a href="qbytearray.html">QByteArray</a> QSignalTransition.signal (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

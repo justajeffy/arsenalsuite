@@ -19,9 +19,9 @@ with scripting your C++ application.</p>
 <p>Use <a href="qscriptengine.html#evaluate">evaluate</a>() to
 evaluate script code; this is the C++ equivalent of the built-in
 script function <tt>eval()</tt>.</p>
-<pre class="highlightedCode brush: cpp">
- QScriptEngine myEngine;
- QScriptValue three = myEngine.evaluate("1 + 2");
+<pre class="cpp">
+ <span class="type">QScriptEngine</span> myEngine;
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> three <span class="operator">=</span> myEngine<span class="operator">.</span><a href="qscriptengine.html#evaluate">evaluate</a>(<span class="string">"1 + 2"</span>);
 </pre>
 <p><a href="qscriptengine.html#evaluate">evaluate</a>() returns a
 <a href="qscriptvalue.html">QScriptValue</a> that holds the result
@@ -31,25 +31,25 @@ types (e.g. <a href="qscriptvalue.html#toString">QScriptValue.toString</a>() and
 <a href="qscriptvalue.html#toNumber">QScriptValue.toNumber</a>()).</p>
 <p>The following code snippet shows how a script function can be
 defined and then invoked from C++ using <a href="qscriptvalue.html#call">QScriptValue.call</a>():</p>
-<pre class="highlightedCode brush: cpp">
- QScriptValue fun = myEngine.evaluate("(function(a, b) { return a + b; })");
- QScriptValueList args;
- args &lt;&lt; 1 &lt;&lt; 2;
- QScriptValue threeAgain = fun.call(QScriptValue(), args);
+<pre class="cpp">
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> fun <span class="operator">=</span> myEngine<span class="operator">.</span><a href="qscriptengine.html#evaluate">evaluate</a>(<span class="string">"(function(a, b) { return a + b; })"</span>);
+ <span class="type">QScriptValueList</span> args;
+ args <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="number">1</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="number">2</span>;
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> threeAgain <span class="operator">=</span> fun<span class="operator">.</span>call(<span class="type"><a href="qscriptvalue.html">QScriptValue</a></span>()<span class="operator">,</span> args);
 </pre>
 <p>As can be seen from the above snippets, a script is provided to
 the engine in the form of a string. One common way of loading
 scripts is by reading the contents of a file and passing it to
 <a href="qscriptengine.html#evaluate">evaluate</a>():</p>
-<pre class="highlightedCode brush: cpp">
- QString fileName = "helloworld.qs";
- QFile scriptFile(fileName);
- if (!scriptFile.open(QIODevice.ReadOnly))
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> fileName <span class="operator">=</span> <span class="string">"helloworld.qs"</span>;
+ <span class="type"><a href="qfile.html">QFile</a></span> scriptFile(fileName);
+ <span class="keyword">if</span> (<span class="operator">!</span>scriptFile<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>ReadOnly))
      <span class="comment">// handle error</span>
- QTextStream stream(&amp;scriptFile);
- QString contents = stream.readAll();
- scriptFile.close();
- myEngine.evaluate(contents, fileName);
+ <span class="type"><a href="qtextstream.html">QTextStream</a></span> stream(<span class="operator">&amp;</span>scriptFile);
+ <span class="type"><a href="qstring.html">QString</a></span> contents <span class="operator">=</span> stream<span class="operator">.</span>readAll();
+ scriptFile<span class="operator">.</span>close();
+ myEngine<span class="operator">.</span><a href="qscriptengine.html#evaluate">evaluate</a>(contents<span class="operator">,</span> fileName);
 </pre>
 <p>Here we pass the name of the file as the second argument to
 <a href="qscriptengine.html#evaluate">evaluate</a>(). This does not
@@ -66,10 +66,10 @@ script engine. Properties of the Global Object are accessible from
 any script code (i.e. they are global variables). Typically, before
 evaluating "user" scripts, you will want to configure a script
 engine by adding one or more properties to the Global Object:</p>
-<pre class="highlightedCode brush: cpp">
- myEngine.globalObject().setProperty("myNumber", 123);
- ...
- QScriptValue myNumberPlusOne = myEngine.evaluate("myNumber + 1");
+<pre class="cpp">
+ myEngine<span class="operator">.</span><a href="qscriptengine.html#globalObject">globalObject</a>()<span class="operator">.</span><a href="qobject.html#setProperty">setProperty</a>(<span class="string">"myNumber"</span><span class="operator">,</span> <span class="number">123</span>);
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> myNumberPlusOne <span class="operator">=</span> myEngine<span class="operator">.</span><a href="qscriptengine.html#evaluate">evaluate</a>(<span class="string">"myNumber + 1"</span>);
 </pre>
 <p>Adding custom properties to the scripting environment is one of
 the standard means of providing a scripting API that is specific to
@@ -88,11 +88,11 @@ an error message. The current uncaught exception is also available
 through <a href="qscriptengine.html#uncaughtException">uncaughtException</a>().
 Calling <a href="qscriptengine.html#clearExceptions">clearExceptions</a>() will
 cause any uncaught exceptions to be cleared.</p>
-<pre class="highlightedCode brush: cpp">
- QScriptValue result = myEngine.evaluate(...);
- if (myEngine.hasUncaughtException()) {
-     int line = myEngine.uncaughtExceptionLineNumber();
-     qDebug() &lt;&lt; "uncaught exception at line" &lt;&lt; line &lt;&lt; ":" &lt;&lt; result.toString();
+<pre class="cpp">
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> result <span class="operator">=</span> myEngine<span class="operator">.</span><a href="qscriptengine.html#evaluate">evaluate</a>(<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
+ <span class="keyword">if</span> (myEngine<span class="operator">.</span>hasUncaughtException()) {
+     <span class="type">int</span> line <span class="operator">=</span> myEngine<span class="operator">.</span>uncaughtExceptionLineNumber();
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"uncaught exception at line"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> line <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">":"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> result<span class="operator">.</span>toString();
  }
 </pre>
 <p>The <a href="qscriptengine.html#checkSyntax">checkSyntax</a>()
@@ -118,15 +118,15 @@ proxy script object; properties, children, and signals and slots of
 the <a href="qobject.html">QObject</a> are available as properties
 of the proxy object. No binding code is needed because it is done
 dynamically using the Qt meta object system.</p>
-<pre class="highlightedCode brush: cpp">
- QPushButton button;
- QScriptValue scriptButton = myEngine.newQObject(&amp;button);
- myEngine.globalObject().setProperty("button", scriptButton);
+<pre class="cpp">
+ <span class="type"><a href="qpushbutton.html">QPushButton</a></span> button;
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> scriptButton <span class="operator">=</span> myEngine<span class="operator">.</span><a href="qscriptengine.html#newQObject">newQObject</a>(<span class="operator">&amp;</span>button);
+ myEngine<span class="operator">.</span><a href="qscriptengine.html#globalObject">globalObject</a>()<span class="operator">.</span><a href="qobject.html#setProperty">setProperty</a>(<span class="string">"button"</span><span class="operator">,</span> scriptButton);
 
- myEngine.evaluate("button.checkable = true");
+ myEngine<span class="operator">.</span><a href="qscriptengine.html#evaluate">evaluate</a>(<span class="string">"button.checkable = true"</span>);
 
- qDebug() &lt;&lt; scriptButton.property("checkable").toBoolean();
- scriptButton.property("show").call(); <span class="comment">// call the show() slot</span>
+ <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> scriptButton<span class="operator">.</span><a href="qobject.html#property">property</a>(<span class="string">"checkable"</span>)<span class="operator">.</span>toBoolean();
+ scriptButton<span class="operator">.</span><a href="qobject.html#property">property</a>(<span class="string">"show"</span>)<span class="operator">.</span>call(); <span class="comment">// call the show() slot</span>
 </pre>
 <p>Use <a href="qscriptengine.html#qScriptConnect">qScriptConnect</a>() to connect
 a C++ signal to a script function; this is the Qt Script equivalent
@@ -189,24 +189,24 @@ functions must have the signature <a href="qscriptengine.html#FunctionSignature-
 You may then pass the function as argument to <a href="qscriptengine.html#newFunction">newFunction</a>(). Here is an
 example of a function that returns the sum of its first two
 arguments:</p>
-<pre class="highlightedCode brush: cpp">
- QScriptValue myAdd(QScriptContext *context, QScriptEngine *engine)
+<pre class="cpp">
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> myAdd(<span class="type"><a href="qscriptcontext.html">QScriptContext</a></span> <span class="operator">*</span>context<span class="operator">,</span> <span class="type">QScriptEngine</span> <span class="operator">*</span>engine)
  {
-    QScriptValue a = context-&gt;argument(0);
-    QScriptValue b = context-&gt;argument(1);
-    return a.toNumber() + b.toNumber();
+    <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> a <span class="operator">=</span> context<span class="operator">-</span><span class="operator">&gt;</span>argument(<span class="number">0</span>);
+    <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> b <span class="operator">=</span> context<span class="operator">-</span><span class="operator">&gt;</span>argument(<span class="number">1</span>);
+    <span class="keyword">return</span> a<span class="operator">.</span>toNumber() <span class="operator">+</span> b<span class="operator">.</span>toNumber();
  }
 </pre>
 <p>To expose this function to script code, you can set it as a
 property of the Global Object:</p>
-<pre class="highlightedCode brush: cpp">
- QScriptValue fun = myEngine.newFunction(myAdd);
- myEngine.globalObject().setProperty("myAdd", fun);
+<pre class="cpp">
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> fun <span class="operator">=</span> myEngine<span class="operator">.</span><a href="qscriptengine.html#newFunction">newFunction</a>(myAdd);
+ myEngine<span class="operator">.</span><a href="qscriptengine.html#globalObject">globalObject</a>()<span class="operator">.</span><a href="qobject.html#setProperty">setProperty</a>(<span class="string">"myAdd"</span><span class="operator">,</span> fun);
 </pre>
 <p>Once this is done, script code can call your function in the
 exact same manner as a "normal" script function:</p>
-<pre class="highlightedCode brush: cpp">
- QScriptValue result = myEngine.evaluate("myAdd(myNumber, 1)");
+<pre class="cpp">
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> result <span class="operator">=</span> myEngine<span class="operator">.</span><a href="qscriptengine.html#evaluate">evaluate</a>(<span class="string">"myAdd(myNumber, 1)"</span>);
 </pre>
 <a id="long-running-scripts" name="long-running-scripts" />
 <h3>Long-running Scripts</h3>
@@ -239,7 +239,7 @@ can be used to implement debugging and profiling of a
 QScriptEngine.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="QObjectWrapOption-enum" />QScriptEngine.QObjectWrapOption</h3><p>These flags specify options when wrapping a <a href="qobject.html">QObject</a> pointer with <a href="qscriptengine.html#newQObject">newQObject</a>().</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -247,46 +247,46 @@ QScriptEngine.</p>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngine.ExcludeChildObjects</tt></td>
-<td class=" topAlign"><tt>0x0001</tt></td>
+<td class="topAlign"><tt>0x0001</tt></td>
 <td class="topAlign">The script object will not expose child
 objects as properties.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngine.ExcludeSuperClassMethods</tt></td>
-<td class=" topAlign"><tt>0x0002</tt></td>
+<td class="topAlign"><tt>0x0002</tt></td>
 <td class="topAlign">The script object will not expose signals and
 slots inherited from the superclass.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngine.ExcludeSuperClassProperties</tt></td>
-<td class=" topAlign"><tt>0x0004</tt></td>
+<td class="topAlign"><tt>0x0004</tt></td>
 <td class="topAlign">The script object will not expose properties
 inherited from the superclass.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngine.ExcludeSuperClassContents</tt></td>
-<td class=" topAlign"><tt>0x0006</tt></td>
+<td class="topAlign"><tt>0x0006</tt></td>
 <td class="topAlign">Shorthand form for ExcludeSuperClassMethods |
 ExcludeSuperClassProperties</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngine.ExcludeDeleteLater</tt></td>
-<td class=" topAlign"><tt>0x0010</tt></td>
+<td class="topAlign"><tt>0x0010</tt></td>
 <td class="topAlign">The script object will not expose the <a href="qobject.html#deleteLater">QObject.deleteLater</a>() slot.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QScriptEngine.ExcludeSlots</tt></td>
-<td class=" topAlign"><tt>0x0020</tt></td>
+<td class="topAlign"><tt>0x0020</tt></td>
 <td class="topAlign">The script object will not expose the <a href="qobject.html">QObject</a>'s slots.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngine.AutoCreateDynamicProperties</tt></td>
-<td class=" topAlign"><tt>0x0100</tt></td>
+<td class="topAlign"><tt>0x0100</tt></td>
 <td class="topAlign">Properties that don't already exist in the
 <a href="qobject.html">QObject</a> will be created as dynamic
 properties of that object, rather than as properties of the script
@@ -295,14 +295,14 @@ object.</td>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngine.PreferExistingWrapperObject</tt></td>
-<td class=" topAlign"><tt>0x0200</tt></td>
+<td class="topAlign"><tt>0x0200</tt></td>
 <td class="topAlign">If a wrapper object with the requested
 configuration already exists, return that object.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngine.SkipMethodsInEnumeration</tt></td>
-<td class=" topAlign"><tt>0x0008</tt></td>
+<td class="topAlign"><tt>0x0008</tt></td>
 <td class="topAlign">Don't include methods (signals and slots) when
 enumerating the object's properties.</td>
 </tr>
@@ -314,21 +314,21 @@ combination of QObjectWrapOption values.</p>
 <h3 class="fn"><a name="ValueOwnership-enum" />QScriptEngine.ValueOwnership</h3><p>This enum specifies the ownership when wrapping a C++ value,
 e.g. by using <a href="qscriptengine.html#newQObject">newQObject</a>().</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QScriptEngine.QtOwnership</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The standard Qt ownership rules apply, i.e.
 the associated object will never be explicitly deleted by the
 script engine. This is the default. (<a href="qobject.html">QObject</a> ownership is explained in <a href="objecttrees.html">Object Trees &amp; Ownership</a>.)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QScriptEngine.ScriptOwnership</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The value is owned by the script environment.
 The associated data will be deleted when appropriate (i.e. after
 the garbage collector has discovered that there are no more live
@@ -336,7 +336,7 @@ references to the value).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QScriptEngine.AutoOwnership</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">If the associated object has a parent, the Qt
 ownership rules apply (QtOwnership); otherwise, the object is owned
 by the script environment (ScriptOwnership).</td>
@@ -365,15 +365,13 @@ false), this function does nothing.</p>
 some reason, e.g. when you have detected that the script has been
 running for several seconds without completing.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptengine.html#evaluate">evaluate</a>(),
-<a href="qscriptengine.html#isEvaluating">isEvaluating</a>(), and
-<a href="qscriptengine.html#setProcessEventsInterval">setProcessEventsInterval</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#evaluate">evaluate</a>(), <a href="qscriptengine.html#isEvaluating">isEvaluating</a>(), and <a href="qscriptengine.html#setProcessEventsInterval">setProcessEventsInterval</a>().</p>
 
 
 <h3 class="fn"><a name="agent" /><a href="qscriptengineagent.html">QScriptEngineAgent</a> QScriptEngine.agent (<i>self</i>)</h3><p>Returns the agent currently installed on this engine, or 0 if no
 agent is installed.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptengine.html#setAgent">setAgent</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#setAgent">setAgent</a>().</p>
 
 
 <h3 class="fn"><a name="availableExtensions" />QStringList QScriptEngine.availableExtensions (<i>self</i>)</h3><p>Returns a list naming the available extensions that can be
@@ -381,7 +379,7 @@ imported using the <a href="qscriptengine.html#importExtension">importExtension<
 function. This list includes extensions that have been
 imported.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptengine.html#importExtension">importExtension</a>() and
+<p><b>See also</b> <a href="qscriptengine.html#importExtension">importExtension</a>() and
 <a href="qscriptengine.html#importedExtensions">importedExtensions</a>().</p>
 
 
@@ -393,7 +391,7 @@ object that contains the result of the check.</p>
 
 <h3 class="fn"><a name="clearExceptions" />QScriptEngine.clearExceptions (<i>self</i>)</h3><p>Clears any uncaught exceptions in this engine.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptengine.html#hasUncaughtException">hasUncaughtException</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#hasUncaughtException">hasUncaughtException</a>().</p>
 
 
 <h3 class="fn"><a name="collectGarbage" />QScriptEngine.collectGarbage (<i>self</i>)</h3><p>Runs the garbage collector.</p>
@@ -405,7 +403,7 @@ collector will automatically be invoked when the <a href="qscriptengine.html">QS
 so (i.e. when a certain number of new objects have been created).
 However, you can call this function to explicitly request that
 garbage collection should be performed as soon as possible.</p>
-<p>See also <a href="qscriptengine.html#reportAdditionalMemoryCost">reportAdditionalMemoryCost</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#reportAdditionalMemoryCost">reportAdditionalMemoryCost</a>().</p>
 
 
 <h3 class="fn"><a name="currentContext" /><a href="qscriptcontext.html">QScriptContext</a> QScriptEngine.currentContext (<i>self</i>)</h3><p>Returns the current context.</p>
@@ -417,7 +415,7 @@ it is available as the first argument in <a href="qscriptengine.html#FunctionSig
 <h3 class="fn"><a name="defaultPrototype" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.defaultPrototype (<i>self</i>, int&#160;<i>metaTypeId</i>)</h3><p>Returns the default prototype associated with the given
 <i>metaTypeId</i>, or an invalid <a href="qscriptvalue.html">QScriptValue</a> if no default prototype has
 been set.</p>
-<p>See also <a href="qscriptengine.html#setDefaultPrototype">setDefaultPrototype</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#setDefaultPrototype">setDefaultPrototype</a>().</p>
 
 
 <h3 class="fn"><a name="evaluate" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.evaluate (<i>self</i>, QString&#160;<i>program</i>, QString&#160;<i>fileName</i>&#160;=&#160;QString(), int&#160;<i>lineNumber</i>&#160;=&#160;1)</h3><p>Evaluates <i>program</i>, using <i>lineNumber</i> as the base
@@ -440,7 +438,7 @@ line number is specified, line numbers will be 1-based.</p>
 <p><i>fileName</i> is used for error reporting. For example in
 error objects the file name is accessible through the "fileName"
 property if it's provided with this function.</p>
-<p>See also <a class="obsolete" href="qscriptengine-obsolete.html#canEvaluate">canEvaluate</a>(), <a href="qscriptengine.html#hasUncaughtException">hasUncaughtException</a>(),
+<p><b>See also</b> <a class="obsolete" href="qscriptengine-obsolete.html#canEvaluate">canEvaluate</a>(), <a href="qscriptengine.html#hasUncaughtException">hasUncaughtException</a>(),
 <a href="qscriptengine.html#isEvaluating">isEvaluating</a>(), and
 <a href="qscriptengine.html#abortEvaluation">abortEvaluation</a>().</p>
 
@@ -453,13 +451,13 @@ set properties of the Global Object to make your own extensions
 available to all script code. Non-local variables in script code
 will be created as properties of the Global Object, as well as
 local variables in global code.</p>
-<p>See also <a href="qscriptengine.html#setGlobalObject">setGlobalObject</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#setGlobalObject">setGlobalObject</a>().</p>
 
 
 <h3 class="fn"><a name="hasUncaughtException" />bool QScriptEngine.hasUncaughtException (<i>self</i>)</h3><p>Returns true if the last script evaluation resulted in an
 uncaught exception; otherwise returns false.</p>
 <p>The exception state is cleared when <a href="qscriptengine.html#evaluate">evaluate</a>() is called.</p>
-<p>See also <a href="qscriptengine.html#uncaughtException">uncaughtException</a>() and
+<p><b>See also</b> <a href="qscriptengine.html#uncaughtException">uncaughtException</a>() and
 <a href="qscriptengine.html#uncaughtExceptionLineNumber">uncaughtExceptionLineNumber</a>().</p>
 
 
@@ -467,7 +465,7 @@ uncaught exception; otherwise returns false.</p>
 using the <a href="qscriptengine.html#importExtension">importExtension</a>()
 function.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptengine.html#availableExtensions">availableExtensions</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#availableExtensions">availableExtensions</a>().</p>
 
 
 <h3 class="fn"><a name="importExtension" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.importExtension (<i>self</i>, QString&#160;<i>extension</i>)</h3><p>Imports the given <i>extension</i> into this <a href="qscriptengine.html">QScriptEngine</a>. Returns <a href="qscriptengine.html#undefinedValue">undefinedValue</a>() if the
@@ -479,7 +477,7 @@ the value that was thrown by the exception (usually an
 particular extension is only imported once; subsequent calls to
 importExtension() with the same extension name will do nothing and
 return <a href="qscriptengine.html#undefinedValue">undefinedValue</a>().</p>
-<p>See also <a href="qscriptengine.html#availableExtensions">availableExtensions</a>(),
+<p><b>See also</b> <a href="qscriptengine.html#availableExtensions">availableExtensions</a>(),
 <a href="qscriptextensionplugin.html">QScriptExtensionPlugin</a>,
 and <a href="qtscriptextensions.html">Creating QtScript
 Extensions</a>.</p>
@@ -491,75 +489,50 @@ the Global Object if no object is specified.</p>
 translator functions is described in the following table:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Script Function</th>
 <th>Corresponding C++ Function</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>qsTr()</p>
-</td>
-<td>
-<p><a href="qobject.html#tr">QObject.tr</a>()</p>
-</td>
+<tr class="odd" valign="top">
+<td>qsTr()</td>
+<td><a href="qobject.html#tr">QObject.tr</a>()</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qtcore.html#QT_TR_NOOP">QT_TR_NOOP</a>()</p>
-</td>
-<td>
-<p><a href="qtcore.html#QT_TR_NOOP">QT_TR_NOOP</a>()</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qtcore.html#QT_TR_NOOP">QT_TR_NOOP</a>()</td>
+<td><a href="qtcore.html#QT_TR_NOOP">QT_TR_NOOP</a>()</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>qsTranslate()</p>
-</td>
-<td>
-<p><a href="qcoreapplication.html#translate">QCoreApplication.translate</a>()</p>
-</td>
+<tr class="odd" valign="top">
+<td>qsTranslate()</td>
+<td><a href="qcoreapplication.html#translate">QCoreApplication.translate</a>()</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qtcore.html#QT_TRANSLATE_NOOP">QT_TRANSLATE_NOOP</a>()</p>
-</td>
-<td>
-<p><a href="qtcore.html#QT_TRANSLATE_NOOP">QT_TRANSLATE_NOOP</a>()</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qtcore.html#QT_TRANSLATE_NOOP">QT_TRANSLATE_NOOP</a>()</td>
+<td><a href="qtcore.html#QT_TRANSLATE_NOOP">QT_TRANSLATE_NOOP</a>()</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>qsTrId() (since 4.7)</p>
-</td>
-<td>
-<p><a href="qtcore.html#qtTrId">qtTrId</a>()</p>
-</td>
+<tr class="odd" valign="top">
+<td>qsTrId() (since 4.7)</td>
+<td><a href="qtcore.html#qtTrId">qtTrId</a>()</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qtcore.html#QT_TRID_NOOP">QT_TRID_NOOP</a>() (since
-4.7)</p>
-</td>
-<td>
-<p><a href="qtcore.html#QT_TRID_NOOP">QT_TRID_NOOP</a>()</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qtcore.html#QT_TRID_NOOP">QT_TRID_NOOP</a>() (since
+4.7)</td>
+<td><a href="qtcore.html#QT_TRID_NOOP">QT_TRID_NOOP</a>()</td>
 </tr>
 </table>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="internationalization.html">Internationalization with Qt</a>.</p>
+<p><b>See also</b> <a href="internationalization.html">Internationalization with Qt</a>.</p>
 
 
 <h3 class="fn"><a name="isEvaluating" />bool QScriptEngine.isEvaluating (<i>self</i>)</h3><p>Returns true if this engine is currently evaluating a script,
 otherwise returns false.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptengine.html#evaluate">evaluate</a>()
-and <a href="qscriptengine.html#abortEvaluation">abortEvaluation</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#evaluate">evaluate</a>() and <a href="qscriptengine.html#abortEvaluation">abortEvaluation</a>().</p>
 
 
 <h3 class="fn"><a name="newArray" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.newArray (<i>self</i>, int&#160;<i>length</i>&#160;=&#160;0)</h3><p>Creates a <a href="qtscript.html">QtScript</a> object of class
 Array with the given <i>length</i>.</p>
-<p>See also <a href="qscriptengine.html#newObject">newObject</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#newObject">newObject</a>().</p>
 
 
 <h3 class="fn"><a name="newDate" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.newDate (<i>self</i>, float&#160;<i>value</i>)</h3><p>Creates a <a href="qtscript.html">QtScript</a> object of class
@@ -569,7 +542,7 @@ Date with the given <i>value</i> (the number of milliseconds since
 
 <h3 class="fn"><a name="newDate-2" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.newDate (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>value</i>)</h3><p>Creates a <a href="qtscript.html">QtScript</a> object of class
 Date from the given <i>value</i>.</p>
-<p>See also <a href="qscriptvalue.html#toDateTime">QScriptValue.toDateTime</a>().</p>
+<p><b>See also</b> <a href="qscriptvalue.html#toDateTime">QScriptValue.toDateTime</a>().</p>
 
 
 <h3 class="fn"><a name="newFunction" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.newFunction (<i>self</i>, callable&#160;<i>signature</i>, int&#160;<i>length</i>&#160;=&#160;0)</h3><p>Creates a <a href="qscriptvalue.html">QScriptValue</a> that
@@ -593,20 +566,20 @@ you can create script object properties that behave like normal
 properties in script code, but are in fact accessed through
 functions (analogous to how properties work in <a href="properties.html#qt-s-property-system">Qt's Property System</a>).
 Example:</p>
-<pre class="highlightedCode brush: cpp">
- static QScriptValue getSetFoo(QScriptContext *context, QScriptEngine *engine)
+<pre class="cpp">
+ <span class="keyword">static</span> <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> getSetFoo(<span class="type"><a href="qscriptcontext.html">QScriptContext</a></span> <span class="operator">*</span>context<span class="operator">,</span> <span class="type"><a href="qscriptengine.html">QScriptEngine</a></span> <span class="operator">*</span>engine)
  {
-     QScriptValue callee = context-&gt;callee();
-     if (context-&gt;argumentCount() == 1) <span class="comment">// writing?</span>
-         callee.setProperty("value", context-&gt;argument(0));
-     return callee.property("value");
+     <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> callee <span class="operator">=</span> context<span class="operator">-</span><span class="operator">&gt;</span>callee();
+     <span class="keyword">if</span> (context<span class="operator">-</span><span class="operator">&gt;</span>argumentCount() <span class="operator">=</span><span class="operator">=</span> <span class="number">1</span>) <span class="comment">// writing?</span>
+         callee<span class="operator">.</span>setProperty(<span class="string">"value"</span><span class="operator">,</span> context<span class="operator">-</span><span class="operator">&gt;</span>argument(<span class="number">0</span>));
+     <span class="keyword">return</span> callee<span class="operator">.</span>property(<span class="string">"value"</span>);
  }
 
- ....
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 
- QScriptValue object = engine.newObject();
- object.setProperty("foo", engine.newFunction(getSetFoo),
-     QScriptValue.PropertyGetter | QScriptValue.PropertySetter);
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> object <span class="operator">=</span> engine<span class="operator">.</span><a href="qscriptengine.html#newObject">newObject</a>();
+ object<span class="operator">.</span><a href="qobject.html#setProperty">setProperty</a>(<span class="string">"foo"</span><span class="operator">,</span> engine<span class="operator">.</span>newFunction(getSetFoo)<span class="operator">,</span>
+     <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span><span class="operator">.</span>PropertyGetter <span class="operator">|</span> <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span><span class="operator">.</span>PropertySetter);
 </pre>
 <p>When the property <tt>foo</tt> of the script object is
 subsequently accessed in script code, <tt>getSetFoo()</tt> will be
@@ -621,12 +594,12 @@ use two separate functions; just specify the relevant flag
 (<a href="qscriptvalue.html#PropertyFlag-enum">QScriptValue.PropertyGetter</a>
 or <a href="qscriptvalue.html#PropertyFlag-enum">QScriptValue.PropertySetter</a>)
 when setting the property, e.g.:</p>
-<pre class="highlightedCode brush: cpp">
- QScriptValue object = engine.newObject();
- object.setProperty("foo", engine.newFunction(getFoo), QScriptValue.PropertyGetter);
- object.setProperty("foo", engine.newFunction(setFoo), QScriptValue.PropertySetter);
+<pre class="cpp">
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> object <span class="operator">=</span> engine<span class="operator">.</span><a href="qscriptengine.html#newObject">newObject</a>();
+ object<span class="operator">.</span><a href="qobject.html#setProperty">setProperty</a>(<span class="string">"foo"</span><span class="operator">,</span> engine<span class="operator">.</span>newFunction(getFoo)<span class="operator">,</span> <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span><span class="operator">.</span>PropertyGetter);
+ object<span class="operator">.</span><a href="qobject.html#setProperty">setProperty</a>(<span class="string">"foo"</span><span class="operator">,</span> engine<span class="operator">.</span>newFunction(setFoo)<span class="operator">,</span> <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span><span class="operator">.</span>PropertySetter);
 </pre>
-<p>See also <a href="qscriptvalue.html#call">QScriptValue.call</a>().</p>
+<p><b>See also</b> <a href="qscriptvalue.html#call">QScriptValue.call</a>().</p>
 
 
 <h3 class="fn"><a name="newFunction-2" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.newFunction (<i>self</i>, callable&#160;<i>signature</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>prototype</i>, int&#160;<i>length</i>&#160;=&#160;0)</h3><p>Creates a constructor function from <i>fun</i>, with the given
@@ -646,61 +619,61 @@ prototype of your object is set correctly; either by setting it
 manually, or, when wrapping a custom type, by having registered the
 <a href="qscriptengine.html#defaultPrototype">defaultPrototype</a>() of
 that type. Example:</p>
-<pre class="highlightedCode brush: cpp">
- QScriptValue Foo(QScriptContext *context, QScriptEngine *engine)
+<pre class="cpp">
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> Foo(<span class="type"><a href="qscriptcontext.html">QScriptContext</a></span> <span class="operator">*</span>context<span class="operator">,</span> <span class="type"><a href="qscriptengine.html">QScriptEngine</a></span> <span class="operator">*</span>engine)
  {
-     if (context-&gt;calledAsConstructor()) {
+     <span class="keyword">if</span> (context<span class="operator">-</span><span class="operator">&gt;</span>calledAsConstructor()) {
          <span class="comment">// initialize the new object</span>
-         context-&gt;thisObject().setProperty("bar", ...);
+         context<span class="operator">-</span><span class="operator">&gt;</span>thisObject()<span class="operator">.</span>setProperty(<span class="string">"bar"</span><span class="operator">,</span> <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
          <span class="comment">// ...</span>
          <span class="comment">// return a non-object value to indicate that the</span>
          <span class="comment">// thisObject() should be the result of the "new Foo()" expression</span>
-         return engine-&gt;undefinedValue();
-     } else {
+         <span class="keyword">return</span> engine<span class="operator">-</span><span class="operator">&gt;</span>undefinedValue();
+     } <span class="keyword">else</span> {
          <span class="comment">// not called as "new Foo()", just "Foo()"</span>
          <span class="comment">// create our own object and return that one</span>
-         QScriptValue object = engine-&gt;newObject();
-         object.setPrototype(context-&gt;callee().property("prototype"));
-         object.setProperty("baz", ...);
-         return object;
+         <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> object <span class="operator">=</span> engine<span class="operator">-</span><span class="operator">&gt;</span>newObject();
+         object<span class="operator">.</span>setPrototype(context<span class="operator">-</span><span class="operator">&gt;</span>callee()<span class="operator">.</span>property(<span class="string">"prototype"</span>));
+         object<span class="operator">.</span>setProperty(<span class="string">"baz"</span><span class="operator">,</span> <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
+         <span class="keyword">return</span> object;
      }
  }
 
- ...
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 
- QScriptValue fooProto = engine-&gt;newObject();
- fooProto.setProperty("whatever", ...);
- engine-&gt;globalObject().setProperty("Foo", engine-&gt;newFunction(Foo, fooProto));
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> fooProto <span class="operator">=</span> engine<span class="operator">-</span><span class="operator">&gt;</span><a href="qscriptengine.html#newObject">newObject</a>();
+ fooProto<span class="operator">.</span><a href="qobject.html#setProperty">setProperty</a>(<span class="string">"whatever"</span><span class="operator">,</span> <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
+ engine<span class="operator">-</span><span class="operator">&gt;</span><a href="qscriptengine.html#globalObject">globalObject</a>()<span class="operator">.</span><a href="qobject.html#setProperty">setProperty</a>(<span class="string">"Foo"</span><span class="operator">,</span> engine<span class="operator">-</span><span class="operator">&gt;</span>newFunction(Foo<span class="operator">,</span> fooProto));
 </pre>
 <p>To wrap a custom type and provide a constructor for it, you'd
 typically do something like this:</p>
-<pre class="highlightedCode brush: cpp">
- class Bar { ... };
+<pre class="cpp">
+ <span class="keyword">class</span> Bar { <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span> };
 
- Q_DECLARE_METATYPE(Bar)
+ <a href="qmetatype.html#Q_DECLARE_METATYPE">Q_DECLARE_METATYPE</a>(Bar)
 
- QScriptValue constructBar(QScriptContext *context, QScriptEngine *engine)
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> constructBar(<span class="type"><a href="qscriptcontext.html">QScriptContext</a></span> <span class="operator">*</span>context<span class="operator">,</span> <span class="type"><a href="qscriptengine.html">QScriptEngine</a></span> <span class="operator">*</span>engine)
  {
      Bar bar;
      <span class="comment">// initialize from arguments in context, if desired</span>
-     ...
-     return engine-&gt;toScriptValue(bar);
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+     <span class="keyword">return</span> engine<span class="operator">-</span><span class="operator">&gt;</span>toScriptValue(bar);
  }
 
- class BarPrototype : public QObject, public QScriptable
+ <span class="keyword">class</span> BarPrototype : <span class="keyword">public</span> <span class="type"><a href="qobject.html">QObject</a></span><span class="operator">,</span> <span class="keyword">public</span> <span class="type"><a href="qscriptable.html">QScriptable</a></span>
  {
-<span class="comment"> // provide the scriptable interface of this type using slots and properties</span>
- ...
+ <span class="comment">// provide the scriptable interface of this type using slots and properties</span>
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  };
 
- ...
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 
-<span class="comment"> // create and register the Bar prototype and constructor in the engine</span>
- BarPrototype *barPrototypeObject = new BarPrototype(...);
- QScriptValue barProto = engine-&gt;newQObject(barPrototypeObject);
- engine-&gt;setDefaultPrototype(qMetaTypeId&lt;Bar&gt;, barProto);
- QScriptValue barCtor = engine-&gt;newFunction(constructBar, barProto);
- engine-&gt;globalObject().setProperty("Bar", barCtor);
+ <span class="comment">// create and register the Bar prototype and constructor in the engine</span>
+ BarPrototype <span class="operator">*</span>barPrototypeObject <span class="operator">=</span> <span class="keyword">new</span> BarPrototype(<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> barProto <span class="operator">=</span> engine<span class="operator">-</span><span class="operator">&gt;</span><a href="qscriptengine.html#newQObject">newQObject</a>(barPrototypeObject);
+ engine<span class="operator">-</span><span class="operator">&gt;</span><a href="qscriptengine.html#setDefaultPrototype">setDefaultPrototype</a>(<a href="qmetatype.html#qMetaTypeId">qMetaTypeId</a><span class="operator">&lt;</span>Bar<span class="operator">&gt;</span><span class="operator">,</span> barProto);
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> barCtor <span class="operator">=</span> engine<span class="operator">-</span><span class="operator">&gt;</span><a href="qscriptengine.html#newFunction">newFunction</a>(constructBar<span class="operator">,</span> barProto);
+ engine<span class="operator">-</span><span class="operator">&gt;</span><a href="qscriptengine.html#globalObject">globalObject</a>()<span class="operator">.</span><a href="qobject.html#setProperty">setProperty</a>(<span class="string">"Bar"</span><span class="operator">,</span> barCtor);
 </pre>
 
 
@@ -708,8 +681,7 @@ typically do something like this:</p>
 Object.</p>
 <p>The prototype of the created object will be the Object prototype
 object.</p>
-<p>See also <a href="qscriptengine.html#newArray">newArray</a>()
-and <a href="qscriptvalue.html#setProperty">QScriptValue.setProperty</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#newArray">newArray</a>() and <a href="qscriptvalue.html#setProperty">QScriptValue.setProperty</a>().</p>
 
 
 <h3 class="fn"><a name="newObject-2" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.newObject (<i>self</i>, <a href="qscriptclass.html">QScriptClass</a>&#160;<i>scriptClass</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>data</i>&#160;=&#160;QScriptValue())</h3><p>This is an overloaded function.</p>
@@ -720,7 +692,7 @@ object.</p>
 <p><i>data</i>, if specified, is set as the internal data of the
 new object (using <a href="qscriptvalue.html#setData">QScriptValue.setData</a>()).</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptvalue.html#scriptClass">QScriptValue.scriptClass</a>() and
+<p><b>See also</b> <a href="qscriptvalue.html#scriptClass">QScriptValue.scriptClass</a>() and
 <a href="qscriptengine.html#reportAdditionalMemoryCost">reportAdditionalMemoryCost</a>().</p>
 
 
@@ -732,24 +704,24 @@ as properties of the created <a href="qscriptvalue.html">QScriptValue</a>. When 
 function, <i>ctor</i> will be called to create a new instance of
 the class.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QScriptValue mySpecialQObjectConstructor(QScriptContext *context,
-                                          QScriptEngine *engine)
+<pre class="cpp">
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> mySpecialQObjectConstructor(<span class="type"><a href="qscriptcontext.html">QScriptContext</a></span> <span class="operator">*</span>context<span class="operator">,</span>
+                                          <span class="type"><a href="qscriptengine.html">QScriptEngine</a></span> <span class="operator">*</span>engine)
  {
-     QObject *parent = context-&gt;argument(0).toQObject();
-     QObject *object = new QObject(parent);
-     return engine-&gt;newQObject(object, QScriptEngine.ScriptOwnership);
+     <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>parent <span class="operator">=</span> context<span class="operator">-</span><span class="operator">&gt;</span>argument(<span class="number">0</span>)<span class="operator">.</span>toQObject();
+     <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>object <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qobject.html">QObject</a></span>(parent);
+     <span class="keyword">return</span> engine<span class="operator">-</span><span class="operator">&gt;</span>newQObject(object<span class="operator">,</span> <span class="type"><a href="qscriptengine.html">QScriptEngine</a></span><span class="operator">.</span>ScriptOwnership);
  }
 
- ...
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 
- QScriptValue ctor = engine.newFunction(mySpecialQObjectConstructor);
- QScriptValue metaObject = engine.newQMetaObject(&amp;QObject.staticMetaObject, ctor);
- engine.globalObject().setProperty("QObject", metaObject);
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> ctor <span class="operator">=</span> engine<span class="operator">.</span>newFunction(mySpecialQObjectConstructor);
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> metaObject <span class="operator">=</span> engine<span class="operator">.</span>newQMetaObject(<span class="operator">&amp;</span><span class="type"><a href="qobject.html">QObject</a></span><span class="operator">.</span>staticMetaObject<span class="operator">,</span> ctor);
+ engine<span class="operator">.</span>globalObject()<span class="operator">.</span>setProperty(<span class="string">"QObject"</span><span class="operator">,</span> metaObject);
 
- QScriptValue result = engine.evaluate("new QObject()");
+ <span class="type"><a href="qscriptvalue.html">QScriptValue</a></span> result <span class="operator">=</span> engine<span class="operator">.</span>evaluate(<span class="string">"new QObject()"</span>);
 </pre>
-<p>See also <a href="qscriptengine.html#newQObject">newQObject</a>() and <a href="qscriptengine.html#scriptValueFromQMetaObject">scriptValueFromQMetaObject</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#newQObject">newQObject</a>() and <a href="qscriptengine.html#scriptValueFromQMetaObject">scriptValueFromQMetaObject</a>().</p>
 
 
 <h3 class="fn"><a name="newQObject" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.newQObject (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>object</i>, <a href="qscriptengine.html#ValueOwnership-enum">ValueOwnership</a>&#160;<i>ownership</i>&#160;=&#160;QScriptEngine.QtOwnership, <a href="qscriptengine-qobjectwrapoptions.html">QObjectWrapOptions</a>&#160;<i>options</i>&#160;=&#160;0)</h3><p>Creates a <a href="qtscript.html">QtScript</a> object that wraps
@@ -770,7 +742,7 @@ prototype.</p>
 deleted <a href="qobject.html">QObject</a>'s members through the
 <a href="qtscript.html">QtScript</a> wrapper object (either by
 script code or C++) will result in a script exception.</p>
-<p>See also <a href="qscriptvalue.html#toQObject">QScriptValue.toQObject</a>() and
+<p><b>See also</b> <a href="qscriptvalue.html#toQObject">QScriptValue.toQObject</a>() and
 <a href="qscriptengine.html#reportAdditionalMemoryCost">reportAdditionalMemoryCost</a>().</p>
 
 
@@ -795,12 +767,12 @@ returns true), you can pass <a href="qscriptcontext.html#thisObject">QScriptCont
 (the default constructed script object) to this function to
 initialize the new object.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptengine.html#reportAdditionalMemoryCost">reportAdditionalMemoryCost</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#reportAdditionalMemoryCost">reportAdditionalMemoryCost</a>().</p>
 
 
 <h3 class="fn"><a name="newRegExp" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.newRegExp (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>regexp</i>)</h3><p>Creates a <a href="qtscript.html">QtScript</a> object of class
 RegExp with the given <i>regexp</i>.</p>
-<p>See also <a href="qscriptvalue.html#toRegExp">QScriptValue.toRegExp</a>().</p>
+<p><b>See also</b> <a href="qscriptvalue.html#toRegExp">QScriptValue.toRegExp</a>().</p>
 
 
 <h3 class="fn"><a name="newRegExp-2" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.newRegExp (<i>self</i>, QString&#160;<i>pattern</i>, QString&#160;<i>flags</i>)</h3><p>Creates a <a href="qtscript.html">QtScript</a> object of class
@@ -815,7 +787,7 @@ the given variant <i>value</i>.</p>
 of <i>value</i>, then the prototype of the created object will be
 that prototype; otherwise, the prototype will be the Object
 prototype object.</p>
-<p>See also <a href="qscriptengine.html#setDefaultPrototype">setDefaultPrototype</a>(),
+<p><b>See also</b> <a href="qscriptengine.html#setDefaultPrototype">setDefaultPrototype</a>(),
 <a href="qscriptvalue.html#toVariant">QScriptValue.toVariant</a>(), and
 <a href="qscriptengine.html#reportAdditionalMemoryCost">reportAdditionalMemoryCost</a>().</p>
 
@@ -838,22 +810,22 @@ returns true), you can pass <a href="qscriptcontext.html#thisObject">QScriptCont
 (the default constructed script object) to this function to
 initialize the new object.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptengine.html#reportAdditionalMemoryCost">reportAdditionalMemoryCost</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#reportAdditionalMemoryCost">reportAdditionalMemoryCost</a>().</p>
 
 
 <h3 class="fn"><a name="nullValue" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.nullValue (<i>self</i>)</h3><p>Returns a <a href="qscriptvalue.html">QScriptValue</a> of the
 primitive type Null.</p>
-<p>See also <a href="qscriptengine.html#undefinedValue">undefinedValue</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#undefinedValue">undefinedValue</a>().</p>
 
 
 <h3 class="fn"><a name="popContext" />QScriptEngine.popContext (<i>self</i>)</h3><p>Pops the current execution context and restores the previous
 one. This function must be used in conjunction with <a href="qscriptengine.html#pushContext">pushContext</a>().</p>
-<p>See also <a href="qscriptengine.html#pushContext">pushContext</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#pushContext">pushContext</a>().</p>
 
 
 <h3 class="fn"><a name="processEventsInterval" />int QScriptEngine.processEventsInterval (<i>self</i>)</h3><p>Returns the interval in milliseconds between calls to <a href="qcoreapplication.html#processEvents">QCoreApplication.processEvents</a>()
 while the interpreter is running.</p>
-<p>See also <a href="qscriptengine.html#setProcessEventsInterval">setProcessEventsInterval</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#setProcessEventsInterval">setProcessEventsInterval</a>().</p>
 
 
 <h3 class="fn"><a name="pushContext" /><a href="qscriptcontext.html">QScriptContext</a> QScriptEngine.pushContext (<i>self</i>)</h3><p>Enters a new execution context and returns the associated
@@ -867,19 +839,19 @@ if it were the body of a function. You can use the context's
 <a href="qscriptcontext.html#activationObject">activationObject</a>() to
 initialize local variables that will be available to scripts.
 Example:</p>
-<pre class="highlightedCode brush: cpp">
- QScriptEngine engine;
- QScriptContext *context = engine.pushContext();
- context-&gt;activationObject().setProperty("myArg", 123);
- engine.evaluate("var tmp = myArg + 42");
- ...
- engine.popContext();
+<pre class="cpp">
+ <span class="type"><a href="qscriptengine.html">QScriptEngine</a></span> engine;
+ <span class="type"><a href="qscriptcontext.html">QScriptContext</a></span> <span class="operator">*</span>context <span class="operator">=</span> engine<span class="operator">.</span>pushContext();
+ context<span class="operator">-</span><span class="operator">&gt;</span>activationObject()<span class="operator">.</span>setProperty(<span class="string">"myArg"</span><span class="operator">,</span> <span class="number">123</span>);
+ engine<span class="operator">.</span>evaluate(<span class="string">"var tmp = myArg + 42"</span>);
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ engine<span class="operator">.</span>popContext();
 </pre>
 <p>In the above example, the new variable "tmp" defined in the
 script will be local to the context; in other words, the script
 doesn't have any effect on the global environment.</p>
 <p>Returns 0 in case of stack overflow</p>
-<p>See also <a href="qscriptengine.html#popContext">popContext</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#popContext">popContext</a>().</p>
 
 
 <h3 class="fn"><a name="reportAdditionalMemoryCost" />QScriptEngine.reportAdditionalMemoryCost (<i>self</i>, int&#160;<i>size</i>)</h3><p>Reports an additional memory cost of the given <i>size</i>,
@@ -896,7 +868,7 @@ be freed anyway.</p>
 can't be used to report that the additional memory has been
 deallocated.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qscriptengine.html#collectGarbage">collectGarbage</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#collectGarbage">collectGarbage</a>().</p>
 
 
 <h3 class="fn"><a name="setAgent" />QScriptEngine.setAgent (<i>self</i>, <a href="qscriptengineagent.html">QScriptEngineAgent</a>&#160;<i>agent</i>)</h3><p>Installs the given <i>agent</i> on this engine. The agent will
@@ -908,7 +880,7 @@ interface is the basis of tools like debuggers and profilers.</p>
 <p>Calling this function will replace the existing agent, if
 any.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptengine.html#agent">agent</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#agent">agent</a>().</p>
 
 
 <h3 class="fn"><a name="setDefaultPrototype" />QScriptEngine.setDefaultPrototype (<i>self</i>, int&#160;<i>metaTypeId</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>prototype</i>)</h3><p>Sets the default prototype of the C++ type identified by the
@@ -925,7 +897,7 @@ scripting API of the type through <a href="qobject.html">QObject</a> properties 
 possibility is to create a script object by calling <a href="qscriptengine.html#newObject">newObject</a>(), and populate the
 object with the desired properties (e.g. native functions wrapped
 with <a href="qscriptengine.html#newFunction">newFunction</a>()).</p>
-<p>See also <a href="qscriptengine.html#defaultPrototype">defaultPrototype</a>(),
+<p><b>See also</b> <a href="qscriptengine.html#defaultPrototype">defaultPrototype</a>(),
 <a href="qscriptengine.html#qScriptRegisterMetaType">qScriptRegisterMetaType</a>(),
 <a href="qscriptable.html">QScriptable</a>, and <a href="script-defaultprototypes.html">Default Prototypes Example</a>.</p>
 
@@ -939,7 +911,7 @@ copy the properties of the standard Global Object; alternatively,
 you can set the internal prototype of your custom object to be the
 original Global Object.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qscriptengine.html#globalObject">globalObject</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#globalObject">globalObject</a>().</p>
 
 
 <h3 class="fn"><a name="setProcessEventsInterval" />QScriptEngine.setProcessEventsInterval (<i>self</i>, int&#160;<i>interval</i>)</h3><p>Sets the interval between calls to
@@ -960,7 +932,7 @@ interval. For example, you could keep track of the total running
 time of the script and call <a href="qscriptengine.html#abortEvaluation">abortEvaluation</a>() when you
 detect that the script has been running for a long time without
 completing.</p>
-<p>See also <a href="qscriptengine.html#processEventsInterval">processEventsInterval</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#processEventsInterval">processEventsInterval</a>().</p>
 
 
 <h3 class="fn"><a name="toObject" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.toObject (<i>self</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>value</i>)</h3><p>Converts the given <i>value</i> to an object, if such a
@@ -968,65 +940,41 @@ conversion is possible; otherwise returns an invalid <a href="qscriptvalue.html"
 according to the following table:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Input Type</th>
 <th>Result</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>Undefined</p>
-</td>
-<td>
-<p>An invalid <a href="qscriptvalue.html">QScriptValue</a>.</p>
-</td>
+<tr class="odd" valign="top">
+<td>Undefined</td>
+<td>An invalid <a href="qscriptvalue.html">QScriptValue</a>.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Null</p>
-</td>
-<td>
-<p>An invalid <a href="qscriptvalue.html">QScriptValue</a>.</p>
-</td>
+<tr class="even" valign="top">
+<td>Null</td>
+<td>An invalid <a href="qscriptvalue.html">QScriptValue</a>.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Boolean</p>
-</td>
-<td>
-<p>A new Boolean object whose internal value is set to the value of
-the boolean.</p>
-</td>
+<tr class="odd" valign="top">
+<td>Boolean</td>
+<td>A new Boolean object whose internal value is set to the value
+of the boolean.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Number</p>
-</td>
-<td>
-<p>A new Number object whose internal value is set to the value of
-the number.</p>
-</td>
+<tr class="even" valign="top">
+<td>Number</td>
+<td>A new Number object whose internal value is set to the value of
+the number.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>String</p>
-</td>
-<td>
-<p>A new String object whose internal value is set to the value of
-the string.</p>
-</td>
+<tr class="odd" valign="top">
+<td>String</td>
+<td>A new String object whose internal value is set to the value of
+the string.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Object</p>
-</td>
-<td>
-<p>The result is the object itself (no conversion).</p>
-</td>
+<tr class="even" valign="top">
+<td>Object</td>
+<td>The result is the object itself (no conversion).</td>
 </tr>
 </table>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qscriptengine.html#newObject">newObject</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#newObject">newObject</a>().</p>
 
 
 <h3 class="fn"><a name="toStringHandle" /><a href="qscriptstring.html">QScriptString</a> QScriptEngine.toStringHandle (<i>self</i>, QString&#160;<i>str</i>)</h3><p>Returns a handle that represents the given string,
@@ -1035,7 +983,7 @@ the string.</p>
 quickly look up properties, and compare property names, of script
 objects.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptvalue.html#property">QScriptValue.property</a>().</p>
+<p><b>See also</b> <a href="qscriptvalue.html#property">QScriptValue.property</a>().</p>
 
 
 <h3 class="fn"><a name="uncaughtException" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.uncaughtException (<i>self</i>)</h3><p>Returns the current uncaught exception, or an invalid <a href="qscriptvalue.html">QScriptValue</a> if there is no uncaught
@@ -1043,7 +991,7 @@ exception.</p>
 <p>The exception value is typically an <tt>Error</tt> object; in
 that case, you can call toString() on the return value to obtain an
 error message.</p>
-<p>See also <a href="qscriptengine.html#hasUncaughtException">hasUncaughtException</a>()
+<p><b>See also</b> <a href="qscriptengine.html#hasUncaughtException">hasUncaughtException</a>()
 and <a href="qscriptengine.html#uncaughtExceptionLineNumber">uncaughtExceptionLineNumber</a>().</p>
 
 
@@ -1051,23 +999,23 @@ and <a href="qscriptengine.html#uncaughtExceptionLineNumber">uncaughtExceptionLi
 exception.</p>
 <p>It is in the form
 <tt>&lt;function-name&gt;()@&lt;file-name&gt;:&lt;line-number&gt;</tt>.</p>
-<p>See also <a href="qscriptengine.html#uncaughtException">uncaughtException</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#uncaughtException">uncaughtException</a>().</p>
 
 
 <h3 class="fn"><a name="uncaughtExceptionLineNumber" />int QScriptEngine.uncaughtExceptionLineNumber (<i>self</i>)</h3><p>Returns the line number where the last uncaught exception
 occurred.</p>
 <p>Line numbers are 1-based, unless a different base was specified
 as the second argument to <a href="qscriptengine.html#evaluate">evaluate</a>().</p>
-<p>See also <a href="qscriptengine.html#hasUncaughtException">hasUncaughtException</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#hasUncaughtException">hasUncaughtException</a>().</p>
 
 
 <h3 class="fn"><a name="undefinedValue" /><a href="qscriptvalue.html">QScriptValue</a> QScriptEngine.undefinedValue (<i>self</i>)</h3><p>Returns a <a href="qscriptvalue.html">QScriptValue</a> of the
 primitive type Undefined.</p>
-<p>See also <a href="qscriptengine.html#nullValue">nullValue</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#nullValue">nullValue</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="signalHandlerException" />void signalHandlerException (const QScriptValue&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when a script function connected to a
 signal causes an <i>exception</i>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qscriptengine.html#qScriptConnect">qScriptConnect</a>().</p>
+<p><b>See also</b> <a href="qscriptengine.html#qScriptConnect">qScriptConnect</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -16,12 +16,12 @@ unformatted XML.</p>
 <p>QXmlSerializer translates an <a href="qabstractxmlreceiver.html#xquery-sequence">XQuery sequence</a>,
 usually the output of an <a href="qxmlquery.html">QXmlQuery</a>,
 into XML. Consider the example:</p>
-<pre class="highlightedCode brush: cpp">
- QXmlQuery query;
- query.setQuery("doc('index.html')/html/body/p[1]");
+<pre class="cpp">
+ <span class="type"><a href="qxmlquery.html">QXmlQuery</a></span> query;
+ query<span class="operator">.</span>setQuery(<span class="string">"doc('index.html')/html/body/p[1]"</span>);
 
- QXmlSerializer serializer(query, myOutputDevice);
- query.evaluateTo(&amp;serializer);
+ <span class="type">QXmlSerializer</span> serializer(query<span class="operator">,</span> myOutputDevice);
+ query<span class="operator">.</span>evaluateTo(<span class="operator">&amp;</span>serializer);
 </pre>
 <p>First it constructs a <a href="qxmlquery.html">query</a> that
 gets the first paragraph from document <tt>index.html</tt>. Then it
@@ -65,7 +65,7 @@ ownership of <i>outputDevice</i>.</p>
 
 <h3 class="fn"><a name="codec" /><a href="qtextcodec.html">QTextCodec</a> QXmlSerializer.codec (<i>self</i>)</h3><p>Returns the codec being used by the serializer for encoding its
 XML output.</p>
-<p>See also <a href="qxmlserializer.html#setCodec">setCodec</a>().</p>
+<p><b>See also</b> <a href="qxmlserializer.html#setCodec">setCodec</a>().</p>
 
 
 <h3 class="fn"><a name="comment" />QXmlSerializer.comment (<i>self</i>, QString&#160;<i>value</i>)</h3><p>Reimplemented from <a href="qabstractxmlreceiver.html#comment">QAbstractXmlReceiver.comment</a>().</p>
@@ -96,7 +96,7 @@ does not take ownership of its IO device.</p>
 output. The output codec is set to <i>outputCodec</i>. By default,
 the output codec is set to the one for <tt>UTF-8</tt>. The
 serializer does not take ownership of the codec.</p>
-<p>See also <a href="qxmlserializer.html#codec">codec</a>().</p>
+<p><b>See also</b> <a href="qxmlserializer.html#codec">codec</a>().</p>
 
 
 <h3 class="fn"><a name="startDocument" />QXmlSerializer.startDocument (<i>self</i>)</h3><p>Reimplemented from <a href="qabstractxmlreceiver.html#startDocument">QAbstractXmlReceiver.startDocument</a>().</p>
@@ -106,4 +106,4 @@ serializer does not take ownership of the codec.</p>
 
 
 <h3 class="fn"><a name="startOfSequence" />QXmlSerializer.startOfSequence (<i>self</i>)</h3><p>Reimplemented from <a href="qabstractxmlreceiver.html#startOfSequence">QAbstractXmlReceiver.startOfSequence</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

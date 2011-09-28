@@ -57,29 +57,29 @@ drawing, for instance, if they make use of native theme engines.
 This is the case for both the Windows XP, Windows Vista, and the
 Mac OS X styles.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="ColorGroup-enum" />QPalette.ColorGroup</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Disabled</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Active</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Inactive</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Normal</tt></td>
-<td class=" topAlign"><tt>Active</tt></td>
+<td class="topAlign"><tt>Active</tt></td>
 <td class="topAlign">synonym for Active</td>
 </tr>
 </table>
@@ -90,36 +90,36 @@ Mac OS X styles.</p>
 used in current GUIs.</p>
 <p>The central roles are:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Window</tt></td>
-<td class=" topAlign"><tt>10</tt></td>
+<td class="topAlign"><tt>10</tt></td>
 <td class="topAlign">A general background color.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Background</tt></td>
-<td class=" topAlign"><tt>Window</tt></td>
+<td class="topAlign"><tt>Window</tt></td>
 <td class="topAlign">This value is obsolete. Use Window
 instead.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.WindowText</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">A general foreground color.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Foreground</tt></td>
-<td class=" topAlign"><tt>WindowText</tt></td>
+<td class="topAlign"><tt>WindowText</tt></td>
 <td class="topAlign">This value is obsolete. Use WindowText
 instead.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Base</tt></td>
-<td class=" topAlign"><tt>9</tt></td>
+<td class="topAlign"><tt>9</tt></td>
 <td class="topAlign">Used mostly as the background color for text
 entry widgets, but can also be used for other painting - such as
 the background of combobox drop down lists and toolbar handles. It
@@ -127,27 +127,27 @@ is usually white or another light color.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.AlternateBase</tt></td>
-<td class=" topAlign"><tt>16</tt></td>
+<td class="topAlign"><tt>16</tt></td>
 <td class="topAlign">Used as the alternate background color in
 views with alternating row colors (see <a href="qabstractitemview.html#alternatingRowColors-prop">QAbstractItemView.setAlternatingRowColors</a>()).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.ToolTipBase</tt></td>
-<td class=" topAlign"><tt>18</tt></td>
+<td class="topAlign"><tt>18</tt></td>
 <td class="topAlign">Used as the background color for <a href="qtooltip.html">QToolTip</a> and <a href="qwhatsthis.html">QWhatsThis</a>. Tool tips use the Inactive color
 group of <a href="qpalette.html">QPalette</a>, because tool tips
 are not active windows.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.ToolTipText</tt></td>
-<td class=" topAlign"><tt>19</tt></td>
+<td class="topAlign"><tt>19</tt></td>
 <td class="topAlign">Used as the foreground color for <a href="qtooltip.html">QToolTip</a> and <a href="qwhatsthis.html">QWhatsThis</a>. Tool tips use the Inactive color
 group of <a href="qpalette.html">QPalette</a>, because tool tips
 are not active windows.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Text</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">The foreground color used with <tt>Base</tt>.
 This is usually the same as the <tt>WindowText</tt>, in which case
 it must provide good contrast with <tt>Window</tt> and
@@ -155,20 +155,20 @@ it must provide good contrast with <tt>Window</tt> and
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Button</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The general button background color. This
 background can be different from <tt>Window</tt> as some styles
 require a different background color for buttons.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.ButtonText</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">A foreground color used with the
 <tt>Button</tt> color.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.BrightText</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">A text color that is very different from
 <tt>WindowText</tt>, and contrasts well with e.g. <tt>Dark</tt>.
 Typically used for text that needs to be drawn where <tt>Text</tt>
@@ -186,56 +186,56 @@ buttons depend on it to make the bevels look attractive, and Motif
 scroll bars depend on <tt>Mid</tt> to be slightly different from
 <tt>Window</tt>.</p>
 <table class="valuelist">
-<tr class="even">
+<tr class="even" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Light</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Lighter than <tt>Button</tt> color.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Midlight</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Between <tt>Button</tt> and
 <tt>Light</tt>.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Dark</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Darker than <tt>Button</tt>.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Mid</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">Between <tt>Button</tt> and
 <tt>Dark</tt>.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Shadow</tt></td>
-<td class=" topAlign"><tt>11</tt></td>
+<td class="topAlign"><tt>11</tt></td>
 <td class="topAlign">A very dark color. By default, the shadow
 color is <a href="qt.html#GlobalColor-enum">Qt.black</a>.</td>
 </tr>
 </table>
 <p>Selected (marked) items have two roles:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Highlight</tt></td>
-<td class=" topAlign"><tt>12</tt></td>
+<td class="topAlign"><tt>12</tt></td>
 <td class="topAlign">A color to indicate a selected item or the
 current item. By default, the highlight color is <a href="qt.html#GlobalColor-enum">Qt.darkBlue</a>.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.HighlightedText</tt></td>
-<td class=" topAlign"><tt>13</tt></td>
+<td class="topAlign"><tt>13</tt></td>
 <td class="topAlign">A text color that contrasts with
 <tt>Highlight</tt>. By default, the highlighted text color is
 <a href="qt.html#GlobalColor-enum">Qt.white</a>.</td>
@@ -243,20 +243,20 @@ current item. By default, the highlight color is <a href="qt.html#GlobalColor-en
 </table>
 <p>There are two color roles related to hyperlinks:</p>
 <table class="valuelist">
-<tr class="even">
+<tr class="even" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.Link</tt></td>
-<td class=" topAlign"><tt>14</tt></td>
+<td class="topAlign"><tt>14</tt></td>
 <td class="topAlign">A text color used for unvisited hyperlinks. By
 default, the link color is <a href="qt.html#GlobalColor-enum">Qt.blue</a>.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.LinkVisited</tt></td>
-<td class=" topAlign"><tt>15</tt></td>
+<td class="topAlign"><tt>15</tt></td>
 <td class="topAlign">A text color used for already visited
 hyperlinks. By default, the linkvisited color is <a href="qt.html#GlobalColor-enum">Qt.magenta</a>.</td>
 </tr>
@@ -265,28 +265,28 @@ hyperlinks. By default, the linkvisited color is <a href="qt.html#GlobalColor-en
 <tt>LinkVisited</tt> roles when rendering rich text in Qt, and that
 we recommend that you use CSS and the <a href="qtextdocument.html#defaultStyleSheet-prop">QTextDocument.setDefaultStyleSheet</a>()
 function to alter the appearance of links. For example:</p>
-<pre class="highlightedCode brush: cpp">
-     QTextBrowser browser;
-     QColor linkColor(Qt.red);
-     QString sheet = QString.fromLatin1("a { text-decoration: underline; color: %1 }").arg(linkColor.name());
-     browser.document()-&gt;setDefaultStyleSheet(sheet);
+<pre class="cpp">
+     <span class="type"><a href="qtextbrowser.html">QTextBrowser</a></span> browser;
+     <span class="type"><a href="qcolor.html">QColor</a></span> linkColor(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>red);
+     <span class="type"><a href="qstring.html">QString</a></span> sheet <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>fromLatin1(<span class="string">"a { text-decoration: underline; color: %1 }"</span>)<span class="operator">.</span>arg(linkColor<span class="operator">.</span>name());
+     browser<span class="operator">.</span>document()<span class="operator">-</span><span class="operator">&gt;</span>setDefaultStyleSheet(sheet);
 </pre>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPalette.NoRole</tt></td>
-<td class=" topAlign"><tt>17</tt></td>
+<td class="topAlign"><tt>17</tt></td>
 <td class="topAlign">No role; this special role is often used to
 indicate that a role has not been assigned.</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QPalette" />QPalette.__init__ (<i>self</i>)</h3><p>Constructs a palette object that uses the application's default
 palette.</p>
-<p>See also <a href="qapplication.html#setPalette">QApplication.setPalette</a>() and
+<p><b>See also</b> <a href="qapplication.html#setPalette">QApplication.setPalette</a>() and
 <a href="qapplication.html#palette">QApplication.palette</a>().</p>
 
 
@@ -309,7 +309,7 @@ on these colors.</p>
 plain colors for <i>windowText</i>, <i>button</i>, <i>light</i>,
 <i>dark</i>, <i>mid</i>, <i>text</i>, <i>bright_text</i>,
 <i>base</i> and <i>window</i>.</p>
-<p>See also <a href="qbrush.html">QBrush</a>.</p>
+<p><b>See also</b> <a href="qbrush.html">QBrush</a>.</p>
 
 
 <h3 class="fn"><a name="QPalette-6" />QPalette.__init__ (<i>self</i>, <a href="qcolor.html">QColor</a>&#160;<i>foreground</i>, <a href="qcolor.html">QColor</a>&#160;<i>background</i>, <a href="qcolor.html">QColor</a>&#160;<i>light</i>, <a href="qcolor.html">QColor</a>&#160;<i>dark</i>, <a href="qcolor.html">QColor</a>&#160;<i>mid</i>, <a href="qcolor.html">QColor</a>&#160;<i>text</i>, <a href="qcolor.html">QColor</a>&#160;<i>base</i>)</h3><h3 class="fn"><a name="QPalette-7" />QPalette.__init__ (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>palette</i>)</h3><h3 class="fn"><a name="QPalette-8" />QPalette.__init__ (<i>self</i>, QVariant&#160;<i>variant</i>)</h3><p>Constructs a copy of <i>p</i>.</p>
@@ -317,41 +317,38 @@ plain colors for <i>windowText</i>, <i>button</i>, <i>light</i>,
 
 
 <h3 class="fn"><a name="alternateBase" /><a href="qbrush.html">QBrush</a> QPalette.alternateBase (<i>self</i>)</h3><p>Returns the alternate base brush of the current color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="background" /><a href="qbrush.html">QBrush</a> QPalette.background (<i>self</i>)</h3><h3 class="fn"><a name="base" /><a href="qbrush.html">QBrush</a> QPalette.base (<i>self</i>)</h3><p>Returns the base brush of the current color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="brightText" /><a href="qbrush.html">QBrush</a> QPalette.brightText (<i>self</i>)</h3><p>Returns the bright text foreground brush of the current color
 group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="brush" /><a href="qbrush.html">QBrush</a> QPalette.brush (<i>self</i>, <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>&#160;<i>cg</i>, <a href="qpalette.html#ColorRole-enum">ColorRole</a>&#160;<i>cr</i>)</h3><p>Returns the brush in the specified color <i>group</i>, used for
 the given color <i>role</i>.</p>
-<p>See also <a href="qpalette.html#color">color</a>(), <a href="qpalette.html#setBrush">setBrush</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
+<p><b>See also</b> <a href="qpalette.html#color">color</a>(),
+<a href="qpalette.html#setBrush">setBrush</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
 
 
 <h3 class="fn"><a name="brush-2" /><a href="qbrush.html">QBrush</a> QPalette.brush (<i>self</i>, <a href="qpalette.html#ColorRole-enum">ColorRole</a>&#160;<i>cr</i>)</h3><p>This is an overloaded function.</p>
 <p>Returns the brush that has been set for the given color
 <i>role</i> in the current <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>.</p>
-<p>See also <a href="qpalette.html#color">color</a>(), <a href="qpalette.html#setBrush">setBrush</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
+<p><b>See also</b> <a href="qpalette.html#color">color</a>(),
+<a href="qpalette.html#setBrush">setBrush</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
 
 
 <h3 class="fn"><a name="button" /><a href="qbrush.html">QBrush</a> QPalette.button (<i>self</i>)</h3><p>Returns the button brush of the current color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="buttonText" /><a href="qbrush.html">QBrush</a> QPalette.buttonText (<i>self</i>)</h3><p>Returns the button text foreground brush of the current color
 group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="cacheKey" />int QPalette.cacheKey (<i>self</i>)</h3><p>Returns a number that identifies the contents of this <a href="qpalette.html">QPalette</a> object. Distinct <a href="qpalette.html">QPalette</a> objects can have the same key if they
@@ -361,48 +358,46 @@ refer to the same contents.</p>
 
 <h3 class="fn"><a name="color" /><a href="qcolor.html">QColor</a> QPalette.color (<i>self</i>, <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>&#160;<i>cg</i>, <a href="qpalette.html#ColorRole-enum">ColorRole</a>&#160;<i>cr</i>)</h3><p>Returns the color in the specified color <i>group</i>, used for
 the given color <i>role</i>.</p>
-<p>See also <a href="qpalette.html#brush">brush</a>(), <a href="qpalette.html#setColor">setColor</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
+<p><b>See also</b> <a href="qpalette.html#brush">brush</a>(),
+<a href="qpalette.html#setColor">setColor</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
 
 
 <h3 class="fn"><a name="color-2" /><a href="qcolor.html">QColor</a> QPalette.color (<i>self</i>, <a href="qpalette.html#ColorRole-enum">ColorRole</a>&#160;<i>cr</i>)</h3><p>This is an overloaded function.</p>
 <p>Returns the color that has been set for the given color
 <i>role</i> in the current <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>.</p>
-<p>See also <a href="qpalette.html#brush">brush</a>() and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
+<p><b>See also</b> <a href="qpalette.html#brush">brush</a>() and
+<a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
 
 
 <h3 class="fn"><a name="currentColorGroup" /><a href="qpalette.html#ColorGroup-enum">ColorGroup</a> QPalette.currentColorGroup (<i>self</i>)</h3><p>Returns the palette's current color group.</p>
-<p>See also <a href="qpalette.html#setCurrentColorGroup">setCurrentColorGroup</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#setCurrentColorGroup">setCurrentColorGroup</a>().</p>
 
 
 <h3 class="fn"><a name="dark" /><a href="qbrush.html">QBrush</a> QPalette.dark (<i>self</i>)</h3><p>Returns the dark brush of the current color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="foreground" /><a href="qbrush.html">QBrush</a> QPalette.foreground (<i>self</i>)</h3><h3 class="fn"><a name="highlight" /><a href="qbrush.html">QBrush</a> QPalette.highlight (<i>self</i>)</h3><p>Returns the highlight brush of the current color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="highlightedText" /><a href="qbrush.html">QBrush</a> QPalette.highlightedText (<i>self</i>)</h3><p>Returns the highlighted text brush of the current color
 group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="isBrushSet" />bool QPalette.isBrushSet (<i>self</i>, <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>&#160;<i>cg</i>, <a href="qpalette.html#ColorRole-enum">ColorRole</a>&#160;<i>cr</i>)</h3><p>Returns true if the <a href="qpalette.html#ColorGroup-enum">ColorGroup</a> <i>cg</i> and
 <a href="qpalette.html#ColorRole-enum">ColorRole</a> <i>cr</i> has
 been set previously on this palette; otherwise returns false.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qpalette.html#setBrush">setBrush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#setBrush">setBrush</a>().</p>
 
 
 <h3 class="fn"><a name="isCopyOf" />bool QPalette.isCopyOf (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>p</i>)</h3><p>Returns true if this palette and <i>p</i> are copies of each
 other, i.e. one of them was created as a copy of the other and
 neither was subsequently modified; otherwise returns false. This is
 much stricter than equality.</p>
-<p>See also <a href="qpalette.html#operator-eq">operator=</a>() and
-<a href="qpalette.html#operator-eq-eq">operator==</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#operator-eq">operator=</a>() and <a href="qpalette.html#operator-eq-eq">operator==</a>().</p>
 
 
 <h3 class="fn"><a name="isEqual" />bool QPalette.isEqual (<i>self</i>, <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>&#160;<i>cr1</i>, <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>&#160;<i>cr2</i>)</h3><p>Returns true (usually quickly) if color group <i>cg1</i> is
@@ -410,30 +405,25 @@ equal to <i>cg2</i>; otherwise returns false.</p>
 
 
 <h3 class="fn"><a name="light" /><a href="qbrush.html">QBrush</a> QPalette.light (<i>self</i>)</h3><p>Returns the light brush of the current color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="link" /><a href="qbrush.html">QBrush</a> QPalette.link (<i>self</i>)</h3><p>Returns the unvisited link text brush of the current color
 group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="linkVisited" /><a href="qbrush.html">QBrush</a> QPalette.linkVisited (<i>self</i>)</h3><p>Returns the visited link text brush of the current color
 group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="mid" /><a href="qbrush.html">QBrush</a> QPalette.mid (<i>self</i>)</h3><p>Returns the mid brush of the current color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="midlight" /><a href="qbrush.html">QBrush</a> QPalette.midlight (<i>self</i>)</h3><p>Returns the midlight brush of the current color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="resolve" /><a href="qpalette.html">QPalette</a> QPalette.resolve (<i>self</i>, <a href="qpalette.html">QPalette</a>)</h3><p>Returns a new <a href="qpalette.html">QPalette</a> that has
@@ -442,47 +432,48 @@ attributes copied from <i>other</i>.</p>
 
 <h3 class="fn"><a name="resolve-2" />int QPalette.resolve (<i>self</i>)</h3><h3 class="fn"><a name="resolve-3" />QPalette.resolve (<i>self</i>, int&#160;<i>mask</i>)</h3><h3 class="fn"><a name="serialNumber" />int QPalette.serialNumber (<i>self</i>)</h3><h3 class="fn"><a name="setBrush" />QPalette.setBrush (<i>self</i>, <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>&#160;<i>cg</i>, <a href="qpalette.html#ColorRole-enum">ColorRole</a>&#160;<i>cr</i>, <a href="qbrush.html">QBrush</a>&#160;<i>brush</i>)</h3><p>Sets the brush for the given color <i>role</i> to the specified
 <i>brush</i> for all groups in the palette.</p>
-<p>See also <a href="qpalette.html#brush">brush</a>(), <a href="qpalette.html#setColor">setColor</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
+<p><b>See also</b> <a href="qpalette.html#brush">brush</a>(),
+<a href="qpalette.html#setColor">setColor</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
 
 
 <h3 class="fn"><a name="setBrush-2" />QPalette.setBrush (<i>self</i>, <a href="qpalette.html#ColorRole-enum">ColorRole</a>&#160;<i>acr</i>, <a href="qbrush.html">QBrush</a>&#160;<i>abrush</i>)</h3><p>This is an overloaded function.</p>
 <p>Sets the brush in the specified color <i>group</i>, used for the
 given color <i>role</i>, to <i>brush</i>.</p>
-<p>See also <a href="qpalette.html#brush">brush</a>(), <a href="qpalette.html#setColor">setColor</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
+<p><b>See also</b> <a href="qpalette.html#brush">brush</a>(),
+<a href="qpalette.html#setColor">setColor</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
 
 
 <h3 class="fn"><a name="setColor" />QPalette.setColor (<i>self</i>, <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>&#160;<i>acg</i>, <a href="qpalette.html#ColorRole-enum">ColorRole</a>&#160;<i>acr</i>, <a href="qcolor.html">QColor</a>&#160;<i>acolor</i>)</h3><p>Sets the color in the specified color <i>group</i>, used for the
 given color <i>role</i>, to the specified solid <i>color</i>.</p>
-<p>See also <a href="qpalette.html#setBrush">setBrush</a>(),
+<p><b>See also</b> <a href="qpalette.html#setBrush">setBrush</a>(),
 <a href="qpalette.html#color">color</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
 
 
 <h3 class="fn"><a name="setColor-2" />QPalette.setColor (<i>self</i>, <a href="qpalette.html#ColorRole-enum">ColorRole</a>&#160;<i>acr</i>, <a href="qcolor.html">QColor</a>&#160;<i>acolor</i>)</h3><p>This is an overloaded function.</p>
 <p>Sets the color used for the given color <i>role</i>, in all
 color groups, to the specified solid <i>color</i>.</p>
-<p>See also <a href="qpalette.html#brush">brush</a>(), <a href="qpalette.html#setColor">setColor</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
+<p><b>See also</b> <a href="qpalette.html#brush">brush</a>(),
+<a href="qpalette.html#setColor">setColor</a>(), and <a href="qpalette.html#ColorRole-enum">ColorRole</a>.</p>
 
 
 <h3 class="fn"><a name="setColorGroup" />QPalette.setColorGroup (<i>self</i>, <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>&#160;<i>cr</i>, <a href="qbrush.html">QBrush</a>&#160;<i>foreground</i>, <a href="qbrush.html">QBrush</a>&#160;<i>button</i>, <a href="qbrush.html">QBrush</a>&#160;<i>light</i>, <a href="qbrush.html">QBrush</a>&#160;<i>dark</i>, <a href="qbrush.html">QBrush</a>&#160;<i>mid</i>, <a href="qbrush.html">QBrush</a>&#160;<i>text</i>, <a href="qbrush.html">QBrush</a>&#160;<i>bright_text</i>, <a href="qbrush.html">QBrush</a>&#160;<i>base</i>, <a href="qbrush.html">QBrush</a>&#160;<i>background</i>)</h3><p>Sets a the group at <i>cg</i>. You can pass either brushes,
 pixmaps or plain colors for <i>windowText</i>, <i>button</i>,
 <i>light</i>, <i>dark</i>, <i>mid</i>, <i>text</i>,
 <i>bright_text</i>, <i>base</i> and <i>window</i>.</p>
-<p>See also <a href="qbrush.html">QBrush</a>.</p>
+<p><b>See also</b> <a href="qbrush.html">QBrush</a>.</p>
 
 
 <h3 class="fn"><a name="setCurrentColorGroup" />QPalette.setCurrentColorGroup (<i>self</i>, <a href="qpalette.html#ColorGroup-enum">ColorGroup</a>&#160;<i>cg</i>)</h3><p>Set the palette's current color group to <i>cg</i>.</p>
-<p>See also <a href="qpalette.html#currentColorGroup">currentColorGroup</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#currentColorGroup">currentColorGroup</a>().</p>
 
 
 <h3 class="fn"><a name="shadow" /><a href="qbrush.html">QBrush</a> QPalette.shadow (<i>self</i>)</h3><p>Returns the shadow brush of the current color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="text" /><a href="qbrush.html">QBrush</a> QPalette.text (<i>self</i>)</h3><p>Returns the text foreground brush of the current color
 group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="toolTipBase" /><a href="qbrush.html">QBrush</a> QPalette.toolTipBase (<i>self</i>)</h3><p>Returns the tool tip base brush of the current color group. This
@@ -490,8 +481,7 @@ brush is used by <a href="qtooltip.html">QToolTip</a> and <a href="qwhatsthis.ht
 <p><b>Note:</b> Tool tips use the Inactive color group of <a href="qpalette.html">QPalette</a>, because tool tips are not active
 windows.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="toolTipText" /><a href="qbrush.html">QBrush</a> QPalette.toolTipText (<i>self</i>)</h3><p>Returns the tool tip text brush of the current color group. This
@@ -499,20 +489,17 @@ brush is used by <a href="qtooltip.html">QToolTip</a> and <a href="qwhatsthis.ht
 <p><b>Note:</b> Tool tips use the Inactive color group of <a href="qpalette.html">QPalette</a>, because tool tips are not active
 windows.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="window" /><a href="qbrush.html">QBrush</a> QPalette.window (<i>self</i>)</h3><p>Returns the window (general background) brush of the current
 color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
 <h3 class="fn"><a name="windowText" /><a href="qbrush.html">QBrush</a> QPalette.windowText (<i>self</i>)</h3><p>Returns the window text (general foreground) brush of the
 current color group.</p>
-<p>See also <a href="qpalette.html#ColorRole-enum">ColorRole</a>
-and <a href="qpalette.html#brush">brush</a>().</p>
+<p><b>See also</b> <a href="qpalette.html#ColorRole-enum">ColorRole</a> and <a href="qpalette.html#brush">brush</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QPalette.__eq__ (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>p</i>)</h3><h3 class="fn"><a name="__ne__" />bool QPalette.__ne__ (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>p</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QPalette.__eq__ (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>p</i>)</h3><h3 class="fn"><a name="__ne__" />bool QPalette.__ne__ (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>p</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

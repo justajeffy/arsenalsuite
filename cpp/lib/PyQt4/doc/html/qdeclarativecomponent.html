@@ -15,27 +15,27 @@ definition.</p>
 well-defined interfaces. They are often defined in <a href="qdeclarativedocuments.html">Component Files</a>.</p>
 <p>A QDeclarativeComponent instance can be created from a QML file.
 For example, if there is a <tt>main.qml</tt> file like this:</p>
-<pre class="highlightedCode brush: cpp">
+<pre class="qml">
  import QtQuick 1.0
 
- Item {
-     width: 200
-     height: 200
+ <span class="type"><a href="qml-item.html">Item</a></span> {
+     <span class="name">width</span>: <span class="number">200</span>
+     <span class="name">height</span>: <span class="number">200</span>
  }
 </pre>
 <p>The following code loads this QML file as a component, creates
 an instance of this component using <a href="qdeclarativecomponent.html#create">create</a>(), and then queries
 the <a href="qml-item.html">Item</a>'s <a href="qml-item.html#width-prop">width</a> value:</p>
-<pre class="highlightedCode brush: cpp">
- QDeclarativeEngine *engine = new QDeclarativeEngine;
- QDeclarativeComponent component(engine, QUrl.fromLocalFile("main.qml"));
+<pre class="cpp">
+ <span class="type"><a href="qdeclarativeengine.html">QDeclarativeEngine</a></span> <span class="operator">*</span>engine <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qdeclarativeengine.html">QDeclarativeEngine</a></span>;
+ <span class="type">QDeclarativeComponent</span> component(engine<span class="operator">,</span> <span class="type"><a href="qurl.html">QUrl</a></span><span class="operator">.</span>fromLocalFile(<span class="string">"main.qml"</span>));
 
- QObject *myObject = component.create();
- QDeclarativeItem *item = qobject_cast&lt;QDeclarativeItem*&gt;(myObject);
- int width = item-&gt;width();  <span class="comment">// width = 200</span>
+ <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>myObject <span class="operator">=</span> component<span class="operator">.</span><a href="qdeclarativecomponent.html#create">create</a>();
+ <span class="type"><a href="qdeclarativeitem.html">QDeclarativeItem</a></span> <span class="operator">*</span>item <span class="operator">=</span> qobject_cast<span class="operator">&lt;</span><span class="type"><a href="qdeclarativeitem.html">QDeclarativeItem</a></span><span class="operator">*</span><span class="operator">&gt;</span>(myObject);
+ <span class="type">int</span> width <span class="operator">=</span> item<span class="operator">-</span><span class="operator">&gt;</span>width();  <span class="comment">// width = 200</span>
 </pre>
 <a id="network-components" name="network-components" />
-<h3>Network Components</h3>
+<h4>Network Components</h4>
 <p>If the URL passed to QDeclarativeComponent is a network
 resource, or if the QML document references a network resource, the
 QDeclarativeComponent has to fetch the network data before it is
@@ -51,36 +51,36 @@ signal and otherwise calls the <tt>continueLoading()</tt> method
 directly. Note that <a href="qdeclarativecomponent.html#isLoading">QDeclarativeComponent.isLoading</a>()
 may be false for a network component if the component has been
 cached and is ready immediately.</p>
-<pre class="highlightedCode brush: cpp">
- MyApplication.MyApplication()
+<pre class="cpp">
+ MyApplication<span class="operator">.</span>MyApplication()
  {
      <span class="comment">// ...</span>
-     component = new QDeclarativeComponent(engine, QUrl("http://www.example.com/main.qml"));
-     if (component-&gt;isLoading())
-         QObject.connect(component, SIGNAL(statusChanged(QDeclarativeComponent.Status)),
-                          this, SLOT(continueLoading()));
-     else
+     component <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QDeclarativeComponent</span>(engine<span class="operator">,</span> <span class="type"><a href="qurl.html">QUrl</a></span>(<span class="string">"http://www.example.com/main.qml"</span>));
+     <span class="keyword">if</span> (component<span class="operator">-</span><span class="operator">&gt;</span>isLoading())
+         <span class="type"><a href="qobject.html">QObject</a></span><span class="operator">.</span>connect(component<span class="operator">,</span> SIGNAL(statusChanged(<span class="type">QDeclarativeComponent</span><span class="operator">.</span>Status))<span class="operator">,</span>
+                          <span class="keyword">this</span><span class="operator">,</span> SLOT(continueLoading()));
+     <span class="keyword">else</span>
          continueLoading();
  }
 
- void MyApplication.continueLoading()
+ <span class="type">void</span> MyApplication<span class="operator">.</span>continueLoading()
  {
-     if (component-&gt;isError()) {
-         qWarning() &lt;&lt; component-&gt;errors();
-     } else {
-         QObject *myObject = component-&gt;create();
+     <span class="keyword">if</span> (component<span class="operator">-</span><span class="operator">&gt;</span>isError()) {
+         <a href="qtcore.html#qWarning">qWarning</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> component<span class="operator">-</span><span class="operator">&gt;</span>errors();
+     } <span class="keyword">else</span> {
+         <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>myObject <span class="operator">=</span> component<span class="operator">-</span><span class="operator">&gt;</span>create();
      }
  }
 </pre><hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Status-enum" />QDeclarativeComponent.Status</h3><p>Specifies the loading status of the <a href="qdeclarativecomponent.html">QDeclarativeComponent</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeComponent.Null</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">This <a href="qdeclarativecomponent.html">QDeclarativeComponent</a> has no data.
 Call <a href="qdeclarativecomponent.html#loadUrl">loadUrl</a>() or
 <a href="qdeclarativecomponent.html#setData">setData</a>() to add
@@ -88,20 +88,20 @@ QML content.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeComponent.Ready</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">This <a href="qdeclarativecomponent.html">QDeclarativeComponent</a> is ready and
 <a href="qdeclarativecomponent.html#create">create</a>() may be
 called.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeComponent.Loading</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">This <a href="qdeclarativecomponent.html">QDeclarativeComponent</a> is loading
 network data.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeComponent.Error</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">An error has occurred. Call <a href="qdeclarativecomponent.html#errors">errors</a>() to retrieve a list
 of {<a href="qdeclarativeerror.html">QDeclarativeError</a>}{errors}.</td>
 </tr>
@@ -114,7 +114,7 @@ data with <a href="qdeclarativecomponent.html#setData">setData</a>().</p>
 <h3 class="fn"><a name="QDeclarativeComponent-2" />QDeclarativeComponent.__init__ (<i>self</i>, <a href="qdeclarativeengine.html">QDeclarativeEngine</a>, QString&#160;<i>fileName</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><h3 class="fn"><a name="QDeclarativeComponent-3" />QDeclarativeComponent.__init__ (<i>self</i>, <a href="qdeclarativeengine.html">QDeclarativeEngine</a>, <a href="qurl.html">QUrl</a>&#160;<i>url</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Create a <a href="qdeclarativecomponent.html">QDeclarativeComponent</a> from the
 given <i>fileName</i> and give it the specified <i>parent</i> and
 <i>engine</i>.</p>
-<p>See also <a href="qdeclarativecomponent.html#loadUrl">loadUrl</a>().</p>
+<p><b>See also</b> <a href="qdeclarativecomponent.html#loadUrl">loadUrl</a>().</p>
 
 
 <h3 class="fn"><a name="beginCreate" /><a href="qobject.html">QObject</a> QDeclarativeComponent.beginCreate (<i>self</i>, <a href="qdeclarativecontext.html">QDeclarativeContext</a>)</h3><p>This method provides more advanced control over component
@@ -195,4 +195,4 @@ loaded) and 1.0 (finished).</p>
 
 <h3 class="fn"><a name="statusChanged" />void statusChanged (QDeclarativeComponent::Status)</h3><p>This is the default overload of this signal.</p><p>Emitted whenever the component's status changes. <i>status</i>
 will be the new status.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -22,25 +22,25 @@ properties. It is usually necessary to specify the size of the
 drawing by setting the <a href="qsvggenerator.html#size-prop">size</a> property, and in some cases
 where the drawing will be included in another, the <a href="qsvggenerator.html#viewBox-prop">viewBox</a> property also needs
 to be set.</p>
-<pre class="highlightedCode brush: cpp">
-     QSvgGenerator generator;
-     generator.setFileName(path);
-     generator.setSize(QSize(200, 200));
-     generator.setViewBox(QRect(0, 0, 200, 200));
-     generator.setTitle(tr("SVG Generator Example Drawing"));
-     generator.setDescription(tr("An SVG drawing created by the SVG Generator "
-                                 "Example provided with Qt."));
+<pre class="cpp">
+     <span class="type">QSvgGenerator</span> generator;
+     generator<span class="operator">.</span>setFileName(path);
+     generator<span class="operator">.</span>setSize(<span class="type"><a href="qsize.html">QSize</a></span>(<span class="number">200</span><span class="operator">,</span> <span class="number">200</span>));
+     generator<span class="operator">.</span>setViewBox(<span class="type"><a href="qrect.html">QRect</a></span>(<span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">200</span><span class="operator">,</span> <span class="number">200</span>));
+     generator<span class="operator">.</span>setTitle(tr(<span class="string">"SVG Generator Example Drawing"</span>));
+     generator<span class="operator">.</span>setDescription(tr(<span class="string">"An SVG drawing created by the SVG Generator "</span>
+                                 <span class="string">"Example provided with Qt."</span>));
 </pre>
 <p>Other meta-data can be specified by setting the <i>title</i>,
 <i>description</i> and <i>resolution</i> properties.</p>
 <p>As with other <a href="qpaintdevice.html">QPaintDevice</a>
 subclasses, a <a href="qpainter.html">QPainter</a> object is used
 to paint onto an instance of this class:</p>
-<pre class="highlightedCode brush: cpp">
-     QPainter painter;
-     painter.begin(&amp;generator);
+<pre class="cpp">
+     <span class="type"><a href="qpainter.html">QPainter</a></span> painter;
+     painter<span class="operator">.</span>begin(<span class="operator">&amp;</span>generator);
      ...
-     painter.end();
+     painter<span class="operator">.</span>end();
 </pre>
 <p>Painting is performed in the same way as for any other paint
 device. However, it is necessary to use the <a href="qpainter.html#begin">QPainter.begin</a>() and <a href="qpainter.html#end">end()</a> to explicitly begin and end painting
@@ -61,5 +61,5 @@ to SVG format information.</p>
 
 <h3 class="fn"><a name="resolution" />int QSvgGenerator.resolution (<i>self</i>)</h3><h3 class="fn"><a name="setDescription" />QSvgGenerator.setDescription (<i>self</i>, QString&#160;<i>description</i>)</h3><h3 class="fn"><a name="setFileName" />QSvgGenerator.setFileName (<i>self</i>, QString&#160;<i>fileName</i>)</h3><h3 class="fn"><a name="setOutputDevice" />QSvgGenerator.setOutputDevice (<i>self</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>outputDevice</i>)</h3><h3 class="fn"><a name="setResolution" />QSvgGenerator.setResolution (<i>self</i>, int&#160;<i>resolution</i>)</h3><h3 class="fn"><a name="setSize" />QSvgGenerator.setSize (<i>self</i>, <a href="qsize.html">QSize</a>&#160;<i>size</i>)</h3><h3 class="fn"><a name="setTitle" />QSvgGenerator.setTitle (<i>self</i>, QString&#160;<i>title</i>)</h3><h3 class="fn"><a name="setViewBox" />QSvgGenerator.setViewBox (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>viewBox</i>)</h3><h3 class="fn"><a name="setViewBox-2" />QSvgGenerator.setViewBox (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>viewBox</i>)</h3><h3 class="fn"><a name="size" /><a href="qsize.html">QSize</a> QSvgGenerator.size (<i>self</i>)</h3><h3 class="fn"><a name="title" />QString QSvgGenerator.title (<i>self</i>)</h3><h3 class="fn"><a name="viewBox" /><a href="qrect.html">QRect</a> QSvgGenerator.viewBox (<i>self</i>)</h3><p>Returns <a href="qsvggenerator.html#viewBox-prop">viewBoxF</a>().toRect().</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qsvggenerator.html#viewBox-prop">setViewBox</a>() and <a href="qsvggenerator.html#viewBox-prop">viewBoxF</a>().</p>
-<h3 class="fn"><a name="viewBoxF" /><a href="qrectf.html">QRectF</a> QSvgGenerator.viewBoxF (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qsvggenerator.html#viewBox-prop">setViewBox</a>() and <a href="qsvggenerator.html#viewBox-prop">viewBoxF</a>().</p>
+<h3 class="fn"><a name="viewBoxF" /><a href="qrectf.html">QRectF</a> QSvgGenerator.viewBoxF (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

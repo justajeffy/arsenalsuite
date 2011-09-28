@@ -33,16 +33,16 @@ specific format, you can check if the device supports it with
 or fetch a supported format that is as close as possible to the
 format with <a href="qaudiodeviceinfo.html#nearestFormat">nearestFormat</a>(). For
 instance:</p>
-<pre class="highlightedCode brush: cpp">
-         QAudioFormat format;
-         format.setFrequency(44100);
+<pre class="cpp">
+         <span class="type"><a href="qaudioformat.html">QAudioFormat</a></span> format;
+         format<span class="operator">.</span>setFrequency(<span class="number">44100</span>);
          ...
-         format.setSampleType(QAudioFormat.SignedInt);
+         format<span class="operator">.</span>setSampleType(<span class="type"><a href="qaudioformat.html">QAudioFormat</a></span><span class="operator">.</span>SignedInt);
 
-         QAudioDeviceInfo info(QAudioDeviceInfo.defaultOutputDevice());
+         <span class="type">QAudioDeviceInfo</span> info(<span class="type">QAudioDeviceInfo</span><span class="operator">.</span>defaultOutputDevice());
 
-         if (!info.isFormatSupported(format))
-             format = info.nearestFormat(format);
+         <span class="keyword">if</span> (<span class="operator">!</span>info<span class="operator">.</span>isFormatSupported(format))
+             format <span class="operator">=</span> info<span class="operator">.</span>nearestFormat(format);
 </pre>
 <p>A QAudioDeviceInfo is used by Qt to construct classes that
 communicate with the device--such as <a href="qaudioinput.html">QAudioInput</a>, and <a href="qaudiooutput.html">QAudioOutput</a>. The static functions <a href="qaudiodeviceinfo.html#defaultInputDevice">defaultInputDevice</a>(),
@@ -52,9 +52,9 @@ you get a list of all available devices. Devices are fetch
 according to the value of mode this is specified by the <a href="qaudio.html#Mode-enum">QAudio.Mode</a> enum. The QAudioDeviceInfo
 returned are only valid for the <a href="qaudio.html#Mode-enum">QAudio.Mode</a>.</p>
 <p>For instance:</p>
-<pre class="highlightedCode brush: cpp">
- foreach(const QAudioDeviceInfo &amp;deviceInfo, QAudioDeviceInfo.availableDevices(QAudio.AudioOutput))
-     qDebug() &lt;&lt; "Device name: " &lt;&lt; deviceInfo.deviceName();
+<pre class="cpp">
+ <a href="qtcore.html#foreach">foreach</a>(<span class="keyword">const</span> <span class="type">QAudioDeviceInfo</span> <span class="operator">&amp;</span>deviceInfo<span class="operator">,</span> <span class="type">QAudioDeviceInfo</span><span class="operator">.</span>availableDevices(<span class="type"><a href="qaudio.html">QAudio</a></span><span class="operator">.</span>AudioOutput))
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Device name: "</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> deviceInfo<span class="operator">.</span><a href="qaudiodeviceinfo.html#deviceName">deviceName</a>();
 </pre>
 <p>In this code sample, we loop through all devices that are able
 to output sound, i.e., play an audio stream in a supported format.
@@ -137,4 +137,4 @@ for:</p>
 <h3 class="fn"><a name="supportedSampleTypes" />list-of-QAudioFormat.SampleType QAudioDeviceInfo.supportedSampleTypes (<i>self</i>)</h3><p>Returns a list of supported sample types.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

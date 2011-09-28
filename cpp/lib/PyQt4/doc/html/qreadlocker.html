@@ -18,26 +18,26 @@ situations to ensure that the state of the lock is always
 well-defined.</p>
 <p>Here's an example that uses QReadLocker to lock and unlock a
 read-write lock for reading:</p>
-<pre class="highlightedCode brush: cpp">
- QReadWriteLock lock;
+<pre class="cpp">
+ <span class="type"><a href="qreadwritelock.html">QReadWriteLock</a></span> lock;
 
- QByteArray readData()
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> readData()
  {
-     QReadLocker locker(&amp;lock);
-     ...
-     return data;
+     <span class="type">QReadLocker</span> locker(<span class="operator">&amp;</span>lock);
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+     <span class="keyword">return</span> data;
  }
 </pre>
 <p>It is equivalent to the following code:</p>
-<pre class="highlightedCode brush: cpp">
- QReadWriteLock lock;
+<pre class="cpp">
+ <span class="type"><a href="qreadwritelock.html">QReadWriteLock</a></span> lock;
 
- QByteArray readData()
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> readData()
  {
-     lock.lockForRead();
-     ...
-     lock.unlock();
-     return data;
+     lock<span class="operator">.</span>lockForRead();
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+     lock<span class="operator">.</span>unlock();
+     <span class="keyword">return</span> data;
  }
 </pre>
 <p>The <a href="qmutexlocker.html">QMutexLocker</a> documentation
@@ -48,7 +48,7 @@ locks <i>lock</i> for reading. The lock will be unlocked when the
 <a href="qreadlocker.html">QReadLocker</a> is destroyed. If
 <tt>lock</tt> is zero, <a href="qreadlocker.html">QReadLocker</a>
 does nothing.</p>
-<p>See also <a href="qreadwritelock.html#lockForRead">QReadWriteLock.lockForRead</a>().</p>
+<p><b>See also</b> <a href="qreadwritelock.html#lockForRead">QReadWriteLock.lockForRead</a>().</p>
 
 
 <h3 class="fn"><a name="readWriteLock" /><a href="qreadwritelock.html">QReadWriteLock</a> QReadLocker.readWriteLock (<i>self</i>)</h3><p>Returns a pointer to the read-write lock that was passed to the
@@ -56,9 +56,9 @@ constructor.</p>
 
 
 <h3 class="fn"><a name="relock" />QReadLocker.relock (<i>self</i>)</h3><p>Relocks an unlocked lock.</p>
-<p>See also <a href="qreadlocker.html#unlock">unlock</a>().</p>
+<p><b>See also</b> <a href="qreadlocker.html#unlock">unlock</a>().</p>
 
 
 <h3 class="fn"><a name="unlock" />QReadLocker.unlock (<i>self</i>)</h3><p>Unlocks the lock associated with this locker.</p>
-<p>See also <a href="qreadwritelock.html#unlock">QReadWriteLock.unlock</a>().</p>
-<h3 class="fn"><a name="__enter__" />object QReadLocker.__enter__ (<i>self</i>)</h3><h3 class="fn"><a name="__exit__" />QReadLocker.__exit__ (<i>self</i>, object&#160;<i>type</i>, object&#160;<i>value</i>, object&#160;<i>traceback</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qreadwritelock.html#unlock">QReadWriteLock.unlock</a>().</p>
+<h3 class="fn"><a name="__enter__" />object QReadLocker.__enter__ (<i>self</i>)</h3><h3 class="fn"><a name="__exit__" />QReadLocker.__exit__ (<i>self</i>, object&#160;<i>type</i>, object&#160;<i>value</i>, object&#160;<i>traceback</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

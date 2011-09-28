@@ -32,12 +32,12 @@ size.</p>
 the width and height to the nearest integers.</p>
 <p>QSizeF objects can be streamed as well as compared.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QSizeF" />QSizeF.__init__ (<i>self</i>)</h3><p>Constructs an invalid size.</p>
-<p>See also <a href="qsizef.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="QSizeF-2" />QSizeF.__init__ (<i>self</i>, <a href="qsize.html">QSize</a>&#160;<i>sz</i>)</h3><p>Constructs a size with floating point accuracy from the given
 <i>size</i>.</p>
-<p>See also <a href="qsizef.html#toSize">toSize</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#toSize">toSize</a>().</p>
 
 
 <h3 class="fn"><a name="QSizeF-3" />QSizeF.__init__ (<i>self</i>, float&#160;<i>w</i>, float&#160;<i>h</i>)</h3><p>Constructs a size with the given <i>width</i> and
@@ -46,23 +46,24 @@ the width and height to the nearest integers.</p>
 
 <h3 class="fn"><a name="QSizeF-4" />QSizeF.__init__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>)</h3><h3 class="fn"><a name="boundedTo" /><a href="qsizef.html">QSizeF</a> QSizeF.boundedTo (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>otherSize</i>)</h3><p>Returns a size holding the minimum width and height of this size
 and the given <i>otherSize</i>.</p>
-<p>See also <a href="qsizef.html#expandedTo">expandedTo</a>() and
-<a href="qsizef.html#scale">scale</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#expandedTo">expandedTo</a>() and <a href="qsizef.html#scale">scale</a>().</p>
 
 
 <h3 class="fn"><a name="expandedTo" /><a href="qsizef.html">QSizeF</a> QSizeF.expandedTo (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>otherSize</i>)</h3><p>Returns a size holding the maximum width and height of this size
 and the given <i>otherSize</i>.</p>
-<p>See also <a href="qsizef.html#boundedTo">boundedTo</a>() and
-<a href="qsizef.html#scale">scale</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#boundedTo">boundedTo</a>()
+and <a href="qsizef.html#scale">scale</a>().</p>
 
 
 <h3 class="fn"><a name="height" />float QSizeF.height (<i>self</i>)</h3><p>Returns the height.</p>
-<p>See also <a href="qsizef.html#width">width</a>() and <a href="qsizef.html#setHeight">setHeight</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#width">width</a>() and
+<a href="qsizef.html#setHeight">setHeight</a>().</p>
 
 
 <h3 class="fn"><a name="isEmpty" />bool QSizeF.isEmpty (<i>self</i>)</h3><p>Returns true if either of the width and height is less than or
 equal to 0; otherwise returns false.</p>
-<p>See also <a href="qsizef.html#isNull">isNull</a>() and <a href="qsizef.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#isNull">isNull</a>() and
+<a href="qsizef.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="isNull" />bool QSizeF.isNull (<i>self</i>)</h3><p>Returns true if both the width and height are +0.0; otherwise
@@ -70,13 +71,14 @@ returns false.</p>
 <p><b>Note:</b> Since this function treats +0.0 and -0.0
 differently, sizes with zero width and height where either or both
 values have a negative sign are not defined to be null sizes.</p>
-<p>See also <a href="qsizef.html#isValid">isValid</a>() and
+<p><b>See also</b> <a href="qsizef.html#isValid">isValid</a>() and
 <a href="qsizef.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="isValid" />bool QSizeF.isValid (<i>self</i>)</h3><p>Returns true if both the width and height is equal to or greater
 than 0; otherwise returns false.</p>
-<p>See also <a href="qsizef.html#isNull">isNull</a>() and <a href="qsizef.html#isEmpty">isEmpty</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#isNull">isNull</a>() and
+<a href="qsizef.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="scale" />QSizeF.scale (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s</i>, <a href="qt.html#AspectRatioMode-enum">Qt.AspectRatioMode</a>&#160;<i>mode</i>)</h3><p>Scales the size to a rectangle with the given <i>width</i> and
@@ -93,21 +95,21 @@ outside (<i>width</i>, <i>height</i>), preserving the aspect
 ratio.</li>
 </ul>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QSizeF t1(10, 12);
- t1.scale(60, 60, Qt.IgnoreAspectRatio);
-<span class="comment"> // t1 is (60, 60)</span>
+<pre class="cpp">
+ <span class="type"><a href="qsizef.html">QSizeF</a></span> t1(<span class="number">10</span><span class="operator">,</span> <span class="number">12</span>);
+ t1<span class="operator">.</span>scale(<span class="number">60</span><span class="operator">,</span> <span class="number">60</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>IgnoreAspectRatio);
+ <span class="comment">// t1 is (60, 60)</span>
 
- QSizeF t2(10, 12);
- t2.scale(60, 60, Qt.KeepAspectRatio);
-<span class="comment"> // t2 is (50, 60)</span>
+ <span class="type"><a href="qsizef.html">QSizeF</a></span> t2(<span class="number">10</span><span class="operator">,</span> <span class="number">12</span>);
+ t2<span class="operator">.</span>scale(<span class="number">60</span><span class="operator">,</span> <span class="number">60</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>KeepAspectRatio);
+ <span class="comment">// t2 is (50, 60)</span>
 
- QSizeF t3(10, 12);
- t3.scale(60, 60, Qt.KeepAspectRatioByExpanding);
-<span class="comment"> // t3 is (60, 72)</span>
+ <span class="type"><a href="qsizef.html">QSizeF</a></span> t3(<span class="number">10</span><span class="operator">,</span> <span class="number">12</span>);
+ t3<span class="operator">.</span>scale(<span class="number">60</span><span class="operator">,</span> <span class="number">60</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>KeepAspectRatioByExpanding);
+ <span class="comment">// t3 is (60, 72)</span>
 </pre>
-<p>See also <a href="qsizef.html#setWidth">setWidth</a>() and
-<a href="qsizef.html#setHeight">setHeight</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#setWidth">setWidth</a>()
+and <a href="qsizef.html#setHeight">setHeight</a>().</p>
 
 
 <h3 class="fn"><a name="scale-2" />QSizeF.scale (<i>self</i>, float&#160;<i>w</i>, float&#160;<i>h</i>, <a href="qt.html#AspectRatioMode-enum">Qt.AspectRatioMode</a>&#160;<i>mode</i>)</h3><p>This is an overloaded function.</p>
@@ -116,26 +118,29 @@ according to the specified <i>mode</i>.</p>
 
 
 <h3 class="fn"><a name="setHeight" />QSizeF.setHeight (<i>self</i>, float&#160;<i>h</i>)</h3><p>Sets the height to the given <i>height</i>.</p>
-<p>See also <a href="qsizef.html#height">height</a>(), <a href="qsizef.html#rheight">rheight</a>(), and <a href="qsizef.html#setWidth">setWidth</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#height">height</a>(),
+<a href="qsizef.html#rheight">rheight</a>(), and <a href="qsizef.html#setWidth">setWidth</a>().</p>
 
 
 <h3 class="fn"><a name="setWidth" />QSizeF.setWidth (<i>self</i>, float&#160;<i>w</i>)</h3><p>Sets the width to the given <i>width</i>.</p>
-<p>See also <a href="qsizef.html#width">width</a>(), <a href="qsizef.html#rwidth">rwidth</a>(), and <a href="qsizef.html#setHeight">setHeight</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#width">width</a>(),
+<a href="qsizef.html#rwidth">rwidth</a>(), and <a href="qsizef.html#setHeight">setHeight</a>().</p>
 
 
 <h3 class="fn"><a name="toSize" /><a href="qsize.html">QSize</a> QSizeF.toSize (<i>self</i>)</h3><p>Returns an integer based copy of this size.</p>
 <p>Note that the coordinates in the returned size will be rounded
 to the nearest integer.</p>
-<p>See also <a href="qsizef.html#QSizeF">QSizeF</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#QSizeF">QSizeF</a>().</p>
 
 
 <h3 class="fn"><a name="transpose" />QSizeF.transpose (<i>self</i>)</h3><p>Swaps the width and height values.</p>
-<p>See also <a href="qsizef.html#setWidth">setWidth</a>() and
-<a href="qsizef.html#setHeight">setHeight</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#setWidth">setWidth</a>()
+and <a href="qsizef.html#setHeight">setHeight</a>().</p>
 
 
 <h3 class="fn"><a name="width" />float QSizeF.width (<i>self</i>)</h3><p>Returns the width.</p>
-<p>See also <a href="qsizef.html#height">height</a>() and <a href="qsizef.html#setWidth">setWidth</a>().</p>
+<p><b>See also</b> <a href="qsizef.html#height">height</a>() and
+<a href="qsizef.html#setWidth">setWidth</a>().</p>
 
 
-<h3 class="fn"><a name="__add__" /><a href="qsizef.html">QSizeF</a> QSizeF.__add__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__bool__" />int QSizeF.__bool__ (<i>self</i>)</h3><h3 class="fn"><a name="__div__" /><a href="qsizef.html">QSizeF</a> QSizeF.__div__ (<i>self</i>, float&#160;<i>c</i>)</h3><h3 class="fn"><a name="__eq__" />bool QSizeF.__eq__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__iadd__" /><a href="qsizef.html">QSizeF</a> QSizeF.__iadd__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__idiv__" /><a href="qsizef.html">QSizeF</a> QSizeF.__idiv__ (<i>self</i>, float&#160;<i>c</i>)</h3><h3 class="fn"><a name="__imul__" /><a href="qsizef.html">QSizeF</a> QSizeF.__imul__ (<i>self</i>, float&#160;<i>c</i>)</h3><h3 class="fn"><a name="__isub__" /><a href="qsizef.html">QSizeF</a> QSizeF.__isub__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__mul__" /><a href="qsizef.html">QSizeF</a> QSizeF.__mul__ (<i>self</i>, float&#160;<i>c</i>)</h3><h3 class="fn"><a name="__mul__-2" /><a href="qsizef.html">QSizeF</a> QSizeF.__mul__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ne__" />bool QSizeF.__ne__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__repr__" />str QSizeF.__repr__ (<i>self</i>)</h3><h3 class="fn"><a name="__sub__" /><a href="qsizef.html">QSizeF</a> QSizeF.__sub__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s2</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__add__" /><a href="qsizef.html">QSizeF</a> QSizeF.__add__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__bool__" />int QSizeF.__bool__ (<i>self</i>)</h3><h3 class="fn"><a name="__div__" /><a href="qsizef.html">QSizeF</a> QSizeF.__div__ (<i>self</i>, float&#160;<i>c</i>)</h3><h3 class="fn"><a name="__eq__" />bool QSizeF.__eq__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__iadd__" /><a href="qsizef.html">QSizeF</a> QSizeF.__iadd__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__idiv__" /><a href="qsizef.html">QSizeF</a> QSizeF.__idiv__ (<i>self</i>, float&#160;<i>c</i>)</h3><h3 class="fn"><a name="__imul__" /><a href="qsizef.html">QSizeF</a> QSizeF.__imul__ (<i>self</i>, float&#160;<i>c</i>)</h3><h3 class="fn"><a name="__isub__" /><a href="qsizef.html">QSizeF</a> QSizeF.__isub__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__mul__" /><a href="qsizef.html">QSizeF</a> QSizeF.__mul__ (<i>self</i>, float&#160;<i>c</i>)</h3><h3 class="fn"><a name="__mul__-2" /><a href="qsizef.html">QSizeF</a> QSizeF.__mul__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ne__" />bool QSizeF.__ne__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__repr__" />str QSizeF.__repr__ (<i>self</i>)</h3><h3 class="fn"><a name="__sub__" /><a href="qsizef.html">QSizeF</a> QSizeF.__sub__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>s2</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

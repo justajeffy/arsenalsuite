@@ -40,25 +40,25 @@ example, <a href="qfontdatabase.html#standardSizes">standardSizes</a>(). You can
 retrieve the description of a writing system using <a href="qfontdatabase.html#writingSystemName">writingSystemName</a>(), and
 a sample of characters in a writing system with <a href="qfontdatabase.html#writingSystemSample">writingSystemSample</a>().</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QFontDatabase database;
-     QTreeWidget fontTree;
-     fontTree.setColumnCount(2);
-     fontTree.setHeaderLabels(QStringList() &lt;&lt; "Font" &lt;&lt; "Smooth Sizes");
+<pre class="cpp">
+     <span class="type">QFontDatabase</span> database;
+     <span class="type"><a href="qtreewidget.html">QTreeWidget</a></span> fontTree;
+     fontTree<span class="operator">.</span>setColumnCount(<span class="number">2</span>);
+     fontTree<span class="operator">.</span>setHeaderLabels(<span class="type"><a href="qstringlist.html">QStringList</a></span>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Font"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Smooth Sizes"</span>);
 
-     foreach (const QString &amp;family, database.families()) {
-         QTreeWidgetItem *familyItem = new QTreeWidgetItem(&amp;fontTree);
-         familyItem-&gt;setText(0, family);
+     foreach (<span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>family<span class="operator">,</span> database<span class="operator">.</span>families()) {
+         <span class="type"><a href="qtreewidgetitem.html">QTreeWidgetItem</a></span> <span class="operator">*</span>familyItem <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qtreewidgetitem.html">QTreeWidgetItem</a></span>(<span class="operator">&amp;</span>fontTree);
+         familyItem<span class="operator">-</span><span class="operator">&gt;</span>setText(<span class="number">0</span><span class="operator">,</span> family);
 
-         foreach (const QString &amp;style, database.styles(family)) {
-             QTreeWidgetItem *styleItem = new QTreeWidgetItem(familyItem);
-             styleItem-&gt;setText(0, style);
+         foreach (<span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>style<span class="operator">,</span> database<span class="operator">.</span>styles(family)) {
+             <span class="type"><a href="qtreewidgetitem.html">QTreeWidgetItem</a></span> <span class="operator">*</span>styleItem <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qtreewidgetitem.html">QTreeWidgetItem</a></span>(familyItem);
+             styleItem<span class="operator">-</span><span class="operator">&gt;</span>setText(<span class="number">0</span><span class="operator">,</span> style);
 
-             QString sizes;
-             foreach (int points, database.smoothSizes(family, style))
-                 sizes += QString.number(points) + " ";
+             <span class="type"><a href="qstring.html">QString</a></span> sizes;
+             foreach (<span class="type">int</span> points<span class="operator">,</span> database<span class="operator">.</span>smoothSizes(family<span class="operator">,</span> style))
+                 sizes <span class="operator">+</span><span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>number(points) <span class="operator">+</span> <span class="string">" "</span>;
 
-             styleItem-&gt;setText(1, sizes.trimmed());
+             styleItem<span class="operator">-</span><span class="operator">&gt;</span>setText(<span class="number">1</span><span class="operator">,</span> sizes<span class="operator">.</span>trimmed());
          }
      }
 </pre>
@@ -67,185 +67,185 @@ for each family, and the point sizes that are available for each
 combination of family and style, displaying this information in a
 tree view.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="WritingSystem-enum" />QFontDatabase.WritingSystem</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Any</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Latin</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Greek</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Cyrillic</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Armenian</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Hebrew</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Arabic</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Syriac</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Thaana</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Devanagari</tt></td>
-<td class=" topAlign"><tt>9</tt></td>
+<td class="topAlign"><tt>9</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Bengali</tt></td>
-<td class=" topAlign"><tt>10</tt></td>
+<td class="topAlign"><tt>10</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Gurmukhi</tt></td>
-<td class=" topAlign"><tt>11</tt></td>
+<td class="topAlign"><tt>11</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Gujarati</tt></td>
-<td class=" topAlign"><tt>12</tt></td>
+<td class="topAlign"><tt>12</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Oriya</tt></td>
-<td class=" topAlign"><tt>13</tt></td>
+<td class="topAlign"><tt>13</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Tamil</tt></td>
-<td class=" topAlign"><tt>14</tt></td>
+<td class="topAlign"><tt>14</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Telugu</tt></td>
-<td class=" topAlign"><tt>15</tt></td>
+<td class="topAlign"><tt>15</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Kannada</tt></td>
-<td class=" topAlign"><tt>16</tt></td>
+<td class="topAlign"><tt>16</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Malayalam</tt></td>
-<td class=" topAlign"><tt>17</tt></td>
+<td class="topAlign"><tt>17</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Sinhala</tt></td>
-<td class=" topAlign"><tt>18</tt></td>
+<td class="topAlign"><tt>18</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Thai</tt></td>
-<td class=" topAlign"><tt>19</tt></td>
+<td class="topAlign"><tt>19</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Lao</tt></td>
-<td class=" topAlign"><tt>20</tt></td>
+<td class="topAlign"><tt>20</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Tibetan</tt></td>
-<td class=" topAlign"><tt>21</tt></td>
+<td class="topAlign"><tt>21</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Myanmar</tt></td>
-<td class=" topAlign"><tt>22</tt></td>
+<td class="topAlign"><tt>22</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Georgian</tt></td>
-<td class=" topAlign"><tt>23</tt></td>
+<td class="topAlign"><tt>23</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Khmer</tt></td>
-<td class=" topAlign"><tt>24</tt></td>
+<td class="topAlign"><tt>24</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.SimplifiedChinese</tt></td>
-<td class=" topAlign"><tt>25</tt></td>
+<td class="topAlign"><tt>25</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QFontDatabase.TraditionalChinese</tt></td>
-<td class=" topAlign"><tt>26</tt></td>
+<td class="topAlign"><tt>26</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Japanese</tt></td>
-<td class=" topAlign"><tt>27</tt></td>
+<td class="topAlign"><tt>27</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Korean</tt></td>
-<td class=" topAlign"><tt>28</tt></td>
+<td class="topAlign"><tt>28</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Vietnamese</tt></td>
-<td class=" topAlign"><tt>29</tt></td>
+<td class="topAlign"><tt>29</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Symbol</tt></td>
-<td class=" topAlign"><tt>30</tt></td>
+<td class="topAlign"><tt>30</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Other</tt></td>
-<td class=" topAlign"><tt>Symbol</tt></td>
+<td class="topAlign"><tt>Symbol</tt></td>
 <td class="topAlign">(the same as Symbol)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Ogham</tt></td>
-<td class=" topAlign">?</td>
+<td class="topAlign">?</td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Runic</tt></td>
-<td class=" topAlign">?</td>
+<td class="topAlign">?</td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFontDatabase.Nko</tt></td>
-<td class=" topAlign">?</td>
+<td class="topAlign">?</td>
 <td class="topAlign">&#160;</td>
 </tr>
 </table>
@@ -264,7 +264,7 @@ without fontconfig is currently not supported.</p>
 <p><b>Note:</b> On Symbian, the font family names get truncated to
 a length of 20 characters.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qfontdatabase.html#addApplicationFontFromData">addApplicationFontFromData</a>(),
+<p><b>See also</b> <a href="qfontdatabase.html#addApplicationFontFromData">addApplicationFontFromData</a>(),
 <a href="qfontdatabase.html#applicationFontFamilies">applicationFontFamilies</a>(),
 and <a href="qfontdatabase.html#removeApplicationFont">removeApplicationFont</a>().</p>
 
@@ -281,7 +281,7 @@ without fontconfig is currently not supported.</p>
 <p><b>Note:</b> On Symbian, the font family names get truncated to
 a length of 20 characters.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qfontdatabase.html#addApplicationFont">addApplicationFont</a>(),
+<p><b>See also</b> <a href="qfontdatabase.html#addApplicationFont">addApplicationFont</a>(),
 <a href="qfontdatabase.html#applicationFontFamilies">applicationFontFamilies</a>(),
 and <a href="qfontdatabase.html#removeApplicationFont">removeApplicationFont</a>().</p>
 
@@ -289,14 +289,14 @@ and <a href="qfontdatabase.html#removeApplicationFont">removeApplicationFont</a>
 <h3 class="fn"><a name="applicationFontFamilies" />QStringList QFontDatabase.applicationFontFamilies (int&#160;<i>id</i>)</h3><p>Returns a list of font families for the given application font
 identified by <i>id</i>.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qfontdatabase.html#addApplicationFont">addApplicationFont</a>()
+<p><b>See also</b> <a href="qfontdatabase.html#addApplicationFont">addApplicationFont</a>()
 and <a href="qfontdatabase.html#addApplicationFontFromData">addApplicationFontFromData</a>().</p>
 
 
 <h3 class="fn"><a name="bold" />bool QFontDatabase.bold (<i>self</i>, QString&#160;<i>family</i>, QString&#160;<i>style</i>)</h3><p>Returns true if the font that has family <i>family</i> and style
 <i>style</i> is bold; otherwise returns false.</p>
-<p>See also <a href="qfontdatabase.html#italic">italic</a>() and
-<a href="qfontdatabase.html#weight">weight</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#italic">italic</a>()
+and <a href="qfontdatabase.html#weight">weight</a>().</p>
 
 
 <h3 class="fn"><a name="families" />QStringList QFontDatabase.families (<i>self</i>, <a href="qfontdatabase.html#WritingSystem-enum">WritingSystem</a>&#160;<i>writingSystem</i>&#160;=&#160;QFontDatabase.Any)</h3><p>Returns a sorted list of the available font families which
@@ -304,7 +304,7 @@ support the <i>writingSystem</i>.</p>
 <p>If a family exists in several foundries, the returned name for
 that font is in the form "family [foundry]". Examples: "Times
 [Adobe]", "Times [Cronyx]", "Palatino".</p>
-<p>See also <a href="qfontdatabase.html#writingSystems">writingSystems</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#writingSystems">writingSystems</a>().</p>
 
 
 <h3 class="fn"><a name="font" /><a href="qfont.html">QFont</a> QFontDatabase.font (<i>self</i>, QString&#160;<i>family</i>, QString&#160;<i>style</i>, int&#160;<i>pointSize</i>)</h3><p>Returns a <a href="qfont.html">QFont</a> object that has family
@@ -319,7 +319,7 @@ Scaling a bitmap font usually produces an unattractive hardly
 readable result, because the pixels of the font are scaled. If you
 need to scale a bitmap font it is better to scale it to one of the
 fixed sizes returned by <a href="qfontdatabase.html#smoothSizes">smoothSizes</a>().</p>
-<p>See also <a href="qfontdatabase.html#isScalable">isScalable</a>() and <a href="qfontdatabase.html#isSmoothlyScalable">isSmoothlyScalable</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#isScalable">isScalable</a>() and <a href="qfontdatabase.html#isSmoothlyScalable">isSmoothlyScalable</a>().</p>
 
 
 <h3 class="fn"><a name="isFixedPitch" />bool QFontDatabase.isFixedPitch (<i>self</i>, QString&#160;<i>family</i>, QString&#160;<i>style</i>&#160;=&#160;QString())</h3><p>Returns true if the font that has family <i>family</i> and style
@@ -328,7 +328,7 @@ fixed sizes returned by <a href="qfontdatabase.html#smoothSizes">smoothSizes</a>
 
 <h3 class="fn"><a name="isScalable" />bool QFontDatabase.isScalable (<i>self</i>, QString&#160;<i>family</i>, QString&#160;<i>style</i>&#160;=&#160;QString())</h3><p>Returns true if the font that has family <i>family</i> and style
 <i>style</i> is scalable; otherwise returns false.</p>
-<p>See also <a href="qfontdatabase.html#isBitmapScalable">isBitmapScalable</a>() and
+<p><b>See also</b> <a href="qfontdatabase.html#isBitmapScalable">isBitmapScalable</a>() and
 <a href="qfontdatabase.html#isSmoothlyScalable">isSmoothlyScalable</a>().</p>
 
 
@@ -336,19 +336,19 @@ fixed sizes returned by <a href="qfontdatabase.html#smoothSizes">smoothSizes</a>
 <i>style</i> is smoothly scalable; otherwise returns false. If this
 function returns true, it's safe to scale this font to any size,
 and the result will always look attractive.</p>
-<p>See also <a href="qfontdatabase.html#isScalable">isScalable</a>() and <a href="qfontdatabase.html#isBitmapScalable">isBitmapScalable</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#isScalable">isScalable</a>() and <a href="qfontdatabase.html#isBitmapScalable">isBitmapScalable</a>().</p>
 
 
 <h3 class="fn"><a name="italic" />bool QFontDatabase.italic (<i>self</i>, QString&#160;<i>family</i>, QString&#160;<i>style</i>)</h3><p>Returns true if the font that has family <i>family</i> and style
 <i>style</i> is italic; otherwise returns false.</p>
-<p>See also <a href="qfontdatabase.html#weight">weight</a>() and
-<a href="qfontdatabase.html#bold">bold</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#weight">weight</a>()
+and <a href="qfontdatabase.html#bold">bold</a>().</p>
 
 
 <h3 class="fn"><a name="pointSizes" />list-of-int QFontDatabase.pointSizes (<i>self</i>, QString&#160;<i>family</i>, QString&#160;<i>style</i>&#160;=&#160;QString())</h3><p>Returns a list of the point sizes available for the font that
 has family <i>family</i> and style <i>style</i>. The list may be
 empty.</p>
-<p>See also <a href="qfontdatabase.html#smoothSizes">smoothSizes</a>() and <a href="qfontdatabase.html#standardSizes">standardSizes</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#smoothSizes">smoothSizes</a>() and <a href="qfontdatabase.html#standardSizes">standardSizes</a>().</p>
 
 
 <h3 class="fn"><a name="removeAllApplicationFonts" />bool QFontDatabase.removeAllApplicationFonts ()</h3><p>Removes all application-local fonts previously added using
@@ -357,7 +357,7 @@ and <a href="qfontdatabase.html#addApplicationFontFromData">addApplicationFontFr
 <p>Returns true if unloading of the fonts succeeded; otherwise
 returns false.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qfontdatabase.html#removeApplicationFont">removeApplicationFont</a>(),
+<p><b>See also</b> <a href="qfontdatabase.html#removeApplicationFont">removeApplicationFont</a>(),
 <a href="qfontdatabase.html#addApplicationFont">addApplicationFont</a>(),
 and <a href="qfontdatabase.html#addApplicationFontFromData">addApplicationFontFromData</a>().</p>
 
@@ -366,7 +366,7 @@ and <a href="qfontdatabase.html#addApplicationFontFromData">addApplicationFontFr
 <i>id</i>. Returns true if unloading of the font succeeded;
 otherwise returns false.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qfontdatabase.html#removeAllApplicationFonts">removeAllApplicationFonts</a>(),
+<p><b>See also</b> <a href="qfontdatabase.html#removeAllApplicationFonts">removeAllApplicationFonts</a>(),
 <a href="qfontdatabase.html#addApplicationFont">addApplicationFont</a>(),
 and <a href="qfontdatabase.html#addApplicationFontFromData">addApplicationFontFromData</a>().</p>
 
@@ -375,17 +375,17 @@ and <a href="qfontdatabase.html#addApplicationFontFromData">addApplicationFontFr
 and style <i>style</i> that will look attractive. The list may be
 empty. For non-scalable fonts and bitmap scalable fonts, this
 function is equivalent to <a href="qfontdatabase.html#pointSizes">pointSizes</a>().</p>
-<p>See also <a href="qfontdatabase.html#pointSizes">pointSizes</a>() and <a href="qfontdatabase.html#standardSizes">standardSizes</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#pointSizes">pointSizes</a>() and <a href="qfontdatabase.html#standardSizes">standardSizes</a>().</p>
 
 
 <h3 class="fn"><a name="standardSizes" />list-of-int QFontDatabase.standardSizes ()</h3><p>Returns a list of standard font sizes.</p>
-<p>See also <a href="qfontdatabase.html#smoothSizes">smoothSizes</a>() and <a href="qfontdatabase.html#pointSizes">pointSizes</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#smoothSizes">smoothSizes</a>() and <a href="qfontdatabase.html#pointSizes">pointSizes</a>().</p>
 
 
 <h3 class="fn"><a name="styles" />QStringList QFontDatabase.styles (<i>self</i>, QString&#160;<i>family</i>)</h3><p>Returns a list of the styles available for the font family
 <i>family</i>. Some example styles: "Light", "Light Italic",
 "Bold", "Oblique", "Demi". The list may be empty.</p>
-<p>See also <a href="qfontdatabase.html#families">families</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#families">families</a>().</p>
 
 
 <h3 class="fn"><a name="styleString" />QString QFontDatabase.styleString (<i>self</i>, <a href="qfont.html">QFont</a>&#160;<i>font</i>)</h3><p>Returns a string that describes the style of the <i>font</i>.
@@ -403,15 +403,15 @@ thread, false otherwise. In other words, a return value of false
 means that all <a href="qpainter.html#drawText">QPainter.drawText</a>() calls outside the
 GUI thread will not produce readable output.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="threads-modules.html#painting-in-threads">Painting In
+<p><b>See also</b> <a href="threads-modules.html#painting-in-threads">Painting In
 Threads</a>.</p>
 
 
 <h3 class="fn"><a name="weight" />int QFontDatabase.weight (<i>self</i>, QString&#160;<i>family</i>, QString&#160;<i>style</i>)</h3><p>Returns the weight of the font that has family <i>family</i> and
 style <i>style</i>. If there is no such family and style
 combination, returns -1.</p>
-<p>See also <a href="qfontdatabase.html#italic">italic</a>() and
-<a href="qfontdatabase.html#bold">bold</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#italic">italic</a>()
+and <a href="qfontdatabase.html#bold">bold</a>().</p>
 
 
 <h3 class="fn"><a name="writingSystemName" />QString QFontDatabase.writingSystemName (<a href="qfontdatabase.html#WritingSystem-enum">WritingSystem</a>&#160;<i>writingSystem</i>)</h3><p>Returns the names the <i>writingSystem</i> (e.g. for displaying
@@ -421,14 +421,14 @@ to the user in a dialog).</p>
 <h3 class="fn"><a name="writingSystems" />list-of-QFontDatabase.WritingSystem QFontDatabase.writingSystems (<i>self</i>)</h3><p>Returns a sorted list of the available writing systems. This is
 list generated from information about all installed fonts on the
 system.</p>
-<p>See also <a href="qfontdatabase.html#families">families</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#families">families</a>().</p>
 
 
 <h3 class="fn"><a name="writingSystems-2" />list-of-QFontDatabase.WritingSystem QFontDatabase.writingSystems (<i>self</i>, QString&#160;<i>family</i>)</h3><p>Returns a sorted list of the writing systems supported by a
 given font <i>family</i>.</p>
-<p>See also <a href="qfontdatabase.html#families">families</a>().</p>
+<p><b>See also</b> <a href="qfontdatabase.html#families">families</a>().</p>
 <h3 class="fn"><a name="writingSystemSample" />QString QFontDatabase.writingSystemSample (<a href="qfontdatabase.html#WritingSystem-enum">WritingSystem</a>&#160;<i>writingSystem</i>)</h3><p>Returns a string with sample characters from
 <i>writingSystem</i>.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

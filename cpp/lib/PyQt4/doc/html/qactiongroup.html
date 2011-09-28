@@ -16,13 +16,13 @@ action, only one of these actions should be active at any one time.
 One simple way of achieving this is to group the actions together
 in an action group.</p>
 <p>Here's a example (from the <a href="mainwindows-menus.html">Menus</a> example):</p>
-<pre class="highlightedCode brush: cpp">
-     alignmentGroup = new QActionGroup(this);
-     alignmentGroup-&gt;addAction(leftAlignAct);
-     alignmentGroup-&gt;addAction(rightAlignAct);
-     alignmentGroup-&gt;addAction(justifyAct);
-     alignmentGroup-&gt;addAction(centerAct);
-     leftAlignAct-&gt;setChecked(true);
+<pre class="cpp">
+     alignmentGroup <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QActionGroup</span>(<span class="keyword">this</span>);
+     alignmentGroup<span class="operator">-</span><span class="operator">&gt;</span>addAction(leftAlignAct);
+     alignmentGroup<span class="operator">-</span><span class="operator">&gt;</span>addAction(rightAlignAct);
+     alignmentGroup<span class="operator">-</span><span class="operator">&gt;</span>addAction(justifyAct);
+     alignmentGroup<span class="operator">-</span><span class="operator">&gt;</span>addAction(centerAct);
+     leftAlignAct<span class="operator">-</span><span class="operator">&gt;</span>setChecked(<span class="keyword">true</span>);
 </pre>
 <p>Here we create a new action group. Since the action group is
 exclusive by default, only one of the actions in the group is
@@ -57,14 +57,14 @@ empty.</p>
 <h3 class="fn"><a name="addAction" /><a href="qaction.html">QAction</a> QActionGroup.addAction (<i>self</i>, <a href="qaction.html">QAction</a>&#160;<i>a</i>)</h3><p>The <i>a</i> argument has it's ownership transferred to Qt.</p><p>Adds the <i>action</i> to this group, and returns it.</p>
 <p>Normally an action is added to a group by creating it with the
 group as its parent, so this function is not usually used.</p>
-<p>See also <a href="qaction.html#setActionGroup">QAction.setActionGroup</a>().</p>
+<p><b>See also</b> <a href="qaction.html#setActionGroup">QAction.setActionGroup</a>().</p>
 
 
 <h3 class="fn"><a name="addAction-2" /><a href="qaction.html">QAction</a> QActionGroup.addAction (<i>self</i>, QString&#160;<i>text</i>)</h3><p>Creates and returns an action with <i>text</i>. The newly
 created action is a child of this action group.</p>
 <p>Normally an action is added to a group by creating it with the
 group as parent, so this function is not usually used.</p>
-<p>See also <a href="qaction.html#setActionGroup">QAction.setActionGroup</a>().</p>
+<p><b>See also</b> <a href="qaction.html#setActionGroup">QAction.setActionGroup</a>().</p>
 
 
 <h3 class="fn"><a name="addAction-3" /><a href="qaction.html">QAction</a> QActionGroup.addAction (<i>self</i>, <a href="qicon.html">QIcon</a>&#160;<i>icon</i>, QString&#160;<i>text</i>)</h3><p>Creates and returns an action with <i>text</i> and an
@@ -72,7 +72,7 @@ group as parent, so this function is not usually used.</p>
 group.</p>
 <p>Normally an action is added to a group by creating it with the
 group as its parent, so this function is not usually used.</p>
-<p>See also <a href="qaction.html#setActionGroup">QAction.setActionGroup</a>().</p>
+<p><b>See also</b> <a href="qaction.html#setActionGroup">QAction.setActionGroup</a>().</p>
 
 
 <h3 class="fn"><a name="checkedAction" /><a href="qaction.html">QAction</a> QActionGroup.checkedAction (<i>self</i>)</h3><p>Returns the currently checked action in the group, or 0 if none
@@ -81,7 +81,7 @@ are checked.</p>
 
 <h3 class="fn"><a name="isEnabled" />bool QActionGroup.isEnabled (<i>self</i>)</h3><h3 class="fn"><a name="isExclusive" />bool QActionGroup.isExclusive (<i>self</i>)</h3><h3 class="fn"><a name="isVisible" />bool QActionGroup.isVisible (<i>self</i>)</h3><h3 class="fn"><a name="removeAction" />QActionGroup.removeAction (<i>self</i>, <a href="qaction.html">QAction</a>&#160;<i>a</i>)</h3><p>The <i>a</i> argument</p><p>Removes the <i>action</i> from this group. The action will have
 no parent as a result.</p>
-<p>See also <a href="qaction.html#setActionGroup">QAction.setActionGroup</a>().</p>
+<p><b>See also</b> <a href="qaction.html#setActionGroup">QAction.setActionGroup</a>().</p>
 
 
 <h3 class="fn"><a name="setDisabled" />QActionGroup.setDisabled (<i>self</i>, bool&#160;<i>b</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setDisabled(bool)</tt>.</p><p>This is a convenience function for the <a href="qactiongroup.html#enabled-prop">enabled</a> property, that is
@@ -93,7 +93,7 @@ action group is disabled; otherwise it is enabled.</p>
 action group is highlighted by the user; for example, when the user
 pauses with the cursor over a menu option, toolbar button, or
 presses an action's shortcut key combination.</p>
-<p>See also <a href="qaction.html#activate">QAction.activate</a>().</p>
+<p><b>See also</b> <a href="qaction.html#activate">QAction.activate</a>().</p>
 
 
 <h3 class="fn"><a name="selected" />void selected (QAction *)</h3><p>This is the default overload of this signal.</p><h3 class="fn"><a name="triggered" />void triggered (QAction *)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the given <i>action</i> in the
@@ -101,5 +101,5 @@ action group is activated by the user; for example, when the user
 clicks a menu option, toolbar button, or presses an action's
 shortcut key combination.</p>
 <p>Connect to this signal for command actions.</p>
-<p>See also <a href="qaction.html#activate">QAction.activate</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qaction.html#activate">QAction.activate</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

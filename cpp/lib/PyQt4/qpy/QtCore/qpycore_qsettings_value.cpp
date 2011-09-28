@@ -93,6 +93,13 @@ PyObject *qpycore_qsettings_value(const QSettings *qset, const QString &key,
             else
                 value_obj = convert(ct, value);
         }
+        else if (!value.isValid() && ct->py_type())
+        {
+            // Convert an invalid value to the default value of the requested
+            // type.  This is most useful when the requested type is a list or
+            // dict.
+            value_obj = PyObject_CallObject(ct->py_type(), NULL);
+        }
         else
         {
             // This is likely to fail and the exception will say why.

@@ -27,8 +27,8 @@
 /*
  * Define the SIP version number.
  */
-#define SIP_VERSION         0x040c04
-#define SIP_VERSION_STR     "4.12.4-snapshot-bbe43a0bad78"
+#define SIP_VERSION         0x040c05
+#define SIP_VERSION_STR     "4.12.5-snapshot-de6a700f5faa"
 
 
 #ifdef TRUE
@@ -441,6 +441,13 @@ typedef enum {
 } Warning;
 
 
+/* Docstring formatting. */
+typedef enum {
+    raw,
+    deindented
+} Format;
+
+
 /* Levels of keyword argument support. */
 typedef enum {
     NoKwArgs = 0,
@@ -765,6 +772,7 @@ typedef struct _moduleDef {
     int qobjclass;                      /* QObject class, -1 if none. */
     struct _memberDef *othfuncs;        /* List of other functions. */
     struct _overDef *overs;             /* Global overloads. */
+    Format defdocstring;                /* The default docstring format. */
     argType encoding;                   /* The default string encoding. */
     nameDef *defmetatype;               /* The optional default meta-type. */
     nameDef *defsupertype;              /* The optional default super-type. */
@@ -1303,6 +1311,12 @@ typedef struct _consModuleCfg {
     codeBlock *docstring;
 } consModuleCfg;
 
+/* %DefaultDocstringFormat */
+typedef struct _defDocstringCfg {
+    int token;
+    const char *name;
+} defDocstringCfg;
+
 /* %DefaultEncoding */
 typedef struct _defEncodingCfg {
     int token;
@@ -1320,6 +1334,12 @@ typedef struct _defSupertypeCfg {
     int token;
     const char *name;
 } defSupertypeCfg;
+
+/* %Docstring */
+typedef struct _docstringCfg {
+    int token;
+    Format format;
+} docstringCfg;
 
 /* %Exception */
 typedef struct _exceptionCfg {

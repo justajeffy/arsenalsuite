@@ -61,31 +61,31 @@ function is provided for Qt API consistency.</p>
 <h3 class="fn"><a name="item" /><a href="qdomnode.html">QDomNode</a> QDomNamedNodeMap.item (<i>self</i>, int&#160;<i>index</i>)</h3><p>Retrieves the node at position <i>index</i>.</p>
 <p>This can be used to iterate over the map. Note that the nodes in
 the map are ordered arbitrarily.</p>
-<p>See also <a href="qdomnamednodemap.html#length">length</a>().</p>
+<p><b>See also</b> <a href="qdomnamednodemap.html#length">length</a>().</p>
 
 
 <h3 class="fn"><a name="length" />int QDomNamedNodeMap.length (<i>self</i>)</h3><p>Returns the number of nodes in the map.</p>
-<p>See also <a href="qdomnamednodemap.html#item">item</a>().</p>
+<p><b>See also</b> <a href="qdomnamednodemap.html#item">item</a>().</p>
 
 
 <h3 class="fn"><a name="namedItem" /><a href="qdomnode.html">QDomNode</a> QDomNamedNodeMap.namedItem (<i>self</i>, QString&#160;<i>name</i>)</h3><p>Returns the node called <i>name</i>.</p>
 <p>If the named node map does not contain such a node, a <a href="qdomnode.html#isNull">null node</a> is returned. A node's name is
 the name returned by <a href="qdomnode.html#nodeName">QDomNode.nodeName</a>().</p>
-<p>See also <a href="qdomnamednodemap.html#setNamedItem">setNamedItem</a>() and
+<p><b>See also</b> <a href="qdomnamednodemap.html#setNamedItem">setNamedItem</a>() and
 <a href="qdomnamednodemap.html#namedItemNS">namedItemNS</a>().</p>
 
 
 <h3 class="fn"><a name="namedItemNS" /><a href="qdomnode.html">QDomNode</a> QDomNamedNodeMap.namedItemNS (<i>self</i>, QString&#160;<i>nsURI</i>, QString&#160;<i>localName</i>)</h3><p>Returns the node associated with the local name <i>localName</i>
 and the namespace URI <i>nsURI</i>.</p>
 <p>If the map does not contain such a node, a <a href="qdomnode.html#isNull">null node</a> is returned.</p>
-<p>See also <a href="qdomnamednodemap.html#setNamedItemNS">setNamedItemNS</a>() and
+<p><b>See also</b> <a href="qdomnamednodemap.html#setNamedItemNS">setNamedItemNS</a>() and
 <a href="qdomnamednodemap.html#namedItem">namedItem</a>().</p>
 
 
 <h3 class="fn"><a name="removeNamedItem" /><a href="qdomnode.html">QDomNode</a> QDomNamedNodeMap.removeNamedItem (<i>self</i>, QString&#160;<i>name</i>)</h3><p>Removes the node called <i>name</i> from the map.</p>
 <p>The function returns the removed node or a <a href="qdomnode.html#isNull">null node</a> if the map did not contain a
 node called <i>name</i>.</p>
-<p>See also <a href="qdomnamednodemap.html#setNamedItem">setNamedItem</a>(), <a href="qdomnamednodemap.html#namedItem">namedItem</a>(), and <a href="qdomnamednodemap.html#removeNamedItemNS">removeNamedItemNS</a>().</p>
+<p><b>See also</b> <a href="qdomnamednodemap.html#setNamedItem">setNamedItem</a>(), <a href="qdomnamednodemap.html#namedItem">namedItem</a>(), and <a href="qdomnamednodemap.html#removeNamedItemNS">removeNamedItemNS</a>().</p>
 
 
 <h3 class="fn"><a name="removeNamedItemNS" /><a href="qdomnode.html">QDomNode</a> QDomNamedNodeMap.removeNamedItemNS (<i>self</i>, QString&#160;<i>nsURI</i>, QString&#160;<i>localName</i>)</h3><p>Removes the node with the local name <i>localName</i> and the
@@ -93,7 +93,7 @@ namespace URI <i>nsURI</i> from the map.</p>
 <p>The function returns the removed node or a <a href="qdomnode.html#isNull">null node</a> if the map did not contain a
 node with the local name <i>localName</i> and the namespace URI
 <i>nsURI</i>.</p>
-<p>See also <a href="qdomnamednodemap.html#setNamedItemNS">setNamedItemNS</a>(),
+<p><b>See also</b> <a href="qdomnamednodemap.html#setNamedItemNS">setNamedItemNS</a>(),
 <a href="qdomnamednodemap.html#namedItemNS">namedItemNS</a>(), and
 <a href="qdomnamednodemap.html#removeNamedItem">removeNamedItem</a>().</p>
 
@@ -103,7 +103,7 @@ name used by the map is the node name of <i>newNode</i> as returned
 by <a href="qdomnode.html#nodeName">QDomNode.nodeName</a>().</p>
 <p>If the new node replaces an existing node, i.e. the map contains
 a node with the same name, the replaced node is returned.</p>
-<p>See also <a href="qdomnamednodemap.html#namedItem">namedItem</a>(), <a href="qdomnamednodemap.html#removeNamedItem">removeNamedItem</a>(), and
+<p><b>See also</b> <a href="qdomnamednodemap.html#namedItem">namedItem</a>(), <a href="qdomnamednodemap.html#removeNamedItem">removeNamedItem</a>(), and
 <a href="qdomnamednodemap.html#setNamedItemNS">setNamedItemNS</a>().</p>
 
 
@@ -111,7 +111,7 @@ a node with the same name, the replaced node is returned.</p>
 same namespace URI and the same local name already exists in the
 map, it is replaced by <i>newNode</i>. If the new node replaces an
 existing node, the replaced node is returned.</p>
-<p>See also <a href="qdomnamednodemap.html#namedItemNS">namedItemNS</a>(), <a href="qdomnamednodemap.html#removeNamedItemNS">removeNamedItemNS</a>(),
+<p><b>See also</b> <a href="qdomnamednodemap.html#namedItemNS">namedItemNS</a>(), <a href="qdomnamednodemap.html#removeNamedItemNS">removeNamedItemNS</a>(),
 and <a href="qdomnamednodemap.html#setNamedItem">setNamedItem</a>().</p>
 
 
@@ -119,4 +119,4 @@ and <a href="qdomnamednodemap.html#setNamedItem">setNamedItem</a>().</p>
 equivalent to <a href="qdomnamednodemap.html#length">length</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QDomNamedNodeMap.__eq__ (<i>self</i>, <a href="qdomnamednodemap.html">QDomNamedNodeMap</a>)</h3><h3 class="fn"><a name="__len__" /> QDomNamedNodeMap.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__ne__" />bool QDomNamedNodeMap.__ne__ (<i>self</i>, <a href="qdomnamednodemap.html">QDomNamedNodeMap</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QDomNamedNodeMap.__eq__ (<i>self</i>, <a href="qdomnamednodemap.html">QDomNamedNodeMap</a>)</h3><h3 class="fn"><a name="__len__" /> QDomNamedNodeMap.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__ne__" />bool QDomNamedNodeMap.__ne__ (<i>self</i>, <a href="qdomnamednodemap.html">QDomNamedNodeMap</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

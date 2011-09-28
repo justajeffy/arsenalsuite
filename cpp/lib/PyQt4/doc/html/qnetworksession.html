@@ -40,8 +40,7 @@ must either <a href="qnetworksession.html#accept">accept</a>() or
 will return to the previous access point if the roaming was
 rejected. The subsequent state diagram depicts the required state
 transitions.</p>
-<p class="centerAlign"><font color="red">[Missing image
-roaming-states.png]</font></p>
+<p class="centerAlign"><img src="images/roaming-states.png" /></p>
 <p>Some platforms may distinguish forced roaming and application
 level roaming (ALR). ALR implies that the application controls (via
 <a href="qnetworksession.html#migrate">migrate</a>(), <a href="qnetworksession.html#ignore">ignore</a>(), <a href="qnetworksession.html#accept">accept</a>() and <a href="qnetworksession.html#reject">reject</a>()) whether a network
@@ -69,7 +68,7 @@ Clients can suppress roaming by connecting to the <a href="qnetworksession.html#
 signal and answer each signal emission with <a href="qnetworksession.html#ignore">ignore</a>().</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="SessionError-enum" />QNetworkSession.SessionError</h3><p>This enum describes the session errors that can occur.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -77,33 +76,33 @@ signal and answer each signal emission with <a href="qnetworksession.html#ignore
 <tr>
 <td class="topAlign">
 <tt>QNetworkSession.UnknownSessionError</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">An unidentified error occurred.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkSession.SessionAbortedError</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The session was aborted by the user or
 system.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkSession.RoamingError</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The session cannot roam to a new
 configuration.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkSession.OperationNotSupportedError</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The operation is not supported for current
 configuration.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkSession.InvalidConfigurationError</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The operation cannot currently be performed
 for the current configuration.</td>
 </tr>
@@ -115,33 +114,33 @@ the session is based on a single access point configuration the
 state of the session is the same as the state of the associated
 network interface.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkSession.Invalid</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The session is invalid due to an invalid
 configuration. This may happen due to a removed access point or a
 configuration that was invalid to begin with.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkSession.NotAvailable</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The session is based on a defined but not yet
 discovered <a href="qnetworkconfiguration.html">QNetworkConfiguration</a> (see
 <a href="qnetworkconfiguration.html#StateFlag-enum">QNetworkConfiguration.StateFlag</a>).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkSession.Connecting</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The network session is being established.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkSession.Connected</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The network session is connected. If the
 current process wishes to use this session it has to register its
 interest by calling <a href="qnetworksession.html#open">open</a>().
@@ -151,27 +150,27 @@ connected.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkSession.Closing</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The network session is in the process of being
 shut down.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkSession.Disconnected</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The network session is not connected. The
 associated <a href="qnetworkconfiguration.html">QNetworkConfiguration</a> has the
 state <a href="qnetworkconfiguration.html#StateFlag-enum">QNetworkConfiguration.Discovered</a>.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkSession.Roaming</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">The network session is roaming from one access
 point to another access point.</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QNetworkSession" />QNetworkSession.__init__ (<i>self</i>, <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>&#160;<i>connConfig</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a session based on <i>connectionConfig</i> with the
 given <i>parent</i>.</p>
-<p>See also <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>.</p>
+<p><b>See also</b> <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>.</p>
 
 
 <h3 class="fn"><a name="accept" />QNetworkSession.accept (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void accept()</tt>.</p><p>Instructs the session to permanently accept the new access
@@ -221,28 +220,28 @@ this function does not stop the interface. In this case <a href="qnetworksession
 shut down. The platform capabilities can be detected via <a href="qnetworkconfigurationmanager.html#capabilities">QNetworkConfigurationManager.capabilities</a>().</p>
 <p>Note that this call is asynchronous. Depending on the outcome of
 this call the results can be enquired by connecting to the <a href="qnetworksession.html#stateChanged">stateChanged</a>(), <a href="qnetworksession.html#opened">opened</a>() or <a href="qnetworksession.html#error">error</a>() signals.</p>
-<p>See also <a href="qnetworksession.html#open">open</a>(),
+<p><b>See also</b> <a href="qnetworksession.html#open">open</a>(),
 <a href="qnetworksession.html#stop">stop</a>(), and <a href="qnetworksession.html#isOpen">isOpen</a>().</p>
 
 
 <h3 class="fn"><a name="configuration" /><a href="qnetworkconfiguration.html">QNetworkConfiguration</a> QNetworkSession.configuration (<i>self</i>)</h3><p>Returns the <a href="qnetworkconfiguration.html">QNetworkConfiguration</a> that this
 network session object is based on.</p>
-<p>See also <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>.</p>
+<p><b>See also</b> <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>.</p>
 
 
 <h3 class="fn"><a name="connectNotify" />QNetworkSession.connectNotify (<i>self</i>, SIGNAL()&#160;<i>signal</i>)</h3><h3 class="fn"><a name="disconnectNotify" />QNetworkSession.disconnectNotify (<i>self</i>, SIGNAL()&#160;<i>signal</i>)</h3><h3 class="fn"><a name="error" /><a href="qnetworksession.html#SessionError-enum">SessionError</a> QNetworkSession.error (<i>self</i>)</h3><p>Returns the type of error that last occurred.</p>
-<p>See also <a href="qnetworksession.html#state">state</a>() and
-<a href="qnetworksession.html#errorString">errorString</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#state">state</a>()
+and <a href="qnetworksession.html#errorString">errorString</a>().</p>
 
 
 <h3 class="fn"><a name="errorString" />QString QNetworkSession.errorString (<i>self</i>)</h3><p>Returns a human-readable description of the last device error
 that occurred.</p>
-<p>See also <a href="qnetworksession.html#error">error</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#error">error</a>().</p>
 
 
 <h3 class="fn"><a name="ignore" />QNetworkSession.ignore (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void ignore()</tt>.</p><p>This function indicates that the application does not wish to
 roam the session.</p>
-<p>See also <a href="qnetworksession.html#migrate">migrate</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#migrate">migrate</a>().</p>
 
 
 <h3 class="fn"><a name="interface" /><a href="qnetworkinterface.html">QNetworkInterface</a> QNetworkSession.interface (<i>self</i>)</h3><p>Returns the network interface that is used by this session.</p>
@@ -252,7 +251,7 @@ roam the session.</p>
 process.</p>
 <p>Note: this function does not work in Symbian emulator due to the
 way the connectivity is emulated on Windows.</p>
-<p>See also <a href="qnetworksession.html#state">state</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#state">state</a>().</p>
 
 
 <h3 class="fn"><a name="isOpen" />bool QNetworkSession.isOpen (<i>self</i>)</h3><p>Returns true if this session is open. If the number of all open
@@ -265,7 +264,7 @@ remain connected/up.</p>
 access point remains active until the application calls <a href="qnetworksession.html#accept">accept</a>().</p>
 <p>The <a href="qnetworksession.html#newConfigurationActivated">newConfigurationActivated</a>()
 signal is emitted once roaming has been completed.</p>
-<p>See also <a href="qnetworksession.html#accept">accept</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#accept">accept</a>().</p>
 
 
 <h3 class="fn"><a name="open" />QNetworkSession.open (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void open()</tt>.</p><p>Creates an open session which increases the session counter on
@@ -282,15 +281,14 @@ capabilities can be detected via <a href="qnetworkconfigurationmanager.html#capa
 this call the results can be enquired by connecting to the <a href="qnetworksession.html#stateChanged">stateChanged</a>(), <a href="qnetworksession.html#opened">opened</a>() or <a href="qnetworksession.html#error">error</a>() signals.</p>
 <p>It is not a requirement to open a session in order to monitor
 the underlying network interface.</p>
-<p>See also <a href="qnetworksession.html#close">close</a>(),
-<a href="qnetworksession.html#stop">stop</a>(), and <a href="qnetworksession.html#isOpen">isOpen</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#close">close</a>(), <a href="qnetworksession.html#stop">stop</a>(), and <a href="qnetworksession.html#isOpen">isOpen</a>().</p>
 
 
 <h3 class="fn"><a name="reject" />QNetworkSession.reject (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void reject()</tt>.</p><p>The new access point is not suitable for the application. By
 calling this function the session returns to the previous access
 point/configuration. This action may invalidate any socket that has
 been created via the not desired access point.</p>
-<p>See also <a href="qnetworksession.html#accept">accept</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#accept">accept</a>().</p>
 
 
 <h3 class="fn"><a name="sessionProperty" />QVariant QNetworkSession.sessionProperty (<i>self</i>, QString&#160;<i>key</i>)</h3><p>Returns the value for property <i>key</i>.</p>
@@ -301,48 +299,42 @@ gain access to those properties.</p>
 all platforms:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Key</th>
 <th>Description</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>ActiveConfiguration</p>
-</td>
-<td>
-<p>If the session <a href="qnetworksession.html#isOpen">isOpen</a>() this property returns
+<tr class="odd" valign="top">
+<td>ActiveConfiguration</td>
+<td>If the session <a href="qnetworksession.html#isOpen">isOpen</a>() this property returns
 the identifier of the <a href="qnetworkconfiguration.html">QNetworkConfiguration</a> that is used
-by this session; otherwise an empty string.</p>
+by this session; otherwise an empty string.
 <p>The main purpose of this key is to determine which Internet
 access point is used if the session is based on a <a href="qnetworkconfiguration.html#Type-enum">ServiceNetwork</a>. The
 following code snippet highlights the difference:</p>
-<pre class="highlightedCode brush: cpp">
- QNetworkConfigurationManager mgr;
- QNetworkConfiguration ap = mgr.defaultConfiguration();
- QNetworkSession* session = new QNetworkSession(ap);
- ... <span class="comment">//code activates session</span>
+<pre class="cpp">
+ <span class="type"><a href="qnetworkconfigurationmanager.html">QNetworkConfigurationManager</a></span> mgr;
+ <span class="type"><a href="qnetworkconfiguration.html">QNetworkConfiguration</a></span> ap <span class="operator">=</span> mgr<span class="operator">.</span>defaultConfiguration();
+ <span class="type"><a href="qnetworksession.html">QNetworkSession</a></span><span class="operator">*</span> session <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qnetworksession.html">QNetworkSession</a></span>(ap);
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span> <span class="comment">//code activates session</span>
 
- QString ident = session-&gt;sessionProperty("ActiveConfiguration").toString();
- if ( ap.type() == QNetworkConfiguration.ServiceNetwork ) {
-     Q_ASSERT( ap.identifier() != ident );
-     Q_ASSERT( ap.children().contains( mgr.configurationFromIdentifier(ident) ) );
- } else if ( ap.type() == QNetworkConfiguration.InternetAccessPoint ) {
-     Q_ASSERT( ap.identifier() == ident );
+ <span class="type"><a href="qstring.html">QString</a></span> ident <span class="operator">=</span> session<span class="operator">-</span><span class="operator">&gt;</span>sessionProperty(<span class="string">"ActiveConfiguration"</span>)<span class="operator">.</span>toString();
+ <span class="keyword">if</span> ( ap<span class="operator">.</span>type() <span class="operator">=</span><span class="operator">=</span> <span class="type"><a href="qnetworkconfiguration.html">QNetworkConfiguration</a></span><span class="operator">.</span>ServiceNetwork ) {
+     Q_ASSERT( ap<span class="operator">.</span>identifier() <span class="operator">!</span><span class="operator">=</span> ident );
+     Q_ASSERT( ap<span class="operator">.</span>children()<span class="operator">.</span>contains( mgr<span class="operator">.</span>configurationFromIdentifier(ident) ) );
+ } <span class="keyword">else</span> <span class="keyword">if</span> ( ap<span class="operator">.</span>type() <span class="operator">=</span><span class="operator">=</span> <span class="type"><a href="qnetworkconfiguration.html">QNetworkConfiguration</a></span><span class="operator">.</span>InternetAccessPoint ) {
+     Q_ASSERT( ap<span class="operator">.</span>identifier() <span class="operator">=</span><span class="operator">=</span> ident );
  }
 </pre></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>UserChoiceConfiguration</p>
-</td>
-<td>
-<p>If the session <a href="qnetworksession.html#isOpen">isOpen</a>() and is bound to a
+<tr class="even" valign="top">
+<td>UserChoiceConfiguration</td>
+<td>If the session <a href="qnetworksession.html#isOpen">isOpen</a>() and is bound to a
 <a href="qnetworkconfiguration.html">QNetworkConfiguration</a> of
 type UserChoice, this property returns the identifier of the
 <a href="qnetworkconfiguration.html">QNetworkConfiguration</a> that
 the configuration resolved to when <a href="qnetworksession.html#open">open</a>() was called; otherwise an
-empty string.</p>
+empty string.
 <p>The purpose of this key is to determine the real <a href="qnetworkconfiguration.html">QNetworkConfiguration</a> that the
 session is using. This key is different from
 <i>ActiveConfiguration</i> in that this key may return an
@@ -353,28 +345,21 @@ always returns identifiers to <a href="qnetworkconfiguration.html#Type-enum">Int
 configurations.</p>
 </td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>ConnectInBackground</p>
-</td>
-<td>
-<p>Setting this property to <i>true</i> before calling <a href="qnetworksession.html#open">open</a>() implies that the connection
+<tr class="odd" valign="top">
+<td>ConnectInBackground</td>
+<td>Setting this property to <i>true</i> before calling <a href="qnetworksession.html#open">open</a>() implies that the connection
 attempt is made but if no connection can be established, the user
 is not connsulted and asked to select a suitable connection. This
 property is not set by default and support for it depends on the
-platform.</p>
-</td>
+platform.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>AutoCloseSessionTimeout</p>
-</td>
-<td>
-<p>If the session requires polling to keep its state up to date,
+<tr class="even" valign="top">
+<td>AutoCloseSessionTimeout</td>
+<td>If the session requires polling to keep its state up to date,
 this property holds the timeout in milliseconds before the session
 will automatically close. If the value of this property is -1 the
 session will not automatically close. This property is set to -1 by
-default.</p>
+default.
 <p>The purpose of this property is to minimize resource use on
 platforms that use polling to update the state of the session.
 Applications can set the value of this property to the desired
@@ -386,7 +371,7 @@ polling.</p>
 </td>
 </tr>
 </table>
-<p>See also <a href="qnetworksession.html#setSessionProperty">setSessionProperty</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#setSessionProperty">setSessionProperty</a>().</p>
 
 
 <h3 class="fn"><a name="setSessionProperty" />QNetworkSession.setSessionProperty (<i>self</i>, QString&#160;<i>key</i>, QVariant&#160;<i>value</i>)</h3><p>Sets the property <i>value</i> on the session. The property is
@@ -395,7 +380,7 @@ be achieved by passing an invalid <a href="qvariant.html">QVariant</a>.</p>
 <p>Note that the <i>UserChoiceConfiguration</i> and
 <i>ActiveConfiguration</i> properties are read only and cannot be
 changed using this method.</p>
-<p>See also <a href="qnetworksession.html#sessionProperty">sessionProperty</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#sessionProperty">sessionProperty</a>().</p>
 
 
 <h3 class="fn"><a name="state" /><a href="qnetworksession.html#State-enum">State</a> QNetworkSession.state (<i>self</i>)</h3><p>Returns the state of the session.</p>
@@ -413,8 +398,8 @@ obtain the network interface state. A connected but closed session
 may be used to monitor network interfaces whereas an open and
 connected session object may prevent the network interface from
 being shut down.</p>
-<p>See also <a href="qnetworksession.html#error">error</a>() and
-<a href="qnetworksession.html#stateChanged">stateChanged</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#error">error</a>()
+and <a href="qnetworksession.html#stateChanged">stateChanged</a>().</p>
 
 
 <h3 class="fn"><a name="stop" />QNetworkSession.stop (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void stop()</tt>.</p><p>Invalidates all open sessions against the network interface and
@@ -423,8 +408,8 @@ always changes the session's <a href="qnetworksession.html#state">state</a>() fl
 <p>On Symbian platform, a 'NetworkControl' capability is required
 for full interface-level stop (without the capability, only the
 current session is stopped).</p>
-<p>See also <a href="qnetworksession.html#open">open</a>() and
-<a href="qnetworksession.html#close">close</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#open">open</a>()
+and <a href="qnetworksession.html#close">close</a>().</p>
 
 
 <h3 class="fn"><a name="waitForOpened" />bool QNetworkSession.waitForOpened (<i>self</i>, int&#160;<i>msecs</i>&#160;=&#160;30000)</h3><p>Waits until the session has been opened, up to <i>msecs</i>
@@ -434,22 +419,22 @@ false, you can call <a href="qnetworksession.html#error">error</a>() to determin
 the error.</p>
 <p>The following example waits up to one second for the session to
 be opened:</p>
-<pre class="highlightedCode brush: cpp">
- session-&gt;open();
- if (session-&gt;waitForOpened(1000))
-     qDebug("Open!");
+<pre class="cpp">
+ session<span class="operator">-</span><span class="operator">&gt;</span><a href="qnetworksession.html#open">open</a>();
+ <span class="keyword">if</span> (session<span class="operator">-</span><span class="operator">&gt;</span>waitForOpened(<span class="number">1000</span>))
+     <a href="qtcore.html#qDebug">qDebug</a>(<span class="string">"Open!"</span>);
 </pre>
 <p>If <i>msecs</i> is -1, this function will not time out.</p>
-<p>See also <a href="qnetworksession.html#open">open</a>() and
-<a href="qnetworksession.html#error">error</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#open">open</a>()
+and <a href="qnetworksession.html#error">error</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="closed" />void closed ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the network session has been
 closed.</p>
 
 
 <h3 class="fn"><a name="error-2" />void error (QNetworkSession::SessionError)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted after an error occurred. The <i>error</i>
 parameter describes the error that occurred.</p>
-<p>See also <a href="qnetworksession.html#error">error</a>() and
-<a href="qnetworksession.html#errorString">errorString</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#error">error</a>()
+and <a href="qnetworksession.html#errorString">errorString</a>().</p>
 
 
 <h3 class="fn"><a name="newConfigurationActivated" />void newConfigurationActivated ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted once the session has roamed to the new
@@ -457,8 +442,7 @@ access point. The application may reopen its socket and test the
 suitability of the new network link. Subsequently it must either
 <a href="qnetworksession.html#accept">accept</a>() or <a href="qnetworksession.html#reject">reject</a>() the new access
 point.</p>
-<p>See also <a href="qnetworksession.html#accept">accept</a>() and
-<a href="qnetworksession.html#reject">reject</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#accept">accept</a>() and <a href="qnetworksession.html#reject">reject</a>().</p>
 
 
 <h3 class="fn"><a name="opened" />void opened ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the network session has been
@@ -495,13 +479,12 @@ choose whether it wants to be consulted (ALR use case) by
 connecting to this signal. For as long as this signal connection
 remains the session remains registered as a roaming stakeholder;
 otherwise roaming will be enforced by the platform.</p>
-<p>See also <a href="qnetworksession.html#migrate">migrate</a>(),
-<a href="qnetworksession.html#ignore">ignore</a>(), and <a href="qnetworkconfiguration.html#isRoamingAvailable">QNetworkConfiguration.isRoamingAvailable</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#migrate">migrate</a>(), <a href="qnetworksession.html#ignore">ignore</a>(), and <a href="qnetworkconfiguration.html#isRoamingAvailable">QNetworkConfiguration.isRoamingAvailable</a>().</p>
 
 
 <h3 class="fn"><a name="stateChanged" />void stateChanged (QNetworkSession::State)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the state of the network session
 changes. The <i>state</i> parameter is the new state.</p>
-<p>See also <a href="qnetworksession.html#state">state</a>().</p>
+<p><b>See also</b> <a href="qnetworksession.html#state">state</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -21,10 +21,10 @@ QDirIterator does not support sorting.</p>
 <p>The QDirIterator constructor takes a <a href="qdir.html">QDir</a> or a directory as argument. After
 construction, the iterator is located before the first directory
 entry. Here's how to iterate over all the entries sequentially:</p>
-<pre class="highlightedCode brush: cpp">
- QDirIterator it("/etc", QDirIterator.Subdirectories);
- while (it.hasNext()) {
-     qDebug() &lt;&lt; it.next();
+<pre class="cpp">
+ <span class="type">QDirIterator</span> it(<span class="string">"/etc"</span><span class="operator">,</span> <span class="type">QDirIterator</span><span class="operator">.</span>Subdirectories);
+ <span class="keyword">while</span> (it<span class="operator">.</span>hasNext()) {
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> it<span class="operator">.</span>next();
 
      <span class="comment">// /etc/.</span>
      <span class="comment">// /etc/..</span>
@@ -49,26 +49,26 @@ implemented using <a href="qabstractfileengineiterator.html">QAbstractFileEngine
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="IteratorFlag-enum" />QDirIterator.IteratorFlag</h3><p>This enum describes flags that you can combine to configure the
 behavior of <a href="qdiriterator.html">QDirIterator</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDirIterator.NoIteratorFlags</tt></td>
-<td class=" topAlign"><tt>0x0</tt></td>
+<td class="topAlign"><tt>0x0</tt></td>
 <td class="topAlign">The default value, representing no flags. The
 iterator will return entries for the assigned path.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDirIterator.Subdirectories</tt></td>
-<td class=" topAlign"><tt>0x2</tt></td>
+<td class="topAlign"><tt>0x2</tt></td>
 <td class="topAlign">List entries inside all subdirectories as
 well.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDirIterator.FollowSymlinks</tt></td>
-<td class=" topAlign"><tt>0x1</tt></td>
+<td class="topAlign"><tt>0x1</tt></td>
 <td class="topAlign">When combined with Subdirectories, this flag
 enables iterating through all subdirectories of the assigned path,
 following all symbolic links. Symbolic link loops (e.g., "link"
@@ -88,8 +88,7 @@ provides the same behavior as in <a href="qdir.html#entryList">QDir.entryList</a
 <p><b>Note:</b> To list symlinks that point to non existing files,
 <a href="qdir.html#Filter-enum">QDir.System</a> must be passed to
 the flags.</p>
-<p>See also <a href="qdiriterator.html#hasNext">hasNext</a>(),
-<a href="qdiriterator.html#next">next</a>(), and <a href="qdiriterator.html#IteratorFlag-enum">IteratorFlags</a>.</p>
+<p><b>See also</b> <a href="qdiriterator.html#hasNext">hasNext</a>(), <a href="qdiriterator.html#next">next</a>(), and <a href="qdiriterator.html#IteratorFlag-enum">IteratorFlags</a>.</p>
 
 
 <h3 class="fn"><a name="QDirIterator-2" />QDirIterator.__init__ (<i>self</i>, QString&#160;<i>path</i>, <a href="qdiriterator-iteratorflags.html">IteratorFlags</a>&#160;<i>flags</i>&#160;=&#160;QDirIterator.NoIteratorFlags)</h3><p>Constructs a <a href="qdiriterator.html">QDirIterator</a> that
@@ -100,8 +99,7 @@ provides the same behavior as in <a href="qdir.html#entryList">QDir.entryList</a
 <p><b>Note:</b> To list symlinks that point to non existing files,
 <a href="qdir.html#Filter-enum">QDir.System</a> must be passed to
 the flags.</p>
-<p>See also <a href="qdiriterator.html#hasNext">hasNext</a>(),
-<a href="qdiriterator.html#next">next</a>(), and <a href="qdiriterator.html#IteratorFlag-enum">IteratorFlags</a>.</p>
+<p><b>See also</b> <a href="qdiriterator.html#hasNext">hasNext</a>(), <a href="qdiriterator.html#next">next</a>(), and <a href="qdiriterator.html#IteratorFlag-enum">IteratorFlags</a>.</p>
 
 
 <h3 class="fn"><a name="QDirIterator-3" />QDirIterator.__init__ (<i>self</i>, QString&#160;<i>path</i>, <a href="qdir-filters.html">QDir.Filters</a>&#160;<i>filters</i>, <a href="qdiriterator-iteratorflags.html">IteratorFlags</a>&#160;<i>flags</i>&#160;=&#160;QDirIterator.NoIteratorFlags)</h3><p>Constructs a <a href="qdiriterator.html">QDirIterator</a> that
@@ -114,8 +112,7 @@ which provides the same behavior as in <a href="qdir.html#entryList">QDir.entryL
 <p><b>Note:</b> To list symlinks that point to non existing files,
 <a href="qdir.html#Filter-enum">QDir.System</a> must be passed to
 the flags.</p>
-<p>See also <a href="qdiriterator.html#hasNext">hasNext</a>(),
-<a href="qdiriterator.html#next">next</a>(), and <a href="qdiriterator.html#IteratorFlag-enum">IteratorFlags</a>.</p>
+<p><b>See also</b> <a href="qdiriterator.html#hasNext">hasNext</a>(), <a href="qdiriterator.html#next">next</a>(), and <a href="qdiriterator.html#IteratorFlag-enum">IteratorFlags</a>.</p>
 
 
 <h3 class="fn"><a name="QDirIterator-4" />QDirIterator.__init__ (<i>self</i>, QString&#160;<i>path</i>, QStringList&#160;<i>nameFilters</i>, <a href="qdir-filters.html">QDir.Filters</a>&#160;<i>filters</i>&#160;=&#160;QDir.NoFilter, <a href="qdiriterator-iteratorflags.html">IteratorFlags</a>&#160;<i>flags</i>&#160;=&#160;QDirIterator.NoIteratorFlags)</h3><p>Constructs a <a href="qdiriterator.html">QDirIterator</a> that
@@ -127,14 +124,12 @@ provides the same behavior as <a href="qdir.html#entryList">QDir.entryList</a>()
 <p><b>Note:</b> To list symlinks that point to non existing files,
 <a href="qdir.html#Filter-enum">QDir.System</a> must be passed to
 the flags.</p>
-<p>See also <a href="qdiriterator.html#hasNext">hasNext</a>(),
-<a href="qdiriterator.html#next">next</a>(), and <a href="qdiriterator.html#IteratorFlag-enum">IteratorFlags</a>.</p>
+<p><b>See also</b> <a href="qdiriterator.html#hasNext">hasNext</a>(), <a href="qdiriterator.html#next">next</a>(), and <a href="qdiriterator.html#IteratorFlag-enum">IteratorFlags</a>.</p>
 
 
 <h3 class="fn"><a name="fileInfo" /><a href="qfileinfo.html">QFileInfo</a> QDirIterator.fileInfo (<i>self</i>)</h3><p>Returns a <a href="qfileinfo.html">QFileInfo</a> for the current
 directory entry.</p>
-<p>See also <a href="qdiriterator.html#filePath">filePath</a>() and
-<a href="qdiriterator.html#fileName">fileName</a>().</p>
+<p><b>See also</b> <a href="qdiriterator.html#filePath">filePath</a>() and <a href="qdiriterator.html#fileName">fileName</a>().</p>
 
 
 <h3 class="fn"><a name="fileName" />QString QDirIterator.fileName (<i>self</i>)</h3><p>Returns the file name for the current directory entry, without
@@ -143,18 +138,17 @@ the path prepended.</p>
 When using the <a href="qdiriterator.html#IteratorFlag-enum">QDirIterator.Subdirectories</a>
 flag, you can use <a href="qdiriterator.html#filePath">filePath</a>() to get the full
 path.</p>
-<p>See also <a href="qdiriterator.html#filePath">filePath</a>() and
-<a href="qdiriterator.html#fileInfo">fileInfo</a>().</p>
+<p><b>See also</b> <a href="qdiriterator.html#filePath">filePath</a>() and <a href="qdiriterator.html#fileInfo">fileInfo</a>().</p>
 
 
 <h3 class="fn"><a name="filePath" />QString QDirIterator.filePath (<i>self</i>)</h3><p>Returns the full file path for the current directory entry.</p>
-<p>See also <a href="qdiriterator.html#fileInfo">fileInfo</a>() and
-<a href="qdiriterator.html#fileName">fileName</a>().</p>
+<p><b>See also</b> <a href="qdiriterator.html#fileInfo">fileInfo</a>() and <a href="qdiriterator.html#fileName">fileName</a>().</p>
 
 
 <h3 class="fn"><a name="hasNext" />bool QDirIterator.hasNext (<i>self</i>)</h3><p>Returns true if there is at least one more entry in the
 directory; otherwise, false is returned.</p>
-<p>See also <a href="qdiriterator.html#next">next</a>(), <a href="qdiriterator.html#fileName">fileName</a>(), <a href="qdiriterator.html#filePath">filePath</a>(), and <a href="qdiriterator.html#fileInfo">fileInfo</a>().</p>
+<p><b>See also</b> <a href="qdiriterator.html#next">next</a>(),
+<a href="qdiriterator.html#fileName">fileName</a>(), <a href="qdiriterator.html#filePath">filePath</a>(), and <a href="qdiriterator.html#fileInfo">fileInfo</a>().</p>
 
 
 <h3 class="fn"><a name="next" />QString QDirIterator.next (<i>self</i>)</h3><p>Advances the iterator to the next entry, and returns the file
@@ -163,8 +157,7 @@ function does nothing, and returns a null <a href="qstring.html">QString</a>.</p
 <p>You can call <a href="qdiriterator.html#fileName">fileName</a>()
 or <a href="qdiriterator.html#filePath">filePath</a>() to get the
 current entry file name or path, or <a href="qdiriterator.html#fileInfo">fileInfo</a>() to get a <a href="qfileinfo.html">QFileInfo</a> for the current entry.</p>
-<p>See also <a href="qdiriterator.html#hasNext">hasNext</a>(),
-<a href="qdiriterator.html#fileName">fileName</a>(), <a href="qdiriterator.html#filePath">filePath</a>(), and <a href="qdiriterator.html#fileInfo">fileInfo</a>().</p>
+<p><b>See also</b> <a href="qdiriterator.html#hasNext">hasNext</a>(), <a href="qdiriterator.html#fileName">fileName</a>(), <a href="qdiriterator.html#filePath">filePath</a>(), and <a href="qdiriterator.html#fileInfo">fileInfo</a>().</p>
 
 
-<h3 class="fn"><a name="path" />QString QDirIterator.path (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="path" />QString QDirIterator.path (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

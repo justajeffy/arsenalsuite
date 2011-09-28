@@ -28,8 +28,8 @@ button a "disabled" appearance.</p>
 <p>If the button is a text button with a string containing an
 ampersand ('&amp;'), QAbstractButton automatically creates a
 shortcut key. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QPushButton *button = new QPushButton(tr("Ro&amp;ck &amp;&amp; Roll"), this);
+<pre class="cpp">
+ <span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span>button <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>(tr(<span class="string">"Ro&amp;ck &amp;&amp; Roll"</span>)<span class="operator">,</span> <span class="keyword">this</span>);
 </pre>
 <p>The <b>Alt+C</b> shortcut is assigned to the button, i.e., when
 the user presses <b>Alt+C</b> the button will call <a href="qabstractbutton.html#animateClick">animateClick</a>(). See the
@@ -38,9 +38,9 @@ details (to display an actual ampersand, use '&amp;&amp;').</p>
 <p>You can also set a custom shortcut key using the <a href="qabstractbutton.html#shortcut-prop">setShortcut</a>() function.
 This is useful mostly for buttons that do not have any text,
 because they have no automatic shortcut.</p>
-<pre class="highlightedCode brush: cpp">
- button-&gt;setIcon(QIcon(":/images/print.png"));
- button-&gt;setShortcut(tr("Alt+F7"));
+<pre class="cpp">
+ button<span class="operator">-</span><span class="operator">&gt;</span><a href="qabstractbutton.html#icon-prop">setIcon</a>(<span class="type"><a href="qicon.html">QIcon</a></span>(<span class="string">":/images/print.png"</span>));
+ button<span class="operator">-</span><span class="operator">&gt;</span><a href="qabstractbutton.html#shortcut-prop">setShortcut</a>(tr(<span class="string">"Alt+F7"</span>));
 </pre>
 <p>All of the buttons provided by Qt (<a href="qpushbutton.html">QPushButton</a>, <a href="qtoolbutton.html">QToolButton</a>, <a href="qcheckbox.html">QCheckBox</a>, and <a href="qradiobutton.html">QRadioButton</a>) can display both <a href="qabstractbutton.html#text-prop">text</a> and <a href="qabstractbutton.html#icon-prop">icons</a>.</p>
 <p>A button can be made the default button in a dialog are provided
@@ -106,7 +106,7 @@ reset the release timer.</p>
 <p>All signals associated with a click are emitted as
 appropriate.</p>
 <p>This function does nothing if the button is <a href="qwidget.html#enabled-prop">disabled.</a></p>
-<p>See also <a href="qabstractbutton.html#click">click</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#click">click</a>().</p>
 
 
 <h3 class="fn"><a name="autoExclusive" />bool QAbstractButton.autoExclusive (<i>self</i>)</h3><h3 class="fn"><a name="autoRepeat" />bool QAbstractButton.autoRepeat (<i>self</i>)</h3><h3 class="fn"><a name="autoRepeatDelay" />int QAbstractButton.autoRepeatDelay (<i>self</i>)</h3><h3 class="fn"><a name="autoRepeatInterval" />int QAbstractButton.autoRepeatInterval (<i>self</i>)</h3><h3 class="fn"><a name="changeEvent" />QAbstractButton.changeEvent (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#changeEvent">QWidget.changeEvent</a>().</p>
@@ -115,7 +115,7 @@ appropriate.</p>
 <h3 class="fn"><a name="checkStateSet" />QAbstractButton.checkStateSet (<i>self</i>)</h3><p>This virtual handler is called when <a href="qabstractbutton.html#checked-prop">setChecked</a>() was called,
 unless it was called from within <a href="qabstractbutton.html#nextCheckState">nextCheckState</a>(). It
 allows subclasses to reset their intermediate button states.</p>
-<p>See also <a href="qabstractbutton.html#nextCheckState">nextCheckState</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#nextCheckState">nextCheckState</a>().</p>
 
 
 <h3 class="fn"><a name="click" />QAbstractButton.click (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void click()</tt>.</p><p>Performs a click.</p>
@@ -123,7 +123,7 @@ allows subclasses to reset their intermediate button states.</p>
 appropriate. If the button is checkable, the state of the button is
 toggled.</p>
 <p>This function does nothing if the button is <a href="qwidget.html#enabled-prop">disabled.</a></p>
-<p>See also <a href="qabstractbutton.html#animateClick">animateClick</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#animateClick">animateClick</a>().</p>
 
 
 <h3 class="fn"><a name="event" />bool QAbstractButton.event (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -137,7 +137,7 @@ toggled.</p>
 
 <h3 class="fn"><a name="group" /><a href="qbuttongroup.html">QButtonGroup</a> QAbstractButton.group (<i>self</i>)</h3><p>Returns the group that this button belongs to.</p>
 <p>If the button is not a member of any <a href="qbuttongroup.html">QButtonGroup</a>, this function returns 0.</p>
-<p>See also <a href="qbuttongroup.html">QButtonGroup</a>.</p>
+<p><b>See also</b> <a href="qbuttongroup.html">QButtonGroup</a>.</p>
 
 
 <h3 class="fn"><a name="hitButton" />bool QAbstractButton.hitButton (<i>self</i>, <a href="qpoint.html">QPoint</a>&#160;<i>pos</i>)</h3><p>Returns true if <i>pos</i> is inside the clickable button
@@ -166,7 +166,7 @@ areas of different shapes and sizes.</p>
 default implementation calls setChecked(!<a href="qabstractbutton.html#checked-prop">isChecked</a>()) if the button
 <a href="qabstractbutton.html#checkable-prop">isCheckable</a>(). It
 allows subclasses to implement intermediate button states.</p>
-<p>See also <a href="qabstractbutton.html#checkStateSet">checkStateSet</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#checkStateSet">checkStateSet</a>().</p>
 
 
 <h3 class="fn"><a name="paintEvent" />QAbstractButton.paintEvent (<i>self</i>, <a href="qpaintevent.html">QPaintEvent</a>&#160;<i>e</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Reimplemented from <a href="qwidget.html#paintEvent">QWidget.paintEvent</a>().</p>
@@ -176,7 +176,7 @@ allows subclasses to implement intermediate button states.</p>
 
 
 <h3 class="fn"><a name="toggle" />QAbstractButton.toggle (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void toggle()</tt>.</p><p>Toggles the state of a checkable button.</p>
-<p>See also <a href="qabstractbutton.html#checked-prop">checked</a>.</p>
+<p><b>See also</b> <a href="qabstractbutton.html#checked-prop">checked</a>.</p>
 
 
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="clicked" />void clicked (bool = 0)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the button is activated (i.e.
@@ -185,19 +185,15 @@ button), when the shortcut key is typed, or when <a href="qabstractbutton.html#c
 Notably, this signal is <i>not</i> emitted if you call <a href="qabstractbutton.html#down-prop">setDown</a>(), <a href="qabstractbutton.html#checked-prop">setChecked</a>() or <a href="qabstractbutton.html#toggle">toggle</a>().</p>
 <p>If the button is checkable, <i>checked</i> is true if the button
 is checked, or false if the button is unchecked.</p>
-<p>See also <a href="qabstractbutton.html#pressed">pressed</a>(),
-<a href="qabstractbutton.html#released">released</a>(), and
-<a href="qabstractbutton.html#toggled">toggled</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#pressed">pressed</a>(), <a href="qabstractbutton.html#released">released</a>(), and <a href="qabstractbutton.html#toggled">toggled</a>().</p>
 
 
 <h3 class="fn"><a name="pressed" />void pressed ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the button is pressed down.</p>
-<p>See also <a href="qabstractbutton.html#released">released</a>()
-and <a href="qabstractbutton.html#clicked">clicked</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#released">released</a>() and <a href="qabstractbutton.html#clicked">clicked</a>().</p>
 
 
 <h3 class="fn"><a name="released" />void released ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the button is released.</p>
-<p>See also <a href="qabstractbutton.html#pressed">pressed</a>(),
-<a href="qabstractbutton.html#clicked">clicked</a>(), and <a href="qabstractbutton.html#toggled">toggled</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#pressed">pressed</a>(), <a href="qabstractbutton.html#clicked">clicked</a>(), and <a href="qabstractbutton.html#toggled">toggled</a>().</p>
 
 
 <h3 class="fn"><a name="toggled" />void toggled (bool)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever a checkable button changes its
@@ -213,18 +209,17 @@ in the group whose states have changed.</p>
 <p>For example, a slot that reacts to signals emitted by newly
 checked buttons but which ignores signals from buttons that have
 been unchecked can be implemented using the following pattern:</p>
-<pre class="highlightedCode brush: cpp">
- void MyWidget.reactToToggle(bool checked)
+<pre class="cpp">
+ <span class="type">void</span> MyWidget<span class="operator">.</span>reactToToggle(<span class="type">bool</span> checked)
  {
-    if (checked) {
+    <span class="keyword">if</span> (checked) {
        <span class="comment">// Examine the new button states.</span>
-       ...
+       <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
     }
  }
 </pre>
 <p>Button groups can be created using the <a href="qbuttongroup.html">QButtonGroup</a> class, and updates to the
 button states monitored with the <a href="qbuttongroup.html#buttonClicked">QButtonGroup.buttonClicked</a>()
 signal.</p>
-<p>See also <a href="qabstractbutton.html#checked-prop">checked</a>
-and <a href="qabstractbutton.html#clicked">clicked</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qabstractbutton.html#checked-prop">checked</a> and <a href="qabstractbutton.html#clicked">clicked</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -23,12 +23,12 @@ scene. With the <a href="qgraphicsview.html">QGraphicsView</a>
 widget, you can either visualize the whole scene, or zoom in and
 view only parts of the scene.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QGraphicsScene scene;
- scene.addText("Hello, world!");
+<pre class="cpp">
+ <span class="type">QGraphicsScene</span> scene;
+ scene<span class="operator">.</span><a href="qgraphicsscene.html#addText">addText</a>(<span class="string">"Hello, world!"</span>);
 
- QGraphicsView view(&amp;scene);
- view.show();
+ <span class="type"><a href="qgraphicsview.html">QGraphicsView</a></span> view(<span class="operator">&amp;</span>scene);
+ view<span class="operator">.</span>show();
 </pre>
 <p>Note that QGraphicsScene has no visual appearance of its own; it
 only manages the items. You need to create a <a href="qgraphicsview.html">QGraphicsView</a> widget to visualize the
@@ -101,7 +101,7 @@ have focus, and all key events are discarded. If <a href="qgraphicsscene.html#se
 item on the scene gains focus, the scene automatically gains focus.
 If the scene has focus, <a href="qgraphicsscene.html#hasFocus">hasFocus</a>() will return true, and
 key events will be forwarded to the focus item, if any. If the
-scene loses focus, (i.e., someone calls <a href="qgraphicsscene.html#clearFocus">clearFocus</a>(),) while an item
+scene loses focus, (i.e., someone calls <a href="qgraphicsscene.html#clearFocus">clearFocus</a>()) while an item
 has focus, the scene will maintain its item focus information, and
 once the scene regains focus, it will make sure the last focus item
 regains focus.</p>
@@ -121,14 +121,14 @@ determine what item is currently grabbing the mouse.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="ItemIndexMethod-enum" />QGraphicsScene.ItemIndexMethod</h3><p>This enum describes the indexing algorithms <a href="qgraphicsscene.html">QGraphicsScene</a> provides for managing
 positional information about items on the scene.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsScene.BspTreeIndex</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">A Binary Space Partitioning tree is applied.
 All <a href="qgraphicsscene.html">QGraphicsScene</a>'s item
 location algorithms are of an order close to logarithmic
@@ -138,7 +138,7 @@ scenes (i.e., scenes where most items do not move).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsScene.NoIndex</tt></td>
-<td class=" topAlign"><tt>-1</tt></td>
+<td class="topAlign"><tt>-1</tt></td>
 <td class="topAlign">No index is applied. Item location is of
 linear complexity, as all items on the scene are searched. Adding,
 moving and removing items, however, is done in constant time. This
@@ -146,7 +146,7 @@ approach is ideal for dynamic scenes, where many items are added,
 moved or removed continuously.</td>
 </tr>
 </table>
-<p>See also <a href="qgraphicsscene.html#itemIndexMethod-prop">setItemIndexMethod</a>()
+<p><b>See also</b> <a href="qgraphicsscene.html#itemIndexMethod-prop">setItemIndexMethod</a>()
 and <a href="qgraphicsscene.html#bspTreeDepth-prop">bspTreeDepth</a>.</p>
 
 
@@ -155,35 +155,35 @@ it renders each of these layers separately, in order.</p>
 <p>Each layer represents a flag that can be OR'ed together when
 calling functions such as <a href="qgraphicsscene.html#invalidate">invalidate</a>() or <a href="qgraphicsview.html#invalidateScene">QGraphicsView.invalidateScene</a>().</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsScene.ItemLayer</tt></td>
-<td class=" topAlign"><tt>0x1</tt></td>
+<td class="topAlign"><tt>0x1</tt></td>
 <td class="topAlign">The item layer. <a href="qgraphicsscene.html">QGraphicsScene</a> renders all items are in
 this layer by calling the virtual function <a class="obsolete" href="qgraphicsscene-obsolete.html#drawItems">drawItems</a>(). The item layer is drawn after the
 background layer, but before the foreground layer.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsScene.BackgroundLayer</tt></td>
-<td class=" topAlign"><tt>0x2</tt></td>
+<td class="topAlign"><tt>0x2</tt></td>
 <td class="topAlign">The background layer. <a href="qgraphicsscene.html">QGraphicsScene</a> renders the scene's
 background in this layer by calling the virtual function <a href="qgraphicsscene.html#drawBackground">drawBackground</a>(). The
 background layer is drawn first of all layers.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsScene.ForegroundLayer</tt></td>
-<td class=" topAlign"><tt>0x4</tt></td>
+<td class="topAlign"><tt>0x4</tt></td>
 <td class="topAlign">The foreground layer. <a href="qgraphicsscene.html">QGraphicsScene</a> renders the scene's
 foreground in this layer by calling the virtual function <a href="qgraphicsscene.html#drawForeground">drawForeground</a>(). The
 foreground layer is drawn last of all layers.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsScene.AllLayers</tt></td>
-<td class=" topAlign"><tt>0xffff</tt></td>
+<td class="topAlign"><tt>0xffff</tt></td>
 <td class="topAlign">All layers; this value represents a
 combination of all three layers.</td>
 </tr>
@@ -191,7 +191,7 @@ combination of all three layers.</td>
 <p>This enum was introduced or modified in Qt 4.3.</p>
 <p>The SceneLayers type is a typedef for <a href="qflags.html">QFlags</a>&lt;SceneLayer&gt;. It stores an OR
 combination of SceneLayer values.</p>
-<p>See also <a href="qgraphicsscene.html#invalidate">invalidate</a>() and <a href="qgraphicsview.html#invalidateScene">QGraphicsView.invalidateScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#invalidate">invalidate</a>() and <a href="qgraphicsview.html#invalidateScene">QGraphicsView.invalidateScene</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QGraphicsScene" />QGraphicsScene.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qgraphicsscene.html">QGraphicsScene</a>
 object. The <i>parent</i> parameter is passed to <a href="qobject.html">QObject</a>'s constructor.</p>
 
@@ -199,26 +199,26 @@ object. The <i>parent</i> parameter is passed to <a href="qobject.html">QObject<
 <h3 class="fn"><a name="QGraphicsScene-2" />QGraphicsScene.__init__ (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>sceneRect</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qgraphicsscene.html">QGraphicsScene</a>
 object, using <i>sceneRect</i> for its scene rectangle. The
 <i>parent</i> parameter is passed to <a href="qobject.html">QObject</a>'s constructor.</p>
-<p>See also <a href="qgraphicsscene.html#sceneRect-prop">sceneRect</a>.</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#sceneRect-prop">sceneRect</a>.</p>
 
 
 <h3 class="fn"><a name="QGraphicsScene-3" />QGraphicsScene.__init__ (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>, float&#160;<i>width</i>, float&#160;<i>height</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qgraphicsscene.html">QGraphicsScene</a>
 object, using the rectangle specified by (<i>x</i>, <i>y</i>), and
 the given <i>width</i> and <i>height</i> for its scene rectangle.
 The <i>parent</i> parameter is passed to <a href="qobject.html">QObject</a>'s constructor.</p>
-<p>See also <a href="qgraphicsscene.html#sceneRect-prop">sceneRect</a>.</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#sceneRect-prop">sceneRect</a>.</p>
 
 
 <h3 class="fn"><a name="activePanel" /><a href="qgraphicsitem.html">QGraphicsItem</a> QGraphicsScene.activePanel (<i>self</i>)</h3><p>Returns the current active panel, or 0 if no panel is currently
 active.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsscene.html#setActivePanel">QGraphicsScene.setActivePanel</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#setActivePanel">QGraphicsScene.setActivePanel</a>().</p>
 
 
 <h3 class="fn"><a name="activeWindow" /><a href="qgraphicswidget.html">QGraphicsWidget</a> QGraphicsScene.activeWindow (<i>self</i>)</h3><p>Returns the current active window, or 0 if no window is
 currently active.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qgraphicsscene.html#setActiveWindow">QGraphicsScene.setActiveWindow</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#setActiveWindow">QGraphicsScene.setActiveWindow</a>().</p>
 
 
 <h3 class="fn"><a name="addEllipse" /><a href="qgraphicsellipseitem.html">QGraphicsEllipseItem</a> QGraphicsScene.addEllipse (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rect</i>, <a href="qpen.html">QPen</a>&#160;<i>pen</i>&#160;=&#160;QPen(), <a href="qbrush.html">QBrush</a>&#160;<i>brush</i>&#160;=&#160;QBrush())</h3><p>Creates and adds an ellipse item to the scene, and returns the
@@ -231,8 +231,7 @@ and its position is initialized to (0, 0).</p>
 returns true), <a href="qgraphicsscene.html">QGraphicsScene</a>
 will emit <a href="qgraphicsscene.html#changed">changed</a>() once
 control goes back to the event loop.</p>
-<p>See also <a href="qgraphicsscene.html#addLine">addLine</a>(),
-<a href="qgraphicsscene.html#addPath">addPath</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPath">addPath</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
 
 
 <h3 class="fn"><a name="addEllipse-2" /><a href="qgraphicsellipseitem.html">QGraphicsEllipseItem</a> QGraphicsScene.addEllipse (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>, float&#160;<i>w</i>, float&#160;<i>h</i>, <a href="qpen.html">QPen</a>&#160;<i>pen</i>&#160;=&#160;QPen(), <a href="qbrush.html">QBrush</a>&#160;<i>brush</i>&#160;=&#160;QBrush())</h3><p>This convenience function is equivalent to calling
@@ -258,7 +257,7 @@ is moved to this scene), <a href="qgraphicsscene.html">QGraphicsScene</a> will s
 notification as the item is removed from its previous scene.</p>
 <p>If the item is a panel, the scene is active, and there is no
 active panel in the scene, then the item will be activated.</p>
-<p>See also <a href="qgraphicsscene.html#removeItem">removeItem</a>(), <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPath">addPath</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addWidget">addWidget</a>(), and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#removeItem">removeItem</a>(), <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPath">addPath</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addWidget">addWidget</a>(), and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="addLine" /><a href="qgraphicslineitem.html">QGraphicsLineItem</a> QGraphicsScene.addLine (<i>self</i>, <a href="qlinef.html">QLineF</a>&#160;<i>line</i>, <a href="qpen.html">QPen</a>&#160;<i>pen</i>&#160;=&#160;QPen())</h3><p>Creates and adds a line item to the scene, and returns the item
@@ -270,7 +269,7 @@ and its position is initialized to (0, 0).</p>
 returns true), <a href="qgraphicsscene.html">QGraphicsScene</a>
 will emit <a href="qgraphicsscene.html#changed">changed</a>() once
 control goes back to the event loop.</p>
-<p>See also <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addPath">addPath</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addPath">addPath</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
 
 
 <h3 class="fn"><a name="addLine-2" /><a href="qgraphicslineitem.html">QGraphicsLineItem</a> QGraphicsScene.addLine (<i>self</i>, float&#160;<i>x1</i>, float&#160;<i>y1</i>, float&#160;<i>x2</i>, float&#160;<i>y2</i>, <a href="qpen.html">QPen</a>&#160;<i>pen</i>&#160;=&#160;QPen())</h3><p>This convenience function is equivalent to calling
@@ -289,7 +288,7 @@ and its position is initialized to (0, 0).</p>
 returns true), <a href="qgraphicsscene.html">QGraphicsScene</a>
 will emit <a href="qgraphicsscene.html#changed">changed</a>() once
 control goes back to the event loop.</p>
-<p>See also <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
 
 
 <h3 class="fn"><a name="addPixmap" /><a href="qgraphicspixmapitem.html">QGraphicsPixmapItem</a> QGraphicsScene.addPixmap (<i>self</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>)</h3><p>Creates and adds a pixmap item to the scene, and returns the
@@ -300,7 +299,7 @@ and its position is initialized to (0, 0).</p>
 returns true), <a href="qgraphicsscene.html">QGraphicsScene</a>
 will emit <a href="qgraphicsscene.html#changed">changed</a>() once
 control goes back to the event loop.</p>
-<p>See also <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPath">addPath</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPath">addPath</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
 
 
 <h3 class="fn"><a name="addPolygon" /><a href="qgraphicspolygonitem.html">QGraphicsPolygonItem</a> QGraphicsScene.addPolygon (<i>self</i>, <a href="qpolygonf.html">QPolygonF</a>&#160;<i>polygon</i>, <a href="qpen.html">QPen</a>&#160;<i>pen</i>&#160;=&#160;QPen(), <a href="qbrush.html">QBrush</a>&#160;<i>brush</i>&#160;=&#160;QBrush())</h3><p>Creates and adds a polygon item to the scene, and returns the
@@ -312,7 +311,7 @@ and its position is initialized to (0, 0).</p>
 returns true), <a href="qgraphicsscene.html">QGraphicsScene</a>
 will emit <a href="qgraphicsscene.html#changed">changed</a>() once
 control goes back to the event loop.</p>
-<p>See also <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPath">addPath</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPath">addPath</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
 
 
 <h3 class="fn"><a name="addRect" /><a href="qgraphicsrectitem.html">QGraphicsRectItem</a> QGraphicsScene.addRect (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rect</i>, <a href="qpen.html">QPen</a>&#160;<i>pen</i>&#160;=&#160;QPen(), <a href="qbrush.html">QBrush</a>&#160;<i>brush</i>&#160;=&#160;QBrush())</h3><p>Creates and adds a rectangle item to the scene, and returns the
@@ -328,7 +327,7 @@ items coordinate system.</p>
 returns true), <a href="qgraphicsscene.html">QGraphicsScene</a>
 will emit <a href="qgraphicsscene.html#changed">changed</a>() once
 control goes back to the event loop.</p>
-<p>See also <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
 
 
 <h3 class="fn"><a name="addRect-2" /><a href="qgraphicsrectitem.html">QGraphicsRectItem</a> QGraphicsScene.addRect (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>, float&#160;<i>w</i>, float&#160;<i>h</i>, <a href="qpen.html">QPen</a>&#160;<i>pen</i>&#160;=&#160;QPen(), <a href="qbrush.html">QBrush</a>&#160;<i>brush</i>&#160;=&#160;QBrush())</h3><p>This convenience function is equivalent to calling
@@ -345,7 +344,7 @@ to <i>text</i>, and its font is initialized to <i>font</i>.</p>
 returns true), <a href="qgraphicsscene.html">QGraphicsScene</a>
 will emit <a href="qgraphicsscene.html#changed">changed</a>() once
 control goes back to the event loop.</p>
-<p>See also <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
 
 
 <h3 class="fn"><a name="addText" /><a href="qgraphicstextitem.html">QGraphicsTextItem</a> QGraphicsScene.addText (<i>self</i>, QString&#160;<i>text</i>, <a href="qfont.html">QFont</a>&#160;<i>font</i>&#160;=&#160;QFont())</h3><p>Creates and adds a text item to the scene, and returns the item
@@ -356,7 +355,7 @@ font is initialized to <i>font</i>.</p>
 returns true), <a href="qgraphicsscene.html">QGraphicsScene</a>
 will emit <a href="qgraphicsscene.html#changed">changed</a>() once
 control goes back to the event loop.</p>
-<p>See also <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addItem">addItem</a>(), and <a href="qgraphicsscene.html#addWidget">addWidget</a>().</p>
 
 
 <h3 class="fn"><a name="addWidget" /><a href="qgraphicsproxywidget.html">QGraphicsProxyWidget</a> QGraphicsScene.addWidget (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>widget</i>, <a href="qt-windowflags.html">Qt.WindowFlags</a>&#160;<i>flags</i>&#160;=&#160;0)</h3><p>The <i>widget</i> argument has it's ownership transferred to Qt.</p><p>Creates a new <a href="qgraphicsproxywidget.html">QGraphicsProxyWidget</a> for
@@ -371,7 +370,7 @@ control goes back to the event loop.</p>
 <p>Note that widgets with the <a href="qt.html#WidgetAttribute-enum">Qt.WA_PaintOnScreen</a> widget
 attribute set and widgets that wrap an external application or
 controller are not supported. Examples are <a href="qglwidget.html">QGLWidget</a> and <a href="qaxwidget.html">QAxWidget</a>.</p>
-<p>See also <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addSimpleText">addSimpleText</a>(), and
+<p><b>See also</b> <a href="qgraphicsscene.html#addEllipse">addEllipse</a>(), <a href="qgraphicsscene.html#addLine">addLine</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addPixmap">addPixmap</a>(), <a href="qgraphicsscene.html#addRect">addRect</a>(), <a href="qgraphicsscene.html#addText">addText</a>(), <a href="qgraphicsscene.html#addSimpleText">addSimpleText</a>(), and
 <a href="qgraphicsscene.html#addItem">addItem</a>().</p>
 
 
@@ -383,26 +382,25 @@ change, and in the second phase all items are notified that they
 can move. In the first phase, <a href="qgraphicsitem.html#advance">QGraphicsItem.advance</a>() is called
 passing a value of 0 as an argument, and 1 is passed in the second
 phase.</p>
-<p>See also <a href="qgraphicsitem.html#advance">QGraphicsItem.advance</a>(), <a href="qgraphicsitemanimation.html">QGraphicsItemAnimation</a>, and
+<p><b>See also</b> <a href="qgraphicsitem.html#advance">QGraphicsItem.advance</a>(), <a href="qgraphicsitemanimation.html">QGraphicsItemAnimation</a>, and
 <a href="qtimeline.html">QTimeLine</a>.</p>
 
 
 <h3 class="fn"><a name="backgroundBrush" /><a href="qbrush.html">QBrush</a> QGraphicsScene.backgroundBrush (<i>self</i>)</h3><h3 class="fn"><a name="bspTreeDepth" />int QGraphicsScene.bspTreeDepth (<i>self</i>)</h3><h3 class="fn"><a name="clear" />QGraphicsScene.clear (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void clear()</tt>.</p><p>Removes and deletes all items from the scene, but otherwise
 leaves the state of the scene unchanged.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qgraphicsscene.html#addItem">addItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addItem">addItem</a>().</p>
 
 
 <h3 class="fn"><a name="clearFocus" />QGraphicsScene.clearFocus (<i>self</i>)</h3><p>Clears focus from the scene. If any item has focus when this
 function is called, it will lose focus, and regain focus again once
 the scene regains focus.</p>
 <p>A scene that does not have focus ignores key events.</p>
-<p>See also <a href="qgraphicsscene.html#hasFocus">hasFocus</a>(),
-<a href="qgraphicsscene.html#setFocus">setFocus</a>(), and <a href="qgraphicsscene.html#setFocusItem">setFocusItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#hasFocus">hasFocus</a>(), <a href="qgraphicsscene.html#setFocus">setFocus</a>(), and <a href="qgraphicsscene.html#setFocusItem">setFocusItem</a>().</p>
 
 
 <h3 class="fn"><a name="clearSelection" />QGraphicsScene.clearSelection (<i>self</i>)</h3><p>Clears the current selection.</p>
-<p>See also <a href="qgraphicsscene.html#setSelectionArea">setSelectionArea</a>() and
+<p><b>See also</b> <a href="qgraphicsscene.html#setSelectionArea">setSelectionArea</a>() and
 <a href="qgraphicsscene.html#selectedItems">selectedItems</a>().</p>
 
 
@@ -414,7 +412,7 @@ all items whose shape intersects <i>item</i> or is contained inside
 <p>The items are returned in descending stacking order (i.e., the
 first item in the list is the uppermost item, and the last item is
 the lowermost item).</p>
-<p>See also <a href="qgraphicsscene.html#items">items</a>(),
+<p><b>See also</b> <a href="qgraphicsscene.html#items">items</a>(),
 <a href="qgraphicsscene.html#itemAt">itemAt</a>(), <a href="qgraphicsitem.html#collidesWithItem">QGraphicsItem.collidesWithItem</a>(),
 and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
@@ -425,7 +423,7 @@ default implementation forwards the event to the topmost item that
 accepts context menu events at the position of the event. If no
 items accept context menu events at this position, the event is
 ignored.</p>
-<p>See also <a href="qgraphicsitem.html#contextMenuEvent">QGraphicsItem.contextMenuEvent</a>().</p>
+<p><b>See also</b> <a href="qgraphicsitem.html#contextMenuEvent">QGraphicsItem.contextMenuEvent</a>().</p>
 
 
 <h3 class="fn"><a name="createItemGroup" /><a href="qgraphicsitemgroup.html">QGraphicsItemGroup</a> QGraphicsScene.createItemGroup (<i>self</i>, list-of-QGraphicsItem&#160;<i>items</i>)</h3><p>The <i>items</i> argument has it's ownership transferred to Qt.</p><p>Groups all items in <i>items</i> into a new <a href="qgraphicsitemgroup.html">QGraphicsItemGroup</a>, and returns a
@@ -437,7 +435,7 @@ this function will return an empty top-level <a href="qgraphicsitemgroup.html">Q
 <p><a href="qgraphicsscene.html">QGraphicsScene</a> has ownership
 of the group item; you do not need to delete it. To dismantle
 (ungroup) a group, call <a href="qgraphicsscene.html#destroyItemGroup">destroyItemGroup</a>().</p>
-<p>See also <a href="qgraphicsscene.html#destroyItemGroup">destroyItemGroup</a>() and
+<p><b>See also</b> <a href="qgraphicsscene.html#destroyItemGroup">destroyItemGroup</a>() and
 <a href="qgraphicsitemgroup.html#addToGroup">QGraphicsItemGroup.addToGroup</a>().</p>
 
 
@@ -445,7 +443,7 @@ of the group item; you do not need to delete it. To dismantle
 item, then removes <i>group</i> from the scene, and finally deletes
 it. The items' positions and transformations are mapped from the
 group to the group's parent.</p>
-<p>See also <a href="qgraphicsscene.html#createItemGroup">createItemGroup</a>() and
+<p><b>See also</b> <a href="qgraphicsscene.html#createItemGroup">createItemGroup</a>() and
 <a href="qgraphicsitemgroup.html#removeFromGroup">QGraphicsItemGroup.removeFromGroup</a>().</p>
 
 
@@ -453,7 +451,7 @@ group to the group's parent.</p>
 in a subclass to receive drag enter events for the scene.</p>
 <p>The default implementation accepts the event and prepares the
 scene to accept drag move events.</p>
-<p>See also <a href="qgraphicsitem.html#dragEnterEvent">QGraphicsItem.dragEnterEvent</a>(),
+<p><b>See also</b> <a href="qgraphicsitem.html#dragEnterEvent">QGraphicsItem.dragEnterEvent</a>(),
 <a href="qgraphicsscene.html#dragMoveEvent">dragMoveEvent</a>(),
 <a href="qgraphicsscene.html#dragLeaveEvent">dragLeaveEvent</a>(),
 and <a href="qgraphicsscene.html#dropEvent">dropEvent</a>().</p>
@@ -461,7 +459,7 @@ and <a href="qgraphicsscene.html#dropEvent">dropEvent</a>().</p>
 
 <h3 class="fn"><a name="dragLeaveEvent" />QGraphicsScene.dragLeaveEvent (<i>self</i>, <a href="qgraphicsscenedragdropevent.html">QGraphicsSceneDragDropEvent</a>&#160;<i>event</i>)</h3><p>This event handler, for event <i>event</i>, can be reimplemented
 in a subclass to receive drag leave events for the scene.</p>
-<p>See also <a href="qgraphicsitem.html#dragLeaveEvent">QGraphicsItem.dragLeaveEvent</a>(),
+<p><b>See also</b> <a href="qgraphicsitem.html#dragLeaveEvent">QGraphicsItem.dragLeaveEvent</a>(),
 <a href="qgraphicsscene.html#dragEnterEvent">dragEnterEvent</a>(),
 <a href="qgraphicsscene.html#dragMoveEvent">dragMoveEvent</a>(),
 and <a href="qgraphicsscene.html#dropEvent">dropEvent</a>().</p>
@@ -469,7 +467,7 @@ and <a href="qgraphicsscene.html#dropEvent">dropEvent</a>().</p>
 
 <h3 class="fn"><a name="dragMoveEvent" />QGraphicsScene.dragMoveEvent (<i>self</i>, <a href="qgraphicsscenedragdropevent.html">QGraphicsSceneDragDropEvent</a>&#160;<i>event</i>)</h3><p>This event handler, for event <i>event</i>, can be reimplemented
 in a subclass to receive drag move events for the scene.</p>
-<p>See also <a href="qgraphicsitem.html#dragMoveEvent">QGraphicsItem.dragMoveEvent</a>(),
+<p><b>See also</b> <a href="qgraphicsitem.html#dragMoveEvent">QGraphicsItem.dragMoveEvent</a>(),
 <a href="qgraphicsscene.html#dragEnterEvent">dragEnterEvent</a>(),
 <a href="qgraphicsscene.html#dragLeaveEvent">dragLeaveEvent</a>(),
 and <a href="qgraphicsscene.html#dropEvent">dropEvent</a>().</p>
@@ -483,7 +481,7 @@ to provide a custom background for the scene.</p>
 <p>If all you want is to define a color, texture, or gradient for
 the background, you can call <a href="qgraphicsscene.html#backgroundBrush-prop">setBackgroundBrush</a>()
 instead.</p>
-<p>See also <a href="qgraphicsscene.html#drawForeground">drawForeground</a>() and
+<p><b>See also</b> <a href="qgraphicsscene.html#drawForeground">drawForeground</a>() and
 <a class="obsolete" href="qgraphicsscene-obsolete.html#drawItems">drawItems</a>().</p>
 
 
@@ -495,13 +493,13 @@ function to provide a custom foreground for the scene.</p>
 <p>If all you want is to define a color, texture or gradient for
 the foreground, you can call <a href="qgraphicsscene.html#foregroundBrush-prop">setForegroundBrush</a>()
 instead.</p>
-<p>See also <a href="qgraphicsscene.html#drawBackground">drawBackground</a>() and
+<p><b>See also</b> <a href="qgraphicsscene.html#drawBackground">drawBackground</a>() and
 <a class="obsolete" href="qgraphicsscene-obsolete.html#drawItems">drawItems</a>().</p>
 
 
 <h3 class="fn"><a name="drawItems" />QGraphicsScene.drawItems (<i>self</i>, <a href="qpainter.html">QPainter</a>&#160;<i>painter</i>, list-of-QGraphicsItem&#160;<i>items</i>, list-of-QStyleOptionGraphicsItem&#160;<i>options</i>, <a href="qwidget.html">QWidget</a>&#160;<i>widget</i>&#160;=&#160;None)</h3><h3 class="fn"><a name="dropEvent" />QGraphicsScene.dropEvent (<i>self</i>, <a href="qgraphicsscenedragdropevent.html">QGraphicsSceneDragDropEvent</a>&#160;<i>event</i>)</h3><p>This event handler, for event <i>event</i>, can be reimplemented
 in a subclass to receive drop events for the scene.</p>
-<p>See also <a href="qgraphicsitem.html#dropEvent">QGraphicsItem.dropEvent</a>(),
+<p><b>See also</b> <a href="qgraphicsitem.html#dropEvent">QGraphicsItem.dropEvent</a>(),
 <a href="qgraphicsscene.html#dragEnterEvent">dragEnterEvent</a>(),
 <a href="qgraphicsscene.html#dragMoveEvent">dragMoveEvent</a>(),
 and <a href="qgraphicsscene.html#dragLeaveEvent">dragLeaveEvent</a>().</p>
@@ -518,7 +516,7 @@ them.</p>
 <p>Unlike <a href="qwidget.html">QWidget</a>, <a href="qgraphicsscene.html">QGraphicsScene</a> does not have the
 convenience functions <a href="qwidget.html#enterEvent">enterEvent()</a> and <a href="qwidget.html#leaveEvent">leaveEvent()</a>. Use this function to
 obtain those events instead.</p>
-<p>See also <a href="qgraphicsscene.html#contextMenuEvent">contextMenuEvent</a>(),
+<p><b>See also</b> <a href="qgraphicsscene.html#contextMenuEvent">contextMenuEvent</a>(),
 <a href="qgraphicsscene.html#keyPressEvent">keyPressEvent</a>(),
 <a href="qgraphicsscene.html#keyReleaseEvent">keyReleaseEvent</a>(),
 <a href="qgraphicsscene.html#mousePressEvent">mousePressEvent</a>(),
@@ -539,7 +537,7 @@ palette and font changes.</p>
 reimplemented in a subclass to receive focus in events.</p>
 <p>The default implementation sets focus on the scene, and then on
 the last focus item.</p>
-<p>See also <a href="qgraphicsitem.html#focusOutEvent">QGraphicsItem.focusOutEvent</a>().</p>
+<p><b>See also</b> <a href="qgraphicsitem.html#focusOutEvent">QGraphicsItem.focusOutEvent</a>().</p>
 
 
 <h3 class="fn"><a name="focusItem" /><a href="qgraphicsitem.html">QGraphicsItem</a> QGraphicsScene.focusItem (<i>self</i>)</h3><p>When the scene is active, this functions returns the scene's
@@ -548,7 +546,7 @@ scene is inactive, this functions returns the item that will gain
 input focus when the scene becomes active.</p>
 <p>The focus item receives keyboard input when the scene receives a
 key event.</p>
-<p>See also <a href="qgraphicsscene.html#setFocusItem">setFocusItem</a>(), <a href="qgraphicsitem.html#hasFocus">QGraphicsItem.hasFocus</a>(), and
+<p><b>See also</b> <a href="qgraphicsscene.html#setFocusItem">setFocusItem</a>(), <a href="qgraphicsitem.html#hasFocus">QGraphicsItem.hasFocus</a>(), and
 <a href="qgraphicsscene.html#isActive">isActive</a>().</p>
 
 
@@ -567,18 +565,17 @@ implementation is based on the tab focus chain defined by <a href="qgraphicswidg
 reimplemented in a subclass to receive focus out events.</p>
 <p>The default implementation removes focus from any focus item,
 then removes focus from the scene.</p>
-<p>See also <a href="qgraphicsitem.html#focusInEvent">QGraphicsItem.focusInEvent</a>().</p>
+<p><b>See also</b> <a href="qgraphicsitem.html#focusInEvent">QGraphicsItem.focusInEvent</a>().</p>
 
 
 <h3 class="fn"><a name="font" /><a href="qfont.html">QFont</a> QGraphicsScene.font (<i>self</i>)</h3><h3 class="fn"><a name="foregroundBrush" /><a href="qbrush.html">QBrush</a> QGraphicsScene.foregroundBrush (<i>self</i>)</h3><h3 class="fn"><a name="hasFocus" />bool QGraphicsScene.hasFocus (<i>self</i>)</h3><p>Returns true if the scene has focus; otherwise returns false. If
 the scene has focus, it will will forward key events from <a href="qkeyevent.html">QKeyEvent</a> to any item that has focus.</p>
-<p>See also <a href="qgraphicsscene.html#setFocus">setFocus</a>()
-and <a href="qgraphicsscene.html#setFocusItem">setFocusItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#setFocus">setFocus</a>() and <a href="qgraphicsscene.html#setFocusItem">setFocusItem</a>().</p>
 
 
 <h3 class="fn"><a name="height" />float QGraphicsScene.height (<i>self</i>)</h3><p>This convenience function is equivalent to calling
 <tt>sceneRect().height()</tt>.</p>
-<p>See also <a href="qgraphicsscene.html#width">width</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#width">width</a>().</p>
 
 
 <h3 class="fn"><a name="helpEvent" />QGraphicsScene.helpEvent (<i>self</i>, <a href="qgraphicsscenehelpevent.html">QGraphicsSceneHelpEvent</a>&#160;<i>event</i>)</h3><p>This event handler, for event <i>helpEvent</i>, can be
@@ -589,7 +586,7 @@ are created when a tooltip is requested.</p>
 item, i.e., the item with the highest z-value, at the mouse cursor
 position. If no item has a tooltip set, this function does
 nothing.</p>
-<p>See also <a href="qgraphicsitem.html#toolTip">QGraphicsItem.toolTip</a>() and
+<p><b>See also</b> <a href="qgraphicsitem.html#toolTip">QGraphicsItem.toolTip</a>() and
 <a href="qgraphicsscenehelpevent.html">QGraphicsSceneHelpEvent</a>.</p>
 
 
@@ -598,7 +595,7 @@ in a subclass to receive input method events for the scene.</p>
 <p>The default implementation forwards the event to the <a href="qgraphicsscene.html#focusItem">focusItem</a>(). If no item
 currently has focus or the current focus item does not accept input
 methods, this function does nothing.</p>
-<p>See also <a href="qgraphicsitem.html#inputMethodEvent">QGraphicsItem.inputMethodEvent</a>().</p>
+<p><b>See also</b> <a href="qgraphicsitem.html#inputMethodEvent">QGraphicsItem.inputMethodEvent</a>().</p>
 
 
 <h3 class="fn"><a name="inputMethodQuery" />QVariant QGraphicsScene.inputMethodQuery (<i>self</i>, <a href="qt.html#InputMethodQuery-enum">Qt.InputMethodQuery</a>&#160;<i>query</i>)</h3><p>This method is used by input methods to query a set of
@@ -606,7 +603,7 @@ properties of the scene to be able to support complex input method
 operations as support for surrounding text and reconversions.</p>
 <p>The <i>query</i> parameter specifies which property is
 queried.</p>
-<p>See also <a href="qwidget.html#inputMethodQuery">QWidget.inputMethodQuery</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#inputMethodQuery">QWidget.inputMethodQuery</a>().</p>
 
 
 <h3 class="fn"><a name="invalidate" />QGraphicsScene.invalidate (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rect</i>&#160;=&#160;QRectF(), <a href="qgraphicsscene-scenelayers.html">SceneLayers</a>&#160;<i>layers</i>&#160;=&#160;QGraphicsScene.AllLayers)</h3><p>This method is also a Qt slot with the C++ signature <tt>void invalidate(const QRectF&amp; = QRectF(),QGraphicsScene::SceneLayers = QGraphicsScene.AllLayers)</tt>.</p><p>Invalidates and schedules a redraw of the <i>layers</i> in
@@ -618,30 +615,30 @@ commonly used for scenes with tile-based backgrounds to notify
 changes when <a href="qgraphicsview.html">QGraphicsView</a> has
 enabled <a href="qgraphicsview.html#CacheModeFlag-enum">CacheBackground</a>.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QRectF TileScene.rectForTile(int x, int y) const
+<pre class="cpp">
+ <span class="type"><a href="qrectf.html">QRectF</a></span> TileScene<span class="operator">.</span>rectForTile(<span class="type">int</span> x<span class="operator">,</span> <span class="type">int</span> y) <span class="keyword">const</span>
  {
      <span class="comment">// Return the rectangle for the tile at position (x, y).</span>
-     return QRectF(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
+     <span class="keyword">return</span> <span class="type"><a href="qrectf.html">QRectF</a></span>(x <span class="operator">*</span> tileWidth<span class="operator">,</span> y <span class="operator">*</span> tileHeight<span class="operator">,</span> tileWidth<span class="operator">,</span> tileHeight);
  }
 
- void TileScene.setTile(int x, int y, const QPixmap &amp;pixmap)
+ <span class="type">void</span> TileScene<span class="operator">.</span>setTile(<span class="type">int</span> x<span class="operator">,</span> <span class="type">int</span> y<span class="operator">,</span> <span class="keyword">const</span> <span class="type"><a href="qpixmap.html">QPixmap</a></span> <span class="operator">&amp;</span>pixmap)
  {
      <span class="comment">// Sets or replaces the tile at position (x, y) with pixmap.</span>
-     if (x &gt;= 0 &amp;&amp; x &lt; numTilesH &amp;&amp; y &gt;= 0 &amp;&amp; y &lt; numTilesV) {
-         tiles[y][x] = pixmap;
-         invalidate(rectForTile(x, y), BackgroundLayer);
+     <span class="keyword">if</span> (x <span class="operator">&gt;</span><span class="operator">=</span> <span class="number">0</span> <span class="operator">&amp;</span><span class="operator">&amp;</span> x <span class="operator">&lt;</span> numTilesH <span class="operator">&amp;</span><span class="operator">&amp;</span> y <span class="operator">&gt;</span><span class="operator">=</span> <span class="number">0</span> <span class="operator">&amp;</span><span class="operator">&amp;</span> y <span class="operator">&lt;</span> numTilesV) {
+         tiles<span class="operator">[</span>y<span class="operator">]</span><span class="operator">[</span>x<span class="operator">]</span> <span class="operator">=</span> pixmap;
+         invalidate(rectForTile(x<span class="operator">,</span> y)<span class="operator">,</span> BackgroundLayer);
      }
  }
 
- void TileScene.drawBackground(QPainter *painter, const QRectF &amp;exposed)
+ <span class="type">void</span> TileScene<span class="operator">.</span>drawBackground(<span class="type"><a href="qpainter.html">QPainter</a></span> <span class="operator">*</span>painter<span class="operator">,</span> <span class="keyword">const</span> <span class="type"><a href="qrectf.html">QRectF</a></span> <span class="operator">&amp;</span>exposed)
  {
      <span class="comment">// Draws all tiles that intersect the exposed area.</span>
-     for (int y = 0; y &lt; numTilesV; ++y) {
-         for (int x = 0; x &lt; numTilesH; ++x) {
-             QRectF rect = rectForTile(x, y);
-             if (exposed.intersects(rect))
-                 painter-&gt;drawPixmap(rect.topLeft(), tiles[y][x]);
+     <span class="keyword">for</span> (<span class="type">int</span> y <span class="operator">=</span> <span class="number">0</span>; y <span class="operator">&lt;</span> numTilesV; <span class="operator">+</span><span class="operator">+</span>y) {
+         <span class="keyword">for</span> (<span class="type">int</span> x <span class="operator">=</span> <span class="number">0</span>; x <span class="operator">&lt;</span> numTilesH; <span class="operator">+</span><span class="operator">+</span>x) {
+             <span class="type"><a href="qrectf.html">QRectF</a></span> rect <span class="operator">=</span> rectForTile(x<span class="operator">,</span> y);
+             <span class="keyword">if</span> (exposed<span class="operator">.</span>intersects(rect))
+                 painter<span class="operator">-</span><span class="operator">&gt;</span>drawPixmap(rect<span class="operator">.</span>topLeft()<span class="operator">,</span> tiles<span class="operator">[</span>y<span class="operator">]</span><span class="operator">[</span>x<span class="operator">]</span>);
          }
      }
  }
@@ -650,7 +647,7 @@ enabled <a href="qgraphicsview.html#CacheModeFlag-enum">CacheBackground</a>.</p>
 currently supports background caching only (see <a href="qgraphicsview.html#CacheModeFlag-enum">QGraphicsView.CacheBackground</a>).
 This function is equivalent to calling <a href="qgraphicsscene.html#update">update</a>() if any layer but <a href="qgraphicsscene.html#SceneLayer-enum">BackgroundLayer</a> is
 passed.</p>
-<p>See also <a href="qgraphicsview.html#resetCachedContent">QGraphicsView.resetCachedContent</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#resetCachedContent">QGraphicsView.resetCachedContent</a>().</p>
 
 
 <h3 class="fn"><a name="invalidate-2" />QGraphicsScene.invalidate (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>, float&#160;<i>w</i>, float&#160;<i>h</i>, <a href="qgraphicsscene-scenelayers.html">SceneLayers</a>&#160;<i>layers</i>&#160;=&#160;QGraphicsScene.AllLayers)</h3><p>This is an overloaded function.</p>
@@ -664,7 +661,7 @@ invalidate(<a href="qrectf.html">QRectF</a>(<i>x</i>, <i>y</i>,
 least one <a href="qgraphicsview.html">QGraphicsView</a> that is
 active); otherwise returns false.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsitem.html#isActive">QGraphicsItem.isActive</a>() and
+<p><b>See also</b> <a href="qgraphicsitem.html#isActive">QGraphicsItem.isActive</a>() and
 <a href="qwidget.html#isActiveWindow-prop">QWidget.isActiveWindow</a>().</p>
 
 
@@ -674,7 +671,7 @@ active); otherwise returns false.</p>
 view, and needs to be provided if the scene contains items that
 ignore transformations.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsscene.html#items">items</a>(),
+<p><b>See also</b> <a href="qgraphicsscene.html#items">items</a>(),
 <a href="qgraphicsscene.html#collidingItems">collidingItems</a>(),
 and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
@@ -692,16 +689,12 @@ ignore transformations.</p>
 
 <h3 class="fn"><a name="itemAt-4" /><a href="qgraphicsitem.html">QGraphicsItem</a> QGraphicsScene.itemAt (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>, <a href="qtransform.html">QTransform</a>&#160;<i>deviceTransform</i>)</h3><h3 class="fn"><a name="itemIndexMethod" /><a href="qgraphicsscene.html#ItemIndexMethod-enum">ItemIndexMethod</a> QGraphicsScene.itemIndexMethod (<i>self</i>)</h3><h3 class="fn"><a name="items" />list-of-QGraphicsItem QGraphicsScene.items (<i>self</i>)</h3><p>Returns a list of all items in the scene in descending stacking
 order.</p>
-<p>See also <a href="qgraphicsscene.html#addItem">addItem</a>(),
-<a href="qgraphicsscene.html#removeItem">removeItem</a>(), and
-<a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addItem">addItem</a>(), <a href="qgraphicsscene.html#removeItem">removeItem</a>(), and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="items-2" />list-of-QGraphicsItem QGraphicsScene.items (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>pos</i>)</h3><p>Returns an ordered list of all items on the scene. <i>order</i>
 decides the stacking order.</p>
-<p>See also <a href="qgraphicsscene.html#addItem">addItem</a>(),
-<a href="qgraphicsscene.html#removeItem">removeItem</a>(), and
-<a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addItem">addItem</a>(), <a href="qgraphicsscene.html#removeItem">removeItem</a>(), and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="items-3" />list-of-QGraphicsItem QGraphicsScene.items (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rectangle</i>, <a href="qt.html#ItemSelectionMode-enum">Qt.ItemSelectionMode</a>&#160;<i>mode</i>&#160;=&#160;Qt.IntersectsItemShape)</h3><p>Returns all visible items that, depending on <i>mode</i>, are at
@@ -713,8 +706,7 @@ returned.</p>
 view, and needs to be provided if the scene contains items that
 ignore transformations.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsscene.html#itemAt">itemAt</a>() and
-<a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#itemAt">itemAt</a>() and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="items-4" />list-of-QGraphicsItem QGraphicsScene.items (<i>self</i>, <a href="qpolygonf.html">QPolygonF</a>&#160;<i>polygon</i>, <a href="qt.html#ItemSelectionMode-enum">Qt.ItemSelectionMode</a>&#160;<i>mode</i>&#160;=&#160;Qt.IntersectsItemShape)</h3><h3 class="fn"><a name="items-5" />list-of-QGraphicsItem QGraphicsScene.items (<i>self</i>, <a href="qpainterpath.html">QPainterPath</a>&#160;<i>path</i>, <a href="qt.html#ItemSelectionMode-enum">Qt.ItemSelectionMode</a>&#160;<i>mode</i>&#160;=&#160;Qt.IntersectsItemShape)</h3><h3 class="fn"><a name="items-6" />list-of-QGraphicsItem QGraphicsScene.items (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>, float&#160;<i>w</i>, float&#160;<i>h</i>, <a href="qt.html#ItemSelectionMode-enum">Qt.ItemSelectionMode</a>&#160;<i>mode</i>&#160;=&#160;Qt.IntersectsItemShape)</h3><h3 class="fn"><a name="items-7" />list-of-QGraphicsItem QGraphicsScene.items (<i>self</i>, <a href="qt.html#SortOrder-enum">Qt.SortOrder</a>&#160;<i>order</i>)</h3><p>This is an overloaded function.</p>
@@ -739,8 +731,7 @@ items whose exact shape intersects with or is contained by
 view, and needs to be provided if the scene contains items that
 ignore transformations.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsscene.html#itemAt">itemAt</a>() and
-<a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#itemAt">itemAt</a>() and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="items-11" />list-of-QGraphicsItem QGraphicsScene.items (<i>self</i>, <a href="qpainterpath.html">QPainterPath</a>&#160;<i>path</i>, <a href="qt.html#ItemSelectionMode-enum">Qt.ItemSelectionMode</a>&#160;<i>mode</i>, <a href="qt.html#SortOrder-enum">Qt.SortOrder</a>&#160;<i>order</i>, <a href="qtransform.html">QTransform</a>&#160;<i>deviceTransform</i>&#160;=&#160;QTransform())</h3><p>This is an overloaded function.</p>
@@ -754,8 +745,7 @@ items whose exact shape intersects with or is contained by
 view, and needs to be provided if the scene contains items that
 ignore transformations.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsscene.html#itemAt">itemAt</a>() and
-<a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#itemAt">itemAt</a>() and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="items-12" />list-of-QGraphicsItem QGraphicsScene.items (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>, float&#160;<i>w</i>, float&#160;<i>h</i>, <a href="qt.html#ItemSelectionMode-enum">Qt.ItemSelectionMode</a>&#160;<i>mode</i>, <a href="qt.html#SortOrder-enum">Qt.SortOrder</a>&#160;<i>order</i>, <a href="qtransform.html">QTransform</a>&#160;<i>deviceTransform</i>&#160;=&#160;QTransform())</h3><p>This is an overloaded function.</p>
@@ -769,20 +759,19 @@ items whose exact shape intersects with or is contained by
 view, and needs to be provided if the scene contains items that
 ignore transformations.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsscene.html#itemAt">itemAt</a>() and
-<a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#itemAt">itemAt</a>() and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="itemsBoundingRect" /><a href="qrectf.html">QRectF</a> QGraphicsScene.itemsBoundingRect (<i>self</i>)</h3><p>Calculates and returns the bounding rect of all items on the
 scene. This function works by iterating over all items, and because
 if this, it can be slow for large scenes.</p>
-<p>See also <a href="qgraphicsscene.html#sceneRect-prop">sceneRect</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#sceneRect-prop">sceneRect</a>().</p>
 
 
 <h3 class="fn"><a name="keyPressEvent" />QGraphicsScene.keyPressEvent (<i>self</i>, <a href="qkeyevent.html">QKeyEvent</a>&#160;<i>event</i>)</h3><p>This event handler, for event <i>keyEvent</i>, can be
 reimplemented in a subclass to receive keypress events. The default
 implementation forwards the event to current focus item.</p>
-<p>See also <a href="qgraphicsitem.html#keyPressEvent">QGraphicsItem.keyPressEvent</a>()
+<p><b>See also</b> <a href="qgraphicsitem.html#keyPressEvent">QGraphicsItem.keyPressEvent</a>()
 and <a href="qgraphicsscene.html#focusItem">focusItem</a>().</p>
 
 
@@ -790,7 +779,7 @@ and <a href="qgraphicsscene.html#focusItem">focusItem</a>().</p>
 reimplemented in a subclass to receive key release events. The
 default implementation forwards the event to current focus
 item.</p>
-<p>See also <a href="qgraphicsitem.html#keyReleaseEvent">QGraphicsItem.keyReleaseEvent</a>()
+<p><b>See also</b> <a href="qgraphicsitem.html#keyReleaseEvent">QGraphicsItem.keyReleaseEvent</a>()
 and <a href="qgraphicsscene.html#focusItem">focusItem</a>().</p>
 
 
@@ -805,7 +794,7 @@ that received the first press and release, it will be delivered as
 a press event. However, tripleclick events are not delivered as
 doubleclick events in this case.</p>
 <p>The default implementation is similar to <a href="qgraphicsscene.html#mousePressEvent">mousePressEvent</a>().</p>
-<p>See also <a href="qgraphicsitem.html#mousePressEvent">QGraphicsItem.mousePressEvent</a>(),
+<p><b>See also</b> <a href="qgraphicsitem.html#mousePressEvent">QGraphicsItem.mousePressEvent</a>(),
 <a href="qgraphicsitem.html#mouseMoveEvent">QGraphicsItem.mouseMoveEvent</a>(),
 <a href="qgraphicsitem.html#mouseReleaseEvent">QGraphicsItem.mouseReleaseEvent</a>(),
 and <a href="qgraphicsitem.html#setAcceptedMouseButtons">QGraphicsItem.setAcceptedMouseButtons</a>().</p>
@@ -821,8 +810,8 @@ the following events occur:</p>
 <li>If the item receives a mouse release event when there are no
 other buttons pressed, it loses the mouse grab.</li>
 <li>If the item becomes invisible (i.e., someone calls
-<tt>item-&gt;setVisible(false))</tt>, or if it becomes disabled
-(i.e., someone calls <tt>item-&gt;setEnabled(false))</tt>, it loses
+<tt>item-&gt;setVisible(false)</tt>), or if it becomes disabled
+(i.e., someone calls <tt>item-&gt;setEnabled(false)</tt>), it loses
 the mouse grab.</li>
 <li>If the item is removed from the scene, it loses the mouse
 grab.</li>
@@ -840,7 +829,7 @@ If there is a mouse grabber item, the event is sent to the mouse
 grabber. If there are any items that accept hover events at the
 current position, the event is translated into a hover event and
 accepted; otherwise it's ignored.</p>
-<p>See also <a href="qgraphicsitem.html#mousePressEvent">QGraphicsItem.mousePressEvent</a>(),
+<p><b>See also</b> <a href="qgraphicsitem.html#mousePressEvent">QGraphicsItem.mousePressEvent</a>(),
 <a href="qgraphicsitem.html#mouseReleaseEvent">QGraphicsItem.mouseReleaseEvent</a>(),
 <a href="qgraphicsitem.html#mouseDoubleClickEvent">QGraphicsItem.mouseDoubleClickEvent</a>(),
 and <a href="qgraphicsitem.html#setAcceptedMouseButtons">QGraphicsItem.setAcceptedMouseButtons</a>().</p>
@@ -857,7 +846,7 @@ item promptly becomes the mouse grabber item.</p>
 <p>If there is no item at the given position on the scene, the
 selection area is reset, any focus item loses its input focus, and
 the event is then ignored.</p>
-<p>See also <a href="qgraphicsitem.html#mousePressEvent">QGraphicsItem.mousePressEvent</a>()
+<p><b>See also</b> <a href="qgraphicsitem.html#mousePressEvent">QGraphicsItem.mousePressEvent</a>()
 and <a href="qgraphicsitem.html#setAcceptedMouseButtons">QGraphicsItem.setAcceptedMouseButtons</a>().</p>
 
 
@@ -869,7 +858,7 @@ If there is no mouse grabber, the event is ignored. Otherwise, if
 there is a mouse grabber item, the event is sent to the mouse
 grabber. If this mouse release represents the last pressed button
 on the mouse, the mouse grabber item then loses the mouse grab.</p>
-<p>See also <a href="qgraphicsitem.html#mousePressEvent">QGraphicsItem.mousePressEvent</a>(),
+<p><b>See also</b> <a href="qgraphicsitem.html#mousePressEvent">QGraphicsItem.mousePressEvent</a>(),
 <a href="qgraphicsitem.html#mouseMoveEvent">QGraphicsItem.mouseMoveEvent</a>(),
 <a href="qgraphicsitem.html#mouseDoubleClickEvent">QGraphicsItem.mouseDoubleClickEvent</a>(),
 and <a href="qgraphicsitem.html#setAcceptedMouseButtons">QGraphicsItem.setAcceptedMouseButtons</a>().</p>
@@ -879,7 +868,7 @@ and <a href="qgraphicsitem.html#setAcceptedMouseButtons">QGraphicsItem.setAccept
 scene. The ownership of <i>item</i> is passed on to the caller
 (i.e., <a href="qgraphicsscene.html">QGraphicsScene</a> will no
 longer delete <i>item</i> when destroyed).</p>
-<p>See also <a href="qgraphicsscene.html#addItem">addItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addItem">addItem</a>().</p>
 
 
 <h3 class="fn"><a name="render" />QGraphicsScene.render (<i>self</i>, <a href="qpainter.html">QPainter</a>&#160;<i>painter</i>, <a href="qrectf.html">QRectF</a>&#160;<i>target</i>&#160;=&#160;QRectF(), <a href="qrectf.html">QRectF</a>&#160;<i>source</i>&#160;=&#160;QRectF(), <a href="qt.html#AspectRatioMode-enum">Qt.AspectRatioMode</a>&#160;<i>mode</i>&#160;=&#160;Qt.KeepAspectRatio)</h3><p>Renders the <i>source</i> rect from scene into <i>target</i>,
@@ -887,15 +876,15 @@ using <i>painter</i>. This function is useful for capturing the
 contents of the scene onto a paint device, such as a <a href="qimage.html">QImage</a> (e.g., to take a screenshot), or for
 printing with <a href="qprinter.html">QPrinter</a>. For
 example:</p>
-<pre class="highlightedCode brush: cpp">
- QGraphicsScene scene;
- scene.addItem(...
- ...
- QPrinter printer(QPrinter.HighResolution);
- printer.setPaperSize(QPrinter.A4);
+<pre class="cpp">
+ <span class="type"><a href="qgraphicsscene.html">QGraphicsScene</a></span> scene;
+ scene<span class="operator">.</span><a href="qgraphicsscene.html#addItem">addItem</a>(<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ <span class="type"><a href="qprinter.html">QPrinter</a></span> printer(<span class="type"><a href="qprinter.html">QPrinter</a></span><span class="operator">.</span>HighResolution);
+ printer<span class="operator">.</span>setPaperSize(<span class="type"><a href="qprinter.html">QPrinter</a></span><span class="operator">.</span>A4);
 
- QPainter painter(&amp;printer);
- scene.render(&amp;painter);
+ <span class="type"><a href="qpainter.html">QPainter</a></span> painter(<span class="operator">&amp;</span>printer);
+ scene<span class="operator">.</span>render(<span class="operator">&amp;</span>painter);
 </pre>
 <p>If <i>source</i> is a null rect, this function will use <a href="qgraphicsscene.html#sceneRect-prop">sceneRect</a>() to determine
 what to render. If <i>target</i> is a null rect, the dimensions of
@@ -904,18 +893,18 @@ what to render. If <i>target</i> is a null rect, the dimensions of
 <i>aspectRatioMode</i> to fit into the target rect. By default, the
 aspect ratio is kept, and <i>source</i> is scaled to fit in
 <i>target</i>.</p>
-<p>See also <a href="qgraphicsview.html#render">QGraphicsView.render</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#render">QGraphicsView.render</a>().</p>
 
 
 <h3 class="fn"><a name="sceneRect" /><a href="qrectf.html">QRectF</a> QGraphicsScene.sceneRect (<i>self</i>)</h3><h3 class="fn"><a name="selectedItems" />list-of-QGraphicsItem QGraphicsScene.selectedItems (<i>self</i>)</h3><p>Returns a list of all currently selected items. The items are
 returned in no particular order.</p>
-<p>See also <a href="qgraphicsscene.html#setSelectionArea">setSelectionArea</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#setSelectionArea">setSelectionArea</a>().</p>
 
 
 <h3 class="fn"><a name="selectionArea" /><a href="qpainterpath.html">QPainterPath</a> QGraphicsScene.selectionArea (<i>self</i>)</h3><p>Returns the selection area that was previously set with <a href="qgraphicsscene.html#setSelectionArea">setSelectionArea</a>(), or
 an empty <a href="qpainterpath.html">QPainterPath</a> if no
 selection area has been set.</p>
-<p>See also <a href="qgraphicsscene.html#setSelectionArea">setSelectionArea</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#setSelectionArea">setSelectionArea</a>().</p>
 
 
 <h3 class="fn"><a name="sendEvent" />bool QGraphicsScene.sendEvent (<i>self</i>, <a href="qgraphicsitem.html">QGraphicsItem</a>&#160;<i>item</i>, <a href="qevent.html">QEvent</a>&#160;<i>event</i>)</h3><p>Sends event <i>event</i> to item <i>item</i> through possible
@@ -925,7 +914,7 @@ event filters.</p>
 is disabled. Otherwise returns the value that was returned from the
 event handler.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsitem.html#sceneEvent">QGraphicsItem.sceneEvent</a>() and
+<p><b>See also</b> <a href="qgraphicsitem.html#sceneEvent">QGraphicsItem.sceneEvent</a>() and
 <a href="qgraphicsitem.html#sceneEventFilter">QGraphicsItem.sceneEventFilter</a>().</p>
 
 
@@ -936,14 +925,14 @@ currently active panel.</p>
 until the scene becomes active (or, ir <i>item</i> is 0, no item
 will be activated).</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsscene.html#activePanel">activePanel</a>(), <a href="qgraphicsscene.html#isActive">isActive</a>(), and <a href="qgraphicsitem.html#isActive">QGraphicsItem.isActive</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#activePanel">activePanel</a>(), <a href="qgraphicsscene.html#isActive">isActive</a>(), and <a href="qgraphicsitem.html#isActive">QGraphicsItem.isActive</a>().</p>
 
 
 <h3 class="fn"><a name="setActiveWindow" />QGraphicsScene.setActiveWindow (<i>self</i>, <a href="qgraphicswidget.html">QGraphicsWidget</a>&#160;<i>widget</i>)</h3><p>Activates <i>widget</i>, which must be a widget in this scene.
 You can also pass 0 for <i>widget</i>, in which case <a href="qgraphicsscene.html">QGraphicsScene</a> will deactivate any
 currently active window.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qgraphicsscene.html#activeWindow">activeWindow</a>() and <a href="qgraphicswidget.html#isActiveWindow">QGraphicsWidget.isActiveWindow</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#activeWindow">activeWindow</a>() and <a href="qgraphicswidget.html#isActiveWindow">QGraphicsWidget.isActiveWindow</a>().</p>
 
 
 <h3 class="fn"><a name="setBackgroundBrush" />QGraphicsScene.setBackgroundBrush (<i>self</i>, <a href="qbrush.html">QBrush</a>&#160;<i>brush</i>)</h3><h3 class="fn"><a name="setBspTreeDepth" />QGraphicsScene.setBspTreeDepth (<i>self</i>, int&#160;<i>depth</i>)</h3><h3 class="fn"><a name="setFocus" />QGraphicsScene.setFocus (<i>self</i>, <a href="qt.html#FocusReason-enum">Qt.FocusReason</a>&#160;<i>focusReason</i>&#160;=&#160;Qt.OtherFocusReason)</h3><p>Sets focus on the scene by sending a <a href="qfocusevent.html">QFocusEvent</a> to the scene, passing
@@ -951,9 +940,7 @@ currently active window.</p>
 having previously lost it while an item had focus, the last focus
 item will receive focus with <i>focusReason</i> as the reason.</p>
 <p>If the scene already has focus, this function does nothing.</p>
-<p>See also <a href="qgraphicsscene.html#hasFocus">hasFocus</a>(),
-<a href="qgraphicsscene.html#clearFocus">clearFocus</a>(), and
-<a href="qgraphicsscene.html#setFocusItem">setFocusItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#hasFocus">hasFocus</a>(), <a href="qgraphicsscene.html#clearFocus">clearFocus</a>(), and <a href="qgraphicsscene.html#setFocusItem">setFocusItem</a>().</p>
 
 
 <h3 class="fn"><a name="setFocusItem" />QGraphicsScene.setFocusItem (<i>self</i>, <a href="qgraphicsitem.html">QGraphicsItem</a>&#160;<i>item</i>, <a href="qt.html#FocusReason-enum">Qt.FocusReason</a>&#160;<i>focusReason</i>&#160;=&#160;Qt.OtherFocusReason)</h3><p>Sets the scene's focus item to <i>item</i>, with the focus
@@ -966,7 +953,7 @@ removes focus from any previous focusitem.</p>
 <p>If item is not 0, and the scene does not currently have focus
 (i.e., <a href="qgraphicsscene.html#hasFocus">hasFocus</a>()
 returns false), this function will call <a href="qgraphicsscene.html#setFocus">setFocus</a>() automatically.</p>
-<p>See also <a href="qgraphicsscene.html#focusItem">focusItem</a>(), <a href="qgraphicsscene.html#hasFocus">hasFocus</a>(), and <a href="qgraphicsscene.html#setFocus">setFocus</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#focusItem">focusItem</a>(), <a href="qgraphicsscene.html#hasFocus">hasFocus</a>(), and <a href="qgraphicsscene.html#setFocus">setFocus</a>().</p>
 
 
 <h3 class="fn"><a name="setFont" />QGraphicsScene.setFont (<i>self</i>, <a href="qfont.html">QFont</a>&#160;<i>font</i>)</h3><h3 class="fn"><a name="setForegroundBrush" />QGraphicsScene.setForegroundBrush (<i>self</i>, <a href="qbrush.html">QBrush</a>&#160;<i>brush</i>)</h3><h3 class="fn"><a name="setItemIndexMethod" />QGraphicsScene.setItemIndexMethod (<i>self</i>, <a href="qgraphicsscene.html#ItemIndexMethod-enum">ItemIndexMethod</a>&#160;<i>method</i>)</h3><h3 class="fn"><a name="setPalette" />QGraphicsScene.setPalette (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>palette</i>)</h3><h3 class="fn"><a name="setSceneRect" />QGraphicsScene.setSceneRect (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rect</i>)</h3><h3 class="fn"><a name="setSceneRect-2" />QGraphicsScene.setSceneRect (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>, float&#160;<i>w</i>, float&#160;<i>h</i>)</h3><h3 class="fn"><a name="setSelectionArea" />QGraphicsScene.setSelectionArea (<i>self</i>, <a href="qpainterpath.html">QPainterPath</a>&#160;<i>path</i>)</h3><p>Sets the selection area to <i>path</i>. All items within this
@@ -979,7 +966,7 @@ ignore transformations.</p>
 <p>For an item to be selected, it must be marked as
 <i>selectable</i> (<a href="qgraphicsitem.html#GraphicsItemFlag-enum">QGraphicsItem.ItemIsSelectable</a>).</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsscene.html#clearSelection">clearSelection</a>() and
+<p><b>See also</b> <a href="qgraphicsscene.html#clearSelection">clearSelection</a>() and
 <a href="qgraphicsscene.html#selectionArea">selectionArea</a>().</p>
 
 
@@ -990,7 +977,7 @@ determine if items are included in the selection area.</p>
 view, and needs to be provided if the scene contains items that
 ignore transformations.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsscene.html#clearSelection">clearSelection</a>() and
+<p><b>See also</b> <a href="qgraphicsscene.html#clearSelection">clearSelection</a>() and
 <a href="qgraphicsscene.html#selectionArea">selectionArea</a>().</p>
 
 
@@ -1004,17 +991,17 @@ automatically update the style for all widgets in the scene that do
 not have a style explicitly assigned to them.</p>
 <p>If <i>style</i> is 0, <a href="qgraphicsscene.html">QGraphicsScene</a> will revert to <a href="qapplication.html#style">QApplication.style</a>().</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qgraphicsscene.html#style">style</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#style">style</a>().</p>
 
 
 <h3 class="fn"><a name="stickyFocus" />bool QGraphicsScene.stickyFocus (<i>self</i>)</h3><h3 class="fn"><a name="style" /><a href="qstyle.html">QStyle</a> QGraphicsScene.style (<i>self</i>)</h3><p>Returns the scene's style, or the same as <a href="qapplication.html#style">QApplication.style</a>() if the scene
 has not been explicitly assigned a style.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qgraphicsscene.html#setStyle">setStyle</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#setStyle">setStyle</a>().</p>
 
 
 <h3 class="fn"><a name="update" />QGraphicsScene.update (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rect</i>&#160;=&#160;QRectF())</h3><p>This method is also a Qt slot with the C++ signature <tt>void update(const QRectF&amp; = QRectF())</tt>.</p><p>Schedules a redraw of the area <i>rect</i> on the scene.</p>
-<p>See also <a href="qgraphicsscene.html#sceneRect-prop">sceneRect</a>() and <a href="qgraphicsscene.html#changed">changed</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#sceneRect-prop">sceneRect</a>() and <a href="qgraphicsscene.html#changed">changed</a>().</p>
 
 
 <h3 class="fn"><a name="update-2" />QGraphicsScene.update (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>, float&#160;<i>w</i>, float&#160;<i>h</i>)</h3><p>This is an overloaded function.</p>
@@ -1024,7 +1011,7 @@ has not been explicitly assigned a style.</p>
 
 
 <h3 class="fn"><a name="views" />list-of-QGraphicsView QGraphicsScene.views (<i>self</i>)</h3><p>Returns a list of all the views that display this scene.</p>
-<p>See also <a href="qgraphicsview.html#scene">QGraphicsView.scene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#scene">QGraphicsView.scene</a>().</p>
 
 
 <h3 class="fn"><a name="wheelEvent" />QGraphicsScene.wheelEvent (<i>self</i>, <a href="qgraphicsscenewheelevent.html">QGraphicsSceneWheelEvent</a>&#160;<i>event</i>)</h3><p>This event handler, for event <i>wheelEvent</i>, can be
@@ -1034,21 +1021,21 @@ scene.</p>
 under the cursor. If ignored, the event propagates to the item
 beneath, and again until the event is accepted, or it reaches the
 scene. If no items accept the event, it is ignored.</p>
-<p>See also <a href="qgraphicsitem.html#wheelEvent">QGraphicsItem.wheelEvent</a>().</p>
+<p><b>See also</b> <a href="qgraphicsitem.html#wheelEvent">QGraphicsItem.wheelEvent</a>().</p>
 
 
 <h3 class="fn"><a name="width" />float QGraphicsScene.width (<i>self</i>)</h3><p>This convenience function is equivalent to calling <a href="qgraphicsscene.html#sceneRect-prop">sceneRect</a>().width().</p>
-<p>See also <a href="qgraphicsscene.html#height">height</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#height">height</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="changed" />void changed (const QList&lt;QRectF&gt;&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted by <a href="qgraphicsscene.html">QGraphicsScene</a> when control reaches the
 event loop, if the scene content changes. The <i>region</i>
 parameter contains a list of scene rectangles that indicate the
 area that has been changed.</p>
-<p>See also <a href="qgraphicsview.html#updateScene">QGraphicsView.updateScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#updateScene">QGraphicsView.updateScene</a>().</p>
 
 
 <h3 class="fn"><a name="sceneRectChanged" />void sceneRectChanged (const QRectF&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted by <a href="qgraphicsscene.html">QGraphicsScene</a> whenever the scene rect
 changes. The <i>rect</i> parameter is the new scene rectangle.</p>
-<p>See also <a href="qgraphicsview.html#updateSceneRect">QGraphicsView.updateSceneRect</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#updateSceneRect">QGraphicsView.updateSceneRect</a>().</p>
 
 
 <h3 class="fn"><a name="selectionChanged" />void selectionChanged ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted by <a href="qgraphicsscene.html">QGraphicsScene</a> whenever the selection
@@ -1065,9 +1052,9 @@ remove from the scene a parent item that contains several selected
 items, selectionChanged() is emitted only once after the operation
 has completed (instead of once for each item).</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qgraphicsscene.html#setSelectionArea">setSelectionArea</a>(),
+<p><b>See also</b> <a href="qgraphicsscene.html#setSelectionArea">setSelectionArea</a>(),
 <a href="qgraphicsscene.html#selectedItems">selectedItems</a>(),
 and <a href="qgraphicsitem.html#setSelected">QGraphicsItem.setSelected</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

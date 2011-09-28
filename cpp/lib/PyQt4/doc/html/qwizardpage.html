@@ -68,7 +68,7 @@ accessed at any time using <a href="qwizardpage.html#field">field</a>() and <a h
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QWizardPage" />QWizardPage.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a wizard page with the given <i>parent</i>.</p>
 <p>When the page is inserted into a wizard using <a href="qwizard.html#addPage">QWizard.addPage</a>() or <a href="qwizard.html#setPage">QWizard.setPage</a>(), the parent is
 automatically set to be the wizard.</p>
-<p>See also <a href="qwizardpage.html#wizard">wizard</a>().</p>
+<p><b>See also</b> <a href="qwizardpage.html#wizard">wizard</a>().</p>
 
 
 <h3 class="fn"><a name="buttonText" />QString QWizardPage.buttonText (<i>self</i>, <a href="qwizard.html#WizardButton-enum">QWizard.WizardButton</a>&#160;<i>which</i>)</h3><p>Returns the text on button <i>which</i> on this page.</p>
@@ -78,7 +78,7 @@ text is returned.</p>
 <p>By default, the text on buttons depends on the <a href="qwizard.html#wizardStyle-prop">QWizard.wizardStyle</a>. For
 example, on Mac OS X, the <b>Next</b> button is called
 <b>Continue</b>.</p>
-<p>See also <a href="qwizardpage.html#setButtonText">setButtonText</a>(), <a href="qwizard.html#buttonText">QWizard.buttonText</a>(), and <a href="qwizard.html#setButtonText">QWizard.setButtonText</a>().</p>
+<p><b>See also</b> <a href="qwizardpage.html#setButtonText">setButtonText</a>(), <a href="qwizard.html#buttonText">QWizard.buttonText</a>(), and <a href="qwizard.html#setButtonText">QWizard.setButtonText</a>().</p>
 
 
 <h3 class="fn"><a name="cleanupPage" />QWizardPage.cleanupPage (<i>self</i>)</h3><p>This virtual function is called by <a href="qwizard.html#cleanupPage">QWizard.cleanupPage</a>() when the user
@@ -87,7 +87,7 @@ option is set).</p>
 <p>The default implementation resets the page's fields to their
 original values (the values they had before <a href="qwizardpage.html#initializePage">initializePage</a>() was
 called).</p>
-<p>See also <a href="qwizard.html#cleanupPage">QWizard.cleanupPage</a>(), <a href="qwizardpage.html#initializePage">initializePage</a>(), and
+<p><b>See also</b> <a href="qwizard.html#cleanupPage">QWizard.cleanupPage</a>(), <a href="qwizardpage.html#initializePage">initializePage</a>(), and
 <a href="qwizard.html#WizardOption-enum">QWizard.IndependentPages</a>.</p>
 
 
@@ -95,17 +95,16 @@ called).</p>
 <p>This function can be used to access fields on any page of the
 wizard. It is equivalent to calling <a href="qwizardpage.html#wizard">wizard</a>()-&gt;<a href="qwizard.html#field">field</a>(<i>name</i>).</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- void OutputFilesPage.initializePage()
+<pre class="cpp">
+ <span class="type">void</span> OutputFilesPage<span class="operator">.</span><a href="qwizardpage.html#initializePage">initializePage</a>()
  {
-     QString className = field("className").toString();
-     headerLineEdit-&gt;setText(className.toLower() + ".h");
-     implementationLineEdit-&gt;setText(className.toLower() + ".cpp");
-     outputDirLineEdit-&gt;setText(QDir.convertSeparators(QDir.tempPath()));
+     <span class="type"><a href="qstring.html">QString</a></span> className <span class="operator">=</span> field(<span class="string">"className"</span>)<span class="operator">.</span>toString();
+     headerLineEdit<span class="operator">-</span><span class="operator">&gt;</span>setText(className<span class="operator">.</span>toLower() <span class="operator">+</span> <span class="string">".h"</span>);
+     implementationLineEdit<span class="operator">-</span><span class="operator">&gt;</span>setText(className<span class="operator">.</span>toLower() <span class="operator">+</span> <span class="string">".cpp"</span>);
+     outputDirLineEdit<span class="operator">-</span><span class="operator">&gt;</span>setText(<span class="type"><a href="qdir.html">QDir</a></span><span class="operator">.</span>convertSeparators(<span class="type"><a href="qdir.html">QDir</a></span><span class="operator">.</span>tempPath()));
  }
 </pre>
-<p>See also <a href="qwizard.html#field">QWizard.field</a>(),
-<a href="qwizardpage.html#setField">setField</a>(), and <a href="qwizardpage.html#registerField">registerField</a>().</p>
+<p><b>See also</b> <a href="qwizard.html#field">QWizard.field</a>(), <a href="qwizardpage.html#setField">setField</a>(), and <a href="qwizardpage.html#registerField">registerField</a>().</p>
 
 
 <h3 class="fn"><a name="initializePage" />QWizardPage.initializePage (<i>self</i>)</h3><p>This virtual function is called by <a href="qwizard.html#initializePage">QWizard.initializePage</a>() to
@@ -118,24 +117,24 @@ is shown.)</p>
 <p>By reimplementing this function, you can ensure that the page's
 fields are properly initialized based on fields from previous
 pages. For example:</p>
-<pre class="highlightedCode brush: cpp">
- void OutputFilesPage.initializePage()
+<pre class="cpp">
+ <span class="type">void</span> OutputFilesPage<span class="operator">.</span>initializePage()
  {
-     QString className = field("className").toString();
-     headerLineEdit-&gt;setText(className.toLower() + ".h");
-     implementationLineEdit-&gt;setText(className.toLower() + ".cpp");
-     outputDirLineEdit-&gt;setText(QDir.convertSeparators(QDir.tempPath()));
+     <span class="type"><a href="qstring.html">QString</a></span> className <span class="operator">=</span> field(<span class="string">"className"</span>)<span class="operator">.</span>toString();
+     headerLineEdit<span class="operator">-</span><span class="operator">&gt;</span>setText(className<span class="operator">.</span>toLower() <span class="operator">+</span> <span class="string">".h"</span>);
+     implementationLineEdit<span class="operator">-</span><span class="operator">&gt;</span>setText(className<span class="operator">.</span>toLower() <span class="operator">+</span> <span class="string">".cpp"</span>);
+     outputDirLineEdit<span class="operator">-</span><span class="operator">&gt;</span>setText(<span class="type"><a href="qdir.html">QDir</a></span><span class="operator">.</span>convertSeparators(<span class="type"><a href="qdir.html">QDir</a></span><span class="operator">.</span>tempPath()));
  }
 </pre>
 <p>The default implementation does nothing.</p>
-<p>See also <a href="qwizard.html#initializePage">QWizard.initializePage</a>(),
+<p><b>See also</b> <a href="qwizard.html#initializePage">QWizard.initializePage</a>(),
 <a href="qwizardpage.html#cleanupPage">cleanupPage</a>(), and
 <a href="qwizard.html#WizardOption-enum">QWizard.IndependentPages</a>.</p>
 
 
 <h3 class="fn"><a name="isCommitPage" />bool QWizardPage.isCommitPage (<i>self</i>)</h3><p>Returns true if this page is a commit page; otherwise returns
 false.</p>
-<p>See also <a href="qwizardpage.html#setCommitPage">setCommitPage</a>().</p>
+<p><b>See also</b> <a href="qwizardpage.html#setCommitPage">setCommitPage</a>().</p>
 
 
 <h3 class="fn"><a name="isComplete" />bool QWizardPage.isComplete (<i>self</i>)</h3><p>This virtual function is called by <a href="qwizard.html">QWizard</a> to determine whether the <b>Next</b> or
@@ -148,7 +147,7 @@ changes. This ensures that <a href="qwizard.html">QWizard</a>
 updates the enabled or disabled state of its buttons. An example of
 the reimplementation is available <a href="http://qt.nokia.com/doc/qq/qq22-qwizard.html#validatebeforeitstoolate">
 here</a>.</p>
-<p>See also <a href="qwizardpage.html#completeChanged">completeChanged</a>() and
+<p><b>See also</b> <a href="qwizardpage.html#completeChanged">completeChanged</a>() and
 <a href="qwizardpage.html#isFinalPage">isFinalPage</a>().</p>
 
 
@@ -160,8 +159,7 @@ page or not.</p>
 otherwise, it returns false.</p>
 <p>By explicitly calling setFinalPage(true), you can let the user
 perform an "early finish".</p>
-<p>See also <a href="qwizardpage.html#isComplete">isComplete</a>()
-and <a href="qwizard.html#WizardOption-enum">QWizard.HaveFinishButtonOnEarlyPages</a>.</p>
+<p><b>See also</b> <a href="qwizardpage.html#isComplete">isComplete</a>() and <a href="qwizard.html#WizardOption-enum">QWizard.HaveFinishButtonOnEarlyPages</a>.</p>
 
 
 <h3 class="fn"><a name="nextId" />int QWizardPage.nextId (<i>self</i>)</h3><p>This virtual function is called by <a href="qwizard.html#nextId">QWizard.nextId</a>() to find out which page
@@ -172,24 +170,23 @@ follows.</p>
 ID of the current page, or -1 if there is no such ID.</p>
 <p>By reimplementing this function, you can specify a dynamic page
 order. For example:</p>
-<pre class="highlightedCode brush: cpp">
- int IntroPage.nextId() const
+<pre class="cpp">
+ <span class="type">int</span> IntroPage<span class="operator">.</span>nextId() <span class="keyword">const</span>
  {
-     if (evaluateRadioButton-&gt;isChecked()) {
-         return LicenseWizard.Page_Evaluate;
-     } else {
-         return LicenseWizard.Page_Register;
+     <span class="keyword">if</span> (evaluateRadioButton<span class="operator">-</span><span class="operator">&gt;</span>isChecked()) {
+         <span class="keyword">return</span> LicenseWizard<span class="operator">.</span>Page_Evaluate;
+     } <span class="keyword">else</span> {
+         <span class="keyword">return</span> LicenseWizard<span class="operator">.</span>Page_Register;
      }
  }
 </pre>
-<p>See also <a href="qwizard.html#nextId">QWizard.nextId</a>().</p>
+<p><b>See also</b> <a href="qwizard.html#nextId">QWizard.nextId</a>().</p>
 
 
 <h3 class="fn"><a name="pixmap" /><a href="qpixmap.html">QPixmap</a> QWizardPage.pixmap (<i>self</i>, <a href="qwizard.html#WizardPixmap-enum">QWizard.WizardPixmap</a>&#160;<i>which</i>)</h3><p>Returns the pixmap set for role <i>which</i>.</p>
 <p>Pixmaps can also be set for the entire wizard using <a href="qwizard.html#setPixmap">QWizard.setPixmap</a>(), in which case
 they apply for all pages that don't specify a pixmap.</p>
-<p>See also <a href="qwizardpage.html#setPixmap">setPixmap</a>(),
-<a href="qwizard.html#pixmap">QWizard.pixmap</a>(), and <a href="qwizard.html#elements-of-a-wizard-page">Elements of a Wizard
+<p><b>See also</b> <a href="qwizardpage.html#setPixmap">setPixmap</a>(), <a href="qwizard.html#pixmap">QWizard.pixmap</a>(), and <a href="qwizard.html#elements-of-a-wizard-page">Elements of a Wizard
 Page</a>.</p>
 
 
@@ -212,88 +209,46 @@ a <i>property</i> or a <i>changedSignal</i>. The table below lists
 these widgets:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Widget</th>
 <th>Property</th>
 <th>Change Notification Signal</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><a href="qabstractbutton.html">QAbstractButton</a></p>
-</td>
-<td>
-<p>bool <a href="qabstractbutton.html#checked-prop">checked</a></p>
-</td>
-<td>
-<p><a href="qabstractbutton.html#toggled">toggled()</a></p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qabstractbutton.html">QAbstractButton</a></td>
+<td>bool <a href="qabstractbutton.html#checked-prop">checked</a></td>
+<td><a href="qabstractbutton.html#toggled">toggled()</a></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qabstractslider.html">QAbstractSlider</a></p>
-</td>
-<td>
-<p>int <a href="qabstractslider.html#value-prop">value</a></p>
-</td>
-<td>
-<p><a href="qabstractslider.html#valueChanged">valueChanged()</a></p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qabstractslider.html">QAbstractSlider</a></td>
+<td>int <a href="qabstractslider.html#value-prop">value</a></td>
+<td><a href="qabstractslider.html#valueChanged">valueChanged()</a></td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qcombobox.html">QComboBox</a></p>
-</td>
-<td>
-<p>int <a href="qcombobox.html#currentIndex-prop">currentIndex</a></p>
-</td>
-<td>
-<p><a href="qcombobox.html#currentIndexChanged">currentIndexChanged()</a></p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qcombobox.html">QComboBox</a></td>
+<td>int <a href="qcombobox.html#currentIndex-prop">currentIndex</a></td>
+<td><a href="qcombobox.html#currentIndexChanged">currentIndexChanged()</a></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qdatetimeedit.html">QDateTimeEdit</a></p>
-</td>
-<td>
-<p><a href="qdatetime.html">QDateTime</a> <a href="qdatetimeedit.html#dateTime-prop">dateTime</a></p>
-</td>
-<td>
-<p><a href="qdatetimeedit.html#dateTimeChanged">dateTimeChanged()</a></p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qdatetimeedit.html">QDateTimeEdit</a></td>
+<td><a href="qdatetime.html">QDateTime</a> <a href="qdatetimeedit.html#dateTime-prop">dateTime</a></td>
+<td><a href="qdatetimeedit.html#dateTimeChanged">dateTimeChanged()</a></td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qlineedit.html">QLineEdit</a></p>
-</td>
-<td>
-<p><a href="qstring.html">QString</a> <a href="qlineedit.html#text-prop">text</a></p>
-</td>
-<td>
-<p><a href="qlineedit.html#textChanged">textChanged()</a></p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qlineedit.html">QLineEdit</a></td>
+<td><a href="qstring.html">QString</a> <a href="qlineedit.html#text-prop">text</a></td>
+<td><a href="qlineedit.html#textChanged">textChanged()</a></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qlistwidget.html">QListWidget</a></p>
-</td>
-<td>
-<p>int <a href="qlistwidget.html#currentRow-prop">currentRow</a></p>
-</td>
-<td>
-<p><a href="qlistwidget.html#currentRowChanged">currentRowChanged()</a></p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qlistwidget.html">QListWidget</a></td>
+<td>int <a href="qlistwidget.html#currentRow-prop">currentRow</a></td>
+<td><a href="qlistwidget.html#currentRowChanged">currentRowChanged()</a></td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qspinbox.html">QSpinBox</a></p>
-</td>
-<td>
-<p>int <a href="qspinbox.html#value-prop">value</a></p>
-</td>
-<td>
-<p><a href="qspinbox.html#valueChanged">valueChanged()</a></p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qspinbox.html">QSpinBox</a></td>
+<td>int <a href="qspinbox.html#value-prop">value</a></td>
+<td><a href="qspinbox.html#valueChanged">valueChanged()</a></td>
 </tr>
 </table>
 <p>You can use <a href="qwizard.html#setDefaultProperty">QWizard.setDefaultProperty</a>()
@@ -307,16 +262,16 @@ returns true, to honor any validator or mask.</p>
 <p><a href="qwizard.html">QWizard</a>'s mandatory field mechanism
 is provided for convenience. It can be bypassed by reimplementing
 <a href="qwizardpage.html#isComplete">QWizardPage.isComplete</a>().</p>
-<p>See also <a href="qwizardpage.html#field">field</a>(), <a href="qwizardpage.html#setField">setField</a>(), and <a href="qwizard.html#setDefaultProperty">QWizard.setDefaultProperty</a>().</p>
+<p><b>See also</b> <a href="qwizardpage.html#field">field</a>(),
+<a href="qwizardpage.html#setField">setField</a>(), and <a href="qwizard.html#setDefaultProperty">QWizard.setDefaultProperty</a>().</p>
 
 
 <h3 class="fn"><a name="registerField-2" />QWizardPage.registerField (<i>self</i>, QString&#160;<i>name</i>, <a href="qwidget.html">QWidget</a>&#160;<i>widget</i>, str&#160;<i>property</i>&#160;=&#160;None, SIGNAL()&#160;<i>changedSignal</i>&#160;=&#160;0)</h3><h3 class="fn"><a name="setButtonText" />QWizardPage.setButtonText (<i>self</i>, <a href="qwizard.html#WizardButton-enum">QWizard.WizardButton</a>&#160;<i>which</i>, QString&#160;<i>text</i>)</h3><p>Sets the text on button <i>which</i> to be <i>text</i> on this
 page.</p>
 <p>By default, the text on buttons depends on the <a href="qwizard.html#wizardStyle-prop">QWizard.wizardStyle</a>, but may
 be redefined for the wizard as a whole using <a href="qwizard.html#setButtonText">QWizard.setButtonText</a>().</p>
-<p>See also <a href="qwizardpage.html#buttonText">buttonText</a>(),
-<a href="qwizard.html#setButtonText">QWizard.setButtonText</a>(),
-and <a href="qwizard.html#buttonText">QWizard.buttonText</a>().</p>
+<p><b>See also</b> <a href="qwizardpage.html#buttonText">buttonText</a>(), <a href="qwizard.html#setButtonText">QWizard.setButtonText</a>(), and
+<a href="qwizard.html#buttonText">QWizard.buttonText</a>().</p>
 
 
 <h3 class="fn"><a name="setCommitPage" />QWizardPage.setCommitPage (<i>self</i>, bool&#160;<i>commitPage</i>)</h3><p>Sets this page to be a commit page if <i>commitPage</i> is true;
@@ -328,7 +283,7 @@ commit page. Clicking this button simply calls <a href="qwizard.html#next">QWiza
 <b>Next</b> does.</p>
 <p>A page entered directly from a commit page has its <b>Back</b>
 button disabled.</p>
-<p>See also <a href="qwizardpage.html#isCommitPage">isCommitPage</a>().</p>
+<p><b>See also</b> <a href="qwizardpage.html#isCommitPage">isCommitPage</a>().</p>
 
 
 <h3 class="fn"><a name="setField" />QWizardPage.setField (<i>self</i>, QString&#160;<i>name</i>, QVariant&#160;<i>value</i>)</h3><p>Sets the value of the field called <i>name</i> to
@@ -336,7 +291,7 @@ button disabled.</p>
 <p>This function can be used to set fields on any page of the
 wizard. It is equivalent to calling <a href="qwizardpage.html#wizard">wizard</a>()-&gt;<a href="qwizard.html#setField">setField(<i>name</i>,
 <i>value</i>)</a>.</p>
-<p>See also <a href="qwizard.html#setField">QWizard.setField</a>(), <a href="qwizardpage.html#field">field</a>(), and <a href="qwizardpage.html#registerField">registerField</a>().</p>
+<p><b>See also</b> <a href="qwizard.html#setField">QWizard.setField</a>(), <a href="qwizardpage.html#field">field</a>(), and <a href="qwizardpage.html#registerField">registerField</a>().</p>
 
 
 <h3 class="fn"><a name="setFinalPage" />QWizardPage.setFinalPage (<i>self</i>, bool&#160;<i>finalPage</i>)</h3><p>Explicitly sets this page to be final if <i>finalPage</i> is
@@ -346,7 +301,7 @@ the <b>Finish</b> button is visible (and enabled if <a href="qwizardpage.html#is
 <p>After calling setFinalPage(false), <a href="qwizardpage.html#isFinalPage">isFinalPage</a>() returns true if
 <a href="qwizardpage.html#nextId">nextId</a>() returns -1;
 otherwise, it returns false.</p>
-<p>See also <a href="qwizardpage.html#isFinalPage">isFinalPage</a>(), <a href="qwizardpage.html#isComplete">isComplete</a>(), and <a href="qwizard.html#WizardOption-enum">QWizard.HaveFinishButtonOnEarlyPages</a>.</p>
+<p><b>See also</b> <a href="qwizardpage.html#isFinalPage">isFinalPage</a>(), <a href="qwizardpage.html#isComplete">isComplete</a>(), and <a href="qwizard.html#WizardOption-enum">QWizard.HaveFinishButtonOnEarlyPages</a>.</p>
 
 
 <h3 class="fn"><a name="setPixmap" />QWizardPage.setPixmap (<i>self</i>, <a href="qwizard.html#WizardPixmap-enum">QWizard.WizardPixmap</a>&#160;<i>which</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>)</h3><p>Sets the pixmap for role <i>which</i> to <i>pixmap</i>.</p>
@@ -355,7 +310,7 @@ displaying a page. Which pixmaps are actually used depend on the
 <a href="qwizard.html#wizard-look-and-feel">wizard style</a>.</p>
 <p>Pixmaps can also be set for the entire wizard using <a href="qwizard.html#setPixmap">QWizard.setPixmap</a>(), in which case
 they apply for all pages that don't specify a pixmap.</p>
-<p>See also <a href="qwizardpage.html#pixmap">pixmap</a>(),
+<p><b>See also</b> <a href="qwizardpage.html#pixmap">pixmap</a>(),
 <a href="qwizard.html#setPixmap">QWizard.setPixmap</a>(), and
 <a href="qwizard.html#elements-of-a-wizard-page">Elements of a
 Wizard Page</a>.</p>
@@ -370,22 +325,21 @@ last-minute validation. If it returns true, the next page is shown
 <b>Next</b> or <b>Finish</b> button (by specifying <a href="qwizard.html#mandatory-fields">mandatory fields</a> or
 reimplementing <a href="qwizardpage.html#isComplete">isComplete</a>()) than to reimplement
 validatePage().</p>
-<p>See also <a href="qwizard.html#validateCurrentPage">QWizard.validateCurrentPage</a>()
+<p><b>See also</b> <a href="qwizard.html#validateCurrentPage">QWizard.validateCurrentPage</a>()
 and <a href="qwizardpage.html#isComplete">isComplete</a>().</p>
 
 
 <h3 class="fn"><a name="wizard" /><a href="qwizard.html">QWizard</a> QWizardPage.wizard (<i>self</i>)</h3><p>Returns the wizard associated with this page, or 0 if this page
 hasn't been inserted into a <a href="qwizard.html">QWizard</a>
 yet.</p>
-<p>See also <a href="qwizard.html#addPage">QWizard.addPage</a>()
-and <a href="qwizard.html#setPage">QWizard.setPage</a>().</p>
+<p><b>See also</b> <a href="qwizard.html#addPage">QWizard.addPage</a>() and <a href="qwizard.html#setPage">QWizard.setPage</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="completeChanged" />void completeChanged ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the complete state of the page
 (i.e., the value of <a href="qwizardpage.html#isComplete">isComplete</a>()) changes.</p>
 <p>If you reimplement <a href="qwizardpage.html#isComplete">isComplete</a>(), make sure to emit
 completeChanged() whenever the value of <a href="qwizardpage.html#isComplete">isComplete</a>() changes, to ensure
 that <a href="qwizard.html">QWizard</a> updates the enabled or
 disabled state of its buttons.</p>
-<p>See also <a href="qwizardpage.html#isComplete">isComplete</a>().</p>
+<p><b>See also</b> <a href="qwizardpage.html#isComplete">isComplete</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

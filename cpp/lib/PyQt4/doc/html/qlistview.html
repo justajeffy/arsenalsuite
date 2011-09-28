@@ -46,31 +46,19 @@ govern how and when the items are laid out. Items are spaced
 according to their <a href="qlistview.html#spacing-prop">spacing</a>(), and can exist within a
 notional grid of size specified by <a href="qlistview.html#gridSize-prop">gridSize</a>(). The items can be
 rendered as large or small icons depending on their <a href="qabstractitemview.html#iconSize-prop">iconSize</a>().</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Screenshot of a Windows XP style list view" src="images/windowsxp-listview.png" /></p>
-</td>
-<td>
-<p><img alt="Screenshot of a Macintosh style table view" src="images/macintosh-listview.png" /></p>
-</td>
-<td>
-<p><img alt="Screenshot of a Plastique style table view" src="images/plastique-listview.png" /></p>
-</td>
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img alt="Screenshot of a Windows XP style list view" src="images/windowsxp-listview.png" /></td>
+<td><img alt="Screenshot of a Macintosh style table view" src="images/macintosh-listview.png" /></td>
+<td><img alt="Screenshot of a Plastique style table view" src="images/plastique-listview.png" /></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>A <a href="gallery-windowsxp.html">Windows XP style</a> list
-view.</p>
-</td>
-<td>
-<p>A <a href="gallery-macintosh.html">Macintosh style</a> list
-view.</p>
-</td>
-<td>
-<p>A <a href="gallery-plastique.html">Plastique style</a> list
-view.</p>
-</td>
+<tr class="even" valign="top">
+<td>A <a href="gallery-windowsxp.html">Windows XP style</a> list
+view.</td>
+<td>A <a href="gallery-macintosh.html">Macintosh style</a> list
+view.</td>
+<td>A <a href="gallery-plastique.html">Plastique style</a> list
+view.</td>
 </tr>
 </table>
 <a id="improving-performance" name="improving-performance" />
@@ -81,20 +69,20 @@ numbers of items. One approach that can be taken for views that are
 intended to display items with equal sizes is to set the <a href="qlistview.html#uniformItemSizes-prop">uniformItemSizes</a>
 property to true.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Flow-enum" />QListView.Flow</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.LeftToRight</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The items are laid out in the view from the
 left to the right.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.TopToBottom</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The items are laid out in the view from the
 top to the bottom.</td>
 </tr>
@@ -102,45 +90,45 @@ top to the bottom.</td>
 
 
 <h3 class="fn"><a name="LayoutMode-enum" />QListView.LayoutMode</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.SinglePass</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The items are laid out all at once.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.Batched</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The items are laid out in batches of <a href="qlistview.html#batchSize-prop">batchSize</a> items.</td>
 </tr>
 </table>
-<p>See also <a href="qlistview.html#batchSize-prop">batchSize</a>.</p>
+<p><b>See also</b> <a href="qlistview.html#batchSize-prop">batchSize</a>.</p>
 
 
 <h3 class="fn"><a name="Movement-enum" />QListView.Movement</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.Static</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The items cannot be moved by the user.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.Free</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The items can be moved freely by the
 user.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.Snap</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The items snap to the specified grid when
 moved; see <a href="qlistview.html#gridSize-prop">setGridSize</a>().</td>
 </tr>
@@ -148,20 +136,20 @@ moved; see <a href="qlistview.html#gridSize-prop">setGridSize</a>().</td>
 
 
 <h3 class="fn"><a name="ResizeMode-enum" />QListView.ResizeMode</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.Fixed</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The items will only be laid out the first time
 the view is shown.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.Adjust</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The items will be laid out every time the view
 is resized.</td>
 </tr>
@@ -169,20 +157,20 @@ is resized.</td>
 
 
 <h3 class="fn"><a name="ViewMode-enum" />QListView.ViewMode</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.ListMode</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The items are laid out using <a href="qlistview.html#Flow-enum">TopToBottom</a> flow, with Small size
 and Static movement</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QListView.IconMode</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The items are laid out using <a href="qlistview.html#Flow-enum">LeftToRight</a> flow, with Large size
 and Free movement</td>
 </tr>
@@ -247,7 +235,7 @@ false.</p>
 
 <h3 class="fn"><a name="rectForIndex" /><a href="qrect.html">QRect</a> QListView.rectForIndex (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Returns the rectangle of the item at position <i>index</i> in
 the model. The rectangle is in contents coordinates.</p>
-<p>See also <a href="qlistview.html#visualRect">visualRect</a>().</p>
+<p><b>See also</b> <a href="qlistview.html#visualRect">visualRect</a>().</p>
 
 
 <h3 class="fn"><a name="reset" />QListView.reset (<i>self</i>)</h3><h3 class="fn"><a name="resizeEvent" />QListView.resizeEvent (<i>self</i>, <a href="qresizeevent.html">QResizeEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#resizeEvent">QWidget.resizeEvent</a>().</p>
@@ -277,7 +265,7 @@ effect.</p>
 
 <h3 class="fn"><a name="setResizeMode" />QListView.setResizeMode (<i>self</i>, <a href="qlistview.html#ResizeMode-enum">ResizeMode</a>&#160;<i>mode</i>)</h3><h3 class="fn"><a name="setRootIndex" />QListView.setRootIndex (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><h3 class="fn"><a name="setRowHidden" />QListView.setRowHidden (<i>self</i>, int&#160;<i>row</i>, bool&#160;<i>hide</i>)</h3><p>If <i>hide</i> is true, the given <i>row</i> will be hidden;
 otherwise the <i>row</i> will be shown.</p>
-<p>See also <a href="qlistview.html#isRowHidden">isRowHidden</a>().</p>
+<p><b>See also</b> <a href="qlistview.html#isRowHidden">isRowHidden</a>().</p>
 
 
 <h3 class="fn"><a name="setSelection" />QListView.setSelection (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>rect</i>, <a href="qitemselectionmodel-selectionflags.html">QItemSelectionModel.SelectionFlags</a>&#160;<i>command</i>)</h3><p>Reimplemented from <a href="qabstractitemview.html#setSelection">QAbstractItemView.setSelection</a>().</p>
@@ -309,4 +297,4 @@ moved in the view.</p>
 <p>This function was introduced in Qt 4.2.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

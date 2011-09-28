@@ -42,8 +42,7 @@ mechanism is to simplify the representation of enum values in a
 user interface.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QButtonGroup" />QButtonGroup.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a new, empty button group with the given
 <i>parent</i>.</p>
-<p>See also <a href="qbuttongroup.html#addButton">addButton</a>()
-and <a href="qbuttongroup.html#exclusive-prop">setExclusive</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#addButton">addButton</a>() and <a href="qbuttongroup.html#exclusive-prop">setExclusive</a>().</p>
 
 
 <h3 class="fn"><a name="addButton" />QButtonGroup.addButton (<i>self</i>, <a href="qabstractbutton.html">QAbstractButton</a>)</h3><p>Adds the given <i>button</i> to the end of the group's internal
@@ -52,12 +51,12 @@ list of buttons. An id will be assigned to the button by this
 assigned ids are guaranteed to be negative, starting with -2. If
 you are also assigning your own ids, use positive values to avoid
 conflicts.</p>
-<p>See also <a href="qbuttongroup.html#removeButton">removeButton</a>() and <a href="qbuttongroup.html#buttons">buttons</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#removeButton">removeButton</a>() and <a href="qbuttongroup.html#buttons">buttons</a>().</p>
 
 
 <h3 class="fn"><a name="addButton-2" />QButtonGroup.addButton (<i>self</i>, <a href="qabstractbutton.html">QAbstractButton</a>, int&#160;<i>id</i>)</h3><p>Adds the given <i>button</i> to the button group, with the given
 <i>id</i>. It is recommended to assign only positive ids.</p>
-<p>See also <a href="qbuttongroup.html#removeButton">removeButton</a>() and <a href="qbuttongroup.html#buttons">buttons</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#removeButton">removeButton</a>() and <a href="qbuttongroup.html#buttons">buttons</a>().</p>
 
 
 <h3 class="fn"><a name="button" /><a href="qabstractbutton.html">QAbstractButton</a> QButtonGroup.button (<i>self</i>, int&#160;<i>id</i>)</h3><p>Returns the button with the specified <i>id</i>, or 0 if no such
@@ -67,71 +66,69 @@ button exists.</p>
 
 <h3 class="fn"><a name="buttons" />list-of-QAbstractButton QButtonGroup.buttons (<i>self</i>)</h3><p>Returns the list of this groups's buttons. This may be
 empty.</p>
-<p>See also <a href="qbuttongroup.html#addButton">addButton</a>()
-and <a href="qbuttongroup.html#removeButton">removeButton</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#addButton">addButton</a>() and <a href="qbuttongroup.html#removeButton">removeButton</a>().</p>
 
 
 <h3 class="fn"><a name="checkedButton" /><a href="qabstractbutton.html">QAbstractButton</a> QButtonGroup.checkedButton (<i>self</i>)</h3><p>Returns the button group's checked button, or 0 if no buttons
 are checked.</p>
-<p>See also <a href="qbuttongroup.html#buttonClicked">buttonClicked</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#buttonClicked">buttonClicked</a>().</p>
 
 
 <h3 class="fn"><a name="checkedId" />int QButtonGroup.checkedId (<i>self</i>)</h3><p>Returns the id of the <a href="qbuttongroup.html#checkedButton">checkedButton</a>(), or -1 if no
 button is checked.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qbuttongroup.html#setId">setId</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#setId">setId</a>().</p>
 
 
 <h3 class="fn"><a name="exclusive" />bool QButtonGroup.exclusive (<i>self</i>)</h3><h3 class="fn"><a name="id" />int QButtonGroup.id (<i>self</i>, <a href="qabstractbutton.html">QAbstractButton</a>&#160;<i>button</i>)</h3><p>Returns the id for the specified <i>button</i>, or -1 if no such
 button exists.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qbuttongroup.html#setId">setId</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#setId">setId</a>().</p>
 
 
 <h3 class="fn"><a name="removeButton" />QButtonGroup.removeButton (<i>self</i>, <a href="qabstractbutton.html">QAbstractButton</a>)</h3><p>Removes the given <i>button</i> from the button group.</p>
-<p>See also <a href="qbuttongroup.html#addButton">addButton</a>()
-and <a href="qbuttongroup.html#buttons">buttons</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#addButton">addButton</a>() and <a href="qbuttongroup.html#buttons">buttons</a>().</p>
 
 
 <h3 class="fn"><a name="setExclusive" />QButtonGroup.setExclusive (<i>self</i>, bool)</h3><h3 class="fn"><a name="setId" />QButtonGroup.setId (<i>self</i>, <a href="qabstractbutton.html">QAbstractButton</a>&#160;<i>button</i>, int&#160;<i>id</i>)</h3><p>Sets the <i>id</i> for the specified <i>button</i>. Note that
 <i>id</i> can not be -1.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qbuttongroup.html#id">id</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#id">id</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="buttonClicked" />void buttonClicked (QAbstractButton *)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the given <i>button</i> is clicked.
 A button is clicked when it is first pressed and then released,
 when its shortcut key is typed, or programmatically when <a href="qabstractbutton.html#click">QAbstractButton.click</a>() or
 <a href="qabstractbutton.html#animateClick">QAbstractButton.animateClick</a>()
 is called.</p>
-<p>See also <a href="qbuttongroup.html#checkedButton">checkedButton</a>() and <a href="qabstractbutton.html#clicked">QAbstractButton.clicked</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#checkedButton">checkedButton</a>() and <a href="qabstractbutton.html#clicked">QAbstractButton.clicked</a>().</p>
 
 
 <h3 class="fn"><a name="buttonClicked-2" />void buttonClicked (int)</h3><p>This signal is emitted when a button with the given <i>id</i> is
 clicked.</p>
-<p>See also <a href="qbuttongroup.html#checkedButton">checkedButton</a>() and <a href="qabstractbutton.html#clicked">QAbstractButton.clicked</a>().</p>
+<p><b>See also</b> <a href="qbuttongroup.html#checkedButton">checkedButton</a>() and <a href="qabstractbutton.html#clicked">QAbstractButton.clicked</a>().</p>
 
 
 <h3 class="fn"><a name="buttonPressed" />void buttonPressed (QAbstractButton *)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the given <i>button</i> is pressed
 down.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractbutton.html#pressed">QAbstractButton.pressed</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#pressed">QAbstractButton.pressed</a>().</p>
 
 
 <h3 class="fn"><a name="buttonPressed-2" />void buttonPressed (int)</h3><p>This signal is emitted when a button with the given <i>id</i> is
 pressed down.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractbutton.html#pressed">QAbstractButton.pressed</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#pressed">QAbstractButton.pressed</a>().</p>
 
 
 <h3 class="fn"><a name="buttonReleased" />void buttonReleased (QAbstractButton *)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the given <i>button</i> is
 released.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractbutton.html#released">QAbstractButton.released</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#released">QAbstractButton.released</a>().</p>
 
 
 <h3 class="fn"><a name="buttonReleased-2" />void buttonReleased (int)</h3><p>This signal is emitted when a button with the given <i>id</i> is
 released.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractbutton.html#released">QAbstractButton.released</a>().</p>
+<p><b>See also</b> <a href="qabstractbutton.html#released">QAbstractButton.released</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

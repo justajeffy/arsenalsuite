@@ -17,37 +17,25 @@ unique build key. This class provides an abstraction for accessing
 this information.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Function</th>
 <th>Return value</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><a href="qlibraryinfo.html#buildKey">buildKey</a>()</p>
-</td>
-<td>
-<p>A string that identifies the Qt version and the configuration.
+<tr class="odd" valign="top">
+<td><a href="qlibraryinfo.html#buildKey">buildKey</a>()</td>
+<td>A string that identifies the Qt version and the configuration.
 This key is used to ensure that <a href="plugins.html">plugins</a>
-link against the same version of Qt as the application.</p>
-</td>
+link against the same version of Qt as the application.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qlibraryinfo.html#location">location</a>()</p>
-</td>
-<td>
-<p>The path to a certain Qt component (e.g., documentation, header
-files).</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qlibraryinfo.html#location">location</a>()</td>
+<td>The path to a certain Qt component (e.g., documentation, header
+files).</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qlibraryinfo.html#licensee">licensee</a>(), <a href="qlibraryinfo.html#licensedProducts">licensedProducts</a>()</p>
-</td>
-<td>
-<p>Licensing information.</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qlibraryinfo.html#licensee">licensee</a>(), <a href="qlibraryinfo.html#licensedProducts">licensedProducts</a>()</td>
+<td>Licensing information.</td>
 </tr>
 </table>
 <p>You can also use a <tt>qt.conf</tt> file to override the
@@ -58,77 +46,77 @@ documentation.</p>
 <p>This enum type is used to specify a specific location
 specifier:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.PrefixPath</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The default prefix for all paths.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.DocumentationPath</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The location for documentation upon
 install.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.HeadersPath</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The location for all headers.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.LibrariesPath</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The location of installed libraries.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.BinariesPath</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The location of installed Qt binaries (tools
 and applications).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.PluginsPath</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The location of installed Qt plugins.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.ImportsPath</tt></td>
-<td class=" topAlign"><tt>11</tt></td>
+<td class="topAlign"><tt>11</tt></td>
 <td class="topAlign">The location of installed QML extensions to
 import.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.DataPath</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">The location of general Qt data.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.TranslationsPath</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">The location of translation information for Qt
 strings.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.SettingsPath</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">The location for Qt settings.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.ExamplesPath</tt></td>
-<td class=" topAlign"><tt>10</tt></td>
+<td class="topAlign"><tt>10</tt></td>
 <td class="topAlign">The location for examples upon install.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibraryInfo.DemosPath</tt></td>
-<td class=" topAlign"><tt>9</tt></td>
+<td class="topAlign"><tt>9</tt></td>
 <td class="topAlign">The location for demos upon install.</td>
 </tr>
 </table>
-<p>See also <a href="qlibraryinfo.html#location">location</a>().</p>
+<p><b>See also</b> <a href="qlibraryinfo.html#location">location</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QLibraryInfo" />QLibraryInfo.__init__ (<i>self</i>, <a href="qlibraryinfo.html">QLibraryInfo</a>)</h3><h3 class="fn"><a name="buildDate" /><a href="qdate.html">QDate</a> QLibraryInfo.buildDate ()</h3><p>Returns the installation date for this build of Qt. The install
 date will usually be the last time that Qt sources were
 configured.</p>
@@ -140,17 +128,17 @@ configurations. This key is not globally unique, rather only useful
 for establishing of two configurations are compatible. This can be
 used to compare with the <tt>QT_BUILD_KEY</tt> preprocessor
 symbol.</p>
-<p>See also <a href="qlibraryinfo.html#location">location</a>().</p>
+<p><b>See also</b> <a href="qlibraryinfo.html#location">location</a>().</p>
 
 
 <h3 class="fn"><a name="licensedProducts" />QString QLibraryInfo.licensedProducts ()</h3><p>Returns the products that the license for this build of Qt has
 access to.</p>
-<p>See also <a href="qlibraryinfo.html#licensee">licensee</a>().</p>
+<p><b>See also</b> <a href="qlibraryinfo.html#licensee">licensee</a>().</p>
 
 
 <h3 class="fn"><a name="licensee" />QString QLibraryInfo.licensee ()</h3><p>Returns the person to whom this build of Qt is licensed.</p>
-<p>See also <a href="qlibraryinfo.html#licensedProducts">licensedProducts</a>().</p>
+<p><b>See also</b> <a href="qlibraryinfo.html#licensedProducts">licensedProducts</a>().</p>
 
 
 <h3 class="fn"><a name="location" />QString QLibraryInfo.location (<a href="qlibraryinfo.html#LibraryLocation-enum">LibraryLocation</a>)</h3><p>Returns the location specified by <i>loc</i>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

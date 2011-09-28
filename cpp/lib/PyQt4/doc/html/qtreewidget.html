@@ -23,13 +23,13 @@ allows the storage of data to be separated from its
 representation.</p>
 <p>In its simplest form, a tree widget can be constructed in the
 following way:</p>
-<pre class="highlightedCode brush: cpp">
- QTreeWidget *treeWidget = new QTreeWidget();
- treeWidget-&gt;setColumnCount(1);
- QList&lt;QTreeWidgetItem *&gt; items;
- for (int i = 0; i &lt; 10; ++i)
-     items.append(new QTreeWidgetItem((QTreeWidget*)0, QStringList(QString("item: %1").arg(i))));
- treeWidget-&gt;insertTopLevelItems(0, items);
+<pre class="cpp">
+ <span class="type">QTreeWidget</span> <span class="operator">*</span>treeWidget <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QTreeWidget</span>();
+ treeWidget<span class="operator">-</span><span class="operator">&gt;</span><a href="qtreewidget.html#columnCount-prop">setColumnCount</a>(<span class="number">1</span>);
+ <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qtreewidgetitem.html">QTreeWidgetItem</a></span> <span class="operator">*</span><span class="operator">&gt;</span> items;
+ <span class="keyword">for</span> (<span class="type">int</span> i <span class="operator">=</span> <span class="number">0</span>; i <span class="operator">&lt;</span> <span class="number">10</span>; <span class="operator">+</span><span class="operator">+</span>i)
+     items<span class="operator">.</span>append(<span class="keyword">new</span> <span class="type"><a href="qtreewidgetitem.html">QTreeWidgetItem</a></span>((<span class="type">QTreeWidget</span><span class="operator">*</span>)<span class="number">0</span><span class="operator">,</span> <span class="type"><a href="qstringlist.html">QStringList</a></span>(<span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"item: %1"</span>)<span class="operator">.</span>arg(i))));
+ treeWidget<span class="operator">-</span><span class="operator">&gt;</span><a href="qtreewidget.html#insertTopLevelItems">insertTopLevelItems</a>(<span class="number">0</span><span class="operator">,</span> items);
 </pre>
 <p>Before items can be added to the tree widget, the number of
 columns must be set with <a href="qtreewidget.html#columnCount-prop">setColumnCount</a>(). This
@@ -46,31 +46,19 @@ items by clicking on a column header. Sorting can be enabled or
 disabled by calling <a href="qtreeview.html#sortingEnabled-prop">setSortingEnabled()</a>. The
 <a href="qtreeview.html#sortingEnabled-prop">isSortingEnabled()</a>
 function indicates whether sorting is enabled.</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Screenshot of a Windows XP style tree widget" src="images/windowsxp-treeview.png" /></p>
-</td>
-<td>
-<p><img alt="Screenshot of a Macintosh style tree widget" src="images/macintosh-treeview.png" /></p>
-</td>
-<td>
-<p><img alt="Screenshot of a Plastique style tree widget" src="images/plastique-treeview.png" /></p>
-</td>
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img alt="Screenshot of a Windows XP style tree widget" src="images/windowsxp-treeview.png" /></td>
+<td><img alt="Screenshot of a Macintosh style tree widget" src="images/macintosh-treeview.png" /></td>
+<td><img alt="Screenshot of a Plastique style tree widget" src="images/plastique-treeview.png" /></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>A <a href="gallery-windowsxp.html">Windows XP style</a> tree
-widget.</p>
-</td>
-<td>
-<p>A <a href="gallery-macintosh.html">Macintosh style</a> tree
-widget.</p>
-</td>
-<td>
-<p>A <a href="gallery-plastique.html">Plastique style</a> tree
-widget.</p>
-</td>
+<tr class="even" valign="top">
+<td>A <a href="gallery-windowsxp.html">Windows XP style</a> tree
+widget.</td>
+<td>A <a href="gallery-macintosh.html">Macintosh style</a> tree
+widget.</td>
+<td>A <a href="gallery-plastique.html">Plastique style</a> tree
+widget.</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QTreeWidget" />QTreeWidget.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a tree widget with the given <i>parent</i>.</p>
@@ -78,12 +66,12 @@ widget.</p>
 
 <h3 class="fn"><a name="addTopLevelItem" />QTreeWidget.addTopLevelItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>The <i>item</i> argument has it's ownership transferred to Qt.</p><p>Appends the <i>item</i> as a top-level item in the widget.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtreewidget.html#insertTopLevelItem">insertTopLevelItem</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#insertTopLevelItem">insertTopLevelItem</a>().</p>
 
 
 <h3 class="fn"><a name="addTopLevelItems" />QTreeWidget.addTopLevelItems (<i>self</i>, list-of-QTreeWidgetItem&#160;<i>items</i>)</h3><p>The <i>items</i> argument has it's ownership transferred to Qt.</p><p>Appends the list of <i>items</i> as a top-level items in the
 widget.</p>
-<p>See also <a href="qtreewidget.html#insertTopLevelItems">insertTopLevelItems</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#insertTopLevelItems">insertTopLevelItems</a>().</p>
 
 
 <h3 class="fn"><a name="clear" />QTreeWidget.clear (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void clear()</tt>.</p><p>Clears the tree widget by removing all of its items and
@@ -91,7 +79,7 @@ selections.</p>
 <p><b>Note:</b> Since each item is removed from the tree widget
 before being deleted, the return value of <a href="qtreewidgetitem.html#treeWidget">QTreeWidgetItem.treeWidget</a>()
 will be invalid when called from an item's destructor.</p>
-<p>See also <a href="qtreewidget.html#takeTopLevelItem">takeTopLevelItem</a>(),
+<p><b>See also</b> <a href="qtreewidget.html#takeTopLevelItem">takeTopLevelItem</a>(),
 <a href="qtreewidget.html#topLevelItemCount-prop">topLevelItemCount</a>(),
 and <a href="qtreewidget.html#columnCount-prop">columnCount</a>().</p>
 
@@ -100,22 +88,21 @@ and <a href="qtreewidget.html#columnCount-prop">columnCount</a>().</p>
 <i>column</i>.</p>
 <p>This function has no effect if no persistent editor is open for
 this combination of item and column.</p>
-<p>See also <a href="qtreewidget.html#openPersistentEditor">openPersistentEditor</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#openPersistentEditor">openPersistentEditor</a>().</p>
 
 
 <h3 class="fn"><a name="collapseItem" />QTreeWidget.collapseItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void collapseItem(const QTreeWidgetItem *)</tt>.</p><p>Closes the <i>item</i>. This causes the tree containing the
 item's children to be collapsed.</p>
-<p>See also <a href="qtreewidget.html#expandItem">expandItem</a>(),
-<a href="qtreewidget.html#currentItem">currentItem</a>(), <a href="qtreewidget.html#itemAt">itemAt</a>(), and <a href="qtreewidget.html#topLevelItem">topLevelItem</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#expandItem">expandItem</a>(), <a href="qtreewidget.html#currentItem">currentItem</a>(), <a href="qtreewidget.html#itemAt">itemAt</a>(), and <a href="qtreewidget.html#topLevelItem">topLevelItem</a>().</p>
 
 
 <h3 class="fn"><a name="columnCount" />int QTreeWidget.columnCount (<i>self</i>)</h3><h3 class="fn"><a name="currentColumn" />int QTreeWidget.currentColumn (<i>self</i>)</h3><p>Returns the current column in the tree widget.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtreewidget.html#setCurrentItem">setCurrentItem</a>() and <a href="qtreewidget.html#columnCount-prop">columnCount</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#setCurrentItem">setCurrentItem</a>() and <a href="qtreewidget.html#columnCount-prop">columnCount</a>().</p>
 
 
 <h3 class="fn"><a name="currentItem" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.currentItem (<i>self</i>)</h3><p>Returns the current item in the tree widget.</p>
-<p>See also <a href="qtreewidget.html#setCurrentItem">setCurrentItem</a>() and <a href="qtreewidget.html#currentItemChanged">currentItemChanged</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#setCurrentItem">setCurrentItem</a>() and <a href="qtreewidget.html#currentItemChanged">currentItemChanged</a>().</p>
 
 
 <h3 class="fn"><a name="dropEvent" />QTreeWidget.dropEvent (<i>self</i>, <a href="qdropevent.html">QDropEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#dropEvent">QWidget.dropEvent</a>().</p>
@@ -127,7 +114,7 @@ given <i>parent</i> item.</p>
 <p>The default implementation returns true if the drop was
 successfully handled by decoding the mime data and inserting it
 into the model; otherwise it returns false.</p>
-<p>See also <a href="qtreewidget.html#supportedDropActions">supportedDropActions</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#supportedDropActions">supportedDropActions</a>().</p>
 
 
 <h3 class="fn"><a name="editItem" />QTreeWidget.editItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, int&#160;<i>column</i>&#160;=&#160;0)</h3><p>Starts editing the <i>item</i> in the given <i>column</i> if it
@@ -139,7 +126,7 @@ is editable.</p>
 
 <h3 class="fn"><a name="expandItem" />QTreeWidget.expandItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void expandItem(const QTreeWidgetItem *)</tt>.</p><p>Expands the <i>item</i>. This causes the tree containing the
 item's children to be expanded.</p>
-<p>See also <a href="qtreewidget.html#collapseItem">collapseItem</a>(), <a href="qtreewidget.html#currentItem">currentItem</a>(), <a href="qtreewidget.html#itemAt">itemAt</a>(), <a href="qtreewidget.html#topLevelItem">topLevelItem</a>(), and <a href="qtreewidget.html#itemExpanded">itemExpanded</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#collapseItem">collapseItem</a>(), <a href="qtreewidget.html#currentItem">currentItem</a>(), <a href="qtreewidget.html#itemAt">itemAt</a>(), <a href="qtreewidget.html#topLevelItem">topLevelItem</a>(), and <a href="qtreewidget.html#itemExpanded">itemExpanded</a>().</p>
 
 
 <h3 class="fn"><a name="findItems" />list-of-QTreeWidgetItem QTreeWidget.findItems (<i>self</i>, QString&#160;<i>text</i>, <a href="qt-matchflags.html">Qt.MatchFlags</a>&#160;<i>flags</i>, int&#160;<i>column</i>&#160;=&#160;0)</h3><p>Returns a list of items that match the given <i>text</i>, using
@@ -147,25 +134,24 @@ the given <i>flags</i>, in the given <i>column</i>.</p>
 
 
 <h3 class="fn"><a name="headerItem" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.headerItem (<i>self</i>)</h3><p>Returns the item used for the tree widget's header.</p>
-<p>See also <a href="qtreewidget.html#setHeaderItem">setHeaderItem</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#setHeaderItem">setHeaderItem</a>().</p>
 
 
 <h3 class="fn"><a name="indexFromItem" /><a href="qmodelindex.html">QModelIndex</a> QTreeWidget.indexFromItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, int&#160;<i>column</i>&#160;=&#160;0)</h3><p>Returns the <a href="qmodelindex.html">QModelIndex</a> assocated
 with the given <i>item</i> in the given <i>column</i>.</p>
-<p>See also <a href="qtreewidget.html#itemFromIndex">itemFromIndex</a>() and <a href="qtreewidget.html#topLevelItem">topLevelItem</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#itemFromIndex">itemFromIndex</a>() and <a href="qtreewidget.html#topLevelItem">topLevelItem</a>().</p>
 
 
 <h3 class="fn"><a name="indexOfTopLevelItem" />int QTreeWidget.indexOfTopLevelItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>Returns the index of the given top-level <i>item</i>, or -1 if
 the item cannot be found.</p>
-<p>See also <a href="qtreewidget.html#sortItems">sortItems</a>()
-and <a href="qtreewidget.html#topLevelItemCount-prop">topLevelItemCount</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#sortItems">sortItems</a>() and <a href="qtreewidget.html#topLevelItemCount-prop">topLevelItemCount</a>().</p>
 
 
 <h3 class="fn"><a name="insertTopLevelItem" />QTreeWidget.insertTopLevelItem (<i>self</i>, int&#160;<i>index</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>The <i>item</i> argument has it's ownership transferred to Qt.</p><p>Inserts the <i>item</i> at <i>index</i> in the top level in the
 view.</p>
 <p>If the item has already been inserted somewhere else it wont be
 inserted.</p>
-<p>See also <a href="qtreewidget.html#addTopLevelItem">addTopLevelItem</a>() and
+<p><b>See also</b> <a href="qtreewidget.html#addTopLevelItem">addTopLevelItem</a>() and
 <a href="qtreewidget.html#columnCount-prop">columnCount</a>().</p>
 
 
@@ -174,7 +160,7 @@ level in the view.</p>
 <p>Items that have already been inserted somewhere else wont be
 inserted.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtreewidget.html#addTopLevelItems">addTopLevelItems</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#addTopLevelItems">addTopLevelItems</a>().</p>
 
 
 <h3 class="fn"><a name="invisibleRootItem" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.invisibleRootItem (<i>self</i>)</h3><p>Returns the tree widget's invisible root item.</p>
@@ -188,20 +174,22 @@ children in a uniform way; for example, recursive functions.</p>
 <h3 class="fn"><a name="isFirstItemColumnSpanned" />bool QTreeWidget.isFirstItemColumnSpanned (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>Returns true if the given <i>item</i> is set to show only one
 section over all columns; otherwise returns false.</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qtreewidget.html#setFirstItemColumnSpanned">setFirstItemColumnSpanned</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#setFirstItemColumnSpanned">setFirstItemColumnSpanned</a>().</p>
 
 
 <h3 class="fn"><a name="isItemExpanded" />bool QTreeWidget.isItemExpanded (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><h3 class="fn"><a name="isItemHidden" />bool QTreeWidget.isItemHidden (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><h3 class="fn"><a name="isItemSelected" />bool QTreeWidget.isItemSelected (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><h3 class="fn"><a name="isSortingEnabled" />bool QTreeWidget.isSortingEnabled (<i>self</i>)</h3><h3 class="fn"><a name="itemAbove" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.itemAbove (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>Returns the item above the given <i>item</i>.</p>
 <p>This function was introduced in Qt 4.3.</p>
 
 
-<h3 class="fn"><a name="itemAt" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.itemAt (<i>self</i>, <a href="qpoint.html">QPoint</a>&#160;<i>p</i>)</h3><p>Returns a pointer to the item at the coordinates <i>p</i>.</p>
-<p>See also <a href="qtreewidget.html#visualItemRect">visualItemRect</a>().</p>
+<h3 class="fn"><a name="itemAt" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.itemAt (<i>self</i>, <a href="qpoint.html">QPoint</a>&#160;<i>p</i>)</h3><p>Returns a pointer to the item at the coordinates <i>p</i>. The
+coordinates are relative to the tree widget's <a href="qabstractscrollarea.html#viewport">viewport()</a>.</p>
+<p><b>See also</b> <a href="qtreewidget.html#visualItemRect">visualItemRect</a>().</p>
 
 
 <h3 class="fn"><a name="itemAt-2" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.itemAt (<i>self</i>, int&#160;<i>ax</i>, int&#160;<i>ay</i>)</h3><p>This is an overloaded function.</p>
 <p>Returns a pointer to the item at the coordinates (<i>x</i>,
-<i>y</i>).</p>
+<i>y</i>). The coordinates are relative to the tree widget's
+<a href="qabstractscrollarea.html#viewport">viewport()</a>.</p>
 
 
 <h3 class="fn"><a name="itemBelow" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.itemBelow (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>Returns the item visually below the given <i>item</i>.</p>
@@ -210,14 +198,14 @@ section over all columns; otherwise returns false.</p>
 
 <h3 class="fn"><a name="itemFromIndex" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.itemFromIndex (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Returns a pointer to the <a href="qtreewidgetitem.html">QTreeWidgetItem</a> assocated with the given
 <i>index</i>.</p>
-<p>See also <a href="qtreewidget.html#indexFromItem">indexFromItem</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#indexFromItem">indexFromItem</a>().</p>
 
 
 <h3 class="fn"><a name="items" />list-of-QTreeWidgetItem QTreeWidget.items (<i>self</i>, <a href="qmimedata.html">QMimeData</a>&#160;<i>data</i>)</h3><h3 class="fn"><a name="itemWidget" /><a href="qwidget.html">QWidget</a> QTreeWidget.itemWidget (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, int&#160;<i>column</i>)</h3><p>Returns the widget displayed in the cell specified by
 <i>item</i> and the given <i>column</i>.</p>
 <p><b>Note:</b> The tree takes ownership of the widget.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtreewidget.html#setItemWidget">setItemWidget</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#setItemWidget">setItemWidget</a>().</p>
 
 
 <h3 class="fn"><a name="mimeData" /><a href="qmimedata.html">QMimeData</a> QTreeWidget.mimeData (<i>self</i>, list-of-QTreeWidgetItem&#160;<i>items</i>)</h3><p>The <i>QMimeData</i> result</p><p>Returns an object that contains a serialized description of the
@@ -229,12 +217,12 @@ serialized empty list.</p>
 
 <h3 class="fn"><a name="mimeTypes" />QStringList QTreeWidget.mimeTypes (<i>self</i>)</h3><p>Returns a list of MIME types that can be used to describe a list
 of treewidget items.</p>
-<p>See also <a href="qtreewidget.html#mimeData">mimeData</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#mimeData">mimeData</a>().</p>
 
 
 <h3 class="fn"><a name="openPersistentEditor" />QTreeWidget.openPersistentEditor (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, int&#160;<i>column</i>&#160;=&#160;0)</h3><p>Opens a persistent editor for the <i>item</i> in the given
 <i>column</i>.</p>
-<p>See also <a href="qtreewidget.html#closePersistentEditor">closePersistentEditor</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#closePersistentEditor">closePersistentEditor</a>().</p>
 
 
 <h3 class="fn"><a name="removeItemWidget" />QTreeWidget.removeItemWidget (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, int&#160;<i>column</i>)</h3><p>Removes the widget set in the given <i>item</i> in the given
@@ -244,44 +232,43 @@ of treewidget items.</p>
 
 <h3 class="fn"><a name="scrollToItem" />QTreeWidget.scrollToItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, <a href="qabstractitemview.html#ScrollHint-enum">QAbstractItemView.ScrollHint</a>&#160;<i>hint</i>&#160;=&#160;QAbstractItemView.EnsureVisible)</h3><p>This method is also a Qt slot with the C++ signature <tt>void scrollToItem(const QTreeWidgetItem *,QAbstractItemView::ScrollHint = QAbstractItemView.EnsureVisible)</tt>.</p><p>Ensures that the <i>item</i> is visible, scrolling the view if
 necessary using the specified <i>hint</i>.</p>
-<p>See also <a href="qtreewidget.html#currentItem">currentItem</a>(), <a href="qtreewidget.html#itemAt">itemAt</a>(), and <a href="qtreewidget.html#topLevelItem">topLevelItem</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#currentItem">currentItem</a>(), <a href="qtreewidget.html#itemAt">itemAt</a>(), and <a href="qtreewidget.html#topLevelItem">topLevelItem</a>().</p>
 
 
 <h3 class="fn"><a name="selectedItems" />list-of-QTreeWidgetItem QTreeWidget.selectedItems (<i>self</i>)</h3><p>Returns a list of all selected non-hidden items.</p>
-<p>See also <a href="qtreewidget.html#itemSelectionChanged">itemSelectionChanged</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#itemSelectionChanged">itemSelectionChanged</a>().</p>
 
 
 <h3 class="fn"><a name="setColumnCount" />QTreeWidget.setColumnCount (<i>self</i>, int&#160;<i>columns</i>)</h3><h3 class="fn"><a name="setCurrentItem" />QTreeWidget.setCurrentItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>Sets the current <i>item</i> in the tree widget.</p>
 <p>Unless the selection mode is <a href="qabstractitemview.html#SelectionMode-enum">NoSelection</a>, the
 item is also be selected.</p>
-<p>See also <a href="qtreewidget.html#currentItem">currentItem</a>() and <a href="qtreewidget.html#currentItemChanged">currentItemChanged</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#currentItem">currentItem</a>() and <a href="qtreewidget.html#currentItemChanged">currentItemChanged</a>().</p>
 
 
 <h3 class="fn"><a name="setCurrentItem-2" />QTreeWidget.setCurrentItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, int&#160;<i>column</i>)</h3><p>Sets the current <i>item</i> in the tree widget and the current
 column to <i>column</i>.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtreewidget.html#currentItem">currentItem</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#currentItem">currentItem</a>().</p>
 
 
 <h3 class="fn"><a name="setCurrentItem-3" />QTreeWidget.setCurrentItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, int&#160;<i>column</i>, <a href="qitemselectionmodel-selectionflags.html">QItemSelectionModel.SelectionFlags</a>&#160;<i>command</i>)</h3><p>Sets the current <i>item</i> in the tree widget and the current
 column to <i>column</i>, using the given <i>command</i>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qtreewidget.html#currentItem">currentItem</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#currentItem">currentItem</a>().</p>
 
 
 <h3 class="fn"><a name="setFirstItemColumnSpanned" />QTreeWidget.setFirstItemColumnSpanned (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, bool&#160;<i>span</i>)</h3><p>Sets the given <i>item</i> to only show one section for all
 columns if <i>span</i> is true; otherwise the item will show one
 section per column.</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qtreewidget.html#isFirstItemColumnSpanned">isFirstItemColumnSpanned</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#isFirstItemColumnSpanned">isFirstItemColumnSpanned</a>().</p>
 
 
 <h3 class="fn"><a name="setHeaderItem" />QTreeWidget.setHeaderItem (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>The <i>item</i> argument has it's ownership transferred to Qt.</p><p>Sets the header <i>item</i> for the tree widget. The label for
 each column in the header is supplied by the corresponding label in
 the item.</p>
 <p>The tree widget takes ownership of the item.</p>
-<p>See also <a href="qtreewidget.html#headerItem">headerItem</a>()
-and <a href="qtreewidget.html#setHeaderLabels">setHeaderLabels</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#headerItem">headerItem</a>() and <a href="qtreewidget.html#setHeaderLabels">setHeaderLabels</a>().</p>
 
 
 <h3 class="fn"><a name="setHeaderLabel" />QTreeWidget.setHeaderLabel (<i>self</i>, QString&#160;<i>alabel</i>)</h3><p>Same as setHeaderLabels(<a href="qstringlist.html">QStringList</a>(<i>label</i>)).</p>
@@ -291,7 +278,7 @@ and <a href="qtreewidget.html#setHeaderLabels">setHeaderLabels</a>().</p>
 <h3 class="fn"><a name="setHeaderLabels" />QTreeWidget.setHeaderLabels (<i>self</i>, QStringList&#160;<i>labels</i>)</h3><p>Adds a column in the header for each item in the <i>labels</i>
 list, and sets the label for each column.</p>
 <p>Note that setHeaderLabels() won't remove existing columns.</p>
-<p>See also <a href="qtreewidget.html#setHeaderItem">setHeaderItem</a>() and <a href="qtreewidget.html#setHeaderLabel">setHeaderLabel</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#setHeaderItem">setHeaderItem</a>() and <a href="qtreewidget.html#setHeaderLabel">setHeaderLabel</a>().</p>
 
 
 <h3 class="fn"><a name="setItemExpanded" />QTreeWidget.setItemExpanded (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, bool&#160;<i>expand</i>)</h3><h3 class="fn"><a name="setItemHidden" />QTreeWidget.setItemHidden (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, bool&#160;<i>hide</i>)</h3><h3 class="fn"><a name="setItemSelected" />QTreeWidget.setItemSelected (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, bool&#160;<i>select</i>)</h3><h3 class="fn"><a name="setItemWidget" />QTreeWidget.setItemWidget (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>, int&#160;<i>column</i>, <a href="qwidget.html">QWidget</a>&#160;<i>widget</i>)</h3><p>The <i>widget</i> argument has it's ownership transferred to Qt.</p><p>Sets the given <i>widget</i> to be displayed in the cell
@@ -309,8 +296,7 @@ been set up, i.e., the <a href="qtreewidgetitem.html">QTreeWidgetItem</a> that w
 is set.</p>
 <p><b>Note:</b> The tree takes ownership of the widget.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtreewidget.html#itemWidget">itemWidget</a>()
-and <a href="model-view-programming.html#delegate-classes">Delegate
+<p><b>See also</b> <a href="qtreewidget.html#itemWidget">itemWidget</a>() and <a href="model-view-programming.html#delegate-classes">Delegate
 Classes</a>.</p>
 
 
@@ -319,38 +305,38 @@ Classes</a>.</p>
 
 <h3 class="fn"><a name="setSortingEnabled" />QTreeWidget.setSortingEnabled (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="sortColumn" />int QTreeWidget.sortColumn (<i>self</i>)</h3><p>Returns the column used to sort the contents of the widget.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtreewidget.html#sortItems">sortItems</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#sortItems">sortItems</a>().</p>
 
 
 <h3 class="fn"><a name="sortItems" />QTreeWidget.sortItems (<i>self</i>, int&#160;<i>column</i>, <a href="qt.html#SortOrder-enum">Qt.SortOrder</a>&#160;<i>order</i>)</h3><p>Sorts the items in the widget in the specified <i>order</i> by
 the values in the given <i>column</i>.</p>
-<p>See also <a href="qtreewidget.html#sortColumn">sortColumn</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#sortColumn">sortColumn</a>().</p>
 
 
 <h3 class="fn"><a name="supportedDropActions" /><a href="qt-dropactions.html">Qt.DropActions</a> QTreeWidget.supportedDropActions (<i>self</i>)</h3><p>Returns the drop actions supported by this view.</p>
-<p>See also <a href="qt.html#DropAction-enum">Qt.DropActions</a>.</p>
+<p><b>See also</b> <a href="qt.html#DropAction-enum">Qt.DropActions</a>.</p>
 
 
 <h3 class="fn"><a name="takeTopLevelItem" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.takeTopLevelItem (<i>self</i>, int&#160;<i>index</i>)</h3><p>The <i>QTreeWidgetItem</i> result</p><p>Removes the top-level item at the given <i>index</i> in the tree
 and returns it, otherwise returns 0;</p>
-<p>See also <a href="qtreewidget.html#insertTopLevelItem">insertTopLevelItem</a>(),
+<p><b>See also</b> <a href="qtreewidget.html#insertTopLevelItem">insertTopLevelItem</a>(),
 <a href="qtreewidget.html#topLevelItem">topLevelItem</a>(), and
 <a href="qtreewidget.html#topLevelItemCount-prop">topLevelItemCount</a>().</p>
 
 
 <h3 class="fn"><a name="topLevelItem" /><a href="qtreewidgetitem.html">QTreeWidgetItem</a> QTreeWidget.topLevelItem (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the top level item at the given <i>index</i>, or 0 if
 the item does not exist.</p>
-<p>See also <a href="qtreewidget.html#topLevelItemCount-prop">topLevelItemCount</a>()
+<p><b>See also</b> <a href="qtreewidget.html#topLevelItemCount-prop">topLevelItemCount</a>()
 and <a href="qtreewidget.html#insertTopLevelItem">insertTopLevelItem</a>().</p>
 
 
 <h3 class="fn"><a name="topLevelItemCount" />int QTreeWidget.topLevelItemCount (<i>self</i>)</h3><h3 class="fn"><a name="visualItemRect" /><a href="qrect.html">QRect</a> QTreeWidget.visualItemRect (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>Returns the rectangle on the viewport occupied by the item at
 <i>item</i>.</p>
-<p>See also <a href="qtreewidget.html#itemAt">itemAt</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#itemAt">itemAt</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="currentItemChanged" />void currentItemChanged (QTreeWidgetItem *,QTreeWidgetItem *)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the current item changes. The
 current item is specified by <i>current</i>, and this replaces the
 <i>previous</i> current item.</p>
-<p>See also <a href="qtreewidget.html#setCurrentItem">setCurrentItem</a>().</p>
+<p><b>See also</b> <a href="qtreewidget.html#setCurrentItem">setCurrentItem</a>().</p>
 
 
 <h3 class="fn"><a name="itemActivated" />void itemActivated (QTreeWidgetItem *,int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the user activates an item by
@@ -377,7 +363,7 @@ clicked, no signal will be emitted.</p>
 collapsed so that none of its children are displayed.</p>
 <p><b>Note:</b> This signal will not be emitted if an item changes
 its state when <a href="qtreeview.html#collapseAll">collapseAll</a>() is invoked.</p>
-<p>See also <a href="qtreewidgetitem.html#isExpanded">QTreeWidgetItem.isExpanded</a>(),
+<p><b>See also</b> <a href="qtreewidgetitem.html#isExpanded">QTreeWidgetItem.isExpanded</a>(),
 <a href="qtreewidget.html#itemExpanded">itemExpanded</a>(), and
 <a href="qtreewidget.html#collapseItem">collapseItem</a>().</p>
 
@@ -400,7 +386,7 @@ expanded so that all of its children are displayed.</p>
 <p><b>Note:</b> This signal will not be emitted if an item changes
 its state when <a href="qtreeview.html#expandAll">expandAll</a>()
 is invoked.</p>
-<p>See also <a class="obsolete" href="qtreewidget-obsolete.html#setItemExpanded">setItemExpanded</a>(), <a href="qtreewidgetitem.html#isExpanded">QTreeWidgetItem.isExpanded</a>(),
+<p><b>See also</b> <a class="obsolete" href="qtreewidget-obsolete.html#setItemExpanded">setItemExpanded</a>(), <a href="qtreewidgetitem.html#isExpanded">QTreeWidgetItem.isExpanded</a>(),
 <a href="qtreewidget.html#itemCollapsed">itemCollapsed</a>(), and
 <a href="qtreewidget.html#expandItem">expandItem</a>().</p>
 
@@ -416,4 +402,4 @@ was clicked, or -1 if no item was clicked.</p>
 widget. The current selection can be found with <a href="qtreewidget.html#selectedItems">selectedItems</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

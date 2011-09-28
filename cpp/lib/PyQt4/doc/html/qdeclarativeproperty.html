@@ -24,28 +24,28 @@ property's value, programmers create a QDeclarativeProperty
 instance and call the <a href="qdeclarativeproperty.html#read">read</a>() method. Likewise to
 write a property value the <a href="qdeclarativeproperty.html#write">write</a>() method is used.</p>
 <p>For example, for the following QML code:</p>
-<pre class="highlightedCode brush: cpp">
- // MyItem.qml
+<pre class="qml">
+ <span class="comment">// MyItem.qml</span>
  import QtQuick 1.0
 
- Text { text: "A bit of text" }
+ <span class="type"><a href="qml-text.html">Text</a></span> { <span class="name">text</span>: <span class="string">"A bit of text"</span> }
 </pre>
 <p>The <a href="qml-text.html">Text</a> object's properties could
 be accessed using QDeclarativeProperty, like this:</p>
-<pre class="highlightedCode brush: cpp">
- #include &lt;QDeclarativeProperty&gt;
- #include &lt;QGraphicsObject&gt;
+<pre class="cpp">
+ <span class="preprocessor">#include &lt;QDeclarativeProperty&gt;</span>
+ <span class="preprocessor">#include &lt;QGraphicsObject&gt;</span>
 
- ...
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 
- QDeclarativeView view(QUrl.fromLocalFile("MyItem.qml"));
- QDeclarativeProperty property(view.rootObject(), "font.pixelSize");
- qWarning() &lt;&lt; "Current pixel size:" &lt;&lt; property.read().toInt();
- property.write(24);
- qWarning() &lt;&lt; "Pixel size should now be 24:" &lt;&lt; property.read().toInt();
+ <span class="type"><a href="qdeclarativeview.html">QDeclarativeView</a></span> view(<span class="type"><a href="qurl.html">QUrl</a></span><span class="operator">.</span>fromLocalFile(<span class="string">"MyItem.qml"</span>));
+ <span class="type">QDeclarativeProperty</span> <a href="qdeclarativeproperty.html#property">property</a>(view<span class="operator">.</span>rootObject()<span class="operator">,</span> <span class="string">"font.pixelSize"</span>);
+ <a href="qtcore.html#qWarning">qWarning</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Current pixel size:"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> property<span class="operator">.</span><a href="qdeclarativeproperty.html#read">read</a>()<span class="operator">.</span>toInt();
+ property<span class="operator">.</span><a href="qdeclarativeproperty.html#write">write</a>(<span class="number">24</span>);
+ <a href="qtcore.html#qWarning">qWarning</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Pixel size should now be 24:"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> property<span class="operator">.</span><a href="qdeclarativeproperty.html#read">read</a>()<span class="operator">.</span>toInt();
 </pre><hr /><h2>Type Documentation</h2><h3 class="fn"><a name="PropertyTypeCategory-enum" />QDeclarativeProperty.PropertyTypeCategory</h3><p>This enum specifies a category of QML property.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -53,24 +53,24 @@ be accessed using QDeclarativeProperty, like this:</p>
 <tr>
 <td class="topAlign">
 <tt>QDeclarativeProperty.InvalidCategory</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The property is invalid, or is a signal
 property.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeProperty.List</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The property is a <a href="qdeclarativelistproperty.html">QDeclarativeListProperty</a> list
 property</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeProperty.Object</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The property is a <a href="qobject.html">QObject</a> derived type pointer</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeProperty.Normal</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The property is a normal value property.</td>
 </tr>
 </table>
@@ -78,25 +78,25 @@ property</td>
 
 <h3 class="fn"><a name="Type-enum" />QDeclarativeProperty.Type</h3><p>This enum specifies a type of QML property.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeProperty.Invalid</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The property is invalid.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeProperty.Property</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The property is a regular Qt property.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QDeclarativeProperty.SignalProperty</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The property is a signal property.</td>
 </tr>
 </table>
@@ -218,27 +218,27 @@ no type name.</p>
 
 <h3 class="fn"><a name="read-2" />QVariant QDeclarativeProperty.read (<a href="qobject.html">QObject</a>, QString)</h3><p>Return the <i>name</i> property value of <i>object</i>. This
 method is equivalent to:</p>
-<pre class="highlightedCode brush: cpp">
- QDeclarativeProperty p(object, name);
- p.read();
+<pre class="cpp">
+ <span class="type"><a href="qdeclarativeproperty.html">QDeclarativeProperty</a></span> p(object<span class="operator">,</span> name);
+ p<span class="operator">.</span><a href="qdeclarativeproperty.html#read">read</a>();
 </pre>
 
 
 <h3 class="fn"><a name="read-3" />QVariant QDeclarativeProperty.read (<a href="qobject.html">QObject</a>, QString, <a href="qdeclarativecontext.html">QDeclarativeContext</a>)</h3><p>Return the <i>name</i> property value of <i>object</i> using the
 <a href="qdeclarativecontext.html">context</a> <i>ctxt</i>. This
 method is equivalent to:</p>
-<pre class="highlightedCode brush: cpp">
- QDeclarativeProperty p(object, name, context);
- p.read();
+<pre class="cpp">
+ <span class="type"><a href="qdeclarativeproperty.html">QDeclarativeProperty</a></span> p(object<span class="operator">,</span> name<span class="operator">,</span> context);
+ p<span class="operator">.</span><a href="qdeclarativeproperty.html#read">read</a>();
 </pre>
 
 
 <h3 class="fn"><a name="read-4" />QVariant QDeclarativeProperty.read (<a href="qobject.html">QObject</a>, QString, <a href="qdeclarativeengine.html">QDeclarativeEngine</a>)</h3><p>Return the <i>name</i> property value of <i>object</i> using the
 environment for instantiating QML components that is provided by
 <i>engine</i>. . This method is equivalent to:</p>
-<pre class="highlightedCode brush: cpp">
- QDeclarativeProperty p(object, name, engine);
- p.read();
+<pre class="cpp">
+ <span class="type"><a href="qdeclarativeproperty.html">QDeclarativeProperty</a></span> p(object<span class="operator">,</span> name<span class="operator">,</span> engine);
+ p<span class="operator">.</span><a href="qdeclarativeproperty.html#read">read</a>();
 </pre>
 
 
@@ -257,28 +257,28 @@ is the wrong type, for example.</p>
 
 <h3 class="fn"><a name="write-2" />bool QDeclarativeProperty.write (<a href="qobject.html">QObject</a>, QString, QVariant)</h3><p>Writes <i>value</i> to the <i>name</i> property of
 <i>object</i>. This method is equivalent to:</p>
-<pre class="highlightedCode brush: cpp">
- QDeclarativeProperty p(object, name);
- p.write(value);
+<pre class="cpp">
+ <span class="type"><a href="qdeclarativeproperty.html">QDeclarativeProperty</a></span> p(object<span class="operator">,</span> name);
+ p<span class="operator">.</span><a href="qdeclarativeproperty.html#write">write</a>(value);
 </pre>
 
 
 <h3 class="fn"><a name="write-3" />bool QDeclarativeProperty.write (<a href="qobject.html">QObject</a>, QString, QVariant, <a href="qdeclarativecontext.html">QDeclarativeContext</a>)</h3><p>Writes <i>value</i> to the <i>name</i> property of <i>object</i>
 using the <a href="qdeclarativecontext.html">context</a>
 <i>ctxt</i>. This method is equivalent to:</p>
-<pre class="highlightedCode brush: cpp">
- QDeclarativeProperty p(object, name, ctxt);
- p.write(value);
+<pre class="cpp">
+ <span class="type"><a href="qdeclarativeproperty.html">QDeclarativeProperty</a></span> p(object<span class="operator">,</span> name<span class="operator">,</span> ctxt);
+ p<span class="operator">.</span><a href="qdeclarativeproperty.html#write">write</a>(value);
 </pre>
 
 
 <h3 class="fn"><a name="write-4" />bool QDeclarativeProperty.write (<a href="qobject.html">QObject</a>, QString, QVariant, <a href="qdeclarativeengine.html">QDeclarativeEngine</a>)</h3><p>Writes <i>value</i> to the <i>name</i> property of <i>object</i>
 using the environment for instantiating QML components that is
 provided by <i>engine</i>. This method is equivalent to:</p>
-<pre class="highlightedCode brush: cpp">
- QDeclarativeProperty p(object, name, engine);
- p.write(value);
+<pre class="cpp">
+ <span class="type"><a href="qdeclarativeproperty.html">QDeclarativeProperty</a></span> p(object<span class="operator">,</span> name<span class="operator">,</span> engine);
+ p<span class="operator">.</span><a href="qdeclarativeproperty.html#write">write</a>(value);
 </pre>
 
 
-<h3 class="fn"><a name="__eq__" />bool QDeclarativeProperty.__eq__ (<i>self</i>, <a href="qdeclarativeproperty.html">QDeclarativeProperty</a>)</h3><h3 class="fn"><a name="__hash__" />int QDeclarativeProperty.__hash__ (<i>self</i>)</h3><h3 class="fn"><a name="__ne__" />bool QDeclarativeProperty.__ne__ (<i>self</i>, <a href="qdeclarativeproperty.html">QDeclarativeProperty</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QDeclarativeProperty.__eq__ (<i>self</i>, <a href="qdeclarativeproperty.html">QDeclarativeProperty</a>)</h3><h3 class="fn"><a name="__hash__" />int QDeclarativeProperty.__hash__ (<i>self</i>)</h3><h3 class="fn"><a name="__ne__" />bool QDeclarativeProperty.__ne__ (<i>self</i>, <a href="qdeclarativeproperty.html">QDeclarativeProperty</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -27,7 +27,7 @@ can call <a href="qcoreapplication.html#processEvents">processEvents</a>() to ke
 the application responsive.</p>
 <p>In general, we recommend that you create a QCoreApplication or a
 <a href="qapplication.html">QApplication</a> object in your
-<tt>main()</tt> function as early as possible. <a href="qcoreapplication.html#exit">exit</a>() will not return until the
+<tt>main()</tt> function as early as possible. <a href="qcoreapplication.html#exec">exec_</a>() will not return until the
 event loop exits; e.g., when <a href="qcoreapplication.html#quit">quit</a>() is called.</p>
 <p>Several static convenience functions are also provided. The
 QCoreApplication object is available from <a href="qcoreapplication.html#instance">instance</a>(). Events can be sent
@@ -74,29 +74,30 @@ reset the locale that is used for number formatting to
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Encoding-enum" />QCoreApplication.Encoding</h3><p>This enum type defines the 8-bit encoding of character string
 arguments to <a href="qcoreapplication.html#translate">translate</a>():</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QCoreApplication.CodecForTr</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The encoding specified by <a href="qtextcodec.html#codecForTr">QTextCodec.codecForTr</a>() (Latin-1
 if none has been set).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QCoreApplication.UnicodeUTF8</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">UTF-8.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QCoreApplication.DefaultCodec</tt></td>
-<td class=" topAlign"><tt>CodecForTr</tt></td>
+<td class="topAlign"><tt>CodecForTr</tt></td>
 <td class="topAlign">(Obsolete) Use CodecForTr instead.</td>
 </tr>
 </table>
-<p>See also <a href="qobject.html#tr">QObject.tr</a>(), <a href="qobject.html#trUtf8">QObject.trUtf8</a>(), and <a href="qstring.html#fromUtf8">QString.fromUtf8</a>().</p>
+<p><b>See also</b> <a href="qobject.html#tr">QObject.tr</a>(),
+<a href="qobject.html#trUtf8">QObject.trUtf8</a>(), and <a href="qstring.html#fromUtf8">QString.fromUtf8</a>().</p>
 
 
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QCoreApplication" />QCoreApplication.__init__ (<i>self</i>, list-of-str&#160;<i>argv</i>)</h3><p>Constructs a Qt kernel application. Kernel applications are
@@ -123,7 +124,7 @@ directory for plugins is <tt>INSTALL/plugins</tt>, where
 <p>In Symbian this function is only useful for adding paths for
 finding Qt extension plugin stubs, since the OS can only load
 libraries from the <tt>/sys/bin</tt> directory.</p>
-<p>See also <a href="qcoreapplication.html#removeLibraryPath">removeLibraryPath</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#removeLibraryPath">removeLibraryPath</a>(),
 <a href="qcoreapplication.html#libraryPaths">libraryPaths</a>(),
 and <a href="qcoreapplication.html#setLibraryPaths">setLibraryPaths</a>().</p>
 
@@ -147,7 +148,7 @@ directory, not the path to executable itself, as those are always
 in <tt>/sys/bin</tt>. If the application is in a read only drive,
 i.e. ROM, then the private path on the system drive will be
 returned.</p>
-<p>See also <a href="qcoreapplication.html#applicationFilePath">applicationFilePath</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#applicationFilePath">applicationFilePath</a>().</p>
 
 
 <h3 class="fn"><a name="applicationFilePath" />QString QCoreApplication.applicationFilePath ()</h3><p>Returns the file path of the application executable.</p>
@@ -160,7 +161,7 @@ from the <tt>/proc</tt> file system. If that fails, it assumes that
 <tt>argv[0]</tt> contains the absolute file name of the executable.
 The function also assumes that the current directory has not been
 changed by the application.</p>
-<p>See also <a href="qcoreapplication.html#applicationDirPath">applicationDirPath</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#applicationDirPath">applicationDirPath</a>().</p>
 
 
 <h3 class="fn"><a name="applicationName" />QString QCoreApplication.applicationName ()</h3><h3 class="fn"><a name="applicationPid" />int QCoreApplication.applicationPid ()</h3><p>Returns the current process ID for the application.</p>
@@ -187,13 +188,20 @@ arguments() are constructed from the return value of <a href="http://msdn2.micro
 As a result of this, the string given by arguments().at(0) might
 not be the program name on Windows, depending on how the
 application was started.</p>
+<p>For Symbian applications started with
+<tt>RApaLsSession.StartApp</tt> one can specify arguments using
+<tt>CApaCommandLine.SetTailEndL</tt> function. Such arguments are
+only available via this method; they will not be passed to
+<tt>main</tt> function. Also note that only 8-bit string data set
+with <tt>CApaCommandLine.SetTailEndL</tt> is supported by this
+function.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qcoreapplication.html#applicationFilePath">applicationFilePath</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#applicationFilePath">applicationFilePath</a>().</p>
 
 
 <h3 class="fn"><a name="argv" />list-of-str QCoreApplication.argv ()</h3><h3 class="fn"><a name="closingDown" />bool QCoreApplication.closingDown ()</h3><p>Returns true if the application objects are being destroyed;
 otherwise returns false.</p>
-<p>See also <a href="qcoreapplication.html#startingUp">startingUp</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#startingUp">startingUp</a>().</p>
 
 
 <h3 class="fn"><a name="event" />bool QCoreApplication.event (<i>self</i>, <a href="qevent.html">QEvent</a>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -217,7 +225,7 @@ top-level windows. Hence, there is no guarantee that the
 application will have time to exit its event loop and execute code
 at the end of the <tt>main()</tt> function after the
 QCoreApplication.exec() call.</p>
-<p>See also <a href="qcoreapplication.html#quit">quit</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#quit">quit</a>(),
 <a href="qcoreapplication.html#exit">exit</a>(), <a href="qcoreapplication.html#processEvents">processEvents</a>(), and
 <a href="qapplication.html#exec">QApplication.exec</a>().</p>
 
@@ -232,8 +240,8 @@ non-zero value indicates an error.</p>
 <p>Note that unlike the C library function of the same name, this
 function <i>does</i> return to the caller -- it is event processing
 that stops.</p>
-<p>See also <a href="qcoreapplication.html#quit">quit</a>() and
-<a href="qcoreapplication.html#exec">exec_</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#quit">quit</a>()
+and <a href="qcoreapplication.html#exec">exec_</a>().</p>
 
 
 <h3 class="fn"><a name="flush" />QCoreApplication.flush ()</h3><p>Flushes the platform specific event queues.</p>
@@ -242,13 +250,13 @@ return to the event loop on asynchronous window systems like X11 or
 double buffered window systems like Mac OS X, and you want to
 visualize these changes immediately (e.g. Splash Screens), call
 this function.</p>
-<p>See also <a href="qcoreapplication.html#sendPostedEvents">sendPostedEvents</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#sendPostedEvents">sendPostedEvents</a>().</p>
 
 
 <h3 class="fn"><a name="hasPendingEvents" />bool QCoreApplication.hasPendingEvents ()</h3><p>This function returns true if there are pending events;
 otherwise returns false. Pending events can be either from the
 window system or posted events using <a href="qcoreapplication.html#postEvent">postEvent</a>().</p>
-<p>See also <a href="qabstracteventdispatcher.html#hasPendingEvents">QAbstractEventDispatcher.hasPendingEvents</a>().</p>
+<p><b>See also</b> <a href="qabstracteventdispatcher.html#hasPendingEvents">QAbstractEventDispatcher.hasPendingEvents</a>().</p>
 
 
 <h3 class="fn"><a name="installTranslator" />QCoreApplication.installTranslator (<a href="qtranslator.html">QTranslator</a>)</h3><p>Adds the translation file <i>translationFile</i> to the list of
@@ -268,7 +276,7 @@ function to the respective property setters. User-interface classes
 generated by <a href="designer-manual.html#qt-designer">Qt
 Designer</a> provide a <tt>retranslateUi()</tt> function that can
 be called.</p>
-<p>See also <a href="qcoreapplication.html#removeTranslator">removeTranslator</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#removeTranslator">removeTranslator</a>(),
 <a href="qcoreapplication.html#translate">translate</a>(), <a href="qtranslator.html#load">QTranslator.load</a>(), and <a href="internationalization.html#dynamic-translation">Dynamic
 Translation</a>.</p>
 
@@ -291,11 +299,11 @@ executable (NOT the working directory) is always added, as well as
 the colon separated entries of the QT_PLUGIN_PATH environment
 variable.</p>
 <p>If you want to iterate over the list, you can use the <a href="containers.html#foreach">foreach</a> pseudo-keyword:</p>
-<pre class="highlightedCode brush: cpp">
- foreach (const QString &amp;path, app.libraryPaths())
+<pre class="cpp">
+ <a href="qtcore.html#foreach">foreach</a> (<span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>path<span class="operator">,</span> app<span class="operator">.</span>libraryPaths())
      do_something(path);
 </pre>
-<p>See also <a href="qcoreapplication.html#setLibraryPaths">setLibraryPaths</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#setLibraryPaths">setLibraryPaths</a>(),
 <a href="qcoreapplication.html#addLibraryPath">addLibraryPath</a>(),
 <a href="qcoreapplication.html#removeLibraryPath">removeLibraryPath</a>(),
 <a href="qlibrary.html">QLibrary</a>, and <a href="plugins-howto.html">How to Create Qt Plugins</a>.</p>
@@ -332,8 +340,7 @@ event filters.</li>
 gets all the events, including Tab and Shift+Tab key press events,
 as long as they do not change the focus widget.</li>
 </ol>
-<p>See also <a href="qobject.html#event">QObject.event</a>() and
-<a href="qobject.html#installEventFilter">installEventFilter</a>().</p>
+<p><b>See also</b> <a href="qobject.html#event">QObject.event</a>() and <a href="qobject.html#installEventFilter">installEventFilter</a>().</p>
 
 
 <h3 class="fn"><a name="organizationDomain" />QString QCoreApplication.organizationDomain ()</h3><h3 class="fn"><a name="organizationName" />QString QCoreApplication.organizationName ()</h3><h3 class="fn"><a name="postEvent" />QCoreApplication.postEvent (<a href="qobject.html">QObject</a>&#160;<i>receiver</i>, <a href="qevent.html">QEvent</a>&#160;<i>event</i>)</h3><p>The <i>event</i> argument has it's ownership transferred to Qt.</p><p>Adds the event <i>event</i>, with the object <i>receiver</i> as
@@ -350,7 +357,7 @@ the processing order, use the postEvent() overload below, which
 takes a priority argument. This function posts all event with a
 <a href="qt.html#EventPriority-enum">Qt.NormalEventPriority</a>.</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#thread-safe">thread-safe</a>.</p>
-<p>See also <a href="qcoreapplication.html#sendEvent">sendEvent</a>(), <a href="qcoreapplication.html#notify">notify</a>(), and <a href="qcoreapplication.html#sendPostedEvents">sendPostedEvents</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#sendEvent">sendEvent</a>(), <a href="qcoreapplication.html#notify">notify</a>(), and <a href="qcoreapplication.html#sendPostedEvents">sendPostedEvents</a>().</p>
 
 
 <h3 class="fn"><a name="postEvent-2" />QCoreApplication.postEvent (<a href="qobject.html">QObject</a>&#160;<i>receiver</i>, <a href="qevent.html">QEvent</a>&#160;<i>event</i>, int&#160;<i>priority</i>)</h3><p>The <i>event</i> argument has it's ownership transferred to Qt.</p><p>This function overloads <a href="qcoreapplication.html#postEvent">postEvent</a>().</p>
@@ -371,7 +378,7 @@ details. Events with equal <i>priority</i> will be processed in the
 order posted.</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#thread-safe">thread-safe</a>.</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qcoreapplication.html#sendEvent">sendEvent</a>(), <a href="qcoreapplication.html#notify">notify</a>(), <a href="qcoreapplication.html#sendPostedEvents">sendPostedEvents</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#sendEvent">sendEvent</a>(), <a href="qcoreapplication.html#notify">notify</a>(), <a href="qcoreapplication.html#sendPostedEvents">sendPostedEvents</a>(),
 and <a href="qt.html#EventPriority-enum">Qt.EventPriority</a>.</p>
 
 
@@ -388,7 +395,7 @@ from within that local loop.</p>
 <p>Calling this function processes events only for the calling
 thread.</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#thread-safe">thread-safe</a>.</p>
-<p>See also <a href="qcoreapplication.html#exec">exec_</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#exec">exec_</a>(),
 <a href="qtimer.html">QTimer</a>, <a href="qeventloop.html#processEvents">QEventLoop.processEvents</a>(),
 <a href="qcoreapplication.html#flush">flush</a>(), and <a href="qcoreapplication.html#sendPostedEvents">sendPostedEvents</a>().</p>
 
@@ -402,7 +409,7 @@ doing a long operation (e.g. copying a file).</p>
 <p>Calling this function processes events only for the calling
 thread.</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#thread-safe">thread-safe</a>.</p>
-<p>See also <a href="qcoreapplication.html#exec">exec_</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#exec">exec_</a>(),
 <a href="qtimer.html">QTimer</a>, and <a href="qeventloop.html#processEvents">QEventLoop.processEvents</a>().</p>
 
 
@@ -413,18 +420,18 @@ signal to quit(), and you also often connect e.g. <a href="qabstractbutton.html#
 signals in <a href="qaction.html">QAction</a>, <a href="qmenu.html">QMenu</a>, or <a href="qmenubar.html">QMenuBar</a> to
 it.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QPushButton *quitButton = new QPushButton("Quit");
- connect(quitButton, SIGNAL(clicked()), &amp;app, SLOT(quit()));
+<pre class="cpp">
+ <span class="type"><a href="qpushbutton.html">QPushButton</a></span> <span class="operator">*</span>quitButton <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>(<span class="string">"Quit"</span>);
+ <a href="qobject.html#connect">connect</a>(quitButton<span class="operator">,</span> SIGNAL(clicked())<span class="operator">,</span> <span class="operator">&amp;</span>app<span class="operator">,</span> SLOT(quit()));
 </pre>
-<p>See also <a href="qcoreapplication.html#exit">exit</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#exit">exit</a>(),
 <a href="qcoreapplication.html#aboutToQuit">aboutToQuit</a>(), and
 <a href="qapplication.html#lastWindowClosed">QApplication.lastWindowClosed</a>().</p>
 
 
 <h3 class="fn"><a name="removeLibraryPath" />QCoreApplication.removeLibraryPath (QString)</h3><p>Removes <i>path</i> from the library path list. If <i>path</i>
 is empty or not in the path list, the list is not changed.</p>
-<p>See also <a href="qcoreapplication.html#addLibraryPath">addLibraryPath</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#addLibraryPath">addLibraryPath</a>(),
 <a href="qcoreapplication.html#libraryPaths">libraryPaths</a>(),
 and <a href="qcoreapplication.html#setLibraryPaths">setLibraryPaths</a>().</p>
 
@@ -456,7 +463,7 @@ are removed for <i>receiver</i>.</p>
 <h3 class="fn"><a name="removeTranslator" />QCoreApplication.removeTranslator (<a href="qtranslator.html">QTranslator</a>)</h3><p>Removes the translation file <i>translationFile</i> from the
 list of translation files used by this application. (It does not
 delete the translation file from the file system.)</p>
-<p>See also <a href="qcoreapplication.html#installTranslator">installTranslator</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#installTranslator">installTranslator</a>(),
 <a href="qcoreapplication.html#translate">translate</a>(), and
 <a href="qobject.html#tr">QObject.tr</a>().</p>
 
@@ -468,11 +475,11 @@ handler.</p>
 <p>The event is <i>not</i> deleted when the event has been sent.
 The normal approach is to create the event on the stack, for
 example:</p>
-<pre class="highlightedCode brush: cpp">
- QMouseEvent event(QEvent.MouseButtonPress, pos, 0, 0, 0);
- QApplication.sendEvent(mainWindow, &amp;event);
+<pre class="cpp">
+ <span class="type"><a href="qmouseevent.html">QMouseEvent</a></span> <a href="qcoreapplication.html#event">event</a>(<span class="type"><a href="qevent.html">QEvent</a></span><span class="operator">.</span>MouseButtonPress<span class="operator">,</span> pos<span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span>);
+ <span class="type"><a href="qapplication.html">QApplication</a></span><span class="operator">.</span>sendEvent(mainWindow<span class="operator">,</span> <span class="operator">&amp;</span>event);
 </pre>
-<p>See also <a href="qcoreapplication.html#postEvent">postEvent</a>() and <a href="qcoreapplication.html#notify">notify</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#postEvent">postEvent</a>() and <a href="qcoreapplication.html#notify">notify</a>().</p>
 
 
 <h3 class="fn"><a name="sendPostedEvents" />QCoreApplication.sendPostedEvents (<a href="qobject.html">QObject</a>&#160;<i>receiver</i>, int&#160;<i>event_type</i>)</h3><p>Immediately dispatches all events which have been previously
@@ -487,8 +494,7 @@ sent for <i>receiver</i>.</p>
 <p><b>Note:</b> This method must be called from the same thread as
 its <a href="qobject.html">QObject</a> parameter,
 <i>receiver</i>.</p>
-<p>See also <a href="qcoreapplication.html#flush">flush</a>() and
-<a href="qcoreapplication.html#postEvent">postEvent</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#flush">flush</a>() and <a href="qcoreapplication.html#postEvent">postEvent</a>().</p>
 
 
 <h3 class="fn"><a name="sendPostedEvents-2" />QCoreApplication.sendPostedEvents ()</h3><p>This function overloads <a href="qcoreapplication.html#sendPostedEvents">sendPostedEvents</a>().</p>
@@ -503,7 +509,7 @@ It tells Qt to create toplevel windows immediately. Normally,
 resources for widgets are allocated on demand to improve efficiency
 and minimize resource usage. Therefore, if it is important to
 minimize resource consumption, do not set this attribute.</p>
-<p>See also <a href="qcoreapplication.html#testAttribute">testAttribute</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#testAttribute">testAttribute</a>().</p>
 
 
 <h3 class="fn"><a name="setLibraryPaths" />QCoreApplication.setLibraryPaths (QStringList)</h3><p>Sets the list of directories to search when loading libraries to
@@ -512,19 +518,19 @@ will consist of the paths given in <i>paths</i>.</p>
 <p>In Symbian this function is only useful for setting paths for
 finding Qt extension plugin stubs, since the OS can only load
 libraries from the <tt>/sys/bin</tt> directory.</p>
-<p>See also <a href="qcoreapplication.html#libraryPaths">libraryPaths</a>(), <a href="qcoreapplication.html#addLibraryPath">addLibraryPath</a>(),
+<p><b>See also</b> <a href="qcoreapplication.html#libraryPaths">libraryPaths</a>(), <a href="qcoreapplication.html#addLibraryPath">addLibraryPath</a>(),
 <a href="qcoreapplication.html#removeLibraryPath">removeLibraryPath</a>(),
 and <a href="qlibrary.html">QLibrary</a>.</p>
 
 
 <h3 class="fn"><a name="setOrganizationDomain" />QCoreApplication.setOrganizationDomain (QString&#160;<i>orgDomain</i>)</h3><h3 class="fn"><a name="setOrganizationName" />QCoreApplication.setOrganizationName (QString&#160;<i>orgName</i>)</h3><h3 class="fn"><a name="startingUp" />bool QCoreApplication.startingUp ()</h3><p>Returns true if an application object has not been created yet;
 otherwise returns false.</p>
-<p>See also <a href="qcoreapplication.html#closingDown">closingDown</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#closingDown">closingDown</a>().</p>
 
 
 <h3 class="fn"><a name="testAttribute" />bool QCoreApplication.testAttribute (<a href="qt.html#ApplicationAttribute-enum">Qt.ApplicationAttribute</a>&#160;<i>attribute</i>)</h3><p>Returns true if attribute <i>attribute</i> is set; otherwise
 returns false.</p>
-<p>See also <a href="qcoreapplication.html#setAttribute">setAttribute</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#setAttribute">setAttribute</a>().</p>
 
 
 <h3 class="fn"><a name="translate" />QString QCoreApplication.translate (str&#160;<i>context</i>, str&#160;<i>sourceText</i>, str&#160;<i>disambiguation</i>&#160;=&#160;None, <a href="qcoreapplication.html#Encoding-enum">Encoding</a>&#160;<i>encoding</i>&#160;=&#160;QCoreApplication.CodecForTr)</h3><p>Returns the translation text for <i>sourceText</i>, by querying
@@ -560,7 +566,8 @@ supported. Doing so will most likely result in crashes or other
 undesirable behavior.</p>
 <p><b>Note:</b> This function is <a href="threads-reentrancy.html#reentrant">reentrant</a>.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qobject.html#tr">QObject.tr</a>(), <a href="qcoreapplication.html#installTranslator">installTranslator</a>(),
+<p><b>See also</b> <a href="qobject.html#tr">QObject.tr</a>(),
+<a href="qcoreapplication.html#installTranslator">installTranslator</a>(),
 and <a href="qtextcodec.html#codecForTr">QTextCodec.codecForTr</a>().</p>
 
 
@@ -574,7 +581,7 @@ or when the users shuts down the entire desktop session.</p>
 <p>The signal is particularly useful if your application has to do
 some last-second cleanup. Note that no user interaction is possible
 in this state.</p>
-<p>See also <a href="qcoreapplication.html#quit">quit</a>().</p>
+<p><b>See also</b> <a href="qcoreapplication.html#quit">quit</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

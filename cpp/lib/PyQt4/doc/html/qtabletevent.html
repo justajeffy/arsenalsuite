@@ -48,74 +48,74 @@ be picked up Qt.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="PointerType-enum" />QTabletEvent.PointerType</h3><p>This enum defines what type of point is generating the
 event.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTabletEvent.UnknownPointer</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">An unknown device.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTabletEvent.Pen</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Tip end of a stylus-like device (the narrow
 end of the pen).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTabletEvent.Cursor</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Any puck-like device.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTabletEvent.Eraser</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Eraser end of a stylus-like device (the broad
 end of the pen).</td>
 </tr>
 </table>
-<p>See also <a href="qtabletevent.html#pointerType">pointerType</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#pointerType">pointerType</a>().</p>
 
 
 <h3 class="fn"><a name="TabletDevice-enum" />QTabletEvent.TabletDevice</h3><p>This enum defines what type of device is generating the
 event.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTabletEvent.NoDevice</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">No device, or an unknown device.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTabletEvent.Puck</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">A Puck (a device that is similar to a flat
 mouse with a transparent circle with cross-hairs).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTabletEvent.Stylus</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">A Stylus.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTabletEvent.Airbrush</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">An airbrush</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTabletEvent.FourDMouse</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">A 4D Mouse.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTabletEvent.RotationStylus</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">A special stylus that also knows about
 rotation (a 6D stylus).</td>
 </tr>
@@ -145,12 +145,13 @@ pressure, pass 0 here.</p>
 <p><i>rotation</i> contains the device's rotation in degrees. 4D
 mice support rotation. If the device does not support rotation,
 pass 0 here.</p>
-<p>See also <a href="qtabletevent.html#pos">pos</a>(), <a href="qtabletevent.html#globalPos">globalPos</a>(), <a href="qtabletevent.html#device">device</a>(), <a href="qtabletevent.html#pressure">pressure</a>(), <a href="qtabletevent.html#xTilt">xTilt</a>(), <a href="qtabletevent.html#yTilt">yTilt</a>(), <a href="qtabletevent.html#uniqueId">uniqueId</a>(), <a href="qtabletevent.html#rotation">rotation</a>(), <a href="qtabletevent.html#tangentialPressure">tangentialPressure</a>(),
+<p><b>See also</b> <a href="qtabletevent.html#pos">pos</a>(),
+<a href="qtabletevent.html#globalPos">globalPos</a>(), <a href="qtabletevent.html#device">device</a>(), <a href="qtabletevent.html#pressure">pressure</a>(), <a href="qtabletevent.html#xTilt">xTilt</a>(), <a href="qtabletevent.html#yTilt">yTilt</a>(), <a href="qtabletevent.html#uniqueId">uniqueId</a>(), <a href="qtabletevent.html#rotation">rotation</a>(), <a href="qtabletevent.html#tangentialPressure">tangentialPressure</a>(),
 and <a href="qtabletevent.html#z">z</a>().</p>
 
 
 <h3 class="fn"><a name="QTabletEvent-2" />QTabletEvent.__init__ (<i>self</i>, <a href="qtabletevent.html">QTabletEvent</a>)</h3><h3 class="fn"><a name="device" /><a href="qtabletevent.html#TabletDevice-enum">TabletDevice</a> QTabletEvent.device (<i>self</i>)</h3><p>Returns the type of device that generated the event.</p>
-<p>See also <a href="qtabletevent.html#TabletDevice-enum">TabletDevice</a>.</p>
+<p><b>See also</b> <a href="qtabletevent.html#TabletDevice-enum">TabletDevice</a>.</p>
 
 
 <h3 class="fn"><a name="globalPos" /><a href="qpoint.html">QPoint</a> QTabletEvent.globalPos (<i>self</i>)</h3><p>Returns the global position of the device <i>at the time of the
@@ -158,28 +159,23 @@ event</i>. This is important on asynchronous windows systems like
 X11; whenever you move your widgets around in response to mouse
 events, globalPos() can differ significantly from the current
 position <a href="qcursor.html#pos">QCursor.pos</a>().</p>
-<p>See also <a href="qtabletevent.html#globalX">globalX</a>(),
-<a href="qtabletevent.html#globalY">globalY</a>(), and <a href="qtabletevent.html#hiResGlobalPos">hiResGlobalPos</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#globalX">globalX</a>(), <a href="qtabletevent.html#globalY">globalY</a>(), and <a href="qtabletevent.html#hiResGlobalPos">hiResGlobalPos</a>().</p>
 
 
 <h3 class="fn"><a name="globalX" />int QTabletEvent.globalX (<i>self</i>)</h3><p>Returns the global x position of the mouse pointer at the time
 of the event.</p>
-<p>See also <a href="qtabletevent.html#globalY">globalY</a>(),
-<a href="qtabletevent.html#globalPos">globalPos</a>(), and <a href="qtabletevent.html#hiResGlobalX">hiResGlobalX</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#globalY">globalY</a>(), <a href="qtabletevent.html#globalPos">globalPos</a>(), and <a href="qtabletevent.html#hiResGlobalX">hiResGlobalX</a>().</p>
 
 
 <h3 class="fn"><a name="globalY" />int QTabletEvent.globalY (<i>self</i>)</h3><p>Returns the global y position of the tablet device at the time
 of the event.</p>
-<p>See also <a href="qtabletevent.html#globalX">globalX</a>(),
-<a href="qtabletevent.html#globalPos">globalPos</a>(), and <a href="qtabletevent.html#hiResGlobalY">hiResGlobalY</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#globalX">globalX</a>(), <a href="qtabletevent.html#globalPos">globalPos</a>(), and <a href="qtabletevent.html#hiResGlobalY">hiResGlobalY</a>().</p>
 
 
 <h3 class="fn"><a name="hiResGlobalPos" /><a href="qpointf.html">QPointF</a> QTabletEvent.hiResGlobalPos (<i>self</i>)</h3><p>The high precision coordinates delivered from the tablet
 expressed. Sub pixeling information is in the fractional part of
 the <a href="qpointf.html">QPointF</a>.</p>
-<p>See also <a href="qtabletevent.html#globalPos">globalPos</a>(),
-<a href="qtabletevent.html#hiResGlobalX">hiResGlobalX</a>(), and
-<a href="qtabletevent.html#hiResGlobalY">hiResGlobalY</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#globalPos">globalPos</a>(), <a href="qtabletevent.html#hiResGlobalX">hiResGlobalX</a>(), and <a href="qtabletevent.html#hiResGlobalY">hiResGlobalY</a>().</p>
 
 
 <h3 class="fn"><a name="hiResGlobalX" />float QTabletEvent.hiResGlobalX (<i>self</i>)</h3><p>The high precision x position of the tablet device.</p>
@@ -196,13 +192,13 @@ received the event.</p>
 <p>If you move widgets around in response to mouse events, use
 <a href="qtabletevent.html#globalPos">globalPos</a>() instead of
 this function.</p>
-<p>See also <a href="qtabletevent.html#x">x</a>(), <a href="qtabletevent.html#y">y</a>(), and <a href="qtabletevent.html#globalPos">globalPos</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#x">x</a>(), <a href="qtabletevent.html#y">y</a>(), and <a href="qtabletevent.html#globalPos">globalPos</a>().</p>
 
 
 <h3 class="fn"><a name="pressure" />float QTabletEvent.pressure (<i>self</i>)</h3><p>Returns the pressure for the device. 0.0 indicates that the
 stylus is not on the tablet, 1.0 indicates the maximum amount of
 pressure for the stylus.</p>
-<p>See also <a href="qtabletevent.html#tangentialPressure">tangentialPressure</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#tangentialPressure">tangentialPressure</a>().</p>
 
 
 <h3 class="fn"><a name="rotation" />float QTabletEvent.rotation (<i>self</i>)</h3><p>Returns the rotation of the current device in degress. This is
@@ -216,7 +212,7 @@ from -1.0 to 1.0. 0.0 indicates a neutral position. Current
 airbrushes can only move in the positive direction from the
 neutrual position. If the device does not support tangential
 pressure, this value is always 0.0.</p>
-<p>See also <a href="qtabletevent.html#pressure">pressure</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#pressure">pressure</a>().</p>
 
 
 <h3 class="fn"><a name="uniqueId" />int QTabletEvent.uniqueId (<i>self</i>)</h3><p>Returns a unique ID for the current device, making it possible
@@ -232,12 +228,13 @@ driver.</p>
 orientation of the pen. Earlier versions would report a different
 value when using the eraser-end versus the pen-end of the stylus on
 some OS's.</p>
-<p>See also <a href="qtabletevent.html#pointerType">pointerType</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#pointerType">pointerType</a>().</p>
 
 
 <h3 class="fn"><a name="x" />int QTabletEvent.x (<i>self</i>)</h3><p>Returns the x position of the device, relative to the widget
 that received the event.</p>
-<p>See also <a href="qtabletevent.html#y">y</a>() and <a href="qtabletevent.html#pos">pos</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#y">y</a>() and
+<a href="qtabletevent.html#pos">pos</a>().</p>
 
 
 <h3 class="fn"><a name="xTilt" />int QTabletEvent.xTilt (<i>self</i>)</h3><p>Returns the angle between the device (a pen, for example) and
@@ -245,24 +242,25 @@ the perpendicular in the direction of the x axis. Positive values
 are towards the tablet's physical right. The angle is in the range
 -60 to +60 degrees.</p>
 <p class="centerAlign"><img src="images/qtabletevent-tilt.png" /></p>
-<p>See also <a href="qtabletevent.html#yTilt">yTilt</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#yTilt">yTilt</a>().</p>
 
 
 <h3 class="fn"><a name="y" />int QTabletEvent.y (<i>self</i>)</h3><p>Returns the y position of the device, relative to the widget
 that received the event.</p>
-<p>See also <a href="qtabletevent.html#x">x</a>() and <a href="qtabletevent.html#pos">pos</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#x">x</a>() and
+<a href="qtabletevent.html#pos">pos</a>().</p>
 
 
 <h3 class="fn"><a name="yTilt" />int QTabletEvent.yTilt (<i>self</i>)</h3><p>Returns the angle between the device (a pen, for example) and
 the perpendicular in the direction of the y axis. Positive values
 are towards the bottom of the tablet. The angle is within the range
 -60 to +60 degrees.</p>
-<p>See also <a href="qtabletevent.html#xTilt">xTilt</a>().</p>
+<p><b>See also</b> <a href="qtabletevent.html#xTilt">xTilt</a>().</p>
 
 
 <h3 class="fn"><a name="z" />int QTabletEvent.z (<i>self</i>)</h3><p>Returns the z position of the device. Typically this is
 represented by a wheel on a 4D Mouse. If the device does not
 support a Z-axis, this value is always zero. This is <b>not</b> the
 same as pressure.</p>
-<p>See also <a href="qtabletevent.html#pressure">pressure</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qtabletevent.html#pressure">pressure</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

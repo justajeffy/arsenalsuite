@@ -54,25 +54,25 @@ make the widget a child of the viewport; this way, we do not have
 to calculate which part of the widget to draw but can simply move
 the widget with <a href="qwidget.html#pos-prop">QWidget.move</a>(). When the area contents
 or the viewport size changes, we do the following:</p>
-<pre class="highlightedCode brush: cpp">
-     QSize areaSize = viewport()-&gt;size();
-     QSize  widgetSize = widget-&gt;size();
+<pre class="cpp">
+     <span class="type"><a href="qsize.html">QSize</a></span> areaSize <span class="operator">=</span> viewport()<span class="operator">-</span><span class="operator">&gt;</span>size();
+     <span class="type"><a href="qsize.html">QSize</a></span>  widgetSize <span class="operator">=</span> widget<span class="operator">-</span><span class="operator">&gt;</span>size();
 
-     verticalScrollBar()-&gt;setPageStep(widgetSize.height());
-     horizontalScrollBar()-&gt;setPageStep(widgetSize.width());
-     verticalScrollBar()-&gt;setRange(0, widgetSize.height() - areaSize.height());
-     horizontalScrollBar()-&gt;setRange(0, widgetSize.width() - areaSize.width());
+     verticalScrollBar()<span class="operator">-</span><span class="operator">&gt;</span>setPageStep(widgetSize<span class="operator">.</span>height());
+     horizontalScrollBar()<span class="operator">-</span><span class="operator">&gt;</span>setPageStep(widgetSize<span class="operator">.</span>width());
+     verticalScrollBar()<span class="operator">-</span><span class="operator">&gt;</span>setRange(<span class="number">0</span><span class="operator">,</span> widgetSize<span class="operator">.</span>height() <span class="operator">-</span> areaSize<span class="operator">.</span>height());
+     horizontalScrollBar()<span class="operator">-</span><span class="operator">&gt;</span>setRange(<span class="number">0</span><span class="operator">,</span> widgetSize<span class="operator">.</span>width() <span class="operator">-</span> areaSize<span class="operator">.</span>width());
      updateWidgetPosition();
 </pre>
 <p>When the scroll bars change value, we need to update the widget
 position, i.e., find the part of the widget that is to be drawn in
 the viewport:</p>
-<pre class="highlightedCode brush: cpp">
-     int hvalue = horizontalScrollBar()-&gt;value();
-     int vvalue = verticalScrollBar()-&gt;value();
-     QPoint topLeft = viewport()-&gt;rect().topLeft();
+<pre class="cpp">
+     <span class="type">int</span> hvalue <span class="operator">=</span> horizontalScrollBar()<span class="operator">-</span><span class="operator">&gt;</span>value();
+     <span class="type">int</span> vvalue <span class="operator">=</span> verticalScrollBar()<span class="operator">-</span><span class="operator">&gt;</span>value();
+     <span class="type"><a href="qpoint.html">QPoint</a></span> topLeft <span class="operator">=</span> viewport()<span class="operator">-</span><span class="operator">&gt;</span>rect()<span class="operator">.</span>topLeft();
 
-     widget-&gt;move(topLeft.x() - hvalue, topLeft.y() - vvalue);
+     widget<span class="operator">-</span><span class="operator">&gt;</span>move(topLeft<span class="operator">.</span>x() <span class="operator">-</span> hvalue<span class="operator">,</span> topLeft<span class="operator">.</span>y() <span class="operator">-</span> vvalue);
 </pre>
 <p>In order to track scroll bar movements, reimplement the virtual
 function <a href="qabstractscrollarea.html#scrollContentsBy">scrollContentsBy</a>().
@@ -103,7 +103,7 @@ entire contents of the area is not suitable for being drawn on a
 <a href="qwidget.html">QWidget</a> or if you do not want smooth
 scrolling.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QAbstractScrollArea" />QAbstractScrollArea.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a viewport.</p>
-<p>The <i>parent</i> arguments is sent to the <a href="qwidget.html">QWidget</a> constructor.</p>
+<p>The <i>parent</i> argument is sent to the <a href="qwidget.html">QWidget</a> constructor.</p>
 
 
 <h3 class="fn"><a name="addScrollBarWidget" />QAbstractScrollArea.addScrollBarWidget (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>widget</i>, <a href="qt-alignment.html">Qt.Alignment</a>&#160;<i>alignment</i>)</h3><p>The <i>widget</i> argument has it's ownership transferred to Qt.</p><p>Adds <i>widget</i> as a scroll bar widget in the location
@@ -129,45 +129,45 @@ set a horizontal size policy. If you want a square widget, call
 QStyle.pixelMetric(<a href="qstyle.html#PixelMetric-enum">QStyle.PM_ScrollBarExtent</a>) and
 set the width to this value.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractscrollarea.html#scrollBarWidgets">scrollBarWidgets</a>().</p>
+<p><b>See also</b> <a href="qabstractscrollarea.html#scrollBarWidgets">scrollBarWidgets</a>().</p>
 
 
 <h3 class="fn"><a name="contextMenuEvent" />QAbstractScrollArea.contextMenuEvent (<i>self</i>, <a href="qcontextmenuevent.html">QContextMenuEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#contextMenuEvent">QWidget.contextMenuEvent</a>().</p>
 <p>This event handler can be reimplemented in a subclass to receive
 context menu events for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget. The
 event is passed in <i>e</i>.</p>
-<p>See also <a href="qwidget.html#contextMenuEvent">QWidget.contextMenuEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#contextMenuEvent">QWidget.contextMenuEvent</a>().</p>
 
 
 <h3 class="fn"><a name="cornerWidget" /><a href="qwidget.html">QWidget</a> QAbstractScrollArea.cornerWidget (<i>self</i>)</h3><p>Returns the widget in the corner between the two scroll
 bars.</p>
 <p>By default, no corner widget is present.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractscrollarea.html#setCornerWidget">setCornerWidget</a>().</p>
+<p><b>See also</b> <a href="qabstractscrollarea.html#setCornerWidget">setCornerWidget</a>().</p>
 
 
 <h3 class="fn"><a name="dragEnterEvent" />QAbstractScrollArea.dragEnterEvent (<i>self</i>, <a href="qdragenterevent.html">QDragEnterEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#dragEnterEvent">QWidget.dragEnterEvent</a>().</p>
 <p>This event handler can be reimplemented in a subclass to receive
 drag enter events (passed in <i>event</i>), for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget.</p>
-<p>See also <a href="qwidget.html#dragEnterEvent">QWidget.dragEnterEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#dragEnterEvent">QWidget.dragEnterEvent</a>().</p>
 
 
 <h3 class="fn"><a name="dragLeaveEvent" />QAbstractScrollArea.dragLeaveEvent (<i>self</i>, <a href="qdragleaveevent.html">QDragLeaveEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#dragLeaveEvent">QWidget.dragLeaveEvent</a>().</p>
 <p>This event handler can be reimplemented in a subclass to receive
 drag leave events (passed in <i>event</i>), for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget.</p>
-<p>See also <a href="qwidget.html#dragLeaveEvent">QWidget.dragLeaveEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#dragLeaveEvent">QWidget.dragLeaveEvent</a>().</p>
 
 
 <h3 class="fn"><a name="dragMoveEvent" />QAbstractScrollArea.dragMoveEvent (<i>self</i>, <a href="qdragmoveevent.html">QDragMoveEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#dragMoveEvent">QWidget.dragMoveEvent</a>().</p>
 <p>This event handler can be reimplemented in a subclass to receive
 drag move events (passed in <i>event</i>), for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget.</p>
-<p>See also <a href="qwidget.html#dragMoveEvent">QWidget.dragMoveEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#dragMoveEvent">QWidget.dragMoveEvent</a>().</p>
 
 
 <h3 class="fn"><a name="dropEvent" />QAbstractScrollArea.dropEvent (<i>self</i>, <a href="qdropevent.html">QDropEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#dropEvent">QWidget.dropEvent</a>().</p>
 <p>This event handler can be reimplemented in a subclass to receive
 drop events (passed in <i>event</i>), for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget.</p>
-<p>See also <a href="qwidget.html#dropEvent">QWidget.dropEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#dropEvent">QWidget.dropEvent</a>().</p>
 
 
 <h3 class="fn"><a name="event" />bool QAbstractScrollArea.event (<i>self</i>, <a href="qevent.html">QEvent</a>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -175,11 +175,11 @@ drop events (passed in <i>event</i>), for the <a href="qabstractscrollarea.html#
 (<i>not</i> the scrolling area <a href="qabstractscrollarea.html#viewport">viewport</a>()). The specified
 <i>event</i> is a general event object that may need to be cast to
 the appropriate class depending on its type.</p>
-<p>See also <a href="qevent.html#type">QEvent.type</a>().</p>
+<p><b>See also</b> <a href="qevent.html#type">QEvent.type</a>().</p>
 
 
 <h3 class="fn"><a name="horizontalScrollBar" /><a href="qscrollbar.html">QScrollBar</a> QAbstractScrollArea.horizontalScrollBar (<i>self</i>)</h3><p>Returns the horizontal scroll bar.</p>
-<p>See also <a href="qabstractscrollarea.html#setHorizontalScrollBar">setHorizontalScrollBar</a>(),
+<p><b>See also</b> <a href="qabstractscrollarea.html#setHorizontalScrollBar">setHorizontalScrollBar</a>(),
 <a href="qabstractscrollarea.html#horizontalScrollBarPolicy-prop">horizontalScrollBarPolicy</a>,
 and <a href="qabstractscrollarea.html#verticalScrollBar">verticalScrollBar</a>().</p>
 
@@ -201,28 +201,28 @@ valid scrolling range.</p>
 <p>This event handler can be reimplemented in a subclass to receive
 mouse double click events for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget. The
 event is passed in <i>e</i>.</p>
-<p>See also <a href="qwidget.html#mouseDoubleClickEvent">QWidget.mouseDoubleClickEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#mouseDoubleClickEvent">QWidget.mouseDoubleClickEvent</a>().</p>
 
 
 <h3 class="fn"><a name="mouseMoveEvent" />QAbstractScrollArea.mouseMoveEvent (<i>self</i>, <a href="qmouseevent.html">QMouseEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#mouseMoveEvent">QWidget.mouseMoveEvent</a>().</p>
 <p>This event handler can be reimplemented in a subclass to receive
 mouse move events for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget. The
 event is passed in <i>e</i>.</p>
-<p>See also <a href="qwidget.html#mouseMoveEvent">QWidget.mouseMoveEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#mouseMoveEvent">QWidget.mouseMoveEvent</a>().</p>
 
 
 <h3 class="fn"><a name="mousePressEvent" />QAbstractScrollArea.mousePressEvent (<i>self</i>, <a href="qmouseevent.html">QMouseEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#mousePressEvent">QWidget.mousePressEvent</a>().</p>
 <p>This event handler can be reimplemented in a subclass to receive
 mouse press events for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget. The
 event is passed in <i>e</i>.</p>
-<p>See also <a href="qwidget.html#mousePressEvent">QWidget.mousePressEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#mousePressEvent">QWidget.mousePressEvent</a>().</p>
 
 
 <h3 class="fn"><a name="mouseReleaseEvent" />QAbstractScrollArea.mouseReleaseEvent (<i>self</i>, <a href="qmouseevent.html">QMouseEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#mouseReleaseEvent">QWidget.mouseReleaseEvent</a>().</p>
 <p>This event handler can be reimplemented in a subclass to receive
 mouse release events for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget. The
 event is passed in <i>e</i>.</p>
-<p>See also <a href="qwidget.html#mouseReleaseEvent">QWidget.mouseReleaseEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#mouseReleaseEvent">QWidget.mouseReleaseEvent</a>().</p>
 
 
 <h3 class="fn"><a name="paintEvent" />QAbstractScrollArea.paintEvent (<i>self</i>, <a href="qpaintevent.html">QPaintEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#paintEvent">QWidget.paintEvent</a>().</p>
@@ -230,7 +230,7 @@ event is passed in <i>e</i>.</p>
 paint events (passed in <i>event</i>), for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget.</p>
 <p><b>Note:</b> If you open a painter, make sure to open it on the
 <a href="qabstractscrollarea.html#viewport">viewport</a>().</p>
-<p>See also <a href="qwidget.html#paintEvent">QWidget.paintEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#paintEvent">QWidget.paintEvent</a>().</p>
 
 
 <h3 class="fn"><a name="resizeEvent" />QAbstractScrollArea.resizeEvent (<i>self</i>, <a href="qresizeevent.html">QResizeEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#resizeEvent">QWidget.resizeEvent</a>().</p>
@@ -239,14 +239,14 @@ resize events (passed in <i>event</i>), for the <a href="qabstractscrollarea.htm
 <p>When resizeEvent() is called, the viewport already has its new
 geometry: Its new size is accessible through the <a href="qresizeevent.html#size">QResizeEvent.size</a>() function, and the
 old size through <a href="qresizeevent.html#oldSize">QResizeEvent.oldSize</a>().</p>
-<p>See also <a href="qwidget.html#resizeEvent">QWidget.resizeEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#resizeEvent">QWidget.resizeEvent</a>().</p>
 
 
 <h3 class="fn"><a name="scrollBarWidgets" />list-of-QWidget QAbstractScrollArea.scrollBarWidgets (<i>self</i>, <a href="qt-alignment.html">Qt.Alignment</a>&#160;<i>alignment</i>)</h3><p>Returns a list of the currently set scroll bar widgets.
 <i>alignment</i> can be any combination of the four location
 flags.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractscrollarea.html#addScrollBarWidget">addScrollBarWidget</a>().</p>
+<p><b>See also</b> <a href="qabstractscrollarea.html#addScrollBarWidget">addScrollBarWidget</a>().</p>
 
 
 <h3 class="fn"><a name="scrollContentsBy" />QAbstractScrollArea.scrollContentsBy (<i>self</i>, int&#160;<i>dx</i>, int&#160;<i>dy</i>)</h3><p>This virtual handler is called when the scroll bars are moved by
@@ -279,7 +279,7 @@ setting some other corner widget (or 0).</p>
 <p>Any <i>newly</i> set widget should have no current parent.</p>
 <p>By default, no corner widget is present.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractscrollarea.html#cornerWidget">cornerWidget</a>(),
+<p><b>See also</b> <a href="qabstractscrollarea.html#cornerWidget">cornerWidget</a>(),
 <a href="qabstractscrollarea.html#horizontalScrollBarPolicy-prop">horizontalScrollBarPolicy</a>,
 and <a href="qabstractscrollarea.html#horizontalScrollBarPolicy-prop">horizontalScrollBarPolicy</a>.</p>
 
@@ -293,7 +293,7 @@ already provides horizontal and vertical scroll bars by default.
 You can call this function to replace the default horizontal scroll
 bar with your own custom scroll bar.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractscrollarea.html#horizontalScrollBar">horizontalScrollBar</a>()
+<p><b>See also</b> <a href="qabstractscrollarea.html#horizontalScrollBar">horizontalScrollBar</a>()
 and <a href="qabstractscrollarea.html#setVerticalScrollBar">setVerticalScrollBar</a>().</p>
 
 
@@ -301,7 +301,7 @@ and <a href="qabstractscrollarea.html#setVerticalScrollBar">setVerticalScrollBar
 setViewport(<i>viewport</i>) has been called. Reimplement this
 function in a subclass of <a href="qabstractscrollarea.html">QAbstractScrollArea</a> to initialize
 the new <i>viewport</i> before it is used.</p>
-<p>See also <a href="qabstractscrollarea.html#setViewport">setViewport</a>().</p>
+<p><b>See also</b> <a href="qabstractscrollarea.html#setViewport">setViewport</a>().</p>
 
 
 <h3 class="fn"><a name="setVerticalScrollBar" />QAbstractScrollArea.setVerticalScrollBar (<i>self</i>, <a href="qscrollbar.html">QScrollBar</a>&#160;<i>scrollbar</i>)</h3><p>The <i>scrollbar</i> argument has it's ownership transferred to Qt.</p><p>Replaces the existing vertical scroll bar with <i>scrollBar</i>,
@@ -312,7 +312,7 @@ already provides vertical and horizontal scroll bars by default.
 You can call this function to replace the default vertical scroll
 bar with your own custom scroll bar.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractscrollarea.html#verticalScrollBar">verticalScrollBar</a>()
+<p><b>See also</b> <a href="qabstractscrollarea.html#verticalScrollBar">verticalScrollBar</a>()
 and <a href="qabstractscrollarea.html#setHorizontalScrollBar">setHorizontalScrollBar</a>().</p>
 
 
@@ -322,7 +322,7 @@ ownership of the given <i>widget</i>.</p>
 new <a href="qwidget.html">QWidget</a> instance for the
 viewport.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractscrollarea.html#viewport">viewport</a>().</p>
+<p><b>See also</b> <a href="qabstractscrollarea.html#viewport">viewport</a>().</p>
 
 
 <h3 class="fn"><a name="setViewportMargins" />QAbstractScrollArea.setViewportMargins (<i>self</i>, int&#160;<i>left</i>, int&#160;<i>top</i>, int&#160;<i>right</i>, int&#160;<i>bottom</i>)</h3><p>Sets the margins around the scrolling area to <i>left</i>,
@@ -349,7 +349,7 @@ unused area.</p>
 
 
 <h3 class="fn"><a name="verticalScrollBar" /><a href="qscrollbar.html">QScrollBar</a> QAbstractScrollArea.verticalScrollBar (<i>self</i>)</h3><p>Returns the vertical scroll bar.</p>
-<p>See also <a href="qabstractscrollarea.html#setVerticalScrollBar">setVerticalScrollBar</a>(),
+<p><b>See also</b> <a href="qabstractscrollarea.html#setVerticalScrollBar">setVerticalScrollBar</a>(),
 <a href="qabstractscrollarea.html#verticalScrollBarPolicy-prop">verticalScrollBarPolicy</a>,
 and <a href="qabstractscrollarea.html#horizontalScrollBar">horizontalScrollBar</a>().</p>
 
@@ -357,7 +357,7 @@ and <a href="qabstractscrollarea.html#horizontalScrollBar">horizontalScrollBar</
 <h3 class="fn"><a name="verticalScrollBarPolicy" /><a href="qt.html#ScrollBarPolicy-enum">Qt.ScrollBarPolicy</a> QAbstractScrollArea.verticalScrollBarPolicy (<i>self</i>)</h3><h3 class="fn"><a name="viewport" /><a href="qwidget.html">QWidget</a> QAbstractScrollArea.viewport (<i>self</i>)</h3><p>Returns the viewport widget.</p>
 <p>Use the <a href="qscrollarea.html#widget">QScrollArea.widget</a>() function to
 retrieve the contents of the viewport widget.</p>
-<p>See also <a href="qabstractscrollarea.html#setViewport">setViewport</a>() and
+<p><b>See also</b> <a href="qabstractscrollarea.html#setViewport">setViewport</a>() and
 <a href="qscrollarea.html#widget">QScrollArea.widget</a>().</p>
 
 
@@ -386,5 +386,5 @@ and <a href="qabstractscrollarea.html#resizeEvent">resizeEvent</a>().</p>
 <p>This event handler can be reimplemented in a subclass to receive
 wheel events for the <a href="qabstractscrollarea.html#viewport">viewport</a>() widget. The
 event is passed in <i>e</i>.</p>
-<p>See also <a href="qwidget.html#wheelEvent">QWidget.wheelEvent</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qwidget.html#wheelEvent">QWidget.wheelEvent</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

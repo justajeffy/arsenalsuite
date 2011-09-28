@@ -15,23 +15,23 @@ pairs that can be used in QML bindings.</p>
 domain data to the UI layer. The following example shows how you
 might declare data in C++ and then access it in QML.</p>
 <p>In the C++ file:</p>
-<pre class="highlightedCode brush: cpp">
- // create our data
- QDeclarativePropertyMap ownerData;
- ownerData.insert("name", QVariant(QString("John Smith")));
- ownerData.insert("phone", QVariant(QString("555-5555")));
+<pre class="cpp">
+ <span class="comment">// create our data</span>
+ <span class="type">QDeclarativePropertyMap</span> ownerData;
+ ownerData<span class="operator">.</span><a href="qdeclarativepropertymap.html#insert">insert</a>(<span class="string">"name"</span><span class="operator">,</span> <span class="type"><a href="qvariant.html">QVariant</a></span>(<span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"John Smith"</span>)));
+ ownerData<span class="operator">.</span><a href="qdeclarativepropertymap.html#insert">insert</a>(<span class="string">"phone"</span><span class="operator">,</span> <span class="type"><a href="qvariant.html">QVariant</a></span>(<span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"555-5555"</span>)));
 
-<span class="comment"> // expose it to the UI layer</span>
- QDeclarativeView view;
- QDeclarativeContext *ctxt = view.rootContext();
- ctxt-&gt;setContextProperty("owner", &amp;ownerData);
+ <span class="comment">// expose it to the UI layer</span>
+ <span class="type"><a href="qdeclarativeview.html">QDeclarativeView</a></span> view;
+ <span class="type"><a href="qdeclarativecontext.html">QDeclarativeContext</a></span> <span class="operator">*</span>ctxt <span class="operator">=</span> view<span class="operator">.</span>rootContext();
+ ctxt<span class="operator">-</span><span class="operator">&gt;</span>setContextProperty(<span class="string">"owner"</span><span class="operator">,</span> <span class="operator">&amp;</span>ownerData);
 
- view.setSource(QUrl.fromLocalFile("main.qml"));
- view.show();
+ view<span class="operator">.</span>setSource(<span class="type"><a href="qurl.html">QUrl</a></span><span class="operator">.</span>fromLocalFile(<span class="string">"main.qml"</span>));
+ view<span class="operator">.</span>show();
 </pre>
 <p>Then, in <tt>main.qml</tt>:</p>
-<pre class="highlightedCode brush: cpp">
- Text { text: owner.name + " " + owner.phone }
+<pre class="cpp">
+ Text { text: owner<span class="operator">.</span>name <span class="operator">+</span> <span class="string">" "</span> <span class="operator">+</span> owner<span class="operator">.</span>phone }
 </pre>
 <p>The binding is dynamic - whenever a key's value is updated,
 anything bound to that key will be updated as well.</p>
@@ -50,7 +50,7 @@ associated value.</p>
 
 
 <h3 class="fn"><a name="contains" />bool QDeclarativePropertyMap.contains (<i>self</i>, QString&#160;<i>key</i>)</h3><p>Returns true if the map contains <i>key</i>.</p>
-<p>See also <a href="qdeclarativepropertymap.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qdeclarativepropertymap.html#size">size</a>().</p>
 
 
 <h3 class="fn"><a name="count" />int QDeclarativePropertyMap.count (<i>self</i>)</h3><p>This is an overloaded function.</p>
@@ -63,7 +63,7 @@ associated value.</p>
 
 <h3 class="fn"><a name="isEmpty" />bool QDeclarativePropertyMap.isEmpty (<i>self</i>)</h3><p>Returns true if the map contains no keys; otherwise returns
 false.</p>
-<p>See also <a href="qdeclarativepropertymap.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qdeclarativepropertymap.html#size">size</a>().</p>
 
 
 <h3 class="fn"><a name="keys" />QStringList QDeclarativePropertyMap.keys (<i>self</i>)</h3><p>Returns the list of keys.</p>
@@ -72,7 +72,7 @@ though their associated values are invalid <a href="qtwebkit-bridge.html#qvarian
 
 
 <h3 class="fn"><a name="size" />int QDeclarativePropertyMap.size (<i>self</i>)</h3><p>Returns the number of keys in the map.</p>
-<p>See also <a href="qdeclarativepropertymap.html#isEmpty">isEmpty</a>() and <a href="qdeclarativepropertymap.html#count">count</a>().</p>
+<p><b>See also</b> <a href="qdeclarativepropertymap.html#isEmpty">isEmpty</a>() and <a href="qdeclarativepropertymap.html#count">count</a>().</p>
 
 
 <h3 class="fn"><a name="value" />QVariant QDeclarativePropertyMap.value (<i>self</i>, QString&#160;<i>key</i>)</h3><p>Returns the value associated with <i>key</i>.</p>
@@ -89,4 +89,4 @@ are made by calling <a href="qdeclarativepropertymap.html#insert">insert</a>() o
 emitted when a value is updated from QML.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

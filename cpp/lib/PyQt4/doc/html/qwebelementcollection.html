@@ -19,10 +19,10 @@ that match a specified CSS selector expression.</p>
 elements can be retrieved by index using <a href="qwebelementcollection.html#at">at</a>().</p>
 <p>It is also possible to iterate through all elements in the
 collection using Qt's foreach macro:</p>
-<pre class="highlightedCode brush: cpp">
- QWebElementCollection collection = document.findAll("p");
- foreach (QWebElement paraElement, collection) {
-     ...
+<pre class="cpp">
+ <span class="type">QWebElementCollection</span> collection <span class="operator">=</span> document<span class="operator">.</span>findAll(<span class="string">"p"</span>);
+ <a href="qtcore.html#foreach">foreach</a> (<span class="type"><a href="qwebelement.html">QWebElement</a></span> paraElement<span class="operator">,</span> collection) {
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre><hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QWebElementCollection" />QWebElementCollection.__init__ (<i>self</i>)</h3><p>Constructs an empty collection.</p>
 
@@ -38,7 +38,7 @@ selector <i>query</i>.</p>
 <h3 class="fn"><a name="append" />QWebElementCollection.append (<i>self</i>, <a href="qwebelementcollection.html">QWebElementCollection</a>&#160;<i>collection</i>)</h3><p>Extends the collection by appending all items of
 <i>other</i>.</p>
 <p>The resulting collection may include duplicate elements.</p>
-<p>See also <a href="qwebelementcollection.html#operator-2b-eq">operator+=</a>().</p>
+<p><b>See also</b> <a href="qwebelementcollection.html#operator-2b-eq">operator+=</a>().</p>
 
 
 <h3 class="fn"><a name="at" /><a href="qwebelement.html">QWebElement</a> QWebElementCollection.at (<i>self</i>, int&#160;<i>i</i>)</h3><p>Returns the element at index position <i>i</i> in the
@@ -49,14 +49,12 @@ collection.</p>
 
 
 <h3 class="fn"><a name="first" /><a href="qwebelement.html">QWebElement</a> QWebElementCollection.first (<i>self</i>)</h3><p>Returns the first element in the collection.</p>
-<p>See also <a href="qwebelementcollection.html#last">last</a>(),
-<a href="qwebelementcollection.html#operator-5b-5d">operator[]</a>(),
+<p><b>See also</b> <a href="qwebelementcollection.html#last">last</a>(), <a href="qwebelementcollection.html#operator-5b-5d">operator[]</a>(),
 <a href="qwebelementcollection.html#at">at</a>(), and <a href="qwebelementcollection.html#count">count</a>().</p>
 
 
 <h3 class="fn"><a name="last" /><a href="qwebelement.html">QWebElement</a> QWebElementCollection.last (<i>self</i>)</h3><p>Returns the last element in the collection.</p>
-<p>See also <a href="qwebelementcollection.html#first">first</a>(),
-<a href="qwebelementcollection.html#operator-5b-5d">operator[]</a>(),
+<p><b>See also</b> <a href="qwebelementcollection.html#first">first</a>(), <a href="qwebelementcollection.html#operator-5b-5d">operator[]</a>(),
 <a href="qwebelementcollection.html#at">at</a>(), and <a href="qwebelementcollection.html#count">count</a>().</p>
 
 
@@ -64,4 +62,4 @@ collection.</p>
 elements contained in this collection.</p>
 
 
-<h3 class="fn"><a name="__add__" /><a href="qwebelementcollection.html">QWebElementCollection</a> QWebElementCollection.__add__ (<i>self</i>, <a href="qwebelementcollection.html">QWebElementCollection</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__getitem__" /><a href="qwebelement.html">QWebElement</a> QWebElementCollection.__getitem__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__iadd__" /><a href="qwebelementcollection.html">QWebElementCollection</a> QWebElementCollection.__iadd__ (<i>self</i>, <a href="qwebelementcollection.html">QWebElementCollection</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__len__" /> QWebElementCollection.__len__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__add__" /><a href="qwebelementcollection.html">QWebElementCollection</a> QWebElementCollection.__add__ (<i>self</i>, <a href="qwebelementcollection.html">QWebElementCollection</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__getitem__" /><a href="qwebelement.html">QWebElement</a> QWebElementCollection.__getitem__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__iadd__" /><a href="qwebelementcollection.html">QWebElementCollection</a> QWebElementCollection.__iadd__ (<i>self</i>, <a href="qwebelementcollection.html">QWebElementCollection</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__len__" /> QWebElementCollection.__len__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

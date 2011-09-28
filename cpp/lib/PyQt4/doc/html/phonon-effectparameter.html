@@ -12,10 +12,10 @@ body { background: #ffffff; color: black; }
 <h3>Types</h3><ul><li><div class="fn" />enum <b><a href="phonon-effectparameter.html#Hint-enum">Hint</a></b> { ToggledHint, LogarithmicHint, IntegerHint }</li><li><div class="fn" />class <b><a href="phonon-effectparameter-hints.html">Hints</a></b></li></ul><h3>Methods</h3><ul><li><div class="fn" /><b><a href="phonon-effectparameter.html#EffectParameter">__init__</a></b> (<i>self</i>, int&#160;<i>parameterId</i>, QString&#160;<i>name</i>, Hints&#160;<i>hints</i>, QVariant&#160;<i>defaultValue</i>, QVariant&#160;<i>min</i>&#160;=&#160;QVariant(), QVariant&#160;<i>max</i>&#160;=&#160;QVariant(), list-of-QVariant&#160;<i>values</i>&#160;=&#160;[], QString&#160;<i>description</i>&#160;=&#160;QString())</li><li><div class="fn" /><b><a href="phonon-effectparameter.html#EffectParameter-2">__init__</a></b> (<i>self</i>, EffectParameter&#160;<i>rhs</i>)</li><li><div class="fn" />QVariant <b><a href="phonon-effectparameter.html#defaultValue">defaultValue</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="phonon-effectparameter.html#description">description</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="phonon-effectparameter.html#isLogarithmicControl">isLogarithmicControl</a></b> (<i>self</i>)</li><li><div class="fn" />QVariant <b><a href="phonon-effectparameter.html#maximumValue">maximumValue</a></b> (<i>self</i>)</li><li><div class="fn" />QVariant <b><a href="phonon-effectparameter.html#minimumValue">minimumValue</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="phonon-effectparameter.html#name">name</a></b> (<i>self</i>)</li><li><div class="fn" />list-of-QVariant <b><a href="phonon-effectparameter.html#possibleValues">possibleValues</a></b> (<i>self</i>)</li><li><div class="fn" />Type <b><a href="phonon-effectparameter.html#type">type</a></b> (<i>self</i>)</li></ul><h3>Special Methods</h3><ul><li><div class="fn" />int <b><a href="phonon-effectparameter.html#__hash__">__hash__</a></b> (<i>self</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The EffectParameter class describes one parameter of an
 effect.</p>
 <p>You fetch the parameters of an <a href="phonon-effect.html">Effect</a> with <a href="phonon-effect.html#parameters">Effect.parameters()</a>.</p>
-<pre class="highlightedCode brush: cpp">
-     QList&lt;Phonon.EffectParameter&gt; parameters = effect-&gt;parameters();
+<pre class="cpp">
+     <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span>Phonon<span class="operator">.</span>EffectParameter<span class="operator">&gt;</span> parameters <span class="operator">=</span> effect<span class="operator">-</span><span class="operator">&gt;</span>parameters();
 
-     foreach(Phonon.EffectParameter parameter, parameters) {
+     foreach(Phonon<span class="operator">.</span>EffectParameter parameter<span class="operator">,</span> parameters) {
          <span class="comment">// Do something with parameter</span>
      }
 </pre>
@@ -37,15 +37,15 @@ values. Values are returned as <a href="qvariant.html">QVariant</a>s. If the par
 requested value, an <a href="qvariant.html#Type-enum">QVariant.Invalid</a> invalid <a href="qvariant.html">QVariant</a> is returned from these functions.</p>
 <p>The <a href="phonon-effectwidget.html">EffectWidget</a> provides
 a widget with which one can control the parameters of an <a href="phonon-effect.html">Effect</a>.</p>
-<pre class="highlightedCode brush: cpp">
-     Phonon.EffectWidget *effectWidget = new Phonon.EffectWidget(effect);
+<pre class="cpp">
+     Phonon<span class="operator">.</span>EffectWidget <span class="operator">*</span>effectWidget <span class="operator">=</span> <span class="keyword">new</span> Phonon<span class="operator">.</span>EffectWidget(effect);
 </pre><hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Hint-enum" />EffectParameter.Hint</h3><p>Only for backend developers:</p>
 <p>Flags to set the return values of isToggleControl(), <a href="phonon-effectparameter.html#isLogarithmicControl">isLogarithmicControl</a>(),
 isIntegerControl(), isBoundedBelow() and isBoundedAbove(). The
 values of the flags correspond to the values used for LADSPA
 effects.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -53,7 +53,7 @@ effects.</p>
 <tr>
 <td class="topAlign">
 <tt>Phonon.EffectParameter.ToggledHint</tt></td>
-<td class=" topAlign"><tt>0x04</tt></td>
+<td class="topAlign"><tt>0x04</tt></td>
 <td class="topAlign">If this hint is set it means that the control
 has only two states: zero and non-zero (see
 isToggleControl()).</td>
@@ -61,7 +61,7 @@ isToggleControl()).</td>
 <tr>
 <td class="topAlign">
 <tt>Phonon.EffectParameter.LogarithmicHint</tt></td>
-<td class=" topAlign"><tt>0x10</tt></td>
+<td class="topAlign"><tt>0x10</tt></td>
 <td class="topAlign">LADSPA's SAMPLE_RATE hint needs to be
 translated by the backend to normal bounds, as the backend knows
 the sample rate - and the frontend doesn't (see <a href="phonon-effectparameter.html#isLogarithmicControl">isLogarithmicControl</a>()).</td>
@@ -69,7 +69,7 @@ the sample rate - and the frontend doesn't (see <a href="phonon-effectparameter.
 <tr>
 <td class="topAlign">
 <tt>Phonon.EffectParameter.IntegerHint</tt></td>
-<td class=" topAlign"><tt>0x20</tt></td>
+<td class="topAlign"><tt>0x20</tt></td>
 <td class="topAlign">See isIntegerControl().</td>
 </tr>
 </table>
@@ -121,4 +121,4 @@ values this returns the list (otherwise it returns an empty
 the possible values from possibleValues.</p>
 
 
-<h3 class="fn"><a name="__hash__" />int EffectParameter.__hash__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__hash__" />int EffectParameter.__hash__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

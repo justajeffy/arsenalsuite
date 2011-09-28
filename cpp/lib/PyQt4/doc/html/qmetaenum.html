@@ -25,68 +25,66 @@ this enumerator was declared in.</p>
 returns false.</p>
 <p>When used as flags, enumerators can be combined using the OR
 operator.</p>
-<p>See also <a href="qmetaenum.html#keysToValue">keysToValue</a>()
-and <a href="qmetaenum.html#valueToKeys">valueToKeys</a>().</p>
+<p><b>See also</b> <a href="qmetaenum.html#keysToValue">keysToValue</a>() and <a href="qmetaenum.html#valueToKeys">valueToKeys</a>().</p>
 
 
 <h3 class="fn"><a name="isValid" />bool QMetaEnum.isValid (<i>self</i>)</h3><p>Returns true if this enum is valid (has a name); otherwise
 returns false.</p>
-<p>See also <a href="qmetaenum.html#name">name</a>().</p>
+<p><b>See also</b> <a href="qmetaenum.html#name">name</a>().</p>
 
 
 <h3 class="fn"><a name="key" />str QMetaEnum.key (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the key with the given <i>index</i>, or 0 if no such key
 exists.</p>
-<p>See also <a href="qmetaenum.html#keyCount">keyCount</a>(),
-<a href="qmetaenum.html#value">value</a>(), and <a href="qmetaenum.html#valueToKey">valueToKey</a>().</p>
+<p><b>See also</b> <a href="qmetaenum.html#keyCount">keyCount</a>(), <a href="qmetaenum.html#value">value</a>(), and <a href="qmetaenum.html#valueToKey">valueToKey</a>().</p>
 
 
 <h3 class="fn"><a name="keyCount" />int QMetaEnum.keyCount (<i>self</i>)</h3><p>Returns the number of keys.</p>
-<p>See also <a href="qmetaenum.html#key">key</a>().</p>
+<p><b>See also</b> <a href="qmetaenum.html#key">key</a>().</p>
 
 
 <h3 class="fn"><a name="keysToValue" />int QMetaEnum.keysToValue (<i>self</i>, str&#160;<i>keys</i>)</h3><p>Returns the value derived from combining together the values of
 the <i>keys</i> using the OR operator, or -1 if <i>keys</i> is not
 defined. Note that the strings in <i>keys</i> must be
 '|'-separated.</p>
-<p>See also <a href="qmetaenum.html#isFlag">isFlag</a>(), <a href="qmetaenum.html#valueToKey">valueToKey</a>(), and <a href="qmetaenum.html#valueToKeys">valueToKeys</a>().</p>
+<p><b>See also</b> <a href="qmetaenum.html#isFlag">isFlag</a>(),
+<a href="qmetaenum.html#valueToKey">valueToKey</a>(), and <a href="qmetaenum.html#valueToKeys">valueToKeys</a>().</p>
 
 
 <h3 class="fn"><a name="keyToValue" />int QMetaEnum.keyToValue (<i>self</i>, str&#160;<i>key</i>)</h3><p>Returns the integer value of the given enumeration <i>key</i>,
 or -1 if <i>key</i> is not defined.</p>
 <p>For flag types, use <a href="qmetaenum.html#keysToValue">keysToValue</a>().</p>
-<p>See also <a href="qmetaenum.html#valueToKey">valueToKey</a>(),
-<a href="qmetaenum.html#isFlag">isFlag</a>(), and <a href="qmetaenum.html#keysToValue">keysToValue</a>().</p>
+<p><b>See also</b> <a href="qmetaenum.html#valueToKey">valueToKey</a>(), <a href="qmetaenum.html#isFlag">isFlag</a>(), and <a href="qmetaenum.html#keysToValue">keysToValue</a>().</p>
 
 
 <h3 class="fn"><a name="name" />str QMetaEnum.name (<i>self</i>)</h3><p>Returns the name of the enumerator (without the scope).</p>
 <p>For example, the <a href="qt.html#AlignmentFlag-enum">Qt.AlignmentFlag</a> enumeration has
 <tt>AlignmentFlag</tt> as the name and <a href="qt.html">Qt</a> as
 the scope.</p>
-<p>See also <a href="qmetaenum.html#isValid">isValid</a>() and
-<a href="qmetaenum.html#scope">scope</a>().</p>
+<p><b>See also</b> <a href="qmetaenum.html#isValid">isValid</a>()
+and <a href="qmetaenum.html#scope">scope</a>().</p>
 
 
 <h3 class="fn"><a name="scope" />str QMetaEnum.scope (<i>self</i>)</h3><p>Returns the scope this enumerator was declared in.</p>
 <p>For example, the <a href="qt.html#AlignmentFlag-enum">Qt.AlignmentFlag</a> enumeration has
 <tt>Qt</tt> as the scope and <tt>AlignmentFlag</tt> as the
 name.</p>
-<p>See also <a href="qmetaenum.html#name">name</a>().</p>
+<p><b>See also</b> <a href="qmetaenum.html#name">name</a>().</p>
 
 
 <h3 class="fn"><a name="value" />int QMetaEnum.value (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the value with the given <i>index</i>; or returns -1 if
 there is no such value.</p>
-<p>See also <a href="qmetaenum.html#keyCount">keyCount</a>(),
-<a href="qmetaenum.html#key">key</a>(), and <a href="qmetaenum.html#keyToValue">keyToValue</a>().</p>
+<p><b>See also</b> <a href="qmetaenum.html#keyCount">keyCount</a>(), <a href="qmetaenum.html#key">key</a>(), and <a href="qmetaenum.html#keyToValue">keyToValue</a>().</p>
 
 
 <h3 class="fn"><a name="valueToKey" />str QMetaEnum.valueToKey (<i>self</i>, int&#160;<i>value</i>)</h3><p>Returns the string that is used as the name of the given
 enumeration <i>value</i>, or 0 if <i>value</i> is not defined.</p>
 <p>For flag types, use <a href="qmetaenum.html#valueToKeys">valueToKeys</a>().</p>
-<p>See also <a href="qmetaenum.html#isFlag">isFlag</a>() and
+<p><b>See also</b> <a href="qmetaenum.html#isFlag">isFlag</a>() and
 <a href="qmetaenum.html#valueToKeys">valueToKeys</a>().</p>
 
 
 <h3 class="fn"><a name="valueToKeys" /><a href="qbytearray.html">QByteArray</a> QMetaEnum.valueToKeys (<i>self</i>, int&#160;<i>value</i>)</h3><p>Returns a byte array of '|'-separated keys that represents the
 given <i>value</i>.</p>
-<p>See also <a href="qmetaenum.html#isFlag">isFlag</a>(), <a href="qmetaenum.html#valueToKey">valueToKey</a>(), and <a href="qmetaenum.html#keysToValue">keysToValue</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qmetaenum.html#isFlag">isFlag</a>(),
+<a href="qmetaenum.html#valueToKey">valueToKey</a>(), and <a href="qmetaenum.html#keysToValue">keysToValue</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -20,12 +20,12 @@ a number of child windows, each of which is a widget.</p>
 constructor that takes a parent widget. Workspaces can be placed in
 any layout, but are typically given as the central widget in a
 <a href="qmainwindow.html">QMainWindow</a>:</p>
-<pre class="highlightedCode brush: cpp">
- MainWindow.MainWindow()
+<pre class="cpp">
+ MainWindow<span class="operator">.</span>MainWindow()
  {
-     workspace = new QWorkspace;
+     workspace <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QWorkspace</span>;
      setCentralWidget(workspace);
-     ...
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
 <p>Child windows (MDI windows) are standard Qt widgets that are
@@ -58,13 +58,9 @@ windows: <a href="qworkspace.html#cascade">cascade</a>() and
 <a href="qworkspace.html#tile">tile</a>(). Both are slots so you
 can easily connect menu entries to them.</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/mdi-cascade.png" /></p>
-</td>
-<td>
-<p><img src="images/mdi-tile.png" /></p>
-</td>
+<tr class="odd" valign="top">
+<td><img src="images/mdi-cascade.png" /></td>
+<td><img src="images/mdi-tile.png" /></td>
 </tr>
 </table>
 <p>If you want your users to be able to work with child windows
@@ -73,20 +69,20 @@ property to true.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="WindowOrder-enum" />QWorkspace.WindowOrder</h3><p>Specifies the order in which child windows are returned from
 <a href="qworkspace.html#windowList">windowList</a>().</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QWorkspace.CreationOrder</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The windows are returned in the order of their
 creation</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QWorkspace.StackingOrder</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The windows are returned in the order of their
 stacking</td>
 </tr>
@@ -96,17 +92,17 @@ stacking</td>
 
 <h3 class="fn"><a name="activateNextWindow" />QWorkspace.activateNextWindow (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void activateNextWindow()</tt>.</p><p>Gives the input focus to the next window in the list of child
 windows.</p>
-<p>See also <a href="qworkspace.html#activatePreviousWindow">activatePreviousWindow</a>().</p>
+<p><b>See also</b> <a href="qworkspace.html#activatePreviousWindow">activatePreviousWindow</a>().</p>
 
 
 <h3 class="fn"><a name="activatePreviousWindow" />QWorkspace.activatePreviousWindow (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void activatePreviousWindow()</tt>.</p><p>Gives the input focus to the previous window in the list of
 child windows.</p>
-<p>See also <a href="qworkspace.html#activateNextWindow">activateNextWindow</a>().</p>
+<p><b>See also</b> <a href="qworkspace.html#activateNextWindow">activateNextWindow</a>().</p>
 
 
 <h3 class="fn"><a name="activeWindow" /><a href="qwidget.html">QWidget</a> QWorkspace.activeWindow (<i>self</i>)</h3><p>Returns a pointer to the widget corresponding to the active
 child window, or 0 if no window is active.</p>
-<p>See also <a href="qworkspace.html#setActiveWindow">setActiveWindow</a>().</p>
+<p><b>See also</b> <a href="qworkspace.html#setActiveWindow">setActiveWindow</a>().</p>
 
 
 <h3 class="fn"><a name="addWindow" /><a href="qwidget.html">QWidget</a> QWorkspace.addWindow (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>w</i>, <a href="qt-windowflags.html">Qt.WindowFlags</a>&#160;<i>flags</i>&#160;=&#160;0)</h3><p>The <i>w</i> argument has it's ownership transferred to Qt.</p><p>Adds widget <i>w</i> as new sub window to the workspace. If
@@ -120,12 +116,13 @@ parent (or 0 to make it a stand-alone window).</p>
 
 <h3 class="fn"><a name="arrangeIcons" />QWorkspace.arrangeIcons (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void arrangeIcons()</tt>.</p><p>Arranges all iconified windows at the bottom of the
 workspace.</p>
-<p>See also <a href="qworkspace.html#cascade">cascade</a>() and
-<a href="qworkspace.html#tile">tile</a>().</p>
+<p><b>See also</b> <a href="qworkspace.html#cascade">cascade</a>()
+and <a href="qworkspace.html#tile">tile</a>().</p>
 
 
 <h3 class="fn"><a name="background" /><a href="qbrush.html">QBrush</a> QWorkspace.background (<i>self</i>)</h3><h3 class="fn"><a name="cascade" />QWorkspace.cascade (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void cascade()</tt>.</p><p>Arranges all the child windows in a cascade pattern.</p>
-<p>See also <a href="qworkspace.html#tile">tile</a>() and <a href="qworkspace.html#arrangeIcons">arrangeIcons</a>().</p>
+<p><b>See also</b> <a href="qworkspace.html#tile">tile</a>() and
+<a href="qworkspace.html#arrangeIcons">arrangeIcons</a>().</p>
 
 
 <h3 class="fn"><a name="changeEvent" />QWorkspace.changeEvent (<i>self</i>, <a href="qevent.html">QEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#changeEvent">QWidget.changeEvent</a>().</p>
@@ -135,13 +132,13 @@ workspace.</p>
 
 
 <h3 class="fn"><a name="closeActiveWindow" />QWorkspace.closeActiveWindow (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void closeActiveWindow()</tt>.</p><p>Closes the child window that is currently active.</p>
-<p>See also <a href="qworkspace.html#closeAllWindows">closeAllWindows</a>().</p>
+<p><b>See also</b> <a href="qworkspace.html#closeAllWindows">closeAllWindows</a>().</p>
 
 
 <h3 class="fn"><a name="closeAllWindows" />QWorkspace.closeAllWindows (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void closeAllWindows()</tt>.</p><p>Closes all child windows.</p>
 <p>If any child window fails to accept the close event, the
 remaining windows will remain open.</p>
-<p>See also <a href="qworkspace.html#closeActiveWindow">closeActiveWindow</a>().</p>
+<p><b>See also</b> <a href="qworkspace.html#closeActiveWindow">closeActiveWindow</a>().</p>
 
 
 <h3 class="fn"><a name="event" />bool QWorkspace.event (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -161,7 +158,7 @@ remaining windows will remain open.</p>
 
 <h3 class="fn"><a name="scrollBarsEnabled" />bool QWorkspace.scrollBarsEnabled (<i>self</i>)</h3><h3 class="fn"><a name="setActiveWindow" />QWorkspace.setActiveWindow (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>w</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setActiveWindow(QWidget *)</tt>.</p><p>Makes the child window that contains <i>w</i> the active child
 window.</p>
-<p>See also <a href="qworkspace.html#activeWindow">activeWindow</a>().</p>
+<p><b>See also</b> <a href="qworkspace.html#activeWindow">activeWindow</a>().</p>
 
 
 <h3 class="fn"><a name="setBackground" />QWorkspace.setBackground (<i>self</i>, <a href="qbrush.html">QBrush</a>&#160;<i>background</i>)</h3><h3 class="fn"><a name="setScrollBarsEnabled" />QWorkspace.setScrollBarsEnabled (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="showEvent" />QWorkspace.showEvent (<i>self</i>, <a href="qshowevent.html">QShowEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#showEvent">QWidget.showEvent</a>().</p>
@@ -171,8 +168,8 @@ window.</p>
 
 
 <h3 class="fn"><a name="tile" />QWorkspace.tile (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void tile()</tt>.</p><p>Arranges all child windows in a tile pattern.</p>
-<p>See also <a href="qworkspace.html#cascade">cascade</a>() and
-<a href="qworkspace.html#arrangeIcons">arrangeIcons</a>().</p>
+<p><b>See also</b> <a href="qworkspace.html#cascade">cascade</a>()
+and <a href="qworkspace.html#arrangeIcons">arrangeIcons</a>().</p>
 
 
 <h3 class="fn"><a name="wheelEvent" />QWorkspace.wheelEvent (<i>self</i>, <a href="qwheelevent.html">QWheelEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#wheelEvent">QWidget.wheelEvent</a>().</p>
@@ -187,7 +184,7 @@ last item in the list.</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="windowActivated" />void windowActivated (QWidget *)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the child window <i>w</i> becomes
 active. Note that <i>w</i> can be 0, and that more than one signal
 may be emitted for a single activation event.</p>
-<p>See also <a href="qworkspace.html#activeWindow">activeWindow</a>() and <a href="qworkspace.html#windowList">windowList</a>().</p>
+<p><b>See also</b> <a href="qworkspace.html#activeWindow">activeWindow</a>() and <a href="qworkspace.html#windowList">windowList</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

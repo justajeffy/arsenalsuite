@@ -1,7 +1,7 @@
 Introduction
 ============
 
-This is the reference guide for SIP 4.12.4-snapshot-bbe43a0bad78.  SIP is a tool for
+This is the reference guide for SIP 4.12.5-snapshot-de6a700f5faa.  SIP is a tool for
 automatically generating `Python <http://www.python.org>`__ bindings for C and
 C++ libraries.  SIP was originally developed in 1998 for
 `PyQt <http://www.riverbankcomputing.com/software/pyqt>`__ - the Python

@@ -36,11 +36,11 @@ text. To be as fast as possible, the default stylesheet uses a
 simple method to determine whether the text can be rendered as
 plain text. See <a href="qt.html#mightBeRichText">Qt.mightBeRichText</a>() for
 details.</p>
-<pre class="highlightedCode brush: cpp">
-     newAct = new QAction(tr("&amp;New"), this);
-     newAct-&gt;setShortcut(tr("Ctrl+N"));
-     newAct-&gt;setStatusTip(tr("Create a new file"));
-     newAct-&gt;setWhatsThis(tr("Click this option to create a new file."));
+<pre class="cpp">
+     newAct <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qaction.html">QAction</a></span>(tr(<span class="string">"&amp;New"</span>)<span class="operator">,</span> <span class="keyword">this</span>);
+     newAct<span class="operator">-</span><span class="operator">&gt;</span>setShortcut(tr(<span class="string">"Ctrl+N"</span>));
+     newAct<span class="operator">-</span><span class="operator">&gt;</span>setStatusTip(tr(<span class="string">"Create a new file"</span>));
+     newAct<span class="operator">-</span><span class="operator">&gt;</span>setWhatsThis(tr(<span class="string">"Click this option to create a new file."</span>));
 </pre>
 <p>An alternative way to enter "What's This?" mode is to call
 <a href="qwhatsthis.html#createAction">createAction</a>(), and add
@@ -81,29 +81,29 @@ the user (e.g. by them clicking or pressing Esc), or
 programmatically by calling <a href="qwhatsthis.html#leaveWhatsThisMode">leaveWhatsThisMode</a>().</p>
 <p>When entering "What's This?" mode, a <a href="qevent.html">QEvent</a> of type Qt.EnterWhatsThisMode is sent to
 all toplevel widgets.</p>
-<p>See also <a href="qwhatsthis.html#inWhatsThisMode">inWhatsThisMode</a>() and
+<p><b>See also</b> <a href="qwhatsthis.html#inWhatsThisMode">inWhatsThisMode</a>() and
 <a href="qwhatsthis.html#leaveWhatsThisMode">leaveWhatsThisMode</a>().</p>
 
 
 <h3 class="fn"><a name="hideText" />QWhatsThis.hideText ()</h3><p>If a "What's This?" window is showing, this destroys it.</p>
-<p>See also <a href="qwhatsthis.html#showText">showText</a>().</p>
+<p><b>See also</b> <a href="qwhatsthis.html#showText">showText</a>().</p>
 
 
 <h3 class="fn"><a name="inWhatsThisMode" />bool QWhatsThis.inWhatsThisMode ()</h3><p>Returns true if the user interface is in "What's This?" mode;
 otherwise returns false.</p>
-<p>See also <a href="qwhatsthis.html#enterWhatsThisMode">enterWhatsThisMode</a>().</p>
+<p><b>See also</b> <a href="qwhatsthis.html#enterWhatsThisMode">enterWhatsThisMode</a>().</p>
 
 
 <h3 class="fn"><a name="leaveWhatsThisMode" />QWhatsThis.leaveWhatsThisMode ()</h3><p>If the user interface is in "What's This?" mode, this function
 switches back to normal mode; otherwise it does nothing.</p>
 <p>When leaving "What's This?" mode, a <a href="qevent.html">QEvent</a> of type Qt.LeaveWhatsThisMode is sent to
 all toplevel widgets.</p>
-<p>See also <a href="qwhatsthis.html#enterWhatsThisMode">enterWhatsThisMode</a>() and
+<p><b>See also</b> <a href="qwhatsthis.html#enterWhatsThisMode">enterWhatsThisMode</a>() and
 <a href="qwhatsthis.html#inWhatsThisMode">inWhatsThisMode</a>().</p>
 
 
 <h3 class="fn"><a name="showText" />QWhatsThis.showText (<a href="qpoint.html">QPoint</a>&#160;<i>pos</i>, QString&#160;<i>text</i>, <a href="qwidget.html">QWidget</a>&#160;<i>widget</i>&#160;=&#160;None)</h3><p>Shows <i>text</i> as a "What's This?" window, at global position
 <i>pos</i>. The optional widget argument, <i>w</i>, is used to
 determine the appropriate screen on multi-head systems.</p>
-<p>See also <a href="qwhatsthis.html#hideText">hideText</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qwhatsthis.html#hideText">hideText</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

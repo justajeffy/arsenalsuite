@@ -50,10 +50,10 @@ performance on some databases. Once an active query is positioned
 on a valid record, data can be retrieved using <a href="qsqlquery.html#value">value</a>(). All data is transferred from
 the SQL backend using <a href="qtwebkit-bridge.html#qvariants">QVariants</a>.</p>
 <p>For example:</p>
-<pre class="highlightedCode brush: cpp">
-     QSqlQuery query("SELECT country FROM artist");
-     while (query.next()) {
-         QString country = query.value(0).toString();
+<pre class="cpp">
+     <span class="type">QSqlQuery</span> query(<span class="string">"SELECT country FROM artist"</span>);
+     <span class="keyword">while</span> (query<span class="operator">.</span>next()) {
+         <span class="type"><a href="qstring.html">QString</a></span> country <span class="operator">=</span> query<span class="operator">.</span>value(<span class="number">0</span>)<span class="operator">.</span>toString();
          doSomething(country);
      }
 </pre>
@@ -66,11 +66,11 @@ because the order of the fields returned is indeterminate.</p>
 field by name (unless you use prepared queries with names, as
 explained below). To convert a field name into an index, use
 <a href="qsqlquery.html#record">record</a>().<a href="qsqlrecord.html#indexOf">indexOf()</a>, for example:</p>
-<pre class="highlightedCode brush: cpp">
-     QSqlQuery query("SELECT * FROM artist");
-     int fieldNo = query.record().indexOf("country");
-     while (query.next()) {
-         QString country = query.value(fieldNo).toString();
+<pre class="cpp">
+     <span class="type">QSqlQuery</span> query(<span class="string">"SELECT * FROM artist"</span>);
+     <span class="type">int</span> fieldNo <span class="operator">=</span> query<span class="operator">.</span>record()<span class="operator">.</span>indexOf(<span class="string">"country"</span>);
+     <span class="keyword">while</span> (query<span class="operator">.</span>next()) {
+         <span class="type"><a href="qstring.html">QString</a></span> country <span class="operator">=</span> query<span class="operator">.</span>value(fieldNo)<span class="operator">.</span>toString();
          doSomething(country);
      }
 </pre>
@@ -97,58 +97,58 @@ variable (a map) using <a href="qsqlquery.html#boundValues">boundValues</a>().</
 different binding approaches, as well as one example of binding
 values to a stored procedure.</p>
 <p><b>Named binding using named placeholders:</b></p>
-<pre class="highlightedCode brush: cpp">
-     QSqlQuery query;
-     query.prepare("INSERT INTO person (id, forename, surname) "
-                   "VALUES (:id, :forename, :surname)");
-     query.bindValue(":id", 1001);
-     query.bindValue(":forename", "Bart");
-     query.bindValue(":surname", "Simpson");
-     query.exec();
+<pre class="cpp">
+     <span class="type">QSqlQuery</span> query;
+     query<span class="operator">.</span>prepare(<span class="string">"INSERT INTO person (id, forename, surname) "</span>
+                   <span class="string">"VALUES (:id, :forename, :surname)"</span>);
+     query<span class="operator">.</span>bindValue(<span class="string">":id"</span><span class="operator">,</span> <span class="number">1001</span>);
+     query<span class="operator">.</span>bindValue(<span class="string">":forename"</span><span class="operator">,</span> <span class="string">"Bart"</span>);
+     query<span class="operator">.</span>bindValue(<span class="string">":surname"</span><span class="operator">,</span> <span class="string">"Simpson"</span>);
+     query<span class="operator">.</span>exec();
 </pre>
 <p><b>Positional binding using named placeholders:</b></p>
-<pre class="highlightedCode brush: cpp">
-     QSqlQuery query;
-     query.prepare("INSERT INTO person (id, forename, surname) "
-                   "VALUES (:id, :forename, :surname)");
-     query.bindValue(0, 1001);
-     query.bindValue(1, "Bart");
-     query.bindValue(2, "Simpson");
-     query.exec();
+<pre class="cpp">
+     <span class="type">QSqlQuery</span> query;
+     query<span class="operator">.</span>prepare(<span class="string">"INSERT INTO person (id, forename, surname) "</span>
+                   <span class="string">"VALUES (:id, :forename, :surname)"</span>);
+     query<span class="operator">.</span>bindValue(<span class="number">0</span><span class="operator">,</span> <span class="number">1001</span>);
+     query<span class="operator">.</span>bindValue(<span class="number">1</span><span class="operator">,</span> <span class="string">"Bart"</span>);
+     query<span class="operator">.</span>bindValue(<span class="number">2</span><span class="operator">,</span> <span class="string">"Simpson"</span>);
+     query<span class="operator">.</span>exec();
 </pre>
 <p><b>Binding values using positional placeholders (version
 1):</b></p>
-<pre class="highlightedCode brush: cpp">
-     QSqlQuery query;
-     query.prepare("INSERT INTO person (id, forename, surname) "
-                   "VALUES (?, ?, ?)");
-     query.bindValue(0, 1001);
-     query.bindValue(1, "Bart");
-     query.bindValue(2, "Simpson");
-     query.exec();
+<pre class="cpp">
+     <span class="type">QSqlQuery</span> query;
+     query<span class="operator">.</span>prepare(<span class="string">"INSERT INTO person (id, forename, surname) "</span>
+                   <span class="string">"VALUES (?, ?, ?)"</span>);
+     query<span class="operator">.</span>bindValue(<span class="number">0</span><span class="operator">,</span> <span class="number">1001</span>);
+     query<span class="operator">.</span>bindValue(<span class="number">1</span><span class="operator">,</span> <span class="string">"Bart"</span>);
+     query<span class="operator">.</span>bindValue(<span class="number">2</span><span class="operator">,</span> <span class="string">"Simpson"</span>);
+     query<span class="operator">.</span>exec();
 </pre>
 <p><b>Binding values using positional placeholders (version
 2):</b></p>
-<pre class="highlightedCode brush: cpp">
-     QSqlQuery query;
-     query.prepare("INSERT INTO person (id, forename, surname) "
-                   "VALUES (?, ?, ?)");
-     query.addBindValue(1001);
-     query.addBindValue("Bart");
-     query.addBindValue("Simpson");
-     query.exec();
+<pre class="cpp">
+     <span class="type">QSqlQuery</span> query;
+     query<span class="operator">.</span>prepare(<span class="string">"INSERT INTO person (id, forename, surname) "</span>
+                   <span class="string">"VALUES (?, ?, ?)"</span>);
+     query<span class="operator">.</span>addBindValue(<span class="number">1001</span>);
+     query<span class="operator">.</span>addBindValue(<span class="string">"Bart"</span>);
+     query<span class="operator">.</span>addBindValue(<span class="string">"Simpson"</span>);
+     query<span class="operator">.</span>exec();
 </pre>
 <p><b>Binding values to a stored procedure:</b></p>
 <p>This code calls a stored procedure called <tt>AsciiToInt()</tt>,
 passing it a character through its in parameter, and taking its
 result in the out parameter.</p>
-<pre class="highlightedCode brush: cpp">
-     QSqlQuery query;
-     query.prepare("CALL AsciiToInt(?, ?)");
-     query.bindValue(0, "A");
-     query.bindValue(1, 0, QSql.Out);
-     query.exec();
-     int i = query.boundValue(1).toInt(); <span class="comment">// i is 65</span>
+<pre class="cpp">
+     <span class="type">QSqlQuery</span> query;
+     query<span class="operator">.</span>prepare(<span class="string">"CALL AsciiToInt(?, ?)"</span>);
+     query<span class="operator">.</span>bindValue(<span class="number">0</span><span class="operator">,</span> <span class="string">"A"</span>);
+     query<span class="operator">.</span>bindValue(<span class="number">1</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="type"><a href="qsql.html">QSql</a></span><span class="operator">.</span>Out);
+     query<span class="operator">.</span>exec();
+     <span class="type">int</span> i <span class="operator">=</span> query<span class="operator">.</span>boundValue(<span class="number">1</span>)<span class="operator">.</span>toInt(); <span class="comment">// i is 65</span>
 </pre>
 <p>Note that unbound parameters will retain their values.</p>
 <p>Stored procedures that uses the return statement to return
@@ -160,21 +160,21 @@ connection before a QSqlQuery is created. Also, the connection must
 remain open while the query exists; otherwise, the behavior of
 QSqlQuery is undefined.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="BatchExecutionMode-enum" />QSqlQuery.BatchExecutionMode</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSqlQuery.ValuesAsRows</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">- Updates multiple rows. Treats every entry in
 a <a href="qvariant.html#QVariantList-typedef">QVariantList</a> as
 a value for updating the next row.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSqlQuery.ValuesAsColumns</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">- Updates a single row. Treats every entry in
 a <a href="qvariant.html#QVariantList-typedef">QVariantList</a> as
 a single value of an array type.</td>
@@ -190,13 +190,13 @@ the SQL <i>query</i> and the database <i>db</i>. If <i>db</i> is
 not specified, or is invalid, the application's default database is
 used. If <i>query</i> is not an empty string, it will be
 executed.</p>
-<p>See also <a href="qsqldatabase.html">QSqlDatabase</a>.</p>
+<p><b>See also</b> <a href="qsqldatabase.html">QSqlDatabase</a>.</p>
 
 
 <h3 class="fn"><a name="QSqlQuery-3" />QSqlQuery.__init__ (<i>self</i>, <a href="qsqldatabase.html">QSqlDatabase</a>&#160;<i>db</i>)</h3><p>Constructs a <a href="qsqlquery.html">QSqlQuery</a> object using
 the database <i>db</i>. If <i>db</i> is invalid, the application's
 default database will be used.</p>
-<p>See also <a href="qsqldatabase.html">QSqlDatabase</a>.</p>
+<p><b>See also</b> <a href="qsqldatabase.html">QSqlDatabase</a>.</p>
 
 
 <h3 class="fn"><a name="QSqlQuery-4" />QSqlQuery.__init__ (<i>self</i>, <a href="qsqlquery.html">QSqlQuery</a>&#160;<i>other</i>)</h3><p>Constructs a copy of <i>other</i>.</p>
@@ -210,16 +210,14 @@ will be overwritten with data from the database after the <a href="qsqlquery.htm
 <p>To bind a NULL value, use a null <a href="qvariant.html">QVariant</a>; for example, use
 <tt>QVariant(QVariant.String)</tt> if you are binding a
 string.</p>
-<p>See also <a href="qsqlquery.html#bindValue">bindValue</a>(),
-<a href="qsqlquery.html#prepare">prepare</a>(), <a href="qsqlquery.html#exec">exec_</a>(), <a href="qsqlquery.html#boundValue">boundValue</a>(), and <a href="qsqlquery.html#boundValues">boundValues</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#bindValue">bindValue</a>(), <a href="qsqlquery.html#prepare">prepare</a>(), <a href="qsqlquery.html#exec">exec_</a>(), <a href="qsqlquery.html#boundValue">boundValue</a>(), and <a href="qsqlquery.html#boundValues">boundValues</a>().</p>
 
 
 <h3 class="fn"><a name="at" />int QSqlQuery.at (<i>self</i>)</h3><p>Returns the current internal position of the query. The first
 record is at position zero. If the position is invalid, the
 function returns <a href="qsql.html#Location-enum">QSql.BeforeFirstRow</a> or <a href="qsql.html#Location-enum">QSql.AfterLastRow</a>, which are special
 negative values.</p>
-<p>See also <a href="qsqlquery.html#previous">previous</a>(),
-<a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="bindValue" />QSqlQuery.bindValue (<i>self</i>, QString&#160;<i>placeholder</i>, QVariant&#160;<i>val</i>, <a href="qsql-paramtype.html">QSql.ParamType</a>&#160;<i>type</i>&#160;=&#160;QSql.In)</h3><p>Set the placeholder <i>placeholder</i> to be bound to value
@@ -233,12 +231,12 @@ space must be pre-allocated to store the result into.</p>
 string.</p>
 <p>Values cannot be bound to multiple locations in the query,
 eg:</p>
-<pre class="highlightedCode brush: cpp">
- INSERT INTO testtable (id, name, samename) VALUES (:id, :name, :name)
+<pre class="cpp">
+ INSERT INTO testtable (id<span class="operator">,</span> name<span class="operator">,</span> samename) VALUES (:id<span class="operator">,</span> :name<span class="operator">,</span> :name)
 </pre>
 <p>Binding to name will bind to the first :name, but not the
 second.</p>
-<p>See also <a href="qsqlquery.html#addBindValue">addBindValue</a>(), <a href="qsqlquery.html#prepare">prepare</a>(), <a href="qsqlquery.html#exec">exec_</a>(), <a href="qsqlquery.html#boundValue">boundValue</a>(), and <a href="qsqlquery.html#boundValues">boundValues</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#addBindValue">addBindValue</a>(), <a href="qsqlquery.html#prepare">prepare</a>(), <a href="qsqlquery.html#exec">exec_</a>(), <a href="qsqlquery.html#boundValue">boundValue</a>(), and <a href="qsqlquery.html#boundValues">boundValues</a>().</p>
 
 
 <h3 class="fn"><a name="bindValue-2" />QSqlQuery.bindValue (<i>self</i>, int&#160;<i>pos</i>, QVariant&#160;<i>val</i>, <a href="qsql-paramtype.html">QSql.ParamType</a>&#160;<i>type</i>&#160;=&#160;QSql.In)</h3><p>Set the placeholder in position <i>pos</i> to be bound to value
@@ -248,8 +246,7 @@ will be overwritten with data from the database after the <a href="qsqlquery.htm
 
 
 <h3 class="fn"><a name="boundValue" />QVariant QSqlQuery.boundValue (<i>self</i>, QString&#160;<i>placeholder</i>)</h3><p>Returns the value for the <i>placeholder</i>.</p>
-<p>See also <a href="qsqlquery.html#boundValues">boundValues</a>(),
-<a href="qsqlquery.html#bindValue">bindValue</a>(), and <a href="qsqlquery.html#addBindValue">addBindValue</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#boundValues">boundValues</a>(), <a href="qsqlquery.html#bindValue">bindValue</a>(), and <a href="qsqlquery.html#addBindValue">addBindValue</a>().</p>
 
 
 <h3 class="fn"><a name="boundValue-2" />QVariant QSqlQuery.boundValue (<i>self</i>, int&#160;<i>pos</i>)</h3><p>Returns the value for the placeholder at position
@@ -259,22 +256,21 @@ will be overwritten with data from the database after the <a href="qsqlquery.htm
 <h3 class="fn"><a name="boundValues" />dict-of-QString-QVariant QSqlQuery.boundValues (<i>self</i>)</h3><p>Returns a map of the bound values.</p>
 <p>With named binding, the bound values can be examined in the
 following ways:</p>
-<pre class="highlightedCode brush: cpp">
-     QMapIterator&lt;QString, QVariant&gt; i(query.boundValues());
-     while (i.hasNext()) {
-         i.next();
-         cout &lt;&lt; i.key().toAscii().data() &lt;&lt; ": "
-              &lt;&lt; i.value().toString().toAscii().data() &lt;&lt; endl;
+<pre class="cpp">
+     <span class="type"><a href="qmapiterator.html">QMapIterator</a></span><span class="operator">&lt;</span><span class="type"><a href="qstring.html">QString</a></span><span class="operator">,</span> <span class="type"><a href="qvariant.html">QVariant</a></span><span class="operator">&gt;</span> i(query<span class="operator">.</span>boundValues());
+     <span class="keyword">while</span> (i<span class="operator">.</span>hasNext()) {
+         i<span class="operator">.</span>next();
+         cout <span class="operator">&lt;</span><span class="operator">&lt;</span> i<span class="operator">.</span>key()<span class="operator">.</span>toAscii()<span class="operator">.</span>data() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">": "</span>
+              <span class="operator">&lt;</span><span class="operator">&lt;</span> i<span class="operator">.</span>value()<span class="operator">.</span>toString()<span class="operator">.</span>toAscii()<span class="operator">.</span>data() <span class="operator">&lt;</span><span class="operator">&lt;</span> endl;
      }
 </pre>
 <p>With positional binding, the code becomes:</p>
-<pre class="highlightedCode brush: cpp">
-     QList&lt;QVariant&gt; list = query.boundValues().values();
-     for (int i = 0; i &lt; list.size(); ++i)
-         cout &lt;&lt; i &lt;&lt; ": " &lt;&lt; list.at(i).toString().toAscii().data() &lt;&lt; endl;
+<pre class="cpp">
+     <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qvariant.html">QVariant</a></span><span class="operator">&gt;</span> list <span class="operator">=</span> query<span class="operator">.</span>boundValues()<span class="operator">.</span>values();
+     <span class="keyword">for</span> (<span class="type">int</span> i <span class="operator">=</span> <span class="number">0</span>; i <span class="operator">&lt;</span> list<span class="operator">.</span>size(); <span class="operator">+</span><span class="operator">+</span>i)
+         cout <span class="operator">&lt;</span><span class="operator">&lt;</span> i <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">": "</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> list<span class="operator">.</span>at(i)<span class="operator">.</span>toString()<span class="operator">.</span>toAscii()<span class="operator">.</span>data() <span class="operator">&lt;</span><span class="operator">&lt;</span> endl;
 </pre>
-<p>See also <a href="qsqlquery.html#boundValue">boundValue</a>(),
-<a href="qsqlquery.html#bindValue">bindValue</a>(), and <a href="qsqlquery.html#addBindValue">addBindValue</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#boundValue">boundValue</a>(), <a href="qsqlquery.html#bindValue">bindValue</a>(), and <a href="qsqlquery.html#addBindValue">addBindValue</a>().</p>
 
 
 <h3 class="fn"><a name="clear" />QSqlQuery.clear (<i>self</i>)</h3><p>Clears the result set and releases any resources held by the
@@ -296,19 +292,18 @@ before data values can be retrieved (for example, using <a href="qsqlquery.html#
 <p>Note that the last error for this query is reset when exec() is
 called.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QSqlQuery query;
-     query.exec("INSERT INTO employee (id, name, salary) "
-                "VALUES (1001, 'Thad Beaumont', 65000)");
+<pre class="cpp">
+     <span class="type"><a href="qsqlquery.html">QSqlQuery</a></span> query;
+     query<span class="operator">.</span>exec(<span class="string">"INSERT INTO employee (id, name, salary) "</span>
+                <span class="string">"VALUES (1001, 'Thad Beaumont', 65000)"</span>);
 </pre>
-<p>See also <a href="qsqlquery.html#isActive">isActive</a>(),
-<a href="qsqlquery.html#isValid">isValid</a>(), <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), and <a href="qsqlquery.html#seek">seek</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#isActive">isActive</a>(), <a href="qsqlquery.html#isValid">isValid</a>(), <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), and <a href="qsqlquery.html#seek">seek</a>().</p>
 
 
 <h3 class="fn"><a name="exec-2" />bool QSqlQuery.exec_ (<i>self</i>)</h3><p>Executes a previously prepared SQL query. Returns true if the
 query executed successfully; otherwise returns false.</p>
 <p>Note that the last error for this query is reset when <a href="qsqlquery.html#exec">exec_</a>() is called.</p>
-<p>See also <a href="qsqlquery.html#prepare">prepare</a>(),
+<p><b>See also</b> <a href="qsqlquery.html#prepare">prepare</a>(),
 <a href="qsqlquery.html#bindValue">bindValue</a>(), <a href="qsqlquery.html#addBindValue">addBindValue</a>(), <a href="qsqlquery.html#boundValue">boundValue</a>(), and <a href="qsqlquery.html#boundValues">boundValues</a>().</p>
 
 
@@ -319,28 +314,28 @@ conventional <a href="qsqlquery.html#exec">exec_</a>() calls.</p>
 <p>Returns true if the query is executed successfully; otherwise
 returns false.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QSqlQuery q;
- q.prepare("insert into myTable values (?, ?)");
+<pre class="cpp">
+ <span class="type"><a href="qsqlquery.html">QSqlQuery</a></span> q;
+ q<span class="operator">.</span><a href="qsqlquery.html#prepare">prepare</a>(<span class="string">"insert into myTable values (?, ?)"</span>);
 
- QVariantList ints;
- ints &lt;&lt; 1 &lt;&lt; 2 &lt;&lt; 3 &lt;&lt; 4;
- q.addBindValue(ints);
+ <span class="type"><a href="qvariant.html#QVariantList-typedef">QVariantList</a></span> ints;
+ ints <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="number">1</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="number">2</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="number">3</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="number">4</span>;
+ q<span class="operator">.</span><a href="qsqlquery.html#addBindValue">addBindValue</a>(ints);
 
- QVariantList names;
- names &lt;&lt; "Harald" &lt;&lt; "Boris" &lt;&lt; "Trond" &lt;&lt; QVariant(QVariant.String);
- q.addBindValue(names);
+ <span class="type"><a href="qvariant.html#QVariantList-typedef">QVariantList</a></span> names;
+ names <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Harald"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Boris"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Trond"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="type"><a href="qvariant.html">QVariant</a></span>(<span class="type"><a href="qvariant.html">QVariant</a></span><span class="operator">.</span>String);
+ q<span class="operator">.</span><a href="qsqlquery.html#addBindValue">addBindValue</a>(names);
 
- if (!q.execBatch())
-     qDebug() &lt;&lt; q.lastError();
+ <span class="keyword">if</span> (<span class="operator">!</span>q<span class="operator">.</span>execBatch())
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> q<span class="operator">.</span><a href="qsqlquery.html#lastError">lastError</a>();
 </pre>
 <p>The example above inserts four new rows into
 <tt>myTable</tt>:</p>
-<pre class="highlightedCode brush: cpp">
- 1  Harald
- 2  Boris
- 3  Trond
- 4  NULL
+<pre class="cpp">
+ <span class="number">1</span>  Harald
+ <span class="number">2</span>  Boris
+ <span class="number">3</span>  Trond
+ <span class="number">4</span>  NULL
 </pre>
 <p>To bind NULL values, a null <a href="qvariant.html">QVariant</a>
 of the relevant type has to be added to the bound <a href="qvariant.html#QVariantList-typedef">QVariantList</a>; for example,
@@ -363,7 +358,7 @@ a table-type consisting of only one column of a basic type, for
 example <tt>TYPE myType IS TABLE OF VARCHAR(64) INDEX BY
 BINARY_INTEGER;</tt></p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qsqlquery.html#prepare">prepare</a>(),
+<p><b>See also</b> <a href="qsqlquery.html#prepare">prepare</a>(),
 <a href="qsqlquery.html#bindValue">bindValue</a>(), and <a href="qsqlquery.html#addBindValue">addBindValue</a>().</p>
 
 
@@ -374,7 +369,7 @@ the preparation of this query is emulated. The placeholders in the
 original query are replaced with their bound values to form a new
 query. This function returns the modified query. It is mostly
 useful for debugging purposes.</p>
-<p>See also <a href="qsqlquery.html#lastQuery">lastQuery</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#lastQuery">lastQuery</a>().</p>
 
 
 <h3 class="fn"><a name="finish" />QSqlQuery.finish (<i>self</i>)</h3><p>Instruct the database driver that no more data will be fetched
@@ -385,7 +380,7 @@ query at a later time.</p>
 <p>Sets the query to inactive. Bound values retain their
 values.</p>
 <p>This function was introduced in Qt 4.3.2.</p>
-<p>See also <a href="qsqlquery.html#prepare">prepare</a>(),
+<p><b>See also</b> <a href="qsqlquery.html#prepare">prepare</a>(),
 <a href="qsqlquery.html#exec">exec_</a>(), and <a href="qsqlquery.html#isActive">isActive</a>().</p>
 
 
@@ -396,7 +391,8 @@ and <a href="qsqlquery.html#isSelect">isSelect</a>() must return
 true before calling this function or it will do nothing and return
 false. Returns true if successful. If unsuccessful the query
 position is set to an invalid position and false is returned.</p>
-<p>See also <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#at">at</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#next">next</a>(),
+<a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#at">at</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="isActive" />bool QSqlQuery.isActive (<i>self</i>)</h3><p>Returns true if the query is <i>active</i>. An active <a href="qsqlquery.html">QSqlQuery</a> is one that has been <a href="qsqlquery.html#exec">exec()'d</a> successfully but not yet
@@ -410,20 +406,19 @@ can cause a <a href="qsqldatabase.html#commit">commit()</a> or a
 before committing or rolling back, you should make your active
 <tt>SELECT</tt> statement query inactive using one of the ways
 listed above.</p>
-<p>See also <a href="qsqlquery.html#isSelect">isSelect</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#isSelect">isSelect</a>().</p>
 
 
 <h3 class="fn"><a name="isForwardOnly" />bool QSqlQuery.isForwardOnly (<i>self</i>)</h3><p>Returns true if you can only scroll forward through a result
 set; otherwise returns false.</p>
-<p>See also <a href="qsqlquery.html#setForwardOnly">setForwardOnly</a>() and <a href="qsqlquery.html#next">next</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#setForwardOnly">setForwardOnly</a>() and <a href="qsqlquery.html#next">next</a>().</p>
 
 
 <h3 class="fn"><a name="isNull" />bool QSqlQuery.isNull (<i>self</i>, int&#160;<i>field</i>)</h3><p>Returns true if the query is <a href="qsqlquery.html#isActive">active</a> and positioned on a valid
 record and the <i>field</i> is NULL; otherwise returns false. Note
 that for some drivers, isNull() will not return accurate
 information until after an attempt is made to retrieve data.</p>
-<p>See also <a href="qsqlquery.html#isActive">isActive</a>(),
-<a href="qsqlquery.html#isValid">isValid</a>(), and <a href="qsqlquery.html#value">value</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#isActive">isActive</a>(), <a href="qsqlquery.html#isValid">isValid</a>(), and <a href="qsqlquery.html#value">value</a>().</p>
 
 
 <h3 class="fn"><a name="isSelect" />bool QSqlQuery.isSelect (<i>self</i>)</h3><p>Returns true if the current query is a <tt>SELECT</tt>
@@ -441,12 +436,14 @@ and <a href="qsqlquery.html#isSelect">isSelect</a>() must return
 true before calling this function or it will do nothing and return
 false. Returns true if successful. If unsuccessful the query
 position is set to an invalid position and false is returned.</p>
-<p>See also <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#at">at</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#next">next</a>(),
+<a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#at">at</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="lastError" /><a href="qsqlerror.html">QSqlError</a> QSqlQuery.lastError (<i>self</i>)</h3><p>Returns error information about the last error (if any) that
 occurred with this query.</p>
-<p>See also <a href="qsqlerror.html">QSqlError</a> and <a href="qsqldatabase.html#lastError">QSqlDatabase.lastError</a>().</p>
+<p><b>See also</b> <a href="qsqlerror.html">QSqlError</a> and
+<a href="qsqldatabase.html#lastError">QSqlDatabase.lastError</a>().</p>
 
 
 <h3 class="fn"><a name="lastInsertId" />QVariant QSqlQuery.lastInsertId (<i>self</i>)</h3><p>Returns the object ID of the most recent inserted row if the
@@ -460,12 +457,12 @@ returned.</p>
 must contain OIDs, which may not have been created by default.
 Check the <tt>default_with_oids</tt> configuration variable to be
 sure.</p>
-<p>See also <a href="qsqldriver.html#hasFeature">QSqlDriver.hasFeature</a>().</p>
+<p><b>See also</b> <a href="qsqldriver.html#hasFeature">QSqlDriver.hasFeature</a>().</p>
 
 
 <h3 class="fn"><a name="lastQuery" />QString QSqlQuery.lastQuery (<i>self</i>)</h3><p>Returns the text of the current query being used, or an empty
 string if there is no current query text.</p>
-<p>See also <a href="qsqlquery.html#executedQuery">executedQuery</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#executedQuery">executedQuery</a>().</p>
 
 
 <h3 class="fn"><a name="next" />bool QSqlQuery.next (<i>self</i>)</h3><p>Retrieves the next record in the result, if available, and
@@ -487,8 +484,7 @@ made to retrieve the next record.</li>
 <p>If the record could not be retrieved, the result is positioned
 after the last record and false is returned. If the record is
 successfully retrieved, true is returned.</p>
-<p>See also <a href="qsqlquery.html#previous">previous</a>(),
-<a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#at">at</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#at">at</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="nextResult" />bool QSqlQuery.nextResult (<i>self</i>)</h3><p>Discards the current result set and navigates to the next if
@@ -513,11 +509,11 @@ the execution until the result set is actually accessed, and some
 databases may have restrictions on which statements are allowed to
 be used in a SQL batch.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qsqldriver.html#hasFeature">QSqlDriver.hasFeature</a>(), <a href="qsqlquery.html#setForwardOnly">setForwardOnly</a>(), <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#isSelect">isSelect</a>(), <a href="qsqlquery.html#numRowsAffected">numRowsAffected</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#lastError">lastError</a>().</p>
+<p><b>See also</b> <a href="qsqldriver.html#hasFeature">QSqlDriver.hasFeature</a>(), <a href="qsqlquery.html#setForwardOnly">setForwardOnly</a>(), <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#isSelect">isSelect</a>(), <a href="qsqlquery.html#numRowsAffected">numRowsAffected</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#lastError">lastError</a>().</p>
 
 
 <h3 class="fn"><a name="numericalPrecisionPolicy" /><a href="qsql.html#NumericalPrecisionPolicy-enum">QSql.NumericalPrecisionPolicy</a> QSqlQuery.numericalPrecisionPolicy (<i>self</i>)</h3><p>Returns the current precision policy.</p>
-<p>See also <a href="qsql.html#NumericalPrecisionPolicy-enum">QSql.NumericalPrecisionPolicy</a>
+<p><b>See also</b> <a href="qsql.html#NumericalPrecisionPolicy-enum">QSql.NumericalPrecisionPolicy</a>
 and <a href="qsqlquery.html#setNumericalPrecisionPolicy">setNumericalPrecisionPolicy</a>().</p>
 
 
@@ -525,7 +521,8 @@ and <a href="qsqlquery.html#setNumericalPrecisionPolicy">setNumericalPrecisionPo
 statement, or -1 if it cannot be determined. Note that for
 <tt>SELECT</tt> statements, the value is undefined; use <a href="qsqlquery.html#size">size</a>() instead. If the query is not
 <a href="qsqlquery.html#isActive">active</a>, -1 is returned.</p>
-<p>See also <a href="qsqlquery.html#size">size</a>() and <a href="qsqldriver.html#hasFeature">QSqlDriver.hasFeature</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#size">size</a>() and
+<a href="qsqldriver.html#hasFeature">QSqlDriver.hasFeature</a>().</p>
 
 
 <h3 class="fn"><a name="prepare" />bool QSqlQuery.prepare (<i>self</i>, QString&#160;<i>query</i>)</h3><p>Prepares the SQL query <i>query</i> for execution. Returns true
@@ -540,16 +537,17 @@ query until it is executed the first time. In this case, preparing
 a syntactically wrong query succeeds, but every consecutive
 <a href="qsqlquery.html#exec">exec_</a>() will fail.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QSqlQuery query;
-     query.prepare("INSERT INTO person (id, forename, surname) "
-                   "VALUES (:id, :forename, :surname)");
-     query.bindValue(":id", 1001);
-     query.bindValue(":forename", "Bart");
-     query.bindValue(":surname", "Simpson");
-     query.exec();
+<pre class="cpp">
+     <span class="type"><a href="qsqlquery.html">QSqlQuery</a></span> query;
+     query<span class="operator">.</span>prepare(<span class="string">"INSERT INTO person (id, forename, surname) "</span>
+                   <span class="string">"VALUES (:id, :forename, :surname)"</span>);
+     query<span class="operator">.</span>bindValue(<span class="string">":id"</span><span class="operator">,</span> <span class="number">1001</span>);
+     query<span class="operator">.</span>bindValue(<span class="string">":forename"</span><span class="operator">,</span> <span class="string">"Bart"</span>);
+     query<span class="operator">.</span>bindValue(<span class="string">":surname"</span><span class="operator">,</span> <span class="string">"Simpson"</span>);
+     query<span class="operator">.</span>exec();
 </pre>
-<p>See also <a href="qsqlquery.html#exec">exec_</a>(), <a href="qsqlquery.html#bindValue">bindValue</a>(), and <a href="qsqlquery.html#addBindValue">addBindValue</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#exec">exec_</a>(),
+<a href="qsqlquery.html#bindValue">bindValue</a>(), and <a href="qsqlquery.html#addBindValue">addBindValue</a>().</p>
 
 
 <h3 class="fn"><a name="previous" />bool QSqlQuery.previous (<i>self</i>)</h3><p>Retrieves the previous record in the result, if available, and
@@ -570,7 +568,8 @@ retrieve the previous record.</li>
 <p>If the record could not be retrieved, the result is positioned
 before the first record and false is returned. If the record is
 successfully retrieved, true is returned.</p>
-<p>See also <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#at">at</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#next">next</a>(),
+<a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#at">at</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="record" /><a href="qsqlrecord.html">QSqlRecord</a> QSqlQuery.record (<i>self</i>)</h3><p>Returns a <a href="qsqlrecord.html">QSqlRecord</a> containing
@@ -583,17 +582,17 @@ index-based lookup is faster.</p>
 <p>In the following example, a <tt>SELECT * FROM</tt> query is
 executed. Since the order of the columns is not defined, <a href="qsqlrecord.html#indexOf">QSqlRecord.indexOf</a>() is used to
 obtain the index of a column.</p>
-<pre class="highlightedCode brush: cpp">
- QSqlQuery q("select * from employees");
- QSqlRecord rec = q.record();
+<pre class="cpp">
+ <span class="type"><a href="qsqlquery.html">QSqlQuery</a></span> q(<span class="string">"select * from employees"</span>);
+ <span class="type"><a href="qsqlrecord.html">QSqlRecord</a></span> rec <span class="operator">=</span> q<span class="operator">.</span>record();
 
- qDebug() &lt;&lt; "Number of columns: " &lt;&lt; rec.count();
+ <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Number of columns: "</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> rec<span class="operator">.</span>count();
 
- int nameCol = rec.indexOf("name"); <span class="comment">// index of the field "name"</span>
- while (q.next())
-     qDebug() &lt;&lt; q.value(nameCol).toString(); <span class="comment">// output all names</span>
+ <span class="type">int</span> nameCol <span class="operator">=</span> rec<span class="operator">.</span>indexOf(<span class="string">"name"</span>); <span class="comment">// index of the field "name"</span>
+ <span class="keyword">while</span> (q<span class="operator">.</span>next())
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> q<span class="operator">.</span><a href="qsqlquery.html#value">value</a>(nameCol)<span class="operator">.</span>toString(); <span class="comment">// output all names</span>
 </pre>
-<p>See also <a href="qsqlquery.html#value">value</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#value">value</a>().</p>
 
 
 <h3 class="fn"><a name="result" /><a href="qsqlresult.html">QSqlResult</a> QSqlQuery.result (<i>self</i>)</h3><p>Returns the result associated with the query.</p>
@@ -635,7 +634,8 @@ result is positioned after the last record if <i>index</i> &gt;= 0,
 is returned. If the record is successfully retrieved, true is
 returned.</li>
 </ul>
-<p>See also <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#at">at</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#next">next</a>(),
+<a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#at">at</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="setForwardOnly" />QSqlQuery.setForwardOnly (<i>self</i>, bool&#160;<i>forward</i>)</h3><p>Sets forward only mode to <i>forward</i>. If <i>forward</i> is
@@ -655,7 +655,7 @@ return the correct status of the result set.</p>
 <p><b>Note:</b> Calling setForwardOnly after execution of the query
 will result in unexpected results at best, and crashes at
 worst.</p>
-<p>See also <a href="qsqlquery.html#isForwardOnly">isForwardOnly</a>(), <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#seek">seek</a>(), and <a href="qsqlresult.html#setForwardOnly">QSqlResult.setForwardOnly</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#isForwardOnly">isForwardOnly</a>(), <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#seek">seek</a>(), and <a href="qsqlresult.html#setForwardOnly">QSqlResult.setForwardOnly</a>().</p>
 
 
 <h3 class="fn"><a name="setNumericalPrecisionPolicy" />QSqlQuery.setNumericalPrecisionPolicy (<i>self</i>, <a href="qsql.html#NumericalPrecisionPolicy-enum">QSql.NumericalPrecisionPolicy</a>&#160;<i>precisionPolicy</i>)</h3><p>Instruct the database driver to return numerical values with a
@@ -671,7 +671,7 @@ to find out whether a driver supports this feature.</p>
 <p>Note: Setting the precision policy doesn't affect the currently
 active query. Call <a href="qsqlquery.html#exec">exec_</a>(<a href="qstring.html">QString</a>) or <a href="qsqlquery.html#prepare">prepare</a>() in order to activate the
 policy.</p>
-<p>See also <a href="qsql.html#NumericalPrecisionPolicy-enum">QSql.NumericalPrecisionPolicy</a>
+<p><b>See also</b> <a href="qsql.html#NumericalPrecisionPolicy-enum">QSql.NumericalPrecisionPolicy</a>
 and <a href="qsqlquery.html#numericalPrecisionPolicy">numericalPrecisionPolicy</a>().</p>
 
 
@@ -683,8 +683,7 @@ will return -1. If the query is not active (<a href="qsqlquery.html#isActive">is
 returned.</p>
 <p>To determine the number of rows affected by a
 non-<tt>SELECT</tt> statement, use <a href="qsqlquery.html#numRowsAffected">numRowsAffected</a>().</p>
-<p>See also <a href="qsqlquery.html#isActive">isActive</a>(),
-<a href="qsqlquery.html#numRowsAffected">numRowsAffected</a>(), and
+<p><b>See also</b> <a href="qsqlquery.html#isActive">isActive</a>(), <a href="qsqlquery.html#numRowsAffected">numRowsAffected</a>(), and
 <a href="qsqldriver.html#hasFeature">QSqlDriver.hasFeature</a>().</p>
 
 
@@ -692,8 +691,8 @@ non-<tt>SELECT</tt> statement, use <a href="qsqlquery.html#numRowsAffected">numR
 record.</p>
 <p>The fields are numbered from left to right using the text of the
 <tt>SELECT</tt> statement, e.g. in</p>
-<pre class="highlightedCode brush: cpp">
- SELECT forename, surname FROM people;
+<pre class="cpp">
+ SELECT forename<span class="operator">,</span> surname FROM people;
 </pre>
 <p>field 0 is <tt>forename</tt> and field 1 is <tt>surname</tt>.
 Using <tt>SELECT *</tt> is not recommended because the order of the
@@ -701,8 +700,7 @@ fields in the query is undefined.</p>
 <p>An invalid <a href="qvariant.html">QVariant</a> is returned if
 field <i>index</i> does not exist, if the query is inactive, or if
 the query is positioned on an invalid record.</p>
-<p>See also <a href="qsqlquery.html#previous">previous</a>(),
-<a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#previous">previous</a>(), <a href="qsqlquery.html#next">next</a>(), <a href="qsqlquery.html#first">first</a>(), <a href="qsqlquery.html#last">last</a>(), <a href="qsqlquery.html#seek">seek</a>(), <a href="qsqlquery.html#isActive">isActive</a>(), and <a href="qsqlquery.html#isValid">isValid</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

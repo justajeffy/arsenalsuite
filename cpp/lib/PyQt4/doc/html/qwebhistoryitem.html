@@ -18,60 +18,36 @@ location, and when it was last visited.</p>
 history item, and the functions used to access them.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Function</th>
 <th>Description</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><a href="qwebhistoryitem.html#title">title</a>()</p>
-</td>
-<td>
-<p>The page title.</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qwebhistoryitem.html#title">title</a>()</td>
+<td>The page title.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qwebhistoryitem.html#url">url</a>()</p>
-</td>
-<td>
-<p>The location of the page.</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qwebhistoryitem.html#url">url</a>()</td>
+<td>The location of the page.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qwebhistoryitem.html#originalUrl">originalUrl</a>()</p>
-</td>
-<td>
-<p>The URL used to access the page.</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qwebhistoryitem.html#originalUrl">originalUrl</a>()</td>
+<td>The URL used to access the page.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qwebhistoryitem.html#lastVisited">lastVisited</a>()</p>
-</td>
-<td>
-<p>The date and time of the user's last visit to the page.</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qwebhistoryitem.html#lastVisited">lastVisited</a>()</td>
+<td>The date and time of the user's last visit to the page.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qwebhistoryitem.html#icon">icon</a>()</p>
-</td>
-<td>
-<p>The icon associated with the page that was provided by the
-server.</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qwebhistoryitem.html#icon">icon</a>()</td>
+<td>The icon associated with the page that was provided by the
+server.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qwebhistoryitem.html#userData">userData</a>()</p>
-</td>
-<td>
-<p>The user specific data that was stored with the history
-item.</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qwebhistoryitem.html#userData">userData</a>()</td>
+<td>The user specific data that was stored with the history
+item.</td>
 </tr>
 </table>
 <p><b>Note:</b> QWebHistoryItem objects are value based, but
@@ -84,8 +60,7 @@ or <i>other</i> will modify both instances.</p>
 
 
 <h3 class="fn"><a name="icon" /><a href="qicon.html">QIcon</a> QWebHistoryItem.icon (<i>self</i>)</h3><p>Returns the icon associated with the history item.</p>
-<p>See also <a href="qwebhistoryitem.html#title">title</a>(),
-<a href="qwebhistoryitem.html#url">url</a>(), and <a href="qwebhistoryitem.html#lastVisited">lastVisited</a>().</p>
+<p><b>See also</b> <a href="qwebhistoryitem.html#title">title</a>(), <a href="qwebhistoryitem.html#url">url</a>(), and <a href="qwebhistoryitem.html#lastVisited">lastVisited</a>().</p>
 
 
 <h3 class="fn"><a name="isValid" />bool QWebHistoryItem.isValid (<i>self</i>)</h3><p>Returns whether this is a valid history item.</p>
@@ -94,35 +69,34 @@ or <i>other</i> will modify both instances.</p>
 
 <h3 class="fn"><a name="lastVisited" /><a href="qdatetime.html">QDateTime</a> QWebHistoryItem.lastVisited (<i>self</i>)</h3><p>Returns the date and time that the page associated with the item
 was last visited.</p>
-<p>See also <a href="qwebhistoryitem.html#title">title</a>(),
-<a href="qwebhistoryitem.html#icon">icon</a>(), and <a href="qwebhistoryitem.html#url">url</a>().</p>
+<p><b>See also</b> <a href="qwebhistoryitem.html#title">title</a>(), <a href="qwebhistoryitem.html#icon">icon</a>(), and <a href="qwebhistoryitem.html#url">url</a>().</p>
 
 
 <h3 class="fn"><a name="originalUrl" /><a href="qurl.html">QUrl</a> QWebHistoryItem.originalUrl (<i>self</i>)</h3><p>Returns the original URL associated with the history item.</p>
-<p>See also <a href="qwebhistoryitem.html#url">url</a>().</p>
+<p><b>See also</b> <a href="qwebhistoryitem.html#url">url</a>().</p>
 
 
 <h3 class="fn"><a name="setUserData" />QWebHistoryItem.setUserData (<i>self</i>, QVariant&#160;<i>userData</i>)</h3><p>Stores user specific data <i>userData</i> with the history
 item.</p>
 <p><b>Note:</b> All copies of this item will be modified.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qwebhistoryitem.html#userData">userData</a>().</p>
+<p><b>See also</b> <a href="qwebhistoryitem.html#userData">userData</a>().</p>
 
 
 <h3 class="fn"><a name="title" />QString QWebHistoryItem.title (<i>self</i>)</h3><p>Returns the title of the page associated with the history
 item.</p>
-<p>See also <a href="qwebhistoryitem.html#icon">icon</a>(),
+<p><b>See also</b> <a href="qwebhistoryitem.html#icon">icon</a>(),
 <a href="qwebhistoryitem.html#url">url</a>(), and <a href="qwebhistoryitem.html#lastVisited">lastVisited</a>().</p>
 
 
 <h3 class="fn"><a name="url" /><a href="qurl.html">QUrl</a> QWebHistoryItem.url (<i>self</i>)</h3><p>Returns the URL associated with the history item.</p>
-<p>See also <a href="qwebhistoryitem.html#originalUrl">originalUrl</a>(), <a href="qwebhistoryitem.html#title">title</a>(), and <a href="qwebhistoryitem.html#lastVisited">lastVisited</a>().</p>
+<p><b>See also</b> <a href="qwebhistoryitem.html#originalUrl">originalUrl</a>(), <a href="qwebhistoryitem.html#title">title</a>(), and <a href="qwebhistoryitem.html#lastVisited">lastVisited</a>().</p>
 
 
 <h3 class="fn"><a name="userData" />QVariant QWebHistoryItem.userData (<i>self</i>)</h3><p>Returns the user specific data that was stored with the history
 item.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qwebhistoryitem.html#setUserData">setUserData</a>().</p>
+<p><b>See also</b> <a href="qwebhistoryitem.html#setUserData">setUserData</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

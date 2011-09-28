@@ -20,13 +20,13 @@ developers.</p>
 <p>The <a href="qwebpage.html">QWebPage</a> to be inspected must be
 specified using the <a href="qwebinspector.html#setPage">setPage</a>() method.</p>
 <p>A typical use of QWebInspector follows:</p>
-<pre class="highlightedCode brush: cpp">
+<pre class="cpp">
      <span class="comment">// ...</span>
-     QWebPage *page = new QWebPage;
+     <span class="type"><a href="qwebpage.html">QWebPage</a></span> <span class="operator">*</span>page <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qwebpage.html">QWebPage</a></span>;
      <span class="comment">// ...</span>
 
-     QWebInspector *inspector = new QWebInspector;
-     inspector-&gt;setPage(page);
+     <span class="type">QWebInspector</span> <span class="operator">*</span>inspector <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QWebInspector</span>;
+     inspector<span class="operator">-</span><span class="operator">&gt;</span>setPage(page);
 </pre>
 <p>A QWebInspector can be made visible either programmatically
 using <a href="qwidget.html#visible-prop">setVisible</a>(), or by
@@ -73,7 +73,7 @@ parent.</p>
 <h3 class="fn"><a name="page" /><a href="qwebpage.html">QWebPage</a> QWebInspector.page (<i>self</i>)</h3><p>Returns the inspected <a href="qwebpage.html">QWebPage</a>. If
 no web page is currently associated, a null pointer is
 returned.</p>
-<p>See also <a href="qwebinspector.html#setPage">setPage</a>().</p>
+<p><b>See also</b> <a href="qwebinspector.html#setPage">setPage</a>().</p>
 
 
 <h3 class="fn"><a name="resizeEvent" />QWebInspector.resizeEvent (<i>self</i>, <a href="qresizeevent.html">QResizeEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#resizeEvent">QWidget.resizeEvent</a>().</p>
@@ -89,11 +89,11 @@ current association, if any.</li>
 <li>If <i>page</i> is already associated to another <a href="qwebinspector.html">QWebInspector</a>, the association will be
 replaced and the previous <a href="qwebinspector.html">QWebInspector</a> will become unbound</li>
 </ul>
-<p>See also <a href="qwebinspector.html#page">page</a>().</p>
+<p><b>See also</b> <a href="qwebinspector.html#page">page</a>().</p>
 
 
 <h3 class="fn"><a name="showEvent" />QWebInspector.showEvent (<i>self</i>, <a href="qshowevent.html">QShowEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#showEvent">QWidget.showEvent</a>().</p>
 
 
 <h3 class="fn"><a name="sizeHint" /><a href="qsize.html">QSize</a> QWebInspector.sizeHint (<i>self</i>)</h3><p>Reimplemented from <a href="qwidget.html#sizeHint-prop">QWidget.sizeHint</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

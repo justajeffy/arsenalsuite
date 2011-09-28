@@ -66,27 +66,27 @@ deleting text) are regarded as a single undo/redo operation.</li>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="FindFlag-enum" />QTextDocument.FindFlag</h3><p>This enum describes the options available to <a href="qtextdocument.html">QTextDocument</a>'s find function. The options
 can be OR-ed together from the following list:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextDocument.FindBackward</tt></td>
-<td class=" topAlign"><tt>0x00001</tt></td>
+<td class="topAlign"><tt>0x00001</tt></td>
 <td class="topAlign">Search backwards instead of forwards.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QTextDocument.FindCaseSensitively</tt></td>
-<td class=" topAlign"><tt>0x00002</tt></td>
+<td class="topAlign"><tt>0x00002</tt></td>
 <td class="topAlign">By default find works case insensitive.
 Specifying this option changes the behaviour to a case sensitive
 find operation.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextDocument.FindWholeWords</tt></td>
-<td class=" topAlign"><tt>0x00004</tt></td>
+<td class="topAlign"><tt>0x00004</tt></td>
 <td class="topAlign">Makes find match only complete words.</td>
 </tr>
 </table>
@@ -97,43 +97,43 @@ combination of FindFlag values.</p>
 <h3 class="fn"><a name="MetaInformation-enum" />QTextDocument.MetaInformation</h3><p>This enum describes the different types of meta information that
 can be added to a document.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextDocument.DocumentTitle</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The title of the document.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextDocument.DocumentUrl</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The url of the document. The <a href="qtextdocument.html#loadResource">loadResource</a>() function uses
 this url as the base when loading relative resources.</td>
 </tr>
 </table>
-<p>See also <a href="qtextdocument.html#metaInformation">metaInformation</a>() and
+<p><b>See also</b> <a href="qtextdocument.html#metaInformation">metaInformation</a>() and
 <a href="qtextdocument.html#setMetaInformation">setMetaInformation</a>().</p>
 
 
 <h3 class="fn"><a name="ResourceType-enum" />QTextDocument.ResourceType</h3><p>This enum describes the types of resources that can be loaded by
 <a href="qtextdocument.html">QTextDocument</a>'s <a href="qtextdocument.html#loadResource">loadResource</a>() function.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextDocument.HtmlResource</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The resource contains HTML.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextDocument.ImageResource</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The resource contains image data. Currently
 supported data types are <a href="qvariant.html#Type-enum">QVariant.Pixmap</a> and <a href="qvariant.html#Type-enum">QVariant.Image</a>. If the corresponding
 variant is of type <a href="qvariant.html#Type-enum">QVariant.ByteArray</a> then Qt attempts
@@ -144,38 +144,38 @@ types first, for example using QIcon.pixmap.</td>
 <tr>
 <td class="topAlign">
 <tt>QTextDocument.StyleSheetResource</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The resource contains CSS.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextDocument.UserResource</tt></td>
-<td class=" topAlign"><tt>100</tt></td>
+<td class="topAlign"><tt>100</tt></td>
 <td class="topAlign">The first available value for user defined
 resource types.</td>
 </tr>
 </table>
-<p>See also <a href="qtextdocument.html#loadResource">loadResource</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#loadResource">loadResource</a>().</p>
 
 
 <h3 class="fn"><a name="Stacks-enum" />QTextDocument.Stacks</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextDocument.UndoStack</tt></td>
-<td class=" topAlign"><tt>0x01</tt></td>
+<td class="topAlign"><tt>0x01</tt></td>
 <td class="topAlign">The undo stack.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextDocument.RedoStack</tt></td>
-<td class=" topAlign"><tt>0x02</tt></td>
+<td class="topAlign"><tt>0x02</tt></td>
 <td class="topAlign">The redo stack.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextDocument.UndoAndRedoStacks</tt></td>
-<td class=" topAlign"><tt>UndoStack | RedoStack</tt></td>
+<td class="topAlign"><tt>UndoStack | RedoStack</tt></td>
 <td class="topAlign">Both the undo and redo stacks.</td>
 </tr>
 </table>
@@ -193,26 +193,26 @@ the given <i>parent</i>.</p>
 value from <a href="qtextdocument.html#ResourceType-enum">QTextDocument.ResourceType</a>.</p>
 <p>For example, you can add an image as a resource in order to
 reference it from within the document:</p>
-<pre class="highlightedCode brush: cpp">
-     document-&gt;addResource(QTextDocument.ImageResource,
-         QUrl("mydata://image.png"), QVariant(image));
+<pre class="cpp">
+     document<span class="operator">-</span><span class="operator">&gt;</span>addResource(<span class="type"><a href="qtextdocument.html">QTextDocument</a></span><span class="operator">.</span>ImageResource<span class="operator">,</span>
+         <span class="type"><a href="qurl.html">QUrl</a></span>(<span class="string">"mydata://image.png"</span>)<span class="operator">,</span> <span class="type"><a href="qvariant.html">QVariant</a></span>(image));
 </pre>
 <p>The image can be inserted into the document using the <a href="qtextcursor.html">QTextCursor</a> API:</p>
-<pre class="highlightedCode brush: cpp">
-     QTextImageFormat imageFormat;
-     imageFormat.setName("mydata://image.png");
-     cursor.insertImage(imageFormat);
+<pre class="cpp">
+     <span class="type"><a href="qtextimageformat.html">QTextImageFormat</a></span> imageFormat;
+     imageFormat<span class="operator">.</span>setName(<span class="string">"mydata://image.png"</span>);
+     cursor<span class="operator">.</span>insertImage(imageFormat);
 </pre>
 <p>Alternatively, you can insert images using the HTML <tt>img</tt>
 tag:</p>
-<pre class="highlightedCode brush: cpp">
-     editor-&gt;append("&lt;img src=\"mydata://image.png\" /&gt;");
+<pre class="cpp">
+     editor<span class="operator">-</span><span class="operator">&gt;</span>append(<span class="string">"&lt;img src=\"mydata://image.png\" /&gt;"</span>);
 </pre>
 
 
 <h3 class="fn"><a name="adjustSize" />QTextDocument.adjustSize (<i>self</i>)</h3><p>Adjusts the document to a reasonable size.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qtextdocument.html#idealWidth">idealWidth</a>(), <a href="qtextdocument.html#textWidth-prop">textWidth</a>, and <a href="qtextdocument.html#size-prop">size</a>.</p>
+<p><b>See also</b> <a href="qtextdocument.html#idealWidth">idealWidth</a>(), <a href="qtextdocument.html#textWidth-prop">textWidth</a>, and <a href="qtextdocument.html#size-prop">size</a>.</p>
 
 
 <h3 class="fn"><a name="allFormats" />list-of-QTextFormat QTextDocument.allFormats (<i>self</i>)</h3><p>Returns a vector of text formats for all the formats used in the
@@ -221,27 +221,27 @@ document.</p>
 
 <h3 class="fn"><a name="availableRedoSteps" />int QTextDocument.availableRedoSteps (<i>self</i>)</h3><p>Returns the number of available redo steps.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qtextdocument.html#isRedoAvailable">isRedoAvailable</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#isRedoAvailable">isRedoAvailable</a>().</p>
 
 
 <h3 class="fn"><a name="availableUndoSteps" />int QTextDocument.availableUndoSteps (<i>self</i>)</h3><p>Returns the number of available undo steps.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qtextdocument.html#isUndoAvailable">isUndoAvailable</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#isUndoAvailable">isUndoAvailable</a>().</p>
 
 
 <h3 class="fn"><a name="begin" /><a href="qtextblock.html">QTextBlock</a> QTextDocument.begin (<i>self</i>)</h3><p>Returns the document's first text block.</p>
-<p>See also <a href="qtextdocument.html#firstBlock">firstBlock</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#firstBlock">firstBlock</a>().</p>
 
 
 <h3 class="fn"><a name="blockCount" />int QTextDocument.blockCount (<i>self</i>)</h3><h3 class="fn"><a name="characterAt" />QChar QTextDocument.characterAt (<i>self</i>, int&#160;<i>pos</i>)</h3><p>Returns the character at position <i>pos</i>, or a null
 character if the position is out of range.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qtextdocument.html#characterCount">characterCount</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#characterCount">characterCount</a>().</p>
 
 
 <h3 class="fn"><a name="characterCount" />int QTextDocument.characterCount (<i>self</i>)</h3><p>Returns the number of characters of this document.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qtextdocument.html#blockCount-prop">blockCount</a>() and <a href="qtextdocument.html#characterAt">characterAt</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#blockCount-prop">blockCount</a>() and <a href="qtextdocument.html#characterAt">characterAt</a>().</p>
 
 
 <h3 class="fn"><a name="clear" />QTextDocument.clear (<i>self</i>)</h3><p>Clears the document.</p>
@@ -253,7 +253,7 @@ stack, or both (the default). If commands are cleared, the
 appropriate signals are emitted, <a href="qtextdocument.html#undoAvailable">QTextDocument.undoAvailable</a>()
 or <a href="qtextdocument.html#redoAvailable">QTextDocument.redoAvailable</a>().</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qtextdocument.html#undoAvailable">QTextDocument.undoAvailable</a>()
+<p><b>See also</b> <a href="qtextdocument.html#undoAvailable">QTextDocument.undoAvailable</a>()
 and <a href="qtextdocument.html#redoAvailable">QTextDocument.redoAvailable</a>().</p>
 
 
@@ -270,7 +270,7 @@ document.</p>
 
 
 <h3 class="fn"><a name="defaultFont" /><a href="qfont.html">QFont</a> QTextDocument.defaultFont (<i>self</i>)</h3><h3 class="fn"><a name="defaultStyleSheet" />QString QTextDocument.defaultStyleSheet (<i>self</i>)</h3><h3 class="fn"><a name="defaultTextOption" /><a href="qtextoption.html">QTextOption</a> QTextDocument.defaultTextOption (<i>self</i>)</h3><h3 class="fn"><a name="documentLayout" /><a href="qabstracttextdocumentlayout.html">QAbstractTextDocumentLayout</a> QTextDocument.documentLayout (<i>self</i>)</h3><p>Returns the document layout for this document.</p>
-<p>See also <a href="qtextdocument.html#setDocumentLayout">setDocumentLayout</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#setDocumentLayout">setDocumentLayout</a>().</p>
 
 
 <h3 class="fn"><a name="documentMargin" />float QTextDocument.documentMargin (<i>self</i>)</h3><h3 class="fn"><a name="drawContents" />QTextDocument.drawContents (<i>self</i>, <a href="qpainter.html">QPainter</a>&#160;<i>p</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rect</i>&#160;=&#160;QRectF())</h3><p>Draws the content of the document with painter <i>p</i>, clipped
@@ -281,14 +281,14 @@ the document is painted unclipped.</p>
 
 <h3 class="fn"><a name="end" /><a href="qtextblock.html">QTextBlock</a> QTextDocument.end (<i>self</i>)</h3><p>This function returns a block to test for the end of the
 document while iterating over it.</p>
-<pre class="highlightedCode brush: cpp">
-     for (QTextBlock it = doc-&gt;begin(); it != doc-&gt;end(); it = it.next())
-         cout &lt;&lt; it.text().toStdString() &lt;&lt; endl;
+<pre class="cpp">
+     <span class="keyword">for</span> (<span class="type"><a href="qtextblock.html">QTextBlock</a></span> it <span class="operator">=</span> doc<span class="operator">-</span><span class="operator">&gt;</span>begin(); it <span class="operator">!</span><span class="operator">=</span> doc<span class="operator">-</span><span class="operator">&gt;</span>end(); it <span class="operator">=</span> it<span class="operator">.</span>next())
+         cout <span class="operator">&lt;</span><span class="operator">&lt;</span> it<span class="operator">.</span>text()<span class="operator">.</span>toStdString() <span class="operator">&lt;</span><span class="operator">&lt;</span> endl;
 </pre>
 <p>The block returned is invalid and represents the block after the
 last block in the document. You can use <a href="qtextdocument.html#lastBlock">lastBlock</a>() to retrieve the last
 valid block of the document.</p>
-<p>See also <a href="qtextdocument.html#lastBlock">lastBlock</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#lastBlock">lastBlock</a>().</p>
 
 
 <h3 class="fn"><a name="find" /><a href="qtextcursor.html">QTextCursor</a> QTextDocument.find (<i>self</i>, QString&#160;<i>subString</i>, int&#160;<i>position</i>&#160;=&#160;0, <a href="qtextdocument-findflags.html">FindFlags</a>&#160;<i>options</i>&#160;=&#160;0)</h3><p>Finds the next occurrence of the string, <i>subString</i>, in
@@ -356,13 +356,13 @@ character.</p>
 <h3 class="fn"><a name="findBlockByLineNumber" /><a href="qtextblock.html">QTextBlock</a> QTextDocument.findBlockByLineNumber (<i>self</i>, int&#160;<i>blockNumber</i>)</h3><p>Returns the text block that contains the specified
 <i>lineNumber</i>.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qtextblock.html#firstLineNumber">QTextBlock.firstLineNumber</a>().</p>
+<p><b>See also</b> <a href="qtextblock.html#firstLineNumber">QTextBlock.firstLineNumber</a>().</p>
 
 
 <h3 class="fn"><a name="findBlockByNumber" /><a href="qtextblock.html">QTextBlock</a> QTextDocument.findBlockByNumber (<i>self</i>, int&#160;<i>blockNumber</i>)</h3><p>Returns the text block with the specified
 <i>blockNumber</i>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qtextblock.html#blockNumber">QTextBlock.blockNumber</a>().</p>
+<p><b>See also</b> <a href="qtextblock.html#blockNumber">QTextBlock.blockNumber</a>().</p>
 
 
 <h3 class="fn"><a name="firstBlock" /><a href="qtextblock.html">QTextBlock</a> QTextDocument.firstBlock (<i>self</i>)</h3><p>Returns the document's first text block.</p>
@@ -373,7 +373,7 @@ character.</p>
 the actually used width of the document without optional alignments
 taken into account. It is always &lt;= <a href="qtextdocument.html#size-prop">size</a>().width().</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qtextdocument.html#adjustSize">adjustSize</a>() and <a href="qtextdocument.html#textWidth-prop">textWidth</a>.</p>
+<p><b>See also</b> <a href="qtextdocument.html#adjustSize">adjustSize</a>() and <a href="qtextdocument.html#textWidth-prop">textWidth</a>.</p>
 
 
 <h3 class="fn"><a name="indentWidth" />float QTextDocument.indentWidth (<i>self</i>)</h3><h3 class="fn"><a name="isEmpty" />bool QTextDocument.isEmpty (<i>self</i>)</h3><p>Returns true if the document is empty; otherwise returns
@@ -381,12 +381,12 @@ false.</p>
 
 
 <h3 class="fn"><a name="isModified" />bool QTextDocument.isModified (<i>self</i>)</h3><h3 class="fn"><a name="isRedoAvailable" />bool QTextDocument.isRedoAvailable (<i>self</i>)</h3><p>Returns true if redo is available; otherwise returns false.</p>
-<p>See also <a href="qtextdocument.html#isUndoAvailable">isUndoAvailable</a>() and
+<p><b>See also</b> <a href="qtextdocument.html#isUndoAvailable">isUndoAvailable</a>() and
 <a href="qtextdocument.html#availableRedoSteps">availableRedoSteps</a>().</p>
 
 
 <h3 class="fn"><a name="isUndoAvailable" />bool QTextDocument.isUndoAvailable (<i>self</i>)</h3><p>Returns true if undo is available; otherwise returns false.</p>
-<p>See also <a href="qtextdocument.html#isRedoAvailable">isRedoAvailable</a>() and
+<p><b>See also</b> <a href="qtextdocument.html#isRedoAvailable">isRedoAvailable</a>() and
 <a href="qtextdocument.html#availableUndoSteps">availableUndoSteps</a>().</p>
 
 
@@ -398,7 +398,7 @@ false.</p>
 supports this). Otherwise, this is identical to the number of
 blocks.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qtextdocument.html#blockCount-prop">blockCount</a>() and <a href="qtextdocument.html#characterCount">characterCount</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#blockCount-prop">blockCount</a>() and <a href="qtextdocument.html#characterCount">characterCount</a>().</p>
 
 
 <h3 class="fn"><a name="loadResource" />QVariant QTextDocument.loadResource (<i>self</i>, int&#160;<i>type</i>, <a href="qurl.html">QUrl</a>&#160;<i>name</i>)</h3><p>Loads data of the specified <i>type</i> from the resource with
@@ -421,7 +421,7 @@ be laid out again.</p>
 
 <h3 class="fn"><a name="maximumBlockCount" />int QTextDocument.maximumBlockCount (<i>self</i>)</h3><h3 class="fn"><a name="metaInformation" />QString QTextDocument.metaInformation (<i>self</i>, <a href="qtextdocument.html#MetaInformation-enum">MetaInformation</a>&#160;<i>info</i>)</h3><p>Returns meta information about the document of the type
 specified by <i>info</i>.</p>
-<p>See also <a href="qtextdocument.html#setMetaInformation">setMetaInformation</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#setMetaInformation">setMetaInformation</a>().</p>
 
 
 <h3 class="fn"><a name="object" /><a href="qtextobject.html">QTextObject</a> QTextDocument.object (<i>self</i>, int&#160;<i>objectIndex</i>)</h3><p>Returns the text object associated with the given
@@ -455,7 +455,7 @@ have a <a href="qtextedit.html">QTextEdit</a> associated with your
 <a href="qtextedit.html">QTextEdit</a>'s print() function because
 <a href="qtextedit.html">QTextEdit</a> has access to the user's
 selection.</p>
-<p>See also <a href="qtextedit.html#print">QTextEdit.print</a>().</p>
+<p><b>See also</b> <a href="qtextedit.html#print">QTextEdit.print</a>().</p>
 
 
 <h3 class="fn"><a name="print" />QTextDocument.print_ (<i>self</i>, <a href="qprinter.html">QPrinter</a>&#160;<i>printer</i>)</h3><p>Prints the document to the given <i>printer</i>. The <a href="qprinter.html">QPrinter</a> must be set up before being used with
@@ -479,7 +479,7 @@ have a <a href="qtextedit.html">QTextEdit</a> associated with your
 <a href="qtextedit.html">QTextEdit</a>'s print() function because
 <a href="qtextedit.html">QTextEdit</a> has access to the user's
 selection.</p>
-<p>See also <a href="qtextedit.html#print">QTextEdit.print</a>().</p>
+<p><b>See also</b> <a href="qtextedit.html#print">QTextEdit.print</a>().</p>
 
 
 <h3 class="fn"><a name="redo" />QTextDocument.redo (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void redo()</tt>.</p><p>Redoes the last editing operation on the document if <a href="qtextdocument.html#isRedoAvailable">redo is available</a>.</p>
@@ -503,14 +503,14 @@ object.</p>
 can not be found in the cache, loadResource is called to try to
 load the resource. loadResource should then use addResource to add
 the resource to the cache.</p>
-<p>See also <a href="qtextdocument.html#ResourceType-enum">QTextDocument.ResourceType</a>.</p>
+<p><b>See also</b> <a href="qtextdocument.html#ResourceType-enum">QTextDocument.ResourceType</a>.</p>
 
 
 <h3 class="fn"><a name="revision" />int QTextDocument.revision (<i>self</i>)</h3><p>Returns the document's revision (if undo is enabled).</p>
 <p>The revision is guaranteed to increase when a document that is
 not modified is edited.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qtextblock.html#revision">QTextBlock.revision</a>() and <a href="qtextdocument.html#modified-prop">isModified</a>().</p>
+<p><b>See also</b> <a href="qtextblock.html#revision">QTextBlock.revision</a>() and <a href="qtextdocument.html#modified-prop">isModified</a>().</p>
 
 
 <h3 class="fn"><a name="rootFrame" /><a href="qtextframe.html">QTextFrame</a> QTextDocument.rootFrame (<i>self</i>)</h3><p>Returns the document's root frame.</p>
@@ -518,7 +518,7 @@ not modified is edited.</p>
 
 <h3 class="fn"><a name="setDefaultFont" />QTextDocument.setDefaultFont (<i>self</i>, <a href="qfont.html">QFont</a>&#160;<i>font</i>)</h3><h3 class="fn"><a name="setDefaultStyleSheet" />QTextDocument.setDefaultStyleSheet (<i>self</i>, QString&#160;<i>sheet</i>)</h3><h3 class="fn"><a name="setDefaultTextOption" />QTextDocument.setDefaultTextOption (<i>self</i>, <a href="qtextoption.html">QTextOption</a>&#160;<i>option</i>)</h3><h3 class="fn"><a name="setDocumentLayout" />QTextDocument.setDocumentLayout (<i>self</i>, <a href="qabstracttextdocumentlayout.html">QAbstractTextDocumentLayout</a>&#160;<i>layout</i>)</h3><p>The <i>layout</i> argument has it's ownership transferred to Qt.</p><p>Sets the document to use the given <i>layout</i>. The previous
 layout is deleted.</p>
-<p>See also <a href="qtextdocument.html#documentLayoutChanged">documentLayoutChanged</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#documentLayoutChanged">documentLayoutChanged</a>().</p>
 
 
 <h3 class="fn"><a name="setDocumentMargin" />QTextDocument.setDocumentMargin (<i>self</i>, float&#160;<i>margin</i>)</h3><h3 class="fn"><a name="setHtml" />QTextDocument.setHtml (<i>self</i>, QString&#160;<i>html</i>)</h3><p>Replaces the entire contents of the document with the given
@@ -530,17 +530,17 @@ first word has a font weight that gives it a bold appearance:
 <p><b>Note:</b> It is the responsibility of the caller to make sure
 that the text is correctly decoded when a <a href="qstring.html">QString</a> containing HTML is created and passed to
 setHtml().</p>
-<p>See also <a href="qtextdocument.html#setPlainText">setPlainText</a>() and <a href="richtext-html-subset.html">Supported HTML Subset</a>.</p>
+<p><b>See also</b> <a href="qtextdocument.html#setPlainText">setPlainText</a>() and <a href="richtext-html-subset.html">Supported HTML Subset</a>.</p>
 
 
 <h3 class="fn"><a name="setIndentWidth" />QTextDocument.setIndentWidth (<i>self</i>, float&#160;<i>width</i>)</h3><h3 class="fn"><a name="setMaximumBlockCount" />QTextDocument.setMaximumBlockCount (<i>self</i>, int&#160;<i>maximum</i>)</h3><h3 class="fn"><a name="setMetaInformation" />QTextDocument.setMetaInformation (<i>self</i>, <a href="qtextdocument.html#MetaInformation-enum">MetaInformation</a>&#160;<i>info</i>, QString)</h3><p>Sets the document's meta information of the type specified by
 <i>info</i> to the given <i>string</i>.</p>
-<p>See also <a href="qtextdocument.html#metaInformation">metaInformation</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#metaInformation">metaInformation</a>().</p>
 
 
 <h3 class="fn"><a name="setModified" />QTextDocument.setModified (<i>self</i>, bool&#160;<i>on</i>&#160;=&#160;True)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setModified(bool = 1)</tt>.</p><h3 class="fn"><a name="setPageSize" />QTextDocument.setPageSize (<i>self</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>size</i>)</h3><h3 class="fn"><a name="setPlainText" />QTextDocument.setPlainText (<i>self</i>, QString&#160;<i>text</i>)</h3><p>Replaces the entire contents of the document with the given
 plain <i>text</i>.</p>
-<p>See also <a href="qtextdocument.html#setHtml">setHtml</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#setHtml">setHtml</a>().</p>
 
 
 <h3 class="fn"><a name="setTextWidth" />QTextDocument.setTextWidth (<i>self</i>, float&#160;<i>width</i>)</h3><h3 class="fn"><a name="setUndoRedoEnabled" />QTextDocument.setUndoRedoEnabled (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setUseDesignMetrics" />QTextDocument.setUseDesignMetrics (<i>self</i>, bool&#160;<i>b</i>)</h3><h3 class="fn"><a name="size" /><a href="qsizef.html">QSizeF</a> QTextDocument.size (<i>self</i>)</h3><h3 class="fn"><a name="textWidth" />float QTextDocument.textWidth (<i>self</i>)</h3><h3 class="fn"><a name="toHtml" />QString QTextDocument.toHtml (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>encoding</i>&#160;=&#160;QByteArray())</h3><p>Returns a string containing an HTML representation of the
@@ -549,8 +549,8 @@ document.</p>
 charset attribute in the html header. For example if 'utf-8' is
 specified then the beginning of the generated html will look like
 this:</p>
-<pre class="highlightedCode brush: cpp">
- &lt;html&gt;&lt;head&gt;&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;&lt;/head&gt;&lt;body&gt;...
+<pre class="cpp">
+ <span class="operator">&lt;</span>html<span class="operator">&gt;</span><span class="operator">&lt;</span>head<span class="operator">&gt;</span><span class="operator">&lt;</span>meta http<span class="operator">-</span>equiv<span class="operator">=</span><span class="string">"Content-Type"</span> content<span class="operator">=</span><span class="string">"text/html; charset=utf-8"</span><span class="operator">&gt;</span><span class="operator">&lt;</span><span class="operator">/</span>head<span class="operator">&gt;</span><span class="operator">&lt;</span>body<span class="operator">&gt;</span><span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 </pre>
 <p>If no encoding is specified then no such meta information is
 generated.</p>
@@ -558,13 +558,13 @@ generated.</p>
 array for transmission over a network or when saving to disk you
 should specify the encoding you're going to use for the conversion
 to a byte array here.</p>
-<p>See also <a href="richtext-html-subset.html">Supported HTML
-Subset</a>.</p>
+<p><b>See also</b> <a href="richtext-html-subset.html">Supported
+HTML Subset</a>.</p>
 
 
 <h3 class="fn"><a name="toPlainText" />QString QTextDocument.toPlainText (<i>self</i>)</h3><p>Returns the plain text contained in the document. If you want
 formatting information use a <a href="qtextcursor.html">QTextCursor</a> instead.</p>
-<p>See also <a href="qtextdocument.html#toHtml">toHtml</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#toHtml">toHtml</a>().</p>
 
 
 <h3 class="fn"><a name="undo" />QTextDocument.undo (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void undo()</tt>.</p><p>Undoes the last editing operation on the document if undo is
@@ -573,7 +573,7 @@ the location where the edition operation was undone.</p>
 <p>See the <a href="qundo.html">Qt Undo Framework</a> documentation
 for details.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qtextdocument.html#undoAvailable">undoAvailable</a>() and <a href="qtextdocument.html#undoRedoEnabled-prop">isUndoRedoEnabled</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#undoAvailable">undoAvailable</a>() and <a href="qtextdocument.html#undoRedoEnabled-prop">isUndoRedoEnabled</a>().</p>
 
 
 <h3 class="fn"><a name="undo-2" />QTextDocument.undo (<i>self</i>, <a href="qtextcursor.html">QTextCursor</a>&#160;<i>cursor</i>)</h3><p>This is an overloaded function.</p>
@@ -595,14 +595,14 @@ characters added (<i>charsAdded</i>).</p>
 <p>The signal is emitted before the document's layout manager is
 notified about the change. This hook allows you to implement syntax
 highlighting for the document.</p>
-<p>See also <a href="qabstracttextdocumentlayout.html#documentChanged">QAbstractTextDocumentLayout.documentChanged</a>()
+<p><b>See also</b> <a href="qabstracttextdocumentlayout.html#documentChanged">QAbstractTextDocumentLayout.documentChanged</a>()
 and <a href="qtextdocument.html#contentsChanged">contentsChanged</a>().</p>
 
 
 <h3 class="fn"><a name="contentsChanged" />void contentsChanged ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the document's content changes;
 for example, when text is inserted or deleted, or when formatting
 is applied.</p>
-<p>See also <a href="qtextdocument.html#contentsChange">contentsChange</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#contentsChange">contentsChange</a>().</p>
 
 
 <h3 class="fn"><a name="cursorPositionChanged" />void cursorPositionChanged (const QTextCursor&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the position of a cursor changed
@@ -614,7 +614,7 @@ signal in <a href="qtextedit.html">QTextEdit</a>.</p>
 
 <h3 class="fn"><a name="documentLayoutChanged" />void documentLayoutChanged ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when a new document layout is set.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qtextdocument.html#setDocumentLayout">setDocumentLayout</a>().</p>
+<p><b>See also</b> <a href="qtextdocument.html#setDocumentLayout">setDocumentLayout</a>().</p>
 
 
 <h3 class="fn"><a name="modificationChanged" />void modificationChanged (bool)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the content of the document
@@ -637,11 +637,11 @@ false).</p>
 false).</p>
 <p>See the <a href="qundo.html">Qt Undo Framework</a> documentation
 for details.</p>
-<p>See also <a href="qtextdocument.html#undo">undo</a>() and
+<p><b>See also</b> <a href="qtextdocument.html#undo">undo</a>() and
 <a href="qtextdocument.html#undoRedoEnabled-prop">isUndoRedoEnabled</a>().</p>
 
 
 <h3 class="fn"><a name="undoCommandAdded" />void undoCommandAdded ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted every time a new level of undo is added
 to the <a href="qtextdocument.html">QTextDocument</a>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
