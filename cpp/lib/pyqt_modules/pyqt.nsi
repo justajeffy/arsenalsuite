@@ -3,7 +3,7 @@
 ; DESCRIPTION: AssFreezer installer script
 ; (C) Blur Studio 2005
 
-!include pyqt-svnrev.nsi
+;!include pyqt-svnrev.nsi
 !define MUI_PRODUCT "Blur Python Modules"
 !define MUI_VERSION "v1.0.X"
 
@@ -12,7 +12,7 @@ Name "${MUI_PRODUCT} ${MUI_VERSION} ${PLATFORM}"
 !include "MUI.nsh"
 
 ; Name of resulting executable installer
-OutFile "blur_pyqt_modules_install_${MUI_SVNREV}_${PLATFORM}.exe"
+OutFile "blur_pyqt_modules_install_${MUI_VERSION}_${PLATFORM}.exe"
 InstallDir "${PYTHON_PATH}\Lib\site-packages\"
 
 !define MUI_FINISHPAGE
