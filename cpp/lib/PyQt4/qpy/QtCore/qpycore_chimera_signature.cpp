@@ -1,6 +1,6 @@
 // This is the implementation of the Chimera::Signature class.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -34,7 +29,11 @@
 
 
 // Forward declarations.
-extern "C" {static void Signature_delete(void *args);}
+#if defined(SIP_USE_PYCAPSULE)
+extern "C" {static void Signature_delete(PyObject *cap);}
+#else
+extern "C" {static void Signature_delete(void *sig);}
+#endif
 
 
 // Destroy the signature and any type objects.
@@ -51,7 +50,11 @@ Chimera::Signature::~Signature()
 // Return the parsed signature wrapped in a Python object.
 PyObject *Chimera::Signature::toPyObject(Chimera::Signature *parsed_signature)
 {
+#if defined(SIP_USE_PYCAPSULE)
+    PyObject *py = PyCapsule_New(parsed_signature, NULL, Signature_delete);
+#else
     PyObject *py = PyCObject_FromVoidPtr(parsed_signature, Signature_delete);
+#endif
 
     if (!py)
         delete parsed_signature;
@@ -63,7 +66,11 @@ PyObject *Chimera::Signature::toPyObject(Chimera::Signature *parsed_signature)
 // Return the parsed signature extracted from a Python object.
 Chimera::Signature *Chimera::Signature::fromPyObject(PyObject *py)
 {
+#if defined(SIP_USE_PYCAPSULE)
+    return reinterpret_cast<Chimera::Signature *>(PyCapsule_GetPointer(py, NULL));
+#else
     return reinterpret_cast<Chimera::Signature *>(PyCObject_AsVoidPtr(py));
+#endif
 }
 
 
@@ -95,8 +102,17 @@ QByteArray Chimera::Signature::arguments(const QByteArray &signature)
 }
 
 
-// The PyCObject destructor for the Chimera::Signature type.
-static void Signature_delete(void *args)
+#if defined(SIP_USE_PYCAPSULE)
+// The PyCapsule destructor for the Chimera::Signature type.
+static void Signature_delete(PyObject *cap)
 {
-    delete reinterpret_cast<Chimera::Signature *>(args);
+    delete reinterpret_cast<Chimera::Signature *>(
+            PyCapsule_GetPointer(cap, NULL));
 }
+#else
+// The PyCObject destructor for the Chimera::Signature type.
+static void Signature_delete(void *sig)
+{
+    delete reinterpret_cast<Chimera::Signature *>(sig);
+}
+#endif

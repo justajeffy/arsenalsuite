@@ -1,6 +1,6 @@
 // This is the signal/slot helper code for SIP.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -38,6 +33,7 @@
 #include <QObject>
 
 #include "qpycore_chimera.h"
+#include "qpycore_pyqtboundsignal.h"
 #include "qpycore_pyqtproxy.h"
 #include "qpycore_pyqtpyobject.h"
 #include "qpycore_sip.h"
@@ -147,7 +143,8 @@ extern "C" void *sipQtCreateUniversalSignal(void *tx, const char **sigp)
 
 
 // Factory function to create a universal slot instance.  Returns a pointer to
-// the instance or 0 if there was an error.
+// the instance or 0 if there was an error.  Note that we may also return a
+// Qt signal (from a bound signal).
 extern "C" void *sipQtCreateUniversalSlot(sipWrapper *tx, const char *sig,
         PyObject *rxObj, const char *slot, const char **member, int flags)
 {
@@ -155,11 +152,25 @@ extern "C" void *sipQtCreateUniversalSlot(sipWrapper *tx, const char *sig,
     PyObject *qrxObj;
 
     if (slot)
+    {
         qrxObj = rxObj;
+    }
+    else if (Py_TYPE(rxObj) == &qpycore_pyqtBoundSignal_Type)
+    {
+        qpycore_pyqtBoundSignal *bs = (qpycore_pyqtBoundSignal *)rxObj;
+
+        *member = bs->bound_overload->signature.constData();
+
+        return bs->bound_qobject;
+    }
     else if (PyMethod_Check(rxObj))
+    {
         qrxObj = PyMethod_GET_SELF(rxObj);
+    }
     else
+    {
         qrxObj = 0;
+    }
 
     QObject *qrx = 0;
 
@@ -373,15 +384,10 @@ bool qpycore_emit(QObject *qtx, int signal_index,
 
     if (args.size() != PyTuple_GET_SIZE(sigargs))
     {
-        const char *sig = parsed_signature->signature.constData();
-
-        // Bound signals include the type character.
-        if (*sig == '2')
-            ++sig;
-
         PyErr_Format(PyExc_TypeError,
-                "signal %s has %d argument(s) but %d provided", sig,
-                args.size(), (int)PyTuple_GET_SIZE(sigargs));
+                "signal %s has %d argument(s) but %d provided",
+                parsed_signature->py_signature.constData(), args.size(),
+                (int)PyTuple_GET_SIZE(sigargs));
 
         return false;
     }
@@ -408,11 +414,7 @@ bool qpycore_emit(QObject *qtx, int signal_index,
 
             if (!sig || *sig != '\1')
             {
-                sig = parsed_signature->signature.constData();
-
-                // Bound signals include the type character.
-                if (*sig == '2')
-                    ++sig;
+                sig = parsed_signature->py_signature.constData();
             }
             else
             {
@@ -422,7 +424,7 @@ bool qpycore_emit(QObject *qtx, int signal_index,
 
             // Mimic SIP's exception text.
             PyErr_Format(PyExc_TypeError,
-                    "%s: argument %d has unexpected type '%s'", sig,
+                    "%s.emit(): argument %d has unexpected type '%s'", sig,
                     a + 1, Py_TYPE(arg_obj)->tp_name);
 
             delete[] argv;

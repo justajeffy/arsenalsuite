@@ -1,7 +1,7 @@
 /*
  * The main module for SIP.
  *
- * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
  *
  * This file is part of SIP.
  *
@@ -30,8 +30,6 @@
 #define PACKAGE "sip"
 #endif
 
-#define VERSION "4.10.2"
-
 
 /* Global variables - see sip.h for their meaning. */
 char *sipVersion;
@@ -52,13 +50,15 @@ int main(int argc, char **argv)
 {
     char *filename, *docFile, *codeDir, *srcSuffix, *flagFile, *consModule;
     char arg, *optarg, *buildFile, *apiFile, *xmlFile;
-    int optnr, exceptions, tracing, releaseGIL, parts, kwdArgs, protHack, docs;
+    int optnr, exceptions, tracing, releaseGIL, parts, protHack, docs;
+    int timestamp;
+    KwArgs kwArgs;
     FILE *file;
     sipSpec spec;
-    stringList *versions, *xfeatures;
+    stringList *versions, *xfeatures, *extracts;
 
     /* Initialise. */
-    sipVersion = VERSION;
+    sipVersion = SIP_VERSION_STR;
     includeDirList = NULL;
     versions = NULL;
     xfeatures = NULL;
@@ -70,18 +70,20 @@ int main(int argc, char **argv)
     apiFile = NULL;
     xmlFile = NULL;
     consModule = NULL;
+    extracts = NULL;
     exceptions = FALSE;
     tracing = FALSE;
     releaseGIL = FALSE;
     parts = 0;
-    kwdArgs = FALSE;
+    kwArgs = NoKwArgs;
     protHack = FALSE;
     docs = FALSE;
+    timestamp = TRUE;
 
     /* Parse the command line. */
     optnr = 1;
 
-    while ((arg = parseopt(argc, argv, "hVa:b:ec:d:gI:j:km:op:Prs:t:wx:z:", &flagFile, &optnr, &optarg)) != '\0')
+    while ((arg = parseopt(argc, argv, "hVa:b:ec:d:gI:j:km:op:Prs:t:Twx:X:z:", &flagFile, &optnr, &optarg)) != '\0')
         switch (arg)
         {
         case 'o':
@@ -152,9 +154,19 @@ int main(int argc, char **argv)
             appendString(&versions,optarg);
             break;
 
+        case 'T':
+            /* Disable the timestamp in the header of generated files. */
+            timestamp = FALSE;
+            break;
+
         case 'x':
             /* Which features are disabled. */
             appendString(&xfeatures,optarg);
+            break;
+
+        case 'X':
+            /* Which extracts are to be created. */
+            appendString(&extracts, optarg);
             break;
 
         case 'I':
@@ -179,7 +191,7 @@ int main(int argc, char **argv)
 
         case 'k':
             /* Allow keyword arguments in functions and methods. */
-            kwdArgs = TRUE;
+            kwArgs = AllKwArgs;
             break;
 
         case 'h':
@@ -210,15 +222,26 @@ int main(int argc, char **argv)
         filename = "stdin";
     }
 
+    /* Issue warnings after they (might) have been enabled. */
+    if (docFile != NULL)
+        warning(DeprecationWarning, "the -d flag is deprecated\n");
+
+    if (kwArgs != NoKwArgs)
+        warning(DeprecationWarning, "the -k flag is deprecated\n");
+
     /* Parse the input file. */
-    parse(&spec, file, filename, versions, xfeatures, kwdArgs, protHack);
+    parse(&spec, file, filename, versions, xfeatures, kwArgs, protHack);
 
     /* Verify and transform the parse tree. */
     transform(&spec);
 
     /* Generate code. */
     generateCode(&spec, codeDir, buildFile, docFile, srcSuffix, exceptions,
-            tracing, releaseGIL, parts, xfeatures, consModule, docs);
+            tracing, releaseGIL, parts, xfeatures, consModule, docs,
+            timestamp);
+
+    /* Generate any extracts. */
+    generateExtracts(&spec, extracts);
 
     /* Generate the API file. */
     if (apiFile != NULL)
@@ -410,26 +433,40 @@ void appendString(stringList **headp, const char *s)
 /*
  * Display a warning message.
  */
-void warning(char *fmt,...)
+void warning(Warning w, const char *fmt, ...)
 {
     static int start = TRUE;
 
     va_list ap;
 
+    /* At some point deprecation warnings will not be suppressed. */
     if (!warnings)
         return;
 
     if (start)
     {
-        fprintf(stderr,"%s: Warning: ",sipPackage);
+        const char *wstr;
+
+        switch (w)
+        {
+        case ParserWarning:
+            wstr = "Parser warning";
+            break;
+
+        case DeprecationWarning:
+            wstr = "Deprecation warning";
+            break;
+        }
+
+        fprintf(stderr, "%s: %s: ", sipPackage, wstr);
         start = FALSE;
     }
 
-    va_start(ap,fmt);
-    vfprintf(stderr,fmt,ap);
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
     va_end(ap);
 
-    if (strchr(fmt,'\n') != NULL)
+    if (strchr(fmt, '\n') != NULL)
         start = TRUE;
 }
 
@@ -476,14 +513,14 @@ static void help(void)
 {
     printf(
 "Usage:\n"
-"    %s [-h] [-V] [-a file] [-b file] [-c dir] [-d file] [-e] [-g] [-I dir] [-j #] [-k] [-m file] [-o] [-p module] [-P] [-r] [-s suffix] [-t tag] [-w] [-x feature] [-z file] [file]\n"
+"    %s [-h] [-V] [-a file] [-b file] [-c dir] [-d file] [-e] [-g] [-I dir] [-j #] [-k] [-m file] [-o] [-p module] [-P] [-r] [-s suffix] [-t tag] [-T] [-w] [-x feature] [-X id:file] [-z file] [file]\n"
 "where:\n"
 "    -h          display this help message\n"
 "    -V          display the %s version number\n"
 "    -a file     the name of the QScintilla API file [default not generated]\n"
 "    -b file     the name of the build file [default none generated]\n"
 "    -c dir      the name of the code directory [default not generated]\n"
-"    -d file     the name of the documentation file [default not generated]\n"
+"    -d file     the name of the documentation file (deprecated) [default not generated]\n"
 "    -e          enable support for exceptions [default disabled]\n"
 "    -g          always release and reacquire the GIL [default only when specified]\n"
 "    -I dir      look in this directory when including files\n"
@@ -496,8 +533,10 @@ static void help(void)
 "    -r          generate code with tracing enabled [default disabled]\n"
 "    -s suffix   the suffix to use for C or C++ source files [default \".c\" or \".cpp\"]\n"
 "    -t tag      the version/platform to generate code for\n"
+"    -T          disable the timestamp in the header of generated files\n"
 "    -w          enable warning messages\n"
 "    -x feature  this feature is disabled\n"
+"    -X id:file  create the extracts for an id in a file\n"
 "    -z file     the name of a file containing more command line flags\n"
 "    file        the name of the specification file [default stdin]\n"
         , sipPackage, sipPackage);
@@ -511,5 +550,5 @@ static void help(void)
  */
 static void usage(void)
 {
-    fatal("Usage: %s [-h] [-V] [-a file] [-b file] [-c dir] [-d file] [-e] [-g] [-I dir] [-j #] [-k] [-m file] [-o] [-p module] [-r] [-s suffix] [-t tag] [-w] [-x feature] [-z file] [file]\n", sipPackage);
+    fatal("Usage: %s [-h] [-V] [-a file] [-b file] [-c dir] [-d file] [-e] [-g] [-I dir] [-j #] [-k] [-m file] [-o] [-p module] [-P] [-r] [-s suffix] [-t tag] [-T] [-w] [-x feature] [-X id:file] [-z file] [file]\n", sipPackage);
 }

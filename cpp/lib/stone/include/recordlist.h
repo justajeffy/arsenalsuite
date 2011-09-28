@@ -133,6 +133,8 @@ public:
 	// slice( INT_MAX, INT_MIN, -1 ) returns the list backwards
 	RecordList slice( int start, int end = INT_MAX, int step = 1 );
 	
+	void reverse();
+	
 	/// Returns the RecordImp * for the \param nth record
 	/// in this list.  Returns 0 if \param nth is out of range.
 	RecordImp * imp( uint nth ) const;
@@ -156,6 +158,11 @@ public:
 	/// to by \param it.  If it points to end, \param r
 	/// will be appended to this list.
 	void insert( RecordIter it, const Record & r );
+	
+	/// Follows python behavior, if pos < 0 then it counts from end of list backwards.
+	/// There is no invalid pos, if pos > size then it appends the item, or if pos < -size
+	/// then the item is prepended
+	void insert( int pos, const Record & r );
 
 	/// Finds the first occurance of a committed record and replaces it
 	/// with 'record'.  Used to update the unmodified record when iterating
@@ -173,6 +180,10 @@ public:
 	/// a new RecordIter pointing to the next record in the list.
 	RecordIter remove( const RecordIter & iter );
 
+	/// Follows python behavior.  If i < 0 then the popped position is size() - i
+	/// If index is out of range then an empty record is returned
+	Record pop( int i = -1 );
+	
 	/// Removes all records from the list.
 	void clear();
 

@@ -1,6 +1,6 @@
 // This is the interface of the Chimera and related classes.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -47,6 +42,9 @@
 class Chimera
 {
 public:
+    // Construct a copy.
+    Chimera(const Chimera &other);
+
     // Destroy the type.
     ~Chimera();
 
@@ -55,6 +53,9 @@ public:
 
     // Parses a Qt meta-property as a type.  Return 0 if there was an error.
     static const Chimera *parse(const QMetaProperty &mprop);
+
+    // Parses a C++ type name as a type.  Return 0 if there was an error.
+    static const Chimera *parse(const QByteArray &name);
 
     class Signature
     {
@@ -71,6 +72,9 @@ public:
         // The original normalised signature (possibly including a method name
         // but excluding a return type).
         QByteArray signature;
+
+        // The signature as declared by the user for use in exceptions.
+        QByteArray py_signature;
 
         // The optional docstring which will start with '\1' if it is auto
         // generated and so can be used in exceptions.
@@ -103,7 +107,7 @@ public:
         bool _cached;
 
         Signature(const QByteArray &sig, bool cached)
-            : result(0), signature(sig), docstring(0), _cached(cached) {}
+            : result(0), signature(sig), py_signature(sig), docstring(0), _cached(cached) {}
 
         Signature(const Signature &);
         Signature &operator=(const Signature &);
@@ -118,7 +122,7 @@ public:
             const char *context);
 
     // Raise an exception after parse() has failed.
-    static void raiseParseException(PyObject *obj, const char *context);
+    static void raiseParseException(PyObject *type, const char *context);
 
     class Storage
     {
@@ -179,7 +183,7 @@ public:
 
     // Convert a Python object to a QVariant.  Return false if there was an
     // error.
-    bool fromPyObject(PyObject *py, QVariant *var) const;
+    bool fromPyObject(PyObject *py, QVariant *var, bool strict = true) const;
 
     // Convert a Python object to a QVariant based on the type of the object.
     static QVariant fromAnyPyObject(PyObject *py, int *is_err);
@@ -196,6 +200,10 @@ public:
     // Returns the Qt meta-type id.  It will be QMetaType::Void if the type
     // isn't known to Qt's meta-type system.
     int metatype() const {return _metatype;}
+
+    // Returns a borrowed reference to the Python type object that was used to
+    // define the type (if any).
+    PyObject *py_type() const {return _py_type;}
 
     // Returns the C++ name of the type.
     const QByteArray &name() const {return _name;}
@@ -216,6 +224,10 @@ private:
     // The generated type structure.  This may be 0 if the type is known by Qt
     // but hasn't been wrapped.
     const sipTypeDef *_type;
+
+    // The Python type object if a Python type (rather than a C++ type string)
+    // was given.
+    PyObject *_py_type;
 
     // The Qt meta-type.  This will always be valid but may refer to the
     // PyObject wrapper if the underlying type isn't known to Qt.
@@ -242,6 +254,8 @@ private:
     bool parse_py_type(PyTypeObject *type_obj);
     sipAssignFunc get_assign_helper() const;
     void set_flag();
+    static int QList_QObject_metatype();
+    bool to_QList_QObject(PyObject *py, QList<QObject *> &cpp) const;
     bool to_QVariantList(PyObject *py, QVariantList &cpp) const;
     bool to_QVariantMap(PyObject *py, QVariantMap &cpp) const;
 #if QT_VERSION >= 0x040500
@@ -252,8 +266,8 @@ private:
     static void raiseParseException(const char *type, const char *context);
     static QVariant keep_as_pyobject(PyObject *py);
     static int extract_raw_type(const QByteArray &type, QByteArray &raw_type);
+    static QByteArray resolve_types(const QByteArray &type);
 
-    Chimera(const Chimera &);
     Chimera &operator=(const Chimera &);
 };
 

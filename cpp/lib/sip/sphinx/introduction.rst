@@ -1,7 +1,7 @@
 Introduction
 ============
 
-This is the reference guide for SIP snapshot-4.10.1-724e4236428b.  SIP is a tool for
+This is the reference guide for SIP 4.12.4-snapshot-bbe43a0bad78.  SIP is a tool for
 automatically generating `Python <http://www.python.org>`__ bindings for C and
 C++ libraries.  SIP was originally developed in 1998 for
 `PyQt <http://www.riverbankcomputing.com/software/pyqt>`__ - the Python
@@ -154,6 +154,25 @@ SIP comprises a number of different components.
   system.  This can be as simple as adding your .sip files to the list of files
   needed to build the extension module.  It is covered in detail in
   :ref:`ref-distutils`.
+
+
+Preparing for SIP v5
+--------------------
+
+The syntax of a SIP specification file will change in SIP v5.  The command line
+options to the SIP code generator will also change.  In order to help users
+manage the transition the following approach will be adopted.
+
+- Where possible, all incompatible changes will be first implemented in SIP v4.
+
+- When an incompatible change is implemented, the old syntax will be deprecated
+  (with a warning message) but will be supported for the lifetime of v4.
+
+- Deprecation warning messages are currently suppressed by default.  The
+  :option:`-w <sip -w>` command line option can be used to display them.
+
+- At some point in the future the deprecation warning messages will be
+  displayed by default and it will not be possible to suppress them.
 
 
 Qt Support

@@ -1,4 +1,45 @@
+#############################################################################
+##
+## Copyright (C) 2011 Riverbank Computing Limited.
+## Copyright (C) 2006 Thorsten Marek.
+## All right reserved.
+##
+## This file is part of PyQt.
+##
+## You may use this file under the terms of the GPL v2 or the revised BSD
+## license as follows:
+##
+## "Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are
+## met:
+##   * Redistributions of source code must retain the above copyright
+##     notice, this list of conditions and the following disclaimer.
+##   * Redistributions in binary form must reproduce the above copyright
+##     notice, this list of conditions and the following disclaimer in
+##     the documentation and/or other materials provided with the
+##     distribution.
+##   * Neither the name of the Riverbank Computing Limited nor the names
+##     of its contributors may be used to endorse or promote products
+##     derived from this software without specific prior written
+##     permission.
+##
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+##
+#############################################################################
+
+
 import logging
+import os.path
 import sys
 
 from PyQt4.uic.exceptions import UnsupportedPropertyError
@@ -36,7 +77,16 @@ class Properties(object):
         QtGui = QtGui_mod
         QtCore = QtCore_mod
         self.factory = factory
+
+        self._base_dir = ''
+
         self.reset()
+
+    def set_base_dir(self, base_dir):
+        """ Set the base directory to be used for all relative filenames. """
+
+        self._base_dir = base_dir
+        self.icon_cache.set_base_dir(base_dir)
 
     def reset(self):
         self.buddies = []
@@ -46,20 +96,18 @@ class Properties(object):
     def _pyEnumMember(self, cpp_name):
         try:
             prefix, membername = cpp_name.split("::")
-            DEBUG(membername)
-            if prefix == "Qt":
-                return getattr(QtCore.Qt, membername)
-            else:
-                return getattr(getattr(QtGui, prefix), membername)
         except ValueError:
-            pass
+            prefix = "Qt"
+            membername = cpp_name
 
-        try:
-            return getattr(QtCore.Qt, cpp_name)
-        except AttributeError:
-            # There seems to be a bug where this can succeed when it shouldn't.
-            # If so it will be picked up when the generated code is run.
-            return getattr(getattr(QtGui, self.wclass), cpp_name)
+        if prefix == "Qt":
+            return getattr(QtCore.Qt, membername)
+
+        scope = self.factory.findQObjectType(prefix)
+        if scope is None:
+            raise AttributeError("unknown enum %s" % cpp_name)
+
+        return getattr(scope, membername)
 
     def _set(self, prop):
         expr = [self._pyEnumMember(v) for v in prop.text.split('|')]
@@ -85,17 +133,19 @@ class Properties(object):
         return prop.text == 'true'
 
     def _stringlist(self, prop):
-        return [self._string(p) for p in prop]
+        return [self._string(p, notr='true') for p in prop]
 
-    def _string(self, prop):
-        if prop.get("notr", None) == "true":
-            return self._cstring(prop)
+    def _string(self, prop, notr=None):
+        text = prop.text
 
-        if prop.text is None:
+        if text is None:
             return ""
 
-        return QtGui.QApplication.translate(self.uiname, prop.text, None,
-                QtGui.QApplication.UnicodeUTF8)
+        if prop.get('notr', notr) == 'true':
+            return text
+
+        return QtGui.QApplication.translate(self.uiname, text,
+                prop.get('comment'), QtGui.QApplication.UnicodeUTF8)
 
     _char = _string
 
@@ -132,13 +182,26 @@ class Properties(object):
         return QtCore.QSizeF(*float_list(prop))
 
     def _pixmap(self, prop):
-        return QtGui.QPixmap(prop.text.replace("\\", "\\\\"))
+        if prop.text:
+            fname = prop.text.replace("\\", "\\\\")
+            if self._base_dir != '' and fname[0] != ':' and not os.path.isabs(fname):
+                fname = os.path.join(self._base_dir, fname)
+
+            return QtGui.QPixmap(fname)
+
+        # Don't bother to set the property if the pixmap is empty.
+        return None
 
     def _iconset(self, prop):
         return self.icon_cache.get_icon(prop)
 
     def _url(self, prop):
         return QtCore.QUrl(prop[0].text)
+
+    def _locale(self, prop):
+        lang = getattr(QtCore.QLocale, prop.attrib['language'])
+        country = getattr(QtCore.QLocale, prop.attrib['country'])
+        return QtCore.QLocale(lang, country)
 
     def _cursor(self, prop):
         return QtGui.QCursor(QtCore.Qt.CursorShape(int(prop.text)))
@@ -222,25 +285,29 @@ class Properties(object):
                             QtGui.QPalette.ColorRole(role), self._color(color))
                 elif color.tag == 'colorrole':
                     role = getattr(QtGui.QPalette, color.get('role'))
-
-                    brushstyle = color[0].get('brushstyle')
-                    if brushstyle in ('LinearGradientPattern', 'ConicalGradientPattern', 'RadialGradientPattern'):
-                        gradient = self._gradient(color[0][0])
-                        brush = self.factory.createQObject("QBrush", "brush",
-                                (gradient, ), is_attribute=False)
-                    else:
-                        color = self._color(color[0][0])
-                        brush = self.factory.createQObject("QBrush", "brush",
-                                (color, ), is_attribute=False)
-
-                        brushstyle = getattr(QtCore.Qt, brushstyle)
-                        brush.setStyle(brushstyle)
-
+                    brush = self._brush(color[0])
                     palette.setBrush(sub_palette, role, brush)
                 else:
                     raise UnsupportedPropertyError(color.tag)
 
         return palette
+
+    def _brush(self, prop):
+        brushstyle = prop.get('brushstyle')
+
+        if brushstyle in ('LinearGradientPattern', 'ConicalGradientPattern', 'RadialGradientPattern'):
+            gradient = self._gradient(prop[0])
+            brush = self.factory.createQObject("QBrush", "brush", (gradient, ),
+                    is_attribute=False)
+        else:
+            color = self._color(prop[0])
+            brush = self.factory.createQObject("QBrush", "brush", (color, ),
+                    is_attribute=False)
+
+            brushstyle = getattr(QtCore.Qt, brushstyle)
+            brush.setStyle(brushstyle)
+
+        return brush
 
     #@needsWidget
     def _sizepolicy(self, prop, widget):
@@ -287,7 +354,7 @@ class Properties(object):
     def _cursorShape(self, prop):
         return getattr(QtCore.Qt, prop.text)
 
-    def convert(self, prop, widget = None):
+    def convert(self, prop, widget=None):
         try:
             func = getattr(self, "_" + prop[0].tag)
         except AttributeError:
@@ -301,20 +368,17 @@ class Properties(object):
             return func(prop[0], **args)
 
 
-    def _getChild(self, elem_tag, elem, name, default = None):
+    def _getChild(self, elem_tag, elem, name, default=None):
         for prop in elem.findall(elem_tag):
             if prop.attrib["name"] == name:
-                if prop[0].tag == "enum":
-                    return prop[0].text
-                else:
-                    return self.convert(prop)
+                return self.convert(prop)
         else:
             return default
 
-    def getProperty(self, elem, name, default = None):
+    def getProperty(self, elem, name, default=None):
         return self._getChild("property", elem, name, default)
 
-    def getAttribute(self, elem, name, default = None):
+    def getAttribute(self, elem, name, default=None):
         return self._getChild("attribute", elem, name, default)
 
     def setProperties(self, widget, elem):
@@ -323,10 +387,8 @@ class Properties(object):
         except KeyError:
             pass
         for prop in elem.findall("property"):
-            if prop[0].text is None:
-                continue
-            propname = prop.attrib["name"]
-            DEBUG("setting property %s" % (propname,))
+            prop_name = prop.attrib["name"]
+            DEBUG("setting property %s" % (prop_name,))
 
             try:
                 stdset = bool(int(prop.attrib["stdset"]))
@@ -335,10 +397,12 @@ class Properties(object):
 
             if not stdset:
                 self._setViaSetProperty(widget, prop)
-            elif hasattr(self, propname):
-                getattr(self, propname)(widget, prop)
+            elif hasattr(self, prop_name):
+                getattr(self, prop_name)(widget, prop)
             else:
-                getattr(widget, "set%s%s" % (ascii_upper(propname[0]), propname[1:]))(self.convert(prop, widget))
+                prop_value = self.convert(prop, widget)
+                if prop_value is not None:
+                    getattr(widget, "set%s%s" % (ascii_upper(prop_name[0]), prop_name[1:]))(prop_value)
 
     # SPECIAL PROPERTIES
     # If a property has a well-known value type but needs special,
@@ -346,24 +410,28 @@ class Properties(object):
 
     # Delayed properties will be set after the whole widget tree has been
     # populated.
-    def _delay(self, widget, prop):
-        propname = prop.attrib["name"]
-        self.delayed_props.append((
-                getattr(widget, "set%s%s" % (ascii_upper(propname[0]), propname[1:])),
-                self.convert(prop)))
+    def _delayed_property(self, widget, prop):
+        prop_value = self.convert(prop)
+        if prop_value is not None:
+            prop_name = prop.attrib["name"]
+            self.delayed_props.append((widget, False,
+                    'set%s%s' % (ascii_upper(prop_name[0]), prop_name[1:]),
+                    prop_value))
 
     # These properties will be set with a widget.setProperty call rather than
     # calling the set<property> function.
     def _setViaSetProperty(self, widget, prop):
-        widget.setProperty(prop.attrib["name"], self.convert(prop))
+        prop_value = self.convert(prop)
+        if prop_value is not None:
+            widget.setProperty(prop.attrib["name"], prop_value)
 
     # Ignore the property.
     def _ignore(self, widget, prop):
         pass
 
     # Define properties that use the canned handlers.
-    currentIndex = _delay
-    currentRow = _delay
+    currentIndex = _delayed_property
+    currentRow = _delayed_property
 
     showDropIndicator = _setViaSetProperty
     intValue = _setViaSetProperty
@@ -377,11 +445,19 @@ class Properties(object):
     horizontalSpacing = _ignore
     verticalSpacing = _ignore
 
+    # tabSpacing is actually the spacing property of the widget's layout.
+    def tabSpacing(self, widget, prop):
+        prop_value = self.convert(prop)
+        if prop_value is not None:
+            self.delayed_props.append((widget, True, 'setSpacing', prop_value))
+
     # buddy setting has to be done after the whole widget tree has been
     # populated.  We can't use delay here because we cannot get the actual
     # buddy yet.
     def buddy(self, widget, prop):
-        self.buddies.append((widget, prop[0].text))
+        buddy_name = prop[0].text
+        if buddy_name:
+            self.buddies.append((widget, buddy_name))
 
     # geometry is handled specially if set on the toplevel widget.
     def geometry(self, widget, prop):

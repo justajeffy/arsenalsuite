@@ -8,13 +8,15 @@
 #ifndef HOST_VIEWER_FACTORY_H
 #define HOST_VIEWER_FACTORY_H
 
+#include "afcommon.h"
+
 #include <qmap.h>
 #include <qstring.h>
 
 class QWidget;
 class HostViewerPlugin;
 
-class HostViewerFactory
+class FREEZER_EXPORT HostViewerFactory
 {
 public:
 	static void registerPlugin( HostViewerPlugin * );

@@ -149,7 +149,7 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int queryPosOffset, FieldLis
 		mValues = new VariantVector( size );
 		int pos = queryPosOffset;
 		foreach( Field * f, allFields ) {
-			bool isIncoming = !f->flag(Field::LocalVariable) && ( (incomingFields && incomingFields->contains(f)) || !f->flag(Field::NoDefaultSelect) );
+			bool isIncoming = !f->flag(Field::LocalVariable) && ( incomingFields ? incomingFields->contains(f) : !f->flag(Field::NoDefaultSelect) );
 			if( isIncoming )
 				(*mValues)[f->pos()] = f->coerce(q.value(pos++));
 			else {
@@ -178,7 +178,7 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int * queryColPos, FieldList
 		mValues = new VariantVector( size );
 		int pos = 0;
 		foreach( Field * f, allFields ) {
-			bool isIncoming = !f->flag(Field::LocalVariable) && ( (incomingFields && incomingFields->contains(f)) || !f->flag(Field::NoDefaultSelect) );
+			bool isIncoming = !f->flag(Field::LocalVariable) && ( incomingFields ? incomingFields->contains(f) : !f->flag(Field::NoDefaultSelect) );
 			if( isIncoming )
 				(*mValues)[f->pos()] = f->coerce(q.value(queryColPos[pos++]));
 			else {

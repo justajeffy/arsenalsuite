@@ -1,25 +1,46 @@
 #!/usr/bin/env python
 
-############################################################################
+
+#############################################################################
 ##
-## Copyright (C) 2006-2007 Trolltech ASA. All rights reserved.
+## Copyright (C) 2010 Riverbank Computing Limited.
+## Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+## All rights reserved.
 ##
-## This file is part of the example classes of the Qt Toolkit.
+## This file is part of the examples of PyQt.
 ##
-## Licensees holding a valid Qt License Agreement may use this file in
-## accordance with the rights, responsibilities and obligations
-## contained therein.  Please consult your licensing agreement or
-## contact sales@trolltech.com if any conditions of this licensing
-## agreement are not clear to you.
+## $QT_BEGIN_LICENSE:BSD$
+## You may use this file under the terms of the BSD license as follows:
 ##
-## Further information about Qt licensing is available at:
-## http://www.trolltech.com/products/qt/licensing.html or by
-## contacting info@trolltech.com.
+## "Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are
+## met:
+##   * Redistributions of source code must retain the above copyright
+##     notice, this list of conditions and the following disclaimer.
+##   * Redistributions in binary form must reproduce the above copyright
+##     notice, this list of conditions and the following disclaimer in
+##     the documentation and/or other materials provided with the
+##     distribution.
+##   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
+##     the names of its contributors may be used to endorse or promote
+##     products derived from this software without specific prior written
+##     permission.
 ##
-## This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-## WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+## $QT_END_LICENSE$
 ##
-############################################################################
+#############################################################################
+
 
 # This is only needed for Python v2 but is harmless for Python v3.
 import sip
@@ -28,11 +49,31 @@ sip.setapi('QVariant', 2)
 from PyQt4 import QtCore, QtGui
 
 
+SUBJECT, SENDER, DATE = range(3)
+
+# Work around the fact that QSortFilterProxyModel always filters datetime
+# values in QtCore.Qt.ISODate format, but the tree views display using
+# QtCore.Qt.DefaultLocaleShortDate format.
+class SortFilterProxyModel(QtGui.QSortFilterProxyModel):
+    def filterAcceptsRow(self, sourceRow, sourceParent):
+        # Do we filter for the date column?
+        if self.filterKeyColumn() == DATE:
+            # Fetch datetime value.
+            index = self.sourceModel().index(sourceRow, DATE, sourceParent)
+            data = self.sourceModel().data(index)
+
+            # Return, if regExp match in displayed format.
+            return (self.filterRegExp().indexIn(data.toString(QtCore.Qt.DefaultLocaleShortDate)) >= 0)
+
+        # Not our business.
+        return super(SortFilterProxyModel, self).filterAcceptsRow(sourceRow, sourceParent)
+
+
 class Window(QtGui.QWidget):
     def __init__(self):
         super(Window, self).__init__()
 
-        self.proxyModel = QtGui.QSortFilterProxyModel()
+        self.proxyModel = SortFilterProxyModel()
         self.proxyModel.setDynamicSortFilter(True)
 
         self.sourceGroupBox = QtGui.QGroupBox("Original Model")
@@ -102,8 +143,8 @@ class Window(QtGui.QWidget):
         self.setWindowTitle("Basic Sort/Filter Model")
         self.resize(500, 450)
 
-        self.proxyView.sortByColumn(1, QtCore.Qt.AscendingOrder)
-        self.filterColumnComboBox.setCurrentIndex(1)
+        self.proxyView.sortByColumn(SENDER, QtCore.Qt.AscendingOrder)
+        self.filterColumnComboBox.setCurrentIndex(SENDER)
 
         self.filterPatternLineEdit.setText("Andy|Grace")
         self.filterCaseSensitivityCheckBox.setChecked(True)
@@ -140,17 +181,17 @@ class Window(QtGui.QWidget):
 
 def addMail(model, subject, sender, date):
     model.insertRow(0)
-    model.setData(model.index(0, 0), subject)
-    model.setData(model.index(0, 1), sender)
-    model.setData(model.index(0, 2), date)
+    model.setData(model.index(0, SUBJECT), subject)
+    model.setData(model.index(0, SENDER), sender)
+    model.setData(model.index(0, DATE), date)
 
 
 def createMailModel(parent):
     model = QtGui.QStandardItemModel(0, 3, parent)
 
-    model.setHeaderData(0, QtCore.Qt.Horizontal, "Subject")
-    model.setHeaderData(1, QtCore.Qt.Horizontal, "Sender")
-    model.setHeaderData(2, QtCore.Qt.Horizontal, "Date")
+    model.setHeaderData(SUBJECT, QtCore.Qt.Horizontal, "Subject")
+    model.setHeaderData(SENDER, QtCore.Qt.Horizontal, "Sender")
+    model.setHeaderData(DATE, QtCore.Qt.Horizontal, "Date")
 
     addMail(model, "Happy New Year!", "Grace K. <grace@software-inc.com>",
             QtCore.QDateTime(QtCore.QDate(2006, 12, 31), QtCore.QTime(17, 3)))

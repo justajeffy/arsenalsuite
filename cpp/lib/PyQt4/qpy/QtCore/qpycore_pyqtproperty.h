@@ -1,6 +1,6 @@
 // This contains the definitions for the implementation of pyqtProperty.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -44,19 +39,23 @@ extern "C" {
 typedef struct {
     PyObject_HEAD
 
-    // The following members must match the propertyobject structure defined in
-    // Objects/descrobject.c of the Python source because we choose to
-    // sub-class from the standard Python property (even though Python doesn't
-    // publish this structure).  Alternatively we could implement pyqtProperty
-    // as a completely unrelated type that supported the descriptor protocol in
-    // the same way.
-    PyObject *prop_get;
-    PyObject *prop_set;
-    PyObject *prop_del;
-    PyObject *prop_doc;
+    // The fget/getter/read callable.
+    PyObject *pyqtprop_get;
 
-    // The freset callable.
+    // The fset/setter/write callable.
+    PyObject *pyqtprop_set;
+
+    // The fdel/deleter callable.
+    PyObject *pyqtprop_del;
+
+    // The docstring.
+    PyObject *pyqtprop_doc;
+
+    // The freset/reset callable.
     PyObject *pyqtprop_reset;
+
+    // The notify signal.
+    PyObject *pyqtprop_notify;
 
     // The property type.
     PyObject *pyqtprop_type;
@@ -64,7 +63,7 @@ typedef struct {
     // The parsed type information.
     const Chimera *pyqtprop_parsed_type;
 
-    // The DESIGNABLE, SCIPTABLE, STORED, USER, CONSTANT and FINAL flags.
+    // The DESIGNABLE, SCRIPTABLE, STORED, USER, CONSTANT and FINAL flags.
     unsigned pyqtprop_flags;
 
     // The property's sequence number that determines the position of the

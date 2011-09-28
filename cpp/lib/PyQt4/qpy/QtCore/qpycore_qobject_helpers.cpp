@@ -1,6 +1,6 @@
 // This implements the helpers for QObject.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -16,13 +16,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -144,26 +139,40 @@ static int qt_metacall_worker(sipSimpleWrapper *pySelf, PyTypeObject *pytype,
         {
             qpycore_pyqtProperty *prop = qo->pprops.at(_id);
 
-            if (prop->prop_get)
+            if (prop->pyqtprop_get)
             {
-                PyObject *py = PyObject_CallFunction(prop->prop_get,
+                PyObject *py = PyObject_CallFunction(prop->pyqtprop_get,
                         const_cast<char *>("O"), pySelf);
 
                 if (py)
                 {
-                    // Get the underlying QVariant.
+                    // Get the underlying QVariant.  As of Qt v4.7.0,
+                    // QtDeclarative doesn't pass a QVariant and this value is
+                    // 0.
                     QVariant *var = reinterpret_cast<QVariant *>(_a[1]);
 
-                    // This tells QMetaProperty::read() to use the new contents
-                    // of the QVariant it provided.
-                    _a[1] = 0;
+                    if (var)
+                    {
+                        ok = prop->pyqtprop_parsed_type->fromPyObject(py, var);
 
-                    ok = prop->pyqtprop_parsed_type->fromPyObject(py, var);
+                        // Make sure that _a[0] still points to the QVariant
+                        // data (whose address we may have just changed) so
+                        // that QMetaProperty::read() doesn't try to create a 
+                        // new QVariant.
+                        if (ok)
+                            _a[0] = var->data();
+                    }
+                    else
+                    {
+                        ok = prop->pyqtprop_parsed_type->fromPyObject(py, _a[0]);
+                    }
 
                     Py_DECREF(py);
                 }
                 else
+                {
                     ok = false;
+                }
             }
         }
 
@@ -175,7 +184,7 @@ static int qt_metacall_worker(sipSimpleWrapper *pySelf, PyTypeObject *pytype,
         {
             qpycore_pyqtProperty *prop = qo->pprops.at(_id);
 
-            if (prop->prop_set)
+            if (prop->pyqtprop_set)
             {
                 // _a is an array whose length and contents vary according to
                 // the version of Qt.  Prior to v4.6 _a[1] was the address of
@@ -191,7 +200,7 @@ static int qt_metacall_worker(sipSimpleWrapper *pySelf, PyTypeObject *pytype,
 
                 if (py)
                 {
-                    PyObject *res = PyObject_CallFunction(prop->prop_set,
+                    PyObject *res = PyObject_CallFunction(prop->pyqtprop_set,
                             const_cast<char *>("OO"), pySelf, py);
 
                     if (res)
@@ -305,11 +314,10 @@ PyObject *qpycore_qobject_staticmetaobject(PyObject *type_obj)
 
 
 // This is a helper for QObject.sender().
-QObject *qpycore_qobject_sender()
+QObject *qpycore_qobject_sender(QObject *obj)
 {
-    // Handle the trivial case.
-    if (!PyQtProxy::last_sender)
-        return 0;
+    if (obj || !PyQtProxy::last_sender)
+        return obj;
 
     // See if it is a short-circuit signal proxy.
     PyQtShortcircuitSignalProxy *ssp = qobject_cast<PyQtShortcircuitSignalProxy *>(PyQtProxy::last_sender);

@@ -1,3 +1,87 @@
+v4.12.3 22nd May 2011
+  - A bug fix release.
+
+v4.12.2 30th April 2011
+  - /KeepReference/ is now supported as a function annotation.
+  - Handwritten code in class templates no longer have the types substituted in
+    lines that appear to contain C preprocessor directives.
+  - Added support for global inplace numeric operators.
+
+v4.12.1 22nd January 2011
+  - Added support for the __getattribute__, __getattr__, __setattr__ and
+    __delattr__ methods.
+  - Added the /RaisesPyException/ function annotation.
+  - Added SIP_SSIZE_T as a predefined type.
+  - PyObject * can now be used as a synonym for SIP_PYOBJECT.
+  - Added sip.ispycreated() to the sip module.
+  - Added the --deployment-target flag to configure.py for MacOS/X.
+
+v4.12 23rd December 2010
+  - Implemented the revised directive syntax for %Module.
+  - Deprecated %CModule, use %Module instead.
+  - Added the keyword_arguments argument to %Module to specify the level of
+    support for Python keyword arguments.
+  - Deprecated the -k flag to sip, use the keyword_arguments argument to
+    %Module instead.
+  - Added an automatic pseudo-%Timeline to allow the SIP version number to be
+    used in the %If directive.
+  - Changed the behavior of the /KeywordArgs/ annotation to specify the level
+    of support for Python keyword arguments.
+  - Deprecated the /NoKeywordArgs/ annotation, use /KeywordArgs="None"/
+    instead.
+  - Added the use_argument_names argument to %Module to provide the real names
+    of arguments to handwritten code.
+  - Module docstrings are now supported.
+  - Added %AutoPyName to automatically provide Python names.
+  - Added %Property to implement Python properties based on C/C++ getters and
+    setters.
+  - Added %Extract to allow arbitrary text to be embedded in specification
+    files and subsequently extracted.
+  - Deprecated %Doc and %ExportedDoc, use %Extract instead.
+  - Added the -X flag to sip to extract text defined with %Extract.
+  - Deprecated the -d flag to sip, use -X instead.
+  - Added /PyInt/ as an argument, function and typedef annotation to force
+    char types to be handled as Python integers rather than single character
+    strings.
+  - Added the L and M format characters to sipBuildResult(), sipCallMethod()
+    and sipParseResult().
+  - Added sipGetAddress().
+  - Added the -T flag to sip to suppress the timestamp in the header comments
+    of generated files.
+  - sip.voidptr now behaves like a Python memoryview object and supports
+    sub-script assignment.
+  - Added the --sip-module flag to configure.py to allow the name and
+    containing package of the sip module to be specified thereby allowing
+    packages to include a local copy of the sip module.
+
+v4.11.2 22nd October 2010
+  - /KeepReference/ can now be applied to global functions and static methods.
+  - %TypeCode can now be specified in a %MappedType directive.
+  - Mapped types for templates no longer require the template arguments to be
+    fully defined.
+  - Build system changes required by PyQt v4.8 and Qt v4.7.
+
+v4.11.1 6th September 2010
+  - A bug fix release.
+
+v4.11 31st August 2010
+  - Added the %UnitPostIncludeCode directive.
+  - /KeepReference/ will now accept a key to track when the same object is
+    passed to more than one method.
+  - operator() and __call__() can now accept keyword arguments.
+  - Added support for Python v3.2.
+
+v4.10.5 16th July 2010
+  - A bug fix release for Python v3 and Python v2.7.
+
+v4.10.4 15th July 2010
+  - Use capsules when being built for Python v2.7 to work around an apparent
+    bug in the support for PyCObject.
+
+v4.10.3 12th July 2010
+  - Added support for Q_SLOT, Q_SLOTS, Q_SIGNAL and Q_SIGNALS.
+  - Added the /__len__/ function annotation.
+
 v4.10.2 16th April 2010
   - A bug fix release.
 

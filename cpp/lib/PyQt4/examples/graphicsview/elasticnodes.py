@@ -1,25 +1,46 @@
 #!/usr/bin/env python
 
-############################################################################
+
+#############################################################################
 ##
-## Copyright (C) 2006-2006 Trolltech ASA. All rights reserved.
+## Copyright (C) 2010 Riverbank Computing Limited.
+## Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+## All rights reserved.
 ##
-## This file is part of the example classes of the Qt Toolkit.
+## This file is part of the examples of PyQt.
 ##
-## Licensees holding a valid Qt License Agreement may use this file in
-## accordance with the rights, responsibilities and obligations
-## contained therein.  Please consult your licensing agreement or
-## contact sales@trolltech.com if any conditions of this licensing
-## agreement are not clear to you.
+## $QT_BEGIN_LICENSE:BSD$
+## You may use this file under the terms of the BSD license as follows:
 ##
-## Further information about Qt licensing is available at:
-## http://www.trolltech.com/products/qt/licensing.html or by
-## contacting info@trolltech.com.
+## "Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are
+## met:
+##   * Redistributions of source code must retain the above copyright
+##     notice, this list of conditions and the following disclaimer.
+##   * Redistributions in binary form must reproduce the above copyright
+##     notice, this list of conditions and the following disclaimer in
+##     the documentation and/or other materials provided with the
+##     distribution.
+##   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
+##     the names of its contributors may be used to endorse or promote
+##     products derived from this software without specific prior written
+##     permission.
 ##
-## This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
-## WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+## $QT_END_LICENSE$
 ##
-############################################################################
+#############################################################################
+
 
 import math
 
@@ -71,26 +92,28 @@ class Edge(QtGui.QGraphicsItem):
                 self.mapFromItem(self.dest, 0, 0))
         length = line.length()
 
-        if length == 0.0:
-            return
-
-        edgeOffset = QtCore.QPointF((line.dx() * 10) / length,
-                (line.dy() * 10) / length)
-
         self.prepareGeometryChange()
-        self.sourcePoint = line.p1() + edgeOffset
-        self.destPoint = line.p2() - edgeOffset
+
+        if length > 20.0:
+            edgeOffset = QtCore.QPointF((line.dx() * 10) / length,
+                    (line.dy() * 10) / length)
+
+            self.sourcePoint = line.p1() + edgeOffset
+            self.destPoint = line.p2() - edgeOffset
+        else:
+            self.sourcePoint = line.p1()
+            self.destPoint = line.p1()
 
     def boundingRect(self):
         if not self.source or not self.dest:
             return QtCore.QRectF()
 
-        penWidth = 1
+        penWidth = 1.0
         extra = (penWidth + self.arrowSize) / 2.0
 
         return QtCore.QRectF(self.sourcePoint,
-                             QtCore.QSizeF(self.destPoint.x() - self.sourcePoint.x(),
-                                           self.destPoint.y() - self.sourcePoint.y())).normalized().adjusted(-extra, -extra, extra, extra)
+                QtCore.QSizeF(self.destPoint.x() - self.sourcePoint.x(),
+                        self.destPoint.y() - self.sourcePoint.y())).normalized().adjusted(-extra, -extra, extra, extra)
 
     def paint(self, painter, option, widget):
         if not self.source or not self.dest:
@@ -136,6 +159,7 @@ class Node(QtGui.QGraphicsItem):
         self.newPos = QtCore.QPointF()
 
         self.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
+        self.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges)
         self.setCacheMode(QtGui.QGraphicsItem.DeviceCoordinateCache)
         self.setZValue(1)
 
@@ -225,7 +249,7 @@ class Node(QtGui.QGraphicsItem):
         painter.drawEllipse(-10, -10, 20, 20)
 
     def itemChange(self, change, value):
-        if change == QtGui.QGraphicsItem.ItemPositionChange:
+        if change == QtGui.QGraphicsItem.ItemPositionHasChanged:
             for edge in self.edgeList:
                 edge.adjust()
             self.graph.itemMoved()

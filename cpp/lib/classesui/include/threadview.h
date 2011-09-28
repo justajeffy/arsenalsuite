@@ -23,16 +23,15 @@
 #ifndef THREAD_VIEW_H
 #define THREAD_VIEW_H
 
+#include "element.h"
+#include "job.h"
+#include "thread.h"
+
+#include "classesui.h"
 #include "ui_threadviewui.h"
 
 class QMenu;
 class QPushButton;
-
-class ThreadViewInternal;
-
-#include "element.h"
-#include "job.h"
-#include "thread.h"
 
 class User;
 class Element;
@@ -40,8 +39,10 @@ class ElementList;
 class Job;
 class JobList;
 class Thread;
- 
-class ThreadView : public QWidget
+
+class ThreadViewInternal;
+
+class CLASSESUI_EXPORT ThreadView : public QWidget
 {
 Q_OBJECT
 public:
@@ -57,7 +58,7 @@ protected:
 };
 
 
-class ThreadModel : public RecordSuperModel
+class CLASSESUI_EXPORT ThreadModel : public RecordSuperModel
 {
 Q_OBJECT
 public:
@@ -70,7 +71,7 @@ public:
 	bool Thread;
 };
 
-class ThreadViewInternal : public QWidget, public Ui::ThreadViewUI
+class CLASSESUI_EXPORT ThreadViewInternal : public QWidget, public Ui::ThreadViewUI
 {
 Q_OBJECT
 public:

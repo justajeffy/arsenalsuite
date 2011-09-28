@@ -170,9 +170,11 @@ public slots:
 	void showRemapWarning(const QString & drive);
 	void setIsMapped( bool );
 
+#ifndef Q_OS_WIN
     // Qt signal handlers
 	void handleSigInt();
 	void handleSigTerm();
+#endif
 
     /// Update memory usage of running and finished jobs
     void setAvailableMemory();

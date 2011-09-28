@@ -1,7 +1,7 @@
 // This is the implementation of the pySlot (and deprecated pyqtSignature)
 // decorator.
 //
-// Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -17,13 +17,8 @@
 // GPL Exception version 1.1, which can be found in the file
 // GPL_EXCEPTION.txt in this package.
 // 
-// Please review the following information to ensure GNU General
-// Public Licensing requirements will be met:
-// http://trolltech.com/products/qt/licenses/licensing/opensource/. If
-// you are unsure which license is appropriate for your use, please
-// review the following information:
-// http://trolltech.com/products/qt/licenses/licensing/licensingoverview
-// or contact the sales department at sales@riverbankcomputing.com.
+// If you are unsure which license is appropriate for your use, please
+// contact the sales department at sales@riverbankcomputing.com.
 // 
 // This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -137,7 +132,7 @@ static PyObject *decorate(Chimera::Signature *parsed_sig, PyObject *res_obj,
         }
     }
 
-    // Wrap the parsed signature in a PyCObject.
+    // Wrap the parsed signature in a Python object.
     PyObject *sig_obj = Chimera::Signature::toPyObject(parsed_sig);
 
     if (!sig_obj)
@@ -180,6 +175,7 @@ static PyObject *decorator(PyObject *self, PyObject *f)
             return 0;
 
         parsed_sig->signature.prepend(ascii);
+        parsed_sig->py_signature.prepend(ascii);
         Py_DECREF(ascii_obj);
     }
 

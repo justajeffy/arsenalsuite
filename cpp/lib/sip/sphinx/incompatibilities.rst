@@ -5,6 +5,46 @@ This section describes incompatibilities introduced by particular versions of
 SIP.  Normally these are the removal of previously deprecated features.
 
 
+SIP v4.12.3
+-----------
+
+Prior to this version, when SIP searches a class hierachy to see if there is a
+Python reimplementation of a virtual C++ method, it ignored any objects that
+were not Python functions or methods.
+
+Starting with this version such an object is not ignored and will be called.
+If it is not callable then a Python exception will be raised.  For example,
+the following code will now raise an excepton because the ``Mixin.event``
+attribute will now be called as it is assumed to be a valid reimplementation of
+``QObject.event()``::
+
+    class Mixin:
+        event = False
+
+    class MyObject(QObject, Mixin):
+        pass
+
+
+SIP v4.12
+---------
+
+Prior to this version several directives ignored any enclosing :directive:`%If`
+directive.  Starting with this version all directives are affected by the
+:directive:`%If` directive.
+
+
+SIP v4.10.1
+-----------
+
+Newly Deprecated Features
+*************************
+
+The following parts of the :ref:`C API <ref-c-api>` are now deprecated (but
+still supported).
+
+- The ``D`` format character of :cfunc:`sipParseResult()`.
+
+
 SIP v4.8
 --------
 
@@ -121,7 +161,7 @@ still supported).
 - The ``B``, ``C`` and ``E`` format characters of :cfunc:`sipBuildResult()` and
   :cfunc:`sipCallMethod()`.
 
-- The ``s``, ``C`` and ``E`` format character of :cfunc:`sipParseResult()`.
+- The ``s``, ``C`` and ``E`` format characters of :cfunc:`sipParseResult()`.
 
 
 SIP v4.7.8

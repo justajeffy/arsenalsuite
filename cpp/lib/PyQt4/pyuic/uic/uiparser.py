@@ -1,3 +1,43 @@
+#############################################################################
+##
+## Copyright (C) 2011 Riverbank Computing Limited.
+## Copyright (C) 2006 Thorsten Marek.
+## All right reserved.
+##
+## This file is part of PyQt.
+##
+## You may use this file under the terms of the GPL v2 or the revised BSD
+## license as follows:
+##
+## "Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are
+## met:
+##   * Redistributions of source code must retain the above copyright
+##     notice, this list of conditions and the following disclaimer.
+##   * Redistributions in binary form must reproduce the above copyright
+##     notice, this list of conditions and the following disclaimer in
+##     the documentation and/or other materials provided with the
+##     distribution.
+##   * Neither the name of the Riverbank Computing Limited nor the names
+##     of its contributors may be used to endorse or promote products
+##     derived from this software without specific prior written
+##     permission.
+##
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+##
+#############################################################################
+
+
 import sys
 import logging
 import os.path
@@ -125,6 +165,7 @@ class UIParser(object):
         self.currentActionGroup = None
         self.resources = []
         self.button_groups = []
+        self.layout_widget = False
 
     def setupObject(self, clsname, parent, branch, is_attribute = True):
         name = self.uniqueName(branch.attrib.get("name") or clsname[1:].lower())
@@ -140,27 +181,31 @@ class UIParser(object):
         return obj
     
     def createWidget(self, elem):
-        def widgetClass(elem):
-            cls = elem.attrib["class"].replace('::', '.')
-            if cls == "Line":
-                return "QFrame"
-            else:
-                return cls
-            
         self.column_counter = 0
         self.row_counter = 0
         self.item_nr = 0
         self.itemstack = []
         self.sorting_enabled = None
+
+        widget_class = elem.attrib['class'].replace('::', '.')
+        if widget_class == 'Line':
+            widget_class = 'QFrame'
         
+        # Ignore the parent if it is a container.
         parent = self.stack.topwidget
-        if isinstance(parent, (QtGui.QToolBox, QtGui.QTabWidget,
-                               QtGui.QStackedWidget, QtGui.QDockWidget,
+        if isinstance(parent, (QtGui.QDockWidget, QtGui.QMdiArea,
+                               QtGui.QScrollArea, QtGui.QStackedWidget,
+                               QtGui.QToolBox, QtGui.QTabWidget,
                                QtGui.QWizard)):
             parent = None
-        
-        
-        self.stack.push(self.setupObject(widgetClass(elem), parent, elem))
+
+        # See if this is a layout widget.
+        if widget_class == 'QWidget':
+            if parent is not None:
+                if not isinstance(parent, QtGui.QMainWindow):
+                    self.layout_widget = True
+
+        self.stack.push(self.setupObject(widget_class, parent, elem))
 
         if isinstance(self.stack.topwidget, QtGui.QTableWidget):
             self.stack.topwidget.setColumnCount(len(elem.findall("column")))
@@ -168,6 +213,8 @@ class UIParser(object):
 
         self.traverseWidgetTree(elem)
         widget = self.stack.popWidget()
+
+        self.layout_widget = False
 
         if isinstance(widget, QtGui.QTreeView):
             self.handleHeaderView(elem, "header", widget.header())
@@ -181,7 +228,14 @@ class UIParser(object):
         elif isinstance(widget, QtGui.QAbstractButton):
             bg_i18n = self.wprops.getAttribute(elem, "buttonGroup")
             if bg_i18n is not None:
-                bg_name = bg_i18n.string
+                # This should be handled properly in case the problem arises
+                # elsewhere as well.
+                try:
+                    # We are compiling the .ui file.
+                    bg_name = bg_i18n.string
+                except AttributeError:
+                    # We are loading the .ui file.
+                    bg_name = bg_i18n
 
                 for bg in self.button_groups:
                     if bg.objectName() == bg_name:
@@ -203,12 +257,7 @@ class UIParser(object):
             gp = elem.attrib["grid-position"]
 
             if isinstance(lay, QtGui.QFormLayout):
-                if gp[1]:
-                    role = QtGui.QFormLayout.FieldRole
-                else:
-                    role = QtGui.QFormLayout.LabelRole
-
-                lay.setWidget(gp[0], role, widget)
+                lay.setWidget(gp[0], self._form_layout_role(gp), widget)
             else:
                 lay.addWidget(widget, *gp)
 
@@ -254,11 +303,6 @@ class UIParser(object):
                 if tbArea is None:
                     topwidget.addToolBar(widget)
                 else:
-                    if isinstance(tbArea, str):
-                        tbArea = getattr(QtCore.Qt, tbArea)
-                    else:
-                        tbArea = QtCore.Qt.ToolBarArea(tbArea)
-
                     topwidget.addToolBar(tbArea, widget)
 
                 tbBreak = self.wprops.getAttribute(elem, "toolBarBreak")
@@ -305,21 +349,24 @@ class UIParser(object):
             header.setStretchLastSection(value)
 
     def createSpacer(self, elem):
-        width = int(elem.findtext("property/size/width"))
-        height = int(elem.findtext("property/size/height"))
+        width = elem.findtext("property/size/width")
+        height = elem.findtext("property/size/height")
 
-        sizeType = self.wprops.getProperty(elem, "sizeType")
-        if sizeType is None:
-            sizeType = "QSizePolicy::Expanding"
+        if width is None or height is None:
+            size_args = ()
+        else:
+            size_args = (int(width), int(height))
 
-        policy = (QtGui.QSizePolicy.Minimum,
-                  getattr(QtGui.QSizePolicy, sizeType.split("::")[-1]))
+        sizeType = self.wprops.getProperty(elem, "sizeType",
+                QtGui.QSizePolicy.Expanding)
 
-        if self.wprops.getProperty(elem, "orientation") == "Qt::Horizontal":
+        policy = (QtGui.QSizePolicy.Minimum, sizeType)
+
+        if self.wprops.getProperty(elem, "orientation") == QtCore.Qt.Horizontal:
             policy = policy[1], policy[0]
 
         spacer = self.factory.createQObject("QSpacerItem",
-                self.uniqueName("spacerItem"), (width, height) + policy,
+                self.uniqueName("spacerItem"), size_args + policy,
                 is_attribute=False)
 
         if self.stack.topIsLayout():
@@ -327,12 +374,7 @@ class UIParser(object):
             gp = elem.attrib["grid-position"]
 
             if isinstance(lay, QtGui.QFormLayout):
-                if gp[1]:
-                    role = QtGui.QFormLayout.FieldRole
-                else:
-                    role = QtGui.QFormLayout.LabelRole
-
-                lay.setItem(gp[0], role, spacer)
+                lay.setItem(gp[0], self._form_layout_role(gp), spacer)
             else:
                 lay.addItem(spacer, *gp)
 
@@ -378,6 +420,13 @@ class UIParser(object):
                 SubElement(cme, 'number').text = str(top)
                 SubElement(cme, 'number').text = str(right)
                 SubElement(cme, 'number').text = str(bottom)
+        elif self.layout_widget:
+            # The layout's of layout widgets have no margin.
+            me = SubElement(elem, 'property', name='margin')
+            SubElement(me, 'number').text = '0'
+
+            # In case there are any nested layouts.
+            self.layout_widget = False
 
         # We do the same for setHorizontalSpacing() and setVerticalSpacing().
         horiz = self.wprops.getProperty(elem, 'horizontalSpacing', -1)
@@ -400,22 +449,16 @@ class UIParser(object):
         self.traverseWidgetTree(elem)
 
         layout = self.stack.popLayout()
+        self.configureLayout(elem, layout)
+
         if self.stack.topIsLayout():
             top_layout = self.stack.peek()
             gp = elem.attrib["grid-position"]
 
             if isinstance(top_layout, QtGui.QFormLayout):
-                if gp[1]:
-                    role = QtGui.QFormLayout.FieldRole
-                else:
-                    role = QtGui.QFormLayout.LabelRole
-
-                top_layout.setLayout(gp[0], role, layout)
+                top_layout.setLayout(gp[0], self._form_layout_role(gp), layout)
             else:
-                self.configureLayout(elem, layout)
                 top_layout.addLayout(layout, *gp)
-        else:
-            self.configureLayout(elem, layout)
 
     def configureLayout(self, elem, layout):
         if isinstance(layout, QtGui.QGridLayout):
@@ -459,8 +502,11 @@ class UIParser(object):
                 text = self.wprops.getProperty(elem, "text")
                 icon = self.wprops.getProperty(elem, "icon")
                 flags = self.wprops.getProperty(elem, "flags")
+                check_state = self.wprops.getProperty(elem, "checkState")
+                background = self.wprops.getProperty(elem, "background")
+                foreground = self.wprops.getProperty(elem, "foreground")
 
-                if icon or flags:
+                if icon or flags or check_state:
                     item_name = "item"
                 else:
                     item_name = None
@@ -480,6 +526,15 @@ class UIParser(object):
 
                 if flags:
                     item.setFlags(flags)
+
+                if check_state:
+                    item.setCheckState(check_state)
+
+                if background:
+                    item.setBackground(background)
+
+                if foreground:
+                    item.setForeground(foreground)
 
             elif isinstance(w, QtGui.QTreeWidget):
                 if self.itemstack:
@@ -518,6 +573,12 @@ class UIParser(object):
                         item.setIcon(column, c_prop)
                     elif c_prop_name == "flags":
                         item.setFlags(c_prop)
+                    elif c_prop_name == "checkState":
+                        item.setCheckState(column, c_prop)
+                    elif c_prop_name == "background":
+                        item.setBackground(column, c_prop)
+                    elif c_prop_name == "foreground":
+                        item.setForeground(column, c_prop)
 
                 self.traverseWidgetTree(elem)
                 _, self.item_nr = self.itemstack.pop()
@@ -526,6 +587,9 @@ class UIParser(object):
                 text = self.wprops.getProperty(elem, "text")
                 icon = self.wprops.getProperty(elem, "icon")
                 flags = self.wprops.getProperty(elem, "flags")
+                check_state = self.wprops.getProperty(elem, "checkState")
+                background = self.wprops.getProperty(elem, "background")
+                foreground = self.wprops.getProperty(elem, "foreground")
 
                 item = self.factory.createQObject("QTableWidgetItem", "item",
                         (), False)
@@ -537,16 +601,28 @@ class UIParser(object):
                 row = int(elem.attrib["row"])
                 col = int(elem.attrib["column"])
 
-                if text:
-                    w.item(row, col).setText(text)
-
                 if icon:
                     item.setIcon(icon)
 
                 if flags:
                     item.setFlags(flags)
 
+                if check_state:
+                    item.setCheckState(check_state)
+
+                if background:
+                    item.setBackground(background)
+
+                if foreground:
+                    item.setForeground(foreground)
+
                 w.setItem(row, col, item)
+
+                if text:
+                    # Text is translated so we don't have access to the item
+                    # attribute when generating code so we must get it from the
+                    # widget after it has been set.
+                    w.item(row, col).setText(text)
 
             self.item_nr += 1
 
@@ -669,8 +745,12 @@ class UIParser(object):
                     widget.addAction(action_obj)
 
     def setDelayedProps(self):
-        for func, args in self.wprops.delayed_props:
-            func(args)
+        for widget, layout, setter, args in self.wprops.delayed_props:
+            if layout:
+                widget = widget.layout()
+
+            setter = getattr(widget, setter)
+            setter(args)
             
     def setBuddies(self):
         for widget, buddy in self.wprops.buddies:
@@ -779,10 +859,12 @@ class UIParser(object):
     def finalize(self):
         pass
 
-    def parse(self, filename):
-        # the order in which the different branches are handled is important
-        # the widget tree handler relies on all custom widgets being known,
-        # and in order to create the connections, all widgets have to be populated
+    def parse(self, filename, base_dir=''):
+        self.wprops.set_base_dir(base_dir)
+
+        # The order in which the different branches are handled is important.
+        # The widget tree handler relies on all custom widgets being known, and
+        # in order to create the connections, all widgets have to be populated.
         branchHandlers = (
             ("layoutdefault", self.readDefaults),
             ("class",         self.classname),
@@ -796,8 +878,7 @@ class UIParser(object):
         document = parse(filename)
         version = document.getroot().attrib["version"]
         DEBUG("UI version is %s" % (version,))
-        # Right now, only version 4.0 is supported, which is used up to at
-        # least Qt 4.4.
+        # Right now, only version 4.0 is supported.
         assert version in ("4.0",)
         for tagname, actor in branchHandlers:
             elem = document.find(tagname)
@@ -807,3 +888,14 @@ class UIParser(object):
         w = self.toplevelWidget
         self.reset()
         return w
+
+    @staticmethod
+    def _form_layout_role(grid_position):
+        if grid_position[3] > 1:
+            role = QtGui.QFormLayout.SpanningRole
+        elif grid_position[1] == 1:
+            role = QtGui.QFormLayout.FieldRole
+        else:
+            role = QtGui.QFormLayout.LabelRole
+
+        return role

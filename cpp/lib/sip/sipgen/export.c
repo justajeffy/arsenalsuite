@@ -1,7 +1,7 @@
 /*
  * The XML and API file generator module for SIP.
  *
- * Copyright (c) 2010 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
  *
  * This file is part of SIP.
  *
@@ -239,7 +239,8 @@ static int apiOverload(sipSpec *pt, moduleDef *mod, classDef *scope,
     prScopedPythonName(fp, scope, od->common->pyname->text);
     fprintf(fp, "?%d", METHOD_ID);
 
-    need_sec = prPythonSignature(pt, fp, &od->pysig, sec, TRUE, TRUE, FALSE);
+    need_sec = prPythonSignature(pt, fp, &od->pysig, sec, TRUE, TRUE, FALSE,
+            FALSE);
 
     fprintf(fp, "\n");
 
@@ -985,6 +986,9 @@ static const char *pyType(sipSpec *pt, argDef *ad, int sec, classDef **scope)
         type_name = "str";
         break;
 
+    case byte_type:
+    case sbyte_type:
+    case ubyte_type:
     case ushort_type:
     case uint_type:
     case long_type:
@@ -1074,11 +1078,11 @@ void prScopedPythonName(FILE *fp, classDef *scope, const char *pyname)
  * Generate a Python signature.
  */
 int prPythonSignature(sipSpec *pt, FILE *fp, signatureDef *sd, int sec,
-        int names, int defaults, int in_str)
+        int names, int defaults, int in_str, int is_signal)
 {
     int need_sec = FALSE, need_comma = FALSE, is_res, nr_out, a;
 
-    fprintf(fp, "(");
+    fprintf(fp, "%c", (is_signal ? '[' : '('));
 
     nr_out = 0;
 
@@ -1099,7 +1103,7 @@ int prPythonSignature(sipSpec *pt, FILE *fp, signatureDef *sd, int sec,
             need_sec = TRUE;
     }
 
-    fprintf(fp, ")");
+    fprintf(fp, "%c", (is_signal ? ']' : ')'));
 
     is_res = !((sd->result.atype == void_type && sd->result.nrderefs == 0) ||
             (sd->result.doctype != NULL && sd->result.doctype[0] == '\0'));
