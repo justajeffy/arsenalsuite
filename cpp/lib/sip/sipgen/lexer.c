@@ -1,6 +1,5 @@
-#line 2 "/blur/cpp/lib/sip/sipgen/lexer.c"
 
-#line 4 "/blur/cpp/lib/sip/sipgen/lexer.c"
+#line 3 "<stdout>"
 
 #define  YY_INT_ALIGNED short int
 
@@ -1347,7 +1346,7 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 1 "lexer.l"
 /*
  * The SIP lexer.
  *
@@ -1365,7 +1364,7 @@ char *yytext;
  * SIP is supplied WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#line 20 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 20 "lexer.l"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1406,7 +1405,7 @@ static void fatallex(char *);
 
 
 
-#line 1410 "/blur/cpp/lib/sip/sipgen/lexer.c"
+#line 1409 "<stdout>"
 
 #define INITIAL 0
 #define code 1
@@ -1610,10 +1609,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 65 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 65 "lexer.l"
 
 
-#line 1617 "/blur/cpp/lib/sip/sipgen/lexer.c"
+#line 1616 "<stdout>"
 
 	if ( !(yy_init) )
 		{
@@ -1699,492 +1698,492 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 67 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 67 "lexer.l"
 {BEGIN directive_start; return TK_API;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 68 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 68 "lexer.l"
 {BEGIN directive_start; return TK_AUTOPYNAME;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 69 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 69 "lexer.l"
 {return TK_CMODULE;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 70 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 70 "lexer.l"
 {BEGIN directive_start; return TK_COMPOMODULE;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 71 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 71 "lexer.l"
 {BEGIN directive_start; return TK_CONSMODULE;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 72 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 72 "lexer.l"
 {BEGIN directive_start; return TK_DEFDOCSTRING;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 73 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 73 "lexer.l"
 {BEGIN directive_start; return TK_DEFENCODING;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 74 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 74 "lexer.l"
 {BEGIN directive_start; return TK_DEFMETATYPE;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 75 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 75 "lexer.l"
 {BEGIN directive_start; return TK_DEFSUPERTYPE;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 76 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 76 "lexer.l"
 {return TK_END;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 77 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 77 "lexer.l"
 {BEGIN INITIAL; return TK_END;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 78 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 78 "lexer.l"
 {return TK_EXCEPTION;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 79 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 79 "lexer.l"
 {BEGIN directive_start; return TK_FEATURE;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 80 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 80 "lexer.l"
 {return TK_IF;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 81 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 81 "lexer.l"
 {BEGIN directive_start; return TK_IMPORT;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 82 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 82 "lexer.l"
 {BEGIN directive_start; return TK_INCLUDE;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 83 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 83 "lexer.l"
 {BEGIN directive_start; return TK_LICENSE;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 84 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 84 "lexer.l"
 {return TK_MAPPEDTYPE;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 85 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 85 "lexer.l"
 {BEGIN directive_start; return TK_MODULE;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 86 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 86 "lexer.l"
 {return TK_OPTINCLUDE;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 87 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 87 "lexer.l"
 {return TK_PLATFORMS;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 88 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 88 "lexer.l"
 {BEGIN directive_start; return TK_PLUGIN;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 89 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 89 "lexer.l"
 {BEGIN directive_start; return TK_PROPERTY;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 90 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 90 "lexer.l"
 {return TK_TIMELINE;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 91 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 91 "lexer.l"
 {return TK_VIRTERRORHANDLER; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 93 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 93 "lexer.l"
 {return TK_CLASS;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 94 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 94 "lexer.l"
 {return TK_STRUCT;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 95 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 95 "lexer.l"
 {return TK_PUBLIC;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 96 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 96 "lexer.l"
 {return TK_PROTECTED;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 97 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 97 "lexer.l"
 {return TK_PRIVATE;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 98 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 98 "lexer.l"
 {return TK_SIGNALS;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 99 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 99 "lexer.l"
 {return TK_SIGNALS;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 100 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 100 "lexer.l"
 {return TK_SIGNAL_METHOD;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 101 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 101 "lexer.l"
 {return TK_SLOTS;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 102 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 102 "lexer.l"
 {return TK_SLOTS;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 103 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 103 "lexer.l"
 {return TK_SLOT_METHOD;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 104 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 104 "lexer.l"
 {return TK_CHAR;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 105 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 105 "lexer.l"
 {return TK_WCHAR_T;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 106 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 106 "lexer.l"
 {return TK_BOOL;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 107 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 107 "lexer.l"
 {return TK_SHORT;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 108 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 108 "lexer.l"
 {return TK_INT;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 109 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 109 "lexer.l"
 {return TK_LONG;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 110 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 110 "lexer.l"
 {return TK_FLOAT;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 111 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 111 "lexer.l"
 {return TK_DOUBLE;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 112 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 112 "lexer.l"
 {return TK_VOID;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 113 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 113 "lexer.l"
 {return TK_VIRTUAL;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 114 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 114 "lexer.l"
 {return TK_ENUM;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 115 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 115 "lexer.l"
 {return TK_SIGNED;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 116 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 116 "lexer.l"
 {return TK_UNSIGNED;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 117 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 117 "lexer.l"
 {return TK_CONST;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 118 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 118 "lexer.l"
 {return TK_STATIC;}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 119 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 119 "lexer.l"
 {return TK_TRUE_VALUE;}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 120 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 120 "lexer.l"
 {return TK_FALSE_VALUE;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 121 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 121 "lexer.l"
 {return TK_NULL_VALUE;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 122 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 122 "lexer.l"
 {return TK_TYPEDEF;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 123 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 123 "lexer.l"
 {return TK_NAMESPACE;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 124 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 124 "lexer.l"
 {return TK_OPERATOR;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 125 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 125 "lexer.l"
 {return TK_THROW;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 126 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 126 "lexer.l"
 {return TK_EXPLICIT;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 127 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 127 "lexer.l"
 {return TK_TEMPLATE;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 128 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 128 "lexer.l"
 {return TK_SCOPE;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 129 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 129 "lexer.l"
 {return TK_LOGICAL_OR;}
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 130 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 130 "lexer.l"
 {return TK_PYOBJECT;}
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 131 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 131 "lexer.l"
 {return TK_PYTUPLE;}
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 132 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 132 "lexer.l"
 {return TK_PYLIST;}
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 133 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 133 "lexer.l"
 {return TK_PYDICT;}
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 134 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 134 "lexer.l"
 {return TK_PYCALLABLE;}
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 135 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 135 "lexer.l"
 {return TK_PYSLICE;}
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 136 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 136 "lexer.l"
 {return TK_PYTYPE;}
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 137 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 137 "lexer.l"
 {return TK_SIPSIGNAL;}
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 138 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 138 "lexer.l"
 {return TK_SIPSLOT;}
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 139 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 139 "lexer.l"
 {return TK_SIPANYSLOT;}
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 140 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 140 "lexer.l"
 {return TK_SIPRXCON;}
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 141 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 141 "lexer.l"
 {return TK_SIPRXDIS;}
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 142 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 142 "lexer.l"
 {return TK_SIPSLOTCON;}
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 143 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 143 "lexer.l"
 {return TK_SIPSLOTDIS;}
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 144 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 144 "lexer.l"
 {return TK_SIPSSIZET;}
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 145 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 145 "lexer.l"
 {return TK_QOBJECT;}
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 146 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 146 "lexer.l"
 {return TK_ELLIPSIS;}
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 148 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 148 "lexer.l"
 {return TK_FORMAT;}
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 149 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 149 "lexer.l"
 {return TK_GET;}
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 150 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 150 "lexer.l"
 {return TK_ID;}
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 151 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 151 "lexer.l"
 {return TK_KWARGS;}
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 152 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 152 "lexer.l"
 {return TK_LANGUAGE;}
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 153 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 153 "lexer.l"
 {return TK_LICENSEE;}
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 154 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 154 "lexer.l"
 {return TK_NAME;}
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 155 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 155 "lexer.l"
 {return TK_OPTIONAL;}
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 156 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 156 "lexer.l"
 {return TK_ORDER;}
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 157 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 157 "lexer.l"
 {return TK_REMOVELEADING;}
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 158 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 158 "lexer.l"
 {return TK_SET;}
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 159 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 159 "lexer.l"
 {return TK_SIGNATURE;}
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 160 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 160 "lexer.l"
 {return TK_TIMESTAMP;}
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 161 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 161 "lexer.l"
 {return TK_TYPE;}
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 162 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 162 "lexer.l"
 {return TK_USEARGNAMES;}
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 163 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 163 "lexer.l"
 {return TK_VERSION;}
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 165 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 165 "lexer.l"
 {return TK_TRUE_VALUE;}
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 166 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 166 "lexer.l"
 {return TK_FALSE_VALUE;}
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 169 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 169 "lexer.l"
 {
     /* Ignore whitespace. */
     ;
@@ -2192,7 +2191,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 174 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 174 "lexer.l"
 {
     /*
      * Maintain the parenthesis depth so that we don't enter the 'code' state
@@ -2207,7 +2206,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 186 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 186 "lexer.l"
 {
     /* Maintain the parenthesis depth. */
     --parenDepth;
@@ -2220,7 +2219,7 @@ YY_RULE_SETUP
 case 101:
 /* rule 101 can match eol */
 YY_RULE_SETUP
-#line 195 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 195 "lexer.l"
 {
     /* Maintain the line number. */
     ++inputFileStack[currentFile].lineno;
@@ -2233,7 +2232,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 205 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 205 "lexer.l"
 {
     /* Ignore C++ style comments. */
     ;
@@ -2241,7 +2240,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 211 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 211 "lexer.l"
 {
     /* A signed decimal number. */
     yylval.number = strtol(yytext,NULL,0);
@@ -2250,7 +2249,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 218 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 218 "lexer.l"
 {
     /* A floating point number. */
     yylval.real = strtod(yytext,NULL);
@@ -2259,7 +2258,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 225 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 225 "lexer.l"
 {
     /* An unsigned hexadecimal number. */
     yylval.number = strtol(yytext,NULL,16);
@@ -2268,7 +2267,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 232 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 232 "lexer.l"
 {
     /* An identifier name. */
     yylval.text = sipStrdup(yytext);
@@ -2277,7 +2276,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 239 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 239 "lexer.l"
 {
     /* A relative pathname. */
     yylval.text = sipStrdup(yytext);
@@ -2287,7 +2286,7 @@ YY_RULE_SETUP
 case 108:
 /* rule 108 can match eol */
 YY_RULE_SETUP
-#line 246 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 246 "lexer.l"
 {
     /* A double-quoted string. */
     char *dp, *sp;
@@ -2315,7 +2314,7 @@ YY_RULE_SETUP
 case 109:
 /* rule 109 can match eol */
 YY_RULE_SETUP
-#line 271 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 271 "lexer.l"
 {
     /* A single-quoted character. */
     if (strlen(yytext) != 3)
@@ -2328,7 +2327,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 282 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 282 "lexer.l"
 {
     /* Ignore C-style comments. */
     yy_push_state(ccomment);
@@ -2337,28 +2336,28 @@ YY_RULE_SETUP
 case 111:
 /* rule 111 can match eol */
 YY_RULE_SETUP
-#line 286 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 286 "lexer.l"
 {
     ++inputFileStack[currentFile].lineno;
 }
 	YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 289 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 289 "lexer.l"
 {
     yy_pop_state();
 }
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 292 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 292 "lexer.l"
 {
     ;
 }
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 297 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 297 "lexer.l"
 {
     /* The software license. */
     codeIdx = 0;
@@ -2367,7 +2366,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 303 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 303 "lexer.l"
 {
     /* The start of a from-type code block. */
     codeIdx = 0;
@@ -2376,7 +2375,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 309 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 309 "lexer.l"
 {
     /* The start of a to-type code block. */
     codeIdx = 0;
@@ -2385,7 +2384,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 315 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 315 "lexer.l"
 {
     /* The start of a to-sub-class code block. */
     codeIdx = 0;
@@ -2394,7 +2393,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 321 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 321 "lexer.l"
 {
     /* The start of an exported header code block. */
     codeIdx = 0;
@@ -2403,7 +2402,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 327 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 327 "lexer.l"
 {
     /* The start of part of an extract. */
     codeIdx = 0;
@@ -2415,7 +2414,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 336 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 336 "lexer.l"
 {
     /* The start of a module header code block. */
     codeIdx = 0;
@@ -2424,7 +2423,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 342 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 342 "lexer.l"
 {
     /* The start of a type header code block. */
     codeIdx = 0;
@@ -2433,7 +2432,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 348 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 348 "lexer.l"
 {
     /* The start of a pre-initialisation code block. */
     codeIdx = 0;
@@ -2442,7 +2441,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 354 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 354 "lexer.l"
 {
     /* The start of an initialisation code block. */
     codeIdx = 0;
@@ -2451,7 +2450,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 360 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 360 "lexer.l"
 {
     /* The start of a post-initialisation code block. */
     codeIdx = 0;
@@ -2460,7 +2459,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 366 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 366 "lexer.l"
 {
     /* The start of a unit code block. */
     codeIdx = 0;
@@ -2469,7 +2468,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 372 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 372 "lexer.l"
 {
     /* The start of a unit post-include code block. */
     codeIdx = 0;
@@ -2478,7 +2477,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 378 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 378 "lexer.l"
 {
     /* The start of a module code block. */
     codeIdx = 0;
@@ -2487,7 +2486,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 128:
 YY_RULE_SETUP
-#line 384 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 384 "lexer.l"
 {
     /* The start of a type code block. */
     codeIdx = 0;
@@ -2496,7 +2495,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 390 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 390 "lexer.l"
 {
     /* The start of a C++ method code block. */
     codeIdx = 0;
@@ -2505,7 +2504,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 396 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 396 "lexer.l"
 {
     /* The start of a C++ virtual code block. */
     codeIdx = 0;
@@ -2514,7 +2513,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 402 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 402 "lexer.l"
 {
     /* The start of a traverse code block. */
     codeIdx = 0;
@@ -2523,7 +2522,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 408 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 408 "lexer.l"
 {
     /* The start of a clear code block. */
     codeIdx = 0;
@@ -2532,7 +2531,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 414 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 414 "lexer.l"
 {
     /* The start of a get buffer code block. */
     codeIdx = 0;
@@ -2541,7 +2540,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 420 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 420 "lexer.l"
 {
     /* The start of a release buffer code block. */
     codeIdx = 0;
@@ -2550,7 +2549,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 426 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 426 "lexer.l"
 {
     /* The start of a read buffer code block. */
     codeIdx = 0;
@@ -2559,7 +2558,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 136:
 YY_RULE_SETUP
-#line 432 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 432 "lexer.l"
 {
     /* The start of a write buffer code block. */
     codeIdx = 0;
@@ -2568,7 +2567,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 438 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 438 "lexer.l"
 {
     /* The start of a segment count code block. */
     codeIdx = 0;
@@ -2577,7 +2576,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 444 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 444 "lexer.l"
 {
     /* The start of a char buffer code block. */
     codeIdx = 0;
@@ -2586,7 +2585,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 450 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 450 "lexer.l"
 {
     /* The start of a pickle code block. */
     codeIdx = 0;
@@ -2595,7 +2594,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 456 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 456 "lexer.l"
 {
     /* The start of a pre-Python code block. */
     deprecated("%PrePythonCode is deprecated");
@@ -2606,7 +2605,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 464 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 464 "lexer.l"
 {
     /* The start of a raise exception code block. */
     codeIdx = 0;
@@ -2615,7 +2614,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 470 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 470 "lexer.l"
 {
     /* The start of a docstring block. */
     codeIdx = 0;
@@ -2624,7 +2623,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 476 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 476 "lexer.l"
 {
     /* The start of a documentation block. */
     deprecated("%Doc is deprecated, use %Extract instead");
@@ -2635,7 +2634,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 484 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 484 "lexer.l"
 {
     /* The start of an exported documentation block. */
     deprecated("%ExportedDoc is deprecated, use %Extract instead");
@@ -2646,7 +2645,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 492 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 492 "lexer.l"
 {
     /* The start of a Makefile code block. */
     deprecated("%Makefile is deprecated");
@@ -2657,7 +2656,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 146:
 YY_RULE_SETUP
-#line 500 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 500 "lexer.l"
 {
     /* The start of an access code block. */
     codeIdx = 0;
@@ -2666,7 +2665,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 147:
 YY_RULE_SETUP
-#line 506 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 506 "lexer.l"
 {
     /* The start of a get code block. */
     codeIdx = 0;
@@ -2675,7 +2674,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 148:
 YY_RULE_SETUP
-#line 512 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 512 "lexer.l"
 {
     /* The start of a set code block. */
     codeIdx = 0;
@@ -2684,7 +2683,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 149:
 YY_RULE_SETUP
-#line 518 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 518 "lexer.l"
 {
     /* The end of a code block. */
     BEGIN INITIAL;
@@ -2695,7 +2694,7 @@ YY_RULE_SETUP
 case 150:
 /* rule 150 can match eol */
 YY_RULE_SETUP
-#line 525 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 525 "lexer.l"
 {
     /* The end of a code line . */
     struct inputFile *ifp;
@@ -2717,7 +2716,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 151:
 YY_RULE_SETUP
-#line 544 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 544 "lexer.l"
 {
     /* The contents of a code line. */
     if (codeIdx == MAX_CODE_LINE_LENGTH)
@@ -2728,7 +2727,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 152:
 YY_RULE_SETUP
-#line 552 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 552 "lexer.l"
 {
     /* Anything else is returned as is. */
     return yytext[0];
@@ -2736,10 +2735,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 153:
 YY_RULE_SETUP
-#line 557 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 557 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 2743 "/blur/cpp/lib/sip/sipgen/lexer.c"
+#line 2742 "<stdout>"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(code):
 case YY_STATE_EOF(ccomment):
@@ -3789,7 +3788,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 557 "/blur/cpp/lib/sip/sipgen/lexer.l"
+#line 557 "lexer.l"
 
 
 
