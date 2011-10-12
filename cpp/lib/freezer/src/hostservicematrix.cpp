@@ -357,6 +357,7 @@ HostServiceMatrix::HostServiceMatrix( QWidget * parent )
 	connect( Service::table(), SIGNAL( updated(Record,Record) ), SLOT( updateServices() ) );
 
     userFiltering = false;
+    useLoggedIn = true;
 }
 
 HostServiceModel * HostServiceMatrix::getModel() const
