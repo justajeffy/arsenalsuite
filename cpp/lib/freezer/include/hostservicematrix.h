@@ -3,6 +3,7 @@
 #define HOST_SERVICE_MATRIX_H
 
 #include <qaction.h>
+#include <qtimer.h>
 
 #include "host.h"
 #include "hostservice.h"
@@ -28,12 +29,28 @@ public:
 	HostService findHostService( const QModelIndex & ) const;
 	QVariant serviceData ( const Host &, int column, int role ) const;
 
-	void setHostFilter( const QString & );
+	void setHostFilter( const QString &, bool cascading=false );
+    void setServiceFilter( const QString &, bool cascading=false );
+    void setStatusFilter( const QString &, bool cascading=false );
+    void setOSFilter( const QString &, bool cascading=false );
+    void setUserLoggedFilter( bool, bool, bool cascading=false );
 
 public slots:
 	void updateServices();
 
 protected:
+    bool hostFiltering;
+    QString currentHostFilter;
+
+    bool statusFiltering;
+    QString currentStatusFilter;
+
+    bool osFiltering;
+    QString currentOsFilter;
+
+    bool userFiltering;
+
+    HostList currentFilteredList;
 
 	ServiceList mServices;
 };
@@ -48,13 +65,28 @@ public:
 public slots:
 	void setHostFilter( const QString & );
 	void setServiceFilter( const QString & );
+    void setStatusFilter( const QString & );
+    void setOSFilter( const QString & );
+    void setUserLoggedFilter( int );
+
+    void setUserLoggedType( bool );
+
+    void hostTimerExpired();
+    void statusTimerExpired();
+    void osTimerExpired();
 
 	void slotShowMenu( const QPoint & pos, const QModelIndex & underMouse );
 
 	void updateServices();
 protected:
+    QTimer* hostFTimer;
+    QTimer* statusFTimer;
+    QTimer* osFTimer;
 
-	QString mHostFilter, mServiceFilter;
+    bool useLoggedIn;
+    bool userFiltering;
+
+	QString mHostFilter, mServiceFilter, mHostStatusFilter, mHostOsFilter;
 	HostServiceModel * mModel;
 };
 
