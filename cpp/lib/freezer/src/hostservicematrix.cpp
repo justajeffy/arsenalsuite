@@ -440,7 +440,7 @@ void HostServiceMatrix::slotShowMenu( const QPoint & pos, const QModelIndex & /*
 			foreach( QModelIndex idx, sel.indexes() ) {
 				HostService hs = mModel->findHostService( idx );
                 // We only want to manipulate what we've filtered out.
-                if( QRegExp(mServiceFilter).indexIn(hs.service().service()) > -1)
+                if( mServiceFilter == "" || QRegExp(mServiceFilter).indexIn(hs.service().service()) > -1)
                 {
     				hs.setEnabled( result == en );
     				toUpdate += hs;
