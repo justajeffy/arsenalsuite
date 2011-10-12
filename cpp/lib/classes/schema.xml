@@ -810,6 +810,9 @@
    <column name="fkeyJob"/>
    <column name="fkeyHost"/>
   </index>
+  <index useCache="false" type="multi" name="Host">
+   <column name="fkeyHost"/>
+  </index>
  </table>
  <table docs="JobFilterMessage stores a list of regexes that are matched against the stdout/stdout of a Job. If one is matched an action is triggered based on the JobFilterType." useCodeGen="true" name="JobFilterMessage" expireKeyCache="true" className="JobFilterMessage">
   <column type="uint" methodName="keyJobFilterMessage" name="keyJobFilterMessage" pkey="true"/>
