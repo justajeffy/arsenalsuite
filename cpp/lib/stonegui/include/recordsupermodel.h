@@ -47,32 +47,6 @@ public:
 	virtual QModelIndexList appendRecordList(RecordList rl, const QModelIndex & parent = QModelIndex() );
 };
 
-class STONEGUI_EXPORT SipRecordDataTranslatorInterface : public RecordDataTranslatorInterface
-{
-public:
-    SipRecordDataTranslatorInterface(ModelTreeBuilder * builder) : RecordDataTranslatorInterface(builder) {}
-
-    virtual QVariant recordData(const Record &, const QModelIndex &, int role) const { return QVariant(); }
-    virtual bool setRecordData(Record, const QModelIndex &, const QVariant &, int role) { return false; }
-    virtual Qt::ItemFlags recordFlags(const Record &, const QModelIndex &) const { return 0; }
-    virtual int recordCompare( const Record &, const Record &, const QModelIndex &, const QModelIndex &, int, bool ) const { return 0; }
-    virtual RecordList recordChildren( const Record &, const QModelIndex & ) const { return RecordList(); }
-
-    virtual Record getRecord(const QModelIndex &) const { return Record();}
-    virtual RecordList children(const QModelIndex &) const { return RecordList(); }
-    virtual void setup(const QModelIndex & idx, const Record & record ) {}
-    virtual QModelIndexList insertRecordList(int row, RecordList & rl, const QModelIndex & parent = QModelIndex() ) { return QModelIndexList(); }
-
-    virtual int dataSize() { return 0; }
-    virtual QVariant modelData( void * dataPtr, const QModelIndex &, int role ) const { return QVariant(); }
-    virtual bool setModelData( void * dataPtr, const QModelIndex &, const QVariant & value, int role ) { return false; }
-    virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const { return 0; }
-    virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const { return 0; }
-    virtual void deleteData( void * dataPtr ) {}
-    virtual void constructData( void * dataPtr, void * copySource = 0 ) {}
-    virtual void copyData( void * dataPtr, void * copySource ) {}
-};
-
 /**
  * Maps model columns to Record fields, with support for setting editable flags and
  * showing foreign key values.
@@ -82,7 +56,7 @@ class STONEGUI_EXPORT RecordDataTranslatorBase : public RecordDataTranslatorInte
 public:
 	RecordDataTranslatorBase(ModelTreeBuilder * builder) : RecordDataTranslatorInterface(builder){}
 	~RecordDataTranslatorBase() {}
-	
+
 	virtual QVariant recordData(const Record &, const QModelIndex &, int role) const;
 	virtual bool setRecordData(Record, const QModelIndex &, const QVariant &, int role);
 	virtual Qt::ItemFlags recordFlags(const Record &, const QModelIndex &) const;
@@ -108,6 +82,29 @@ protected:
 
 	// These map the column to the field to show from the record
 	mutable QVector<ColumnEntry> mColumnEntries;
+};
+
+class STONEGUI_EXPORT SipRecordDataTranslatorBase : public RecordDataTranslatorBase
+{
+public:
+    SipRecordDataTranslatorBase(ModelTreeBuilder * builder) : RecordDataTranslatorBase(builder){}
+    ~SipRecordDataTranslatorBase() {}
+
+    virtual QVariant recordData(const Record & r, const QModelIndex & idx, int role) const { return RecordDataTranslatorBase::recordData(r, idx, role); }
+
+    virtual Record getRecord(const QModelIndex & idx) const { return Record(); }
+    virtual RecordList children(const QModelIndex &) const { return RecordList(); }
+    virtual void setup(const QModelIndex & idx, const Record & record ) {}
+    virtual QModelIndexList insertRecordList(int row, RecordList & rl, const QModelIndex & parent = QModelIndex() ) { return QModelIndexList(); }
+
+    virtual int dataSize() { return 0; }
+    virtual QVariant modelData( void * dataPtr, const QModelIndex &, int role ) const { return QVariant(); }
+    virtual bool setModelData( void * dataPtr, const QModelIndex &, const QVariant & value, int role ) { return false; }
+    virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const { return 0; }
+    virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const { return 0; }
+    virtual void deleteData( void * dataPtr ) {}
+    virtual void constructData( void * dataPtr, void * copySource = 0 ) {}
+    virtual void copyData( void * dataPtr, void * copySource ) {}
 };
 
 /**
