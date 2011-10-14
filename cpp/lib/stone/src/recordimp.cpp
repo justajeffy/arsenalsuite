@@ -199,7 +199,6 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int * queryColPos, FieldList
 , mLiterals( 0 )
 , mNotSelectedBits( 0 )
 {
-    LOG_1("test");
 	sRecordImpCount++;
 	if( table ) {
 		table->mImpCount++;
