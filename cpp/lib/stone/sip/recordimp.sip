@@ -6,29 +6,29 @@ class RecordImp
 %End
 
 public:
-	RecordImp( Table * table, QVariant * toLoad=0 );
-	RecordImp( Table * table, QSqlQuery & q, int queryPosOffset = 0 );
+	RecordImp( Table * table, QVariant * toLoad=0 ) /HoldGIL/;
+	RecordImp( Table * table, QSqlQuery & q, int queryPosOffset = 0 ) /HoldGIL/;
 
-	~RecordImp();
-	
+    ~RecordImp() /HoldGIL/;
+
 	void ref();
 	void deref();
 
 	int refCount() const;
 
 	QVariant getColumn( int col ) const;
-	RecordImp * setColumn( int col, const QVariant & v );
+	RecordImp * setColumn( int col, const QVariant & v ) /HoldGIL/;
 
 	QVariant getValue( const QString & column ) const;
-	RecordImp * setValue( const QString & column, const QVariant & v );
+	RecordImp * setValue( const QString & column, const QVariant & v ) /HoldGIL/;
 	
-	Table * table() const;
+	Table * table() const /HoldGIL/;
 
-	RecordImp * copy();
+	RecordImp * copy() /HoldGIL/;
 
 	uint key() const;
 	
-	RecordImp * commit(bool newPrimaryKey=true,bool sync=true);
+	RecordImp * commit(bool newPrimaryKey=true,bool sync=true) /HoldGIL/;
 
 	void remove();
 
@@ -36,7 +36,7 @@ public:
 	bool isColumnModified( uint col ) const;
 	void clearModifiedBits();
 	
-	RecordImp * setColumnLiteral( uint col, bool modified );
+	RecordImp * setColumnLiteral( uint col, bool modified ) /HoldGIL/;
 	bool isColumnLiteral( uint col ) const;
 	void clearColumnLiterals();
 	

@@ -47,6 +47,32 @@ public:
 	virtual QModelIndexList appendRecordList(RecordList rl, const QModelIndex & parent = QModelIndex() );
 };
 
+class STONEGUI_EXPORT SipRecordDataTranslatorInterface : public RecordDataTranslatorInterface
+{
+public:
+    SipRecordDataTranslatorInterface(ModelTreeBuilder * builder) : RecordDataTranslatorInterface(builder) {}
+
+    virtual QVariant recordData(const Record &, const QModelIndex &, int role) const {}
+    virtual bool setRecordData(Record, const QModelIndex &, const QVariant &, int role) {}
+    virtual Qt::ItemFlags recordFlags(const Record &, const QModelIndex &) const {}
+    virtual int recordCompare( const Record &, const Record &, const QModelIndex &, const QModelIndex &, int, bool ) const {}
+    virtual RecordList recordChildren( const Record &, const QModelIndex & ) const {}
+
+    virtual Record getRecord(const QModelIndex &) const {}
+    virtual RecordList children(const QModelIndex &) const {}
+    virtual void setup(const QModelIndex & idx, const Record & record ) {}
+    virtual QModelIndexList insertRecordList(int row, RecordList & rl, const QModelIndex & parent = QModelIndex() ) {}
+
+    virtual int dataSize() {}
+    virtual QVariant modelData( void * dataPtr, const QModelIndex &, int role ) const {}
+    virtual bool setModelData( void * dataPtr, const QModelIndex &, const QVariant & value, int role ) {}
+    virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const {}
+    virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const {}
+    virtual void deleteData( void * dataPtr ) {}
+    virtual void constructData( void * dataPtr, void * copySource = 0 ) {}
+    virtual void copyData( void * dataPtr, void * copySource ) {}
+};
+
 /**
  * Maps model columns to Record fields, with support for setting editable flags and
  * showing foreign key values.

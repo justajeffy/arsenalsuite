@@ -1,4 +1,13 @@
 
+class RecordItemBase : ItemBase
+{
+%TypeHeaderCode
+#include <recordsupermodel.h>
+%End
+public:
+    RecordList children( const QModelIndex & );
+    Qt::ItemFlags modelFlags( const QModelIndex & );
+};
 
 class RecordDataTranslatorInterface : ModelDataTranslator /Abstract/
 {
@@ -18,6 +27,26 @@ public:
 	virtual void setup(const QModelIndex & idx, const Record & record ) = 0;
 	virtual QModelIndexList insertRecordList(int row, RecordList & rl, const QModelIndex & parent = QModelIndex() ) = 0;
 	virtual QModelIndexList appendRecordList(RecordList rl, const QModelIndex & parent = QModelIndex() );
+};
+
+class SipRecordDataTranslatorInterface : RecordDataTranslatorInterface
+{
+%TypeHeaderCode
+#include <recordsupermodel.h>
+%End
+public:
+    SipRecordDataTranslatorInterface(ModelTreeBuilder * builder /TransferThis/ );
+
+    virtual QVariant recordData(const MappedRecord &, const QModelIndex &, int role) const;
+    virtual bool setRecordData(MappedRecord, const QModelIndex &, const QVariant &, int role);
+    virtual Qt::ItemFlags recordFlags(const MappedRecord &, const QModelIndex &) const;
+    virtual int recordCompare( const MappedRecord &, const MappedRecord &, const QModelIndex &, const QModelIndex &, int, bool ) const;
+    virtual RecordList recordChildren( const MappedRecord &, const QModelIndex & ) const;
+
+    virtual MappedRecord getRecord(const QModelIndex &);
+    virtual void setup(const QModelIndex & idx, const Record & record );
+    virtual QModelIndexList insertRecordList(int row, RecordList & rl /TransferThis/, const QModelIndex & parent = QModelIndex() );
+    virtual QModelIndexList appendRecordList(RecordList rl /TransferThis/, const QModelIndex & parent = QModelIndex() );
 };
 
 class RecordDataTranslatorBase : RecordDataTranslatorInterface /Abstract/

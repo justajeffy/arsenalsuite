@@ -6,16 +6,12 @@
 #include "recorddrag.h"
 
 QModelIndexList RecordDataTranslatorInterface::appendRecordList(RecordList rl, const QModelIndex & parent )
-{
-	return insertRecordList(model()->rowCount(parent),rl,parent);
-}
+{ return insertRecordList(model()->rowCount(parent),rl,parent); }
 
 const char * RecordDataTranslatorInterface::IfaceName = "RecordDataTranslatorInterface";
 
 const void * RecordDataTranslatorInterface::iface( const char * iface ) const
-{
-	return strcmp(iface,IfaceName) == 0 ? this : 0;
-}
+{ return strcmp(iface,IfaceName) == 0 ? this : 0; }
 
 const RecordDataTranslatorInterface * RecordDataTranslatorInterface::cast( const ModelDataTranslator * trans )
 { return trans ? (const RecordDataTranslatorInterface*)trans->iface(IfaceName) : 0; }
@@ -257,7 +253,9 @@ void RecordSuperModel::setupChildren( const QModelIndex & parent, const RecordLi
 	clearChildren(parent);
 	
 	ModelDataTranslator * trans = translator(parent);
-	if( !trans ) trans = treeBuilder()->defaultTranslator();
+	if( !trans ) {
+        trans = treeBuilder()->defaultTranslator();
+    }
 
 	const RecordDataTranslatorInterface * rdt = RecordDataTranslatorInterface::cast(trans);
 	if( rdt )
