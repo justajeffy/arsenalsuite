@@ -52,22 +52,22 @@ class STONEGUI_EXPORT SipRecordDataTranslatorInterface : public RecordDataTransl
 public:
     SipRecordDataTranslatorInterface(ModelTreeBuilder * builder) : RecordDataTranslatorInterface(builder) {}
 
-    virtual QVariant recordData(const Record &, const QModelIndex &, int role) const {}
-    virtual bool setRecordData(Record, const QModelIndex &, const QVariant &, int role) {}
-    virtual Qt::ItemFlags recordFlags(const Record &, const QModelIndex &) const {}
-    virtual int recordCompare( const Record &, const Record &, const QModelIndex &, const QModelIndex &, int, bool ) const {}
-    virtual RecordList recordChildren( const Record &, const QModelIndex & ) const {}
+    virtual QVariant recordData(const Record &, const QModelIndex &, int role) const { return QVariant(); }
+    virtual bool setRecordData(Record, const QModelIndex &, const QVariant &, int role) { return false; }
+    virtual Qt::ItemFlags recordFlags(const Record &, const QModelIndex &) const { return 0; }
+    virtual int recordCompare( const Record &, const Record &, const QModelIndex &, const QModelIndex &, int, bool ) const { return 0; }
+    virtual RecordList recordChildren( const Record &, const QModelIndex & ) const { return RecordList(); }
 
-    virtual Record getRecord(const QModelIndex &) const {}
-    virtual RecordList children(const QModelIndex &) const {}
+    virtual Record getRecord(const QModelIndex &) const { return Record();}
+    virtual RecordList children(const QModelIndex &) const { return RecordList(); }
     virtual void setup(const QModelIndex & idx, const Record & record ) {}
-    virtual QModelIndexList insertRecordList(int row, RecordList & rl, const QModelIndex & parent = QModelIndex() ) {}
+    virtual QModelIndexList insertRecordList(int row, RecordList & rl, const QModelIndex & parent = QModelIndex() ) { return QModelIndexList(); }
 
-    virtual int dataSize() {}
-    virtual QVariant modelData( void * dataPtr, const QModelIndex &, int role ) const {}
-    virtual bool setModelData( void * dataPtr, const QModelIndex &, const QVariant & value, int role ) {}
-    virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const {}
-    virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const {}
+    virtual int dataSize() { return 0; }
+    virtual QVariant modelData( void * dataPtr, const QModelIndex &, int role ) const { return QVariant(); }
+    virtual bool setModelData( void * dataPtr, const QModelIndex &, const QVariant & value, int role ) { return false; }
+    virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const { return 0; }
+    virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const { return 0; }
     virtual void deleteData( void * dataPtr ) {}
     virtual void constructData( void * dataPtr, void * copySource = 0 ) {}
     virtual void copyData( void * dataPtr, void * copySource ) {}
@@ -179,6 +179,12 @@ class STONEGUI_EXPORT RecordItemBase : public ItemBase
 public:
 	RecordList children( const QModelIndex & ) { return RecordList(); }
 	Qt::ItemFlags modelFlags( const QModelIndex & ) { return Qt::ItemFlags(0); }
+};
+
+class STONEGUI_EXPORT SipRecordItemBase : public RecordItemBase
+{
+public:
+    SipRecordItemBase(ModelTreeBuilder * builder) {}
 };
 
 /**
