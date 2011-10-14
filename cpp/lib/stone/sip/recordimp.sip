@@ -6,8 +6,9 @@ class RecordImp
 %End
 
 public:
-	RecordImp( Table * table, QVariant * toLoad=0 ) /HoldGIL/;
-	RecordImp( Table * table, QSqlQuery & q, int queryPosOffset = 0 ) /HoldGIL/;
+	RecordImp( Table * table /TransferThis/, QVariant * toLoad=0 ) /HoldGIL/;
+    RecordImp( Table * table /TransferThis/, QSqlQuery & q /TransferThis/, int queryPosOffset = 0) /HoldGIL/;
+    RecordImp( QSqlQuery & q /TransferThis/, Table * table /TransferThis/, int queryPosOffset = 0) /HoldGIL/;
 
     ~RecordImp() /HoldGIL/;
 

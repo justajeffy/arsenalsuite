@@ -66,6 +66,8 @@ public:
 	// If fields is 0, then q should have data for every non-local field that doesn't have NoDefaultSelect set
 	// otherwise fields should contain the full list of fields contained in q
 	RecordImp( Table * table, QSqlQuery & q, int queryPosOffset = 0, FieldList * fields = 0 );
+
+    RecordImp( QSqlQuery & q, Table * table, int queryPosOffset = 0, FieldList * fields = 0 );
 	
 	// Loads mValues with the data in the sql query, indexed by the entries in the queryColPos array
 	// If fields is 0, then q should have data for every non-local field that doesn't have NoDefaultSelect set
