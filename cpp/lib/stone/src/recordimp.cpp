@@ -198,7 +198,7 @@ RecordImp::~RecordImp()
 		mTable->mImpCount--;
 		//printf( "DELETE RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
 	}
-	delete mValues;
+    delete mValues;
 	mValues = 0;
 	delete [] mModifiedBits;
 	mModifiedBits = 0;

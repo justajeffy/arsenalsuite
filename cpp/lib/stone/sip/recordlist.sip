@@ -33,6 +33,8 @@ public:
 	sipCpp = new RecordList( recordListFromPyList(a0) );
 %End
 
+    ~RecordList() /HoldGIL/;
+
 	MappedRecordList & operator += ( const Record & );
 	MappedRecordList & operator += ( const RecordList & );
 
