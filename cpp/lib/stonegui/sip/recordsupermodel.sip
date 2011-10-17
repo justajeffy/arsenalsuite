@@ -70,7 +70,10 @@ public:
     SipRecordDataTranslatorBase(ModelTreeBuilder * builder /TransferThis/ );
     ~SipRecordDataTranslatorBase();
 
+    virtual Record getRecord(const QModelIndex &) const;
+
     virtual QVariant modelData( void * dataPtr, const QModelIndex &, int role ) const;
+    virtual bool setModelData( void * dataPtr, const QModelIndex &, const QVariant &, int);
     virtual void setup(const QModelIndex & idx, const Record & record );
     virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const;
     virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const;
