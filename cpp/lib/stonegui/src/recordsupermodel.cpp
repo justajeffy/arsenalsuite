@@ -168,7 +168,7 @@ Record RecordSuperModel::getRecord(const QModelIndex & i) const
 {
 	if( !i.isValid() ) return Record();
 	RecordDataTranslatorInterface * rdt = recordDataTranslator(i);
-	if( rdt )
+	if( rdt ) 
 		return rdt->getRecord(i);
 	//LOG_1( "No RecordDataTranslator found for index" );
 	return Record();
@@ -180,7 +180,12 @@ RecordList RecordSuperModel::listFromIS( const QItemSelection & is )
 	foreach( QItemSelectionRange sr, is ) {
 		QModelIndex i = sr.topLeft();
 		do {
-			ret += getRecord(i);
+            Record r = getRecord(i);
+            if( r.isValid() )
+    			ret += getRecord(i);
+            else
+                LOG_1("Empty selection?");
+
 			i = i.sibling( i.row() + 1, 0 );
 		} while( sr.contains(i) );
 	}
