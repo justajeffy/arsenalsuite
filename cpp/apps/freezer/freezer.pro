@@ -62,7 +62,7 @@ unix{
 }
 
 # Python modules
-win32 {
+Release:win32 {
 	LIBS+=-L../../lib/freezer/sipFreezer -lpyFreezer
 	LIBS+=-L../../lib/classes/sipClasses -lpyClasses
 	LIBS+=-L../../lib/classesui/sipClassesui -lpyClassesui
@@ -72,12 +72,22 @@ win32 {
 	LIBS+=-L../../lib/sip/siplib -lsip
 }
 
+Debug:win32 {
+	LIBS+=-L../../lib/freezer/sipFreezer -lpyFreezer_d
+	LIBS+=-L../../lib/classes/sipClasses -lpyClasses_d
+	LIBS+=-L../../lib/classesui/sipClassesui -lpyClassesui_d
+	LIBS+=-L../../lib/stone/sipStone -lpyStone_d
+	LIBS+=-L../../lib/stonegui/sipStonegui -lpyStonegui_d
+	LIBS+=-L../../lib/absubmit/sipAbsubmit -lpyAbsubmit_d
+	LIBS+=-L../../lib/sip/siplib -lsip_d
+}
+
 macx: CONFIG-=app_bundle
 QMAKE_MACOSX_DEPLOYMENT_TARGET=10.5
 
 RESOURCES+=freezer.qrc
 
-CONFIG += qt thread warn_on opengl
+CONFIG += qt thread warn_on opengl console
 QT+=opengl xml sql network
 DESTDIR=./
 RC_FILE = freezer.rc
