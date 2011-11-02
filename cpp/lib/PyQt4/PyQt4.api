@@ -921,20 +921,15 @@ PyQt4.QtCore.Qt.BGMode?10
 PyQt4.QtCore.Qt.TransparentMode?10
 PyQt4.QtCore.Qt.OpaqueMode?10
 PyQt4.QtCore.Qt.ImageConversionFlag?10
-PyQt4.QtCore.Qt.ColorMode_Mask?10
 PyQt4.QtCore.Qt.AutoColor?10
 PyQt4.QtCore.Qt.ColorOnly?10
 PyQt4.QtCore.Qt.MonoOnly?10
-PyQt4.QtCore.Qt.AlphaDither_Mask?10
 PyQt4.QtCore.Qt.ThresholdAlphaDither?10
 PyQt4.QtCore.Qt.OrderedAlphaDither?10
 PyQt4.QtCore.Qt.DiffuseAlphaDither?10
-PyQt4.QtCore.Qt.NoAlpha?10
-PyQt4.QtCore.Qt.Dither_Mask?10
 PyQt4.QtCore.Qt.DiffuseDither?10
 PyQt4.QtCore.Qt.OrderedDither?10
 PyQt4.QtCore.Qt.ThresholdDither?10
-PyQt4.QtCore.Qt.DitherMode_Mask?10
 PyQt4.QtCore.Qt.AutoDither?10
 PyQt4.QtCore.Qt.PreferDither?10
 PyQt4.QtCore.Qt.AvoidDither?10
@@ -18153,12 +18148,16 @@ PyQt4.QtNetwork.QHostAddress?1(int)
 PyQt4.QtNetwork.QHostAddress.__init__?1(self, int)
 PyQt4.QtNetwork.QHostAddress?1(QString)
 PyQt4.QtNetwork.QHostAddress.__init__?1(self, QString)
+PyQt4.QtNetwork.QHostAddress?1(16-tuple-of-int)
+PyQt4.QtNetwork.QHostAddress.__init__?1(self, 16-tuple-of-int)
 PyQt4.QtNetwork.QHostAddress?1(QHostAddress)
 PyQt4.QtNetwork.QHostAddress.__init__?1(self, QHostAddress)
 PyQt4.QtNetwork.QHostAddress.setAddress?4(int)
 PyQt4.QtNetwork.QHostAddress.setAddress?4(QString) -> bool
+PyQt4.QtNetwork.QHostAddress.setAddress?4(16-tuple-of-int)
 PyQt4.QtNetwork.QHostAddress.protocol?4() -> QAbstractSocket.NetworkLayerProtocol
 PyQt4.QtNetwork.QHostAddress.toIPv4Address?4() -> int
+PyQt4.QtNetwork.QHostAddress.toIPv6Address?4() -> 16-tuple-of-int
 PyQt4.QtNetwork.QHostAddress.toString?4() -> QString
 PyQt4.QtNetwork.QHostAddress.scopeId?4() -> QString
 PyQt4.QtNetwork.QHostAddress.setScopeId?4(QString)

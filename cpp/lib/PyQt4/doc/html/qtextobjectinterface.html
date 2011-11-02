@@ -51,11 +51,11 @@ replacement character is encountered.</li>
 <a href="qobject.html">QObject</a> and QTextObjectInterface.
 <a href="qobject.html">QObject</a> must be the first class
 inherited. For instance:</p>
-<pre class="highlightedCode brush: cpp">
- class SvgTextObject : public QObject, public QTextObjectInterface
+<pre class="cpp">
+ <span class="keyword">class</span> SvgTextObject : <span class="keyword">public</span> <span class="type"><a href="qobject.html">QObject</a></span><span class="operator">,</span> <span class="keyword">public</span> <span class="type">QTextObjectInterface</span>
  {
      Q_OBJECT
-     Q_INTERFACES(QTextObjectInterface)
+     Q_INTERFACES(<span class="type">QTextObjectInterface</span>)
 </pre>
 <p>The data of a text object is usually stored in the <a href="qtextcharformat.html">QTextCharFormat</a> using <a href="qtextformat.html#setProperty">QTextCharFormat.setProperty</a>(),
 and then retrieved with <a href="qtextformat.html#property">QTextCharFormat.property</a>().</p>
@@ -67,7 +67,7 @@ previously calculated by <a href="qtextobjectinterface.html#intrinsicSize">intri
 rectangles position is relative to the <i>painter</i>.</p>
 <p>You also get the document (<i>doc</i>) and the position
 (<i>posInDocument</i>) of the <i>format</i> in that document.</p>
-<p>See also <a href="qtextobjectinterface.html#intrinsicSize">intrinsicSize</a>().</p>
+<p><b>See also</b> <a href="qtextobjectinterface.html#intrinsicSize">intrinsicSize</a>().</p>
 
 
 <h3 class="fn"><a name="intrinsicSize" /><a href="qsizef.html">QSizeF</a> QTextObjectInterface.intrinsicSize (<i>self</i>, <a href="qtextdocument.html">QTextDocument</a>&#160;<i>doc</i>, int&#160;<i>posInDocument</i>, <a href="qtextformat.html">QTextFormat</a>&#160;<i>format</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>The intrinsicSize() function returns the size of the text object
@@ -76,5 +76,5 @@ the given position (<i>posInDocument</i>).</p>
 <p>The size calculated will be used for subsequent calls to
 <a href="qtextobjectinterface.html#drawObject">drawObject</a>() for
 this <i>format</i>.</p>
-<p>See also <a href="qtextobjectinterface.html#drawObject">drawObject</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qtextobjectinterface.html#drawObject">drawObject</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

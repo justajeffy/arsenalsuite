@@ -17,29 +17,23 @@ view can provide scroll bars so that the entire area of the child
 widget can be viewed. The child widget must be specified with
 <a href="qscrollarea.html#setWidget">setWidget</a>(). For
 example:</p>
-<pre class="highlightedCode brush: cpp">
- QLabel *imageLabel = new QLabel;
- QImage image("happyguy.png");
- imageLabel-&gt;setPixmap(QPixmap.fromImage(image));
+<pre class="cpp">
+ <span class="type"><a href="qlabel.html">QLabel</a></span> <span class="operator">*</span>imageLabel <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlabel.html">QLabel</a></span>;
+ <span class="type"><a href="qimage.html">QImage</a></span> image(<span class="string">"happyguy.png"</span>);
+ imageLabel<span class="operator">-</span><span class="operator">&gt;</span>setPixmap(<span class="type"><a href="qpixmap.html">QPixmap</a></span><span class="operator">.</span>fromImage(image));
 
- scrollArea = new QScrollArea;
- scrollArea-&gt;setBackgroundRole(QPalette.Dark);
- scrollArea-&gt;setWidget(imageLabel);
+ scrollArea <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QScrollArea</span>;
+ scrollArea<span class="operator">-</span><span class="operator">&gt;</span><a href="qwidget.html#setBackgroundRole">setBackgroundRole</a>(<span class="type"><a href="qpalette.html">QPalette</a></span><span class="operator">.</span>Dark);
+ scrollArea<span class="operator">-</span><span class="operator">&gt;</span><a href="qscrollarea.html#setWidget">setWidget</a>(imageLabel);
 </pre>
 <p>The code above creates a scroll area (shown in the images below)
 containing an image label. When scaling the image, the scroll area
 can provide the necessary scroll bars:</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/qscrollarea-noscrollbars.png" /></p>
-</td>
-<td>
-<p><img src="images/qscrollarea-onescrollbar.png" /></p>
-</td>
-<td>
-<p><img src="images/qscrollarea-twoscrollbars.png" /></p>
-</td>
+<tr class="odd" valign="top">
+<td><img src="images/qscrollarea-noscrollbars.png" /></td>
+<td><img src="images/qscrollarea-onescrollbar.png" /></td>
+<td><img src="images/qscrollarea-twoscrollbars.png" /></td>
 </tr>
 </table>
 <p>The scroll bars appearance depends on the currently set <a href="qt.html#ScrollBarPolicy-enum">scroll bar policies</a>. You can
@@ -86,7 +80,7 @@ example shows how to combine <a href="qlabel.html">QLabel</a> and
 QScrollArea to display an image.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QScrollArea" />QScrollArea.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs an empty scroll area with the given
 <i>parent</i>.</p>
-<p>See also <a href="qscrollarea.html#setWidget">setWidget</a>().</p>
+<p><b>See also</b> <a href="qscrollarea.html#setWidget">setWidget</a>().</p>
 
 
 <h3 class="fn"><a name="alignment" /><a href="qt-alignment.html">Qt.Alignment</a> QScrollArea.alignment (<i>self</i>)</h3><h3 class="fn"><a name="ensureVisible" />QScrollArea.ensureVisible (<i>self</i>, int&#160;<i>x</i>, int&#160;<i>y</i>, int&#160;<i>xMargin</i>&#160;=&#160;50, int&#160;<i>yMargin</i>&#160;=&#160;50)</h3><p>Scrolls the contents of the scroll area so that the point
@@ -134,7 +128,7 @@ call this function; if you add it later, the <i>widget</i> will not
 be visible - regardless of when you <a href="qwidget.html#show">show()</a> the scroll area. In this case, you
 can also not <a href="qwidget.html#show">show()</a> the
 <i>widget</i> later.</p>
-<p>See also <a href="qscrollarea.html#widget">widget</a>().</p>
+<p><b>See also</b> <a href="qscrollarea.html#widget">widget</a>().</p>
 
 
 <h3 class="fn"><a name="setWidgetResizable" />QScrollArea.setWidgetResizable (<i>self</i>, bool&#160;<i>resizable</i>)</h3><h3 class="fn"><a name="sizeHint" /><a href="qsize.html">QSize</a> QScrollArea.sizeHint (<i>self</i>)</h3><p>Reimplemented from <a href="qwidget.html#sizeHint-prop">QWidget.sizeHint</a>().</p>
@@ -142,9 +136,9 @@ can also not <a href="qwidget.html#show">show()</a> the
 
 <h3 class="fn"><a name="takeWidget" /><a href="qwidget.html">QWidget</a> QScrollArea.takeWidget (<i>self</i>)</h3><p>The <i>QWidget</i> result</p><p>Removes the scroll area's widget, and passes ownership of the
 widget to the caller.</p>
-<p>See also <a href="qscrollarea.html#widget">widget</a>().</p>
+<p><b>See also</b> <a href="qscrollarea.html#widget">widget</a>().</p>
 
 
 <h3 class="fn"><a name="widget" /><a href="qwidget.html">QWidget</a> QScrollArea.widget (<i>self</i>)</h3><p>Returns the scroll area's widget, or 0 if there is none.</p>
-<p>See also <a href="qscrollarea.html#setWidget">setWidget</a>().</p>
-<h3 class="fn"><a name="widgetResizable" />bool QScrollArea.widgetResizable (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qscrollarea.html#setWidget">setWidget</a>().</p>
+<h3 class="fn"><a name="widgetResizable" />bool QScrollArea.widgetResizable (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

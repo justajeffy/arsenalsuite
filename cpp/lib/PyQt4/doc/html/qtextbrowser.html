@@ -52,8 +52,7 @@ with parent <i>parent</i>.</p>
 <h3 class="fn"><a name="backward" />QTextBrowser.backward (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void backward()</tt>.</p><p>Changes the document displayed to the previous document in the
 list of documents built by navigating links. Does nothing if there
 is no previous document.</p>
-<p>See also <a href="qtextbrowser.html#forward">forward</a>() and
-<a href="qtextbrowser.html#backwardAvailable">backwardAvailable</a>().</p>
+<p><b>See also</b> <a href="qtextbrowser.html#forward">forward</a>() and <a href="qtextbrowser.html#backwardAvailable">backwardAvailable</a>().</p>
 
 
 <h3 class="fn"><a name="backwardHistoryCount" />int QTextBrowser.backwardHistoryCount (<i>self</i>)</h3><p>Returns the number of locations backward in the history.</p>
@@ -63,8 +62,7 @@ is no previous document.</p>
 <h3 class="fn"><a name="clearHistory" />QTextBrowser.clearHistory (<i>self</i>)</h3><p>Clears the history of visited documents and disables the forward
 and backward navigation.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qtextbrowser.html#backward">backward</a>() and
-<a href="qtextbrowser.html#forward">forward</a>().</p>
+<p><b>See also</b> <a href="qtextbrowser.html#backward">backward</a>() and <a href="qtextbrowser.html#forward">forward</a>().</p>
 
 
 <h3 class="fn"><a name="event" />bool QTextBrowser.event (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -79,8 +77,7 @@ and backward navigation.</p>
 <h3 class="fn"><a name="forward" />QTextBrowser.forward (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void forward()</tt>.</p><p>Changes the document displayed to the next document in the list
 of documents built by navigating links. Does nothing if there is no
 next document.</p>
-<p>See also <a href="qtextbrowser.html#backward">backward</a>() and
-<a href="qtextbrowser.html#forwardAvailable">forwardAvailable</a>().</p>
+<p><b>See also</b> <a href="qtextbrowser.html#backward">backward</a>() and <a href="qtextbrowser.html#forwardAvailable">forwardAvailable</a>().</p>
 
 
 <h3 class="fn"><a name="forwardHistoryCount" />int QTextBrowser.forwardHistoryCount (<i>self</i>)</h3><p>Returns the number of locations forward in the history.</p>
@@ -91,39 +88,28 @@ next document.</p>
 HistoryItem.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Input</th>
 <th>Return</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><i>i</i> &lt; 0</p>
-</td>
-<td>
-<p><a href="qtextbrowser.html#backward">backward</a>() history</p>
-</td>
+<tr class="odd" valign="top">
+<td><i>i</i> &lt; 0</td>
+<td><a href="qtextbrowser.html#backward">backward</a>()
+history</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><i>i</i> == 0</p>
-</td>
-<td>
-<p>current, see <a href="qtextbrowser.html#source-prop">QTextBrowser.source</a>()</p>
-</td>
+<tr class="even" valign="top">
+<td><i>i</i> == 0</td>
+<td>current, see <a href="qtextbrowser.html#source-prop">QTextBrowser.source</a>()</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><i>i</i> &gt; 0</p>
-</td>
-<td>
-<p><a href="qtextbrowser.html#forward">forward</a>() history</p>
-</td>
+<tr class="odd" valign="top">
+<td><i>i</i> &gt; 0</td>
+<td><a href="qtextbrowser.html#forward">forward</a>() history</td>
 </tr>
 </table>
-<pre class="highlightedCode brush: cpp">
- backaction.setToolTip(browser.historyTitle(-1));
- forwardaction.setToolTip(browser.historyTitle(+1));
+<pre class="cpp">
+ backaction<span class="operator">.</span><a href="qwidget.html#toolTip-prop">setToolTip</a>(browser<span class="operator">.</span>historyTitle(<span class="operator">-</span><span class="number">1</span>));
+ forwardaction<span class="operator">.</span><a href="qwidget.html#toolTip-prop">setToolTip</a>(browser<span class="operator">.</span>historyTitle(<span class="operator">+</span><span class="number">1</span>));
 </pre>
 <p>This function was introduced in Qt 4.4.</p>
 
@@ -131,34 +117,23 @@ HistoryItem.</p>
 <h3 class="fn"><a name="historyUrl" /><a href="qurl.html">QUrl</a> QTextBrowser.historyUrl (<i>self</i>, int)</h3><p>Returns the url of the HistoryItem.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Input</th>
 <th>Return</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><i>i</i> &lt; 0</p>
-</td>
-<td>
-<p><a href="qtextbrowser.html#backward">backward</a>() history</p>
-</td>
+<tr class="odd" valign="top">
+<td><i>i</i> &lt; 0</td>
+<td><a href="qtextbrowser.html#backward">backward</a>()
+history</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><i>i</i> == 0</p>
-</td>
-<td>
-<p>current, see <a href="qtextbrowser.html#source-prop">QTextBrowser.source</a>()</p>
-</td>
+<tr class="even" valign="top">
+<td><i>i</i> == 0</td>
+<td>current, see <a href="qtextbrowser.html#source-prop">QTextBrowser.source</a>()</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><i>i</i> &gt; 0</p>
-</td>
-<td>
-<p><a href="qtextbrowser.html#forward">forward</a>() history</p>
-</td>
+<tr class="odd" valign="top">
+<td><i>i</i> &gt; 0</td>
+<td><a href="qtextbrowser.html#forward">forward</a>() history</td>
 </tr>
 </table>
 <p>This function was introduced in Qt 4.4.</p>
@@ -171,14 +146,14 @@ history.</p>
 <h3 class="fn"><a name="isBackwardAvailable" />bool QTextBrowser.isBackwardAvailable (<i>self</i>)</h3><p>Returns true if the text browser can go backward in the document
 history using <a href="qtextbrowser.html#backward">backward</a>().</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qtextbrowser.html#backwardAvailable">backwardAvailable</a>() and
+<p><b>See also</b> <a href="qtextbrowser.html#backwardAvailable">backwardAvailable</a>() and
 <a href="qtextbrowser.html#backward">backward</a>().</p>
 
 
 <h3 class="fn"><a name="isForwardAvailable" />bool QTextBrowser.isForwardAvailable (<i>self</i>)</h3><p>Returns true if the text browser can go forward in the document
 history using <a href="qtextbrowser.html#forward">forward</a>().</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qtextbrowser.html#forwardAvailable">forwardAvailable</a>() and
+<p><b>See also</b> <a href="qtextbrowser.html#forwardAvailable">forwardAvailable</a>() and
 <a href="qtextbrowser.html#forward">forward</a>().</p>
 
 
@@ -187,34 +162,22 @@ history using <a href="qtextbrowser.html#forward">forward</a>().</p>
 shortcuts:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Keypress</th>
 <th>Action</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>Alt+Left Arrow</p>
-</td>
-<td>
-<p><a href="qtextbrowser.html#backward">backward</a>()</p>
-</td>
+<tr class="odd" valign="top">
+<td>Alt+Left Arrow</td>
+<td><a href="qtextbrowser.html#backward">backward</a>()</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Alt+Right Arrow</p>
-</td>
-<td>
-<p><a href="qtextbrowser.html#forward">forward</a>()</p>
-</td>
+<tr class="even" valign="top">
+<td>Alt+Right Arrow</td>
+<td><a href="qtextbrowser.html#forward">forward</a>()</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Alt+Up Arrow</p>
-</td>
-<td>
-<p><a href="qtextbrowser.html#home">home</a>()</p>
-</td>
+<tr class="odd" valign="top">
+<td>Alt+Up Arrow</td>
+<td><a href="qtextbrowser.html#home">home</a>()</td>
 </tr>
 </table>
 
@@ -236,34 +199,22 @@ of the file.</p>
 variant types are supported depending on the resource type:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>ResourceType</th>
 <th><a href="qvariant.html#Type-enum">QVariant.Type</a></th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><a href="qtextdocument.html#ResourceType-enum">QTextDocument.HtmlResource</a></p>
-</td>
-<td>
-<p><a href="qstring.html">QString</a> or <a href="qbytearray.html">QByteArray</a></p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qtextdocument.html#ResourceType-enum">QTextDocument.HtmlResource</a></td>
+<td><a href="qstring.html">QString</a> or <a href="qbytearray.html">QByteArray</a></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qtextdocument.html#ResourceType-enum">QTextDocument.ImageResource</a></p>
-</td>
-<td>
-<p><a href="qimage.html">QImage</a>, <a href="qpixmap.html">QPixmap</a> or <a href="qbytearray.html">QByteArray</a></p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qtextdocument.html#ResourceType-enum">QTextDocument.ImageResource</a></td>
+<td><a href="qimage.html">QImage</a>, <a href="qpixmap.html">QPixmap</a> or <a href="qbytearray.html">QByteArray</a></td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qtextdocument.html#ResourceType-enum">QTextDocument.StyleSheetResource</a></p>
-</td>
-<td>
-<p><a href="qstring.html">QString</a> or <a href="qbytearray.html">QByteArray</a></p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qtextdocument.html#ResourceType-enum">QTextDocument.StyleSheetResource</a></td>
+<td><a href="qstring.html">QString</a> or <a href="qbytearray.html">QByteArray</a></td>
 </tr>
 </table>
 
@@ -314,7 +265,7 @@ just a <a href="qstring.html">QString</a>, like for example
 
 <h3 class="fn"><a name="historyChanged" />void historyChanged ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the history changes.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qtextbrowser.html#historyTitle">historyTitle</a>() and <a href="qtextbrowser.html#historyUrl">historyUrl</a>().</p>
+<p><b>See also</b> <a href="qtextbrowser.html#historyTitle">historyTitle</a>() and <a href="qtextbrowser.html#historyUrl">historyUrl</a>().</p>
 
 
 <h3 class="fn"><a name="sourceChanged" />void sourceChanged (const QUrl&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the source has changed, <i>src</i>
@@ -322,4 +273,4 @@ being the new source.</p>
 <p>Source changes happen both programmatically when calling
 <a href="qtextbrowser.html#source-prop">setSource</a>(), <a href="qtextbrowser.html#forward">forward</a>(), backword() or <a href="qtextbrowser.html#home">home</a>() or when the user clicks on
 links or presses the equivalent key sequences.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

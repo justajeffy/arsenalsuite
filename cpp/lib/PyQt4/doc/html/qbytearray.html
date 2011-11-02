@@ -31,8 +31,8 @@ conservation is critical (e.g., with Qt for Embedded Linux).</p>
 <p>One way to initialize a QByteArray is simply to pass a <tt>const
 char *</tt> to its constructor. For example, the following code
 creates a byte array of size 5 containing the data "Hello":</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("Hello");
+<pre class="cpp">
+ <span class="type">QByteArray</span> ba(<span class="string">"Hello"</span>);
 </pre>
 <p>Although the <a href="qbytearray.html#size">size</a>() is 5, the
 byte array also maintains an extra '\0' character at the end so
@@ -50,20 +50,20 @@ arrays. To access the byte at a particular index position, you can
 use operator[](). On non-const byte arrays, operator[]() returns a
 reference to a byte that can be used on the left side of an
 assignment. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba;
- ba.resize(5);
- ba[0] = 0x3c;
- ba[1] = 0xb8;
- ba[2] = 0x64;
- ba[3] = 0x18;
- ba[4] = 0xca;
+<pre class="cpp">
+ <span class="type">QByteArray</span> ba;
+ ba<span class="operator">.</span>resize(<span class="number">5</span>);
+ ba<span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">=</span> <span class="number">0x3c</span>;
+ ba<span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="operator">=</span> <span class="number">0xb8</span>;
+ ba<span class="operator">[</span><span class="number">2</span><span class="operator">]</span> <span class="operator">=</span> <span class="number">0x64</span>;
+ ba<span class="operator">[</span><span class="number">3</span><span class="operator">]</span> <span class="operator">=</span> <span class="number">0x18</span>;
+ ba<span class="operator">[</span><span class="number">4</span><span class="operator">]</span> <span class="operator">=</span> <span class="number">0xca</span>;
 </pre>
 <p>For read-only access, an alternative syntax is to use <a href="qbytearray.html#at">at</a>():</p>
-<pre class="highlightedCode brush: cpp">
- for (int i = 0; i &lt; ba.size(); ++i) {
-     if (ba.at(i) &gt;= 'a' &amp;&amp; ba.at(i) &lt;= 'f')
-         cout &lt;&lt; "Found character in range [a-f]" &lt;&lt; endl;
+<pre class="cpp">
+ <span class="keyword">for</span> (<span class="type">int</span> i <span class="operator">=</span> <span class="number">0</span>; i <span class="operator">&lt;</span> ba<span class="operator">.</span>size(); <span class="operator">+</span><span class="operator">+</span>i) {
+     <span class="keyword">if</span> (ba<span class="operator">.</span>at(i) <span class="operator">&gt;</span><span class="operator">=</span> <span class="char">'a'</span> <span class="operator">&amp;</span><span class="operator">&amp;</span> ba<span class="operator">.</span>at(i) <span class="operator">&lt;</span><span class="operator">=</span> <span class="char">'f'</span>)
+         cout <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Found character in range [a-f]"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> endl;
  }
 </pre>
 <p><a href="qbytearray.html#at">at</a>() can be faster than
@@ -86,11 +86,11 @@ not counted in <a href="qbytearray.html#size">size</a>().</p>
 <p>QByteArray provides the following basic functions for modifying
 the byte data: <a href="qbytearray.html#append">append</a>(),
 <a href="qbytearray.html#prepend">prepend</a>(), <a href="qbytearray.html#insert">insert</a>(), <a href="qbytearray.html#replace">replace</a>(), and <a href="qbytearray.html#remove">remove</a>(). For example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("and");
- x.prepend("rock ");         <span class="comment">// x == "rock and"</span>
- x.append(" roll");          <span class="comment">// x == "rock and roll"</span>
- x.replace(5, 3, "&amp;");       <span class="comment">// x == "rock &amp; roll"</span>
+<pre class="cpp">
+ <span class="type">QByteArray</span> x(<span class="string">"and"</span>);
+ x<span class="operator">.</span>prepend(<span class="string">"rock "</span>);         <span class="comment">// x == "rock and"</span>
+ x<span class="operator">.</span>append(<span class="string">" roll"</span>);          <span class="comment">// x == "rock and roll"</span>
+ x<span class="operator">.</span>replace(<span class="number">5</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="string">"&amp;"</span>);       <span class="comment">// x == "rock &amp; roll"</span>
 </pre>
 <p>The <a href="qbytearray.html#replace">replace</a>() and <a href="qbytearray.html#remove">remove</a>() functions' first two
 arguments are the position from which to start erasing and the
@@ -114,12 +114,12 @@ searches backward. Both return the index position of the character
 or substring if they find it; otherwise, they return -1. For
 example, here's a typical loop that finds all occurrences of a
 particular substring:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("We must be &lt;b&gt;bold&lt;/b&gt;, very &lt;b&gt;bold&lt;/b&gt;");
- int j = 0;
- while ((j = ba.indexOf("&lt;b&gt;", j)) != -1) {
-     cout &lt;&lt; "Found &lt;b&gt; tag at index position " &lt;&lt; j &lt;&lt; endl;
-     ++j;
+<pre class="cpp">
+ <span class="type">QByteArray</span> ba(<span class="string">"We must be &lt;b&gt;bold&lt;/b&gt;, very &lt;b&gt;bold&lt;/b&gt;"</span>);
+ <span class="type">int</span> j <span class="operator">=</span> <span class="number">0</span>;
+ <span class="keyword">while</span> ((j <span class="operator">=</span> ba<span class="operator">.</span>indexOf(<span class="string">"&lt;b&gt;"</span><span class="operator">,</span> j)) <span class="operator">!</span><span class="operator">=</span> <span class="operator">-</span><span class="number">1</span>) {
+     cout <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Found &lt;b&gt; tag at index position "</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> j <span class="operator">&lt;</span><span class="operator">&lt;</span> endl;
+     <span class="operator">+</span><span class="operator">+</span>j;
  }
 </pre>
 <p>If you simply want to check whether a QByteArray contains a
@@ -141,15 +141,15 @@ constructor or by passing (const char *)0 to the constructor. An
 <i>empty</i> byte array is any byte array with size 0. A null byte
 array is always empty, but an empty byte array isn't necessarily
 null:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray().isNull();          <span class="comment">// returns true</span>
- QByteArray().isEmpty();         <span class="comment">// returns true</span>
+<pre class="cpp">
+ <span class="type">QByteArray</span>()<span class="operator">.</span>isNull();          <span class="comment">// returns true</span>
+ <span class="type">QByteArray</span>()<span class="operator">.</span>isEmpty();         <span class="comment">// returns true</span>
 
- QByteArray("").isNull();        <span class="comment">// returns false</span>
- QByteArray("").isEmpty();       <span class="comment">// returns true</span>
+ <span class="type">QByteArray</span>(<span class="string">""</span>)<span class="operator">.</span>isNull();        <span class="comment">// returns false</span>
+ <span class="type">QByteArray</span>(<span class="string">""</span>)<span class="operator">.</span>isEmpty();       <span class="comment">// returns true</span>
 
- QByteArray("abc").isNull();     <span class="comment">// returns false</span>
- QByteArray("abc").isEmpty();    <span class="comment">// returns false</span>
+ <span class="type">QByteArray</span>(<span class="string">"abc"</span>)<span class="operator">.</span>isNull();     <span class="comment">// returns false</span>
+ <span class="type">QByteArray</span>(<span class="string">"abc"</span>)<span class="operator">.</span>isEmpty();    <span class="comment">// returns false</span>
 </pre>
 <p>All functions except <a href="qbytearray.html#isNull">isNull</a>() treat null byte arrays the
 same as empty byte arrays. For example, <a href="qbytearray.html#data">data</a>() returns a pointer to a '\0'
@@ -178,7 +178,7 @@ operator&lt;=(), operator&gt;(), operator&gt;=(), <a href="qbytearray.html#toLow
 <p>This issue does not apply to QStrings since they represent
 characters using Unicode.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QByteArray" />QByteArray.__init__ (<i>self</i>)</h3><p>Constructs an empty byte array.</p>
-<p>See also <a href="qbytearray.html#isEmpty">isEmpty</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="QByteArray-2" />QByteArray.__init__ (<i>self</i>, int&#160;<i>size</i>, str&#160;<i>c</i>)</h3><p>Constructs a byte array initialized with the string
@@ -192,17 +192,17 @@ of array <i>data</i>.</p>
 <p>If <i>data</i> is 0, a null byte array is constructed.</p>
 <p><a href="qbytearray.html">QByteArray</a> makes a deep copy of
 the string data.</p>
-<p>See also <a href="qbytearray.html#fromRawData">fromRawData</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#fromRawData">fromRawData</a>().</p>
 
 
 <h3 class="fn"><a name="append" /><a href="qbytearray.html">QByteArray</a> QByteArray.append (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><p>Appends the byte array <i>ba</i> onto the end of this byte
 array.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("free");
- QByteArray y("dom");
- x.append(y);
-<span class="comment"> // x == "freedom"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"free"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y(<span class="string">"dom"</span>);
+ x<span class="operator">.</span>append(y);
+ <span class="comment">// x == "freedom"</span>
 </pre>
 <p>This is the same as insert(<a href="qbytearray.html#size">size</a>(), <i>ba</i>).</p>
 <p>Note: <a href="qbytearray.html">QByteArray</a> is an <a href="implicit-sharing.html#implicitly-shared">implicitly shared</a>
@@ -218,7 +218,7 @@ time</a>.</p>
 overhead, because <a href="qbytearray.html">QByteArray</a>
 preallocates extra space at the end of the data so that it may grow
 without reallocating for each append operation.</p>
-<p>See also <a href="qbytearray.html#operator-2b-eq">operator+=</a>(), <a href="qbytearray.html#prepend">prepend</a>(), and <a href="qbytearray.html#insert">insert</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#operator-2b-eq">operator+=</a>(), <a href="qbytearray.html#prepend">prepend</a>(), and <a href="qbytearray.html#insert">insert</a>().</p>
 
 
 <h3 class="fn"><a name="append-2" /><a href="qbytearray.html">QByteArray</a> QByteArray.append (<i>self</i>, QString&#160;<i>s</i>)</h3><p>This is an overloaded function.</p>
@@ -236,7 +236,7 @@ if you want to convert the data to <tt>const char *</tt>.</p>
 array.</p>
 <p><i>i</i> must be a valid index position in the byte array (i.e.,
 0 &lt;= <i>i</i> &lt; <a href="qbytearray.html#size">size</a>()).</p>
-<p>See also <a href="qbytearray.html#operator-5b-5d">operator[]</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#operator-5b-5d">operator[]</a>().</p>
 
 
 <h3 class="fn"><a name="capacity" />int QByteArray.capacity (<i>self</i>)</h3><p>Returns the maximum number of bytes that can be stored in the
@@ -245,37 +245,35 @@ byte array without forcing a reallocation.</p>
 tuning <a href="qbytearray.html">QByteArray</a>'s memory usage. In
 general, you will rarely ever need to call this function. If you
 want to know how many bytes are in the byte array, call <a href="qbytearray.html#size">size</a>().</p>
-<p>See also <a href="qbytearray.html#reserve">reserve</a>() and
-<a href="qbytearray.html#squeeze">squeeze</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#reserve">reserve</a>()
+and <a href="qbytearray.html#squeeze">squeeze</a>().</p>
 
 
 <h3 class="fn"><a name="chop" />QByteArray.chop (<i>self</i>, int&#160;<i>n</i>)</h3><p>Removes <i>n</i> bytes from the end of the byte array.</p>
 <p>If <i>n</i> is greater than <a href="qbytearray.html#size">size</a>(), the result is an empty byte
 array.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("STARTTLS\r\n");
- ba.chop(2);                 <span class="comment">// ba == "STARTTLS"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba(<span class="string">"STARTTLS\r\n"</span>);
+ ba<span class="operator">.</span>chop(<span class="number">2</span>);                 <span class="comment">// ba == "STARTTLS"</span>
 </pre>
-<p>See also <a href="qbytearray.html#truncate">truncate</a>(),
-<a href="qbytearray.html#resize">resize</a>(), and <a href="qbytearray.html#left">left</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#truncate">truncate</a>(), <a href="qbytearray.html#resize">resize</a>(), and <a href="qbytearray.html#left">left</a>().</p>
 
 
 <h3 class="fn"><a name="clear" />QByteArray.clear (<i>self</i>)</h3><p>Clears the contents of the byte array and makes it empty.</p>
-<p>See also <a href="qbytearray.html#resize">resize</a>() and
-<a href="qbytearray.html#isEmpty">isEmpty</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#resize">resize</a>()
+and <a href="qbytearray.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="contains" />bool QByteArray.contains (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><p>Returns true if the byte array contains an occurrence of the
 byte array <i>ba</i>; otherwise returns false.</p>
-<p>See also <a href="qbytearray.html#indexOf">indexOf</a>() and
-<a href="qbytearray.html#count">count</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#indexOf">indexOf</a>()
+and <a href="qbytearray.html#count">count</a>().</p>
 
 
 <h3 class="fn"><a name="count" />int QByteArray.count (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><p>Returns the number of (potentially overlapping) occurrences of
 byte array <i>ba</i> in this byte array.</p>
-<p>See also <a href="qbytearray.html#contains">contains</a>() and
-<a href="qbytearray.html#indexOf">indexOf</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#contains">contains</a>() and <a href="qbytearray.html#indexOf">indexOf</a>().</p>
 
 
 <h3 class="fn"><a name="count-2" />int QByteArray.count (<i>self</i>)</h3><p>This is an overloaded function.</p>
@@ -288,12 +286,12 @@ pointer can be used to access and modify the bytes that compose the
 array. The data is '\0'-terminated, i.e. the number of bytes in the
 returned character string is <a href="qbytearray.html#size">size</a>() + 1 for the '\0' terminator.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("Hello world");
- char *data = ba.data();
- while (*data) {
-     cout &lt;&lt; "[" &lt;&lt; *data &lt;&lt; "]" &lt;&lt; endl;
-     ++data;
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba(<span class="string">"Hello world"</span>);
+ <span class="type">char</span> <span class="operator">*</span>data <span class="operator">=</span> ba<span class="operator">.</span>data();
+ <span class="keyword">while</span> (<span class="operator">*</span>data) {
+     cout <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"["</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="operator">*</span>data <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"]"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> endl;
+     <span class="operator">+</span><span class="operator">+</span>data;
  }
 </pre>
 <p>The pointer remains valid as long as the byte array isn't
@@ -305,54 +303,52 @@ function that accepts a <tt>const char *</tt>.</p>
 <p>The following example makes a copy of the char* returned by
 data(), but it will corrupt the heap and cause a crash because it
 does not allocate a byte for the '\0' at the end:</p>
-<pre class="highlightedCode brush: cpp">
- QString tmp = "test";
- QByteArray text = tmp.toLocal8Bit();
- char *data = new char[text.size()]
- strcpy(data, text.data());
- delete [] data;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> tmp <span class="operator">=</span> <span class="string">"test"</span>;
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> text <span class="operator">=</span> tmp<span class="operator">.</span>toLocal8Bit();
+ <span class="type">char</span> <span class="operator">*</span>data <span class="operator">=</span> <span class="keyword">new</span> <span class="type">char</span><span class="operator">[</span>text<span class="operator">.</span>size()<span class="operator">]</span>
+ strcpy(data<span class="operator">,</span> text<span class="operator">.</span>data());
+ <span class="keyword">delete</span> <span class="operator">[</span><span class="operator">]</span> data;
 </pre>
 <p>This one allocates the correct amount of space:</p>
-<pre class="highlightedCode brush: cpp">
- QString tmp = "test";
- QByteArray text = tmp.toLocal8Bit();
- char *data = new char[text.size() + 1]
- strcpy(data, text.data());
- delete [] data;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> tmp <span class="operator">=</span> <span class="string">"test"</span>;
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> text <span class="operator">=</span> tmp<span class="operator">.</span>toLocal8Bit();
+ <span class="type">char</span> <span class="operator">*</span>data <span class="operator">=</span> <span class="keyword">new</span> <span class="type">char</span><span class="operator">[</span>text<span class="operator">.</span>size() <span class="operator">+</span> <span class="number">1</span><span class="operator">]</span>
+ strcpy(data<span class="operator">,</span> text<span class="operator">.</span>data());
+ <span class="keyword">delete</span> <span class="operator">[</span><span class="operator">]</span> data;
 </pre>
 <p>Note: A <a href="qbytearray.html">QByteArray</a> can store any
 byte values including '\0's, but most functions that take <tt>char
 *</tt> arguments assume that the data ends at the first '\0' they
 encounter.</p>
-<p>See also <a href="qbytearray.html#constData">constData</a>() and
-<a href="qbytearray.html#operator-5b-5d">operator[]</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#constData">constData</a>() and <a href="qbytearray.html#operator-5b-5d">operator[]</a>().</p>
 
 
 <h3 class="fn"><a name="endsWith" />bool QByteArray.endsWith (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><p>Returns true if this byte array ends with byte array <i>ba</i>;
 otherwise returns false.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray url("http://qt.nokia.com/index.html");
- if (url.endsWith(".html"))
-     ...
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> url(<span class="string">"http://qt.nokia.com/index.html"</span>);
+ <span class="keyword">if</span> (url<span class="operator">.</span>endsWith(<span class="string">".html"</span>))
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 </pre>
-<p>See also <a href="qbytearray.html#startsWith">startsWith</a>()
-and <a href="qbytearray.html#right">right</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#startsWith">startsWith</a>() and <a href="qbytearray.html#right">right</a>().</p>
 
 
 <h3 class="fn"><a name="fill" /><a href="qbytearray.html">QByteArray</a> QByteArray.fill (<i>self</i>, str&#160;<i>ch</i>, int&#160;<i>size</i>&#160;=&#160;-1)</h3><p>Sets every byte in the byte array to character <i>ch</i>. If
 <i>size</i> is different from -1 (the default), the byte array is
 resized to size <i>size</i> beforehand.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("Istambul");
- ba.fill('o');
-<span class="comment"> // ba == "oooooooo"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba(<span class="string">"Istambul"</span>);
+ ba<span class="operator">.</span>fill(<span class="char">'o'</span>);
+ <span class="comment">// ba == "oooooooo"</span>
 
- ba.fill('X', 2);
-<span class="comment"> // ba == "XX"</span>
+ ba<span class="operator">.</span>fill(<span class="char">'X'</span><span class="operator">,</span> <span class="number">2</span>);
+ <span class="comment">// ba == "XX"</span>
 </pre>
-<p>See also <a href="qbytearray.html#resize">resize</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#resize">resize</a>().</p>
 
 
 <h3 class="fn"><a name="fromBase64" /><a href="qbytearray.html">QByteArray</a> QByteArray.fromBase64 (<a href="qbytearray.html">QByteArray</a>&#160;<i>base64</i>)</h3><p>Returns a decoded copy of the Base64 array <i>base64</i>. Input
@@ -360,14 +356,14 @@ is not checked for validity; invalid characters in the input are
 skipped, enabling the decoding process to continue with subsequent
 characters.</p>
 <p>For example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray text = QByteArray.fromBase64("UXQgaXMgZ3JlYXQh");
- text.data();            <span class="comment">// returns "Qt is great</span>!"
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> text <span class="operator">=</span> <span class="type"><a href="qbytearray.html">QByteArray</a></span><span class="operator">.</span>fromBase64(<span class="string">"UXQgaXMgZ3JlYXQh"</span>);
+ text<span class="operator">.</span>data();            <span class="comment">// returns "Qt is great!"</span>
 </pre>
 <p>The algorithm used to decode Base64-encoded data is defined in
 <a href="http://www.rfc-editor.org/rfc/rfc2045.txt">RFC
 2045</a>.</p>
-<p>See also <a href="qbytearray.html#toBase64">toBase64</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#toBase64">toBase64</a>().</p>
 
 
 <h3 class="fn"><a name="fromHex" /><a href="qbytearray.html">QByteArray</a> QByteArray.fromHex (<a href="qbytearray.html">QByteArray</a>&#160;<i>hexEncoded</i>)</h3><p>Returns a decoded copy of the hex encoded array
@@ -375,23 +371,23 @@ characters.</p>
 characters in the input are skipped, enabling the decoding process
 to continue with subsequent characters.</p>
 <p>For example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray text = QByteArray.fromHex("517420697320677265617421");
- text.data();            <span class="comment">// returns "Qt is great</span>!"
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> text <span class="operator">=</span> <span class="type"><a href="qbytearray.html">QByteArray</a></span><span class="operator">.</span>fromHex(<span class="string">"517420697320677265617421"</span>);
+ text<span class="operator">.</span>data();            <span class="comment">// returns "Qt is great!"</span>
 </pre>
-<p>See also <a href="qbytearray.html#toHex">toHex</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#toHex">toHex</a>().</p>
 
 
 <h3 class="fn"><a name="fromPercentEncoding" /><a href="qbytearray.html">QByteArray</a> QByteArray.fromPercentEncoding (<a href="qbytearray.html">QByteArray</a>&#160;<i>input</i>, str&#160;<i>percent</i>&#160;=&#160;'%')</h3><p>Returns a decoded copy of the URI/URL-style percent-encoded
 <i>input</i>. The <i>percent</i> parameter allows you to replace
 the '%' character for another (for instance, '<a href="index.html">_</a>' or '=').</p>
 <p>For example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray text = QByteArray.fromPercentEncoding("Qt%20is%20great%33");
- text.data();            <span class="comment">// returns "Qt is great</span>!"
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> text <span class="operator">=</span> <span class="type"><a href="qbytearray.html">QByteArray</a></span><span class="operator">.</span>fromPercentEncoding(<span class="string">"Qt%20is%20great%33"</span>);
+ text<span class="operator">.</span><a href="qbytearray.html#data">data</a>();            <span class="comment">// returns "Qt is great!"</span>
 </pre>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qbytearray.html#toPercentEncoding">toPercentEncoding</a>() and
+<p><b>See also</b> <a href="qbytearray.html#toPercentEncoding">toPercentEncoding</a>() and
 <a href="qurl.html#fromPercentEncoding">QUrl.fromPercentEncoding</a>().</p>
 
 
@@ -417,17 +413,17 @@ doing the modification. This ensures that the raw <i>data</i> array
 itself will never be modified by <a href="qbytearray.html">QByteArray</a>.</p>
 <p>Here is an example of how to read data using a <a href="qdatastream.html">QDataStream</a> on raw data in memory without
 copying the raw data into a <a href="qbytearray.html">QByteArray</a>:</p>
-<pre class="highlightedCode brush: cpp">
-  static const char mydata[] = {
-     0x00, 0x00, 0x03, 0x84, 0x78, 0x9c, 0x3b, 0x76,
-     0xec, 0x18, 0xc3, 0x31, 0x0a, 0xf1, 0xcc, 0x99,
-     ...
-     0x6d, 0x5b
+<pre class="cpp">
+  <span class="keyword">static</span> <span class="keyword">const</span> <span class="type">char</span> mydata<span class="operator">[</span><span class="operator">]</span> <span class="operator">=</span> {
+     <span class="number">0x00</span><span class="operator">,</span> <span class="number">0x00</span><span class="operator">,</span> <span class="number">0x03</span><span class="operator">,</span> <span class="number">0x84</span><span class="operator">,</span> <span class="number">0x78</span><span class="operator">,</span> <span class="number">0x9c</span><span class="operator">,</span> <span class="number">0x3b</span><span class="operator">,</span> <span class="number">0x76</span><span class="operator">,</span>
+     <span class="number">0xec</span><span class="operator">,</span> <span class="number">0x18</span><span class="operator">,</span> <span class="number">0xc3</span><span class="operator">,</span> <span class="number">0x31</span><span class="operator">,</span> <span class="number">0x0a</span><span class="operator">,</span> <span class="number">0xf1</span><span class="operator">,</span> <span class="number">0xcc</span><span class="operator">,</span> <span class="number">0x99</span><span class="operator">,</span>
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+     <span class="number">0x6d</span><span class="operator">,</span> <span class="number">0x5b</span>
  };
 
- QByteArray data = QByteArray.fromRawData(mydata, sizeof(mydata));
- QDataStream in(&amp;data, QIODevice.ReadOnly);
- ...
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> data <span class="operator">=</span> <span class="type"><a href="qbytearray.html">QByteArray</a></span><span class="operator">.</span>fromRawData(mydata<span class="operator">,</span> <span class="keyword">sizeof</span>(mydata));
+ <span class="type"><a href="qdatastream.html">QDataStream</a></span> in(<span class="operator">&amp;</span>data<span class="operator">,</span> <span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>ReadOnly);
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 </pre>
 <p><b>Warning:</b> A byte array created with fromRawData() is
 <i>not</i> null-terminated, unless the raw data contains a 0
@@ -436,8 +432,7 @@ character at position <i>size</i>. While that does not matter for
 <a href="qbytearray.html#indexOf">indexOf</a>(), passing the byte
 array to a function accepting a <tt>const char *</tt> expected to
 be '\0'-terminated will fail.</p>
-<p>See also <a href="qbytearray.html#setRawData">setRawData</a>(),
-<a href="qbytearray.html#data">data</a>(), and <a href="qbytearray.html#constData">constData</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#setRawData">setRawData</a>(), <a href="qbytearray.html#data">data</a>(), and <a href="qbytearray.html#constData">constData</a>().</p>
 
 
 <h3 class="fn"><a name="indexOf" />int QByteArray.indexOf (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>ba</i>, int&#160;<i>from</i>&#160;=&#160;0)</h3><p>Returns the index position of the first occurrence of the byte
@@ -445,15 +440,15 @@ array <i>ba</i> in this byte array, searching forward from index
 position <i>from</i>. Returns -1 if <i>ba</i> could not be
 found.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("sticky question");
- QByteArray y("sti");
- x.indexOf(y);               <span class="comment">// returns 0</span>
- x.indexOf(y, 1);            <span class="comment">// returns 10</span>
- x.indexOf(y, 10);           <span class="comment">// returns 10</span>
- x.indexOf(y, 11);           <span class="comment">// returns -1</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"sticky question"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y(<span class="string">"sti"</span>);
+ x<span class="operator">.</span>indexOf(y);               <span class="comment">// returns 0</span>
+ x<span class="operator">.</span>indexOf(y<span class="operator">,</span> <span class="number">1</span>);            <span class="comment">// returns 10</span>
+ x<span class="operator">.</span>indexOf(y<span class="operator">,</span> <span class="number">10</span>);           <span class="comment">// returns 10</span>
+ x<span class="operator">.</span>indexOf(y<span class="operator">,</span> <span class="number">11</span>);           <span class="comment">// returns -1</span>
 </pre>
-<p>See also <a href="qbytearray.html#lastIndexOf">lastIndexOf</a>(), <a href="qbytearray.html#contains">contains</a>(), and <a href="qbytearray.html#count">count</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#lastIndexOf">lastIndexOf</a>(), <a href="qbytearray.html#contains">contains</a>(), and <a href="qbytearray.html#count">count</a>().</p>
 
 
 <h3 class="fn"><a name="indexOf-2" />int QByteArray.indexOf (<i>self</i>, QString&#160;<i>str</i>, int&#160;<i>from</i>&#160;=&#160;0)</h3><p>This is an overloaded function.</p>
@@ -473,12 +468,13 @@ if you want to convert the data to <tt>const char *</tt>.</p>
 <h3 class="fn"><a name="insert" /><a href="qbytearray.html">QByteArray</a> QByteArray.insert (<i>self</i>, int&#160;<i>i</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><p>Inserts the byte array <i>ba</i> at index position <i>i</i> and
 returns a reference to this byte array.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("Meal");
- ba.insert(1, QByteArray("ontr"));
-<span class="comment"> // ba == "Montreal"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba(<span class="string">"Meal"</span>);
+ ba<span class="operator">.</span>insert(<span class="number">1</span><span class="operator">,</span> <span class="type"><a href="qbytearray.html">QByteArray</a></span>(<span class="string">"ontr"</span>));
+ <span class="comment">// ba == "Montreal"</span>
 </pre>
-<p>See also <a href="qbytearray.html#append">append</a>(), <a href="qbytearray.html#prepend">prepend</a>(), <a href="qbytearray.html#replace">replace</a>(), and <a href="qbytearray.html#remove">remove</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#append">append</a>(),
+<a href="qbytearray.html#prepend">prepend</a>(), <a href="qbytearray.html#replace">replace</a>(), and <a href="qbytearray.html#remove">remove</a>().</p>
 
 
 <h3 class="fn"><a name="insert-2" /><a href="qbytearray.html">QByteArray</a> QByteArray.insert (<i>self</i>, int&#160;<i>i</i>, QString&#160;<i>s</i>)</h3><p>This is an overloaded function.</p>
@@ -498,27 +494,27 @@ if you want to convert the data to <tt>const char *</tt>.</p>
 <h3 class="fn"><a name="isEmpty" />bool QByteArray.isEmpty (<i>self</i>)</h3><p>Returns true if the byte array has size 0; otherwise returns
 false.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray().isEmpty();         <span class="comment">// returns true</span>
- QByteArray("").isEmpty();       <span class="comment">// returns true</span>
- QByteArray("abc").isEmpty();    <span class="comment">// returns false</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span>()<span class="operator">.</span>isEmpty();         <span class="comment">// returns true</span>
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span>(<span class="string">""</span>)<span class="operator">.</span>isEmpty();       <span class="comment">// returns true</span>
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span>(<span class="string">"abc"</span>)<span class="operator">.</span>isEmpty();    <span class="comment">// returns false</span>
 </pre>
-<p>See also <a href="qbytearray.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#size">size</a>().</p>
 
 
 <h3 class="fn"><a name="isNull" />bool QByteArray.isNull (<i>self</i>)</h3><p>Returns true if this byte array is null; otherwise returns
 false.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray().isNull();          <span class="comment">// returns true</span>
- QByteArray("").isNull();        <span class="comment">// returns false</span>
- QByteArray("abc").isNull();     <span class="comment">// returns false</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span>()<span class="operator">.</span>isNull();          <span class="comment">// returns true</span>
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span>(<span class="string">""</span>)<span class="operator">.</span>isNull();        <span class="comment">// returns false</span>
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span>(<span class="string">"abc"</span>)<span class="operator">.</span>isNull();     <span class="comment">// returns false</span>
 </pre>
 <p>Qt makes a distinction between null byte arrays and empty byte
 arrays for historical reasons. For most applications, what matters
 is whether or not a byte array contains any data, and this can be
 determined using <a href="qbytearray.html#isEmpty">isEmpty</a>().</p>
-<p>See also <a href="qbytearray.html#isEmpty">isEmpty</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="lastIndexOf" />int QByteArray.lastIndexOf (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>ba</i>, int&#160;<i>from</i>&#160;=&#160;-1)</h3><p>Returns the index position of the last occurrence of the byte
@@ -527,15 +523,15 @@ position <i>from</i>. If <i>from</i> is -1 (the default), the
 search starts at the last byte. Returns -1 if <i>ba</i> could not
 be found.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("crazy azimuths");
- QByteArray y("az");
- x.lastIndexOf(y);           <span class="comment">// returns 6</span>
- x.lastIndexOf(y, 6);        <span class="comment">// returns 6</span>
- x.lastIndexOf(y, 5);        <span class="comment">// returns 2</span>
- x.lastIndexOf(y, 1);        <span class="comment">// returns -1</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"crazy azimuths"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y(<span class="string">"az"</span>);
+ x<span class="operator">.</span>lastIndexOf(y);           <span class="comment">// returns 6</span>
+ x<span class="operator">.</span>lastIndexOf(y<span class="operator">,</span> <span class="number">6</span>);        <span class="comment">// returns 6</span>
+ x<span class="operator">.</span>lastIndexOf(y<span class="operator">,</span> <span class="number">5</span>);        <span class="comment">// returns 2</span>
+ x<span class="operator">.</span>lastIndexOf(y<span class="operator">,</span> <span class="number">1</span>);        <span class="comment">// returns -1</span>
 </pre>
-<p>See also <a href="qbytearray.html#indexOf">indexOf</a>(),
+<p><b>See also</b> <a href="qbytearray.html#indexOf">indexOf</a>(),
 <a href="qbytearray.html#contains">contains</a>(), and <a href="qbytearray.html#count">count</a>().</p>
 
 
@@ -560,12 +556,13 @@ of this byte array.</p>
 <p>The entire byte array is returned if <i>len</i> is greater than
 <a href="qbytearray.html#size">size</a>().</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("Pineapple");
- QByteArray y = x.left(4);
-<span class="comment"> // y == "Pine"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"Pineapple"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y <span class="operator">=</span> x<span class="operator">.</span>left(<span class="number">4</span>);
+ <span class="comment">// y == "Pine"</span>
 </pre>
-<p>See also <a href="qbytearray.html#right">right</a>(), <a href="qbytearray.html#mid">mid</a>(), <a href="qbytearray.html#startsWith">startsWith</a>(), and <a href="qbytearray.html#truncate">truncate</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#right">right</a>(),
+<a href="qbytearray.html#mid">mid</a>(), <a href="qbytearray.html#startsWith">startsWith</a>(), and <a href="qbytearray.html#truncate">truncate</a>().</p>
 
 
 <h3 class="fn"><a name="leftJustified" /><a href="qbytearray.html">QByteArray</a> QByteArray.leftJustified (<i>self</i>, int&#160;<i>width</i>, str&#160;<i>fill</i>&#160;=&#160;' ', bool&#160;<i>truncate</i>&#160;=&#160;False)</h3><p>Returns a byte array of size <i>width</i> that contains this
@@ -577,11 +574,11 @@ array.</p>
 <i>width</i>, then any bytes in a copy of the byte array after
 position <i>width</i> are removed, and the copy is returned.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("apple");
- QByteArray y = x.leftJustified(8, '.');   <span class="comment">// y == "apple..."</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"apple"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y <span class="operator">=</span> x<span class="operator">.</span>leftJustified(<span class="number">8</span><span class="operator">,</span> <span class="char">'.'</span>);   <span class="comment">// y == "apple..."</span>
 </pre>
-<p>See also <a href="qbytearray.html#rightJustified">rightJustified</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#rightJustified">rightJustified</a>().</p>
 
 
 <h3 class="fn"><a name="length" />int QByteArray.length (<i>self</i>)</h3><p>Same as <a href="qbytearray.html#size">size</a>().</p>
@@ -594,50 +591,51 @@ array, starting at position <i>pos</i>.</p>
 array containing all bytes starting at position <i>pos</i> until
 the end of the byte array.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("Five pineapples");
- QByteArray y = x.mid(5, 4);     <span class="comment">// y == "pine"</span>
- QByteArray z = x.mid(5);        <span class="comment">// z == "pineapples"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"Five pineapples"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y <span class="operator">=</span> x<span class="operator">.</span>mid(<span class="number">5</span><span class="operator">,</span> <span class="number">4</span>);     <span class="comment">// y == "pine"</span>
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> z <span class="operator">=</span> x<span class="operator">.</span>mid(<span class="number">5</span>);        <span class="comment">// z == "pineapples"</span>
 </pre>
-<p>See also <a href="qbytearray.html#left">left</a>() and <a href="qbytearray.html#right">right</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#left">left</a>() and
+<a href="qbytearray.html#right">right</a>().</p>
 
 
 <h3 class="fn"><a name="number" /><a href="qbytearray.html">QByteArray</a> QByteArray.number (int&#160;<i>n</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns a byte array containing the string equivalent of the
 number <i>n</i> to base <i>base</i> (10 by default). The
 <i>base</i> can be any value between 2 and 36.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- int n = 63;
- QByteArray.number(n);              <span class="comment">// returns "63"</span>
- QByteArray.number(n, 16);          <span class="comment">// returns "3f"</span>
- QByteArray.number(n, 16).toUpper();  <span class="comment">// returns "3F"</span>
+<pre class="cpp">
+ <span class="type">int</span> n <span class="operator">=</span> <span class="number">63</span>;
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span><span class="operator">.</span>number(n);              <span class="comment">// returns "63"</span>
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span><span class="operator">.</span>number(n<span class="operator">,</span> <span class="number">16</span>);          <span class="comment">// returns "3f"</span>
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span><span class="operator">.</span>number(n<span class="operator">,</span> <span class="number">16</span>)<span class="operator">.</span>toUpper();  <span class="comment">// returns "3F"</span>
 </pre>
 <p><b>Note:</b> The format of the number is not localized; the
 default C locale is used irrespective of the user's locale.</p>
-<p>See also <a href="qbytearray.html#setNum">setNum</a>() and
-<a href="qbytearray.html#toInt">toInt</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#setNum">setNum</a>()
+and <a href="qbytearray.html#toInt">toInt</a>().</p>
 
 
 <h3 class="fn"><a name="number-2" /><a href="qbytearray.html">QByteArray</a> QByteArray.number (float&#160;<i>n</i>, str&#160;<i>format</i>&#160;=&#160;'g', int&#160;<i>precision</i>&#160;=&#160;6)</h3><p>This is an overloaded function.</p>
-<p>See also <a href="qbytearray.html#toUInt">toUInt</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#toUInt">toUInt</a>().</p>
 
 
 <h3 class="fn"><a name="number-3" /><a href="qbytearray.html">QByteArray</a> QByteArray.number (int&#160;<i>n</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>This is an overloaded function.</p>
-<p>See also <a href="qbytearray.html#toLongLong">toLongLong</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#toLongLong">toLongLong</a>().</p>
 
 
 <h3 class="fn"><a name="number-4" /><a href="qbytearray.html">QByteArray</a> QByteArray.number (int&#160;<i>n</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>This is an overloaded function.</p>
-<p>See also <a href="qbytearray.html#toULongLong">toULongLong</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#toULongLong">toULongLong</a>().</p>
 
 
 <h3 class="fn"><a name="prepend" /><a href="qbytearray.html">QByteArray</a> QByteArray.prepend (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><p>Prepends the byte array <i>ba</i> to this byte array and returns
 a reference to this byte array.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("ship");
- QByteArray y("air");
- x.prepend(y);
-<span class="comment"> // x == "airship"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"ship"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y(<span class="string">"air"</span>);
+ x<span class="operator">.</span>prepend(y);
+ <span class="comment">// x == "airship"</span>
 </pre>
 <p>This is the same as insert(0, <i>ba</i>).</p>
 <p>Note: <a href="qbytearray.html">QByteArray</a> is an <a href="implicit-sharing.html#implicitly-shared">implicitly shared</a>
@@ -649,8 +647,8 @@ time</a>. If a shared instance is modified, it will be copied
 <p>If <i>this</i> is not an empty <a href="qbytearray.html">QByteArray</a>, a deep copy of the data is
 performed, taking <a href="containers.html#linear-time">linear
 time</a>.</p>
-<p>See also <a href="qbytearray.html#append">append</a>() and
-<a href="qbytearray.html#insert">insert</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#append">append</a>()
+and <a href="qbytearray.html#insert">insert</a>().</p>
 
 
 <h3 class="fn"><a name="push_back" />QByteArray.push_back (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><p>This function is provided for STL compatibility. It is
@@ -667,13 +665,13 @@ position <i>pos</i>, and returns a reference to the array.</p>
 valid, but <i>pos</i> + <i>len</i> is larger than the size of the
 array, the array is truncated at position <i>pos</i>.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("Montreal");
- ba.remove(1, 4);
-<span class="comment"> // ba == "Meal"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba(<span class="string">"Montreal"</span>);
+ ba<span class="operator">.</span>remove(<span class="number">1</span><span class="operator">,</span> <span class="number">4</span>);
+ <span class="comment">// ba == "Meal"</span>
 </pre>
-<p>See also <a href="qbytearray.html#insert">insert</a>() and
-<a href="qbytearray.html#replace">replace</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#insert">insert</a>()
+and <a href="qbytearray.html#replace">replace</a>().</p>
 
 
 <h3 class="fn"><a name="repeated" /><a href="qbytearray.html">QByteArray</a> QByteArray.repeated (<i>self</i>, int&#160;<i>times</i>)</h3><p>Returns a copy of this byte array repeated the specified number
@@ -681,9 +679,9 @@ of <i>times</i>.</p>
 <p>If <i>times</i> is less than 1, an empty byte array is
 returned.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("ab");
- ba.repeated(4);             <span class="comment">// returns "abababab"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba(<span class="string">"ab"</span>);
+ ba<span class="operator">.</span>repeated(<span class="number">4</span>);             <span class="comment">// returns "abababab"</span>
 </pre>
 <p>This function was introduced in Qt 4.5.</p>
 
@@ -692,14 +690,14 @@ returned.</p>
 the byte array <i>after</i>, and returns a reference to this byte
 array.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("Say yes!");
- QByteArray y("no");
- x.replace(4, 3, y);
-<span class="comment"> // x == "Say no</span>!"
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"Say yes!"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y(<span class="string">"no"</span>);
+ x<span class="operator">.</span>replace(<span class="number">4</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> y);
+ <span class="comment">// x == "Say no!"</span>
 </pre>
-<p>See also <a href="qbytearray.html#insert">insert</a>() and
-<a href="qbytearray.html#remove">remove</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#insert">insert</a>()
+and <a href="qbytearray.html#remove">remove</a>().</p>
 
 
 <h3 class="fn"><a name="replace-2" /><a href="qbytearray.html">QByteArray</a> QByteArray.replace (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>before</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>after</i>)</h3><p>This is an overloaded function.</p>
@@ -724,8 +722,8 @@ that will happen is that the <a href="qbytearray.html">QByteArray</a> will be a 
 tuning <a href="qbytearray.html">QByteArray</a>'s memory usage. In
 general, you will rarely ever need to call this function. If you
 want to change the size of the byte array, call <a href="qbytearray.html#resize">resize</a>().</p>
-<p>See also <a href="qbytearray.html#squeeze">squeeze</a>() and
-<a href="qbytearray.html#capacity">capacity</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#squeeze">squeeze</a>()
+and <a href="qbytearray.html#capacity">capacity</a>().</p>
 
 
 <h3 class="fn"><a name="resize" />QByteArray.resize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Sets the size of the byte array to <i>size</i> bytes.</p>
@@ -734,7 +732,8 @@ is extended to make it <i>size</i> bytes with the extra bytes added
 to the end. The new bytes are uninitialized.</p>
 <p>If <i>size</i> is less than the current size, bytes are removed
 from the end.</p>
-<p>See also <a href="qbytearray.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#size">size</a>() and
+<a href="qbytearray.html#truncate">truncate</a>().</p>
 
 
 <h3 class="fn"><a name="right" /><a href="qbytearray.html">QByteArray</a> QByteArray.right (<i>self</i>, int&#160;<i>len</i>)</h3><p>Returns a byte array that contains the rightmost <i>len</i>
@@ -742,13 +741,12 @@ bytes of this byte array.</p>
 <p>The entire byte array is returned if <i>len</i> is greater than
 <a href="qbytearray.html#size">size</a>().</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("Pineapple");
- QByteArray y = x.right(5);
-<span class="comment"> // y == "apple"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"Pineapple"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y <span class="operator">=</span> x<span class="operator">.</span>right(<span class="number">5</span>);
+ <span class="comment">// y == "apple"</span>
 </pre>
-<p>See also <a href="qbytearray.html#endsWith">endsWith</a>(),
-<a href="qbytearray.html#left">left</a>(), and <a href="qbytearray.html#mid">mid</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#endsWith">endsWith</a>(), <a href="qbytearray.html#left">left</a>(), and <a href="qbytearray.html#mid">mid</a>().</p>
 
 
 <h3 class="fn"><a name="rightJustified" /><a href="qbytearray.html">QByteArray</a> QByteArray.rightJustified (<i>self</i>, int&#160;<i>width</i>, str&#160;<i>fill</i>&#160;=&#160;' ', bool&#160;<i>truncate</i>&#160;=&#160;False)</h3><p>Returns a byte array of size <i>width</i> that contains the
@@ -760,39 +758,39 @@ this byte array.</p>
 more than <i>width</i>, then the resulting byte array is truncated
 at position <i>width</i>.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("apple");
- QByteArray y = x.rightJustified(8, '.');    <span class="comment">// y == "...apple"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"apple"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y <span class="operator">=</span> x<span class="operator">.</span>rightJustified(<span class="number">8</span><span class="operator">,</span> <span class="char">'.'</span>);    <span class="comment">// y == "...apple"</span>
 </pre>
-<p>See also <a href="qbytearray.html#leftJustified">leftJustified</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#leftJustified">leftJustified</a>().</p>
 
 
 <h3 class="fn"><a name="setNum" /><a href="qbytearray.html">QByteArray</a> QByteArray.setNum (<i>self</i>, int&#160;<i>n</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Sets the byte array to the printed value of <i>n</i> in base
 <i>base</i> (10 by default) and returns a reference to the byte
 array. The <i>base</i> can be any value between 2 and 36.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba;
- int n = 63;
- ba.setNum(n);           <span class="comment">// ba == "63"</span>
- ba.setNum(n, 16);       <span class="comment">// ba == "3f"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba;
+ <span class="type">int</span> n <span class="operator">=</span> <span class="number">63</span>;
+ ba<span class="operator">.</span>setNum(n);           <span class="comment">// ba == "63"</span>
+ ba<span class="operator">.</span>setNum(n<span class="operator">,</span> <span class="number">16</span>);       <span class="comment">// ba == "3f"</span>
 </pre>
 <p><b>Note:</b> The format of the number is not localized; the
 default C locale is used irrespective of the user's locale.</p>
-<p>See also <a href="qbytearray.html#number">number</a>() and
-<a href="qbytearray.html#toInt">toInt</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>()
+and <a href="qbytearray.html#toInt">toInt</a>().</p>
 
 
 <h3 class="fn"><a name="setNum-2" /><a href="qbytearray.html">QByteArray</a> QByteArray.setNum (<i>self</i>, float&#160;<i>n</i>, str&#160;<i>format</i>&#160;=&#160;'g', int&#160;<i>precision</i>&#160;=&#160;6)</h3><p>This is an overloaded function.</p>
-<p>See also <a href="qbytearray.html#toUInt">toUInt</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#toUInt">toUInt</a>().</p>
 
 
 <h3 class="fn"><a name="setNum-3" /><a href="qbytearray.html">QByteArray</a> QByteArray.setNum (<i>self</i>, int&#160;<i>n</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>This is an overloaded function.</p>
-<p>See also <a href="qbytearray.html#toShort">toShort</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#toShort">toShort</a>().</p>
 
 
 <h3 class="fn"><a name="setNum-4" /><a href="qbytearray.html">QByteArray</a> QByteArray.setNum (<i>self</i>, int&#160;<i>n</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>This is an overloaded function.</p>
-<p>See also <a href="qbytearray.html#toUShort">toUShort</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#toUShort">toUShort</a>().</p>
 
 
 <h3 class="fn"><a name="simplified" /><a href="qbytearray.html">QByteArray</a> QByteArray.simplified (<i>self</i>)</h3><p>Returns a byte array that has whitespace removed from the start
@@ -802,12 +800,12 @@ replaced with a single space.</p>
 isspace() function returns true. This includes the ASCII characters
 '\t', '\n', '\v', '\f', '\r', and ' '.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("  lots\t of\nwhitespace\r\n ");
- ba = ba.simplified();
-<span class="comment"> // ba == "lots of whitespace";</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba(<span class="string">"  lots\t of\nwhitespace\r\n "</span>);
+ ba <span class="operator">=</span> ba<span class="operator">.</span>simplified();
+ <span class="comment">// ba == "lots of whitespace";</span>
 </pre>
-<p>See also <a href="qbytearray.html#trimmed">trimmed</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#trimmed">trimmed</a>().</p>
 
 
 <h3 class="fn"><a name="size" />int QByteArray.size (<i>self</i>)</h3><p>Returns the number of bytes in this byte array.</p>
@@ -818,15 +816,15 @@ return value of <a href="qbytearray.html#data">data</a>() and
 <a href="qbytearray.html#constData">constData</a>() as arguments to
 functions that expect '\0'-terminated strings.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("Hello");
- int n = ba.size();          <span class="comment">// n == 5</span>
- ba.data()[0];               <span class="comment">// returns 'H'</span>
- ba.data()[4];               <span class="comment">// returns 'o'</span>
- ba.data()[5];               <span class="comment">// returns '\0'</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba(<span class="string">"Hello"</span>);
+ <span class="type">int</span> n <span class="operator">=</span> ba<span class="operator">.</span>size();          <span class="comment">// n == 5</span>
+ ba<span class="operator">.</span>data()<span class="operator">[</span><span class="number">0</span><span class="operator">]</span>;               <span class="comment">// returns 'H'</span>
+ ba<span class="operator">.</span>data()<span class="operator">[</span><span class="number">4</span><span class="operator">]</span>;               <span class="comment">// returns 'o'</span>
+ ba<span class="operator">.</span>data()<span class="operator">[</span><span class="number">5</span><span class="operator">]</span>;               <span class="comment">// returns '\0'</span>
 </pre>
-<p>See also <a href="qbytearray.html#isEmpty">isEmpty</a>() and
-<a href="qbytearray.html#resize">resize</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#isEmpty">isEmpty</a>()
+and <a href="qbytearray.html#resize">resize</a>().</p>
 
 
 <h3 class="fn"><a name="split" />list-of-QByteArray QByteArray.split (<i>self</i>, str&#160;<i>sep</i>)</h3><p>Splits the byte array into subarrays wherever <i>sep</i> occurs,
@@ -839,44 +837,43 @@ containing this byte array.</p>
 <p>The sole purpose of this function is to provide a means of fine
 tuning <a href="qbytearray.html">QByteArray</a>'s memory usage. In
 general, you will rarely ever need to call this function.</p>
-<p>See also <a href="qbytearray.html#reserve">reserve</a>() and
-<a href="qbytearray.html#capacity">capacity</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#reserve">reserve</a>()
+and <a href="qbytearray.html#capacity">capacity</a>().</p>
 
 
 <h3 class="fn"><a name="startsWith" />bool QByteArray.startsWith (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><p>Returns true if this byte array starts with byte array
 <i>ba</i>; otherwise returns false.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray url("ftp://ftp.qt.nokia.com/");
- if (url.startsWith("ftp:"))
-     ...
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> url(<span class="string">"ftp://ftp.qt.nokia.com/"</span>);
+ <span class="keyword">if</span> (url<span class="operator">.</span>startsWith(<span class="string">"ftp:"</span>))
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 </pre>
-<p>See also <a href="qbytearray.html#endsWith">endsWith</a>() and
-<a href="qbytearray.html#left">left</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#endsWith">endsWith</a>() and <a href="qbytearray.html#left">left</a>().</p>
 
 
 <h3 class="fn"><a name="toBase64" /><a href="qbytearray.html">QByteArray</a> QByteArray.toBase64 (<i>self</i>)</h3><p>Returns a copy of the byte array, encoded as Base64.</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray text("Qt is great!");
- text.toBase64();        <span class="comment">// returns "UXQgaXMgZ3JlYXQh"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> text(<span class="string">"Qt is great!"</span>);
+ text<span class="operator">.</span>toBase64();        <span class="comment">// returns "UXQgaXMgZ3JlYXQh"</span>
 </pre>
 <p>The algorithm used to encode Base64-encoded data is defined in
 <a href="http://www.rfc-editor.org/rfc/rfc2045.txt">RFC
 2045</a>.</p>
-<p>See also <a href="qbytearray.html#fromBase64">fromBase64</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#fromBase64">fromBase64</a>().</p>
 
 
 <h3 class="fn"><a name="toDouble" />(float, bool&#160;<i>ok</i>) QByteArray.toDouble (<i>self</i>)</h3><p>Returns the byte array converted to a <tt>double</tt> value.</p>
 <p>Returns 0.0 if the conversion fails.</p>
 <p>If <i>ok</i> is not 0: if a conversion error occurs, *<i>ok</i>
 is set to false; otherwise *<i>ok</i> is set to true.</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray string("1234.56");
- double a = string.toDouble();   <span class="comment">// a == 1234.56</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> string(<span class="string">"1234.56"</span>);
+ <span class="type">double</span> a <span class="operator">=</span> string<span class="operator">.</span>toDouble();   <span class="comment">// a == 1234.56</span>
 </pre>
 <p><b>Note:</b> The conversion of the number is performed in the
 default C locale, irrespective of the user's locale.</p>
-<p>See also <a href="qbytearray.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="toFloat" />(float, bool&#160;<i>ok</i>) QByteArray.toFloat (<i>self</i>)</h3><p>Returns the byte array converted to a <tt>float</tt> value.</p>
@@ -885,12 +882,12 @@ default C locale, irrespective of the user's locale.</p>
 is set to false; otherwise *<i>ok</i> is set to true.</p>
 <p><b>Note:</b> The conversion of the number is performed in the
 default C locale, irrespective of the user's locale.</p>
-<p>See also <a href="qbytearray.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="toHex" /><a href="qbytearray.html">QByteArray</a> QByteArray.toHex (<i>self</i>)</h3><p>Returns a hex encoded copy of the byte array. The hex encoding
 uses the numbers 0-9 and the letters a-f.</p>
-<p>See also <a href="qbytearray.html#fromHex">fromHex</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#fromHex">fromHex</a>().</p>
 
 
 <h3 class="fn"><a name="toInt" />(int, bool&#160;<i>ok</i>) QByteArray.toInt (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the byte array converted to an <tt>int</tt> using base
@@ -903,15 +900,15 @@ be octal; otherwise it is assumed to be decimal.</p>
 <p>Returns 0 if the conversion fails.</p>
 <p>If <i>ok</i> is not 0: if a conversion error occurs, *<i>ok</i>
 is set to false; otherwise *<i>ok</i> is set to true.</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray str("FF");
- bool ok;
- int hex = str.toInt(&amp;ok, 16);     <span class="comment">// hex == 255, ok == true</span>
- int dec = str.toInt(&amp;ok, 10);     <span class="comment">// dec == 0, ok == false</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> str(<span class="string">"FF"</span>);
+ <span class="type">bool</span> ok;
+ <span class="type">int</span> hex <span class="operator">=</span> str<span class="operator">.</span>toInt(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">16</span>);     <span class="comment">// hex == 255, ok == true</span>
+ <span class="type">int</span> dec <span class="operator">=</span> str<span class="operator">.</span>toInt(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">10</span>);     <span class="comment">// dec == 0, ok == false</span>
 </pre>
 <p><b>Note:</b> The conversion of the number is performed in the
 default C locale, irrespective of the user's locale.</p>
-<p>See also <a href="qbytearray.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="toLong" />(int, bool&#160;<i>ok</i>) QByteArray.toLong (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the byte array converted to a <tt>long</tt> int using
@@ -924,16 +921,16 @@ be octal; otherwise it is assumed to be decimal.</p>
 <p>Returns 0 if the conversion fails.</p>
 <p>If <i>ok</i> is not 0: if a conversion error occurs, *<i>ok</i>
 is set to false; otherwise *<i>ok</i> is set to true.</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray str("FF");
- bool ok;
- long hex = str.toLong(&amp;ok, 16);   <span class="comment">// hex == 255, ok == true</span>
- long dec = str.toLong(&amp;ok, 10);   <span class="comment">// dec == 0, ok == false</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> str(<span class="string">"FF"</span>);
+ <span class="type">bool</span> ok;
+ <span class="type">long</span> hex <span class="operator">=</span> str<span class="operator">.</span>toLong(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">16</span>);   <span class="comment">// hex == 255, ok == true</span>
+ <span class="type">long</span> dec <span class="operator">=</span> str<span class="operator">.</span>toLong(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">10</span>);   <span class="comment">// dec == 0, ok == false</span>
 </pre>
 <p><b>Note:</b> The conversion of the number is performed in the
 default C locale, irrespective of the user's locale.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qbytearray.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="toLongLong" />(int, bool&#160;<i>ok</i>) QByteArray.toLongLong (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the byte array converted to a <tt>long long</tt> using
@@ -948,19 +945,19 @@ be octal; otherwise it is assumed to be decimal.</p>
 is set to false; otherwise *<i>ok</i> is set to true.</p>
 <p><b>Note:</b> The conversion of the number is performed in the
 default C locale, irrespective of the user's locale.</p>
-<p>See also <a href="qbytearray.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="toLower" /><a href="qbytearray.html">QByteArray</a> QByteArray.toLower (<i>self</i>)</h3><p>Returns a lowercase copy of the byte array. The bytearray is
 interpreted as a Latin-1 encoded string.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("Qt by NOKIA");
- QByteArray y = x.toLower();
-<span class="comment"> // y == "qt by nokia"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"Qt by NOKIA"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y <span class="operator">=</span> x<span class="operator">.</span>toLower();
+ <span class="comment">// y == "qt by nokia"</span>
 </pre>
-<p>See also <a href="qbytearray.html#toUpper">toUpper</a>() and
-<a href="qbytearray.html#8-bit-character-comparisons">8-bit
+<p><b>See also</b> <a href="qbytearray.html#toUpper">toUpper</a>()
+and <a href="qbytearray.html#8-bit-character-comparisons">8-bit
 Character Comparisons</a>.</p>
 
 
@@ -975,16 +972,16 @@ not one of the following:</p>
 <i>exclude</i>. To force characters to be encoded pass them to
 <i>include</i>. The <i>percent</i> character is always encoded.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray text = "{a fishy string?}";
- QByteArray ba = text.toPercentEncoding("{}", "s");
- qDebug(ba.constData());
-<span class="comment"> // prints "{a fi%73hy %73tring%3F}"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> text <span class="operator">=</span> <span class="string">"{a fishy string?}"</span>;
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba <span class="operator">=</span> text<span class="operator">.</span>toPercentEncoding(<span class="string">"{}"</span><span class="operator">,</span> <span class="string">"s"</span>);
+ <a href="qtcore.html#qDebug">qDebug</a>(ba<span class="operator">.</span>constData());
+ <span class="comment">// prints "{a fi%73hy %73tring%3F}"</span>
 </pre>
 <p>The hex encoding uses the numbers 0-9 and the uppercase letters
 A-F.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qbytearray.html#fromPercentEncoding">fromPercentEncoding</a>() and
+<p><b>See also</b> <a href="qbytearray.html#fromPercentEncoding">fromPercentEncoding</a>() and
 <a href="qurl.html#toPercentEncoding">QUrl.toPercentEncoding</a>().</p>
 
 
@@ -1000,7 +997,7 @@ be octal; otherwise it is assumed to be decimal.</p>
 is set to false; otherwise *<i>ok</i> is set to true.</p>
 <p><b>Note:</b> The conversion of the number is performed in the
 default C locale, irrespective of the user's locale.</p>
-<p>See also <a href="qbytearray.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="toUInt" />(int, bool&#160;<i>ok</i>) QByteArray.toUInt (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the byte array converted to an <tt>unsigned int</tt>
@@ -1015,7 +1012,7 @@ be octal; otherwise it is assumed to be decimal.</p>
 is set to false; otherwise *<i>ok</i> is set to true.</p>
 <p><b>Note:</b> The conversion of the number is performed in the
 default C locale, irrespective of the user's locale.</p>
-<p>See also <a href="qbytearray.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="toULong" />(int, bool&#160;<i>ok</i>) QByteArray.toULong (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the byte array converted to an <tt>unsigned long
@@ -1031,7 +1028,7 @@ is set to false; otherwise *<i>ok</i> is set to true.</p>
 <p><b>Note:</b> The conversion of the number is performed in the
 default C locale, irrespective of the user's locale.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qbytearray.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="toULongLong" />(int, bool&#160;<i>ok</i>) QByteArray.toULongLong (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the byte array converted to an <tt>unsigned long
@@ -1046,19 +1043,19 @@ be octal; otherwise it is assumed to be decimal.</p>
 is set to false; otherwise *<i>ok</i> is set to true.</p>
 <p><b>Note:</b> The conversion of the number is performed in the
 default C locale, irrespective of the user's locale.</p>
-<p>See also <a href="qbytearray.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="toUpper" /><a href="qbytearray.html">QByteArray</a> QByteArray.toUpper (<i>self</i>)</h3><p>Returns an uppercase copy of the byte array. The bytearray is
 interpreted as a Latin-1 encoded string.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray x("Qt by NOKIA");
- QByteArray y = x.toUpper();
-<span class="comment"> // y == "QT BY NOKIA"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> x(<span class="string">"Qt by NOKIA"</span>);
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> y <span class="operator">=</span> x<span class="operator">.</span>toUpper();
+ <span class="comment">// y == "QT BY NOKIA"</span>
 </pre>
-<p>See also <a href="qbytearray.html#toLower">toLower</a>() and
-<a href="qbytearray.html#8-bit-character-comparisons">8-bit
+<p><b>See also</b> <a href="qbytearray.html#toLower">toLower</a>()
+and <a href="qbytearray.html#8-bit-character-comparisons">8-bit
 Character Comparisons</a>.</p>
 
 
@@ -1074,7 +1071,7 @@ be octal; otherwise it is assumed to be decimal.</p>
 is set to false; otherwise *<i>ok</i> is set to true.</p>
 <p><b>Note:</b> The conversion of the number is performed in the
 default C locale, irrespective of the user's locale.</p>
-<p>See also <a href="qbytearray.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="trimmed" /><a href="qbytearray.html">QByteArray</a> QByteArray.trimmed (<i>self</i>)</h3><p>Returns a byte array that has whitespace removed from the start
@@ -1083,25 +1080,26 @@ and the end.</p>
 isspace() function returns true. This includes the ASCII characters
 '\t', '\n', '\v', '\f', '\r', and ' '.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("  lots\t of\nwhitespace\r\n ");
- ba = ba.trimmed();
-<span class="comment"> // ba == "lots\t of\nwhitespace";</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba(<span class="string">"  lots\t of\nwhitespace\r\n "</span>);
+ ba <span class="operator">=</span> ba<span class="operator">.</span>trimmed();
+ <span class="comment">// ba == "lots\t of\nwhitespace";</span>
 </pre>
 <p>Unlike <a href="qbytearray.html#simplified">simplified</a>(),
 trimmed() leaves internal whitespace alone.</p>
-<p>See also <a href="qbytearray.html#simplified">simplified</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#simplified">simplified</a>().</p>
 
 
 <h3 class="fn"><a name="truncate" />QByteArray.truncate (<i>self</i>, int&#160;<i>pos</i>)</h3><p>Truncates the byte array at index position <i>pos</i>.</p>
 <p>If <i>pos</i> is beyond the end of the array, nothing
 happens.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QByteArray ba("Stockholm");
- ba.truncate(5);             <span class="comment">// ba == "Stock"</span>
+<pre class="cpp">
+ <span class="type"><a href="qbytearray.html">QByteArray</a></span> ba(<span class="string">"Stockholm"</span>);
+ ba<span class="operator">.</span>truncate(<span class="number">5</span>);             <span class="comment">// ba == "Stock"</span>
 </pre>
-<p>See also <a href="qbytearray.html#chop">chop</a>(), <a href="qbytearray.html#resize">resize</a>(), and <a href="qbytearray.html#left">left</a>().</p>
+<p><b>See also</b> <a href="qbytearray.html#chop">chop</a>(),
+<a href="qbytearray.html#resize">resize</a>(), and <a href="qbytearray.html#left">left</a>().</p>
 
 
-<h3 class="fn"><a name="__add__" /><a href="qbytearray.html">QByteArray</a> QByteArray.__add__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__add__-2" />QString QByteArray.__add__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__contains__" />int QByteArray.__contains__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><h3 class="fn"><a name="__eq__" />bool QByteArray.__eq__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__eq__-2" />bool QByteArray.__eq__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__ge__" />bool QByteArray.__ge__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ge__-2" />bool QByteArray.__ge__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__getitem__" />str QByteArray.__getitem__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__getitem__-2" /><a href="qbytearray.html">QByteArray</a> QByteArray.__getitem__ (<i>self</i>, slice&#160;<i>slice</i>)</h3><h3 class="fn"><a name="__gt__" />bool QByteArray.__gt__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__gt__-2" />bool QByteArray.__gt__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__hash__" />int QByteArray.__hash__ (<i>self</i>)</h3><h3 class="fn"><a name="__iadd__" /><a href="qbytearray.html">QByteArray</a> QByteArray.__iadd__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><h3 class="fn"><a name="__iadd__-2" /><a href="qbytearray.html">QByteArray</a> QByteArray.__iadd__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__imul__" /><a href="qbytearray.html">QByteArray</a> QByteArray.__imul__ (<i>self</i>, int&#160;<i>m</i>)</h3><h3 class="fn"><a name="__le__" />bool QByteArray.__le__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__le__-2" />bool QByteArray.__le__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__len__" /> QByteArray.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__lt__" />bool QByteArray.__lt__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__lt__-2" />bool QByteArray.__lt__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__mul__" /><a href="qbytearray.html">QByteArray</a> QByteArray.__mul__ (<i>self</i>, int&#160;<i>m</i>)</h3><h3 class="fn"><a name="__ne__" />bool QByteArray.__ne__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__-2" />bool QByteArray.__ne__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__repr__" />str QByteArray.__repr__ (<i>self</i>)</h3><h3 class="fn"><a name="__str__" />str QByteArray.__str__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__add__" /><a href="qbytearray.html">QByteArray</a> QByteArray.__add__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__add__-2" />QString QByteArray.__add__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__contains__" />int QByteArray.__contains__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><h3 class="fn"><a name="__eq__" />bool QByteArray.__eq__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__eq__-2" />bool QByteArray.__eq__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__ge__" />bool QByteArray.__ge__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ge__-2" />bool QByteArray.__ge__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__getitem__" />str QByteArray.__getitem__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__getitem__-2" /><a href="qbytearray.html">QByteArray</a> QByteArray.__getitem__ (<i>self</i>, slice&#160;<i>slice</i>)</h3><h3 class="fn"><a name="__gt__" />bool QByteArray.__gt__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__gt__-2" />bool QByteArray.__gt__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__hash__" />int QByteArray.__hash__ (<i>self</i>)</h3><h3 class="fn"><a name="__iadd__" /><a href="qbytearray.html">QByteArray</a> QByteArray.__iadd__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a</i>)</h3><h3 class="fn"><a name="__iadd__-2" /><a href="qbytearray.html">QByteArray</a> QByteArray.__iadd__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__imul__" /><a href="qbytearray.html">QByteArray</a> QByteArray.__imul__ (<i>self</i>, int&#160;<i>m</i>)</h3><h3 class="fn"><a name="__le__" />bool QByteArray.__le__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__le__-2" />bool QByteArray.__le__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__len__" /> QByteArray.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__lt__" />bool QByteArray.__lt__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__lt__-2" />bool QByteArray.__lt__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__mul__" /><a href="qbytearray.html">QByteArray</a> QByteArray.__mul__ (<i>self</i>, int&#160;<i>m</i>)</h3><h3 class="fn"><a name="__ne__" />bool QByteArray.__ne__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__-2" />bool QByteArray.__ne__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>a2</i>)</h3><h3 class="fn"><a name="__repr__" />str QByteArray.__repr__ (<i>self</i>)</h3><h3 class="fn"><a name="__str__" />str QByteArray.__str__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

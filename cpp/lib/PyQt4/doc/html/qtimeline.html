@@ -28,20 +28,20 @@ steady rate. You can specify the update interval by calling
 When done, QTimeLine enters <a href="qtimeline.html#State-enum">NotRunning</a> state, and emits
 <a href="qtimeline.html#finished">finished</a>().</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- ...
- progressBar = new QProgressBar(this);
- progressBar-&gt;setRange(0, 100);
+<pre class="cpp">
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ progressBar <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qprogressbar.html">QProgressBar</a></span>(<span class="keyword">this</span>);
+ progressBar<span class="operator">-</span><span class="operator">&gt;</span>setRange(<span class="number">0</span><span class="operator">,</span> <span class="number">100</span>);
 
-<span class="comment"> // Construct a 1-second timeline with a frame range of 0 - 100</span>
- QTimeLine *timeLine = new QTimeLine(1000, this);
- timeLine-&gt;setFrameRange(0, 100);
- connect(timeLine, SIGNAL(frameChanged(int)), progressBar, SLOT(setValue(int)));
+ <span class="comment">// Construct a 1-second timeline with a frame range of 0 - 100</span>
+ <span class="type">QTimeLine</span> <span class="operator">*</span>timeLine <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QTimeLine</span>(<span class="number">1000</span><span class="operator">,</span> <span class="keyword">this</span>);
+ timeLine<span class="operator">-</span><span class="operator">&gt;</span><a href="qtimeline.html#setFrameRange">setFrameRange</a>(<span class="number">0</span><span class="operator">,</span> <span class="number">100</span>);
+ <a href="qobject.html#connect">connect</a>(timeLine<span class="operator">,</span> SIGNAL(frameChanged(<span class="type">int</span>))<span class="operator">,</span> progressBar<span class="operator">,</span> SLOT(setValue(<span class="type">int</span>)));
 
-<span class="comment"> // Clicking the push button will start the progress bar animation</span>
- pushButton = new QPushButton(tr("Start animation"), this);
- connect(pushButton, SIGNAL(clicked()), timeLine, SLOT(start()));
- ...
+ <span class="comment">// Clicking the push button will start the progress bar animation</span>
+ pushButton <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qpushbutton.html">QPushButton</a></span>(tr(<span class="string">"Start animation"</span>)<span class="operator">,</span> <span class="keyword">this</span>);
+ <a href="qobject.html#connect">connect</a>(pushButton<span class="operator">,</span> SIGNAL(clicked())<span class="operator">,</span> timeLine<span class="operator">,</span> SLOT(start()));
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 </pre>
 <p>You can also use QTimeLine with the <a href="graphicsview.html#graphics-view">Graphics View framework</a> for
 animations. The <a href="qgraphicsitemanimation.html">QGraphicsItemAnimation</a> class
@@ -82,83 +82,83 @@ ignored.</p>
 EaseInOutCurve. The curve defines the relation between the value
 and the timeline.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.EaseInCurve</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The value starts growing slowly, then
 increases in speed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.EaseOutCurve</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The value starts growing steadily, then ends
 slowly.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.EaseInOutCurve</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The value starts growing slowly, then runs
 steadily, then grows slowly again.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.LinearCurve</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The value grows linearly (e.g., if the
 duration is 1000 ms, the value at time 500 ms is 0.5).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.SineCurve</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The value grows sinusoidally.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.CosineCurve</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The value grows cosinusoidally.</td>
 </tr>
 </table>
-<p>See also <a href="qtimeline.html#curveShape-prop">setCurveShape</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#curveShape-prop">setCurveShape</a>().</p>
 
 
 <h3 class="fn"><a name="Direction-enum" />QTimeLine.Direction</h3><p>This enum describes the direction of the timeline when in
 <a href="qtimeline.html#State-enum">Running</a> state.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.Forward</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The current time of the timeline increases
 with time (i.e., moves from 0 and towards the end / duration).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.Backward</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The current time of the timeline decreases
 with time (i.e., moves from the end / duration and towards 0).</td>
 </tr>
 </table>
-<p>See also <a href="qtimeline.html#direction-prop">setDirection</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#direction-prop">setDirection</a>().</p>
 
 
 <h3 class="fn"><a name="State-enum" />QTimeLine.State</h3><p>This enum describes the state of the timeline.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.NotRunning</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The timeline is not running. This is the
 initial state of <a href="qtimeline.html">QTimeLine</a>, and the
 state <a href="qtimeline.html">QTimeLine</a> reenters when
@@ -168,45 +168,45 @@ or the timeline is started by calling <a href="qtimeline.html#start">start</a>()
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.Paused</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The timeline is paused (i.e., temporarily
 suspended). Calling setPaused(false) will resume timeline
 activity.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTimeLine.Running</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The timeline is running. While control is in
 the event loop, <a href="qtimeline.html">QTimeLine</a> will update
 its current time at regular intervals, emitting <a href="qtimeline.html#valueChanged">valueChanged</a>() and <a href="qtimeline.html#frameChanged">frameChanged</a>() when
 appropriate.</td>
 </tr>
 </table>
-<p>See also <a href="qtimeline.html#state">state</a>() and <a href="qtimeline.html#stateChanged">stateChanged</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#state">state</a>() and
+<a href="qtimeline.html#stateChanged">stateChanged</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QTimeLine" />QTimeLine.__init__ (<i>self</i>, int&#160;<i>duration</i>&#160;=&#160;1000, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a timeline with a duration of <i>duration</i>
 milliseconds. <i>parent</i> is passed to <a href="qobject.html">QObject</a>'s constructor. The default duration is
 1000 milliseconds.</p>
 
 
 <h3 class="fn"><a name="currentFrame" />int QTimeLine.currentFrame (<i>self</i>)</h3><p>Returns the frame corresponding to the current time.</p>
-<p>See also <a href="qtimeline.html#currentTime-prop">currentTime</a>(), <a href="qtimeline.html#frameForTime">frameForTime</a>(), and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#currentTime-prop">currentTime</a>(), <a href="qtimeline.html#frameForTime">frameForTime</a>(), and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
 
 
 <h3 class="fn"><a name="currentTime" />int QTimeLine.currentTime (<i>self</i>)</h3><h3 class="fn"><a name="currentValue" />float QTimeLine.currentValue (<i>self</i>)</h3><p>Returns the value corresponding to the current time.</p>
-<p>See also <a href="qtimeline.html#valueForTime">valueForTime</a>() and <a href="qtimeline.html#currentFrame">currentFrame</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#valueForTime">valueForTime</a>() and <a href="qtimeline.html#currentFrame">currentFrame</a>().</p>
 
 
 <h3 class="fn"><a name="curveShape" /><a href="qtimeline.html#CurveShape-enum">CurveShape</a> QTimeLine.curveShape (<i>self</i>)</h3><h3 class="fn"><a name="direction" /><a href="qtimeline.html#Direction-enum">Direction</a> QTimeLine.direction (<i>self</i>)</h3><h3 class="fn"><a name="duration" />int QTimeLine.duration (<i>self</i>)</h3><h3 class="fn"><a name="easingCurve" /><a href="qeasingcurve.html">QEasingCurve</a> QTimeLine.easingCurve (<i>self</i>)</h3><h3 class="fn"><a name="endFrame" />int QTimeLine.endFrame (<i>self</i>)</h3><p>Returns the end frame, which is the frame corresponding to the
 end of the timeline (i.e., the frame for which the current value is
 1).</p>
-<p>See also <a href="qtimeline.html#setEndFrame">setEndFrame</a>()
-and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#setEndFrame">setEndFrame</a>() and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
 
 
 <h3 class="fn"><a name="frameForTime" />int QTimeLine.frameForTime (<i>self</i>, int&#160;<i>msec</i>)</h3><p>Returns the frame corresponding to the time <i>msec</i>. This
 value is calculated using a linear interpolation of the start and
 end frame, based on the value returned by <a href="qtimeline.html#valueForTime">valueForTime</a>().</p>
-<p>See also <a href="qtimeline.html#valueForTime">valueForTime</a>() and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#valueForTime">valueForTime</a>() and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
 
 
 <h3 class="fn"><a name="loopCount" />int QTimeLine.loopCount (<i>self</i>)</h3><h3 class="fn"><a name="resume" />QTimeLine.resume (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void resume()</tt>.</p><p>Resumes the timeline from the current time. <a href="qtimeline.html">QTimeLine</a> will reenter Running state, and once
@@ -214,14 +214,16 @@ it enters the event loop, it will update its current time, frame
 and value at regular intervals.</p>
 <p>In contrast to <a href="qtimeline.html#start">start</a>(), this
 function does not restart the timeline before it resumes.</p>
-<p>See also <a href="qtimeline.html#start">start</a>(), <a href="qtimeline.html#updateInterval-prop">updateInterval</a>(), <a href="qtimeline.html#frameChanged">frameChanged</a>(), and <a href="qtimeline.html#valueChanged">valueChanged</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#start">start</a>(),
+<a href="qtimeline.html#updateInterval-prop">updateInterval</a>(),
+<a href="qtimeline.html#frameChanged">frameChanged</a>(), and
+<a href="qtimeline.html#valueChanged">valueChanged</a>().</p>
 
 
 <h3 class="fn"><a name="setCurrentTime" />QTimeLine.setCurrentTime (<i>self</i>, int&#160;<i>msec</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setCurrentTime(int)</tt>.</p><h3 class="fn"><a name="setCurveShape" />QTimeLine.setCurveShape (<i>self</i>, <a href="qtimeline.html#CurveShape-enum">CurveShape</a>&#160;<i>shape</i>)</h3><h3 class="fn"><a name="setDirection" />QTimeLine.setDirection (<i>self</i>, <a href="qtimeline.html#Direction-enum">Direction</a>&#160;<i>direction</i>)</h3><h3 class="fn"><a name="setDuration" />QTimeLine.setDuration (<i>self</i>, int&#160;<i>duration</i>)</h3><h3 class="fn"><a name="setEasingCurve" />QTimeLine.setEasingCurve (<i>self</i>, <a href="qeasingcurve.html">QEasingCurve</a>&#160;<i>curve</i>)</h3><h3 class="fn"><a name="setEndFrame" />QTimeLine.setEndFrame (<i>self</i>, int&#160;<i>frame</i>)</h3><p>Sets the end frame, which is the frame corresponding to the end
 of the timeline (i.e., the frame for which the current value is 1),
 to <i>frame</i>.</p>
-<p>See also <a href="qtimeline.html#endFrame">endFrame</a>(),
-<a href="qtimeline.html#startFrame">startFrame</a>(), and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#endFrame">endFrame</a>(), <a href="qtimeline.html#startFrame">startFrame</a>(), and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
 
 
 <h3 class="fn"><a name="setFrameRange" />QTimeLine.setFrameRange (<i>self</i>, int&#160;<i>startFrame</i>, int&#160;<i>endFrame</i>)</h3><p>Sets the timeline's frame counter to start at <i>startFrame</i>,
@@ -231,8 +233,7 @@ using the return value of <a href="qtimeline.html#valueForTime">valueForTime</a>
 <p>When in Running state, <a href="qtimeline.html">QTimeLine</a>
 also emits the <a href="qtimeline.html#frameChanged">frameChanged</a>() signal when the
 frame changes.</p>
-<p>See also <a href="qtimeline.html#startFrame">startFrame</a>(),
-<a href="qtimeline.html#endFrame">endFrame</a>(), <a href="qtimeline.html#start">start</a>(), and <a href="qtimeline.html#currentFrame">currentFrame</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#startFrame">startFrame</a>(), <a href="qtimeline.html#endFrame">endFrame</a>(), <a href="qtimeline.html#start">start</a>(), and <a href="qtimeline.html#currentFrame">currentFrame</a>().</p>
 
 
 <h3 class="fn"><a name="setLoopCount" />QTimeLine.setLoopCount (<i>self</i>, int&#160;<i>count</i>)</h3><h3 class="fn"><a name="setPaused" />QTimeLine.setPaused (<i>self</i>, bool&#160;<i>paused</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setPaused(bool)</tt>.</p><p>If <i>paused</i> is true, the timeline is paused, causing
@@ -240,14 +241,14 @@ frame changes.</p>
 updates will be signaled until either <a href="qtimeline.html#start">start</a>() or setPaused(false) is called.
 If <i>paused</i> is false, the timeline is resumed and continues
 where it left.</p>
-<p>See also <a href="qtimeline.html#state">state</a>() and <a href="qtimeline.html#start">start</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#state">state</a>() and
+<a href="qtimeline.html#start">start</a>().</p>
 
 
 <h3 class="fn"><a name="setStartFrame" />QTimeLine.setStartFrame (<i>self</i>, int&#160;<i>frame</i>)</h3><p>Sets the start frame, which is the frame corresponding to the
 start of the timeline (i.e., the frame for which the current value
 is 0), to <i>frame</i>.</p>
-<p>See also <a href="qtimeline.html#startFrame">startFrame</a>(),
-<a href="qtimeline.html#endFrame">endFrame</a>(), and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#startFrame">startFrame</a>(), <a href="qtimeline.html#endFrame">endFrame</a>(), and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
 
 
 <h3 class="fn"><a name="setUpdateInterval" />QTimeLine.setUpdateInterval (<i>self</i>, int&#160;<i>interval</i>)</h3><h3 class="fn"><a name="start" />QTimeLine.start (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void start()</tt>.</p><p>Starts the timeline. <a href="qtimeline.html">QTimeLine</a> will
@@ -258,21 +259,25 @@ change the update interval by calling <a href="qtimeline.html#updateInterval-pro
 <p>The timeline will start from position 0, or the end if going
 backward. If you want to resume a stopped timeline without
 restarting, you can call <a href="qtimeline.html#resume">resume</a>() instead.</p>
-<p>See also <a href="qtimeline.html#resume">resume</a>(), <a href="qtimeline.html#updateInterval-prop">updateInterval</a>(), <a href="qtimeline.html#frameChanged">frameChanged</a>(), and <a href="qtimeline.html#valueChanged">valueChanged</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#resume">resume</a>(),
+<a href="qtimeline.html#updateInterval-prop">updateInterval</a>(),
+<a href="qtimeline.html#frameChanged">frameChanged</a>(), and
+<a href="qtimeline.html#valueChanged">valueChanged</a>().</p>
 
 
 <h3 class="fn"><a name="startFrame" />int QTimeLine.startFrame (<i>self</i>)</h3><p>Returns the start frame, which is the frame corresponding to the
 start of the timeline (i.e., the frame for which the current value
 is 0).</p>
-<p>See also <a href="qtimeline.html#setStartFrame">setStartFrame</a>() and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#setStartFrame">setStartFrame</a>() and <a href="qtimeline.html#setFrameRange">setFrameRange</a>().</p>
 
 
 <h3 class="fn"><a name="state" /><a href="qtimeline.html#State-enum">State</a> QTimeLine.state (<i>self</i>)</h3><p>Returns the state of the timeline.</p>
-<p>See also <a href="qtimeline.html#start">start</a>(), <a href="qtimeline.html#setPaused">setPaused</a>(), and <a href="qtimeline.html#stop">stop</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#start">start</a>(),
+<a href="qtimeline.html#setPaused">setPaused</a>(), and <a href="qtimeline.html#stop">stop</a>().</p>
 
 
 <h3 class="fn"><a name="stop" />QTimeLine.stop (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void stop()</tt>.</p><p>Stops the timeline, causing <a href="qtimeline.html">QTimeLine</a> to enter <a href="qtimeline.html#State-enum">NotRunning</a> state.</p>
-<p>See also <a href="qtimeline.html#start">start</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#start">start</a>().</p>
 
 
 <h3 class="fn"><a name="timerEvent" />QTimeLine.timerEvent (<i>self</i>, <a href="qtimerevent.html">QTimerEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qobject.html#timerEvent">QObject.timerEvent</a>().</p>
@@ -280,7 +285,7 @@ is 0).</p>
 
 <h3 class="fn"><a name="toggleDirection" />QTimeLine.toggleDirection (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void toggleDirection()</tt>.</p><p>Toggles the direction of the timeline. If the direction was
 Forward, it becomes Backward, and vice verca.</p>
-<p>See also <a href="qtimeline.html#direction-prop">setDirection</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#direction-prop">setDirection</a>().</p>
 
 
 <h3 class="fn"><a name="updateInterval" />int QTimeLine.updateInterval (<i>self</i>)</h3><h3 class="fn"><a name="valueForTime" />float QTimeLine.valueForTime (<i>self</i>, int&#160;<i>msec</i>)</h3><p>Returns the timeline value for the time <i>msec</i>. The
@@ -289,8 +294,7 @@ always between 0 and 1. If <i>msec</i> is 0, the default
 implementation always returns 0.</p>
 <p>Reimplement this function to provide a custom curve shape for
 your timeline.</p>
-<p>See also <a href="qtimeline.html#CurveShape-enum">CurveShape</a>
-and <a href="qtimeline.html#frameForTime">frameForTime</a>().</p>
+<p><b>See also</b> <a href="qtimeline.html#CurveShape-enum">CurveShape</a> and <a href="qtimeline.html#frameForTime">frameForTime</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="finished" />void finished ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when <a href="qtimeline.html">QTimeLine</a> finishes (i.e., reaches the end of
 its time line), and does not loop.</p>
 
@@ -299,7 +303,7 @@ its time line), and does not loop.</p>
 regular intervals when in <a href="qtimeline.html#State-enum">Running</a> state, but only if the
 current frame changes. <i>frame</i> is the current frame
 number.</p>
-<p>See also <a href="qtimeline.html#setFrameRange">QTimeLine.setFrameRange</a>() and
+<p><b>See also</b> <a href="qtimeline.html#setFrameRange">QTimeLine.setFrameRange</a>() and
 <a href="qtimeline.html#updateInterval-prop">QTimeLine.updateInterval</a>.</p>
 
 
@@ -311,9 +315,9 @@ number.</p>
 regular intervals when in <a href="qtimeline.html#State-enum">Running</a> state, but only if the
 current value changes. <i>value</i> is the current value.
 <i>value</i> is a number between 0.0 and 1.0</p>
-<p>See also <a href="qtimeline.html#duration-prop">QTimeLine.setDuration</a>(),
+<p><b>See also</b> <a href="qtimeline.html#duration-prop">QTimeLine.setDuration</a>(),
 <a href="qtimeline.html#valueForTime">QTimeLine.valueForTime</a>(), and
 <a href="qtimeline.html#updateInterval-prop">QTimeLine.updateInterval</a>.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

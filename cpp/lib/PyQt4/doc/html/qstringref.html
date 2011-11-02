@@ -69,8 +69,8 @@ string reference.</p>
 
 <h3 class="fn"><a name="clear" />QStringRef.clear (<i>self</i>)</h3><p>Clears the contents of the string reference by making it null
 and empty.</p>
-<p>See also <a href="qstringref.html#isEmpty">isEmpty</a>() and
-<a href="qstringref.html#isNull">isNull</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#isEmpty">isEmpty</a>()
+and <a href="qstringref.html#isNull">isNull</a>().</p>
 
 
 <h3 class="fn"><a name="compare" />int QStringRef.compare (<i>self</i>, QString&#160;<i>other</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><p>Compares the string <i>s1</i> with the string <i>s2</i> and
@@ -111,7 +111,7 @@ comparison is case sensitive; otherwise the comparison is case
 insensitive.</p>
 <p>Equivalent to <tt>compare(*this, other, cs)</tt>.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qstring.html#compare">QString.compare</a>().</p>
+<p><b>See also</b> <a href="qstring.html#compare">QString.compare</a>().</p>
 
 
 <h3 class="fn"><a name="compare-5" />int QStringRef.compare (QStringRef&#160;<i>s1</i>, QStringRef&#160;<i>s2</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><p>This is an overloaded function.</p>
@@ -123,7 +123,7 @@ comparison is case sensitive; otherwise the comparison is case
 insensitive.</p>
 <p>Equivalent to <tt>compare(*this, other, cs)</tt>.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qstring.html#compare">QString.compare</a>().</p>
+<p><b>See also</b> <a href="qstring.html#compare">QString.compare</a>().</p>
 
 
 <h3 class="fn"><a name="compare-6" />int QStringRef.compare (QStringRef&#160;<i>s1</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><p>This is an overloaded function.</p>
@@ -135,7 +135,7 @@ comparison is case sensitive; otherwise the comparison is case
 insensitive.</p>
 <p>Equivalent to <tt>compare(*this, other, cs)</tt>.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qstring.html#compare">QString.compare</a>().</p>
+<p><b>See also</b> <a href="qstring.html#compare">QString.compare</a>().</p>
 
 
 <h3 class="fn"><a name="constData" />QChar QStringRef.constData (<i>self</i>)</h3><p>Same as <a href="qstringref.html#unicode">unicode</a>().</p>
@@ -144,8 +144,7 @@ insensitive.</p>
 <h3 class="fn"><a name="count" />int QStringRef.count (<i>self</i>)</h3><p>Returns the number of characters referred to by the string
 reference. Equivalent to <a href="qstringref.html#size">size</a>()
 and <a href="qstringref.html#length">length</a>().</p>
-<p>See also <a href="qstringref.html#position">position</a>() and
-<a href="qstringref.html#string">string</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#position">position</a>() and <a href="qstringref.html#string">string</a>().</p>
 
 
 <h3 class="fn"><a name="data" />QChar QStringRef.data (<i>self</i>)</h3><p>Same as <a href="qstringref.html#unicode">unicode</a>().</p>
@@ -154,20 +153,19 @@ and <a href="qstringref.html#length">length</a>().</p>
 <h3 class="fn"><a name="isEmpty" />bool QStringRef.isEmpty (<i>self</i>)</h3><p>Returns true if the string reference has no characters;
 otherwise returns false.</p>
 <p>A string reference is empty if its size is zero.</p>
-<p>See also <a href="qstringref.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#size">size</a>().</p>
 
 
 <h3 class="fn"><a name="isNull" />bool QStringRef.isNull (<i>self</i>)</h3><p>Returns true if <a href="qstringref.html#string">string</a>()
 returns a null pointer or a pointer to a null string; otherwise
 returns true.</p>
-<p>See also <a href="qstringref.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#size">size</a>().</p>
 
 
 <h3 class="fn"><a name="length" />int QStringRef.length (<i>self</i>)</h3><p>Returns the number of characters referred to by the string
 reference. Equivalent to <a href="qstringref.html#size">size</a>()
 and <a href="qstringref.html#count">count</a>().</p>
-<p>See also <a href="qstringref.html#position">position</a>() and
-<a href="qstringref.html#string">string</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#position">position</a>() and <a href="qstringref.html#string">string</a>().</p>
 
 
 <h3 class="fn"><a name="localeAwareCompare" />int QStringRef.localeAwareCompare (<i>self</i>, QString&#160;<i>s</i>)</h3><p>Compares <i>s1</i> with <i>s2</i> and returns an integer less
@@ -179,8 +177,8 @@ lists of strings to the user.</p>
 <p>On Mac OS X, this function compares according the "Order for
 sorted lists" setting in the International prefereces panel.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qstringref.html#compare">compare</a>() and
-<a class="compat" href="qtextcodec-qt3.html#locale">QTextCodec.locale</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#compare">compare</a>()
+and <a class="compat" href="qtextcodec-qt3.html#locale">QTextCodec.locale</a>().</p>
 
 
 <h3 class="fn"><a name="localeAwareCompare-2" />int QStringRef.localeAwareCompare (<i>self</i>, QStringRef&#160;<i>s</i>)</h3><p>This is an overloaded function.</p>
@@ -215,32 +213,32 @@ lists of strings to the user.</p>
 
 <h3 class="fn"><a name="position" />int QStringRef.position (<i>self</i>)</h3><p>Returns the starting position in the referenced string that is
 referred to by the string reference.</p>
-<p>See also <a href="qstringref.html#size">size</a>() and <a href="qstringref.html#string">string</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#size">size</a>() and
+<a href="qstringref.html#string">string</a>().</p>
 
 
 <h3 class="fn"><a name="size" />int QStringRef.size (<i>self</i>)</h3><p>Returns the number of characters referred to by the string
 reference. Equivalent to <a href="qstringref.html#length">length</a>() and <a href="qstringref.html#count">count</a>().</p>
-<p>See also <a href="qstringref.html#position">position</a>() and
-<a href="qstringref.html#string">string</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#position">position</a>() and <a href="qstringref.html#string">string</a>().</p>
 
 
 <h3 class="fn"><a name="string" />QString QStringRef.string (<i>self</i>)</h3><p>Returns a pointer to the string referred to by the string
 reference, or 0 if it does not reference a string.</p>
-<p>See also <a href="qstringref.html#unicode">unicode</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#unicode">unicode</a>().</p>
 
 
 <h3 class="fn"><a name="toString" />QString QStringRef.toString (<i>self</i>)</h3><p>Returns a copy of the string reference as a <a href="qstring.html">QString</a> object.</p>
 <p>If the string reference is not a complete reference of the
 string (meaning that <a href="qstringref.html#position">position</a>() is 0 and <a href="qstringref.html#size">size</a>() equals <a href="qstringref.html#string">string</a>()-&gt;<a href="qstringref.html#size">size</a>()), this function will allocate a
 new string to return.</p>
-<p>See also <a href="qstringref.html#string">string</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#string">string</a>().</p>
 
 
 <h3 class="fn"><a name="unicode" />QChar QStringRef.unicode (<i>self</i>)</h3><p>Returns a Unicode representation of the string reference. Since
 the data stems directly from the referenced string, it is not
 null-terminated unless the string reference includes the string's
 null terminator.</p>
-<p>See also <a href="qstringref.html#string">string</a>().</p>
+<p><b>See also</b> <a href="qstringref.html#string">string</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QStringRef.__eq__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__eq__-2" />bool QStringRef.__eq__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__eq__-3" />bool QStringRef.__eq__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ge__" />bool QStringRef.__ge__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__gt__" />bool QStringRef.__gt__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__le__" />bool QStringRef.__le__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__len__" /> QStringRef.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__lt__" />bool QStringRef.__lt__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__" />bool QStringRef.__ne__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__-2" />bool QStringRef.__ne__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__-3" />bool QStringRef.__ne__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__str__" />str QStringRef.__str__ (<i>self</i>)</h3><h3 class="fn"><a name="__unicode__" />unicode QStringRef.__unicode__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QStringRef.__eq__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__eq__-2" />bool QStringRef.__eq__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__eq__-3" />bool QStringRef.__eq__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ge__" />bool QStringRef.__ge__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__gt__" />bool QStringRef.__gt__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__le__" />bool QStringRef.__le__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__len__" /> QStringRef.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__lt__" />bool QStringRef.__lt__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__" />bool QStringRef.__ne__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__-2" />bool QStringRef.__ne__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__-3" />bool QStringRef.__ne__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__str__" />str QStringRef.__str__ (<i>self</i>)</h3><h3 class="fn"><a name="__unicode__" />unicode QStringRef.__unicode__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

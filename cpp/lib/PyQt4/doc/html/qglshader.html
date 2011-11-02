@@ -18,26 +18,26 @@ from the details of compiling and linking vertex and fragment
 shaders.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="ShaderTypeBit-enum" />QGLShader.ShaderTypeBit</h3><p>This enum specifies the type of <a href="qglshader.html">QGLShader</a> that is being created.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLShader.Vertex</tt></td>
-<td class=" topAlign"><tt>0x0001</tt></td>
+<td class="topAlign"><tt>0x0001</tt></td>
 <td class="topAlign">Vertex shader written in the OpenGL Shading
 Language (GLSL).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLShader.Fragment</tt></td>
-<td class=" topAlign"><tt>0x0002</tt></td>
+<td class="topAlign"><tt>0x0002</tt></td>
 <td class="topAlign">Fragment shader written in the OpenGL Shading
 Language (GLSL).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLShader.Geometry</tt></td>
-<td class=" topAlign"><tt>0x0004</tt></td>
+<td class="topAlign"><tt>0x0004</tt></td>
 <td class="topAlign">Geometry shaders written in the OpenGL Shading
 Language (GLSL), based on the GL_EXT_geometry_shader4
 extension.</td>
@@ -52,7 +52,7 @@ will return false.</p>
 <p>This constructor is normally followed by a call to <a href="qglshader.html#compileSourceCode">compileSourceCode</a>() or
 <a href="qglshader.html#compileSourceFile">compileSourceFile</a>().</p>
 <p>The shader will be associated with the current <a href="qglcontext.html">QGLContext</a>.</p>
-<p>See also <a href="qglshader.html#compileSourceCode">compileSourceCode</a>() and
+<p><b>See also</b> <a href="qglshader.html#compileSourceCode">compileSourceCode</a>() and
 <a href="qglshader.html#compileSourceFile">compileSourceFile</a>().</p>
 
 
@@ -63,27 +63,27 @@ will return false.</p>
 <p>This constructor is normally followed by a call to <a href="qglshader.html#compileSourceCode">compileSourceCode</a>() or
 <a href="qglshader.html#compileSourceFile">compileSourceFile</a>().</p>
 <p>The shader will be associated with <i>context</i>.</p>
-<p>See also <a href="qglshader.html#compileSourceCode">compileSourceCode</a>() and
+<p><b>See also</b> <a href="qglshader.html#compileSourceCode">compileSourceCode</a>() and
 <a href="qglshader.html#compileSourceFile">compileSourceFile</a>().</p>
 
 
 <h3 class="fn"><a name="compileSourceCode" />bool QGLShader.compileSourceCode (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>source</i>)</h3><p>Sets the <i>source</i> code for this shader and compiles it.
 Returns true if the source was successfully compiled, false
 otherwise.</p>
-<p>See also <a href="qglshader.html#compileSourceFile">compileSourceFile</a>().</p>
+<p><b>See also</b> <a href="qglshader.html#compileSourceFile">compileSourceFile</a>().</p>
 
 
 <h3 class="fn"><a name="compileSourceCode-2" />bool QGLShader.compileSourceCode (<i>self</i>, QString&#160;<i>source</i>)</h3><p>This is an overloaded function.</p>
 <p>Sets the <i>source</i> code for this shader and compiles it.
 Returns true if the source was successfully compiled, false
 otherwise.</p>
-<p>See also <a href="qglshader.html#compileSourceFile">compileSourceFile</a>().</p>
+<p><b>See also</b> <a href="qglshader.html#compileSourceFile">compileSourceFile</a>().</p>
 
 
 <h3 class="fn"><a name="compileSourceFile" />bool QGLShader.compileSourceFile (<i>self</i>, QString&#160;<i>fileName</i>)</h3><p>Sets the source code for this shader to the contents of
 <i>fileName</i> and compiles it. Returns true if the file could be
 opened and the source compiled, false otherwise.</p>
-<p>See also <a href="qglshader.html#compileSourceCode">compileSourceCode</a>().</p>
+<p><b>See also</b> <a href="qglshader.html#compileSourceCode">compileSourceCode</a>().</p>
 
 
 <h3 class="fn"><a name="hasOpenGLShaders" />bool QGLShader.hasOpenGLShaders (<a href="qglshader-shadertype.html">ShaderType</a>&#160;<i>type</i>, <a href="qglcontext.html">QGLContext</a>&#160;<i>context</i>&#160;=&#160;None)</h3><p>Returns true if shader programs of type <i>type</i> are
@@ -96,23 +96,23 @@ is used.</p>
 
 <h3 class="fn"><a name="isCompiled" />bool QGLShader.isCompiled (<i>self</i>)</h3><p>Returns true if this shader has been compiled; false
 otherwise.</p>
-<p>See also <a href="qglshader.html#compileSourceCode">compileSourceCode</a>() and
+<p><b>See also</b> <a href="qglshader.html#compileSourceCode">compileSourceCode</a>() and
 <a href="qglshader.html#compileSourceFile">compileSourceFile</a>().</p>
 
 
 <h3 class="fn"><a name="log" />QString QGLShader.log (<i>self</i>)</h3><p>Returns the errors and warnings that occurred during the last
 compile.</p>
-<p>See also <a href="qglshader.html#compileSourceCode">compileSourceCode</a>() and
+<p><b>See also</b> <a href="qglshader.html#compileSourceCode">compileSourceCode</a>() and
 <a href="qglshader.html#compileSourceFile">compileSourceFile</a>().</p>
 
 
 <h3 class="fn"><a name="shaderId" />int QGLShader.shaderId (<i>self</i>)</h3><p>Returns the OpenGL identifier associated with this shader.</p>
-<p>See also <a href="qglshaderprogram.html#programId">QGLShaderProgram.programId</a>().</p>
+<p><b>See also</b> <a href="qglshaderprogram.html#programId">QGLShaderProgram.programId</a>().</p>
 
 
 <h3 class="fn"><a name="shaderType" /><a href="qglshader-shadertype.html">ShaderType</a> QGLShader.shaderType (<i>self</i>)</h3><p>Returns the type of this shader.</p>
 
 
 <h3 class="fn"><a name="sourceCode" /><a href="qbytearray.html">QByteArray</a> QGLShader.sourceCode (<i>self</i>)</h3><p>Returns the source code for this shader.</p>
-<p>See also <a href="qglshader.html#compileSourceCode">compileSourceCode</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qglshader.html#compileSourceCode">compileSourceCode</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

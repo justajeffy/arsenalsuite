@@ -20,54 +20,34 @@ the sample type, and the byte order. The following table describes
 these in more detail.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Parameter</th>
 <th>Description</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>Sample Rate</p>
-</td>
-<td>
-<p>Samples per second of audio data in Hertz.</p>
-</td>
+<tr class="odd" valign="top">
+<td>Sample Rate</td>
+<td>Samples per second of audio data in Hertz.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Number of channels</p>
-</td>
-<td>
-<p>The number of audio channels (typically one for mono or two for
-stereo)</p>
-</td>
+<tr class="even" valign="top">
+<td>Number of channels</td>
+<td>The number of audio channels (typically one for mono or two for
+stereo)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Sample size</p>
-</td>
-<td>
-<p>How much data is stored in each sample (typically 8 or 16
-bits)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Sample size</td>
+<td>How much data is stored in each sample (typically 8 or 16
+bits)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Sample type</p>
-</td>
-<td>
-<p>Numerical representation of sample (typically signed integer,
-unsigned integer or float)</p>
-</td>
+<tr class="even" valign="top">
+<td>Sample type</td>
+<td>Numerical representation of sample (typically signed integer,
+unsigned integer or float)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Byte order</p>
-</td>
-<td>
-<p>Byte ordering of sample (typically little endian, big
-endian)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Byte order</td>
+<td>Byte ordering of sample (typically little endian, big
+endian)</td>
 </tr>
 </table>
 <p>You can obtain audio formats compatible with the audio device
@@ -77,48 +57,48 @@ set the parameters yourself. See the <a href="qaudiodeviceinfo.html">QAudioDevic
 details. You need to know the format of the audio streams you wish
 to play. Qt does not set up formats for you.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Endian-enum" />QAudioFormat.Endian</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAudioFormat.BigEndian</tt></td>
-<td class=" topAlign"><tt>QSysInfo.BigEndian</tt></td>
+<td class="topAlign"><tt>QSysInfo.BigEndian</tt></td>
 <td class="topAlign">samples are big endian byte order</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAudioFormat.LittleEndian</tt></td>
-<td class=" topAlign"><tt>QSysInfo.LittleEndian</tt></td>
+<td class="topAlign"><tt>QSysInfo.LittleEndian</tt></td>
 <td class="topAlign">samples are little endian byte order</td>
 </tr>
 </table>
 
 
 <h3 class="fn"><a name="SampleType-enum" />QAudioFormat.SampleType</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAudioFormat.Unknown</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Not Set</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAudioFormat.SignedInt</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">samples are signed integers</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAudioFormat.UnSignedInt</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">samples are unsigned intergers</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAudioFormat.Float</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">samples are floats</td>
 </tr>
 </table>
@@ -143,17 +123,16 @@ to play. Qt does not set up formats for you.</p>
 
 
 <h3 class="fn"><a name="byteOrder" /><a href="qaudioformat.html#Endian-enum">Endian</a> QAudioFormat.byteOrder (<i>self</i>)</h3><p>Returns the current byteOrder value.</p>
-<p>See also <a href="qaudioformat.html#setByteOrder">setByteOrder</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#setByteOrder">setByteOrder</a>().</p>
 
 
 <h3 class="fn"><a name="channelCount" />int QAudioFormat.channelCount (<i>self</i>)</h3><p>Returns the current channel count value.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qaudioformat.html#setChannelCount">setChannelCount</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#setChannelCount">setChannelCount</a>().</p>
 
 
 <h3 class="fn"><a name="channels" />int QAudioFormat.channels (<i>self</i>)</h3><h3 class="fn"><a name="codec" />QString QAudioFormat.codec (<i>self</i>)</h3><p>Returns the current codec value.</p>
-<p>See also <a href="qaudioformat.html#setCodec">setCodec</a>() and
-<a href="qaudiodeviceinfo.html#supportedCodecs">QAudioDeviceInfo.supportedCodecs</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#setCodec">setCodec</a>() and <a href="qaudiodeviceinfo.html#supportedCodecs">QAudioDeviceInfo.supportedCodecs</a>().</p>
 
 
 <h3 class="fn"><a name="frequency" />int QAudioFormat.frequency (<i>self</i>)</h3><h3 class="fn"><a name="isValid" />bool QAudioFormat.isValid (<i>self</i>)</h3><p>Returns true if all of the parameters are valid.</p>
@@ -161,42 +140,42 @@ to play. Qt does not set up formats for you.</p>
 
 <h3 class="fn"><a name="sampleRate" />int QAudioFormat.sampleRate (<i>self</i>)</h3><p>Returns the current sample rate in Hertz.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qaudioformat.html#setSampleRate">setSampleRate</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#setSampleRate">setSampleRate</a>().</p>
 
 
 <h3 class="fn"><a name="sampleSize" />int QAudioFormat.sampleSize (<i>self</i>)</h3><p>Returns the current sample size value.</p>
-<p>See also <a href="qaudioformat.html#setSampleSize">setSampleSize</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#setSampleSize">setSampleSize</a>().</p>
 
 
 <h3 class="fn"><a name="sampleType" /><a href="qaudioformat.html#SampleType-enum">SampleType</a> QAudioFormat.sampleType (<i>self</i>)</h3><p>Returns the current <a href="qaudioformat.html#SampleType-enum">SampleType</a> value.</p>
-<p>See also <a href="qaudioformat.html#setSampleType">setSampleType</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#setSampleType">setSampleType</a>().</p>
 
 
 <h3 class="fn"><a name="setByteOrder" />QAudioFormat.setByteOrder (<i>self</i>, <a href="qaudioformat.html#Endian-enum">Endian</a>&#160;<i>byteOrder</i>)</h3><p>Sets the byteOrder to <i>byteOrder</i>.</p>
-<p>See also <a href="qaudioformat.html#byteOrder">byteOrder</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#byteOrder">byteOrder</a>().</p>
 
 
 <h3 class="fn"><a name="setChannelCount" />QAudioFormat.setChannelCount (<i>self</i>, int&#160;<i>channelCount</i>)</h3><p>Sets the channel count to <i>channels</i>.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qaudioformat.html#channelCount">channelCount</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#channelCount">channelCount</a>().</p>
 
 
 <h3 class="fn"><a name="setChannels" />QAudioFormat.setChannels (<i>self</i>, int&#160;<i>channels</i>)</h3><h3 class="fn"><a name="setCodec" />QAudioFormat.setCodec (<i>self</i>, QString&#160;<i>codec</i>)</h3><p>Sets the codec to <i>codec</i>.</p>
-<p>See also <a href="qaudioformat.html#codec">codec</a>() and
-<a href="qaudiodeviceinfo.html#supportedCodecs">QAudioDeviceInfo.supportedCodecs</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#codec">codec</a>()
+and <a href="qaudiodeviceinfo.html#supportedCodecs">QAudioDeviceInfo.supportedCodecs</a>().</p>
 
 
 <h3 class="fn"><a name="setFrequency" />QAudioFormat.setFrequency (<i>self</i>, int&#160;<i>frequency</i>)</h3><h3 class="fn"><a name="setSampleRate" />QAudioFormat.setSampleRate (<i>self</i>, int&#160;<i>sampleRate</i>)</h3><p>Sets the sample rate to <i>samplerate</i> Hertz.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qaudioformat.html#sampleRate">sampleRate</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#sampleRate">sampleRate</a>().</p>
 
 
 <h3 class="fn"><a name="setSampleSize" />QAudioFormat.setSampleSize (<i>self</i>, int&#160;<i>sampleSize</i>)</h3><p>Sets the sample size to the <i>sampleSize</i> specified.</p>
-<p>See also <a href="qaudioformat.html#sampleSize">sampleSize</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#sampleSize">sampleSize</a>().</p>
 
 
 <h3 class="fn"><a name="setSampleType" />QAudioFormat.setSampleType (<i>self</i>, <a href="qaudioformat.html#SampleType-enum">SampleType</a>&#160;<i>sampleType</i>)</h3><p>Sets the sampleType to <i>sampleType</i>.</p>
-<p>See also <a href="qaudioformat.html#sampleType">sampleType</a>().</p>
+<p><b>See also</b> <a href="qaudioformat.html#sampleType">sampleType</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QAudioFormat.__eq__ (<i>self</i>, <a href="qaudioformat.html">QAudioFormat</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QAudioFormat.__ne__ (<i>self</i>, <a href="qaudioformat.html">QAudioFormat</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QAudioFormat.__eq__ (<i>self</i>, <a href="qaudioformat.html">QAudioFormat</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QAudioFormat.__ne__ (<i>self</i>, <a href="qaudioformat.html">QAudioFormat</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

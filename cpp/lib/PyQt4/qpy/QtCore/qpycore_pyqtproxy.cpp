@@ -29,6 +29,7 @@
 #include <QMetaObject>
 #include <QMutex>
 #include <QObject>
+#include <QThread>
 
 #include "qpycore_chimera.h"
 #include "qpycore_pyqtproxy.h"
@@ -398,7 +399,7 @@ void PyQtProxy::unislot(void **qargs)
     PyObject *res;
 
     // See if the sender was a short-circuit signal. */
-    if (last_sender && qobject_cast<PyQtShortcircuitSignalProxy *>(last_sender))
+    if (last_sender && PyQtShortcircuitSignalProxy::shortcircuitSignal(last_sender))
     {
         // The Python arguments will be the only argument.
         PyObject *pyargs = reinterpret_cast<PyQt_PyObject *>(qargs[1])->pyobject;
@@ -413,7 +414,12 @@ void PyQtProxy::unislot(void **qargs)
 
         // Self destruct if we are a single shot or disabled.
         if (proxy_flags & (SIP_SINGLE_SHOT|PROXY_SLOT_DISABLED))
-            delete this;
+        {
+            if (QThread::currentThread() == thread())
+                delete this;
+            else
+                deleteLater();
+        }
     }
 
     if (res)
@@ -433,8 +439,10 @@ void PyQtProxy::disable()
 {
     if (proxy_flags & PROXY_SLOT_INVOKED)
         proxy_flags |= PROXY_SLOT_DISABLED;
-    else
+    else if (QThread::currentThread() == thread())
         delete this;
+    else
+        deleteLater();
 }
 
 
@@ -521,7 +529,11 @@ void PyQtProxy::deleteSlotProxies(void *tx, const char *sig)
         {
             up->hashed = false;
             it = proxy_slots.erase(it);
-            delete up;
+
+            if (QThread::currentThread() == up->thread())
+                delete up;
+            else
+                up->deleteLater();
         }
         else
             ++it;
@@ -531,10 +543,16 @@ void PyQtProxy::deleteSlotProxies(void *tx, const char *sig)
 }
 
 
+// This is set if a PyQtShortcircuitSignalProxy has never been created.
+bool PyQtShortcircuitSignalProxy::no_shortcircuit_signals = true;
+
+
 // Create the short-circuit signal proxy.
 PyQtShortcircuitSignalProxy::PyQtShortcircuitSignalProxy(QObject *parent)
     : QObject()
 {
+    no_shortcircuit_signals = false;
+
     // We can't just set the parent because we might be in a different thread.
     moveToThread(parent->thread());
     setParent(parent);
@@ -545,6 +563,9 @@ PyQtShortcircuitSignalProxy::PyQtShortcircuitSignalProxy(QObject *parent)
 PyQtShortcircuitSignalProxy *PyQtShortcircuitSignalProxy::find(QObject *tx,
         const char *sig)
 {
+    if (no_shortcircuit_signals)
+        return 0;
+
     // Only check immediate children.
     const QObjectList &kids = tx->children();
 
@@ -557,4 +578,16 @@ PyQtShortcircuitSignalProxy *PyQtShortcircuitSignalProxy::find(QObject *tx,
     }
 
     return 0;
+}
+
+
+// Return true if an object is a PyQtShortcircuitSignalProxy instance.  This is
+// done without calling qobject_cast() unless absolutely necessary in case the
+// object has been deleted.
+PyQtShortcircuitSignalProxy *PyQtShortcircuitSignalProxy::shortcircuitSignal(QObject *obj)
+{
+    if (no_shortcircuit_signals)
+        return 0;
+
+    return qobject_cast<PyQtShortcircuitSignalProxy *>(obj);
 }

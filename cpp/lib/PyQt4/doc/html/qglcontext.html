@@ -27,20 +27,20 @@ contents with the off-screen buffer using <a href="qglcontext.html#swapBuffers">
 <p>Please note that QGLContext is not thread safe.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="BindOption-enum" />QGLContext.BindOption</h3><p>A set of options to decide how to bind a texture using <a href="qglcontext.html#bindTexture">bindTexture</a>().</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLContext.NoBindOption</tt></td>
-<td class=" topAlign"><tt>0x0000</tt></td>
+<td class="topAlign"><tt>0x0000</tt></td>
 <td class="topAlign">Don't do anything, pass the texture straight
 through.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLContext.InvertedYBindOption</tt></td>
-<td class=" topAlign"><tt>0x0001</tt></td>
+<td class="topAlign"><tt>0x0001</tt></td>
 <td class="topAlign">Specifies that the texture should be flipped
 over the X axis so that the texture coordinate 0,0 corresponds to
 the top left corner. Inverting the texture implies a deep copy
@@ -48,7 +48,7 @@ prior to upload.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLContext.MipmapBindOption</tt></td>
-<td class=" topAlign"><tt>0x0002</tt></td>
+<td class="topAlign"><tt>0x0002</tt></td>
 <td class="topAlign">Specifies that <a href="qglcontext.html#bindTexture">bindTexture</a>() should try to
 generate mipmaps. If the GL implementation supports the
 <tt>GL_SGIS_generate_mipmap</tt> extension, mipmaps will be
@@ -58,21 +58,21 @@ supported for the <tt>GL_TEXTURE_2D</tt> target.</td>
 <tr>
 <td class="topAlign">
 <tt>QGLContext.PremultipliedAlphaBindOption</tt></td>
-<td class=" topAlign"><tt>0x0004</tt></td>
+<td class="topAlign"><tt>0x0004</tt></td>
 <td class="topAlign">Specifies that the image should be uploaded
 with premultiplied alpha and does a conversion accordingly.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QGLContext.LinearFilteringBindOption</tt></td>
-<td class=" topAlign"><tt>0x0008</tt></td>
+<td class="topAlign"><tt>0x0008</tt></td>
 <td class="topAlign">Specifies that the texture filtering should be
 set to GL_LINEAR. Default is GL_NEAREST. If mipmap is also enabled,
 filtering will be set to GL_LINEAR_MIPMAP_LINEAR.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLContext.DefaultBindOption</tt></td>
-<td class=" topAlign"><tt>LinearFilteringBindOption |
+<td class="topAlign"><tt>LinearFilteringBindOption |
 InvertedYBindOption | MipmapBindOption</tt></td>
 <td class="topAlign">In Qt 4.5 and earlier, <a href="qglcontext.html#bindTexture">bindTexture</a>() would mirror the
 image and automatically generate mipmaps. This option helps
@@ -97,8 +97,8 @@ format obtained.</p>
 object has been constructed, <a href="qglcontext.html#create">create</a>() must be called explicitly to
 create the actual OpenGL context. The context will be <a href="qglcontext.html#isValid">invalid</a> if it was not possible to
 obtain a GL context at all.</p>
-<p>See also <a href="qglcontext.html#format">format</a>() and
-<a href="qglcontext.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#format">format</a>()
+and <a href="qglcontext.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="areSharing" />bool QGLContext.areSharing (<a href="qglcontext.html">QGLContext</a>&#160;<i>context1</i>, <a href="qglcontext.html">QGLContext</a>&#160;<i>context2</i>)</h3><p>Returns true if <i>context1</i> and <i>context2</i> are sharing
@@ -122,7 +122,7 @@ return the same texture id.</p>
 <p>Note that we assume default values for the glPixelStore() and
 glPixelTransfer() parameters.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qglcontext.html#deleteTexture">deleteTexture</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#deleteTexture">deleteTexture</a>().</p>
 
 
 <h3 class="fn"><a name="bindTexture-2" />int QGLContext.bindTexture (<i>self</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>, int&#160;<i>target</i>&#160;=&#160;GL_TEXTURE_2D, int&#160;<i>format</i>&#160;=&#160;GL_RGBA)</h3><p>This is an overloaded function.</p>
@@ -139,7 +139,7 @@ and the ETC1 texture has been encapsulated in the PVR container
 format. Also, textures in the PVRTC2 and PVRTC4 formats can be
 loaded if the <tt>GL_IMG_texture_compression_pvrtc</tt> extension
 is supported.</p>
-<p>See also <a href="qglcontext.html#deleteTexture">deleteTexture</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#deleteTexture">deleteTexture</a>().</p>
 
 
 <h3 class="fn"><a name="bindTexture-3" />int QGLContext.bindTexture (<i>self</i>, QString&#160;<i>fileName</i>)</h3><p>Generates and binds a 2D GL texture to the current context,
@@ -175,7 +175,7 @@ request cannot be met.</p>
 <p>The algorithm for reducing the demands of the format is quite
 simple-minded, so override this method in your subclass if your
 application has spcific requirements on visual selection.</p>
-<p>See also <a href="qglcontext.html#chooseContext">chooseContext</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#chooseContext">chooseContext</a>().</p>
 
 
 <h3 class="fn"><a name="create" />bool QGLContext.create (<i>self</i>, <a href="qglcontext.html">QGLContext</a>&#160;<i>shareContext</i>&#160;=&#160;None)</h3><p>Creates the GL context. Returns true if it was successful in
@@ -197,23 +197,23 @@ problem is that virtual functions are not properly called during
 construction (even though this is correct C++) because C++
 constructs class hierarchies from the bottom up. For this reason we
 need a create() function.</p>
-<p>See also <a href="qglcontext.html#chooseContext">chooseContext</a>(), <a href="qglcontext.html#format">format</a>(), and <a href="qglcontext.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#chooseContext">chooseContext</a>(), <a href="qglcontext.html#format">format</a>(), and <a href="qglcontext.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="currentContext" /><a href="qglcontext.html">QGLContext</a> QGLContext.currentContext ()</h3><p>Returns the current context, i.e. the context to which any
 OpenGL commands will currently be directed. Returns 0 if no context
 is current.</p>
-<p>See also <a href="qglcontext.html#makeCurrent">makeCurrent</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#makeCurrent">makeCurrent</a>().</p>
 
 
 <h3 class="fn"><a name="deleteTexture" />QGLContext.deleteTexture (<i>self</i>, int&#160;<i>tx_id</i>)</h3><p>Removes the texture identified by <i>id</i> from the texture
 cache, and calls glDeleteTextures() to delete the texture from the
 context.</p>
-<p>See also <a href="qglcontext.html#bindTexture">bindTexture</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#bindTexture">bindTexture</a>().</p>
 
 
 <h3 class="fn"><a name="device" /><a href="qpaintdevice.html">QPaintDevice</a> QGLContext.device (<i>self</i>)</h3><p>Returns the paint device set for this context.</p>
-<p>See also <a href="qglcontext.html#QGLContext">QGLContext.QGLContext</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#QGLContext">QGLContext.QGLContext</a>().</p>
 
 
 <h3 class="fn"><a name="deviceIsPixmap" />bool QGLContext.deviceIsPixmap (<i>self</i>)</h3><p>Returns true if the paint device of this context is a pixmap;
@@ -264,8 +264,7 @@ OpenGL ES.</p>
 
 <h3 class="fn"><a name="format" /><a href="qglformat.html">QGLFormat</a> QGLContext.format (<i>self</i>)</h3><p>Returns the frame buffer format that was obtained (this may be a
 subset of what was requested).</p>
-<p>See also <a href="qglcontext.html#setFormat">setFormat</a>() and
-<a href="qglcontext.html#requestedFormat">requestedFormat</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#setFormat">setFormat</a>() and <a href="qglcontext.html#requestedFormat">requestedFormat</a>().</p>
 
 
 <h3 class="fn"><a name="generateFontDisplayLists" />QGLContext.generateFontDisplayLists (<i>self</i>, <a href="qfont.html">QFont</a>&#160;<i>fnt</i>, int&#160;<i>listBase</i>)</h3><h3 class="fn"><a name="getProcAddress" />sip.voidptr QGLContext.getProcAddress (<i>self</i>, QString&#160;<i>proc</i>)</h3><p>Returns a function pointer to the GL extension function passed
@@ -276,7 +275,7 @@ not be obtained.</p>
 <h3 class="fn"><a name="initialized" />bool QGLContext.initialized (<i>self</i>)</h3><p>Returns true if this context has been initialized, i.e. if
 <a href="qglwidget.html#initializeGL">QGLWidget.initializeGL</a>()
 has been performed on it; otherwise returns false.</p>
-<p>See also <a href="qglcontext.html#setInitialized">setInitialized</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#setInitialized">setInitialized</a>().</p>
 
 
 <h3 class="fn"><a name="isSharing" />bool QGLContext.isSharing (<i>self</i>)</h3><p>Returns true if this context is sharing its GL context with
@@ -312,59 +311,60 @@ examples/opengl/overlay_x11 example for details.</p>
 
 <h3 class="fn"><a name="requestedFormat" /><a href="qglformat.html">QGLFormat</a> QGLContext.requestedFormat (<i>self</i>)</h3><p>Returns the frame buffer format that was originally requested in
 the constructor or <a href="qglcontext.html#setFormat">setFormat</a>().</p>
-<p>See also <a href="qglcontext.html#format">format</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#format">format</a>().</p>
 
 
 <h3 class="fn"><a name="reset" />QGLContext.reset (<i>self</i>)</h3><p>Resets the context and makes it invalid.</p>
-<p>See also <a href="qglcontext.html#create">create</a>() and
-<a href="qglcontext.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#create">create</a>()
+and <a href="qglcontext.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="setFormat" />QGLContext.setFormat (<i>self</i>, <a href="qglformat.html">QGLFormat</a>&#160;<i>format</i>)</h3><p>Sets a <i>format</i> for this context. The context is <a href="qglcontext.html#reset">reset</a>.</p>
 <p>Call <a href="qglcontext.html#create">create</a>() to create a
 new GL context that tries to match the new format.</p>
-<pre class="highlightedCode brush: cpp">
- QGLContext *cx;
-<span class="comment"> //  ...</span>
- QGLFormat f;
- f.setStereo(true);
- cx-&gt;setFormat(f);
- if (!cx-&gt;create())
+<pre class="cpp">
+ <span class="type"><a href="qglcontext.html">QGLContext</a></span> <span class="operator">*</span>cx;
+ <span class="comment">//  ...</span>
+ <span class="type"><a href="qglformat.html">QGLFormat</a></span> f;
+ f<span class="operator">.</span>setStereo(<span class="keyword">true</span>);
+ cx<span class="operator">-</span><span class="operator">&gt;</span>setFormat(f);
+ <span class="keyword">if</span> (<span class="operator">!</span>cx<span class="operator">-</span><span class="operator">&gt;</span>create())
      exit(); <span class="comment">// no OpenGL support, or cannot render on the specified paintdevice</span>
- if (!cx-&gt;format().stereo())
+ <span class="keyword">if</span> (<span class="operator">!</span>cx<span class="operator">-</span><span class="operator">&gt;</span>format()<span class="operator">.</span>stereo())
      exit(); <span class="comment">// could not create stereo context</span>
 </pre>
-<p>See also <a href="qglcontext.html#format">format</a>(), <a href="qglcontext.html#reset">reset</a>(), and <a href="qglcontext.html#create">create</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#format">format</a>(),
+<a href="qglcontext.html#reset">reset</a>(), and <a href="qglcontext.html#create">create</a>().</p>
 
 
 <h3 class="fn"><a name="setInitialized" />QGLContext.setInitialized (<i>self</i>, bool&#160;<i>on</i>)</h3><p>If <i>on</i> is true the context has been initialized, i.e.
 QGLContext.setInitialized() has been called on it. If <i>on</i> is
 false the context has not been initialized.</p>
-<p>See also <a href="qglcontext.html#initialized">initialized</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#initialized">initialized</a>().</p>
 
 
 <h3 class="fn"><a name="setTextureCacheLimit" />QGLContext.setTextureCacheLimit (int&#160;<i>size</i>)</h3><p>This function sets the limit for the texture cache to
 <i>size</i>, expressed in kilobytes.</p>
 <p>By default, the cache limit is approximately 64 MB.</p>
-<p>See also <a href="qglcontext.html#textureCacheLimit">textureCacheLimit</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#textureCacheLimit">textureCacheLimit</a>().</p>
 
 
 <h3 class="fn"><a name="setWindowCreated" />QGLContext.setWindowCreated (<i>self</i>, bool&#160;<i>on</i>)</h3><p>If <i>on</i> is true the context has had a window created for
 it. If <i>on</i> is false no window has been created for the
 context.</p>
-<p>See also <a href="qglcontext.html#windowCreated">windowCreated</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#windowCreated">windowCreated</a>().</p>
 
 
 <h3 class="fn"><a name="swapBuffers" />QGLContext.swapBuffers (<i>self</i>)</h3><p>Swaps the screen contents with an off-screen buffer. Only works
 if the context is in double buffer mode.</p>
-<p>See also <a href="qglformat.html#setDoubleBuffer">QGLFormat.setDoubleBuffer</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setDoubleBuffer">QGLFormat.setDoubleBuffer</a>().</p>
 
 
 <h3 class="fn"><a name="textureCacheLimit" />int QGLContext.textureCacheLimit ()</h3><p>Returns the current texture cache limit in kilobytes.</p>
-<p>See also <a href="qglcontext.html#setTextureCacheLimit">setTextureCacheLimit</a>().</p>
+<p><b>See also</b> <a href="qglcontext.html#setTextureCacheLimit">setTextureCacheLimit</a>().</p>
 
 
 <h3 class="fn"><a name="windowCreated" />bool QGLContext.windowCreated (<i>self</i>)</h3><p>Returns true if a window has been created for this context;
 otherwise returns false.</p>
-<p>See also <a href="qglcontext.html#setWindowCreated">setWindowCreated</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qglcontext.html#setWindowCreated">setWindowCreated</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

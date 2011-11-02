@@ -15,19 +15,19 @@ evaluating an <a href="xmlprocessing.html">XQuery</a> in <a href="qxmlquery.html
 as a sequence of <a href="qxmlitem.html">QXmlItems</a>. The
 sequence is traversed by repeatedly calling <a href="qxmlresultitems.html#next">next</a>(), which actually produces the
 sequence by lazy evaluation of the query.</p>
-<pre class="highlightedCode brush: cpp">
- QXmlQuery query;
- query.setQuery("&lt;e/&gt;, 1, 'two'");
- QXmlResultItems result;
+<pre class="cpp">
+ <span class="type"><a href="qxmlquery.html">QXmlQuery</a></span> query;
+ query<span class="operator">.</span>setQuery(<span class="string">"&lt;e/&gt;, 1, 'two'"</span>);
+ <span class="type">QXmlResultItems</span> result;
 
- if (query.isValid()) {
-     query.evaluateTo(&amp;result);
-     QXmlItem item(result.next());
-     while (!item.isNull()) {
+ <span class="keyword">if</span> (query<span class="operator">.</span>isValid()) {
+     query<span class="operator">.</span>evaluateTo(<span class="operator">&amp;</span>result);
+     <span class="type"><a href="qxmlitem.html">QXmlItem</a></span> item(result<span class="operator">.</span>next());
+     <span class="keyword">while</span> (<span class="operator">!</span>item<span class="operator">.</span>isNull()) {
          <span class="comment">// use item</span>
-         item = result.next();
+         item <span class="operator">=</span> result<span class="operator">.</span>next();
      }
-     if (result.hasError())
+     <span class="keyword">if</span> (result<span class="operator">.</span>hasError())
          <span class="comment">/* Runtime error! */</span>;
  }
 </pre>
@@ -67,4 +67,4 @@ occurred. Call <a href="qxmlresultitems.html#hasError">hasError</a>() to determi
 the null item was caused by normal termination or by an error.</p>
 <p>Returns a null <a href="qxmlitem.html">QXmlItem</a> if there is
 no associated <a href="qxmlquery.html">QXmlQuery</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

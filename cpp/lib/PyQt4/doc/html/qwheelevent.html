@@ -33,7 +33,8 @@ specify the global position explicitly.</p>
 the time of the event, <i>delta</i> contains the rotation distance,
 <i>modifiers</i> holds the keyboard modifier flags at the time of
 the event, and <i>orient</i> holds the wheel's orientation.</p>
-<p>See also <a href="qwheelevent.html#pos">pos</a>(), <a href="qwheelevent.html#delta">delta</a>(), and <a class="compat" href="qwheelevent-qt3.html#state">state</a>().</p>
+<p><b>See also</b> <a href="qwheelevent.html#pos">pos</a>(),
+<a href="qwheelevent.html#delta">delta</a>(), and <a class="compat" href="qwheelevent-qt3.html#state">state</a>().</p>
 
 
 <h3 class="fn"><a name="QWheelEvent-2" />QWheelEvent.__init__ (<i>self</i>, <a href="qpoint.html">QPoint</a>&#160;<i>pos</i>, <a href="qpoint.html">QPoint</a>&#160;<i>globalPos</i>, int&#160;<i>delta</i>, <a href="qt-mousebuttons.html">Qt.MouseButtons</a>&#160;<i>buttons</i>, <a href="qt-keyboardmodifiers.html">Qt.KeyboardModifiers</a>&#160;<i>modifiers</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>&#160;<i>orientation</i>&#160;=&#160;Qt.Vertical)</h3><p>Constructs a wheel event object.</p>
@@ -42,7 +43,8 @@ the widget. The position in global coordinates is specified by
 <i>globalPos</i>. <i>delta</i> contains the rotation distance,
 <i>modifiers</i> holds the keyboard modifier flags at the time of
 the event, and <i>orient</i> holds the wheel's orientation.</p>
-<p>See also <a href="qwheelevent.html#pos">pos</a>(), <a href="qwheelevent.html#globalPos">globalPos</a>(), <a href="qwheelevent.html#delta">delta</a>(), and <a class="compat" href="qwheelevent-qt3.html#state">state</a>().</p>
+<p><b>See also</b> <a href="qwheelevent.html#pos">pos</a>(),
+<a href="qwheelevent.html#globalPos">globalPos</a>(), <a href="qwheelevent.html#delta">delta</a>(), and <a class="compat" href="qwheelevent-qt3.html#state">state</a>().</p>
 
 
 <h3 class="fn"><a name="QWheelEvent-3" />QWheelEvent.__init__ (<i>self</i>, <a href="qwheelevent.html">QWheelEvent</a>)</h3><h3 class="fn"><a name="buttons" /><a href="qt-mousebuttons.html">Qt.MouseButtons</a> QWheelEvent.buttons (<i>self</i>)</h3><p>Returns the mouse state when the event occurred.</p>
@@ -62,18 +64,18 @@ values from events until the value of 120 is reached, then scroll
 the widget, or you can partially scroll the widget in response to
 each wheel event.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- void MyWidget.wheelEvent(QWheelEvent *event)
+<pre class="cpp">
+ <span class="type">void</span> MyWidget<span class="operator">.</span>wheelEvent(<span class="type"><a href="qwheelevent.html">QWheelEvent</a></span> <span class="operator">*</span>event)
  {
-     int numDegrees = event-&gt;delta() / 8;
-     int numSteps = numDegrees / 15;
+     <span class="type">int</span> numDegrees <span class="operator">=</span> event<span class="operator">-</span><span class="operator">&gt;</span>delta() <span class="operator">/</span> <span class="number">8</span>;
+     <span class="type">int</span> numSteps <span class="operator">=</span> numDegrees <span class="operator">/</span> <span class="number">15</span>;
 
-     if (event-&gt;orientation() == Qt.Horizontal) {
+     <span class="keyword">if</span> (event<span class="operator">-</span><span class="operator">&gt;</span>orientation() <span class="operator">=</span><span class="operator">=</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>Horizontal) {
          scrollHorizontally(numSteps);
-     } else {
+     } <span class="keyword">else</span> {
          scrollVertically(numSteps);
      }
-     event-&gt;accept();
+     event<span class="operator">-</span><span class="operator">&gt;</span>accept();
  }
 </pre>
 
@@ -83,20 +85,20 @@ of the event</i>. This is important on asynchronous window systems
 such as X11; whenever you move your widgets around in response to
 mouse events, globalPos() can differ a lot from the current cursor
 position returned by <a href="qcursor.html#pos">QCursor.pos</a>().</p>
-<p>See also <a href="qwheelevent.html#globalX">globalX</a>() and
-<a href="qwheelevent.html#globalY">globalY</a>().</p>
+<p><b>See also</b> <a href="qwheelevent.html#globalX">globalX</a>()
+and <a href="qwheelevent.html#globalY">globalY</a>().</p>
 
 
 <h3 class="fn"><a name="globalX" />int QWheelEvent.globalX (<i>self</i>)</h3><p>Returns the global x position of the mouse cursor at the time of
 the event.</p>
-<p>See also <a href="qwheelevent.html#globalY">globalY</a>() and
-<a href="qwheelevent.html#globalPos">globalPos</a>().</p>
+<p><b>See also</b> <a href="qwheelevent.html#globalY">globalY</a>()
+and <a href="qwheelevent.html#globalPos">globalPos</a>().</p>
 
 
 <h3 class="fn"><a name="globalY" />int QWheelEvent.globalY (<i>self</i>)</h3><p>Returns the global y position of the mouse cursor at the time of
 the event.</p>
-<p>See also <a href="qwheelevent.html#globalX">globalX</a>() and
-<a href="qwheelevent.html#globalPos">globalPos</a>().</p>
+<p><b>See also</b> <a href="qwheelevent.html#globalX">globalX</a>()
+and <a href="qwheelevent.html#globalPos">globalPos</a>().</p>
 
 
 <h3 class="fn"><a name="orientation" /><a href="qt.html#Orientation-enum">Qt.Orientation</a> QWheelEvent.orientation (<i>self</i>)</h3><p>Returns the wheel's orientation.</p>
@@ -107,15 +109,17 @@ that received the event.</p>
 <p>If you move your widgets around in response to mouse events, use
 <a href="qwheelevent.html#globalPos">globalPos</a>() instead of
 this function.</p>
-<p>See also <a href="qwheelevent.html#x">x</a>(), <a href="qwheelevent.html#y">y</a>(), and <a href="qwheelevent.html#globalPos">globalPos</a>().</p>
+<p><b>See also</b> <a href="qwheelevent.html#x">x</a>(), <a href="qwheelevent.html#y">y</a>(), and <a href="qwheelevent.html#globalPos">globalPos</a>().</p>
 
 
 <h3 class="fn"><a name="x" />int QWheelEvent.x (<i>self</i>)</h3><p>Returns the x position of the mouse cursor, relative to the
 widget that received the event.</p>
-<p>See also <a href="qwheelevent.html#y">y</a>() and <a href="qwheelevent.html#pos">pos</a>().</p>
+<p><b>See also</b> <a href="qwheelevent.html#y">y</a>() and
+<a href="qwheelevent.html#pos">pos</a>().</p>
 
 
 <h3 class="fn"><a name="y" />int QWheelEvent.y (<i>self</i>)</h3><p>Returns the y position of the mouse cursor, relative to the
 widget that received the event.</p>
-<p>See also <a href="qwheelevent.html#x">x</a>() and <a href="qwheelevent.html#pos">pos</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qwheelevent.html#x">x</a>() and
+<a href="qwheelevent.html#pos">pos</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

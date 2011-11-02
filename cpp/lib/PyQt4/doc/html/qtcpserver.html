@@ -43,8 +43,8 @@ qmake variable.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QTcpServer" />QTcpServer.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qtcpserver.html">QTcpServer</a>
 object.</p>
 <p><i>parent</i> is passed to the <a href="qobject.html">QObject</a> constructor.</p>
-<p>See also <a href="qtcpserver.html#listen">listen</a>() and
-<a href="qtcpserver.html#setSocketDescriptor">setSocketDescriptor</a>().</p>
+<p><b>See also</b> <a href="qtcpserver.html#listen">listen</a>()
+and <a href="qtcpserver.html#setSocketDescriptor">setSocketDescriptor</a>().</p>
 
 
 <h3 class="fn"><a name="addPendingConnection" />QTcpServer.addPendingConnection (<i>self</i>, <a href="qtcpsocket.html">QTcpSocket</a>&#160;<i>socket</i>)</h3><p>This function is called by <a href="qtcpserver.html#incomingConnection">QTcpServer.incomingConnection</a>()
@@ -54,22 +54,22 @@ connections.</p>
 <a href="qtcpserver.html#incomingConnection">incomingConnection</a>() if
 you do not want to break the Pending Connections mechanism.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qtcpserver.html#incomingConnection">incomingConnection</a>().</p>
+<p><b>See also</b> <a href="qtcpserver.html#incomingConnection">incomingConnection</a>().</p>
 
 
 <h3 class="fn"><a name="close" />QTcpServer.close (<i>self</i>)</h3><p>Closes the server. The server will no longer listen for incoming
 connections.</p>
-<p>See also <a href="qtcpserver.html#listen">listen</a>().</p>
+<p><b>See also</b> <a href="qtcpserver.html#listen">listen</a>().</p>
 
 
 <h3 class="fn"><a name="errorString" />QString QTcpServer.errorString (<i>self</i>)</h3><p>Returns a human readable description of the last error that
 occurred.</p>
-<p>See also <a href="qtcpserver.html#serverError">serverError</a>().</p>
+<p><b>See also</b> <a href="qtcpserver.html#serverError">serverError</a>().</p>
 
 
 <h3 class="fn"><a name="hasPendingConnections" />bool QTcpServer.hasPendingConnections (<i>self</i>)</h3><p>Returns true if the server has a pending connection; otherwise
 returns false.</p>
-<p>See also <a href="qtcpserver.html#nextPendingConnection">nextPendingConnection</a>()
+<p><b>See also</b> <a href="qtcpserver.html#nextPendingConnection">nextPendingConnection</a>()
 and <a href="qtcpserver.html#setMaxPendingConnections">setMaxPendingConnections</a>().</p>
 
 
@@ -90,13 +90,13 @@ thread you have to pass the socketDescriptor to the other thread
 and create the <a href="qtcpsocket.html">QTcpSocket</a> object
 there and use its <a href="qtcpserver.html#setSocketDescriptor">setSocketDescriptor</a>()
 method.</p>
-<p>See also <a href="qtcpserver.html#newConnection">newConnection</a>(), <a href="qtcpserver.html#nextPendingConnection">nextPendingConnection</a>(),
+<p><b>See also</b> <a href="qtcpserver.html#newConnection">newConnection</a>(), <a href="qtcpserver.html#nextPendingConnection">nextPendingConnection</a>(),
 and <a href="qtcpserver.html#addPendingConnection">addPendingConnection</a>().</p>
 
 
 <h3 class="fn"><a name="isListening" />bool QTcpServer.isListening (<i>self</i>)</h3><p>Returns true if the server is currently listening for incoming
 connections; otherwise returns false.</p>
-<p>See also <a href="qtcpserver.html#listen">listen</a>().</p>
+<p><b>See also</b> <a href="qtcpserver.html#listen">listen</a>().</p>
 
 
 <h3 class="fn"><a name="listen" />bool QTcpServer.listen (<i>self</i>, <a href="qhostaddress.html">QHostAddress</a>&#160;<i>address</i>&#160;=&#160;QHostAddress.Any, int&#160;<i>port</i>&#160;=&#160;0)</h3><p>Tells the server to listen for incoming connections on address
@@ -104,12 +104,12 @@ connections; otherwise returns false.</p>
 chosen automatically. If <i>address</i> is <a href="qhostaddress.html#SpecialAddress-enum">QHostAddress.Any</a>, the
 server will listen on all network interfaces.</p>
 <p>Returns true on success; otherwise returns false.</p>
-<p>See also <a href="qtcpserver.html#isListening">isListening</a>().</p>
+<p><b>See also</b> <a href="qtcpserver.html#isListening">isListening</a>().</p>
 
 
 <h3 class="fn"><a name="maxPendingConnections" />int QTcpServer.maxPendingConnections (<i>self</i>)</h3><p>Returns the maximum number of pending accepted connections. The
 default is 30.</p>
-<p>See also <a href="qtcpserver.html#setMaxPendingConnections">setMaxPendingConnections</a>()
+<p><b>See also</b> <a href="qtcpserver.html#setMaxPendingConnections">setMaxPendingConnections</a>()
 and <a href="qtcpserver.html#hasPendingConnections">hasPendingConnections</a>().</p>
 
 
@@ -123,29 +123,27 @@ pending connections.</p>
 <p><b>Note:</b> The returned <a href="qtcpsocket.html">QTcpSocket</a> object cannot be used from another
 thread. If you want to use an incoming connection from another
 thread, you need to override <a href="qtcpserver.html#incomingConnection">incomingConnection</a>().</p>
-<p>See also <a href="qtcpserver.html#hasPendingConnections">hasPendingConnections</a>().</p>
+<p><b>See also</b> <a href="qtcpserver.html#hasPendingConnections">hasPendingConnections</a>().</p>
 
 
 <h3 class="fn"><a name="proxy" /><a href="qnetworkproxy.html">QNetworkProxy</a> QTcpServer.proxy (<i>self</i>)</h3><p>Returns the network proxy for this socket. By default <a href="qnetworkproxy.html#ProxyType-enum">QNetworkProxy.DefaultProxy</a>
 is used.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtcpserver.html#setProxy">setProxy</a>() and
-<a href="qnetworkproxy.html">QNetworkProxy</a>.</p>
+<p><b>See also</b> <a href="qtcpserver.html#setProxy">setProxy</a>() and <a href="qnetworkproxy.html">QNetworkProxy</a>.</p>
 
 
 <h3 class="fn"><a name="serverAddress" /><a href="qhostaddress.html">QHostAddress</a> QTcpServer.serverAddress (<i>self</i>)</h3><p>Returns the server's address if the server is listening for
 connections; otherwise returns <a href="qhostaddress.html#SpecialAddress-enum">QHostAddress.Null</a>.</p>
-<p>See also <a href="qtcpserver.html#serverPort">serverPort</a>()
-and <a href="qtcpserver.html#listen">listen</a>().</p>
+<p><b>See also</b> <a href="qtcpserver.html#serverPort">serverPort</a>() and <a href="qtcpserver.html#listen">listen</a>().</p>
 
 
 <h3 class="fn"><a name="serverError" /><a href="qabstractsocket.html#SocketError-enum">QAbstractSocket.SocketError</a> QTcpServer.serverError (<i>self</i>)</h3><p>Returns an error code for the last error that occurred.</p>
-<p>See also <a href="qtcpserver.html#errorString">errorString</a>().</p>
+<p><b>See also</b> <a href="qtcpserver.html#errorString">errorString</a>().</p>
 
 
 <h3 class="fn"><a name="serverPort" />int QTcpServer.serverPort (<i>self</i>)</h3><p>Returns the server's port if the server is listening for
 connections; otherwise returns 0.</p>
-<p>See also <a href="qtcpserver.html#serverAddress">serverAddress</a>() and <a href="qtcpserver.html#listen">listen</a>().</p>
+<p><b>See also</b> <a href="qtcpserver.html#serverAddress">serverAddress</a>() and <a href="qtcpserver.html#listen">listen</a>().</p>
 
 
 <h3 class="fn"><a name="setMaxPendingConnections" />QTcpServer.setMaxPendingConnections (<i>self</i>, int&#160;<i>numConnections</i>)</h3><p>Sets the maximum number of pending accepted connections to
@@ -158,7 +156,7 @@ its maximum number of pending connections (i.e., <a href="qtcpsocket.html">QTcpS
 signal). <a href="qtcpserver.html">QTcpServer</a> will stop
 accepting the new connections, but the operating system may still
 keep them in queue.</p>
-<p>See also <a href="qtcpserver.html#maxPendingConnections">maxPendingConnections</a>()
+<p><b>See also</b> <a href="qtcpserver.html#maxPendingConnections">maxPendingConnections</a>()
 and <a href="qtcpserver.html#hasPendingConnections">hasPendingConnections</a>().</p>
 
 
@@ -166,11 +164,11 @@ and <a href="qtcpserver.html#hasPendingConnections">hasPendingConnections</a>().
 <i>networkProxy</i>.</p>
 <p>To disable the use of a proxy for this socket, use the <a href="qnetworkproxy.html#ProxyType-enum">QNetworkProxy.NoProxy</a>
 proxy type:</p>
-<pre class="highlightedCode brush: cpp">
- server-&gt;setProxy(QNetworkProxy.NoProxy);
+<pre class="cpp">
+ server<span class="operator">-</span><span class="operator">&gt;</span>setProxy(<span class="type"><a href="qnetworkproxy.html">QNetworkProxy</a></span><span class="operator">.</span>NoProxy);
 </pre>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtcpserver.html#proxy">proxy</a>() and
+<p><b>See also</b> <a href="qtcpserver.html#proxy">proxy</a>() and
 <a href="qnetworkproxy.html">QNetworkProxy</a>.</p>
 
 
@@ -178,7 +176,7 @@ proxy type:</p>
 for incoming connections to <i>socketDescriptor</i>. Returns true
 if the socket is set successfully; otherwise returns false.</p>
 <p>The socket is assumed to be in listening state.</p>
-<p>See also <a href="qtcpserver.html#socketDescriptor">socketDescriptor</a>() and
+<p><b>See also</b> <a href="qtcpserver.html#socketDescriptor">socketDescriptor</a>() and
 <a href="qtcpserver.html#isListening">isListening</a>().</p>
 
 
@@ -187,7 +185,7 @@ for incoming instructions, or -1 if the server is not
 listening.</p>
 <p>If the server is using <a href="qnetworkproxy.html">QNetworkProxy</a>, the returned descriptor may
 not be usable with native socket functions.</p>
-<p>See also <a href="qtcpserver.html#setSocketDescriptor">setSocketDescriptor</a>() and
+<p><b>See also</b> <a href="qtcpserver.html#setSocketDescriptor">setSocketDescriptor</a>() and
 <a href="qtcpserver.html#isListening">isListening</a>().</p>
 
 
@@ -201,12 +199,12 @@ stop responding until the function returns. waitForNewConnection()
 is mostly useful when there is no event loop available.</p>
 <p>The non-blocking alternative is to connect to the <a href="qtcpserver.html#newConnection">newConnection</a>() signal.</p>
 <p>If msec is -1, this function will not time out.</p>
-<p>See also <a href="qtcpserver.html#hasPendingConnections">hasPendingConnections</a>()
+<p><b>See also</b> <a href="qtcpserver.html#hasPendingConnections">hasPendingConnections</a>()
 and <a href="qtcpserver.html#nextPendingConnection">nextPendingConnection</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="newConnection" />void newConnection ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted every time a new connection is
 available.</p>
-<p>See also <a href="qtcpserver.html#hasPendingConnections">hasPendingConnections</a>()
+<p><b>See also</b> <a href="qtcpserver.html#hasPendingConnections">hasPendingConnections</a>()
 and <a href="qtcpserver.html#nextPendingConnection">nextPendingConnection</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

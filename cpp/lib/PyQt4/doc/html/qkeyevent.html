@@ -39,7 +39,7 @@ given <i>text</i> is the Unicode text that the key generated. If
 
 <h3 class="fn"><a name="QKeyEvent-2" />QKeyEvent.__init__ (<i>self</i>, <a href="qkeyevent.html">QKeyEvent</a>)</h3><h3 class="fn"><a name="count" />int QKeyEvent.count (<i>self</i>)</h3><p>Returns the number of keys involved in this event. If <a href="qkeyevent.html#text">text</a>() is not empty, this is simply the
 length of the string.</p>
-<p>See also <a href="qt.html#WidgetAttribute-enum">Qt.WA_KeyCompression</a>.</p>
+<p><b>See also</b> <a href="qt.html#WidgetAttribute-enum">Qt.WA_KeyCompression</a>.</p>
 
 
 <h3 class="fn"><a name="isAutoRepeat" />bool QKeyEvent.isAutoRepeat (<i>self</i>)</h3><p>Returns true if this event comes from an auto-repeating key;
@@ -59,7 +59,7 @@ text the key generated) for this purpose.</p>
 the result of a known key; for example, it may be the result of a
 compose sequence, a keyboard macro, or due to key event
 compression.</p>
-<p>See also <a href="qt.html#WidgetAttribute-enum">Qt.WA_KeyCompression</a>.</p>
+<p><b>See also</b> <a href="qt.html#WidgetAttribute-enum">Qt.WA_KeyCompression</a>.</p>
 
 
 <h3 class="fn"><a name="matches" />bool QKeyEvent.matches (<i>self</i>, <a href="qkeysequence.html#StandardKey-enum">QKeySequence.StandardKey</a>&#160;<i>key</i>)</h3><p>Returns true if the key event matches the given standard
@@ -72,7 +72,7 @@ after the event occurred.</p>
 <p><b>Warning:</b> This function cannot always be trusted. The user
 can confuse it by pressing both <b>Shift</b> keys simultaneously
 and releasing one of them, for example.</p>
-<p>See also <a href="qapplication.html#keyboardModifiers">QApplication.keyboardModifiers</a>().</p>
+<p><b>See also</b> <a href="qapplication.html#keyboardModifiers">QApplication.keyboardModifiers</a>().</p>
 
 
 <h3 class="fn"><a name="nativeModifiers" />int QKeyEvent.nativeModifiers (<i>self</i>)</h3><p>Returns the native modifiers of a key event. If the key event
@@ -104,5 +104,5 @@ returned can be an empty string in cases where modifier keys, such
 as Shift, Control, Alt, and Meta, are being pressed or released. In
 such cases <a href="qkeyevent.html#key">key</a>() will contain a
 valid value.</p>
-<p>See also <a href="qt.html#WidgetAttribute-enum">Qt.WA_KeyCompression</a>.</p>
-<h3 class="fn"><a name="__eq__" />bool QKeyEvent.__eq__ (<i>self</i>, <a href="qkeysequence.html#StandardKey-enum">QKeySequence.StandardKey</a>&#160;<i>key</i>)</h3><h3 class="fn"><a name="__len__" /> QKeyEvent.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__ne__" />bool QKeyEvent.__ne__ (<i>self</i>, <a href="qkeysequence.html#StandardKey-enum">QKeySequence.StandardKey</a>&#160;<i>key</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qt.html#WidgetAttribute-enum">Qt.WA_KeyCompression</a>.</p>
+<h3 class="fn"><a name="__eq__" />bool QKeyEvent.__eq__ (<i>self</i>, <a href="qkeysequence.html#StandardKey-enum">QKeySequence.StandardKey</a>&#160;<i>key</i>)</h3><h3 class="fn"><a name="__len__" /> QKeyEvent.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__ne__" />bool QKeyEvent.__ne__ (<i>self</i>, <a href="qkeysequence.html#StandardKey-enum">QKeySequence.StandardKey</a>&#160;<i>key</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

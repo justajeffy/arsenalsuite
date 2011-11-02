@@ -15,13 +15,9 @@ model for a single database table, with foreign key support.</p>
 <p>QSqlRelationalTableModel acts like <a href="qsqltablemodel.html">QSqlTableModel</a>, but allows columns to be
 set as foreign keys into other database tables.</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/noforeignkeys.png" /></p>
-</td>
-<td>
-<p><img src="images/foreignkeys.png" /></p>
-</td>
+<tr class="odd" valign="top">
+<td><img src="images/noforeignkeys.png" /></td>
+<td><img src="images/foreignkeys.png" /></td>
 </tr>
 </table>
 <p>The screenshot on the left shows a plain <a href="qsqltablemodel.html">QSqlTableModel</a> in a <a href="qtableview.html">QTableView</a>. Foreign keys (<tt>city</tt> and
@@ -30,11 +26,11 @@ screenshot on the right shows a QSqlRelationalTableModel, with
 foreign keys resolved into human-readable text strings.</p>
 <p>The following code snippet shows how the
 QSqlRelationalTableModel was set up:</p>
-<pre class="highlightedCode brush: cpp">
-     model-&gt;setTable("employee");
+<pre class="cpp">
+     model<span class="operator">-</span><span class="operator">&gt;</span>setTable(<span class="string">"employee"</span>);
 
-     model-&gt;setRelation(2, QSqlRelation("city", "id", "name"));
-     model-&gt;setRelation(3, QSqlRelation("country", "id", "name"));
+     model<span class="operator">-</span><span class="operator">&gt;</span>setRelation(<span class="number">2</span><span class="operator">,</span> <span class="type"><a href="qsqlrelation.html">QSqlRelation</a></span>(<span class="string">"city"</span><span class="operator">,</span> <span class="string">"id"</span><span class="operator">,</span> <span class="string">"name"</span>));
+     model<span class="operator">-</span><span class="operator">&gt;</span>setRelation(<span class="number">3</span><span class="operator">,</span> <span class="type"><a href="qsqlrelation.html">QSqlRelation</a></span>(<span class="string">"country"</span><span class="operator">,</span> <span class="string">"id"</span><span class="operator">,</span> <span class="string">"name"</span>));
 </pre>
 <p>The <a href="qsqlrelationaltablemodel.html#setRelation">setRelation</a>()
 function calls establish a relationship between two tables. The
@@ -49,10 +45,10 @@ view. Unlike the default delegate, <a href="qsqlrelationaldelegate.html">QSqlRel
 combobox for fields that are foreign keys into other tables. To use
 the class, simply call <a href="qabstractitemview.html#setItemDelegate">QAbstractItemView.setItemDelegate</a>()
 on the view with an instance of <a href="qsqlrelationaldelegate.html">QSqlRelationalDelegate</a>:</p>
-<pre class="highlightedCode brush: cpp">
-     QTableView *view = new QTableView;
-     view-&gt;setModel(model);
-     view-&gt;setItemDelegate(new QSqlRelationalDelegate(view));
+<pre class="cpp">
+     <span class="type"><a href="qtableview.html">QTableView</a></span> <span class="operator">*</span>view <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qtableview.html">QTableView</a></span>;
+     view<span class="operator">-</span><span class="operator">&gt;</span>setModel(model);
+     view<span class="operator">-</span><span class="operator">&gt;</span>setItemDelegate(<span class="keyword">new</span> <span class="type"><a href="qsqlrelationaldelegate.html">QSqlRelationalDelegate</a></span>(view));
 </pre>
 <p>The <a href="sql-relationaltablemodel.html">sql/relationaltablemodel</a>
 example illustrates how to use QSqlRelationalTableModel in
@@ -93,7 +89,7 @@ connection will be used.</p>
 
 
 <h3 class="fn"><a name="data" />QVariant QSqlRelationalTableModel.data (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>, int&#160;<i>role</i>&#160;=&#160;Qt.DisplayRole)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#data">QAbstractItemModel.data</a>().</p>
-<p>See also <a href="qsqlrelationaltablemodel.html#setData">setData</a>().</p>
+<p><b>See also</b> <a href="qsqlrelationaltablemodel.html#setData">setData</a>().</p>
 
 
 <h3 class="fn"><a name="insertRowIntoTable" />bool QSqlRelationalTableModel.insertRowIntoTable (<i>self</i>, <a href="qsqlrecord.html">QSqlRecord</a>&#160;<i>values</i>)</h3><p>Reimplemented from <a href="qsqltablemodel.html#insertRowIntoTable">QSqlTableModel.insertRowIntoTable</a>().</p>
@@ -104,7 +100,7 @@ connection will be used.</p>
 
 <h3 class="fn"><a name="relation" /><a href="qsqlrelation.html">QSqlRelation</a> QSqlRelationalTableModel.relation (<i>self</i>, int&#160;<i>column</i>)</h3><p>Returns the relation for the column <i>column</i>, or an invalid
 relation if no relation is set.</p>
-<p>See also <a href="qsqlrelationaltablemodel.html#setRelation">setRelation</a>() and
+<p><b>See also</b> <a href="qsqlrelationaltablemodel.html#setRelation">setRelation</a>() and
 <a href="qsqlrelation.html#isValid">QSqlRelation.isValid</a>().</p>
 
 
@@ -112,7 +108,7 @@ relation if no relation is set.</p>
 object for accessing the table for which <i>column</i> is a foreign
 key, or 0 if there is no relation for the given <i>column</i>.</p>
 <p>The returned object is owned by the <a href="qsqlrelationaltablemodel.html">QSqlRelationalTableModel</a>.</p>
-<p>See also <a href="qsqlrelationaltablemodel.html#setRelation">setRelation</a>() and
+<p><b>See also</b> <a href="qsqlrelationaltablemodel.html#setRelation">setRelation</a>() and
 <a href="qsqlrelationaltablemodel.html#relation">relation</a>().</p>
 
 
@@ -138,16 +134,16 @@ example, if <i>index</i> is out of bounds).</p>
 <p>For relational columns, <i>value</i> must be the index, not the
 display value. The index must also exist in the referenced table,
 otherwise the function returns false.</p>
-<p>See also <a href="qsqltablemodel.html#editStrategy">editStrategy</a>(), <a href="qsqlrelationaltablemodel.html#data">data</a>(), <a href="qsqltablemodel.html#submit">submit</a>(), and <a href="qsqlrelationaltablemodel.html#revertRow">revertRow</a>().</p>
+<p><b>See also</b> <a href="qsqltablemodel.html#editStrategy">editStrategy</a>(), <a href="qsqlrelationaltablemodel.html#data">data</a>(), <a href="qsqltablemodel.html#submit">submit</a>(), and <a href="qsqlrelationaltablemodel.html#revertRow">revertRow</a>().</p>
 
 
 <h3 class="fn"><a name="setRelation" />QSqlRelationalTableModel.setRelation (<i>self</i>, int&#160;<i>column</i>, <a href="qsqlrelation.html">QSqlRelation</a>&#160;<i>relation</i>)</h3><p>Lets the specified <i>column</i> be a foreign index specified by
 <i>relation</i>.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     model-&gt;setTable("employee");
+<pre class="cpp">
+     model<span class="operator">-</span><span class="operator">&gt;</span>setTable(<span class="string">"employee"</span>);
 
-     model-&gt;setRelation(2, QSqlRelation("city", "id", "name"));
+     model<span class="operator">-</span><span class="operator">&gt;</span>setRelation(<span class="number">2</span><span class="operator">,</span> <span class="type"><a href="qsqlrelation.html">QSqlRelation</a></span>(<span class="string">"city"</span><span class="operator">,</span> <span class="string">"id"</span><span class="operator">,</span> <span class="string">"name"</span>));
 </pre>
 <p>The setRelation() call specifies that column 2 in table
 <tt>employee</tt> is a foreign key that maps with field <tt>id</tt>
@@ -155,11 +151,11 @@ of table <tt>city</tt>, and that the view should present the
 <tt>city</tt>'s <tt>name</tt> field to the user.</p>
 <p>Note: The table's primary key may not contain a relation to
 another table.</p>
-<p>See also <a href="qsqlrelationaltablemodel.html#relation">relation</a>().</p>
+<p><b>See also</b> <a href="qsqlrelationaltablemodel.html#relation">relation</a>().</p>
 
 
 <h3 class="fn"><a name="setTable" />QSqlRelationalTableModel.setTable (<i>self</i>, QString&#160;<i>tableName</i>)</h3><p>Reimplemented from <a href="qsqltablemodel.html#setTable">QSqlTableModel.setTable</a>().</p>
 
 
 <h3 class="fn"><a name="updateRowInTable" />bool QSqlRelationalTableModel.updateRowInTable (<i>self</i>, int&#160;<i>row</i>, <a href="qsqlrecord.html">QSqlRecord</a>&#160;<i>values</i>)</h3><p>Reimplemented from <a href="qsqltablemodel.html#updateRowInTable">QSqlTableModel.updateRowInTable</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

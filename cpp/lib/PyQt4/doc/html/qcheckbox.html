@@ -20,13 +20,9 @@ representation.</p>
 <p>The image below further illustrates the differences between
 exclusive and non-exclusive checkboxes.</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/checkboxes-exclusive.png" /></p>
-</td>
-<td>
-<p><img src="images/checkboxes-non-exclusive.png" /></p>
-</td>
+<tr class="odd" valign="top">
+<td><img src="images/checkboxes-exclusive.png" /></td>
+<td><img src="images/checkboxes-non-exclusive.png" /></td>
 </tr>
 </table>
 <p>Whenever a checkbox is checked or cleared it emits the signal
@@ -46,8 +42,8 @@ displays text, and optionally a small icon. The icon is set with
 can be set in the constructor or with <a href="qabstractbutton.html#text-prop">setText</a>(). A shortcut key can
 be specified by preceding the preferred character with an
 ampersand. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QCheckBox *checkbox = new QCheckBox("C&amp;ase sensitive", this);
+<pre class="cpp">
+ <span class="type">QCheckBox</span> <span class="operator">*</span>checkbox <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QCheckBox</span>(<span class="string">"C&amp;ase sensitive"</span><span class="operator">,</span> <span class="keyword">this</span>);
 </pre>
 <p>In this example the shortcut is <i>Alt+A</i>. See the <a href="qshortcut.html#mnemonic">QShortcut</a> documentation for details
 (to display an actual ampersand, use '&amp;&amp;').</p>
@@ -56,31 +52,18 @@ ampersand. For example:</p>
 <a class="compat" href="qabstractbutton-qt3.html#isToggleButton">isToggleButton</a>(), <a href="qabstractbutton.html#down-prop">setDown</a>(), <a href="qabstractbutton.html#down-prop">isDown</a>(), <a class="compat" href="qabstractbutton-qt3.html#isOn">isOn</a>(), <a href="qcheckbox.html#checkState">checkState</a>(), <a href="qabstractbutton.html#autoRepeat-prop">autoRepeat</a>(),
 isExclusiveToggle(), <a href="qabstractbutton.html#group">group</a>(), <a href="qabstractbutton.html#autoRepeat-prop">setAutoRepeat</a>(),
 <a href="qabstractbutton.html#toggle">toggle</a>(), <a href="qabstractbutton.html#pressed">pressed</a>(), <a href="qabstractbutton.html#released">released</a>(), <a href="qabstractbutton.html#clicked">clicked</a>(), <a href="qabstractbutton.html#toggled">toggled</a>(), <a href="qcheckbox.html#checkState">checkState</a>(), and <a href="qcheckbox.html#stateChanged">stateChanged</a>().</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Screenshot of a Macintosh style checkbox" src="images/macintosh-checkbox.png" /></p>
-</td>
-<td>
-<p>A checkbox shown in the <a href="gallery-macintosh.html">Macintosh widget style</a>.</p>
-</td>
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img alt="Screenshot of a Macintosh style checkbox" src="images/macintosh-checkbox.png" /></td>
+<td>A checkbox shown in the <a href="gallery-macintosh.html">Macintosh widget style</a>.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><img alt="Screenshot of a Windows XP style checkbox" src="images/windows-checkbox.png" /></p>
-</td>
-<td>
-<p>A checkbox shown in the <a href="gallery-windowsxp.html">Windows
-XP widget style</a>.</p>
-</td>
+<tr class="even" valign="top">
+<td><img alt="Screenshot of a Windows XP style checkbox" src="images/windows-checkbox.png" /></td>
+<td>A checkbox shown in the <a href="gallery-windowsxp.html">Windows XP widget style</a>.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><img alt="Screenshot of a Plastique style checkbox" src="images/plastique-checkbox.png" /></p>
-</td>
-<td>
-<p>A checkbox shown in the <a href="gallery-plastique.html">Plastique widget style</a>.</p>
-</td>
+<tr class="odd" valign="top">
+<td><img alt="Screenshot of a Plastique style checkbox" src="images/plastique-checkbox.png" /></td>
+<td>A checkbox shown in the <a href="gallery-plastique.html">Plastique widget style</a>.</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QCheckBox" />QCheckBox.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a checkbox with the given <i>parent</i>, but with no
@@ -96,7 +79,7 @@ text.</p>
 <h3 class="fn"><a name="checkState" /><a href="qt.html#CheckState-enum">Qt.CheckState</a> QCheckBox.checkState (<i>self</i>)</h3><p>Returns the check box's check state. If you do not need tristate
 support, you can also use <a href="qabstractbutton.html#checked-prop">QAbstractButton.isChecked</a>()
 which returns a boolean.</p>
-<p>See also <a href="qcheckbox.html#setCheckState">setCheckState</a>() and <a href="qt.html#CheckState-enum">Qt.CheckState</a>.</p>
+<p><b>See also</b> <a href="qcheckbox.html#setCheckState">setCheckState</a>() and <a href="qt.html#CheckState-enum">Qt.CheckState</a>.</p>
 
 
 <h3 class="fn"><a name="checkStateSet" />QCheckBox.checkStateSet (<i>self</i>)</h3><p>Reimplemented from <a href="qabstractbutton.html#checkStateSet">QAbstractButton.checkStateSet</a>().</p>
@@ -111,7 +94,7 @@ which returns a boolean.</p>
 <h3 class="fn"><a name="initStyleOption" />QCheckBox.initStyleOption (<i>self</i>, <a href="qstyleoptionbutton.html">QStyleOptionButton</a>&#160;<i>option</i>)</h3><p>Initializes <i>option</i> with the values from this <a href="qcheckbox.html">QCheckBox</a>. This method is useful for
 subclasses that require a <a href="qstyleoptionbutton.html">QStyleOptionButton</a>, but do not want
 to fill in all the information themselves.</p>
-<p>See also <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
+<p><b>See also</b> <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
 
 
 <h3 class="fn"><a name="isTristate" />bool QCheckBox.isTristate (<i>self</i>)</h3><h3 class="fn"><a name="mouseMoveEvent" />QCheckBox.mouseMoveEvent (<i>self</i>, <a href="qmouseevent.html">QMouseEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#mouseMoveEvent">QWidget.mouseMoveEvent</a>().</p>
@@ -126,8 +109,7 @@ to fill in all the information themselves.</p>
 <h3 class="fn"><a name="setCheckState" />QCheckBox.setCheckState (<i>self</i>, <a href="qt.html#CheckState-enum">Qt.CheckState</a>&#160;<i>state</i>)</h3><p>Sets the check box's check state to <i>state</i>. If you do not
 need tristate support, you can also use <a href="qabstractbutton.html#checked-prop">QAbstractButton.setChecked</a>()
 which takes a boolean.</p>
-<p>See also <a href="qcheckbox.html#checkState">checkState</a>()
-and <a href="qt.html#CheckState-enum">Qt.CheckState</a>.</p>
+<p><b>See also</b> <a href="qcheckbox.html#checkState">checkState</a>() and <a href="qt.html#CheckState-enum">Qt.CheckState</a>.</p>
 
 
 <h3 class="fn"><a name="setTristate" />QCheckBox.setTristate (<i>self</i>, bool&#160;<i>on</i>&#160;=&#160;True)</h3><h3 class="fn"><a name="sizeHint" /><a href="qsize.html">QSize</a> QCheckBox.sizeHint (<i>self</i>)</h3><p>Reimplemented from <a href="qwidget.html#sizeHint-prop">QWidget.sizeHint</a>().</p>
@@ -136,4 +118,4 @@ and <a href="qt.html#CheckState-enum">Qt.CheckState</a>.</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="stateChanged" />void stateChanged (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the check box's state changes,
 i.e. whenever the user checks or unchecks it.</p>
 <p><i>state</i> contains the check box's new <a href="qt.html#CheckState-enum">Qt.CheckState</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

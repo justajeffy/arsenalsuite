@@ -42,59 +42,35 @@ value at all; others may just provide multiples of <a href="qabstractslider.html
 <p>QAbstractSlider emits a comprehensive set of signals:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Signal</th>
 <th>Emitted when</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><a href="qabstractslider.html#valueChanged">valueChanged</a>()</p>
-</td>
-<td>
-<p>the value has changed. The <a href="qabstractslider.html#tracking-prop">tracking</a> determines
-whether this signal is emitted during user interaction.</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qabstractslider.html#valueChanged">valueChanged</a>()</td>
+<td>the value has changed. The <a href="qabstractslider.html#tracking-prop">tracking</a> determines
+whether this signal is emitted during user interaction.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qabstractslider.html#sliderPressed">sliderPressed</a>()</p>
-</td>
-<td>
-<p>the user starts to drag the slider.</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qabstractslider.html#sliderPressed">sliderPressed</a>()</td>
+<td>the user starts to drag the slider.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qabstractslider.html#sliderMoved">sliderMoved</a>()</p>
-</td>
-<td>
-<p>the user drags the slider.</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qabstractslider.html#sliderMoved">sliderMoved</a>()</td>
+<td>the user drags the slider.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qabstractslider.html#sliderReleased">sliderReleased</a>()</p>
-</td>
-<td>
-<p>the user releases the slider.</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qabstractslider.html#sliderReleased">sliderReleased</a>()</td>
+<td>the user releases the slider.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qabstractslider.html#actionTriggered">actionTriggered</a>()</p>
-</td>
-<td>
-<p>a slider action was triggerd.</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qabstractslider.html#actionTriggered">actionTriggered</a>()</td>
+<td>a slider action was triggerd.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qabstractslider.html#rangeChanged">rangeChanged</a>()</p>
-</td>
-<td>
-<p>a the range has changed.</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qabstractslider.html#rangeChanged">rangeChanged</a>()</td>
+<td>a the range has changed.</td>
 </tr>
 </table>
 <p>QAbstractSlider provides a virtual <a href="qabstractslider.html#sliderChange">sliderChange</a>() function
@@ -111,39 +87,39 @@ range values.</p>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractSlider.SliderNoAction</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSlider.SliderSingleStepAdd</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSlider.SliderSingleStepSub</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSlider.SliderPageStepAdd</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSlider.SliderPageStepSub</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractSlider.SliderToMinimum</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractSlider.SliderToMaximum</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractSlider.SliderMove</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 </tr>
 </table>
 
@@ -156,26 +132,26 @@ range values.</p>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSlider.SliderRangeChange</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSlider.SliderOrientationChange</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSlider.SliderStepsChange</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSlider.SliderValueChange</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QAbstractSlider" />QAbstractSlider.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs an abstract slider.</p>
-<p>The <i>parent</i> arguments is sent to the <a href="qwidget.html">QWidget</a> constructor.</p>
+<p>The <i>parent</i> argument is sent to the <a href="qwidget.html">QWidget</a> constructor.</p>
 <p>The <a href="qabstractslider.html#minimum-prop">minimum</a>
 defaults to 0, the <a href="qabstractslider.html#maximum-prop">maximum</a> to 99, with a
 <a href="qabstractslider.html#singleStep-prop">singleStep</a> size
@@ -194,21 +170,20 @@ an initial <a href="qabstractslider.html#value-prop">value</a> of
 
 
 <h3 class="fn"><a name="maximum" />int QAbstractSlider.maximum (<i>self</i>)</h3><h3 class="fn"><a name="minimum" />int QAbstractSlider.minimum (<i>self</i>)</h3><h3 class="fn"><a name="orientation" /><a href="qt.html#Orientation-enum">Qt.Orientation</a> QAbstractSlider.orientation (<i>self</i>)</h3><h3 class="fn"><a name="pageStep" />int QAbstractSlider.pageStep (<i>self</i>)</h3><h3 class="fn"><a name="repeatAction" /><a href="qabstractslider.html#SliderAction-enum">SliderAction</a> QAbstractSlider.repeatAction (<i>self</i>)</h3><p>Returns the current repeat action.</p>
-<p>See also <a href="qabstractslider.html#setRepeatAction">setRepeatAction</a>().</p>
+<p><b>See also</b> <a href="qabstractslider.html#setRepeatAction">setRepeatAction</a>().</p>
 
 
 <h3 class="fn"><a name="setInvertedAppearance" />QAbstractSlider.setInvertedAppearance (<i>self</i>, bool)</h3><h3 class="fn"><a name="setInvertedControls" />QAbstractSlider.setInvertedControls (<i>self</i>, bool)</h3><h3 class="fn"><a name="setMaximum" />QAbstractSlider.setMaximum (<i>self</i>, int)</h3><h3 class="fn"><a name="setMinimum" />QAbstractSlider.setMinimum (<i>self</i>, int)</h3><h3 class="fn"><a name="setOrientation" />QAbstractSlider.setOrientation (<i>self</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setOrientation(Qt::Orientation)</tt>.</p><h3 class="fn"><a name="setPageStep" />QAbstractSlider.setPageStep (<i>self</i>, int)</h3><h3 class="fn"><a name="setRange" />QAbstractSlider.setRange (<i>self</i>, int&#160;<i>min</i>, int&#160;<i>max</i>)</h3><p>Sets the slider's minimum to <i>min</i> and its maximum to
 <i>max</i>.</p>
 <p>If <i>max</i> is smaller than <i>min</i>, <i>min</i> becomes the
 only legal value.</p>
-<p>See also <a href="qabstractslider.html#minimum-prop">minimum</a>
-and <a href="qabstractslider.html#maximum-prop">maximum</a>.</p>
+<p><b>See also</b> <a href="qabstractslider.html#minimum-prop">minimum</a> and <a href="qabstractslider.html#maximum-prop">maximum</a>.</p>
 
 
 <h3 class="fn"><a name="setRepeatAction" />QAbstractSlider.setRepeatAction (<i>self</i>, <a href="qabstractslider.html#SliderAction-enum">SliderAction</a>&#160;<i>action</i>, int&#160;<i>thresholdTime</i>&#160;=&#160;500, int&#160;<i>repeatTime</i>&#160;=&#160;50)</h3><p>Sets action <i>action</i> to be triggered repetitively in
 intervals of <i>repeatTime</i>, after an initial delay of
 <i>thresholdTime</i>.</p>
-<p>See also <a href="qabstractslider.html#triggerAction">triggerAction</a>() and
+<p><b>See also</b> <a href="qabstractslider.html#triggerAction">triggerAction</a>() and
 <a href="qabstractslider.html#repeatAction">repeatAction</a>().</p>
 
 
@@ -231,7 +206,7 @@ default implementation only updates the display and ignores the
 <a href="qabstractslider.html#SliderAction-enum">SliderToMinimum</a>,
 <a href="qabstractslider.html#SliderAction-enum">SliderToMaximum</a>, and
 <a href="qabstractslider.html#SliderAction-enum">SliderMove</a>.</p>
-<p>See also <a href="qabstractslider.html#actionTriggered">actionTriggered</a>().</p>
+<p><b>See also</b> <a href="qabstractslider.html#actionTriggered">actionTriggered</a>().</p>
 
 
 <h3 class="fn"><a name="value" />int QAbstractSlider.value (<i>self</i>)</h3><h3 class="fn"><a name="wheelEvent" />QAbstractSlider.wheelEvent (<i>self</i>, <a href="qwheelevent.html">QWheelEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#wheelEvent">QWidget.wheelEvent</a>().</p>
@@ -250,27 +225,26 @@ not yet emitted), and the visual display has not been updated. In
 slots connected to this signal you can thus safely adjust any
 action by calling <a href="qabstractslider.html#sliderPosition-prop">setSliderPosition</a>()
 yourself, based on both the action and the slider's value.</p>
-<p>See also <a href="qabstractslider.html#triggerAction">triggerAction</a>().</p>
+<p><b>See also</b> <a href="qabstractslider.html#triggerAction">triggerAction</a>().</p>
 
 
 <h3 class="fn"><a name="rangeChanged" />void rangeChanged (int,int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the slider range has changed, with
 <i>min</i> being the new minimum, and <i>max</i> being the new
 maximum.</p>
-<p>See also <a href="qabstractslider.html#minimum-prop">minimum</a>
-and <a href="qabstractslider.html#maximum-prop">maximum</a>.</p>
+<p><b>See also</b> <a href="qabstractslider.html#minimum-prop">minimum</a> and <a href="qabstractslider.html#maximum-prop">maximum</a>.</p>
 
 
 <h3 class="fn"><a name="sliderMoved" />void sliderMoved (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when <a href="qabstractslider.html#sliderDown-prop">sliderDown</a> is true and
 the slider moves. This usually happens when the user is dragging
 the slider. The <i>value</i> is the new slider position.</p>
 <p>This signal is emitted even when tracking is turned off.</p>
-<p>See also <a href="qabstractslider.html#tracking-prop">setTracking</a>(), <a href="qabstractslider.html#valueChanged">valueChanged</a>(), <a href="qabstractslider.html#sliderDown-prop">isSliderDown</a>(), <a href="qabstractslider.html#sliderPressed">sliderPressed</a>(), and
+<p><b>See also</b> <a href="qabstractslider.html#tracking-prop">setTracking</a>(), <a href="qabstractslider.html#valueChanged">valueChanged</a>(), <a href="qabstractslider.html#sliderDown-prop">isSliderDown</a>(), <a href="qabstractslider.html#sliderPressed">sliderPressed</a>(), and
 <a href="qabstractslider.html#sliderReleased">sliderReleased</a>().</p>
 
 
 <h3 class="fn"><a name="sliderPressed" />void sliderPressed ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the user presses the slider with the
 mouse, or programmatically when setSliderDown(true) is called.</p>
-<p>See also <a href="qabstractslider.html#sliderReleased">sliderReleased</a>(),
+<p><b>See also</b> <a href="qabstractslider.html#sliderReleased">sliderReleased</a>(),
 <a href="qabstractslider.html#sliderMoved">sliderMoved</a>(), and
 <a href="qabstractslider.html#sliderDown-prop">isSliderDown</a>().</p>
 
@@ -278,11 +252,11 @@ mouse, or programmatically when setSliderDown(true) is called.</p>
 <h3 class="fn"><a name="sliderReleased" />void sliderReleased ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the user releases the slider with
 the mouse, or programmatically when setSliderDown(false) is
 called.</p>
-<p>See also <a href="qabstractslider.html#sliderPressed">sliderPressed</a>(), <a href="qabstractslider.html#sliderMoved">sliderMoved</a>(), and <a href="qabstractslider.html#sliderDown-prop">sliderDown</a>.</p>
+<p><b>See also</b> <a href="qabstractslider.html#sliderPressed">sliderPressed</a>(), <a href="qabstractslider.html#sliderMoved">sliderMoved</a>(), and <a href="qabstractslider.html#sliderDown-prop">sliderDown</a>.</p>
 
 
 <h3 class="fn"><a name="valueChanged" />void valueChanged (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the slider value has changed, with
 the new slider <i>value</i> as argument.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

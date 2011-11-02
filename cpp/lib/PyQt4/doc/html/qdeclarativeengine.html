@@ -18,14 +18,14 @@ QDeclarativeEngine.</p>
 <p>Prior to creating any QML components, an application must have
 created a QDeclarativeEngine to gain access to a QML context. The
 following example shows how to create a simple Text item.</p>
-<pre class="highlightedCode brush: cpp">
- QDeclarativeEngine engine;
- QDeclarativeComponent component(&amp;engine);
- component.setData("import QtQuick 1.0\nText { text: \"Hello world!\" }", QUrl());
- QDeclarativeItem *item = qobject_cast&lt;QDeclarativeItem *&gt;(component.create());
+<pre class="cpp">
+ <span class="type">QDeclarativeEngine</span> engine;
+ <span class="type"><a href="qdeclarativecomponent.html">QDeclarativeComponent</a></span> component(<span class="operator">&amp;</span>engine);
+ component<span class="operator">.</span>setData(<span class="string">"import QtQuick 1.0\nText { text: \"Hello world!\" }"</span><span class="operator">,</span> <span class="type"><a href="qurl.html">QUrl</a></span>());
+ <span class="type"><a href="qdeclarativeitem.html">QDeclarativeItem</a></span> <span class="operator">*</span>item <span class="operator">=</span> qobject_cast<span class="operator">&lt;</span><span class="type"><a href="qdeclarativeitem.html">QDeclarativeItem</a></span> <span class="operator">*</span><span class="operator">&gt;</span>(component<span class="operator">.</span>create());
 
-<span class="comment"> //add item to view, etc</span>
- ...
+ <span class="comment">//add item to view, etc</span>
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 </pre>
 <p>In this case, the Text item will be created in the engine's
 <a href="qdeclarativeengine.html#rootContext">root context</a>.</p>
@@ -34,14 +34,14 @@ following example shows how to create a simple Text item.</p>
 collected by the JavaScript engine. The two ownership options
 are:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeEngine.CppOwnership</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The object is owned by C++ code, and will
 never be deleted by QML. The JavaScript destroy() method cannot be
 used on objects with CppOwnership. This option is similar to
@@ -50,7 +50,7 @@ used on objects with CppOwnership. This option is similar to
 <tr>
 <td class="topAlign">
 <tt>QDeclarativeEngine.JavaScriptOwnership</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The object is owned by JavaScript. When the
 object is returned to QML as the return value of a method call or
 property access, QML will delete the object if there are no
@@ -87,15 +87,15 @@ before any QML sources files are loaded.</p>
 <p>Note that images loaded from a <a href="qdeclarativeimageprovider.html">QDeclarativeImageProvider</a> are
 cached by <a href="qpixmapcache.html">QPixmapCache</a>, similar to
 any image loaded by QML.</p>
-<p>See also <a href="qdeclarativeengine.html#removeImageProvider">removeImageProvider</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#removeImageProvider">removeImageProvider</a>().</p>
 
 
 <h3 class="fn"><a name="addImportPath" />QDeclarativeEngine.addImportPath (<i>self</i>, QString&#160;<i>dir</i>)</h3><p>Adds <i>path</i> as a directory where the engine searches for
 installed modules in a URL-based directory structure. The
 <i>path</i> may be a local filesystem directory or a URL.</p>
 <p>The newly added <i>path</i> will be first in the <a href="qdeclarativeengine.html#importPathList">importPathList</a>().</p>
-<p>See also <a href="qdeclarativeengine.html#setImportPathList">setImportPathList</a>(),
-l, and <a href="qdeclarativemodules.html#qml-modules">QML
+<p><b>See also</b> <a href="qdeclarativeengine.html#setImportPathList">setImportPathList</a>()
+and <a href="qdeclarativemodules.html#qml-modules">QML
 Modules</a>.</p>
 
 
@@ -105,7 +105,7 @@ native plugins for imported modules (referenced in the
 <p>By default, the list contains only <tt>.</tt>, i.e. the engine
 searches in the directory of the <tt>qmldir</tt> file itself.</p>
 <p>The newly added <i>path</i> will be first in the <a href="qdeclarativeengine.html#pluginPathList">pluginPathList</a>().</p>
-<p>See also <a href="qdeclarativeengine.html#setPluginPathList">setPluginPathList</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#setPluginPathList">setPluginPathList</a>().</p>
 
 
 <h3 class="fn"><a name="baseUrl" /><a href="qurl.html">QUrl</a> QDeclarativeEngine.baseUrl (<i>self</i>)</h3><p>Return the base URL for this engine. The base URL is only used
@@ -113,7 +113,7 @@ to resolve components when a relative URL is passed to the <a href="qdeclarative
 constructor.</p>
 <p>If a base URL has not been explicitly set, this method returns
 the application's current working directory.</p>
-<p>See also <a href="qdeclarativeengine.html#setBaseUrl">setBaseUrl</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#setBaseUrl">setBaseUrl</a>().</p>
 
 
 <h3 class="fn"><a name="clearComponentCache" />QDeclarativeEngine.clearComponentCache (<i>self</i>)</h3><p>Clears the engine's internal component cache.</p>
@@ -127,7 +127,7 @@ component to be reloaded.</p>
 <p>When the <a href="qdeclarativeengine.html">QDeclarativeEngine</a> instantiates a
 <a href="qobject.html">QObject</a>, the context is set
 automatically.</p>
-<p>See also <a href="qdeclarativeengine.html#setContextForObject">setContextForObject</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#setContextForObject">setContextForObject</a>().</p>
 
 
 <h3 class="fn"><a name="imageProvider" /><a href="qdeclarativeimageprovider.html">QDeclarativeImageProvider</a> QDeclarativeEngine.imageProvider (<i>self</i>, QString&#160;<i>id</i>)</h3><p>Returns the <a href="qdeclarativeimageprovider.html">QDeclarativeImageProvider</a> set
@@ -147,7 +147,7 @@ declarative extensions plugins.</p>
 executable, paths specified in the <tt>QML_IMPORT_PATH</tt>
 environment variable, and the builtin <tt>ImportsPath</tt> from
 <a href="qlibraryinfo.html">QLibraryInfo</a>.</p>
-<p>See also <a href="qdeclarativeengine.html#addImportPath">addImportPath</a>() and
+<p><b>See also</b> <a href="qdeclarativeengine.html#addImportPath">addImportPath</a>() and
 <a href="qdeclarativeengine.html#setImportPathList">setImportPathList</a>().</p>
 
 
@@ -168,22 +168,22 @@ been created, the <a href="qdeclarativenetworkaccessmanagerfactory.html">QDeclar
 will be used to create the <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a>; otherwise
 the returned <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a> will have no
 proxy or cache set.</p>
-<p>See also <a href="qdeclarativeengine.html#setNetworkAccessManagerFactory">setNetworkAccessManagerFactory</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#setNetworkAccessManagerFactory">setNetworkAccessManagerFactory</a>().</p>
 
 
 <h3 class="fn"><a name="networkAccessManagerFactory" /><a href="qdeclarativenetworkaccessmanagerfactory.html">QDeclarativeNetworkAccessManagerFactory</a> QDeclarativeEngine.networkAccessManagerFactory (<i>self</i>)</h3><p>Returns the current <a href="qdeclarativenetworkaccessmanagerfactory.html">QDeclarativeNetworkAccessManagerFactory</a>.</p>
-<p>See also <a href="qdeclarativeengine.html#setNetworkAccessManagerFactory">setNetworkAccessManagerFactory</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#setNetworkAccessManagerFactory">setNetworkAccessManagerFactory</a>().</p>
 
 
 <h3 class="fn"><a name="objectOwnership" /><a href="qdeclarativeengine.html#ObjectOwnership-enum">ObjectOwnership</a> QDeclarativeEngine.objectOwnership (<a href="qobject.html">QObject</a>)</h3><p>Returns the ownership of <i>object</i>.</p>
-<p>See also <a href="qdeclarativeengine.html#setObjectOwnership">setObjectOwnership</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#setObjectOwnership">setObjectOwnership</a>().</p>
 
 
 <h3 class="fn"><a name="offlineStoragePath" />QString QDeclarativeEngine.offlineStoragePath (<i>self</i>)</h3><h3 class="fn"><a name="outputWarningsToStandardError" />bool QDeclarativeEngine.outputWarningsToStandardError (<i>self</i>)</h3><p>Returns true if warning messages will be output to stderr in
 addition to being emitted by the <a href="qdeclarativeengine.html#warnings">warnings</a>() signal, otherwise
 false.</p>
 <p>The default value is true.</p>
-<p>See also <a href="qdeclarativeengine.html#setOutputWarningsToStandardError">setOutputWarningsToStandardError</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#setOutputWarningsToStandardError">setOutputWarningsToStandardError</a>().</p>
 
 
 <h3 class="fn"><a name="pluginPathList" />QStringList QDeclarativeEngine.pluginPathList (<i>self</i>)</h3><p>Returns the list of directories where the engine searches for
@@ -191,14 +191,14 @@ native plugins for imported modules (referenced in the
 <tt>qmldir</tt> file).</p>
 <p>By default, the list contains only <tt>.</tt>, i.e. the engine
 searches in the directory of the <tt>qmldir</tt> file itself.</p>
-<p>See also <a href="qdeclarativeengine.html#addPluginPath">addPluginPath</a>() and
+<p><b>See also</b> <a href="qdeclarativeengine.html#addPluginPath">addPluginPath</a>() and
 <a href="qdeclarativeengine.html#setPluginPathList">setPluginPathList</a>().</p>
 
 
 <h3 class="fn"><a name="removeImageProvider" />QDeclarativeEngine.removeImageProvider (<i>self</i>, QString&#160;<i>id</i>)</h3><p>Removes the <a href="qdeclarativeimageprovider.html">QDeclarativeImageProvider</a> for
 <i>providerId</i>.</p>
 <p>Returns the provider if it was found; otherwise returns 0.</p>
-<p>See also <a href="qdeclarativeengine.html#addImageProvider">addImageProvider</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#addImageProvider">addImageProvider</a>().</p>
 
 
 <h3 class="fn"><a name="rootContext" /><a href="qdeclarativecontext.html">QDeclarativeContext</a> QDeclarativeEngine.rootContext (<i>self</i>)</h3><p>Returns the engine's root context.</p>
@@ -211,7 +211,7 @@ root context.</p>
 
 
 <h3 class="fn"><a name="setBaseUrl" />QDeclarativeEngine.setBaseUrl (<i>self</i>, <a href="qurl.html">QUrl</a>)</h3><p>Set the base URL for this engine to <i>url</i>.</p>
-<p>See also <a href="qdeclarativeengine.html#baseUrl">baseUrl</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#baseUrl">baseUrl</a>().</p>
 
 
 <h3 class="fn"><a name="setContextForObject" />QDeclarativeEngine.setContextForObject (<a href="qobject.html">QObject</a>, <a href="qdeclarativecontext.html">QDeclarativeContext</a>)</h3><p>Sets the <a href="qdeclarativecontext.html">QDeclarativeContext</a> for the
@@ -220,7 +220,7 @@ context, a warning is output, but the context is not changed.</p>
 <p>When the <a href="qdeclarativeengine.html">QDeclarativeEngine</a> instantiates a
 <a href="qobject.html">QObject</a>, the context is set
 automatically.</p>
-<p>See also <a href="qdeclarativeengine.html#contextForObject">contextForObject</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#contextForObject">contextForObject</a>().</p>
 
 
 <h3 class="fn"><a name="setImportPathList" />QDeclarativeEngine.setImportPathList (<i>self</i>, QStringList&#160;<i>paths</i>)</h3><p>Sets <i>paths</i> as the list of directories where the engine
@@ -230,7 +230,7 @@ structure.</p>
 executable, paths specified in the <tt>QML_IMPORT_PATH</tt>
 environment variable, and the builtin <tt>ImportsPath</tt> from
 <a href="qlibraryinfo.html">QLibraryInfo</a>.</p>
-<p>See also <a href="qdeclarativeengine.html#importPathList">importPathList</a>() and
+<p><b>See also</b> <a href="qdeclarativeengine.html#importPathList">importPathList</a>() and
 <a href="qdeclarativeengine.html#addImportPath">addImportPath</a>().</p>
 
 
@@ -240,11 +240,11 @@ is used for all network access by QML. By implementing a factory it
 is possible to create custom <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a> with
 specialized caching, proxy and cookie support.</p>
 <p>The factory must be set before executing the engine.</p>
-<p>See also <a href="qdeclarativeengine.html#networkAccessManagerFactory">networkAccessManagerFactory</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#networkAccessManagerFactory">networkAccessManagerFactory</a>().</p>
 
 
 <h3 class="fn"><a name="setObjectOwnership" />QDeclarativeEngine.setObjectOwnership (<a href="qobject.html">QObject</a>, <a href="qdeclarativeengine.html#ObjectOwnership-enum">ObjectOwnership</a>)</h3><p>Sets the <i>ownership</i> of <i>object</i>.</p>
-<p>See also <a href="qdeclarativeengine.html#objectOwnership">objectOwnership</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#objectOwnership">objectOwnership</a>().</p>
 
 
 <h3 class="fn"><a name="setOfflineStoragePath" />QDeclarativeEngine.setOfflineStoragePath (<i>self</i>, QString&#160;<i>dir</i>)</h3><h3 class="fn"><a name="setOutputWarningsToStandardError" />QDeclarativeEngine.setOutputWarningsToStandardError (<i>self</i>, bool)</h3><p>Set whether warning messages will be output to stderr to
@@ -255,7 +255,7 @@ will be output to stderr and emitted by the <a href="qdeclarativeengine.html#war
 emitted. This allows applications to handle warning output
 themselves.</p>
 <p>The default value is true.</p>
-<p>See also <a href="qdeclarativeengine.html#outputWarningsToStandardError">outputWarningsToStandardError</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeengine.html#outputWarningsToStandardError">outputWarningsToStandardError</a>().</p>
 
 
 <h3 class="fn"><a name="setPluginPathList" />QDeclarativeEngine.setPluginPathList (<i>self</i>, QStringList&#160;<i>paths</i>)</h3><p>Sets the list of directories where the engine searches for
@@ -263,7 +263,7 @@ native plugins for imported modules (referenced in the
 <tt>qmldir</tt> file) to <i>paths</i>.</p>
 <p>By default, the list contains only <tt>.</tt>, i.e. the engine
 searches in the directory of the <tt>qmldir</tt> file itself.</p>
-<p>See also <a href="qdeclarativeengine.html#pluginPathList">pluginPathList</a>() and
+<p><b>See also</b> <a href="qdeclarativeengine.html#pluginPathList">pluginPathList</a>() and
 <a href="qdeclarativeengine.html#addPluginPath">addPluginPath</a>().</p>
 
 
@@ -273,4 +273,4 @@ like to quit.</p>
 
 <h3 class="fn"><a name="warnings" />void warnings (const QList&lt;QDeclarativeError&gt;&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when <i>warnings</i> messages are
 generated by QML.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

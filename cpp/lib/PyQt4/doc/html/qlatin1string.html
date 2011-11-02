@@ -18,17 +18,17 @@ functions such as <a href="qstring.html#insert">insert()</a>,
 <a href="qstring.html#replace">replace()</a>, and <a href="qstring.html#indexOf">indexOf()</a>. These functions are usually
 optimized to avoid constructing a <a href="qstring.html">QString</a> object for the <tt>const char *</tt>
 data. For example, assuming <tt>str</tt> is a <a href="qstring.html">QString</a>,</p>
-<pre class="highlightedCode brush: cpp">
- if (str == "auto" || str == "extern"
-         || str == "static" || str == "register") {
-     ...
+<pre class="cpp">
+ <span class="keyword">if</span> (str <span class="operator">=</span><span class="operator">=</span> <span class="string">"auto"</span> <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> <span class="string">"extern"</span>
+         <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> <span class="string">"static"</span> <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> <span class="string">"register"</span>) {
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
 <p>is much faster than</p>
-<pre class="highlightedCode brush: cpp">
- if (str == QString("auto") || str == QString("extern")
-         || str == QString("static") || str == QString("register")) {
-     ...
+<pre class="cpp">
+ <span class="keyword">if</span> (str <span class="operator">=</span><span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"auto"</span>) <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"extern"</span>)
+         <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"static"</span>) <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"register"</span>)) {
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
 <p>because it doesn't construct four temporary <a href="qstring.html">QString</a> objects and make a deep copy of the
@@ -40,12 +40,12 @@ char *</tt> API. To provide an efficient way of specifying constant
 Latin-1 strings, Qt provides the QLatin1String, which is just a
 very thin wrapper around a <tt>const char *</tt>. Using
 QLatin1String, the example code above becomes</p>
-<pre class="highlightedCode brush: cpp">
- if (str == QLatin1String("auto")
-         || str == QLatin1String("extern")
-         || str == QLatin1String("static")
-         || str == QLatin1String("register") {
-     ...
+<pre class="cpp">
+ <span class="keyword">if</span> (str <span class="operator">=</span><span class="operator">=</span> QLatin1String(<span class="string">"auto"</span>)
+         <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> QLatin1String(<span class="string">"extern"</span>)
+         <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> QLatin1String(<span class="string">"static"</span>)
+         <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> QLatin1String(<span class="string">"register"</span>) {
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
 <p>This is a bit longer to type, but it provides exactly the same
@@ -55,8 +55,8 @@ converting the Latin-1 strings using <a href="qstring.html#fromLatin1">QString.f
 QLatin1String &amp;) constructor, QLatin1String can be used
 everywhere a <a href="qstring.html">QString</a> is expected. For
 example:</p>
-<pre class="highlightedCode brush: cpp">
- QLabel *label = new QLabel(QLatin1String("MOD"), this);
+<pre class="cpp">
+ <span class="type"><a href="qlabel.html">QLabel</a></span> <span class="operator">*</span>label <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlabel.html">QLabel</a></span>(QLatin1String(<span class="string">"MOD"</span>)<span class="operator">,</span> <span class="keyword">this</span>);
 </pre><hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QLatin1String" />QLatin1String.__init__ (<i>self</i>, str&#160;<i>s</i>)</h3><p>Constructs a <a href="qlatin1string.html">QLatin1String</a>
 object that stores <i>str</i>. Note that if <i>str</i> is 0, an
 empty string is created; this case is handled by <a href="qstring.html">QString</a>.</p>
@@ -64,10 +64,10 @@ empty string is created; this case is handled by <a href="qstring.html">QString<
 guarantee that <i>str</i> will not be deleted or modified as long
 as the <a href="qlatin1string.html">QLatin1String</a> object
 exists.</p>
-<p>See also <a href="qlatin1string.html#latin1">latin1</a>().</p>
+<p><b>See also</b> <a href="qlatin1string.html#latin1">latin1</a>().</p>
 
 
 <h3 class="fn"><a name="QLatin1String-2" />QLatin1String.__init__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>)</h3><h3 class="fn"><a name="latin1" />str QLatin1String.latin1 (<i>self</i>)</h3><p>Returns the Latin-1 string stored in this object.</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QLatin1String.__eq__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__eq__-2" />bool QLatin1String.__eq__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__eq__-3" />bool QLatin1String.__eq__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ge__" />bool QLatin1String.__ge__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ge__-2" />bool QLatin1String.__ge__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__gt__" />bool QLatin1String.__gt__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__gt__-2" />bool QLatin1String.__gt__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__le__" />bool QLatin1String.__le__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__le__-2" />bool QLatin1String.__le__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__lt__" />bool QLatin1String.__lt__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__lt__-2" />bool QLatin1String.__lt__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__" />bool QLatin1String.__ne__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ne__-2" />bool QLatin1String.__ne__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__-3" />bool QLatin1String.__ne__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__repr__" />str QLatin1String.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QLatin1String.__eq__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__eq__-2" />bool QLatin1String.__eq__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__eq__-3" />bool QLatin1String.__eq__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ge__" />bool QLatin1String.__ge__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ge__-2" />bool QLatin1String.__ge__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__gt__" />bool QLatin1String.__gt__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__gt__-2" />bool QLatin1String.__gt__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__le__" />bool QLatin1String.__le__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__le__-2" />bool QLatin1String.__le__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__lt__" />bool QLatin1String.__lt__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__lt__-2" />bool QLatin1String.__lt__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__" />bool QLatin1String.__ne__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ne__-2" />bool QLatin1String.__ne__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ne__-3" />bool QLatin1String.__ne__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__repr__" />str QLatin1String.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

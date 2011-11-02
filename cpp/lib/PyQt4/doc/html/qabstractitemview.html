@@ -22,76 +22,44 @@ scrolling, item editing, and selections. The keyboard navigation
 implements this functionality:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Keys</th>
 <th>Functionality</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>Arrow keys</p>
-</td>
-<td>
-<p>Changes the current item and selects it.</p>
-</td>
+<tr class="odd" valign="top">
+<td>Arrow keys</td>
+<td>Changes the current item and selects it.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Ctrl+Arrow keys</p>
-</td>
-<td>
-<p>Changes the current item but does not select it.</p>
-</td>
+<tr class="even" valign="top">
+<td>Ctrl+Arrow keys</td>
+<td>Changes the current item but does not select it.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Shift+Arrow keys</p>
-</td>
-<td>
-<p>Changes the current item and selects it. The previously selected
-item(s) is not deselected.</p>
-</td>
+<tr class="odd" valign="top">
+<td>Shift+Arrow keys</td>
+<td>Changes the current item and selects it. The previously
+selected item(s) is not deselected.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Ctr+Space</p>
-</td>
-<td>
-<p>Toggles selection of the current item.</p>
-</td>
+<tr class="even" valign="top">
+<td>Ctr+Space</td>
+<td>Toggles selection of the current item.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Tab/Backtab</p>
-</td>
-<td>
-<p>Changes the current item to the next/previous item.</p>
-</td>
+<tr class="odd" valign="top">
+<td>Tab/Backtab</td>
+<td>Changes the current item to the next/previous item.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Home/End</p>
-</td>
-<td>
-<p>Selects the first/last item in the model.</p>
-</td>
+<tr class="even" valign="top">
+<td>Home/End</td>
+<td>Selects the first/last item in the model.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Page up/Page down</p>
-</td>
-<td>
-<p>Scrolls the rows shown up/down by the number of visible rows in
-the view.</p>
-</td>
+<tr class="odd" valign="top">
+<td>Page up/Page down</td>
+<td>Scrolls the rows shown up/down by the number of visible rows in
+the view.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Ctrl+A</p>
-</td>
-<td>
-<p>Selects all items in the model.</p>
-</td>
+<tr class="even" valign="top">
+<td>Ctrl+A</td>
+<td>Selects all items in the model.</td>
 </tr>
 </table>
 <p>Note that the above table assumes that the <a href="qabstractitemview.html#selectionMode-prop">selection mode</a>
@@ -115,10 +83,10 @@ and <a href="qabstractitemview.html#verticalScrollMode-prop">setVerticalScrollMo
 To set the range of the scroll bars, you can, for example,
 reimplement the view's <a href="qabstractitemview.html#resizeEvent">resizeEvent</a>()
 function:</p>
-<pre class="highlightedCode brush: cpp">
- void MyView.resizeEvent(QResizeEvent *event) {
-     horizontalScrollBar()-&gt;setRange(0, realWidth - width());
-     ...
+<pre class="cpp">
+ <span class="type">void</span> MyView<span class="operator">.</span><a href="qabstractitemview.html#resizeEvent">resizeEvent</a>(<span class="type"><a href="qresizeevent.html">QResizeEvent</a></span> <span class="operator">*</span>event) {
+     horizontalScrollBar()<span class="operator">-</span><span class="operator">&gt;</span>setRange(<span class="number">0</span><span class="operator">,</span> realWidth <span class="operator">-</span> width());
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
 <p>Note that the range is not updated until the widget is
@@ -143,102 +111,102 @@ painting operations take place on the viewport.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="CursorAction-enum" />QAbstractItemView.CursorAction</h3><p>This enum describes the different ways to navigate between
 items,</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.MoveUp</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Move to the item above the current item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.MoveDown</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Move to the item below the current item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.MoveLeft</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Move to the item left of the current
 item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.MoveRight</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Move to the item right of the current
 item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.MoveHome</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Move to the top-left corner item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.MoveEnd</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">Move to the bottom-right corner item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.MovePageUp</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">Move one page up above the current item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.MovePageDown</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">Move one page down below the current
 item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.MoveNext</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">Move to the item after the current item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.MovePrevious</tt></td>
-<td class=" topAlign"><tt>9</tt></td>
+<td class="topAlign"><tt>9</tt></td>
 <td class="topAlign">Move to the item before the current item.</td>
 </tr>
 </table>
-<p>See also <a href="qabstractitemview.html#moveCursor">moveCursor</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#moveCursor">moveCursor</a>().</p>
 
 
 <h3 class="fn"><a name="DragDropMode-enum" />QAbstractItemView.DragDropMode</h3><p>Describes the various drag and drop events the view can act
 upon. By default the view does not support dragging or dropping
 (<tt>NoDragDrop</tt>).</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.NoDragDrop</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Does not support dragging or dropping.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.DragOnly</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The view supports dragging of its own
 items</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.DropOnly</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The view accepts drops</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.DragDrop</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The view supports both dragging and
 dropping</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.InternalMove</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The view accepts move (<b>not copy</b>)
 operations only from itself.</td>
 </tr>
@@ -246,7 +214,7 @@ operations only from itself.</td>
 <p>Note that the model used needs to provide support for drag and
 drop operations.</p>
 <p>This enum was introduced or modified in Qt 4.2.</p>
-<p>See also <a href="qabstractitemview.html#dragDropMode-prop">setDragDropMode</a>()
+<p><b>See also</b> <a href="qabstractitemview.html#dragDropMode-prop">setDragDropMode</a>()
 and <a href="model-view-programming.html#using-drag-and-drop-with-item-views">Using
 drag and drop with item views</a>.</p>
 
@@ -254,29 +222,29 @@ drag and drop with item views</a>.</p>
 <h3 class="fn"><a name="DropIndicatorPosition-enum" />QAbstractItemView.DropIndicatorPosition</h3><p>This enum indicates the position of the drop indicator in
 relation to the index at the current mouse position:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.OnItem</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The item will be dropped on the index.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.AboveItem</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The item will be dropped above the index.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.BelowItem</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The item will be dropped below the index.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.OnViewport</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The item will be dropped onto a region of the
 viewport with no items. The way each view handles items dropped
 onto the viewport depends on the behavior of the underlying model
@@ -288,7 +256,7 @@ in use.</td>
 <h3 class="fn"><a name="EditTrigger-enum" />QAbstractItemView.EditTrigger</h3><p>This enum describes actions which will initiate item
 editing.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -296,46 +264,46 @@ editing.</p>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.NoEditTriggers</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">No editing possible.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.CurrentChanged</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Editing start whenever current item
 changes.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.DoubleClicked</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Editing starts when an item is double
 clicked.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.SelectedClicked</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Editing starts when clicking on an already
 selected item.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.EditKeyPressed</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">Editing starts when the platform edit key has
 been pressed over an item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.AnyKeyPressed</tt></td>
-<td class=" topAlign"><tt>16</tt></td>
+<td class="topAlign"><tt>16</tt></td>
 <td class="topAlign">Editing starts when any key is pressed over an
 item.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.AllEditTriggers</tt></td>
-<td class=" topAlign"><tt>31</tt></td>
+<td class="topAlign"><tt>31</tt></td>
 <td class="topAlign">Editing starts for all above actions.</td>
 </tr>
 </table>
@@ -344,34 +312,34 @@ combination of EditTrigger values.</p>
 
 
 <h3 class="fn"><a name="ScrollHint-enum" />QAbstractItemView.ScrollHint</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.EnsureVisible</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Scroll to ensure that the item is
 visible.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.PositionAtTop</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Scroll to position the item at the top of the
 viewport.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.PositionAtBottom</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Scroll to position the item at the bottom of
 the viewport.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.PositionAtCenter</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Scroll to position the item at the center of
 the viewport.</td>
 </tr>
@@ -379,21 +347,21 @@ the viewport.</td>
 
 
 <h3 class="fn"><a name="ScrollMode-enum" />QAbstractItemView.ScrollMode</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.ScrollPerItem</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The view will scroll the contents one item at
 a time.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.ScrollPerPixel</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The view will scroll the contents one pixel at
 a time.</td>
 </tr>
@@ -402,24 +370,24 @@ a time.</td>
 
 
 <h3 class="fn"><a name="SelectionBehavior-enum" />QAbstractItemView.SelectionBehavior</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.SelectItems</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Selecting single items.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.SelectRows</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Selecting only rows.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.SelectColumns</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Selecting only columns.</td>
 </tr>
 </table>
@@ -428,7 +396,7 @@ a time.</td>
 <h3 class="fn"><a name="SelectionMode-enum" />QAbstractItemView.SelectionMode</h3><p>This enum indicates how the view responds to user
 selections:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -436,7 +404,7 @@ selections:</p>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.SingleSelection</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">When the user selects an item, any
 already-selected item becomes unselected, and the user cannot
 unselect the selected item by clicking on it.</td>
@@ -444,7 +412,7 @@ unselect the selected item by clicking on it.</td>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.ContiguousSelection</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">When the user selects an item in the usual
 way, the selection is cleared and the new item selected. However,
 if the user presses the Shift key while clicking on an item, all
@@ -454,7 +422,7 @@ unselected, depending on the state of the clicked item.</td>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.ExtendedSelection</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">When the user selects an item in the usual
 way, the selection is cleared and the new item selected. However,
 if the user presses the Ctrl key when clicking on an item, the
@@ -467,7 +435,7 @@ items can be selected by dragging the mouse over them.</td>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.MultiSelection</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">When the user selects an item in the usual
 way, the selection status of that item is toggled and the other
 items are left alone. Multiple items can be toggled by dragging the
@@ -475,7 +443,7 @@ mouse over them.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.NoSelection</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Items cannot be selected.</td>
 </tr>
 </table>
@@ -486,49 +454,49 @@ ExtendedSelection.</p>
 <h3 class="fn"><a name="State-enum" />QAbstractItemView.State</h3><p>Describes the different states the view can be in. This is
 usually only interesting when reimplementing your own view.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.NoState</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The is the default state.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.DraggingState</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The user is dragging items.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.DragSelectingState</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The user is selecting items.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractItemView.EditingState</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The user is editing an item in a widget
 editor.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.ExpandingState</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The user is opening a branch of items.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.CollapsingState</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The user is closing a branch of items.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractItemView.AnimatingState</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">The item view is performing an animation.</td>
 </tr>
 </table>
@@ -538,7 +506,7 @@ editor.</td>
 
 <h3 class="fn"><a name="alternatingRowColors" />bool QAbstractItemView.alternatingRowColors (<i>self</i>)</h3><h3 class="fn"><a name="autoScrollMargin" />int QAbstractItemView.autoScrollMargin (<i>self</i>)</h3><h3 class="fn"><a name="clearSelection" />QAbstractItemView.clearSelection (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void clearSelection()</tt>.</p><p>Deselects all selected items. The current index will not be
 changed.</p>
-<p>See also <a href="qabstractitemview.html#setSelection">setSelection</a>() and
+<p><b>See also</b> <a href="qabstractitemview.html#setSelection">setSelection</a>() and
 <a href="qabstractitemview.html#selectAll">selectAll</a>().</p>
 
 
@@ -546,17 +514,17 @@ changed.</p>
 is used to specify how the view should respond to the end of the
 editing operation. For example, the hint may indicate that the next
 item in the view should be opened for editing.</p>
-<p>See also <a href="qabstractitemview.html#edit">edit</a>() and
-<a href="qabstractitemview.html#commitData">commitData</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#edit">edit</a>()
+and <a href="qabstractitemview.html#commitData">commitData</a>().</p>
 
 
 <h3 class="fn"><a name="closePersistentEditor" />QAbstractItemView.closePersistentEditor (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Closes the persistent editor for the item at the given
 <i>index</i>.</p>
-<p>See also <a href="qabstractitemview.html#openPersistentEditor">openPersistentEditor</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#openPersistentEditor">openPersistentEditor</a>().</p>
 
 
 <h3 class="fn"><a name="commitData" />QAbstractItemView.commitData (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>editor</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void commitData(QWidget *)</tt>.</p><p>Commit the data in the <i>editor</i> to the model.</p>
-<p>See also <a href="qabstractitemview.html#closeEditor">closeEditor</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#closeEditor">closeEditor</a>().</p>
 
 
 <h3 class="fn"><a name="currentChanged" />QAbstractItemView.currentChanged (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>current</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>previous</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void currentChanged(const QModelIndex&amp;,const QModelIndex&amp;)</tt>.</p><p>This slot is called when a new item becomes the current item.
@@ -566,7 +534,7 @@ index, and the new item by the <i>current</i> index.</p>
 
 
 <h3 class="fn"><a name="currentIndex" /><a href="qmodelindex.html">QModelIndex</a> QAbstractItemView.currentIndex (<i>self</i>)</h3><p>Returns the model index of the current item.</p>
-<p>See also <a href="qabstractitemview.html#setCurrentIndex">setCurrentIndex</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#setCurrentIndex">setCurrentIndex</a>().</p>
 
 
 <h3 class="fn"><a name="dataChanged" />QAbstractItemView.dataChanged (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>topLeft</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>bottomRight</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void dataChanged(const QModelIndex&amp;,const QModelIndex&amp;)</tt>.</p><p>This slot is called when items are changed in the model. The
@@ -581,7 +549,7 @@ and implement a <a href="qabstractscrollarea.html#paintEvent">paintEvent</a>() i
 subclass of <a href="qabstractitemview.html">QAbstractItemView</a>,
 you should translate the area given by the paint event with the
 offset returned from this function.</p>
-<p>See also <a href="qabstractitemview.html#scrollDirtyRegion">scrollDirtyRegion</a>()
+<p><b>See also</b> <a href="qabstractitemview.html#scrollDirtyRegion">scrollDirtyRegion</a>()
 and <a href="qabstractitemview.html#setDirtyRegion">setDirtyRegion</a>().</p>
 
 
@@ -590,7 +558,7 @@ and <a href="qabstractitemview.html#setDirtyRegion">setDirtyRegion</a>().</p>
 and drop operation enters the widget. If the drag is over a valid
 dropping place (e.g. over an item that accepts drops), the event is
 accepted; otherwise it is ignored.</p>
-<p>See also <a href="qabstractitemview.html#dropEvent">dropEvent</a>() and <a href="qabstractitemview.html#startDrag">startDrag</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#dropEvent">dropEvent</a>() and <a href="qabstractitemview.html#startDrag">startDrag</a>().</p>
 
 
 <h3 class="fn"><a name="dragLeaveEvent" />QAbstractItemView.dragLeaveEvent (<i>self</i>, <a href="qdragleaveevent.html">QDragLeaveEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#dragLeaveEvent">QWidget.dragLeaveEvent</a>().</p>
@@ -605,14 +573,14 @@ during a drag and drop operation over the widget. It can cause the
 view to scroll if, for example, the user drags a selection to
 view's right or bottom edge. In this case, the event will be
 accepted; otherwise it will be ignored.</p>
-<p>See also <a href="qabstractitemview.html#dropEvent">dropEvent</a>() and <a href="qabstractitemview.html#startDrag">startDrag</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#dropEvent">dropEvent</a>() and <a href="qabstractitemview.html#startDrag">startDrag</a>().</p>
 
 
 <h3 class="fn"><a name="dropEvent" />QAbstractItemView.dropEvent (<i>self</i>, <a href="qdropevent.html">QDropEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#dropEvent">QWidget.dropEvent</a>().</p>
 <p>This function is called with the given <i>event</i> when a drop
 event occurs over the widget. If the model accepts the even
 position the drop event is accepted; otherwise it is ignored.</p>
-<p>See also <a href="qabstractitemview.html#startDrag">startDrag</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#startDrag">startDrag</a>().</p>
 
 
 <h3 class="fn"><a name="dropIndicatorPosition" /><a href="qabstractitemview.html#DropIndicatorPosition-enum">DropIndicatorPosition</a> QAbstractItemView.dropIndicatorPosition (<i>self</i>)</h3><p>Returns the position of the drop indicator in relation to the
@@ -627,7 +595,7 @@ the current index defines the next and previous items to edit,
 users may find that keyboard navigation does not work as expected.
 To provide consistent navigation behavior, call <a href="qabstractitemview.html#setCurrentIndex">setCurrentIndex</a>()
 before this function with the same model index.</p>
-<p>See also <a href="qmodelindex.html#flags">QModelIndex.flags</a>().</p>
+<p><b>See also</b> <a href="qmodelindex.html#flags">QModelIndex.flags</a>().</p>
 
 
 <h3 class="fn"><a name="edit-2" />bool QAbstractItemView.edit (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>, <a href="qabstractitemview.html#EditTrigger-enum">EditTrigger</a>&#160;<i>trigger</i>, <a href="qevent.html">QEvent</a>&#160;<i>event</i>)</h3><p>Starts editing the item at <i>index</i>, creating an editor if
@@ -638,12 +606,12 @@ returns false.</p>
 <i>event</i>.</p>
 <p>Editing can be forced by specifying the <i>trigger</i> to be
 <a href="qabstractitemview.html#EditTrigger-enum">QAbstractItemView.AllEditTriggers</a>.</p>
-<p>See also <a href="qabstractitemview.html#closeEditor">closeEditor</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#closeEditor">closeEditor</a>().</p>
 
 
 <h3 class="fn"><a name="editorDestroyed" />QAbstractItemView.editorDestroyed (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>editor</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void editorDestroyed(QObject *)</tt>.</p><p>This function is called when the given <i>editor</i> has been
 destroyed.</p>
-<p>See also <a href="qabstractitemview.html#closeEditor">closeEditor</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#closeEditor">closeEditor</a>().</p>
 
 
 <h3 class="fn"><a name="editTriggers" /><a href="qabstractitemview-edittriggers.html">EditTriggers</a> QAbstractItemView.editTriggers (<i>self</i>)</h3><h3 class="fn"><a name="event" />bool QAbstractItemView.event (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -651,14 +619,14 @@ destroyed.</p>
 
 <h3 class="fn"><a name="executeDelayedItemsLayout" />QAbstractItemView.executeDelayedItemsLayout (<i>self</i>)</h3><p>Executes the scheduled layouts without waiting for the event
 processing to begin.</p>
-<p>See also <a href="qabstractitemview.html#scheduleDelayedItemsLayout">scheduleDelayedItemsLayout</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#scheduleDelayedItemsLayout">scheduleDelayedItemsLayout</a>().</p>
 
 
 <h3 class="fn"><a name="focusInEvent" />QAbstractItemView.focusInEvent (<i>self</i>, <a href="qfocusevent.html">QFocusEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#focusInEvent">QWidget.focusInEvent</a>().</p>
 <p>This function is called with the given <i>event</i> when the
 widget obtains the focus. By default, the event is ignored.</p>
-<p>See also <a href="qwidget.html#setFocus">setFocus</a>() and
-<a href="qabstractitemview.html#focusOutEvent">focusOutEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#setFocus">setFocus</a>()
+and <a href="qabstractitemview.html#focusOutEvent">focusOutEvent</a>().</p>
 
 
 <h3 class="fn"><a name="focusNextPrevChild" />bool QAbstractItemView.focusNextPrevChild (<i>self</i>, bool&#160;<i>next</i>)</h3><p>Reimplemented from <a href="qwidget.html#focusNextPrevChild">QWidget.focusNextPrevChild</a>().</p>
@@ -667,24 +635,23 @@ widget obtains the focus. By default, the event is ignored.</p>
 <h3 class="fn"><a name="focusOutEvent" />QAbstractItemView.focusOutEvent (<i>self</i>, <a href="qfocusevent.html">QFocusEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#focusOutEvent">QWidget.focusOutEvent</a>().</p>
 <p>This function is called with the given <i>event</i> when the
 widget looses the focus. By default, the event is ignored.</p>
-<p>See also <a href="qwidget.html#clearFocus">clearFocus</a>() and
-<a href="qabstractitemview.html#focusInEvent">focusInEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#clearFocus">clearFocus</a>() and <a href="qabstractitemview.html#focusInEvent">focusInEvent</a>().</p>
 
 
 <h3 class="fn"><a name="hasAutoScroll" />bool QAbstractItemView.hasAutoScroll (<i>self</i>)</h3><h3 class="fn"><a name="horizontalOffset" />int QAbstractItemView.horizontalOffset (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the horizontal offset of the view.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractitemview.html#verticalOffset">verticalOffset</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#verticalOffset">verticalOffset</a>().</p>
 
 
 <h3 class="fn"><a name="horizontalScrollbarAction" />QAbstractItemView.horizontalScrollbarAction (<i>self</i>, int&#160;<i>action</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void horizontalScrollbarAction(int)</tt>.</p><h3 class="fn"><a name="horizontalScrollbarValueChanged" />QAbstractItemView.horizontalScrollbarValueChanged (<i>self</i>, int&#160;<i>value</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void horizontalScrollbarValueChanged(int)</tt>.</p><h3 class="fn"><a name="horizontalScrollMode" /><a href="qabstractitemview.html#ScrollMode-enum">ScrollMode</a> QAbstractItemView.horizontalScrollMode (<i>self</i>)</h3><h3 class="fn"><a name="horizontalStepsPerItem" />int QAbstractItemView.horizontalStepsPerItem (<i>self</i>)</h3><h3 class="fn"><a name="iconSize" /><a href="qsize.html">QSize</a> QAbstractItemView.iconSize (<i>self</i>)</h3><h3 class="fn"><a name="indexAt" /><a href="qmodelindex.html">QModelIndex</a> QAbstractItemView.indexAt (<i>self</i>, <a href="qpoint.html">QPoint</a>&#160;<i>p</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the model index of the item at the viewport coordinates
 <i>point</i>.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractitemview.html#visualRect">visualRect</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#visualRect">visualRect</a>().</p>
 
 
 <h3 class="fn"><a name="indexWidget" /><a href="qwidget.html">QWidget</a> QAbstractItemView.indexWidget (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Returns the widget for the item at the given <i>index</i>.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qabstractitemview.html#setIndexWidget">setIndexWidget</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#setIndexWidget">setIndexWidget</a>().</p>
 
 
 <h3 class="fn"><a name="inputMethodEvent" />QAbstractItemView.inputMethodEvent (<i>self</i>, <a href="qinputmethodevent.html">QInputMethodEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#inputMethodEvent">QWidget.inputMethodEvent</a>().</p>
@@ -703,7 +670,7 @@ column can be marked as hidden or a row in the TreeView.</p>
 <h3 class="fn"><a name="itemDelegate" /><a href="qabstractitemdelegate.html">QAbstractItemDelegate</a> QAbstractItemView.itemDelegate (<i>self</i>)</h3><p>Returns the item delegate used by this view and model. This is
 either one set with <a href="qabstractitemview.html#setItemDelegate">setItemDelegate</a>(), or
 the default one.</p>
-<p>See also <a href="qabstractitemview.html#setItemDelegate">setItemDelegate</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#setItemDelegate">setItemDelegate</a>().</p>
 
 
 <h3 class="fn"><a name="itemDelegate-2" /><a href="qabstractitemdelegate.html">QAbstractItemDelegate</a> QAbstractItemView.itemDelegate (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Returns the item delegate used by this view and model for the
@@ -714,7 +681,7 @@ given <i>index</i>.</p>
 given <i>column</i>. You can call <a href="qabstractitemview.html#itemDelegate">itemDelegate</a>() to get a
 pointer to the current delegate for a given index.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractitemview.html#setItemDelegateForColumn">setItemDelegateForColumn</a>(),
+<p><b>See also</b> <a href="qabstractitemview.html#setItemDelegateForColumn">setItemDelegateForColumn</a>(),
 <a href="qabstractitemview.html#itemDelegateForRow">itemDelegateForRow</a>(),
 and <a href="qabstractitemview.html#itemDelegate">itemDelegate</a>().</p>
 
@@ -724,7 +691,7 @@ given <i>row</i>, or 0 if no delegate has been assigned. You can
 call <a href="qabstractitemview.html#itemDelegate">itemDelegate</a>() to get a
 pointer to the current delegate for a given index.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractitemview.html#setItemDelegateForRow">setItemDelegateForRow</a>(),
+<p><b>See also</b> <a href="qabstractitemview.html#setItemDelegateForRow">setItemDelegateForRow</a>(),
 <a href="qabstractitemview.html#itemDelegateForColumn">itemDelegateForColumn</a>(),
 and <a href="qabstractitemview.html#setItemDelegate">setItemDelegate</a>().</p>
 
@@ -745,14 +712,12 @@ emitted if the current index is valid and the activation key is
 pressed (e.g. Enter or Return, depending on the platform). This
 function is where editing is initiated by key press, e.g. if F2 is
 pressed.</p>
-<p>See also <a href="qabstractitemview.html#edit">edit</a>(),
-<a href="qabstractitemview.html#moveCursor">moveCursor</a>(),
-<a href="qabstractitemview.html#keyboardSearch">keyboardSearch</a>(), and
+<p><b>See also</b> <a href="qabstractitemview.html#edit">edit</a>(), <a href="qabstractitemview.html#moveCursor">moveCursor</a>(), <a href="qabstractitemview.html#keyboardSearch">keyboardSearch</a>(), and
 <a href="qabstractitemview.html#tabKeyNavigation-prop">tabKeyNavigation</a>.</p>
 
 
 <h3 class="fn"><a name="model" /><a href="qabstractitemmodel.html">QAbstractItemModel</a> QAbstractItemView.model (<i>self</i>)</h3><p>Returns the model that this view is presenting.</p>
-<p>See also <a href="qabstractitemview.html#setModel">setModel</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#setModel">setModel</a>().</p>
 
 
 <h3 class="fn"><a name="mouseDoubleClickEvent" />QAbstractItemView.mouseDoubleClickEvent (<i>self</i>, <a href="qmouseevent.html">QMouseEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#mouseDoubleClickEvent">QWidget.mouseDoubleClickEvent</a>().</p>
@@ -796,7 +761,7 @@ pointing to the next object in the view, based on the given
 
 <h3 class="fn"><a name="openPersistentEditor" />QAbstractItemView.openPersistentEditor (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Opens a persistent editor on the item at the given <i>index</i>.
 If no editor exists, the delegate will create a new editor.</p>
-<p>See also <a href="qabstractitemview.html#closePersistentEditor">closePersistentEditor</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#closePersistentEditor">closePersistentEditor</a>().</p>
 
 
 <h3 class="fn"><a name="reset" />QAbstractItemView.reset (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void reset()</tt>.</p><p>Reset the internal state of the view.</p>
@@ -810,26 +775,26 @@ and then call the superclass' implementation.</p>
 <h3 class="fn"><a name="resizeEvent" />QAbstractItemView.resizeEvent (<i>self</i>, <a href="qresizeevent.html">QResizeEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#resizeEvent">QWidget.resizeEvent</a>().</p>
 <p>This function is called with the given <i>event</i> when a
 resize event is sent to the widget.</p>
-<p>See also <a href="qwidget.html#resizeEvent">QWidget.resizeEvent</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#resizeEvent">QWidget.resizeEvent</a>().</p>
 
 
 <h3 class="fn"><a name="rootIndex" /><a href="qmodelindex.html">QModelIndex</a> QAbstractItemView.rootIndex (<i>self</i>)</h3><p>Returns the model index of the model's root item. The root item
 is the parent item to the view's toplevel items. The root can be
 invalid.</p>
-<p>See also <a href="qabstractitemview.html#setRootIndex">setRootIndex</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#setRootIndex">setRootIndex</a>().</p>
 
 
 <h3 class="fn"><a name="rowsAboutToBeRemoved" />QAbstractItemView.rowsAboutToBeRemoved (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>, int&#160;<i>start</i>, int&#160;<i>end</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void rowsAboutToBeRemoved(const QModelIndex&amp;,int,int)</tt>.</p><p>This slot is called when rows are about to be removed. The
 deleted rows are those under the given <i>parent</i> from
 <i>start</i> to <i>end</i> inclusive.</p>
-<p>See also <a href="qabstractitemview.html#rowsInserted">rowsInserted</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#rowsInserted">rowsInserted</a>().</p>
 
 
 <h3 class="fn"><a name="rowsInserted" />QAbstractItemView.rowsInserted (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>, int&#160;<i>start</i>, int&#160;<i>end</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void rowsInserted(const QModelIndex&amp;,int,int)</tt>.</p><p>This slot is called when rows are inserted. The new rows are
 those under the given <i>parent</i> from <i>start</i> to <i>end</i>
 inclusive. The base class implementation calls fetchMore() on the
 model to check for more data.</p>
-<p>See also <a href="qabstractitemview.html#rowsAboutToBeRemoved">rowsAboutToBeRemoved</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#rowsAboutToBeRemoved">rowsAboutToBeRemoved</a>().</p>
 
 
 <h3 class="fn"><a name="scheduleDelayedItemsLayout" />QAbstractItemView.scheduleDelayedItemsLayout (<i>self</i>)</h3><p>Schedules a layout of the items in the view to be executed when
@@ -837,7 +802,7 @@ the event processing starts.</p>
 <p>Even if scheduleDelayedItemsLayout() is called multiple times
 before events are processed, the view will only do the layout
 once.</p>
-<p>See also <a href="qabstractitemview.html#executeDelayedItemsLayout">executeDelayedItemsLayout</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#executeDelayedItemsLayout">executeDelayedItemsLayout</a>().</p>
 
 
 <h3 class="fn"><a name="scrollDirtyRegion" />QAbstractItemView.scrollDirtyRegion (<i>self</i>, int&#160;<i>dx</i>, int&#160;<i>dy</i>)</h3><p>Prepares the view for scrolling by (<i>dx</i>,<i>dy</i>) pixels
@@ -848,7 +813,7 @@ viewport in your view subclass.</p>
 in a subclass of <a href="qabstractitemview.html">QAbstractItemView</a>, call this function
 before you call <a href="qwidget.html#scroll">QWidget.scroll</a>()
 on the viewport. Alternatively, just call <a href="qabstractitemview.html#update">update</a>().</p>
-<p>See also <a href="qabstractscrollarea.html#scrollContentsBy">scrollContentsBy</a>(),
+<p><b>See also</b> <a href="qabstractscrollarea.html#scrollContentsBy">scrollContentsBy</a>(),
 <a href="qabstractitemview.html#dirtyRegionOffset">dirtyRegionOffset</a>(),
 and <a href="qabstractitemview.html#setDirtyRegion">setDirtyRegion</a>().</p>
 
@@ -861,30 +826,30 @@ according to the given <i>hint</i>.</p>
 
 <h3 class="fn"><a name="scrollToBottom" />QAbstractItemView.scrollToBottom (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void scrollToBottom()</tt>.</p><p>Scrolls the view to the bottom.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qabstractitemview.html#scrollTo">scrollTo</a>() and <a href="qabstractitemview.html#scrollToTop">scrollToTop</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#scrollTo">scrollTo</a>() and <a href="qabstractitemview.html#scrollToTop">scrollToTop</a>().</p>
 
 
 <h3 class="fn"><a name="scrollToTop" />QAbstractItemView.scrollToTop (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void scrollToTop()</tt>.</p><p>Scrolls the view to the top.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qabstractitemview.html#scrollTo">scrollTo</a>() and <a href="qabstractitemview.html#scrollToBottom">scrollToBottom</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#scrollTo">scrollTo</a>() and <a href="qabstractitemview.html#scrollToBottom">scrollToBottom</a>().</p>
 
 
 <h3 class="fn"><a name="selectAll" />QAbstractItemView.selectAll (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void selectAll()</tt>.</p><p>Selects all items in the view. This function will use the
 selection behavior set on the view when selecting.</p>
-<p>See also <a href="qabstractitemview.html#setSelection">setSelection</a>(), <a href="qabstractitemview.html#selectedIndexes">selectedIndexes</a>(), and
+<p><b>See also</b> <a href="qabstractitemview.html#setSelection">setSelection</a>(), <a href="qabstractitemview.html#selectedIndexes">selectedIndexes</a>(), and
 <a href="qabstractitemview.html#clearSelection">clearSelection</a>().</p>
 
 
 <h3 class="fn"><a name="selectedIndexes" />list-of-QModelIndex QAbstractItemView.selectedIndexes (<i>self</i>)</h3><p>This convenience function returns a list of all selected and
 non-hidden item indexes in the view. The list contains no
 duplicates, and is not sorted.</p>
-<p>See also <a href="qitemselectionmodel.html#selectedIndexes">QItemSelectionModel.selectedIndexes</a>().</p>
+<p><b>See also</b> <a href="qitemselectionmodel.html#selectedIndexes">QItemSelectionModel.selectedIndexes</a>().</p>
 
 
 <h3 class="fn"><a name="selectionBehavior" /><a href="qabstractitemview.html#SelectionBehavior-enum">SelectionBehavior</a> QAbstractItemView.selectionBehavior (<i>self</i>)</h3><h3 class="fn"><a name="selectionChanged" />QAbstractItemView.selectionChanged (<i>self</i>, <a href="qitemselection.html">QItemSelection</a>&#160;<i>selected</i>, <a href="qitemselection.html">QItemSelection</a>&#160;<i>deselected</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void selectionChanged(const QItemSelection&amp;,const QItemSelection&amp;)</tt>.</p><p>This slot is called when the selection is changed. The previous
 selection (which may be empty), is specified by <i>deselected</i>,
 and the new selection by <i>selected</i>.</p>
-<p>See also <a href="qabstractitemview.html#setSelection">setSelection</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#setSelection">setSelection</a>().</p>
 
 
 <h3 class="fn"><a name="selectionCommand" /><a href="qitemselectionmodel-selectionflags.html">QItemSelectionModel.SelectionFlags</a> QAbstractItemView.selectionCommand (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>, <a href="qevent.html">QEvent</a>&#160;<i>event</i>&#160;=&#160;None)</h3><p>Returns the SelectionFlags to be used when updating a selection
@@ -892,11 +857,11 @@ with to include the <i>index</i> specified. The <i>event</i> is a
 user input event, such as a mouse or keyboard event.</p>
 <p>Reimplement this function to define your own selection
 behavior.</p>
-<p>See also <a href="qabstractitemview.html#setSelection">setSelection</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#setSelection">setSelection</a>().</p>
 
 
 <h3 class="fn"><a name="selectionMode" /><a href="qabstractitemview.html#SelectionMode-enum">SelectionMode</a> QAbstractItemView.selectionMode (<i>self</i>)</h3><h3 class="fn"><a name="selectionModel" /><a href="qitemselectionmodel.html">QItemSelectionModel</a> QAbstractItemView.selectionModel (<i>self</i>)</h3><p>Returns the current selection model.</p>
-<p>See also <a href="qabstractitemview.html#setSelectionModel">setSelectionModel</a>()
+<p><b>See also</b> <a href="qabstractitemview.html#setSelectionModel">setSelectionModel</a>()
 and <a href="qabstractitemview.html#selectedIndexes">selectedIndexes</a>().</p>
 
 
@@ -908,7 +873,7 @@ starting position for any new selections the user performs.</p>
 call</p>
 <p><tt>selectionModel()-&gt;setCurrentIndex(index,
 QItemSelectionModel.NoUpdate);</tt></p>
-<p>See also <a href="qabstractitemview.html#currentIndex">currentIndex</a>(), <a href="qabstractitemview.html#currentChanged">currentChanged</a>(), and
+<p><b>See also</b> <a href="qabstractitemview.html#currentIndex">currentIndex</a>(), <a href="qabstractitemview.html#currentChanged">currentChanged</a>(), and
 <a href="qabstractitemview.html#selectionMode-prop">selectionMode</a>.</p>
 
 
@@ -916,7 +881,7 @@ QItemSelectionModel.NoUpdate);</tt></p>
 updated. You only need to call this function if you are
 implementing your own view subclass.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qabstractitemview.html#scrollDirtyRegion">scrollDirtyRegion</a>()
+<p><b>See also</b> <a href="qabstractitemview.html#scrollDirtyRegion">scrollDirtyRegion</a>()
 and <a href="qabstractitemview.html#dirtyRegionOffset">dirtyRegionOffset</a>().</p>
 
 
@@ -931,10 +896,10 @@ the model data and the item at the given <i>index</i>.</p>
 <p>If index widget A is replaced with index widget B, index widget
 A will be deleted. For example, in the code snippet below, the
 <a href="qlineedit.html">QLineEdit</a> object will be deleted.</p>
-<pre class="highlightedCode brush: cpp">
- setIndexWidget(index, new QLineEdit);
- ...
- setIndexWidget(index, new QTextEdit);
+<pre class="cpp">
+ setIndexWidget(index<span class="operator">,</span> <span class="keyword">new</span> <span class="type"><a href="qlineedit.html">QLineEdit</a></span>);
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ setIndexWidget(index<span class="operator">,</span> <span class="keyword">new</span> <span class="type"><a href="qtextedit.html">QTextEdit</a></span>);
 </pre>
 <p>This function should only be used to display static content
 within the visible area corresponding to an item of data. If you
@@ -942,7 +907,7 @@ want to display custom dynamic content or implement a custom editor
 widget, subclass <a href="qitemdelegate.html">QItemDelegate</a>
 instead.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qabstractitemview.html#indexWidget">indexWidget</a>() and <a href="model-view-programming.html#delegate-classes">Delegate
+<p><b>See also</b> <a href="qabstractitemview.html#indexWidget">indexWidget</a>() and <a href="model-view-programming.html#delegate-classes">Delegate
 Classes</a>.</p>
 
 
@@ -957,7 +922,7 @@ editing behavior since each view connected to a given delegate may
 receive the <a href="qabstractitemdelegate.html#closeEditor">closeEditor()</a> signal,
 and attempt to access, modify or close an editor that has already
 been closed.</p>
-<p>See also <a href="qabstractitemview.html#itemDelegate">itemDelegate</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#itemDelegate">itemDelegate</a>().</p>
 
 
 <h3 class="fn"><a name="setItemDelegateForColumn" />QAbstractItemView.setItemDelegateForColumn (<i>self</i>, int&#160;<i>column</i>, <a href="qabstractitemdelegate.html">QAbstractItemDelegate</a>&#160;<i>delegate</i>)</h3><p>Sets the given item <i>delegate</i> used by this view and model
@@ -977,7 +942,7 @@ receive the <a href="qabstractitemdelegate.html#closeEditor">closeEditor()</a> s
 and attempt to access, modify or close an editor that has already
 been closed.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractitemview.html#itemDelegateForColumn">itemDelegateForColumn</a>(),
+<p><b>See also</b> <a href="qabstractitemview.html#itemDelegateForColumn">itemDelegateForColumn</a>(),
 <a href="qabstractitemview.html#setItemDelegateForRow">setItemDelegateForRow</a>(),
 and <a href="qabstractitemview.html#itemDelegate">itemDelegate</a>().</p>
 
@@ -999,7 +964,7 @@ receive the <a href="qabstractitemdelegate.html#closeEditor">closeEditor()</a> s
 and attempt to access, modify or close an editor that has already
 been closed.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractitemview.html#itemDelegateForRow">itemDelegateForRow</a>(),
+<p><b>See also</b> <a href="qabstractitemview.html#itemDelegateForRow">itemDelegateForRow</a>(),
 <a href="qabstractitemview.html#setItemDelegateForColumn">setItemDelegateForColumn</a>(),
 and <a href="qabstractitemview.html#itemDelegate">itemDelegate</a>().</p>
 
@@ -1011,25 +976,24 @@ However, the old selection model will not be deleted as it may be
 shared between several views. We recommend that you delete the old
 selection model if it is no longer required. This is done with the
 following code:</p>
-<pre class="highlightedCode brush: cpp">
- QItemSelectionModel *m = view-&gt;selectionModel();
- view-&gt;setModel(new model);
- delete m;
+<pre class="cpp">
+ <span class="type"><a href="qitemselectionmodel.html">QItemSelectionModel</a></span> <span class="operator">*</span>m <span class="operator">=</span> view<span class="operator">-</span><span class="operator">&gt;</span><a href="qabstractitemview.html#selectionModel">selectionModel</a>();
+ view<span class="operator">-</span><span class="operator">&gt;</span>setModel(<span class="keyword">new</span> model);
+ <span class="keyword">delete</span> m;
 </pre>
 <p>If both the old model and the old selection model do not have
 parents, or if their parents are long-lived objects, it may be
 preferable to call their <a href="qobject.html#deleteLater">deleteLater</a>() functions to
 explicitly delete them.</p>
 <p>The view <i>does not</i> take ownership of the model unless it
-is the model's parent object because the view may be shared between
-many different views.</p>
-<p>See also <a href="qabstractitemview.html#model">model</a>(),
-<a href="qabstractitemview.html#selectionModel">selectionModel</a>(), and
+is the model's parent object because the model may be shared
+between many different views.</p>
+<p><b>See also</b> <a href="qabstractitemview.html#model">model</a>(), <a href="qabstractitemview.html#selectionModel">selectionModel</a>(), and
 <a href="qabstractitemview.html#setSelectionModel">setSelectionModel</a>().</p>
 
 
 <h3 class="fn"><a name="setRootIndex" />QAbstractItemView.setRootIndex (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setRootIndex(const QModelIndex&amp;)</tt>.</p><p>Sets the root item to the item at the given <i>index</i>.</p>
-<p>See also <a href="qabstractitemview.html#rootIndex">rootIndex</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#rootIndex">rootIndex</a>().</p>
 
 
 <h3 class="fn"><a name="setSelection" />QAbstractItemView.setSelection (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>rect</i>, <a href="qitemselectionmodel-selectionflags.html">QItemSelectionModel.SelectionFlags</a>&#160;<i>command</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Applies the selection <i>flags</i> to the items in or touched by
@@ -1038,7 +1002,7 @@ the rectangle, <i>rect</i>.</p>
 <a href="qabstractitemview.html#selectionModel">selectionModel</a>()-&gt;select(selection,
 flags) where selection is either an empty <a href="qmodelindex.html">QModelIndex</a> or a <a href="qitemselection.html">QItemSelection</a> that contains all items
 that are contained in <i>rect</i>.</p>
-<p>See also <a href="qabstractitemview.html#selectionCommand">selectionCommand</a>()
+<p><b>See also</b> <a href="qabstractitemview.html#selectionCommand">selectionCommand</a>()
 and <a href="qabstractitemview.html#selectedIndexes">selectedIndexes</a>().</p>
 
 
@@ -1054,13 +1018,13 @@ object is deleted. However, if it does not have a parent, or if the
 parent is a long-lived object, it may be preferable to call its
 <a href="qobject.html#deleteLater">deleteLater</a>() function to
 explicitly delete it.</p>
-<p>See also <a href="qabstractitemview.html#selectionModel">selectionModel</a>(),
+<p><b>See also</b> <a href="qabstractitemview.html#selectionModel">selectionModel</a>(),
 <a href="qabstractitemview.html#setModel">setModel</a>(), and
 <a href="qabstractitemview.html#clearSelection">clearSelection</a>().</p>
 
 
 <h3 class="fn"><a name="setState" />QAbstractItemView.setState (<i>self</i>, <a href="qabstractitemview.html#State-enum">State</a>&#160;<i>state</i>)</h3><p>Sets the item view's state to the given <i>state</i>.</p>
-<p>See also <a href="qabstractitemview.html#state">state</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#state">state</a>().</p>
 
 
 <h3 class="fn"><a name="setTabKeyNavigation" />QAbstractItemView.setTabKeyNavigation (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setTextElideMode" />QAbstractItemView.setTextElideMode (<i>self</i>, <a href="qt.html#TextElideMode-enum">Qt.TextElideMode</a>&#160;<i>mode</i>)</h3><h3 class="fn"><a name="setVerticalScrollMode" />QAbstractItemView.setVerticalScrollMode (<i>self</i>, <a href="qabstractitemview.html#ScrollMode-enum">ScrollMode</a>&#160;<i>mode</i>)</h3><h3 class="fn"><a name="setVerticalStepsPerItem" />QAbstractItemView.setVerticalStepsPerItem (<i>self</i>, int&#160;<i>steps</i>)</h3><h3 class="fn"><a name="showDropIndicator" />bool QAbstractItemView.showDropIndicator (<i>self</i>)</h3><h3 class="fn"><a name="sizeHintForColumn" />int QAbstractItemView.sizeHintForColumn (<i>self</i>, int&#160;<i>column</i>)</h3><p>Returns the width size hint for the specified <i>column</i> or
@@ -1068,12 +1032,12 @@ explicitly delete it.</p>
 <p>This function is used in views with a horizontal header to find
 the size hint for a header section based on the contents of the
 given <i>column</i>.</p>
-<p>See also <a href="qabstractitemview.html#sizeHintForRow">sizeHintForRow</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#sizeHintForRow">sizeHintForRow</a>().</p>
 
 
 <h3 class="fn"><a name="sizeHintForIndex" /><a href="qsize.html">QSize</a> QAbstractItemView.sizeHintForIndex (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Returns the size hint for the item with the specified
 <i>index</i> or an invalid size for invalid indexes.</p>
-<p>See also <a href="qabstractitemview.html#sizeHintForRow">sizeHintForRow</a>() and
+<p><b>See also</b> <a href="qabstractitemview.html#sizeHintForRow">sizeHintForRow</a>() and
 <a href="qabstractitemview.html#sizeHintForColumn">sizeHintForColumn</a>().</p>
 
 
@@ -1087,7 +1051,7 @@ function.</p>
 <p>This function is used in views with a vertical header to find
 the size hint for a header section based on the contents of the
 given <i>row</i>.</p>
-<p>See also <a href="qabstractitemview.html#sizeHintForColumn">sizeHintForColumn</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#sizeHintForColumn">sizeHintForColumn</a>().</p>
 
 
 <h3 class="fn"><a name="startDrag" />QAbstractItemView.startDrag (<i>self</i>, <a href="qt-dropactions.html">Qt.DropActions</a>&#160;<i>supportedActions</i>)</h3><p>Starts a drag by calling drag-&gt;exec() using the given
@@ -1095,13 +1059,13 @@ given <i>row</i>.</p>
 
 
 <h3 class="fn"><a name="state" /><a href="qabstractitemview.html#State-enum">State</a> QAbstractItemView.state (<i>self</i>)</h3><p>Returns the item view's state.</p>
-<p>See also <a href="qabstractitemview.html#setState">setState</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#setState">setState</a>().</p>
 
 
 <h3 class="fn"><a name="tabKeyNavigation" />bool QAbstractItemView.tabKeyNavigation (<i>self</i>)</h3><h3 class="fn"><a name="textElideMode" /><a href="qt.html#TextElideMode-enum">Qt.TextElideMode</a> QAbstractItemView.textElideMode (<i>self</i>)</h3><h3 class="fn"><a name="timerEvent" />QAbstractItemView.timerEvent (<i>self</i>, <a href="qtimerevent.html">QTimerEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qobject.html#timerEvent">QObject.timerEvent</a>().</p>
 <p>This function is called with the given <i>event</i> when a timer
 event is sent to the widget.</p>
-<p>See also <a href="qobject.html#timerEvent">QObject.timerEvent</a>().</p>
+<p><b>See also</b> <a href="qobject.html#timerEvent">QObject.timerEvent</a>().</p>
 
 
 <h3 class="fn"><a name="update" />QAbstractItemView.update (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void update()</tt>.</p><p>Updates the area occupied by the given <i>index</i>.</p>
@@ -1114,7 +1078,7 @@ event is sent to the widget.</p>
 
 <h3 class="fn"><a name="verticalOffset" />int QAbstractItemView.verticalOffset (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the vertical offset of the view.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractitemview.html#horizontalOffset">horizontalOffset</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#horizontalOffset">horizontalOffset</a>().</p>
 
 
 <h3 class="fn"><a name="verticalScrollbarAction" />QAbstractItemView.verticalScrollbarAction (<i>self</i>, int&#160;<i>action</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void verticalScrollbarAction(int)</tt>.</p><h3 class="fn"><a name="verticalScrollbarValueChanged" />QAbstractItemView.verticalScrollbarValueChanged (<i>self</i>, int&#160;<i>value</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void verticalScrollbarValueChanged(int)</tt>.</p><h3 class="fn"><a name="verticalScrollMode" /><a href="qabstractitemview.html#ScrollMode-enum">ScrollMode</a> QAbstractItemView.verticalScrollMode (<i>self</i>)</h3><h3 class="fn"><a name="verticalStepsPerItem" />int QAbstractItemView.verticalStepsPerItem (<i>self</i>)</h3><h3 class="fn"><a name="viewOptions" /><a href="qstyleoptionviewitem.html">QStyleOptionViewItem</a> QAbstractItemView.viewOptions (<i>self</i>)</h3><p>Returns a <a href="qstyleoptionviewitem.html">QStyleOptionViewItem</a> structure
@@ -1134,20 +1098,18 @@ should return the primary area that contains index and not the
 complete area that index might encompasses, touch or cause
 drawing.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractitemview.html#indexAt">indexAt</a>()
-and <a href="qabstractitemview.html#visualRegionForSelection">visualRegionForSelection</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#indexAt">indexAt</a>() and <a href="qabstractitemview.html#visualRegionForSelection">visualRegionForSelection</a>().</p>
 
 
 <h3 class="fn"><a name="visualRegionForSelection" /><a href="qregion.html">QRegion</a> QAbstractItemView.visualRegionForSelection (<i>self</i>, <a href="qitemselection.html">QItemSelection</a>&#160;<i>selection</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the region from the viewport of the items in the given
 <i>selection</i>.</p>
 <p>In the base class this is a pure virtual function.</p>
-<p>See also <a href="qabstractitemview.html#visualRect">visualRect</a>() and <a href="qabstractitemview.html#selectedIndexes">selectedIndexes</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#visualRect">visualRect</a>() and <a href="qabstractitemview.html#selectedIndexes">selectedIndexes</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="activated" />void activated (const QModelIndex&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the item specified by <i>index</i>
 is activated by the user. How to activate items depends on the
 platform; e.g., by single- or double-clicking the item, or by
 pressing the Return or Enter key when the item is current.</p>
-<p>See also <a href="qabstractitemview.html#clicked">clicked</a>(),
-<a href="qabstractitemview.html#doubleClicked">doubleClicked</a>(),
+<p><b>See also</b> <a href="qabstractitemview.html#clicked">clicked</a>(), <a href="qabstractitemview.html#doubleClicked">doubleClicked</a>(),
 <a href="qabstractitemview.html#entered">entered</a>(), and
 <a href="qabstractitemview.html#pressed">pressed</a>().</p>
 
@@ -1155,7 +1117,7 @@ pressing the Return or Enter key when the item is current.</p>
 <h3 class="fn"><a name="clicked" />void clicked (const QModelIndex&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when a mouse button is clicked. The item
 the mouse was clicked on is specified by <i>index</i>. The signal
 is only emitted when the index is valid.</p>
-<p>See also <a href="qabstractitemview.html#activated">activated</a>(), <a href="qabstractitemview.html#doubleClicked">doubleClicked</a>(),
+<p><b>See also</b> <a href="qabstractitemview.html#activated">activated</a>(), <a href="qabstractitemview.html#doubleClicked">doubleClicked</a>(),
 <a href="qabstractitemview.html#entered">entered</a>(), and
 <a href="qabstractitemview.html#pressed">pressed</a>().</p>
 
@@ -1164,14 +1126,13 @@ is only emitted when the index is valid.</p>
 The item the mouse was double-clicked on is specified by
 <i>index</i>. The signal is only emitted when the index is
 valid.</p>
-<p>See also <a href="qabstractitemview.html#clicked">clicked</a>()
-and <a href="qabstractitemview.html#activated">activated</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#clicked">clicked</a>() and <a href="qabstractitemview.html#activated">activated</a>().</p>
 
 
 <h3 class="fn"><a name="entered" />void entered (const QModelIndex&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the mouse cursor enters the item
 specified by <i>index</i>. Mouse tracking needs to be enabled for
 this feature to work.</p>
-<p>See also <a href="qabstractitemview.html#viewportEntered">viewportEntered</a>(),
+<p><b>See also</b> <a href="qabstractitemview.html#viewportEntered">viewportEntered</a>(),
 <a href="qabstractitemview.html#activated">activated</a>(),
 <a href="qabstractitemview.html#clicked">clicked</a>(), <a href="qabstractitemview.html#doubleClicked">doubleClicked</a>(), and
 <a href="qabstractitemview.html#pressed">pressed</a>().</p>
@@ -1182,14 +1143,14 @@ the mouse was pressed on is specified by <i>index</i>. The signal
 is only emitted when the index is valid.</p>
 <p>Use the <a href="qapplication.html#mouseButtons">QApplication.mouseButtons</a>()
 function to get the state of the mouse buttons.</p>
-<p>See also <a href="qabstractitemview.html#activated">activated</a>(), <a href="qabstractitemview.html#clicked">clicked</a>(), <a href="qabstractitemview.html#doubleClicked">doubleClicked</a>(), and
+<p><b>See also</b> <a href="qabstractitemview.html#activated">activated</a>(), <a href="qabstractitemview.html#clicked">clicked</a>(), <a href="qabstractitemview.html#doubleClicked">doubleClicked</a>(), and
 <a href="qabstractitemview.html#entered">entered</a>().</p>
 
 
 <h3 class="fn"><a name="viewportEntered" />void viewportEntered ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the mouse cursor enters the
 viewport. Mouse tracking needs to be enabled for this feature to
 work.</p>
-<p>See also <a href="qabstractitemview.html#entered">entered</a>().</p>
+<p><b>See also</b> <a href="qabstractitemview.html#entered">entered</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

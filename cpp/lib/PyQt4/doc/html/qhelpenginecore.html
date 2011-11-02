@@ -53,7 +53,7 @@ created.</p>
 attributes are specified by <i>attributes</i>. If the filter
 already exists, its attribute set is replaced. The function returns
 true if the operation succeeded, otherwise it returns false.</p>
-<p>See also <a href="qhelpenginecore.html#customFilters">customFilters</a>() and
+<p><b>See also</b> <a href="qhelpenginecore.html#customFilters">customFilters</a>() and
 <a href="qhelpenginecore.html#removeCustomFilter">removeCustomFilter</a>().</p>
 
 
@@ -65,14 +65,14 @@ Collection files (<tt>.qch</tt>) files are updated accordingly.</p>
 
 
 <h3 class="fn"><a name="currentFilter" />QString QHelpEngineCore.currentFilter (<i>self</i>)</h3><h3 class="fn"><a name="customFilters" />QStringList QHelpEngineCore.customFilters (<i>self</i>)</h3><p>Returns a list of custom filters.</p>
-<p>See also <a href="qhelpenginecore.html#addCustomFilter">addCustomFilter</a>() and
+<p><b>See also</b> <a href="qhelpenginecore.html#addCustomFilter">addCustomFilter</a>() and
 <a href="qhelpenginecore.html#removeCustomFilter">removeCustomFilter</a>().</p>
 
 
 <h3 class="fn"><a name="customValue" />QVariant QHelpEngineCore.customValue (<i>self</i>, QString&#160;<i>key</i>, QVariant&#160;<i>defaultValue</i>&#160;=&#160;QVariant())</h3><p>Returns the value assigned to the <i>key</i>. If the requested
 key does not exist, the specified <i>defaultValue</i> is
 returned.</p>
-<p>See also <a href="qhelpenginecore.html#setCustomValue">setCustomValue</a>() and
+<p><b>See also</b> <a href="qhelpenginecore.html#setCustomValue">setCustomValue</a>() and
 <a href="qhelpenginecore.html#removeCustomValue">removeCustomValue</a>().</p>
 
 
@@ -80,7 +80,7 @@ returned.</p>
 (.qch) identified by the <i>namespaceName</i>. If there is no Qt
 compressed help file with the specified namespace registered, an
 empty string is returned.</p>
-<p>See also <a href="qhelpenginecore.html#namespaceName">namespaceName</a>().</p>
+<p><b>See also</b> <a href="qhelpenginecore.html#namespaceName">namespaceName</a>().</p>
 
 
 <h3 class="fn"><a name="error" />QString QHelpEngineCore.error (<i>self</i>)</h3><p>Returns a description of the last error that occurred.</p>
@@ -88,7 +88,7 @@ empty string is returned.</p>
 
 <h3 class="fn"><a name="fileData" /><a href="qbytearray.html">QByteArray</a> QHelpEngineCore.fileData (<i>self</i>, <a href="qurl.html">QUrl</a>&#160;<i>url</i>)</h3><p>Returns the data of the file specified by <i>url</i>. If the
 file does not exist, an empty <a href="qbytearray.html">QByteArray</a> is returned.</p>
-<p>See also <a href="qhelpenginecore.html#findFile">findFile</a>().</p>
+<p><b>See also</b> <a href="qhelpenginecore.html#findFile">findFile</a>().</p>
 
 
 <h3 class="fn"><a name="files" />list-of-QUrl QHelpEngineCore.files (<i>self</i>, QString&#160;<i>namespaceName</i>, QStringList&#160;<i>filterAttributes</i>, QString&#160;<i>extensionFilter</i>&#160;=&#160;QString())</h3><p>Returns a list of files contained in the Qt compressed help file
@@ -132,7 +132,7 @@ documentation.</p>
 <h3 class="fn"><a name="namespaceName" />QString QHelpEngineCore.namespaceName (QString&#160;<i>documentationFileName</i>)</h3><p>Returns the namespace name defined for the Qt compressed help
 file (.qch) specified by its <i>documentationFileName</i>. If the
 file is not valid, an empty string is returned.</p>
-<p>See also <a href="qhelpenginecore.html#documentationFileName">documentationFileName</a>().</p>
+<p><b>See also</b> <a href="qhelpenginecore.html#documentationFileName">documentationFileName</a>().</p>
 
 
 <h3 class="fn"><a name="registerDocumentation" />bool QHelpEngineCore.registerDocumentation (<i>self</i>, QString&#160;<i>documentationFileName</i>)</h3><p>Registers the Qt compressed help file (.qch) contained in the
@@ -140,7 +140,7 @@ file <i>documentationFileName</i>. One compressed help file,
 uniquely identified by its namespace can only be registered once.
 True is returned if the registration was successful, otherwise
 false.</p>
-<p>See also <a href="qhelpenginecore.html#unregisterDocumentation">unregisterDocumentation</a>()
+<p><b>See also</b> <a href="qhelpenginecore.html#unregisterDocumentation">unregisterDocumentation</a>()
 and <a href="qhelpenginecore.html#error">error</a>().</p>
 
 
@@ -151,20 +151,20 @@ the registered Qt compressed help files (.qch).</p>
 
 <h3 class="fn"><a name="removeCustomFilter" />bool QHelpEngineCore.removeCustomFilter (<i>self</i>, QString&#160;<i>filterName</i>)</h3><p>Returns true if the filter <i>filterName</i> was removed
 successfully, otherwise false.</p>
-<p>See also <a href="qhelpenginecore.html#addCustomFilter">addCustomFilter</a>() and
+<p><b>See also</b> <a href="qhelpenginecore.html#addCustomFilter">addCustomFilter</a>() and
 <a href="qhelpenginecore.html#customFilters">customFilters</a>().</p>
 
 
 <h3 class="fn"><a name="removeCustomValue" />bool QHelpEngineCore.removeCustomValue (<i>self</i>, QString&#160;<i>key</i>)</h3><p>Removes the <i>key</i> from the settings section in the
 collection file. Returns true if the value was removed
 successfully, otherwise false.</p>
-<p>See also <a href="qhelpenginecore.html#customValue">customValue</a>() and <a href="qhelpenginecore.html#setCustomValue">setCustomValue</a>().</p>
+<p><b>See also</b> <a href="qhelpenginecore.html#customValue">customValue</a>() and <a href="qhelpenginecore.html#setCustomValue">setCustomValue</a>().</p>
 
 
 <h3 class="fn"><a name="setAutoSaveFilter" />QHelpEngineCore.setAutoSaveFilter (<i>self</i>, bool&#160;<i>save</i>)</h3><h3 class="fn"><a name="setCollectionFile" />QHelpEngineCore.setCollectionFile (<i>self</i>, QString&#160;<i>fileName</i>)</h3><h3 class="fn"><a name="setCurrentFilter" />QHelpEngineCore.setCurrentFilter (<i>self</i>, QString&#160;<i>filterName</i>)</h3><h3 class="fn"><a name="setCustomValue" />bool QHelpEngineCore.setCustomValue (<i>self</i>, QString&#160;<i>key</i>, QVariant&#160;<i>value</i>)</h3><p>Save the <i>value</i> under the <i>key</i>. If the key already
 exist, the value will be overwritten. Returns true if the value was
 saved successfully, otherwise false.</p>
-<p>See also <a href="qhelpenginecore.html#customValue">customValue</a>() and <a href="qhelpenginecore.html#removeCustomValue">removeCustomValue</a>().</p>
+<p><b>See also</b> <a href="qhelpenginecore.html#customValue">customValue</a>() and <a href="qhelpenginecore.html#removeCustomValue">removeCustomValue</a>().</p>
 
 
 <h3 class="fn"><a name="setupData" />bool QHelpEngineCore.setupData (<i>self</i>)</h3><p>Sets up the help engine by processing the information found in
@@ -182,7 +182,7 @@ help collections.</p>
 <h3 class="fn"><a name="unregisterDocumentation" />bool QHelpEngineCore.unregisterDocumentation (<i>self</i>, QString&#160;<i>namespaceName</i>)</h3><p>Unregisters the Qt compressed help file (.qch) identified by its
 <i>namespaceName</i> from the help collection. Returns true on
 success, otherwise false.</p>
-<p>See also <a href="qhelpenginecore.html#registerDocumentation">registerDocumentation</a>()
+<p><b>See also</b> <a href="qhelpenginecore.html#registerDocumentation">registerDocumentation</a>()
 and <a href="qhelpenginecore.html#error">error</a>().</p>
 
 
@@ -198,4 +198,4 @@ and <a href="qhelpenginecore.html#error">error</a>().</p>
 
 <h3 class="fn"><a name="warning" />void warning (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when a non critical error occurs. The
 warning message is stored in <i>msg</i>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

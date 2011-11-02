@@ -32,7 +32,7 @@ refers to the position before the first character. The last
 position at the length of the string is also valid and refers to
 the position after the last character.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="BoundaryReason-enum" />QTextBoundaryFinder.BoundaryReason</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -40,19 +40,19 @@ the position after the last character.</p>
 <tr>
 <td class="topAlign">
 <tt>QTextBoundaryFinder.NotAtBoundary</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The boundary finder is not at a boundary
 position.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextBoundaryFinder.StartWord</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The boundary finder is at the start of a
 word.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextBoundaryFinder.EndWord</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The boundary finder is at the end of a
 word.</td>
 </tr>
@@ -62,32 +62,32 @@ combination of BoundaryReason values.</p>
 
 
 <h3 class="fn"><a name="BoundaryType-enum" />QTextBoundaryFinder.BoundaryType</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextBoundaryFinder.Grapheme</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Finds a grapheme which is the smallest
 boundary. It including letters, punctation marks, numerals and
 more.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextBoundaryFinder.Word</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Finds a word.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextBoundaryFinder.Line</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Finds possible positions for breaking the text
 into multiple lines.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextBoundaryFinder.Sentence</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Finds sentence boundaries. These include
 periods, question marks etc.</td>
 </tr>
@@ -118,7 +118,7 @@ returns false. A default <a href="qtextboundaryfinder.html">QTextBoundaryFinder<
 <h3 class="fn"><a name="position" />int QTextBoundaryFinder.position (<i>self</i>)</h3><p>Returns the current position of the <a href="qtextboundaryfinder.html">QTextBoundaryFinder</a>.</p>
 <p>The range is from 0 (the beginning of the string) to the length
 of the string inclusive.</p>
-<p>See also <a href="qtextboundaryfinder.html#setPosition">setPosition</a>().</p>
+<p><b>See also</b> <a href="qtextboundaryfinder.html#setPosition">setPosition</a>().</p>
 
 
 <h3 class="fn"><a name="setPosition" />QTextBoundaryFinder.setPosition (<i>self</i>, int&#160;<i>position</i>)</h3><p>Sets the current position of the <a href="qtextboundaryfinder.html">QTextBoundaryFinder</a> to
@@ -126,7 +126,7 @@ of the string inclusive.</p>
 <p>If <i>position</i> is out of bounds, it will be bound to only
 valid positions. In this case, valid positions are from 0 to the
 length of the string inclusive.</p>
-<p>See also <a href="qtextboundaryfinder.html#position">position</a>().</p>
+<p><b>See also</b> <a href="qtextboundaryfinder.html#position">position</a>().</p>
 
 
 <h3 class="fn"><a name="string" />QString QTextBoundaryFinder.string (<i>self</i>)</h3><p>Returns the string the <a href="qtextboundaryfinder.html">QTextBoundaryFinder</a> object operates
@@ -135,7 +135,7 @@ on.</p>
 
 <h3 class="fn"><a name="toEnd" />QTextBoundaryFinder.toEnd (<i>self</i>)</h3><p>Moves the finder to the end of the string. This is equivalent to
 setPosition(string.length()).</p>
-<p>See also <a href="qtextboundaryfinder.html#setPosition">setPosition</a>() and
+<p><b>See also</b> <a href="qtextboundaryfinder.html#setPosition">setPosition</a>() and
 <a href="qtextboundaryfinder.html#position">position</a>().</p>
 
 
@@ -151,11 +151,11 @@ boundary position and returns that position.</p>
 
 <h3 class="fn"><a name="toStart" />QTextBoundaryFinder.toStart (<i>self</i>)</h3><p>Moves the finder to the start of the string. This is equivalent
 to setPosition(0).</p>
-<p>See also <a href="qtextboundaryfinder.html#setPosition">setPosition</a>() and
+<p><b>See also</b> <a href="qtextboundaryfinder.html#setPosition">setPosition</a>() and
 <a href="qtextboundaryfinder.html#position">position</a>().</p>
 
 
 <h3 class="fn"><a name="type" /><a href="qtextboundaryfinder.html#BoundaryType-enum">BoundaryType</a> QTextBoundaryFinder.type (<i>self</i>)</h3><p>Returns the type of the <a href="qtextboundaryfinder.html">QTextBoundaryFinder</a>.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

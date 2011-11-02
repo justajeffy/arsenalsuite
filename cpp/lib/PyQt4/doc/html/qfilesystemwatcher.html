@@ -68,7 +68,7 @@ files and directories that can be monitored simultaneously. If this
 limit has been reached, <i>path</i> will not be added to the file
 system watcher, and a warning message will be printed to
 <i>stderr</i>.</p>
-<p>See also <a href="qfilesystemwatcher.html#addPaths">addPaths</a>() and <a href="qfilesystemwatcher.html#removePath">removePath</a>().</p>
+<p><b>See also</b> <a href="qfilesystemwatcher.html#addPaths">addPaths</a>() and <a href="qfilesystemwatcher.html#removePath">removePath</a>().</p>
 
 
 <h3 class="fn"><a name="addPaths" />QFileSystemWatcher.addPaths (<i>self</i>, QStringList&#160;<i>files</i>)</h3><p>Adds each path in <i>paths</i> to the file system watcher. Paths
@@ -83,40 +83,39 @@ files and directories that can be monitored simultaneously. If this
 limit has been reached, the excess <i>paths</i> will not be added
 to the file system watcher, and a warning message will be printed
 to <i>stderr</i> for each path that could not be added.</p>
-<p>See also <a href="qfilesystemwatcher.html#addPath">addPath</a>()
-and <a href="qfilesystemwatcher.html#removePaths">removePaths</a>().</p>
+<p><b>See also</b> <a href="qfilesystemwatcher.html#addPath">addPath</a>() and <a href="qfilesystemwatcher.html#removePaths">removePaths</a>().</p>
 
 
 <h3 class="fn"><a name="directories" />QStringList QFileSystemWatcher.directories (<i>self</i>)</h3><p>Returns a list of paths to directories that are being
 watched.</p>
-<p>See also <a href="qfilesystemwatcher.html#files">files</a>().</p>
+<p><b>See also</b> <a href="qfilesystemwatcher.html#files">files</a>().</p>
 
 
 <h3 class="fn"><a name="files" />QStringList QFileSystemWatcher.files (<i>self</i>)</h3><p>Returns a list of paths to files that are being watched.</p>
-<p>See also <a href="qfilesystemwatcher.html#directories">directories</a>().</p>
+<p><b>See also</b> <a href="qfilesystemwatcher.html#directories">directories</a>().</p>
 
 
 <h3 class="fn"><a name="removePath" />QFileSystemWatcher.removePath (<i>self</i>, QString&#160;<i>file</i>)</h3><p>Removes the specified <i>path</i> from the file system
 watcher.</p>
-<p>See also <a href="qfilesystemwatcher.html#removePaths">removePaths</a>() and
+<p><b>See also</b> <a href="qfilesystemwatcher.html#removePaths">removePaths</a>() and
 <a href="qfilesystemwatcher.html#addPath">addPath</a>().</p>
 
 
 <h3 class="fn"><a name="removePaths" />QFileSystemWatcher.removePaths (<i>self</i>, QStringList&#160;<i>files</i>)</h3><p>Removes the specified <i>paths</i> from the file system
 watcher.</p>
-<p>See also <a href="qfilesystemwatcher.html#removePath">removePath</a>() and <a href="qfilesystemwatcher.html#addPaths">addPaths</a>().</p>
+<p><b>See also</b> <a href="qfilesystemwatcher.html#removePath">removePath</a>() and <a href="qfilesystemwatcher.html#addPaths">addPaths</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="directoryChanged" />void directoryChanged (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the directory at a specified
 <i>path</i>, is modified (e.g., when a file is added, modified or
 deleted) or removed from disk. Note that if there are several
 changes during a short period of time, some of the changes might
 not emit this signal. However, the last change in the sequence of
 changes will always generate this signal.</p>
-<p>See also <a href="qfilesystemwatcher.html#fileChanged">fileChanged</a>().</p>
+<p><b>See also</b> <a href="qfilesystemwatcher.html#fileChanged">fileChanged</a>().</p>
 
 
 <h3 class="fn"><a name="fileChanged" />void fileChanged (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the file at the specified
 <i>path</i> is modified, renamed or removed from disk.</p>
-<p>See also <a href="qfilesystemwatcher.html#directoryChanged">directoryChanged</a>().</p>
+<p><b>See also</b> <a href="qfilesystemwatcher.html#directoryChanged">directoryChanged</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

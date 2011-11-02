@@ -11,19 +11,19 @@ body { background: #ffffff; color: black; }
 <p>Inherits <a href="qdomnode.html">QDomNode</a>.</p><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qdomattr.html#QDomAttr">__init__</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qdomattr.html#QDomAttr-2">__init__</a></b> (<i>self</i>, QDomAttr&#160;<i>x</i>)</li><li><div class="fn" />QString <b><a href="qdomattr.html#name">name</a></b> (<i>self</i>)</li><li><div class="fn" />QDomNode.NodeType <b><a href="qdomattr.html#nodeType">nodeType</a></b> (<i>self</i>)</li><li><div class="fn" />QDomElement <b><a href="qdomattr.html#ownerElement">ownerElement</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qdomattr.html#setValue">setValue</a></b> (<i>self</i>, QString)</li><li><div class="fn" />bool <b><a href="qdomattr.html#specified">specified</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qdomattr.html#value">value</a></b> (<i>self</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QDomAttr class represents one attribute of a <a href="qdomelement.html">QDomElement</a>.</p>
 <p>For example, the following piece of XML produces an element with
 no children, but two attributes:</p>
-<pre class="highlightedCode brush: cpp">
- &lt;link href="http://qt.nokia.com" color="red" /&gt;
+<pre class="cpp">
+ <span class="operator">&lt;</span>link href<span class="operator">=</span><span class="string">"http://qt.nokia.com"</span> color<span class="operator">=</span><span class="string">"red"</span> <span class="operator">/</span><span class="operator">&gt;</span>
 </pre>
 <p>You can access the attributes of an element with code like
 this:</p>
-<pre class="highlightedCode brush: cpp">
- QDomElement e = <span class="comment">//...</span>
-<span class="comment"> //...</span>
- QDomAttr a = e.attributeNode("href");
- cout &lt;&lt; a.value() &lt;&lt; endl;                <span class="comment">// prints "http://qt.nokia.com"</span>
- a.setValue("http://qt.nokia.com/doc"); <span class="comment">// change the node's attribute</span>
- QDomAttr a2 = e.attributeNode("href");
- cout &lt;&lt; a2.value() &lt;&lt; endl;               <span class="comment">// prints "http://qt.nokia.com/doc"</span>
+<pre class="cpp">
+ <span class="type"><a href="qdomelement.html">QDomElement</a></span> e <span class="operator">=</span> <span class="comment">//...</span>
+ <span class="comment">//...</span>
+ <span class="type">QDomAttr</span> a <span class="operator">=</span> e<span class="operator">.</span>attributeNode(<span class="string">"href"</span>);
+ cout <span class="operator">&lt;</span><span class="operator">&lt;</span> a<span class="operator">.</span><a href="qdomattr.html#value">value</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> endl;                <span class="comment">// prints "http://qt.nokia.com"</span>
+ a<span class="operator">.</span><a href="qdomattr.html#setValue">setValue</a>(<span class="string">"http://qt.nokia.com/doc"</span>); <span class="comment">// change the node's attribute</span>
+ <span class="type">QDomAttr</span> a2 <span class="operator">=</span> e<span class="operator">.</span>attributeNode(<span class="string">"href"</span>);
+ cout <span class="operator">&lt;</span><span class="operator">&lt;</span> a2<span class="operator">.</span><a href="qdomattr.html#value">value</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> endl;               <span class="comment">// prints "http://qt.nokia.com/doc"</span>
 </pre>
 <p>This example also shows that changing an attribute received from
 an element changes the attribute of the element. If you do not want
@@ -61,19 +61,18 @@ not attached to any element.</p>
 
 
 <h3 class="fn"><a name="setValue" />QDomAttr.setValue (<i>self</i>, QString)</h3><p>Sets the attribute's value to <i>v</i>.</p>
-<p>See also <a href="qdomattr.html#value">value</a>().</p>
+<p><b>See also</b> <a href="qdomattr.html#value">value</a>().</p>
 
 
 <h3 class="fn"><a name="specified" />bool QDomAttr.specified (<i>self</i>)</h3><p>Returns true if the attribute has been set by the user with
 <a href="qdomattr.html#setValue">setValue</a>(). Returns false if
 the value hasn't been specified or set.</p>
-<p>See also <a href="qdomattr.html#setValue">setValue</a>().</p>
+<p><b>See also</b> <a href="qdomattr.html#setValue">setValue</a>().</p>
 
 
 <h3 class="fn"><a name="value" />QString QDomAttr.value (<i>self</i>)</h3><p>Returns the value of the attribute or an empty string if the
 attribute has not been specified.</p>
-<p>See also <a href="qdomattr.html#specified">specified</a>() and
-<a href="qdomattr.html#setValue">setValue</a>().</p>
+<p><b>See also</b> <a href="qdomattr.html#specified">specified</a>() and <a href="qdomattr.html#setValue">setValue</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

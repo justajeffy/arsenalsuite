@@ -36,13 +36,13 @@ returns true.</p>
 <a id="reading-files-directly" name="reading-files-directly" />
 <h3>Reading Files Directly</h3>
 <p>The following example reads a text file line by line:</p>
-<pre class="highlightedCode brush: cpp">
-     QFile file("in.txt");
-     if (!file.open(QIODevice.ReadOnly | QIODevice.Text))
-         return;
+<pre class="cpp">
+     <span class="type">QFile</span> file(<span class="string">"in.txt"</span>);
+     <span class="keyword">if</span> (<span class="operator">!</span>file<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>ReadOnly <span class="operator">|</span> <span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>Text))
+         <span class="keyword">return</span>;
 
-     while (!file.atEnd()) {
-         QByteArray line = file.readLine();
+     <span class="keyword">while</span> (<span class="operator">!</span>file<span class="operator">.</span>atEnd()) {
+         <span class="type"><a href="qbytearray.html">QByteArray</a></span> line <span class="operator">=</span> file<span class="operator">.</span>readLine();
          process_line(line);
      }
 </pre>
@@ -55,14 +55,14 @@ any conversion on the bytes stored in the file.</p>
 <h3>Using Streams to Read Files</h3>
 <p>The next example uses <a href="qtextstream.html">QTextStream</a>
 to read a text file line by line:</p>
-<pre class="highlightedCode brush: cpp">
-     QFile file("in.txt");
-     if (!file.open(QIODevice.ReadOnly | QIODevice.Text))
-         return;
+<pre class="cpp">
+     <span class="type">QFile</span> file(<span class="string">"in.txt"</span>);
+     <span class="keyword">if</span> (<span class="operator">!</span>file<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>ReadOnly <span class="operator">|</span> <span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>Text))
+         <span class="keyword">return</span>;
 
-     QTextStream in(&amp;file);
-     while (!in.atEnd()) {
-         QString line = in.readLine();
+     <span class="type"><a href="qtextstream.html">QTextStream</a></span> in(<span class="operator">&amp;</span>file);
+     <span class="keyword">while</span> (<span class="operator">!</span>in<span class="operator">.</span>atEnd()) {
+         <span class="type"><a href="qstring.html">QString</a></span> line <span class="operator">=</span> in<span class="operator">.</span>readLine();
          process_line(line);
      }
 </pre>
@@ -75,13 +75,13 @@ for details). This can be changed using setCodec().</p>
 <p>To write text, we can use operator&lt;&lt;(), which is
 overloaded to take a <a href="qtextstream.html">QTextStream</a> on
 the left and various data types (including <a href="qstring.html">QString</a>) on the right:</p>
-<pre class="highlightedCode brush: cpp">
-     QFile file("out.txt");
-     if (!file.open(QIODevice.WriteOnly | QIODevice.Text))
-         return;
+<pre class="cpp">
+     <span class="type">QFile</span> file(<span class="string">"out.txt"</span>);
+     <span class="keyword">if</span> (<span class="operator">!</span>file<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>WriteOnly <span class="operator">|</span> <span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>Text))
+         <span class="keyword">return</span>;
 
-     QTextStream out(&amp;file);
-     out &lt;&lt; "The magic number is: " &lt;&lt; 49 &lt;&lt; "\n";
+     <span class="type"><a href="qtextstream.html">QTextStream</a></span> out(<span class="operator">&amp;</span>file);
+     out <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"The magic number is: "</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="number">49</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"\n"</span>;
 </pre>
 <p><a href="qdatastream.html">QDataStream</a> is similar, in that
 you can use operator&lt;&lt;() to write data and operator&gt;&gt;()
@@ -105,16 +105,16 @@ determine if there is more data to read (since <a href="qfile.html#atEnd">atEnd<
 claims to have size 0). Instead, you should either call <a href="qiodevice.html#readAll">readAll</a>(), or call <a href="qiodevice.html#read">read</a>() or <a href="qiodevice.html#readLine">readLine</a>() repeatedly until no more
 data can be read. The next example uses <a href="qtextstream.html">QTextStream</a> to read <tt>/proc/modules</tt>
 line by line:</p>
-<pre class="highlightedCode brush: cpp">
-     QFile file("/proc/modules");
-     if (!file.open(QIODevice.ReadOnly | QIODevice.Text))
-         return;
+<pre class="cpp">
+     <span class="type">QFile</span> file(<span class="string">"/proc/modules"</span>);
+     <span class="keyword">if</span> (<span class="operator">!</span>file<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>ReadOnly <span class="operator">|</span> <span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>Text))
+         <span class="keyword">return</span>;
 
-     QTextStream in(&amp;file);
-     QString line = in.readLine();
-     while (!line.isNull()) {
+     <span class="type"><a href="qtextstream.html">QTextStream</a></span> in(<span class="operator">&amp;</span>file);
+     <span class="type"><a href="qstring.html">QString</a></span> line <span class="operator">=</span> in<span class="operator">.</span>readLine();
+     <span class="keyword">while</span> (<span class="operator">!</span>line<span class="operator">.</span>isNull()) {
          process_line(line);
-         line = in.readLine();
+         line <span class="operator">=</span> in<span class="operator">.</span>readLine();
      }
 </pre>
 <a id="signals" name="signals" />
@@ -136,87 +136,87 @@ in it.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="FileError-enum" />QFile.FileError</h3><p>This enum describes the errors that may be returned by the
 <a href="qfile.html#error">error</a>() function.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.NoError</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">No error occurred.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ReadError</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">An error occurred when reading from the
 file.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.WriteError</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">An error occurred when writing to the
 file.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.FatalError</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">A fatal error occurred.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ResourceError</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">&#160;</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.OpenError</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The file could not be opened.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.AbortError</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">The operation was aborted.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.TimeOutError</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">A timeout occurred.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.UnspecifiedError</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">An unspecified error occurred.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.RemoveError</tt></td>
-<td class=" topAlign"><tt>9</tt></td>
+<td class="topAlign"><tt>9</tt></td>
 <td class="topAlign">The file could not be removed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.RenameError</tt></td>
-<td class=" topAlign"><tt>10</tt></td>
+<td class="topAlign"><tt>10</tt></td>
 <td class="topAlign">The file could not be renamed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.PositionError</tt></td>
-<td class=" topAlign"><tt>11</tt></td>
+<td class="topAlign"><tt>11</tt></td>
 <td class="topAlign">The position in the file could not be
 changed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ResizeError</tt></td>
-<td class=" topAlign"><tt>12</tt></td>
+<td class="topAlign"><tt>12</tt></td>
 <td class="topAlign">The file could not be resized.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.PermissionsError</tt></td>
-<td class=" topAlign"><tt>13</tt></td>
+<td class="topAlign"><tt>13</tt></td>
 <td class="topAlign">The file could not be accessed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.CopyError</tt></td>
-<td class=" topAlign"><tt>14</tt></td>
+<td class="topAlign"><tt>14</tt></td>
 <td class="topAlign">The file could not be copied.</td>
 </tr>
 </table>
@@ -225,14 +225,14 @@ changed.</td>
 <h3 class="fn"><a name="MemoryMapFlags-enum" />QFile.MemoryMapFlags</h3><p>This enum describes special options that may be used by the
 <a href="qfile.html#map">map</a>() function.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.NoOptions</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">No options.</td>
 </tr>
 </table>
@@ -243,72 +243,72 @@ changed.</td>
 permissions and ownership of a file. The values may be OR-ed
 together to test multiple permissions and ownership values.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ReadOwner</tt></td>
-<td class=" topAlign"><tt>0x4000</tt></td>
+<td class="topAlign"><tt>0x4000</tt></td>
 <td class="topAlign">The file is readable by the owner of the
 file.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.WriteOwner</tt></td>
-<td class=" topAlign"><tt>0x2000</tt></td>
+<td class="topAlign"><tt>0x2000</tt></td>
 <td class="topAlign">The file is writable by the owner of the
 file.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ExeOwner</tt></td>
-<td class=" topAlign"><tt>0x1000</tt></td>
+<td class="topAlign"><tt>0x1000</tt></td>
 <td class="topAlign">The file is executable by the owner of the
 file.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ReadUser</tt></td>
-<td class=" topAlign"><tt>0x0400</tt></td>
+<td class="topAlign"><tt>0x0400</tt></td>
 <td class="topAlign">The file is readable by the user.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.WriteUser</tt></td>
-<td class=" topAlign"><tt>0x0200</tt></td>
+<td class="topAlign"><tt>0x0200</tt></td>
 <td class="topAlign">The file is writable by the user.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ExeUser</tt></td>
-<td class=" topAlign"><tt>0x0100</tt></td>
+<td class="topAlign"><tt>0x0100</tt></td>
 <td class="topAlign">The file is executable by the user.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ReadGroup</tt></td>
-<td class=" topAlign"><tt>0x0040</tt></td>
+<td class="topAlign"><tt>0x0040</tt></td>
 <td class="topAlign">The file is readable by the group.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.WriteGroup</tt></td>
-<td class=" topAlign"><tt>0x0020</tt></td>
+<td class="topAlign"><tt>0x0020</tt></td>
 <td class="topAlign">The file is writable by the group.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ExeGroup</tt></td>
-<td class=" topAlign"><tt>0x0010</tt></td>
+<td class="topAlign"><tt>0x0010</tt></td>
 <td class="topAlign">The file is executable by the group.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ReadOther</tt></td>
-<td class=" topAlign"><tt>0x0004</tt></td>
+<td class="topAlign"><tt>0x0004</tt></td>
 <td class="topAlign">The file is readable by anyone.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.WriteOther</tt></td>
-<td class=" topAlign"><tt>0x0002</tt></td>
+<td class="topAlign"><tt>0x0002</tt></td>
 <td class="topAlign">The file is writable by anyone.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFile.ExeOther</tt></td>
-<td class=" topAlign"><tt>0x0001</tt></td>
+<td class="topAlign"><tt>0x0001</tt></td>
 <td class="topAlign">The file is executable by anyone.</td>
 </tr>
 </table>
@@ -321,14 +321,14 @@ returned. This behavior might change in a future Qt version.</p>
 file systems, as this may decrease the performance of file handling
 considerably. It is possible to force permission checking on NTFS
 by including the following code in your source:</p>
-<pre class="highlightedCode brush: cpp">
- extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
+<pre class="cpp">
+ <span class="keyword">extern</span> Q_CORE_EXPORT <span class="type">int</span> qt_ntfs_permission_lookup;
 </pre>
 <p>Permission checking is then turned on and off by incrementing
 and decrementing <tt>qt_ntfs_permission_lookup</tt> by 1.</p>
-<pre class="highlightedCode brush: cpp">
- qt_ntfs_permission_lookup++; <span class="comment">// turn checking on</span>
- qt_ntfs_permission_lookup--; <span class="comment">// turn it off again</span>
+<pre class="cpp">
+ qt_ntfs_permission_lookup<span class="operator">+</span><span class="operator">+</span>; <span class="comment">// turn checking on</span>
+ qt_ntfs_permission_lookup<span class="operator">-</span><span class="operator">-</span>; <span class="comment">// turn it off again</span>
 </pre>
 <p>The Permissions type is a typedef for <a href="qflags.html">QFlags</a>&lt;Permission&gt;. It stores an OR
 combination of Permission values.</p>
@@ -359,7 +359,7 @@ read.</p>
 <h3 class="fn"><a name="close" />QFile.close (<i>self</i>)</h3><p>Reimplemented from <a href="qiodevice.html#close">QIODevice.close</a>().</p>
 <p>Calls <a href="qfile.html#flush">QFile.flush</a>() and closes
 the file. Errors from flush are ignored.</p>
-<p>See also <a href="qiodevice.html#close">QIODevice.close</a>().</p>
+<p><b>See also</b> <a href="qiodevice.html#close">QIODevice.close</a>().</p>
 
 
 <h3 class="fn"><a name="copy" />bool QFile.copy (<i>self</i>, QString&#160;<i>newName</i>)</h3><p>Copies the file currently specified by <a href="qfile.html#fileName">fileName</a>() to a file called
@@ -369,19 +369,19 @@ false.</p>
 copy() returns false (i.e. <a href="qfile.html">QFile</a> will not
 overwrite it).</p>
 <p>The source file is closed before it is copied.</p>
-<p>See also <a href="qfile.html#setFileName">setFileName</a>().</p>
+<p><b>See also</b> <a href="qfile.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="copy-2" />bool QFile.copy (QString&#160;<i>fileName</i>, QString&#160;<i>newName</i>)</h3><p>This is an overloaded function.</p>
 <p>Copies the file <i>fileName</i> to <i>newName</i>. Returns true
 if successful; otherwise returns false.</p>
 <p>If a file with the name <i>newName</i> already exists, <a href="qfile.html#copy">copy</a>() returns false (i.e., <a href="qfile.html">QFile</a> will not overwrite it).</p>
-<p>See also <a href="qfile.html#rename">rename</a>().</p>
+<p><b>See also</b> <a href="qfile.html#rename">rename</a>().</p>
 
 
 <h3 class="fn"><a name="decodeName" />QString QFile.decodeName (<a href="qbytearray.html">QByteArray</a>&#160;<i>localFileName</i>)</h3><p>This does the reverse of <a href="qfile.html#encodeName">QFile.encodeName</a>() using
 <i>localFileName</i>.</p>
-<p>See also <a href="qfile.html#setDecodingFunction">setDecodingFunction</a>() and
+<p><b>See also</b> <a href="qfile.html#setDecodingFunction">setDecodingFunction</a>() and
 <a href="qfile.html#encodeName">encodeName</a>().</p>
 
 
@@ -396,8 +396,8 @@ details.</p>
 for file names that the user chooses. File names hard-coded into
 the application should only use 7-bit ASCII filename
 characters.</p>
-<p>See also <a href="qfile.html#decodeName">decodeName</a>() and
-<a href="qfile.html#setEncodingFunction">setEncodingFunction</a>().</p>
+<p><b>See also</b> <a href="qfile.html#decodeName">decodeName</a>()
+and <a href="qfile.html#setEncodingFunction">setEncodingFunction</a>().</p>
 
 
 <h3 class="fn"><a name="error" /><a href="qfile.html#FileError-enum">FileError</a> QFile.error (<i>self</i>)</h3><p>Returns the file error status.</p>
@@ -405,7 +405,7 @@ characters.</p>
 <a href="qfile.html#open">open</a>() returns false, or a read/write
 operation returns -1, this function can be called to find out the
 reason why the operation failed.</p>
-<p>See also <a href="qfile.html#unsetError">unsetError</a>().</p>
+<p><b>See also</b> <a href="qfile.html#unsetError">unsetError</a>().</p>
 
 
 <h3 class="fn"><a name="exists" />bool QFile.exists (<i>self</i>)</h3><p>Returns true if the file specified by <i>fileName</i> exists;
@@ -415,13 +415,12 @@ otherwise returns false.</p>
 <h3 class="fn"><a name="exists-2" />bool QFile.exists (QString&#160;<i>fileName</i>)</h3><p>This is an overloaded function.</p>
 <p>Returns true if the file specified by <a href="qfile.html#fileName">fileName</a>() exists; otherwise returns
 false.</p>
-<p>See also <a href="qfile.html#fileName">fileName</a>() and
+<p><b>See also</b> <a href="qfile.html#fileName">fileName</a>() and
 <a href="qfile.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="fileEngine" /><a href="qabstractfileengine.html">QAbstractFileEngine</a> QFile.fileEngine (<i>self</i>)</h3><h3 class="fn"><a name="fileName" />QString QFile.fileName (<i>self</i>)</h3><p>Returns the name set by <a href="qfile.html#setFileName">setFileName</a>() or to the <a href="qfile.html">QFile</a> constructors.</p>
-<p>See also <a href="qfile.html#setFileName">setFileName</a>() and
-<a href="qfileinfo.html#fileName">QFileInfo.fileName</a>().</p>
+<p><b>See also</b> <a href="qfile.html#setFileName">setFileName</a>() and <a href="qfileinfo.html#fileName">QFileInfo.fileName</a>().</p>
 
 
 <h3 class="fn"><a name="flush" />bool QFile.flush (<i>self</i>)</h3><p>Flushes any buffered data to the file. Returns true if
@@ -436,7 +435,7 @@ the handle can be used with <a href="qsocketnotifier.html">QSocketNotifier</a> a
 <p>If the file is not open, or there is an error, handle() returns
 -1.</p>
 <p>This function is not supported on Windows CE.</p>
-<p>See also <a href="qsocketnotifier.html">QSocketNotifier</a>.</p>
+<p><b>See also</b> <a href="qsocketnotifier.html">QSocketNotifier</a>.</p>
 
 
 <h3 class="fn"><a name="isSequential" />bool QFile.isSequential (<i>self</i>)</h3><p>Reimplemented from <a href="qiodevice.html#isSequential">QIODevice.isSequential</a>().</p>
@@ -444,7 +443,7 @@ the handle can be used with <a href="qsocketnotifier.html">QSocketNotifier</a> a
 otherwise returns false.</p>
 <p>Most files support random-access, but some special files may
 not.</p>
-<p>See also <a href="qiodevice.html#isSequential">QIODevice.isSequential</a>().</p>
+<p><b>See also</b> <a href="qiodevice.html#isSequential">QIODevice.isSequential</a>().</p>
 
 
 <h3 class="fn"><a name="link" />bool QFile.link (<i>self</i>, QString&#160;<i>newName</i>)</h3><p>Creates a link named <i>linkName</i> that points to the file
@@ -460,7 +459,7 @@ must have a <tt>.lnk</tt> file extension.</p>
 <p><b>Note:</b> On Symbian, no link is created and false is
 returned if <a href="qfile.html#fileName">fileName</a>() currently
 specifies a directory.</p>
-<p>See also <a href="qfile.html#setFileName">setFileName</a>().</p>
+<p><b>See also</b> <a href="qfile.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="link-2" />bool QFile.link (QString&#160;<i>oldname</i>, QString&#160;<i>newName</i>)</h3><p>This is an overloaded function.</p>
@@ -468,7 +467,7 @@ specifies a directory.</p>
 <i>fileName</i>. What a link is depends on the underlying
 filesystem (be it a shortcut on Windows or a symbolic link on
 Unix). Returns true if successful; otherwise returns false.</p>
-<p>See also <a href="qfile.html#link">link</a>().</p>
+<p><b>See also</b> <a href="qfile.html#link">link</a>().</p>
 
 
 <h3 class="fn"><a name="map" />sip.voidptr QFile.map (<i>self</i>, int&#160;<i>offset</i>, int&#160;<i>size</i>, <a href="qfile.html#MemoryMapFlags-enum">MemoryMapFlags</a>&#160;<i>flags</i>&#160;=&#160;QFile.NoOptions)</h3><p>Maps <i>size</i> bytes of the file into memory starting at
@@ -482,7 +481,8 @@ will automatically be unmapped.</p>
 <p><b>Note:</b> On Windows CE 5.0 the file will be closed before
 mapping occurs.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qfile.html#unmap">unmap</a>() and <a href="qabstractfileengine.html#supportsExtension">QAbstractFileEngine.supportsExtension</a>().</p>
+<p><b>See also</b> <a href="qfile.html#unmap">unmap</a>() and
+<a href="qabstractfileengine.html#supportsExtension">QAbstractFileEngine.supportsExtension</a>().</p>
 
 
 <h3 class="fn"><a name="open" />bool QFile.open (<i>self</i>, <a href="qiodevice-openmode.html">QIODevice.OpenMode</a>&#160;<i>flags</i>)</h3><p>Reimplemented from <a href="qiodevice.html#open">QIODevice.open</a>().</p>
@@ -495,13 +495,13 @@ also have additional flags, such as <a href="qiodevice.html#OpenModeFlag-enum">Q
 <p><b>Note:</b> In <a href="qiodevice.html#OpenModeFlag-enum">WriteOnly</a> or <a href="qiodevice.html#OpenModeFlag-enum">ReadWrite</a> mode, if the
 relevant file does not already exist, this function will try to
 create a new file before opening it.</p>
-<p>See also <a href="qiodevice.html#OpenModeFlag-enum">QIODevice.OpenMode</a> and
+<p><b>See also</b> <a href="qiodevice.html#OpenModeFlag-enum">QIODevice.OpenMode</a> and
 <a href="qfile.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="open-2" />bool QFile.open (<i>self</i>, int&#160;<i>fd</i>, <a href="qiodevice-openmode.html">QIODevice.OpenMode</a>&#160;<i>flags</i>)</h3><h3 class="fn"><a name="permissions" /><a href="qfile-permissions.html">Permissions</a> QFile.permissions (<i>self</i>)</h3><p>Returns the complete OR-ed together combination of <a href="qfile.html#Permission-enum">QFile.Permission</a> for the
 file.</p>
-<p>See also <a href="qfile.html#setPermissions">setPermissions</a>() and <a href="qfile.html#setFileName">setFileName</a>().</p>
+<p><b>See also</b> <a href="qfile.html#setPermissions">setPermissions</a>() and <a href="qfile.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="permissions-2" /><a href="qfile-permissions.html">Permissions</a> QFile.permissions (QString&#160;<i>filename</i>)</h3><p>This is an overloaded function.</p>
@@ -521,13 +521,13 @@ file.</p>
 <h3 class="fn"><a name="readLink" />QString QFile.readLink (<i>self</i>)</h3><h3 class="fn"><a name="readLink-2" />QString QFile.readLink (QString&#160;<i>fileName</i>)</h3><h3 class="fn"><a name="remove" />bool QFile.remove (<i>self</i>)</h3><p>Removes the file specified by <a href="qfile.html#fileName">fileName</a>(). Returns true if successful;
 otherwise returns false.</p>
 <p>The file is closed before it is removed.</p>
-<p>See also <a href="qfile.html#setFileName">setFileName</a>().</p>
+<p><b>See also</b> <a href="qfile.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="remove-2" />bool QFile.remove (QString&#160;<i>fileName</i>)</h3><p>This is an overloaded function.</p>
 <p>Removes the file specified by the <i>fileName</i> given.</p>
 <p>Returns true if successful; otherwise returns false.</p>
-<p>See also <a href="qfile.html#remove">remove</a>().</p>
+<p><b>See also</b> <a href="qfile.html#remove">remove</a>().</p>
 
 
 <h3 class="fn"><a name="rename" />bool QFile.rename (<i>self</i>, QString&#160;<i>newName</i>)</h3><p>Renames the file currently specified by <a href="qfile.html#fileName">fileName</a>() to <i>newName</i>. Returns
@@ -536,21 +536,22 @@ true if successful; otherwise returns false.</p>
 returns false (i.e., <a href="qfile.html">QFile</a> will not
 overwrite it).</p>
 <p>The file is closed before it is renamed.</p>
-<p>See also <a href="qfile.html#setFileName">setFileName</a>().</p>
+<p><b>See also</b> <a href="qfile.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="rename-2" />bool QFile.rename (QString&#160;<i>oldName</i>, QString&#160;<i>newName</i>)</h3><p>This is an overloaded function.</p>
 <p>Renames the file <i>oldName</i> to <i>newName</i>. Returns true
 if successful; otherwise returns false.</p>
 <p>If a file with the name <i>newName</i> already exists, <a href="qfile.html#rename">rename</a>() returns false (i.e., <a href="qfile.html">QFile</a> will not overwrite it).</p>
-<p>See also <a href="qfile.html#rename">rename</a>().</p>
+<p><b>See also</b> <a href="qfile.html#rename">rename</a>().</p>
 
 
 <h3 class="fn"><a name="resize" />bool QFile.resize (<i>self</i>, int&#160;<i>sz</i>)</h3><p>Sets the file size (in bytes) <i>sz</i>. Returns true if the
 file if the resize succeeds; false otherwise. If <i>sz</i> is
 larger than the file currently is the new bytes will be set to 0,
 if <i>sz</i> is smaller the file is simply truncated.</p>
-<p>See also <a href="qfile.html#size">size</a>() and <a href="qfile.html#setFileName">setFileName</a>().</p>
+<p><b>See also</b> <a href="qfile.html#size">size</a>() and
+<a href="qfile.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="resize-2" />bool QFile.resize (QString&#160;<i>filename</i>, int&#160;<i>sz</i>)</h3><p>This is an overloaded function.</p>
@@ -558,7 +559,7 @@ if <i>sz</i> is smaller the file is simply truncated.</p>
 if the file if the resize succeeds; false otherwise. If <i>sz</i>
 is larger than <i>fileName</i> currently is the new bytes will be
 set to 0, if <i>sz</i> is smaller the file is simply truncated.</p>
-<p>See also <a href="qfile.html#resize">resize</a>().</p>
+<p><b>See also</b> <a href="qfile.html#resize">resize</a>().</p>
 
 
 <h3 class="fn"><a name="seek" />bool QFile.seek (<i>self</i>, int&#160;<i>offset</i>)</h3><p>Reimplemented from <a href="qiodevice.html#seek">QIODevice.seek</a>().</p>
@@ -572,23 +573,23 @@ opened.</p>
 will be the application's current directory path <i>at the time of
 the <a href="qfile.html#open">open</a>()</i> call.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QFile file;
- QDir.setCurrent("/tmp");
- file.setFileName("readme.txt");
- QDir.setCurrent("/home");
- file.open(QIODevice.ReadOnly);      <span class="comment">// opens "/home/readme.txt" under Unix</span>
+<pre class="cpp">
+ <span class="type"><a href="qfile.html">QFile</a></span> file;
+ <span class="type"><a href="qdir.html">QDir</a></span><span class="operator">.</span>setCurrent(<span class="string">"/tmp"</span>);
+ file<span class="operator">.</span>setFileName(<span class="string">"readme.txt"</span>);
+ <span class="type"><a href="qdir.html">QDir</a></span><span class="operator">.</span>setCurrent(<span class="string">"/home"</span>);
+ file<span class="operator">.</span><a href="qfile.html#open">open</a>(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>ReadOnly);      <span class="comment">// opens "/home/readme.txt" under Unix</span>
 </pre>
 <p>Note that the directory separator "/" works for all operating
 systems supported by Qt.</p>
-<p>See also <a href="qfile.html#fileName">fileName</a>(), <a href="qfileinfo.html">QFileInfo</a>, and <a href="qdir.html">QDir</a>.</p>
+<p><b>See also</b> <a href="qfile.html#fileName">fileName</a>(),
+<a href="qfileinfo.html">QFileInfo</a>, and <a href="qdir.html">QDir</a>.</p>
 
 
 <h3 class="fn"><a name="setPermissions" />bool QFile.setPermissions (<i>self</i>, <a href="qfile-permissions.html">Permissions</a>&#160;<i>permissionSpec</i>)</h3><p>Sets the permissions for the file to the <i>permissions</i>
 specified. Returns true if successful, or false if the permissions
 cannot be modified.</p>
-<p>See also <a href="qfile.html#permissions">permissions</a>() and
-<a href="qfile.html#setFileName">setFileName</a>().</p>
+<p><b>See also</b> <a href="qfile.html#permissions">permissions</a>() and <a href="qfile.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="setPermissions-2" />bool QFile.setPermissions (QString&#160;<i>filename</i>, <a href="qfile-permissions.html">Permissions</a>&#160;<i>permissionSpec</i>)</h3><p>This is an overloaded function.</p>
@@ -621,19 +622,19 @@ isn't a symbolic link.</p>
 string. <a href="qfile.html#exists">QFile.exists</a>() returns
 true if the symlink points to an existing file.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qfile.html#fileName">fileName</a>() and
+<p><b>See also</b> <a href="qfile.html#fileName">fileName</a>() and
 <a href="qfile.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="unmap" />bool QFile.unmap (<i>self</i>, sip.voidptr&#160;<i>address</i>)</h3><p>Unmaps the memory <i>address</i>.</p>
 <p>Returns true if the unmap succeeds; false otherwise.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qfile.html#map">map</a>() and <a href="qabstractfileengine.html#supportsExtension">QAbstractFileEngine.supportsExtension</a>().</p>
+<p><b>See also</b> <a href="qfile.html#map">map</a>() and <a href="qabstractfileengine.html#supportsExtension">QAbstractFileEngine.supportsExtension</a>().</p>
 
 
 <h3 class="fn"><a name="unsetError" />QFile.unsetError (<i>self</i>)</h3><p>Sets the file's error to <a href="qfile.html#FileError-enum">QFile.NoError</a>.</p>
-<p>See also <a href="qfile.html#error">error</a>().</p>
+<p><b>See also</b> <a href="qfile.html#error">error</a>().</p>
 
 
 <h3 class="fn"><a name="writeData" />int QFile.writeData (<i>self</i>, str&#160;<i>data</i>)</h3><p>Reimplemented from <a href="qiodevice.html#writeData">QIODevice.writeData</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

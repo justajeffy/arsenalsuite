@@ -26,12 +26,12 @@ is used to obtain any data returned in response to the
 corresponding request.</p>
 <p>A simple download off the network could be accomplished
 with:</p>
-<pre class="highlightedCode brush: cpp">
- QNetworkAccessManager *manager = new QNetworkAccessManager(this);
- connect(manager, SIGNAL(finished(QNetworkReply*)),
-         this, SLOT(replyFinished(QNetworkReply*)));
+<pre class="cpp">
+ <span class="type">QNetworkAccessManager</span> <span class="operator">*</span>manager <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QNetworkAccessManager</span>(<span class="keyword">this</span>);
+ <a href="qobject.html#connect">connect</a>(manager<span class="operator">,</span> SIGNAL(finished(<span class="type"><a href="qnetworkreply.html">QNetworkReply</a></span><span class="operator">*</span>))<span class="operator">,</span>
+         <span class="keyword">this</span><span class="operator">,</span> SLOT(replyFinished(<span class="type"><a href="qnetworkreply.html">QNetworkReply</a></span><span class="operator">*</span>)));
 
- manager-&gt;get(QNetworkRequest(QUrl("http://qt.nokia.com")));
+ manager<span class="operator">-</span><span class="operator">&gt;</span><a href="qnetworkaccessmanager.html#get">get</a>(<span class="type"><a href="qnetworkrequest.html">QNetworkRequest</a></span>(<span class="type"><a href="qurl.html">QUrl</a></span>(<span class="string">"http://qt.nokia.com"</span>)));
 </pre>
 <p>QNetworkAccessManager has an asynchronous API. When the
 <tt>replyFinished</tt> slot above is called, the parameter it takes
@@ -51,17 +51,17 @@ platforms, 6 requests are executed in parallel for one host/port
 combination.</p>
 <p>A more involved example, assuming the manager is already
 existent, can be:</p>
-<pre class="highlightedCode brush: cpp">
- QNetworkRequest request;
- request.setUrl(QUrl("http://qt.nokia.com"));
- request.setRawHeader("User-Agent", "MyOwnBrowser 1.0");
+<pre class="cpp">
+ <span class="type"><a href="qnetworkrequest.html">QNetworkRequest</a></span> request;
+ request<span class="operator">.</span>setUrl(<span class="type"><a href="qurl.html">QUrl</a></span>(<span class="string">"http://qt.nokia.com"</span>));
+ request<span class="operator">.</span>setRawHeader(<span class="string">"User-Agent"</span><span class="operator">,</span> <span class="string">"MyOwnBrowser 1.0"</span>);
 
- QNetworkReply *reply = manager-&gt;get(request);
- connect(reply, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
- connect(reply, SIGNAL(error(QNetworkReply.NetworkError)),
-         this, SLOT(slotError(QNetworkReply.NetworkError)));
- connect(reply, SIGNAL(sslErrors(QList&lt;QSslError&gt;)),
-         this, SLOT(slotSslErrors(QList&lt;QSslError&gt;)));
+ <span class="type"><a href="qnetworkreply.html">QNetworkReply</a></span> <span class="operator">*</span>reply <span class="operator">=</span> manager<span class="operator">-</span><span class="operator">&gt;</span><a href="qnetworkaccessmanager.html#get">get</a>(request);
+ <a href="qobject.html#connect">connect</a>(reply<span class="operator">,</span> SIGNAL(readyRead())<span class="operator">,</span> <span class="keyword">this</span><span class="operator">,</span> SLOT(slotReadyRead()));
+ <a href="qobject.html#connect">connect</a>(reply<span class="operator">,</span> SIGNAL(error(<span class="type"><a href="qnetworkreply.html">QNetworkReply</a></span><span class="operator">.</span>NetworkError))<span class="operator">,</span>
+         <span class="keyword">this</span><span class="operator">,</span> SLOT(slotError(<span class="type"><a href="qnetworkreply.html">QNetworkReply</a></span><span class="operator">.</span>NetworkError)));
+ <a href="qobject.html#connect">connect</a>(reply<span class="operator">,</span> SIGNAL(sslErrors(<span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qsslerror.html">QSslError</a></span><span class="operator">&gt;</span>))<span class="operator">,</span>
+         <span class="keyword">this</span><span class="operator">,</span> SLOT(slotSslErrors(<span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qsslerror.html">QSslError</a></span><span class="operator">&gt;</span>)));
 </pre>
 <a id="network-and-roaming-support" name="network-and-roaming-support" />
 <h3>Network and Roaming support</h3>
@@ -98,7 +98,7 @@ qmake variable.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="NetworkAccessibility-enum" />QNetworkAccessManager.NetworkAccessibility</h3><p>Indicates whether the network is accessible via this network
 access manager.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -106,14 +106,14 @@ access manager.</p>
 <tr>
 <td class="topAlign">
 <tt>QNetworkAccessManager.UnknownAccessibility</tt></td>
-<td class=" topAlign"><tt>-1</tt></td>
+<td class="topAlign"><tt>-1</tt></td>
 <td class="topAlign">The network accessibility cannot be
 determined.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkAccessManager.NotAccessible</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The network is not currently accessible,
 either because there is currently no network coverage or network
 access has been explicitly disabled by a call to <a href="qnetworkaccessmanager.html#networkAccessible-prop">setNetworkAccessible</a>().</td>
@@ -121,16 +121,16 @@ access has been explicitly disabled by a call to <a href="qnetworkaccessmanager.
 <tr>
 <td class="topAlign">
 <tt>QNetworkAccessManager.Accessible</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The network is accessible.</td>
 </tr>
 </table>
-<p>See also <a href="qnetworkaccessmanager.html#networkAccessible-prop">networkAccessible</a>.</p>
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#networkAccessible-prop">networkAccessible</a>.</p>
 
 
 <h3 class="fn"><a name="Operation-enum" />QNetworkAccessManager.Operation</h3><p>Indicates the operation this reply is processing.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -138,47 +138,47 @@ access has been explicitly disabled by a call to <a href="qnetworkaccessmanager.
 <tr>
 <td class="topAlign">
 <tt>QNetworkAccessManager.HeadOperation</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">retrieve headers operation (created with
 <a href="qnetworkaccessmanager.html#head">head</a>())</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkAccessManager.GetOperation</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">retrieve headers and download contents
 (created with <a href="qnetworkaccessmanager.html#get">get</a>())</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkAccessManager.PutOperation</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">upload contents operation (created with
 <a href="qnetworkaccessmanager.html#put">put</a>())</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkAccessManager.PostOperation</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">send the contents of an HTML form for
 processing via HTTP POST (created with <a href="qnetworkaccessmanager.html#post">post</a>())</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkAccessManager.DeleteOperation</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">delete contents operation (created with
 <a href="qnetworkaccessmanager.html#deleteResource">deleteResource</a>())</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkAccessManager.CustomOperation</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">custom operation (created with <a href="qnetworkaccessmanager.html#sendCustomRequest">sendCustomRequest</a>())</td>
 </tr>
 </table>
 <p>This enum was introduced or modified in Qt 4.7.</p>
-<p>See also <a href="qnetworkreply.html#operation">QNetworkReply.operation</a>().</p>
+<p><b>See also</b> <a href="qnetworkreply.html#operation">QNetworkReply.operation</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QNetworkAccessManager" />QNetworkAccessManager.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a> object that
 is the center of the Network Access API and sets <i>parent</i> as
 the parent object.</p>
@@ -193,27 +193,27 @@ network configuration as <a href="qnetworkaccessmanager.html#configuration">conf
 <p>Use this function to return the actual network configuration
 currently in use by the network session.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qnetworkaccessmanager.html#configuration">configuration</a>().</p>
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#configuration">configuration</a>().</p>
 
 
 <h3 class="fn"><a name="cache" /><a href="qabstractnetworkcache.html">QAbstractNetworkCache</a> QNetworkAccessManager.cache (<i>self</i>)</h3><p>Returns the cache that is used to store data obtained from the
 network.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qnetworkaccessmanager.html#setCache">setCache</a>().</p>
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#setCache">setCache</a>().</p>
 
 
 <h3 class="fn"><a name="configuration" /><a href="qnetworkconfiguration.html">QNetworkConfiguration</a> QNetworkAccessManager.configuration (<i>self</i>)</h3><p>Returns the network configuration that will be used to create
 the <a href="qnetworksession.html">network session</a> which will
 be used when processing network requests.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qnetworkaccessmanager.html#setConfiguration">setConfiguration</a>()
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#setConfiguration">setConfiguration</a>()
 and <a href="qnetworkaccessmanager.html#activeConfiguration">activeConfiguration</a>().</p>
 
 
 <h3 class="fn"><a name="cookieJar" /><a href="qnetworkcookiejar.html">QNetworkCookieJar</a> QNetworkAccessManager.cookieJar (<i>self</i>)</h3><p>Returns the <a href="qnetworkcookiejar.html">QNetworkCookieJar</a> that is used to
 store cookies obtained from the network as well as cookies that are
 about to be sent.</p>
-<p>See also <a href="qnetworkaccessmanager.html#setCookieJar">setCookieJar</a>().</p>
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#setCookieJar">setCookieJar</a>().</p>
 
 
 <h3 class="fn"><a name="createRequest" /><a href="qnetworkreply.html">QNetworkReply</a> QNetworkAccessManager.createRequest (<i>self</i>, <a href="qnetworkaccessmanager.html#Operation-enum">Operation</a>&#160;<i>op</i>, <a href="qnetworkrequest.html">QNetworkRequest</a>&#160;<i>request</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>device</i>&#160;=&#160;None)</h3><p>Returns a new <a href="qnetworkreply.html">QNetworkReply</a>
@@ -233,8 +233,7 @@ obtain the cookies to be sent to the remote server.</p>
 <p><b>Note:</b> This feature is currently available for HTTP only,
 performing an HTTP DELETE request.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qnetworkaccessmanager.html#get">get</a>(),
-<a href="qnetworkaccessmanager.html#post">post</a>(), <a href="qnetworkaccessmanager.html#put">put</a>(), and <a href="qnetworkaccessmanager.html#sendCustomRequest">sendCustomRequest</a>().</p>
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#get">get</a>(), <a href="qnetworkaccessmanager.html#post">post</a>(), <a href="qnetworkaccessmanager.html#put">put</a>(), and <a href="qnetworkaccessmanager.html#sendCustomRequest">sendCustomRequest</a>().</p>
 
 
 <h3 class="fn"><a name="get" /><a href="qnetworkreply.html">QNetworkReply</a> QNetworkAccessManager.get (<i>self</i>, <a href="qnetworkrequest.html">QNetworkRequest</a>&#160;<i>request</i>)</h3><p>Posts a request to obtain the contents of the target
@@ -243,8 +242,7 @@ which emits the <a href="qiodevice.html#readyRead">readyRead()</a>
 signal whenever new data arrives.</p>
 <p>The contents as well as associated headers will be
 downloaded.</p>
-<p>See also <a href="qnetworkaccessmanager.html#post">post</a>(),
-<a href="qnetworkaccessmanager.html#put">put</a>(), <a href="qnetworkaccessmanager.html#deleteResource">deleteResource</a>(),
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#post">post</a>(), <a href="qnetworkaccessmanager.html#put">put</a>(), <a href="qnetworkaccessmanager.html#deleteResource">deleteResource</a>(),
 and <a href="qnetworkaccessmanager.html#sendCustomRequest">sendCustomRequest</a>().</p>
 
 
@@ -269,8 +267,7 @@ the <a href="qnetworkaccessmanager.html#finished">finished</a>()
 signal is emitted for this reply.</p>
 <p><b>Note:</b> Sending a POST request on protocols other than HTTP
 and HTTPS is undefined and will probably fail.</p>
-<p>See also <a href="qnetworkaccessmanager.html#get">get</a>(),
-<a href="qnetworkaccessmanager.html#put">put</a>(), <a href="qnetworkaccessmanager.html#deleteResource">deleteResource</a>(),
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#get">get</a>(), <a href="qnetworkaccessmanager.html#put">put</a>(), <a href="qnetworkaccessmanager.html#deleteResource">deleteResource</a>(),
 and <a href="qnetworkaccessmanager.html#sendCustomRequest">sendCustomRequest</a>().</p>
 
 
@@ -282,7 +279,7 @@ destination specified by <i>request</i>.</p>
 <h3 class="fn"><a name="proxy" /><a href="qnetworkproxy.html">QNetworkProxy</a> QNetworkAccessManager.proxy (<i>self</i>)</h3><p>Returns the <a href="qnetworkproxy.html">QNetworkProxy</a> that
 the requests sent using this <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a> object will
 use. The default value for the proxy is <a href="qnetworkproxy.html#ProxyType-enum">QNetworkProxy.DefaultProxy</a>.</p>
-<p>See also <a href="qnetworkaccessmanager.html#setProxy">setProxy</a>(), <a href="qnetworkaccessmanager.html#setProxyFactory">setProxyFactory</a>(),
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#setProxy">setProxy</a>(), <a href="qnetworkaccessmanager.html#setProxyFactory">setProxyFactory</a>(),
 and <a href="qnetworkaccessmanager.html#proxyAuthenticationRequired">proxyAuthenticationRequired</a>().</p>
 
 
@@ -292,7 +289,7 @@ using to determine the proxies to be used for requests.</p>
 <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a> and
 could be deleted at any time.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qnetworkaccessmanager.html#setProxyFactory">setProxyFactory</a>()
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#setProxyFactory">setProxyFactory</a>()
 and <a href="qnetworkaccessmanager.html#proxy">proxy</a>().</p>
 
 
@@ -310,8 +307,7 @@ protocols will probably have content in their replies.</p>
 which most servers do not allow. Form upload mechanisms, including
 that of uploading files through HTML forms, use the POST
 mechanism.</p>
-<p>See also <a href="qnetworkaccessmanager.html#get">get</a>(),
-<a href="qnetworkaccessmanager.html#post">post</a>(), <a href="qnetworkaccessmanager.html#deleteResource">deleteResource</a>(),
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#get">get</a>(), <a href="qnetworkaccessmanager.html#post">post</a>(), <a href="qnetworkaccessmanager.html#deleteResource">deleteResource</a>(),
 and <a href="qnetworkaccessmanager.html#sendCustomRequest">sendCustomRequest</a>().</p>
 
 
@@ -331,11 +327,10 @@ sending an HTTP OPTIONS command.</p>
 device will be uploaded to the server; in that case, data must be
 open for reading and must remain valid until the <a href="qnetworkaccessmanager.html#finished">finished</a>() signal is
 emitted for this reply.</p>
-<p><b>Note:</b> This feature is currently available for HTTP
+<p><b>Note:</b> This feature is currently available for HTTP(S)
 only.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qnetworkaccessmanager.html#get">get</a>(),
-<a href="qnetworkaccessmanager.html#post">post</a>(), <a href="qnetworkaccessmanager.html#put">put</a>(), and <a href="qnetworkaccessmanager.html#deleteResource">deleteResource</a>().</p>
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#get">get</a>(), <a href="qnetworkaccessmanager.html#post">post</a>(), <a href="qnetworkaccessmanager.html#put">put</a>(), and <a href="qnetworkaccessmanager.html#deleteResource">deleteResource</a>().</p>
 
 
 <h3 class="fn"><a name="setCache" />QNetworkAccessManager.setCache (<i>self</i>, <a href="qabstractnetworkcache.html">QAbstractNetworkCache</a>&#160;<i>cache</i>)</h3><p>The <i>cache</i> argument has it's ownership transferred to Qt.</p><p>Sets the manager's network cache to be the <i>cache</i>
@@ -351,8 +346,7 @@ by default does not have a set cache. Qt provides a simple disk
 cache, <a href="qnetworkdiskcache.html">QNetworkDiskCache</a>,
 which can be used.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qnetworkaccessmanager.html#cache">cache</a>()
-and <a href="qnetworkrequest.html#CacheLoadControl-enum">QNetworkRequest.CacheLoadControl</a>.</p>
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#cache">cache</a>() and <a href="qnetworkrequest.html#CacheLoadControl-enum">QNetworkRequest.CacheLoadControl</a>.</p>
 
 
 <h3 class="fn"><a name="setConfiguration" />QNetworkAccessManager.setConfiguration (<i>self</i>, <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>&#160;<i>config</i>)</h3><p>Sets the network configuration that will be used when creating
@@ -365,18 +359,18 @@ network configuration returned by <a href="qnetworkconfigurationmanager.html#def
 will be used.</p>
 <p>To restore the default network configuration set the network
 configuration to the value returned from <a href="qnetworkconfigurationmanager.html#defaultConfiguration">QNetworkConfigurationManager.defaultConfiguration</a>().</p>
-<pre class="highlightedCode brush: cpp">
- QNetworkConfigurationManager manager;
- networkAccessManager-&gt;setConfiguration(manager.defaultConfiguration());
+<pre class="cpp">
+ <span class="type"><a href="qnetworkconfigurationmanager.html">QNetworkConfigurationManager</a></span> manager;
+ networkAccessManager<span class="operator">-</span><span class="operator">&gt;</span>setConfiguration(manager<span class="operator">.</span>defaultConfiguration());
 </pre>
 <p>If an invalid network configuration is set, a network session
 will not be created. In this case network requests will be
 processed regardless, but may fail. For example:</p>
-<pre class="highlightedCode brush: cpp">
- networkAccessManager-&gt;setConfiguration(QNetworkConfiguration());
+<pre class="cpp">
+ networkAccessManager<span class="operator">-</span><span class="operator">&gt;</span>setConfiguration(<span class="type"><a href="qnetworkconfiguration.html">QNetworkConfiguration</a></span>());
 </pre>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qnetworkaccessmanager.html#configuration">configuration</a>() and
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#configuration">configuration</a>() and
 <a href="qnetworksession.html">QNetworkSession</a>.</p>
 
 
@@ -403,7 +397,7 @@ order to implement your own security policy, override the <a href="qnetworkcooki
 and <a href="qnetworkcookiejar.html#setCookiesFromUrl">QNetworkCookieJar.setCookiesFromUrl</a>()
 virtual functions. Those functions are called by <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a> when it
 detects a new cookie.</p>
-<p>See also <a href="qnetworkaccessmanager.html#cookieJar">cookieJar</a>(), <a href="qnetworkcookiejar.html#cookiesForUrl">QNetworkCookieJar.cookiesForUrl</a>(),
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#cookieJar">cookieJar</a>(), <a href="qnetworkcookiejar.html#cookiesForUrl">QNetworkCookieJar.cookiesForUrl</a>(),
 and <a href="qnetworkcookiejar.html#setCookiesFromUrl">QNetworkCookieJar.setCookiesFromUrl</a>().</p>
 
 
@@ -416,8 +410,7 @@ issued by <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a>. In som
 cases, it might be necessary to select different proxies depending
 on the type of request being sent or the destination host. If
 that's the case, you should consider using <a href="qnetworkaccessmanager.html#setProxyFactory">setProxyFactory</a>().</p>
-<p>See also <a href="qnetworkaccessmanager.html#proxy">proxy</a>()
-and <a href="qnetworkaccessmanager.html#proxyAuthenticationRequired">proxyAuthenticationRequired</a>().</p>
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#proxy">proxy</a>() and <a href="qnetworkaccessmanager.html#proxyAuthenticationRequired">proxyAuthenticationRequired</a>().</p>
 
 
 <h3 class="fn"><a name="setProxyFactory" />QNetworkAccessManager.setProxyFactory (<i>self</i>, <a href="qnetworkproxyfactory.html">QNetworkProxyFactory</a>&#160;<i>factory</i>)</h3><p>The <i>factory</i> argument has it's ownership transferred to Qt.</p><p>Sets the proxy factory for this class to be <i>factory</i>. A
@@ -442,7 +435,7 @@ will delete the object when necessary.</p>
 <p><b>Note:</b> If a specific proxy is set with <a href="qnetworkaccessmanager.html#setProxy">setProxy</a>(), the factory
 will not be used.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qnetworkaccessmanager.html#proxyFactory">proxyFactory</a>(),
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#proxyFactory">proxyFactory</a>(),
 <a href="qnetworkaccessmanager.html#setProxy">setProxy</a>(), and
 <a href="qnetworkproxyquery.html">QNetworkProxyQuery</a>.</p>
 
@@ -457,7 +450,7 @@ will cache the credentials internally and will send the same values
 if the server requires authentication again, without emitting the
 authenticationRequired() signal. If it rejects the credentials,
 this signal will be emitted again.</p>
-<p>See also <a href="qnetworkaccessmanager.html#proxyAuthenticationRequired">proxyAuthenticationRequired</a>().</p>
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#proxyAuthenticationRequired">proxyAuthenticationRequired</a>().</p>
 
 
 <h3 class="fn"><a name="finished" />void finished (QNetworkReply *)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever a pending network reply is
@@ -469,7 +462,7 @@ signal.</p>
 information on the status that the object will be in.</p>
 <p><b>Note:</b> Do not delete the <i>reply</i> object in the slot
 connected to this signal. Use <a href="qobject.html#deleteLater">deleteLater</a>().</p>
-<p>See also <a href="qnetworkreply.html#finished">QNetworkReply.finished</a>() and
+<p><b>See also</b> <a href="qnetworkreply.html#finished">QNetworkReply.finished</a>() and
 <a href="qnetworkreply.html#error">QNetworkReply.error</a>().</p>
 
 
@@ -485,9 +478,7 @@ automatically send the same credential without emitting the
 proxyAuthenticationRequired signal again.</p>
 <p>If the proxy rejects the credentials, <a href="qnetworkaccessmanager.html">QNetworkAccessManager</a> will emit
 the signal again.</p>
-<p>See also <a href="qnetworkaccessmanager.html#proxy">proxy</a>(),
-<a href="qnetworkaccessmanager.html#setProxy">setProxy</a>(), and
-<a href="qnetworkaccessmanager.html#authenticationRequired">authenticationRequired</a>().</p>
+<p><b>See also</b> <a href="qnetworkaccessmanager.html#proxy">proxy</a>(), <a href="qnetworkaccessmanager.html#setProxy">setProxy</a>(), and <a href="qnetworkaccessmanager.html#authenticationRequired">authenticationRequired</a>().</p>
 
 
 <h3 class="fn"><a name="sslErrors" />void sslErrors (QNetworkReply *,const QList&lt;QSslError&gt;&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted if the SSL/TLS session encountered errors
@@ -505,7 +496,7 @@ indicating that security may be compromised and display the SSL
 settings (see sslConfiguration() to obtain it). If the user decides
 to proceed after analyzing the remote certificate, the slot should
 call ignoreSslErrors().</p>
-<p>See also <a href="qsslsocket.html#sslErrors">QSslSocket.sslErrors</a>(), <a href="qnetworkreply.html#sslErrors">QNetworkReply.sslErrors</a>(),
+<p><b>See also</b> <a href="qsslsocket.html#sslErrors">QSslSocket.sslErrors</a>(), <a href="qnetworkreply.html#sslErrors">QNetworkReply.sslErrors</a>(),
 <a href="qnetworkreply.html#sslConfiguration">QNetworkReply.sslConfiguration</a>(),
 and <a href="qnetworkreply.html#ignoreSslErrors">QNetworkReply.ignoreSslErrors</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

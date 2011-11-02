@@ -42,8 +42,8 @@ Linux</a>).</p>
 <p>One way to initialize a QString is simply to pass a <tt>const
 char *</tt> to its constructor. For example, the following code
 creates a QString of size 5 containing the data "Hello":</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "Hello";
+<pre class="cpp">
+ <span class="type">QString</span> str <span class="operator">=</span> <span class="string">"Hello"</span>;
 </pre>
 <p>QString converts the <tt>const char *</tt> data into Unicode
 using the <a href="qstring.html#fromAscii">fromAscii</a>()
@@ -54,9 +54,9 @@ parameters, the <tt>const char *</tt> is interpreted as a classic
 C-style '\0'-terminated string. It is legal for the <tt>const char
 *</tt> parameter to be 0.</p>
 <p>You can also provide string data as an array of <a href="qchar.html">QChar</a>s:</p>
-<pre class="highlightedCode brush: cpp">
-     static const QChar data[4] = { 0x0055, 0x006e, 0x10e3, 0x03a3 };
-     QString str(data, 4);
+<pre class="cpp">
+ <span class="keyword">static</span> <span class="keyword">const</span> <span class="type"><a href="qchar.html">QChar</a></span> data<span class="operator">[</span><span class="number">4</span><span class="operator">]</span> <span class="operator">=</span> { <span class="number">0x0055</span><span class="operator">,</span> <span class="number">0x006e</span><span class="operator">,</span> <span class="number">0x10e3</span><span class="operator">,</span> <span class="number">0x03a3</span> };
+ <span class="type">QString</span> str(data<span class="operator">,</span> <span class="number">4</span>);
 </pre>
 <p>QString makes a deep copy of the <a href="qchar.html">QChar</a>
 data, so you can modify it later without experiencing side effects.
@@ -69,24 +69,24 @@ you can use <a href="qstring.html#operator-5b-5d">operator[]</a>().
 On non-const strings, <a href="qstring.html#operator-5b-5d">operator[]</a>() returns a reference
 to a character that can be used on the left side of an assignment.
 For example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str;
-     str.resize(4);
+<pre class="cpp">
+ <span class="type">QString</span> str;
+ str<span class="operator">.</span>resize(<span class="number">4</span>);
 
-     str[0] = QChar('U');
-     str[1] = QChar('n');
-     str[2] = QChar(0x10e3);
-     str[3] = QChar(0x03a3);
+ str<span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">=</span> <span class="type"><a href="qchar.html">QChar</a></span>(<span class="char">'U'</span>);
+ str<span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="operator">=</span> <span class="type"><a href="qchar.html">QChar</a></span>(<span class="char">'n'</span>);
+ str<span class="operator">[</span><span class="number">2</span><span class="operator">]</span> <span class="operator">=</span> <span class="type"><a href="qchar.html">QChar</a></span>(<span class="number">0x10e3</span>);
+ str<span class="operator">[</span><span class="number">3</span><span class="operator">]</span> <span class="operator">=</span> <span class="type"><a href="qchar.html">QChar</a></span>(<span class="number">0x03a3</span>);
 </pre>
 <p>For read-only access, an alternative syntax is to use the
 <a href="qstring.html#at">at</a>() function:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str;
+<pre class="cpp">
+ <span class="type">QString</span> str;
 
-     for (int i = 0; i &lt; str.size(); ++i) {
-         if (str.at(i) &gt;= QChar('a') &amp;&amp; str.at(i) &lt;= QChar('f'))
-             qDebug() &lt;&lt; "Found character in range [a-f]";
-     }
+ <span class="keyword">for</span> (<span class="type">int</span> i <span class="operator">=</span> <span class="number">0</span>; i <span class="operator">&lt;</span> str<span class="operator">.</span>size(); <span class="operator">+</span><span class="operator">+</span>i) {
+     <span class="keyword">if</span> (str<span class="operator">.</span>at(i) <span class="operator">&gt;</span><span class="operator">=</span> <span class="type"><a href="qchar.html">QChar</a></span>(<span class="char">'a'</span>) <span class="operator">&amp;</span><span class="operator">&amp;</span> str<span class="operator">.</span>at(i) <span class="operator">&lt;</span><span class="operator">=</span> <span class="type"><a href="qchar.html">QChar</a></span>(<span class="char">'f'</span>))
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Found character in range [a-f]"</span>;
+ }
 </pre>
 <p>The <a href="qstring.html#at">at</a>() function can be faster
 than <a href="qstring.html#operator-5b-5d">operator[]</a>(),
@@ -104,13 +104,13 @@ all the characters in the string to a particular value, use the
 usage. For example, if you want to compare a QString with a string
 literal, you can write code like this and it will work as
 expected:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str;
+<pre class="cpp">
+ <span class="type">QString</span> str;
 
-     if (str == "auto" || str == "extern"
-             || str == "static" || str == "register") {
-         <span class="comment">// ...</span>
-     }
+ <span class="keyword">if</span> (str <span class="operator">=</span><span class="operator">=</span> <span class="string">"auto"</span> <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> <span class="string">"extern"</span>
+         <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> <span class="string">"static"</span> <span class="operator">|</span><span class="operator">|</span> str <span class="operator">=</span><span class="operator">=</span> <span class="string">"register"</span>) {
+     <span class="comment">// ...</span>
+ }
 </pre>
 <p>You can also pass string literals to functions that take
 QStrings as arguments, invoking the QString(const char *)
@@ -123,11 +123,11 @@ calling &lt;QString&gt;.<a href="qstring.html#toLocal8Bit">toLocal8Bit</a>().<a 
 <p>QString provides the following basic functions for modifying the
 character data: <a href="qstring.html#append">append</a>(),
 <a href="qstring.html#prepend">prepend</a>(), <a href="qstring.html#insert">insert</a>(), <a href="qstring.html#replace">replace</a>(), and <a href="qstring.html#remove">remove</a>(). For example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "and";
-     str.prepend("rock ");     <span class="comment">// str == "rock and"</span>
-     str.append(" roll");        <span class="comment">// str == "rock and roll"</span>
-     str.replace(5, 3, "&amp;");   <span class="comment">// str == "rock &amp; roll"</span>
+<pre class="cpp">
+ <span class="type">QString</span> str <span class="operator">=</span> <span class="string">"and"</span>;
+ str<span class="operator">.</span>prepend(<span class="string">"rock "</span>);     <span class="comment">// str == "rock and"</span>
+ str<span class="operator">.</span>append(<span class="string">" roll"</span>);        <span class="comment">// str == "rock and roll"</span>
+ str<span class="operator">.</span>replace(<span class="number">5</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="string">"&amp;"</span>);   <span class="comment">// str == "rock &amp; roll"</span>
 </pre>
 <p>If you are building a QString gradually and know in advance
 approximately how many characters the QString will contain, you can
@@ -154,14 +154,14 @@ searches backward. Both return the index position of the character
 or substring if they find it; otherwise, they return -1. For
 example, here's a typical loop that finds all occurrences of a
 particular substring:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "We must be &lt;b&gt;bold&lt;/b&gt;, very &lt;b&gt;bold&lt;/b&gt;";
-     int j = 0;
+<pre class="cpp">
+ <span class="type">QString</span> str <span class="operator">=</span> <span class="string">"We must be &lt;b&gt;bold&lt;/b&gt;, very &lt;b&gt;bold&lt;/b&gt;"</span>;
+ <span class="type">int</span> j <span class="operator">=</span> <span class="number">0</span>;
 
-     while ((j = str.indexOf("&lt;b&gt;", j)) != -1) {
-         qDebug() &lt;&lt; "Found &lt;b&gt; tag at index position" &lt;&lt; j;
-         ++j;
-     }
+ <span class="keyword">while</span> ((j <span class="operator">=</span> str<span class="operator">.</span>indexOf(<span class="string">"&lt;b&gt;"</span><span class="operator">,</span> j)) <span class="operator">!</span><span class="operator">=</span> <span class="operator">-</span><span class="number">1</span>) {
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Found &lt;b&gt; tag at index position"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> j;
+     <span class="operator">+</span><span class="operator">+</span>j;
+ }
 </pre>
 <p>QString provides many functions for converting numbers into
 strings and strings into numbers. See the <a href="qstring.html#arg">arg</a>() functions, the <a href="qstring.html#setNum">setNum</a>() functions, the <a href="qstring.html#number">number</a>() static functions, and the
@@ -229,36 +229,38 @@ QString to C strings.</li>
 </ul>
 <p>One way to define these preprocessor symbols globally for your
 application is to add the following entry to your <a href="qmake-project-files.html">qmake project file</a>:</p>
-<pre class="highlightedCode brush: cpp">
- DEFINES += QT_NO_CAST_FROM_ASCII \
+<pre class="cpp">
+ DEFINES <span class="operator">+</span><span class="operator">=</span> QT_NO_CAST_FROM_ASCII \
             QT_NO_CAST_TO_ASCII
 </pre>
 <p>You then need to explicitly call <a href="qstring.html#fromAscii">fromAscii</a>(), <a href="qstring.html#fromLatin1">fromLatin1</a>(), <a href="qstring.html#fromUtf8">fromUtf8</a>(), or <a href="qstring.html#fromLocal8Bit">fromLocal8Bit</a>() to construct a
 QString from an 8-bit string, or use the lightweight <a href="qlatin1string.html">QLatin1String</a> class, for example:</p>
-<pre class="highlightedCode brush: cpp">
- QString url = QLatin1String("http://www.unicode.org/");
+<pre class="cpp">
+ <span class="type">QString</span> url <span class="operator">=</span> QLatin1String(<span class="string">"http://www.unicode.org/"</span>);
 </pre>
 <p>Similarly, you must call <a href="qstring.html#toAscii">toAscii</a>(), <a href="qstring.html#toLatin1">toLatin1</a>(), <a href="qstring.html#toUtf8">toUtf8</a>(), or <a href="qstring.html#toLocal8Bit">toLocal8Bit</a>() explicitly to convert
 the QString to an 8-bit string. (Other encodings are supported
 through the <a href="qtextcodec.html">QTextCodec</a> class.)</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><a id="note-for-c-programmers" name="note-for-c-programmers" /></p>
-<h3>Note for C Programmers</h3>
-<p>Due to C++'s type system and the fact that QString is <a href="implicit-sharing.html#implicitly-shared">implicitly shared</a>,
+<table class="generic" width="100 %">
+<thead>
+<tr class="qt-style">
+<th>Note for C Programmers</th>
+</tr>
+</thead>
+<tr class="odd" valign="top">
+<td>Due to C++'s type system and the fact that QString is <a href="implicit-sharing.html#implicitly-shared">implicitly shared</a>,
 QStrings may be treated like <tt>int</tt>s or other basic types.
-For example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString Widget.boolToString(bool b)
-     {
-         QString result;
-         if (b)
-             result = "True";
-         else
-             result = "False";
-         return result;
-     }
+For example:
+<pre class="cpp">
+ <span class="type">QString</span> Widget<span class="operator">.</span>boolToString(<span class="type">bool</span> b)
+ {
+     <span class="type">QString</span> result;
+     <span class="keyword">if</span> (b)
+         result <span class="operator">=</span> <span class="string">"True"</span>;
+     <span class="keyword">else</span>
+         result <span class="operator">=</span> <span class="string">"False"</span>;
+     <span class="keyword">return</span> result;
+ }
 </pre>
 <p>The <tt>result</tt> variable, is a normal variable allocated on
 the stack. When <tt>return</tt> is called, and because we're
@@ -276,15 +278,15 @@ is initialized using QString's default constructor or by passing
 (const char *)0 to the constructor. An <i>empty</i> string is any
 string with size 0. A null string is always empty, but an empty
 string isn't necessarily null:</p>
-<pre class="highlightedCode brush: cpp">
-     QString().isNull();               <span class="comment">// returns true</span>
-     QString().isEmpty();              <span class="comment">// returns true</span>
+<pre class="cpp">
+ <span class="type">QString</span>()<span class="operator">.</span>isNull();               <span class="comment">// returns true</span>
+ <span class="type">QString</span>()<span class="operator">.</span>isEmpty();              <span class="comment">// returns true</span>
 
-     QString("").isNull();             <span class="comment">// returns false</span>
-     QString("").isEmpty();            <span class="comment">// returns true</span>
+ <span class="type">QString</span>(<span class="string">""</span>)<span class="operator">.</span>isNull();             <span class="comment">// returns false</span>
+ <span class="type">QString</span>(<span class="string">""</span>)<span class="operator">.</span>isEmpty();            <span class="comment">// returns true</span>
 
-     QString("abc").isNull();          <span class="comment">// returns false</span>
-     QString("abc").isEmpty();         <span class="comment">// returns false</span>
+ <span class="type">QString</span>(<span class="string">"abc"</span>)<span class="operator">.</span>isNull();          <span class="comment">// returns false</span>
+ <span class="type">QString</span>(<span class="string">"abc"</span>)<span class="operator">.</span>isEmpty();         <span class="comment">// returns false</span>
 </pre>
 <p>All functions except <a href="qstring.html#isNull">isNull</a>()
 treat null strings the same as empty strings. For example, <a href="qstring.html#toAscii">toAscii</a>().<a href="qstring.html#constData">constData</a>() returns a pointer to a
@@ -298,52 +300,32 @@ specified (e.g., <a href="qstring.html#arg">arg</a>(), <a href="qstring.html#num
 be one of the following:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Format</th>
 <th>Meaning</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><tt>e</tt></p>
-</td>
-<td>
-<p>format as [-]9.9e[+|-]999</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>e</tt></td>
+<td>format as [-]9.9e[+|-]999</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>E</tt></p>
-</td>
-<td>
-<p>format as [-]9.9E[+|-]999</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>E</tt></td>
+<td>format as [-]9.9E[+|-]999</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>f</tt></p>
-</td>
-<td>
-<p>format as [-]9.9</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>f</tt></td>
+<td>format as [-]9.9</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>g</tt></p>
-</td>
-<td>
-<p>use <tt>e</tt> or <tt>f</tt> format, whichever is the most
-concise</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>g</tt></td>
+<td>use <tt>e</tt> or <tt>f</tt> format, whichever is the most
+concise</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>G</tt></p>
-</td>
-<td>
-<p>use <tt>E</tt> or <tt>f</tt> format, whichever is the most
-concise</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>G</tt></td>
+<td>use <tt>E</tt> or <tt>f</tt> format, whichever is the most
+concise</td>
 </tr>
 </table>
 <p>A <i>precision</i> is also specified with the argument
@@ -357,14 +339,14 @@ zeroes are omitted).</p>
 <p>Using the QString <tt>'+'</tt> operator, it is easy to construct
 a complex string from multiple substrings. You will often write
 code like this:</p>
-<pre class="highlightedCode brush: cpp">
-     QString foo;
-     QString type = "long";
+<pre class="cpp">
+     <span class="type">QString</span> foo;
+     <span class="type">QString</span> type <span class="operator">=</span> <span class="string">"long"</span>;
 
-     foo-&gt;setText(QLatin1String("vector&lt;") + type + QLatin1String("&gt;.iterator"));
+     foo<span class="operator">-</span><span class="operator">&gt;</span>setText(QLatin1String(<span class="string">"vector&lt;"</span>) <span class="operator">+</span> type <span class="operator">+</span> QLatin1String(<span class="string">"&gt;.iterator"</span>));
 
-     if (foo.startsWith("(" + type + ") 0x"))
-         ...
+     <span class="keyword">if</span> (foo<span class="operator">.</span>startsWith(<span class="string">"("</span> <span class="operator">+</span> type <span class="operator">+</span> <span class="string">") 0x"</span>))
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 </pre>
 <p>There is nothing wrong with either of these string
 constructions, but there are a few hidden inefficiencies. Beginning
@@ -406,62 +388,61 @@ string construction. The straightforward way is to include
 <tt>QStringBuilder</tt> wherever you want to use it, and use the
 <tt>'%'</tt> operator instead of <tt>'+'</tt> when concatenating
 strings:</p>
-<pre class="highlightedCode brush: cpp">
-     #include &lt;QStringBuilder&gt;
+<pre class="cpp">
+     <span class="preprocessor">#include &lt;QStringBuilder&gt;</span>
 
-     QString hello("hello");
-     QStringRef el(&amp;hello, 2, 3);
-     QLatin1String world("world");
-     QString message =  hello % el % world % QChar('!');
+     <span class="type">QString</span> hello(<span class="string">"hello"</span>);
+     <span class="type"><a href="qstringref.html">QStringRef</a></span> el(<span class="operator">&amp;</span>hello<span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span>);
+     QLatin1String world(<span class="string">"world"</span>);
+     <span class="type">QString</span> message <span class="operator">=</span>  hello <span class="operator">%</span> el <span class="operator">%</span> world <span class="operator">%</span> <span class="type"><a href="qchar.html">QChar</a></span>(<span class="char">'!'</span>);
 </pre>
 <p>A more global approach is to include this define:</p>
-<pre class="highlightedCode brush: cpp">
-     #define QT_USE_FAST_CONCATENATION
+<pre class="cpp">
+     <span class="preprocessor">#define QT_USE_FAST_CONCATENATION</span>
 </pre>
 <p>and use <tt>'%'</tt> instead of <tt>'+'</tt> for string
 concatenation everywhere. The third approach, which is the most
 convenient but not entirely source compatible, is to include two
 defines:</p>
-<pre class="highlightedCode brush: cpp">
-     #define QT_USE_FAST_CONCATENATION
-     #define QT_USE_FAST_OPERATOR_PLUS
+<pre class="cpp">
+     <span class="preprocessor">#define QT_USE_FAST_CONCATENATION</span>
+     <span class="preprocessor">#define QT_USE_FAST_OPERATOR_PLUS</span>
 </pre>
 <p>and the <tt>'+'</tt> will automatically be performed as the
 <tt>QStringBuilder</tt> <tt>'%'</tt> everywhere.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="NormalizationForm-enum" />QString.NormalizationForm</h3><p>This enum describes the various normalized forms of Unicode
 text.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QString.NormalizationForm_D</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Canonical Decomposition</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QString.NormalizationForm_C</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Canonical Decomposition followed by Canonical
 Composition</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QString.NormalizationForm_KD</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Compatibility Decomposition</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QString.NormalizationForm_KC</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Compatibility Decomposition followed by
 Canonical Composition</td>
 </tr>
 </table>
-<p>See also <a href="qstring.html#normalized">normalized</a>() and
-<a href="http://www.unicode.org/reports/tr15/">Unicode Standard
-Annex #15</a>.</p>
+<p><b>See also</b> <a href="qstring.html#normalized">normalized</a>() and <a href="http://www.unicode.org/reports/tr15/">Unicode Standard Annex
+#15</a>.</p>
 
 
 <h3 class="fn"><a name="SectionFlag-enum" />QString.SectionFlag</h3><p>This enum specifies flags that can be used to affect various
@@ -469,21 +450,21 @@ aspects of the <a href="qstring.html#section">section</a>()
 function's behavior with respect to separators and empty
 fields.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QString.SectionDefault</tt></td>
-<td class=" topAlign"><tt>0x00</tt></td>
+<td class="topAlign"><tt>0x00</tt></td>
 <td class="topAlign">Empty fields are counted, leading and trailing
 separators are not included, and the separator is compared case
 sensitively.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QString.SectionSkipEmpty</tt></td>
-<td class=" topAlign"><tt>0x01</tt></td>
+<td class="topAlign"><tt>0x01</tt></td>
 <td class="topAlign">Treat empty fields as if they don't exist,
 i.e. they are not considered as far as <i>start</i> and <i>end</i>
 are concerned.</td>
@@ -491,63 +472,63 @@ are concerned.</td>
 <tr>
 <td class="topAlign">
 <tt>QString.SectionIncludeLeadingSep</tt></td>
-<td class=" topAlign"><tt>0x02</tt></td>
+<td class="topAlign"><tt>0x02</tt></td>
 <td class="topAlign">Include the leading separator (if any) in the
 result string.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QString.SectionIncludeTrailingSep</tt></td>
-<td class=" topAlign"><tt>0x04</tt></td>
+<td class="topAlign"><tt>0x04</tt></td>
 <td class="topAlign">Include the trailing separator (if any) in the
 result string.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QString.SectionCaseInsensitiveSeps</tt></td>
-<td class=" topAlign"><tt>0x08</tt></td>
+<td class="topAlign"><tt>0x08</tt></td>
 <td class="topAlign">Compare the separator case-insensitively.</td>
 </tr>
 </table>
 <p>The SectionFlags type is a typedef for <a href="qflags.html">QFlags</a>&lt;SectionFlag&gt;. It stores an OR
 combination of SectionFlag values.</p>
-<p>See also <a href="qstring.html#section">section</a>().</p>
+<p><b>See also</b> <a href="qstring.html#section">section</a>().</p>
 
 
 <h3 class="fn"><a name="SplitBehavior-enum" />QString.SplitBehavior</h3><p>This enum specifies how the <a href="qstring.html#split">split</a>() function should behave with
 respect to empty strings.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QString.KeepEmptyParts</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">If a field is empty, keep it in the
 result.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QString.SkipEmptyParts</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">If a field is empty, don't include it in the
 result.</td>
 </tr>
 </table>
-<p>See also <a href="qstring.html#split">split</a>().</p>
+<p><b>See also</b> <a href="qstring.html#split">split</a>().</p>
 
 
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QString" />QString.__init__ (<i>self</i>)</h3><p>Constructs a null string. Null strings are also empty.</p>
-<p>See also <a href="qstring.html#isEmpty">isEmpty</a>().</p>
+<p><b>See also</b> <a href="qstring.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="QString" />QString.__init__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>)</h3><p>This method is only available if the QtGui module is imported.</p><p>Constructs a null string. Null strings are also empty.</p>
-<p>See also <a href="qstring.html#isEmpty">isEmpty</a>().</p>
+<p><b>See also</b> <a href="qstring.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="QString" />QString.__init__ (<i>self</i>, <a href="qscriptstring.html">QScriptString</a>)</h3><p>This method is only available if the QtScript module is imported.</p><p>Constructs a null string. Null strings are also empty.</p>
-<p>See also <a href="qstring.html#isEmpty">isEmpty</a>().</p>
+<p><b>See also</b> <a href="qstring.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="QString-2" />QString.__init__ (<i>self</i>, int&#160;<i>size</i>, QChar&#160;<i>c</i>)</h3><p>Constructs a string initialized with the first <i>size</i>
@@ -573,28 +554,27 @@ Mark is preserved if present.</p>
 
 <h3 class="fn"><a name="QString-5" />QString.__init__ (<i>self</i>, <a href="quuid.html">QUuid</a>)</h3><p>Constructs a string of the given <i>size</i> with every
 character set to <i>ch</i>.</p>
-<p>See also <a href="qstring.html#fill">fill</a>().</p>
+<p><b>See also</b> <a href="qstring.html#fill">fill</a>().</p>
 
 
 <h3 class="fn"><a name="append" />QString QString.append (<i>self</i>, QString&#160;<i>s</i>)</h3><p>Appends the string <i>str</i> onto the end of this string.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString x = "free";
-     QString y = "dom";
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> x <span class="operator">=</span> <span class="string">"free"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> y <span class="operator">=</span> <span class="string">"dom"</span>;
 
-     x.append(y);
-     <span class="comment">// x == "freedom"</span>
+ x<span class="operator">.</span>append(y);
+ <span class="comment">// x == "freedom"</span>
 </pre>
 <p>This is the same as using the <a href="qstring.html#insert">insert</a>() function:</p>
-<pre class="highlightedCode brush: cpp">
-     x.insert(x.size(), y);
+<pre class="cpp">
+ x<span class="operator">.</span>insert(x<span class="operator">.</span>size()<span class="operator">,</span> y);
 </pre>
 <p>The append() function is typically very fast (<a href="containers.html#constant-time">constant time</a>), because
 <a href="qstring.html">QString</a> preallocates extra space at the
 end of the string data so it can grow without reallocating the
 entire string each time.</p>
-<p>See also <a href="qstring.html#operator-2b-eq">operator+=</a>(),
-<a href="qstring.html#prepend">prepend</a>(), and <a href="qstring.html#insert">insert</a>().</p>
+<p><b>See also</b> <a href="qstring.html#operator-2b-eq">operator+=</a>(), <a href="qstring.html#prepend">prepend</a>(), and <a href="qstring.html#insert">insert</a>().</p>
 
 
 <h3 class="fn"><a name="append-2" />QString QString.append (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><p>Appends the given string <i>reference</i> to this string and
@@ -617,13 +597,13 @@ right-aligned text. A negative <i>fieldWidth</i> produces
 left-aligned text.</p>
 <p>This example shows how we might create a <tt>status</tt> string
 for reporting progress while processing a list of files:</p>
-<pre class="highlightedCode brush: cpp">
-     QString i;           <span class="comment">// current file's number</span>
-     QString total;       <span class="comment">// number of files to process</span>
-     QString fileName;    <span class="comment">// current file's name</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> i;           <span class="comment">// current file's number</span>
+ <span class="type"><a href="qstring.html">QString</a></span> total;       <span class="comment">// number of files to process</span>
+ <span class="type"><a href="qstring.html">QString</a></span> fileName;    <span class="comment">// current file's name</span>
 
-     QString status = QString("Processing file %1 of %2: %3")
-                     .arg(i).arg(total).arg(fileName);
+ <span class="type"><a href="qstring.html">QString</a></span> status <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"Processing file %1 of %2: %3"</span>)
+                 <span class="operator">.</span>arg(i)<span class="operator">.</span>arg(total)<span class="operator">.</span>arg(fileName);
 </pre>
 <p>First, <tt>arg(i)</tt> replaces <tt>%1</tt>. Then
 <tt>arg(total)</tt> replaces <tt>%2</tt>. Finally,
@@ -643,12 +623,12 @@ must be in the range 1 to 99.</p>
 <p>This is the same as <tt>str.arg(a1).arg(a2)</tt>, except that
 the strings <i>a1</i> and <i>a2</i> are replaced in one pass. This
 can make a difference if <i>a1</i> contains e.g. <tt>%1</tt>:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str;
-     str = "%1 %2";
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str;
+ str <span class="operator">=</span> <span class="string">"%1 %2"</span>;
 
-     str.arg("%1f", "Hello");        <span class="comment">// returns "%1f Hello"</span>
-     str.arg("%1f").arg("Hello");    <span class="comment">// returns "Hellof %2"</span>
+ str<span class="operator">.</span>arg(<span class="string">"%1f"</span><span class="operator">,</span> <span class="string">"Hello"</span>);        <span class="comment">// returns "%1f Hello"</span>
+ str<span class="operator">.</span>arg(<span class="string">"%1f"</span>)<span class="operator">.</span>arg(<span class="string">"Hello"</span>);    <span class="comment">// returns "Hellof %2"</span>
 </pre>
 
 
@@ -715,18 +695,18 @@ replaced with a localized representation of <i>a</i>. The
 conversion uses the default locale, set by <a href="qlocale.html#setDefault">QLocale.setDefault</a>(). If no default
 locale was specified, the "C" locale is used. The 'L' flag is
 ignored if <i>base</i> is not 10.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str;
-     str = QString("Decimal 63 is %1 in hexadecimal")
-             .arg(63, 0, 16);
-     <span class="comment">// str == "Decimal 63 is 3f in hexadecimal"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str;
+ str <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"Decimal 63 is %1 in hexadecimal"</span>)
+         <span class="operator">.</span>arg(<span class="number">63</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">16</span>);
+ <span class="comment">// str == "Decimal 63 is 3f in hexadecimal"</span>
 
-     QLocale.setDefault(QLocale(QLocale.English, QLocale.UnitedStates));
-     str = QString("%1 %L2 %L3")
-             .arg(12345)
-             .arg(12345)
-             .arg(12345, 0, 16);
-     <span class="comment">// str == "12345 12,345 3039"</span>
+ <span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>setDefault(<span class="type"><a href="qlocale.html">QLocale</a></span>(<span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>English<span class="operator">,</span> <span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>UnitedStates));
+ str <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"%1 %L2 %L3"</span>)
+         <span class="operator">.</span>arg(<span class="number">12345</span>)
+         <span class="operator">.</span>arg(<span class="number">12345</span>)
+         <span class="operator">.</span>arg(<span class="number">12345</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">16</span>);
+ <span class="comment">// str == "12345 12,345 3039"</span>
 </pre>
 <p>If <i>fillChar</i> is '0' (the number 0, ASCII 48), the locale's
 zero is used. For negative numbers, zero padding might appear
@@ -755,18 +735,18 @@ conversion uses the default locale. The default locale is
 determined from the system's locale settings at application
 startup. It can be changed using <a href="qlocale.html#setDefault">QLocale.setDefault</a>(). The 'L' flag
 is ignored if <i>base</i> is not 10.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str;
-     str = QString("Decimal 63 is %1 in hexadecimal")
-             .arg(63, 0, 16);
-     <span class="comment">// str == "Decimal 63 is 3f in hexadecimal"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str;
+ str <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"Decimal 63 is %1 in hexadecimal"</span>)
+         <span class="operator">.</span>arg(<span class="number">63</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">16</span>);
+ <span class="comment">// str == "Decimal 63 is 3f in hexadecimal"</span>
 
-     QLocale.setDefault(QLocale(QLocale.English, QLocale.UnitedStates));
-     str = QString("%1 %L2 %L3")
-             .arg(12345)
-             .arg(12345)
-             .arg(12345, 0, 16);
-     <span class="comment">// str == "12345 12,345 3039"</span>
+ <span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>setDefault(<span class="type"><a href="qlocale.html">QLocale</a></span>(<span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>English<span class="operator">,</span> <span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>UnitedStates));
+ str <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"%1 %L2 %L3"</span>)
+         <span class="operator">.</span>arg(<span class="number">12345</span>)
+         <span class="operator">.</span>arg(<span class="number">12345</span>)
+         <span class="operator">.</span>arg(<span class="number">12345</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">16</span>);
+ <span class="comment">// str == "12345 12,345 3039"</span>
 </pre>
 <p>If <i>fillChar</i> is '0' (the number 0, ASCII 48), the locale's
 zero is used. For negative numbers, zero padding might appear
@@ -791,7 +771,7 @@ before the minus sign.</p>
 string.</p>
 <p>The <i>position</i> must be a valid index position in the string
 (i.e., 0 &lt;= <i>position</i> &lt; <a href="qstring.html#size">size</a>()).</p>
-<p>See also <a href="qstring.html#operator-5b-5d">operator[]</a>().</p>
+<p><b>See also</b> <a href="qstring.html#operator-5b-5d">operator[]</a>().</p>
 
 
 <h3 class="fn"><a name="capacity" />int QString.capacity (<i>self</i>)</h3><p>Returns the maximum number of characters that can be stored in
@@ -800,27 +780,28 @@ the string without forcing a reallocation.</p>
 tuning <a href="qstring.html">QString</a>'s memory usage. In
 general, you will rarely ever need to call this function. If you
 want to know how many characters are in the string, call <a href="qstring.html#size">size</a>().</p>
-<p>See also <a href="qstring.html#reserve">reserve</a>() and
+<p><b>See also</b> <a href="qstring.html#reserve">reserve</a>() and
 <a href="qstring.html#squeeze">squeeze</a>().</p>
 
 
 <h3 class="fn"><a name="chop" />QString.chop (<i>self</i>, int&#160;<i>n</i>)</h3><p>Removes <i>n</i> characters from the end of the string.</p>
 <p>If <i>n</i> is greater than <a href="qstring.html#size">size</a>(), the result is an empty string.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str("LOGOUT\r\n");
-     str.chop(2);
-     <span class="comment">// str == "LOGOUT"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str(<span class="string">"LOGOUT\r\n"</span>);
+ str<span class="operator">.</span>chop(<span class="number">2</span>);
+ <span class="comment">// str == "LOGOUT"</span>
 </pre>
 <p>If you want to remove characters from the <i>beginning</i> of
 the string, use <a href="qstring.html#remove">remove</a>()
 instead.</p>
-<p>See also <a href="qstring.html#truncate">truncate</a>(),
+<p><b>See also</b> <a href="qstring.html#truncate">truncate</a>(),
 <a href="qstring.html#resize">resize</a>(), and <a href="qstring.html#remove">remove</a>().</p>
 
 
 <h3 class="fn"><a name="clear" />QString.clear (<i>self</i>)</h3><p>Clears the contents of the string and makes it empty.</p>
-<p>See also <a href="qstring.html#resize">resize</a>() and <a href="qstring.html#isEmpty">isEmpty</a>().</p>
+<p><b>See also</b> <a href="qstring.html#resize">resize</a>() and
+<a href="qstring.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="compare" />int QString.compare (<i>self</i>, QString&#160;<i>s</i>)</h3><p>Compares <i>s1</i> with <i>s2</i> and returns an integer less
@@ -833,14 +814,13 @@ insensitive.</p>
 Unicode values of the characters and is very fast, but is not what
 a human would expect. Consider sorting user-visible strings with
 <a href="qstring.html#localeAwareCompare">localeAwareCompare</a>().</p>
-<pre class="highlightedCode brush: cpp">
-     int x = QString.compare("aUtO", "AuTo", Qt.CaseInsensitive);  <span class="comment">// x == 0</span>
-     int y = QString.compare("auto", "Car", Qt.CaseSensitive);     <span class="comment">// y &gt; 0</span>
-     int z = QString.compare("auto", "Car", Qt.CaseInsensitive);   <span class="comment">// z &lt; 0</span>
+<pre class="cpp">
+ <span class="type">int</span> x <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>compare(<span class="string">"aUtO"</span><span class="operator">,</span> <span class="string">"AuTo"</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>CaseInsensitive);  <span class="comment">// x == 0</span>
+ <span class="type">int</span> y <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>compare(<span class="string">"auto"</span><span class="operator">,</span> <span class="string">"Car"</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>CaseSensitive);     <span class="comment">// y &gt; 0</span>
+ <span class="type">int</span> z <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>compare(<span class="string">"auto"</span><span class="operator">,</span> <span class="string">"Car"</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>CaseInsensitive);   <span class="comment">// z &lt; 0</span>
 </pre>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qstring.html#operator-eq-eq">operator==</a>(),
-<a href="qstring.html#operator-lt">operator&lt;</a>(), and <a href="qstring.html#operator-gt">operator&gt;</a>().</p>
+<p><b>See also</b> <a href="qstring.html#operator-eq-eq">operator==</a>(), <a href="qstring.html#operator-lt">operator&lt;</a>(), and <a href="qstring.html#operator-gt">operator&gt;</a>().</p>
 
 
 <h3 class="fn"><a name="compare-2" />int QString.compare (<i>self</i>, QString&#160;<i>s</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>)</h3><p>This function overloads <a href="qstring.html#compare">compare</a>().</p>
@@ -893,11 +873,11 @@ string is less than, equal to, or greater than <i>ref</i>.</p>
 search is case sensitive; otherwise the search is case
 insensitive.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "Peter Pan";
-     str.contains("peter", Qt.CaseInsensitive);    <span class="comment">// returns true</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"Peter Pan"</span>;
+ str<span class="operator">.</span>contains(<span class="string">"peter"</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>CaseInsensitive);    <span class="comment">// returns true</span>
 </pre>
-<p>See also <a href="qstring.html#indexOf">indexOf</a>() and
+<p><b>See also</b> <a href="qstring.html#indexOf">indexOf</a>() and
 <a href="qstring.html#count">count</a>().</p>
 
 
@@ -906,8 +886,8 @@ the string <i>str</i> in this string.</p>
 <p>If <i>cs</i> is <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitive</a> (default), the
 search is case sensitive; otherwise the search is case
 insensitive.</p>
-<p>See also <a href="qstring.html#contains">contains</a>() and
-<a href="qstring.html#indexOf">indexOf</a>().</p>
+<p><b>See also</b> <a href="qstring.html#contains">contains</a>()
+and <a href="qstring.html#indexOf">indexOf</a>().</p>
 
 
 <h3 class="fn"><a name="count-2" />int QString.count (<i>self</i>, QString&#160;<i>str</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><p>This function overloads <a href="qstring.html#count">count</a>().</p>
@@ -920,9 +900,9 @@ string.</p>
 matches in the string.</p>
 <p>This function counts overlapping matches, so in the example
 below, there are four instances of "ana" or "ama":</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "banana and panama";
-     str.count(QRegExp("a[nm]a"));    <span class="comment">// returns 4</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"banana and panama"</span>;
+ str<span class="operator">.</span>count(<span class="type"><a href="qregexp.html">QRegExp</a></span>(<span class="string">"a[nm]a"</span>));    <span class="comment">// returns 4</span>
 </pre>
 
 
@@ -931,27 +911,27 @@ false.</p>
 <p>If <i>cs</i> is <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitive</a> (default), the
 search is case sensitive; otherwise the search is case
 insensitive.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "Bananas";
-     str.endsWith("anas");         <span class="comment">// returns true</span>
-     str.endsWith("pple");         <span class="comment">// returns false</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"Bananas"</span>;
+ str<span class="operator">.</span>endsWith(<span class="string">"anas"</span>);         <span class="comment">// returns true</span>
+ str<span class="operator">.</span>endsWith(<span class="string">"pple"</span>);         <span class="comment">// returns false</span>
 </pre>
-<p>See also <a href="qstring.html#startsWith">startsWith</a>().</p>
+<p><b>See also</b> <a href="qstring.html#startsWith">startsWith</a>().</p>
 
 
 <h3 class="fn"><a name="endsWith-2" />bool QString.endsWith (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><h3 class="fn"><a name="fill" />QString QString.fill (<i>self</i>, QChar&#160;<i>ch</i>, int&#160;<i>size</i>&#160;=&#160;-1)</h3><p>Sets every character in the string to character <i>ch</i>. If
 <i>size</i> is different from -1 (default), the string is resized
 to <i>size</i> beforehand.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "Berlin";
-     str.fill('z');
-     <span class="comment">// str == "zzzzzz"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"Berlin"</span>;
+ str<span class="operator">.</span>fill(<span class="char">'z'</span>);
+ <span class="comment">// str == "zzzzzz"</span>
 
-     str.fill('A', 2);
-     <span class="comment">// str == "AA"</span>
+ str<span class="operator">.</span>fill(<span class="char">'A'</span><span class="operator">,</span> <span class="number">2</span>);
+ <span class="comment">// str == "AA"</span>
 </pre>
-<p>See also <a href="qstring.html#resize">resize</a>().</p>
+<p><b>See also</b> <a href="qstring.html#resize">resize</a>().</p>
 
 
 <h3 class="fn"><a name="fromAscii" />QString QString.fromAscii (str&#160;<i>str</i>, int&#160;<i>size</i>&#160;=&#160;-1)</h3><p>Returns a <a href="qstring.html">QString</a> initialized with
@@ -963,7 +943,8 @@ codec defined by <a href="qtextcodec.html#setCodecForCStrings">QTextCodec.setCod
 to convert <i>str</i> to Unicode. Depending on the codec, it may
 not accept valid US-ASCII (ANSI X3.4-1986) input. If no codec has
 been set, this function does the same as <a href="qstring.html#fromLatin1">fromLatin1</a>().</p>
-<p>See also <a href="qstring.html#toAscii">toAscii</a>(), <a href="qstring.html#fromLatin1">fromLatin1</a>(), <a href="qstring.html#fromUtf8">fromUtf8</a>(), and <a href="qstring.html#fromLocal8Bit">fromLocal8Bit</a>().</p>
+<p><b>See also</b> <a href="qstring.html#toAscii">toAscii</a>(),
+<a href="qstring.html#fromLatin1">fromLatin1</a>(), <a href="qstring.html#fromUtf8">fromUtf8</a>(), and <a href="qstring.html#fromLocal8Bit">fromLocal8Bit</a>().</p>
 
 
 <h3 class="fn"><a name="fromLatin1" />QString QString.fromLatin1 (str&#160;<i>str</i>, int&#160;<i>size</i>&#160;=&#160;-1)</h3><p>Returns a <a href="qstring.html">QString</a> initialized with
@@ -971,7 +952,7 @@ the first <i>size</i> characters of the Latin-1 string
 <i>str</i>.</p>
 <p>If <i>size</i> is -1 (default), it is taken to be
 qstrlen(<i>str</i>).</p>
-<p>See also <a href="qstring.html#toLatin1">toLatin1</a>(),
+<p><b>See also</b> <a href="qstring.html#toLatin1">toLatin1</a>(),
 <a href="qstring.html#fromAscii">fromAscii</a>(), <a href="qstring.html#fromUtf8">fromUtf8</a>(), and <a href="qstring.html#fromLocal8Bit">fromLocal8Bit</a>().</p>
 
 
@@ -981,9 +962,8 @@ the first <i>size</i> characters of the 8-bit string
 <p>If <i>size</i> is -1 (default), it is taken to be
 qstrlen(<i>str</i>).</p>
 <p><a href="qtextcodec.html#codecForLocale">QTextCodec.codecForLocale</a>()
-is used to perform the conversion from Unicode.</p>
-<p>See also <a href="qstring.html#toLocal8Bit">toLocal8Bit</a>(),
-<a href="qstring.html#fromAscii">fromAscii</a>(), <a href="qstring.html#fromLatin1">fromLatin1</a>(), and <a href="qstring.html#fromUtf8">fromUtf8</a>().</p>
+is used to perform the conversion.</p>
+<p><b>See also</b> <a href="qstring.html#toLocal8Bit">toLocal8Bit</a>(), <a href="qstring.html#fromAscii">fromAscii</a>(), <a href="qstring.html#fromLatin1">fromLatin1</a>(), and <a href="qstring.html#fromUtf8">fromUtf8</a>().</p>
 
 
 <h3 class="fn"><a name="fromUtf8" />QString QString.fromUtf8 (str&#160;<i>str</i>, int&#160;<i>size</i>&#160;=&#160;-1)</h3><p>Returns a <a href="qstring.html">QString</a> initialized with
@@ -1002,7 +982,8 @@ and must not be used in text interchange. They are the last two
 codepoints in each Unicode Plane (U+FFFE, U+FFFF, U+1FFFE, U+1FFFF,
 U+2FFFE, etc.), as well as 16 codepoints in the range
 U+FDD0..U+FDDF, inclusive.</p>
-<p>See also <a href="qstring.html#toUtf8">toUtf8</a>(), <a href="qstring.html#fromAscii">fromAscii</a>(), <a href="qstring.html#fromLatin1">fromLatin1</a>(), and <a href="qstring.html#fromLocal8Bit">fromLocal8Bit</a>().</p>
+<p><b>See also</b> <a href="qstring.html#toUtf8">toUtf8</a>(),
+<a href="qstring.html#fromAscii">fromAscii</a>(), <a href="qstring.html#fromLatin1">fromLatin1</a>(), and <a href="qstring.html#fromLocal8Bit">fromLocal8Bit</a>().</p>
 
 
 <h3 class="fn"><a name="indexOf" />int QString.indexOf (<i>self</i>, QString&#160;<i>str</i>, int&#160;<i>from</i>&#160;=&#160;0, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><p>Returns the index position of the first occurrence of the string
@@ -1012,18 +993,17 @@ U+FDD0..U+FDDF, inclusive.</p>
 search is case sensitive; otherwise the search is case
 insensitive.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString x = "sticky question";
-     QString y = "sti";
-     x.indexOf(y);               <span class="comment">// returns 0</span>
-     x.indexOf(y, 1);            <span class="comment">// returns 10</span>
-     x.indexOf(y, 10);           <span class="comment">// returns 10</span>
-     x.indexOf(y, 11);           <span class="comment">// returns -1</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> x <span class="operator">=</span> <span class="string">"sticky question"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> y <span class="operator">=</span> <span class="string">"sti"</span>;
+ x<span class="operator">.</span>indexOf(y);               <span class="comment">// returns 0</span>
+ x<span class="operator">.</span>indexOf(y<span class="operator">,</span> <span class="number">1</span>);            <span class="comment">// returns 10</span>
+ x<span class="operator">.</span>indexOf(y<span class="operator">,</span> <span class="number">10</span>);           <span class="comment">// returns 10</span>
+ x<span class="operator">.</span>indexOf(y<span class="operator">,</span> <span class="number">11</span>);           <span class="comment">// returns -1</span>
 </pre>
 <p>If <i>from</i> is -1, the search starts at the last character;
 if it is -2, at the next to last character and so on.</p>
-<p>See also <a href="qstring.html#lastIndexOf">lastIndexOf</a>(),
-<a href="qstring.html#contains">contains</a>(), and <a href="qstring.html#count">count</a>().</p>
+<p><b>See also</b> <a href="qstring.html#lastIndexOf">lastIndexOf</a>(), <a href="qstring.html#contains">contains</a>(), and <a href="qstring.html#count">count</a>().</p>
 
 
 <h3 class="fn"><a name="indexOf-2" />int QString.indexOf (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>str</i>, int&#160;<i>from</i>&#160;=&#160;0, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><p>Returns the index position of the first occurrence of the string
@@ -1033,19 +1013,18 @@ if it is -2, at the next to last character and so on.</p>
 search is case sensitive; otherwise the search is case
 insensitive.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString x = "sticky question";
-     QString y = "sti";
-     x.indexOf(y);               <span class="comment">// returns 0</span>
-     x.indexOf(y, 1);            <span class="comment">// returns 10</span>
-     x.indexOf(y, 10);           <span class="comment">// returns 10</span>
-     x.indexOf(y, 11);           <span class="comment">// returns -1</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> x <span class="operator">=</span> <span class="string">"sticky question"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> y <span class="operator">=</span> <span class="string">"sti"</span>;
+ x<span class="operator">.</span>indexOf(y);               <span class="comment">// returns 0</span>
+ x<span class="operator">.</span>indexOf(y<span class="operator">,</span> <span class="number">1</span>);            <span class="comment">// returns 10</span>
+ x<span class="operator">.</span>indexOf(y<span class="operator">,</span> <span class="number">10</span>);           <span class="comment">// returns 10</span>
+ x<span class="operator">.</span>indexOf(y<span class="operator">,</span> <span class="number">11</span>);           <span class="comment">// returns -1</span>
 </pre>
 <p>If <i>from</i> is -1, the search starts at the last character;
 if it is -2, at the next to last character and so on.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qstring.html#lastIndexOf">lastIndexOf</a>(),
-<a href="qstring.html#contains">contains</a>(), and <a href="qstring.html#count">count</a>().</p>
+<p><b>See also</b> <a href="qstring.html#lastIndexOf">lastIndexOf</a>(), <a href="qstring.html#contains">contains</a>(), and <a href="qstring.html#count">count</a>().</p>
 
 
 <h3 class="fn"><a name="indexOf-3" />int QString.indexOf (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>rx</i>, int&#160;<i>from</i>&#160;=&#160;0)</h3><p>This function overloads <a href="qstring.html#indexOf">indexOf</a>().</p>
@@ -1058,14 +1037,15 @@ found.</p>
 <h3 class="fn"><a name="insert" />QString QString.insert (<i>self</i>, int&#160;<i>i</i>, QString&#160;<i>s</i>)</h3><p>Inserts the string <i>str</i> at the given index <i>position</i>
 and returns a reference to this string.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "Meal";
-     str.insert(1, QString("ontr"));
-     <span class="comment">// str == "Montreal"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"Meal"</span>;
+ str<span class="operator">.</span>insert(<span class="number">1</span><span class="operator">,</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"ontr"</span>));
+ <span class="comment">// str == "Montreal"</span>
 </pre>
 <p>If the given <i>position</i> is greater than <a href="qstring.html#size">size</a>(), the array is first extended using
 <a href="qstring.html#resize">resize</a>().</p>
-<p>See also <a href="qstring.html#append">append</a>(), <a href="qstring.html#prepend">prepend</a>(), <a href="qstring.html#replace">replace</a>(), and <a href="qstring.html#remove">remove</a>().</p>
+<p><b>See also</b> <a href="qstring.html#append">append</a>(),
+<a href="qstring.html#prepend">prepend</a>(), <a href="qstring.html#replace">replace</a>(), and <a href="qstring.html#remove">remove</a>().</p>
 
 
 <h3 class="fn"><a name="insert-2" />QString QString.insert (<i>self</i>, int&#160;<i>i</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><p>This function overloads <a href="qstring.html#insert">insert</a>().</p>
@@ -1076,29 +1056,29 @@ and returns a reference to this string.</p>
 <h3 class="fn"><a name="isEmpty" />bool QString.isEmpty (<i>self</i>)</h3><p>Returns true if the string has no characters; otherwise returns
 false.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString().isEmpty();            <span class="comment">// returns true</span>
-     QString("").isEmpty();          <span class="comment">// returns true</span>
-     QString("x").isEmpty();         <span class="comment">// returns false</span>
-     QString("abc").isEmpty();       <span class="comment">// returns false</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span>()<span class="operator">.</span>isEmpty();            <span class="comment">// returns true</span>
+ <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">""</span>)<span class="operator">.</span>isEmpty();          <span class="comment">// returns true</span>
+ <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"x"</span>)<span class="operator">.</span>isEmpty();         <span class="comment">// returns false</span>
+ <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"abc"</span>)<span class="operator">.</span>isEmpty();       <span class="comment">// returns false</span>
 </pre>
-<p>See also <a href="qstring.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qstring.html#size">size</a>().</p>
 
 
 <h3 class="fn"><a name="isNull" />bool QString.isNull (<i>self</i>)</h3><p>Returns true if this string is null; otherwise returns
 false.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString().isNull();             <span class="comment">// returns true</span>
-     QString("").isNull();           <span class="comment">// returns false</span>
-     QString("abc").isNull();        <span class="comment">// returns false</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span>()<span class="operator">.</span>isNull();             <span class="comment">// returns true</span>
+ <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">""</span>)<span class="operator">.</span>isNull();           <span class="comment">// returns false</span>
+ <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"abc"</span>)<span class="operator">.</span>isNull();        <span class="comment">// returns false</span>
 </pre>
 <p>Qt makes a distinction between null strings and empty strings
 for historical reasons. For most applications, what matters is
 whether or not a string contains any data, and this can be
 determined using the <a href="qstring.html#isEmpty">isEmpty</a>()
 function.</p>
-<p>See also <a href="qstring.html#isEmpty">isEmpty</a>().</p>
+<p><b>See also</b> <a href="qstring.html#isEmpty">isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="isRightToLeft" />bool QString.isRightToLeft (<i>self</i>)</h3><p>Returns true if the string is read right to left.</p>
@@ -1113,15 +1093,16 @@ character and so on. Returns -1 if <i>str</i> is not found.</p>
 search is case sensitive; otherwise the search is case
 insensitive.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString x = "crazy azimuths";
-     QString y = "az";
-     x.lastIndexOf(y);           <span class="comment">// returns 6</span>
-     x.lastIndexOf(y, 6);        <span class="comment">// returns 6</span>
-     x.lastIndexOf(y, 5);        <span class="comment">// returns 2</span>
-     x.lastIndexOf(y, 1);        <span class="comment">// returns -1</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> x <span class="operator">=</span> <span class="string">"crazy azimuths"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> y <span class="operator">=</span> <span class="string">"az"</span>;
+ x<span class="operator">.</span>lastIndexOf(y);           <span class="comment">// returns 6</span>
+ x<span class="operator">.</span>lastIndexOf(y<span class="operator">,</span> <span class="number">6</span>);        <span class="comment">// returns 6</span>
+ x<span class="operator">.</span>lastIndexOf(y<span class="operator">,</span> <span class="number">5</span>);        <span class="comment">// returns 2</span>
+ x<span class="operator">.</span>lastIndexOf(y<span class="operator">,</span> <span class="number">1</span>);        <span class="comment">// returns -1</span>
 </pre>
-<p>See also <a href="qstring.html#indexOf">indexOf</a>(), <a href="qstring.html#contains">contains</a>(), and <a href="qstring.html#count">count</a>().</p>
+<p><b>See also</b> <a href="qstring.html#indexOf">indexOf</a>(),
+<a href="qstring.html#contains">contains</a>(), and <a href="qstring.html#count">count</a>().</p>
 
 
 <h3 class="fn"><a name="lastIndexOf-2" />int QString.lastIndexOf (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>str</i>, int&#160;<i>from</i>&#160;=&#160;-1, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><p>Returns the index position of the last occurrence of the string
@@ -1133,16 +1114,17 @@ character and so on. Returns -1 if <i>str</i> is not found.</p>
 search is case sensitive; otherwise the search is case
 insensitive.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString x = "crazy azimuths";
-     QString y = "az";
-     x.lastIndexOf(y);           <span class="comment">// returns 6</span>
-     x.lastIndexOf(y, 6);        <span class="comment">// returns 6</span>
-     x.lastIndexOf(y, 5);        <span class="comment">// returns 2</span>
-     x.lastIndexOf(y, 1);        <span class="comment">// returns -1</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> x <span class="operator">=</span> <span class="string">"crazy azimuths"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> y <span class="operator">=</span> <span class="string">"az"</span>;
+ x<span class="operator">.</span>lastIndexOf(y);           <span class="comment">// returns 6</span>
+ x<span class="operator">.</span>lastIndexOf(y<span class="operator">,</span> <span class="number">6</span>);        <span class="comment">// returns 6</span>
+ x<span class="operator">.</span>lastIndexOf(y<span class="operator">,</span> <span class="number">5</span>);        <span class="comment">// returns 2</span>
+ x<span class="operator">.</span>lastIndexOf(y<span class="operator">,</span> <span class="number">1</span>);        <span class="comment">// returns -1</span>
 </pre>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qstring.html#indexOf">indexOf</a>(), <a href="qstring.html#contains">contains</a>(), and <a href="qstring.html#count">count</a>().</p>
+<p><b>See also</b> <a href="qstring.html#indexOf">indexOf</a>(),
+<a href="qstring.html#contains">contains</a>(), and <a href="qstring.html#count">count</a>().</p>
 
 
 <h3 class="fn"><a name="lastIndexOf-3" />int QString.lastIndexOf (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>rx</i>, int&#160;<i>from</i>&#160;=&#160;-1)</h3><p>This function overloads <a href="qstring.html#lastIndexOf">lastIndexOf</a>().</p>
@@ -1155,34 +1137,35 @@ character <i>ch</i>, searching backward from position
 characters of the string.</p>
 <p>The entire string is returned if <i>n</i> is greater than
 <a href="qstring.html#size">size</a>() or less than zero.</p>
-<pre class="highlightedCode brush: cpp">
-     QString x = "Pineapple";
-     QString y = x.left(4);      <span class="comment">// y == "Pine"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> x <span class="operator">=</span> <span class="string">"Pineapple"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> y <span class="operator">=</span> x<span class="operator">.</span>left(<span class="number">4</span>);      <span class="comment">// y == "Pine"</span>
 </pre>
-<p>See also <a href="qstring.html#right">right</a>(), <a href="qstring.html#mid">mid</a>(), and <a href="qstring.html#startsWith">startsWith</a>().</p>
+<p><b>See also</b> <a href="qstring.html#right">right</a>(),
+<a href="qstring.html#mid">mid</a>(), and <a href="qstring.html#startsWith">startsWith</a>().</p>
 
 
 <h3 class="fn"><a name="leftJustified" />QString QString.leftJustified (<i>self</i>, int&#160;<i>width</i>, QChar&#160;<i>fillChar</i>&#160;=&#160;QLatin1Char(' '), bool&#160;<i>truncate</i>&#160;=&#160;False)</h3><p>Returns a string of size <i>width</i> that contains this string
 padded by the <i>fill</i> character.</p>
 <p>If <i>truncate</i> is false and the <a href="qstring.html#size">size</a>() of the string is more than
 <i>width</i>, then the returned string is a copy of the string.</p>
-<pre class="highlightedCode brush: cpp">
-     QString s = "apple";
-     QString t = s.leftJustified(8, '.');    <span class="comment">// t == "apple..."</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> s <span class="operator">=</span> <span class="string">"apple"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> t <span class="operator">=</span> s<span class="operator">.</span>leftJustified(<span class="number">8</span><span class="operator">,</span> <span class="char">'.'</span>);    <span class="comment">// t == "apple..."</span>
 </pre>
 <p>If <i>truncate</i> is true and the <a href="qstring.html#size">size</a>() of the string is more than
 <i>width</i>, then any characters in a copy of the string after
 position <i>width</i> are removed, and the copy is returned.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "Pineapple";
-     str = str.leftJustified(5, '.', true);    <span class="comment">// str == "Pinea"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"Pineapple"</span>;
+ str <span class="operator">=</span> str<span class="operator">.</span>leftJustified(<span class="number">5</span><span class="operator">,</span> <span class="char">'.'</span><span class="operator">,</span> <span class="keyword">true</span>);    <span class="comment">// str == "Pinea"</span>
 </pre>
-<p>See also <a href="qstring.html#rightJustified">rightJustified</a>().</p>
+<p><b>See also</b> <a href="qstring.html#rightJustified">rightJustified</a>().</p>
 
 
 <h3 class="fn"><a name="length" />int QString.length (<i>self</i>)</h3><p>Returns the number of characters in this string. Equivalent to
 <a href="qstring.html#size">size</a>().</p>
-<p>See also <a class="compat" href="qstring-qt3.html#setLength">setLength</a>() and <a href="qstring.html#resize">resize</a>().</p>
+<p><b>See also</b> <a class="compat" href="qstring-qt3.html#setLength">setLength</a>() and <a href="qstring.html#resize">resize</a>().</p>
 
 
 <h3 class="fn"><a name="localeAwareCompare" />int QString.localeAwareCompare (<i>self</i>, QString&#160;<i>s</i>)</h3><p>Compares <i>s1</i> with <i>s2</i> and returns an integer less
@@ -1194,7 +1177,7 @@ lists of strings to the user.</p>
 <p>On Mac OS X since Qt 4.3, this function compares according the
 "Order for sorted lists" setting in the International prefereces
 panel.</p>
-<p>See also <a href="qstring.html#compare">compare</a>() and
+<p><b>See also</b> <a href="qstring.html#compare">compare</a>() and
 <a class="compat" href="qtextcodec-qt3.html#locale">QTextCodec.locale</a>().</p>
 
 
@@ -1237,12 +1220,13 @@ available in the string starting at the given <i>position</i>, or
 if <i>n</i> is -1 (default), the function returns all characters
 that are available from the specified <i>position</i>.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString x = "Nine pineapples";
-     QString y = x.mid(5, 4);            <span class="comment">// y == "pine"</span>
-     QString z = x.mid(5);               <span class="comment">// z == "pineapples"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> x <span class="operator">=</span> <span class="string">"Nine pineapples"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> y <span class="operator">=</span> x<span class="operator">.</span>mid(<span class="number">5</span><span class="operator">,</span> <span class="number">4</span>);            <span class="comment">// y == "pine"</span>
+ <span class="type"><a href="qstring.html">QString</a></span> z <span class="operator">=</span> x<span class="operator">.</span>mid(<span class="number">5</span>);               <span class="comment">// z == "pineapples"</span>
 </pre>
-<p>See also <a href="qstring.html#left">left</a>() and <a href="qstring.html#right">right</a>().</p>
+<p><b>See also</b> <a href="qstring.html#left">left</a>() and
+<a href="qstring.html#right">right</a>().</p>
 
 
 <h3 class="fn"><a name="normalized" />QString QString.normalized (<i>self</i>, <a href="qstring.html#NormalizationForm-enum">NormalizationForm</a>&#160;<i>mode</i>)</h3><p>Returns the string in the given Unicode normalization
@@ -1260,12 +1244,12 @@ the specified <i>base</i>.</p>
 <p>The base is 10 by default and must be between 2 and 36. For
 bases other than 10, <i>n</i> is treated as an unsigned
 integer.</p>
-<pre class="highlightedCode brush: cpp">
-     long a = 63;
-     QString s = QString.number(a, 16);             <span class="comment">// s == "3f"</span>
-     QString t = QString.number(a, 16).toUpper();     <span class="comment">// t == "3F"</span>
+<pre class="cpp">
+ <span class="type">long</span> a <span class="operator">=</span> <span class="number">63</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> s <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>number(a<span class="operator">,</span> <span class="number">16</span>);             <span class="comment">// s == "3f"</span>
+ <span class="type"><a href="qstring.html">QString</a></span> t <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>number(a<span class="operator">,</span> <span class="number">16</span>)<span class="operator">.</span>toUpper();     <span class="comment">// t == "3F"</span>
 </pre>
-<p>See also <a href="qstring.html#setNum">setNum</a>().</p>
+<p><b>See also</b> <a href="qstring.html#setNum">setNum</a>().</p>
 
 
 <h3 class="fn"><a name="number-2" />QString QString.number (float&#160;<i>n</i>, str&#160;<i>format</i>&#160;=&#160;'g', int&#160;<i>precision</i>&#160;=&#160;6)</h3><p>Returns a string equivalent of the number <i>n</i>, formatted
@@ -1274,7 +1258,8 @@ according to the specified <i>format</i> and <i>precision</i>. See
 details.</p>
 <p>Unlike <a href="qlocale.html#toString">QLocale.toString</a>(),
 this function does not honor the user's locale settings.</p>
-<p>See also <a href="qstring.html#setNum">setNum</a>() and <a href="qlocale.html#toString">QLocale.toString</a>().</p>
+<p><b>See also</b> <a href="qstring.html#setNum">setNum</a>() and
+<a href="qlocale.html#toString">QLocale.toString</a>().</p>
 
 
 <h3 class="fn"><a name="number-3" />QString QString.number (int&#160;<i>n</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>This is an overloaded function.</p>
@@ -1286,13 +1271,14 @@ this function does not honor the user's locale settings.</p>
 <h3 class="fn"><a name="prepend" />QString QString.prepend (<i>self</i>, QString&#160;<i>s</i>)</h3><p>Prepends the string <i>str</i> to the beginning of this string
 and returns a reference to this string.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString x = "ship";
-     QString y = "air";
-     x.prepend(y);
-     <span class="comment">// x == "airship"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> x <span class="operator">=</span> <span class="string">"ship"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> y <span class="operator">=</span> <span class="string">"air"</span>;
+ x<span class="operator">.</span>prepend(y);
+ <span class="comment">// x == "airship"</span>
 </pre>
-<p>See also <a href="qstring.html#append">append</a>() and <a href="qstring.html#insert">insert</a>().</p>
+<p><b>See also</b> <a href="qstring.html#append">append</a>() and
+<a href="qstring.html#insert">insert</a>().</p>
 
 
 <h3 class="fn"><a name="prepend-2" />QString QString.prepend (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><p>This function overloads <a href="qstring.html#prepend">prepend</a>().</p>
@@ -1312,13 +1298,13 @@ example.</p>
 <h3 class="fn"><a name="push_back" />QString.push_back (<i>self</i>, QString&#160;<i>s</i>)</h3><p>This function is provided for STL compatibility, appending the
 given <i>other</i> string onto the end of this string. It is
 equivalent to <tt>append(other)</tt>.</p>
-<p>See also <a href="qstring.html#append">append</a>().</p>
+<p><b>See also</b> <a href="qstring.html#append">append</a>().</p>
 
 
 <h3 class="fn"><a name="push_front" />QString.push_front (<i>self</i>, QString&#160;<i>s</i>)</h3><p>This function is provided for STL compatibility, prepending the
 given <i>other</i> string to the beginning of this string. It is
 equivalent to <tt>prepend(other)</tt>.</p>
-<p>See also <a href="qstring.html#prepend">prepend</a>().</p>
+<p><b>See also</b> <a href="qstring.html#prepend">prepend</a>().</p>
 
 
 <h3 class="fn"><a name="remove" />QString QString.remove (<i>self</i>, int&#160;<i>i</i>, int&#160;<i>len</i>)</h3><p>Removes <i>n</i> characters from the string, starting at the
@@ -1327,12 +1313,13 @@ string.</p>
 <p>If the specified <i>position</i> index is within the string, but
 <i>position</i> + <i>n</i> is beyond the end of the string, the
 string is truncated at the specified <i>position</i>.</p>
-<pre class="highlightedCode brush: cpp">
-     QString s = "Montreal";
-     s.remove(1, 4);
-     <span class="comment">// s == "Meal"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> s <span class="operator">=</span> <span class="string">"Montreal"</span>;
+ s<span class="operator">.</span>remove(<span class="number">1</span><span class="operator">,</span> <span class="number">4</span>);
+ <span class="comment">// s == "Meal"</span>
 </pre>
-<p>See also <a href="qstring.html#insert">insert</a>() and <a href="qstring.html#replace">replace</a>().</p>
+<p><b>See also</b> <a href="qstring.html#insert">insert</a>() and
+<a href="qstring.html#replace">replace</a>().</p>
 
 
 <h3 class="fn"><a name="remove-2" />QString QString.remove (<i>self</i>, QString&#160;<i>str</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><p>Removes every occurrence of the character <i>ch</i> in this
@@ -1341,13 +1328,13 @@ string, and returns a reference to this string.</p>
 search is case sensitive; otherwise the search is case
 insensitive.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString t = "Ali Baba";
-     t.remove(QChar('a'), Qt.CaseInsensitive);
-     <span class="comment">// t == "li Bb"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> t <span class="operator">=</span> <span class="string">"Ali Baba"</span>;
+ t<span class="operator">.</span>remove(<span class="type"><a href="qchar.html">QChar</a></span>(<span class="char">'a'</span>)<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>CaseInsensitive);
+ <span class="comment">// t == "li Bb"</span>
 </pre>
 <p>This is the same as <tt>replace(ch, "", cs)</tt>.</p>
-<p>See also <a href="qstring.html#replace">replace</a>().</p>
+<p><b>See also</b> <a href="qstring.html#replace">replace</a>().</p>
 
 
 <h3 class="fn"><a name="remove-3" />QString QString.remove (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>rx</i>)</h3><p>Removes every occurrence of the given <i>str</i> string in this
@@ -1356,16 +1343,16 @@ string, and returns a reference to this string.</p>
 search is case sensitive; otherwise the search is case
 insensitive.</p>
 <p>This is the same as <tt>replace(str, "", cs)</tt>.</p>
-<p>See also <a href="qstring.html#replace">replace</a>().</p>
+<p><b>See also</b> <a href="qstring.html#replace">replace</a>().</p>
 
 
 <h3 class="fn"><a name="repeated" />QString QString.repeated (<i>self</i>, int&#160;<i>times</i>)</h3><p>Returns a copy of this string repeated the specified number of
 <i>times</i>.</p>
 <p>If <i>times</i> is less than 1, an empty string is returned.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QString str("ab");
- str.repeated(4);            <span class="comment">// returns "abababab"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str(<span class="string">"ab"</span>);
+ str<span class="operator">.</span>repeated(<span class="number">4</span>);            <span class="comment">// returns "abababab"</span>
 </pre>
 <p>This function was introduced in Qt 4.5.</p>
 
@@ -1374,13 +1361,14 @@ insensitive.</p>
 with the string <i>after</i> and returns a reference to this
 string.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString x = "Say yes!";
-     QString y = "no";
-     x.replace(4, 3, y);
-     <span class="comment">// x == "Say no</span>!"
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> x <span class="operator">=</span> <span class="string">"Say yes!"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> y <span class="operator">=</span> <span class="string">"no"</span>;
+ x<span class="operator">.</span>replace(<span class="number">4</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> y);
+ <span class="comment">// x == "Say no!"</span>
 </pre>
-<p>See also <a href="qstring.html#insert">insert</a>() and <a href="qstring.html#remove">remove</a>().</p>
+<p><b>See also</b> <a href="qstring.html#insert">insert</a>() and
+<a href="qstring.html#remove">remove</a>().</p>
 
 
 <h3 class="fn"><a name="replace-2" />QString QString.replace (<i>self</i>, QString&#160;<i>before</i>, QString&#160;<i>after</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><h3 class="fn"><a name="replace-3" />QString QString.replace (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>rx</i>, QString&#160;<i>after</i>)</h3><h3 class="fn"><a name="replace-4" />QString QString.replace (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>before</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>after</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><h3 class="fn"><a name="replace-5" />QString QString.replace (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>before</i>, QString&#160;<i>after</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><h3 class="fn"><a name="replace-6" />QString QString.replace (<i>self</i>, QString&#160;<i>before</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>after</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><p>This function overloads <a href="qstring.html#replace">replace</a>().</p>
@@ -1403,20 +1391,20 @@ string and wants to avoid repeated reallocation. In this example,
 we want to add to the string until some condition is true, and
 we're fairly sure that size is large enough to make a call to
 reserve() worthwhile:</p>
-<pre class="highlightedCode brush: cpp">
-     QString result;
-     int maxSize;
-     bool condition;
-     QChar nextChar;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> result;
+ <span class="type">int</span> maxSize;
+ <span class="type">bool</span> condition;
+ <span class="type"><a href="qchar.html">QChar</a></span> nextChar;
 
-     result.reserve(maxSize);
+ result<span class="operator">.</span>reserve(maxSize);
 
-     while (condition)
-         result.append(nextChar);
+ <span class="keyword">while</span> (condition)
+     result<span class="operator">.</span>append(nextChar);
 
-     result.squeeze();
+ result<span class="operator">.</span>squeeze();
 </pre>
-<p>See also <a href="qstring.html#squeeze">squeeze</a>() and
+<p><b>See also</b> <a href="qstring.html#squeeze">squeeze</a>() and
 <a href="qstring.html#capacity">capacity</a>().</p>
 
 
@@ -1428,21 +1416,21 @@ uninitialized.</p>
 <p>If <i>size</i> is less than the current size, characters are
 removed from the end.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString s = "Hello world";
-     s.resize(5);
-     <span class="comment">// s == "Hello"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> s <span class="operator">=</span> <span class="string">"Hello world"</span>;
+ s<span class="operator">.</span>resize(<span class="number">5</span>);
+ <span class="comment">// s == "Hello"</span>
 
-     s.resize(8);
-     <span class="comment">// s == "Hello???" (where ? stands for any character)</span>
+ s<span class="operator">.</span>resize(<span class="number">8</span>);
+ <span class="comment">// s == "Hello???" (where ? stands for any character)</span>
 </pre>
 <p>If you want to append a certain number of identical characters
 to the string, use <a href="qstring.html#operator-2b-eq">operator+=</a>() as follows rather
 than resize():</p>
-<pre class="highlightedCode brush: cpp">
-     QString t = "Hello";
-     t += QString(10, 'X');
-     <span class="comment">// t == "HelloXXXXXXXXXX"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> t <span class="operator">=</span> <span class="string">"Hello"</span>;
+ t <span class="operator">+</span><span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="number">10</span><span class="operator">,</span> <span class="char">'X'</span>);
+ <span class="comment">// t == "HelloXXXXXXXXXX"</span>
 </pre>
 <p>If you want to expand the string so that it reaches a certain
 width and fill the new positions with a particular character, use
@@ -1450,43 +1438,43 @@ the <a href="qstring.html#leftJustified">leftJustified</a>()
 function:</p>
 <p>If <i>size</i> is negative, it is equivalent to passing
 zero.</p>
-<pre class="highlightedCode brush: cpp">
-     QString r = "Hello";
-     r = r.leftJustified(10, ' ');
-     <span class="comment">// r == "Hello     "</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> r <span class="operator">=</span> <span class="string">"Hello"</span>;
+ r <span class="operator">=</span> r<span class="operator">.</span>leftJustified(<span class="number">10</span><span class="operator">,</span> <span class="char">' '</span>);
+ <span class="comment">// r == "Hello     "</span>
 </pre>
-<p>See also <a href="qstring.html#truncate">truncate</a>() and
-<a href="qstring.html#reserve">reserve</a>().</p>
+<p><b>See also</b> <a href="qstring.html#truncate">truncate</a>()
+and <a href="qstring.html#reserve">reserve</a>().</p>
 
 
 <h3 class="fn"><a name="right" />QString QString.right (<i>self</i>, int&#160;<i>len</i>)</h3><p>Returns a substring that contains the <i>n</i> rightmost
 characters of the string.</p>
 <p>The entire string is returned if <i>n</i> is greater than
 <a href="qstring.html#size">size</a>() or less than zero.</p>
-<pre class="highlightedCode brush: cpp">
-     QString x = "Pineapple";
-     QString y = x.right(5);      <span class="comment">// y == "apple"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> x <span class="operator">=</span> <span class="string">"Pineapple"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> y <span class="operator">=</span> x<span class="operator">.</span>right(<span class="number">5</span>);      <span class="comment">// y == "apple"</span>
 </pre>
-<p>See also <a href="qstring.html#left">left</a>(), <a href="qstring.html#mid">mid</a>(), and <a href="qstring.html#endsWith">endsWith</a>().</p>
+<p><b>See also</b> <a href="qstring.html#left">left</a>(), <a href="qstring.html#mid">mid</a>(), and <a href="qstring.html#endsWith">endsWith</a>().</p>
 
 
 <h3 class="fn"><a name="rightJustified" />QString QString.rightJustified (<i>self</i>, int&#160;<i>width</i>, QChar&#160;<i>fillChar</i>&#160;=&#160;QLatin1Char(' '), bool&#160;<i>truncate</i>&#160;=&#160;False)</h3><p>Returns a string of <a href="qstring.html#size">size</a>()
 <i>width</i> that contains the <i>fill</i> character followed by
 the string. For example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString s = "apple";
-     QString t = s.rightJustified(8, '.');    <span class="comment">// t == "...apple"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> s <span class="operator">=</span> <span class="string">"apple"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> t <span class="operator">=</span> s<span class="operator">.</span>rightJustified(<span class="number">8</span><span class="operator">,</span> <span class="char">'.'</span>);    <span class="comment">// t == "...apple"</span>
 </pre>
 <p>If <i>truncate</i> is false and the <a href="qstring.html#size">size</a>() of the string is more than
 <i>width</i>, then the returned string is a copy of the string.</p>
 <p>If <i>truncate</i> is true and the <a href="qstring.html#size">size</a>() of the string is more than
 <i>width</i>, then the resulting string is truncated at position
 <i>width</i>.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "Pineapple";
-     str = str.rightJustified(5, '.', true);    <span class="comment">// str == "Pinea"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"Pineapple"</span>;
+ str <span class="operator">=</span> str<span class="operator">.</span>rightJustified(<span class="number">5</span><span class="operator">,</span> <span class="char">'.'</span><span class="operator">,</span> <span class="keyword">true</span>);    <span class="comment">// str == "Pinea"</span>
 </pre>
-<p>See also <a href="qstring.html#leftJustified">leftJustified</a>().</p>
+<p><b>See also</b> <a href="qstring.html#leftJustified">leftJustified</a>().</p>
 
 
 <h3 class="fn"><a name="section" />QString QString.section (<i>self</i>, QString&#160;<i>sep</i>, int&#160;<i>start</i>, int&#160;<i>end</i>&#160;=&#160;-1, <a href="qstring-sectionflags.html">SectionFlags</a>&#160;<i>flags</i>&#160;=&#160;QString.SectionDefault)</h3><p>This function returns a section of the string.</p>
@@ -1501,35 +1489,35 @@ to left.</p>
 the function's behavior, e.g. whether to be case sensitive, whether
 to skip empty fields and how to deal with leading and trailing
 separators; see <a href="qstring.html#SectionFlag-enum">SectionFlags</a>.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str;
-     QString csv = "forename,middlename,surname,phone";
-     QString path = "/usr/local/bin/myapp"; <span class="comment">// First field is empty</span>
-     QString.SectionFlag flag = QString.SectionSkipEmpty;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str;
+ <span class="type"><a href="qstring.html">QString</a></span> csv <span class="operator">=</span> <span class="string">"forename,middlename,surname,phone"</span>;
+ <span class="type"><a href="qstring.html">QString</a></span> path <span class="operator">=</span> <span class="string">"/usr/local/bin/myapp"</span>; <span class="comment">// First field is empty</span>
+ <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>SectionFlag flag <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>SectionSkipEmpty;
 
-     str = csv.section(',', 2, 2);   <span class="comment">// str == "surname"</span>
-     str = path.section('/', 3, 4);  <span class="comment">// str == "bin/myapp"</span>
-     str = path.section('/', 3, 3, flag); <span class="comment">// str == "myapp"</span>
+ str <span class="operator">=</span> csv<span class="operator">.</span>section(<span class="char">','</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">2</span>);   <span class="comment">// str == "surname"</span>
+ str <span class="operator">=</span> path<span class="operator">.</span>section(<span class="char">'/'</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">4</span>);  <span class="comment">// str == "bin/myapp"</span>
+ str <span class="operator">=</span> path<span class="operator">.</span>section(<span class="char">'/'</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> flag); <span class="comment">// str == "myapp"</span>
 </pre>
 <p>If <i>start</i> or <i>end</i> is negative, we count fields from
 the right of the string, the right-most field being -1, the one
 from right-most field being -2, and so on.</p>
-<pre class="highlightedCode brush: cpp">
-     str = csv.section(',', -3, -2);  <span class="comment">// str == "middlename,surname"</span>
-     str = path.section('/', -1); <span class="comment">// str == "myapp"</span>
+<pre class="cpp">
+ str <span class="operator">=</span> csv<span class="operator">.</span>section(<span class="char">','</span><span class="operator">,</span> <span class="operator">-</span><span class="number">3</span><span class="operator">,</span> <span class="operator">-</span><span class="number">2</span>);  <span class="comment">// str == "middlename,surname"</span>
+ str <span class="operator">=</span> path<span class="operator">.</span>section(<span class="char">'/'</span><span class="operator">,</span> <span class="operator">-</span><span class="number">1</span>); <span class="comment">// str == "myapp"</span>
 </pre>
-<p>See also <a href="qstring.html#split">split</a>().</p>
+<p><b>See also</b> <a href="qstring.html#split">split</a>().</p>
 
 
 <h3 class="fn"><a name="section-2" />QString QString.section (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>reg</i>, int&#160;<i>start</i>, int&#160;<i>end</i>&#160;=&#160;-1, <a href="qstring-sectionflags.html">SectionFlags</a>&#160;<i>flags</i>&#160;=&#160;QString.SectionDefault)</h3><p>This function overloads <a href="qstring.html#section">section</a>().</p>
-<pre class="highlightedCode brush: cpp">
-     QString str;
-     QString data = "forename**middlename**surname**phone";
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str;
+ <span class="type"><a href="qstring.html">QString</a></span> data <span class="operator">=</span> <span class="string">"forename**middlename**surname**phone"</span>;
 
-     str = data.section("**", 2, 2); <span class="comment">// str == "surname"</span>
-     str = data.section("**", -3, -2); <span class="comment">// str == "middlename**surname"</span>
+ str <span class="operator">=</span> data<span class="operator">.</span>section(<span class="string">"**"</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">2</span>); <span class="comment">// str == "surname"</span>
+ str <span class="operator">=</span> data<span class="operator">.</span>section(<span class="string">"**"</span><span class="operator">,</span> <span class="operator">-</span><span class="number">3</span><span class="operator">,</span> <span class="operator">-</span><span class="number">2</span>); <span class="comment">// str == "middlename**surname"</span>
 </pre>
-<p>See also <a href="qstring.html#split">split</a>().</p>
+<p><b>See also</b> <a href="qstring.html#split">split</a>().</p>
 
 
 <h3 class="fn"><a name="setNum" />QString QString.setNum (<i>self</i>, int&#160;<i>n</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Sets the string to the printed value of <i>n</i> in the
@@ -1537,9 +1525,9 @@ specified <i>base</i>, and returns a reference to the string.</p>
 <p>The base is 10 by default and must be between 2 and 36. For
 bases other than 10, <i>n</i> is treated as an unsigned
 integer.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str;
-     str.setNum(1234);       <span class="comment">// str == "1234"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str;
+ str<span class="operator">.</span>setNum(<span class="number">1234</span>);       <span class="comment">// str == "1234"</span>
 </pre>
 <p>The formatting always uses <a href="qlocale.html#Language-enum">QLocale.C</a>, i.e.,
 English/UnitedStates. To get a localized string representation of a
@@ -1563,12 +1551,12 @@ with a single space.</p>
 includes the ASCII characters '\t', '\n', '\v', '\f', '\r', and '
 '.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "  lots\t of\nwhitespace\r\n ";
-     str = str.simplified();
-     <span class="comment">// str == "lots of whitespace";</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"  lots\t of\nwhitespace\r\n "</span>;
+ str <span class="operator">=</span> str<span class="operator">.</span>simplified();
+ <span class="comment">// str == "lots of whitespace";</span>
 </pre>
-<p>See also <a href="qstring.html#trimmed">trimmed</a>().</p>
+<p><b>See also</b> <a href="qstring.html#trimmed">trimmed</a>().</p>
 
 
 <h3 class="fn"><a name="size" />int QString.size (<i>self</i>)</h3><p>Returns the number of characters in this string.</p>
@@ -1579,14 +1567,14 @@ the return value of <a href="qstring.html#data">data</a>() and
 <a href="qstring.html#constData">constData</a>() as arguments to
 functions that expect '\0'-terminated strings.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "World";
-     int n = str.size();         <span class="comment">// n == 5</span>
-     str.data()[0];              <span class="comment">// returns 'W'</span>
-     str.data()[4];              <span class="comment">// returns 'd'</span>
-     str.data()[5];              <span class="comment">// returns '\0'</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"World"</span>;
+ <span class="type">int</span> n <span class="operator">=</span> str<span class="operator">.</span>size();         <span class="comment">// n == 5</span>
+ str<span class="operator">.</span>data()<span class="operator">[</span><span class="number">0</span><span class="operator">]</span>;              <span class="comment">// returns 'W'</span>
+ str<span class="operator">.</span>data()<span class="operator">[</span><span class="number">4</span><span class="operator">]</span>;              <span class="comment">// returns 'd'</span>
+ str<span class="operator">.</span>data()<span class="operator">[</span><span class="number">5</span><span class="operator">]</span>;              <span class="comment">// returns '\0'</span>
 </pre>
-<p>See also <a href="qstring.html#isEmpty">isEmpty</a>() and
+<p><b>See also</b> <a href="qstring.html#isEmpty">isEmpty</a>() and
 <a href="qstring.html#resize">resize</a>().</p>
 
 
@@ -1600,17 +1588,16 @@ sensitively or case insensitively.</p>
 empty entries don't appear in the result. By default, empty entries
 are kept.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "a,,b,c";
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"a,,b,c"</span>;
 
-     QStringList list1 = str.split(",");
-     <span class="comment">// list1: [ "a", "", "b", "c" ]</span>
+ <span class="type"><a href="qstringlist.html">QStringList</a></span> list1 <span class="operator">=</span> str<span class="operator">.</span>split(<span class="string">","</span>);
+ <span class="comment">// list1: [ "a", "", "b", "c" ]</span>
 
-     QStringList list2 = str.split(",", QString.SkipEmptyParts);
-     <span class="comment">// list2: [ "a", "b", "c" ]</span>
+ <span class="type"><a href="qstringlist.html">QStringList</a></span> list2 <span class="operator">=</span> str<span class="operator">.</span>split(<span class="string">","</span><span class="operator">,</span> <span class="type"><a href="qstring.html">QString</a></span><span class="operator">.</span>SkipEmptyParts);
+ <span class="comment">// list2: [ "a", "b", "c" ]</span>
 </pre>
-<p>See also <a href="qstringlist.html#join">QStringList.join</a>()
-and <a href="qstring.html#section">section</a>().</p>
+<p><b>See also</b> <a href="qstringlist.html#join">QStringList.join</a>() and <a href="qstring.html#section">section</a>().</p>
 
 
 <h3 class="fn"><a name="split-2" />QStringList QString.split (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>sep</i>, <a href="qstring.html#SplitBehavior-enum">SplitBehavior</a>&#160;<i>behavior</i>&#160;=&#160;QString.KeepEmptyParts)</h3><p>This is an overloaded function.</p>
@@ -1621,7 +1608,7 @@ data.</p>
 <p>The sole purpose of this function is to provide a means of fine
 tuning <a href="qstring.html">QString</a>'s memory usage. In
 general, you will rarely ever need to call this function.</p>
-<p>See also <a href="qstring.html#reserve">reserve</a>() and
+<p><b>See also</b> <a href="qstring.html#reserve">reserve</a>() and
 <a href="qstring.html#capacity">capacity</a>().</p>
 
 
@@ -1630,12 +1617,12 @@ returns false.</p>
 <p>If <i>cs</i> is <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitive</a> (default), the
 search is case sensitive; otherwise the search is case
 insensitive.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "Bananas";
-     str.startsWith("Ban");     <span class="comment">// returns true</span>
-     str.startsWith("Car");     <span class="comment">// returns false</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"Bananas"</span>;
+ str<span class="operator">.</span>startsWith(<span class="string">"Ban"</span>);     <span class="comment">// returns true</span>
+ str<span class="operator">.</span>startsWith(<span class="string">"Car"</span>);     <span class="comment">// returns false</span>
 </pre>
-<p>See also <a href="qstring.html#endsWith">endsWith</a>().</p>
+<p><b>See also</b> <a href="qstring.html#endsWith">endsWith</a>().</p>
 
 
 <h3 class="fn"><a name="startsWith-2" />bool QString.startsWith (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>cs</i>&#160;=&#160;Qt.CaseSensitive)</h3><h3 class="fn"><a name="toAscii" /><a href="qbytearray.html">QByteArray</a> QString.toAscii (<i>self</i>)</h3><p>Returns an 8-bit representation of the string as a <a href="qbytearray.html">QByteArray</a>.</p>
@@ -1645,8 +1632,7 @@ function does the same as <a href="qstring.html#toLatin1">toLatin1</a>().</p>
 <p>Note that, despite the name, this function does not necessarily
 return an US-ASCII (ANSI X3.4-1986) string and its result may not
 be US-ASCII compatible.</p>
-<p>See also <a href="qstring.html#fromAscii">fromAscii</a>(),
-<a href="qstring.html#toLatin1">toLatin1</a>(), <a href="qstring.html#toUtf8">toUtf8</a>(), <a href="qstring.html#toLocal8Bit">toLocal8Bit</a>(), and <a href="qtextcodec.html">QTextCodec</a>.</p>
+<p><b>See also</b> <a href="qstring.html#fromAscii">fromAscii</a>(), <a href="qstring.html#toLatin1">toLatin1</a>(), <a href="qstring.html#toUtf8">toUtf8</a>(), <a href="qstring.html#toLocal8Bit">toLocal8Bit</a>(), and <a href="qtextcodec.html">QTextCodec</a>.</p>
 
 
 <h3 class="fn"><a name="toCaseFolded" />QString QString.toCaseFolded (<i>self</i>)</h3><p>Returns the case folded equivalent of the string. For most
@@ -1657,41 +1643,44 @@ Unicode characters this is the same as <a href="qstring.html#toLower">toLower</a
 <p>Returns 0.0 if the conversion fails.</p>
 <p>If a conversion error occurs, <tt>*</tt><i>ok</i> is set to
 false; otherwise <tt>*</tt><i>ok</i> is set to true.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "1234.56";
-     double val = str.toDouble();   <span class="comment">// val == 1234.56</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"1234.56"</span>;
+ <span class="type">double</span> val <span class="operator">=</span> str<span class="operator">.</span>toDouble();   <span class="comment">// val == 1234.56</span>
 </pre>
 <p>Various string formats for floating point numbers can be
 converted to double values:</p>
-<pre class="highlightedCode brush: cpp">
-     bool ok;
-     double d;
+<pre class="cpp">
+ <span class="type">bool</span> ok;
+ <span class="type">double</span> d;
 
-     d = QString( "1234.56e-02" ).toDouble(&amp;ok); <span class="comment">// ok == true, d == 12.3456</span>
+ d <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>( <span class="string">"1234.56e-02"</span> )<span class="operator">.</span>toDouble(<span class="operator">&amp;</span>ok); <span class="comment">// ok == true, d == 12.3456</span>
 </pre>
 <p>This function tries to interpret the string according to the
 current locale. The current locale is determined from the system at
 application startup and can be changed by calling <a href="qlocale.html#setDefault">QLocale.setDefault</a>(). If the string
 cannot be interpreted according to the current locale, this
 function falls back on the "C" locale.</p>
-<pre class="highlightedCode brush: cpp">
-     QLocale.setDefault(QLocale.C);
-     d = QString( "1234,56" ).toDouble(&amp;ok); <span class="comment">// ok == false</span>
-     d = QString( "1234.56" ).toDouble(&amp;ok); <span class="comment">// ok == true, d == 1234.56</span>
+<pre class="cpp">
+ <span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>setDefault(<span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>C);
+ d <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>( <span class="string">"1234,56"</span> )<span class="operator">.</span>toDouble(<span class="operator">&amp;</span>ok); <span class="comment">// ok == false</span>
+ d <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>( <span class="string">"1234.56"</span> )<span class="operator">.</span>toDouble(<span class="operator">&amp;</span>ok); <span class="comment">// ok == true, d == 1234.56</span>
 
-     QLocale.setDefault(QLocale.German);
-     d = QString( "1234,56" ).toDouble(&amp;ok); <span class="comment">// ok == true, d == 1234.56</span>
-     d = QString( "1234.56" ).toDouble(&amp;ok); <span class="comment">// ok == true, d == 1234.56</span>
+ <span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>setDefault(<span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>German);
+ d <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>( <span class="string">"1234,56"</span> )<span class="operator">.</span>toDouble(<span class="operator">&amp;</span>ok); <span class="comment">// ok == true, d == 1234.56</span>
+ d <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>( <span class="string">"1234.56"</span> )<span class="operator">.</span>toDouble(<span class="operator">&amp;</span>ok); <span class="comment">// ok == true, d == 1234.56</span>
 </pre>
 <p>Due to the ambiguity between the decimal point and thousands
 group separator in various locales, this function does not handle
 thousands group separators. If you need to convert such numbers,
 see <a href="qlocale.html#toDouble">QLocale.toDouble</a>().</p>
-<pre class="highlightedCode brush: cpp">
-     QLocale.setDefault(QLocale.C);
-     d = QString( "1234,56" ).toDouble(&amp;ok); <span class="comment">// ok == false</span>
+<pre class="cpp">
+ <span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>setDefault(<span class="type"><a href="qlocale.html">QLocale</a></span><span class="operator">.</span>C);
+ d <span class="operator">=</span> <span class="type"><a href="qstring.html">QString</a></span>( <span class="string">"1234,56"</span> )<span class="operator">.</span>toDouble(<span class="operator">&amp;</span>ok); <span class="comment">// ok == false</span>
 </pre>
-<p>See also <a href="qstring.html#number">number</a>(), <a href="qlocale.html#setDefault">QLocale.setDefault</a>(), <a href="qlocale.html#toDouble">QLocale.toDouble</a>(), and <a href="qstring.html#trimmed">trimmed</a>().</p>
+<p><b>See also</b> <a href="qstring.html#number">number</a>(),
+<a href="qlocale.html#setDefault">QLocale.setDefault</a>(),
+<a href="qlocale.html#toDouble">QLocale.toDouble</a>(), and
+<a href="qstring.html#trimmed">trimmed</a>().</p>
 
 
 <h3 class="fn"><a name="toFloat" />(float, bool&#160;<i>ok</i>) QString.toFloat (<i>self</i>)</h3><p>Returns the string converted to a <tt>float</tt> value.</p>
@@ -1699,15 +1688,16 @@ see <a href="qlocale.html#toDouble">QLocale.toDouble</a>().</p>
 otherwise *<i>ok</i> is set to true. Returns 0.0 if the conversion
 fails.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str1 = "1234.56";
-     str1.toFloat();             <span class="comment">// returns 1234.56</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str1 <span class="operator">=</span> <span class="string">"1234.56"</span>;
+ str1<span class="operator">.</span>toFloat();             <span class="comment">// returns 1234.56</span>
 
-     bool ok;
-     QString str2 = "R2D2";
-     str2.toFloat(&amp;ok);          <span class="comment">// returns 0.0, sets ok to false</span>
+ <span class="type">bool</span> ok;
+ <span class="type"><a href="qstring.html">QString</a></span> str2 <span class="operator">=</span> <span class="string">"R2D2"</span>;
+ str2<span class="operator">.</span>toFloat(<span class="operator">&amp;</span>ok);          <span class="comment">// returns 0.0, sets ok to false</span>
 </pre>
-<p>See also <a href="qstring.html#number">number</a>(), <a href="qstring.html#toDouble">toDouble</a>(), and <a href="qstring.html#toInt">toInt</a>().</p>
+<p><b>See also</b> <a href="qstring.html#number">number</a>(),
+<a href="qstring.html#toDouble">toDouble</a>(), and <a href="qstring.html#toInt">toInt</a>().</p>
 
 
 <h3 class="fn"><a name="toInt" />(int, bool&#160;<i>ok</i>) QString.toInt (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the string converted to an <tt>int</tt> using base
@@ -1719,21 +1709,21 @@ otherwise *<i>ok</i> is set to true.</p>
 string begins with "0x", base 16 is used; if the string begins with
 "0", base 8 is used; otherwise, base 10 is used.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "FF";
-     bool ok;
-     int hex = str.toInt(&amp;ok, 16);       <span class="comment">// hex == 255, ok == true</span>
-     int dec = str.toInt(&amp;ok, 10);       <span class="comment">// dec == 0, ok == false</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"FF"</span>;
+ <span class="type">bool</span> ok;
+ <span class="type">int</span> hex <span class="operator">=</span> str<span class="operator">.</span>toInt(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">16</span>);       <span class="comment">// hex == 255, ok == true</span>
+ <span class="type">int</span> dec <span class="operator">=</span> str<span class="operator">.</span>toInt(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">10</span>);       <span class="comment">// dec == 0, ok == false</span>
 </pre>
-<p>See also <a href="qstring.html#number">number</a>(), <a href="qstring.html#toUInt">toUInt</a>(), and <a href="qstring.html#toDouble">toDouble</a>().</p>
+<p><b>See also</b> <a href="qstring.html#number">number</a>(),
+<a href="qstring.html#toUInt">toUInt</a>(), and <a href="qstring.html#toDouble">toDouble</a>().</p>
 
 
 <h3 class="fn"><a name="toLatin1" /><a href="qbytearray.html">QByteArray</a> QString.toLatin1 (<i>self</i>)</h3><p>Returns a Latin-1 representation of the string as a <a href="qbytearray.html">QByteArray</a>.</p>
 <p>The returned byte array is undefined if the string contains
 non-Latin1 characters. Those characters may be suppressed or
 replaced with a question mark.</p>
-<p>See also <a href="qstring.html#fromLatin1">fromLatin1</a>(),
-<a href="qstring.html#toAscii">toAscii</a>(), <a href="qstring.html#toUtf8">toUtf8</a>(), <a href="qstring.html#toLocal8Bit">toLocal8Bit</a>(), and <a href="qtextcodec.html">QTextCodec</a>.</p>
+<p><b>See also</b> <a href="qstring.html#fromLatin1">fromLatin1</a>(), <a href="qstring.html#toAscii">toAscii</a>(), <a href="qstring.html#toUtf8">toUtf8</a>(), <a href="qstring.html#toLocal8Bit">toLocal8Bit</a>(), and <a href="qtextcodec.html">QTextCodec</a>.</p>
 
 
 <h3 class="fn"><a name="toLocal8Bit" /><a href="qbytearray.html">QByteArray</a> QString.toLocal8Bit (<i>self</i>)</h3><p>Returns the local 8-bit representation of the string as a
@@ -1747,7 +1737,7 @@ encoding could not be determined, this function does the same as
 <p>If this string contains any characters that cannot be encoded in
 the locale, the returned byte array is undefined. Those characters
 may be suppressed or replaced by another.</p>
-<p>See also <a href="qstring.html#fromLocal8Bit">fromLocal8Bit</a>(), <a href="qstring.html#toAscii">toAscii</a>(), <a href="qstring.html#toLatin1">toLatin1</a>(), <a href="qstring.html#toUtf8">toUtf8</a>(), and <a href="qtextcodec.html">QTextCodec</a>.</p>
+<p><b>See also</b> <a href="qstring.html#fromLocal8Bit">fromLocal8Bit</a>(), <a href="qstring.html#toAscii">toAscii</a>(), <a href="qstring.html#toLatin1">toLatin1</a>(), <a href="qstring.html#toUtf8">toUtf8</a>(), and <a href="qtextcodec.html">QTextCodec</a>.</p>
 
 
 <h3 class="fn"><a name="toLong" />(int, bool&#160;<i>ok</i>) QString.toLong (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the string converted to a <tt>long</tt> using base
@@ -1759,14 +1749,15 @@ otherwise *<i>ok</i> is set to true.</p>
 string begins with "0x", base 16 is used; if the string begins with
 "0", base 8 is used; otherwise, base 10 is used.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "FF";
-     bool ok;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"FF"</span>;
+ <span class="type">bool</span> ok;
 
-     long hex = str.toLong(&amp;ok, 16);     <span class="comment">// hex == 255, ok == true</span>
-     long dec = str.toLong(&amp;ok, 10);     <span class="comment">// dec == 0, ok == false</span>
+ <span class="type">long</span> hex <span class="operator">=</span> str<span class="operator">.</span>toLong(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">16</span>);     <span class="comment">// hex == 255, ok == true</span>
+ <span class="type">long</span> dec <span class="operator">=</span> str<span class="operator">.</span>toLong(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">10</span>);     <span class="comment">// dec == 0, ok == false</span>
 </pre>
-<p>See also <a href="qstring.html#number">number</a>(), <a href="qstring.html#toULong">toULong</a>(), and <a href="qstring.html#toInt">toInt</a>().</p>
+<p><b>See also</b> <a href="qstring.html#number">number</a>(),
+<a href="qstring.html#toULong">toULong</a>(), and <a href="qstring.html#toInt">toInt</a>().</p>
 
 
 <h3 class="fn"><a name="toLongLong" />(int, bool&#160;<i>ok</i>) QString.toLongLong (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the string converted to a <tt>long long</tt> using base
@@ -1778,22 +1769,23 @@ otherwise *<i>ok</i> is set to true.</p>
 string begins with "0x", base 16 is used; if the string begins with
 "0", base 8 is used; otherwise, base 10 is used.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "FF";
-     bool ok;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"FF"</span>;
+ <span class="type">bool</span> ok;
 
-     long hex = str.toLongLong(&amp;ok, 16);      <span class="comment">// hex == 255, ok == true</span>
-     long dec = str.toLongLong(&amp;ok, 10);      <span class="comment">// dec == 0, ok == false</span>
+ <span class="type"><a href="qtcore.html#qint64-typedef">long</a></span> hex <span class="operator">=</span> str<span class="operator">.</span>toLongLong(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">16</span>);      <span class="comment">// hex == 255, ok == true</span>
+ <span class="type"><a href="qtcore.html#qint64-typedef">long</a></span> dec <span class="operator">=</span> str<span class="operator">.</span>toLongLong(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">10</span>);      <span class="comment">// dec == 0, ok == false</span>
 </pre>
-<p>See also <a href="qstring.html#number">number</a>(), <a href="qstring.html#toULongLong">toULongLong</a>(), and <a href="qstring.html#toInt">toInt</a>().</p>
+<p><b>See also</b> <a href="qstring.html#number">number</a>(),
+<a href="qstring.html#toULongLong">toULongLong</a>(), and <a href="qstring.html#toInt">toInt</a>().</p>
 
 
 <h3 class="fn"><a name="toLower" />QString QString.toLower (<i>self</i>)</h3><p>Returns a lowercase copy of the string.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "Qt by NOKIA";
-     str = str.toLower();        <span class="comment">// str == "qt by nokia"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"Qt by NOKIA"</span>;
+ str <span class="operator">=</span> str<span class="operator">.</span>toLower();        <span class="comment">// str == "qt by nokia"</span>
 </pre>
-<p>See also <a href="qstring.html#toUpper">toUpper</a>().</p>
+<p><b>See also</b> <a href="qstring.html#toUpper">toUpper</a>().</p>
 
 
 <h3 class="fn"><a name="toShort" />(int, bool&#160;<i>ok</i>) QString.toShort (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the string converted to a <tt>short</tt> using base
@@ -1805,14 +1797,15 @@ otherwise *<i>ok</i> is set to true.</p>
 string begins with "0x", base 16 is used; if the string begins with
 "0", base 8 is used; otherwise, base 10 is used.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "FF";
-     bool ok;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"FF"</span>;
+ <span class="type">bool</span> ok;
 
-     short hex = str.toShort(&amp;ok, 16);   <span class="comment">// hex == 255, ok == true</span>
-     short dec = str.toShort(&amp;ok, 10);   <span class="comment">// dec == 0, ok == false</span>
+ <span class="type">short</span> hex <span class="operator">=</span> str<span class="operator">.</span>toShort(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">16</span>);   <span class="comment">// hex == 255, ok == true</span>
+ <span class="type">short</span> dec <span class="operator">=</span> str<span class="operator">.</span>toShort(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">10</span>);   <span class="comment">// dec == 0, ok == false</span>
 </pre>
-<p>See also <a href="qstring.html#number">number</a>(), <a href="qstring.html#toUShort">toUShort</a>(), and <a href="qstring.html#toInt">toInt</a>().</p>
+<p><b>See also</b> <a href="qstring.html#number">number</a>(),
+<a href="qstring.html#toUShort">toUShort</a>(), and <a href="qstring.html#toInt">toInt</a>().</p>
 
 
 <h3 class="fn"><a name="toUInt" />(int, bool&#160;<i>ok</i>) QString.toUInt (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the string converted to an <tt>unsigned int</tt> using
@@ -1824,14 +1817,15 @@ otherwise *<i>ok</i> is set to true.</p>
 string begins with "0x", base 16 is used; if the string begins with
 "0", base 8 is used; otherwise, base 10 is used.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "FF";
-     bool ok;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"FF"</span>;
+ <span class="type">bool</span> ok;
 
-     uint hex = str.toUInt(&amp;ok, 16);     <span class="comment">// hex == 255, ok == true</span>
-     uint dec = str.toUInt(&amp;ok, 10);     <span class="comment">// dec == 0, ok == false</span>
+ <span class="type"><a href="qtcore.html#uint-typedef">uint</a></span> hex <span class="operator">=</span> str<span class="operator">.</span>toUInt(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">16</span>);     <span class="comment">// hex == 255, ok == true</span>
+ <span class="type"><a href="qtcore.html#uint-typedef">uint</a></span> dec <span class="operator">=</span> str<span class="operator">.</span>toUInt(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">10</span>);     <span class="comment">// dec == 0, ok == false</span>
 </pre>
-<p>See also <a href="qstring.html#number">number</a>() and <a href="qstring.html#toInt">toInt</a>().</p>
+<p><b>See also</b> <a href="qstring.html#number">number</a>() and
+<a href="qstring.html#toInt">toInt</a>().</p>
 
 
 <h3 class="fn"><a name="toULong" />(int, bool&#160;<i>ok</i>) QString.toULong (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the string converted to an <tt>unsigned long</tt> using
@@ -1843,14 +1837,14 @@ otherwise *<i>ok</i> is set to true.</p>
 string begins with "0x", base 16 is used; if the string begins with
 "0", base 8 is used; otherwise, base 10 is used.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "FF";
-     bool ok;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"FF"</span>;
+ <span class="type">bool</span> ok;
 
-     ulong hex = str.toULong(&amp;ok, 16);   <span class="comment">// hex == 255, ok == true</span>
-     ulong dec = str.toULong(&amp;ok, 10);   <span class="comment">// dec == 0, ok == false</span>
+ <span class="type"><a href="qtcore.html#ulong-typedef">ulong</a></span> hex <span class="operator">=</span> str<span class="operator">.</span>toULong(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">16</span>);   <span class="comment">// hex == 255, ok == true</span>
+ <span class="type"><a href="qtcore.html#ulong-typedef">ulong</a></span> dec <span class="operator">=</span> str<span class="operator">.</span>toULong(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">10</span>);   <span class="comment">// dec == 0, ok == false</span>
 </pre>
-<p>See also <a href="qstring.html#number">number</a>().</p>
+<p><b>See also</b> <a href="qstring.html#number">number</a>().</p>
 
 
 <h3 class="fn"><a name="toULongLong" />(int, bool&#160;<i>ok</i>) QString.toULongLong (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the string converted to an <tt>unsigned long long</tt>
@@ -1862,22 +1856,23 @@ otherwise *<i>ok</i> is set to true.</p>
 string begins with "0x", base 16 is used; if the string begins with
 "0", base 8 is used; otherwise, base 10 is used.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "FF";
-     bool ok;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"FF"</span>;
+ <span class="type">bool</span> ok;
 
-     unsigned long hex = str.toULongLong(&amp;ok, 16);    <span class="comment">// hex == 255, ok == true</span>
-     unsigned long dec = str.toULongLong(&amp;ok, 10);    <span class="comment">// dec == 0, ok == false</span>
+ <span class="type"><a href="qtcore.html#quint64-typedef">unsigned long</a></span> hex <span class="operator">=</span> str<span class="operator">.</span>toULongLong(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">16</span>);    <span class="comment">// hex == 255, ok == true</span>
+ <span class="type"><a href="qtcore.html#quint64-typedef">unsigned long</a></span> dec <span class="operator">=</span> str<span class="operator">.</span>toULongLong(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">10</span>);    <span class="comment">// dec == 0, ok == false</span>
 </pre>
-<p>See also <a href="qstring.html#number">number</a>() and <a href="qstring.html#toLongLong">toLongLong</a>().</p>
+<p><b>See also</b> <a href="qstring.html#number">number</a>() and
+<a href="qstring.html#toLongLong">toLongLong</a>().</p>
 
 
 <h3 class="fn"><a name="toUpper" />QString QString.toUpper (<i>self</i>)</h3><p>Returns an uppercase copy of the string.</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "TeXt";
-     str = str.toUpper();        <span class="comment">// str == "TEXT"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"TeXt"</span>;
+ str <span class="operator">=</span> str<span class="operator">.</span>toUpper();        <span class="comment">// str == "TEXT"</span>
 </pre>
-<p>See also <a href="qstring.html#toLower">toLower</a>().</p>
+<p><b>See also</b> <a href="qstring.html#toLower">toLower</a>().</p>
 
 
 <h3 class="fn"><a name="toUShort" />(int, bool&#160;<i>ok</i>) QString.toUShort (<i>self</i>, int&#160;<i>base</i>&#160;=&#160;10)</h3><p>Returns the string converted to an <tt>unsigned short</tt> using
@@ -1889,14 +1884,15 @@ otherwise *<i>ok</i> is set to true.</p>
 string begins with "0x", base 16 is used; if the string begins with
 "0", base 8 is used; otherwise, base 10 is used.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "FF";
-     bool ok;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"FF"</span>;
+ <span class="type">bool</span> ok;
 
-     ushort hex = str.toUShort(&amp;ok, 16);     <span class="comment">// hex == 255, ok == true</span>
-     ushort dec = str.toUShort(&amp;ok, 10);     <span class="comment">// dec == 0, ok == false</span>
+ <span class="type"><a href="qtcore.html#ushort-typedef">ushort</a></span> hex <span class="operator">=</span> str<span class="operator">.</span>toUShort(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">16</span>);     <span class="comment">// hex == 255, ok == true</span>
+ <span class="type"><a href="qtcore.html#ushort-typedef">ushort</a></span> dec <span class="operator">=</span> str<span class="operator">.</span>toUShort(<span class="operator">&amp;</span>ok<span class="operator">,</span> <span class="number">10</span>);     <span class="comment">// dec == 0, ok == false</span>
 </pre>
-<p>See also <a href="qstring.html#number">number</a>() and <a href="qstring.html#toShort">toShort</a>().</p>
+<p><b>See also</b> <a href="qstring.html#number">number</a>() and
+<a href="qstring.html#toShort">toShort</a>().</p>
 
 
 <h3 class="fn"><a name="toUtf8" /><a href="qbytearray.html">QByteArray</a> QString.toUtf8 (<i>self</i>)</h3><p>Returns a UTF-8 representation of the string as a <a href="qbytearray.html">QByteArray</a>.</p>
@@ -1910,7 +1906,7 @@ U+FDD0..U+FDDF, inclusive, as non-characters. If any of those
 appear in the string, they may be discarded and will not appear in
 the UTF-8 representation, or they may be replaced by one or more
 replacement characters.</p>
-<p>See also <a href="qstring.html#fromUtf8">fromUtf8</a>(),
+<p><b>See also</b> <a href="qstring.html#fromUtf8">fromUtf8</a>(),
 <a href="qstring.html#toAscii">toAscii</a>(), <a href="qstring.html#toLatin1">toLatin1</a>(), <a href="qstring.html#toLocal8Bit">toLocal8Bit</a>(), and <a href="qtextcodec.html">QTextCodec</a>.</p>
 
 
@@ -1920,28 +1916,28 @@ the end.</p>
 includes the ASCII characters '\t', '\n', '\v', '\f', '\r', and '
 '.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "  lots\t of\nwhitespace\r\n ";
-     str = str.trimmed();
-     <span class="comment">// str == "lots\t of\nwhitespace"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"  lots\t of\nwhitespace\r\n "</span>;
+ str <span class="operator">=</span> str<span class="operator">.</span>trimmed();
+ <span class="comment">// str == "lots\t of\nwhitespace"</span>
 </pre>
 <p>Unlike <a href="qstring.html#simplified">simplified</a>(),
 trimmed() leaves internal whitespace alone.</p>
-<p>See also <a href="qstring.html#simplified">simplified</a>().</p>
+<p><b>See also</b> <a href="qstring.html#simplified">simplified</a>().</p>
 
 
 <h3 class="fn"><a name="truncate" />QString.truncate (<i>self</i>, int&#160;<i>pos</i>)</h3><p>Truncates the string at the given <i>position</i> index.</p>
 <p>If the specified <i>position</i> index is beyond the end of the
 string, nothing happens.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
-     QString str = "Vladivostok";
-     str.truncate(4);
-     <span class="comment">// str == "Vlad"</span>
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str <span class="operator">=</span> <span class="string">"Vladivostok"</span>;
+ str<span class="operator">.</span>truncate(<span class="number">4</span>);
+ <span class="comment">// str == "Vlad"</span>
 </pre>
 <p>If <i>position</i> is negative, it is equivalent to passing
 zero.</p>
-<p>See also <a href="qstring.html#chop">chop</a>(), <a href="qstring.html#resize">resize</a>(), and <a href="qstring.html#left">left</a>().</p>
+<p><b>See also</b> <a href="qstring.html#chop">chop</a>(), <a href="qstring.html#resize">resize</a>(), and <a href="qstring.html#left">left</a>().</p>
 
 
-<h3 class="fn"><a name="__add__" />QString QString.__add__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__add__-2" />QString QString.__add__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>ba</i>)</h3><h3 class="fn"><a name="__contains__" />int QString.__contains__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__eq__" />bool QString.__eq__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__eq__-2" />bool QString.__eq__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__eq__-3" />bool QString.__eq__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__eq__-4" />bool QString.__eq__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ge__" />bool QString.__ge__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ge__-2" />bool QString.__ge__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ge__-3" />bool QString.__ge__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__getitem__" />QString QString.__getitem__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__getitem__-2" />QString QString.__getitem__ (<i>self</i>, slice&#160;<i>slice</i>)</h3><h3 class="fn"><a name="__gt__" />bool QString.__gt__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__gt__-2" />bool QString.__gt__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__gt__-3" />bool QString.__gt__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__hash__" />int QString.__hash__ (<i>self</i>)</h3><h3 class="fn"><a name="__iadd__" />QString QString.__iadd__ (<i>self</i>, <a href="qchar.html#SpecialCharacter-enum">QChar.SpecialCharacter</a>&#160;<i>c</i>)</h3><h3 class="fn"><a name="__iadd__-2" />QString QString.__iadd__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__iadd__-3" />QString QString.__iadd__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__iadd__-4" />QString QString.__iadd__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__imul__" />QString QString.__imul__ (<i>self</i>, int&#160;<i>m</i>)</h3><h3 class="fn"><a name="__le__" />bool QString.__le__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__le__-2" />bool QString.__le__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__le__-3" />bool QString.__le__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__len__" /> QString.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__lt__" />bool QString.__lt__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__lt__-2" />bool QString.__lt__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__lt__-3" />bool QString.__lt__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__mul__" />QString QString.__mul__ (<i>self</i>, int&#160;<i>m</i>)</h3><h3 class="fn"><a name="__ne__" />bool QString.__ne__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ne__-2" />bool QString.__ne__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ne__-3" />bool QString.__ne__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ne__-4" />bool QString.__ne__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__repr__" />str QString.__repr__ (<i>self</i>)</h3><h3 class="fn"><a name="__str__" />str QString.__str__ (<i>self</i>)</h3><h3 class="fn"><a name="__unicode__" />unicode QString.__unicode__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__add__" />QString QString.__add__ (<i>self</i>, QString&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__add__-2" />QString QString.__add__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>ba</i>)</h3><h3 class="fn"><a name="__contains__" />int QString.__contains__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__eq__" />bool QString.__eq__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__eq__-2" />bool QString.__eq__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__eq__-3" />bool QString.__eq__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__eq__-4" />bool QString.__eq__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__ge__" />bool QString.__ge__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ge__-2" />bool QString.__ge__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ge__-3" />bool QString.__ge__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__getitem__" />QString QString.__getitem__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__getitem__-2" />QString QString.__getitem__ (<i>self</i>, slice&#160;<i>slice</i>)</h3><h3 class="fn"><a name="__gt__" />bool QString.__gt__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__gt__-2" />bool QString.__gt__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__gt__-3" />bool QString.__gt__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__hash__" />int QString.__hash__ (<i>self</i>)</h3><h3 class="fn"><a name="__iadd__" />QString QString.__iadd__ (<i>self</i>, <a href="qchar.html#SpecialCharacter-enum">QChar.SpecialCharacter</a>&#160;<i>c</i>)</h3><h3 class="fn"><a name="__iadd__-2" />QString QString.__iadd__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__iadd__-3" />QString QString.__iadd__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__iadd__-4" />QString QString.__iadd__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__imul__" />QString QString.__imul__ (<i>self</i>, int&#160;<i>m</i>)</h3><h3 class="fn"><a name="__le__" />bool QString.__le__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__le__-2" />bool QString.__le__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__le__-3" />bool QString.__le__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__len__" /> QString.__len__ (<i>self</i>)</h3><h3 class="fn"><a name="__lt__" />bool QString.__lt__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__lt__-2" />bool QString.__lt__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__lt__-3" />bool QString.__lt__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__mul__" />QString QString.__mul__ (<i>self</i>, int&#160;<i>m</i>)</h3><h3 class="fn"><a name="__ne__" />bool QString.__ne__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ne__-2" />bool QString.__ne__ (<i>self</i>, <a href="qlatin1string.html">QLatin1String</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ne__-3" />bool QString.__ne__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>s</i>)</h3><h3 class="fn"><a name="__ne__-4" />bool QString.__ne__ (<i>self</i>, QStringRef&#160;<i>s2</i>)</h3><h3 class="fn"><a name="__repr__" />str QString.__repr__ (<i>self</i>)</h3><h3 class="fn"><a name="__str__" />str QString.__str__ (<i>self</i>)</h3><h3 class="fn"><a name="__unicode__" />unicode QString.__unicode__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

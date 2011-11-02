@@ -22,40 +22,39 @@ functions and other virtual functions that you need.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="BindingSyntax-enum" />QSqlResult.BindingSyntax</h3><p>This enum type specifies the different syntaxes for specifying
 placeholders in prepared queries.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSqlResult.PositionalBinding</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Use the ODBC-style positional syntax, with "?"
 as placeholders.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSqlResult.NamedBinding</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Use the Oracle-style syntax with named
 placeholders (e.g., ":id")</td>
 </tr>
 </table>
-<p>See also <a href="qsqlresult.html#bindingSyntax">bindingSyntax</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#bindingSyntax">bindingSyntax</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QSqlResult" />QSqlResult.__init__ (<i>self</i>, <a href="qsqldriver.html">QSqlDriver</a>&#160;<i>db</i>)</h3><p>Creates a <a href="qsqlresult.html">QSqlResult</a> using
 database driver <i>db</i>. The object is initialized to an inactive
 state.</p>
-<p>See also <a href="qsqlresult.html#isActive">isActive</a>() and
-<a href="qsqlresult.html#driver">driver</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#isActive">isActive</a>() and <a href="qsqlresult.html#driver">driver</a>().</p>
 
 
 <h3 class="fn"><a name="addBindValue" />QSqlResult.addBindValue (<i>self</i>, QVariant&#160;<i>val</i>, <a href="qsql-paramtype.html">QSql.ParamType</a>&#160;<i>type</i>)</h3><p>Binds the value <i>val</i> of parameter type <i>paramType</i> to
 the next available position in the current record (row).</p>
-<p>See also <a href="qsqlresult.html#bindValue">bindValue</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#bindValue">bindValue</a>().</p>
 
 
 <h3 class="fn"><a name="at" />int QSqlResult.at (<i>self</i>)</h3><p>Returns the current (zero-based) row position of the result. May
 return the special values <a href="qsql.html#Location-enum">QSql.BeforeFirstRow</a> or <a href="qsql.html#Location-enum">QSql.AfterLastRow</a>.</p>
-<p>See also <a href="qsqlresult.html#setAt">setAt</a>() and
+<p><b>See also</b> <a href="qsqlresult.html#setAt">setAt</a>() and
 <a href="qsqlresult.html#isValid">isValid</a>().</p>
 
 
@@ -64,7 +63,7 @@ return the special values <a href="qsql.html#Location-enum">QSql.BeforeFirstRow<
 
 <h3 class="fn"><a name="bindValue" />QSqlResult.bindValue (<i>self</i>, int&#160;<i>pos</i>, QVariant&#160;<i>val</i>, <a href="qsql-paramtype.html">QSql.ParamType</a>&#160;<i>type</i>)</h3><p>Binds the value <i>val</i> of parameter type <i>paramType</i> to
 position <i>index</i> in the current record (row).</p>
-<p>See also <a href="qsqlresult.html#addBindValue">addBindValue</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#addBindValue">addBindValue</a>().</p>
 
 
 <h3 class="fn"><a name="bindValue-2" />QSqlResult.bindValue (<i>self</i>, QString&#160;<i>placeholder</i>, QVariant&#160;<i>val</i>, <a href="qsql-paramtype.html">QSql.ParamType</a>&#160;<i>type</i>)</h3><p>This is an overloaded function.</p>
@@ -72,19 +71,19 @@ position <i>index</i> in the current record (row).</p>
 the <i>placeholder</i> name in the current record (row).</p>
 <p>Values cannot be bound to multiple locations in the query,
 eg:</p>
-<pre class="highlightedCode brush: cpp">
- INSERT INTO testtable (id, name, samename) VALUES (:id, :name, :name)
+<pre class="cpp">
+ INSERT INTO testtable (id<span class="operator">,</span> name<span class="operator">,</span> samename) VALUES (:id<span class="operator">,</span> :name<span class="operator">,</span> :name)
 </pre>
 <p>Binding to name will bind to the first :name, but not the
 second.</p>
 <p><b>Note:</b> Binding an undefined placeholder will result in
 undefined behavior.</p>
-<p>See also <a href="qsqlquery.html#bindValue">QSqlQuery.bindValue</a>().</p>
+<p><b>See also</b> <a href="qsqlquery.html#bindValue">QSqlQuery.bindValue</a>().</p>
 
 
 <h3 class="fn"><a name="bindValueType" /><a href="qsql-paramtype.html">QSql.ParamType</a> QSqlResult.bindValueType (<i>self</i>, QString&#160;<i>placeholder</i>)</h3><p>Returns the parameter type for the value bound at position
 <i>index</i>.</p>
-<p>See also <a href="qsqlresult.html#boundValue">boundValue</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#boundValue">boundValue</a>().</p>
 
 
 <h3 class="fn"><a name="bindValueType-2" /><a href="qsql-paramtype.html">QSql.ParamType</a> QSqlResult.bindValueType (<i>self</i>, int&#160;<i>pos</i>)</h3><p>This is an overloaded function.</p>
@@ -94,28 +93,27 @@ undefined behavior.</p>
 
 <h3 class="fn"><a name="boundValue" />QVariant QSqlResult.boundValue (<i>self</i>, QString&#160;<i>placeholder</i>)</h3><p>Returns the value bound at position <i>index</i> in the current
 record (row).</p>
-<p>See also <a href="qsqlresult.html#bindValue">bindValue</a>() and
-<a href="qsqlresult.html#boundValues">boundValues</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#bindValue">bindValue</a>() and <a href="qsqlresult.html#boundValues">boundValues</a>().</p>
 
 
 <h3 class="fn"><a name="boundValue-2" />QVariant QSqlResult.boundValue (<i>self</i>, int&#160;<i>pos</i>)</h3><p>This is an overloaded function.</p>
 <p>Returns the value bound by the given <i>placeholder</i> name in
 the current record (row).</p>
-<p>See also <a href="qsqlresult.html#bindValueType">bindValueType</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#bindValueType">bindValueType</a>().</p>
 
 
 <h3 class="fn"><a name="boundValueCount" />int QSqlResult.boundValueCount (<i>self</i>)</h3><p>Returns the number of bound values in the result.</p>
-<p>See also <a href="qsqlresult.html#boundValues">boundValues</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#boundValues">boundValues</a>().</p>
 
 
 <h3 class="fn"><a name="boundValueName" />QString QSqlResult.boundValueName (<i>self</i>, int&#160;<i>pos</i>)</h3><p>Returns the name of the bound value at position <i>index</i> in
 the current record (row).</p>
-<p>See also <a href="qsqlresult.html#boundValue">boundValue</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#boundValue">boundValue</a>().</p>
 
 
 <h3 class="fn"><a name="boundValues" />list-of-QVariant QSqlResult.boundValues (<i>self</i>)</h3><p>Returns a vector of the result's bound values for the current
 record (row).</p>
-<p>See also <a href="qsqlresult.html#boundValueCount">boundValueCount</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#boundValueCount">boundValueCount</a>().</p>
 
 
 <h3 class="fn"><a name="clear" />QSqlResult.clear (<i>self</i>)</h3><p>Clears the entire result set and releases any associated
@@ -136,14 +134,15 @@ object that was passed to the constructor.</p>
 
 <h3 class="fn"><a name="exec" />bool QSqlResult.exec_ (<i>self</i>)</h3><p>Executes the query, returning true if successful; otherwise
 returns false.</p>
-<p>See also <a href="qsqlresult.html#prepare">prepare</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#prepare">prepare</a>().</p>
 
 
 <h3 class="fn"><a name="executedQuery" />QString QSqlResult.executedQuery (<i>self</i>)</h3><p>Returns the query that was actually executed. This may differ
 from the query that was passed, for example if bound values were
 used with a prepared query and the underlying database doesn't
 support prepared queries.</p>
-<p>See also <a href="qsqlresult.html#exec">exec_</a>() and <a href="qsqlresult.html#setQuery">setQuery</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#exec">exec_</a>() and
+<a href="qsqlresult.html#setQuery">setQuery</a>().</p>
 
 
 <h3 class="fn"><a name="fetch" />bool QSqlResult.fetch (<i>self</i>, int&#160;<i>i</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Positions the result to an arbitrary (zero-based) row
@@ -152,8 +151,7 @@ support prepared queries.</p>
 state. Derived classes must reimplement this function and position
 the result to the row <i>index</i>, and call <a href="qsqlresult.html#setAt">setAt</a>() with an appropriate value.
 Return true to indicate success, or false to signify failure.</p>
-<p>See also <a href="qsqlresult.html#isActive">isActive</a>(),
-<a href="qsqlresult.html#fetchFirst">fetchFirst</a>(), <a href="qsqlresult.html#fetchLast">fetchLast</a>(), <a href="qsqlresult.html#fetchNext">fetchNext</a>(), and <a href="qsqlresult.html#fetchPrevious">fetchPrevious</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#isActive">isActive</a>(), <a href="qsqlresult.html#fetchFirst">fetchFirst</a>(), <a href="qsqlresult.html#fetchLast">fetchLast</a>(), <a href="qsqlresult.html#fetchNext">fetchNext</a>(), and <a href="qsqlresult.html#fetchPrevious">fetchPrevious</a>().</p>
 
 
 <h3 class="fn"><a name="fetchFirst" />bool QSqlResult.fetchFirst (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Positions the result to the first record (row 0) in the
@@ -162,7 +160,7 @@ result.</p>
 state. Derived classes must reimplement this function and position
 the result to the first record, and call <a href="qsqlresult.html#setAt">setAt</a>() with an appropriate value.
 Return true to indicate success, or false to signify failure.</p>
-<p>See also <a href="qsqlresult.html#fetch">fetch</a>() and
+<p><b>See also</b> <a href="qsqlresult.html#fetch">fetch</a>() and
 <a href="qsqlresult.html#fetchLast">fetchLast</a>().</p>
 
 
@@ -172,7 +170,7 @@ result.</p>
 state. Derived classes must reimplement this function and position
 the result to the last record, and call <a href="qsqlresult.html#setAt">setAt</a>() with an appropriate value.
 Return true to indicate success, or false to signify failure.</p>
-<p>See also <a href="qsqlresult.html#fetch">fetch</a>() and
+<p><b>See also</b> <a href="qsqlresult.html#fetch">fetch</a>() and
 <a href="qsqlresult.html#fetchFirst">fetchFirst</a>().</p>
 
 
@@ -183,7 +181,7 @@ state. The default implementation calls <a href="qsqlresult.html#fetch">fetch</a
 classes can reimplement this function and position the result to
 the next record in some other way, and call <a href="qsqlresult.html#setAt">setAt</a>() with an appropriate value.
 Return true to indicate success, or false to signify failure.</p>
-<p>See also <a href="qsqlresult.html#fetch">fetch</a>() and
+<p><b>See also</b> <a href="qsqlresult.html#fetch">fetch</a>() and
 <a href="qsqlresult.html#fetchPrevious">fetchPrevious</a>().</p>
 
 
@@ -209,36 +207,36 @@ executed yet.</p>
 <p>The handle returned here is database-dependent, you should query
 the type name of the variant before accessing it.</p>
 <p>This example retrieves the handle for a sqlite result:</p>
-<pre class="highlightedCode brush: cpp">
- QSqlQuery query = ...
- QVariant v = query.result()-&gt;handle();
- if (v.isValid() &amp;&amp; qstrcmp(v.typeName(), "sqlite3_stmt*")) {
+<pre class="cpp">
+ <span class="type"><a href="qsqlquery.html">QSqlQuery</a></span> query <span class="operator">=</span> <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ <span class="type"><a href="qvariant.html">QVariant</a></span> v <span class="operator">=</span> query<span class="operator">.</span>result()<span class="operator">-</span><span class="operator">&gt;</span>handle();
+ <span class="keyword">if</span> (v<span class="operator">.</span>isValid() <span class="operator">&amp;</span><span class="operator">&amp;</span> qstrcmp(v<span class="operator">.</span>typeName()<span class="operator">,</span> <span class="string">"sqlite3_stmt*"</span>)) {
      <span class="comment">// v.data() returns a pointer to the handle</span>
-     sqlite3_stmt *handle = *static_cast&lt;sqlite3_stmt **&gt;(v.data());
-     if (handle != 0) { <span class="comment">// check that it is not NULL</span>
-         ...
+     sqlite3_stmt <span class="operator">*</span>handle <span class="operator">=</span> <span class="operator">*</span><span class="keyword">static_cast</span><span class="operator">&lt;</span>sqlite3_stmt <span class="operator">*</span><span class="operator">*</span><span class="operator">&gt;</span>(v<span class="operator">.</span>data());
+     <span class="keyword">if</span> (handle <span class="operator">!</span><span class="operator">=</span> <span class="number">0</span>) { <span class="comment">// check that it is not NULL</span>
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
      }
  }
 </pre>
 <p>This snippet returns the handle for PostgreSQL or MySQL:</p>
-<pre class="highlightedCode brush: cpp">
- if (v.typeName() == "PGresult*") {
-     PGresult *handle = *static_cast&lt;PGresult **&gt;(v.data());
-     if (handle != 0) ...
+<pre class="cpp">
+ <span class="keyword">if</span> (v<span class="operator">.</span>typeName() <span class="operator">=</span><span class="operator">=</span> <span class="string">"PGresult*"</span>) {
+     PGresult <span class="operator">*</span>handle <span class="operator">=</span> <span class="operator">*</span><span class="keyword">static_cast</span><span class="operator">&lt;</span>PGresult <span class="operator">*</span><span class="operator">*</span><span class="operator">&gt;</span>(v<span class="operator">.</span>data());
+     <span class="keyword">if</span> (handle <span class="operator">!</span><span class="operator">=</span> <span class="number">0</span>) <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 
- if (v.typeName() == "MYSQL_STMT*") {
-     MYSQL_STMT *handle = *static_cast&lt;MYSQL_STMT **&gt;(v.data());
-     if (handle != 0) ...
+ <span class="keyword">if</span> (v<span class="operator">.</span>typeName() <span class="operator">=</span><span class="operator">=</span> <span class="string">"MYSQL_STMT*"</span>) {
+     MYSQL_STMT <span class="operator">*</span>handle <span class="operator">=</span> <span class="operator">*</span><span class="keyword">static_cast</span><span class="operator">&lt;</span>MYSQL_STMT <span class="operator">*</span><span class="operator">*</span><span class="operator">&gt;</span>(v<span class="operator">.</span>data());
+     <span class="keyword">if</span> (handle <span class="operator">!</span><span class="operator">=</span> <span class="number">0</span>) <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
-<p>See also <a href="qsqldriver.html#handle">QSqlDriver.handle</a>().</p>
+<p><b>See also</b> <a href="qsqldriver.html#handle">QSqlDriver.handle</a>().</p>
 
 
 <h3 class="fn"><a name="hasOutValues" />bool QSqlResult.hasOutValues (<i>self</i>)</h3><p>Returns true if at least one of the query's bound values is a
 <tt>QSql.Out</tt> or a <a href="qsql.html#ParamTypeFlag-enum">QSql.InOut</a>; otherwise returns
 false.</p>
-<p>See also <a href="qsqlresult.html#bindValueType">bindValueType</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#bindValueType">bindValueType</a>().</p>
 
 
 <h3 class="fn"><a name="isActive" />bool QSqlResult.isActive (<i>self</i>)</h3><p>Returns true if the result has records to be retrieved;
@@ -247,7 +245,7 @@ otherwise returns false.</p>
 
 <h3 class="fn"><a name="isForwardOnly" />bool QSqlResult.isForwardOnly (<i>self</i>)</h3><p>Returns true if you can only scroll forward through the result
 set; otherwise returns false.</p>
-<p>See also <a href="qsqlresult.html#setForwardOnly">setForwardOnly</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#setForwardOnly">setForwardOnly</a>().</p>
 
 
 <h3 class="fn"><a name="isNull" />bool QSqlResult.isNull (<i>self</i>, int&#160;<i>i</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns true if the field at position <i>index</i> in the
@@ -256,17 +254,17 @@ current row is null; otherwise returns false.</p>
 
 <h3 class="fn"><a name="isSelect" />bool QSqlResult.isSelect (<i>self</i>)</h3><p>Returns true if the current result is from a <tt>SELECT</tt>
 statement; otherwise returns false.</p>
-<p>See also <a href="qsqlresult.html#setSelect">setSelect</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#setSelect">setSelect</a>().</p>
 
 
 <h3 class="fn"><a name="isValid" />bool QSqlResult.isValid (<i>self</i>)</h3><p>Returns true if the result is positioned on a valid record (that
 is, the result is not positioned before the first or after the last
 record); otherwise returns false.</p>
-<p>See also <a href="qsqlresult.html#at">at</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#at">at</a>().</p>
 
 
 <h3 class="fn"><a name="lastError" /><a href="qsqlerror.html">QSqlError</a> QSqlResult.lastError (<i>self</i>)</h3><p>Returns the last error associated with the result.</p>
-<p>See also <a href="qsqlresult.html#setLastError">setLastError</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#setLastError">setLastError</a>().</p>
 
 
 <h3 class="fn"><a name="lastInsertId" />QVariant QSqlResult.lastInsertId (<i>self</i>)</h3><p>Returns the object ID of the most recent inserted row if the
@@ -277,31 +275,31 @@ undefined.</p>
 <p>Note that for Oracle databases the row's ROWID will be returned,
 while for MySQL databases the row's auto-increment field will be
 returned.</p>
-<p>See also <a href="qsqldriver.html#hasFeature">QSqlDriver.hasFeature</a>().</p>
+<p><b>See also</b> <a href="qsqldriver.html#hasFeature">QSqlDriver.hasFeature</a>().</p>
 
 
 <h3 class="fn"><a name="lastQuery" />QString QSqlResult.lastQuery (<i>self</i>)</h3><p>Returns the current SQL query text, or an empty string if there
 isn't one.</p>
-<p>See also <a href="qsqlresult.html#setQuery">setQuery</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#setQuery">setQuery</a>().</p>
 
 
 <h3 class="fn"><a name="numRowsAffected" />int QSqlResult.numRowsAffected (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the number of rows affected by the last query executed,
 or -1 if it cannot be determined or if the query is a
 <tt>SELECT</tt> statement.</p>
-<p>See also <a href="qsqlresult.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#size">size</a>().</p>
 
 
 <h3 class="fn"><a name="prepare" />bool QSqlResult.prepare (<i>self</i>, QString&#160;<i>query</i>)</h3><p>Prepares the given <i>query</i> for execution; the query will
 normally use placeholders so that it can be executed repeatedly.
 Returns true if the query is prepared successfully; otherwise
 returns false.</p>
-<p>See also <a href="qsqlresult.html#exec">exec_</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#exec">exec_</a>().</p>
 
 
 <h3 class="fn"><a name="record" /><a href="qsqlrecord.html">QSqlRecord</a> QSqlResult.record (<i>self</i>)</h3><p>Returns the current record if the query is active; otherwise
 returns an empty <a href="qsqlrecord.html">QSqlRecord</a>.</p>
 <p>The default implementation always returns an empty <a href="qsqlrecord.html">QSqlRecord</a>.</p>
-<p>See also <a href="qsqlresult.html#isActive">isActive</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#isActive">isActive</a>().</p>
 
 
 <h3 class="fn"><a name="reset" />bool QSqlResult.reset (<i>self</i>, QString&#160;<i>sqlquery</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets the result to use the SQL statement <i>query</i> for
@@ -312,23 +310,23 @@ the result is set to an inactive state and is positioned before the
 first record of the new result. Derived classes should return true
 if the query was successful and ready to be used, or false
 otherwise.</p>
-<p>See also <a href="qsqlresult.html#setQuery">setQuery</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#setQuery">setQuery</a>().</p>
 
 
 <h3 class="fn"><a name="savePrepare" />bool QSqlResult.savePrepare (<i>self</i>, QString&#160;<i>sqlquery</i>)</h3><p>Prepares the given <i>query</i>, using the underlying database
 functionality where possible. Returns true if the query is prepared
 successfully; otherwise returns false.</p>
-<p>See also <a href="qsqlresult.html#prepare">prepare</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#prepare">prepare</a>().</p>
 
 
 <h3 class="fn"><a name="setActive" />QSqlResult.setActive (<i>self</i>, bool&#160;<i>a</i>)</h3><p>This function is provided for derived classes to set the
 internal active state to <i>active</i>.</p>
-<p>See also <a href="qsqlresult.html#isActive">isActive</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#isActive">isActive</a>().</p>
 
 
 <h3 class="fn"><a name="setAt" />QSqlResult.setAt (<i>self</i>, int&#160;<i>at</i>)</h3><p>This function is provided for derived classes to set the
 internal (zero-based) row position to <i>index</i>.</p>
-<p>See also <a href="qsqlresult.html#at">at</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#at">at</a>().</p>
 
 
 <h3 class="fn"><a name="setForwardOnly" />QSqlResult.setForwardOnly (<i>self</i>, bool&#160;<i>forward</i>)</h3><p>Sets forward only mode to <i>forward</i>. If <i>forward</i> is
@@ -343,18 +341,18 @@ return the correct status of the result set.</p>
 <p><b>Note:</b> Calling setForwardOnly after execution of the query
 will result in unexpected results at best, and crashes at
 worst.</p>
-<p>See also <a href="qsqlresult.html#isForwardOnly">isForwardOnly</a>(), <a href="qsqlresult.html#fetchNext">fetchNext</a>(), and <a href="qsqlquery.html#setForwardOnly">QSqlQuery.setForwardOnly</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#isForwardOnly">isForwardOnly</a>(), <a href="qsqlresult.html#fetchNext">fetchNext</a>(), and <a href="qsqlquery.html#setForwardOnly">QSqlQuery.setForwardOnly</a>().</p>
 
 
 <h3 class="fn"><a name="setLastError" />QSqlResult.setLastError (<i>self</i>, <a href="qsqlerror.html">QSqlError</a>&#160;<i>e</i>)</h3><p>This function is provided for derived classes to set the last
 error to <i>error</i>.</p>
-<p>See also <a href="qsqlresult.html#lastError">lastError</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#lastError">lastError</a>().</p>
 
 
 <h3 class="fn"><a name="setQuery" />QSqlResult.setQuery (<i>self</i>, QString&#160;<i>query</i>)</h3><p>Sets the current query for the result to <i>query</i>. You must
 call <a href="qsqlresult.html#reset">reset</a>() to execute the
 query on the database.</p>
-<p>See also <a href="qsqlresult.html#reset">reset</a>() and
+<p><b>See also</b> <a href="qsqlresult.html#reset">reset</a>() and
 <a href="qsqlresult.html#lastQuery">lastQuery</a>().</p>
 
 
@@ -363,11 +361,11 @@ whether or not the current statement is a SQL <tt>SELECT</tt>
 statement. The <i>select</i> parameter should be true if the
 statement is a <tt>SELECT</tt> statement; otherwise it should be
 false.</p>
-<p>See also <a href="qsqlresult.html#isSelect">isSelect</a>().</p>
+<p><b>See also</b> <a href="qsqlresult.html#isSelect">isSelect</a>().</p>
 
 
 <h3 class="fn"><a name="size" />int QSqlResult.size (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the size of the <tt>SELECT</tt> result, or -1 if it
 cannot be determined or if the query is not a <tt>SELECT</tt>
 statement.</p>
-<p>See also <a href="qsqlresult.html#numRowsAffected">numRowsAffected</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qsqlresult.html#numRowsAffected">numRowsAffected</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

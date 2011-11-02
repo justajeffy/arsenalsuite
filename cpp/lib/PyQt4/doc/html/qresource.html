@@ -59,45 +59,48 @@ QResource that points to it is destroyed.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QResource" />QResource.__init__ (<i>self</i>, QString&#160;<i>fileName</i>&#160;=&#160;QString(), <a href="qlocale.html">QLocale</a>&#160;<i>locale</i>&#160;=&#160;QLocale())</h3><p>Constructs a <a href="qresource.html">QResource</a> pointing to
 <i>file</i>. <i>locale</i> is used to load a specific localization
 of a resource data.</p>
-<p>See also <a href="qfileinfo.html">QFileInfo</a>, <a class="obsolete" href="qresource-obsolete.html#searchPaths">searchPaths</a>(), <a href="qresource.html#setFileName">setFileName</a>(), and <a href="qresource.html#setLocale">setLocale</a>().</p>
+<p><b>See also</b> <a href="qfileinfo.html">QFileInfo</a>, <a href="qdir.html#searchPaths">QDir.searchPaths</a>(), <a href="qresource.html#setFileName">setFileName</a>(), and <a href="qresource.html#setLocale">setLocale</a>().</p>
 
 
 <h3 class="fn"><a name="absoluteFilePath" />QString QResource.absoluteFilePath (<i>self</i>)</h3><p>Returns the real path that this <a href="qresource.html">QResource</a> represents, if the resource was
-found via the <a class="obsolete" href="qresource-obsolete.html#searchPaths">searchPaths</a>() it will be indicated in the path.</p>
-<p>See also <a href="qresource.html#fileName">fileName</a>().</p>
+found via the <a href="qdir.html#searchPaths">QDir.searchPaths</a>() it will be
+indicated in the path.</p>
+<p><b>See also</b> <a href="qresource.html#fileName">fileName</a>().</p>
 
 
 <h3 class="fn"><a name="addSearchPath" />QResource.addSearchPath (QString&#160;<i>path</i>)</h3><h3 class="fn"><a name="children" />QStringList QResource.children (<i>self</i>)</h3><p>Returns a list of all resources in this directory, if the
 resource represents a file the list will be empty.</p>
-<p>See also <a href="qresource.html#isDir">isDir</a>().</p>
+<p><b>See also</b> <a href="qresource.html#isDir">isDir</a>().</p>
 
 
 <h3 class="fn"><a name="data" />str QResource.data (<i>self</i>)</h3><p>Returns direct access to a read only segment of data that this
 resource represents. If the resource is compressed the data returns
 is compressed and <a href="qtcore.html#qUncompress">qUncompress</a>() must be used to
 access the data. If the resource is a directory 0 is returned.</p>
-<p>See also <a href="qresource.html#size">size</a>(), <a href="qresource.html#isCompressed">isCompressed</a>(), and <a href="qresource.html#isFile">isFile</a>().</p>
+<p><b>See also</b> <a href="qresource.html#size">size</a>(),
+<a href="qresource.html#isCompressed">isCompressed</a>(), and
+<a href="qresource.html#isFile">isFile</a>().</p>
 
 
 <h3 class="fn"><a name="fileName" />QString QResource.fileName (<i>self</i>)</h3><p>Returns the full path to the file that this <a href="qresource.html">QResource</a> represents as it was passed.</p>
-<p>See also <a href="qresource.html#setFileName">setFileName</a>()
-and <a href="qresource.html#absoluteFilePath">absoluteFilePath</a>().</p>
+<p><b>See also</b> <a href="qresource.html#setFileName">setFileName</a>() and <a href="qresource.html#absoluteFilePath">absoluteFilePath</a>().</p>
 
 
 <h3 class="fn"><a name="isCompressed" />bool QResource.isCompressed (<i>self</i>)</h3><p>Returns true if the resource represents a file and the data
 backing it is in a compressed format, false otherwise.</p>
-<p>See also <a href="qresource.html#data">data</a>() and <a href="qresource.html#isFile">isFile</a>().</p>
+<p><b>See also</b> <a href="qresource.html#data">data</a>() and
+<a href="qresource.html#isFile">isFile</a>().</p>
 
 
 <h3 class="fn"><a name="isDir" />bool QResource.isDir (<i>self</i>)</h3><p>Returns true if the resource represents a directory and thus may
 have <a href="qresource.html#children">children</a>() in it, false
 if it represents a file.</p>
-<p>See also <a href="qresource.html#isFile">isFile</a>().</p>
+<p><b>See also</b> <a href="qresource.html#isFile">isFile</a>().</p>
 
 
 <h3 class="fn"><a name="isFile" />bool QResource.isFile (<i>self</i>)</h3><p>Returns true if the resource represents a file and thus has data
 backing it, false if it represents a directory.</p>
-<p>See also <a href="qresource.html#isDir">isDir</a>().</p>
+<p><b>See also</b> <a href="qresource.html#isDir">isDir</a>().</p>
 
 
 <h3 class="fn"><a name="isValid" />bool QResource.isValid (<i>self</i>)</h3><p>Returns true if the resource really exists in the resource
@@ -105,40 +108,41 @@ hierarchy, false otherwise.</p>
 
 
 <h3 class="fn"><a name="locale" /><a href="qlocale.html">QLocale</a> QResource.locale (<i>self</i>)</h3><p>Returns the locale used to locate the data for the <a href="qresource.html">QResource</a>.</p>
-<p>See also <a href="qresource.html#setLocale">setLocale</a>().</p>
+<p><b>See also</b> <a href="qresource.html#setLocale">setLocale</a>().</p>
 
 
 <h3 class="fn"><a name="registerResource" />bool QResource.registerResource (QString&#160;<i>rccFileName</i>, QString&#160;<i>mapRoot</i>&#160;=&#160;QString())</h3><p>Registers the resource with the given <i>rccFileName</i> at the
 location in the resource tree specified by <i>mapRoot</i>, and
 returns true if the file is successfully opened; otherwise returns
 false.</p>
-<p>See also <a href="qresource.html#unregisterResource">unregisterResource</a>().</p>
+<p><b>See also</b> <a href="qresource.html#unregisterResource">unregisterResource</a>().</p>
 
 
 <h3 class="fn"><a name="registerResourceData" />bool QResource.registerResourceData (str&#160;<i>rccData</i>, QString&#160;<i>mapRoot</i>&#160;=&#160;QString())</h3><h3 class="fn"><a name="searchPaths" />QStringList QResource.searchPaths ()</h3><h3 class="fn"><a name="setFileName" />QResource.setFileName (<i>self</i>, QString&#160;<i>file</i>)</h3><p>Sets a <a href="qresource.html">QResource</a> to point to
 <i>file</i>. <i>file</i> can either be absolute, in which case it
 is opened directly, if relative then the file will be tried to be
-found in <a class="obsolete" href="qresource-obsolete.html#searchPaths">searchPaths</a>().</p>
-<p>See also <a href="qresource.html#fileName">fileName</a>() and
-<a href="qresource.html#absoluteFilePath">absoluteFilePath</a>().</p>
+found in <a href="qdir.html#searchPaths">QDir.searchPaths</a>().</p>
+<p><b>See also</b> <a href="qresource.html#fileName">fileName</a>()
+and <a href="qresource.html#absoluteFilePath">absoluteFilePath</a>().</p>
 
 
 <h3 class="fn"><a name="setLocale" />QResource.setLocale (<i>self</i>, <a href="qlocale.html">QLocale</a>&#160;<i>locale</i>)</h3><p>Sets a <a href="qresource.html">QResource</a> to only load the
 localization of resource to for <i>locale</i>. If a resource for
 the specific locale is not found then the C locale is used.</p>
-<p>See also <a href="qresource.html#locale">locale</a>() and
+<p><b>See also</b> <a href="qresource.html#locale">locale</a>() and
 <a href="qresource.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="size" />int QResource.size (<i>self</i>)</h3><p>Returns the size of the data backing the resource.</p>
-<p>See also <a href="qresource.html#data">data</a>() and <a href="qresource.html#isFile">isFile</a>().</p>
+<p><b>See also</b> <a href="qresource.html#data">data</a>() and
+<a href="qresource.html#isFile">isFile</a>().</p>
 
 
 <h3 class="fn"><a name="unregisterResource" />bool QResource.unregisterResource (QString&#160;<i>rccFileName</i>, QString&#160;<i>mapRoot</i>&#160;=&#160;QString())</h3><p>Unregisters the resource with the given <i>rccFileName</i> at
 the location in the resource tree specified by <i>mapRoot</i>, and
 returns true if the resource is successfully unloaded and no
 references exist for the resource; otherwise returns false.</p>
-<p>See also <a href="qresource.html#registerResource">registerResource</a>().</p>
+<p><b>See also</b> <a href="qresource.html#registerResource">registerResource</a>().</p>
 
 
-<h3 class="fn"><a name="unregisterResourceData" />bool QResource.unregisterResourceData (str&#160;<i>rccData</i>, QString&#160;<i>mapRoot</i>&#160;=&#160;QString())</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="unregisterResourceData" />bool QResource.unregisterResourceData (str&#160;<i>rccData</i>, QString&#160;<i>mapRoot</i>&#160;=&#160;QString())</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

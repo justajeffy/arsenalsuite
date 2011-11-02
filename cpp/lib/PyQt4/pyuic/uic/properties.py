@@ -66,6 +66,9 @@ def float_list(prop):
 
 bool_ = lambda v: v == "true"
 
+def qfont_enum(v):
+    return getattr(QtGui.QFont, v)
+
 def needsWidget(func):
     func.needsWidget = True
     return func
@@ -203,9 +206,6 @@ class Properties(object):
         country = getattr(QtCore.QLocale, prop.attrib['country'])
         return QtCore.QLocale(lang, country)
 
-    def _cursor(self, prop):
-        return QtGui.QCursor(QtCore.Qt.CursorShape(int(prop.text)))
-
     def _date(self, prop):
         return QtCore.QDate(*int_list(prop))
 
@@ -332,13 +332,15 @@ class Properties(object):
     _sizepolicy = needsWidget(_sizepolicy)
 
     # font needs special handling/conversion of all child elements.
-    _font_attributes = (("Family",    str),
-                        ("PointSize", int),
-                        ("Weight",    int),
-                        ("Italic",    bool_),
-                        ("Underline", bool_),
-                        ("StrikeOut", bool_),
-                        ("Bold",      bool_))
+    _font_attributes = (("Family",          str),
+                        ("PointSize",       int),
+                        ("Bold",            bool_),
+                        ("Italic",          bool_),
+                        ("Underline",       bool_),
+                        ("Weight",          int),
+                        ("StrikeOut",       bool_),
+                        ("Kerning",         bool_),
+                        ("StyleStrategy",   qfont_enum))
 
     def _font(self, prop):
         newfont = self.factory.createQObject("QFont", "font", (),
@@ -351,8 +353,11 @@ class Properties(object):
             getattr(newfont, "set%s" % (attr,))(converter(v))
         return newfont
 
+    def _cursor(self, prop):
+        return QtGui.QCursor(QtCore.Qt.CursorShape(int(prop.text)))
+
     def _cursorShape(self, prop):
-        return getattr(QtCore.Qt, prop.text)
+        return QtGui.QCursor(getattr(QtCore.Qt, prop.text))
 
     def convert(self, prop, widget=None):
         try:
@@ -423,7 +428,14 @@ class Properties(object):
     def _setViaSetProperty(self, widget, prop):
         prop_value = self.convert(prop)
         if prop_value is not None:
-            widget.setProperty(prop.attrib["name"], prop_value)
+            prop_name = prop.attrib['name']
+
+            # This appears to be a Designer/uic hack where stdset=0 means that
+            # the viewport should be used.
+            if prop[0].tag == 'cursorShape':
+                widget.viewport().setProperty(prop_name, prop_value)
+            else:
+                widget.setProperty(prop_name, prop_value)
 
     # Ignore the property.
     def _ignore(self, widget, prop):

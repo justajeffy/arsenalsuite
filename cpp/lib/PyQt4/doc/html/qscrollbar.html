@@ -28,13 +28,12 @@ situations where a slider control is used to obtain a value within
 a given range, the <a href="qslider.html">QSlider</a> class may be
 more appropriate for your needs.</p>
 <table class="generic">
-<tr class="odd topAlign">
+<tr class="odd" valign="top">
 <td>
 <p class="centerAlign"><img src="images/qscrollbar-picture.png" /></p>
 </td>
-<td>
-<p>Scroll bars typically include four separate controls: a slider,
-scroll arrows, and a page control.</p>
+<td>Scroll bars typically include four separate controls: a slider,
+scroll arrows, and a page control.
 <ul>
 <li>a. The slider provides a way to quickly go to any part of the
 document, but does not support accurate navigation within large
@@ -83,19 +82,14 @@ scroll bar with a page step of 20, a minimum value of 0, and a
 maximum value of 80. This would give us a scroll bar with five
 "pages".</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/qscrollbar-values.png" /></p>
-</td>
-<td>
-<p>The relationship between a document length, the range of values
+<tr class="odd" valign="top">
+<td><img src="images/qscrollbar-values.png" /></td>
+<td>The relationship between a document length, the range of values
 used in a scroll bar, and the page step is simple in many common
 situations. The scroll bar's range of values is determined by
 subtracting a chosen page step from some value representing the
 length of the document. In such cases, the following equation is
-useful:</p>
-<p><i>document length</i> = <a href="qabstractslider.html#maximum-prop">maximum</a>() - <a href="qabstractslider.html#minimum-prop">minimum</a>() + <a href="qabstractslider.html#pageStep-prop">pageStep</a>().</p>
-</td>
+useful: <i>document length</i> = <a href="qabstractslider.html#maximum-prop">maximum</a>() - <a href="qabstractslider.html#minimum-prop">minimum</a>() + <a href="qabstractslider.html#pageStep-prop">pageStep</a>().</td>
 </tr>
 </table>
 <p>QScrollBar only provides integer ranges. Note that although
@@ -142,34 +136,22 @@ useful if you have many different widgets that use a common range
 of values.</p>
 <p>Most GUI styles use the <a href="qabstractslider.html#pageStep-prop">pageStep</a>() value to
 calculate the size of the slider.</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Screenshot of a Macintosh style scroll bar" src="images/macintosh-horizontalscrollbar.png" /></p>
-</td>
-<td>
-<p>A scroll bar shown in the <a href="gallery-macintosh.html">Macintosh widget style</a>.</p>
-</td>
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img alt="Screenshot of a Macintosh style scroll bar" src="images/macintosh-horizontalscrollbar.png" /></td>
+<td>A scroll bar shown in the <a href="gallery-macintosh.html">Macintosh widget style</a>.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><img alt="Screenshot of a Windows XP style scroll bar" src="images/windowsxp-horizontalscrollbar.png" /></p>
-</td>
-<td>
-<p>A scroll bar shown in the <a href="gallery-windowsxp.html">Windows XP widget style</a>.</p>
-</td>
+<tr class="even" valign="top">
+<td><img alt="Screenshot of a Windows XP style scroll bar" src="images/windowsxp-horizontalscrollbar.png" /></td>
+<td>A scroll bar shown in the <a href="gallery-windowsxp.html">Windows XP widget style</a>.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><img alt="Screenshot of a Plastique style scroll bar" src="images/plastique-horizontalscrollbar.png" /></p>
-</td>
-<td>
-<p>A scroll bar shown in the <a href="gallery-plastique.html">Plastique widget style</a>.</p>
-</td>
+<tr class="odd" valign="top">
+<td><img alt="Screenshot of a Plastique style scroll bar" src="images/plastique-horizontalscrollbar.png" /></td>
+<td>A scroll bar shown in the <a href="gallery-plastique.html">Plastique widget style</a>.</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QScrollBar" />QScrollBar.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a vertical scroll bar.</p>
-<p>The <i>parent</i> arguments is sent to the <a href="qwidget.html">QWidget</a> constructor.</p>
+<p>The <i>parent</i> argument is sent to the <a href="qwidget.html">QWidget</a> constructor.</p>
 <p>The <a href="qabstractslider.html#minimum-prop">minimum</a>
 defaults to 0, the <a href="qabstractslider.html#maximum-prop">maximum</a> to 99, with a
 <a href="qabstractslider.html#singleStep-prop">singleStep</a> size
@@ -200,7 +182,7 @@ an initial <a href="qabstractslider.html#value-prop">value</a> of
 <h3 class="fn"><a name="initStyleOption" />QScrollBar.initStyleOption (<i>self</i>, <a href="qstyleoptionslider.html">QStyleOptionSlider</a>&#160;<i>option</i>)</h3><p>Initialize <i>option</i> with the values from this <a href="qscrollbar.html">QScrollBar</a>. This method is useful for
 subclasses when they need a <a href="qstyleoptionslider.html">QStyleOptionSlider</a>, but don't want to
 fill in all the information themselves.</p>
-<p>See also <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
+<p><b>See also</b> <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
 
 
 <h3 class="fn"><a name="mouseMoveEvent" />QScrollBar.mouseMoveEvent (<i>self</i>, <a href="qmouseevent.html">QMouseEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#mouseMoveEvent">QWidget.mouseMoveEvent</a>().</p>
@@ -219,4 +201,4 @@ fill in all the information themselves.</p>
 
 
 <h3 class="fn"><a name="sliderChange" />QScrollBar.sliderChange (<i>self</i>, <a href="qabstractslider.html#SliderChange-enum">QAbstractSlider.SliderChange</a>&#160;<i>change</i>)</h3><p>Reimplemented from <a href="qabstractslider.html#sliderChange">QAbstractSlider.sliderChange</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

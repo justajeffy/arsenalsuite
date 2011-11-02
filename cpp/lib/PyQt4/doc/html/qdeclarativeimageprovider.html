@@ -23,23 +23,34 @@ be:</p>
 use the <b>"image:"</b> scheme for the URL source of the image,
 followed by the identifiers of the image provider and the requested
 image. For example:</p>
-<pre class="highlightedCode brush: cpp">
- Image { source: "image://myimageprovider/image.png" }
+<pre class="qml">
+ <span class="type"><a href="qdeclarativeimageprovider.html#ImageType-enum">Image</a></span> { <span class="name">source</span>: <span class="string">"image://myimageprovider/image.png"</span> }
 </pre>
 <p>This specifies that the image should be loaded by the image
 provider named "myimageprovider", and the image to be loaded is
 named "image.png". The QML engine invokes the appropriate image
 provider according to the providers that have been registered
 through <a href="qdeclarativeengine.html#addImageProvider">QDeclarativeEngine.addImageProvider</a>().</p>
+<p>Note that the identifiers are case-insensitive, but the rest of
+the URL will be passed on with preserved case. For example, the
+below snippet would still specify that the image is loaded by the
+image provider named "myimageprovider", but it would request a
+different image than the above snippet ("Image.png" instead of
+"image.png").</p>
+<pre class="qml">
+ <span class="type"><a href="qdeclarativeimageprovider.html#ImageType-enum">Image</a></span> { <span class="name">source</span>: <span class="string">"image://MyImageProvider/Image.png"</span> }
+</pre>
+<p>If you want the rest of the URL to be case insensitive, you will
+have to take care of that yourself inside your image provider.</p>
 <a id="an-example" name="an-example" />
-<h3>An example</h3>
+<h4>An example</h4>
 <p>Here are two images. Their <tt>source</tt> values indicate they
 should be loaded by an image provider named "colors", and the
 images to be loaded are "yellow" and "red", respectively:</p>
-<pre class="highlightedCode brush: cpp">
- Column {
-     Image { source: "image://colors/yellow" }
-     Image { source: "image://colors/red" }
+<pre class="qml">
+ <span class="type"><a href="qml-column.html">Column</a></span> {
+     <span class="type"><a href="qdeclarativeimageprovider.html#ImageType-enum">Image</a></span> { <span class="name">source</span>: <span class="string">"image://colors/yellow"</span> }
+     <span class="type"><a href="qdeclarativeimageprovider.html#ImageType-enum">Image</a></span> { <span class="name">source</span>: <span class="string">"image://colors/red"</span> }
  }
 </pre>
 <p>When these images are loaded by QML, it looks for a matching
@@ -52,41 +63,41 @@ to "yellow" for the first image, and "red" for the second.</p>
 images requested by the above QML. This implementation dynamically
 generates <a href="qpixmap.html">QPixmap</a> images that are filled
 with the requested color:</p>
-<pre class="highlightedCode brush: cpp">
- class ColorImageProvider : public QDeclarativeImageProvider
+<pre class="cpp">
+ <span class="keyword">class</span> ColorImageProvider : <span class="keyword">public</span> <span class="type">QDeclarativeImageProvider</span>
  {
- public:
+ <span class="keyword">public</span>:
      ColorImageProvider()
-         : QDeclarativeImageProvider(QDeclarativeImageProvider.Pixmap)
+         : <span class="type">QDeclarativeImageProvider</span>(<span class="type">QDeclarativeImageProvider</span><span class="operator">.</span>Pixmap)
      {
      }
 
-     QPixmap requestPixmap(const QString &amp;id, QSize *size, const QSize &amp;requestedSize)
+     <span class="type"><a href="qpixmap.html">QPixmap</a></span> requestPixmap(<span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>id<span class="operator">,</span> <span class="type"><a href="qsize.html">QSize</a></span> <span class="operator">*</span>size<span class="operator">,</span> <span class="keyword">const</span> <span class="type"><a href="qsize.html">QSize</a></span> <span class="operator">&amp;</span>requestedSize)
      {
-         int width = 100;
-         int height = 50;
+         <span class="type">int</span> width <span class="operator">=</span> <span class="number">100</span>;
+         <span class="type">int</span> height <span class="operator">=</span> <span class="number">50</span>;
 
-         if (size)
-             *size = QSize(width, height);
-         QPixmap pixmap(requestedSize.width() &gt; 0 ? requestedSize.width() : width,
-                        requestedSize.height() &gt; 0 ? requestedSize.height() : height);
-         pixmap.fill(QColor(id).rgba());
+         <span class="keyword">if</span> (size)
+             <span class="operator">*</span>size <span class="operator">=</span> <span class="type"><a href="qsize.html">QSize</a></span>(width<span class="operator">,</span> height);
+         <span class="type"><a href="qpixmap.html">QPixmap</a></span> pixmap(requestedSize<span class="operator">.</span>width() <span class="operator">&gt;</span> <span class="number">0</span> <span class="operator">?</span> requestedSize<span class="operator">.</span>width() : width<span class="operator">,</span>
+                        requestedSize<span class="operator">.</span>height() <span class="operator">&gt;</span> <span class="number">0</span> <span class="operator">?</span> requestedSize<span class="operator">.</span>height() : height);
+         pixmap<span class="operator">.</span>fill(<span class="type"><a href="qcolor.html">QColor</a></span>(id)<span class="operator">.</span>rgba());
 
-         return pixmap;
+         <span class="keyword">return</span> pixmap;
      }
  };
 </pre>
 <p>To make this provider accessible to QML, it is registered with
 the QML engine with a "colors" identifier:</p>
-<pre class="highlightedCode brush: cpp">
- int main(int argc, char *argv[])
+<pre class="cpp">
+ <span class="type">int</span> main(<span class="type">int</span> argc<span class="operator">,</span> <span class="type">char</span> <span class="operator">*</span>argv<span class="operator">[</span><span class="operator">]</span>)
  {
-     ...
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 
-     QDeclarativeEngine engine;
-     engine-&gt;addImageProvider(QLatin1String("colors"), new ColorPixmapProvider);
+     <span class="type"><a href="qdeclarativeengine.html">QDeclarativeEngine</a></span> engine;
+     engine<span class="operator">-</span><span class="operator">&gt;</span>addImageProvider(QLatin1String(<span class="string">"colors"</span>)<span class="operator">,</span> <span class="keyword">new</span> ColorPixmapProvider);
 
-     ...
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
 <p>Now the images can be successfully loaded in QML:</p>
@@ -96,7 +107,7 @@ directory. Note the example registers the provider via a <a href="qdeclarativeex
 registering it in the application <tt>main()</tt> function as shown
 above.</p>
 <a id="asynchronous-image-loading" name="asynchronous-image-loading" />
-<h3>Asynchronous image loading</h3>
+<h4>Asynchronous image loading</h4>
 <p>Image providers that support <a href="qimage.html">QImage</a>
 loading automatically include support for asychronous loading of
 images. To enable asynchronous loading for an <a href="qdeclarativeimageprovider.html#ImageType-enum">Image</a> source,
@@ -112,21 +123,21 @@ the main thread. In this case, if <a href="qml-image.html#asynchronous-prop">asy
 synchronously.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="ImageType-enum" />QDeclarativeImageProvider.ImageType</h3><p>Defines the type of image supported by this image provider.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeImageProvider.Image</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The Image Provider provides <a href="qimage.html">QImage</a> images. The <a href="qdeclarativeimageprovider.html#requestImage">requestImage</a>()
 method will be called for all image requests.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QDeclarativeImageProvider.Pixmap</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The Image Provider provides <a href="qpixmap.html">QPixmap</a> images. The <a href="qdeclarativeimageprovider.html#requestPixmap">requestPixmap</a>()
 method will be called for all image requests.</td>
 </tr>
@@ -168,4 +179,4 @@ image returned should be of that size.</p>
 <p>In all cases, <i>size</i> must be set to the original size of
 the image. This is used to set the <a href="qml-item.html#width-prop">width</a> and <a href="qml-item.html#height-prop">height</a> of the relevant <a href="qdeclarativeimageprovider.html#ImageType-enum">Image</a> if these
 values have not been set explicitly.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

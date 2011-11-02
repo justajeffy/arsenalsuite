@@ -32,21 +32,21 @@ QStaticText.</p>
 drawStaticText(). Calling drawStaticText() on a projected painter
 will perform slightly worse than using the regular drawText() call,
 so this should be avoided.</p>
-<pre class="highlightedCode brush: cpp">
- class MyWidget: public QWidget
+<pre class="cpp">
+ <span class="keyword">class</span> MyWidget: <span class="keyword">public</span> <span class="type"><a href="qwidget.html">QWidget</a></span>
  {
- public:
-     MyWidget(QWidget *parent = 0) : QWidget(parent), m_staticText("This is static text")
+ <span class="keyword">public</span>:
+     MyWidget(<span class="type"><a href="qwidget.html">QWidget</a></span> <span class="operator">*</span>parent <span class="operator">=</span> <span class="number">0</span>) : <span class="type"><a href="qwidget.html">QWidget</a></span>(parent)<span class="operator">,</span> m_staticText(<span class="string">"This is static text"</span>)
 
- protected:
-     void paintEvent(QPaintEvent *)
+ <span class="keyword">protected</span>:
+     <span class="type">void</span> paintEvent(<span class="type"><a href="qpaintevent.html">QPaintEvent</a></span> <span class="operator">*</span>)
      {
-         QPainter painter(this);
-         painter.drawStaticText(0, 0, m_staticText);
+         <span class="type"><a href="qpainter.html">QPainter</a></span> painter(<span class="keyword">this</span>);
+         painter<span class="operator">.</span>drawStaticText(<span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> m_staticText);
      }
 
- private:
-     QStaticText m_staticText;
+ <span class="keyword">private</span>:
+     <span class="type">QStaticText</span> m_staticText;
  };
 </pre>
 <p>The QStaticText class can be used to mimic the behavior of
@@ -97,20 +97,20 @@ at the expense of memory. In particular, setting the performance
 hint AggressiveCaching on the <a href="qstatictext.html">QStaticText</a> will improve performance when
 using the OpenGL graphics system or when drawing to a <a href="qglwidget.html">QGLWidget</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QStaticText.ModerateCaching</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Do basic caching for high performance at a low
 memory cost.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QStaticText.AggressiveCaching</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Use additional caching when available. This
 may improve performance at a higher memory cost.</td>
 </tr>
@@ -127,7 +127,7 @@ which is a copy of <i>other</i>.</p>
 
 
 <h3 class="fn"><a name="performanceHint" /><a href="qstatictext.html#PerformanceHint-enum">PerformanceHint</a> QStaticText.performanceHint (<i>self</i>)</h3><p>Returns which performance hint is set for the <a href="qstatictext.html">QStaticText</a>.</p>
-<p>See also <a href="qstatictext.html#setPerformanceHint">setPerformanceHint</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#setPerformanceHint">setPerformanceHint</a>().</p>
 
 
 <h3 class="fn"><a name="prepare" />QStaticText.prepare (<i>self</i>, <a href="qtransform.html">QTransform</a>&#160;<i>matrix</i>&#160;=&#160;QTransform(), <a href="qfont.html">QFont</a>&#160;<i>font</i>&#160;=&#160;QFont())</h3><p>Prepares the <a href="qstatictext.html">QStaticText</a> object
@@ -146,8 +146,7 @@ draw the <a href="qstatictext.html">QStaticText</a> after making
 changes, you can use the prepare() function and pass in the
 <i>matrix</i> and <i>font</i> you expect to use when drawing the
 text.</p>
-<p>See also <a href="qpainter.html#setFont">QPainter.setFont</a>()
-and <a class="obsolete" href="qpainter-obsolete.html#setMatrix">QPainter.setMatrix</a>().</p>
+<p><b>See also</b> <a href="qpainter.html#setFont">QPainter.setFont</a>() and <a class="obsolete" href="qpainter-obsolete.html#setMatrix">QPainter.setMatrix</a>().</p>
 
 
 <h3 class="fn"><a name="setPerformanceHint" />QStaticText.setPerformanceHint (<i>self</i>, <a href="qstatictext.html#PerformanceHint-enum">PerformanceHint</a>&#160;<i>performanceHint</i>)</h3><p>Sets the performance hint of the <a href="qstatictext.html">QStaticText</a> according to the
@@ -157,14 +156,14 @@ performance.</p>
 <p>The default is <a href="qstatictext.html#PerformanceHint-enum">QStaticText.ModerateCaching</a>.</p>
 <p><b>Note:</b> This function will cause the layout of the text to
 require recalculation.</p>
-<p>See also <a href="qstatictext.html#performanceHint">performanceHint</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#performanceHint">performanceHint</a>().</p>
 
 
 <h3 class="fn"><a name="setText" />QStaticText.setText (<i>self</i>, QString&#160;<i>text</i>)</h3><p>Sets the text of the <a href="qstatictext.html">QStaticText</a>
 to <i>text</i>.</p>
 <p><b>Note:</b> This function will cause the layout of the text to
 require recalculation.</p>
-<p>See also <a href="qstatictext.html#text">text</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#text">text</a>().</p>
 
 
 <h3 class="fn"><a name="setTextFormat" />QStaticText.setTextFormat (<i>self</i>, <a href="qt.html#TextFormat-enum">Qt.TextFormat</a>&#160;<i>textFormat</i>)</h3><p>Sets the text format of the <a href="qstatictext.html">QStaticText</a> to <i>textFormat</i>. If
@@ -178,13 +177,12 @@ the font of the text, its color, or its layout are supported by
 <a href="qstatictext.html">QStaticText</a>.</p>
 <p><b>Note:</b> This function will cause the layout of the text to
 require recalculation.</p>
-<p>See also <a href="qstatictext.html#textFormat">textFormat</a>(),
-<a href="qstatictext.html#setText">setText</a>(), and <a href="qstatictext.html#text">text</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#textFormat">textFormat</a>(), <a href="qstatictext.html#setText">setText</a>(), and <a href="qstatictext.html#text">text</a>().</p>
 
 
 <h3 class="fn"><a name="setTextOption" />QStaticText.setTextOption (<i>self</i>, <a href="qtextoption.html">QTextOption</a>&#160;<i>textOption</i>)</h3><p>Sets the text option structure that controls the layout process
 to the given <i>textOption</i>.</p>
-<p>See also <a href="qstatictext.html#textOption">textOption</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#textOption">textOption</a>().</p>
 
 
 <h3 class="fn"><a name="setTextWidth" />QStaticText.setTextWidth (<i>self</i>, float&#160;<i>textWidth</i>)</h3><p>Sets the preferred width for this <a href="qstatictext.html">QStaticText</a>. If the text is wider than the
@@ -197,29 +195,28 @@ the text to be unbounded.</p>
 size of the text.</p>
 <p><b>Note:</b> This function will cause the layout of the text to
 require recalculation.</p>
-<p>See also <a href="qstatictext.html#textWidth">textWidth</a>()
-and <a href="qstatictext.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#textWidth">textWidth</a>() and <a href="qstatictext.html#size">size</a>().</p>
 
 
 <h3 class="fn"><a name="size" /><a href="qsizef.html">QSizeF</a> QStaticText.size (<i>self</i>)</h3><p>Returns the size of the bounding rect for this <a href="qstatictext.html">QStaticText</a>.</p>
-<p>See also <a href="qstatictext.html#textWidth">textWidth</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#textWidth">textWidth</a>().</p>
 
 
 <h3 class="fn"><a name="text" />QString QStaticText.text (<i>self</i>)</h3><p>Returns the text of the <a href="qstatictext.html">QStaticText</a>.</p>
-<p>See also <a href="qstatictext.html#setText">setText</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#setText">setText</a>().</p>
 
 
 <h3 class="fn"><a name="textFormat" /><a href="qt.html#TextFormat-enum">Qt.TextFormat</a> QStaticText.textFormat (<i>self</i>)</h3><p>Returns the text format of the <a href="qstatictext.html">QStaticText</a>.</p>
-<p>See also <a href="qstatictext.html#setTextFormat">setTextFormat</a>(), <a href="qstatictext.html#setText">setText</a>(), and <a href="qstatictext.html#text">text</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#setTextFormat">setTextFormat</a>(), <a href="qstatictext.html#setText">setText</a>(), and <a href="qstatictext.html#text">text</a>().</p>
 
 
 <h3 class="fn"><a name="textOption" /><a href="qtextoption.html">QTextOption</a> QStaticText.textOption (<i>self</i>)</h3><p>Returns the current text option used to control the layout
 process.</p>
-<p>See also <a href="qstatictext.html#setTextOption">setTextOption</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#setTextOption">setTextOption</a>().</p>
 
 
 <h3 class="fn"><a name="textWidth" />float QStaticText.textWidth (<i>self</i>)</h3><p>Returns the preferred width for this <a href="qstatictext.html">QStaticText</a>.</p>
-<p>See also <a href="qstatictext.html#setTextWidth">setTextWidth</a>().</p>
+<p><b>See also</b> <a href="qstatictext.html#setTextWidth">setTextWidth</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QStaticText.__eq__ (<i>self</i>, <a href="qstatictext.html">QStaticText</a>)</h3><h3 class="fn"><a name="__ne__" />bool QStaticText.__ne__ (<i>self</i>, <a href="qstatictext.html">QStaticText</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QStaticText.__eq__ (<i>self</i>, <a href="qstatictext.html">QStaticText</a>)</h3><h3 class="fn"><a name="__ne__" />bool QStaticText.__ne__ (<i>self</i>, <a href="qstatictext.html">QStaticText</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

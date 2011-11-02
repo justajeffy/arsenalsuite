@@ -29,13 +29,13 @@ subclasses support alignment.</p>
 
 
 <h3 class="fn"><a name="QLayoutItem-2" />QLayoutItem.__init__ (<i>self</i>, <a href="qlayoutitem.html">QLayoutItem</a>)</h3><h3 class="fn"><a name="alignment" /><a href="qt-alignment.html">Qt.Alignment</a> QLayoutItem.alignment (<i>self</i>)</h3><p>Returns the alignment of this item.</p>
-<p>See also <a href="qlayoutitem.html#setAlignment">setAlignment</a>().</p>
+<p><b>See also</b> <a href="qlayoutitem.html#setAlignment">setAlignment</a>().</p>
 
 
 <h3 class="fn"><a name="controlTypes" /><a href="qsizepolicy-controltypes.html">QSizePolicy.ControlTypes</a> QLayoutItem.controlTypes (<i>self</i>)</h3><p>Returns the control type(s) for the layout item. For a <a href="qwidgetitem.html">QWidgetItem</a>, the control type comes from the
 widget's size policy; for a <a href="qlayoutitem.html">QLayoutItem</a>, the control types is derived
 from the layout's contents.</p>
-<p>See also <a href="qsizepolicy.html#controlType">QSizePolicy.controlType</a>().</p>
+<p><b>See also</b> <a href="qsizepolicy.html#controlType">QSizePolicy.controlType</a>().</p>
 
 
 <h3 class="fn"><a name="expandingDirections" /><a href="qt-orientations.html">Qt.Orientations</a> QLayoutItem.expandingDirections (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns whether this layout item can make use of more space than
@@ -46,7 +46,7 @@ to grow in both dimensions.</p>
 
 
 <h3 class="fn"><a name="geometry" /><a href="qrect.html">QRect</a> QLayoutItem.geometry (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the rectangle covered by this layout item.</p>
-<p>See also <a href="qlayoutitem.html#setGeometry">setGeometry</a>().</p>
+<p><b>See also</b> <a href="qlayoutitem.html#setGeometry">setGeometry</a>().</p>
 
 
 <h3 class="fn"><a name="hasHeightForWidth" />bool QLayoutItem.hasHeightForWidth (<i>self</i>)</h3><p>Returns true if this layout's preferred height depends on its
@@ -54,7 +54,7 @@ width; otherwise returns false. The default implementation returns
 false.</p>
 <p>Reimplement this function in layout managers that support height
 for width.</p>
-<p>See also <a href="qlayoutitem.html#heightForWidth">heightForWidth</a>() and <a href="qwidget.html#heightForWidth">QWidget.heightForWidth</a>().</p>
+<p><b>See also</b> <a href="qlayoutitem.html#heightForWidth">heightForWidth</a>() and <a href="qwidget.html#heightForWidth">QWidget.heightForWidth</a>().</p>
 
 
 <h3 class="fn"><a name="heightForWidth" />int QLayoutItem.heightForWidth (<i>self</i>, int)</h3><p>Returns the preferred height for this layout item, given the
@@ -66,22 +66,22 @@ typically be much faster than calling this function and testing for
 -1.</p>
 <p>Reimplement this function in layout managers that support height
 for width. A typical implementation will look like this:</p>
-<pre class="highlightedCode brush: cpp">
- int MyLayout.heightForWidth(int w) const
+<pre class="cpp">
+ <span class="type">int</span> MyLayout<span class="operator">.</span>heightForWidth(<span class="type">int</span> w) <span class="keyword">const</span>
  {
-     if (cache_dirty || cached_width != w) {
+     <span class="keyword">if</span> (cache_dirty <span class="operator">|</span><span class="operator">|</span> cached_width <span class="operator">!</span><span class="operator">=</span> w) {
          <span class="comment">// not all C++ compilers support "mutable"</span>
-         MyLayout *that = (MyLayout*)this;
-         int h = calculateHeightForWidth(w);
-         that-&gt;cached_hfw = h;
-         return h;
+         MyLayout <span class="operator">*</span>that <span class="operator">=</span> (MyLayout<span class="operator">*</span>)<span class="keyword">this</span>;
+         <span class="type">int</span> h <span class="operator">=</span> calculateHeightForWidth(w);
+         that<span class="operator">-</span><span class="operator">&gt;</span>cached_hfw <span class="operator">=</span> h;
+         <span class="keyword">return</span> h;
      }
-     return cached_hfw;
+     <span class="keyword">return</span> cached_hfw;
  }
 </pre>
 <p>Caching is strongly recommended; without it layout will take
 exponential time.</p>
-<p>See also <a href="qlayoutitem.html#hasHeightForWidth">hasHeightForWidth</a>().</p>
+<p><b>See also</b> <a href="qlayoutitem.html#hasHeightForWidth">hasHeightForWidth</a>().</p>
 
 
 <h3 class="fn"><a name="invalidate" />QLayoutItem.invalidate (<i>self</i>)</h3><p>Invalidates any cached information in this layout item.</p>
@@ -113,12 +113,12 @@ item.</p>
 <p><b>Note:</b> Item alignment is only supported by <a href="qlayoutitem.html">QLayoutItem</a> subclasses where it would have a
 visual effect. Except for <a href="qspaceritem.html">QSpacerItem</a>, which provides blank space for
 layouts, all public Qt classes that inherit <a href="qlayoutitem.html">QLayoutItem</a> support item alignment.</p>
-<p>See also <a href="qlayoutitem.html#alignment">alignment</a>().</p>
+<p><b>See also</b> <a href="qlayoutitem.html#alignment">alignment</a>().</p>
 
 
 <h3 class="fn"><a name="setGeometry" />QLayoutItem.setGeometry (<i>self</i>, <a href="qrect.html">QRect</a>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Implemented in subclasses to set this item's geometry to
 <i>r</i>.</p>
-<p>See also <a href="qlayoutitem.html#geometry">geometry</a>().</p>
+<p><b>See also</b> <a href="qlayoutitem.html#geometry">geometry</a>().</p>
 
 
 <h3 class="fn"><a name="sizeHint" /><a href="qsize.html">QSize</a> QLayoutItem.sizeHint (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Implemented in subclasses to return the preferred size of this
@@ -134,4 +134,4 @@ casting.</p>
 <h3 class="fn"><a name="widget" /><a href="qwidget.html">QWidget</a> QLayoutItem.widget (<i>self</i>)</h3><p>If this item is a <a href="qwidget.html">QWidget</a>, it is
 returned as a <a href="qwidget.html">QWidget</a>; otherwise 0 is
 returned. This function provides type-safe casting.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -38,22 +38,19 @@ displaying the raw XML file. The benefit of using the
 QXmlInputClass in such cases is that it tries to use the correct
 encoding.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QXmlInputSource" />QXmlInputSource.__init__ (<i>self</i>)</h3><p>Constructs an input source which contains no data.</p>
-<p>See also <a href="qxmlinputsource.html#setData">setData</a>().</p>
+<p><b>See also</b> <a href="qxmlinputsource.html#setData">setData</a>().</p>
 
 
 <h3 class="fn"><a name="QXmlInputSource-2" />QXmlInputSource.__init__ (<i>self</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>dev</i>)</h3><p>Constructs an input source and gets the data from device
 <i>dev</i>. If <i>dev</i> is not open, it is opened in read-only
 mode. If <i>dev</i> is 0 or it is not possible to read from the
 device, the input source will contain no data.</p>
-<p>See also <a href="qxmlinputsource.html#setData">setData</a>(),
-<a href="qxmlinputsource.html#fetchData">fetchData</a>(), and
-<a href="qiodevice.html">QIODevice</a>.</p>
+<p><b>See also</b> <a href="qxmlinputsource.html#setData">setData</a>(), <a href="qxmlinputsource.html#fetchData">fetchData</a>(), and <a href="qiodevice.html">QIODevice</a>.</p>
 
 
 <h3 class="fn"><a name="QXmlInputSource-3" />QXmlInputSource.__init__ (<i>self</i>, <a href="qxmlinputsource.html">QXmlInputSource</a>)</h3><h3 class="fn"><a name="data" />QString QXmlInputSource.data (<i>self</i>)</h3><p>Returns the data the input source contains or an empty string if
 the input source does not contain any data.</p>
-<p>See also <a href="qxmlinputsource.html#setData">setData</a>(),
-<a href="qxmlinputsource.html#QXmlInputSource">QXmlInputSource</a>(), and
+<p><b>See also</b> <a href="qxmlinputsource.html#setData">setData</a>(), <a href="qxmlinputsource.html#QXmlInputSource">QXmlInputSource</a>(), and
 <a href="qxmlinputsource.html#fetchData">fetchData</a>().</p>
 
 
@@ -69,7 +66,7 @@ starts out with some initial data where available), and during a
 call to <a href="qxmlinputsource.html#next">next</a>() (if the data
 had run out).</p>
 <p>You don't normally need to use this function if you use <a href="qxmlinputsource.html#next">next</a>().</p>
-<p>See also <a href="qxmlinputsource.html#data">data</a>(),
+<p><b>See also</b> <a href="qxmlinputsource.html#data">data</a>(),
 <a href="qxmlinputsource.html#next">next</a>(), and <a href="qxmlinputsource.html#QXmlInputSource">QXmlInputSource</a>().</p>
 
 
@@ -96,8 +93,7 @@ returns <a href="qxmlinputsource.html#EndOfDocument-var">QXmlInputSource.EndOfDo
 and will check that the supplied input is well-formed. Therefore,
 when reimplementing this function, it is important to ensure that
 this behavior is duplicated.</p>
-<p>See also <a href="qxmlinputsource.html#reset">reset</a>(),
-<a href="qxmlinputsource.html#fetchData">fetchData</a>(), <a href="qxmlsimplereader.html#parse">QXmlSimpleReader.parse</a>(), and
+<p><b>See also</b> <a href="qxmlinputsource.html#reset">reset</a>(), <a href="qxmlinputsource.html#fetchData">fetchData</a>(), <a href="qxmlsimplereader.html#parse">QXmlSimpleReader.parse</a>(), and
 <a href="qxmlsimplereader.html#parseContinue">QXmlSimpleReader.parseContinue</a>().</p>
 
 
@@ -109,16 +105,16 @@ parse.</p>
 <a href="qiodevice.html">QIODevice</a>, the current position in the
 device is not automatically set to the start of input. Call
 QIODevice.seek(0) on the device to do this.</p>
-<p>See also <a href="qxmlinputsource.html#next">next</a>().</p>
+<p><b>See also</b> <a href="qxmlinputsource.html#next">next</a>().</p>
 
 
 <h3 class="fn"><a name="setData" />QXmlInputSource.setData (<i>self</i>, QString&#160;<i>dat</i>)</h3><p>Sets the data of the input source to <i>dat</i>.</p>
 <p>If the input source already contains data, this function deletes
 that data first.</p>
-<p>See also <a href="qxmlinputsource.html#data">data</a>().</p>
+<p><b>See also</b> <a href="qxmlinputsource.html#data">data</a>().</p>
 
 
 <h3 class="fn"><a name="setData-2" />QXmlInputSource.setData (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>dat</i>)</h3><p>This is an overloaded function.</p>
 <p>The data <i>dat</i> is passed through the correct text-codec,
 before it is set.</p>
-<hr /><h2>Member Documentation</h2><h3 class="fn"><a name="EndOfData-var" />int EndOfData</h3><p>This member should be treated as a constant.</p><h3 class="fn"><a name="EndOfDocument-var" />int EndOfDocument</h3><p>This member should be treated as a constant.</p><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<hr /><h2>Member Documentation</h2><h3 class="fn"><a name="EndOfData-var" />int EndOfData</h3><p>This member should be treated as a constant.</p><h3 class="fn"><a name="EndOfDocument-var" />int EndOfDocument</h3><p>This member should be treated as a constant.</p><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

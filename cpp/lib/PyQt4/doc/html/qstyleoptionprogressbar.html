@@ -31,14 +31,14 @@ the <a href="widgets-styles.html">Styles</a> example.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="StyleOptionType-enum" />QStyleOptionProgressBar.StyleOptionType</h3><p>This enum is used to hold information about the type of the
 style option, and is defined for each <a href="qstyleoption.html">QStyleOption</a> subclass.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QStyleOptionProgressBar.Type</tt></td>
-<td class=" topAlign"><tt>SO_ProgressBar</tt></td>
+<td class="topAlign"><tt>SO_ProgressBar</tt></td>
 <td class="topAlign">The type of style option provided (<a href="qstyleoption.html#OptionType-enum">SO_ProgressBar</a> for this
 class).</td>
 </tr>
@@ -47,27 +47,27 @@ class).</td>
 determine the type of style option. In general you do not need to
 worry about this unless you want to create your own <a href="qstyleoption.html">QStyleOption</a> subclass and your own
 styles.</p>
-<p>See also <a href="qstyleoptionprogressbar.html#StyleOptionVersion-enum">StyleOptionVersion</a>.</p>
+<p><b>See also</b> <a href="qstyleoptionprogressbar.html#StyleOptionVersion-enum">StyleOptionVersion</a>.</p>
 
 
 <h3 class="fn"><a name="StyleOptionVersion-enum" />QStyleOptionProgressBar.StyleOptionVersion</h3><p>This enum is used to hold information about the version of the
 style option, and is defined for each <a href="qstyleoption.html">QStyleOption</a> subclass.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QStyleOptionProgressBar.Version</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">1</td>
 </tr>
 </table>
 <p>The version is used by <a href="qstyleoption.html">QStyleOption</a> subclasses to implement
 extensions without breaking compatibility. If you use <a href="qstyleoption.html#qstyleoption_cast">qstyleoption_cast</a>(), you
 normally do not need to check it.</p>
-<p>See also <a href="qstyleoptionprogressbar.html#StyleOptionType-enum">StyleOptionType</a>.</p>
+<p><b>See also</b> <a href="qstyleoptionprogressbar.html#StyleOptionType-enum">StyleOptionType</a>.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QStyleOptionProgressBar" />QStyleOptionProgressBar.__init__ (<i>self</i>)</h3><p>Constructs a <a href="qstyleoptionprogressbar.html">QStyleOptionProgressBar</a>,
 initializing the members variables to their default values.</p>
 
@@ -76,13 +76,13 @@ initializing the members variables to their default values.</p>
 <hr /><h2>Member Documentation</h2><h3 class="fn"><a name="maximum-var" />int maximum</h3><p>This variable holds the maximum value for the progress bar.</p>
 <p>This is the maximum value in the progress bar. The default value
 is 0.</p>
-<p>See also <a href="qprogressbar.html#maximum-prop">QProgressBar.maximum</a>.</p>
+<p><b>See also</b> <a href="qprogressbar.html#maximum-prop">QProgressBar.maximum</a>.</p>
 
 
 <h3 class="fn"><a name="minimum-var" />int minimum</h3><p>This variable holds the minimum value for the progress bar.</p>
 <p>This is the minimum value in the progress bar. The default value
 is 0.</p>
-<p>See also <a href="qprogressbar.html#minimum-prop">QProgressBar.minimum</a>.</p>
+<p><b>See also</b> <a href="qprogressbar.html#minimum-prop">QProgressBar.minimum</a>.</p>
 
 
 <h3 class="fn"><a name="progress-var" />int progress</h3><p>This variable holds the current progress for the progress
@@ -90,14 +90,14 @@ bar.</p>
 <p>The current progress. A value of <a href="qstyleoptionprogressbar.html#minimum-var">QStyleOptionProgressBar.minimum</a>
 - 1 indicates that the progress hasn't started yet. The default
 value is 0.</p>
-<p>See also <a href="qprogressbar.html#value-prop">QProgressBar.value</a>.</p>
+<p><b>See also</b> <a href="qprogressbar.html#value-prop">QProgressBar.value</a>.</p>
 
 
 <h3 class="fn"><a name="text-var" />QString text</h3><p>This variable holds the text for the progress bar.</p>
 <p>The progress bar text is usually just the progress expressed as
 a string. An empty string indicates that the progress bar has not
 started yet. The default value is an empty string.</p>
-<p>See also <a href="qprogressbar.html#text-prop">QProgressBar.text</a>.</p>
+<p><b>See also</b> <a href="qprogressbar.html#text-prop">QProgressBar.text</a>.</p>
 
 
 <h3 class="fn"><a name="textAlignment-var" /><a href="qt-alignment.html">Qt.Alignment</a> textAlignment</h3><p>This variable holds the text alignment for the text in the
@@ -110,5 +110,5 @@ progress bar. The default value is <a href="qt.html#AlignmentFlag-enum">Qt.Align
 visible.</p>
 <p>If this flag is true then the text is visible. Otherwise, the
 text is not visible. The default value is false.</p>
-<p>See also <a href="qprogressbar.html#textVisible-prop">QProgressBar.textVisible</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qprogressbar.html#textVisible-prop">QProgressBar.textVisible</a>.</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -54,24 +54,22 @@ system</a> documentation.</p>
 <p><a href="qpainter.html">QPainter</a> has functions to translate,
 scale, shear and rotate the coordinate system without using a
 QMatrix. For example:</p>
-<table class="generic">
-<tr class="odd topAlign">
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img src="images/qmatrix-simpletransformation.png" /></td>
 <td>
-<p><img src="images/qmatrix-simpletransformation.png" /></p>
-</td>
-<td>
-<pre class="highlightedCode brush: cpp">
- void SimpleTransformation.paintEvent(QPaintEvent *)
+<pre class="cpp">
+ <span class="type">void</span> SimpleTransformation<span class="operator">.</span>paintEvent(<span class="type"><a href="qpaintevent.html">QPaintEvent</a></span> <span class="operator">*</span>)
  {
-     QPainter painter(this);
-     painter.setPen(QPen(Qt.blue, 1, Qt.DashLine));
-     painter.drawRect(0, 0, 100, 100);
+     <span class="type"><a href="qpainter.html">QPainter</a></span> painter(<span class="keyword">this</span>);
+     painter<span class="operator">.</span>setPen(<span class="type"><a href="qpen.html">QPen</a></span>(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>blue<span class="operator">,</span> <span class="number">1</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>DashLine));
+     painter<span class="operator">.</span>drawRect(<span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">100</span><span class="operator">,</span> <span class="number">100</span>);
 
-     painter.rotate(45);
+     painter<span class="operator">.</span>rotate(<span class="number">45</span>);
 
-     painter.setFont(QFont("Helvetica", 24));
-     painter.setPen(QPen(Qt.black, 1));
-     painter.drawText(20, 10, "QMatrix");
+     painter<span class="operator">.</span>setFont(<span class="type"><a href="qfont.html">QFont</a></span>(<span class="string">"Helvetica"</span><span class="operator">,</span> <span class="number">24</span>));
+     painter<span class="operator">.</span>setPen(<span class="type"><a href="qpen.html">QPen</a></span>(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>black<span class="operator">,</span> <span class="number">1</span>));
+     painter<span class="operator">.</span>drawText(<span class="number">20</span><span class="operator">,</span> <span class="number">10</span><span class="operator">,</span> <span class="string">"QMatrix"</span>);
  }
 </pre></td>
 </tr>
@@ -80,28 +78,26 @@ QMatrix. For example:</p>
 efficient to build a QMatrix and call <a href="qpainter-obsolete.html#setMatrix">QPainter.setMatrix</a>() if you
 want to perform more than a single transform operation. For
 example:</p>
-<table class="generic">
-<tr class="odd topAlign">
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img src="images/qmatrix-combinedtransformation.png" /></td>
 <td>
-<p><img src="images/qmatrix-combinedtransformation.png" /></p>
-</td>
-<td>
-<pre class="highlightedCode brush: cpp">
- void CombinedTransformation.paintEvent(QPaintEvent *)
+<pre class="cpp">
+ <span class="type">void</span> CombinedTransformation<span class="operator">.</span>paintEvent(<span class="type"><a href="qpaintevent.html">QPaintEvent</a></span> <span class="operator">*</span>)
  {
-     QPainter painter(this);
-     painter.setPen(QPen(Qt.blue, 1, Qt.DashLine));
-     painter.drawRect(0, 0, 100, 100);
+     <span class="type"><a href="qpainter.html">QPainter</a></span> painter(<span class="keyword">this</span>);
+     painter<span class="operator">.</span>setPen(<span class="type"><a href="qpen.html">QPen</a></span>(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>blue<span class="operator">,</span> <span class="number">1</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>DashLine));
+     painter<span class="operator">.</span>drawRect(<span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">100</span><span class="operator">,</span> <span class="number">100</span>);
 
-     QMatrix matrix;
-     matrix.translate(50, 50);
-     matrix.rotate(45);
-     matrix.scale(0.5, 1.0);
-     painter.setMatrix(matrix);
+     <span class="type">QMatrix</span> matrix;
+     matrix<span class="operator">.</span>translate(<span class="number">50</span><span class="operator">,</span> <span class="number">50</span>);
+     matrix<span class="operator">.</span>rotate(<span class="number">45</span>);
+     matrix<span class="operator">.</span>scale(<span class="number">0.5</span><span class="operator">,</span> <span class="number">1.0</span>);
+     painter<span class="operator">.</span>setMatrix(matrix);
 
-     painter.setFont(QFont("Helvetica", 24));
-     painter.setPen(QPen(Qt.black, 1));
-     painter.drawText(20, 10, "QMatrix");
+     painter<span class="operator">.</span>setFont(<span class="type"><a href="qfont.html">QFont</a></span>(<span class="string">"Helvetica"</span><span class="operator">,</span> <span class="number">24</span>));
+     painter<span class="operator">.</span>setPen(<span class="type"><a href="qpen.html">QPen</a></span>(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>black<span class="operator">,</span> <span class="number">1</span>));
+     painter<span class="operator">.</span>drawText(<span class="number">20</span><span class="operator">,</span> <span class="number">10</span><span class="operator">,</span> <span class="string">"QMatrix"</span>);
  }
 </pre></td>
 </tr>
@@ -116,9 +112,9 @@ vertical scaling. And finally, the <tt>m21</tt> and <tt>m12</tt>
 elements specify horizontal and vertical <i>shearing</i>.</p>
 <p>QMatrix transforms a point in the plane to another point using
 the following formulas:</p>
-<pre class="highlightedCode brush: cpp">
- x' = m11*x + m21*y + dx
- y' = m22*y + m12*x + dy
+<pre class="cpp">
+ x<span class="char">' = m11*x + m21*y + dx
+ y'</span> <span class="operator">=</span> m22<span class="operator">*</span>y <span class="operator">+</span> m12<span class="operator">*</span>x <span class="operator">+</span> dy
 </pre>
 <p>The point <i>(x, y)</i> is the original point, and <i>(x',
 y')</i> is the transformed point. <i>(x', y')</i> can be
@@ -144,37 +140,35 @@ carefully setting both the shearing factors and the scaling
 factors.</p>
 <p>Here's the combined transformations example using basic matrix
 operations:</p>
-<table class="generic">
-<tr class="odd topAlign">
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img src="images/qmatrix-combinedtransformation.png" /></td>
 <td>
-<p><img src="images/qmatrix-combinedtransformation.png" /></p>
-</td>
-<td>
-<pre class="highlightedCode brush: cpp">
- void BasicOperations.paintEvent(QPaintEvent *)
+<pre class="cpp">
+ <span class="type">void</span> BasicOperations<span class="operator">.</span>paintEvent(<span class="type"><a href="qpaintevent.html">QPaintEvent</a></span> <span class="operator">*</span>)
  {
-     double pi = 3.14;
+     <span class="type">double</span> pi <span class="operator">=</span> <span class="number">3.14</span>;
 
-     double a    = pi/180 * 45.0;
-     double sina = sin(a);
-     double cosa = cos(a);
+     <span class="type">double</span> a    <span class="operator">=</span> pi<span class="operator">/</span><span class="number">180</span> <span class="operator">*</span> <span class="number">45.0</span>;
+     <span class="type">double</span> sina <span class="operator">=</span> sin(a);
+     <span class="type">double</span> cosa <span class="operator">=</span> cos(a);
 
-     QMatrix translationMatrix(1, 0, 0, 1, 50.0, 50.0);
-     QMatrix rotationMatrix(cosa, sina, -sina, cosa, 0, 0);
-     QMatrix scalingMatrix(0.5, 0, 0, 1.0, 0, 0);
+     <span class="type">QMatrix</span> translationMatrix(<span class="number">1</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">1</span><span class="operator">,</span> <span class="number">50.0</span><span class="operator">,</span> <span class="number">50.0</span>);
+     <span class="type">QMatrix</span> rotationMatrix(cosa<span class="operator">,</span> sina<span class="operator">,</span> <span class="operator">-</span>sina<span class="operator">,</span> cosa<span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span>);
+     <span class="type">QMatrix</span> scalingMatrix(<span class="number">0.5</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">1.0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span>);
 
-     QMatrix matrix;
-     matrix =  scalingMatrix * rotationMatrix * translationMatrix;
+     <span class="type">QMatrix</span> matrix;
+     matrix <span class="operator">=</span>  scalingMatrix <span class="operator">*</span> rotationMatrix <span class="operator">*</span> translationMatrix;
 
-     QPainter painter(this);
-     painter.setPen(QPen(Qt.blue, 1, Qt.DashLine));
-     painter.drawRect(0, 0, 100, 100);
+     <span class="type"><a href="qpainter.html">QPainter</a></span> painter(<span class="keyword">this</span>);
+     painter<span class="operator">.</span>setPen(<span class="type"><a href="qpen.html">QPen</a></span>(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>blue<span class="operator">,</span> <span class="number">1</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>DashLine));
+     painter<span class="operator">.</span>drawRect(<span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">100</span><span class="operator">,</span> <span class="number">100</span>);
 
-     painter.setMatrix(matrix);
+     painter<span class="operator">.</span>setMatrix(matrix);
 
-     painter.setFont(QFont("Helvetica", 24));
-     painter.setPen(QPen(Qt.black, 1));
-     painter.drawText(20, 10, "QMatrix");
+     painter<span class="operator">.</span>setFont(<span class="type"><a href="qfont.html">QFont</a></span>(<span class="string">"Helvetica"</span><span class="operator">,</span> <span class="number">24</span>));
+     painter<span class="operator">.</span>setPen(<span class="type"><a href="qpen.html">QPen</a></span>(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>black<span class="operator">,</span> <span class="number">1</span>));
+     painter<span class="operator">.</span>drawText(<span class="number">20</span><span class="operator">,</span> <span class="number">10</span><span class="operator">,</span> <span class="string">"QMatrix"</span>);
  }
 </pre></td>
 </tr>
@@ -182,12 +176,12 @@ operations:</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QMatrix" />QMatrix.__init__ (<i>self</i>)</h3><p>Constructs an identity matrix.</p>
 <p>All elements are set to zero except <tt>m11</tt> and
 <tt>m22</tt> (specifying the scale), which are set to 1.</p>
-<p>See also <a href="qmatrix.html#reset">reset</a>().</p>
+<p><b>See also</b> <a href="qmatrix.html#reset">reset</a>().</p>
 
 
 <h3 class="fn"><a name="QMatrix-2" />QMatrix.__init__ (<i>self</i>, float&#160;<i>m11</i>, float&#160;<i>m12</i>, float&#160;<i>m21</i>, float&#160;<i>m22</i>, float&#160;<i>dx</i>, float&#160;<i>dy</i>)</h3><h3 class="fn"><a name="QMatrix-3" />QMatrix.__init__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>&#160;<i>matrix</i>)</h3><p>Constructs a matrix with the elements, <i>m11</i>, <i>m12</i>,
 <i>m21</i>, <i>m22</i>, <i>dx</i> and <i>dy</i>.</p>
-<p>See also <a href="qmatrix.html#setMatrix">setMatrix</a>().</p>
+<p><b>See also</b> <a href="qmatrix.html#setMatrix">setMatrix</a>().</p>
 
 
 <h3 class="fn"><a name="det" />float QMatrix.det (<i>self</i>)</h3><h3 class="fn"><a name="determinant" />float QMatrix.determinant (<i>self</i>)</h3><p>Returns the matrix's determinant.</p>
@@ -195,13 +189,13 @@ operations:</p>
 
 
 <h3 class="fn"><a name="dx" />float QMatrix.dx (<i>self</i>)</h3><p>Returns the horizontal translation factor.</p>
-<p>See also <a href="qmatrix.html#translate">translate</a>() and
-<a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
+<p><b>See also</b> <a href="qmatrix.html#translate">translate</a>()
+and <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
 
 
 <h3 class="fn"><a name="dy" />float QMatrix.dy (<i>self</i>)</h3><p>Returns the vertical translation factor.</p>
-<p>See also <a href="qmatrix.html#translate">translate</a>() and
-<a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
+<p><b>See also</b> <a href="qmatrix.html#translate">translate</a>()
+and <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
 
 
 <h3 class="fn"><a name="inverted" />(<a href="qmatrix.html">QMatrix</a>, bool&#160;<i>invertible</i>) QMatrix.inverted (<i>self</i>)</h3><p>Returns an inverted copy of this matrix.</p>
@@ -209,37 +203,37 @@ operations:</p>
 is the identity matrix. If <i>invertible</i> is valid (i.e. not 0),
 its value is set to true if the matrix is invertible, otherwise it
 is set to false.</p>
-<p>See also <a href="qmatrix.html#isInvertible">isInvertible</a>().</p>
+<p><b>See also</b> <a href="qmatrix.html#isInvertible">isInvertible</a>().</p>
 
 
 <h3 class="fn"><a name="isIdentity" />bool QMatrix.isIdentity (<i>self</i>)</h3><p>Returns true if the matrix is the identity matrix, otherwise
 returns false.</p>
-<p>See also <a href="qmatrix.html#reset">reset</a>().</p>
+<p><b>See also</b> <a href="qmatrix.html#reset">reset</a>().</p>
 
 
 <h3 class="fn"><a name="isInvertible" />bool QMatrix.isInvertible (<i>self</i>)</h3><p>Returns true if the matrix is invertible, otherwise returns
 false.</p>
-<p>See also <a href="qmatrix.html#inverted">inverted</a>().</p>
+<p><b>See also</b> <a href="qmatrix.html#inverted">inverted</a>().</p>
 
 
 <h3 class="fn"><a name="m11" />float QMatrix.m11 (<i>self</i>)</h3><p>Returns the horizontal scaling factor.</p>
-<p>See also <a href="qmatrix.html#scale">scale</a>() and <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic
-Matrix Operations</a>.</p>
+<p><b>See also</b> <a href="qmatrix.html#scale">scale</a>() and
+<a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
 
 
 <h3 class="fn"><a name="m12" />float QMatrix.m12 (<i>self</i>)</h3><p>Returns the vertical shearing factor.</p>
-<p>See also <a href="qmatrix.html#shear">shear</a>() and <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic
-Matrix Operations</a>.</p>
+<p><b>See also</b> <a href="qmatrix.html#shear">shear</a>() and
+<a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
 
 
 <h3 class="fn"><a name="m21" />float QMatrix.m21 (<i>self</i>)</h3><p>Returns the horizontal shearing factor.</p>
-<p>See also <a href="qmatrix.html#shear">shear</a>() and <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic
-Matrix Operations</a>.</p>
+<p><b>See also</b> <a href="qmatrix.html#shear">shear</a>() and
+<a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
 
 
 <h3 class="fn"><a name="m22" />float QMatrix.m22 (<i>self</i>)</h3><p>Returns the vertical scaling factor.</p>
-<p>See also <a href="qmatrix.html#scale">scale</a>() and <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic
-Matrix Operations</a>.</p>
+<p><b>See also</b> <a href="qmatrix.html#scale">scale</a>() and
+<a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
 
 
 <h3 class="fn"><a name="map" />(int&#160;<i>tx</i>, int&#160;<i>ty</i>) QMatrix.map (<i>self</i>, int&#160;<i>x</i>, int&#160;<i>y</i>)</h3><p>Maps the given coordinates <i>x</i> and <i>y</i> into the
@@ -247,13 +241,13 @@ coordinate system defined by this matrix. The resulting values are
 put in *<i>tx</i> and *<i>ty</i>, respectively.</p>
 <p>The coordinates are transformed using the following
 formulas:</p>
-<pre class="highlightedCode brush: cpp">
- x' = m11*x + m21*y + dx
- y' = m22*y + m12*x + dy
+<pre class="cpp">
+ x<span class="char">' = m11*x + m21*y + dx
+ y'</span> <span class="operator">=</span> m22<span class="operator">*</span>y <span class="operator">+</span> m12<span class="operator">*</span>x <span class="operator">+</span> dy
 </pre>
 <p>The point (x, y) is the original point, and (x', y') is the
 transformed point.</p>
-<p>See also <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
+<p><b>See also</b> <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
 
 
 <h3 class="fn"><a name="map-2" />(float&#160;<i>tx</i>, float&#160;<i>ty</i>) QMatrix.map (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>)</h3><h3 class="fn"><a name="map-3" /><a href="qpoint.html">QPoint</a> QMatrix.map (<i>self</i>, <a href="qpoint.html">QPoint</a>&#160;<i>p</i>)</h3><p>This is an overloaded function.</p>
@@ -315,16 +309,16 @@ that is a copy of the given <i>rectangle</i>, mapped into the
 coordinate system defined by this matrix.</p>
 <p>The rectangle's coordinates are transformed using the following
 formulas:</p>
-<pre class="highlightedCode brush: cpp">
- x' = m11*x + m21*y + dx
- y' = m22*y + m12*x + dy
+<pre class="cpp">
+ x<span class="char">' = m11*x + m21*y + dx
+ y'</span> <span class="operator">=</span> m22<span class="operator">*</span>y <span class="operator">+</span> m12<span class="operator">*</span>x <span class="operator">+</span> dy
 </pre>
 <p>If rotation or shearing has been specified, this function
 returns the <i>bounding</i> rectangle. To retrieve the exact region
 the given <i>rectangle</i> maps to, use the <a href="qmatrix.html#mapToPolygon">mapToPolygon</a>() function
 instead.</p>
-<p>See also <a href="qmatrix.html#mapToPolygon">mapToPolygon</a>()
-and <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
+<p><b>See also</b> <a href="qmatrix.html#mapToPolygon">mapToPolygon</a>() and <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic
+Matrix Operations</a>.</p>
 
 
 <h3 class="fn"><a name="mapRect-2" /><a href="qrectf.html">QRectF</a> QMatrix.mapRect (<i>self</i>, <a href="qrectf.html">QRectF</a>)</h3><p>This is an overloaded function.</p>
@@ -339,22 +333,23 @@ representation of the given <i>rectangle</i>, mapped into the
 coordinate system defined by this matrix.</p>
 <p>The rectangle's coordinates are transformed using the following
 formulas:</p>
-<pre class="highlightedCode brush: cpp">
- x' = m11*x + m21*y + dx
- y' = m22*y + m12*x + dy
+<pre class="cpp">
+ x<span class="char">' = m11*x + m21*y + dx
+ y'</span> <span class="operator">=</span> m22<span class="operator">*</span>y <span class="operator">+</span> m12<span class="operator">*</span>x <span class="operator">+</span> dy
 </pre>
 <p>Polygons and rectangles behave slightly differently when
 transformed (due to integer rounding), so
 <tt>matrix.map(QPolygon(rectangle))</tt> is not always the same as
 <tt>matrix.mapToPolygon(rectangle)</tt>.</p>
-<p>See also <a href="qmatrix.html#mapRect">mapRect</a>() and
+<p><b>See also</b> <a href="qmatrix.html#mapRect">mapRect</a>() and
 <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic Matrix Operations</a>.</p>
 
 
 <h3 class="fn"><a name="reset" />QMatrix.reset (<i>self</i>)</h3><p>Resets the matrix to an identity matrix, i.e. all elements are
 set to zero, except <tt>m11</tt> and <tt>m22</tt> (specifying the
 scale) which are set to 1.</p>
-<p>See also <a href="qmatrix.html#QMatrix">QMatrix</a>(), <a href="qmatrix.html#isIdentity">isIdentity</a>(), and <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic
+<p><b>See also</b> <a href="qmatrix.html#QMatrix">QMatrix</a>(),
+<a href="qmatrix.html#isIdentity">isIdentity</a>(), and <a class="obsolete" href="qmatrix.html#basic-matrix-operations">Basic
 Matrix Operations</a>.</p>
 
 
@@ -364,12 +359,12 @@ counterclockwise.</p>
 the direction of the rotation will be clockwise because the y-axis
 points downwards.</p>
 <p>Returns a reference to the matrix.</p>
-<p>See also <a href="qmatrix.html#setMatrix">setMatrix</a>().</p>
+<p><b>See also</b> <a href="qmatrix.html#setMatrix">setMatrix</a>().</p>
 
 
 <h3 class="fn"><a name="scale" /><a href="qmatrix.html">QMatrix</a> QMatrix.scale (<i>self</i>, float&#160;<i>sx</i>, float&#160;<i>sy</i>)</h3><p>Scales the coordinate system by <i>sx</i> horizontally and
 <i>sy</i> vertically, and returns a reference to the matrix.</p>
-<p>See also <a href="qmatrix.html#setMatrix">setMatrix</a>().</p>
+<p><b>See also</b> <a href="qmatrix.html#setMatrix">setMatrix</a>().</p>
 
 
 <h3 class="fn"><a name="setMatrix" />QMatrix.setMatrix (<i>self</i>, float&#160;<i>m11</i>, float&#160;<i>m12</i>, float&#160;<i>m21</i>, float&#160;<i>m22</i>, float&#160;<i>dx</i>, float&#160;<i>dy</i>)</h3><p>Sets the matrix elements to the specified values, <i>m11</i>,
@@ -377,18 +372,18 @@ points downwards.</p>
 <p>Note that this function replaces the previous values. <a class="obsolete" href="qmatrix.html">QMatrix</a> provide the <a href="qmatrix.html#translate">translate</a>(), <a href="qmatrix.html#rotate">rotate</a>(), <a href="qmatrix.html#scale">scale</a>() and <a href="qmatrix.html#shear">shear</a>() convenience functions to
 manipulate the various matrix elements based on the currently
 defined coordinate system.</p>
-<p>See also <a href="qmatrix.html#QMatrix">QMatrix</a>().</p>
+<p><b>See also</b> <a href="qmatrix.html#QMatrix">QMatrix</a>().</p>
 
 
 <h3 class="fn"><a name="shear" /><a href="qmatrix.html">QMatrix</a> QMatrix.shear (<i>self</i>, float&#160;<i>sh</i>, float&#160;<i>sv</i>)</h3><p>Shears the coordinate system by <i>sh</i> horizontally and
 <i>sv</i> vertically, and returns a reference to the matrix.</p>
-<p>See also <a href="qmatrix.html#setMatrix">setMatrix</a>().</p>
+<p><b>See also</b> <a href="qmatrix.html#setMatrix">setMatrix</a>().</p>
 
 
 <h3 class="fn"><a name="translate" /><a href="qmatrix.html">QMatrix</a> QMatrix.translate (<i>self</i>, float&#160;<i>dx</i>, float&#160;<i>dy</i>)</h3><p>Moves the coordinate system <i>dx</i> along the x axis and
 <i>dy</i> along the y axis, and returns a reference to the
 matrix.</p>
-<p>See also <a href="qmatrix.html#setMatrix">setMatrix</a>().</p>
+<p><b>See also</b> <a href="qmatrix.html#setMatrix">setMatrix</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QMatrix.__eq__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><h3 class="fn"><a name="__imul__" /><a href="qmatrix.html">QMatrix</a> QMatrix.__imul__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><h3 class="fn"><a name="__mul__" /><a href="qmatrix.html">QMatrix</a> QMatrix.__mul__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>&#160;<i>o</i>)</h3><h3 class="fn"><a name="__ne__" />bool QMatrix.__ne__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QMatrix.__eq__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><h3 class="fn"><a name="__imul__" /><a href="qmatrix.html">QMatrix</a> QMatrix.__imul__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><h3 class="fn"><a name="__mul__" /><a href="qmatrix.html">QMatrix</a> QMatrix.__mul__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>&#160;<i>o</i>)</h3><h3 class="fn"><a name="__ne__" />bool QMatrix.__ne__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

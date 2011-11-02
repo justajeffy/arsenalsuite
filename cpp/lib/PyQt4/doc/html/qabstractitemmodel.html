@@ -164,33 +164,27 @@ into the model's underlying data store.</p>
 new columns are inserted; <i>first</i> and <i>last</i> are the
 column numbers of the new columns will have after they have been
 inserted.</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Inserting columns" src="images/modelview-begin-insert-columns.png" /></p>
-</td>
-<td>
-<p>Specify the first and last column numbers for the span of
-columns you want to insert into an item in a model.</p>
+<table class="generic" width="80%">
+<tr class="odd" valign="top">
+<td><img alt="Inserting columns" src="images/modelview-begin-insert-columns.png" /></td>
+<td>Specify the first and last column numbers for the span of
+columns you want to insert into an item in a model.
 <p>For example, as shown in the diagram, we insert three columns
 before column 4, so <i>first</i> is 4 and <i>last</i> is 6:</p>
-<pre class="highlightedCode brush: cpp">
- beginInsertColumns(parent, 4, 6);
+<pre class="cpp">
+ beginInsertColumns(parent<span class="operator">,</span> <span class="number">4</span><span class="operator">,</span> <span class="number">6</span>);
 </pre>
 <p>This inserts the three new columns as columns 4, 5, and 6.</p>
 </td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><img alt="Appending columns" src="images/modelview-begin-append-columns.png" /></p>
-</td>
-<td>
-<p>To append columns, insert them after the last column.</p>
+<tr class="even" valign="top">
+<td><img alt="Appending columns" src="images/modelview-begin-append-columns.png" /></td>
+<td>To append columns, insert them after the last column.
 <p>For example, as shown in the diagram, we append three columns to
 a collection of six existing columns (ending in column 5), so
 <i>first</i> is 6 and <i>last</i> is 8:</p>
-<pre class="highlightedCode brush: cpp">
- beginInsertColumns(parent, 6, 8);
+<pre class="cpp">
+ beginInsertColumns(parent<span class="operator">,</span> <span class="number">6</span><span class="operator">,</span> <span class="number">8</span>);
 </pre>
 <p>This appends the two new columns as columns 6, 7, and 8.</p>
 </td>
@@ -200,7 +194,7 @@ a collection of six existing columns (ending in column 5), so
 signal which connected views (or proxies) must handle before the
 data is inserted. Otherwise, the views may end up in an invalid
 state.</p>
-<p>See also <a href="qabstractitemmodel.html#endInsertColumns">endInsertColumns</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#endInsertColumns">endInsertColumns</a>().</p>
 
 
 <h3 class="fn"><a name="beginInsertRows" />QAbstractItemModel.beginInsertRows (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>, int&#160;<i>first</i>, int&#160;<i>last</i>)</h3><p>Begins a row insertion operation.</p>
@@ -211,33 +205,27 @@ into the model's underlying data store.</p>
 new rows are inserted; <i>first</i> and <i>last</i> are the row
 numbers that the new rows will have after they have been
 inserted.</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Inserting rows" src="images/modelview-begin-insert-rows.png" /></p>
-</td>
-<td>
-<p>Specify the first and last row numbers for the span of rows you
-want to insert into an item in a model.</p>
+<table class="generic" width="80%">
+<tr class="odd" valign="top">
+<td><img alt="Inserting rows" src="images/modelview-begin-insert-rows.png" /></td>
+<td>Specify the first and last row numbers for the span of rows you
+want to insert into an item in a model.
 <p>For example, as shown in the diagram, we insert three rows
 before row 2, so <i>first</i> is 2 and <i>last</i> is 4:</p>
-<pre class="highlightedCode brush: cpp">
- beginInsertRows(parent, 2, 4);
+<pre class="cpp">
+ beginInsertRows(parent<span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">4</span>);
 </pre>
 <p>This inserts the three new rows as rows 2, 3, and 4.</p>
 </td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><img alt="Appending rows" src="images/modelview-begin-append-rows.png" /></p>
-</td>
-<td>
-<p>To append rows, insert them after the last row.</p>
+<tr class="even" valign="top">
+<td><img alt="Appending rows" src="images/modelview-begin-append-rows.png" /></td>
+<td>To append rows, insert them after the last row.
 <p>For example, as shown in the diagram, we append two rows to a
 collection of 4 existing rows (ending in row 3), so <i>first</i> is
 4 and <i>last</i> is 5:</p>
-<pre class="highlightedCode brush: cpp">
- beginInsertRows(parent, 4, 5);
+<pre class="cpp">
+ beginInsertRows(parent<span class="operator">,</span> <span class="number">4</span><span class="operator">,</span> <span class="number">5</span>);
 </pre>
 <p>This appends the two new rows as rows 4 and 5.</p>
 </td>
@@ -247,7 +235,7 @@ collection of 4 existing rows (ending in row 3), so <i>first</i> is
 signal which connected views (or proxies) must handle before the
 data is inserted. Otherwise, the views may end up in an invalid
 state.</p>
-<p>See also <a href="qabstractitemmodel.html#endInsertRows">endInsertRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#endInsertRows">endInsertRows</a>().</p>
 
 
 <h3 class="fn"><a name="beginMoveColumns" />bool QAbstractItemModel.beginMoveColumns (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>sourceParent</i>, int&#160;<i>sourceFirst</i>, int&#160;<i>sourceLast</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>destinationParent</i>, int&#160;<i>destinationColumn</i>)</h3><p>Begins a column move operation.</p>
@@ -284,7 +272,7 @@ one of its own children or ancestors. This method returns false if
 either condition is true, in which case you should abort your move
 operation.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#endMoveColumns">endMoveColumns</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#endMoveColumns">endMoveColumns</a>().</p>
 
 
 <h3 class="fn"><a name="beginMoveRows" />bool QAbstractItemModel.beginMoveRows (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>sourceParent</i>, int&#160;<i>sourceFirst</i>, int&#160;<i>sourceLast</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>destinationParent</i>, int&#160;<i>destinationRow</i>)</h3><p>Begins a row move operation.</p>
@@ -319,56 +307,47 @@ not within the range of <i>sourceFirst</i> and <i>sourceLast</i> +
 one of its own children or ancestors. This method returns false if
 either condition is true, in which case you should abort your move
 operation.</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Moving rows to another parent" src="images/modelview-move-rows-1.png" /></p>
-</td>
-<td>
-<p>Specify the first and last row numbers for the span of rows in
+<table class="generic" width="80%">
+<tr class="odd" valign="top">
+<td><img alt="Moving rows to another parent" src="images/modelview-move-rows-1.png" /></td>
+<td>Specify the first and last row numbers for the span of rows in
 the source parent you want to move in the model. Also specify the
-row in the destination parent to move the span to.</p>
+row in the destination parent to move the span to.
 <p>For example, as shown in the diagram, we move three rows from
 row 2 to 4 in the source, so <i>sourceFirst</i> is 2 and
 <i>sourceLast</i> is 4. We move those items to above row 2 in the
 destination, so <i>destinationChild</i> is 2.</p>
-<pre class="highlightedCode brush: cpp">
- beginMoveRows(sourceParent, 2, 4, destinationParent, 2);
+<pre class="cpp">
+ beginMoveRows(sourceParent<span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">4</span><span class="operator">,</span> destinationParent<span class="operator">,</span> <span class="number">2</span>);
 </pre>
 <p>This moves the three rows rows 2, 3, and 4 in the source to
 become 2, 3 and 4 in the destination. Other affected siblings are
 displaced accordingly.</p>
 </td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><img alt="Moving rows to append to another parent" src="images/modelview-move-rows-2.png" /></p>
-</td>
-<td>
-<p>To append rows to another parent, move them to after the last
-row.</p>
+<tr class="even" valign="top">
+<td><img alt="Moving rows to append to another parent" src="images/modelview-move-rows-2.png" /></td>
+<td>To append rows to another parent, move them to after the last
+row.
 <p>For example, as shown in the diagram, we move three rows to a
 collection of 6 existing rows (ending in row 5), so
 <i>destinationChild</i> is 6:</p>
-<pre class="highlightedCode brush: cpp">
- beginMoveRows(sourceParent, 2, 4, destinationParent, 6);
+<pre class="cpp">
+ beginMoveRows(sourceParent<span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">4</span><span class="operator">,</span> destinationParent<span class="operator">,</span> <span class="number">6</span>);
 </pre>
 <p>This moves the target rows to the end of the target parent as 6,
 7 and 8.</p>
 </td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><img alt="Moving rows in the same parent up" src="images/modelview-move-rows-3.png" /></p>
-</td>
-<td>
-<p>To move rows within the same parent, specify the row to move
-them to.</p>
+<tr class="odd" valign="top">
+<td><img alt="Moving rows in the same parent up" src="images/modelview-move-rows-3.png" /></td>
+<td>To move rows within the same parent, specify the row to move
+them to.
 <p>For example, as shown in the diagram, we move one item from row
 2 to row 0, so <i>sourceFirst</i> and <i>sourceLast</i> are 2 and
 <i>destinationChild</i> is 0.</p>
-<pre class="highlightedCode brush: cpp">
- beginMoveRows(parent, 2, 2, parent, 0);
+<pre class="cpp">
+ beginMoveRows(parent<span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> parent<span class="operator">,</span> <span class="number">0</span>);
 </pre>
 <p>Note that other rows may be displaced accordingly. Note also
 that when moving items within the same parent you should not
@@ -378,25 +357,22 @@ already) or row 3 (no-op as row 3 means above row 3, where it is
 already)</p>
 </td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><img alt="Moving rows in the same parent down" src="images/modelview-move-rows-4.png" /></p>
-</td>
-<td>
-<p>To move rows within the same parent, specify the row to move
-them to.</p>
+<tr class="even" valign="top">
+<td><img alt="Moving rows in the same parent down" src="images/modelview-move-rows-4.png" /></td>
+<td>To move rows within the same parent, specify the row to move
+them to.
 <p>For example, as shown in the diagram, we move one item from row
 2 to row 4, so <i>sourceFirst</i> and <i>sourceLast</i> are 2 and
 <i>destinationChild</i> is 4.</p>
-<pre class="highlightedCode brush: cpp">
- beginMoveRows(parent, 2, 2, parent, 4);
+<pre class="cpp">
+ beginMoveRows(parent<span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> parent<span class="operator">,</span> <span class="number">4</span>);
 </pre>
 <p>Note that other rows may be displaced accordingly.</p>
 </td>
 </tr>
 </table>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#endMoveRows">endMoveRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#endMoveRows">endMoveRows</a>().</p>
 
 
 <h3 class="fn"><a name="beginRemoveColumns" />QAbstractItemModel.beginRemoveColumns (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>, int&#160;<i>first</i>, int&#160;<i>last</i>)</h3><p>Begins a column removal operation.</p>
@@ -406,19 +382,16 @@ from the model's underlying data store.</p>
 <p>The <i>parent</i> index corresponds to the parent from which the
 new columns are removed; <i>first</i> and <i>last</i> are the
 column numbers of the first and last columns to be removed.</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Removing columns" src="images/modelview-begin-remove-columns.png" /></p>
-</td>
-<td>
-<p>Specify the first and last column numbers for the span of
-columns you want to remove from an item in a model.</p>
+<table class="generic" width="80%">
+<tr class="odd" valign="top">
+<td><img alt="Removing columns" src="images/modelview-begin-remove-columns.png" /></td>
+<td>Specify the first and last column numbers for the span of
+columns you want to remove from an item in a model.
 <p>For example, as shown in the diagram, we remove the three
 columns from column 4 to column 6, so <i>first</i> is 4 and
 <i>last</i> is 6:</p>
-<pre class="highlightedCode brush: cpp">
- beginRemoveColumns(parent, 4, 6);
+<pre class="cpp">
+ beginRemoveColumns(parent<span class="operator">,</span> <span class="number">4</span><span class="operator">,</span> <span class="number">6</span>);
 </pre></td>
 </tr>
 </table>
@@ -426,7 +399,7 @@ columns from column 4 to column 6, so <i>first</i> is 4 and
 signal which connected views (or proxies) must handle before the
 data is removed. Otherwise, the views may end up in an invalid
 state.</p>
-<p>See also <a href="qabstractitemmodel.html#endRemoveColumns">endRemoveColumns</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#endRemoveColumns">endRemoveColumns</a>().</p>
 
 
 <h3 class="fn"><a name="beginRemoveRows" />QAbstractItemModel.beginRemoveRows (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>, int&#160;<i>first</i>, int&#160;<i>last</i>)</h3><p>Begins a row removal operation.</p>
@@ -436,18 +409,15 @@ from the model's underlying data store.</p>
 <p>The <i>parent</i> index corresponds to the parent from which the
 new rows are removed; <i>first</i> and <i>last</i> are the row
 numbers of the rows to be removed.</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Removing rows" src="images/modelview-begin-remove-rows.png" /></p>
-</td>
-<td>
-<p>Specify the first and last row numbers for the span of rows you
-want to remove from an item in a model.</p>
+<table class="generic" width="80%">
+<tr class="odd" valign="top">
+<td><img alt="Removing rows" src="images/modelview-begin-remove-rows.png" /></td>
+<td>Specify the first and last row numbers for the span of rows you
+want to remove from an item in a model.
 <p>For example, as shown in the diagram, we remove the two rows
 from row 2 to row 3, so <i>first</i> is 2 and <i>last</i> is 3:</p>
-<pre class="highlightedCode brush: cpp">
- beginRemoveRows(parent, 2, 3);
+<pre class="cpp">
+ beginRemoveRows(parent<span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span>);
 </pre></td>
 </tr>
 </table>
@@ -455,7 +425,7 @@ from row 2 to row 3, so <i>first</i> is 2 and <i>last</i> is 3:</p>
 signal which connected views (or proxies) must handle before the
 data is removed. Otherwise, the views may end up in an invalid
 state.</p>
-<p>See also <a href="qabstractitemmodel.html#endRemoveRows">endRemoveRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#endRemoveRows">endRemoveRows</a>().</p>
 
 
 <h3 class="fn"><a name="beginResetModel" />QAbstractItemModel.beginResetModel (<i>self</i>)</h3><p>Begins a model reset operation.</p>
@@ -474,7 +444,7 @@ has changed.</p>
 <p>You must call this function before resetting any internal data
 structures in your model or proxy model.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#modelAboutToBeReset">modelAboutToBeReset</a>(),
+<p><b>See also</b> <a href="qabstractitemmodel.html#modelAboutToBeReset">modelAboutToBeReset</a>(),
 <a href="qabstractitemmodel.html#modelReset">modelReset</a>(), and
 <a href="qabstractitemmodel.html#endResetModel">endResetModel</a>().</p>
 
@@ -495,7 +465,7 @@ otherwise returns false.</p>
 <a href="qabstractitemmodel.html#fetchMore">fetchMore</a>()
 function is only called when the model is being populated
 incrementally.</p>
-<p>See also <a href="qabstractitemmodel.html#fetchMore">fetchMore</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#fetchMore">fetchMore</a>().</p>
 
 
 <h3 class="fn"><a name="changePersistentIndex" />QAbstractItemModel.changePersistentIndex (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>from</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>to</i>)</h3><p>Changes the <a href="qpersistentmodelindex.html">QPersistentModelIndex</a> that is
@@ -503,7 +473,7 @@ equal to the given <i>from</i> model index to the given <i>to</i>
 model index.</p>
 <p>If no persistent model index equal to the given <i>from</i>
 model index was found, nothing is changed.</p>
-<p>See also <a href="qabstractitemmodel.html#persistentIndexList">persistentIndexList</a>()
+<p><b>See also</b> <a href="qabstractitemmodel.html#persistentIndexList">persistentIndexList</a>()
 and <a href="qabstractitemmodel.html#changePersistentIndexList">changePersistentIndexList</a>().</p>
 
 
@@ -513,7 +483,7 @@ model index list.</p>
 <p>If no persistent model indexes equal to the indexes in the given
 <i>from</i> model index list was found, nothing is changed.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qabstractitemmodel.html#persistentIndexList">persistentIndexList</a>()
+<p><b>See also</b> <a href="qabstractitemmodel.html#persistentIndexList">persistentIndexList</a>()
 and <a href="qabstractitemmodel.html#changePersistentIndex">changePersistentIndex</a>().</p>
 
 
@@ -522,15 +492,15 @@ and <a href="qabstractitemmodel.html#changePersistentIndex">changePersistentInde
 <p>In most subclasses, the number of columns is independent of the
 <i>parent</i>.</p>
 <p>For example:</p>
-<pre class="highlightedCode brush: cpp">
- int DomModel.columnCount(const QModelIndex &amp;<span class="comment">/*parent*/</span>) const
+<pre class="cpp">
+ <span class="type">int</span> DomModel<span class="operator">.</span>columnCount(<span class="keyword">const</span> <span class="type"><a href="qmodelindex.html">QModelIndex</a></span> <span class="operator">&amp;</span><span class="comment">/*parent*/</span>) <span class="keyword">const</span>
  {
-     return 3;
+     <span class="keyword">return</span> <span class="number">3</span>;
  }
 </pre>
 <p><b>Note:</b> When implementing a table based model,
 columnCount() should return 0 when the parent is valid.</p>
-<p>See also <a href="qabstractitemmodel.html#rowCount">rowCount</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#rowCount">rowCount</a>().</p>
 
 
 <h3 class="fn"><a name="createIndex" /><a href="qmodelindex.html">QModelIndex</a> QAbstractItemModel.createIndex (<i>self</i>, int&#160;<i>row</i>, int&#160;<i>column</i>, object&#160;<i>object</i>&#160;=&#160;0)</h3><p>Creates a model index for the given <i>row</i> and <i>column</i>
@@ -547,7 +517,7 @@ referred to by the <i>index</i>.</p>
 <p><b>Note:</b> If you do not have a value to return, return an
 <b>invalid</b> <a href="qvariant.html">QVariant</a> instead of
 returning 0.</p>
-<p>See also <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>, <a href="qabstractitemmodel.html#setData">setData</a>(), and <a href="qabstractitemmodel.html#headerData">headerData</a>().</p>
+<p><b>See also</b> <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>, <a href="qabstractitemmodel.html#setData">setData</a>(), and <a href="qabstractitemmodel.html#headerData">headerData</a>().</p>
 
 
 <h3 class="fn"><a name="decodeData" />bool QAbstractItemModel.decodeData (<i>self</i>, int&#160;<i>row</i>, int&#160;<i>column</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>, <a href="qdatastream.html">QDataStream</a>&#160;<i>stream</i>)</h3><h3 class="fn"><a name="dropMimeData" />bool QAbstractItemModel.dropMimeData (<i>self</i>, <a href="qmimedata.html">QMimeData</a>&#160;<i>data</i>, <a href="qt.html#DropAction-enum">Qt.DropAction</a>&#160;<i>action</i>, int&#160;<i>row</i>, int&#160;<i>column</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>)</h3><p>Handles the <i>data</i> supplied by a drag and drop operation
@@ -566,7 +536,7 @@ inserted as children of the item specified by <i>row</i>,
 to decide where to place the data. This can occur in a tree when
 data is dropped on a parent. Models will usually append the data to
 the parent in this case.</p>
-<p>See also <a href="qabstractitemmodel.html#supportedDropActions">supportedDropActions</a>()
+<p><b>See also</b> <a href="qabstractitemmodel.html#supportedDropActions">supportedDropActions</a>()
 and <a href="model-view-programming.html#using-drag-and-drop-with-item-views">Using
 drag and drop with item views</a>.</p>
 
@@ -575,14 +545,14 @@ drag and drop with item views</a>.</p>
 <p>When reimplementing <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>() in a
 subclass, you must call this function <i>after</i> inserting data
 into the model's underlying data store.</p>
-<p>See also <a href="qabstractitemmodel.html#beginInsertColumns">beginInsertColumns</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginInsertColumns">beginInsertColumns</a>().</p>
 
 
 <h3 class="fn"><a name="endInsertRows" />QAbstractItemModel.endInsertRows (<i>self</i>)</h3><p>Ends a row insertion operation.</p>
 <p>When reimplementing <a href="qabstractitemmodel.html#insertRows">insertRows</a>() in a
 subclass, you must call this function <i>after</i> inserting data
 into the model's underlying data store.</p>
-<p>See also <a href="qabstractitemmodel.html#beginInsertRows">beginInsertRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginInsertRows">beginInsertRows</a>().</p>
 
 
 <h3 class="fn"><a name="endMoveColumns" />QAbstractItemModel.endMoveColumns (<i>self</i>)</h3><p>Ends a column move operation.</p>
@@ -592,7 +562,7 @@ store.</p>
 <p>layoutChanged is emitted by this method for compatibility
 reasons.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#beginMoveColumns">beginMoveColumns</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginMoveColumns">beginMoveColumns</a>().</p>
 
 
 <h3 class="fn"><a name="endMoveRows" />QAbstractItemModel.endMoveRows (<i>self</i>)</h3><p>Ends a row move operation.</p>
@@ -602,28 +572,28 @@ store.</p>
 <p>layoutChanged is emitted by this method for compatibility
 reasons.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#beginMoveRows">beginMoveRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginMoveRows">beginMoveRows</a>().</p>
 
 
 <h3 class="fn"><a name="endRemoveColumns" />QAbstractItemModel.endRemoveColumns (<i>self</i>)</h3><p>Ends a column removal operation.</p>
 <p>When reimplementing <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>() in a
 subclass, you must call this function <i>after</i> removing data
 from the model's underlying data store.</p>
-<p>See also <a href="qabstractitemmodel.html#beginRemoveColumns">beginRemoveColumns</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginRemoveColumns">beginRemoveColumns</a>().</p>
 
 
 <h3 class="fn"><a name="endRemoveRows" />QAbstractItemModel.endRemoveRows (<i>self</i>)</h3><p>Ends a row removal operation.</p>
 <p>When reimplementing <a href="qabstractitemmodel.html#removeRows">removeRows</a>() in a
 subclass, you must call this function <i>after</i> removing data
 from the model's underlying data store.</p>
-<p>See also <a href="qabstractitemmodel.html#beginRemoveRows">beginRemoveRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginRemoveRows">beginRemoveRows</a>().</p>
 
 
 <h3 class="fn"><a name="endResetModel" />QAbstractItemModel.endResetModel (<i>self</i>)</h3><p>Completes a model reset operation.</p>
 <p>You must call this function after resetting any internal data
 structure in your model or proxy model.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#beginResetModel">beginResetModel</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginResetModel">beginResetModel</a>().</p>
 
 
 <h3 class="fn"><a name="fetchMore" />QAbstractItemModel.fetchMore (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>)</h3><p>Fetches any available data for the items with the parent
@@ -631,22 +601,21 @@ specified by the <i>parent</i> index.</p>
 <p>Reimplement this if you are populating your model
 incrementally.</p>
 <p>The default implementation does nothing.</p>
-<p>See also <a href="qabstractitemmodel.html#canFetchMore">canFetchMore</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#canFetchMore">canFetchMore</a>().</p>
 
 
 <h3 class="fn"><a name="flags" /><a href="qt-itemflags.html">Qt.ItemFlags</a> QAbstractItemModel.flags (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Returns the item flags for the given <i>index</i>.</p>
 <p>The base class implementation returns a combination of flags
 that enables the item (<tt>ItemIsEnabled</tt>) and allows it to be
 selected (<tt>ItemIsSelectable</tt>).</p>
-<p>See also <a href="qt.html#ItemFlag-enum">Qt.ItemFlags</a>.</p>
+<p><b>See also</b> <a href="qt.html#ItemFlag-enum">Qt.ItemFlags</a>.</p>
 
 
 <h3 class="fn"><a name="hasChildren" />bool QAbstractItemModel.hasChildren (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>&#160;=&#160;QModelIndex())</h3><p>Returns true if <i>parent</i> has any children; otherwise
 returns false.</p>
 <p>Use <a href="qabstractitemmodel.html#rowCount">rowCount</a>() on
 the parent to find out the number of children.</p>
-<p>See also <a href="qabstractitemmodel.html#parent">parent</a>()
-and <a href="qabstractitemmodel.html#index">index</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#parent">parent</a>() and <a href="qabstractitemmodel.html#index">index</a>().</p>
 
 
 <h3 class="fn"><a name="hasIndex" />bool QAbstractItemModel.hasIndex (<i>self</i>, int&#160;<i>row</i>, int&#160;<i>column</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>&#160;=&#160;QModelIndex())</h3><p>Returns true if the model returns a valid <a href="qmodelindex.html">QModelIndex</a> for <i>row</i> and <i>column</i>
@@ -658,7 +627,7 @@ the header with the specified <i>orientation</i>.</p>
 <p>For horizontal headers, the section number corresponds to the
 column number. Similarly, for vertical headers, the section number
 corresponds to the row number.</p>
-<p>See also <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>, <a href="qabstractitemmodel.html#setHeaderData">setHeaderData</a>(), and
+<p><b>See also</b> <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>, <a href="qabstractitemmodel.html#setHeaderData">setHeaderData</a>(), and
 <a href="qheaderview.html">QHeaderView</a>.</p>
 
 
@@ -667,14 +636,14 @@ given <i>row</i>, <i>column</i> and <i>parent</i> index.</p>
 <p>When reimplementing this function in a subclass, call <a href="qabstractitemmodel.html#createIndex">createIndex</a>() to generate
 model indexes that other components can use to refer to items in
 your model.</p>
-<p>See also <a href="qabstractitemmodel.html#createIndex">createIndex</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#createIndex">createIndex</a>().</p>
 
 
 <h3 class="fn"><a name="insertColumn" />bool QAbstractItemModel.insertColumn (<i>self</i>, int&#160;<i>column</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>&#160;=&#160;QModelIndex())</h3><p>Inserts a single column before the given <i>column</i> in the
 child items of the <i>parent</i> specified.</p>
 <p>Returns true if the column is inserted; otherwise returns
 false.</p>
-<p>See also <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>(),
+<p><b>See also</b> <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>(),
 <a href="qabstractitemmodel.html#insertRow">insertRow</a>(), and
 <a href="qabstractitemmodel.html#removeColumn">removeColumn</a>().</p>
 
@@ -696,7 +665,7 @@ false.</p>
 <p>If you implement your own model, you can reimplement this
 function if you want to support insertions. Alternatively, you can
 provide your own API for altering the data.</p>
-<p>See also <a href="qabstractitemmodel.html#insertRows">insertRows</a>(), <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>(),
+<p><b>See also</b> <a href="qabstractitemmodel.html#insertRows">insertRows</a>(), <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>(),
 <a href="qabstractitemmodel.html#beginInsertColumns">beginInsertColumns</a>(),
 and <a href="qabstractitemmodel.html#endInsertColumns">endInsertColumns</a>().</p>
 
@@ -707,7 +676,7 @@ nothing and returns false.</p>
 items of the <i>parent</i> specified.</p>
 <p>Returns true if the row is inserted; otherwise returns
 false.</p>
-<p>See also <a href="qabstractitemmodel.html#insertRows">insertRows</a>(), <a href="qabstractitemmodel.html#insertColumn">insertColumn</a>(), and
+<p><b>See also</b> <a href="qabstractitemmodel.html#insertRows">insertRows</a>(), <a href="qabstractitemmodel.html#insertColumn">insertColumn</a>(), and
 <a href="qabstractitemmodel.html#removeRow">removeRow</a>().</p>
 
 
@@ -731,7 +700,7 @@ provide your own API for altering the data. In either case, you
 will need to call <a href="qabstractitemmodel.html#beginInsertRows">beginInsertRows</a>() and
 <a href="qabstractitemmodel.html#endInsertRows">endInsertRows</a>()
 to notify other components that the model has changed.</p>
-<p>See also <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>(),
+<p><b>See also</b> <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>(),
 <a href="qabstractitemmodel.html#removeRows">removeRows</a>(),
 <a href="qabstractitemmodel.html#beginInsertRows">beginInsertRows</a>(),
 and <a href="qabstractitemmodel.html#endInsertRows">endInsertRows</a>().</p>
@@ -741,7 +710,7 @@ and <a href="qabstractitemmodel.html#endInsertRows">endInsertRows</a>().</p>
 for the item at the given <i>index</i>.</p>
 <p>Reimplement this function if you want to extend the default
 behavior of this function to include custom roles in the map.</p>
-<p>See also <a href="qabstractitemmodel.html#setItemData">setItemData</a>(), <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>, and <a href="qabstractitemmodel.html#data">data</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#setItemData">setItemData</a>(), <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>, and <a href="qabstractitemmodel.html#data">data</a>().</p>
 
 
 <h3 class="fn"><a name="match" />list-of-QModelIndex QAbstractItemModel.match (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>start</i>, int&#160;<i>role</i>, QVariant&#160;<i>value</i>, int&#160;<i>hits</i>&#160;=&#160;1, <a href="qt-matchflags.html">Qt.MatchFlags</a>&#160;<i>flags</i>&#160;=&#160;Qt.MatchStartsWith|Qt.MatchWrap)</h3><p>Returns a list of indexes for the items in the column of the
@@ -768,12 +737,12 @@ corresponding to the list of <i>indexes</i> specified. The formats
 used to describe the encoded data is obtained from the <a href="qabstractitemmodel.html#mimeTypes">mimeTypes</a>() function.</p>
 <p>If the list of indexes is empty, or there are no supported MIME
 types, 0 is returned rather than a serialized empty list.</p>
-<p>See also <a href="qabstractitemmodel.html#mimeTypes">mimeTypes</a>() and <a href="qabstractitemmodel.html#dropMimeData">dropMimeData</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#mimeTypes">mimeTypes</a>() and <a href="qabstractitemmodel.html#dropMimeData">dropMimeData</a>().</p>
 
 
 <h3 class="fn"><a name="mimeTypes" />QStringList QAbstractItemModel.mimeTypes (<i>self</i>)</h3><p>Returns a list of MIME types that can be used to describe a list
 of model indexes.</p>
-<p>See also <a href="qabstractitemmodel.html#mimeData">mimeData</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#mimeData">mimeData</a>().</p>
 
 
 <h3 class="fn"><a name="parent" /><a href="qmodelindex.html">QModelIndex</a> QAbstractItemModel.parent (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>child</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the parent of the model item with the given
@@ -788,7 +757,7 @@ avoid calling <a href="qmodelindex.html">QModelIndex</a> member
 functions, such as <a href="qmodelindex.html#parent">QModelIndex.parent</a>(), since indexes
 belonging to your model will simply call your implementation,
 leading to infinite recursion.</p>
-<p>See also <a href="qabstractitemmodel.html#createIndex">createIndex</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#createIndex">createIndex</a>().</p>
 
 
 <h3 class="fn"><a name="parent-2" /><a href="qobject.html">QObject</a> QAbstractItemModel.parent (<i>self</i>)</h3><h3 class="fn"><a name="persistentIndexList" />list-of-QModelIndex QAbstractItemModel.persistentIndexList (<i>self</i>)</h3><p>Returns the list of indexes stored as persistent indexes in the
@@ -800,7 +769,7 @@ model.</p>
 <i>parent</i> specified.</p>
 <p>Returns true if the column is removed; otherwise returns
 false.</p>
-<p>See also <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>(),
+<p><b>See also</b> <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>(),
 <a href="qabstractitemmodel.html#removeRow">removeRow</a>(), and
 <a href="qabstractitemmodel.html#insertColumn">insertColumn</a>().</p>
 
@@ -815,7 +784,7 @@ false.</p>
 <p>If you implement your own model, you can reimplement this
 function if you want to support removing. Alternatively, you can
 provide your own API for altering the data.</p>
-<p>See also <a href="qabstractitemmodel.html#removeColumn">removeColumn</a>(), <a href="qabstractitemmodel.html#removeRows">removeRows</a>(), <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>(),
+<p><b>See also</b> <a href="qabstractitemmodel.html#removeColumn">removeColumn</a>(), <a href="qabstractitemmodel.html#removeRows">removeRows</a>(), <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>(),
 <a href="qabstractitemmodel.html#beginRemoveColumns">beginRemoveColumns</a>(),
 and <a href="qabstractitemmodel.html#endRemoveColumns">endRemoveColumns</a>().</p>
 
@@ -826,7 +795,7 @@ and <a href="qabstractitemmodel.html#endRemoveColumns">endRemoveColumns</a>().</
 <p>This is a convenience function that calls <a href="qabstractitemmodel.html#removeRows">removeRows</a>(). The <a href="qabstractitemmodel.html">QAbstractItemModel</a> implementation of
 <a href="qabstractitemmodel.html#removeRows">removeRows</a>() does
 nothing.</p>
-<p>See also <a href="qabstractitemmodel.html#removeRows">removeRows</a>(), <a href="qabstractitemmodel.html#removeColumn">removeColumn</a>(), and
+<p><b>See also</b> <a href="qabstractitemmodel.html#removeRows">removeRows</a>(), <a href="qabstractitemmodel.html#removeColumn">removeColumn</a>(), and
 <a href="qabstractitemmodel.html#insertRow">insertRow</a>().</p>
 
 
@@ -840,7 +809,7 @@ false.</p>
 <p>If you implement your own model, you can reimplement this
 function if you want to support removing. Alternatively, you can
 provide your own API for altering the data.</p>
-<p>See also <a href="qabstractitemmodel.html#removeRow">removeRow</a>(), <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>(),
+<p><b>See also</b> <a href="qabstractitemmodel.html#removeRow">removeRow</a>(), <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>(),
 <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>(),
 <a href="qabstractitemmodel.html#beginRemoveRows">beginRemoveRows</a>(),
 and <a href="qabstractitemmodel.html#endRemoveRows">endRemoveRows</a>().</p>
@@ -858,12 +827,12 @@ unexpected behaviour, especially when used with proxy models.</p>
 
 <h3 class="fn"><a name="revert" />QAbstractItemModel.revert (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void revert()</tt>.</p><p>Lets the model know that it should discard cached information.
 This function is typically used for row editing.</p>
-<p>See also <a href="qabstractitemmodel.html#submit">submit</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#submit">submit</a>().</p>
 
 
 <h3 class="fn"><a name="roleNames" />dict-of-int-QByteArray QAbstractItemModel.roleNames (<i>self</i>)</h3><p>Returns the model's role names.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#setRoleNames">setRoleNames</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#setRoleNames">setRoleNames</a>().</p>
 
 
 <h3 class="fn"><a name="rowCount" />int QAbstractItemModel.rowCount (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>&#160;=&#160;QModelIndex())</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the number of rows under the given <i>parent</i>. When
@@ -871,7 +840,7 @@ the parent is valid it means that rowCount is returning the number
 of children of parent.</p>
 <p><b>Note:</b> When implementing a table based model, rowCount()
 should return 0 when the parent is valid.</p>
-<p>See also <a href="qabstractitemmodel.html#columnCount">columnCount</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#columnCount">columnCount</a>().</p>
 
 
 <h3 class="fn"><a name="setData" />bool QAbstractItemModel.setData (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>, QVariant&#160;<i>value</i>, int&#160;<i>role</i>&#160;=&#160;Qt.EditRole)</h3><p>Sets the <i>role</i> data for the item at <i>index</i> to
@@ -882,7 +851,7 @@ should be emitted if the data was successfully set.</p>
 <p>The base class implementation returns false. This function and
 <a href="qabstractitemmodel.html#data">data</a>() must be
 reimplemented for editable models.</p>
-<p>See also <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>, <a href="qabstractitemmodel.html#data">data</a>(), and <a href="qabstractitemmodel.html#itemData">itemData</a>().</p>
+<p><b>See also</b> <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>, <a href="qabstractitemmodel.html#data">data</a>(), and <a href="qabstractitemmodel.html#itemData">itemData</a>().</p>
 
 
 <h3 class="fn"><a name="setHeaderData" />bool QAbstractItemModel.setHeaderData (<i>self</i>, int&#160;<i>section</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>&#160;<i>orientation</i>, QVariant&#160;<i>value</i>, int&#160;<i>role</i>&#160;=&#160;Qt.EditRole)</h3><p>Sets the data for the given <i>role</i> and <i>section</i> in
@@ -892,14 +861,14 @@ the header with the specified <i>orientation</i> to the
 false.</p>
 <p>When reimplementing this function, the <a href="qabstractitemmodel.html#headerDataChanged">headerDataChanged</a>()
 signal must be emitted explicitly.</p>
-<p>See also <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a> and <a href="qabstractitemmodel.html#headerData">headerData</a>().</p>
+<p><b>See also</b> <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a> and <a href="qabstractitemmodel.html#headerData">headerData</a>().</p>
 
 
 <h3 class="fn"><a name="setItemData" />bool QAbstractItemModel.setItemData (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>, dict-of-int-QVariant&#160;<i>roles</i>)</h3><p>Sets the role data for the item at <i>index</i> to the
 associated value in <i>roles</i>, for every <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>.</p>
 <p>Returns true if successful; otherwise returns false.</p>
 <p>Roles that are not in <i>roles</i> will not be modified.</p>
-<p>See also <a href="qabstractitemmodel.html#setData">setData</a>(), <a href="qabstractitemmodel.html#data">data</a>(), and <a href="qabstractitemmodel.html#itemData">itemData</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#setData">setData</a>(), <a href="qabstractitemmodel.html#data">data</a>(), and <a href="qabstractitemmodel.html#itemData">itemData</a>().</p>
 
 
 <h3 class="fn"><a name="setRoleNames" />QAbstractItemModel.setRoleNames (<i>self</i>, dict-of-int-QByteArray&#160;<i>roleNames</i>)</h3><p>Sets the model's role names to <i>roleNames</i>.</p>
@@ -908,13 +877,13 @@ property names in Declarative UI. This function must be called
 before the model is used. Modifying the role names after the model
 has been set may result in undefined behaviour.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#roleNames">roleNames</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#roleNames">roleNames</a>().</p>
 
 
 <h3 class="fn"><a name="setSupportedDragActions" />QAbstractItemModel.setSupportedDragActions (<i>self</i>, <a href="qt-dropactions.html">Qt.DropActions</a>)</h3><p>Sets the supported drag <i>actions</i> for the items in the
 model.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractitemmodel.html#supportedDragActions">supportedDragActions</a>()
+<p><b>See also</b> <a href="qabstractitemmodel.html#supportedDragActions">supportedDragActions</a>()
 and <a href="model-view-programming.html#using-drag-and-drop-with-item-views">Using
 drag and drop with item views</a>.</p>
 
@@ -925,8 +894,7 @@ location.</p>
 <p>sibling() is just a convenience function that finds the item's
 parent, and uses it to retrieve the index of the child item in the
 specified <i>row</i> and <i>column</i>.</p>
-<p>See also <a href="qabstractitemmodel.html#index">index</a>(),
-<a href="qmodelindex.html#row">QModelIndex.row</a>(), and <a href="qmodelindex.html#column">QModelIndex.column</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#index">index</a>(), <a href="qmodelindex.html#row">QModelIndex.row</a>(), and <a href="qmodelindex.html#column">QModelIndex.column</a>().</p>
 
 
 <h3 class="fn"><a name="sort" />QAbstractItemModel.sort (<i>self</i>, int&#160;<i>column</i>, <a href="qt.html#SortOrder-enum">Qt.SortOrder</a>&#160;<i>order</i>&#160;=&#160;Qt.AscendingOrder)</h3><p>Sorts the model by <i>column</i> in the given <i>order</i>.</p>
@@ -942,7 +910,7 @@ specified <i>row</i> and <i>column</i>.</p>
 permanent storage. This function is typically used for row
 editing.</p>
 <p>Returns true if there is no error; otherwise returns false.</p>
-<p>See also <a href="qabstractitemmodel.html#revert">revert</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#revert">revert</a>().</p>
 
 
 <h3 class="fn"><a name="supportedDragActions" /><a href="qt-dropactions.html">Qt.DropActions</a> QAbstractItemModel.supportedDragActions (<i>self</i>)</h3><p>Returns the actions supported by the data in this model.</p>
@@ -950,7 +918,7 @@ editing.</p>
 unless specific values have been set with <a href="qabstractitemmodel.html#setSupportedDragActions">setSupportedDragActions</a>().</p>
 <p>supportedDragActions() is used by <a href="qabstractitemview.html#startDrag">QAbstractItemView.startDrag</a>()
 as the default values when a drag occurs.</p>
-<p>See also <a href="qabstractitemmodel.html#setSupportedDragActions">setSupportedDragActions</a>(),
+<p><b>See also</b> <a href="qabstractitemmodel.html#setSupportedDragActions">setSupportedDragActions</a>(),
 <a href="qt.html#DropAction-enum">Qt.DropActions</a>, and <a href="model-view-programming.html#using-drag-and-drop-with-item-views">Using
 drag and drop with item views</a>.</p>
 
@@ -961,7 +929,7 @@ function if you wish to support additional actions. You must also
 reimplement the <a href="qabstractitemmodel.html#dropMimeData">dropMimeData</a>() function
 to handle the additional operations.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractitemmodel.html#dropMimeData">dropMimeData</a>(), <a href="qt.html#DropAction-enum">Qt.DropActions</a>, and <a href="model-view-programming.html#using-drag-and-drop-with-item-views">Using
+<p><b>See also</b> <a href="qabstractitemmodel.html#dropMimeData">dropMimeData</a>(), <a href="qt.html#DropAction-enum">Qt.DropActions</a>, and <a href="model-view-programming.html#using-drag-and-drop-with-item-views">Using
 drag and drop with item views</a>.</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="columnsAboutToBeInserted" />void columnsAboutToBeInserted (const QModelIndex&amp;,int,int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted just before columns are inserted into the
 model. The new items will be positioned between <i>start</i> and
@@ -971,7 +939,7 @@ to changes in the model's dimensions. It can only be emitted by the
 <a href="qabstractitemmodel.html">QAbstractItemModel</a>
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
-<p>See also <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>() and
+<p><b>See also</b> <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>() and
 <a href="qabstractitemmodel.html#beginInsertColumns">beginInsertColumns</a>().</p>
 
 
@@ -987,7 +955,7 @@ to changes in the model's dimensions. It can only be emitted by the
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#beginMoveRows">beginMoveRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginMoveRows">beginMoveRows</a>().</p>
 
 
 <h3 class="fn"><a name="columnsAboutToBeRemoved" />void columnsAboutToBeRemoved (const QModelIndex&amp;,int,int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted just before columns are removed from the
@@ -998,7 +966,7 @@ to changes in the model's dimensions. It can only be emitted by the
 <a href="qabstractitemmodel.html">QAbstractItemModel</a>
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
-<p>See also <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>() and
+<p><b>See also</b> <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>() and
 <a href="qabstractitemmodel.html#beginRemoveColumns">beginRemoveColumns</a>().</p>
 
 
@@ -1010,7 +978,7 @@ to changes in the model's dimensions. It can only be emitted by the
 <a href="qabstractitemmodel.html">QAbstractItemModel</a>
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
-<p>See also <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>() and
+<p><b>See also</b> <a href="qabstractitemmodel.html#insertColumns">insertColumns</a>() and
 <a href="qabstractitemmodel.html#beginInsertColumns">beginInsertColumns</a>().</p>
 
 
@@ -1025,7 +993,7 @@ to changes in the model's dimensions. It can only be emitted by the
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#beginMoveRows">beginMoveRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginMoveRows">beginMoveRows</a>().</p>
 
 
 <h3 class="fn"><a name="columnsRemoved" />void columnsRemoved (const QModelIndex&amp;,int,int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted after columns have been removed from the
@@ -1036,7 +1004,7 @@ to changes in the model's dimensions. It can only be emitted by the
 <a href="qabstractitemmodel.html">QAbstractItemModel</a>
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
-<p>See also <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>() and
+<p><b>See also</b> <a href="qabstractitemmodel.html#removeColumns">removeColumns</a>() and
 <a href="qabstractitemmodel.html#beginRemoveColumns">beginRemoveColumns</a>().</p>
 
 
@@ -1047,7 +1015,7 @@ between <i>topLeft</i> and <i>bottomRight</i> inclusive. If the
 items do not have the same parent, the behavior is undefined.</p>
 <p>When reimplementing the <a href="qabstractitemmodel.html#setData">setData</a>() function, this
 signal must be emitted explicitly.</p>
-<p>See also <a href="qabstractitemmodel.html#headerDataChanged">headerDataChanged</a>(),
+<p><b>See also</b> <a href="qabstractitemmodel.html#headerDataChanged">headerDataChanged</a>(),
 <a href="qabstractitemmodel.html#setData">setData</a>(), and
 <a href="qabstractitemmodel.html#layoutChanged">layoutChanged</a>().</p>
 
@@ -1062,7 +1030,7 @@ function, this signal must be emitted explicitly.</p>
 need to emit this signal, but use the begin/end functions (refer to
 the section on subclassing in the <a href="qabstractitemmodel.html">QAbstractItemModel</a> class description
 for details).</p>
-<p>See also <a href="qabstractitemmodel.html#headerData">headerData</a>(), <a href="qabstractitemmodel.html#setHeaderData">setHeaderData</a>(), and
+<p><b>See also</b> <a href="qabstractitemmodel.html#headerData">headerData</a>(), <a href="qabstractitemmodel.html#setHeaderData">setHeaderData</a>(), and
 <a href="qabstractitemmodel.html#dataChanged">dataChanged</a>().</p>
 
 
@@ -1072,7 +1040,7 @@ changes in the model's layout.</p>
 <p>Subclasses should update any persistent model indexes after
 emitting layoutAboutToBeChanged().</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractitemmodel.html#layoutChanged">layoutChanged</a>() and
+<p><b>See also</b> <a href="qabstractitemmodel.html#layoutChanged">layoutChanged</a>() and
 <a href="qabstractitemmodel.html#changePersistentIndex">changePersistentIndex</a>().</p>
 
 
@@ -1096,7 +1064,7 @@ will change</li>
 <li>Call <a href="qabstractitemmodel.html#changePersistentIndex">changePersistentIndex</a>()</li>
 <li>emit layoutChanged</li>
 </ul>
-<p>See also <a href="qabstractitemmodel.html#layoutAboutToBeChanged">layoutAboutToBeChanged</a>(),
+<p><b>See also</b> <a href="qabstractitemmodel.html#layoutAboutToBeChanged">layoutAboutToBeChanged</a>(),
 <a href="qabstractitemmodel.html#dataChanged">dataChanged</a>(),
 <a href="qabstractitemmodel.html#headerDataChanged">headerDataChanged</a>(),
 <a href="qabstractitemmodel.html#modelReset">modelReset</a>(), and
@@ -1107,7 +1075,7 @@ will change</li>
 model's internal state (e.g. persistent model indexes) has been
 invalidated.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qabstractitemmodel.html#beginResetModel">beginResetModel</a>() and
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginResetModel">beginResetModel</a>() and
 <a href="qabstractitemmodel.html#modelReset">modelReset</a>().</p>
 
 
@@ -1115,7 +1083,7 @@ invalidated.</p>
 model's internal state (e.g. persistent model indexes) has been
 invalidated.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qabstractitemmodel.html#endResetModel">endResetModel</a>() and
+<p><b>See also</b> <a href="qabstractitemmodel.html#endResetModel">endResetModel</a>() and
 <a href="qabstractitemmodel.html#modelAboutToBeReset">modelAboutToBeReset</a>().</p>
 
 
@@ -1127,7 +1095,7 @@ to changes in the model's dimensions. It can only be emitted by the
 <a href="qabstractitemmodel.html">QAbstractItemModel</a>
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
-<p>See also <a href="qabstractitemmodel.html#insertRows">insertRows</a>() and <a href="qabstractitemmodel.html#beginInsertRows">beginInsertRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#insertRows">insertRows</a>() and <a href="qabstractitemmodel.html#beginInsertRows">beginInsertRows</a>().</p>
 
 
 <h3 class="fn"><a name="rowsAboutToBeMoved" />void rowsAboutToBeMoved (const QModelIndex&amp;,int,int,const QModelIndex&amp;,int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted just before rows are moved within the
@@ -1142,7 +1110,7 @@ to changes in the model's dimensions. It can only be emitted by the
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#beginMoveRows">beginMoveRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginMoveRows">beginMoveRows</a>().</p>
 
 
 <h3 class="fn"><a name="rowsAboutToBeRemoved" />void rowsAboutToBeRemoved (const QModelIndex&amp;,int,int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted just before rows are removed from the
@@ -1154,7 +1122,7 @@ to changes in the model's dimensions. It can only be emitted by the
 <a href="qabstractitemmodel.html">QAbstractItemModel</a>
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
-<p>See also <a href="qabstractitemmodel.html#removeRows">removeRows</a>() and <a href="qabstractitemmodel.html#beginRemoveRows">beginRemoveRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#removeRows">removeRows</a>() and <a href="qabstractitemmodel.html#beginRemoveRows">beginRemoveRows</a>().</p>
 
 
 <h3 class="fn"><a name="rowsInserted" />void rowsInserted (const QModelIndex&amp;,int,int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted after rows have been inserted into the
@@ -1165,7 +1133,7 @@ to changes in the model's dimensions. It can only be emitted by the
 <a href="qabstractitemmodel.html">QAbstractItemModel</a>
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
-<p>See also <a href="qabstractitemmodel.html#insertRows">insertRows</a>() and <a href="qabstractitemmodel.html#beginInsertRows">beginInsertRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#insertRows">insertRows</a>() and <a href="qabstractitemmodel.html#beginInsertRows">beginInsertRows</a>().</p>
 
 
 <h3 class="fn"><a name="rowsMoved" />void rowsMoved (const QModelIndex&amp;,int,int,const QModelIndex&amp;,int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted after rows have been moved within the
@@ -1179,7 +1147,7 @@ to changes in the model's dimensions. It can only be emitted by the
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qabstractitemmodel.html#beginMoveRows">beginMoveRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#beginMoveRows">beginMoveRows</a>().</p>
 
 
 <h3 class="fn"><a name="rowsRemoved" />void rowsRemoved (const QModelIndex&amp;,int,int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted after rows have been removed from the
@@ -1190,7 +1158,7 @@ to changes in the model's dimensions. It can only be emitted by the
 <a href="qabstractitemmodel.html">QAbstractItemModel</a>
 implementation, and cannot be explicitly emitted in subclass
 code.</p>
-<p>See also <a href="qabstractitemmodel.html#removeRows">removeRows</a>() and <a href="qabstractitemmodel.html#beginRemoveRows">beginRemoveRows</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#removeRows">removeRows</a>() and <a href="qabstractitemmodel.html#beginRemoveRows">beginRemoveRows</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

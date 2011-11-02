@@ -25,57 +25,57 @@ will need to unset this flag.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="TransformOrigin-enum" />QDeclarativeItem.TransformOrigin</h3><p>Controls the point about which simple transforms like scale
 apply.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeItem.TopLeft</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The top-left corner of the item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeItem.Top</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The center point of the top of the item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeItem.TopRight</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The top-right corner of the item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeItem.Left</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The left most point of the vertical
 middle.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeItem.Center</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The center of the item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeItem.Right</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The right most point of the vertical
 middle.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeItem.BottomLeft</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">The bottom-left corner of the item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeItem.Bottom</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">The center point of the bottom of the
 item.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDeclarativeItem.BottomRight</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">The bottom-right corner of the item.</td>
 </tr>
 </table>
@@ -91,36 +91,26 @@ geometries are the same, it doesn't do anything.</p>
 <h3 class="fn"><a name="hasFocus" />bool QDeclarativeItem.hasFocus (<i>self</i>)</h3><h3 class="fn"><a name="heightValid" />bool QDeclarativeItem.heightValid (<i>self</i>)</h3><p>Returns whether the height property has been set explicitly.</p>
 
 
-<h3 class="fn"><a name="implicitHeight" />float QDeclarativeItem.implicitHeight (<i>self</i>)</h3><p>Returns the height of the item that is implied by other
-properties that determine the content.</p>
-<p>See also <a href="qdeclarativeitem.html#setImplicitHeight">setImplicitHeight</a>().</p>
-
-
-<h3 class="fn"><a name="implicitWidth" />float QDeclarativeItem.implicitWidth (<i>self</i>)</h3><p>Returns the width of the item that is implied by other
-properties that determine the content.</p>
-<p>See also <a href="qdeclarativeitem.html#setImplicitWidth">setImplicitWidth</a>().</p>
-
-
-<h3 class="fn"><a name="inputMethodEvent" />QDeclarativeItem.inputMethodEvent (<i>self</i>, <a href="qinputmethodevent.html">QInputMethodEvent</a>)</h3><h3 class="fn"><a name="inputMethodQuery" />QVariant QDeclarativeItem.inputMethodQuery (<i>self</i>, <a href="qt.html#InputMethodQuery-enum">Qt.InputMethodQuery</a>&#160;<i>query</i>)</h3><h3 class="fn"><a name="isComponentComplete" />bool QDeclarativeItem.isComponentComplete (<i>self</i>)</h3><p>Returns true if construction of the QML component is complete;
+<h3 class="fn"><a name="implicitHeight" />float QDeclarativeItem.implicitHeight (<i>self</i>)</h3><h3 class="fn"><a name="implicitWidth" />float QDeclarativeItem.implicitWidth (<i>self</i>)</h3><h3 class="fn"><a name="inputMethodEvent" />QDeclarativeItem.inputMethodEvent (<i>self</i>, <a href="qinputmethodevent.html">QInputMethodEvent</a>)</h3><h3 class="fn"><a name="inputMethodQuery" />QVariant QDeclarativeItem.inputMethodQuery (<i>self</i>, <a href="qt.html#InputMethodQuery-enum">Qt.InputMethodQuery</a>&#160;<i>query</i>)</h3><h3 class="fn"><a name="isComponentComplete" />bool QDeclarativeItem.isComponentComplete (<i>self</i>)</h3><p>Returns true if construction of the QML component is complete;
 otherwise returns false.</p>
 <p>It is often desirable to delay some processing until the
 component is completed.</p>
-<p>See also <a href="qdeclarativeparserstatus.html#componentComplete">componentComplete</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeparserstatus.html#componentComplete">componentComplete</a>().</p>
 
 
 <h3 class="fn"><a name="itemChange" />QVariant QDeclarativeItem.itemChange (<i>self</i>, <a href="qgraphicsitem.html#GraphicsItemChange-enum">QGraphicsItem.GraphicsItemChange</a>, QVariant)</h3><h3 class="fn"><a name="keepMouseGrab" />bool QDeclarativeItem.keepMouseGrab (<i>self</i>)</h3><p>Returns a value indicating whether mouse input should remain
 with this item exclusively.</p>
-<p>See also <a href="qdeclarativeitem.html#setKeepMouseGrab">setKeepMouseGrab</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeitem.html#setKeepMouseGrab">setKeepMouseGrab</a>().</p>
 
 
 <h3 class="fn"><a name="keyPressEvent" />QDeclarativeItem.keyPressEvent (<i>self</i>, <a href="qkeyevent.html">QKeyEvent</a>&#160;<i>event</i>)</h3><h3 class="fn"><a name="keyReleaseEvent" />QDeclarativeItem.keyReleaseEvent (<i>self</i>, <a href="qkeyevent.html">QKeyEvent</a>&#160;<i>event</i>)</h3><h3 class="fn"><a name="paint" />QDeclarativeItem.paint (<i>self</i>, <a href="qpainter.html">QPainter</a>, <a href="qstyleoptiongraphicsitem.html">QStyleOptionGraphicsItem</a>, <a href="qwidget.html">QWidget</a>)</h3><h3 class="fn"><a name="parentItem" /><a href="qdeclarativeitem.html">QDeclarativeItem</a> QDeclarativeItem.parentItem (<i>self</i>)</h3><h3 class="fn"><a name="sceneEvent" />bool QDeclarativeItem.sceneEvent (<i>self</i>, <a href="qevent.html">QEvent</a>)</h3><h3 class="fn"><a name="setBaselineOffset" />QDeclarativeItem.setBaselineOffset (<i>self</i>, float)</h3><h3 class="fn"><a name="setClip" />QDeclarativeItem.setClip (<i>self</i>, bool)</h3><h3 class="fn"><a name="setHeight" />QDeclarativeItem.setHeight (<i>self</i>, float)</h3><h3 class="fn"><a name="setImplicitHeight" />QDeclarativeItem.setImplicitHeight (<i>self</i>, float)</h3><p>Sets the implied height of the item to <i>h</i>. This is the
 height implied by other properties that determine the content.</p>
-<p>See also <a href="qdeclarativeitem.html#implicitHeight">implicitHeight</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeitem.html#implicitHeight-prop">implicitHeight</a>().</p>
 
 
 <h3 class="fn"><a name="setImplicitWidth" />QDeclarativeItem.setImplicitWidth (<i>self</i>, float)</h3><p>Sets the implied width of the item to <i>w</i>. This is the
 width implied by other properties that determine the content.</p>
-<p>See also <a href="qdeclarativeitem.html#implicitWidth">implicitWidth</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeitem.html#implicitWidth-prop">implicitWidth</a>().</p>
 
 
 <h3 class="fn"><a name="setKeepMouseGrab" />QDeclarativeItem.setKeepMouseGrab (<i>self</i>, bool)</h3><p>The flag indicating whether the mouse should remain with this
@@ -135,16 +125,16 @@ to mouse events.</p>
 grab, a filtering item may steal the grab. For example, Flickable
 may attempt to steal a mouse grab if it detects that the user has
 begun to move the viewport.</p>
-<p>See also <a href="qdeclarativeitem.html#keepMouseGrab">keepMouseGrab</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeitem.html#keepMouseGrab">keepMouseGrab</a>().</p>
 
 
 <h3 class="fn"><a name="setParentItem" />QDeclarativeItem.setParentItem (<i>self</i>, <a href="qdeclarativeitem.html">QDeclarativeItem</a>&#160;<i>parent</i>)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><h3 class="fn"><a name="setSmooth" />QDeclarativeItem.setSmooth (<i>self</i>, bool)</h3><h3 class="fn"><a name="setTransformOrigin" />QDeclarativeItem.setTransformOrigin (<i>self</i>, <a href="qdeclarativeitem.html#TransformOrigin-enum">TransformOrigin</a>)</h3><p>Set the transform <i>origin</i>.</p>
-<p>See also <a href="qdeclarativeitem.html#transformOrigin">transformOrigin</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeitem.html#transformOrigin">transformOrigin</a>().</p>
 
 
 <h3 class="fn"><a name="setWidth" />QDeclarativeItem.setWidth (<i>self</i>, float)</h3><h3 class="fn"><a name="smooth" />bool QDeclarativeItem.smooth (<i>self</i>)</h3><h3 class="fn"><a name="transformOrigin" /><a href="qdeclarativeitem.html#TransformOrigin-enum">TransformOrigin</a> QDeclarativeItem.transformOrigin (<i>self</i>)</h3><p>Returns the current transform origin.</p>
-<p>See also <a href="qdeclarativeitem.html#setTransformOrigin">setTransformOrigin</a>().</p>
+<p><b>See also</b> <a href="qdeclarativeitem.html#setTransformOrigin">setTransformOrigin</a>().</p>
 
 
 <h3 class="fn"><a name="widthValid" />bool QDeclarativeItem.widthValid (<i>self</i>)</h3><p>Returns whether the width property has been set explicitly.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

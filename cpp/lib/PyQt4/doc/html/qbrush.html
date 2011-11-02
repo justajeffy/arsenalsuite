@@ -40,12 +40,12 @@ brushes are created by giving a <a href="qgradient.html">QGradient</a> as a cons
 creating the QBrush. Qt provides three different gradients:
 <a href="qlineargradient.html">QLinearGradient</a>, <a href="qconicalgradient.html">QConicalGradient</a>, and <a href="qradialgradient.html">QRadialGradient</a> - all of which inherit
 <a href="qgradient.html">QGradient</a>.</p>
-<pre class="highlightedCode brush: cpp">
-     QRadialGradient gradient(50, 50, 50, 50, 50);
-     gradient.setColorAt(0, QColor.fromRgbF(0, 1, 0, 1));
-     gradient.setColorAt(1, QColor.fromRgbF(0, 0, 0, 0));
+<pre class="cpp">
+     <span class="type"><a href="qradialgradient.html">QRadialGradient</a></span> gradient(<span class="number">50</span><span class="operator">,</span> <span class="number">50</span><span class="operator">,</span> <span class="number">50</span><span class="operator">,</span> <span class="number">50</span><span class="operator">,</span> <span class="number">50</span>);
+     gradient<span class="operator">.</span>setColorAt(<span class="number">0</span><span class="operator">,</span> <span class="type"><a href="qcolor.html">QColor</a></span><span class="operator">.</span>fromRgbF(<span class="number">0</span><span class="operator">,</span> <span class="number">1</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">1</span>));
+     gradient<span class="operator">.</span>setColorAt(<span class="number">1</span><span class="operator">,</span> <span class="type"><a href="qcolor.html">QColor</a></span><span class="operator">.</span>fromRgbF(<span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span>));
 
-     QBrush brush(gradient);
+     <span class="type">QBrush</span> brush(gradient);
 </pre>
 <p>The <a href="qbrush.html#texture">texture</a>() defines the
 pixmap used when the current style is <a href="qt.html#BrushStyle-enum">Qt.TexturePattern</a>. You can create a
@@ -66,26 +66,23 @@ an alpha channel and is not a <a href="qbitmap.html">QBitmap</a>.</li>
 <li>The colors in the <a href="qbrush.html#gradient">gradient</a>()
 all have an alpha component that is 255.</li>
 </ul>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Outlines" src="images/brush-outline.png" /></p>
-</td>
-<td>
-<p>To specify the style and color of lines and outlines, use the
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img alt="Outlines" src="images/brush-outline.png" /></td>
+<td>To specify the style and color of lines and outlines, use the
 <a href="qpainter.html">QPainter</a>'s <a href="qpen.html">pen</a>
 combined with <a href="qt.html#PenStyle-enum">Qt.PenStyle</a> and
-<a href="qt.html#GlobalColor-enum">Qt.GlobalColor</a>:</p>
-<pre class="highlightedCode brush: cpp">
- QPainter painter(this);
+<a href="qt.html#GlobalColor-enum">Qt.GlobalColor</a>:
+<pre class="cpp">
+ <span class="type"><a href="qpainter.html">QPainter</a></span> painter(<span class="keyword">this</span>);
 
- painter.setBrush(Qt.cyan);
- painter.setPen(Qt.darkCyan);
- painter.drawRect(0, 0, 100,100);
+ painter<span class="operator">.</span>setBrush(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>cyan);
+ painter<span class="operator">.</span>setPen(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>darkCyan);
+ painter<span class="operator">.</span>drawRect(<span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">100</span><span class="operator">,</span><span class="number">100</span>);
 
- painter.setBrush(Qt.NoBrush);
- painter.setPen(Qt.darkGreen);
- painter.drawRect(40, 40, 100, 100);
+ painter<span class="operator">.</span>setBrush(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>NoBrush);
+ painter<span class="operator">.</span>setPen(<span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>darkGreen);
+ painter<span class="operator">.</span>drawRect(<span class="number">40</span><span class="operator">,</span> <span class="number">40</span><span class="operator">,</span> <span class="number">100</span><span class="operator">,</span> <span class="number">100</span>);
 </pre>
 <p>Note that, by default, <a href="qpainter.html">QPainter</a>
 renders the outline (using the currently set pen) when drawing
@@ -100,45 +97,45 @@ fill shapes).</p>
 
 
 <h3 class="fn"><a name="QBrush-2" />QBrush.__init__ (<i>self</i>, <a href="qt.html#BrushStyle-enum">Qt.BrushStyle</a>&#160;<i>bs</i>)</h3><p>Constructs a black brush with the given <i>style</i>.</p>
-<p>See also <a href="qbrush.html#setStyle">setStyle</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setStyle">setStyle</a>().</p>
 
 
 <h3 class="fn"><a name="QBrush-3" />QBrush.__init__ (<i>self</i>, <a href="qcolor.html">QColor</a>&#160;<i>color</i>, <a href="qt.html#BrushStyle-enum">Qt.BrushStyle</a>&#160;<i>style</i>&#160;=&#160;Qt.SolidPattern)</h3><p>Constructs a brush with the given <i>color</i> and
 <i>style</i>.</p>
-<p>See also <a href="qbrush.html#setColor">setColor</a>() and
-<a href="qbrush.html#setStyle">setStyle</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setColor">setColor</a>()
+and <a href="qbrush.html#setStyle">setStyle</a>().</p>
 
 
 <h3 class="fn"><a name="QBrush-4" />QBrush.__init__ (<i>self</i>, <a href="qt.html#GlobalColor-enum">Qt.GlobalColor</a>&#160;<i>color</i>, <a href="qt.html#BrushStyle-enum">Qt.BrushStyle</a>&#160;<i>style</i>&#160;=&#160;Qt.SolidPattern)</h3><p>Constructs a brush with the given <i>color</i> and
 <i>style</i>.</p>
-<p>See also <a href="qbrush.html#setColor">setColor</a>() and
-<a href="qbrush.html#setStyle">setStyle</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setColor">setColor</a>()
+and <a href="qbrush.html#setStyle">setStyle</a>().</p>
 
 
 <h3 class="fn"><a name="QBrush-5" />QBrush.__init__ (<i>self</i>, <a href="qcolor.html">QColor</a>&#160;<i>color</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>)</h3><p>Constructs a brush with the given <i>color</i> and the custom
 pattern stored in <i>pixmap</i>.</p>
 <p>The style is set to <a href="qt.html#BrushStyle-enum">Qt.TexturePattern</a>. The color will
 only have an effect for QBitmaps.</p>
-<p>See also <a href="qbrush.html#setColor">setColor</a>() and
-<a class="compat" href="qbrush-qt3.html#setPixmap">setPixmap</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setColor">setColor</a>()
+and <a class="compat" href="qbrush-qt3.html#setPixmap">setPixmap</a>().</p>
 
 
 <h3 class="fn"><a name="QBrush-6" />QBrush.__init__ (<i>self</i>, <a href="qt.html#GlobalColor-enum">Qt.GlobalColor</a>&#160;<i>color</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>)</h3><p>Constructs a brush with the given <i>color</i> and the custom
 pattern stored in <i>pixmap</i>.</p>
 <p>The style is set to <a href="qt.html#BrushStyle-enum">Qt.TexturePattern</a>. The color will
 only have an effect for QBitmaps.</p>
-<p>See also <a href="qbrush.html#setColor">setColor</a>() and
-<a class="compat" href="qbrush-qt3.html#setPixmap">setPixmap</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setColor">setColor</a>()
+and <a class="compat" href="qbrush-qt3.html#setPixmap">setPixmap</a>().</p>
 
 
 <h3 class="fn"><a name="QBrush-7" />QBrush.__init__ (<i>self</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>)</h3><p>Constructs a brush with a black color and a texture set to the
 given <i>pixmap</i>. The style is set to <a href="qt.html#BrushStyle-enum">Qt.TexturePattern</a>.</p>
-<p>See also <a href="qbrush.html#setTexture">setTexture</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setTexture">setTexture</a>().</p>
 
 
 <h3 class="fn"><a name="QBrush-8" />QBrush.__init__ (<i>self</i>, <a href="qimage.html">QImage</a>&#160;<i>image</i>)</h3><p>Constructs a brush with a black color and a texture set to the
 given <i>image</i>. The style is set to <a href="qt.html#BrushStyle-enum">Qt.TexturePattern</a>.</p>
-<p>See also <a href="qbrush.html#setTextureImage">setTextureImage</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setTextureImage">setTextureImage</a>().</p>
 
 
 <h3 class="fn"><a name="QBrush-9" />QBrush.__init__ (<i>self</i>, <a href="qgradient.html">QGradient</a>&#160;<i>gradient</i>)</h3><p>Constructs a copy of <i>other</i>.</p>
@@ -150,7 +147,7 @@ given <i>image</i>. The style is set to <a href="qt.html#BrushStyle-enum">Qt.Tex
 
 
 <h3 class="fn"><a name="QBrush-11" />QBrush.__init__ (<i>self</i>, QVariant&#160;<i>variant</i>)</h3><h3 class="fn"><a name="color" /><a href="qcolor.html">QColor</a> QBrush.color (<i>self</i>)</h3><p>Returns the brush color.</p>
-<p>See also <a href="qbrush.html#setColor">setColor</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setColor">setColor</a>().</p>
 
 
 <h3 class="fn"><a name="gradient" /><a href="qgradient.html">QGradient</a> QBrush.gradient (<i>self</i>)</h3><p>Returns the gradient describing this brush.</p>
@@ -169,14 +166,14 @@ all have an alpha component that is 255.</li>
 
 <h3 class="fn"><a name="matrix" /><a href="qmatrix.html">QMatrix</a> QBrush.matrix (<i>self</i>)</h3><p>Returns the current transformation matrix for the brush.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qbrush.html#setMatrix">setMatrix</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setMatrix">setMatrix</a>().</p>
 
 
 <h3 class="fn"><a name="setColor" />QBrush.setColor (<i>self</i>, <a href="qcolor.html">QColor</a>&#160;<i>color</i>)</h3><p>Sets the brush color to the given <i>color</i>.</p>
 <p>Note that calling setColor() will not make a difference if the
 style is a gradient. The same is the case if the style is <a href="qt.html#BrushStyle-enum">Qt.TexturePattern</a> style unless the
 current texture is a <a href="qbitmap.html">QBitmap</a>.</p>
-<p>See also <a href="qbrush.html#color">color</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#color">color</a>().</p>
 
 
 <h3 class="fn"><a name="setColor-2" />QBrush.setColor (<i>self</i>, <a href="qt.html#GlobalColor-enum">Qt.GlobalColor</a>&#160;<i>acolor</i>)</h3><p>This is an overloaded function.</p>
@@ -188,11 +185,11 @@ current brush. The brush transformation matrix is merged with
 <a href="qpainter.html">QPainter</a> transformation matrix to
 produce the final result.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qbrush.html#matrix">matrix</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#matrix">matrix</a>().</p>
 
 
 <h3 class="fn"><a name="setStyle" />QBrush.setStyle (<i>self</i>, <a href="qt.html#BrushStyle-enum">Qt.BrushStyle</a>)</h3><p>Sets the brush style to <i>style</i>.</p>
-<p>See also <a href="qbrush.html#style">style</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#style">style</a>().</p>
 
 
 <h3 class="fn"><a name="setTexture" />QBrush.setTexture (<i>self</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>)</h3><p>Sets the brush pixmap to <i>pixmap</i>. The style is set to
@@ -200,7 +197,7 @@ produce the final result.</p>
 <p>The current brush color will only have an effect for monochrome
 pixmaps, i.e. for <a href="qpixmap.html#depth">QPixmap.depth</a>()
 == 1 (<a href="qbitmap.html">QBitmaps</a>).</p>
-<p>See also <a href="qbrush.html#texture">texture</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#texture">texture</a>().</p>
 
 
 <h3 class="fn"><a name="setTextureImage" />QBrush.setTextureImage (<i>self</i>, <a href="qimage.html">QImage</a>&#160;<i>image</i>)</h3><p>Sets the brush image to <i>image</i>. The style is set to
@@ -211,8 +208,7 @@ monochrome image brushes, either convert the image to <a href="qbitmap.html">QBi
 set the resulting <a href="qbitmap.html">QBitmap</a> as a texture,
 or change the entries in the color table for the image.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qbrush.html#textureImage">textureImage</a>()
-and <a href="qbrush.html#setTexture">setTexture</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#textureImage">textureImage</a>() and <a href="qbrush.html#setTexture">setTexture</a>().</p>
 
 
 <h3 class="fn"><a name="setTransform" />QBrush.setTransform (<i>self</i>, <a href="qtransform.html">QTransform</a>)</h3><p>Sets <i>matrix</i> as an explicit transformation matrix on the
@@ -220,16 +216,16 @@ current brush. The brush transformation matrix is merged with
 <a href="qpainter.html">QPainter</a> transformation matrix to
 produce the final result.</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qbrush.html#transform">transform</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#transform">transform</a>().</p>
 
 
 <h3 class="fn"><a name="style" /><a href="qt.html#BrushStyle-enum">Qt.BrushStyle</a> QBrush.style (<i>self</i>)</h3><p>Returns the brush style.</p>
-<p>See also <a href="qbrush.html#setStyle">setStyle</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setStyle">setStyle</a>().</p>
 
 
 <h3 class="fn"><a name="texture" /><a href="qpixmap.html">QPixmap</a> QBrush.texture (<i>self</i>)</h3><p>Returns the custom brush pattern, or a null pixmap if no custom
 brush pattern has been set.</p>
-<p>See also <a href="qbrush.html#setTexture">setTexture</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setTexture">setTexture</a>().</p>
 
 
 <h3 class="fn"><a name="textureImage" /><a href="qimage.html">QImage</a> QBrush.textureImage (<i>self</i>)</h3><p>Returns the custom brush pattern, or a null image if no custom
@@ -237,12 +233,12 @@ brush pattern has been set.</p>
 <p>If the texture was set as a <a href="qpixmap.html">QPixmap</a>
 it will be converted to a <a href="qimage.html">QImage</a>.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qbrush.html#setTextureImage">setTextureImage</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setTextureImage">setTextureImage</a>().</p>
 
 
 <h3 class="fn"><a name="transform" /><a href="qtransform.html">QTransform</a> QBrush.transform (<i>self</i>)</h3><p>Returns the current transformation matrix for the brush.</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qbrush.html#setTransform">setTransform</a>().</p>
+<p><b>See also</b> <a href="qbrush.html#setTransform">setTransform</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QBrush.__eq__ (<i>self</i>, <a href="qbrush.html">QBrush</a>&#160;<i>b</i>)</h3><h3 class="fn"><a name="__ne__" />bool QBrush.__ne__ (<i>self</i>, <a href="qbrush.html">QBrush</a>&#160;<i>b</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QBrush.__eq__ (<i>self</i>, <a href="qbrush.html">QBrush</a>&#160;<i>b</i>)</h3><h3 class="fn"><a name="__ne__" />bool QBrush.__ne__ (<i>self</i>, <a href="qbrush.html">QBrush</a>&#160;<i>b</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -56,31 +56,31 @@ features.</p>
 <p>There are different ways to define the display characteristics
 of a rendering context. One is to create a QGLFormat and make it
 the default for the entire application:</p>
-<pre class="highlightedCode brush: cpp">
- QGLFormat fmt;
- fmt.setAlpha(true);
- fmt.setStereo(true);
- QGLFormat.setDefaultFormat(fmt);
+<pre class="cpp">
+ <span class="type">QGLFormat</span> fmt;
+ fmt<span class="operator">.</span><a href="qglformat.html#setAlpha">setAlpha</a>(<span class="keyword">true</span>);
+ fmt<span class="operator">.</span><a href="qglformat.html#setStereo">setStereo</a>(<span class="keyword">true</span>);
+ <span class="type">QGLFormat</span><span class="operator">.</span><a href="qglformat.html#setDefaultFormat">setDefaultFormat</a>(fmt);
 </pre>
 <p>Or you can specify the desired format when creating an object of
 your <a href="qglwidget.html">QGLWidget</a> subclass:</p>
-<pre class="highlightedCode brush: cpp">
- QGLFormat fmt;
- fmt.setDoubleBuffer(false);                 <span class="comment">// single buffer</span>
- fmt.setDirectRendering(false);              <span class="comment">// software rendering</span>
- MyGLWidget* myWidget = new MyGLWidget(fmt, ...);
+<pre class="cpp">
+ <span class="type">QGLFormat</span> fmt;
+ fmt<span class="operator">.</span><a href="qglformat.html#setDoubleBuffer">setDoubleBuffer</a>(<span class="keyword">false</span>);                 <span class="comment">// single buffer</span>
+ fmt<span class="operator">.</span><a href="qglformat.html#setDirectRendering">setDirectRendering</a>(<span class="keyword">false</span>);              <span class="comment">// software rendering</span>
+ MyGLWidget<span class="operator">*</span> myWidget <span class="operator">=</span> <span class="keyword">new</span> MyGLWidget(fmt<span class="operator">,</span> <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
 </pre>
 <p>After the widget has been created, you can find out which of the
 requested features the system was able to provide:</p>
-<pre class="highlightedCode brush: cpp">
- QGLFormat fmt;
- fmt.setOverlay(true);
- fmt.setStereo(true);
- MyGLWidget* myWidget = new MyGLWidget(fmt, ...);
- if (!myWidget-&gt;format().stereo()) {
+<pre class="cpp">
+ <span class="type">QGLFormat</span> fmt;
+ fmt<span class="operator">.</span><a href="qglformat.html#setOverlay">setOverlay</a>(<span class="keyword">true</span>);
+ fmt<span class="operator">.</span><a href="qglformat.html#setStereo">setStereo</a>(<span class="keyword">true</span>);
+ MyGLWidget<span class="operator">*</span> myWidget <span class="operator">=</span> <span class="keyword">new</span> MyGLWidget(fmt<span class="operator">,</span> <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
+ <span class="keyword">if</span> (<span class="operator">!</span>myWidget<span class="operator">-</span><span class="operator">&gt;</span>format()<span class="operator">.</span>stereo()) {
      <span class="comment">// ok, goggles off</span>
-     if (!myWidget-&gt;format().hasOverlay()) {
-         qFatal("Cool hardware required");
+     <span class="keyword">if</span> (<span class="operator">!</span>myWidget<span class="operator">-</span><span class="operator">&gt;</span>format()<span class="operator">.</span>hasOverlay()) {
+         <a href="qtcore.html#qFatal">qFatal</a>(<span class="string">"Cool hardware required"</span>);
      }
  }
 </pre>
@@ -92,25 +92,25 @@ States and other countries.</p>
 specified for contexts implementing OpenGL version 3.2 or higher.
 These profiles are different from OpenGL ES profiles.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.NoProfile</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">OpenGL version is lower than 3.2.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.CoreProfile</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Functionality deprecated in OpenGL version 3.0
 is not available.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.CompatibilityProfile</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Functionality from earlier OpenGL versions is
 available.</td>
 </tr>
@@ -123,92 +123,92 @@ recognized by Qt. Use the <a href="qglformat.html#openGLVersionFlags">QGLFormat.
 function to identify which versions that are supported at
 runtime.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_None</tt></td>
-<td class=" topAlign"><tt>0x00000000</tt></td>
+<td class="topAlign"><tt>0x00000000</tt></td>
 <td class="topAlign">If no OpenGL is present or if no OpenGL
 context is current.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_1_1</tt></td>
-<td class=" topAlign"><tt>0x00000001</tt></td>
+<td class="topAlign"><tt>0x00000001</tt></td>
 <td class="topAlign">OpenGL version 1.1 or higher is present.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_1_2</tt></td>
-<td class=" topAlign"><tt>0x00000002</tt></td>
+<td class="topAlign"><tt>0x00000002</tt></td>
 <td class="topAlign">OpenGL version 1.2 or higher is present.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_1_3</tt></td>
-<td class=" topAlign"><tt>0x00000004</tt></td>
+<td class="topAlign"><tt>0x00000004</tt></td>
 <td class="topAlign">OpenGL version 1.3 or higher is present.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_1_4</tt></td>
-<td class=" topAlign"><tt>0x00000008</tt></td>
+<td class="topAlign"><tt>0x00000008</tt></td>
 <td class="topAlign">OpenGL version 1.4 or higher is present.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_1_5</tt></td>
-<td class=" topAlign"><tt>0x00000010</tt></td>
+<td class="topAlign"><tt>0x00000010</tt></td>
 <td class="topAlign">OpenGL version 1.5 or higher is present.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_2_0</tt></td>
-<td class=" topAlign"><tt>0x00000020</tt></td>
+<td class="topAlign"><tt>0x00000020</tt></td>
 <td class="topAlign">OpenGL version 2.0 or higher is present. Note
 that version 2.0 supports all the functionality of version
 1.5.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_2_1</tt></td>
-<td class=" topAlign"><tt>0x00000040</tt></td>
+<td class="topAlign"><tt>0x00000040</tt></td>
 <td class="topAlign">OpenGL version 2.1 or higher is present.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_3_0</tt></td>
-<td class=" topAlign"><tt>0x00001000</tt></td>
+<td class="topAlign"><tt>0x00001000</tt></td>
 <td class="topAlign">OpenGL version 3.0 or higher is present.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_3_1</tt></td>
-<td class=" topAlign"><tt>0x00002000</tt></td>
+<td class="topAlign"><tt>0x00002000</tt></td>
 <td class="topAlign">OpenGL version 3.1 or higher is present. Note
 that OpenGL version 3.1 or higher does not necessarily support all
 the features of version 3.0 and lower.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_3_2</tt></td>
-<td class=" topAlign"><tt>0x00004000</tt></td>
+<td class="topAlign"><tt>0x00004000</tt></td>
 <td class="topAlign">OpenGL version 3.2 or higher is present.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_3_3</tt></td>
-<td class=" topAlign"><tt>0x00008000</tt></td>
+<td class="topAlign"><tt>0x00008000</tt></td>
 <td class="topAlign">OpenGL version 3.3 or higher is present.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_Version_4_0</tt></td>
-<td class=" topAlign"><tt>0x00010000</tt></td>
+<td class="topAlign"><tt>0x00010000</tt></td>
 <td class="topAlign">OpenGL version 4.0 or higher is present.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QGLFormat.OpenGL_ES_CommonLite_Version_1_0</tt></td>
-<td class=" topAlign"><tt>0x00000100</tt></td>
+<td class="topAlign"><tt>0x00000100</tt></td>
 <td class="topAlign">OpenGL ES version 1.0 Common Lite or higher is
 present.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QGLFormat.OpenGL_ES_Common_Version_1_0</tt></td>
-<td class=" topAlign"><tt>0x00000080</tt></td>
+<td class="topAlign"><tt>0x00000080</tt></td>
 <td class="topAlign">OpenGL ES version 1.0 Common or higher is
 present. The Common profile supports all the features of Common
 Lite.</td>
@@ -216,21 +216,21 @@ Lite.</td>
 <tr>
 <td class="topAlign">
 <tt>QGLFormat.OpenGL_ES_CommonLite_Version_1_1</tt></td>
-<td class=" topAlign"><tt>0x00000400</tt></td>
+<td class="topAlign"><tt>0x00000400</tt></td>
 <td class="topAlign">OpenGL ES version 1.1 Common Lite or higher is
 present.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QGLFormat.OpenGL_ES_Common_Version_1_1</tt></td>
-<td class=" topAlign"><tt>0x00000200</tt></td>
+<td class="topAlign"><tt>0x00000200</tt></td>
 <td class="topAlign">OpenGL ES version 1.1 Common or higher is
 present. The Common profile supports all the features of Common
 Lite.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLFormat.OpenGL_ES_Version_2_0</tt></td>
-<td class=" topAlign"><tt>0x00000800</tt></td>
+<td class="topAlign"><tt>0x00000800</tt></td>
 <td class="topAlign">OpenGL ES version 2.0 or higher is present.
 Note that OpenGL ES version 2.0 does not support all the features
 of OpenGL ES 1.x. So if OpenGL_ES_Version_2_0 is returned, none of
@@ -242,7 +242,7 @@ information about the different revisions of OpenGL.</p>
 <p>This enum was introduced or modified in Qt 4.2.</p>
 <p>The OpenGLVersionFlags type is a typedef for <a href="qflags.html">QFlags</a>&lt;OpenGLVersionFlag&gt;. It stores an OR
 combination of OpenGLVersionFlag values.</p>
-<p>See also <a href="qglformat.html#openGLVersionFlags">openGLVersionFlags</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#openGLVersionFlags">openGLVersionFlags</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QGLFormat" />QGLFormat.__init__ (<i>self</i>)</h3><p>Constructs a <a href="qglformat.html">QGLFormat</a> object with
 the following default settings:</p>
 <ul>
@@ -277,17 +277,17 @@ be <a href="qgl.html#FormatOption-enum">QGL.FormatOption</a>
 values OR'ed together.</p>
 <p>This constructor makes it easy to specify a certain desired
 format in classes derived from <a href="qglwidget.html">QGLWidget</a>, for example:</p>
-<pre class="highlightedCode brush: cpp">
-<span class="comment"> // The rendering in MyGLWidget depends on using</span>
-<span class="comment"> // stencil buffer and alpha channel</span>
- MyGLWidget.MyGLWidget(QWidget* parent)
-     : QGLWidget(QGLFormat(QGL.StencilBuffer | QGL.AlphaChannel), parent)
+<pre class="cpp">
+ <span class="comment">// The rendering in MyGLWidget depends on using</span>
+ <span class="comment">// stencil buffer and alpha channel</span>
+ MyGLWidget<span class="operator">.</span>MyGLWidget(<span class="type"><a href="qwidget.html">QWidget</a></span><span class="operator">*</span> parent)
+     : <span class="type"><a href="qglwidget.html">QGLWidget</a></span>(<span class="type"><a href="qglformat.html">QGLFormat</a></span>(QGL<span class="operator">.</span>StencilBuffer <span class="operator">|</span> QGL<span class="operator">.</span>AlphaChannel)<span class="operator">,</span> parent)
  {
-     if (!format().stencil())
-         qWarning("Could not get stencil buffer; results will be suboptimal");
-     if (!format().alpha())
-         qWarning("Could not get alpha channel; results will be suboptimal");
-     ...
+     <span class="keyword">if</span> (<span class="operator">!</span>format()<span class="operator">.</span>stencil())
+         <a href="qtcore.html#qWarning">qWarning</a>(<span class="string">"Could not get stencil buffer; results will be suboptimal"</span>);
+     <span class="keyword">if</span> (<span class="operator">!</span>format()<span class="operator">.</span>alpha())
+         <a href="qtcore.html#qWarning">qWarning</a>(<span class="string">"Could not get alpha channel; results will be suboptimal"</span>);
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
 <p>Note that there are <a href="qgl.html#FormatOption-enum">QGL.FormatOption</a> values to turn
@@ -295,7 +295,7 @@ format settings both on and off, e.g. <a href="qgl.html#FormatOption-enum">QGL.D
 <p>The <i>plane</i> parameter defaults to 0 and is the plane which
 this format should be associated with. Not all OpenGL
 implementations supports overlay/underlay rendering planes.</p>
-<p>See also <a href="qglformat.html#defaultFormat">defaultFormat</a>(), <a href="qglformat.html#setOption">setOption</a>(), and <a href="qglformat.html#setPlane">setPlane</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#defaultFormat">defaultFormat</a>(), <a href="qglformat.html#setOption">setOption</a>(), and <a href="qglformat.html#setPlane">setPlane</a>().</p>
 
 
 <h3 class="fn"><a name="QGLFormat-3" />QGLFormat.__init__ (<i>self</i>, <a href="qglformat.html">QGLFormat</a>&#160;<i>other</i>)</h3><p>Constructs a copy of <i>other</i>.</p>
@@ -303,29 +303,30 @@ implementations supports overlay/underlay rendering planes.</p>
 
 <h3 class="fn"><a name="accum" />bool QGLFormat.accum (<i>self</i>)</h3><p>Returns true if the accumulation buffer is enabled; otherwise
 returns false. The accumulation buffer is disabled by default.</p>
-<p>See also <a href="qglformat.html#setAccum">setAccum</a>() and
-<a href="qglformat.html#setAccumBufferSize">setAccumBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setAccum">setAccum</a>()
+and <a href="qglformat.html#setAccumBufferSize">setAccumBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="accumBufferSize" />int QGLFormat.accumBufferSize (<i>self</i>)</h3><p>Returns the accumulation buffer size.</p>
-<p>See also <a href="qglformat.html#setAccumBufferSize">setAccumBufferSize</a>(),
+<p><b>See also</b> <a href="qglformat.html#setAccumBufferSize">setAccumBufferSize</a>(),
 <a href="qglformat.html#accum">accum</a>(), and <a href="qglformat.html#setAccum">setAccum</a>().</p>
 
 
 <h3 class="fn"><a name="alpha" />bool QGLFormat.alpha (<i>self</i>)</h3><p>Returns true if the alpha buffer in the framebuffer is enabled;
 otherwise returns false. The alpha buffer is disabled by
 default.</p>
-<p>See also <a href="qglformat.html#setAlpha">setAlpha</a>() and
-<a href="qglformat.html#setAlphaBufferSize">setAlphaBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setAlpha">setAlpha</a>()
+and <a href="qglformat.html#setAlphaBufferSize">setAlphaBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="alphaBufferSize" />int QGLFormat.alphaBufferSize (<i>self</i>)</h3><p>Returns the alpha buffer size.</p>
-<p>See also <a href="qglformat.html#alpha">alpha</a>(), <a href="qglformat.html#setAlpha">setAlpha</a>(), and <a href="qglformat.html#setAlphaBufferSize">setAlphaBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#alpha">alpha</a>(),
+<a href="qglformat.html#setAlpha">setAlpha</a>(), and <a href="qglformat.html#setAlphaBufferSize">setAlphaBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="blueBufferSize" />int QGLFormat.blueBufferSize (<i>self</i>)</h3><p>Returns the blue buffer size.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qglformat.html#setBlueBufferSize">setBlueBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setBlueBufferSize">setBlueBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="defaultFormat" /><a href="qglformat.html">QGLFormat</a> QGLFormat.defaultFormat ()</h3><p>Returns the default <a href="qglformat.html">QGLFormat</a> for
@@ -334,7 +335,7 @@ that are created use this format unless another format is
 specified, e.g. when they are constructed.</p>
 <p>If no special default format has been set using <a href="qglformat.html#setDefaultFormat">setDefaultFormat</a>(), the
 default format is the same as that created with <a href="qglformat.html#QGLFormat">QGLFormat</a>().</p>
-<p>See also <a href="qglformat.html#setDefaultFormat">setDefaultFormat</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setDefaultFormat">setDefaultFormat</a>().</p>
 
 
 <h3 class="fn"><a name="defaultOverlayFormat" /><a href="qglformat.html">QGLFormat</a> QGLFormat.defaultOverlayFormat ()</h3><p>Returns the default <a href="qglformat.html">QGLFormat</a> for
@@ -362,34 +363,35 @@ buffers:</a> Disabled.</li>
 <li><a href="qglformat.html#setPlane">Plane:</a> 1 (i.e., first
 overlay plane).</li>
 </ul>
-<p>See also <a href="qglformat.html#setDefaultOverlayFormat">setDefaultOverlayFormat</a>()
+<p><b>See also</b> <a href="qglformat.html#setDefaultOverlayFormat">setDefaultOverlayFormat</a>()
 and <a href="qglformat.html#setDefaultFormat">setDefaultFormat</a>().</p>
 
 
 <h3 class="fn"><a name="depth" />bool QGLFormat.depth (<i>self</i>)</h3><p>Returns true if the depth buffer is enabled; otherwise returns
 false. The depth buffer is enabled by default.</p>
-<p>See also <a href="qglformat.html#setDepth">setDepth</a>() and
-<a href="qglformat.html#setDepthBufferSize">setDepthBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setDepth">setDepth</a>()
+and <a href="qglformat.html#setDepthBufferSize">setDepthBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="depthBufferSize" />int QGLFormat.depthBufferSize (<i>self</i>)</h3><p>Returns the depth buffer size.</p>
-<p>See also <a href="qglformat.html#depth">depth</a>(), <a href="qglformat.html#setDepth">setDepth</a>(), and <a href="qglformat.html#setDepthBufferSize">setDepthBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#depth">depth</a>(),
+<a href="qglformat.html#setDepth">setDepth</a>(), and <a href="qglformat.html#setDepthBufferSize">setDepthBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="directRendering" />bool QGLFormat.directRendering (<i>self</i>)</h3><p>Returns true if direct rendering is enabled; otherwise returns
 false.</p>
 <p>Direct rendering is enabled by default.</p>
-<p>See also <a href="qglformat.html#setDirectRendering">setDirectRendering</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setDirectRendering">setDirectRendering</a>().</p>
 
 
 <h3 class="fn"><a name="doubleBuffer" />bool QGLFormat.doubleBuffer (<i>self</i>)</h3><p>Returns true if double buffering is enabled; otherwise returns
 false. Double buffering is enabled by default.</p>
-<p>See also <a href="qglformat.html#setDoubleBuffer">setDoubleBuffer</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setDoubleBuffer">setDoubleBuffer</a>().</p>
 
 
 <h3 class="fn"><a name="greenBufferSize" />int QGLFormat.greenBufferSize (<i>self</i>)</h3><p>Returns the green buffer size.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qglformat.html#setGreenBufferSize">setGreenBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setGreenBufferSize">setGreenBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="hasOpenGL" />bool QGLFormat.hasOpenGL ()</h3><p>Returns true if the window system has any OpenGL support;
@@ -409,19 +411,17 @@ created.</p>
 <h3 class="fn"><a name="hasOverlay" />bool QGLFormat.hasOverlay (<i>self</i>)</h3><p>Returns true if overlay plane is enabled; otherwise returns
 false.</p>
 <p>Overlay is disabled by default.</p>
-<p>See also <a href="qglformat.html#setOverlay">setOverlay</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setOverlay">setOverlay</a>().</p>
 
 
 <h3 class="fn"><a name="majorVersion" />int QGLFormat.majorVersion (<i>self</i>)</h3><p>Returns the OpenGL major version.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qglformat.html#setVersion">setVersion</a>()
-and <a href="qglformat.html#minorVersion">minorVersion</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setVersion">setVersion</a>() and <a href="qglformat.html#minorVersion">minorVersion</a>().</p>
 
 
 <h3 class="fn"><a name="minorVersion" />int QGLFormat.minorVersion (<i>self</i>)</h3><p>Returns the OpenGL minor version.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qglformat.html#setVersion">setVersion</a>()
-and <a href="qglformat.html#majorVersion">majorVersion</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setVersion">setVersion</a>() and <a href="qglformat.html#majorVersion">majorVersion</a>().</p>
 
 
 <h3 class="fn"><a name="openGLVersionFlags" /><a href="qglformat-openglversionflags.html">OpenGLVersionFlags</a> QGLFormat.openGLVersionFlags ()</h3><p>Identifies, at runtime, which OpenGL versions that are supported
@@ -435,42 +435,41 @@ possible group of runtime platforms.</p>
 <p>This function needs a valid current OpenGL context to work;
 otherwise it will return <a href="qglformat.html#OpenGLVersionFlag-enum">OpenGL_Version_None</a>.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qglformat.html#hasOpenGL">hasOpenGL</a>() and
-<a href="qglformat.html#hasOpenGLOverlays">hasOpenGLOverlays</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#hasOpenGL">hasOpenGL</a>() and <a href="qglformat.html#hasOpenGLOverlays">hasOpenGLOverlays</a>().</p>
 
 
 <h3 class="fn"><a name="plane" />int QGLFormat.plane (<i>self</i>)</h3><p>Returns the plane of this format. The default for normal formats
 is 0, which means the normal plane. The default for overlay formats
 is 1, which is the first overlay plane.</p>
-<p>See also <a href="qglformat.html#setPlane">setPlane</a>() and
-<a href="qglformat.html#defaultOverlayFormat">defaultOverlayFormat</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setPlane">setPlane</a>()
+and <a href="qglformat.html#defaultOverlayFormat">defaultOverlayFormat</a>().</p>
 
 
 <h3 class="fn"><a name="profile" /><a href="qglformat.html#OpenGLContextProfile-enum">OpenGLContextProfile</a> QGLFormat.profile (<i>self</i>)</h3><p>Returns the OpenGL context profile.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qglformat.html#setProfile">setProfile</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setProfile">setProfile</a>().</p>
 
 
 <h3 class="fn"><a name="redBufferSize" />int QGLFormat.redBufferSize (<i>self</i>)</h3><p>Returns the red buffer size.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qglformat.html#setRedBufferSize">setRedBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setRedBufferSize">setRedBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="rgba" />bool QGLFormat.rgba (<i>self</i>)</h3><p>Returns true if RGBA color mode is set. Returns false if color
 index mode is set. The default color mode is RGBA.</p>
-<p>See also <a href="qglformat.html#setRgba">setRgba</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setRgba">setRgba</a>().</p>
 
 
 <h3 class="fn"><a name="sampleBuffers" />bool QGLFormat.sampleBuffers (<i>self</i>)</h3><p>Returns true if multisample buffer support is enabled; otherwise
 returns false.</p>
 <p>The multisample buffer is disabled by default.</p>
-<p>See also <a href="qglformat.html#setSampleBuffers">setSampleBuffers</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setSampleBuffers">setSampleBuffers</a>().</p>
 
 
 <h3 class="fn"><a name="samples" />int QGLFormat.samples (<i>self</i>)</h3><p>Returns the number of samples per pixel when multisampling is
 enabled. By default, the highest number of samples that is
 available is used.</p>
-<p>See also <a href="qglformat.html#setSampleBuffers">setSampleBuffers</a>(), <a href="qglformat.html#sampleBuffers">sampleBuffers</a>(), and <a href="qglformat.html#setSamples">setSamples</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setSampleBuffers">setSampleBuffers</a>(), <a href="qglformat.html#sampleBuffers">sampleBuffers</a>(), and <a href="qglformat.html#setSamples">setSamples</a>().</p>
 
 
 <h3 class="fn"><a name="setAccum" />QGLFormat.setAccum (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>If <i>enable</i> is true enables the accumulation buffer;
@@ -478,12 +477,14 @@ otherwise disables the accumulation buffer.</p>
 <p>The accumulation buffer is disabled by default.</p>
 <p>The accumulation buffer is used to create blur effects and
 multiple exposures.</p>
-<p>See also <a href="qglformat.html#accum">accum</a>() and <a href="qglformat.html#setAccumBufferSize">setAccumBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#accum">accum</a>() and
+<a href="qglformat.html#setAccumBufferSize">setAccumBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="setAccumBufferSize" />QGLFormat.setAccumBufferSize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Set the preferred accumulation buffer size, where <i>size</i> is
 the bit depth for each RGBA component.</p>
-<p>See also <a href="qglformat.html#accum">accum</a>(), <a href="qglformat.html#setAccum">setAccum</a>(), and <a href="qglformat.html#accumBufferSize">accumBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#accum">accum</a>(),
+<a href="qglformat.html#setAccum">setAccum</a>(), and <a href="qglformat.html#accumBufferSize">accumBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="setAlpha" />QGLFormat.setAlpha (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>If <i>enable</i> is true enables the alpha buffer; otherwise
@@ -492,18 +493,19 @@ disables the alpha buffer.</p>
 <p>The alpha buffer is typically used for implementing transparency
 or translucency. The A in RGBA specifies the transparency of a
 pixel.</p>
-<p>See also <a href="qglformat.html#alpha">alpha</a>() and <a href="qglformat.html#setAlphaBufferSize">setAlphaBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#alpha">alpha</a>() and
+<a href="qglformat.html#setAlphaBufferSize">setAlphaBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="setAlphaBufferSize" />QGLFormat.setAlphaBufferSize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Set the preferred alpha buffer size to <i>size</i>. This
 function implicitly enables the alpha channel.</p>
-<p>See also <a href="qglformat.html#setRedBufferSize">setRedBufferSize</a>(), <a href="qglformat.html#setGreenBufferSize">setGreenBufferSize</a>(), and
+<p><b>See also</b> <a href="qglformat.html#setRedBufferSize">setRedBufferSize</a>(), <a href="qglformat.html#setGreenBufferSize">setGreenBufferSize</a>(), and
 <a href="qglformat.html#alphaBufferSize">alphaBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="setBlueBufferSize" />QGLFormat.setBlueBufferSize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Set the preferred blue buffer size to <i>size</i>.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qglformat.html#blueBufferSize">blueBufferSize</a>(), <a href="qglformat.html#setRedBufferSize">setRedBufferSize</a>(), <a href="qglformat.html#setGreenBufferSize">setGreenBufferSize</a>(), and
+<p><b>See also</b> <a href="qglformat.html#blueBufferSize">blueBufferSize</a>(), <a href="qglformat.html#setRedBufferSize">setRedBufferSize</a>(), <a href="qglformat.html#setGreenBufferSize">setGreenBufferSize</a>(), and
 <a href="qglformat.html#setAlphaBufferSize">setAlphaBufferSize</a>().</p>
 
 
@@ -511,13 +513,13 @@ function implicitly enables the alpha channel.</p>
 the application to <i>f</i>. For example, to set single buffering
 as the default instead of double buffering, your main() might
 contain code like this:</p>
-<pre class="highlightedCode brush: cpp">
- QApplication a(argc, argv);
- QGLFormat f;
- f.setDoubleBuffer(false);
- QGLFormat.setDefaultFormat(f);
+<pre class="cpp">
+ <span class="type"><a href="qapplication.html">QApplication</a></span> a(argc<span class="operator">,</span> argv);
+ <span class="type"><a href="qglformat.html">QGLFormat</a></span> f;
+ f<span class="operator">.</span><a href="qglformat.html#setDoubleBuffer">setDoubleBuffer</a>(<span class="keyword">false</span>);
+ <span class="type"><a href="qglformat.html">QGLFormat</a></span><span class="operator">.</span>setDefaultFormat(f);
 </pre>
-<p>See also <a href="qglformat.html#defaultFormat">defaultFormat</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#defaultFormat">defaultFormat</a>().</p>
 
 
 <h3 class="fn"><a name="setDefaultOverlayFormat" />QGLFormat.setDefaultOverlayFormat (<a href="qglformat.html">QGLFormat</a>&#160;<i>f</i>)</h3><p>Sets a new default <a href="qglformat.html">QGLFormat</a> for
@@ -527,27 +529,27 @@ that <a href="qglformat.html#hasOverlay">hasOverlay</a>()
 enabled.</p>
 <p>For example, to get a double buffered overlay context (if
 available), use code like this:</p>
-<pre class="highlightedCode brush: cpp">
- QGLFormat f = QGLFormat.defaultOverlayFormat();
- f.setDoubleBuffer(true);
- QGLFormat.setDefaultOverlayFormat(f);
+<pre class="cpp">
+ <span class="type"><a href="qglformat.html">QGLFormat</a></span> f <span class="operator">=</span> <span class="type"><a href="qglformat.html">QGLFormat</a></span><span class="operator">.</span><a href="qglformat.html#defaultOverlayFormat">defaultOverlayFormat</a>();
+ f<span class="operator">.</span><a href="qglformat.html#setDoubleBuffer">setDoubleBuffer</a>(<span class="keyword">true</span>);
+ <span class="type"><a href="qglformat.html">QGLFormat</a></span><span class="operator">.</span>setDefaultOverlayFormat(f);
 </pre>
 <p>As usual, you can find out after widget creation whether the
 underlying OpenGL system was able to provide the requested
 specification:</p>
-<pre class="highlightedCode brush: cpp">
-<span class="comment"> // ...continued from above</span>
- MyGLWidget* myWidget = new MyGLWidget(QGLFormat(QGL.HasOverlay), ...);
- if (myWidget-&gt;format().hasOverlay()) {
+<pre class="cpp">
+ <span class="comment">// ...continued from above</span>
+ MyGLWidget<span class="operator">*</span> myWidget <span class="operator">=</span> <span class="keyword">new</span> MyGLWidget(<span class="type"><a href="qglformat.html">QGLFormat</a></span>(QGL<span class="operator">.</span>HasOverlay)<span class="operator">,</span> <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
+ <span class="keyword">if</span> (myWidget<span class="operator">-</span><span class="operator">&gt;</span>format()<span class="operator">.</span>hasOverlay()) {
      <span class="comment">// Yes, we got an overlay, let's check _its_ format:</span>
-     QGLContext* olContext = myWidget-&gt;overlayContext();
-     if (olContext-&gt;format().doubleBuffer())
+     <span class="type"><a href="qglcontext.html">QGLContext</a></span><span class="operator">*</span> olContext <span class="operator">=</span> myWidget<span class="operator">-</span><span class="operator">&gt;</span>overlayContext();
+     <span class="keyword">if</span> (olContext<span class="operator">-</span><span class="operator">&gt;</span>format()<span class="operator">.</span>doubleBuffer())
          ; <span class="comment">// yes, we got a double buffered overlay</span>
-     else
+     <span class="keyword">else</span>
          ; <span class="comment">// no, only single buffered overlays are available</span>
  }
 </pre>
-<p>See also <a href="qglformat.html#defaultOverlayFormat">defaultOverlayFormat</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#defaultOverlayFormat">defaultOverlayFormat</a>().</p>
 
 
 <h3 class="fn"><a name="setDepth" />QGLFormat.setDepth (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>If <i>enable</i> is true enables the depth buffer; otherwise
@@ -558,11 +560,12 @@ hidden surfaces. Pixels are assigned Z values based on the distance
 to the viewer. A pixel with a high Z value is closer to the viewer
 than a pixel with a low Z value. This information is used to decide
 whether to draw a pixel or not.</p>
-<p>See also <a href="qglformat.html#depth">depth</a>() and <a href="qglformat.html#setDepthBufferSize">setDepthBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#depth">depth</a>() and
+<a href="qglformat.html#setDepthBufferSize">setDepthBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="setDepthBufferSize" />QGLFormat.setDepthBufferSize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Set the minimum depth buffer size to <i>size</i>.</p>
-<p>See also <a href="qglformat.html#depthBufferSize">depthBufferSize</a>(), <a href="qglformat.html#setDepth">setDepth</a>(), and <a href="qglformat.html#depth">depth</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#depthBufferSize">depthBufferSize</a>(), <a href="qglformat.html#setDepth">setDepth</a>(), and <a href="qglformat.html#depth">depth</a>().</p>
 
 
 <h3 class="fn"><a name="setDirectRendering" />QGLFormat.setDirectRendering (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>If <i>enable</i> is true enables direct rendering; otherwise
@@ -571,7 +574,7 @@ disables direct rendering.</p>
 <p>Enabling this option will make OpenGL bypass the underlying
 window system and render directly from hardware to the screen, if
 this is supported by the system.</p>
-<p>See also <a href="qglformat.html#directRendering">directRendering</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#directRendering">directRendering</a>().</p>
 
 
 <h3 class="fn"><a name="setDoubleBuffer" />QGLFormat.setDoubleBuffer (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>If <i>enable</i> is true sets double buffering; otherwise sets
@@ -584,18 +587,18 @@ function to exchange the screen contents with the buffer. The
 result is flicker-free drawing and often better performance.</p>
 <p>Note that single buffered contexts are currently not supported
 with EGL.</p>
-<p>See also <a href="qglformat.html#doubleBuffer">doubleBuffer</a>(), <a href="qglcontext.html#swapBuffers">QGLContext.swapBuffers</a>(), and
+<p><b>See also</b> <a href="qglformat.html#doubleBuffer">doubleBuffer</a>(), <a href="qglcontext.html#swapBuffers">QGLContext.swapBuffers</a>(), and
 <a href="qglwidget.html#swapBuffers">QGLWidget.swapBuffers</a>().</p>
 
 
 <h3 class="fn"><a name="setGreenBufferSize" />QGLFormat.setGreenBufferSize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Set the preferred green buffer size to <i>size</i>.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qglformat.html#greenBufferSize">greenBufferSize</a>(), <a href="qglformat.html#setRedBufferSize">setRedBufferSize</a>(), <a href="qglformat.html#setBlueBufferSize">setBlueBufferSize</a>(), and
+<p><b>See also</b> <a href="qglformat.html#greenBufferSize">greenBufferSize</a>(), <a href="qglformat.html#setRedBufferSize">setRedBufferSize</a>(), <a href="qglformat.html#setBlueBufferSize">setBlueBufferSize</a>(), and
 <a href="qglformat.html#setAlphaBufferSize">setAlphaBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="setOption" />QGLFormat.setOption (<i>self</i>, <a href="qgl-formatoptions.html">QGL.FormatOptions</a>&#160;<i>opt</i>)</h3><p>Sets the format option to <i>opt</i>.</p>
-<p>See also <a href="qglformat.html#testOption">testOption</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#testOption">testOption</a>().</p>
 
 
 <h3 class="fn"><a name="setOverlay" />QGLFormat.setOverlay (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>If <i>enable</i> is true enables an overlay plane; otherwise
@@ -603,7 +606,7 @@ disables the overlay plane.</p>
 <p>Enabling the overlay plane will cause <a href="qglwidget.html">QGLWidget</a> to create an additional context in
 an overlay plane. See the <a href="qglwidget.html">QGLWidget</a>
 documentation for further information.</p>
-<p>See also <a href="qglformat.html#hasOverlay">hasOverlay</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#hasOverlay">hasOverlay</a>().</p>
 
 
 <h3 class="fn"><a name="setPlane" />QGLFormat.setPlane (<i>self</i>, int&#160;<i>plane</i>)</h3><p>Sets the requested plane to <i>plane</i>. 0 is the normal plane,
@@ -613,19 +616,19 @@ documentation for further information.</p>
 specifications will be matched exactly. This means that if you
 specify a plane that the underlying OpenGL system cannot provide,
 an <a href="qglwidget.html#isValid">invalid</a> <a href="qglwidget.html">QGLWidget</a> will be created.</p>
-<p>See also <a href="qglformat.html#plane">plane</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#plane">plane</a>().</p>
 
 
 <h3 class="fn"><a name="setProfile" />QGLFormat.setProfile (<i>self</i>, <a href="qglformat.html#OpenGLContextProfile-enum">OpenGLContextProfile</a>&#160;<i>profile</i>)</h3><p>Set the OpenGL context profile to <i>profile</i>. The
 <i>profile</i> is ignored if the requested OpenGL version is less
 than 3.2.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qglformat.html#profile">profile</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#profile">profile</a>().</p>
 
 
 <h3 class="fn"><a name="setRedBufferSize" />QGLFormat.setRedBufferSize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Set the preferred red buffer size to <i>size</i>.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qglformat.html#redBufferSize">redBufferSize</a>(), <a href="qglformat.html#setGreenBufferSize">setGreenBufferSize</a>(),
+<p><b>See also</b> <a href="qglformat.html#redBufferSize">redBufferSize</a>(), <a href="qglformat.html#setGreenBufferSize">setGreenBufferSize</a>(),
 <a href="qglformat.html#setBlueBufferSize">setBlueBufferSize</a>(),
 and <a href="qglformat.html#setAlphaBufferSize">setAlphaBufferSize</a>().</p>
 
@@ -638,18 +641,18 @@ color mode you specify colors as red + green + blue + alpha
 quadruplets.</p>
 <p>In color index mode you specify an index into a color lookup
 table.</p>
-<p>See also <a href="qglformat.html#rgba">rgba</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#rgba">rgba</a>().</p>
 
 
 <h3 class="fn"><a name="setSampleBuffers" />QGLFormat.setSampleBuffers (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>If <i>enable</i> is true, a GL context with multisample buffer
 support is picked; otherwise ignored.</p>
-<p>See also <a href="qglformat.html#sampleBuffers">sampleBuffers</a>(), <a href="qglformat.html#setSamples">setSamples</a>(), and <a href="qglformat.html#samples">samples</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#sampleBuffers">sampleBuffers</a>(), <a href="qglformat.html#setSamples">setSamples</a>(), and <a href="qglformat.html#samples">samples</a>().</p>
 
 
 <h3 class="fn"><a name="setSamples" />QGLFormat.setSamples (<i>self</i>, int&#160;<i>numSamples</i>)</h3><p>Set the preferred number of samples per pixel when multisampling
 is enabled to <i>numSamples</i>. By default, the highest number of
 samples available is used.</p>
-<p>See also <a href="qglformat.html#setSampleBuffers">setSampleBuffers</a>(), <a href="qglformat.html#sampleBuffers">sampleBuffers</a>(), and <a href="qglformat.html#samples">samples</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setSampleBuffers">setSampleBuffers</a>(), <a href="qglformat.html#sampleBuffers">sampleBuffers</a>(), and <a href="qglformat.html#samples">samples</a>().</p>
 
 
 <h3 class="fn"><a name="setStencil" />QGLFormat.setStencil (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>If <i>enable</i> is true enables the stencil buffer; otherwise
@@ -657,12 +660,12 @@ disables the stencil buffer.</p>
 <p>The stencil buffer is enabled by default.</p>
 <p>The stencil buffer masks certain parts of the drawing area so
 that masked parts are not drawn on.</p>
-<p>See also <a href="qglformat.html#stencil">stencil</a>() and
-<a href="qglformat.html#setStencilBufferSize">setStencilBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#stencil">stencil</a>()
+and <a href="qglformat.html#setStencilBufferSize">setStencilBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="setStencilBufferSize" />QGLFormat.setStencilBufferSize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Set the preferred stencil buffer size to <i>size</i>.</p>
-<p>See also <a href="qglformat.html#stencilBufferSize">stencilBufferSize</a>(),
+<p><b>See also</b> <a href="qglformat.html#stencilBufferSize">stencilBufferSize</a>(),
 <a href="qglformat.html#setStencil">setStencil</a>(), and <a href="qglformat.html#stencil">stencil</a>().</p>
 
 
@@ -671,7 +674,7 @@ disables stereo buffering.</p>
 <p>Stereo buffering is disabled by default.</p>
 <p>Stereo buffering provides extra color buffers to generate
 left-eye and right-eye images.</p>
-<p>See also <a href="qglformat.html#stereo">stereo</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#stereo">stereo</a>().</p>
 
 
 <h3 class="fn"><a name="setSwapInterval" />QGLFormat.setSwapInterval (<i>self</i>, int&#160;<i>interval</i>)</h3><p>Set the preferred swap interval. This can be used to sync the GL
@@ -690,7 +693,7 @@ swap.</p>
 be present, and under X11 the <tt>GLX_SGI_video_sync</tt> extension
 has to be present.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qglformat.html#swapInterval">swapInterval</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#swapInterval">swapInterval</a>().</p>
 
 
 <h3 class="fn"><a name="setVersion" />QGLFormat.setVersion (<i>self</i>, int&#160;<i>major</i>, int&#160;<i>minor</i>)</h3><p>Set the OpenGL version to the <i>major</i> and <i>minor</i>
@@ -698,35 +701,34 @@ numbers. If a context compatible with the requested OpenGL version
 cannot be created, a context compatible with version 1.x is created
 instead.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qglformat.html#majorVersion">majorVersion</a>() and <a href="qglformat.html#minorVersion">minorVersion</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#majorVersion">majorVersion</a>() and <a href="qglformat.html#minorVersion">minorVersion</a>().</p>
 
 
 <h3 class="fn"><a name="stencil" />bool QGLFormat.stencil (<i>self</i>)</h3><p>Returns true if the stencil buffer is enabled; otherwise returns
 false. The stencil buffer is enabled by default.</p>
-<p>See also <a href="qglformat.html#setStencil">setStencil</a>()
-and <a href="qglformat.html#setStencilBufferSize">setStencilBufferSize</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setStencil">setStencil</a>() and <a href="qglformat.html#setStencilBufferSize">setStencilBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="stencilBufferSize" />int QGLFormat.stencilBufferSize (<i>self</i>)</h3><p>Returns the stencil buffer size.</p>
-<p>See also <a href="qglformat.html#stencil">stencil</a>(),
+<p><b>See also</b> <a href="qglformat.html#stencil">stencil</a>(),
 <a href="qglformat.html#setStencil">setStencil</a>(), and <a href="qglformat.html#setStencilBufferSize">setStencilBufferSize</a>().</p>
 
 
 <h3 class="fn"><a name="stereo" />bool QGLFormat.stereo (<i>self</i>)</h3><p>Returns true if stereo buffering is enabled; otherwise returns
 false. Stereo buffering is disabled by default.</p>
-<p>See also <a href="qglformat.html#setStereo">setStereo</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setStereo">setStereo</a>().</p>
 
 
 <h3 class="fn"><a name="swapInterval" />int QGLFormat.swapInterval (<i>self</i>)</h3><p>Returns the currently set swap interval. -1 is returned if
 setting the swap interval isn't supported in the system GL
 implementation.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qglformat.html#setSwapInterval">setSwapInterval</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setSwapInterval">setSwapInterval</a>().</p>
 
 
 <h3 class="fn"><a name="testOption" />bool QGLFormat.testOption (<i>self</i>, <a href="qgl-formatoptions.html">QGL.FormatOptions</a>&#160;<i>opt</i>)</h3><p>Returns true if format option <i>opt</i> is set; otherwise
 returns false.</p>
-<p>See also <a href="qglformat.html#setOption">setOption</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#setOption">setOption</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QGLFormat.__eq__ (<i>self</i>, <a href="qglformat.html">QGLFormat</a>)</h3><h3 class="fn"><a name="__ne__" />bool QGLFormat.__ne__ (<i>self</i>, <a href="qglformat.html">QGLFormat</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QGLFormat.__eq__ (<i>self</i>, <a href="qglformat.html">QGLFormat</a>)</h3><h3 class="fn"><a name="__ne__" />bool QGLFormat.__ne__ (<i>self</i>, <a href="qglformat.html">QGLFormat</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

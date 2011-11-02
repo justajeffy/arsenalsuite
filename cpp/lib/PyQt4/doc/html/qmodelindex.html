@@ -46,8 +46,8 @@ delete items. If you need to keep a model index over time use a
 <a href="qpersistentmodelindex.html">QPersistentModelIndex</a>.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QModelIndex" />QModelIndex.__init__ (<i>self</i>)</h3><p>Creates a new empty model index. This type of model index is
 used to indicate that the position in the model is invalid.</p>
-<p>See also <a href="qmodelindex.html#isValid">isValid</a>() and
-<a href="qabstractitemmodel.html">QAbstractItemModel</a>.</p>
+<p><b>See also</b> <a href="qmodelindex.html#isValid">isValid</a>()
+and <a href="qabstractitemmodel.html">QAbstractItemModel</a>.</p>
 
 
 <h3 class="fn"><a name="QModelIndex-2" />QModelIndex.__init__ (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>other</i>)</h3><p>Creates a new model index that is a copy of the <i>other</i>
@@ -58,8 +58,8 @@ model index.</p>
 <i>row</i> and <i>column</i>.</p>
 <p><b>Note:</b> This function does not work for an invalid model
 index which is often used as the root index.</p>
-<p>See also <a href="qmodelindex.html#parent">parent</a>() and
-<a href="qmodelindex.html#sibling">sibling</a>().</p>
+<p><b>See also</b> <a href="qmodelindex.html#parent">parent</a>()
+and <a href="qmodelindex.html#sibling">sibling</a>().</p>
 
 
 <h3 class="fn"><a name="column" />int QModelIndex.column (<i>self</i>)</h3><p>Returns the column this model index refers to.</p>
@@ -75,19 +75,20 @@ to by the index.</p>
 
 <h3 class="fn"><a name="internalId" />int QModelIndex.internalId (<i>self</i>)</h3><p>Returns a <tt>long</tt> used by the model to associate the
 index with the internal data structure.</p>
-<p>See also <a href="qabstractitemmodel.html#createIndex">QAbstractItemModel.createIndex</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#createIndex">QAbstractItemModel.createIndex</a>().</p>
 
 
 <h3 class="fn"><a name="internalPointer" />object QModelIndex.internalPointer (<i>self</i>)</h3><p>Returns a <tt>void</tt> <tt>*</tt> pointer used by the model to
 associate the index with the internal data structure.</p>
-<p>See also <a href="qabstractitemmodel.html#createIndex">QAbstractItemModel.createIndex</a>().</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html#createIndex">QAbstractItemModel.createIndex</a>().</p>
 
 
 <h3 class="fn"><a name="isValid" />bool QModelIndex.isValid (<i>self</i>)</h3><p>Returns true if this model index is valid; otherwise returns
 false.</p>
 <p>A valid index belongs to a model, and has non-negative row and
 column numbers.</p>
-<p>See also <a href="qmodelindex.html#model">model</a>(), <a href="qmodelindex.html#row">row</a>(), and <a href="qmodelindex.html#column">column</a>().</p>
+<p><b>See also</b> <a href="qmodelindex.html#model">model</a>(),
+<a href="qmodelindex.html#row">row</a>(), and <a href="qmodelindex.html#column">column</a>().</p>
 
 
 <h3 class="fn"><a name="model" /><a href="qabstractitemmodel.html">QAbstractItemModel</a> QModelIndex.model (<i>self</i>)</h3><p>Returns a pointer to the model containing the item that this
@@ -99,7 +100,8 @@ and possibly crash your application.</p>
 
 <h3 class="fn"><a name="parent" /><a href="qmodelindex.html">QModelIndex</a> QModelIndex.parent (<i>self</i>)</h3><p>Returns the parent of the model index, or <a href="qmodelindex.html#QModelIndex">QModelIndex</a>() if it has no
 parent.</p>
-<p>See also <a href="qmodelindex.html#child">child</a>(), <a href="qmodelindex.html#sibling">sibling</a>(), and <a href="qmodelindex.html#model">model</a>().</p>
+<p><b>See also</b> <a href="qmodelindex.html#child">child</a>(),
+<a href="qmodelindex.html#sibling">sibling</a>(), and <a href="qmodelindex.html#model">model</a>().</p>
 
 
 <h3 class="fn"><a name="row" />int QModelIndex.row (<i>self</i>)</h3><p>Returns the row this model index refers to.</p>
@@ -107,8 +109,8 @@ parent.</p>
 
 <h3 class="fn"><a name="sibling" /><a href="qmodelindex.html">QModelIndex</a> QModelIndex.sibling (<i>self</i>, int&#160;<i>arow</i>, int&#160;<i>acolumn</i>)</h3><p>Returns the sibling at <i>row</i> and <i>column</i>. If there is
 no sibling at this position, an invalid <a href="qmodelindex.html">QModelIndex</a> is returned.</p>
-<p>See also <a href="qmodelindex.html#parent">parent</a>() and
-<a href="qmodelindex.html#child">child</a>().</p>
+<p><b>See also</b> <a href="qmodelindex.html#parent">parent</a>()
+and <a href="qmodelindex.html#child">child</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QModelIndex.__eq__ (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ge__" />bool QModelIndex.__ge__ (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__hash__" />int QModelIndex.__hash__ (<i>self</i>)</h3><h3 class="fn"><a name="__lt__" />bool QModelIndex.__lt__ (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QModelIndex.__ne__ (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QModelIndex.__eq__ (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ge__" />bool QModelIndex.__ge__ (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__hash__" />int QModelIndex.__hash__ (<i>self</i>)</h3><h3 class="fn"><a name="__lt__" />bool QModelIndex.__lt__ (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QModelIndex.__ne__ (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

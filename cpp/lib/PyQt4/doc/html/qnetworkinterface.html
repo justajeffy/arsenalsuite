@@ -29,31 +29,31 @@ BSDs.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="InterfaceFlag-enum" />QNetworkInterface.InterfaceFlag</h3><p>Specifies the flags associated with this network interface. The
 possible values are:</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkInterface.IsUp</tt></td>
-<td class=" topAlign"><tt>0x1</tt></td>
+<td class="topAlign"><tt>0x1</tt></td>
 <td class="topAlign">the network interface is active</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkInterface.IsRunning</tt></td>
-<td class=" topAlign"><tt>0x2</tt></td>
+<td class="topAlign"><tt>0x2</tt></td>
 <td class="topAlign">the network interface has resources
 allocated</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkInterface.CanBroadcast</tt></td>
-<td class=" topAlign"><tt>0x4</tt></td>
+<td class="topAlign"><tt>0x4</tt></td>
 <td class="topAlign">the network interface works in broadcast
 mode</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkInterface.IsLoopBack</tt></td>
-<td class=" topAlign"><tt>0x8</tt></td>
+<td class="topAlign"><tt>0x8</tt></td>
 <td class="topAlign">the network interface is a loopback interface:
 that is, it's a virtual interface whose destination is the host
 computer itself</td>
@@ -61,14 +61,14 @@ computer itself</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkInterface.IsPointToPoint</tt></td>
-<td class=" topAlign"><tt>0x10</tt></td>
+<td class="topAlign"><tt>0x10</tt></td>
 <td class="topAlign">the network interface is a point-to-point
 interface: that is, there is one, single other address that can be
 directly reached by it.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkInterface.CanMulticast</tt></td>
-<td class=" topAlign"><tt>0x20</tt></td>
+<td class="topAlign"><tt>0x20</tt></td>
 <td class="topAlign">the network interface supports
 multicasting</td>
 </tr>
@@ -147,8 +147,8 @@ field.</p>
 <h3 class="fn"><a name="interfaceFromName" /><a href="qnetworkinterface.html">QNetworkInterface</a> QNetworkInterface.interfaceFromName (QString&#160;<i>name</i>)</h3><p>Returns a <a href="qnetworkinterface.html">QNetworkInterface</a>
 object for the interface named <i>name</i>. If no such interface
 exists, this function returns an invalid <a href="qnetworkinterface.html">QNetworkInterface</a> object.</p>
-<p>See also <a href="qnetworkinterface.html#name">name</a>() and
-<a href="qnetworkinterface.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qnetworkinterface.html#name">name</a>()
+and <a href="qnetworkinterface.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="isValid" />bool QNetworkInterface.isValid (<i>self</i>)</h3><p>Returns true if this <a href="qnetworkinterface.html">QNetworkInterface</a> object contains
@@ -162,4 +162,4 @@ Windows, it's an internal ID that cannot be changed by the
 user.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

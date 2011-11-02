@@ -34,27 +34,27 @@ dialogs.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="ColorDialogOption-enum" />QColorDialog.ColorDialogOption</h3><p>This enum specifies various options that affect the look and
 feel of a color dialog.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QColorDialog.ShowAlphaChannel</tt></td>
-<td class=" topAlign"><tt>0x00000001</tt></td>
+<td class="topAlign"><tt>0x00000001</tt></td>
 <td class="topAlign">Allow the user to select the alpha component
 of a color.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QColorDialog.NoButtons</tt></td>
-<td class=" topAlign"><tt>0x00000002</tt></td>
+<td class="topAlign"><tt>0x00000002</tt></td>
 <td class="topAlign">Don't display <b>OK</b> and <b>Cancel</b>
 buttons. (Useful for "live dialogs".)</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QColorDialog.DontUseNativeDialog</tt></td>
-<td class=" topAlign"><tt>0x00000004</tt></td>
+<td class="topAlign"><tt>0x00000004</tt></td>
 <td class="topAlign">Use Qt's standard color dialog on the Mac
 instead of Apple's native color panel.</td>
 </tr>
@@ -62,8 +62,7 @@ instead of Apple's native color panel.</td>
 <p>This enum was introduced or modified in Qt 4.5.</p>
 <p>The ColorDialogOptions type is a typedef for <a href="qflags.html">QFlags</a>&lt;ColorDialogOption&gt;. It stores an OR
 combination of ColorDialogOption values.</p>
-<p>See also <a href="qcolordialog.html#options-prop">options</a>,
-<a href="qcolordialog.html#setOption">setOption</a>(), <a href="qcolordialog.html#testOption">testOption</a>(), and <a href="qwidget.html#windowModality-prop">windowModality</a>().</p>
+<p><b>See also</b> <a href="qcolordialog.html#options-prop">options</a>, <a href="qcolordialog.html#setOption">setOption</a>(), <a href="qcolordialog.html#testOption">testOption</a>(), and <a href="qwidget.html#windowModality-prop">windowModality</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QColorDialog" />QColorDialog.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a color dialog with the given <i>parent</i>.</p>
 <p>This function was introduced in Qt 4.5.</p>
 
@@ -78,7 +77,7 @@ specified <i>initial</i> color.</p>
 
 <h3 class="fn"><a name="currentColor" /><a href="qcolor.html">QColor</a> QColorDialog.currentColor (<i>self</i>)</h3><h3 class="fn"><a name="customColor" />int QColorDialog.customColor (int)</h3><p>Returns the custom color at the given <i>index</i> as a <a href="qcolor.html#QRgb-typedef">QRgb</a> value.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qcolordialog.html#setCustomColor">setCustomColor</a>().</p>
+<p><b>See also</b> <a href="qcolordialog.html#setCustomColor">setCustomColor</a>().</p>
 
 
 <h3 class="fn"><a name="customCount" />int QColorDialog.customCount ()</h3><p>Returns the number of custom colors supported by <a href="qcolordialog.html">QColorDialog</a>. All color dialogs share the
@@ -89,7 +88,7 @@ same custom colors.</p>
 <p>Closes the dialog and sets its result code to <i>result</i>. If
 this dialog is shown with <a href="qdialog.html#exec">exec_</a>(),
 done() causes the local event loop to finish, and <a href="qdialog.html#exec">exec_</a>() to return <i>result</i>.</p>
-<p>See also <a href="qdialog.html#done">QDialog.done</a>().</p>
+<p><b>See also</b> <a href="qdialog.html#done">QDialog.done</a>().</p>
 
 
 <h3 class="fn"><a name="getColor" /><a href="qcolor.html">QColor</a> QColorDialog.getColor (<a href="qcolor.html">QColor</a>&#160;<i>initial</i>&#160;=&#160;Qt.white, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>Pops up a modal color dialog with the given window <i>title</i>
@@ -120,7 +119,7 @@ dialog and not a <a href="qcolordialog.html">QColorDialog</a>.</p>
 <h3 class="fn"><a name="getRgba" />(int, bool&#160;<i>ok</i>) QColorDialog.getRgba (int&#160;<i>initial</i>&#160;=&#160;4294967295, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><h3 class="fn"><a name="open" />QColorDialog.open (<i>self</i>)</h3><p>Shows the dialog as a <a href="qdialog.html#modal-dialogs">window modal dialog</a>, returning
 immediately.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qdialog.html#open">QDialog.open</a>().</p>
+<p><b>See also</b> <a href="qdialog.html#open">QDialog.open</a>().</p>
 
 
 <h3 class="fn"><a name="open-2" />QColorDialog.open (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>receiver</i>, SLOT()SLOT()&#160;<i>member</i>)</h3><p>This is an overloaded function.</p>
@@ -144,13 +143,12 @@ the one to use.</p>
 Dialog on the Mac OS X platform. If you still require this
 function, use the <a href="qcolordialog.html#ColorDialogOption-enum">QColorDialog.DontUseNativeDialog</a>
 option.</p>
-<p>See also <a href="qcolordialog.html#customColor">customColor</a>().</p>
+<p><b>See also</b> <a href="qcolordialog.html#customColor">customColor</a>().</p>
 
 
 <h3 class="fn"><a name="setOption" />QColorDialog.setOption (<i>self</i>, <a href="qcolordialog.html#ColorDialogOption-enum">ColorDialogOption</a>&#160;<i>option</i>, bool&#160;<i>on</i>&#160;=&#160;True)</h3><p>Sets the given <i>option</i> to be enabled if <i>on</i> is true;
 otherwise, clears the given <i>option</i>.</p>
-<p>See also <a href="qcolordialog.html#options-prop">options</a>
-and <a href="qcolordialog.html#testOption">testOption</a>().</p>
+<p><b>See also</b> <a href="qcolordialog.html#options-prop">options</a> and <a href="qcolordialog.html#testOption">testOption</a>().</p>
 
 
 <h3 class="fn"><a name="setOptions" />QColorDialog.setOptions (<i>self</i>, <a href="qcolordialog-colordialogoptions.html">ColorDialogOptions</a>&#160;<i>options</i>)</h3><h3 class="fn"><a name="setStandardColor" />QColorDialog.setStandardColor (int, int)</h3><p>Sets the standard color at <i>index</i> to the <a href="qcolor.html#QRgb-typedef">QRgb</a> <i>color</i> value.</p>
@@ -168,17 +166,16 @@ the dialog is shown; otherwise, it is hidden.</p>
 <h3 class="fn"><a name="testOption" />bool QColorDialog.testOption (<i>self</i>, <a href="qcolordialog.html#ColorDialogOption-enum">ColorDialogOption</a>&#160;<i>option</i>)</h3><p>Returns true if the given <i>option</i> is enabled; otherwise,
 returns false.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qcolordialog.html#options-prop">options</a>
-and <a href="qcolordialog.html#setOption">setOption</a>().</p>
+<p><b>See also</b> <a href="qcolordialog.html#options-prop">options</a> and <a href="qcolordialog.html#setOption">setOption</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="colorSelected" />void colorSelected (const QColor&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted just after the user has clicked <b>OK</b>
 to select a color to use. The chosen color is specified by
 <i>color</i>.</p>
-<p>See also <a href="qml-color.html">color</a> and <a href="qcolordialog.html#currentColorChanged">currentColorChanged</a>().</p>
+<p><b>See also</b> <a href="qml-color.html">color</a> and <a href="qcolordialog.html#currentColorChanged">currentColorChanged</a>().</p>
 
 
 <h3 class="fn"><a name="currentColorChanged" />void currentColorChanged (const QColor&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the current color changes in the
 dialog. The current color is specified by <i>color</i>.</p>
-<p>See also <a href="qml-color.html">color</a> and <a href="qcolordialog.html#colorSelected">colorSelected</a>().</p>
+<p><b>See also</b> <a href="qml-color.html">color</a> and <a href="qcolordialog.html#colorSelected">colorSelected</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
