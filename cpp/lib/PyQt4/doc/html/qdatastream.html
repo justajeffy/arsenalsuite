@@ -25,21 +25,21 @@ accomplished by breaking up the data into primitive units.</p>
 <p>A data stream cooperates closely with a <a href="qiodevice.html">QIODevice</a>. A <a href="qiodevice.html">QIODevice</a> represents an input/output medium
 one can read data from and write data to. The <a href="qfile.html">QFile</a> class is an example of an I/O device.</p>
 <p>Example (write binary data to a stream):</p>
-<pre class="highlightedCode brush: cpp">
- QFile file("file.dat");
- file.open(QIODevice.WriteOnly);
- QDataStream out(&amp;file);   <span class="comment">// we will serialize the data into the file</span>
- out &lt;&lt; QString("the answer is");   <span class="comment">// serialize a string</span>
- out &lt;&lt; (qint32)42;        <span class="comment">// serialize an integer</span>
+<pre class="cpp">
+ <span class="type"><a href="qfile.html">QFile</a></span> file(<span class="string">"file.dat"</span>);
+ file<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>WriteOnly);
+ <span class="type">QDataStream</span> out(<span class="operator">&amp;</span>file);   <span class="comment">// we will serialize the data into the file</span>
+ out <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="type"><a href="qstring.html">QString</a></span>(<span class="string">"the answer is"</span>);   <span class="comment">// serialize a string</span>
+ out <span class="operator">&lt;</span><span class="operator">&lt;</span> (<span class="type"><a href="qtcore.html#qint32-typedef">qint32</a></span>)<span class="number">42</span>;        <span class="comment">// serialize an integer</span>
 </pre>
 <p>Example (read binary data from a stream):</p>
-<pre class="highlightedCode brush: cpp">
- QFile file("file.dat");
- file.open(QIODevice.ReadOnly);
- QDataStream in(&amp;file);    <span class="comment">// read the data serialized from the file</span>
- QString str;
- qint32 a;
- in &gt;&gt; str &gt;&gt; a;           <span class="comment">// extract "the answer is" and 42</span>
+<pre class="cpp">
+ <span class="type"><a href="qfile.html">QFile</a></span> file(<span class="string">"file.dat"</span>);
+ file<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>ReadOnly);
+ <span class="type">QDataStream</span> in(<span class="operator">&amp;</span>file);    <span class="comment">// read the data serialized from the file</span>
+ <span class="type"><a href="qstring.html">QString</a></span> str;
+ <span class="type"><a href="qtcore.html#qint32-typedef">qint32</a></span> a;
+ in <span class="operator">&gt;</span><span class="operator">&gt;</span> str <span class="operator">&gt;</span><span class="operator">&gt;</span> a;           <span class="comment">// extract "the answer is" and 42</span>
 </pre>
 <p>Each item written to the stream is written in a predefined
 binary format that varies depending on the item's type. Supported
@@ -69,58 +69,58 @@ inputting or outputting complex types, it's very important to make
 sure that the same version of the stream (<a href="qdatastream.html#version">version</a>()) is used for reading and
 writing. If you need both forward and backward compatibility, you
 can hardcode the version number in the application:</p>
-<pre class="highlightedCode brush: cpp">
- stream.setVersion(QDataStream.Qt_4_0);
+<pre class="cpp">
+ stream<span class="operator">.</span>setVersion(<span class="type">QDataStream</span><span class="operator">.</span>Qt_4_0);
 </pre>
 <p>If you are producing a new binary data format, such as a file
 format for documents created by your application, you could use a
 QDataStream to write the data in a portable format. Typically, you
 would write a brief header containing a magic string and a version
 number to give yourself room for future expansion. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QFile file("file.xxx");
- file.open(QIODevice.WriteOnly);
- QDataStream out(&amp;file);
+<pre class="cpp">
+ <span class="type"><a href="qfile.html">QFile</a></span> file(<span class="string">"file.xxx"</span>);
+ file<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>WriteOnly);
+ <span class="type">QDataStream</span> out(<span class="operator">&amp;</span>file);
 
-<span class="comment"> // Write a header with a "magic number" and a version</span>
- out &lt;&lt; (quint32)0xA0B0C0D0;
- out &lt;&lt; (qint32)123;
+ <span class="comment">// Write a header with a "magic number" and a version</span>
+ out <span class="operator">&lt;</span><span class="operator">&lt;</span> (<span class="type"><a href="qtcore.html#quint32-typedef">quint32</a></span>)<span class="number">0xA0B0C0D0</span>;
+ out <span class="operator">&lt;</span><span class="operator">&lt;</span> (<span class="type"><a href="qtcore.html#qint32-typedef">qint32</a></span>)<span class="number">123</span>;
 
- out.setVersion(QDataStream.Qt_4_0);
+ out<span class="operator">.</span>setVersion(<span class="type">QDataStream</span><span class="operator">.</span>Qt_4_0);
 
-<span class="comment"> // Write the data</span>
- out &lt;&lt; lots_of_interesting_data;
+ <span class="comment">// Write the data</span>
+ out <span class="operator">&lt;</span><span class="operator">&lt;</span> lots_of_interesting_data;
 </pre>
 <p>Then read it in with:</p>
-<pre class="highlightedCode brush: cpp">
- QFile file("file.xxx");
- file.open(QIODevice.ReadOnly);
- QDataStream in(&amp;file);
+<pre class="cpp">
+ <span class="type"><a href="qfile.html">QFile</a></span> file(<span class="string">"file.xxx"</span>);
+ file<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>ReadOnly);
+ <span class="type">QDataStream</span> in(<span class="operator">&amp;</span>file);
 
-<span class="comment"> // Read and check the header</span>
- quint32 magic;
- in &gt;&gt; magic;
- if (magic != 0xA0B0C0D0)
-     return XXX_BAD_FILE_FORMAT;
+ <span class="comment">// Read and check the header</span>
+ <span class="type"><a href="qtcore.html#quint32-typedef">quint32</a></span> magic;
+ in <span class="operator">&gt;</span><span class="operator">&gt;</span> magic;
+ <span class="keyword">if</span> (magic <span class="operator">!</span><span class="operator">=</span> <span class="number">0xA0B0C0D0</span>)
+     <span class="keyword">return</span> XXX_BAD_FILE_FORMAT;
 
-<span class="comment"> // Read the version</span>
- qint32 version;
- in &gt;&gt; version;
- if (version &lt; 100)
-     return XXX_BAD_FILE_TOO_OLD;
- if (version &gt; 123)
-     return XXX_BAD_FILE_TOO_NEW;
+ <span class="comment">// Read the version</span>
+ <span class="type"><a href="qtcore.html#qint32-typedef">qint32</a></span> version;
+ in <span class="operator">&gt;</span><span class="operator">&gt;</span> version;
+ <span class="keyword">if</span> (version <span class="operator">&lt;</span> <span class="number">100</span>)
+     <span class="keyword">return</span> XXX_BAD_FILE_TOO_OLD;
+ <span class="keyword">if</span> (version <span class="operator">&gt;</span> <span class="number">123</span>)
+     <span class="keyword">return</span> XXX_BAD_FILE_TOO_NEW;
 
- if (version &lt;= 110)
-     in.setVersion(QDataStream.Qt_3_2);
- else
-     in.setVersion(QDataStream.Qt_4_0);
+ <span class="keyword">if</span> (version <span class="operator">&lt;</span><span class="operator">=</span> <span class="number">110</span>)
+     in<span class="operator">.</span>setVersion(<span class="type">QDataStream</span><span class="operator">.</span>Qt_3_2);
+ <span class="keyword">else</span>
+     in<span class="operator">.</span>setVersion(<span class="type">QDataStream</span><span class="operator">.</span>Qt_4_0);
 
-<span class="comment"> // Read the data</span>
- in &gt;&gt; lots_of_interesting_data;
- if (version &gt;= 120)
-     in &gt;&gt; data_new_in_XXX_version_1_2;
- in &gt;&gt; other_interesting_data;
+ <span class="comment">// Read the data</span>
+ in <span class="operator">&gt;</span><span class="operator">&gt;</span> lots_of_interesting_data;
+ <span class="keyword">if</span> (version <span class="operator">&gt;</span><span class="operator">=</span> <span class="number">120</span>)
+     in <span class="operator">&gt;</span><span class="operator">&gt;</span> data_new_in_XXX_version_1_2;
+ in <span class="operator">&gt;</span><span class="operator">&gt;</span> other_interesting_data;
 </pre>
 <p>You can select which byte order to use when serializing data.
 The default setting is big endian (MSB first). Changing it to
@@ -152,34 +152,34 @@ stream operators are declared as non-members of the classes.</p>
 any Qt classes that you might want to serialize to a QDataStream
 will have appropriate stream operators declared as non-member of
 the class:</p>
-<pre class="highlightedCode brush: cpp">
- QDataStream &amp;operator&lt;&lt;(QDataStream &amp;, const QXxx &amp;);
- QDataStream &amp;operator&gt;&gt;(QDataStream &amp;, QXxx &amp;);
+<pre class="cpp">
+ <span class="type">QDataStream</span> <span class="operator">&amp;</span><span class="keyword">operator</span><span class="operator">&lt;</span><span class="operator">&lt;</span>(<span class="type">QDataStream</span> <span class="operator">&amp;</span><span class="operator">,</span> <span class="keyword">const</span> <span class="type">QXxx</span> <span class="operator">&amp;</span>);
+ <span class="type">QDataStream</span> <span class="operator">&amp;</span><span class="keyword">operator</span><span class="operator">&gt;</span><span class="operator">&gt;</span>(<span class="type">QDataStream</span> <span class="operator">&amp;</span><span class="operator">,</span> <span class="type">QXxx</span> <span class="operator">&amp;</span>);
 </pre>
 <p>For example, here are the stream operators declared as
 non-members of the <a href="qimage.html">QImage</a> class:</p>
-<pre class="highlightedCode brush: cpp">
- QDataStream &amp; operator&lt;&lt; (QDataStream&amp; stream, const QImage&amp; image);
- QDataStream &amp; operator&gt;&gt; (QDataStream&amp; stream, QImage&amp; image);
+<pre class="cpp">
+ <span class="type">QDataStream</span> <span class="operator">&amp;</span> <span class="keyword">operator</span><span class="operator">&lt;</span><span class="operator">&lt;</span> (<span class="type">QDataStream</span><span class="operator">&amp;</span> stream<span class="operator">,</span> <span class="keyword">const</span> <span class="type"><a href="qimage.html">QImage</a></span><span class="operator">&amp;</span> image);
+ <span class="type">QDataStream</span> <span class="operator">&amp;</span> <span class="keyword">operator</span><span class="operator">&gt;</span><span class="operator">&gt;</span> (<span class="type">QDataStream</span><span class="operator">&amp;</span> stream<span class="operator">,</span> <span class="type"><a href="qimage.html">QImage</a></span><span class="operator">&amp;</span> image);
 </pre>
 <p>To see if your favorite Qt class has similar stream operators
 defined, check the <b>Related Non-Members</b> section of the
 class's documentation page.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="ByteOrder-enum" />QDataStream.ByteOrder</h3><p>The byte order used for reading/writing the data.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.BigEndian</tt></td>
-<td class=" topAlign"><tt>QSysInfo.BigEndian</tt></td>
+<td class="topAlign"><tt>QSysInfo.BigEndian</tt></td>
 <td class="topAlign">Most significant byte first (the default)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.LittleEndian</tt></td>
-<td class=" topAlign"><tt>QSysInfo.LittleEndian</tt></td>
+<td class="topAlign"><tt>QSysInfo.LittleEndian</tt></td>
 <td class="topAlign">Least significant byte first</td>
 </tr>
 </table>
@@ -193,49 +193,49 @@ higher.</p>
 same value on the object that writes and the object that reads the
 data stream.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.SinglePrecision</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">All floating point numbers in the data stream
 have 32-bit precision.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.DoublePrecision</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">All floating point numbers in the data stream
 have 64-bit precision.</td>
 </tr>
 </table>
-<p>See also <a href="qdatastream.html#setFloatingPointPrecision">setFloatingPointPrecision</a>()
+<p><b>See also</b> <a href="qdatastream.html#setFloatingPointPrecision">setFloatingPointPrecision</a>()
 and <a href="qdatastream.html#floatingPointPrecision">floatingPointPrecision</a>().</p>
 
 
 <h3 class="fn"><a name="Status-enum" />QDataStream.Status</h3><p>This enum describes the current status of the data stream.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Ok</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The data stream is operating normally.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.ReadPastEnd</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The data stream has read past the end of the
 data in the underlying device.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.ReadCorruptData</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The data stream has read corrupt data.</td>
 </tr>
 </table>
@@ -244,86 +244,85 @@ data in the underlying device.</td>
 <h3 class="fn"><a name="Version-enum" />QDataStream.Version</h3><p>This enum provides symbolic synonyms for the data serialization
 format version numbers.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_1_0</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Version 1 (Qt 1.x)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_2_0</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Version 2 (Qt 2.0)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_2_1</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Version 3 (Qt 2.1, 2.2, 2.3)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_3_0</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Version 4 (Qt 3.0)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_3_1</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">Version 5 (Qt 3.1, 3.2)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_3_3</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">Version 6 (Qt 3.3)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_4_0</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">Version 7 (Qt 4.0, Qt 4.1)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_4_1</tt></td>
-<td class=" topAlign"><tt>Qt_4_0</tt></td>
+<td class="topAlign"><tt>Qt_4_0</tt></td>
 <td class="topAlign">Version 7 (Qt 4.0, Qt 4.1)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_4_2</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">Version 8 (Qt 4.2)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_4_3</tt></td>
-<td class=" topAlign"><tt>9</tt></td>
+<td class="topAlign"><tt>9</tt></td>
 <td class="topAlign">Version 9 (Qt 4.3)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_4_4</tt></td>
-<td class=" topAlign"><tt>10</tt></td>
+<td class="topAlign"><tt>10</tt></td>
 <td class="topAlign">Version 10 (Qt 4.4)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_4_5</tt></td>
-<td class=" topAlign"><tt>11</tt></td>
+<td class="topAlign"><tt>11</tt></td>
 <td class="topAlign">Version 11 (Qt 4.5)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_4_6</tt></td>
-<td class=" topAlign"><tt>12</tt></td>
+<td class="topAlign"><tt>12</tt></td>
 <td class="topAlign">Version 12 (Qt 4.6)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDataStream.Qt_4_7</tt></td>
-<td class=" topAlign"><tt>Qt_4_6 Qt_4_8 = Qt_4_7</tt></td>
+<td class="topAlign"><tt>Qt_4_6 Qt_4_8 = Qt_4_7</tt></td>
 <td class="topAlign">Same as Qt_4_6.</td>
 </tr>
 </table>
-<p>See also <a href="qdatastream.html#setVersion">setVersion</a>()
-and <a href="qdatastream.html#version">version</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#setVersion">setVersion</a>() and <a href="qdatastream.html#version">version</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QDataStream" />QDataStream.__init__ (<i>self</i>)</h3><p>Constructs a data stream that has no I/O device.</p>
-<p>See also <a href="qdatastream.html#setDevice">setDevice</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="QDataStream-2" />QDataStream.__init__ (<i>self</i>, <a href="qiodevice.html">QIODevice</a>)</h3><p>Constructs a data stream that uses the I/O device <i>d</i>.</p>
@@ -332,8 +331,7 @@ and <a href="qdatastream.html#version">version</a>().</p>
 available on the socket for the operation to successfully proceed;
 <a href="qdatastream.html">QDataStream</a> does not have any means
 to handle or recover from short-reads.</p>
-<p>See also <a href="qdatastream.html#setDevice">setDevice</a>()
-and <a href="qdatastream.html#device">device</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#setDevice">setDevice</a>() and <a href="qdatastream.html#device">device</a>().</p>
 
 
 <h3 class="fn"><a name="QDataStream-3" />QDataStream.__init__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>, <a href="qiodevice-openmode.html">QIODevice.OpenMode</a>&#160;<i>flags</i>)</h3><h3 class="fn"><a name="QDataStream-4" />QDataStream.__init__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>)</h3><p>Constructs a data stream that operates on a byte array,
@@ -347,21 +345,21 @@ from a byte array.</p>
 <h3 class="fn"><a name="atEnd" />bool QDataStream.atEnd (<i>self</i>)</h3><p>Returns true if the I/O device has reached the end position (end
 of the stream or file) or if there is no I/O device set; otherwise
 returns false.</p>
-<p>See also <a href="qiodevice.html#atEnd">QIODevice.atEnd</a>().</p>
+<p><b>See also</b> <a href="qiodevice.html#atEnd">QIODevice.atEnd</a>().</p>
 
 
 <h3 class="fn"><a name="byteOrder" /><a href="qdatastream.html#ByteOrder-enum">ByteOrder</a> QDataStream.byteOrder (<i>self</i>)</h3><p>Returns the current byte order setting -- either <a href="qdatastream.html#ByteOrder-enum">BigEndian</a> or <a href="qdatastream.html#ByteOrder-enum">LittleEndian</a>.</p>
-<p>See also <a href="qdatastream.html#setByteOrder">setByteOrder</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#setByteOrder">setByteOrder</a>().</p>
 
 
 <h3 class="fn"><a name="device" /><a href="qiodevice.html">QIODevice</a> QDataStream.device (<i>self</i>)</h3><p>Returns the I/O device currently set, or 0 if no device is
 currently set.</p>
-<p>See also <a href="qdatastream.html#setDevice">setDevice</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="floatingPointPrecision" /><a href="qdatastream.html#FloatingPointPrecision-enum">FloatingPointPrecision</a> QDataStream.floatingPointPrecision (<i>self</i>)</h3><p>Returns the floating point precision of the data stream.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qdatastream.html#FloatingPointPrecision-enum">FloatingPointPrecision</a>
+<p><b>See also</b> <a href="qdatastream.html#FloatingPointPrecision-enum">FloatingPointPrecision</a>
 and <a href="qdatastream.html#setFloatingPointPrecision">setFloatingPointPrecision</a>().</p>
 
 
@@ -374,7 +372,7 @@ the string read is empty, <i>l</i> is set to 0 and <i>s</i> is set
 to a null pointer.</p>
 <p>The serialization format is a quint32 length specifier first,
 then <i>l</i> bytes of data.</p>
-<p>See also <a href="qdatastream.html#readRawData">readRawData</a>() and <a href="qdatastream.html#writeBytes">writeBytes</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#readRawData">readRawData</a>() and <a href="qdatastream.html#writeBytes">writeBytes</a>().</p>
 
 
 <h3 class="fn"><a name="readDouble" />float QDataStream.readDouble (<i>self</i>)</h3><h3 class="fn"><a name="readFloat" />float QDataStream.readFloat (<i>self</i>)</h3><h3 class="fn"><a name="readInt" />int QDataStream.readInt (<i>self</i>)</h3><h3 class="fn"><a name="readInt16" />int QDataStream.readInt16 (<i>self</i>)</h3><h3 class="fn"><a name="readInt32" />int QDataStream.readInt32 (<i>self</i>)</h3><h3 class="fn"><a name="readInt64" />int QDataStream.readInt64 (<i>self</i>)</h3><h3 class="fn"><a name="readInt8" />str QDataStream.readInt8 (<i>self</i>)</h3><h3 class="fn"><a name="readQString" />QString QDataStream.readQString (<i>self</i>)</h3><h3 class="fn"><a name="readQStringList" />QStringList QDataStream.readQStringList (<i>self</i>)</h3><h3 class="fn"><a name="readQVariant" />QVariant QDataStream.readQVariant (<i>self</i>)</h3><h3 class="fn"><a name="readQVariantHash" />dict-of-QString-QVariant QDataStream.readQVariantHash (<i>self</i>)</h3><h3 class="fn"><a name="readQVariantList" />list-of-QVariant QDataStream.readQVariantList (<i>self</i>)</h3><h3 class="fn"><a name="readQVariantMap" />dict-of-QString-QVariant QDataStream.readQVariantMap (<i>self</i>)</h3><h3 class="fn"><a name="readRawData" />str QDataStream.readRawData (<i>self</i>, int&#160;<i>len</i>)</h3><p>Reads at most <i>len</i> bytes from the stream into <i>s</i> and
@@ -382,13 +380,11 @@ returns the number of bytes read. If an error occurs, this function
 returns -1.</p>
 <p>The buffer <i>s</i> must be preallocated. The data is <i>not</i>
 encoded.</p>
-<p>See also <a href="qdatastream.html#readBytes">readBytes</a>(),
-<a href="qiodevice.html#read">QIODevice.read</a>(), and <a href="qdatastream.html#writeRawData">writeRawData</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#readBytes">readBytes</a>(), <a href="qiodevice.html#read">QIODevice.read</a>(), and <a href="qdatastream.html#writeRawData">writeRawData</a>().</p>
 
 
 <h3 class="fn"><a name="readString" />str QDataStream.readString (<i>self</i>)</h3><h3 class="fn"><a name="readUInt16" />int QDataStream.readUInt16 (<i>self</i>)</h3><h3 class="fn"><a name="readUInt32" />int QDataStream.readUInt32 (<i>self</i>)</h3><h3 class="fn"><a name="readUInt64" />int QDataStream.readUInt64 (<i>self</i>)</h3><h3 class="fn"><a name="readUInt8" />str QDataStream.readUInt8 (<i>self</i>)</h3><h3 class="fn"><a name="resetStatus" />QDataStream.resetStatus (<i>self</i>)</h3><p>Resets the status of the data stream.</p>
-<p>See also <a href="qdatastream.html#Status-enum">Status</a>,
-<a href="qdatastream.html#status">status</a>(), and <a href="qdatastream.html#setStatus">setStatus</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#Status-enum">Status</a>, <a href="qdatastream.html#status">status</a>(), and <a href="qdatastream.html#setStatus">setStatus</a>().</p>
 
 
 <h3 class="fn"><a name="setByteOrder" />QDataStream.setByteOrder (<i>self</i>, <a href="qdatastream.html#ByteOrder-enum">ByteOrder</a>)</h3><p>Sets the serialization byte order to <i>bo</i>.</p>
@@ -396,13 +392,13 @@ encoded.</p>
 <a href="qdatastream.html#ByteOrder-enum">QDataStream.LittleEndian</a>.</p>
 <p>The default setting is big endian. We recommend leaving this
 setting unless you have special requirements.</p>
-<p>See also <a href="qdatastream.html#byteOrder">byteOrder</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#byteOrder">byteOrder</a>().</p>
 
 
 <h3 class="fn"><a name="setDevice" />QDataStream.setDevice (<i>self</i>, <a href="qiodevice.html">QIODevice</a>)</h3><p>void QDataStream.setDevice(<a href="qiodevice.html">QIODevice</a> *d)</p>
 <p>Sets the I/O device to <i>d</i>, which can be 0 to unset to
 current I/O device.</p>
-<p>See also <a href="qdatastream.html#device">device</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#device">device</a>().</p>
 
 
 <h3 class="fn"><a name="setFloatingPointPrecision" />QDataStream.setFloatingPointPrecision (<i>self</i>, <a href="qdatastream.html#FloatingPointPrecision-enum">FloatingPointPrecision</a>&#160;<i>precision</i>)</h3><p>Sets the floating point precision of the data stream to
@@ -420,13 +416,12 @@ operator called.</p>
 the object that writes and the object that reads the data
 stream.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qdatastream.html#floatingPointPrecision">floatingPointPrecision</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#floatingPointPrecision">floatingPointPrecision</a>().</p>
 
 
 <h3 class="fn"><a name="setStatus" />QDataStream.setStatus (<i>self</i>, <a href="qdatastream.html#Status-enum">Status</a>&#160;<i>status</i>)</h3><p>Sets the status of the data stream to the <i>status</i>
 given.</p>
-<p>See also <a href="qdatastream.html#Status-enum">Status</a>,
-<a href="qdatastream.html#status">status</a>(), and <a href="qdatastream.html#resetStatus">resetStatus</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#Status-enum">Status</a>, <a href="qdatastream.html#status">status</a>(), and <a href="qdatastream.html#resetStatus">resetStatus</a>().</p>
 
 
 <h3 class="fn"><a name="setVersion" />QDataStream.setVersion (<i>self</i>, int&#160;<i>v</i>)</h3><p>Sets the version number of the data serialization format to
@@ -443,117 +438,69 @@ an earlier version of Qt, use this function to modify the
 serialization format used by <a href="qdatastream.html">QDataStream</a>.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Qt Version</th>
 <th><a href="qdatastream.html">QDataStream</a> Version</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>Qt 4.6</p>
-</td>
-<td>
-<p>12</p>
-</td>
+<tr class="odd" valign="top">
+<td>Qt 4.6</td>
+<td>12</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Qt 4.5</p>
-</td>
-<td>
-<p>11</p>
-</td>
+<tr class="even" valign="top">
+<td>Qt 4.5</td>
+<td>11</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Qt 4.4</p>
-</td>
-<td>
-<p>10</p>
-</td>
+<tr class="odd" valign="top">
+<td>Qt 4.4</td>
+<td>10</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Qt 4.3</p>
-</td>
-<td>
-<p>9</p>
-</td>
+<tr class="even" valign="top">
+<td>Qt 4.3</td>
+<td>9</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Qt 4.2</p>
-</td>
-<td>
-<p>8</p>
-</td>
+<tr class="odd" valign="top">
+<td>Qt 4.2</td>
+<td>8</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Qt 4.0, 4.1</p>
-</td>
-<td>
-<p>7</p>
-</td>
+<tr class="even" valign="top">
+<td>Qt 4.0, 4.1</td>
+<td>7</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Qt 3.3</p>
-</td>
-<td>
-<p>6</p>
-</td>
+<tr class="odd" valign="top">
+<td>Qt 3.3</td>
+<td>6</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Qt 3.1, 3.2</p>
-</td>
-<td>
-<p>5</p>
-</td>
+<tr class="even" valign="top">
+<td>Qt 3.1, 3.2</td>
+<td>5</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Qt 3.0</p>
-</td>
-<td>
-<p>4</p>
-</td>
+<tr class="odd" valign="top">
+<td>Qt 3.0</td>
+<td>4</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Qt 2.1, 2.2, 2.3</p>
-</td>
-<td>
-<p>3</p>
-</td>
+<tr class="even" valign="top">
+<td>Qt 2.1, 2.2, 2.3</td>
+<td>3</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Qt 2.0</p>
-</td>
-<td>
-<p>2</p>
-</td>
+<tr class="odd" valign="top">
+<td>Qt 2.0</td>
+<td>2</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Qt 1.x</p>
-</td>
-<td>
-<p>1</p>
-</td>
+<tr class="even" valign="top">
+<td>Qt 1.x</td>
+<td>1</td>
 </tr>
 </table>
 <p>The <a href="qdatastream.html#Version-enum">Version</a> enum
 provides symbolic constants for the different versions of Qt. For
 example:</p>
-<pre class="highlightedCode brush: cpp">
- QDataStream out(file);
- out.setVersion(QDataStream.Qt_4_0);
+<pre class="cpp">
+ <span class="type"><a href="qdatastream.html">QDataStream</a></span> out(file);
+ out<span class="operator">.</span>setVersion(<span class="type"><a href="qdatastream.html">QDataStream</a></span><span class="operator">.</span>Qt_4_0);
 </pre>
-<p>See also <a href="qdatastream.html#version">version</a>() and
-<a href="qdatastream.html#Version-enum">Version</a>.</p>
+<p><b>See also</b> <a href="qdatastream.html#version">version</a>()
+and <a href="qdatastream.html#Version-enum">Version</a>.</p>
 
 
 <h3 class="fn"><a name="skipRawData" />int QDataStream.skipRawData (<i>self</i>, int&#160;<i>len</i>)</h3><p>Skips <i>len</i> bytes from the device. Returns the number of
@@ -561,17 +508,15 @@ bytes actually skipped, or -1 on error.</p>
 <p>This is equivalent to calling <a href="qdatastream.html#readRawData">readRawData</a>() on a buffer of
 length <i>len</i> and ignoring the buffer.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qiodevice.html#seek">QIODevice.seek</a>().</p>
+<p><b>See also</b> <a href="qiodevice.html#seek">QIODevice.seek</a>().</p>
 
 
 <h3 class="fn"><a name="status" /><a href="qdatastream.html#Status-enum">Status</a> QDataStream.status (<i>self</i>)</h3><p>Returns the status of the data stream.</p>
-<p>See also <a href="qdatastream.html#Status-enum">Status</a>,
-<a href="qdatastream.html#setStatus">setStatus</a>(), and <a href="qdatastream.html#resetStatus">resetStatus</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#Status-enum">Status</a>, <a href="qdatastream.html#setStatus">setStatus</a>(), and <a href="qdatastream.html#resetStatus">resetStatus</a>().</p>
 
 
 <h3 class="fn"><a name="unsetDevice" />QDataStream.unsetDevice (<i>self</i>)</h3><h3 class="fn"><a name="version" />int QDataStream.version (<i>self</i>)</h3><p>Returns the version number of the data serialization format.</p>
-<p>See also <a href="qdatastream.html#setVersion">setVersion</a>()
-and <a href="qdatastream.html#Version-enum">Version</a>.</p>
+<p><b>See also</b> <a href="qdatastream.html#setVersion">setVersion</a>() and <a href="qdatastream.html#Version-enum">Version</a>.</p>
 
 
 <h3 class="fn"><a name="writeBool" />QDataStream.writeBool (<i>self</i>, bool&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeBytes" /><a href="qdatastream.html">QDataStream</a> QDataStream.writeBytes (<i>self</i>, str)</h3><p>Writes the length specifier <i>len</i> and the buffer <i>s</i>
@@ -579,14 +524,13 @@ to the stream and returns a reference to the stream.</p>
 <p>The <i>len</i> is serialized as a quint32, followed by
 <i>len</i> bytes from <i>s</i>. Note that the data is <i>not</i>
 encoded.</p>
-<p>See also <a href="qdatastream.html#writeRawData">writeRawData</a>() and <a href="qdatastream.html#readBytes">readBytes</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#writeRawData">writeRawData</a>() and <a href="qdatastream.html#readBytes">readBytes</a>().</p>
 
 
 <h3 class="fn"><a name="writeDouble" />QDataStream.writeDouble (<i>self</i>, float&#160;<i>f</i>)</h3><h3 class="fn"><a name="writeFloat" />QDataStream.writeFloat (<i>self</i>, float&#160;<i>f</i>)</h3><h3 class="fn"><a name="writeInt" />QDataStream.writeInt (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeInt16" />QDataStream.writeInt16 (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeInt32" />QDataStream.writeInt32 (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeInt64" />QDataStream.writeInt64 (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeInt8" />QDataStream.writeInt8 (<i>self</i>, str&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeQString" />QDataStream.writeQString (<i>self</i>, QString&#160;<i>qstr</i>)</h3><h3 class="fn"><a name="writeQStringList" />QDataStream.writeQStringList (<i>self</i>, QStringList&#160;<i>qstrlst</i>)</h3><h3 class="fn"><a name="writeQVariant" />QDataStream.writeQVariant (<i>self</i>, QVariant&#160;<i>qvar</i>)</h3><h3 class="fn"><a name="writeQVariantHash" />QDataStream.writeQVariantHash (<i>self</i>, dict-of-QString-QVariant&#160;<i>qvarhash</i>)</h3><h3 class="fn"><a name="writeQVariantList" />QDataStream.writeQVariantList (<i>self</i>, list-of-QVariant&#160;<i>qvarlst</i>)</h3><h3 class="fn"><a name="writeQVariantMap" />QDataStream.writeQVariantMap (<i>self</i>, dict-of-QString-QVariant&#160;<i>qvarmap</i>)</h3><h3 class="fn"><a name="writeRawData" />int QDataStream.writeRawData (<i>self</i>, str)</h3><p>Writes <i>len</i> bytes from <i>s</i> to the stream. Returns the
 number of bytes actually written, or -1 on error. The data is
 <i>not</i> encoded.</p>
-<p>See also <a href="qdatastream.html#writeBytes">writeBytes</a>(),
-<a href="qiodevice.html#write">QIODevice.write</a>(), and <a href="qdatastream.html#readRawData">readRawData</a>().</p>
+<p><b>See also</b> <a href="qdatastream.html#writeBytes">writeBytes</a>(), <a href="qiodevice.html#write">QIODevice.write</a>(), and <a href="qdatastream.html#readRawData">readRawData</a>().</p>
 
 
-<h3 class="fn"><a name="writeString" />QDataStream.writeString (<i>self</i>, str&#160;<i>str</i>)</h3><h3 class="fn"><a name="writeUInt16" />QDataStream.writeUInt16 (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeUInt32" />QDataStream.writeUInt32 (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeUInt64" />QDataStream.writeUInt64 (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeUInt8" />QDataStream.writeUInt8 (<i>self</i>, str&#160;<i>i</i>)</h3><h3 class="fn"><a name="__lshift__" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qcolor.html">QColor</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qnetworkcachemetadata.html">QNetworkCacheMetaData</a>)</h3><p>This method is only available if the QtNetwork module is imported.</p><h3 class="fn"><a name="__lshift__" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qscriptcontextinfo.html">QScriptContextInfo</a>)</h3><p>This method is only available if the QtScript module is imported.</p><h3 class="fn"><a name="__lshift__" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qwebhistory.html">QWebHistory</a>)</h3><p>This method is only available if the QtWebKit module is imported.</p><h3 class="fn"><a name="__lshift__-2" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qbrush.html">QBrush</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-2" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qhostaddress.html">QHostAddress</a>)</h3><p>This method is only available if the QtNetwork module is imported.</p><h3 class="fn"><a name="__lshift__-3" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qcursor.html">QCursor</a>&#160;<i>cursor</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-4" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-5" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qicon.html">QIcon</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-6" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qimage.html">QImage</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-7" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>ks</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-8" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qlistwidgetitem.html">QListWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-9" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-10" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qmatrix4x4.html">QMatrix4x4</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-11" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpainterpath.html">QPainterPath</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-12" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>p</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-13" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpen.html">QPen</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-14" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpicture.html">QPicture</a>&#160;<i>p</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-15" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpixmap.html">QPixmap</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-16" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpolygonf.html">QPolygonF</a>&#160;<i>array</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-17" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpolygon.html">QPolygon</a>&#160;<i>polygon</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-18" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-19" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qregion.html">QRegion</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-20" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qsizepolicy.html">QSizePolicy</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-22" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qstandarditem.html">QStandardItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-23" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qtablewidgetitem.html">QTableWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-24" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qtextlength.html">QTextLength</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-25" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qtextformat.html">QTextFormat</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-26" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qtransform.html">QTransform</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-27" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-28" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qvector2d.html">QVector2D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-29" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qvector3d.html">QVector3D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-30" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qvector4d.html">QVector4D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qcolor.html">QColor</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qnetworkcachemetadata.html">QNetworkCacheMetaData</a>)</h3><p>This method is only available if the QtNetwork module is imported.</p><h3 class="fn"><a name="__rshift__" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qscriptcontextinfo.html">QScriptContextInfo</a>)</h3><p>This method is only available if the QtScript module is imported.</p><h3 class="fn"><a name="__rshift__" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qwebhistory.html">QWebHistory</a>)</h3><p>This method is only available if the QtWebKit module is imported.</p><h3 class="fn"><a name="__rshift__-2" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qbrush.html">QBrush</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-2" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qhostaddress.html">QHostAddress</a>)</h3><p>This method is only available if the QtNetwork module is imported.</p><h3 class="fn"><a name="__rshift__-3" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qcursor.html">QCursor</a>&#160;<i>cursor</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-4" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-5" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qicon.html">QIcon</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-6" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qimage.html">QImage</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-7" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>ks</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-8" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qlistwidgetitem.html">QListWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-9" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-10" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qmatrix4x4.html">QMatrix4x4</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-11" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpainterpath.html">QPainterPath</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-12" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>p</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-13" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpen.html">QPen</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-14" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpicture.html">QPicture</a>&#160;<i>p</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-15" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpixmap.html">QPixmap</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-16" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpolygonf.html">QPolygonF</a>&#160;<i>array</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-17" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpolygon.html">QPolygon</a>&#160;<i>polygon</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-18" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-19" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qregion.html">QRegion</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-20" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qsizepolicy.html">QSizePolicy</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-22" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qstandarditem.html">QStandardItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-23" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qtablewidgetitem.html">QTableWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-24" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qtextlength.html">QTextLength</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-25" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qtextformat.html">QTextFormat</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-26" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qtransform.html">QTransform</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-27" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-28" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qvector2d.html">QVector2D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-29" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qvector3d.html">QVector3D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-30" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qvector4d.html">QVector4D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qbitarray.html">QBitArray</a>)</h3><h3 class="fn"><a name="__lshift__-2" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>)</h3><h3 class="fn"><a name="__lshift__-3" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, QChar)</h3><h3 class="fn"><a name="__lshift__-4" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qdate.html">QDate</a>)</h3><h3 class="fn"><a name="__lshift__-5" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qtime.html">QTime</a>)</h3><h3 class="fn"><a name="__lshift__-6" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>)</h3><h3 class="fn"><a name="__lshift__-7" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qeasingcurve.html">QEasingCurve</a>)</h3><h3 class="fn"><a name="__lshift__-8" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qline.html">QLine</a>)</h3><h3 class="fn"><a name="__lshift__-9" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qlinef.html">QLineF</a>)</h3><h3 class="fn"><a name="__lshift__-10" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qlocale.html">QLocale</a>)</h3><h3 class="fn"><a name="__lshift__-11" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qpoint.html">QPoint</a>)</h3><h3 class="fn"><a name="__lshift__-12" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qpointf.html">QPointF</a>)</h3><h3 class="fn"><a name="__lshift__-13" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qrect.html">QRect</a>)</h3><h3 class="fn"><a name="__lshift__-14" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qrectf.html">QRectF</a>)</h3><h3 class="fn"><a name="__lshift__-15" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>regExp</i>)</h3><h3 class="fn"><a name="__lshift__-16" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qsize.html">QSize</a>)</h3><h3 class="fn"><a name="__lshift__-17" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>)</h3><h3 class="fn"><a name="__lshift__-18" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, QString)</h3><h3 class="fn"><a name="__lshift__-19" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, QStringList&#160;<i>list</i>)</h3><h3 class="fn"><a name="__lshift__-20" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qurl.html">QUrl</a>)</h3><h3 class="fn"><a name="__lshift__-21" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="quuid.html">QUuid</a>)</h3><h3 class="fn"><a name="__lshift__-22" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, QVariant&#160;<i>p</i>)</h3><h3 class="fn"><a name="__lshift__-23" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qtcore.html#Type-enum">Type</a>&#160;<i>p</i>)</h3><h3 class="fn"><a name="__rshift__" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qbitarray.html">QBitArray</a>)</h3><h3 class="fn"><a name="__rshift__-2" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>)</h3><h3 class="fn"><a name="__rshift__-3" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, QChar)</h3><h3 class="fn"><a name="__rshift__-4" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qdate.html">QDate</a>)</h3><h3 class="fn"><a name="__rshift__-5" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qtime.html">QTime</a>)</h3><h3 class="fn"><a name="__rshift__-6" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>)</h3><h3 class="fn"><a name="__rshift__-7" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qeasingcurve.html">QEasingCurve</a>)</h3><h3 class="fn"><a name="__rshift__-8" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qline.html">QLine</a>)</h3><h3 class="fn"><a name="__rshift__-9" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qlinef.html">QLineF</a>)</h3><h3 class="fn"><a name="__rshift__-10" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qlocale.html">QLocale</a>)</h3><h3 class="fn"><a name="__rshift__-11" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qpoint.html">QPoint</a>)</h3><h3 class="fn"><a name="__rshift__-12" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qpointf.html">QPointF</a>)</h3><h3 class="fn"><a name="__rshift__-13" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qrect.html">QRect</a>)</h3><h3 class="fn"><a name="__rshift__-14" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qrectf.html">QRectF</a>)</h3><h3 class="fn"><a name="__rshift__-15" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>regExp</i>)</h3><h3 class="fn"><a name="__rshift__-16" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qsize.html">QSize</a>)</h3><h3 class="fn"><a name="__rshift__-17" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>)</h3><h3 class="fn"><a name="__rshift__-18" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, QString)</h3><h3 class="fn"><a name="__rshift__-19" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, QStringList&#160;<i>list</i>)</h3><h3 class="fn"><a name="__rshift__-20" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qurl.html">QUrl</a>)</h3><h3 class="fn"><a name="__rshift__-21" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="quuid.html">QUuid</a>)</h3><h3 class="fn"><a name="__rshift__-22" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, QVariant&#160;<i>p</i>)</h3><h3 class="fn"><a name="__rshift__-23" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qtcore.html#Type-enum">Type</a>&#160;<i>p</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="writeString" />QDataStream.writeString (<i>self</i>, str&#160;<i>str</i>)</h3><h3 class="fn"><a name="writeUInt16" />QDataStream.writeUInt16 (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeUInt32" />QDataStream.writeUInt32 (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeUInt64" />QDataStream.writeUInt64 (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="writeUInt8" />QDataStream.writeUInt8 (<i>self</i>, str&#160;<i>i</i>)</h3><h3 class="fn"><a name="__lshift__" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qcolor.html">QColor</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qnetworkcachemetadata.html">QNetworkCacheMetaData</a>)</h3><p>This method is only available if the QtNetwork module is imported.</p><h3 class="fn"><a name="__lshift__" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qscriptcontextinfo.html">QScriptContextInfo</a>)</h3><p>This method is only available if the QtScript module is imported.</p><h3 class="fn"><a name="__lshift__" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qwebhistory.html">QWebHistory</a>)</h3><p>This method is only available if the QtWebKit module is imported.</p><h3 class="fn"><a name="__lshift__-2" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qbrush.html">QBrush</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-2" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qhostaddress.html">QHostAddress</a>)</h3><p>This method is only available if the QtNetwork module is imported.</p><h3 class="fn"><a name="__lshift__-3" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qcursor.html">QCursor</a>&#160;<i>cursor</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-4" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-5" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qicon.html">QIcon</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-6" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qimage.html">QImage</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-7" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>ks</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-8" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qlistwidgetitem.html">QListWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-9" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-10" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qmatrix4x4.html">QMatrix4x4</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-11" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpainterpath.html">QPainterPath</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-12" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>p</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-13" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpen.html">QPen</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-14" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpicture.html">QPicture</a>&#160;<i>p</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-15" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpixmap.html">QPixmap</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-16" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpolygonf.html">QPolygonF</a>&#160;<i>array</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-17" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qpolygon.html">QPolygon</a>&#160;<i>polygon</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-18" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-19" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qregion.html">QRegion</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-20" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qsizepolicy.html">QSizePolicy</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-22" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qstandarditem.html">QStandardItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-23" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qtablewidgetitem.html">QTableWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-24" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qtextlength.html">QTextLength</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-25" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qtextformat.html">QTextFormat</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-26" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qtransform.html">QTransform</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-27" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-28" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qvector2d.html">QVector2D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-29" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qvector3d.html">QVector3D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__-30" /><a href="qdatastream.html">QDataStream</a> __lshift__ (<i>self</i>, <a href="qvector4d.html">QVector4D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qcolor.html">QColor</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qnetworkcachemetadata.html">QNetworkCacheMetaData</a>)</h3><p>This method is only available if the QtNetwork module is imported.</p><h3 class="fn"><a name="__rshift__" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qscriptcontextinfo.html">QScriptContextInfo</a>)</h3><p>This method is only available if the QtScript module is imported.</p><h3 class="fn"><a name="__rshift__" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qwebhistory.html">QWebHistory</a>)</h3><p>This method is only available if the QtWebKit module is imported.</p><h3 class="fn"><a name="__rshift__-2" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qbrush.html">QBrush</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-2" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qhostaddress.html">QHostAddress</a>)</h3><p>This method is only available if the QtNetwork module is imported.</p><h3 class="fn"><a name="__rshift__-3" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qcursor.html">QCursor</a>&#160;<i>cursor</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-4" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-5" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qicon.html">QIcon</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-6" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qimage.html">QImage</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-7" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>ks</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-8" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qlistwidgetitem.html">QListWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-9" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-10" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qmatrix4x4.html">QMatrix4x4</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-11" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpainterpath.html">QPainterPath</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-12" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpalette.html">QPalette</a>&#160;<i>p</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-13" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpen.html">QPen</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-14" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpicture.html">QPicture</a>&#160;<i>p</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-15" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpixmap.html">QPixmap</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-16" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpolygonf.html">QPolygonF</a>&#160;<i>array</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-17" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qpolygon.html">QPolygon</a>&#160;<i>polygon</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-18" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-19" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qregion.html">QRegion</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-20" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qsizepolicy.html">QSizePolicy</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-22" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qstandarditem.html">QStandardItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-23" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qtablewidgetitem.html">QTableWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-24" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qtextlength.html">QTextLength</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-25" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qtextformat.html">QTextFormat</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-26" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qtransform.html">QTransform</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-27" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qtreewidgetitem.html">QTreeWidgetItem</a>&#160;<i>item</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-28" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qvector2d.html">QVector2D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-29" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qvector3d.html">QVector3D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-30" /><a href="qdatastream.html">QDataStream</a> __rshift__ (<i>self</i>, <a href="qvector4d.html">QVector4D</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qbitarray.html">QBitArray</a>)</h3><h3 class="fn"><a name="__lshift__-2" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>)</h3><h3 class="fn"><a name="__lshift__-3" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, QChar)</h3><h3 class="fn"><a name="__lshift__-4" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qdate.html">QDate</a>)</h3><h3 class="fn"><a name="__lshift__-5" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qtime.html">QTime</a>)</h3><h3 class="fn"><a name="__lshift__-6" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>)</h3><h3 class="fn"><a name="__lshift__-7" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qeasingcurve.html">QEasingCurve</a>)</h3><h3 class="fn"><a name="__lshift__-8" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qline.html">QLine</a>)</h3><h3 class="fn"><a name="__lshift__-9" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qlinef.html">QLineF</a>)</h3><h3 class="fn"><a name="__lshift__-10" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qlocale.html">QLocale</a>)</h3><h3 class="fn"><a name="__lshift__-11" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qpoint.html">QPoint</a>)</h3><h3 class="fn"><a name="__lshift__-12" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qpointf.html">QPointF</a>)</h3><h3 class="fn"><a name="__lshift__-13" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qrect.html">QRect</a>)</h3><h3 class="fn"><a name="__lshift__-14" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qrectf.html">QRectF</a>)</h3><h3 class="fn"><a name="__lshift__-15" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>regExp</i>)</h3><h3 class="fn"><a name="__lshift__-16" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qsize.html">QSize</a>)</h3><h3 class="fn"><a name="__lshift__-17" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>)</h3><h3 class="fn"><a name="__lshift__-18" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, QString)</h3><h3 class="fn"><a name="__lshift__-19" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, QStringList&#160;<i>list</i>)</h3><h3 class="fn"><a name="__lshift__-20" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qurl.html">QUrl</a>)</h3><h3 class="fn"><a name="__lshift__-21" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="quuid.html">QUuid</a>)</h3><h3 class="fn"><a name="__lshift__-22" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, QVariant&#160;<i>p</i>)</h3><h3 class="fn"><a name="__lshift__-23" /><a href="qdatastream.html">QDataStream</a> QDataStream.__lshift__ (<i>self</i>, <a href="qtcore.html#Type-enum">Type</a>&#160;<i>p</i>)</h3><h3 class="fn"><a name="__rshift__" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qbitarray.html">QBitArray</a>)</h3><h3 class="fn"><a name="__rshift__-2" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>)</h3><h3 class="fn"><a name="__rshift__-3" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, QChar)</h3><h3 class="fn"><a name="__rshift__-4" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qdate.html">QDate</a>)</h3><h3 class="fn"><a name="__rshift__-5" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qtime.html">QTime</a>)</h3><h3 class="fn"><a name="__rshift__-6" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>)</h3><h3 class="fn"><a name="__rshift__-7" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qeasingcurve.html">QEasingCurve</a>)</h3><h3 class="fn"><a name="__rshift__-8" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qline.html">QLine</a>)</h3><h3 class="fn"><a name="__rshift__-9" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qlinef.html">QLineF</a>)</h3><h3 class="fn"><a name="__rshift__-10" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qlocale.html">QLocale</a>)</h3><h3 class="fn"><a name="__rshift__-11" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qpoint.html">QPoint</a>)</h3><h3 class="fn"><a name="__rshift__-12" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qpointf.html">QPointF</a>)</h3><h3 class="fn"><a name="__rshift__-13" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qrect.html">QRect</a>)</h3><h3 class="fn"><a name="__rshift__-14" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qrectf.html">QRectF</a>)</h3><h3 class="fn"><a name="__rshift__-15" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qregexp.html">QRegExp</a>&#160;<i>regExp</i>)</h3><h3 class="fn"><a name="__rshift__-16" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qsize.html">QSize</a>)</h3><h3 class="fn"><a name="__rshift__-17" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qsizef.html">QSizeF</a>)</h3><h3 class="fn"><a name="__rshift__-18" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, QString)</h3><h3 class="fn"><a name="__rshift__-19" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, QStringList&#160;<i>list</i>)</h3><h3 class="fn"><a name="__rshift__-20" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qurl.html">QUrl</a>)</h3><h3 class="fn"><a name="__rshift__-21" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="quuid.html">QUuid</a>)</h3><h3 class="fn"><a name="__rshift__-22" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, QVariant&#160;<i>p</i>)</h3><h3 class="fn"><a name="__rshift__-23" /><a href="qdatastream.html">QDataStream</a> QDataStream.__rshift__ (<i>self</i>, <a href="qtcore.html#Type-enum">Type</a>&#160;<i>p</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -17,20 +17,20 @@ QGraphicsProxyWidget supports all core features of <a href="qwidget.html">QWidge
 Drag &amp; Drop, and popups. You can also embed complex widgets,
 e.g., widgets with subwidgets.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- int main(int argc, char **argv)
+<pre class="cpp">
+ <span class="type">int</span> main(<span class="type">int</span> argc<span class="operator">,</span> <span class="type">char</span> <span class="operator">*</span><span class="operator">*</span>argv)
  {
-     QApplication app(argc, argv);
+     <span class="type"><a href="qapplication.html">QApplication</a></span> app(argc<span class="operator">,</span> argv);
 
-     QTabWidget *tabWidget = new QTabWidget;
+     <span class="type"><a href="qtabwidget.html">QTabWidget</a></span> <span class="operator">*</span>tabWidget <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qtabwidget.html">QTabWidget</a></span>;
 
-     QGraphicsScene scene;
-     QGraphicsProxyWidget *proxy = scene.addWidget(tabWidget);
+     <span class="type"><a href="qgraphicsscene.html">QGraphicsScene</a></span> scene;
+     <span class="type">QGraphicsProxyWidget</span> <span class="operator">*</span>proxy <span class="operator">=</span> scene<span class="operator">.</span>addWidget(tabWidget);
 
-     QGraphicsView view(&amp;scene);
-     view.show();
+     <span class="type"><a href="qgraphicsview.html">QGraphicsView</a></span> view(<span class="operator">&amp;</span>scene);
+     view<span class="operator">.</span>show();
 
-     return app.exec();
+     <span class="keyword">return</span> app<span class="operator">.</span>exec();
  }
 </pre>
 <p>QGraphicsProxyWidget takes care of automatically embedding popup
@@ -50,20 +50,20 @@ reparent or position either the proxy, or the embedded widget
 itself.</p>
 <p>For example, in the code snippet below, we embed a group box
 into the proxy:</p>
-<pre class="highlightedCode brush: cpp">
- QGroupBox *groupBox = new QGroupBox("Contact Details");
- QLabel *numberLabel = new QLabel("Telephone number");
- QLineEdit *numberEdit = new QLineEdit;
+<pre class="cpp">
+ <span class="type"><a href="qgroupbox.html">QGroupBox</a></span> <span class="operator">*</span>groupBox <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qgroupbox.html">QGroupBox</a></span>(<span class="string">"Contact Details"</span>);
+ <span class="type"><a href="qlabel.html">QLabel</a></span> <span class="operator">*</span>numberLabel <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlabel.html">QLabel</a></span>(<span class="string">"Telephone number"</span>);
+ <span class="type"><a href="qlineedit.html">QLineEdit</a></span> <span class="operator">*</span>numberEdit <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlineedit.html">QLineEdit</a></span>;
 
- QFormLayout *layout = new QFormLayout;
- layout-&gt;addRow(numberLabel, numberEdit);
- groupBox-&gt;setLayout(layout);
+ <span class="type"><a href="qformlayout.html">QFormLayout</a></span> <span class="operator">*</span>layout <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qformlayout.html">QFormLayout</a></span>;
+ layout<span class="operator">-</span><span class="operator">&gt;</span>addRow(numberLabel<span class="operator">,</span> numberEdit);
+ groupBox<span class="operator">-</span><span class="operator">&gt;</span><a href="qgraphicswidget.html#layout-prop">setLayout</a>(layout);
 
- QGraphicsScene scene;
- QGraphicsProxyWidget *proxy = scene.addWidget(groupBox);
+ <span class="type"><a href="qgraphicsscene.html">QGraphicsScene</a></span> scene;
+ <span class="type">QGraphicsProxyWidget</span> <span class="operator">*</span>proxy <span class="operator">=</span> scene<span class="operator">.</span>addWidget(groupBox);
 
- QGraphicsView view(&amp;scene);
- view.show();
+ <span class="type"><a href="qgraphicsview.html">QGraphicsView</a></span> view(<span class="operator">&amp;</span>scene);
+ view<span class="operator">.</span><a href="qgraphicsitem.html#show">show</a>();
 </pre>
 <p>The image below is the output obtained with its contents margin
 and contents rect labeled.</p>
@@ -88,144 +88,88 @@ the widget and the proxy will be visible because a <a href="qgraphicswidget.html
 (you do not have to call <a href="qgraphicsitem.html#show">show</a>()). If you explicitly hide the
 embedded widget, the proxy will also become invisible.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QGraphicsScene scene;
+<pre class="cpp">
+ <span class="type"><a href="qgraphicsscene.html">QGraphicsScene</a></span> scene;
 
- QLineEdit *edit = new QLineEdit;
- QGraphicsProxyWidget *proxy = scene.addWidget(edit);
+ <span class="type"><a href="qlineedit.html">QLineEdit</a></span> <span class="operator">*</span>edit <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlineedit.html">QLineEdit</a></span>;
+ <span class="type">QGraphicsProxyWidget</span> <span class="operator">*</span>proxy <span class="operator">=</span> scene<span class="operator">.</span>addWidget(edit);
 
- edit-&gt;isVisible();  <span class="comment">// returns true</span>
- proxy-&gt;isVisible(); <span class="comment">// also returns true</span>
+ edit<span class="operator">-</span><span class="operator">&gt;</span><a href="qgraphicsitem.html#isVisible">isVisible</a>();  <span class="comment">// returns true</span>
+ proxy<span class="operator">-</span><span class="operator">&gt;</span><a href="qgraphicsitem.html#isVisible">isVisible</a>(); <span class="comment">// also returns true</span>
 
- edit-&gt;hide();
+ edit<span class="operator">-</span><span class="operator">&gt;</span><a href="qgraphicsitem.html#hide">hide</a>();
 
- edit-&gt;isVisible();  <span class="comment">// returns false</span>
- proxy-&gt;isVisible(); <span class="comment">// also returns false</span>
+ edit<span class="operator">-</span><span class="operator">&gt;</span><a href="qgraphicsitem.html#isVisible">isVisible</a>();  <span class="comment">// returns false</span>
+ proxy<span class="operator">-</span><span class="operator">&gt;</span><a href="qgraphicsitem.html#isVisible">isVisible</a>(); <span class="comment">// also returns false</span>
 </pre>
 <p>QGraphicsProxyWidget maintains symmetry for the following
 states:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th><a href="qwidget.html">QWidget</a> state</th>
 <th>QGraphicsProxyWidget state</th>
 <th>Notes</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><a href="qwidget.html#enabled-prop">QWidget.enabled</a></p>
-</td>
-<td>
-<p><a href="qgraphicsobject.html#enabled-prop">QGraphicsProxyWidget.enabled</a></p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qwidget.html#enabled-prop">QWidget.enabled</a></td>
+<td><a href="qgraphicsobject.html#enabled-prop">QGraphicsProxyWidget.enabled</a></td>
 <td />
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qwidget.html#visible-prop">QWidget.visible</a></p>
-</td>
-<td>
-<p><a href="qgraphicsobject.html#visible-prop">QGraphicsProxyWidget.visible</a></p>
-</td>
-<td>
-<p>The explicit state is also symmetric.</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qwidget.html#visible-prop">QWidget.visible</a></td>
+<td><a href="qgraphicsobject.html#visible-prop">QGraphicsProxyWidget.visible</a></td>
+<td>The explicit state is also symmetric.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qwidget.html#geometry-prop">QWidget.geometry</a></p>
-</td>
-<td>
-<p><a href="qgraphicswidget.html#geometry-prop">QGraphicsProxyWidget.geometry</a></p>
-</td>
-<td>
-<p>Geometry is only guaranteed to be symmetric while the embedded
-widget is visible.</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qwidget.html#geometry-prop">QWidget.geometry</a></td>
+<td><a href="qgraphicswidget.html#geometry-prop">QGraphicsProxyWidget.geometry</a></td>
+<td>Geometry is only guaranteed to be symmetric while the embedded
+widget is visible.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qwidget.html#layoutDirection-prop">QWidget.layoutDirection</a></p>
-</td>
-<td>
-<p><a href="qgraphicswidget.html#layoutDirection-prop">QGraphicsProxyWidget.layoutDirection</a></p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qwidget.html#layoutDirection-prop">QWidget.layoutDirection</a></td>
+<td><a href="qgraphicswidget.html#layoutDirection-prop">QGraphicsProxyWidget.layoutDirection</a></td>
 <td />
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>QWidget.style</p>
-</td>
-<td>
-<p>QGraphicsProxyWidget.style</p>
-</td>
+<tr class="odd" valign="top">
+<td>QWidget.style</td>
+<td>QGraphicsProxyWidget.style</td>
 <td />
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qwidget.html#palette-prop">QWidget.palette</a></p>
-</td>
-<td>
-<p><a href="qgraphicswidget.html#palette-prop">QGraphicsProxyWidget.palette</a></p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qwidget.html#palette-prop">QWidget.palette</a></td>
+<td><a href="qgraphicswidget.html#palette-prop">QGraphicsProxyWidget.palette</a></td>
 <td />
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qwidget.html#font-prop">QWidget.font</a></p>
-</td>
-<td>
-<p><a href="qgraphicswidget.html#font-prop">QGraphicsProxyWidget.font</a></p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qwidget.html#font-prop">QWidget.font</a></td>
+<td><a href="qgraphicswidget.html#font-prop">QGraphicsProxyWidget.font</a></td>
 <td />
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qwidget.html#cursor-prop">QWidget.cursor</a></p>
-</td>
-<td>
-<p>QGraphicsProxyWidget.cursor</p>
-</td>
-<td>
-<p>The embedded widget overrides the proxy widget cursor. The proxy
-cursor changes depending on which embedded subwidget is currently
-under the mouse.</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qwidget.html#cursor-prop">QWidget.cursor</a></td>
+<td>QGraphicsProxyWidget.cursor</td>
+<td>The embedded widget overrides the proxy widget cursor. The
+proxy cursor changes depending on which embedded subwidget is
+currently under the mouse.</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qwidget.html#sizeHint-prop">QWidget.sizeHint</a>()</p>
-</td>
-<td>
-<p><a href="qgraphicsproxywidget.html#sizeHint">QGraphicsProxyWidget.sizeHint</a>()</p>
-</td>
-<td>
-<p>All size hint functionality from the embedded widget is
-forwarded by the proxy.</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qwidget.html#sizeHint-prop">QWidget.sizeHint</a>()</td>
+<td><a href="qgraphicsproxywidget.html#sizeHint">QGraphicsProxyWidget.sizeHint</a>()</td>
+<td>All size hint functionality from the embedded widget is
+forwarded by the proxy.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qwidget.html#getContentsMargins">QWidget.getContentsMargins</a>()</p>
-</td>
-<td>
-<p><a href="qgraphicswidget.html#getContentsMargins">QGraphicsProxyWidget.getContentsMargins</a>()</p>
-</td>
-<td>
-<p>Updated once by <a href="qgraphicsproxywidget.html#setWidget">setWidget</a>().</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qwidget.html#getContentsMargins">QWidget.getContentsMargins</a>()</td>
+<td><a href="qgraphicswidget.html#getContentsMargins">QGraphicsProxyWidget.getContentsMargins</a>()</td>
+<td>Updated once by <a href="qgraphicsproxywidget.html#setWidget">setWidget</a>().</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qwidget.html#windowTitle-prop">QWidget.windowTitle</a></p>
-</td>
-<td>
-<p><a href="qgraphicswidget.html#windowTitle-prop">QGraphicsProxyWidget.windowTitle</a></p>
-</td>
-<td>
-<p>Updated once by <a href="qgraphicsproxywidget.html#setWidget">setWidget</a>().</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qwidget.html#windowTitle-prop">QWidget.windowTitle</a></td>
+<td><a href="qgraphicswidget.html#windowTitle-prop">QGraphicsProxyWidget.windowTitle</a></td>
+<td>Updated once by <a href="qgraphicsproxywidget.html#setWidget">setWidget</a>().</td>
 </tr>
 </table>
 <p><b>Note:</b> <a href="qgraphicsscene.html">QGraphicsScene</a>
@@ -251,7 +195,7 @@ transform only one of its widgets.</p>
 <p>If the widget is already embedded, return the existing proxy
 widget.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qgraphicsproxywidget.html#newProxyWidget">newProxyWidget</a>() and
+<p><b>See also</b> <a href="qgraphicsproxywidget.html#newProxyWidget">newProxyWidget</a>() and
 <a href="qgraphicsscene.html#addWidget">QGraphicsScene.addWidget</a>().</p>
 
 
@@ -328,7 +272,7 @@ created. The default implementation returns a proxy created with
 the <a href="qgraphicsproxywidget.html#QGraphicsProxyWidget">QGraphicsProxyWidget</a>()
 constructor with this proxy widget as the parent.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qgraphicsproxywidget.html#createProxyForChildWidget">createProxyForChildWidget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsproxywidget.html#createProxyForChildWidget">createProxyForChildWidget</a>().</p>
 
 
 <h3 class="fn"><a name="paint" />QGraphicsProxyWidget.paint (<i>self</i>, <a href="qpainter.html">QPainter</a>&#160;<i>painter</i>, <a href="qstyleoptiongraphicsitem.html">QStyleOptionGraphicsItem</a>&#160;<i>option</i>, <a href="qwidget.html">QWidget</a>&#160;<i>widget</i>)</h3><p>Reimplemented from <a href="qgraphicsitem.html#paint">QGraphicsItem.paint</a>().</p>
@@ -366,7 +310,7 @@ also be embedded and their proxy widget destroyed.</p>
 <p>Note that widgets with the <a href="qt.html#WidgetAttribute-enum">Qt.WA_PaintOnScreen</a> widget
 attribute set and widgets that wrap an external application or
 controller cannot be embedded. Examples are <a href="qglwidget.html">QGLWidget</a> and <a href="qaxwidget.html">QAxWidget</a>.</p>
-<p>See also <a href="qgraphicsproxywidget.html#widget">widget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsproxywidget.html#widget">widget</a>().</p>
 
 
 <h3 class="fn"><a name="showEvent" />QGraphicsProxyWidget.showEvent (<i>self</i>, <a href="qshowevent.html">QShowEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qgraphicswidget.html#showEvent">QGraphicsWidget.showEvent</a>().</p>
@@ -381,7 +325,7 @@ proxy item's local coordinates.</p>
 <p>If no widget is embedded, <i>widget</i> is 0, or <i>widget</i>
 is not a descendant of the embedded widget, this function returns
 an empty <a href="qrectf.html">QRectF</a>.</p>
-<p>See also <a href="qgraphicsproxywidget.html#widget">widget</a>().</p>
+<p><b>See also</b> <a href="qgraphicsproxywidget.html#widget">widget</a>().</p>
 
 
 <h3 class="fn"><a name="type" />int QGraphicsProxyWidget.type (<i>self</i>)</h3><p>Reimplemented from <a href="qgraphicsitem.html#type">QGraphicsItem.type</a>().</p>
@@ -394,5 +338,5 @@ an empty <a href="qrectf.html">QRectF</a>.</p>
 
 
 <h3 class="fn"><a name="widget" /><a href="qwidget.html">QWidget</a> QGraphicsProxyWidget.widget (<i>self</i>)</h3><p>Returns a pointer to the embedded widget.</p>
-<p>See also <a href="qgraphicsproxywidget.html#setWidget">setWidget</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qgraphicsproxywidget.html#setWidget">setWidget</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

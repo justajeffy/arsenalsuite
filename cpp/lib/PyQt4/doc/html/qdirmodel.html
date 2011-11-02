@@ -36,15 +36,15 @@ application.</p>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDirModel.FileIconRole</tt></td>
-<td class=" topAlign"><tt>Qt.DecorationRole</tt></td>
+<td class="topAlign"><tt>Qt.DecorationRole</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDirModel.FilePathRole</tt></td>
-<td class=" topAlign"><tt>Qt.UserRole + 1</tt></td>
+<td class="topAlign"><tt>Qt.UserRole + 1</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QDirModel.FileNameRole</tt></td>
-<td class=" topAlign">?</td>
+<td class="topAlign">?</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QDirModel" />QDirModel.__init__ (<i>self</i>, QStringList&#160;<i>nameFilters</i>, <a href="qdir-filters.html">QDir.Filters</a>&#160;<i>filters</i>, <a href="qdir-sortflags.html">QDir.SortFlags</a>&#160;<i>sort</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a new directory model with the given <i>parent</i>.
@@ -64,7 +64,7 @@ item.</p>
 <h3 class="fn"><a name="data" />QVariant QDirModel.data (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>, int&#160;<i>role</i>&#160;=&#160;Qt.DisplayRole)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#data">QAbstractItemModel.data</a>().</p>
 <p>Returns the data for the model item <i>index</i> with the given
 <i>role</i>.</p>
-<p>See also <a href="qdirmodel.html#setData">setData</a>().</p>
+<p><b>See also</b> <a href="qdirmodel.html#setData">setData</a>().</p>
 
 
 <h3 class="fn"><a name="dropMimeData" />bool QDirModel.dropMimeData (<i>self</i>, <a href="qmimedata.html">QMimeData</a>&#160;<i>data</i>, <a href="qt.html#DropAction-enum">Qt.DropAction</a>&#160;<i>action</i>, int&#160;<i>row</i>, int&#160;<i>column</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#dropMimeData">QAbstractItemModel.dropMimeData</a>().</p>
@@ -72,7 +72,7 @@ item.</p>
 that ended with the given <i>action</i> over the row in the model
 specified by the <i>row</i> and <i>column</i> and by the
 <i>parent</i> index.</p>
-<p>See also <a href="qdirmodel.html#supportedDropActions">supportedDropActions</a>().</p>
+<p><b>See also</b> <a href="qdirmodel.html#supportedDropActions">supportedDropActions</a>().</p>
 
 
 <h3 class="fn"><a name="fileIcon" /><a href="qicon.html">QIcon</a> QDirModel.fileIcon (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Returns the icons for the item stored in the model under the
@@ -86,7 +86,7 @@ the underlying filing system, the file information returned will
 contain information about the symbolic link itself, regardless of
 whether <a href="qdirmodel.html#resolveSymlinks-prop">resolveSymlinks</a> is
 enabled or not.</p>
-<p>See also <a href="qfileinfo.html#symLinkTarget">QFileInfo.symLinkTarget</a>().</p>
+<p><b>See also</b> <a href="qfileinfo.html#symLinkTarget">QFileInfo.symLinkTarget</a>().</p>
 
 
 <h3 class="fn"><a name="fileName" />QString QDirModel.fileName (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Returns the name of the item stored in the model under the
@@ -98,14 +98,13 @@ enabled or not.</p>
 
 
 <h3 class="fn"><a name="filter" /><a href="qdir-filters.html">QDir.Filters</a> QDirModel.filter (<i>self</i>)</h3><p>Returns the filter specification for the directory model.</p>
-<p>See also <a href="qdirmodel.html#setFilter">setFilter</a>() and
-<a href="qdir.html#Filter-enum">QDir.Filters</a>.</p>
+<p><b>See also</b> <a href="qdirmodel.html#setFilter">setFilter</a>() and <a href="qdir.html#Filter-enum">QDir.Filters</a>.</p>
 
 
 <h3 class="fn"><a name="flags" /><a href="qt-itemflags.html">Qt.ItemFlags</a> QDirModel.flags (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#flags">QAbstractItemModel.flags</a>().</p>
 <p>Returns the item flags for the given <i>index</i> in the
 model.</p>
-<p>See also <a href="qt.html#ItemFlag-enum">Qt.ItemFlags</a>.</p>
+<p><b>See also</b> <a href="qt.html#ItemFlag-enum">Qt.ItemFlags</a>.</p>
 
 
 <h3 class="fn"><a name="hasChildren" />bool QDirModel.hasChildren (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>&#160;=&#160;QModelIndex())</h3><p>Reimplemented from <a href="qabstractitemmodel.html#hasChildren">QAbstractItemModel.hasChildren</a>().</p>
@@ -120,7 +119,7 @@ specified <i>section</i> of the header with the given
 
 
 <h3 class="fn"><a name="iconProvider" /><a href="qfileiconprovider.html">QFileIconProvider</a> QDirModel.iconProvider (<i>self</i>)</h3><p>Returns the file icon provider for this directory model.</p>
-<p>See also <a href="qdirmodel.html#setIconProvider">setIconProvider</a>().</p>
+<p><b>See also</b> <a href="qdirmodel.html#setIconProvider">setIconProvider</a>().</p>
 
 
 <h3 class="fn"><a name="index" /><a href="qmodelindex.html">QModelIndex</a> QDirModel.index (<i>self</i>, int&#160;<i>row</i>, int&#160;<i>column</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>&#160;=&#160;QModelIndex())</h3><p>Reimplemented from <a href="qabstractitemmodel.html#index">QAbstractItemModel.index</a>().</p>
@@ -154,7 +153,7 @@ model item.</p>
 
 
 <h3 class="fn"><a name="nameFilters" />QStringList QDirModel.nameFilters (<i>self</i>)</h3><p>Returns a list of filters applied to the names in the model.</p>
-<p>See also <a href="qdirmodel.html#setNameFilters">setNameFilters</a>().</p>
+<p><b>See also</b> <a href="qdirmodel.html#setNameFilters">setNameFilters</a>().</p>
 
 
 <h3 class="fn"><a name="parent" /><a href="qmodelindex.html">QModelIndex</a> QDirModel.parent (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>child</i>)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#parent">QAbstractItemModel.parent</a>().</p>
@@ -175,7 +174,7 @@ is returned.</p>
 <p><b>Warning:</b> This function deletes files from the file
 system; it does <b>not</b> move them to a location where they can
 be recovered.</p>
-<p>See also <a href="qdirmodel.html#rmdir">rmdir</a>().</p>
+<p><b>See also</b> <a href="qdirmodel.html#rmdir">rmdir</a>().</p>
 
 
 <h3 class="fn"><a name="resolveSymlinks" />bool QDirModel.resolveSymlinks (<i>self</i>)</h3><h3 class="fn"><a name="rmdir" />bool QDirModel.rmdir (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Removes the directory corresponding to the model item
@@ -186,7 +185,7 @@ returned.</p>
 <p><b>Warning:</b> This function deletes directories from the file
 system; it does <b>not</b> move them to a location where they can
 be recovered.</p>
-<p>See also <a href="qdirmodel.html#remove">remove</a>().</p>
+<p><b>See also</b> <a href="qdirmodel.html#remove">remove</a>().</p>
 
 
 <h3 class="fn"><a name="rowCount" />int QDirModel.rowCount (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>&#160;=&#160;QModelIndex())</h3><p>Reimplemented from <a href="qabstractitemmodel.html#rowCount">QAbstractItemModel.rowCount</a>().</p>
@@ -197,7 +196,8 @@ be recovered.</p>
 <p>Sets the data for the model item <i>index</i> with the given
 <i>role</i> to the data referenced by the <i>value</i>. Returns
 true if successful; otherwise returns false.</p>
-<p>See also <a href="qdirmodel.html#data">data</a>() and <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>.</p>
+<p><b>See also</b> <a href="qdirmodel.html#data">data</a>() and
+<a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>.</p>
 
 
 <h3 class="fn"><a name="setFilter" />QDirModel.setFilter (<i>self</i>, <a href="qdir-filters.html">QDir.Filters</a>&#160;<i>filters</i>)</h3><p>Sets the directory model's filter to that specified by
@@ -205,23 +205,23 @@ true if successful; otherwise returns false.</p>
 <p>Note that the filter you set should always include the <a href="qdir.html#Filter-enum">QDir.AllDirs</a> enum value, otherwise
 <a class="obsolete" href="qdirmodel.html">QDirModel</a> won't be
 able to read the directory structure.</p>
-<p>See also <a href="qdirmodel.html#filter">filter</a>() and
+<p><b>See also</b> <a href="qdirmodel.html#filter">filter</a>() and
 <a href="qdir.html#Filter-enum">QDir.Filters</a>.</p>
 
 
 <h3 class="fn"><a name="setIconProvider" />QDirModel.setIconProvider (<i>self</i>, <a href="qfileiconprovider.html">QFileIconProvider</a>&#160;<i>provider</i>)</h3><p>Sets the <i>provider</i> of file icons for the directory
 model.</p>
-<p>See also <a href="qdirmodel.html#iconProvider">iconProvider</a>().</p>
+<p><b>See also</b> <a href="qdirmodel.html#iconProvider">iconProvider</a>().</p>
 
 
 <h3 class="fn"><a name="setLazyChildCount" />QDirModel.setLazyChildCount (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setNameFilters" />QDirModel.setNameFilters (<i>self</i>, QStringList&#160;<i>filters</i>)</h3><p>Sets the name <i>filters</i> for the directory model.</p>
-<p>See also <a href="qdirmodel.html#nameFilters">nameFilters</a>().</p>
+<p><b>See also</b> <a href="qdirmodel.html#nameFilters">nameFilters</a>().</p>
 
 
 <h3 class="fn"><a name="setReadOnly" />QDirModel.setReadOnly (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setResolveSymlinks" />QDirModel.setResolveSymlinks (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setSorting" />QDirModel.setSorting (<i>self</i>, <a href="qdir-sortflags.html">QDir.SortFlags</a>&#160;<i>sort</i>)</h3><p>Sets the directory model's sorting order to that specified by
 <i>sort</i>.</p>
-<p>See also <a href="qdirmodel.html#sorting">sorting</a>() and
-<a href="qdir.html#SortFlag-enum">QDir.SortFlags</a>.</p>
+<p><b>See also</b> <a href="qdirmodel.html#sorting">sorting</a>()
+and <a href="qdir.html#SortFlag-enum">QDir.SortFlags</a>.</p>
 
 
 <h3 class="fn"><a name="sort" />QDirModel.sort (<i>self</i>, int&#160;<i>column</i>, <a href="qt.html#SortOrder-enum">Qt.SortOrder</a>&#160;<i>order</i>&#160;=&#160;Qt.AscendingOrder)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#sort">QAbstractItemModel.sort</a>().</p>
@@ -230,11 +230,10 @@ given. The order is a value defined in <a href="qt.html#SortOrder-enum">Qt.SortO
 
 
 <h3 class="fn"><a name="sorting" /><a href="qdir-sortflags.html">QDir.SortFlags</a> QDirModel.sorting (<i>self</i>)</h3><p>Returns the sorting method used for the directory model.</p>
-<p>See also <a href="qdirmodel.html#setSorting">setSorting</a>()
-and <a href="qdir.html#SortFlag-enum">QDir.SortFlags</a>.</p>
+<p><b>See also</b> <a href="qdirmodel.html#setSorting">setSorting</a>() and <a href="qdir.html#SortFlag-enum">QDir.SortFlags</a>.</p>
 
 
 <h3 class="fn"><a name="supportedDropActions" /><a href="qt-dropactions.html">Qt.DropActions</a> QDirModel.supportedDropActions (<i>self</i>)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#supportedDropActions">QAbstractItemModel.supportedDropActions</a>().</p>
 <p>Returns the drop actions supported by this model.</p>
-<p>See also <a href="qt.html#DropAction-enum">Qt.DropActions</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qt.html#DropAction-enum">Qt.DropActions</a>.</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

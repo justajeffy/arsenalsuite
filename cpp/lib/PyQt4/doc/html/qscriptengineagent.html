@@ -40,18 +40,18 @@ reuse the relevant script ID for new scripts (i.e. as argument to a
 subsequent call to <a href="qscriptengineagent.html#scriptLoad">scriptLoad</a>()).</p>
 <p>Evaluating the following script will result in <a href="qscriptengineagent.html#scriptUnload">scriptUnload</a>() being
 called immediately after evaluation has completed:</p>
-<pre class="highlightedCode brush: cpp">
- var a = Math.random() + 2;
+<pre class="cpp">
+ var a <span class="operator">=</span> Math<span class="operator">.</span>random() <span class="operator">+</span> <span class="number">2</span>;
 </pre>
 <p>Evaluating the following script will \b{not} result in a call to
 <a href="qscriptengineagent.html#scriptUnload">scriptUnload</a>()
 when evaluation has completed:</p>
-<pre class="highlightedCode brush: cpp">
+<pre class="cpp">
  function cube(a) {
-     return a * a * a;
+     <span class="keyword">return</span> a <span class="operator">*</span> a <span class="operator">*</span> a;
  }
 
- var a = cube(3);
+ var a <span class="operator">=</span> cube(<span class="number">3</span>);
 </pre>
 <p>The script isn't unloaded because it defines a function
 (<tt>cube</tt>) that remains in the script environment after
@@ -82,7 +82,7 @@ called when an exception handler is present, and execution is about
 to be resumed at the handler code.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Extension-enum" />QScriptEngineAgent.Extension</h3><p>This enum specifies the possible extensions to a <a href="qscriptengineagent.html">QScriptEngineAgent</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -90,12 +90,12 @@ to be resumed at the handler code.</p>
 <tr>
 <td class="topAlign">
 <tt>QScriptEngineAgent.DebuggerInvocationRequest</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The agent handles <tt>debugger</tt> script
 statements.</td>
 </tr>
 </table>
-<p>See also <a href="qscriptengineagent.html#extension">extension</a>().</p>
+<p><b>See also</b> <a href="qscriptengineagent.html#extension">extension</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QScriptEngineAgent" />QScriptEngineAgent.__init__ (<i>self</i>, <a href="qscriptengine.html">QScriptEngine</a>&#160;<i>engine</i>)</h3><p>Constructs a <a href="qscriptengineagent.html">QScriptEngineAgent</a> object for the
 given <i>engine</i>.</p>
 <p>The engine takes ownership of the agent.</p>
@@ -106,14 +106,14 @@ this agent the active agent.</p>
 <h3 class="fn"><a name="contextPop" />QScriptEngineAgent.contextPop (<i>self</i>)</h3><p>This function is called when the current script context is about
 to be popped.</p>
 <p>The default implementation does nothing.</p>
-<p>See also <a href="qscriptengineagent.html#contextPush">contextPush</a>() and
+<p><b>See also</b> <a href="qscriptengineagent.html#contextPush">contextPush</a>() and
 <a href="qscriptengineagent.html#functionExit">functionExit</a>().</p>
 
 
 <h3 class="fn"><a name="contextPush" />QScriptEngineAgent.contextPush (<i>self</i>)</h3><p>This function is called when a new script context has been
 pushed.</p>
 <p>The default implementation does nothing.</p>
-<p>See also <a href="qscriptengineagent.html#contextPop">contextPop</a>() and <a href="qscriptengineagent.html#functionEntry">functionEntry</a>().</p>
+<p><b>See also</b> <a href="qscriptengineagent.html#contextPop">contextPop</a>() and <a href="qscriptengineagent.html#functionEntry">functionEntry</a>().</p>
 
 
 <h3 class="fn"><a name="engine" /><a href="qscriptengine.html">QScriptEngine</a> QScriptEngineAgent.engine (<i>self</i>)</h3><p>Returns the <a href="qscriptengine.html">QScriptEngine</a> that
@@ -124,7 +124,7 @@ this agent is associated with.</p>
 to be caught, in the script identified by <i>scriptId</i>.</p>
 <p>Reimplement this function if you want to handle this event.</p>
 <p>The default implementation does nothing.</p>
-<p>See also <a href="qscriptengineagent.html#exceptionThrow">exceptionThrow</a>().</p>
+<p><b>See also</b> <a href="qscriptengineagent.html#exceptionThrow">exceptionThrow</a>().</p>
 
 
 <h3 class="fn"><a name="exceptionThrow" />QScriptEngineAgent.exceptionThrow (<i>self</i>, int&#160;<i>scriptId</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>exception</i>, bool&#160;<i>hasHandler</i>)</h3><p>This function is called when the given <i>exception</i> has
@@ -139,7 +139,7 @@ exception.</p>
 example, a debugger can notify the user when an uncaught exception
 occurs (i.e. <i>hasHandler</i> is false).</p>
 <p>The default implementation does nothing.</p>
-<p>See also <a href="qscriptengineagent.html#exceptionCatch">exceptionCatch</a>().</p>
+<p><b>See also</b> <a href="qscriptengineagent.html#exceptionCatch">exceptionCatch</a>().</p>
 
 
 <h3 class="fn"><a name="extension" />QVariant QScriptEngineAgent.extension (<i>self</i>, <a href="qscriptengineagent.html#Extension-enum">Extension</a>&#160;<i>extension</i>, QVariant&#160;<i>argument</i>&#160;=&#160;QVariant())</h3><p>This virtual function can be reimplemented in a <a href="qscriptengineagent.html">QScriptEngineAgent</a> subclass to
@@ -157,7 +157,7 @@ extension, Qt Script will call this function when a
 three items: The first item is the scriptId (a long), the second
 item is the line number (an int), and the third item is the column
 number (an int).</p>
-<p>See also <a href="qscriptengineagent.html#supportsExtension">supportsExtension</a>().</p>
+<p><b>See also</b> <a href="qscriptengineagent.html#supportsExtension">supportsExtension</a>().</p>
 
 
 <h3 class="fn"><a name="functionEntry" />QScriptEngineAgent.functionEntry (<i>self</i>, int&#160;<i>scriptId</i>)</h3><p>This function is called when a script function is called in the
@@ -174,7 +174,7 @@ debugger implementation could reimplement this function (and
 to keep track of the call stack and provide step-over
 functionality.</p>
 <p>The default implementation does nothing.</p>
-<p>See also <a href="qscriptengineagent.html#functionExit">functionExit</a>(), <a href="qscriptengineagent.html#positionChange">positionChange</a>(), and
+<p><b>See also</b> <a href="qscriptengineagent.html#functionExit">functionExit</a>(), <a href="qscriptengineagent.html#positionChange">positionChange</a>(), and
 <a href="qscriptengine.html#currentContext">QScriptEngine.currentContext</a>().</p>
 
 
@@ -194,7 +194,7 @@ normally.</p>
 <p>Reimplement this function to handle this event; typically you
 will then also want to reimplement <a href="qscriptengineagent.html#functionEntry">functionEntry</a>().</p>
 <p>The default implementation does nothing.</p>
-<p>See also <a href="qscriptengineagent.html#functionEntry">functionEntry</a>() and
+<p><b>See also</b> <a href="qscriptengineagent.html#functionEntry">functionEntry</a>() and
 <a href="qscriptengine.html#hasUncaughtException">QScriptEngine.hasUncaughtException</a>().</p>
 
 
@@ -209,7 +209,7 @@ line-by-line stepping, and a profiler implementation could use it
 to count the number of times each statement is executed.</p>
 <p>The default implementation does nothing.</p>
 <p><b>Note:</b> <i>columnNumber</i> is undefined</p>
-<p>See also <a href="qscriptengineagent.html#scriptLoad">scriptLoad</a>() and <a href="qscriptengineagent.html#functionEntry">functionEntry</a>().</p>
+<p><b>See also</b> <a href="qscriptengineagent.html#scriptLoad">scriptLoad</a>() and <a href="qscriptengineagent.html#functionEntry">functionEntry</a>().</p>
 
 
 <h3 class="fn"><a name="scriptLoad" />QScriptEngineAgent.scriptLoad (<i>self</i>, int&#160;<i>id</i>, QString&#160;<i>program</i>, QString&#160;<i>fileName</i>, int&#160;<i>baseLineNumber</i>)</h3><p>This function is called when the engine has parsed a script and
@@ -226,7 +226,7 @@ the script; for example, by retaining the script text, you can
 obtain the line of text corresponding to a line number in a
 subsequent call to <a href="qscriptengineagent.html#positionChange">positionChange</a>().</p>
 <p>The default implementation does nothing.</p>
-<p>See also <a href="qscriptengineagent.html#scriptUnload">scriptUnload</a>().</p>
+<p><b>See also</b> <a href="qscriptengineagent.html#scriptUnload">scriptUnload</a>().</p>
 
 
 <h3 class="fn"><a name="scriptUnload" />QScriptEngineAgent.scriptUnload (<i>self</i>, int&#160;<i>id</i>)</h3><p>This function is called when the engine has discarded the script
@@ -234,11 +234,11 @@ identified by the given <i>id</i>.</p>
 <p>You can reimplement this function to clean up any resources you
 have associated with the script.</p>
 <p>The default implementation does nothing.</p>
-<p>See also <a href="qscriptengineagent.html#scriptLoad">scriptLoad</a>().</p>
+<p><b>See also</b> <a href="qscriptengineagent.html#scriptLoad">scriptLoad</a>().</p>
 
 
 <h3 class="fn"><a name="supportsExtension" />bool QScriptEngineAgent.supportsExtension (<i>self</i>, <a href="qscriptengineagent.html#Extension-enum">Extension</a>&#160;<i>extension</i>)</h3><p>Returns true if the <a href="qscriptengineagent.html">QScriptEngineAgent</a> supports the given
 <i>extension</i>; otherwise, false is returned. By default, no
 extensions are supported.</p>
-<p>See also <a href="qscriptengineagent.html#extension">extension</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qscriptengineagent.html#extension">extension</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

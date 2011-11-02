@@ -76,8 +76,8 @@ state of all keyboard modifiers.</p>
 <h3 class="fn"><a name="QMouseEvent-3" />QMouseEvent.__init__ (<i>self</i>, <a href="qmouseevent.html">QMouseEvent</a>)</h3><h3 class="fn"><a name="button" /><a href="qt.html#MouseButton-enum">Qt.MouseButton</a> QMouseEvent.button (<i>self</i>)</h3><p>Returns the button that caused the event.</p>
 <p>Note that the returned value is always <a href="qt.html#MouseButton-enum">Qt.NoButton</a> for mouse move
 events.</p>
-<p>See also <a href="qmouseevent.html#buttons">buttons</a>() and
-<a href="qt.html#MouseButton-enum">Qt.MouseButton</a>.</p>
+<p><b>See also</b> <a href="qmouseevent.html#buttons">buttons</a>()
+and <a href="qt.html#MouseButton-enum">Qt.MouseButton</a>.</p>
 
 
 <h3 class="fn"><a name="buttons" /><a href="qt-mousebuttons.html">Qt.MouseButtons</a> QMouseEvent.buttons (<i>self</i>)</h3><p>Returns the button state when the event was generated. The
@@ -86,8 +86,8 @@ For mouse move events, this is all buttons that are pressed down.
 For mouse press and double click events this includes the button
 that caused the event. For mouse release events this excludes the
 button that caused the event.</p>
-<p>See also <a href="qmouseevent.html#button">button</a>() and
-<a href="qt.html#MouseButton-enum">Qt.MouseButton</a>.</p>
+<p><b>See also</b> <a href="qmouseevent.html#button">button</a>()
+and <a href="qt.html#MouseButton-enum">Qt.MouseButton</a>.</p>
 
 
 <h3 class="fn"><a name="globalPos" /><a href="qpoint.html">QPoint</a> QMouseEvent.globalPos (<i>self</i>)</h3><p>Returns the global position of the mouse cursor <i>at the time
@@ -96,20 +96,20 @@ like X11. Whenever you move your widgets around in response to
 mouse events, globalPos() may differ a lot from the current pointer
 position <a href="qcursor.html#pos">QCursor.pos</a>(), and from
 QWidget.mapToGlobal(<a href="qmouseevent.html#pos">pos</a>()).</p>
-<p>See also <a href="qmouseevent.html#globalX">globalX</a>() and
-<a href="qmouseevent.html#globalY">globalY</a>().</p>
+<p><b>See also</b> <a href="qmouseevent.html#globalX">globalX</a>()
+and <a href="qmouseevent.html#globalY">globalY</a>().</p>
 
 
 <h3 class="fn"><a name="globalX" />int QMouseEvent.globalX (<i>self</i>)</h3><p>Returns the global x position of the mouse cursor at the time of
 the event.</p>
-<p>See also <a href="qmouseevent.html#globalY">globalY</a>() and
-<a href="qmouseevent.html#globalPos">globalPos</a>().</p>
+<p><b>See also</b> <a href="qmouseevent.html#globalY">globalY</a>()
+and <a href="qmouseevent.html#globalPos">globalPos</a>().</p>
 
 
 <h3 class="fn"><a name="globalY" />int QMouseEvent.globalY (<i>self</i>)</h3><p>Returns the global y position of the mouse cursor at the time of
 the event.</p>
-<p>See also <a href="qmouseevent.html#globalX">globalX</a>() and
-<a href="qmouseevent.html#globalPos">globalPos</a>().</p>
+<p><b>See also</b> <a href="qmouseevent.html#globalX">globalX</a>()
+and <a href="qmouseevent.html#globalPos">globalPos</a>().</p>
 
 
 <h3 class="fn"><a name="hasExtendedInfo" />bool QMouseEvent.hasExtendedInfo (<i>self</i>)</h3><h3 class="fn"><a name="pos" /><a href="qpoint.html">QPoint</a> QMouseEvent.pos (<i>self</i>)</h3><p>Returns the position of the mouse cursor, relative to the widget
@@ -117,7 +117,7 @@ that received the event.</p>
 <p>If you move the widget as a result of the mouse event, use the
 global position returned by <a href="qmouseevent.html#globalPos">globalPos</a>() to avoid a shaking
 motion.</p>
-<p>See also <a href="qmouseevent.html#x">x</a>(), <a href="qmouseevent.html#y">y</a>(), and <a href="qmouseevent.html#globalPos">globalPos</a>().</p>
+<p><b>See also</b> <a href="qmouseevent.html#x">x</a>(), <a href="qmouseevent.html#y">y</a>(), and <a href="qmouseevent.html#globalPos">globalPos</a>().</p>
 
 
 <h3 class="fn"><a name="posF" /><a href="qpointf.html">QPointF</a> QMouseEvent.posF (<i>self</i>)</h3><p>Returns the position of the mouse cursor as a <a href="qpointf.html">QPointF</a>, relative to the widget that received
@@ -126,15 +126,17 @@ the event.</p>
 global position returned by <a href="qmouseevent.html#globalPos">globalPos</a>() to avoid a shaking
 motion.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qmouseevent.html#x">x</a>(), <a href="qmouseevent.html#y">y</a>(), <a href="qmouseevent.html#pos">pos</a>(), and <a href="qmouseevent.html#globalPos">globalPos</a>().</p>
+<p><b>See also</b> <a href="qmouseevent.html#x">x</a>(), <a href="qmouseevent.html#y">y</a>(), <a href="qmouseevent.html#pos">pos</a>(), and <a href="qmouseevent.html#globalPos">globalPos</a>().</p>
 
 
 <h3 class="fn"><a name="x" />int QMouseEvent.x (<i>self</i>)</h3><p>Returns the x position of the mouse cursor, relative to the
 widget that received the event.</p>
-<p>See also <a href="qmouseevent.html#y">y</a>() and <a href="qmouseevent.html#pos">pos</a>().</p>
+<p><b>See also</b> <a href="qmouseevent.html#y">y</a>() and
+<a href="qmouseevent.html#pos">pos</a>().</p>
 
 
 <h3 class="fn"><a name="y" />int QMouseEvent.y (<i>self</i>)</h3><p>Returns the y position of the mouse cursor, relative to the
 widget that received the event.</p>
-<p>See also <a href="qmouseevent.html#x">x</a>() and <a href="qmouseevent.html#pos">pos</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qmouseevent.html#x">x</a>() and
+<a href="qmouseevent.html#pos">pos</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

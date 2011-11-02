@@ -75,121 +75,61 @@ functions. New file formats can be added as plugins. By default, Qt
 supports the following formats:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Format</th>
 <th>Description</th>
 <th>Qt's support</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>BMP</p>
-</td>
-<td>
-<p>Windows Bitmap</p>
-</td>
-<td>
-<p>Read/write</p>
-</td>
+<tr class="odd" valign="top">
+<td>BMP</td>
+<td>Windows Bitmap</td>
+<td>Read/write</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>GIF</p>
-</td>
-<td>
-<p>Graphic Interchange Format (optional)</p>
-</td>
-<td>
-<p>Read</p>
-</td>
+<tr class="even" valign="top">
+<td>GIF</td>
+<td>Graphic Interchange Format (optional)</td>
+<td>Read</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>JPG</p>
-</td>
-<td>
-<p>Joint Photographic Experts Group</p>
-</td>
-<td>
-<p>Read/write</p>
-</td>
+<tr class="odd" valign="top">
+<td>JPG</td>
+<td>Joint Photographic Experts Group</td>
+<td>Read/write</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>JPEG</p>
-</td>
-<td>
-<p>Joint Photographic Experts Group</p>
-</td>
-<td>
-<p>Read/write</p>
-</td>
+<tr class="even" valign="top">
+<td>JPEG</td>
+<td>Joint Photographic Experts Group</td>
+<td>Read/write</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>PNG</p>
-</td>
-<td>
-<p>Portable Network Graphics</p>
-</td>
-<td>
-<p>Read/write</p>
-</td>
+<tr class="odd" valign="top">
+<td>PNG</td>
+<td>Portable Network Graphics</td>
+<td>Read/write</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>PBM</p>
-</td>
-<td>
-<p>Portable Bitmap</p>
-</td>
-<td>
-<p>Read</p>
-</td>
+<tr class="even" valign="top">
+<td>PBM</td>
+<td>Portable Bitmap</td>
+<td>Read</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>PGM</p>
-</td>
-<td>
-<p>Portable Graymap</p>
-</td>
-<td>
-<p>Read</p>
-</td>
+<tr class="odd" valign="top">
+<td>PGM</td>
+<td>Portable Graymap</td>
+<td>Read</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>PPM</p>
-</td>
-<td>
-<p>Portable Pixmap</p>
-</td>
-<td>
-<p>Read/write</p>
-</td>
+<tr class="even" valign="top">
+<td>PPM</td>
+<td>Portable Pixmap</td>
+<td>Read/write</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>XBM</p>
-</td>
-<td>
-<p>X11 Bitmap</p>
-</td>
-<td>
-<p>Read/write</p>
-</td>
+<tr class="odd" valign="top">
+<td>XBM</td>
+<td>X11 Bitmap</td>
+<td>Read/write</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>XPM</p>
-</td>
-<td>
-<p>X11 Pixmap</p>
-</td>
-<td>
-<p>Read/write</p>
-</td>
+<tr class="even" valign="top">
+<td>XPM</td>
+<td>X11 Pixmap</td>
+<td>Read/write</td>
 </tr>
 </table>
 <a id="pixmap-information" name="pixmap-information" />
@@ -198,30 +138,23 @@ supports the following formats:</p>
 obtain a variety of information about the pixmap:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th />
 <th>Available Functions</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>Geometry</p>
-</td>
-<td>
-<p>The <a href="qpixmap.html#size">size</a>(), <a href="qpixmap.html#width">width</a>() and <a href="qpixmap.html#height">height</a>() functions provide information
+<tr class="odd" valign="top">
+<td>Geometry</td>
+<td>The <a href="qpixmap.html#size">size</a>(), <a href="qpixmap.html#width">width</a>() and <a href="qpixmap.html#height">height</a>() functions provide information
 about the pixmap's size. The <a href="qpixmap.html#rect">rect</a>()
-function returns the image's enclosing rectangle.</p>
-</td>
+function returns the image's enclosing rectangle.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Alpha component</p>
-</td>
-<td>
-<p>The <a href="qpixmap.html#hasAlphaChannel">hasAlphaChannel</a>()
-returns true if the pixmap has a format that respects the alpha
-channel, otherwise returns false. The <a href="qpixmap.html#hasAlpha">hasAlpha</a>(), <a href="qpixmap.html#setMask">setMask</a>() and <a href="qpixmap.html#mask">mask</a>() functions are legacy and should not
-be used. They are potentially very slow.</p>
+<tr class="even" valign="top">
+<td>Alpha component</td>
+<td>The <a href="qpixmap.html#hasAlphaChannel">hasAlphaChannel</a>() returns true
+if the pixmap has a format that respects the alpha channel,
+otherwise returns false. The <a href="qpixmap.html#hasAlpha">hasAlpha</a>(), <a href="qpixmap.html#setMask">setMask</a>() and <a href="qpixmap.html#mask">mask</a>() functions are legacy and should not
+be used. They are potentially very slow.
 <p>The <a href="qpixmap.html#createHeuristicMask">createHeuristicMask</a>()
 function creates and returns a 1-bpp heuristic mask (i.e. a
 <a href="qbitmap.html">QBitmap</a>) for this pixmap. It works by
@@ -231,15 +164,12 @@ function creates and returns a mask (i.e. a <a href="qbitmap.html">QBitmap</a>) 
 color.</p>
 </td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Low-level information</p>
-</td>
-<td>
-<p>The <a href="qpixmap.html#depth">depth</a>() function returns
+<tr class="odd" valign="top">
+<td>Low-level information</td>
+<td>The <a href="qpixmap.html#depth">depth</a>() function returns
 the depth of the pixmap. The <a href="qpixmap.html#defaultDepth">defaultDepth</a>() function returns the
 default depth, i.e. the depth used by the application on the given
-screen.</p>
+screen.
 <p>The <a href="qpixmap.html#cacheKey">cacheKey</a>() function
 returns a number that uniquely identifies the contents of the
 QPixmap object.</p>
@@ -294,21 +224,21 @@ pixmap becomes invalid when the <a href="qapplication.html">QApplication</a> ins
 creating a <a href="qpixmap.html">QPixmap</a> object from a raw X11
 Pixmap handle.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPixmap.ImplicitlyShared</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">This mode will cause the <a href="qpixmap.html">QPixmap</a> object to create a copy of the internal
 data before it is modified, thus keeping the original X11 pixmap
 intact.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QPixmap.ExplicitlyShared</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">In this mode, the pixmap data will <i>not</i>
 be copied before it is modified, which in effect will change the
 original X11 pixmap.</td>
@@ -317,9 +247,9 @@ original X11 pixmap.</td>
 <p><b>Warning:</b> This enum is only used for X11 specific
 functions; using it is non-portable.</p>
 <p>This enum was introduced or modified in Qt 4.5.</p>
-<p>See also <a href="qpixmap.html#fromX11Pixmap">QPixmap.fromX11Pixmap</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#fromX11Pixmap">QPixmap.fromX11Pixmap</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QPixmap" />QPixmap.__init__ (<i>self</i>)</h3><p>Constructs a null pixmap.</p>
-<p>See also <a href="qpixmap.html#isNull">isNull</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#isNull">isNull</a>().</p>
 
 
 <h3 class="fn"><a name="QPixmap-2" />QPixmap.__init__ (<i>self</i>, int&#160;<i>w</i>, int&#160;<i>h</i>)</h3><h3 class="fn"><a name="QPixmap-3" />QPixmap.__init__ (<i>self</i>, <a href="qsize.html">QSize</a>)</h3><p>Constructs a pixmap with the given <i>width</i> and
@@ -327,7 +257,7 @@ functions; using it is non-portable.</p>
 null pixmap is constructed.</p>
 <p><b>Warning:</b> This will create a <a href="qpixmap.html">QPixmap</a> with uninitialized data. Call <a href="qpixmap.html#fill">fill</a>() to fill the pixmap with an
 appropriate color before drawing onto it with <a href="qpainter.html">QPainter</a>.</p>
-<p>See also <a href="qpixmap.html#isNull">isNull</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#isNull">isNull</a>().</p>
 
 
 <h3 class="fn"><a name="QPixmap-4" />QPixmap.__init__ (<i>self</i>, QString&#160;<i>fileName</i>, str&#160;<i>format</i>&#160;=&#160;None, <a href="qt-imageconversionflags.html">Qt.ImageConversionFlags</a>&#160;<i>flags</i>&#160;=&#160;Qt.AutoColor)</h3><p>Constructs a pixmap from the file with the given
@@ -350,7 +280,7 @@ that the data in <i>fileName</i> is not compiled into the binary.
 If <i>fileName</i> contains a relative path (e.g. the filename
 only) the relevant file must be found relative to the runtime
 working directory.</p>
-<p>See also <a href="qpixmap.html#reading-and-writing-image-files">Reading and Writing
+<p><b>See also</b> <a href="qpixmap.html#reading-and-writing-image-files">Reading and Writing
 Image Files</a>.</p>
 
 
@@ -359,11 +289,11 @@ be a valid XPM image.</p>
 <p>Errors are silently ignored.</p>
 <p>Note that it's possible to squeeze the XPM variable a little bit
 by using an unusual declaration:</p>
-<pre class="highlightedCode brush: cpp">
- static const char * const start_xpm[]={
-     "16 15 8 1",
-     "a c #cec6bd",
- ....
+<pre class="cpp">
+ <span class="keyword">static</span> <span class="keyword">const</span> <span class="type">char</span> <span class="operator">*</span> <span class="keyword">const</span> start_xpm<span class="operator">[</span><span class="operator">]</span><span class="operator">=</span>{
+     <span class="string">"16 15 8 1"</span><span class="operator">,</span>
+     <span class="string">"a c #cec6bd"</span><span class="operator">,</span>
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 </pre>
 <p>The extra <tt>const</tt> makes the entire definition read-only,
 which is slightly more efficient (for example, when the code is in
@@ -373,7 +303,7 @@ in ROM.</p>
 
 <h3 class="fn"><a name="QPixmap-6" />QPixmap.__init__ (<i>self</i>, <a href="qpixmap.html">QPixmap</a>)</h3><p>Constructs a pixmap that is a copy of the given
 <i>pixmap</i>.</p>
-<p>See also <a href="qpixmap.html#copy">copy</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#copy">copy</a>().</p>
 
 
 <h3 class="fn"><a name="QPixmap-7" />QPixmap.__init__ (<i>self</i>, QVariant&#160;<i>variant</i>)</h3><h3 class="fn"><a name="alphaChannel" /><a href="qpixmap.html">QPixmap</a> QPixmap.alphaChannel (<i>self</i>)</h3><h3 class="fn"><a name="cacheKey" />int QPixmap.cacheKey (<i>self</i>)</h3><p>Returns a number that identifies this <a href="qpixmap.html">QPixmap</a>. Distinct <a href="qpixmap.html">QPixmap</a> objects can only have the same cache key
@@ -390,7 +320,7 @@ true if the result is that this pixmap is not null.</p>
 earlier. It has been promoted to official API status in 4.7 to
 support updating the pixmap's image without creating a new <a href="qpixmap.html">QPixmap</a> as <a href="qpixmap.html#fromImage">fromImage</a>() would.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qpixmap.html#fromImage">fromImage</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#fromImage">fromImage</a>().</p>
 
 
 <h3 class="fn"><a name="copy" /><a href="qpixmap.html">QPixmap</a> QPixmap.copy (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>rect</i>&#160;=&#160;QRect())</h3><p>Returns a deep copy of the subset of the pixmap that is
@@ -399,8 +329,7 @@ deep copies, see the <a href="implicit-sharing.html#implicit-data-sharing">Impli
 Sharing</a> documentation.</p>
 <p>If the given <i>rectangle</i> is empty, the whole image is
 copied.</p>
-<p>See also <a href="qpixmap.html#operator-eq">operator=</a>(),
-<a href="qpixmap.html#QPixmap">QPixmap</a>(), and <a href="qpixmap.html#pixmap-transformations">Pixmap
+<p><b>See also</b> <a href="qpixmap.html#operator-eq">operator=</a>(), <a href="qpixmap.html#QPixmap">QPixmap</a>(), and <a href="qpixmap.html#pixmap-transformations">Pixmap
 Transformations</a>.</p>
 
 
@@ -418,13 +347,13 @@ large enough to cover the pixels; otherwise, the mask is larger
 than the data pixels.</p>
 <p>The mask may not be perfect but it should be reasonable, so you
 can do things such as the following:</p>
-<pre class="highlightedCode brush: cpp">
- QPixmap myPixmap;
- myPixmap-&gt;setMask(myPixmap-&gt;createHeuristicMask());
+<pre class="cpp">
+ <span class="type"><a href="qpixmap.html">QPixmap</a></span> myPixmap;
+ myPixmap<span class="operator">-</span><span class="operator">&gt;</span>setMask(myPixmap<span class="operator">-</span><span class="operator">&gt;</span>createHeuristicMask());
 </pre>
 <p>This function is slow because it involves converting to/from a
 <a href="qimage.html">QImage</a>, and non-trivial computations.</p>
-<p>See also <a href="qimage.html#createHeuristicMask">QImage.createHeuristicMask</a>()
+<p><b>See also</b> <a href="qimage.html#createHeuristicMask">QImage.createHeuristicMask</a>()
 and <a href="qpixmap.html#createMaskFromColor">createMaskFromColor</a>().</p>
 
 
@@ -434,7 +363,7 @@ the maskColor will be transparent. If <i>mode</i> is <a href="qt.html#MaskMode-e
 the maskColor will be opaque.</p>
 <p>This function is slow because it involves converting to/from a
 <a href="qimage.html">QImage</a>.</p>
-<p>See also <a href="qpixmap.html#createHeuristicMask">createHeuristicMask</a>() and
+<p><b>See also</b> <a href="qpixmap.html#createHeuristicMask">createHeuristicMask</a>() and
 <a href="qimage.html#createMaskFromColor">QImage.createMaskFromColor</a>().</p>
 
 
@@ -442,7 +371,7 @@ the maskColor will be opaque.</p>
 <p>Creates and returns a mask for this pixmap based on the given
 <i>maskColor</i>. Same as calling createMaskFromColor(maskColor,
 <a href="qt.html#MaskMode-enum">Qt.MaskInColor</a>)</p>
-<p>See also <a href="qpixmap.html#createHeuristicMask">createHeuristicMask</a>() and
+<p><b>See also</b> <a href="qpixmap.html#createHeuristicMask">createHeuristicMask</a>() and
 <a href="qimage.html#createMaskFromColor">QImage.createMaskFromColor</a>().</p>
 
 
@@ -450,15 +379,14 @@ the maskColor will be opaque.</p>
 <p>On Windows and Mac, the default depth is always 32. On X11 and
 embedded, the depth of the screen will be returned by this
 function.</p>
-<p>See also <a href="qpixmap.html#depth">depth</a>(), <a href="qcolormap.html#depth">QColormap.depth</a>(), and <a href="qpixmap.html#pixmap-information">Pixmap Information</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#depth">depth</a>(),
+<a href="qcolormap.html#depth">QColormap.depth</a>(), and <a href="qpixmap.html#pixmap-information">Pixmap Information</a>.</p>
 
 
 <h3 class="fn"><a name="depth" />int QPixmap.depth (<i>self</i>)</h3><p>Returns the depth of the pixmap.</p>
 <p>The pixmap depth is also called bits per pixel (bpp) or bit
 planes of a pixmap. A null pixmap has depth 0.</p>
-<p>See also <a href="qpixmap.html#defaultDepth">defaultDepth</a>()
-and <a href="qpixmap.html#pixmap-information">Pixmap
-Information</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#defaultDepth">defaultDepth</a>() and <a href="qpixmap.html#pixmap-information">Pixmap Information</a>.</p>
 
 
 <h3 class="fn"><a name="detach" />QPixmap.detach (<i>self</i>)</h3><p>Detaches the pixmap from shared pixmap data.</p>
@@ -476,7 +404,7 @@ single reference or if the pixmap has not been initialized yet.</p>
 <h3 class="fn"><a name="devType" />int QPixmap.devType (<i>self</i>)</h3><h3 class="fn"><a name="fill" />QPixmap.fill (<i>self</i>, <a href="qcolor.html">QColor</a>&#160;<i>color</i>&#160;=&#160;Qt.white)</h3><p>Fills the pixmap with the given <i>color</i>.</p>
 <p>The effect of this function is undefined when the pixmap is
 being painted on.</p>
-<p>See also <a href="qpixmap.html#pixmap-transformations">Pixmap
+<p><b>See also</b> <a href="qpixmap.html#pixmap-transformations">Pixmap
 Transformations</a>.</p>
 
 
@@ -505,7 +433,7 @@ converted to a 32-bit pixmap and then filled with the colors in the
 color table. If this is too expensive an operation, you can use
 <a href="qbitmap.html#fromImage">QBitmap.fromImage</a>()
 instead.</p>
-<p>See also <a href="qpixmap.html#fromImageReader">fromImageReader</a>(), <a href="qpixmap.html#toImage">toImage</a>(), and <a href="qpixmap.html#pixmap-conversion">Pixmap Conversion</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#fromImageReader">fromImageReader</a>(), <a href="qpixmap.html#toImage">toImage</a>(), and <a href="qpixmap.html#pixmap-conversion">Pixmap Conversion</a>.</p>
 
 
 <h3 class="fn"><a name="fromImageReader" /><a href="qpixmap.html">QPixmap</a> QPixmap.fromImageReader (<a href="qimagereader.html">QImageReader</a>&#160;<i>imageReader</i>, <a href="qt-imageconversionflags.html">Qt.ImageConversionFlags</a>&#160;<i>flags</i>&#160;=&#160;Qt.AutoColor)</h3><p>Create a <a href="qpixmap.html">QPixmap</a> from an image read
@@ -514,8 +442,7 @@ bitwise-OR of the <a href="qt.html#ImageConversionFlag-enum">Qt.ImageConversionF
 Passing 0 for <i>flags</i> sets all the default options.</p>
 <p>On some systems, reading an image directly to <a href="qpixmap.html">QPixmap</a> can use less memory than reading a
 <a href="qimage.html">QImage</a> to convert it to <a href="qpixmap.html">QPixmap</a>.</p>
-<p>See also <a href="qpixmap.html#fromImage">fromImage</a>(),
-<a href="qpixmap.html#toImage">toImage</a>(), and <a href="qpixmap.html#pixmap-conversion">Pixmap Conversion</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#fromImage">fromImage</a>(), <a href="qpixmap.html#toImage">toImage</a>(), and <a href="qpixmap.html#pixmap-conversion">Pixmap Conversion</a>.</p>
 
 
 <h3 class="fn"><a name="fromX11Pixmap" /><a href="qpixmap.html">QPixmap</a> QPixmap.fromX11Pixmap (int&#160;<i>pixmap</i>, <a href="qpixmap.html#ShareMode-enum">ShareMode</a>&#160;<i>mode</i>&#160;=&#160;QPixmap.ImplicitlyShared)</h3><p>Creates a <a href="qpixmap.html">QPixmap</a> from the native X11
@@ -529,7 +456,7 @@ the user.</p>
 <p><b>Warning:</b> This function is X11 specific; using it is
 non-portable.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qpixmap.html#ShareMode-enum">QPixmap.ShareMode</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#ShareMode-enum">QPixmap.ShareMode</a>.</p>
 
 
 <h3 class="fn"><a name="grabWidget" /><a href="qpixmap.html">QPixmap</a> QPixmap.grabWidget (<a href="qwidget.html">QWidget</a>&#160;<i>widget</i>, <a href="qrect.html">QRect</a>&#160;<i>rect</i>)</h3><p>Creates a pixmap and paints the given <i>widget</i>, restricted
@@ -551,7 +478,7 @@ there are overlaying windows, <a href="qpixmap.html#grabWindow">grabWindow</a>()
 will see them.</p>
 <p><b>Warning:</b> Do not grab a widget from its <a href="qwidget.html#paintEvent">QWidget.paintEvent</a>(). However, it is
 safe to grab a widget from another widget's <a href="qwidget.html#paintEvent">paintEvent()</a>.</p>
-<p>See also <a href="qpixmap.html#grabWindow">grabWindow</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#grabWindow">grabWindow</a>().</p>
 
 
 <h3 class="fn"><a name="grabWidget-2" /><a href="qpixmap.html">QPixmap</a> QPixmap.grabWidget (<a href="qwidget.html">QWidget</a>&#160;<i>widget</i>, int&#160;<i>x</i>&#160;=&#160;0, int&#160;<i>y</i>&#160;=&#160;0, int&#160;<i>width</i>&#160;=&#160;-1, int&#160;<i>height</i>&#160;=&#160;-1)</h3><p>This is an overloaded function.</p>
@@ -592,8 +519,7 @@ attribute, will not work. Instead grabbing the desktop widget
 should work.</p>
 <p><b>Warning:</b> In general, grabbing an area outside the screen
 is not safe. This depends on the underlying window system.</p>
-<p>See also <a href="qpixmap.html#grabWidget">grabWidget</a>() and
-<a href="desktop-screenshot.html">Screenshot Example</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#grabWidget">grabWidget</a>() and <a href="desktop-screenshot.html">Screenshot Example</a>.</p>
 
 
 <h3 class="fn"><a name="handle" />int QPixmap.handle (<i>self</i>)</h3><p>Returns the pixmap's handle to the device context.</p>
@@ -604,21 +530,23 @@ function must be called explicitly to ensure that only <i>this</i>
 pixmap's data is modified if the pixmap data is shared.</p>
 <p><b>Warning:</b> This function is X11 specific; using it is
 non-portable.</p>
-<p>See also <a href="qpixmap.html#detach">detach</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#detach">detach</a>().</p>
 
 
 <h3 class="fn"><a name="hasAlpha" />bool QPixmap.hasAlpha (<i>self</i>)</h3><p>Returns true if this pixmap has an alpha channel, <i>or</i> has
 a mask, otherwise returns false.</p>
-<p>See also <a href="qpixmap.html#hasAlphaChannel">hasAlphaChannel</a>() and <a href="qpixmap.html#mask">mask</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#hasAlphaChannel">hasAlphaChannel</a>() and <a href="qpixmap.html#mask">mask</a>().</p>
 
 
 <h3 class="fn"><a name="hasAlphaChannel" />bool QPixmap.hasAlphaChannel (<i>self</i>)</h3><p>Returns true if the pixmap has a format that respects the alpha
 channel, otherwise returns false.</p>
-<p>See also <a href="qpixmap.html#hasAlpha">hasAlpha</a>().</p>
+<p><b>See also</b> <a href="qpixmap.html#hasAlpha">hasAlpha</a>().</p>
 
 
 <h3 class="fn"><a name="height" />int QPixmap.height (<i>self</i>)</h3><p>Returns the height of the pixmap.</p>
-<p>See also <a href="qpixmap.html#size">size</a>() and <a href="qpixmap.html#pixmap-information">Pixmap Information</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#size">size</a>() and
+<a href="qpixmap.html#pixmap-information">Pixmap
+Information</a>.</p>
 
 
 <h3 class="fn"><a name="isNull" />bool QPixmap.isNull (<i>self</i>)</h3><p>Returns true if this is a null pixmap; otherwise returns
@@ -647,9 +575,8 @@ result (e.g. converting from 32-bit to 8-bit), use the <i>flags</i>
 to control the conversion.</p>
 <p>Note that QPixmaps are automatically added to the <a href="qpixmapcache.html">QPixmapCache</a> when loaded from a file; the
 key used is internal and can not be acquired.</p>
-<p>See also <a href="qpixmap.html#loadFromData">loadFromData</a>()
-and <a href="qpixmap.html#reading-and-writing-image-files">Reading
-and Writing Image Files</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#loadFromData">loadFromData</a>() and <a href="qpixmap.html#reading-and-writing-image-files">Reading and Writing
+Image Files</a>.</p>
 
 
 <h3 class="fn"><a name="loadFromData" />bool QPixmap.loadFromData (<i>self</i>, str&#160;<i>buf</i>, str&#160;<i>format</i>&#160;=&#160;None, <a href="qt-imageconversionflags.html">Qt.ImageConversionFlags</a>&#160;<i>flags</i>&#160;=&#160;Qt.AutoColor)</h3><p>Loads a pixmap from the <i>len</i> first bytes of the given
@@ -662,20 +589,21 @@ format.</p>
 <p>If the data needs to be modified to fit in a lower-resolution
 result (e.g. converting from 32-bit to 8-bit), use the <i>flags</i>
 to control the conversion.</p>
-<p>See also <a href="qpixmap.html#load">load</a>() and <a href="qpixmap.html#reading-and-writing-image-files">Reading and Writing
-Image Files</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#load">load</a>() and
+<a href="qpixmap.html#reading-and-writing-image-files">Reading and
+Writing Image Files</a>.</p>
 
 
 <h3 class="fn"><a name="loadFromData-2" />bool QPixmap.loadFromData (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>buf</i>, str&#160;<i>format</i>&#160;=&#160;None, <a href="qt-imageconversionflags.html">Qt.ImageConversionFlags</a>&#160;<i>flags</i>&#160;=&#160;Qt.AutoColor)</h3><h3 class="fn"><a name="mask" /><a href="qbitmap.html">QBitmap</a> QPixmap.mask (<i>self</i>)</h3><p>Extracts a bitmap mask from the pixmap's alpha channel.</p>
 <p><b>Warning:</b> This is potentially an expensive operation. The
 mask of the pixmap is extracted dynamically from the pixeldata.</p>
-<p>See also <a href="qpixmap.html#setMask">setMask</a>() and
+<p><b>See also</b> <a href="qpixmap.html#setMask">setMask</a>() and
 <a href="qpixmap.html#pixmap-information">Pixmap
 Information</a>.</p>
 
 
 <h3 class="fn"><a name="metric" />int QPixmap.metric (<i>self</i>, <a href="qpaintdevice.html#PaintDeviceMetric-enum">QPaintDevice.PaintDeviceMetric</a>)</h3><h3 class="fn"><a name="paintEngine" /><a href="qpaintengine.html">QPaintEngine</a> QPixmap.paintEngine (<i>self</i>)</h3><h3 class="fn"><a name="rect" /><a href="qrect.html">QRect</a> QPixmap.rect (<i>self</i>)</h3><p>Returns the pixmap's enclosing rectangle.</p>
-<p>See also <a href="qpixmap.html#pixmap-information">Pixmap
+<p><b>See also</b> <a href="qpixmap.html#pixmap-information">Pixmap
 Information</a>.</p>
 
 
@@ -687,7 +615,7 @@ Specify 0 to obtain small compressed files, 100 for large
 uncompressed files, and -1 to use the default settings.</p>
 <p>If <i>format</i> is 0, an image format will be chosen from
 <i>fileName</i>'s suffix.</p>
-<p>See also <a href="qpixmap.html#reading-and-writing-image-files">Reading and Writing
+<p><b>See also</b> <a href="qpixmap.html#reading-and-writing-image-files">Reading and Writing
 Image Files</a>.</p>
 
 
@@ -696,12 +624,12 @@ Image Files</a>.</p>
 given <i>device</i> using the specified image file <i>format</i>
 and <i>quality</i> factor. This can be used, for example, to save a
 pixmap directly into a <a href="qbytearray.html">QByteArray</a>:</p>
-<pre class="highlightedCode brush: cpp">
-         QPixmap pixmap;
-         QByteArray bytes;
-         QBuffer buffer(&amp;bytes);
-         buffer.open(QIODevice.WriteOnly);
-         pixmap.save(&amp;buffer, "PNG"); <span class="comment">// writes pixmap into bytes in PNG format</span>
+<pre class="cpp">
+         <span class="type"><a href="qpixmap.html">QPixmap</a></span> pixmap;
+         <span class="type"><a href="qbytearray.html">QByteArray</a></span> bytes;
+         <span class="type"><a href="qbuffer.html">QBuffer</a></span> buffer(<span class="operator">&amp;</span>bytes);
+         buffer<span class="operator">.</span>open(<span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>WriteOnly);
+         pixmap<span class="operator">.</span>save(<span class="operator">&amp;</span>buffer<span class="operator">,</span> <span class="string">"PNG"</span>); <span class="comment">// writes pixmap into bytes in PNG format</span>
 </pre>
 
 
@@ -725,7 +653,8 @@ pixmap.</p>
 painter with a scale set rather than scaling the pixmap. This is
 the case when the painter is for instance based on OpenGL or when
 the scale factor changes rapidly.</p>
-<p>See also <a href="qpixmap.html#isNull">isNull</a>() and <a href="qpixmap.html#pixmap-transformations">Pixmap
+<p><b>See also</b> <a href="qpixmap.html#isNull">isNull</a>() and
+<a href="qpixmap.html#pixmap-transformations">Pixmap
 Transformations</a>.</p>
 
 
@@ -743,7 +672,8 @@ to the given <i>height</i> using the specified transformation
 that the aspect ratio of the pixmap is preserved.</p>
 <p>If <i>height</i> is 0 or negative, a null pixmap is
 returned.</p>
-<p>See also <a href="qpixmap.html#isNull">isNull</a>() and <a href="qpixmap.html#pixmap-transformations">Pixmap
+<p><b>See also</b> <a href="qpixmap.html#isNull">isNull</a>() and
+<a href="qpixmap.html#pixmap-transformations">Pixmap
 Transformations</a>.</p>
 
 
@@ -752,7 +682,8 @@ to the given <i>width</i> using the specified transformation
 <i>mode</i>. The height of the pixmap is automatically calculated
 so that the aspect ratio of the pixmap is preserved.</p>
 <p>If <i>width</i> is 0 or negative, a null pixmap is returned.</p>
-<p>See also <a href="qpixmap.html#isNull">isNull</a>() and <a href="qpixmap.html#pixmap-transformations">Pixmap
+<p><b>See also</b> <a href="qpixmap.html#isNull">isNull</a>() and
+<a href="qpixmap.html#pixmap-transformations">Pixmap
 Transformations</a>.</p>
 
 
@@ -760,24 +691,22 @@ Transformations</a>.</p>
 QPixmap.scroll(<i>dx</i>, <i>dy</i>, <a href="qrect.html">QRect</a>(<i>x</i>, <i>y</i>, <i>width</i>,
 <i>height</i>), <i>exposed</i>).</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qwidget.html#scroll">QWidget.scroll</a>() and
-<a href="qgraphicsitem.html#scroll">QGraphicsItem.scroll</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#scroll">QWidget.scroll</a>() and <a href="qgraphicsitem.html#scroll">QGraphicsItem.scroll</a>().</p>
 
 
 <h3 class="fn"><a name="scroll-2" /><a href="qregion.html">QRegion</a>&#160;<i>exposed</i> QPixmap.scroll (<i>self</i>, int&#160;<i>dx</i>, int&#160;<i>dy</i>, int&#160;<i>x</i>, int&#160;<i>y</i>, int&#160;<i>width</i>, int&#160;<i>height</i>)</h3><p>Scrolls the area <i>rect</i> of this pixmap by (<i>dx</i>,
 <i>dy</i>). The exposed region is left unchanged. You can
 optionally pass a pointer to an empty <a href="qregion.html">QRegion</a> to get the region that is <i>exposed</i>
 by the scroll operation.</p>
-<pre class="highlightedCode brush: cpp">
- QPixmap pixmap("background.png");
- QRegion exposed;
- pixmap.scroll(10, 10, pixmap.rect(), &amp;exposed);
+<pre class="cpp">
+ <span class="type"><a href="qpixmap.html">QPixmap</a></span> pixmap(<span class="string">"background.png"</span>);
+ <span class="type"><a href="qregion.html">QRegion</a></span> exposed;
+ pixmap<span class="operator">.</span>scroll(<span class="number">10</span><span class="operator">,</span> <span class="number">10</span><span class="operator">,</span> pixmap<span class="operator">.</span>rect()<span class="operator">,</span> <span class="operator">&amp;</span>exposed);
 </pre>
 <p>You cannot scroll while there is an active painter on the
 pixmap.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qwidget.html#scroll">QWidget.scroll</a>() and
-<a href="qgraphicsitem.html#scroll">QGraphicsItem.scroll</a>().</p>
+<p><b>See also</b> <a href="qwidget.html#scroll">QWidget.scroll</a>() and <a href="qgraphicsitem.html#scroll">QGraphicsItem.scroll</a>().</p>
 
 
 <h3 class="fn"><a name="serialNumber" />int QPixmap.serialNumber (<i>self</i>)</h3><h3 class="fn"><a name="setAlphaChannel" />QPixmap.setAlphaChannel (<i>self</i>, <a href="qpixmap.html">QPixmap</a>)</h3><h3 class="fn"><a name="setMask" />QPixmap.setMask (<i>self</i>, <a href="qbitmap.html">QBitmap</a>)</h3><p>Sets a mask bitmap.</p>
@@ -789,12 +718,13 @@ must have the same size as this pixmap.</p>
 transparent pixels black. The effect of this function is undefined
 when the pixmap is being painted on.</p>
 <p><b>Warning:</b> This is potentially an expensive operation.</p>
-<p>See also <a href="qpixmap.html#mask">mask</a>(), <a href="qpixmap.html#pixmap-transformations">Pixmap Transformations</a>,
+<p><b>See also</b> <a href="qpixmap.html#mask">mask</a>(), <a href="qpixmap.html#pixmap-transformations">Pixmap Transformations</a>,
 and <a href="qbitmap.html">QBitmap</a>.</p>
 
 
 <h3 class="fn"><a name="size" /><a href="qsize.html">QSize</a> QPixmap.size (<i>self</i>)</h3><p>Returns the size of the pixmap.</p>
-<p>See also <a href="qpixmap.html#width">width</a>(), <a href="qpixmap.html#height">height</a>(), and <a href="qpixmap.html#pixmap-information">Pixmap Information</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#width">width</a>(),
+<a href="qpixmap.html#height">height</a>(), and <a href="qpixmap.html#pixmap-information">Pixmap Information</a>.</p>
 
 
 <h3 class="fn"><a name="toImage" /><a href="qimage.html">QImage</a> QPixmap.toImage (<i>self</i>)</h3><p>Converts the pixmap to a <a href="qimage.html">QImage</a>.
@@ -807,8 +737,8 @@ for pixmaps with an alpha and <a href="qimage.html#Format-enum">QImage.Format_RG
 without alpha.</p>
 <p>Note that for the moment, alpha masks on monochrome images are
 ignored.</p>
-<p>See also <a href="qpixmap.html#fromImage">fromImage</a>() and
-<a href="qimage.html#image-formats">Image Formats</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#fromImage">fromImage</a>()
+and <a href="qimage.html#image-formats">Image Formats</a>.</p>
 
 
 <h3 class="fn"><a name="transformed" /><a href="qpixmap.html">QPixmap</a> QPixmap.transformed (<i>self</i>, <a href="qmatrix.html">QMatrix</a>&#160;<i>matrix</i>, <a href="qt.html#TransformationMode-enum">Qt.TransformationMode</a>&#160;<i>mode</i>&#160;=&#160;Qt.FastTransformation)</h3><p>Returns a copy of the pixmap that is transformed using the given
@@ -822,8 +752,7 @@ actual matrix used for transforming the pixmap.</p>
 <p>This function is slow because it involves transformation to a
 <a href="qimage.html">QImage</a>, non-trivial computations and a
 transformation back to a <a href="qpixmap.html">QPixmap</a>.</p>
-<p>See also <a href="qpixmap.html#trueMatrix">trueMatrix</a>() and
-<a href="qpixmap.html#pixmap-transformations">Pixmap
+<p><b>See also</b> <a href="qpixmap.html#trueMatrix">trueMatrix</a>() and <a href="qpixmap.html#pixmap-transformations">Pixmap
 Transformations</a>.</p>
 
 
@@ -841,8 +770,7 @@ unwanted translation, i.e. <a href="qpixmap.html#transformed">transformed</a>() 
 pixmap containing all transformed points of the original pixmap.
 This function returns the modified matrix, which maps points
 correctly from the original pixmap into the new pixmap.</p>
-<p>See also <a href="qpixmap.html#transformed">transformed</a>()
-and <a href="qpixmap.html#pixmap-transformations">Pixmap
+<p><b>See also</b> <a href="qpixmap.html#transformed">transformed</a>() and <a href="qpixmap.html#pixmap-transformations">Pixmap
 Transformations</a>.</p>
 
 
@@ -854,14 +782,16 @@ width <i>w</i> and the height <i>h</i>.</p>
 
 
 <h3 class="fn"><a name="width" />int QPixmap.width (<i>self</i>)</h3><p>Returns the width of the pixmap.</p>
-<p>See also <a href="qpixmap.html#size">size</a>() and <a href="qpixmap.html#pixmap-information">Pixmap Information</a>.</p>
+<p><b>See also</b> <a href="qpixmap.html#size">size</a>() and
+<a href="qpixmap.html#pixmap-information">Pixmap
+Information</a>.</p>
 
 
 <h3 class="fn"><a name="x11Info" /><a href="qx11info.html">QX11Info</a> QPixmap.x11Info (<i>self</i>)</h3><p><b>X11 only:</b> Returns information about the configuration of
 the X display used by the screen to which the pixmap currently
 belongs.</p>
 <p><b>Warning:</b> This function is only available on X11.</p>
-<p>See also <a href="qpixmap.html#pixmap-information">Pixmap
+<p><b>See also</b> <a href="qpixmap.html#pixmap-information">Pixmap
 Information</a>.</p>
 
 
@@ -872,8 +802,8 @@ into Qt, if the XRender extension is not supported on the X11
 display, or if the handle could not be created. Use of this
 function is not portable.</p>
 <p><b>Warning:</b> This function is only available on X11.</p>
-<p>See also <a href="qpixmap.html#pixmap-information">Pixmap
+<p><b>See also</b> <a href="qpixmap.html#pixmap-information">Pixmap
 Information</a>.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

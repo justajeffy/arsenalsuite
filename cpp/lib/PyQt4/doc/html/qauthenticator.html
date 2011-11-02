@@ -42,22 +42,16 @@ unknown options will be treated or sent back to the server.</p>
 <h4>Basic</h4>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Option</th>
 <th>Direction</th>
 <th>Description</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><tt>realm</tt></p>
-</td>
-<td>
-<p>Incoming</p>
-</td>
-<td>
-<p>Contains the realm of the authentication, the same as <a href="qauthenticator.html#realm">realm</a>()</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>realm</tt></td>
+<td>Incoming</td>
+<td>Contains the realm of the authentication, the same as <a href="qauthenticator.html#realm">realm</a>()</td>
 </tr>
 </table>
 <p>The Basic authentication mechanism supports no outgoing
@@ -70,22 +64,16 @@ or outgoing options.</p>
 <h4>Digest-MD5</h4>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Option</th>
 <th>Direction</th>
 <th>Description</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><tt>realm</tt></p>
-</td>
-<td>
-<p>Incoming</p>
-</td>
-<td>
-<p>Contains the realm of the authentication, the same as <a href="qauthenticator.html#realm">realm</a>()</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>realm</tt></td>
+<td>Incoming</td>
+<td>Contains the realm of the authentication, the same as <a href="qauthenticator.html#realm">realm</a>()</td>
 </tr>
 </table>
 <p>The Digest-MD5 authentication mechanism supports no outgoing
@@ -105,19 +93,18 @@ information on incoming options. If option <i>opt</i> isn't found,
 an invalid <a href="qvariant.html">QVariant</a> will be
 returned.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qauthenticator.html#setOption">setOption</a>(), <a href="qauthenticator.html#options">options</a>(), and <a href="qauthenticator.html#options">QAuthenticator#Options</a>.</p>
+<p><b>See also</b> <a href="qauthenticator.html#setOption">setOption</a>(), <a href="qauthenticator.html#options">options</a>(), and <a href="qauthenticator.html#options">QAuthenticator#Options</a>.</p>
 
 
 <h3 class="fn"><a name="options" />dict-of-QString-QVariant QAuthenticator.options (<i>self</i>)</h3><p>Returns all incoming options set in this <a href="qauthenticator.html">QAuthenticator</a> object by parsing the
 server reply. See <a href="qauthenticator.html#options">QAuthenticator#Options</a> for more
 information on incoming options.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qauthenticator.html#option">option</a>() and
-<a href="qauthenticator.html#options">QAuthenticator#Options</a>.</p>
+<p><b>See also</b> <a href="qauthenticator.html#option">option</a>() and <a href="qauthenticator.html#options">QAuthenticator#Options</a>.</p>
 
 
 <h3 class="fn"><a name="password" />QString QAuthenticator.password (<i>self</i>)</h3><p>returns the password used for authentication.</p>
-<p>See also <a href="qauthenticator.html#setPassword">setPassword</a>().</p>
+<p><b>See also</b> <a href="qauthenticator.html#setPassword">setPassword</a>().</p>
 
 
 <h3 class="fn"><a name="realm" />QString QAuthenticator.realm (<i>self</i>)</h3><p>returns the realm requiring authentication.</p>
@@ -127,20 +114,19 @@ information on incoming options.</p>
 <a href="qauthenticator.html#options">QAuthenticator#Options</a>
 for more information on outgoing options.</p>
 <p>This function was introduced in Qt 4.7.</p>
-<p>See also <a href="qauthenticator.html#options">options</a>(),
-<a href="qauthenticator.html#option">option</a>(), and <a href="qauthenticator.html#options">QAuthenticator#Options</a>.</p>
+<p><b>See also</b> <a href="qauthenticator.html#options">options</a>(), <a href="qauthenticator.html#option">option</a>(), and <a href="qauthenticator.html#options">QAuthenticator#Options</a>.</p>
 
 
 <h3 class="fn"><a name="setPassword" />QAuthenticator.setPassword (<i>self</i>, QString&#160;<i>password</i>)</h3><p>Sets the <i>password</i> used for authentication.</p>
-<p>See also <a href="qauthenticator.html#password">password</a>().</p>
+<p><b>See also</b> <a href="qauthenticator.html#password">password</a>().</p>
 
 
 <h3 class="fn"><a name="setUser" />QAuthenticator.setUser (<i>self</i>, QString&#160;<i>user</i>)</h3><p>Sets the <i>user</i> used for authentication.</p>
-<p>See also <a href="qauthenticator.html#user">user</a>().</p>
+<p><b>See also</b> <a href="qauthenticator.html#user">user</a>().</p>
 
 
 <h3 class="fn"><a name="user" />QString QAuthenticator.user (<i>self</i>)</h3><p>returns the user used for authentication.</p>
-<p>See also <a href="qauthenticator.html#setUser">setUser</a>().</p>
+<p><b>See also</b> <a href="qauthenticator.html#setUser">setUser</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QAuthenticator.__eq__ (<i>self</i>, <a href="qauthenticator.html">QAuthenticator</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QAuthenticator.__ne__ (<i>self</i>, <a href="qauthenticator.html">QAuthenticator</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QAuthenticator.__eq__ (<i>self</i>, <a href="qauthenticator.html">QAuthenticator</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QAuthenticator.__ne__ (<i>self</i>, <a href="qauthenticator.html">QAuthenticator</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -21,29 +21,29 @@ normally has one <a href="qstyle.html">QStyle</a> object shared by
 all widget), a QStylePainter is initialized with a widget,
 eliminating the need to specify the <a href="qwidget.html">QWidget</a>, the <a href="qpainter.html">QPainter</a>, and the <a href="qstyle.html">QStyle</a> for every function call.</p>
 <p>Example using <a href="qstyle.html">QStyle</a> directly:</p>
-<pre class="highlightedCode brush: cpp">
- void MyWidget.paintEvent(QPaintEvent * <span class="comment">/* event */</span>)
+<pre class="cpp">
+ <span class="type">void</span> MyWidget<span class="operator">.</span>paintEvent(<span class="type"><a href="qpaintevent.html">QPaintEvent</a></span> <span class="operator">*</span> <span class="comment">/* event */</span>)
  {
-     QPainter painter(this);
+     <span class="type"><a href="qpainter.html">QPainter</a></span> painter(<span class="keyword">this</span>);
 
-     QStyleOptionFocusRect option;
-     option.initFrom(this);
-     option.backgroundColor = palette().color(QPalette.Background);
+     <span class="type"><a href="qstyleoptionfocusrect.html">QStyleOptionFocusRect</a></span> option;
+     option<span class="operator">.</span>initFrom(<span class="keyword">this</span>);
+     option<span class="operator">.</span>backgroundColor <span class="operator">=</span> palette()<span class="operator">.</span>color(<span class="type"><a href="qpalette.html">QPalette</a></span><span class="operator">.</span>Background);
 
-     style()-&gt;drawPrimitive(QStyle.PE_FrameFocusRect, &amp;option, &amp;painter, this);
+     style()<span class="operator">-</span><span class="operator">&gt;</span>drawPrimitive(<span class="type"><a href="qstyle.html">QStyle</a></span><span class="operator">.</span>PE_FrameFocusRect<span class="operator">,</span> <span class="operator">&amp;</span>option<span class="operator">,</span> <span class="operator">&amp;</span>painter<span class="operator">,</span> <span class="keyword">this</span>);
  }
 </pre>
 <p>Example using QStylePainter:</p>
-<pre class="highlightedCode brush: cpp">
- void MyWidget.paintEvent(QPaintEvent * <span class="comment">/* event */</span>)
+<pre class="cpp">
+ <span class="type">void</span> MyWidget<span class="operator">.</span>paintEvent(<span class="type"><a href="qpaintevent.html">QPaintEvent</a></span> <span class="operator">*</span> <span class="comment">/* event */</span>)
  {
-     QStylePainter painter(this);
+     <span class="type">QStylePainter</span> painter(<span class="keyword">this</span>);
 
-     QStyleOptionFocusRect option;
-     option.initFrom(this);
-     option.backgroundColor = palette().color(QPalette.Background);
+     <span class="type"><a href="qstyleoptionfocusrect.html">QStyleOptionFocusRect</a></span> option;
+     option<span class="operator">.</span>initFrom(<span class="keyword">this</span>);
+     option<span class="operator">.</span>backgroundColor <span class="operator">=</span> palette()<span class="operator">.</span>color(<span class="type"><a href="qpalette.html">QPalette</a></span><span class="operator">.</span>Background);
 
-     painter.drawPrimitive(QStyle.PE_FrameFocusRect, option);
+     painter<span class="operator">.</span>drawPrimitive(<span class="type"><a href="qstyle.html">QStyle</a></span><span class="operator">.</span>PE_FrameFocusRect<span class="operator">,</span> option);
  }
 </pre><hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QStylePainter" />QStylePainter.__init__ (<i>self</i>)</h3><p>Constructs a <a href="qstylepainter.html">QStylePainter</a>.</p>
 
@@ -74,18 +74,18 @@ false.</p>
 <h3 class="fn"><a name="drawComplexControl" />QStylePainter.drawComplexControl (<i>self</i>, <a href="qstyle.html#ComplexControl-enum">QStyle.ComplexControl</a>&#160;<i>cc</i>, <a href="qstyleoptioncomplex.html">QStyleOptionComplex</a>&#160;<i>opt</i>)</h3><p>Use the widget's style to draw a complex control <i>cc</i>
 specified by the <a href="qstyleoptioncomplex.html">QStyleOptionComplex</a>
 <i>option</i>.</p>
-<p>See also <a href="qstyle.html#drawComplexControl">QStyle.drawComplexControl</a>().</p>
+<p><b>See also</b> <a href="qstyle.html#drawComplexControl">QStyle.drawComplexControl</a>().</p>
 
 
 <h3 class="fn"><a name="drawControl" />QStylePainter.drawControl (<i>self</i>, <a href="qstyle.html#ControlElement-enum">QStyle.ControlElement</a>&#160;<i>ce</i>, <a href="qstyleoption.html">QStyleOption</a>&#160;<i>opt</i>)</h3><p>Use the widget's style to draw a control element <i>ce</i>
 specified by <a href="qstyleoption.html">QStyleOption</a>
 <i>option</i>.</p>
-<p>See also <a href="qstyle.html#drawControl">QStyle.drawControl</a>().</p>
+<p><b>See also</b> <a href="qstyle.html#drawControl">QStyle.drawControl</a>().</p>
 
 
 <h3 class="fn"><a name="drawItemPixmap" />QStylePainter.drawItemPixmap (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>, int&#160;<i>flags</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>)</h3><p>Draws the <i>pixmap</i> in rectangle <i>rect</i>. The pixmap is
 aligned according to <i>flags</i>.</p>
-<p>See also <a href="qstyle.html#drawItemPixmap">QStyle.drawItemPixmap</a>() and
+<p><b>See also</b> <a href="qstyle.html#drawItemPixmap">QStyle.drawItemPixmap</a>() and
 <a href="qt.html#AlignmentFlag-enum">Qt.Alignment</a>.</p>
 
 
@@ -96,14 +96,14 @@ aligned according to <i>flags</i>.</p>
 <i>enabled</i> bool indicates whether or not the item is enabled;
 when reimplementing this bool should influence how the item is
 drawn.</p>
-<p>See also <a href="qstyle.html#drawItemText">QStyle.drawItemText</a>() and <a href="qt.html#AlignmentFlag-enum">Qt.Alignment</a>.</p>
+<p><b>See also</b> <a href="qstyle.html#drawItemText">QStyle.drawItemText</a>() and <a href="qt.html#AlignmentFlag-enum">Qt.Alignment</a>.</p>
 
 
 <h3 class="fn"><a name="drawPrimitive" />QStylePainter.drawPrimitive (<i>self</i>, <a href="qstyle.html#PrimitiveElement-enum">QStyle.PrimitiveElement</a>&#160;<i>pe</i>, <a href="qstyleoption.html">QStyleOption</a>&#160;<i>opt</i>)</h3><p>Use the widget's style to draw a primitive element <i>pe</i>
 specified by <a href="qstyleoption.html">QStyleOption</a>
 <i>option</i>.</p>
-<p>See also <a href="qstyle.html#drawPrimitive">QStyle.drawPrimitive</a>().</p>
+<p><b>See also</b> <a href="qstyle.html#drawPrimitive">QStyle.drawPrimitive</a>().</p>
 
 
 <h3 class="fn"><a name="style" /><a href="qstyle.html">QStyle</a> QStylePainter.style (<i>self</i>)</h3><p>Return the current style used by the <a href="qstylepainter.html">QStylePainter</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

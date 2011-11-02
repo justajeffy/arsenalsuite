@@ -27,16 +27,16 @@ will be renderer. This provides a convenient way of selectively
 rendering large SVG files that contain a number of discrete
 elements. For example the following code renders only jokers from a
 SVG file containing a whole card deck:</p>
-<pre class="highlightedCode brush: cpp">
- QSvgRenderer *renderer = new QSvgRenderer(QLatin1String("SvgCardDeck.svg"));
- QGraphicsSvgItem *black = new QGraphicsSvgItem();
- QGraphicsSvgItem *red   = new QGraphicsSvgItem();
+<pre class="cpp">
+ <span class="type"><a href="qsvgrenderer.html">QSvgRenderer</a></span> <span class="operator">*</span>renderer <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qsvgrenderer.html">QSvgRenderer</a></span>(QLatin1String(<span class="string">"SvgCardDeck.svg"</span>));
+ <span class="type">QGraphicsSvgItem</span> <span class="operator">*</span>black <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QGraphicsSvgItem</span>();
+ <span class="type">QGraphicsSvgItem</span> <span class="operator">*</span>red   <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QGraphicsSvgItem</span>();
 
- black-&gt;setSharedRenderer(renderer);
- black-&gt;setElementId(QLatin1String("black_joker"));
+ black<span class="operator">-</span><span class="operator">&gt;</span><a href="qgraphicssvgitem.html#setSharedRenderer">setSharedRenderer</a>(renderer);
+ black<span class="operator">-</span><span class="operator">&gt;</span><a href="qgraphicssvgitem.html#elementId-prop">setElementId</a>(QLatin1String(<span class="string">"black_joker"</span>));
 
- red-&gt;setSharedRenderer(renderer);
- red-&gt;setElementId(QLatin1String("red_joker"));
+ red<span class="operator">-</span><span class="operator">&gt;</span><a href="qgraphicssvgitem.html#setSharedRenderer">setSharedRenderer</a>(renderer);
+ red<span class="operator">-</span><span class="operator">&gt;</span><a href="qgraphicssvgitem.html#elementId-prop">setElementId</a>(QLatin1String(<span class="string">"red_joker"</span>));
 </pre>
 <p>Size of the item can be set via the <a href="qrectf.html#setSize">setSize()</a> method of the <a href="qgraphicssvgitem.html#boundingRect">bounding rectangle</a> or via
 direct manipulation of the items transformation matrix.</p>
@@ -69,4 +69,4 @@ exist for as long as this item is used.</p>
 
 
 <h3 class="fn"><a name="type" />int QGraphicsSvgItem.type (<i>self</i>)</h3><p>Reimplemented from <a href="qgraphicsitem.html#type">QGraphicsItem.type</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

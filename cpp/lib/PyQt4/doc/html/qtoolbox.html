@@ -52,7 +52,7 @@ index.</p>
 
 <h3 class="fn"><a name="count" />int QToolBox.count (<i>self</i>)</h3><h3 class="fn"><a name="currentIndex" />int QToolBox.currentIndex (<i>self</i>)</h3><h3 class="fn"><a name="currentWidget" /><a href="qwidget.html">QWidget</a> QToolBox.currentWidget (<i>self</i>)</h3><p>Returns a pointer to the current widget, or 0 if there is no
 such item.</p>
-<p>See also <a href="qtoolbox.html#currentIndex-prop">currentIndex</a>() and <a href="qtoolbox.html#setCurrentWidget">setCurrentWidget</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#currentIndex-prop">currentIndex</a>() and <a href="qtoolbox.html#setCurrentWidget">setCurrentWidget</a>().</p>
 
 
 <h3 class="fn"><a name="event" />bool QToolBox.event (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -81,27 +81,27 @@ otherwise returns false.</p>
 
 <h3 class="fn"><a name="itemIcon" /><a href="qicon.html">QIcon</a> QToolBox.itemIcon (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the icon of the item at position <i>index</i>, or a null
 icon if <i>index</i> is out of range.</p>
-<p>See also <a href="qtoolbox.html#setItemIcon">setItemIcon</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#setItemIcon">setItemIcon</a>().</p>
 
 
 <h3 class="fn"><a name="itemInserted" />QToolBox.itemInserted (<i>self</i>, int&#160;<i>index</i>)</h3><p>This virtual handler is called after a new item was added or
 inserted at position <i>index</i>.</p>
-<p>See also <a href="qtoolbox.html#itemRemoved">itemRemoved</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#itemRemoved">itemRemoved</a>().</p>
 
 
 <h3 class="fn"><a name="itemRemoved" />QToolBox.itemRemoved (<i>self</i>, int&#160;<i>index</i>)</h3><p>This virtual handler is called after an item was removed from
 position <i>index</i>.</p>
-<p>See also <a href="qtoolbox.html#itemInserted">itemInserted</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#itemInserted">itemInserted</a>().</p>
 
 
 <h3 class="fn"><a name="itemText" />QString QToolBox.itemText (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the text of the item at position <i>index</i>, or an
 empty string if <i>index</i> is out of range.</p>
-<p>See also <a href="qtoolbox.html#setItemText">setItemText</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#setItemText">setItemText</a>().</p>
 
 
 <h3 class="fn"><a name="itemToolTip" />QString QToolBox.itemToolTip (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the tooltip of the item at position <i>index</i>, or an
 empty string if <i>index</i> is out of range.</p>
-<p>See also <a href="qtoolbox.html#setItemToolTip">setItemToolTip</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#setItemToolTip">setItemToolTip</a>().</p>
 
 
 <h3 class="fn"><a name="removeItem" />QToolBox.removeItem (<i>self</i>, int&#160;<i>index</i>)</h3><p>Removes the item at position <i>index</i> from the toolbox. Note
@@ -110,19 +110,20 @@ that the widget is <i>not</i> deleted.</p>
 
 <h3 class="fn"><a name="setCurrentIndex" />QToolBox.setCurrentIndex (<i>self</i>, int&#160;<i>index</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setCurrentIndex(int)</tt>.</p><h3 class="fn"><a name="setCurrentWidget" />QToolBox.setCurrentWidget (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>widget</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setCurrentWidget(QWidget *)</tt>.</p><p>Makes<i>widget</i> the current widget. The <i>widget</i> must be
 an item in this tool box.</p>
-<p>See also <a href="qtoolbox.html#addItem">addItem</a>(), <a href="qtoolbox.html#currentIndex-prop">setCurrentIndex</a>(), and
-<a href="qtoolbox.html#currentWidget">currentWidget</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#addItem">addItem</a>(),
+<a href="qtoolbox.html#currentIndex-prop">setCurrentIndex</a>(),
+and <a href="qtoolbox.html#currentWidget">currentWidget</a>().</p>
 
 
 <h3 class="fn"><a name="setItemEnabled" />QToolBox.setItemEnabled (<i>self</i>, int&#160;<i>index</i>, bool&#160;<i>enabled</i>)</h3><p>If <i>enabled</i> is true then the item at position <i>index</i>
 is enabled; otherwise the item at position <i>index</i> is
 disabled.</p>
-<p>See also <a href="qtoolbox.html#isItemEnabled">isItemEnabled</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#isItemEnabled">isItemEnabled</a>().</p>
 
 
 <h3 class="fn"><a name="setItemIcon" />QToolBox.setItemIcon (<i>self</i>, int&#160;<i>index</i>, <a href="qicon.html">QIcon</a>&#160;<i>icon</i>)</h3><p>Sets the icon of the item at position <i>index</i> to
 <i>icon</i>.</p>
-<p>See also <a href="qtoolbox.html#itemIcon">itemIcon</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#itemIcon">itemIcon</a>().</p>
 
 
 <h3 class="fn"><a name="setItemText" />QToolBox.setItemText (<i>self</i>, int&#160;<i>index</i>, QString&#160;<i>text</i>)</h3><p>Sets the text of the item at position <i>index</i> to
@@ -133,12 +134,12 @@ follows the '&amp;' will be used as the shortcut key. Any previous
 mnemonic will be overwritten, or cleared if no mnemonic is defined
 by the text. See the <a href="qshortcut.html#mnemonic">QShortcut</a> documentation for details
 (to display an actual ampersand, use '&amp;&amp;').</p>
-<p>See also <a href="qtoolbox.html#itemText">itemText</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#itemText">itemText</a>().</p>
 
 
 <h3 class="fn"><a name="setItemToolTip" />QToolBox.setItemToolTip (<i>self</i>, int&#160;<i>index</i>, QString&#160;<i>toolTip</i>)</h3><p>Sets the tooltip of the item at position <i>index</i> to
 <i>toolTip</i>.</p>
-<p>See also <a href="qtoolbox.html#itemToolTip">itemToolTip</a>().</p>
+<p><b>See also</b> <a href="qtoolbox.html#itemToolTip">itemToolTip</a>().</p>
 
 
 <h3 class="fn"><a name="showEvent" />QToolBox.showEvent (<i>self</i>, <a href="qshowevent.html">QShowEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#showEvent">QWidget.showEvent</a>().</p>
@@ -151,4 +152,4 @@ current item's index is passed in <i>index</i>, or -1 if there is
 no current item.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -50,7 +50,7 @@ used by the file engine for the drive specified by <i>fileName</i>.
 On Windows, each drive has its own current directory, so a
 different path is returned for file names that include different
 drive names (e.g. A: or C:).</p>
-<p>See also <a href="qfsfileengine.html#setCurrentPath">setCurrentPath</a>().</p>
+<p><b>See also</b> <a href="qfsfileengine.html#setCurrentPath">setCurrentPath</a>().</p>
 
 
 <h3 class="fn"><a name="drives" />list-of-QFileInfo QFSFileEngine.drives ()</h3><p>For Windows, returns the list of drives in the file system as a
@@ -64,7 +64,7 @@ Windows, this function returns all drives (A:, C:, D:, etc.).</p>
 
 
 <h3 class="fn"><a name="fileName" />QString QFSFileEngine.fileName (<i>self</i>, <a href="qabstractfileengine.html#FileName-enum">QAbstractFileEngine.FileName</a>&#160;<i>file</i>)</h3><p>Reimplemented from <a href="qabstractfileengine.html#fileName">QAbstractFileEngine.fileName</a>().</p>
-<p>See also <a href="qfsfileengine.html#setFileName">setFileName</a>().</p>
+<p><b>See also</b> <a href="qfsfileengine.html#setFileName">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="fileTime" /><a href="qdatetime.html">QDateTime</a> QFSFileEngine.fileTime (<i>self</i>, <a href="qabstractfileengine.html#FileTime-enum">QAbstractFileEngine.FileTime</a>&#160;<i>time</i>)</h3><p>Reimplemented from <a href="qabstractfileengine.html#fileTime">QAbstractFileEngine.fileTime</a>().</p>
@@ -77,7 +77,7 @@ Windows, this function returns all drives (A:, C:, D:, etc.).</p>
 
 
 <h3 class="fn"><a name="homePath" />QString QFSFileEngine.homePath ()</h3><p>Returns the home path of the current user.</p>
-<p>See also <a href="qfsfileengine.html#rootPath">rootPath</a>().</p>
+<p><b>See also</b> <a href="qfsfileengine.html#rootPath">rootPath</a>().</p>
 
 
 <h3 class="fn"><a name="isRelativePath" />bool QFSFileEngine.isRelativePath (<i>self</i>)</h3><p>Reimplemented from <a href="qabstractfileengine.html#isRelativePath">QAbstractFileEngine.isRelativePath</a>().</p>
@@ -132,7 +132,7 @@ If stat() is unsuccessful, -2 is reuturned.</p>
 
 
 <h3 class="fn"><a name="rootPath" />QString QFSFileEngine.rootPath ()</h3><p>Returns the root path.</p>
-<p>See also <a href="qfsfileengine.html#homePath">homePath</a>().</p>
+<p><b>See also</b> <a href="qfsfileengine.html#homePath">homePath</a>().</p>
 
 
 <h3 class="fn"><a name="seek" />bool QFSFileEngine.seek (<i>self</i>, int)</h3><p>Reimplemented from <a href="qabstractfileengine.html#seek">QAbstractFileEngine.seek</a>().</p>
@@ -141,22 +141,22 @@ If stat() is unsuccessful, -2 is reuturned.</p>
 <h3 class="fn"><a name="setCurrentPath" />bool QFSFileEngine.setCurrentPath (QString&#160;<i>path</i>)</h3><p>Sets the current path (e.g., for <a href="qdir.html">QDir</a>),
 to <i>path</i>. Returns true if the new path exists; otherwise this
 function does nothing, and returns false.</p>
-<p>See also <a href="qfsfileengine.html#currentPath">currentPath</a>().</p>
+<p><b>See also</b> <a href="qfsfileengine.html#currentPath">currentPath</a>().</p>
 
 
 <h3 class="fn"><a name="setFileName" />QFSFileEngine.setFileName (<i>self</i>, QString&#160;<i>file</i>)</h3><p>Reimplemented from <a href="qabstractfileengine.html#setFileName">QAbstractFileEngine.setFileName</a>().</p>
-<p>See also <a href="qfsfileengine.html#fileName">fileName</a>().</p>
+<p><b>See also</b> <a href="qfsfileengine.html#fileName">fileName</a>().</p>
 
 
 <h3 class="fn"><a name="setPermissions" />bool QFSFileEngine.setPermissions (<i>self</i>, int&#160;<i>perms</i>)</h3><p>Reimplemented from <a href="qabstractfileengine.html#setPermissions">QAbstractFileEngine.setPermissions</a>().</p>
 
 
 <h3 class="fn"><a name="setSize" />bool QFSFileEngine.setSize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Reimplemented from <a href="qabstractfileengine.html#setSize">QAbstractFileEngine.setSize</a>().</p>
-<p>See also <a href="qfsfileengine.html#size">size</a>().</p>
+<p><b>See also</b> <a href="qfsfileengine.html#size">size</a>().</p>
 
 
 <h3 class="fn"><a name="size" />int QFSFileEngine.size (<i>self</i>)</h3><p>Reimplemented from <a href="qabstractfileengine.html#size">QAbstractFileEngine.size</a>().</p>
-<p>See also <a href="qfsfileengine.html#setSize">setSize</a>().</p>
+<p><b>See also</b> <a href="qfsfileengine.html#setSize">setSize</a>().</p>
 
 
 <h3 class="fn"><a name="tempPath" />QString QFSFileEngine.tempPath ()</h3><p>Returns the temporary path (i.e., a path in which it is safe to
@@ -164,4 +164,4 @@ store temporary files).</p>
 
 
 <h3 class="fn"><a name="write" />int QFSFileEngine.write (<i>self</i>, str&#160;<i>data</i>)</h3><p>Reimplemented from <a href="qabstractfileengine.html#write">QAbstractFileEngine.write</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -34,47 +34,47 @@ called once before the first time <a href="qglwidget.html#resizeGL">resizeGL</a>
 </ul>
 <p>Here is a rough outline of how a QGLWidget subclass might
 look:</p>
-<pre class="highlightedCode brush: cpp">
- class MyGLDrawer : public QGLWidget
+<pre class="cpp">
+ <span class="keyword">class</span> MyGLDrawer : <span class="keyword">public</span> <span class="type">QGLWidget</span>
  {
      Q_OBJECT        <span class="comment">// must include this if you use Qt signals/slots</span>
 
- public:
-     MyGLDrawer(QWidget *parent)
-         : QGLWidget(parent) {}
+ <span class="keyword">public</span>:
+     MyGLDrawer(<span class="type"><a href="qwidget.html">QWidget</a></span> <span class="operator">*</span>parent)
+         : <span class="type">QGLWidget</span>(parent) {}
 
- protected:
+ <span class="keyword">protected</span>:
 
-     void initializeGL()
+     <span class="type">void</span> initializeGL()
      {
          <span class="comment">// Set up the rendering context, define display lists etc.:</span>
-         ...
-         glClearColor(0.0, 0.0, 0.0, 0.0);
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+         glClearColor(<span class="number">0.0</span><span class="operator">,</span> <span class="number">0.0</span><span class="operator">,</span> <span class="number">0.0</span><span class="operator">,</span> <span class="number">0.0</span>);
          glEnable(GL_DEPTH_TEST);
-         ...
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
      }
 
-     void resizeGL(int w, int h)
+     <span class="type">void</span> resizeGL(<span class="type">int</span> w<span class="operator">,</span> <span class="type">int</span> h)
      {
          <span class="comment">// setup viewport, projection etc.:</span>
-         glViewport(0, 0, (GLint)w, (GLint)h);
-         ...
-         glFrustum(...);
-         ...
+         glViewport(<span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> (GLint)w<span class="operator">,</span> (GLint)h);
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+         glFrustum(<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
      }
 
-     void paintGL()
+     <span class="type">void</span> paintGL()
      {
          <span class="comment">// draw the scene:</span>
-         ...
-         glRotatef(...);
-         glMaterialfv(...);
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+         glRotatef(<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
+         glMaterialfv(<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
          glBegin(GL_QUADS);
-         glVertex3f(...);
-         glVertex3f(...);
-         ...
+         glVertex3f(<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
+         glVertex3f(<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
          glEnd();
-         ...
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
      }
 
  };
@@ -172,7 +172,7 @@ You can check whether sharing is in effect by calling <a href="qglwidget.html#is
 <p>The initialization of OpenGL rendering state, etc. should be
 done by overriding the <a href="qglwidget.html#initializeGL">initializeGL</a>() function, rather
 than in the constructor of your <a href="qglwidget.html">QGLWidget</a> subclass.</p>
-<p>See also <a href="qglformat.html#defaultFormat">QGLFormat.defaultFormat</a>() and
+<p><b>See also</b> <a href="qglformat.html#defaultFormat">QGLFormat.defaultFormat</a>() and
 <a href="opengl-textures.html">Textures Example</a>.</p>
 
 
@@ -191,7 +191,7 @@ You can check whether sharing is in effect by calling <a href="qglwidget.html#is
 <p>The initialization of OpenGL rendering state, etc. should be
 done by overriding the <a href="qglwidget.html#initializeGL">initializeGL</a>() function, rather
 than in the constructor of your <a href="qglwidget.html">QGLWidget</a> subclass.</p>
-<p>See also <a href="qglformat.html#defaultFormat">QGLFormat.defaultFormat</a>() and
+<p><b>See also</b> <a href="qglformat.html#defaultFormat">QGLFormat.defaultFormat</a>() and
 <a href="qglwidget.html#isValid">isValid</a>().</p>
 
 
@@ -213,23 +213,23 @@ You can check whether sharing is in effect by calling <a href="qglwidget.html#is
 <p>The initialization of OpenGL rendering state, etc. should be
 done by overriding the <a href="qglwidget.html#initializeGL">initializeGL</a>() function, rather
 than in the constructor of your <a href="qglwidget.html">QGLWidget</a> subclass.</p>
-<p>See also <a href="qglformat.html#defaultFormat">QGLFormat.defaultFormat</a>() and
+<p><b>See also</b> <a href="qglformat.html#defaultFormat">QGLFormat.defaultFormat</a>() and
 <a href="qglwidget.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="autoBufferSwap" />bool QGLWidget.autoBufferSwap (<i>self</i>)</h3><p>Returns true if the widget is doing automatic GL buffer
 swapping; otherwise returns false.</p>
-<p>See also <a href="qglwidget.html#setAutoBufferSwap">setAutoBufferSwap</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#setAutoBufferSwap">setAutoBufferSwap</a>().</p>
 
 
 <h3 class="fn"><a name="bindTexture" />int QGLWidget.bindTexture (<i>self</i>, <a href="qimage.html">QImage</a>&#160;<i>image</i>, int&#160;<i>target</i>&#160;=&#160;GL_TEXTURE_2D, int&#160;<i>format</i>&#160;=&#160;GL_RGBA)</h3><p>Calls QGLContext.:bindTexture(<i>image</i>, <i>target</i>,
 <i>format</i>) on the currently set context.</p>
-<p>See also <a href="qglwidget.html#deleteTexture">deleteTexture</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#deleteTexture">deleteTexture</a>().</p>
 
 
 <h3 class="fn"><a name="bindTexture-2" />int QGLWidget.bindTexture (<i>self</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>, int&#160;<i>target</i>&#160;=&#160;GL_TEXTURE_2D, int&#160;<i>format</i>&#160;=&#160;GL_RGBA)</h3><p>Calls QGLContext.:bindTexture(<i>pixmap</i>, <i>target</i>,
 <i>format</i>) on the currently set context.</p>
-<p>See also <a href="qglwidget.html#deleteTexture">deleteTexture</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#deleteTexture">deleteTexture</a>().</p>
 
 
 <h3 class="fn"><a name="bindTexture-3" />int QGLWidget.bindTexture (<i>self</i>, QString&#160;<i>fileName</i>)</h3><p>This is an overloaded function.</p>
@@ -250,7 +250,7 @@ how to bind the texture to the context.</p>
 <h3 class="fn"><a name="bindTexture-5" />int QGLWidget.bindTexture (<i>self</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>, int&#160;<i>target</i>, int&#160;<i>format</i>, <a href="qglcontext-bindoptions.html">QGLContext.BindOptions</a>&#160;<i>options</i>)</h3><p>This is an overloaded function.</p>
 <p>Calls QGLContext.bindTexture(<i>fileName</i>) on the currently
 set context.</p>
-<p>See also <a href="qglwidget.html#deleteTexture">deleteTexture</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#deleteTexture">deleteTexture</a>().</p>
 
 
 <h3 class="fn"><a name="colormap" /><a href="qglcolormap.html">QGLColormap</a> QGLWidget.colormap (<i>self</i>)</h3><p>Returns the colormap for this widget.</p>
@@ -258,8 +258,7 @@ set context.</p>
 colormaps installed. Asking for the colormap of a child widget will
 return the colormap for the child's top-level widget.</p>
 <p>If no colormap has been set for this widget, the <a href="qglcolormap.html">QGLColormap</a> returned will be empty.</p>
-<p>See also <a href="qglwidget.html#setColormap">setColormap</a>()
-and <a href="qglcolormap.html#isEmpty">QGLColormap.isEmpty</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#setColormap">setColormap</a>() and <a href="qglcolormap.html#isEmpty">QGLColormap.isEmpty</a>().</p>
 
 
 <h3 class="fn"><a name="context" /><a href="qglcontext.html">QGLContext</a> QGLWidget.context (<i>self</i>)</h3><p>Returns the context of this widget.</p>
@@ -276,7 +275,7 @@ GL format used is <tt>GL_RGBA</tt>.</p>
 
 <h3 class="fn"><a name="deleteTexture" />QGLWidget.deleteTexture (<i>self</i>, int&#160;<i>tx_id</i>)</h3><p>Calls QGLContext.deleteTexture(<i>id</i>) on the currently set
 context.</p>
-<p>See also <a href="qglwidget.html#bindTexture">bindTexture</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#bindTexture">bindTexture</a>().</p>
 
 
 <h3 class="fn"><a name="doneCurrent" />QGLWidget.doneCurrent (<i>self</i>)</h3><p>Makes no GL context the current context. Normally, you do not
@@ -286,7 +285,7 @@ may be useful in multithreaded environments.</p>
 
 <h3 class="fn"><a name="doubleBuffer" />bool QGLWidget.doubleBuffer (<i>self</i>)</h3><p>Returns true if the contained GL rendering context has double
 buffering; otherwise returns false.</p>
-<p>See also <a href="qglformat.html#doubleBuffer">QGLFormat.doubleBuffer</a>().</p>
+<p><b>See also</b> <a href="qglformat.html#doubleBuffer">QGLFormat.doubleBuffer</a>().</p>
 
 
 <h3 class="fn"><a name="drawTexture" />QGLWidget.drawTexture (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>target</i>, int&#160;<i>textureId</i>, int&#160;<i>textureTarget</i>&#160;=&#160;GL_TEXTURE_2D)</h3><p>Calls the corresponding <a href="qglcontext.html#drawTexture">QGLContext.drawTexture</a>() with
@@ -305,7 +304,7 @@ widget's context.</p>
 
 
 <h3 class="fn"><a name="fontDisplayListBase" />int QGLWidget.fontDisplayListBase (<i>self</i>, <a href="qfont.html">QFont</a>&#160;<i>font</i>, int&#160;<i>listBase</i>&#160;=&#160;2000)</h3><h3 class="fn"><a name="format" /><a href="qglformat.html">QGLFormat</a> QGLWidget.format (<i>self</i>)</h3><p>Returns the format of the contained GL rendering context.</p>
-<p>See also <a class="obsolete" href="qglwidget-obsolete.html#setFormat">setFormat</a>().</p>
+<p><b>See also</b> <a class="obsolete" href="qglwidget-obsolete.html#setFormat">setFormat</a>().</p>
 
 
 <h3 class="fn"><a name="glDraw" />QGLWidget.glDraw (<i>self</i>)</h3><p>Executes the virtual function <a href="qglwidget.html#paintGL">paintGL</a>().</p>
@@ -350,7 +349,7 @@ called.</p>
 <h3 class="fn"><a name="isSharing" />bool QGLWidget.isSharing (<i>self</i>)</h3><p>Returns true if this widget's GL context is shared with another
 GL context, otherwise false is returned. Context sharing might not
 be possible if the widgets use different formats.</p>
-<p>See also <a href="qglwidget.html#format">format</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#format">format</a>().</p>
 
 
 <h3 class="fn"><a name="isValid" />bool QGLWidget.isValid (<i>self</i>)</h3><p>Returns true if the widget has a valid GL rendering context;
@@ -369,12 +368,12 @@ you need to issue OpenGL commands to the overlay context outside of
 <a href="qglwidget.html#resizeOverlayGL">resizeOverlayGL</a>(), and
 <a href="qglwidget.html#paintOverlayGL">paintOverlayGL</a>().</p>
 <p>Does nothing if this widget has no overlay.</p>
-<p>See also <a href="qglwidget.html#makeCurrent">makeCurrent</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#makeCurrent">makeCurrent</a>().</p>
 
 
 <h3 class="fn"><a name="overlayContext" /><a href="qglcontext.html">QGLContext</a> QGLWidget.overlayContext (<i>self</i>)</h3><p>Returns the overlay context of this widget, or 0 if this widget
 has no overlay.</p>
-<p>See also <a href="qglwidget.html#context">context</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#context">context</a>().</p>
 
 
 <h3 class="fn"><a name="paintEngine" /><a href="qpaintengine.html">QPaintEngine</a> QGLWidget.paintEngine (<i>self</i>)</h3><h3 class="fn"><a name="paintEvent" />QGLWidget.paintEvent (<i>self</i>, <a href="qpaintevent.html">QPaintEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#paintEvent">QWidget.paintEvent</a>().</p>
@@ -405,8 +404,7 @@ called.</p>
 OpenGL. Calls glClearColor (in RGBA mode) or glClearIndex (in
 color-index mode) with the color <i>c</i>. Applies to this widgets
 GL context.</p>
-<p>See also <a href="qglwidget.html#qglColor">qglColor</a>(),
-<a href="qglcontext.html#currentContext">QGLContext.currentContext</a>(),
+<p><b>See also</b> <a href="qglwidget.html#qglColor">qglColor</a>(), <a href="qglcontext.html#currentContext">QGLContext.currentContext</a>(),
 and <a href="qcolor.html">QColor</a>.</p>
 
 
@@ -415,7 +413,7 @@ Calls glColor4 (in RGBA mode) or glIndex (in color-index mode) with
 the color <i>c</i>. Applies to this widgets GL context.</p>
 <p><b>Note:</b> This function is not supported on OpenGL/ES 2.0
 systems.</p>
-<p>See also <a href="qglwidget.html#qglClearColor">qglClearColor</a>(), <a href="qglcontext.html#currentContext">QGLContext.currentContext</a>(),
+<p><b>See also</b> <a href="qglwidget.html#qglClearColor">qglClearColor</a>(), <a href="qglcontext.html#currentContext">QGLContext.currentContext</a>(),
 and <a href="qcolor.html">QColor</a>.</p>
 
 
@@ -511,12 +509,12 @@ on; otherwise it is switched off.</p>
 format, the background and foreground GL buffers will automatically
 be swapped after each <a href="qglwidget.html#paintGL">paintGL</a>() call.</p>
 <p>The buffer auto-swapping is on by default.</p>
-<p>See also <a href="qglwidget.html#autoBufferSwap">autoBufferSwap</a>(), <a href="qglwidget.html#doubleBuffer">doubleBuffer</a>(), and <a href="qglwidget.html#swapBuffers">swapBuffers</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#autoBufferSwap">autoBufferSwap</a>(), <a href="qglwidget.html#doubleBuffer">doubleBuffer</a>(), and <a href="qglwidget.html#swapBuffers">swapBuffers</a>().</p>
 
 
 <h3 class="fn"><a name="setColormap" />QGLWidget.setColormap (<i>self</i>, <a href="qglcolormap.html">QGLColormap</a>&#160;<i>map</i>)</h3><p>Set the colormap for this widget to <i>cmap</i>. Usually it is
 only top-level widgets that can have colormaps installed.</p>
-<p>See also <a href="qglwidget.html#colormap">colormap</a>().</p>
+<p><b>See also</b> <a href="qglwidget.html#colormap">colormap</a>().</p>
 
 
 <h3 class="fn"><a name="setContext" />QGLWidget.setContext (<i>self</i>, <a href="qglcontext.html">QGLContext</a>&#160;<i>context</i>, <a href="qglcontext.html">QGLContext</a>&#160;<i>shareContext</i>&#160;=&#160;None, bool&#160;<i>deleteOldContext</i>&#160;=&#160;True)</h3><p>The <i>context</i> argument has it's ownership transferred to Qt.</p><h3 class="fn"><a name="setFormat" />QGLWidget.setFormat (<i>self</i>, <a href="qglformat.html">QGLFormat</a>&#160;<i>format</i>)</h3><h3 class="fn"><a name="setMouseTracking" />QGLWidget.setMouseTracking (<i>self</i>, bool&#160;<i>enable</i>)</h3><p>If <i>enable</i> is true then mouse tracking is enabled;
@@ -529,7 +527,7 @@ works if the widget's format specifies double buffer mode.</p>
 because it is done automatically after each widget repaint, i.e.
 each time after <a href="qglwidget.html#paintGL">paintGL</a>() has
 been executed.</p>
-<p>See also <a href="qglwidget.html#doubleBuffer">doubleBuffer</a>(), <a href="qglwidget.html#setAutoBufferSwap">setAutoBufferSwap</a>(), and
+<p><b>See also</b> <a href="qglwidget.html#doubleBuffer">doubleBuffer</a>(), <a href="qglwidget.html#setAutoBufferSwap">setAutoBufferSwap</a>(), and
 <a href="qglformat.html#setDoubleBuffer">QGLFormat.setDoubleBuffer</a>().</p>
 
 
@@ -542,4 +540,4 @@ executed.</p>
 <p>The widget's rendering context will become the current context
 and <a href="qglwidget.html#initializeGL">initializeGL</a>() will
 be called if it hasn't already been called.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

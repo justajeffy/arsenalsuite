@@ -83,7 +83,7 @@ function that adjusts the item's <a href="qgraphicslayoutitem.html#geometry">geo
 margins. Note that <a href="qgraphicslayoutitem.html#getContentsMargins">getContentsMargins</a>()
 is a virtual function that you can reimplement to return the item's
 contents margins.</p>
-<p>See also <a href="qgraphicslayoutitem.html#getContentsMargins">getContentsMargins</a>()
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#getContentsMargins">getContentsMargins</a>()
 and <a href="qgraphicslayoutitem.html#geometry">geometry</a>().</p>
 
 
@@ -112,13 +112,13 @@ a combination of both).</p>
 called only once for each value of <i>which</i> - unless
 <i>constraint</i> is not specified and <a href="qgraphicslayoutitem.html#updateGeometry">updateGeometry</a>() has
 been called.</p>
-<p>See also <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>().</p>
 
 
 <h3 class="fn"><a name="geometry" /><a href="qrectf.html">QRectF</a> QGraphicsLayoutItem.geometry (<i>self</i>)</h3><p>Returns the item's geometry (e.g., position and size) as a
 <a href="qrectf.html">QRectF</a>. This function is equivalent to
 <a href="qrectf.html">QRectF</a>(pos(), size()).</p>
-<p>See also <a href="qgraphicslayoutitem.html#setGeometry">setGeometry</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setGeometry">setGeometry</a>().</p>
 
 
 <h3 class="fn"><a name="getContentsMargins" />(float&#160;<i>left</i>, float&#160;<i>top</i>, float&#160;<i>right</i>, float&#160;<i>bottom</i>) QGraphicsLayoutItem.getContentsMargins (<i>self</i>)</h3><p>This virtual function provides the <i>left</i>, <i>top</i>,
@@ -126,55 +126,55 @@ been called.</p>
 implementation assumes all contents margins are 0. The parameters
 point to values stored in qreals. If any of the pointers is 0, that
 value will not be updated.</p>
-<p>See also <a href="qgraphicswidget.html#setContentsMargins">QGraphicsWidget.setContentsMargins</a>().</p>
+<p><b>See also</b> <a href="qgraphicswidget.html#setContentsMargins">QGraphicsWidget.setContentsMargins</a>().</p>
 
 
 <h3 class="fn"><a name="graphicsItem" /><a href="qgraphicsitem.html">QGraphicsItem</a> QGraphicsLayoutItem.graphicsItem (<i>self</i>)</h3><p>Returns the <a href="qgraphicsitem.html">QGraphicsItem</a> that
 this layout item represents. For <a href="qgraphicswidget.html">QGraphicsWidget</a> it will return itself.
 For custom items it can return an aggregated value.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setGraphicsItem">setGraphicsItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setGraphicsItem">setGraphicsItem</a>().</p>
 
 
 <h3 class="fn"><a name="isLayout" />bool QGraphicsLayoutItem.isLayout (<i>self</i>)</h3><p>Returns true if this <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a> is a layout
 (e.g., is inherited by an object that arranges other <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a> objects);
 otherwise returns false.</p>
-<p>See also <a href="qgraphicslayout.html">QGraphicsLayout</a>.</p>
+<p><b>See also</b> <a href="qgraphicslayout.html">QGraphicsLayout</a>.</p>
 
 
 <h3 class="fn"><a name="maximumHeight" />float QGraphicsLayoutItem.maximumHeight (<i>self</i>)</h3><p>Returns the maximum height.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setMaximumHeight">setMaximumHeight</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setMaximumHeight">setMaximumHeight</a>(),
 <a href="qgraphicslayoutitem.html#setMaximumSize">setMaximumSize</a>(), and
 <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>().</p>
 
 
 <h3 class="fn"><a name="maximumSize" /><a href="qsizef.html">QSizeF</a> QGraphicsLayoutItem.maximumSize (<i>self</i>)</h3><p>Returns the maximum size.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setMaximumSize">setMaximumSize</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setMaximumSize">setMaximumSize</a>(),
 <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>(),
 <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>(),
 <a href="qt.html#SizeHint-enum">Qt.MaximumSize</a>, and <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>().</p>
 
 
 <h3 class="fn"><a name="maximumWidth" />float QGraphicsLayoutItem.maximumWidth (<i>self</i>)</h3><p>Returns the maximum width.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setMaximumWidth">setMaximumWidth</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setMaximumWidth">setMaximumWidth</a>(),
 <a href="qgraphicslayoutitem.html#setMaximumSize">setMaximumSize</a>(), and
 <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>().</p>
 
 
 <h3 class="fn"><a name="minimumHeight" />float QGraphicsLayoutItem.minimumHeight (<i>self</i>)</h3><p>Returns the minimum height.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setMinimumHeight">setMinimumHeight</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setMinimumHeight">setMinimumHeight</a>(),
 <a href="qgraphicslayoutitem.html#setMinimumSize">setMinimumSize</a>(), and
 <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>().</p>
 
 
 <h3 class="fn"><a name="minimumSize" /><a href="qsizef.html">QSizeF</a> QGraphicsLayoutItem.minimumSize (<i>self</i>)</h3><p>Returns the minimum size.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setMinimumSize">setMinimumSize</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setMinimumSize">setMinimumSize</a>(),
 <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>(),
 <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>(),
 <a href="qt.html#SizeHint-enum">Qt.MinimumSize</a>, and <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>().</p>
 
 
 <h3 class="fn"><a name="minimumWidth" />float QGraphicsLayoutItem.minimumWidth (<i>self</i>)</h3><p>Returns the minimum width.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setMinimumWidth">setMinimumWidth</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setMinimumWidth">setMinimumWidth</a>(),
 <a href="qgraphicslayoutitem.html#setMinimumSize">setMinimumSize</a>(), and
 <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>().</p>
 
@@ -197,30 +197,30 @@ the <a href="qgraphicsitem.html">QGraphicsItem</a> hierarchy, so
 the parent layout should delete it. Subclasses might override this
 default behaviour by calling setOwnedByLayout(true).</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setOwnedByLayout">setOwnedByLayout</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setOwnedByLayout">setOwnedByLayout</a>().</p>
 
 
 <h3 class="fn"><a name="parentLayoutItem" /><a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a> QGraphicsLayoutItem.parentLayoutItem (<i>self</i>)</h3><p>Returns the parent of this <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a>, or 0 if there
 is no parent, or if the parent does not inherit from <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a> (<a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a> is often used
 through multiple inheritance with <a href="qobject.html">QObject</a>-derived classes).</p>
-<p>See also <a href="qgraphicslayoutitem.html#setParentLayoutItem">setParentLayoutItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setParentLayoutItem">setParentLayoutItem</a>().</p>
 
 
 <h3 class="fn"><a name="preferredHeight" />float QGraphicsLayoutItem.preferredHeight (<i>self</i>)</h3><p>Returns the preferred height.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setPreferredHeight">setPreferredHeight</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setPreferredHeight">setPreferredHeight</a>(),
 <a href="qgraphicslayoutitem.html#setPreferredSize">setPreferredSize</a>(),
 and <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>().</p>
 
 
 <h3 class="fn"><a name="preferredSize" /><a href="qsizef.html">QSizeF</a> QGraphicsLayoutItem.preferredSize (<i>self</i>)</h3><p>Returns the preferred size.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setPreferredSize">setPreferredSize</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setPreferredSize">setPreferredSize</a>(),
 <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>(),
 <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>(),
 <a href="qt.html#SizeHint-enum">Qt.PreferredSize</a>, and <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>().</p>
 
 
 <h3 class="fn"><a name="preferredWidth" />float QGraphicsLayoutItem.preferredWidth (<i>self</i>)</h3><p>Returns the preferred width.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setPreferredWidth">setPreferredWidth</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setPreferredWidth">setPreferredWidth</a>(),
 <a href="qgraphicslayoutitem.html#setPreferredSize">setPreferredSize</a>(),
 and <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>().</p>
 
@@ -235,7 +235,7 @@ rearrangement.</p>
 <p>If <i>rect</i> is outside of the bounds of minimumSize and
 maximumSize, it will be adjusted to its closest size so that it is
 within the legal bounds.</p>
-<p>See also <a href="qgraphicslayoutitem.html#geometry">geometry</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#geometry">geometry</a>().</p>
 
 
 <h3 class="fn"><a name="setGraphicsItem" />QGraphicsLayoutItem.setGraphicsItem (<i>self</i>, <a href="qgraphicsitem.html">QGraphicsItem</a>&#160;<i>item</i>)</h3><p>If the <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a> represents a
@@ -245,11 +245,11 @@ take advantage of the automatic reparenting capabilities of
 this value. Note that if you delete <i>item</i> and not delete the
 layout item, you are responsible of calling setGraphicsItem(0) in
 order to avoid having a dangling pointer.</p>
-<p>See also <a href="qgraphicslayoutitem.html#graphicsItem">graphicsItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#graphicsItem">graphicsItem</a>().</p>
 
 
 <h3 class="fn"><a name="setMaximumHeight" />QGraphicsLayoutItem.setMaximumHeight (<i>self</i>, float&#160;<i>height</i>)</h3><p>Sets the maximum height to <i>height</i>.</p>
-<p>See also <a href="qgraphicslayoutitem.html#maximumHeight">maximumHeight</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#maximumHeight">maximumHeight</a>(),
 <a href="qgraphicslayoutitem.html#setMaximumSize">setMaximumSize</a>(), and
 <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>().</p>
 
@@ -260,26 +260,26 @@ order to avoid having a dangling pointer.</p>
 that <a href="qgraphicslayoutitem.html#effectiveSizeHint">effectiveSizeHint</a>()
 will never return a size larger than <i>size</i>. In order to unset
 the maximum size, use an invalid size.</p>
-<p>See also <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>(), <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>(), <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>(), <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>(), <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>(),
 <a href="qt.html#SizeHint-enum">Qt.MaximumSize</a>, and <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>().</p>
 
 
 <h3 class="fn"><a name="setMaximumSize-2" />QGraphicsLayoutItem.setMaximumSize (<i>self</i>, float&#160;<i>aw</i>, float&#160;<i>ah</i>)</h3><p>This convenience function is equivalent to calling
 setMaximumSize(<a href="qsizef.html">QSizeF</a>(<i>w</i>,
 <i>h</i>)).</p>
-<p>See also <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>(), <a href="qgraphicslayoutitem.html#setMinimumSize">setMinimumSize</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>(), <a href="qgraphicslayoutitem.html#setMinimumSize">setMinimumSize</a>(),
 <a href="qgraphicslayoutitem.html#setPreferredSize">setPreferredSize</a>(),
 and <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>().</p>
 
 
 <h3 class="fn"><a name="setMaximumWidth" />QGraphicsLayoutItem.setMaximumWidth (<i>self</i>, float&#160;<i>width</i>)</h3><p>Sets the maximum width to <i>width</i>.</p>
-<p>See also <a href="qgraphicslayoutitem.html#maximumWidth">maximumWidth</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#maximumWidth">maximumWidth</a>(),
 <a href="qgraphicslayoutitem.html#setMaximumSize">setMaximumSize</a>(),
 and <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>().</p>
 
 
 <h3 class="fn"><a name="setMinimumHeight" />QGraphicsLayoutItem.setMinimumHeight (<i>self</i>, float&#160;<i>height</i>)</h3><p>Sets the minimum height to <i>height</i>.</p>
-<p>See also <a href="qgraphicslayoutitem.html#minimumHeight">minimumHeight</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#minimumHeight">minimumHeight</a>(),
 <a href="qgraphicslayoutitem.html#setMinimumSize">setMinimumSize</a>(), and
 <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>().</p>
 
@@ -290,7 +290,7 @@ and <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>().</p>
 that <a href="qgraphicslayoutitem.html#effectiveSizeHint">effectiveSizeHint</a>()
 will never return a size smaller than <i>size</i>. In order to
 unset the minimum size, use an invalid size.</p>
-<p>See also <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>(), <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>(), <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>(), <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>(), <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>(),
 <a href="qt.html#SizeHint-enum">Qt.MinimumSize</a>, <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>(), <a href="qgraphicslayoutitem.html#setMinimumWidth">setMinimumWidth</a>(),
 and <a href="qgraphicslayoutitem.html#setMinimumHeight">setMinimumHeight</a>().</p>
 
@@ -298,13 +298,13 @@ and <a href="qgraphicslayoutitem.html#setMinimumHeight">setMinimumHeight</a>().<
 <h3 class="fn"><a name="setMinimumSize-2" />QGraphicsLayoutItem.setMinimumSize (<i>self</i>, float&#160;<i>aw</i>, float&#160;<i>ah</i>)</h3><p>This convenience function is equivalent to calling
 setMinimumSize(<a href="qsizef.html">QSizeF</a>(<i>w</i>,
 <i>h</i>)).</p>
-<p>See also <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>(), <a href="qgraphicslayoutitem.html#setMaximumSize">setMaximumSize</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>(), <a href="qgraphicslayoutitem.html#setMaximumSize">setMaximumSize</a>(),
 <a href="qgraphicslayoutitem.html#setPreferredSize">setPreferredSize</a>(),
 and <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>().</p>
 
 
 <h3 class="fn"><a name="setMinimumWidth" />QGraphicsLayoutItem.setMinimumWidth (<i>self</i>, float&#160;<i>width</i>)</h3><p>Sets the minimum width to <i>width</i>.</p>
-<p>See also <a href="qgraphicslayoutitem.html#minimumWidth">minimumWidth</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#minimumWidth">minimumWidth</a>(),
 <a href="qgraphicslayoutitem.html#setMinimumSize">setMinimumSize</a>(),
 and <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>().</p>
 
@@ -313,16 +313,16 @@ and <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>().</p>
 or not. <i>ownership</i> must be true to in order for the layout to
 delete it.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicslayoutitem.html#ownedByLayout">ownedByLayout</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#ownedByLayout">ownedByLayout</a>().</p>
 
 
 <h3 class="fn"><a name="setParentLayoutItem" />QGraphicsLayoutItem.setParentLayoutItem (<i>self</i>, <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a>&#160;<i>parent</i>)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Sets the parent of this <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a> to
 <i>parent</i>.</p>
-<p>See also <a href="qgraphicslayoutitem.html#parentLayoutItem">parentLayoutItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#parentLayoutItem">parentLayoutItem</a>().</p>
 
 
 <h3 class="fn"><a name="setPreferredHeight" />QGraphicsLayoutItem.setPreferredHeight (<i>self</i>, float&#160;<i>height</i>)</h3><p>Sets the preferred height to <i>height</i>.</p>
-<p>See also <a href="qgraphicslayoutitem.html#preferredHeight">preferredHeight</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#preferredHeight">preferredHeight</a>(),
 <a href="qgraphicslayoutitem.html#preferredWidth">preferredWidth</a>(),
 <a href="qgraphicslayoutitem.html#setPreferredSize">setPreferredSize</a>(),
 and <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>().</p>
@@ -333,7 +333,7 @@ and <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>().</p>
 <a href="qt.html#SizeHint-enum">Qt.PreferredSize</a> and provides
 the default value for <a href="qgraphicslayoutitem.html#effectiveSizeHint">effectiveSizeHint</a>().
 In order to unset the preferred size, use an invalid size.</p>
-<p>See also <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>(),
 <a href="qgraphicslayoutitem.html#minimumSize">minimumSize</a>(),
 <a href="qgraphicslayoutitem.html#maximumSize">maximumSize</a>(),
 <a href="qt.html#SizeHint-enum">Qt.PreferredSize</a>, and <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>().</p>
@@ -342,14 +342,14 @@ In order to unset the preferred size, use an invalid size.</p>
 <h3 class="fn"><a name="setPreferredSize-2" />QGraphicsLayoutItem.setPreferredSize (<i>self</i>, float&#160;<i>aw</i>, float&#160;<i>ah</i>)</h3><p>This convenience function is equivalent to calling
 setPreferredSize(<a href="qsizef.html">QSizeF</a>(<i>w</i>,
 <i>h</i>)).</p>
-<p>See also <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>(),
 <a href="qgraphicslayoutitem.html#setMaximumSize">setMaximumSize</a>(),
 <a href="qgraphicslayoutitem.html#setMinimumSize">setMinimumSize</a>(), and
 <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>().</p>
 
 
 <h3 class="fn"><a name="setPreferredWidth" />QGraphicsLayoutItem.setPreferredWidth (<i>self</i>, float&#160;<i>width</i>)</h3><p>Sets the preferred width to <i>width</i>.</p>
-<p>See also <a href="qgraphicslayoutitem.html#preferredWidth">preferredWidth</a>(),
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#preferredWidth">preferredWidth</a>(),
 <a href="qgraphicslayoutitem.html#preferredHeight">preferredHeight</a>(),
 <a href="qgraphicslayoutitem.html#setPreferredSize">setPreferredSize</a>(),
 and <a href="qgraphicslayoutitem.html#preferredSize">preferredSize</a>().</p>
@@ -365,13 +365,13 @@ but it is common for subclasses to change the default. For example,
 (<a href="qsizepolicy.html#Policy-enum">QSizePolicy.Preferred</a>,
 <a href="qsizepolicy.html#Policy-enum">QSizePolicy.Preferred</a>,
 <a href="qsizepolicy.html#ControlType-enum">QSizePolicy.DefaultType</a>).</p>
-<p>See also <a href="qgraphicslayoutitem.html#sizePolicy">sizePolicy</a>() and <a href="qwidget.html#sizePolicy-prop">QWidget.sizePolicy</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#sizePolicy">sizePolicy</a>() and <a href="qwidget.html#sizePolicy-prop">QWidget.sizePolicy</a>().</p>
 
 
 <h3 class="fn"><a name="setSizePolicy-2" />QGraphicsLayoutItem.setSizePolicy (<i>self</i>, <a href="qsizepolicy.html#Policy-enum">QSizePolicy.Policy</a>&#160;<i>hPolicy</i>, <a href="qsizepolicy.html#Policy-enum">QSizePolicy.Policy</a>&#160;<i>vPolicy</i>, <a href="qsizepolicy.html#ControlType-enum">QSizePolicy.ControlType</a>&#160;<i>controlType</i>&#160;=&#160;QSizePolicy.DefaultType)</h3><p>This is an overloaded function.</p>
 <p>This function is equivalent to calling setSizePolicy(<a href="qsizepolicy.html">QSizePolicy</a>(<i>hPolicy</i>, <i>vPolicy</i>,
 <i>controlType</i>)).</p>
-<p>See also <a href="qgraphicslayoutitem.html#sizePolicy">sizePolicy</a>() and <a href="qwidget.html#sizePolicy-prop">QWidget.sizePolicy</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#sizePolicy">sizePolicy</a>() and <a href="qwidget.html#sizePolicy-prop">QWidget.sizePolicy</a>().</p>
 
 
 <h3 class="fn"><a name="sizeHint" /><a href="qsizef.html">QSizeF</a> QGraphicsLayoutItem.sizeHint (<i>self</i>, <a href="qt.html#SizeHint-enum">Qt.SizeHint</a>&#160;<i>which</i>, <a href="qsizef.html">QSizeF</a>&#160;<i>constraint</i>&#160;=&#160;QSizeF())</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>This pure virtual function returns the size hint for
@@ -379,11 +379,11 @@ but it is common for subclasses to change the default. For example,
 or height of <i>constraint</i> to constrain the output.</p>
 <p>Reimplement this function in a subclass of <a href="qgraphicslayoutitem.html">QGraphicsLayoutItem</a> to provide the
 necessary size hints for your items.</p>
-<p>See also <a href="qgraphicslayoutitem.html#effectiveSizeHint">effectiveSizeHint</a>().</p>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#effectiveSizeHint">effectiveSizeHint</a>().</p>
 
 
 <h3 class="fn"><a name="sizePolicy" /><a href="qsizepolicy.html">QSizePolicy</a> QGraphicsLayoutItem.sizePolicy (<i>self</i>)</h3><p>Returns the current size policy.</p>
-<p>See also <a href="qgraphicslayoutitem.html#setSizePolicy">setSizePolicy</a>() and
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#setSizePolicy">setSizePolicy</a>() and
 <a href="qwidget.html#sizePolicy-prop">QWidget.sizePolicy</a>().</p>
 
 
@@ -392,5 +392,5 @@ You should always call this function if you change the return value
 of the <a href="qgraphicslayoutitem.html#sizeHint">sizeHint</a>()
 function. Subclasses must always call the base implementation when
 reimplementing this function.</p>
-<p>See also <a href="qgraphicslayoutitem.html#effectiveSizeHint">effectiveSizeHint</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qgraphicslayoutitem.html#effectiveSizeHint">effectiveSizeHint</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

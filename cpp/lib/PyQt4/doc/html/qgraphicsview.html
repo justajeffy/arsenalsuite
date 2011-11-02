@@ -22,12 +22,12 @@ QGraphicsView's constructor. Alternatively, you can call <a href="qgraphicsview.
 later point. After you call <a href="qwidget.html#show">show</a>(),
 the view will by default scroll to the center of the scene and
 display any items that are visible at this point. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QGraphicsScene scene;
- scene.addText("Hello, world!");
+<pre class="cpp">
+ <span class="type"><a href="qgraphicsscene.html">QGraphicsScene</a></span> scene;
+ scene<span class="operator">.</span>addText(<span class="string">"Hello, world!"</span>);
 
- QGraphicsView view(&amp;scene);
- view.show();
+ <span class="type">QGraphicsView</span> view(<span class="operator">&amp;</span>scene);
+ view<span class="operator">.</span><a href="qwidget.html#show">show</a>();
 </pre>
 <p>You can explicitly scroll to any position on the scene by using
 the scroll bars, or by calling <a href="qgraphicsview.html#centerOn">centerOn</a>(). By passing a point to
@@ -89,20 +89,20 @@ using view coordinates.</p>
 <p class="centerAlign"><img src="images/graphicsview-view.png" /></p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="CacheModeFlag-enum" />QGraphicsView.CacheModeFlag</h3><p>This enum describes the flags that you can set for a <a href="qgraphicsview.html">QGraphicsView</a>'s cache mode.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.CacheNone</tt></td>
-<td class=" topAlign"><tt>0x0</tt></td>
+<td class="topAlign"><tt>0x0</tt></td>
 <td class="topAlign">All painting is done directly onto the
 viewport.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.CacheBackground</tt></td>
-<td class=" topAlign"><tt>0x1</tt></td>
+<td class="topAlign"><tt>0x1</tt></td>
 <td class="topAlign">The background is cached. This affects both
 custom backgrounds, and backgrounds based on the <a href="qgraphicsview.html#backgroundBrush-prop">backgroundBrush</a>
 property. When this flag is enabled, <a href="qgraphicsview.html">QGraphicsView</a> will allocate one pixmap
@@ -111,26 +111,26 @@ with the full size of the viewport.</td>
 </table>
 <p>The CacheMode type is a typedef for <a href="qflags.html">QFlags</a>&lt;CacheModeFlag&gt;. It stores an OR
 combination of CacheModeFlag values.</p>
-<p>See also <a href="qgraphicsview.html#cacheMode-prop">cacheMode</a>.</p>
+<p><b>See also</b> <a href="qgraphicsview.html#cacheMode-prop">cacheMode</a>.</p>
 
 
 <h3 class="fn"><a name="DragMode-enum" />QGraphicsView.DragMode</h3><p>This enum describes the default action for the view when
 pressing and dragging the mouse over the viewport.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.NoDrag</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Nothing happens; the mouse event is
 ignored.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.ScrollHandDrag</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The cursor changes into a pointing hand, and
 dragging the mouse around will scroll the scrolbars. This mode
 works both in <a href="qgraphicsview.html#interactive-prop">interactive</a> and
@@ -138,15 +138,14 @@ non-interactive mode.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.RubberBandDrag</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">A rubber band will appear. Dragging the mouse
 will set the rubber band geometry, and all items covered by the
 rubber band are selected. This mode is disabled for non-interactive
 views.</td>
 </tr>
 </table>
-<p>See also <a href="qgraphicsview.html#dragMode-prop">dragMode</a>
-and <a href="qgraphicsscene.html#setSelectionArea">QGraphicsScene.setSelectionArea</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#dragMode-prop">dragMode</a> and <a href="qgraphicsscene.html#setSelectionArea">QGraphicsScene.setSelectionArea</a>().</p>
 
 
 <h3 class="fn"><a name="OptimizationFlag-enum" />QGraphicsView.OptimizationFlag</h3><p>This enum describes flags that you can enable to improve
@@ -155,20 +154,20 @@ flags are set. Note that setting a flag usually imposes a side
 effect, and this effect can vary between paint devices and
 platforms.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.DontClipPainter</tt></td>
-<td class=" topAlign"><tt>0x1</tt></td>
+<td class="topAlign"><tt>0x1</tt></td>
 <td class="topAlign">This value is obsolete and has no effect.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsView.DontSavePainterState</tt></td>
-<td class=" topAlign"><tt>0x2</tt></td>
+<td class="topAlign"><tt>0x2</tt></td>
 <td class="topAlign">When rendering, <a href="qgraphicsview.html">QGraphicsView</a> protects the painter state
 (see <a href="qpainter.html#save">QPainter.save</a>()) when
 rendering the background or foreground, and when rendering each
@@ -180,7 +179,7 @@ restore the state, you should enable this flag to prevent <a href="qgraphicsview
 <tr>
 <td class="topAlign">
 <tt>QGraphicsView.DontAdjustForAntialiasing</tt></td>
-<td class=" topAlign"><tt>0x4</tt></td>
+<td class="topAlign"><tt>0x4</tt></td>
 <td class="topAlign">Disables <a href="qgraphicsview.html">QGraphicsView</a>'s antialiasing
 auto-adjustment of exposed areas. Items that render antialiased
 lines on the boundaries of their <a href="qgraphicsitem.html#boundingRect">QGraphicsItem.boundingRect</a>()
@@ -195,7 +194,7 @@ traces behind on the scene as they are moved.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.IndirectPainting</tt></td>
-<td class=" topAlign"><tt>0x8</tt></td>
+<td class="topAlign"><tt>0x8</tt></td>
 <td class="topAlign">Since Qt 4.6, restore the old painting
 algorithm that calls <a class="obsolete" href="qgraphicsview-obsolete.html#drawItems">QGraphicsView.drawItems</a>() and <a class="obsolete" href="qgraphicsscene-obsolete.html#drawItems">QGraphicsScene.drawItems</a>(). To be used only for
 compatibility with old code.</td>
@@ -209,38 +208,38 @@ combination of OptimizationFlag values.</p>
 <h3 class="fn"><a name="ViewportAnchor-enum" />QGraphicsView.ViewportAnchor</h3><p>This enums describe the possible anchors that <a href="qgraphicsview.html">QGraphicsView</a> can use when the user
 resizes the view or when the view is transformed.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.NoAnchor</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">No anchor, i.e. the view leaves the scene's
 position unchanged.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.AnchorViewCenter</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The scene point at the center of the view is
 used as the anchor.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.AnchorUnderMouse</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The point under the mouse is used as the
 anchor.</td>
 </tr>
 </table>
-<p>See also <a href="qgraphicsview.html#resizeAnchor-prop">resizeAnchor</a> and
+<p><b>See also</b> <a href="qgraphicsview.html#resizeAnchor-prop">resizeAnchor</a> and
 <a href="qgraphicsview.html#transformationAnchor-prop">transformationAnchor</a>.</p>
 
 
 <h3 class="fn"><a name="ViewportUpdateMode-enum" />QGraphicsView.ViewportUpdateMode</h3><p>This enum describes how <a href="qgraphicsview.html">QGraphicsView</a> updates its viewport when
 the scene contents change or are exposed.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -248,7 +247,7 @@ the scene contents change or are exposed.</p>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsView.FullViewportUpdate</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">When any visible part of the scene changes or
 is reexposed, <a href="qgraphicsview.html">QGraphicsView</a> will
 update the entire viewport. This approach is fastest when <a href="qgraphicsview.html">QGraphicsView</a> spends more time figuring
@@ -261,7 +260,7 @@ to disable scroll optimization.</td>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsView.MinimalViewportUpdate</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign"><a href="qgraphicsview.html">QGraphicsView</a>
 will determine the minimal viewport region that requires a redraw,
 minimizing the time spent drawing by avoiding a redraw of areas
@@ -273,7 +272,7 @@ time finding the minimal approach than it will spend drawing.</td>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsView.SmartViewportUpdate</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign"><a href="qgraphicsview.html">QGraphicsView</a>
 will attempt to find an optimal update mode by analyzing the areas
 that require a redraw.</td>
@@ -281,7 +280,7 @@ that require a redraw.</td>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsView.BoundingRectViewportUpdate</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The bounding rectangle of all changes in the
 viewport will be redrawn. This mode has the advantage that <a href="qgraphicsview.html">QGraphicsView</a> searches only one region for
 changes, minimizing time spent determining what needs redrawing.
@@ -290,7 +289,7 @@ be redrawn.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsView.NoViewportUpdate</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign"><a href="qgraphicsview.html">QGraphicsView</a>
 will never update its viewport when the scene changes; the user is
 expected to control all updates. This mode disables all
@@ -300,7 +299,7 @@ otherwise updated externally.</td>
 </tr>
 </table>
 <p>This enum was introduced or modified in Qt 4.3.</p>
-<p>See also <a href="qgraphicsview.html#viewportUpdateMode-prop">viewportUpdateMode</a>.</p>
+<p><b>See also</b> <a href="qgraphicsview.html#viewportUpdateMode-prop">viewportUpdateMode</a>.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QGraphicsView" />QGraphicsView.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qgraphicsview.html">QGraphicsView</a>.
 <i>parent</i> is passed to <a href="qwidget.html">QWidget</a>'s
 constructor.</p>
@@ -318,7 +317,7 @@ scroll bars operate on integer coordinates, the centering is only
 an approximation.</p>
 <p><b>Note:</b> If the item is close to or outside the border, it
 will be visible in the view, but not centered.</p>
-<p>See also <a href="qgraphicsview.html#ensureVisible">ensureVisible</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#ensureVisible">ensureVisible</a>().</p>
 
 
 <h3 class="fn"><a name="centerOn-2" />QGraphicsView.centerOn (<i>self</i>, <a href="qgraphicsitem.html">QGraphicsItem</a>&#160;<i>item</i>)</h3><p>This is an overloaded function.</p>
@@ -330,7 +329,7 @@ calling centerOn(<a href="qpointf.html">QPointF</a>(<i>x</i>,
 <h3 class="fn"><a name="centerOn-3" />QGraphicsView.centerOn (<i>self</i>, float&#160;<i>ax</i>, float&#160;<i>ay</i>)</h3><p>This is an overloaded function.</p>
 <p>Scrolls the contents of the viewport to ensure that <i>item</i>
 is centered in the view.</p>
-<p>See also <a href="qgraphicsview.html#ensureVisible">ensureVisible</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#ensureVisible">ensureVisible</a>().</p>
 
 
 <h3 class="fn"><a name="contextMenuEvent" />QGraphicsView.contextMenuEvent (<i>self</i>, <a href="qcontextmenuevent.html">QContextMenuEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#contextMenuEvent">QWidget.contextMenuEvent</a>().</p>
@@ -357,7 +356,7 @@ the exposed rectangle.</p>
 <a href="qgraphicsview.html#backgroundBrush-prop">backgroundBrush</a>. If
 no such brush is defined (the default), the scene's
 drawBackground() function is called instead.</p>
-<p>See also <a href="qgraphicsview.html#drawForeground">drawForeground</a>() and
+<p><b>See also</b> <a href="qgraphicsview.html#drawForeground">drawForeground</a>() and
 <a href="qgraphicsscene.html#drawBackground">QGraphicsScene.drawBackground</a>().</p>
 
 
@@ -373,7 +372,7 @@ the exposed rectangle.</p>
 <a href="qgraphicsview.html#foregroundBrush-prop">foregroundBrush</a>. If
 no such brush is defined (the default), the scene's
 drawForeground() function is called instead.</p>
-<p>See also <a href="qgraphicsview.html#drawBackground">drawBackground</a>() and
+<p><b>See also</b> <a href="qgraphicsview.html#drawBackground">drawBackground</a>() and
 <a href="qgraphicsscene.html#drawForeground">QGraphicsScene.drawForeground</a>().</p>
 
 
@@ -385,7 +384,7 @@ drawForeground() function is called instead.</p>
 <i>xmargin</i> and <i>ymargin</i>. If the specified rect cannot be
 reached, the contents are scrolled to the nearest valid position.
 The default value for both margins is 50 pixels.</p>
-<p>See also <a href="qgraphicsview.html#centerOn">centerOn</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#centerOn">centerOn</a>().</p>
 
 
 <h3 class="fn"><a name="ensureVisible-2" />QGraphicsView.ensureVisible (<i>self</i>, <a href="qgraphicsitem.html">QGraphicsItem</a>&#160;<i>item</i>, int&#160;<i>xMargin</i>&#160;=&#160;50, int&#160;<i>yMargin</i>&#160;=&#160;50)</h3><p>This is an overloaded function.</p>
@@ -400,7 +399,7 @@ calling ensureVisible(<a href="qrectf.html">QRectF</a>(<i>x</i>,
 <i>xmargin</i> and <i>ymargin</i>. If the specified point cannot be
 reached, the contents are scrolled to the nearest valid position.
 The default value for both margins is 50 pixels.</p>
-<p>See also <a href="qgraphicsview.html#centerOn">centerOn</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#centerOn">centerOn</a>().</p>
 
 
 <h3 class="fn"><a name="event" />bool QGraphicsView.event (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -424,7 +423,7 @@ policies to always on or always off to prevent this (see <a href="qabstractscrol
 and <a href="qabstractscrollarea.html#verticalScrollBarPolicy-prop">verticalScrollBarPolicy</a>()).</p>
 <p>If <i>rect</i> is empty, or if the viewport is too small, this
 function will do nothing.</p>
-<p>See also <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#ensureVisible">ensureVisible</a>(), and
+<p><b>See also</b> <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#ensureVisible">ensureVisible</a>(), and
 <a href="qgraphicsview.html#centerOn">centerOn</a>().</p>
 
 
@@ -432,13 +431,13 @@ function will do nothing.</p>
 <p>This convenience function is equivalent to calling
 fitInView(<a href="qrectf.html">QRectF</a>(<i>x</i>, <i>y</i>,
 <i>w</i>, <i>h</i>), <i>aspectRatioMode</i>).</p>
-<p>See also <a href="qgraphicsview.html#ensureVisible">ensureVisible</a>() and <a href="qgraphicsview.html#centerOn">centerOn</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#ensureVisible">ensureVisible</a>() and <a href="qgraphicsview.html#centerOn">centerOn</a>().</p>
 
 
 <h3 class="fn"><a name="fitInView-3" />QGraphicsView.fitInView (<i>self</i>, float&#160;<i>x</i>, float&#160;<i>y</i>, float&#160;<i>w</i>, float&#160;<i>h</i>, <a href="qt.html#AspectRatioMode-enum">Qt.AspectRatioMode</a>&#160;<i>mode</i>&#160;=&#160;Qt.IgnoreAspectRatio)</h3><p>This is an overloaded function.</p>
 <p>Ensures that <i>item</i> fits tightly inside the view, scaling
 the view according to <i>aspectRatioMode</i>.</p>
-<p>See also <a href="qgraphicsview.html#ensureVisible">ensureVisible</a>() and <a href="qgraphicsview.html#centerOn">centerOn</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#ensureVisible">ensureVisible</a>() and <a href="qgraphicsview.html#centerOn">centerOn</a>().</p>
 
 
 <h3 class="fn"><a name="focusInEvent" />QGraphicsView.focusInEvent (<i>self</i>, <a href="qfocusevent.html">QFocusEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#focusInEvent">QWidget.focusInEvent</a>().</p>
@@ -468,14 +467,14 @@ caching.</p>
 currently supports background caching only (see <a href="qgraphicsview.html#CacheModeFlag-enum">QGraphicsView.CacheBackground</a>).
 This function is equivalent to calling <a href="qwidget.html#update">update</a>() if any layer but <a href="qgraphicsscene.html#SceneLayer-enum">QGraphicsScene.BackgroundLayer</a>
 is passed.</p>
-<p>See also <a href="qgraphicsscene.html#invalidate">QGraphicsScene.invalidate</a>()
+<p><b>See also</b> <a href="qgraphicsscene.html#invalidate">QGraphicsScene.invalidate</a>()
 and <a href="qwidget.html#update">update</a>().</p>
 
 
 <h3 class="fn"><a name="isInteractive" />bool QGraphicsView.isInteractive (<i>self</i>)</h3><h3 class="fn"><a name="isTransformed" />bool QGraphicsView.isTransformed (<i>self</i>)</h3><p>Returns true if the view is transformed (i.e., a non-identity
 transform has been assigned, or the scrollbars are adjusted).</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qabstractscrollarea.html#horizontalScrollBar">horizontalScrollBar</a>(),
+<p><b>See also</b> <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qabstractscrollarea.html#horizontalScrollBar">horizontalScrollBar</a>(),
 and <a href="qabstractscrollarea.html#verticalScrollBar">verticalScrollBar</a>().</p>
 
 
@@ -483,18 +482,18 @@ and <a href="qabstractscrollarea.html#verticalScrollBar">verticalScrollBar</a>()
 coordinates. If there are several items at this position, this
 function returns the topmost item.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- void CustomView.mousePressEvent(QMouseEvent *event)
+<pre class="cpp">
+ <span class="type">void</span> CustomView<span class="operator">.</span>mousePressEvent(<span class="type"><a href="qmouseevent.html">QMouseEvent</a></span> <span class="operator">*</span>event)
  {
-     if (QGraphicsItem *item = itemAt(event-&gt;pos())) {
-         qDebug() &lt;&lt; "You clicked on item" &lt;&lt; item;
-     } else {
-         qDebug() &lt;&lt; "You didn't click on an item.";
+     <span class="keyword">if</span> (<span class="type"><a href="qgraphicsitem.html">QGraphicsItem</a></span> <span class="operator">*</span>item <span class="operator">=</span> itemAt(event<span class="operator">-</span><span class="operator">&gt;</span>pos())) {
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"You clicked on item"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> item;
+     } <span class="keyword">else</span> {
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"You didn't click on an item."</span>;
      }
  }
 </pre>
-<p>See also <a href="qgraphicsview.html#items">items</a>() and
-<a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsview.html#items">items</a>()
+and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="itemAt-2" /><a href="qgraphicsitem.html">QGraphicsItem</a> QGraphicsView.itemAt (<i>self</i>, int&#160;<i>ax</i>, int&#160;<i>ay</i>)</h3><p>This is an overloaded function.</p>
@@ -506,7 +505,7 @@ calling itemAt(<a href="qpoint.html">QPoint</a>(<i>x</i>,
 <h3 class="fn"><a name="items" />list-of-QGraphicsItem QGraphicsView.items (<i>self</i>)</h3><p>Returns a list of all the items in the associated scene, in
 descending stacking order (i.e., the first item in the returned
 list is the uppermost item).</p>
-<p>See also <a href="qgraphicsscene.html#items">QGraphicsScene.items</a>() and
+<p><b>See also</b> <a href="qgraphicsscene.html#items">QGraphicsScene.items</a>() and
 <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
@@ -517,14 +516,14 @@ is the lowermost item). <i>pos</i> is in viewport coordinates.</p>
 <p>This function is most commonly called from within mouse event
 handlers in a subclass in <a href="qgraphicsview.html">QGraphicsView</a>. <i>pos</i> is in
 untransformed viewport coordinates, just like <a href="qmouseevent.html#pos">QMouseEvent.pos</a>().</p>
-<pre class="highlightedCode brush: cpp">
- void CustomView.mousePressEvent(QMouseEvent *event)
+<pre class="cpp">
+ <span class="type">void</span> CustomView<span class="operator">.</span>mousePressEvent(<span class="type"><a href="qmouseevent.html">QMouseEvent</a></span> <span class="operator">*</span>event)
  {
-     qDebug() &lt;&lt; "There are" &lt;&lt; items(event-&gt;pos()).size()
-              &lt;&lt; "items at position" &lt;&lt; mapToScene(event-&gt;pos());
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"There are"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> items(event<span class="operator">-</span><span class="operator">&gt;</span>pos())<span class="operator">.</span>size()
+              <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"items at position"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> mapToScene(event<span class="operator">-</span><span class="operator">&gt;</span>pos());
  }
 </pre>
-<p>See also <a href="qgraphicsscene.html#items">QGraphicsScene.items</a>() and
+<p><b>See also</b> <a href="qgraphicsscene.html#items">QGraphicsScene.items</a>() and
 <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
@@ -548,8 +547,7 @@ items whose exact shape intersects with or is contained by
 <i>rect</i> are returned.</p>
 <p>The items are sorted in descending stacking order (i.e., the
 first item in the returned list is the uppermost item).</p>
-<p>See also <a href="qgraphicsview.html#itemAt">itemAt</a>(),
-<a href="qgraphicsview.html#items">items</a>(), <a href="qgraphicsview.html#mapToScene">mapToScene</a>(), and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsview.html#itemAt">itemAt</a>(), <a href="qgraphicsview.html#items">items</a>(), <a href="qgraphicsview.html#mapToScene">mapToScene</a>(), and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="items-6" />list-of-QGraphicsItem QGraphicsView.items (<i>self</i>, <a href="qpolygon.html">QPolygon</a>&#160;<i>polygon</i>, <a href="qt.html#ItemSelectionMode-enum">Qt.ItemSelectionMode</a>&#160;<i>mode</i>&#160;=&#160;Qt.IntersectsItemShape)</h3><p>This is an overloaded function.</p>
@@ -561,8 +559,7 @@ items whose exact shape intersects with or is contained by
 <i>polygon</i> are returned.</p>
 <p>The items are sorted by descending stacking order (i.e., the
 first item in the returned list is the uppermost item).</p>
-<p>See also <a href="qgraphicsview.html#itemAt">itemAt</a>(),
-<a href="qgraphicsview.html#items">items</a>(), <a href="qgraphicsview.html#mapToScene">mapToScene</a>(), and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsview.html#itemAt">itemAt</a>(), <a href="qgraphicsview.html#items">items</a>(), <a href="qgraphicsview.html#mapToScene">mapToScene</a>(), and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="items-7" />list-of-QGraphicsItem QGraphicsView.items (<i>self</i>, <a href="qpainterpath.html">QPainterPath</a>&#160;<i>path</i>, <a href="qt.html#ItemSelectionMode-enum">Qt.ItemSelectionMode</a>&#160;<i>mode</i>&#160;=&#160;Qt.IntersectsItemShape)</h3><p>This is an overloaded function.</p>
@@ -572,8 +569,7 @@ is in viewport coordinates.</p>
 <p>The default value for <i>mode</i> is <a href="qt.html#ItemSelectionMode-enum">Qt.IntersectsItemShape</a>; all
 items whose exact shape intersects with or is contained by
 <i>path</i> are returned.</p>
-<p>See also <a href="qgraphicsview.html#itemAt">itemAt</a>(),
-<a href="qgraphicsview.html#items">items</a>(), <a href="qgraphicsview.html#mapToScene">mapToScene</a>(), and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
+<p><b>See also</b> <a href="qgraphicsview.html#itemAt">itemAt</a>(), <a href="qgraphicsview.html#items">items</a>(), <a href="qgraphicsview.html#mapToScene">mapToScene</a>(), and <a href="qgraphicsitem.html#sorting">Sorting</a>.</p>
 
 
 <h3 class="fn"><a name="keyPressEvent" />QGraphicsView.keyPressEvent (<i>self</i>, <a href="qkeyevent.html">QKeyEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#keyPressEvent">QWidget.keyPressEvent</a>().</p>
@@ -584,22 +580,22 @@ items whose exact shape intersects with or is contained by
 
 <h3 class="fn"><a name="mapFromScene" /><a href="qpoint.html">QPoint</a> QGraphicsView.mapFromScene (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>point</i>)</h3><p>Returns the scene coordinate <i>point</i> to viewport
 coordinates.</p>
-<p>See also <a href="qgraphicsview.html#mapToScene">mapToScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#mapToScene">mapToScene</a>().</p>
 
 
 <h3 class="fn"><a name="mapFromScene-2" /><a href="qpolygon.html">QPolygon</a> QGraphicsView.mapFromScene (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rect</i>)</h3><p>Returns the scene rectangle <i>rect</i> to a viewport coordinate
 polygon.</p>
-<p>See also <a href="qgraphicsview.html#mapToScene">mapToScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#mapToScene">mapToScene</a>().</p>
 
 
 <h3 class="fn"><a name="mapFromScene-3" /><a href="qpolygon.html">QPolygon</a> QGraphicsView.mapFromScene (<i>self</i>, <a href="qpolygonf.html">QPolygonF</a>&#160;<i>polygon</i>)</h3><p>Returns the scene coordinate polygon <i>polygon</i> to a
 viewport coordinate polygon.</p>
-<p>See also <a href="qgraphicsview.html#mapToScene">mapToScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#mapToScene">mapToScene</a>().</p>
 
 
 <h3 class="fn"><a name="mapFromScene-4" /><a href="qpainterpath.html">QPainterPath</a> QGraphicsView.mapFromScene (<i>self</i>, <a href="qpainterpath.html">QPainterPath</a>&#160;<i>path</i>)</h3><p>Returns the scene coordinate painter path <i>path</i> to a
 viewport coordinate painter path.</p>
-<p>See also <a href="qgraphicsview.html#mapToScene">mapToScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#mapToScene">mapToScene</a>().</p>
 
 
 <h3 class="fn"><a name="mapFromScene-5" /><a href="qpoint.html">QPoint</a> QGraphicsView.mapFromScene (<i>self</i>, float&#160;<i>ax</i>, float&#160;<i>ay</i>)</h3><p>This function is provided for convenience. It's equivalent to
@@ -618,22 +614,22 @@ coordinates.</p>
 pixel at <i>point</i> instead of the point itself. To do this, you
 can call mapToScene(<a href="qrect.html">QRect</a>(<i>point</i>,
 <a href="qsize.html">QSize</a>(2, 2))).</p>
-<p>See also <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>().</p>
 
 
 <h3 class="fn"><a name="mapToScene-2" /><a href="qpolygonf.html">QPolygonF</a> QGraphicsView.mapToScene (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>rect</i>)</h3><p>Returns the viewport rectangle <i>rect</i> mapped to a scene
 coordinate polygon.</p>
-<p>See also <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>().</p>
 
 
 <h3 class="fn"><a name="mapToScene-3" /><a href="qpolygonf.html">QPolygonF</a> QGraphicsView.mapToScene (<i>self</i>, <a href="qpolygon.html">QPolygon</a>&#160;<i>polygon</i>)</h3><p>Returns the viewport polygon <i>polygon</i> mapped to a scene
 coordinate polygon.</p>
-<p>See also <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>().</p>
 
 
 <h3 class="fn"><a name="mapToScene-4" /><a href="qpainterpath.html">QPainterPath</a> QGraphicsView.mapToScene (<i>self</i>, <a href="qpainterpath.html">QPainterPath</a>&#160;<i>path</i>)</h3><p>Returns the viewport painter path <i>path</i> mapped to a scene
 coordinate painter path.</p>
-<p>See also <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>().</p>
 
 
 <h3 class="fn"><a name="mapToScene-5" /><a href="qpointf.html">QPointF</a> QGraphicsView.mapToScene (<i>self</i>, int&#160;<i>ax</i>, int&#160;<i>ay</i>)</h3><p>This function is provided for convenience. It's equivalent to
@@ -648,8 +644,7 @@ calling mapToScene(<a href="qrect.html">QRect</a>(<i>x</i>,
 
 <h3 class="fn"><a name="matrix" /><a href="qmatrix.html">QMatrix</a> QGraphicsView.matrix (<i>self</i>)</h3><p>Returns the current transformation matrix for the view. If no
 current transformation is set, the identity matrix is returned.</p>
-<p>See also <a href="qgraphicsview.html#setMatrix">setMatrix</a>(),
-<a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#setMatrix">setMatrix</a>(), <a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
 
 
 <h3 class="fn"><a name="mouseDoubleClickEvent" />QGraphicsView.mouseDoubleClickEvent (<i>self</i>, <a href="qmouseevent.html">QMouseEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#mouseDoubleClickEvent">QWidget.mouseDoubleClickEvent</a>().</p>
@@ -674,29 +669,29 @@ capturing the contents of the view onto a paint device, such as a
 <a href="qimage.html">QImage</a> (e.g., to take a screenshot), or
 for printing to <a href="qprinter.html">QPrinter</a>. For
 example:</p>
-<pre class="highlightedCode brush: cpp">
- QGraphicsScene scene;
- scene.addItem(...
- ...
+<pre class="cpp">
+ <span class="type"><a href="qgraphicsscene.html">QGraphicsScene</a></span> scene;
+ scene<span class="operator">.</span>addItem(<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 
- QGraphicsView view(&amp;scene);
- view.show();
- ...
+ <span class="type"><a href="qgraphicsview.html">QGraphicsView</a></span> view(<span class="operator">&amp;</span>scene);
+ view<span class="operator">.</span>show();
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
 
- QPrinter printer(QPrinter.HighResolution);
- printer.setPageSize(QPrinter.A4);
- QPainter painter(&amp;printer);
+ <span class="type"><a href="qprinter.html">QPrinter</a></span> printer(<span class="type"><a href="qprinter.html">QPrinter</a></span><span class="operator">.</span>HighResolution);
+ printer<span class="operator">.</span>setPageSize(<span class="type"><a href="qprinter.html">QPrinter</a></span><span class="operator">.</span>A4);
+ <span class="type"><a href="qpainter.html">QPainter</a></span> painter(<span class="operator">&amp;</span>printer);
 
-<span class="comment"> // print, fitting the viewport contents into a full page</span>
- view.render(&amp;painter);
+ <span class="comment">// print, fitting the viewport contents into a full page</span>
+ view<span class="operator">.</span>render(<span class="operator">&amp;</span>painter);
 
-<span class="comment"> // print the upper half of the viewport into the lower.</span>
-<span class="comment"> // half of the page.</span>
- QRect viewport = view.viewport()-&gt;rect();
- view.render(&amp;painter,
-             QRectF(0, printer.height() / 2,
-                    printer.width(), printer.height() / 2),
-             viewport.adjusted(0, 0, 0, -viewport.height() / 2));
+ <span class="comment">// print the upper half of the viewport into the lower.</span>
+ <span class="comment">// half of the page.</span>
+ <span class="type"><a href="qrect.html">QRect</a></span> viewport <span class="operator">=</span> view<span class="operator">.</span>viewport()<span class="operator">-</span><span class="operator">&gt;</span>rect();
+ view<span class="operator">.</span>render(<span class="operator">&amp;</span>painter<span class="operator">,</span>
+             <span class="type"><a href="qrectf.html">QRectF</a></span>(<span class="number">0</span><span class="operator">,</span> printer<span class="operator">.</span>height() <span class="operator">/</span> <span class="number">2</span><span class="operator">,</span>
+                    printer<span class="operator">.</span>width()<span class="operator">,</span> printer<span class="operator">.</span>height() <span class="operator">/</span> <span class="number">2</span>)<span class="operator">,</span>
+             viewport<span class="operator">.</span>adjusted(<span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="operator">-</span>viewport<span class="operator">.</span>height() <span class="operator">/</span> <span class="number">2</span>));
 </pre>
 <p>If <i>source</i> is a null rect, this function will use <a href="qabstractscrollarea.html#viewport">viewport</a>()-&gt;<a href="qwidget.html#rect-prop">rect</a>() to determine what to draw. If
 <i>target</i> is a null rect, the full dimensions of
@@ -705,7 +700,7 @@ example:</p>
 <i>aspectRatioMode</i> to fit into the target rect. By default, the
 aspect ratio is kept, and <i>source</i> is scaled to fit in
 <i>target</i>.</p>
-<p>See also <a href="qgraphicsscene.html#render">QGraphicsScene.render</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#render">QGraphicsScene.render</a>().</p>
 
 
 <h3 class="fn"><a name="renderHints" /><a href="qpainter-renderhints.html">QPainter.RenderHints</a> QGraphicsView.renderHints (<i>self</i>)</h3><h3 class="fn"><a name="resetCachedContent" />QGraphicsView.resetCachedContent (<i>self</i>)</h3><p>Resets any cached content. Calling this function will clear
@@ -718,17 +713,16 @@ properties change; you only need to call this function if you have
 reimplemented <a href="qgraphicsscene.html#drawBackground">QGraphicsScene.drawBackground</a>()
 or <a href="qgraphicsview.html#drawBackground">QGraphicsView.drawBackground</a>()
 to draw a custom background, and need to trigger a full redraw.</p>
-<p>See also <a href="qgraphicsview.html#cacheMode-prop">cacheMode</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#cacheMode-prop">cacheMode</a>().</p>
 
 
 <h3 class="fn"><a name="resetMatrix" />QGraphicsView.resetMatrix (<i>self</i>)</h3><p>Resets the view transformation matrix to the identity
 matrix.</p>
-<p>See also <a href="qgraphicsview.html#resetTransform">resetTransform</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#resetTransform">resetTransform</a>().</p>
 
 
 <h3 class="fn"><a name="resetTransform" />QGraphicsView.resetTransform (<i>self</i>)</h3><p>Resets the view transformation to the identity matrix.</p>
-<p>See also <a href="qgraphicsview.html#transform">transform</a>()
-and <a href="qgraphicsview.html#setTransform">setTransform</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#transform">transform</a>() and <a href="qgraphicsview.html#setTransform">setTransform</a>().</p>
 
 
 <h3 class="fn"><a name="resizeAnchor" /><a href="qgraphicsview.html#ViewportAnchor-enum">ViewportAnchor</a> QGraphicsView.resizeAnchor (<i>self</i>)</h3><h3 class="fn"><a name="resizeEvent" />QGraphicsView.resizeEvent (<i>self</i>, <a href="qresizeevent.html">QResizeEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#resizeEvent">QWidget.resizeEvent</a>().</p>
@@ -736,17 +730,17 @@ and <a href="qgraphicsview.html#setTransform">setTransform</a>().</p>
 
 <h3 class="fn"><a name="rotate" />QGraphicsView.rotate (<i>self</i>, float&#160;<i>angle</i>)</h3><p>Rotates the current view transformation <i>angle</i> degrees
 clockwise.</p>
-<p>See also <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
 
 
 <h3 class="fn"><a name="rubberBandSelectionMode" /><a href="qt.html#ItemSelectionMode-enum">Qt.ItemSelectionMode</a> QGraphicsView.rubberBandSelectionMode (<i>self</i>)</h3><h3 class="fn"><a name="scale" />QGraphicsView.scale (<i>self</i>, float&#160;<i>sx</i>, float&#160;<i>sy</i>)</h3><p>Scales the current view transformation by (<i>sx</i>,
 <i>sy</i>).</p>
-<p>See also <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
 
 
 <h3 class="fn"><a name="scene" /><a href="qgraphicsscene.html">QGraphicsScene</a> QGraphicsView.scene (<i>self</i>)</h3><p>Returns a pointer to the scene that is currently visualized in
 the view. If no scene is currently visualized, 0 is returned.</p>
-<p>See also <a href="qgraphicsview.html#setScene">setScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#setScene">setScene</a>().</p>
 
 
 <h3 class="fn"><a name="sceneRect" /><a href="qrectf.html">QRectF</a> QGraphicsView.sceneRect (<i>self</i>)</h3><h3 class="fn"><a name="scrollContentsBy" />QGraphicsView.scrollContentsBy (<i>self</i>, int&#160;<i>dx</i>, int&#160;<i>dy</i>)</h3><p>Reimplemented from <a href="qabstractscrollarea.html#scrollContentsBy">QAbstractScrollArea.scrollContentsBy</a>().</p>
@@ -765,13 +759,13 @@ in the view). If a 2x2 scaling matrix is applied, the scene will be
 drawn in 1:2 (e.g., a 10x10 rectangular item is then drawn using
 20x20 pixels in the view).</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QGraphicsScene scene;
- scene.addText("GraphicsView rotated clockwise");
+<pre class="cpp">
+ <span class="type"><a href="qgraphicsscene.html">QGraphicsScene</a></span> scene;
+ scene<span class="operator">.</span>addText(<span class="string">"GraphicsView rotated clockwise"</span>);
 
- QGraphicsView view(&amp;scene);
- view.rotate(90); <span class="comment">// the text is rendered with a 90 degree clockwise rotation</span>
- view.show();
+ <span class="type"><a href="qgraphicsview.html">QGraphicsView</a></span> view(<span class="operator">&amp;</span>scene);
+ view<span class="operator">.</span><a href="qgraphicsview.html#rotate">rotate</a>(<span class="number">90</span>); <span class="comment">// the text is rendered with a 90 degree clockwise rotation</span>
+ view<span class="operator">.</span><a href="qwidget.html#show">show</a>();
 </pre>
 <p>To simplify interation with items using a transformed view,
 <a href="qgraphicsview.html">QGraphicsView</a> provides mapTo...
@@ -779,19 +773,17 @@ and mapFrom... functions that can translate between scene and view
 coordinates. For example, you can call <a href="qgraphicsview.html#mapToScene">mapToScene</a>() to map a view
 coordinate to a floating point scene coordinate, or <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>() to map from
 floating point scene coordinates to view coordinates.</p>
-<p>See also <a href="qgraphicsview.html#matrix">matrix</a>(),
-<a href="qgraphicsview.html#setTransform">setTransform</a>(),
-<a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#matrix">matrix</a>(), <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
 
 
 <h3 class="fn"><a name="setOptimizationFlag" />QGraphicsView.setOptimizationFlag (<i>self</i>, <a href="qgraphicsview.html#OptimizationFlag-enum">OptimizationFlag</a>&#160;<i>flag</i>, bool&#160;<i>enabled</i>&#160;=&#160;True)</h3><p>Enables <i>flag</i> if <i>enabled</i> is true; otherwise
 disables <i>flag</i>.</p>
-<p>See also <a href="qgraphicsview.html#optimizationFlags-prop">optimizationFlags</a>.</p>
+<p><b>See also</b> <a href="qgraphicsview.html#optimizationFlags-prop">optimizationFlags</a>.</p>
 
 
 <h3 class="fn"><a name="setOptimizationFlags" />QGraphicsView.setOptimizationFlags (<i>self</i>, <a href="qgraphicsview-optimizationflags.html">OptimizationFlags</a>&#160;<i>flags</i>)</h3><h3 class="fn"><a name="setRenderHint" />QGraphicsView.setRenderHint (<i>self</i>, <a href="qpainter.html#RenderHint-enum">QPainter.RenderHint</a>&#160;<i>hint</i>, bool&#160;<i>on</i>&#160;=&#160;True)</h3><p>If <i>enabled</i> is true, the render hint <i>hint</i> is
 enabled; otherwise it is disabled.</p>
-<p>See also <a href="qgraphicsview.html#renderHints-prop">renderHints</a>.</p>
+<p><b>See also</b> <a href="qgraphicsview.html#renderHints-prop">renderHints</a>.</p>
 
 
 <h3 class="fn"><a name="setRenderHints" />QGraphicsView.setRenderHints (<i>self</i>, <a href="qpainter-renderhints.html">QPainter.RenderHints</a>&#160;<i>hints</i>)</h3><h3 class="fn"><a name="setResizeAnchor" />QGraphicsView.setResizeAnchor (<i>self</i>, <a href="qgraphicsview.html#ViewportAnchor-enum">ViewportAnchor</a>&#160;<i>anchor</i>)</h3><h3 class="fn"><a name="setRubberBandSelectionMode" />QGraphicsView.setRubberBandSelectionMode (<i>self</i>, <a href="qt.html#ItemSelectionMode-enum">Qt.ItemSelectionMode</a>&#160;<i>mode</i>)</h3><h3 class="fn"><a name="setScene" />QGraphicsView.setScene (<i>self</i>, <a href="qgraphicsscene.html">QGraphicsScene</a>&#160;<i>scene</i>)</h3><p>Sets the current scene to <i>scene</i>. If <i>scene</i> is
@@ -799,7 +791,7 @@ already being viewed, this function does nothing.</p>
 <p>When a scene is set on a view, the <a href="qgraphicsscene.html#changed">QGraphicsScene.changed</a>() signal
 is automatically connected to this view's <a href="qgraphicsview.html#updateScene">updateScene</a>() slot, and the
 view's scroll bars are adjusted to fit the size of the scene.</p>
-<p>See also <a href="qgraphicsview.html#scene">scene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#scene">scene</a>().</p>
 
 
 <h3 class="fn"><a name="setSceneRect" />QGraphicsView.setSceneRect (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rect</i>)</h3><h3 class="fn"><a name="setSceneRect-2" />QGraphicsView.setSceneRect (<i>self</i>, float&#160;<i>ax</i>, float&#160;<i>ay</i>, float&#160;<i>aw</i>, float&#160;<i>ah</i>)</h3><h3 class="fn"><a name="setTransform" />QGraphicsView.setTransform (<i>self</i>, <a href="qtransform.html">QTransform</a>&#160;<i>matrix</i>, bool&#160;<i>combine</i>&#160;=&#160;False)</h3><p>Sets the view's current transformation matrix to
@@ -815,13 +807,13 @@ in the view). If a 2x2 scaling matrix is applied, the scene will be
 drawn in 1:2 (e.g., a 10x10 rectangular item is then drawn using
 20x20 pixels in the view).</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QGraphicsScene scene;
- scene.addText("GraphicsView rotated clockwise");
+<pre class="cpp">
+ <span class="type"><a href="qgraphicsscene.html">QGraphicsScene</a></span> scene;
+ scene<span class="operator">.</span>addText(<span class="string">"GraphicsView rotated clockwise"</span>);
 
- QGraphicsView view(&amp;scene);
- view.rotate(90); <span class="comment">// the text is rendered with a 90 degree clockwise rotation</span>
- view.show();
+ <span class="type"><a href="qgraphicsview.html">QGraphicsView</a></span> view(<span class="operator">&amp;</span>scene);
+ view<span class="operator">.</span>rotate(<span class="number">90</span>); <span class="comment">// the text is rendered with a 90 degree clockwise rotation</span>
+ view<span class="operator">.</span>show();
 </pre>
 <p>To simplify interation with items using a transformed view,
 <a href="qgraphicsview.html">QGraphicsView</a> provides mapTo...
@@ -829,19 +821,18 @@ and mapFrom... functions that can translate between scene and view
 coordinates. For example, you can call <a href="qgraphicsview.html#mapToScene">mapToScene</a>() to map a view
 coordiate to a floating point scene coordinate, or <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>() to map from
 floating point scene coordinates to view coordinates.</p>
-<p>See also <a href="qgraphicsview.html#transform">transform</a>(),
-<a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
 
 
 <h3 class="fn"><a name="setTransformationAnchor" />QGraphicsView.setTransformationAnchor (<i>self</i>, <a href="qgraphicsview.html#ViewportAnchor-enum">ViewportAnchor</a>&#160;<i>anchor</i>)</h3><h3 class="fn"><a name="setupViewport" />QGraphicsView.setupViewport (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>widget</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setupViewport(QWidget *)</tt>.</p><p>This slot is called by <a href="qabstractscrollarea.html">QAbstractScrollArea</a> after <a href="qabstractscrollarea.html#setViewport">setViewport</a>() has been
 called. Reimplement this function in a subclass of <a href="qgraphicsview.html">QGraphicsView</a> to initialize the new
 viewport <i>widget</i> before it is used.</p>
-<p>See also <a href="qabstractscrollarea.html#setViewport">setViewport</a>().</p>
+<p><b>See also</b> <a href="qabstractscrollarea.html#setViewport">setViewport</a>().</p>
 
 
 <h3 class="fn"><a name="setViewportUpdateMode" />QGraphicsView.setViewportUpdateMode (<i>self</i>, <a href="qgraphicsview.html#ViewportUpdateMode-enum">ViewportUpdateMode</a>&#160;<i>mode</i>)</h3><h3 class="fn"><a name="shear" />QGraphicsView.shear (<i>self</i>, float&#160;<i>sh</i>, float&#160;<i>sv</i>)</h3><p>Shears the current view transformation by (<i>sh</i>,
 <i>sv</i>).</p>
-<p>See also <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
 
 
 <h3 class="fn"><a name="showEvent" />QGraphicsView.showEvent (<i>self</i>, <a href="qshowevent.html">QShowEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#showEvent">QWidget.showEvent</a>().</p>
@@ -852,23 +843,23 @@ viewport <i>widget</i> before it is used.</p>
 
 <h3 class="fn"><a name="transform" /><a href="qtransform.html">QTransform</a> QGraphicsView.transform (<i>self</i>)</h3><p>Returns the current transformation matrix for the view. If no
 current transformation is set, the identity matrix is returned.</p>
-<p>See also <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#shear">shear</a>(), and <a href="qgraphicsview.html#translate">translate</a>().</p>
 
 
 <h3 class="fn"><a name="transformationAnchor" /><a href="qgraphicsview.html#ViewportAnchor-enum">ViewportAnchor</a> QGraphicsView.transformationAnchor (<i>self</i>)</h3><h3 class="fn"><a name="translate" />QGraphicsView.translate (<i>self</i>, float&#160;<i>dx</i>, float&#160;<i>dy</i>)</h3><p>Translates the current view transformation by (<i>dx</i>,
 <i>dy</i>).</p>
-<p>See also <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), and <a href="qgraphicsview.html#shear">shear</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#setTransform">setTransform</a>(), <a href="qgraphicsview.html#transform">transform</a>(), <a href="qgraphicsview.html#rotate">rotate</a>(), and <a href="qgraphicsview.html#shear">shear</a>().</p>
 
 
 <h3 class="fn"><a name="updateScene" />QGraphicsView.updateScene (<i>self</i>, list-of-QRectF&#160;<i>rects</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void updateScene(const QList&lt;QRectF&gt;&amp;)</tt>.</p><p>Schedules an update of the scene rectangles <i>rects</i>.</p>
-<p>See also <a href="qgraphicsscene.html#changed">QGraphicsScene.changed</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#changed">QGraphicsScene.changed</a>().</p>
 
 
 <h3 class="fn"><a name="updateSceneRect" />QGraphicsView.updateSceneRect (<i>self</i>, <a href="qrectf.html">QRectF</a>&#160;<i>rect</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void updateSceneRect(const QRectF&amp;)</tt>.</p><p>Notifies <a href="qgraphicsview.html">QGraphicsView</a> that the
 scene's scene rect has changed. <i>rect</i> is the new scene rect.
 If the view already has an explicitly set scene rect, this function
 does nothing.</p>
-<p>See also <a href="qgraphicsview.html#sceneRect-prop">sceneRect</a> and <a href="qgraphicsscene.html#sceneRectChanged">QGraphicsScene.sceneRectChanged</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#sceneRect-prop">sceneRect</a> and <a href="qgraphicsscene.html#sceneRectChanged">QGraphicsScene.sceneRectChanged</a>().</p>
 
 
 <h3 class="fn"><a name="viewportEvent" />bool QGraphicsView.viewportEvent (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qabstractscrollarea.html#viewportEvent">QAbstractScrollArea.viewportEvent</a>().</p>
@@ -876,8 +867,8 @@ does nothing.</p>
 
 <h3 class="fn"><a name="viewportTransform" /><a href="qtransform.html">QTransform</a> QGraphicsView.viewportTransform (<i>self</i>)</h3><p>Returns a matrix that maps viewport coordinates to scene
 coordinates.</p>
-<p>See also <a href="qgraphicsview.html#mapToScene">mapToScene</a>() and <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>().</p>
+<p><b>See also</b> <a href="qgraphicsview.html#mapToScene">mapToScene</a>() and <a href="qgraphicsview.html#mapFromScene">mapFromScene</a>().</p>
 
 
 <h3 class="fn"><a name="viewportUpdateMode" /><a href="qgraphicsview.html#ViewportUpdateMode-enum">ViewportUpdateMode</a> QGraphicsView.viewportUpdateMode (<i>self</i>)</h3><h3 class="fn"><a name="wheelEvent" />QGraphicsView.wheelEvent (<i>self</i>, <a href="qwheelevent.html">QWheelEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#wheelEvent">QWidget.wheelEvent</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

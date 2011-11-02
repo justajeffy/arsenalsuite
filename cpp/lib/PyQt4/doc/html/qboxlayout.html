@@ -74,35 +74,35 @@ of their convenient constructors.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Direction-enum" />QBoxLayout.Direction</h3><p>This type is used to determine the direction of a box
 layout.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QBoxLayout.LeftToRight</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Horizontal from left to right.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QBoxLayout.RightToLeft</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Horizontal from right to left.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QBoxLayout.TopToBottom</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Vertical from top to bottom.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QBoxLayout.BottomToTop</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Vertical from bottom to top.</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QBoxLayout" />QBoxLayout.__init__ (<i>self</i>, <a href="qboxlayout.html#Direction-enum">Direction</a>&#160;<i>direction</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a new <a href="qboxlayout.html">QBoxLayout</a> with
 direction <i>dir</i> and parent widget <i>parent</i>.</p>
-<p>See also <a href="qboxlayout.html#direction">direction</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#direction">direction</a>().</p>
 
 
 <h3 class="fn"><a name="addItem" />QBoxLayout.addItem (<i>self</i>, <a href="qlayoutitem.html">QLayoutItem</a>)</h3><p>The <i>QLayoutItem</i> argument has it's ownership transferred to Qt.</p><p>Reimplemented from <a href="qlayout.html#addItem">QLayout.addItem</a>().</p>
@@ -110,31 +110,30 @@ direction <i>dir</i> and parent widget <i>parent</i>.</p>
 
 <h3 class="fn"><a name="addLayout" />QBoxLayout.addLayout (<i>self</i>, <a href="qlayout.html">QLayout</a>&#160;<i>layout</i>, int&#160;<i>stretch</i>&#160;=&#160;0)</h3><p>The <i>layout</i> argument has it's ownership transferred to Qt.</p><p>Adds <i>layout</i> to the end of the box, with serial stretch
 factor <i>stretch</i>.</p>
-<p>See also <a href="qboxlayout.html#insertLayout">insertLayout</a>(), <a href="qboxlayout.html#addItem">addItem</a>(), and <a href="qboxlayout.html#addWidget">addWidget</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#insertLayout">insertLayout</a>(), <a href="qboxlayout.html#addItem">addItem</a>(), and <a href="qboxlayout.html#addWidget">addWidget</a>().</p>
 
 
 <h3 class="fn"><a name="addSpacerItem" />QBoxLayout.addSpacerItem (<i>self</i>, <a href="qspaceritem.html">QSpacerItem</a>&#160;<i>spacerItem</i>)</h3><p>The <i>spacerItem</i> argument has it's ownership transferred to Qt.</p><p>Adds <i>spacerItem</i> to the end of this box layout.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qboxlayout.html#addSpacing">addSpacing</a>()
-and <a href="qboxlayout.html#addStretch">addStretch</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#addSpacing">addSpacing</a>() and <a href="qboxlayout.html#addStretch">addStretch</a>().</p>
 
 
 <h3 class="fn"><a name="addSpacing" />QBoxLayout.addSpacing (<i>self</i>, int&#160;<i>size</i>)</h3><p>Adds a non-stretchable space (a <a href="qspaceritem.html">QSpacerItem</a>) with size <i>size</i> to the
 end of this box layout. <a href="qboxlayout.html">QBoxLayout</a>
 provides default margin and spacing. This function adds additional
 space.</p>
-<p>See also <a href="qboxlayout.html#insertSpacing">insertSpacing</a>(), <a href="qboxlayout.html#addItem">addItem</a>(), and <a href="qspaceritem.html">QSpacerItem</a>.</p>
+<p><b>See also</b> <a href="qboxlayout.html#insertSpacing">insertSpacing</a>(), <a href="qboxlayout.html#addItem">addItem</a>(), and <a href="qspaceritem.html">QSpacerItem</a>.</p>
 
 
 <h3 class="fn"><a name="addStretch" />QBoxLayout.addStretch (<i>self</i>, int&#160;<i>stretch</i>&#160;=&#160;0)</h3><p>Adds a stretchable space (a <a href="qspaceritem.html">QSpacerItem</a>) with zero minimum size and
 stretch factor <i>stretch</i> to the end of this box layout.</p>
-<p>See also <a href="qboxlayout.html#insertStretch">insertStretch</a>(), <a href="qboxlayout.html#addItem">addItem</a>(), and <a href="qspaceritem.html">QSpacerItem</a>.</p>
+<p><b>See also</b> <a href="qboxlayout.html#insertStretch">insertStretch</a>(), <a href="qboxlayout.html#addItem">addItem</a>(), and <a href="qspaceritem.html">QSpacerItem</a>.</p>
 
 
 <h3 class="fn"><a name="addStrut" />QBoxLayout.addStrut (<i>self</i>, int)</h3><p>Limits the perpendicular dimension of the box (e.g. height if
 the box is <a href="qboxlayout.html#Direction-enum">LeftToRight</a>) to a minimum of
 <i>size</i>. Other constraints may increase the limit.</p>
-<p>See also <a href="qboxlayout.html#addItem">addItem</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#addItem">addItem</a>().</p>
 
 
 <h3 class="fn"><a name="addWidget" />QBoxLayout.addWidget (<i>self</i>, <a href="qwidget.html">QWidget</a>, int&#160;<i>stretch</i>&#160;=&#160;0, <a href="qt-alignment.html">Qt.Alignment</a>&#160;<i>alignment</i>&#160;=&#160;0)</h3><p>The <i>QWidget</i> argument has it's ownership transferred to Qt.</p><p>Adds <i>widget</i> to the end of this box layout, with a stretch
@@ -148,7 +147,7 @@ involved.</p>
 <p>The alignment is specified by <i>alignment</i>. The default
 alignment is 0, which means that the widget fills the entire
 cell.</p>
-<p>See also <a href="qboxlayout.html#insertWidget">insertWidget</a>(), <a href="qboxlayout.html#addItem">addItem</a>(), <a href="qboxlayout.html#addLayout">addLayout</a>(), <a href="qboxlayout.html#addStretch">addStretch</a>(), <a href="qboxlayout.html#addSpacing">addSpacing</a>(), and <a href="qboxlayout.html#addStrut">addStrut</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#insertWidget">insertWidget</a>(), <a href="qboxlayout.html#addItem">addItem</a>(), <a href="qboxlayout.html#addLayout">addLayout</a>(), <a href="qboxlayout.html#addStretch">addStretch</a>(), <a href="qboxlayout.html#addSpacing">addSpacing</a>(), and <a href="qboxlayout.html#addStrut">addStrut</a>().</p>
 
 
 <h3 class="fn"><a name="count" />int QBoxLayout.count (<i>self</i>)</h3><p>Reimplemented from <a href="qlayout.html#count">QLayout.count</a>().</p>
@@ -156,7 +155,7 @@ cell.</p>
 
 <h3 class="fn"><a name="direction" /><a href="qboxlayout.html#Direction-enum">Direction</a> QBoxLayout.direction (<i>self</i>)</h3><p>Returns the direction of the box. <a href="qboxlayout.html#addWidget">addWidget</a>() and <a href="qboxlayout.html#addSpacing">addSpacing</a>() work in this
 direction; the stretch stretches in this direction.</p>
-<p>See also <a href="qboxlayout.html#setDirection">setDirection</a>(), <a href="qboxlayout.html#Direction-enum">QBoxLayout.Direction</a>,
+<p><b>See also</b> <a href="qboxlayout.html#setDirection">setDirection</a>(), <a href="qboxlayout.html#Direction-enum">QBoxLayout.Direction</a>,
 <a href="qboxlayout.html#addWidget">addWidget</a>(), and <a href="qboxlayout.html#addSpacing">addSpacing</a>().</p>
 
 
@@ -172,7 +171,7 @@ direction; the stretch stretches in this direction.</p>
 <h3 class="fn"><a name="insertItem" />QBoxLayout.insertItem (<i>self</i>, int&#160;<i>index</i>, <a href="qlayoutitem.html">QLayoutItem</a>)</h3><p>The <i>QLayoutItem</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Inserts <i>item</i> into this box layout at position
 <i>index</i>. If <i>index</i> is negative, the item is added at the
 end.</p>
-<p>See also <a href="qboxlayout.html#addItem">addItem</a>(),
+<p><b>See also</b> <a href="qboxlayout.html#addItem">addItem</a>(),
 <a href="qboxlayout.html#insertWidget">insertWidget</a>(), <a href="qboxlayout.html#insertLayout">insertLayout</a>(), <a href="qboxlayout.html#insertStretch">insertStretch</a>(), and <a href="qboxlayout.html#insertSpacing">insertSpacing</a>().</p>
 
 
@@ -180,15 +179,14 @@ end.</p>
 factor <i>stretch</i>. If <i>index</i> is negative, the layout is
 added at the end.</p>
 <p><i>layout</i> becomes a child of the box layout.</p>
-<p>See also <a href="qboxlayout.html#addLayout">addLayout</a>() and
-<a href="qboxlayout.html#insertItem">insertItem</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#addLayout">addLayout</a>() and <a href="qboxlayout.html#insertItem">insertItem</a>().</p>
 
 
 <h3 class="fn"><a name="insertSpacerItem" />QBoxLayout.insertSpacerItem (<i>self</i>, int&#160;<i>index</i>, <a href="qspaceritem.html">QSpacerItem</a>&#160;<i>spacerItem</i>)</h3><p>The <i>spacerItem</i> argument has it's ownership transferred to Qt.</p><p>Inserts <i>spacerItem</i> at position <i>index</i>, with zero
 minimum size and stretch factor. If <i>index</i> is negative the
 space is added at the end.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qboxlayout.html#addSpacerItem">addSpacerItem</a>(), <a href="qboxlayout.html#insertStretch">insertStretch</a>(), and <a href="qboxlayout.html#insertSpacing">insertSpacing</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#addSpacerItem">addSpacerItem</a>(), <a href="qboxlayout.html#insertStretch">insertStretch</a>(), and <a href="qboxlayout.html#insertSpacing">insertSpacing</a>().</p>
 
 
 <h3 class="fn"><a name="insertSpacing" />QBoxLayout.insertSpacing (<i>self</i>, int&#160;<i>index</i>, int&#160;<i>size</i>)</h3><p>Inserts a non-stretchable space (a <a href="qspaceritem.html">QSpacerItem</a>) at position <i>index</i>, with
@@ -196,15 +194,13 @@ size <i>size</i>. If <i>index</i> is negative the space is added at
 the end.</p>
 <p>The box layout has default margin and spacing. This function
 adds additional space.</p>
-<p>See also <a href="qboxlayout.html#addSpacing">addSpacing</a>(),
-<a href="qboxlayout.html#insertItem">insertItem</a>(), and <a href="qspaceritem.html">QSpacerItem</a>.</p>
+<p><b>See also</b> <a href="qboxlayout.html#addSpacing">addSpacing</a>(), <a href="qboxlayout.html#insertItem">insertItem</a>(), and <a href="qspaceritem.html">QSpacerItem</a>.</p>
 
 
 <h3 class="fn"><a name="insertStretch" />QBoxLayout.insertStretch (<i>self</i>, int&#160;<i>index</i>, int&#160;<i>stretch</i>&#160;=&#160;0)</h3><p>Inserts a stretchable space (a <a href="qspaceritem.html">QSpacerItem</a>) at position <i>index</i>, with
 zero minimum size and stretch factor <i>stretch</i>. If
 <i>index</i> is negative the space is added at the end.</p>
-<p>See also <a href="qboxlayout.html#addStretch">addStretch</a>(),
-<a href="qboxlayout.html#insertItem">insertItem</a>(), and <a href="qspaceritem.html">QSpacerItem</a>.</p>
+<p><b>See also</b> <a href="qboxlayout.html#addStretch">addStretch</a>(), <a href="qboxlayout.html#insertItem">insertItem</a>(), and <a href="qspaceritem.html">QSpacerItem</a>.</p>
 
 
 <h3 class="fn"><a name="insertWidget" />QBoxLayout.insertWidget (<i>self</i>, int&#160;<i>index</i>, <a href="qwidget.html">QWidget</a>&#160;<i>widget</i>, int&#160;<i>stretch</i>&#160;=&#160;0, <a href="qt-alignment.html">Qt.Alignment</a>&#160;<i>alignment</i>&#160;=&#160;0)</h3><p>The <i>widget</i> argument has it's ownership transferred to Qt.</p><p>Inserts <i>widget</i> at position <i>index</i>, with stretch
@@ -219,8 +215,7 @@ involved.</p>
 <p>The alignment is specified by <i>alignment</i>. The default
 alignment is 0, which means that the widget fills the entire
 cell.</p>
-<p>See also <a href="qboxlayout.html#addWidget">addWidget</a>() and
-<a href="qboxlayout.html#insertItem">insertItem</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#addWidget">addWidget</a>() and <a href="qboxlayout.html#insertItem">insertItem</a>().</p>
 
 
 <h3 class="fn"><a name="invalidate" />QBoxLayout.invalidate (<i>self</i>)</h3><p>Reimplemented from <a href="qlayoutitem.html#invalidate">QLayoutItem.invalidate</a>().</p>
@@ -240,7 +235,7 @@ cell.</p>
 
 
 <h3 class="fn"><a name="setDirection" />QBoxLayout.setDirection (<i>self</i>, <a href="qboxlayout.html#Direction-enum">Direction</a>)</h3><p>Sets the direction of this layout to <i>direction</i>.</p>
-<p>See also <a href="qboxlayout.html#direction">direction</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#direction">direction</a>().</p>
 
 
 <h3 class="fn"><a name="setGeometry" />QBoxLayout.setGeometry (<i>self</i>, <a href="qrect.html">QRect</a>)</h3><p>Reimplemented from <a href="qlayoutitem.html#setGeometry">QLayoutItem.setGeometry</a>().</p>
@@ -248,19 +243,19 @@ cell.</p>
 
 <h3 class="fn"><a name="setSpacing" />QBoxLayout.setSpacing (<i>self</i>, int&#160;<i>spacing</i>)</h3><p>Reimplements <a href="qlayout.html#spacing-prop">QLayout.setSpacing</a>(). Sets the
 spacing property to <i>spacing</i>.</p>
-<p>See also <a href="qlayout.html#spacing-prop">QLayout.setSpacing</a>() and <a href="qboxlayout.html#spacing">spacing</a>().</p>
+<p><b>See also</b> <a href="qlayout.html#spacing-prop">QLayout.setSpacing</a>() and <a href="qboxlayout.html#spacing">spacing</a>().</p>
 
 
 <h3 class="fn"><a name="setStretch" />QBoxLayout.setStretch (<i>self</i>, int&#160;<i>index</i>, int&#160;<i>stretch</i>)</h3><p>Sets the stretch factor at position <i>index</i>. to
 <i>stretch</i>.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qboxlayout.html#stretch">stretch</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#stretch">stretch</a>().</p>
 
 
 <h3 class="fn"><a name="setStretchFactor" />bool QBoxLayout.setStretchFactor (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>w</i>, int&#160;<i>stretch</i>)</h3><p>Sets the stretch factor for <i>widget</i> to <i>stretch</i> and
 returns true if <i>widget</i> is found in this layout (not
 including child layouts); otherwise returns false.</p>
-<p>See also <a href="qlayout.html#setAlignment">setAlignment</a>().</p>
+<p><b>See also</b> <a href="qlayout.html#setAlignment">setAlignment</a>().</p>
 
 
 <h3 class="fn"><a name="setStretchFactor-2" />bool QBoxLayout.setStretchFactor (<i>self</i>, <a href="qlayout.html">QLayout</a>&#160;<i>l</i>, int&#160;<i>stretch</i>)</h3><p>This is an overloaded function.</p>
@@ -279,13 +274,13 @@ in a widget is style dependent, if the parent is a widget, it
 queries the style for the (horizontal or vertical) spacing of the
 layout. Otherwise, the parent is a layout, and it queries the
 parent layout for the spacing().</p>
-<p>See also <a href="qlayout.html#spacing-prop">QLayout.spacing</a>() and <a href="qboxlayout.html#setSpacing">setSpacing</a>().</p>
+<p><b>See also</b> <a href="qlayout.html#spacing-prop">QLayout.spacing</a>() and <a href="qboxlayout.html#setSpacing">setSpacing</a>().</p>
 
 
 <h3 class="fn"><a name="stretch" />int QBoxLayout.stretch (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the stretch factor at position <i>index</i>.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qboxlayout.html#setStretch">setStretch</a>().</p>
+<p><b>See also</b> <a href="qboxlayout.html#setStretch">setStretch</a>().</p>
 
 
 <h3 class="fn"><a name="takeAt" /><a href="qlayoutitem.html">QLayoutItem</a> QBoxLayout.takeAt (<i>self</i>, int)</h3><p>The <i>QLayoutItem</i> result</p><p>Reimplemented from <a href="qlayout.html#takeAt">QLayout.takeAt</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

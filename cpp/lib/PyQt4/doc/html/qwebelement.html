@@ -18,8 +18,8 @@ the tree is called the document element and can be accessed using
 <p>Specific elements can be accessed using <a href="qwebelement.html#findAll">findAll</a>() and <a href="qwebelement.html#findFirst">findFirst</a>(). These elements are
 identified using CSS selectors. The code snippet below demonstrates
 the use of <a href="qwebelement.html#findAll">findAll</a>().</p>
-<pre class="highlightedCode brush: cpp">
-     QWebElement document = frame-&gt;documentElement();
+<pre class="cpp">
+     <span class="type">QWebElement</span> document <span class="operator">=</span> frame<span class="operator">-</span><span class="operator">&gt;</span>documentElement();
      <span class="comment">/* Assume the document has the following structure:
 
         &lt;p class=intro&gt;
@@ -32,8 +32,8 @@ the use of <a href="qwebelement.html#findAll">findAll</a>().</p>
         &lt;/p&gt;
      */</span>
 
-     QWebElementCollection allSpans = document.findAll("span");
-     QWebElementCollection introSpans = document.findAll("p.intro span");
+     <span class="type"><a href="qwebelementcollection.html">QWebElementCollection</a></span> allSpans <span class="operator">=</span> document<span class="operator">.</span>findAll(<span class="string">"span"</span>);
+     <span class="type"><a href="qwebelementcollection.html">QWebElementCollection</a></span> introSpans <span class="operator">=</span> document<span class="operator">.</span>findAll(<span class="string">"p.intro span"</span>);
 </pre>
 <p>The first list contains all <tt>span</tt> elements in the
 document. The second list contains <tt>span</tt> elements that are
@@ -43,34 +43,34 @@ more efficient than calling <a href="qwebelement.html#findAll">findAll</a>(), an
 element only in the list returned.</p>
 <p>Alternatively you can traverse the document manually using
 <a href="qwebelement.html#firstChild">firstChild</a>() and <a href="qwebelement.html#nextSibling">nextSibling</a>():</p>
-<pre class="highlightedCode brush: cpp">
-     frame-&gt;setHtml("&lt;html&gt;&lt;body&gt;&lt;p&gt;First Paragraph&lt;/p&gt;&lt;p&gt;Second Paragraph&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;");
-     QWebElement doc = frame-&gt;documentElement();
-     QWebElement body = doc.firstChild();
-     QWebElement firstParagraph = body.firstChild();
-     QWebElement secondParagraph = firstParagraph.nextSibling();
+<pre class="cpp">
+     frame<span class="operator">-</span><span class="operator">&gt;</span>setHtml(<span class="string">"&lt;html&gt;&lt;body&gt;&lt;p&gt;First Paragraph&lt;/p&gt;&lt;p&gt;Second Paragraph&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;"</span>);
+     <span class="type">QWebElement</span> doc <span class="operator">=</span> frame<span class="operator">-</span><span class="operator">&gt;</span>documentElement();
+     <span class="type">QWebElement</span> body <span class="operator">=</span> doc<span class="operator">.</span>firstChild();
+     <span class="type">QWebElement</span> firstParagraph <span class="operator">=</span> body<span class="operator">.</span>firstChild();
+     <span class="type">QWebElement</span> secondParagraph <span class="operator">=</span> firstParagraph<span class="operator">.</span>nextSibling();
 </pre>
 <p>Individual elements can be inspected or changed using methods
 such as <a href="qwebelement.html#attribute">attribute</a>() or
 <a href="qwebelement.html#setAttribute">setAttribute</a>(). For
 examle, to capture the user's input in a text field for later use
 (auto-completion), a browser could do something like this:</p>
-<pre class="highlightedCode brush: cpp">
-     QWebElement firstTextInput = document.findFirst("input[type=text]");
-     QString storedText = firstTextInput.attribute("value");
+<pre class="cpp">
+     <span class="type">QWebElement</span> firstTextInput <span class="operator">=</span> document<span class="operator">.</span>findFirst(<span class="string">"input[type=text]"</span>);
+     <span class="type"><a href="qstring.html">QString</a></span> storedText <span class="operator">=</span> firstTextInput<span class="operator">.</span>attribute(<span class="string">"value"</span>);
 </pre>
 <p>When the same page is later revisited, the browser can fill in
 the text field automatically by modifying the value attribute of
 the input element:</p>
-<pre class="highlightedCode brush: cpp">
-     QWebElement firstTextInput = document.findFirst("input[type=text]");
-     textInput.setAttribute("value", storedText);
+<pre class="cpp">
+     <span class="type">QWebElement</span> firstTextInput <span class="operator">=</span> document<span class="operator">.</span>findFirst(<span class="string">"input[type=text]"</span>);
+     textInput<span class="operator">.</span>setAttribute(<span class="string">"value"</span><span class="operator">,</span> storedText);
 </pre>
 <p>Another use case is to emulate a click event on an element. The
 following code snippet demonstrates how to call the JavaScript DOM
 method click() of a submit button:</p>
-<pre class="highlightedCode brush: cpp">
-     QWebElement document = frame-&gt;documentElement();
+<pre class="cpp">
+     <span class="type">QWebElement</span> document <span class="operator">=</span> frame<span class="operator">-</span><span class="operator">&gt;</span>documentElement();
      <span class="comment">/* Assume that the document has the following structure:
 
          &lt;form name="myform" action="submit_form.asp" method="get"&gt;
@@ -80,8 +80,8 @@ method click() of a submit button:</p>
 
       */</span>
 
-     QWebElement button = document.findFirst("input[type=submit]");
-     button.evaluateJavaScript("click()");
+     <span class="type">QWebElement</span> button <span class="operator">=</span> document<span class="operator">.</span>findFirst(<span class="string">"input[type=submit]"</span>);
+     button<span class="operator">.</span>evaluateJavaScript(<span class="string">"click()"</span>);
 </pre>
 <p>The underlying content of QWebElement is explicitly shared.
 Creating a copy of a QWebElement does not create a copy of the
@@ -105,28 +105,28 @@ with.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="StyleResolveStrategy-enum" />QWebElement.StyleResolveStrategy</h3><p>This enum describes how <a href="qwebelement.html">QWebElement</a>'s styleProperty resolves the
 given property name.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QWebElement.InlineStyle</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Return the property value as it is defined in
 the element, without respecting style inheritance and other CSS
 rules.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QWebElement.CascadedStyle</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The property's value is determined using the
 inheritance and importance rules defined in the document's
 stylesheet.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QWebElement.ComputedStyle</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The property's value is the absolute value of
 the style property resolved from the environment.</td>
 </tr>
@@ -144,7 +144,7 @@ element.</p>
 <h3 class="fn"><a name="appendInside" />QWebElement.appendInside (<i>self</i>, QString&#160;<i>markup</i>)</h3><p>Appends the result of parsing <i>markup</i> as the element's
 last child.</p>
 <p>Calling this function on a null element does nothing.</p>
-<p>See also <a href="qwebelement.html#prependInside">prependInside</a>(), <a href="qwebelement.html#prependOutside">prependOutside</a>(), and
+<p><b>See also</b> <a href="qwebelement.html#prependInside">prependInside</a>(), <a href="qwebelement.html#prependOutside">prependOutside</a>(), and
 <a href="qwebelement.html#appendOutside">appendOutside</a>().</p>
 
 
@@ -154,39 +154,38 @@ child.</p>
 re-parented to this element. If <i>element</i> is a child of this
 element, then its position in the list of children is changed.</p>
 <p>Calling this function on a null element does nothing.</p>
-<p>See also <a href="qwebelement.html#prependInside">prependInside</a>(), <a href="qwebelement.html#prependOutside">prependOutside</a>(), and
+<p><b>See also</b> <a href="qwebelement.html#prependInside">prependInside</a>(), <a href="qwebelement.html#prependOutside">prependOutside</a>(), and
 <a href="qwebelement.html#appendOutside">appendOutside</a>().</p>
 
 
 <h3 class="fn"><a name="appendOutside" />QWebElement.appendOutside (<i>self</i>, QString&#160;<i>markup</i>)</h3><p>Inserts the result of parsing <i>markup</i> after this
 element.</p>
 <p>Calling this function on a null element does nothing.</p>
-<p>See also <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependInside">prependInside</a>(), and <a href="qwebelement.html#prependOutside">prependOutside</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependInside">prependInside</a>(), and <a href="qwebelement.html#prependOutside">prependOutside</a>().</p>
 
 
 <h3 class="fn"><a name="appendOutside-2" />QWebElement.appendOutside (<i>self</i>, <a href="qwebelement.html">QWebElement</a>&#160;<i>element</i>)</h3><p>Inserts the given <i>element</i> after this element.</p>
 <p>If <i>element</i> is the child of another element, it is
 re-parented to the parent of this element.</p>
 <p>Calling this function on a null element does nothing.</p>
-<p>See also <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependInside">prependInside</a>(), and <a href="qwebelement.html#prependOutside">prependOutside</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependInside">prependInside</a>(), and <a href="qwebelement.html#prependOutside">prependOutside</a>().</p>
 
 
 <h3 class="fn"><a name="attribute" />QString QWebElement.attribute (<i>self</i>, QString&#160;<i>name</i>, QString&#160;<i>defaultValue</i>&#160;=&#160;QString())</h3><p>Returns the attribute with the given <i>name</i>. If the
 attribute does not exist, <i>defaultValue</i> is returned.</p>
-<p>See also <a href="qwebelement.html#setAttribute">setAttribute</a>(), <a href="qwebelement.html#setAttributeNS">setAttributeNS</a>(), and
+<p><b>See also</b> <a href="qwebelement.html#setAttribute">setAttribute</a>(), <a href="qwebelement.html#setAttributeNS">setAttributeNS</a>(), and
 <a href="qwebelement.html#attributeNS">attributeNS</a>().</p>
 
 
 <h3 class="fn"><a name="attributeNames" />QStringList QWebElement.attributeNames (<i>self</i>, QString&#160;<i>namespaceUri</i>&#160;=&#160;QString())</h3><p>Return the list of attributes for the namespace given as
 <i>namespaceUri</i>.</p>
-<p>See also <a href="qwebelement.html#attribute">attribute</a>()
-and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#attribute">attribute</a>() and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
 
 
 <h3 class="fn"><a name="attributeNS" />QString QWebElement.attributeNS (<i>self</i>, QString&#160;<i>namespaceUri</i>, QString&#160;<i>name</i>, QString&#160;<i>defaultValue</i>&#160;=&#160;QString())</h3><p>Returns the attribute with the given <i>name</i> in
 <i>namespaceUri</i>. If the attribute does not exist,
 <i>defaultValue</i> is returned.</p>
-<p>See also <a href="qwebelement.html#setAttributeNS">setAttributeNS</a>(), <a href="qwebelement.html#setAttribute">setAttribute</a>(), and <a href="qwebelement.html#attribute">attribute</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#setAttributeNS">setAttributeNS</a>(), <a href="qwebelement.html#setAttribute">setAttribute</a>(), and <a href="qwebelement.html#attribute">attribute</a>().</p>
 
 
 <h3 class="fn"><a name="classes" />QStringList QWebElement.classes (<i>self</i>)</h3><p>Returns the list of classes of this element.</p>
@@ -194,7 +193,7 @@ and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
 
 <h3 class="fn"><a name="clone" /><a href="qwebelement.html">QWebElement</a> QWebElement.clone (<i>self</i>)</h3><p>Returns a clone of this element.</p>
 <p>The clone may be inserted at any point in the document.</p>
-<p>See also <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependInside">prependInside</a>(), <a href="qwebelement.html#prependOutside">prependOutside</a>(), and
+<p><b>See also</b> <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependInside">prependInside</a>(), <a href="qwebelement.html#prependOutside">prependOutside</a>(), and
 <a href="qwebelement.html#appendOutside">appendOutside</a>().</p>
 
 
@@ -205,24 +204,24 @@ and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
 element becomes the child of the deepest descendant within
 <i>element</i>.</p>
 <p>### illustration</p>
-<p>See also <a href="qwebelement.html#encloseWith">encloseWith</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#encloseWith">encloseWith</a>().</p>
 
 
 <h3 class="fn"><a name="encloseContentsWith-2" />QWebElement.encloseContentsWith (<i>self</i>, QString&#160;<i>markup</i>)</h3><p>Encloses the contents of this element with the result of parsing
 <i>markup</i>. This element becomes the child of the deepest
 descendant within <i>markup</i>.</p>
-<p>See also <a href="qwebelement.html#encloseWith">encloseWith</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#encloseWith">encloseWith</a>().</p>
 
 
 <h3 class="fn"><a name="encloseWith" />QWebElement.encloseWith (<i>self</i>, QString&#160;<i>markup</i>)</h3><p>Encloses this element with the result of parsing <i>markup</i>.
 This element becomes the child of the deepest descendant within
 <i>markup</i>.</p>
-<p>See also <a href="qwebelement.html#replace">replace</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#replace">replace</a>().</p>
 
 
 <h3 class="fn"><a name="encloseWith-2" />QWebElement.encloseWith (<i>self</i>, <a href="qwebelement.html">QWebElement</a>&#160;<i>element</i>)</h3><p>Encloses this element with <i>element</i>. This element becomes
 the child of the deepest descendant within <i>element</i>.</p>
-<p>See also <a href="qwebelement.html#replace">replace</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#replace">replace</a>().</p>
 
 
 <h3 class="fn"><a name="evaluateJavaScript" />QVariant QWebElement.evaluateJavaScript (<i>self</i>, QString&#160;<i>scriptSource</i>)</h3><p>Executes <i>scriptSource</i> with this element as <tt>this</tt>
@@ -235,7 +234,7 @@ an empty list is returned.</p>
 <p><a href="http://www.w3.org/TR/REC-CSS2/selector.html#q1">Standard CSS2
 selector</a> syntax is used for the query.</p>
 <p><b>Note:</b> This search is performed recursively.</p>
-<p>See also <a href="qwebelement.html#findFirst">findFirst</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#findFirst">findFirst</a>().</p>
 
 
 <h3 class="fn"><a name="findFirst" /><a href="qwebelement.html">QWebElement</a> QWebElement.findFirst (<i>self</i>, QString&#160;<i>selectorQuery</i>)</h3><p>Returns the first child element that matches the given CSS
@@ -243,35 +242,32 @@ selector <i>selectorQuery</i>.</p>
 <p><a href="http://www.w3.org/TR/REC-CSS2/selector.html#q1">Standard CSS2
 selector</a> syntax is used for the query.</p>
 <p><b>Note:</b> This search is performed recursively.</p>
-<p>See also <a href="qwebelement.html#findAll">findAll</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#findAll">findAll</a>().</p>
 
 
 <h3 class="fn"><a name="firstChild" /><a href="qwebelement.html">QWebElement</a> QWebElement.firstChild (<i>self</i>)</h3><p>Returns the element's first child.</p>
-<p>See also <a href="qwebelement.html#lastChild">lastChild</a>(),
-<a href="qwebelement.html#previousSibling">previousSibling</a>(),
-and <a href="qwebelement.html#nextSibling">nextSibling</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#lastChild">lastChild</a>(), <a href="qwebelement.html#previousSibling">previousSibling</a>(), and
+<a href="qwebelement.html#nextSibling">nextSibling</a>().</p>
 
 
 <h3 class="fn"><a name="geometry" /><a href="qrect.html">QRect</a> QWebElement.geometry (<i>self</i>)</h3><p>Returns the geometry of this element, relative to its containing
 frame.</p>
-<p>See also <a href="qwebelement.html#tagName">tagName</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#tagName">tagName</a>().</p>
 
 
 <h3 class="fn"><a name="hasAttribute" />bool QWebElement.hasAttribute (<i>self</i>, QString&#160;<i>name</i>)</h3><p>Returns true if this element has an attribute with the given
 <i>name</i>; otherwise returns false.</p>
-<p>See also <a href="qwebelement.html#attribute">attribute</a>()
-and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#attribute">attribute</a>() and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
 
 
 <h3 class="fn"><a name="hasAttributeNS" />bool QWebElement.hasAttributeNS (<i>self</i>, QString&#160;<i>namespaceUri</i>, QString&#160;<i>name</i>)</h3><p>Returns true if this element has an attribute with the given
 <i>name</i>, in <i>namespaceUri</i>; otherwise returns false.</p>
-<p>See also <a href="qwebelement.html#attributeNS">attributeNS</a>() and <a href="qwebelement.html#setAttributeNS">setAttributeNS</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#attributeNS">attributeNS</a>() and <a href="qwebelement.html#setAttributeNS">setAttributeNS</a>().</p>
 
 
 <h3 class="fn"><a name="hasAttributes" />bool QWebElement.hasAttributes (<i>self</i>)</h3><p>Returns true if the element has any attributes defined;
 otherwise returns false;</p>
-<p>See also <a href="qwebelement.html#attribute">attribute</a>()
-and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#attribute">attribute</a>() and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
 
 
 <h3 class="fn"><a name="hasClass" />bool QWebElement.hasClass (<i>self</i>, QString&#160;<i>name</i>)</h3><p>Returns true if this element has a class with the given
@@ -280,7 +276,7 @@ and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
 
 <h3 class="fn"><a name="hasFocus" />bool QWebElement.hasFocus (<i>self</i>)</h3><p>Returns true if the element has keyboard input focus; otherwise,
 returns false</p>
-<p>See also <a href="qwebelement.html#setFocus">setFocus</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#setFocus">setFocus</a>().</p>
 
 
 <h3 class="fn"><a name="isNull" />bool QWebElement.isNull (<i>self</i>)</h3><p>Returns true if the element is a null element; otherwise returns
@@ -288,19 +284,21 @@ false.</p>
 
 
 <h3 class="fn"><a name="lastChild" /><a href="qwebelement.html">QWebElement</a> QWebElement.lastChild (<i>self</i>)</h3><p>Returns the element's last child.</p>
-<p>See also <a href="qwebelement.html#firstChild">firstChild</a>(),
-<a href="qwebelement.html#previousSibling">previousSibling</a>(),
-and <a href="qwebelement.html#nextSibling">nextSibling</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#firstChild">firstChild</a>(), <a href="qwebelement.html#previousSibling">previousSibling</a>(), and
+<a href="qwebelement.html#nextSibling">nextSibling</a>().</p>
 
 
 <h3 class="fn"><a name="localName" />QString QWebElement.localName (<i>self</i>)</h3><p>Returns the local name of the element. If the element does not
 use namespaces, an empty string is returned.</p>
 
 
-<h3 class="fn"><a name="namespaceUri" />QString QWebElement.namespaceUri (<i>self</i>)</h3><h3 class="fn"><a name="nextSibling" /><a href="qwebelement.html">QWebElement</a> QWebElement.nextSibling (<i>self</i>)</h3><p>Returns the element's next sibling.</p>
-<p>See also <a href="qwebelement.html#firstChild">firstChild</a>(),
-<a href="qwebelement.html#previousSibling">previousSibling</a>(),
-and <a href="qwebelement.html#lastChild">lastChild</a>().</p>
+<h3 class="fn"><a name="namespaceUri" />QString QWebElement.namespaceUri (<i>self</i>)</h3><p>Returns the namespace URI of this element. If the element has no
+namespace URI, an empty string is returned.</p>
+
+
+<h3 class="fn"><a name="nextSibling" /><a href="qwebelement.html">QWebElement</a> QWebElement.nextSibling (<i>self</i>)</h3><p>Returns the element's next sibling.</p>
+<p><b>See also</b> <a href="qwebelement.html#firstChild">firstChild</a>(), <a href="qwebelement.html#previousSibling">previousSibling</a>(), and
+<a href="qwebelement.html#lastChild">lastChild</a>().</p>
 
 
 <h3 class="fn"><a name="parent" /><a href="qwebelement.html">QWebElement</a> QWebElement.parent (<i>self</i>)</h3><p>Returns the parent element of this elemen. If this element is
@@ -314,7 +312,7 @@ no namespace prefix, empty string is returned.</p>
 <h3 class="fn"><a name="prependInside" />QWebElement.prependInside (<i>self</i>, QString&#160;<i>markup</i>)</h3><p>Prepends the result of parsing <i>markup</i> as the element's
 first child.</p>
 <p>Calling this function on a null element does nothing.</p>
-<p>See also <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependOutside">prependOutside</a>(), and
+<p><b>See also</b> <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependOutside">prependOutside</a>(), and
 <a href="qwebelement.html#appendOutside">appendOutside</a>().</p>
 
 
@@ -323,44 +321,40 @@ first child.</p>
 re-parented to this element. If <i>element</i> is a child of this
 element, then its position in the list of children is changed.</p>
 <p>Calling this function on a null element does nothing.</p>
-<p>See also <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependOutside">prependOutside</a>(), and
+<p><b>See also</b> <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependOutside">prependOutside</a>(), and
 <a href="qwebelement.html#appendOutside">appendOutside</a>().</p>
 
 
 <h3 class="fn"><a name="prependOutside" />QWebElement.prependOutside (<i>self</i>, QString&#160;<i>markup</i>)</h3><p>Inserts the result of parsing <i>markup</i> before this
 element.</p>
 <p>Calling this function on a null element does nothing.</p>
-<p>See also <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependInside">prependInside</a>(), and <a href="qwebelement.html#appendOutside">appendOutside</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependInside">prependInside</a>(), and <a href="qwebelement.html#appendOutside">appendOutside</a>().</p>
 
 
 <h3 class="fn"><a name="prependOutside-2" />QWebElement.prependOutside (<i>self</i>, <a href="qwebelement.html">QWebElement</a>&#160;<i>element</i>)</h3><p>Inserts the given <i>element</i> before this element.</p>
 <p>If <i>element</i> is the child of another element, it is
 re-parented to the parent of this element.</p>
 <p>Calling this function on a null element does nothing.</p>
-<p>See also <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependInside">prependInside</a>(), and <a href="qwebelement.html#appendOutside">appendOutside</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#appendInside">appendInside</a>(), <a href="qwebelement.html#prependInside">prependInside</a>(), and <a href="qwebelement.html#appendOutside">appendOutside</a>().</p>
 
 
 <h3 class="fn"><a name="previousSibling" /><a href="qwebelement.html">QWebElement</a> QWebElement.previousSibling (<i>self</i>)</h3><p>Returns the element's previous sibling.</p>
-<p>See also <a href="qwebelement.html#firstChild">firstChild</a>(),
-<a href="qwebelement.html#nextSibling">nextSibling</a>(), and
-<a href="qwebelement.html#lastChild">lastChild</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#firstChild">firstChild</a>(), <a href="qwebelement.html#nextSibling">nextSibling</a>(), and <a href="qwebelement.html#lastChild">lastChild</a>().</p>
 
 
 <h3 class="fn"><a name="removeAllChildren" />QWebElement.removeAllChildren (<i>self</i>)</h3><p>Removes all children from this element.</p>
-<p>See also <a href="qwebelement.html#removeFromDocument">removeFromDocument</a>() and
+<p><b>See also</b> <a href="qwebelement.html#removeFromDocument">removeFromDocument</a>() and
 <a href="qwebelement.html#takeFromDocument">takeFromDocument</a>().</p>
 
 
 <h3 class="fn"><a name="removeAttribute" />QWebElement.removeAttribute (<i>self</i>, QString&#160;<i>name</i>)</h3><p>Removes the attribute with the given <i>name</i> from this
 element.</p>
-<p>See also <a href="qwebelement.html#attribute">attribute</a>(),
-<a href="qwebelement.html#setAttribute">setAttribute</a>(), and
-<a href="qwebelement.html#hasAttribute">hasAttribute</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#attribute">attribute</a>(), <a href="qwebelement.html#setAttribute">setAttribute</a>(), and <a href="qwebelement.html#hasAttribute">hasAttribute</a>().</p>
 
 
 <h3 class="fn"><a name="removeAttributeNS" />QWebElement.removeAttributeNS (<i>self</i>, QString&#160;<i>namespaceUri</i>, QString&#160;<i>name</i>)</h3><p>Removes the attribute with the given <i>name</i>, in
 <i>namespaceUri</i>, from this element.</p>
-<p>See also <a href="qwebelement.html#attributeNS">attributeNS</a>(), <a href="qwebelement.html#setAttributeNS">setAttributeNS</a>(), and
+<p><b>See also</b> <a href="qwebelement.html#attributeNS">attributeNS</a>(), <a href="qwebelement.html#setAttributeNS">setAttributeNS</a>(), and
 <a href="qwebelement.html#hasAttributeNS">hasAttributeNS</a>().</p>
 
 
@@ -370,7 +364,7 @@ element.</p>
 
 <h3 class="fn"><a name="removeFromDocument" />QWebElement.removeFromDocument (<i>self</i>)</h3><p>Removes this element from the document and makes it a null
 element.</p>
-<p>See also <a href="qwebelement.html#removeAllChildren">removeAllChildren</a>() and
+<p><b>See also</b> <a href="qwebelement.html#removeAllChildren">removeAllChildren</a>() and
 <a href="qwebelement.html#takeFromDocument">takeFromDocument</a>().</p>
 
 
@@ -381,31 +375,29 @@ element.</p>
 <i>markup</i>.</p>
 <p>This method will not replace the &lt;html&gt;, &lt;head&gt; or
 &lt;body&gt; elements.</p>
-<p>See also <a href="qwebelement.html#encloseWith">encloseWith</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#encloseWith">encloseWith</a>().</p>
 
 
 <h3 class="fn"><a name="replace-2" />QWebElement.replace (<i>self</i>, <a href="qwebelement.html">QWebElement</a>&#160;<i>element</i>)</h3><p>Replaces this element with <i>element</i>.</p>
 <p>This method will not replace the &lt;html&gt;, &lt;head&gt; or
 &lt;body&gt; elements.</p>
-<p>See also <a href="qwebelement.html#encloseWith">encloseWith</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#encloseWith">encloseWith</a>().</p>
 
 
 <h3 class="fn"><a name="setAttribute" />QWebElement.setAttribute (<i>self</i>, QString&#160;<i>name</i>, QString&#160;<i>value</i>)</h3><p>Adds an attribute with the given <i>name</i> and <i>value</i>.
 If an attribute with the same name exists, its value is replaced by
 <i>value</i>.</p>
-<p>See also <a href="qwebelement.html#attribute">attribute</a>(),
-<a href="qwebelement.html#attributeNS">attributeNS</a>(), and
-<a href="qwebelement.html#setAttributeNS">setAttributeNS</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#attribute">attribute</a>(), <a href="qwebelement.html#attributeNS">attributeNS</a>(), and <a href="qwebelement.html#setAttributeNS">setAttributeNS</a>().</p>
 
 
 <h3 class="fn"><a name="setAttributeNS" />QWebElement.setAttributeNS (<i>self</i>, QString&#160;<i>namespaceUri</i>, QString&#160;<i>name</i>, QString&#160;<i>value</i>)</h3><p>Adds an attribute with the given <i>name</i> in
 <i>namespaceUri</i> with <i>value</i>. If an attribute with the
 same name exists, its value is replaced by <i>value</i>.</p>
-<p>See also <a href="qwebelement.html#attributeNS">attributeNS</a>(), <a href="qwebelement.html#attribute">attribute</a>(), and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#attributeNS">attributeNS</a>(), <a href="qwebelement.html#attribute">attribute</a>(), and <a href="qwebelement.html#setAttribute">setAttribute</a>().</p>
 
 
 <h3 class="fn"><a name="setFocus" />QWebElement.setFocus (<i>self</i>)</h3><p>Gives keyboard input focus to this element</p>
-<p>See also <a href="qwebelement.html#hasFocus">hasFocus</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#hasFocus">hasFocus</a>().</p>
 
 
 <h3 class="fn"><a name="setInnerXml" />QWebElement.setInnerXml (<i>self</i>, QString&#160;<i>markup</i>)</h3><p>Replaces the contents of this element with <i>markup</i>. The
@@ -413,9 +405,7 @@ string may contain HTML or XML tags, which is parsed and formatted
 before insertion into the document.</p>
 <p><b>Note:</b> This is currently implemented for (X)HTML elements
 only.</p>
-<p>See also <a href="qwebelement.html#toInnerXml">toInnerXml</a>(),
-<a href="qwebelement.html#toOuterXml">toOuterXml</a>(), and
-<a href="qwebelement.html#setOuterXml">setOuterXml</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#toInnerXml">toInnerXml</a>(), <a href="qwebelement.html#toOuterXml">toOuterXml</a>(), and <a href="qwebelement.html#setOuterXml">setOuterXml</a>().</p>
 
 
 <h3 class="fn"><a name="setOuterXml" />QWebElement.setOuterXml (<i>self</i>, QString&#160;<i>markup</i>)</h3><p>Replaces the contents of this element as well as its own tag
@@ -423,15 +413,13 @@ with <i>markup</i>. The string may contain HTML or XML tags, which
 is parsed and formatted before insertion into the document.</p>
 <p><b>Note:</b> This is currently only implemented for (X)HTML
 elements.</p>
-<p>See also <a href="qwebelement.html#toOuterXml">toOuterXml</a>(),
-<a href="qwebelement.html#toInnerXml">toInnerXml</a>(), and
-<a href="qwebelement.html#setInnerXml">setInnerXml</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#toOuterXml">toOuterXml</a>(), <a href="qwebelement.html#toInnerXml">toInnerXml</a>(), and <a href="qwebelement.html#setInnerXml">setInnerXml</a>().</p>
 
 
 <h3 class="fn"><a name="setPlainText" />QWebElement.setPlainText (<i>self</i>, QString&#160;<i>text</i>)</h3><p>Replaces the existing content of this element with
 <i>text</i>.</p>
 <p>This is equivalent to setting the HTML innerText property.</p>
-<p>See also <a href="qwebelement.html#toPlainText">toPlainText</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#toPlainText">toPlainText</a>().</p>
 
 
 <h3 class="fn"><a name="setStyleProperty" />QWebElement.setStyleProperty (<i>self</i>, QString&#160;<i>name</i>, QString&#160;<i>value</i>)</h3><p>Sets the value of the inline style with the given <i>name</i> to
@@ -442,7 +430,7 @@ might have been set earlier with a higher priority in external or
 embedded style declarations.</p>
 <p>In order to ensure that the value will be applied, you may have
 to append "!important" to the value.</p>
-<p>See also <a href="qwebelement.html#styleProperty">styleProperty</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#styleProperty">styleProperty</a>().</p>
 
 
 <h3 class="fn"><a name="styleProperty" />QString QWebElement.styleProperty (<i>self</i>, QString&#160;<i>name</i>, <a href="qwebelement.html#StyleResolveStrategy-enum">StyleResolveStrategy</a>&#160;<i>strategy</i>)</h3><p>Returns the value of the style with the given <i>name</i> using
@@ -457,18 +445,18 @@ style rule.</p>
 declaration receives highest priority, unless other declarations
 also use the "!important" declaration. Then, the last "!important"
 declaration takes predecence.</p>
-<p>See also <a href="qwebelement.html#setStyleProperty">setStyleProperty</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#setStyleProperty">setStyleProperty</a>().</p>
 
 
 <h3 class="fn"><a name="tagName" />QString QWebElement.tagName (<i>self</i>)</h3><p>Returns the tag name of this element.</p>
-<p>See also <a href="qwebelement.html#geometry">geometry</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#geometry">geometry</a>().</p>
 
 
 <h3 class="fn"><a name="takeFromDocument" /><a href="qwebelement.html">QWebElement</a> QWebElement.takeFromDocument (<i>self</i>)</h3><p>Removes this element from the document and returns a reference
 to it.</p>
 <p>The element is still valid after removal, and can be inserted
 into other parts of the document.</p>
-<p>See also <a href="qwebelement.html#removeAllChildren">removeAllChildren</a>() and
+<p><b>See also</b> <a href="qwebelement.html#removeAllChildren">removeAllChildren</a>() and
 <a href="qwebelement.html#removeFromDocument">removeFromDocument</a>().</p>
 
 
@@ -480,24 +468,24 @@ present. If the class is already present, it will be removed.</p>
 tags.</p>
 <p><b>Note:</b> This is currently implemented for (X)HTML elements
 only.</p>
-<p>See also <a href="qwebelement.html#setInnerXml">setInnerXml</a>(), <a href="qwebelement.html#setOuterXml">setOuterXml</a>(), and <a href="qwebelement.html#toOuterXml">toOuterXml</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#setInnerXml">setInnerXml</a>(), <a href="qwebelement.html#setOuterXml">setOuterXml</a>(), and <a href="qwebelement.html#toOuterXml">toOuterXml</a>().</p>
 
 
 <h3 class="fn"><a name="toOuterXml" />QString QWebElement.toOuterXml (<i>self</i>)</h3><p>Returns this element converted to XML, including the start and
 the end tags as well as its attributes.</p>
 <p><b>Note:</b> This is currently implemented for (X)HTML elements
 only.</p>
-<p>See also <a href="qwebelement.html#setOuterXml">setOuterXml</a>(), <a href="qwebelement.html#setInnerXml">setInnerXml</a>(), and <a href="qwebelement.html#toInnerXml">toInnerXml</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#setOuterXml">setOuterXml</a>(), <a href="qwebelement.html#setInnerXml">setInnerXml</a>(), and <a href="qwebelement.html#toInnerXml">toInnerXml</a>().</p>
 
 
 <h3 class="fn"><a name="toPlainText" />QString QWebElement.toPlainText (<i>self</i>)</h3><p>Returns the text between the start and the end tag of this
 element.</p>
 <p>This is equivalent to reading the HTML innerText property.</p>
-<p>See also <a href="qwebelement.html#setPlainText">setPlainText</a>().</p>
+<p><b>See also</b> <a href="qwebelement.html#setPlainText">setPlainText</a>().</p>
 
 
 <h3 class="fn"><a name="webFrame" /><a href="qwebframe.html">QWebFrame</a> QWebElement.webFrame (<i>self</i>)</h3><p>Returns the web frame which this element is a part of. If the
 element is a null element, null is returned.</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QWebElement.__eq__ (<i>self</i>, <a href="qwebelement.html">QWebElement</a>&#160;<i>o</i>)</h3><h3 class="fn"><a name="__ne__" />bool QWebElement.__ne__ (<i>self</i>, <a href="qwebelement.html">QWebElement</a>&#160;<i>o</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QWebElement.__eq__ (<i>self</i>, <a href="qwebelement.html">QWebElement</a>&#160;<i>o</i>)</h3><h3 class="fn"><a name="__ne__" />bool QWebElement.__ne__ (<i>self</i>, <a href="qwebelement.html">QWebElement</a>&#160;<i>o</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

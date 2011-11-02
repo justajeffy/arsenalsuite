@@ -60,51 +60,51 @@ custom script class supports one or more of the extensions
 specified by the Extension enum.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Extension-enum" />QScriptClass.Extension</h3><p>This enum specifies the possible extensions to a <a href="qscriptclass.html">QScriptClass</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QScriptClass.Callable</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Instances of this class can be called as
 functions.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QScriptClass.HasInstance</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Instances of this class implement
 [[HasInstance]].</td>
 </tr>
 </table>
-<p>See also <a href="qscriptclass.html#extension">extension</a>().</p>
+<p><b>See also</b> <a href="qscriptclass.html#extension">extension</a>().</p>
 
 
 <h3 class="fn"><a name="QueryFlag-enum" />QScriptClass.QueryFlag</h3><p>This enum describes flags that are used to query a <a href="qscriptclass.html">QScriptClass</a> regarding how access to a
 property should be handled.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QScriptClass.HandlesReadAccess</tt></td>
-<td class=" topAlign"><tt>0x01</tt></td>
+<td class="topAlign"><tt>0x01</tt></td>
 <td class="topAlign">The <a href="qscriptclass.html">QScriptClass</a> handles read access to this
 property.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QScriptClass.HandlesWriteAccess</tt></td>
-<td class=" topAlign"><tt>0x02</tt></td>
+<td class="topAlign"><tt>0x02</tt></td>
 <td class="topAlign">The <a href="qscriptclass.html">QScriptClass</a> handles write access to this
 property.</td>
 </tr>
 </table>
 <p>The QueryFlags type is a typedef for <a href="qflags.html">QFlags</a>&lt;QueryFlag&gt;. It stores an OR
 combination of QueryFlag values.</p>
-<p>See also <a href="qscriptclass.html#queryProperty">queryProperty</a>().</p>
+<p><b>See also</b> <a href="qscriptclass.html#queryProperty">queryProperty</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QScriptClass" />QScriptClass.__init__ (<i>self</i>, <a href="qscriptengine.html">QScriptEngine</a>&#160;<i>engine</i>)</h3><p>Constructs a <a href="qscriptclass.html">QScriptClass</a> object
 to be used in the given <i>engine</i>.</p>
 <p>The engine does not take ownership of the <a href="qscriptclass.html">QScriptClass</a> object.</p>
@@ -127,14 +127,14 @@ function (e.g. from a script or using <a href="qscriptvalue.html#call">QScriptVa
 function call, and you should return a <a href="qvariant.html">QVariant</a> that holds the result of the function
 call. In the following example the sum of the arguments to the
 script function are added up and returned:</p>
-<pre class="highlightedCode brush: cpp">
- if (extension == Callable) {
-     QScriptContext *context = qvariant_cast&lt;QScriptContext*&gt;(argument);
-     QScriptEngine *engine = context-&gt;engine();
-     double sum = 0;
-     for (int i = 0; i &lt; context-&gt;argumentCount(); ++i)
-         sum += context-&gt;argument(i).toNumber();
-     return sum;
+<pre class="cpp">
+ <span class="keyword">if</span> (extension <span class="operator">=</span><span class="operator">=</span> Callable) {
+     <span class="type"><a href="qscriptcontext.html">QScriptContext</a></span> <span class="operator">*</span>context <span class="operator">=</span> qvariant_cast<span class="operator">&lt;</span><span class="type"><a href="qscriptcontext.html">QScriptContext</a></span><span class="operator">*</span><span class="operator">&gt;</span>(argument);
+     <span class="type"><a href="qscriptengine.html">QScriptEngine</a></span> <span class="operator">*</span>engine <span class="operator">=</span> context<span class="operator">-</span><span class="operator">&gt;</span>engine();
+     <span class="type">double</span> sum <span class="operator">=</span> <span class="number">0</span>;
+     <span class="keyword">for</span> (<span class="type">int</span> i <span class="operator">=</span> <span class="number">0</span>; i <span class="operator">&lt;</span> context<span class="operator">-</span><span class="operator">&gt;</span>argumentCount(); <span class="operator">+</span><span class="operator">+</span>i)
+         sum <span class="operator">+</span><span class="operator">=</span> context<span class="operator">-</span><span class="operator">&gt;</span>argument(i)<span class="operator">.</span>toNumber();
+     <span class="keyword">return</span> sum;
  }
 </pre>
 <p>If you implement the <a href="qscriptclass.html#Extension-enum">HasInstance</a> extension, Qt
@@ -145,7 +145,7 @@ items: The first item is the object that <a href="qscriptclass.html#Extension-en
 to (an instance of your class), and the second item can be any
 value. extension() should return true if the value delegates
 behavior to the object, false otherwise.</p>
-<p>See also <a href="qscriptclass.html#supportsExtension">supportsExtension</a>().</p>
+<p><b>See also</b> <a href="qscriptclass.html#supportsExtension">supportsExtension</a>().</p>
 
 
 <h3 class="fn"><a name="name" />QString QScriptClass.name (<i>self</i>)</h3><p>Returns the name of the script class.</p>
@@ -165,7 +165,7 @@ handled by <a href="qscriptclass.html#queryProperty">queryProperty</a>()) that y
 want to appear when an object's properties are enumerated (e.g. by
 a for-in statement in a script).</p>
 <p>Qt Script takes ownership of the new iterator object.</p>
-<p>See also <a href="qscriptvalueiterator.html">QScriptValueIterator</a>.</p>
+<p><b>See also</b> <a href="qscriptvalueiterator.html">QScriptValueIterator</a>.</p>
 
 
 <h3 class="fn"><a name="property" /><a href="qscriptvalue.html">QScriptValue</a> QScriptClass.property (<i>self</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>object</i>, <a href="qscriptstring.html">QScriptString</a>&#160;<i>name</i>, int&#160;<i>id</i>)</h3><p>Returns the value of the property with the given <i>name</i> of
@@ -174,7 +174,7 @@ the given <i>object</i>.</p>
 it in <a href="qscriptclass.html#queryProperty">queryProperty</a>().</p>
 <p>The default implementation does nothing and returns an invalid
 <a href="qscriptvalue.html">QScriptValue</a>.</p>
-<p>See also <a href="qscriptclass.html#setProperty">setProperty</a>() and <a href="qscriptclass.html#propertyFlags">propertyFlags</a>().</p>
+<p><b>See also</b> <a href="qscriptclass.html#setProperty">setProperty</a>() and <a href="qscriptclass.html#propertyFlags">propertyFlags</a>().</p>
 
 
 <h3 class="fn"><a name="propertyFlags" /><a href="qscriptvalue-propertyflags.html">QScriptValue.PropertyFlags</a> QScriptClass.propertyFlags (<i>self</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>object</i>, <a href="qscriptstring.html">QScriptString</a>&#160;<i>name</i>, int&#160;<i>id</i>)</h3><p>Returns the flags of the property with the given <i>name</i> of
@@ -182,7 +182,7 @@ the given <i>object</i>.</p>
 <p>The <i>id</i> argument is only useful if you assigned a value to
 it in <a href="qscriptclass.html#queryProperty">queryProperty</a>().</p>
 <p>The default implementation returns 0.</p>
-<p>See also <a href="qscriptclass.html#property">property</a>().</p>
+<p><b>See also</b> <a href="qscriptclass.html#property">property</a>().</p>
 
 
 <h3 class="fn"><a name="prototype" /><a href="qscriptvalue.html">QScriptValue</a> QScriptClass.prototype (<i>self</i>)</h3><p>Returns the object to be used as the prototype of new instances
@@ -219,7 +219,7 @@ advertise that you want to handle read access to property
 assigned a value, it will become a normal script object property,
 and subsequently you will no longer be queried regarding read
 access to <tt>foo</tt>.</p>
-<p>See also <a href="qscriptclass.html#property">property</a>().</p>
+<p><b>See also</b> <a href="qscriptclass.html#property">property</a>().</p>
 
 
 <h3 class="fn"><a name="setProperty" />QScriptClass.setProperty (<i>self</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>object</i>, <a href="qscriptstring.html">QScriptString</a>&#160;<i>name</i>, int&#160;<i>id</i>, <a href="qscriptvalue.html">QScriptValue</a>&#160;<i>value</i>)</h3><p>Sets the property with the given <i>name</i> of the given
@@ -229,7 +229,7 @@ it in <a href="qscriptclass.html#queryProperty">queryProperty</a>().</p>
 <p>The default implementation does nothing.</p>
 <p>An invalid <i>value</i> represents a request to remove the
 property.</p>
-<p>See also <a href="qscriptclass.html#property">property</a>().</p>
+<p><b>See also</b> <a href="qscriptclass.html#property">property</a>().</p>
 
 
 <h3 class="fn"><a name="supportsExtension" />bool QScriptClass.supportsExtension (<i>self</i>, <a href="qscriptclass.html#Extension-enum">Extension</a>&#160;<i>extension</i>)</h3><p>Returns true if the <a href="qscriptclass.html">QScriptClass</a>
@@ -237,5 +237,5 @@ supports the given <i>extension</i>; otherwise, false is returned.
 By default, no extensions are supported.</p>
 <p>Reimplement this function to indicate which extensions your
 custom class supports.</p>
-<p>See also <a href="qscriptclass.html#extension">extension</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qscriptclass.html#extension">extension</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

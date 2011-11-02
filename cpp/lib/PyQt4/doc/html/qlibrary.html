@@ -47,11 +47,11 @@ ignored and system default library location is always used.</p>
 something goes wrong, e.g. the library file does not exist or the
 symbol is not defined, the function pointer will be 0 and won't be
 called.</p>
-<pre class="highlightedCode brush: cpp">
- QLibrary myLib("mylib");
- typedef void (*MyPrototype)();
- MyPrototype myFunction = (MyPrototype) myLib.resolve("mysymbol");
- if (myFunction)
+<pre class="cpp">
+ <span class="type">QLibrary</span> myLib(<span class="string">"mylib"</span>);
+ <span class="keyword">typedef</span> <span class="type">void</span> (<span class="operator">*</span>MyPrototype)();
+ MyPrototype myFunction <span class="operator">=</span> (MyPrototype) myLib<span class="operator">.</span><a href="qlibrary.html#resolve">resolve</a>(<span class="string">"mysymbol"</span>);
+ <span class="keyword">if</span> (myFunction)
      myFunction();
 </pre>
 <p>The symbol must be exported as a C function from the library for
@@ -62,39 +62,39 @@ also requires the use of a <tt>dllexport</tt> macro; see <a href="qlibrary.html#
 is done. For convenience, there is a static <a href="qlibrary.html#resolve">resolve</a>() function which you can use if
 you just want to call a function in a library without explicitly
 loading the library first:</p>
-<pre class="highlightedCode brush: cpp">
- typedef void (*MyPrototype)();
- MyPrototype myFunction =
-         (MyPrototype) QLibrary.resolve("mylib", "mysymbol");
- if (myFunction)
+<pre class="cpp">
+ <span class="keyword">typedef</span> <span class="type">void</span> (<span class="operator">*</span>MyPrototype)();
+ MyPrototype myFunction <span class="operator">=</span>
+         (MyPrototype) <span class="type">QLibrary</span><span class="operator">.</span><a href="qlibrary.html#resolve">resolve</a>(<span class="string">"mylib"</span><span class="operator">,</span> <span class="string">"mysymbol"</span>);
+ <span class="keyword">if</span> (myFunction)
      myFunction();
 </pre><hr /><h2>Type Documentation</h2><h3 class="fn"><a name="LoadHint-enum" />QLibrary.LoadHint</h3><p>This enum describes the possible hints that can be used to
 change the way libraries are handled when they are loaded. These
 values indicate how symbols are resolved when libraries are loaded,
 and are specified using the <a href="qlibrary.html#loadHints-prop">setLoadHints</a>() function.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibrary.ResolveAllSymbolsHint</tt></td>
-<td class=" topAlign"><tt>0x01</tt></td>
+<td class="topAlign"><tt>0x01</tt></td>
 <td class="topAlign">Causes all symbols in a library to be resolved
 when it is loaded, not simply when <a href="qlibrary.html#resolve">resolve</a>() is called.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QLibrary.ExportExternalSymbolsHint</tt></td>
-<td class=" topAlign"><tt>0x02</tt></td>
+<td class="topAlign"><tt>0x02</tt></td>
 <td class="topAlign">Exports unresolved and external symbols in the
 library so that they can be resolved in other dynamically-loaded
 libraries loaded later.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLibrary.LoadArchiveMemberHint</tt></td>
-<td class=" topAlign"><tt>0x04</tt></td>
+<td class="topAlign"><tt>0x04</tt></td>
 <td class="topAlign">Allows the file name of the library to specify
 a particular object file within an archive file. If this hint is
 given, the filename of the library consists of a path, which is a
@@ -104,7 +104,7 @@ archive member.</td>
 </table>
 <p>The LoadHints type is a typedef for <a href="qflags.html">QFlags</a>&lt;LoadHint&gt;. It stores an OR
 combination of LoadHint values.</p>
-<p>See also <a href="qlibrary.html#loadHints-prop">loadHints</a>.</p>
+<p><b>See also</b> <a href="qlibrary.html#loadHints-prop">loadHints</a>.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QLibrary" />QLibrary.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a library with the given <i>parent</i>.</p>
 
 
@@ -154,58 +154,34 @@ that occurred. Currently, errorString will only be set if <a href="qlibrary.html
 loadable library; otherwise returns false.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Platform</th>
 <th>Valid suffixes</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>Windows</p>
-</td>
-<td>
-<p><tt>.dll</tt></p>
-</td>
+<tr class="odd" valign="top">
+<td>Windows</td>
+<td><tt>.dll</tt></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Unix/Linux</p>
-</td>
-<td>
-<p><tt>.so</tt></p>
-</td>
+<tr class="even" valign="top">
+<td>Unix/Linux</td>
+<td><tt>.so</tt></td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>AIX</p>
-</td>
-<td>
-<p><tt>.a</tt></p>
-</td>
+<tr class="odd" valign="top">
+<td>AIX</td>
+<td><tt>.a</tt></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>HP-UX</p>
-</td>
-<td>
-<p><tt>.sl</tt>, <tt>.so</tt> (HP-UXi)</p>
-</td>
+<tr class="even" valign="top">
+<td>HP-UX</td>
+<td><tt>.sl</tt>, <tt>.so</tt> (HP-UXi)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Mac OS X</p>
-</td>
-<td>
-<p><tt>.dylib</tt>, <tt>.bundle</tt>, <tt>.so</tt></p>
-</td>
+<tr class="odd" valign="top">
+<td>Mac OS X</td>
+<td><tt>.dylib</tt>, <tt>.bundle</tt>, <tt>.so</tt></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Symbian</p>
-</td>
-<td>
-<p><tt>.dll</tt></p>
-</td>
+<tr class="even" valign="top">
+<td>Symbian</td>
+<td><tt>.dll</tt></td>
 </tr>
 </table>
 <p>Trailing versioning numbers on Unix are ignored.</p>
@@ -213,7 +189,7 @@ loadable library; otherwise returns false.</p>
 
 <h3 class="fn"><a name="isLoaded" />bool QLibrary.isLoaded (<i>self</i>)</h3><p>Returns true if the library is loaded; otherwise returns
 false.</p>
-<p>See also <a href="qlibrary.html#load">load</a>().</p>
+<p><b>See also</b> <a href="qlibrary.html#load">load</a>().</p>
 
 
 <h3 class="fn"><a name="load" />bool QLibrary.load (<i>self</i>)</h3><p>Loads the library and returns true if the library was loaded
@@ -221,7 +197,7 @@ successfully; otherwise returns false. Since <a href="qlibrary.html#resolve">res
 before resolving any symbols it is not necessary to call it
 explicitly. In some situations you might want the library loaded in
 advance, in which case you would use this function.</p>
-<p>See also <a href="qlibrary.html#unload">unload</a>().</p>
+<p><b>See also</b> <a href="qlibrary.html#unload">unload</a>().</p>
 
 
 <h3 class="fn"><a name="loadHints" /><a href="qlibrary-loadhints.html">LoadHints</a> QLibrary.loadHints (<i>self</i>)</h3><h3 class="fn"><a name="resolve" />sip.voidptr QLibrary.resolve (<i>self</i>, str&#160;<i>symbol</i>)</h3><p>Returns the address of the exported symbol <i>symbol</i>. The
@@ -229,33 +205,33 @@ library is loaded if necessary. The function returns 0 if the
 symbol could not be resolved or if the library could not be
 loaded.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- typedef int (*AvgFunction)(int, int);
+<pre class="cpp">
+ <span class="keyword">typedef</span> <span class="type">int</span> (<span class="operator">*</span>AvgFunction)(<span class="type">int</span><span class="operator">,</span> <span class="type">int</span>);
 
- AvgFunction avg = (AvgFunction) library-&gt;resolve("avg");
- if (avg)
-     return avg(5, 8);
- else
-     return -1;
+ AvgFunction avg <span class="operator">=</span> (AvgFunction) library<span class="operator">-</span><span class="operator">&gt;</span>resolve(<span class="string">"avg"</span>);
+ <span class="keyword">if</span> (avg)
+     <span class="keyword">return</span> avg(<span class="number">5</span><span class="operator">,</span> <span class="number">8</span>);
+ <span class="keyword">else</span>
+     <span class="keyword">return</span> <span class="operator">-</span><span class="number">1</span>;
 </pre>
 <p>The symbol must be exported as a C function from the library.
 This means that the function must be wrapped in an <tt>extern
 "C"</tt> if the library is compiled with a C++ compiler. On Windows
 you must also explicitly export the function from the DLL using the
 <tt>__declspec(dllexport)</tt> compiler directive, for example:</p>
-<pre class="highlightedCode brush: cpp">
- extern "C" MY_EXPORT int avg(int a, int b)
+<pre class="cpp">
+ <span class="keyword">extern</span> <span class="string">"C"</span> MY_EXPORT <span class="type">int</span> avg(<span class="type">int</span> a<span class="operator">,</span> <span class="type">int</span> b)
  {
-     return (a + b) / 2;
+     <span class="keyword">return</span> (a <span class="operator">+</span> b) <span class="operator">/</span> <span class="number">2</span>;
  }
 </pre>
 <p>with <tt>MY_EXPORT</tt> defined as</p>
-<pre class="highlightedCode brush: cpp">
- #ifdef Q_WS_WIN
- #define MY_EXPORT __declspec(dllexport)
- #else
- #define MY_EXPORT
- #endif
+<pre class="cpp">
+ <span class="preprocessor">#ifdef Q_WS_WIN</span>
+ <span class="preprocessor">#define MY_EXPORT __declspec(dllexport)</span>
+ <span class="preprocessor">#else</span>
+ <span class="preprocessor">#define MY_EXPORT</span>
+ <span class="preprocessor">#endif</span>
 </pre>
 <p>Note: In Symbian resolving with symbol names works only if the
 loaded library was built as STDDLL. Otherwise, the ordinals must be
@@ -272,7 +248,7 @@ the library could not be loaded.</p>
 <p>Note: In Symbian resolving with symbol names works only if the
 loaded library was built as STDDLL. Otherwise, the ordinals must be
 used.</p>
-<p>See also <a href="qlibrary.html#resolve">resolve</a>().</p>
+<p><b>See also</b> <a href="qlibrary.html#resolve">resolve</a>().</p>
 
 
 <h3 class="fn"><a name="resolve-3" />sip.voidptr QLibrary.resolve (QString&#160;<i>fileName</i>, int&#160;<i>verNum</i>, str&#160;<i>symbol</i>)</h3><p>This is an overloaded function.</p>
@@ -287,7 +263,7 @@ the library could not be loaded.</p>
 <p>Note: In Symbian resolving with symbol names works only if the
 loaded library was built as STDDLL. Otherwise, the ordinals must be
 used.</p>
-<p>See also <a href="qlibrary.html#resolve">resolve</a>().</p>
+<p><b>See also</b> <a href="qlibrary.html#resolve">resolve</a>().</p>
 
 
 <h3 class="fn"><a name="resolve-4" />sip.voidptr QLibrary.resolve (QString&#160;<i>fileName</i>, QString&#160;<i>version</i>, str&#160;<i>symbol</i>)</h3><p>This is an overloaded function.</p>
@@ -303,7 +279,7 @@ the library could not be loaded.</p>
 loaded library was built as STDDLL. Otherwise, the ordinals must be
 used.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qlibrary.html#resolve">resolve</a>().</p>
+<p><b>See also</b> <a href="qlibrary.html#resolve">resolve</a>().</p>
 
 
 <h3 class="fn"><a name="setFileName" />QLibrary.setFileName (<i>self</i>, QString&#160;<i>fileName</i>)</h3><h3 class="fn"><a name="setFileNameAndVersion" />QLibrary.setFileNameAndVersion (<i>self</i>, QString&#160;<i>fileName</i>, int&#160;<i>verNum</i>)</h3><p>Sets the <a href="qlibrary.html#fileName-prop">fileName</a>
@@ -312,7 +288,7 @@ property and major version number to <i>fileName</i> and
 ignored on Windows and Symbian.</p>
 <p>Note: In Symbian the path portion of the <i>fileName</i> is
 ignored.</p>
-<p>See also <a href="qlibrary.html#fileName-prop">setFileName</a>().</p>
+<p><b>See also</b> <a href="qlibrary.html#fileName-prop">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="setFileNameAndVersion-2" />QLibrary.setFileNameAndVersion (<i>self</i>, QString&#160;<i>fileName</i>, QString&#160;<i>version</i>)</h3><p>Sets the <a href="qlibrary.html#fileName-prop">fileName</a>
@@ -322,7 +298,7 @@ ignored on Windows and Symbian.</p>
 <p>Note: In Symbian the path portion of the <i>fileName</i> is
 ignored.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qlibrary.html#fileName-prop">setFileName</a>().</p>
+<p><b>See also</b> <a href="qlibrary.html#fileName-prop">setFileName</a>().</p>
 
 
 <h3 class="fn"><a name="setLoadHints" />QLibrary.setLoadHints (<i>self</i>, <a href="qlibrary-loadhints.html">LoadHints</a>&#160;<i>hints</i>)</h3><h3 class="fn"><a name="unload" />bool QLibrary.unload (<i>self</i>)</h3><p>Unloads the library and returns true if the library could be
@@ -334,6 +310,6 @@ using the same library, the call will fail, and unloading will only
 happen when every instance has called unload().</p>
 <p>Note that on Mac OS X 10.3 (Panther), dynamic libraries cannot
 be unloaded.</p>
-<p>See also <a href="qlibrary.html#resolve">resolve</a>() and
-<a href="qlibrary.html#load">load</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qlibrary.html#resolve">resolve</a>()
+and <a href="qlibrary.html#load">load</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

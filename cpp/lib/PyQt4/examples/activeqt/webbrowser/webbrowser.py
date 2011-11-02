@@ -136,7 +136,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         QtGui.QMessageBox.about(self, "About WebBrowser",
                 "This Example has been created using the ActiveQt integration into Qt Designer.\n"
                 "It demonstrates the use of QAxWidget to embed the Internet Explorer ActiveX\n"
-                "control into a Qt application."))
+                "control into a Qt application.")
 
     @QtCore.pyqtSlot()
     def on_actionAboutQt_triggered(self):

@@ -22,11 +22,11 @@ iterator when writing your own file engine. To plug the iterator
 into your file system, you simply return an instance of this
 subclass from a reimplementation of <a href="qabstractfileengine.html#beginEntryList">QAbstractFileEngine.beginEntryList</a>().</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QAbstractFileEngineIterator *
- CustomFileEngine.beginEntryList(QDir.Filters filters, const QStringList &amp;filterNames)
+<pre class="cpp">
+ <span class="type">QAbstractFileEngineIterator</span> <span class="operator">*</span>
+ CustomFileEngine<span class="operator">.</span>beginEntryList(<span class="type"><a href="qdir.html">QDir</a></span><span class="operator">.</span>Filters filters<span class="operator">,</span> <span class="keyword">const</span> <span class="type"><a href="qstringlist.html">QStringList</a></span> <span class="operator">&amp;</span>filterNames)
  {
-     return new CustomFileEngineIterator(filters, filterNames);
+     <span class="keyword">return</span> <span class="keyword">new</span> CustomFileEngineIterator(filters<span class="operator">,</span> filterNames);
  }
 </pre>
 <p>QAbstractFileEngineIterator is associated with a path, name
@@ -53,39 +53,39 @@ function is provided for convenience; it returns the full path of
 the current entry.</p>
 <p>Here is an example of how to implement an iterator that returns
 each of three fixed entries in sequence.</p>
-<pre class="highlightedCode brush: cpp">
- class CustomIterator : public QAbstractFileEngineIterator
+<pre class="cpp">
+ <span class="keyword">class</span> CustomIterator : <span class="keyword">public</span> <span class="type">QAbstractFileEngineIterator</span>
  {
- public:
-     CustomIterator(const QStringList &amp;nameFilters, QDir.Filters filters)
-         : QAbstractFileEngineIterator(nameFilters, filters), index(0)
+ <span class="keyword">public</span>:
+     CustomIterator(<span class="keyword">const</span> <span class="type"><a href="qstringlist.html">QStringList</a></span> <span class="operator">&amp;</span>nameFilters<span class="operator">,</span> <span class="type"><a href="qdir.html">QDir</a></span><span class="operator">.</span>Filters filters)
+         : <span class="type">QAbstractFileEngineIterator</span>(nameFilters<span class="operator">,</span> filters)<span class="operator">,</span> index(<span class="number">0</span>)
      {
          <span class="comment">// In a real iterator, these entries are fetched from the</span>
          <span class="comment">// file system based on the value of path().</span>
-         entries &lt;&lt; "entry1" &lt;&lt; "entry2" &lt;&lt; "entry3";
+         entries <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"entry1"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"entry2"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"entry3"</span>;
      }
 
-     bool hasNext() const
+     <span class="type">bool</span> hasNext() <span class="keyword">const</span>
      {
-         return index &lt; entries.size() - 1;
+         <span class="keyword">return</span> index <span class="operator">&lt;</span> entries<span class="operator">.</span>size() <span class="operator">-</span> <span class="number">1</span>;
      }
 
-     QString next()
+     <span class="type"><a href="qstring.html">QString</a></span> next()
      {
-        if (!hasNext())
-            return QString();
-        ++index;
-        return currentFilePath();
+        <span class="keyword">if</span> (<span class="operator">!</span>hasNext())
+            <span class="keyword">return</span> <span class="type"><a href="qstring.html">QString</a></span>();
+        <span class="operator">+</span><span class="operator">+</span>index;
+        <span class="keyword">return</span> currentFilePath();
      }
 
-     QString currentFileName()
+     <span class="type"><a href="qstring.html">QString</a></span> currentFileName()
      {
-         return entries.at(index);
+         <span class="keyword">return</span> entries<span class="operator">.</span>at(index);
      }
 
- private:
-     QStringList entries;
-     int index;
+ <span class="keyword">private</span>:
+     <span class="type"><a href="qstringlist.html">QStringList</a></span> entries;
+     <span class="type">int</span> index;
  };
 </pre>
 <p>Note: QAbstractFileEngineIterator does not deal with
@@ -102,22 +102,23 @@ faster than creating a <a href="qfileinfo.html">QFileInfo</a>
 object yourself, as the object returned by this function might
 contain cached information that <a href="qfileinfo.html">QFileInfo</a> otherwise would have to access
 through the file engine.</p>
-<p>See also <a href="qabstractfileengineiterator.html#currentFileName">currentFileName</a>().</p>
+<p><b>See also</b> <a href="qabstractfileengineiterator.html#currentFileName">currentFileName</a>().</p>
 
 
 <h3 class="fn"><a name="currentFileName" />QString QAbstractFileEngineIterator.currentFileName (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>This pure virtual function returns the name of the current
 directory entry, excluding the path.</p>
-<p>See also <a href="qabstractfileengineiterator.html#currentFilePath">currentFilePath</a>().</p>
+<p><b>See also</b> <a href="qabstractfileengineiterator.html#currentFilePath">currentFilePath</a>().</p>
 
 
 <h3 class="fn"><a name="currentFilePath" />QString QAbstractFileEngineIterator.currentFilePath (<i>self</i>)</h3><p>Returns the path to the current directory entry. It's the same
 as prepending <a href="qabstractfileengineiterator.html#pathx">path</a>() to the return
 value of <a href="qabstractfileengineiterator.html#currentFileName">currentFileName</a>().</p>
-<p>See also <a href="qabstractfileengineiterator.html#currentFileName">currentFileName</a>().</p>
+<p><b>See also</b> <a href="qabstractfileengineiterator.html#currentFileName">currentFileName</a>().</p>
 
 
 <h3 class="fn"><a name="filters" /><a href="qdir-filters.html">QDir.Filters</a> QAbstractFileEngineIterator.filters (<i>self</i>)</h3><p>Returns the entry filters for this iterator.</p>
-<p>See also <a href="qdir.html#filter">QDir.filter</a>(), <a href="qabstractfileengineiterator.html#nameFilters">nameFilters</a>(),
+<p><b>See also</b> <a href="qdir.html#filter">QDir.filter</a>(),
+<a href="qabstractfileengineiterator.html#nameFilters">nameFilters</a>(),
 and <a href="qabstractfileengineiterator.html#pathx">path</a>().</p>
 
 
@@ -125,11 +126,11 @@ and <a href="qabstractfileengineiterator.html#pathx">path</a>().</p>
 more entry in the current directory (i.e., the iterator path is
 valid and accessible, and the iterator has not reached the end of
 the entry list).</p>
-<p>See also <a href="qdiriterator.html#hasNext">QDirIterator.hasNext</a>().</p>
+<p><b>See also</b> <a href="qdiriterator.html#hasNext">QDirIterator.hasNext</a>().</p>
 
 
 <h3 class="fn"><a name="nameFilters" />QStringList QAbstractFileEngineIterator.nameFilters (<i>self</i>)</h3><p>Returns the name filters for this iterator.</p>
-<p>See also <a href="qdir.html#nameFilters">QDir.nameFilters</a>(), <a href="qabstractfileengineiterator.html#filters">filters</a>(), and
+<p><b>See also</b> <a href="qdir.html#nameFilters">QDir.nameFilters</a>(), <a href="qabstractfileengineiterator.html#filters">filters</a>(), and
 <a href="qabstractfileengineiterator.html#pathx">path</a>().</p>
 
 
@@ -141,7 +142,7 @@ and <a href="qabstractfileengineiterator.html#filters">filters</a>() to
 optimize its performance.</p>
 <p>Reimplement this function in a subclass to advance the
 iterator.</p>
-<p>See also <a href="qdiriterator.html#next">QDirIterator.next</a>().</p>
+<p><b>See also</b> <a href="qdiriterator.html#next">QDirIterator.next</a>().</p>
 
 
-<h3 class="fn"><a name="path" />QString QAbstractFileEngineIterator.path (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="path" />QString QAbstractFileEngineIterator.path (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

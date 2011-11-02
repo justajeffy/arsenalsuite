@@ -48,30 +48,27 @@ default mode is DelayedPopupMode which is sometimes used with the
 button down for a while, a menu pops up showing a list of possible
 pages to jump to. The default delay is 600 ms; you can adjust it
 with <a class="compat" href="qtoolbutton-qt3.html#setPopupDelay">setPopupDelay</a>().</p>
-<table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img alt="Qt Assistant&apos;s toolbar with tool buttons" src="images/assistant-toolbar.png" /></p>
-</td>
+<table class="generic" width="100%">
+<tr class="odd" valign="top">
+<td><img alt="Qt Assistant&apos;s toolbar with tool buttons" src="images/assistant-toolbar.png" /></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Qt Assistant's toolbar contains tool buttons that are associated
-with actions used in other parts of the main window.</p>
-</td>
+<tr class="even" valign="top">
+<td>Qt Assistant's toolbar contains tool buttons that are
+associated with actions used in other parts of the main
+window.</td>
 </tr>
 </table>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="ToolButtonPopupMode-enum" />QToolButton.ToolButtonPopupMode</h3><p>Describes how a menu should be popped up for tool buttons that
 has a menu set or contains a list of actions.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QToolButton.DelayedPopup</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">After pressing and holding the tool button
 down for a certain amount of time (the timeout is style dependant,
 see <a href="qstyle.html#StyleHint-enum">QStyle.SH_ToolButton_PopupDelay</a>),
@@ -83,14 +80,14 @@ shows a menu containing the current history list</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QToolButton.MenuButtonPopup</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">In this mode the tool button displays a
 special arrow to indicate that a menu is present. The menu is
 displayed when the arrow part of the button is pressed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QToolButton.InstantPopup</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The menu is displayed, without delay, when the
 tool button is pressed. In this mode, the button's own action is
 not triggered.</td>
@@ -106,7 +103,7 @@ not triggered.</td>
 
 
 <h3 class="fn"><a name="defaultAction" /><a href="qaction.html">QAction</a> QToolButton.defaultAction (<i>self</i>)</h3><p>Returns the default action.</p>
-<p>See also <a href="qtoolbutton.html#setDefaultAction">setDefaultAction</a>().</p>
+<p><b>See also</b> <a href="qtoolbutton.html#setDefaultAction">setDefaultAction</a>().</p>
 
 
 <h3 class="fn"><a name="enterEvent" />QToolButton.enterEvent (<i>self</i>, <a href="qevent.html">QEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#enterEvent">QWidget.enterEvent</a>().</p>
@@ -121,7 +118,7 @@ not triggered.</td>
 <h3 class="fn"><a name="initStyleOption" />QToolButton.initStyleOption (<i>self</i>, <a href="qstyleoptiontoolbutton.html">QStyleOptionToolButton</a>&#160;<i>option</i>)</h3><p>Initialize <i>option</i> with the values from this <a href="qtoolbutton.html">QToolButton</a>. This method is useful for
 subclasses when they need a <a href="qstyleoptiontoolbutton.html">QStyleOptionToolButton</a>, but don't
 want to fill in all the information themselves.</p>
-<p>See also <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
+<p><b>See also</b> <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
 
 
 <h3 class="fn"><a name="leaveEvent" />QToolButton.leaveEvent (<i>self</i>, <a href="qevent.html">QEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#leaveEvent">QWidget.leaveEvent</a>().</p>
@@ -129,7 +126,7 @@ want to fill in all the information themselves.</p>
 
 <h3 class="fn"><a name="menu" /><a href="qmenu.html">QMenu</a> QToolButton.menu (<i>self</i>)</h3><p>Returns the associated menu, or 0 if no menu has been
 defined.</p>
-<p>See also <a href="qtoolbutton.html#setMenu">setMenu</a>().</p>
+<p><b>See also</b> <a href="qtoolbutton.html#setMenu">setMenu</a>().</p>
 
 
 <h3 class="fn"><a name="minimumSizeHint" /><a href="qsize.html">QSize</a> QToolButton.minimumSizeHint (<i>self</i>)</h3><p>Reimplemented from <a href="qwidget.html#minimumSizeHint-prop">QWidget.minimumSizeHint</a>().</p>
@@ -151,13 +148,13 @@ defined.</p>
 <h3 class="fn"><a name="popupMode" /><a href="qtoolbutton.html#ToolButtonPopupMode-enum">ToolButtonPopupMode</a> QToolButton.popupMode (<i>self</i>)</h3><h3 class="fn"><a name="setArrowType" />QToolButton.setArrowType (<i>self</i>, <a href="qt.html#ArrowType-enum">Qt.ArrowType</a>&#160;<i>type</i>)</h3><h3 class="fn"><a name="setAutoRaise" />QToolButton.setAutoRaise (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setDefaultAction" />QToolButton.setDefaultAction (<i>self</i>, <a href="qaction.html">QAction</a>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setDefaultAction(QAction *)</tt>.</p><p>Sets the default action to <i>action</i>.</p>
 <p>If a tool button has a default action, the action defines the
 button's properties like text, icon, tool tip, etc.</p>
-<p>See also <a href="qtoolbutton.html#defaultAction">defaultAction</a>().</p>
+<p><b>See also</b> <a href="qtoolbutton.html#defaultAction">defaultAction</a>().</p>
 
 
 <h3 class="fn"><a name="setMenu" />QToolButton.setMenu (<i>self</i>, <a href="qmenu.html">QMenu</a>&#160;<i>menu</i>)</h3><p>Associates the given <i>menu</i> with this tool button.</p>
 <p>The menu will be shown according to the button's <a href="qtoolbutton.html#popupMode-prop">popupMode</a>.</p>
 <p>Ownership of the menu is not transferred to the tool button.</p>
-<p>See also <a href="qtoolbutton.html#menu">menu</a>().</p>
+<p><b>See also</b> <a href="qtoolbutton.html#menu">menu</a>().</p>
 
 
 <h3 class="fn"><a name="setPopupMode" />QToolButton.setPopupMode (<i>self</i>, <a href="qtoolbutton.html#ToolButtonPopupMode-enum">ToolButtonPopupMode</a>&#160;<i>mode</i>)</h3><h3 class="fn"><a name="setToolButtonStyle" />QToolButton.setToolButtonStyle (<i>self</i>, <a href="qt.html#ToolButtonStyle-enum">Qt.ToolButtonStyle</a>&#160;<i>style</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setToolButtonStyle(Qt::ToolButtonStyle)</tt>.</p><h3 class="fn"><a name="showMenu" />QToolButton.showMenu (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void showMenu()</tt>.</p><p>Shows (pops up) the associated popup menu. If there is no such
@@ -177,4 +174,4 @@ triggered.</p>
 interface, such as menu items and keyboard shortcuts. Sharing
 actions in this way helps make the user interface more consistent
 and is often less work to implement.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

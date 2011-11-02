@@ -1,7 +1,7 @@
 Introduction
 ============
 
-This is the reference guide for PyQt snapshot-4.8.5-a9b83eac34c4.  PyQt v4 is a set of
+This is the reference guide for PyQt snapshot-4.8.6-4726879563e5.  PyQt v4 is a set of
 `Python <http://www.python.org>`__ bindings for v4 of the Qt application
 framework from `Nokia <http://qt.nokia.com>`__.
 

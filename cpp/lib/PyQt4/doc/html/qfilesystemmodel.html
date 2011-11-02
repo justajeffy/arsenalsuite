@@ -28,19 +28,19 @@ application.</p>
 <h3>Example Usage</h3>
 <p>A directory model that displays the contents of a default
 directory is usually constructed with a parent object:</p>
-<pre class="highlightedCode brush: cpp">
-     QFileSystemModel *model = new QFileSystemModel;
-     model-&gt;setRootPath(QDir.currentPath());
+<pre class="cpp">
+     <span class="type">QFileSystemModel</span> <span class="operator">*</span>model <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QFileSystemModel</span>;
+     model<span class="operator">-</span><span class="operator">&gt;</span>setRootPath(<span class="type"><a href="qdir.html">QDir</a></span><span class="operator">.</span>currentPath());
 </pre>
 <p>A tree view can be used to display the contents of the model</p>
-<pre class="highlightedCode brush: cpp">
-     QTreeView *tree = new QTreeView(splitter);
-     tree-&gt;setModel(model);
+<pre class="cpp">
+     <span class="type"><a href="qtreeview.html">QTreeView</a></span> <span class="operator">*</span>tree <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qtreeview.html">QTreeView</a></span>(splitter);
+     tree<span class="operator">-</span><span class="operator">&gt;</span>setModel(model);
 </pre>
 <p>and the contents of a particular directory can be displayed by
 setting the tree view's root index:</p>
-<pre class="highlightedCode brush: cpp">
-     tree-&gt;setRootIndex(model-&gt;index(QDir.currentPath()));
+<pre class="cpp">
+     tree<span class="operator">-</span><span class="operator">&gt;</span>setRootIndex(model<span class="operator">-</span><span class="operator">&gt;</span>index(<span class="type"><a href="qdir.html">QDir</a></span><span class="operator">.</span>currentPath()));
 </pre>
 <p>The view's root index can be used to control how much of a
 hierarchical model is displayed. <a class="obsolete" href="qdirmodel.html">QDirModel<sup>(obsolete)</sup></a> provides a
@@ -66,20 +66,20 @@ is automatically kept up to date using the <a href="qfilesystemwatcher.html">QFi
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileSystemModel.FileIconRole</tt></td>
-<td class=" topAlign"><tt>Qt.DecorationRole</tt></td>
+<td class="topAlign"><tt>Qt.DecorationRole</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileSystemModel.FilePathRole</tt></td>
-<td class=" topAlign"><tt>Qt.UserRole + 1</tt></td>
+<td class="topAlign"><tt>Qt.UserRole + 1</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileSystemModel.FileNameRole</tt></td>
-<td class=" topAlign"><tt>Qt.UserRole + 2</tt></td>
+<td class="topAlign"><tt>Qt.UserRole + 2</tt></td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QFileSystemModel.FilePermissions</tt></td>
-<td class=" topAlign"><tt>Qt.UserRole + 3</tt></td>
+<td class="topAlign"><tt>Qt.UserRole + 3</tt></td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QFileSystemModel" />QFileSystemModel.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a file system model with the given <i>parent</i>.</p>
@@ -92,7 +92,7 @@ is automatically kept up to date using the <a href="qfilesystemwatcher.html">QFi
 
 
 <h3 class="fn"><a name="data" />QVariant QFileSystemModel.data (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>, int&#160;<i>role</i>&#160;=&#160;Qt.DisplayRole)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#data">QAbstractItemModel.data</a>().</p>
-<p>See also <a href="qfilesystemmodel.html#setData">setData</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#setData">setData</a>().</p>
 
 
 <h3 class="fn"><a name="dropMimeData" />bool QFileSystemModel.dropMimeData (<i>self</i>, <a href="qmimedata.html">QMimeData</a>&#160;<i>data</i>, <a href="qt.html#DropAction-enum">Qt.DropAction</a>&#160;<i>action</i>, int&#160;<i>row</i>, int&#160;<i>column</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#dropMimeData">QAbstractItemModel.dropMimeData</a>().</p>
@@ -100,7 +100,7 @@ is automatically kept up to date using the <a href="qfilesystemwatcher.html">QFi
 that ended with the given <i>action</i> over the row in the model
 specified by the <i>row</i> and <i>column</i> and by the
 <i>parent</i> index.</p>
-<p>See also <a href="qfilesystemmodel.html#supportedDropActions">supportedDropActions</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#supportedDropActions">supportedDropActions</a>().</p>
 
 
 <h3 class="fn"><a name="event" />bool QFileSystemModel.event (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -127,7 +127,7 @@ given <i>index</i>.</p>
 
 <h3 class="fn"><a name="filter" /><a href="qdir-filters.html">QDir.Filters</a> QFileSystemModel.filter (<i>self</i>)</h3><p>Returns the filter specified for the directory model.</p>
 <p>If a filter has not been set, the default filter is <a href="qdir.html#Filter-enum">QDir.AllEntries</a> | <a href="qdir.html#Filter-enum">QDir.NoDotAndDotDot</a> | <a href="qdir.html#Filter-enum">QDir.AllDirs</a>.</p>
-<p>See also <a href="qfilesystemmodel.html#setFilter">setFilter</a>() and <a href="qdir.html#Filter-enum">QDir.Filters</a>.</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#setFilter">setFilter</a>() and <a href="qdir.html#Filter-enum">QDir.Filters</a>.</p>
 
 
 <h3 class="fn"><a name="flags" /><a href="qt-itemflags.html">Qt.ItemFlags</a> QFileSystemModel.flags (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#flags">QAbstractItemModel.flags</a>().</p>
@@ -140,7 +140,7 @@ given <i>index</i>.</p>
 
 
 <h3 class="fn"><a name="iconProvider" /><a href="qfileiconprovider.html">QFileIconProvider</a> QFileSystemModel.iconProvider (<i>self</i>)</h3><p>Returns the file icon provider for this directory model.</p>
-<p>See also <a href="qfilesystemmodel.html#setIconProvider">setIconProvider</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#setIconProvider">setIconProvider</a>().</p>
 
 
 <h3 class="fn"><a name="index" /><a href="qmodelindex.html">QModelIndex</a> QFileSystemModel.index (<i>self</i>, int&#160;<i>row</i>, int&#160;<i>column</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>&#160;=&#160;QModelIndex())</h3><p>Reimplemented from <a href="qabstractitemmodel.html#index">QAbstractItemModel.index</a>().</p>
@@ -178,11 +178,11 @@ model index.</p>
 
 <h3 class="fn"><a name="myComputer" />QVariant QFileSystemModel.myComputer (<i>self</i>, int&#160;<i>role</i>&#160;=&#160;Qt.DisplayRole)</h3><p>Returns the data stored under the given <i>role</i> for the item
 "My Computer".</p>
-<p>See also <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>.</p>
+<p><b>See also</b> <a href="qt.html#ItemDataRole-enum">Qt.ItemDataRole</a>.</p>
 
 
 <h3 class="fn"><a name="nameFilterDisables" />bool QFileSystemModel.nameFilterDisables (<i>self</i>)</h3><h3 class="fn"><a name="nameFilters" />QStringList QFileSystemModel.nameFilters (<i>self</i>)</h3><p>Returns a list of filters applied to the names in the model.</p>
-<p>See also <a href="qfilesystemmodel.html#setNameFilters">setNameFilters</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#setNameFilters">setNameFilters</a>().</p>
 
 
 <h3 class="fn"><a name="parent" /><a href="qmodelindex.html">QModelIndex</a> QFileSystemModel.parent (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>child</i>)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#parent">QAbstractItemModel.parent</a>().</p>
@@ -199,7 +199,7 @@ is returned.</p>
 <p><b>Warning:</b> This function deletes files from the file
 system; it does <b>not</b> move them to a location where they can
 be recovered.</p>
-<p>See also <a href="qfilesystemmodel.html#rmdir">rmdir</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#rmdir">rmdir</a>().</p>
 
 
 <h3 class="fn"><a name="resolveSymlinks" />bool QFileSystemModel.resolveSymlinks (<i>self</i>)</h3><h3 class="fn"><a name="rmdir" />bool QFileSystemModel.rmdir (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>aindex</i>)</h3><p>Removes the directory corresponding to the model item
@@ -210,22 +210,22 @@ returned.</p>
 <p><b>Warning:</b> This function deletes directories from the file
 system; it does <b>not</b> move them to a location where they can
 be recovered.</p>
-<p>See also <a href="qfilesystemmodel.html#remove">remove</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#remove">remove</a>().</p>
 
 
 <h3 class="fn"><a name="rootDirectory" /><a href="qdir.html">QDir</a> QFileSystemModel.rootDirectory (<i>self</i>)</h3><p>The currently set directory</p>
-<p>See also <a href="qfilesystemmodel.html#rootPath">rootPath</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#rootPath">rootPath</a>().</p>
 
 
 <h3 class="fn"><a name="rootPath" />QString QFileSystemModel.rootPath (<i>self</i>)</h3><p>The currently set root path</p>
-<p>See also <a href="qfilesystemmodel.html#setRootPath">setRootPath</a>() and <a href="qfilesystemmodel.html#rootDirectory">rootDirectory</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#setRootPath">setRootPath</a>() and <a href="qfilesystemmodel.html#rootDirectory">rootDirectory</a>().</p>
 
 
 <h3 class="fn"><a name="rowCount" />int QFileSystemModel.rowCount (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>parent</i>&#160;=&#160;QModelIndex())</h3><p>Reimplemented from <a href="qabstractitemmodel.html#rowCount">QAbstractItemModel.rowCount</a>().</p>
 
 
 <h3 class="fn"><a name="setData" />bool QFileSystemModel.setData (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>idx</i>, QVariant&#160;<i>value</i>, int&#160;<i>role</i>&#160;=&#160;Qt.EditRole)</h3><p>Reimplemented from <a href="qabstractitemmodel.html#setData">QAbstractItemModel.setData</a>().</p>
-<p>See also <a href="qfilesystemmodel.html#data">data</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#data">data</a>().</p>
 
 
 <h3 class="fn"><a name="setFilter" />QFileSystemModel.setFilter (<i>self</i>, <a href="qdir-filters.html">QDir.Filters</a>&#160;<i>filters</i>)</h3><p>Sets the directory model's filter to that specified by
@@ -233,18 +233,17 @@ be recovered.</p>
 <p>Note that the filter you set should always include the <a href="qdir.html#Filter-enum">QDir.AllDirs</a> enum value, otherwise
 <a href="qfilesystemmodel.html">QFileSystemModel</a> won't be able
 to read the directory structure.</p>
-<p>See also <a href="qfilesystemmodel.html#filter">filter</a>() and
-<a href="qdir.html#Filter-enum">QDir.Filters</a>.</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#filter">filter</a>() and <a href="qdir.html#Filter-enum">QDir.Filters</a>.</p>
 
 
 <h3 class="fn"><a name="setIconProvider" />QFileSystemModel.setIconProvider (<i>self</i>, <a href="qfileiconprovider.html">QFileIconProvider</a>&#160;<i>provider</i>)</h3><p>Sets the <i>provider</i> of file icons for the directory
 model.</p>
-<p>See also <a href="qfilesystemmodel.html#iconProvider">iconProvider</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#iconProvider">iconProvider</a>().</p>
 
 
 <h3 class="fn"><a name="setNameFilterDisables" />QFileSystemModel.setNameFilterDisables (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setNameFilters" />QFileSystemModel.setNameFilters (<i>self</i>, QStringList&#160;<i>filters</i>)</h3><p>Sets the name <i>filters</i> to apply against the existing
 files.</p>
-<p>See also <a href="qfilesystemmodel.html#nameFilters">nameFilters</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#nameFilters">nameFilters</a>().</p>
 
 
 <h3 class="fn"><a name="setReadOnly" />QFileSystemModel.setReadOnly (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setResolveSymlinks" />QFileSystemModel.setResolveSymlinks (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setRootPath" /><a href="qmodelindex.html">QModelIndex</a> QFileSystemModel.setRootPath (<i>self</i>, QString&#160;<i>path</i>)</h3><p>Sets the directory that is being watched by the model to
@@ -258,7 +257,7 @@ model or modify the data available to views. In other words, the
 "root" of the model is <i>not</i> changed to include only files and
 directories within the directory specified by <i>newPath</i> in the
 file system.</p>
-<p>See also <a href="qfilesystemmodel.html#rootPath">rootPath</a>().</p>
+<p><b>See also</b> <a href="qfilesystemmodel.html#rootPath">rootPath</a>().</p>
 
 
 <h3 class="fn"><a name="size" />int QFileSystemModel.size (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Returns the size in bytes of <i>index</i>. If the file does not
@@ -290,4 +289,4 @@ in the directory <i>path</i>.</p>
 to a <i>newPath</i>.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

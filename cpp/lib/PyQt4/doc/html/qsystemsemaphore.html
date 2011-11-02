@@ -34,14 +34,14 @@ resources.</p>
 <p>A system semaphore is created with a string key that other
 processes can use to use the same semaphore.</p>
 <p>Example: Create a system semaphore</p>
-<pre class="highlightedCode brush: cpp">
- QSystemSemaphore sem("market", 3, QSystemSemaphore.Create);
+<pre class="cpp">
+ <span class="type">QSystemSemaphore</span> sem(<span class="string">"market"</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="type">QSystemSemaphore</span><span class="operator">.</span>Create);
                               <span class="comment">// resources available == 3</span>
- sem.acquire();               <span class="comment">// resources available == 2</span>
- sem.acquire();               <span class="comment">// resources available == 1</span>
- sem.acquire();               <span class="comment">// resources available == 0</span>
- sem.release();               <span class="comment">// resources available == 1</span>
- sem.release(2);              <span class="comment">// resources available == 3</span>
+ sem<span class="operator">.</span><a href="qsystemsemaphore.html#acquire">acquire</a>();               <span class="comment">// resources available == 2</span>
+ sem<span class="operator">.</span><a href="qsystemsemaphore.html#acquire">acquire</a>();               <span class="comment">// resources available == 1</span>
+ sem<span class="operator">.</span><a href="qsystemsemaphore.html#acquire">acquire</a>();               <span class="comment">// resources available == 0</span>
+ sem<span class="operator">.</span><a href="qsystemsemaphore.html#release">release</a>();               <span class="comment">// resources available == 1</span>
+ sem<span class="operator">.</span><a href="qsystemsemaphore.html#release">release</a>(<span class="number">2</span>);              <span class="comment">// resources available == 3</span>
 </pre>
 <p>A typical application of system semaphores is for controlling
 access to a circular buffer shared by a producer process and a
@@ -90,21 +90,21 @@ we need a way to force it to reset its resource count, when the
 system reuses the semaphore. In Windows and in Symbian, where
 semaphores can't survive a crash, this enum has no effect.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSystemSemaphore.Open</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">If the semaphore already exists, its initial
 resource count is not reset. If the semaphore does not already
 exist, it is created and its initial resource count set.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSystemSemaphore.Create</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign"><a href="qsystemsemaphore.html">QSystemSemaphore</a> takes ownership of the
 semaphore and sets its resource count to the requested value,
 regardless of whether the semaphore already exists by having
@@ -118,50 +118,50 @@ can't survive a crash, Create and Open have the same behavior.</td>
 
 
 <h3 class="fn"><a name="SystemSemaphoreError-enum" />QSystemSemaphore.SystemSemaphoreError</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSystemSemaphore.NoError</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">No error occurred.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QSystemSemaphore.PermissionDenied</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The operation failed because the caller didn't
 have the required permissions.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSystemSemaphore.KeyError</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The operation failed because of an invalid
 key.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSystemSemaphore.AlreadyExists</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The operation failed because a system
 semaphore with the specified key already existed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSystemSemaphore.NotFound</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The operation failed because a system
 semaphore with the specified key could not be found.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSystemSemaphore.OutOfResources</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The operation failed because there was not
 enough memory available to fill the request.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSystemSemaphore.UnknownError</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">Something else happened and it was bad.</td>
 </tr>
 </table>
@@ -197,8 +197,7 @@ semaphore that survived the crash, and unless <i>mode</i> is
 resource count will not be reset to <i>initialValue</i> but will
 retain the initial value it had been given by the crashed
 process.</p>
-<p>See also <a href="qsystemsemaphore.html#acquire">acquire</a>()
-and <a href="qsystemsemaphore.html#key">key</a>().</p>
+<p><b>See also</b> <a href="qsystemsemaphore.html#acquire">acquire</a>() and <a href="qsystemsemaphore.html#key">key</a>().</p>
 
 
 <h3 class="fn"><a name="acquire" />bool QSystemSemaphore.acquire (<i>self</i>)</h3><p>Acquires one of the resources guarded by this semaphore, if
@@ -209,12 +208,12 @@ having a semaphore with the same key.</p>
 <p>If false is returned, a system error has occurred. Call <a href="qsystemsemaphore.html#error">error</a>() to get a value of
 <a href="qsystemsemaphore.html#SystemSemaphoreError-enum">QSystemSemaphore.SystemSemaphoreError</a>
 that indicates which error occurred.</p>
-<p>See also <a href="qsystemsemaphore.html#release">release</a>().</p>
+<p><b>See also</b> <a href="qsystemsemaphore.html#release">release</a>().</p>
 
 
 <h3 class="fn"><a name="error" /><a href="qsystemsemaphore.html#SystemSemaphoreError-enum">SystemSemaphoreError</a> QSystemSemaphore.error (<i>self</i>)</h3><p>Returns a value indicating whether an error occurred, and, if
 so, which error it was.</p>
-<p>See also <a href="qsystemsemaphore.html#errorString">errorString</a>().</p>
+<p><b>See also</b> <a href="qsystemsemaphore.html#errorString">errorString</a>().</p>
 
 
 <h3 class="fn"><a name="errorString" />QString QSystemSemaphore.errorString (<i>self</i>)</h3><p>Returns a text description of the last error that occurred. If
@@ -222,34 +221,34 @@ so, which error it was.</p>
 <a href="qsystemsemaphore.html#SystemSemaphoreError-enum">error
 value</a>, call this function to get a text string that describes
 the error.</p>
-<p>See also <a href="qsystemsemaphore.html#error">error</a>().</p>
+<p><b>See also</b> <a href="qsystemsemaphore.html#error">error</a>().</p>
 
 
 <h3 class="fn"><a name="key" />QString QSystemSemaphore.key (<i>self</i>)</h3><p>Returns the key assigned to this system semaphore. The key is
 the name by which the semaphore can be accessed from other
 processes.</p>
-<p>See also <a href="qsystemsemaphore.html#setKey">setKey</a>().</p>
+<p><b>See also</b> <a href="qsystemsemaphore.html#setKey">setKey</a>().</p>
 
 
 <h3 class="fn"><a name="release" />bool QSystemSemaphore.release (<i>self</i>, int&#160;<i>n</i>&#160;=&#160;1)</h3><p>Releases <i>n</i> resources guarded by the semaphore. Returns
 true unless there is a system error.</p>
 <p>Example: Create a system semaphore having five resources;
 acquire them all and then release them all.</p>
-<pre class="highlightedCode brush: cpp">
- QSystemSemaphore sem("market", 5, QSystemSemaphore.Create);
- sem.acquire(5);           <span class="comment">// acquire all 5 resources</span>
- sem.release(5);           <span class="comment">// release the 5 resources</span>
+<pre class="cpp">
+ <span class="type"><a href="qsystemsemaphore.html">QSystemSemaphore</a></span> sem(<span class="string">"market"</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="type"><a href="qsystemsemaphore.html">QSystemSemaphore</a></span><span class="operator">.</span>Create);
+ sem<span class="operator">.</span><a href="qsystemsemaphore.html#acquire">acquire</a>(<span class="number">5</span>);           <span class="comment">// acquire all 5 resources</span>
+ sem<span class="operator">.</span>release(<span class="number">5</span>);           <span class="comment">// release the 5 resources</span>
 </pre>
 <p>This function can also "create" resources. For example,
 immediately following the sequence of statements above, suppose we
 add the statement:</p>
-<pre class="highlightedCode brush: cpp">
- sem.release(10);          <span class="comment">// "create" 10 new resources</span>
+<pre class="cpp">
+ sem<span class="operator">.</span>release(<span class="number">10</span>);          <span class="comment">// "create" 10 new resources</span>
 </pre>
 <p>Ten new resources are now guarded by the semaphore, in addition
 to the five that already existed. You would not normally use this
 function to create more resources.</p>
-<p>See also <a href="qsystemsemaphore.html#acquire">acquire</a>().</p>
+<p><b>See also</b> <a href="qsystemsemaphore.html#acquire">acquire</a>().</p>
 
 
 <h3 class="fn"><a name="setKey" />QSystemSemaphore.setKey (<i>self</i>, QString&#160;<i>key</i>, int&#160;<i>initialValue</i>&#160;=&#160;0, <a href="qsystemsemaphore.html#AccessMode-enum">AccessMode</a>&#160;<i>mode</i>&#160;=&#160;QSystemSemaphore.Open)</h3><p>This function works the same as the constructor. It reconstructs
@@ -259,6 +258,6 @@ function is like calling the destructor of the semaphore with the
 old key, then calling the constructor to create a new semaphore
 with the new <i>key</i>. The <i>initialValue</i> and <i>mode</i>
 parameters are as defined for the constructor.</p>
-<p>See also <a href="qsystemsemaphore.html#QSystemSemaphore">QSystemSemaphore</a>() and
+<p><b>See also</b> <a href="qsystemsemaphore.html#QSystemSemaphore">QSystemSemaphore</a>() and
 <a href="qsystemsemaphore.html#key">key</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

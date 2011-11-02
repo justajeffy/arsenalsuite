@@ -34,42 +34,26 @@ composed text.</p>
 <h3>Groups of Functions</h3>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Context</th>
 <th>Functions</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p>Receiving information</p>
-</td>
-<td>
-<p><a href="qinputcontext.html#x11FilterEvent">x11FilterEvent</a>(), <a href="qinputcontext.html#filterEvent">filterEvent</a>(), <a href="qinputcontext.html#mouseHandler">mouseHandler</a>()</p>
-</td>
+<tr class="odd" valign="top">
+<td>Receiving information</td>
+<td><a href="qinputcontext.html#x11FilterEvent">x11FilterEvent</a>(), <a href="qinputcontext.html#filterEvent">filterEvent</a>(), <a href="qinputcontext.html#mouseHandler">mouseHandler</a>()</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Sending back composed text</p>
-</td>
-<td>
-<p><a href="qinputcontext.html#sendEvent">sendEvent</a>()</p>
-</td>
+<tr class="even" valign="top">
+<td>Sending back composed text</td>
+<td><a href="qinputcontext.html#sendEvent">sendEvent</a>()</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>State change notification</p>
-</td>
-<td>
-<p><a href="qinputcontext.html#setFocusWidget">setFocusWidget</a>(), <a href="qinputcontext.html#reset">reset</a>()</p>
-</td>
+<tr class="odd" valign="top">
+<td>State change notification</td>
+<td><a href="qinputcontext.html#setFocusWidget">setFocusWidget</a>(), <a href="qinputcontext.html#reset">reset</a>()</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Context information</p>
-</td>
-<td>
-<p><a href="qinputcontext.html#identifierName">identifierName</a>(), <a href="qinputcontext.html#language">language</a>(), <a href="qinputcontext.html#font">font</a>(), <a href="qinputcontext.html#isComposing">isComposing</a>()</p>
-</td>
+<tr class="even" valign="top">
+<td>Context information</td>
+<td><a href="qinputcontext.html#identifierName">identifierName</a>(), <a href="qinputcontext.html#language">language</a>(), <a href="qinputcontext.html#font">font</a>(), <a href="qinputcontext.html#isComposing">isComposing</a>()</td>
 </tr>
 </table>
 <a id="licensing-information" name="licensing-information" />
@@ -84,23 +68,23 @@ original file headers. Contact immodule-qt@freedesktop.org if any
 conditions of this licensing are not clear to you.</p>
 </div>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="StandardFormat-enum" />QInputContext.StandardFormat</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QInputContext.PreeditFormat</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The preedit text.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QInputContext.SelectionFormat</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The selection text.</td>
 </tr>
 </table>
-<p>See also <a href="qinputcontext.html#standardFormat">standardFormat</a>().</p>
+<p><b>See also</b> <a href="qinputcontext.html#standardFormat">standardFormat</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QInputContext" />QInputContext.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs an input context with the given <i>parent</i>.</p>
 
 
@@ -136,7 +120,8 @@ methods work properly regardless of application design.</p>
 <p>Ordinary input methods require discrete key events to work
 properly, so Qt's key compression is always disabled for any input
 contexts.</p>
-<p>See also <a href="qkeyevent.html">QKeyEvent</a> and <a href="qinputcontext.html#x11FilterEvent">x11FilterEvent</a>().</p>
+<p><b>See also</b> <a href="qkeyevent.html">QKeyEvent</a> and
+<a href="qinputcontext.html#x11FilterEvent">x11FilterEvent</a>().</p>
 
 
 <h3 class="fn"><a name="focusWidget" /><a href="qwidget.html">QWidget</a> QInputContext.focusWidget (<i>self</i>)</h3><p>Returns the widget that has an input focus for this input
@@ -146,7 +131,7 @@ context is shared between several text widgets.</p>
 <p><b>Warning:</b> To ensure platform independence and support
 flexible configuration of widgets, ordinary input methods should
 not call this function directly.</p>
-<p>See also <a href="qinputcontext.html#setFocusWidget">setFocusWidget</a>().</p>
+<p><b>See also</b> <a href="qinputcontext.html#setFocusWidget">setFocusWidget</a>().</p>
 
 
 <h3 class="fn"><a name="font" /><a href="qfont.html">QFont</a> QInputContext.font (<i>self</i>)</h3><p>Returns the font of the current input widget</p>
@@ -162,7 +147,7 @@ The name has to consist of ASCII characters only.</p>
 the input method domain. This function returns one of them. Another
 name is called 'display name' that stands for the name for endusers
 appeared in a menu and so on.</p>
-<p>See also <a href="qinputcontextplugin.html#keys">QInputContextPlugin.keys</a>() and
+<p><b>See also</b> <a href="qinputcontextplugin.html#keys">QInputContextPlugin.keys</a>() and
 <a href="qinputcontextplugin.html#displayName">QInputContextPlugin.displayName</a>().</p>
 
 
@@ -171,7 +156,7 @@ sent to the current focus widget. It is ensured that an input
 context can send InputMethodCompose or InputMethodEnd event safely
 if this function returned true.</p>
 <p>The state is automatically being tracked through <a href="qinputcontext.html#sendEvent">sendEvent</a>().</p>
-<p>See also <a href="qinputcontext.html#sendEvent">sendEvent</a>().</p>
+<p><b>See also</b> <a href="qinputcontext.html#sendEvent">sendEvent</a>().</p>
 
 
 <h3 class="fn"><a name="language" />QString QInputContext.language (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>This function must be implemented in any subclasses to return a
@@ -212,9 +197,9 @@ You can override this function to reset external input method
 engines in complex input method. In the case, call
 QInputContext.reset() to ensure proper termination of
 inputting.</p>
-<p>You must not send any <a href="qinputmethodevent.html">QInputMethodEvent</a> except empty
-InputMethodEnd event using QInputContext.reset() at reimplemented
-reset(). It will break input state consistency.</p>
+<p>In a reimplementation of reset(), you must not send any <a href="qinputmethodevent.html">QInputMethodEvent</a> containing preedit
+text. You can only commit string and attributes; otherwise, you
+risk breaking input state consistency.</p>
 
 
 <h3 class="fn"><a name="sendEvent" />QInputContext.sendEvent (<i>self</i>, <a href="qinputmethodevent.html">QInputMethodEvent</a>&#160;<i>event</i>)</h3><p>Sends an input method event specified by <i>event</i> to the
@@ -228,14 +213,14 @@ contexts (e.g. to enable language switching). To account for this,
 parent object is a <a href="qinputcontext.html">QInputContext</a>.
 If yes, it will call the parents sendEvent() implementation instead
 of sending the event directly.</p>
-<p>See also <a href="qinputmethodevent.html">QInputMethodEvent</a>.</p>
+<p><b>See also</b> <a href="qinputmethodevent.html">QInputMethodEvent</a>.</p>
 
 
 <h3 class="fn"><a name="setFocusWidget" />QInputContext.setFocusWidget (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>w</i>)</h3><p>Sets the <i>widget</i> that has an input focus for this input
 context.</p>
 <p><b>Warning:</b> Ordinary input methods must not call this
 function directly.</p>
-<p>See also <a href="qinputcontext.html#focusWidget">focusWidget</a>().</p>
+<p><b>See also</b> <a href="qinputcontext.html#focusWidget">focusWidget</a>().</p>
 
 
 <h3 class="fn"><a name="standardFormat" /><a href="qtextformat.html">QTextFormat</a> QInputContext.standardFormat (<i>self</i>, <a href="qinputcontext.html#StandardFormat-enum">StandardFormat</a>&#160;<i>s</i>)</h3><p>Returns a <a href="qtextformat.html">QTextFormat</a> object that
@@ -253,4 +238,4 @@ is destroyed. The <i>widget</i> is a widget on which this input
 context is installed.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

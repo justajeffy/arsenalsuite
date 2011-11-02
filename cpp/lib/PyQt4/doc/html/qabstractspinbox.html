@@ -34,35 +34,35 @@ returns a bitset of <a href="qabstractspinbox.html#StepEnabledFlag-enum">StepEna
 the buttons in a spin box.</p>
 <p><img src="images/qspinbox-updown.png" /> <img src="images/qspinbox-plusminus.png" /></p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractSpinBox.UpDownArrows</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Little arrows in the classic style.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractSpinBox.PlusMinus</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign"><b>+</b> and <b>-</b> symbols.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractSpinBox.NoButtons</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Don't display buttons.</td>
 </tr>
 </table>
-<p>See also <a href="qabstractspinbox.html#buttonSymbols-prop">QAbstractSpinBox.buttonSymbols</a>.</p>
+<p><b>See also</b> <a href="qabstractspinbox.html#buttonSymbols-prop">QAbstractSpinBox.buttonSymbols</a>.</p>
 
 
 <h3 class="fn"><a name="CorrectionMode-enum" />QAbstractSpinBox.CorrectionMode</h3><p>This enum type describes the mode the spinbox will use to
 correct an <a href="qvalidator.html#State-enum">Intermediate</a>
 value if editing finishes.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -70,19 +70,19 @@ value if editing finishes.</p>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSpinBox.CorrectToPreviousValue</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The spinbox will revert to the last valid
 value.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSpinBox.CorrectToNearestValue</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The spinbox will revert to the nearest valid
 value.</td>
 </tr>
 </table>
-<p>See also <a href="qabstractspinbox.html#correctionMode-prop">correctionMode</a>.</p>
+<p><b>See also</b> <a href="qabstractspinbox.html#correctionMode-prop">correctionMode</a>.</p>
 
 
 <h3 class="fn"><a name="StepEnabledFlag-enum" />QAbstractSpinBox.StepEnabledFlag</h3><table class="valuelist">
@@ -92,16 +92,16 @@ value.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractSpinBox.StepNone</tt></td>
-<td class=" topAlign"><tt>0x00</tt></td>
+<td class="topAlign"><tt>0x00</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QAbstractSpinBox.StepUpEnabled</tt></td>
-<td class=" topAlign"><tt>0x01</tt></td>
+<td class="topAlign"><tt>0x01</tt></td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QAbstractSpinBox.StepDownEnabled</tt></td>
-<td class=" topAlign"><tt>0x02</tt></td>
+<td class="topAlign"><tt>0x02</tt></td>
 </tr>
 </table>
 <p>The StepEnabled type is a typedef for <a href="qflags.html">QFlags</a>&lt;StepEnabledFlag&gt;. It stores an OR
@@ -146,7 +146,7 @@ Reimplemented in the various subclasses.</p>
 <h3 class="fn"><a name="initStyleOption" />QAbstractSpinBox.initStyleOption (<i>self</i>, <a href="qstyleoptionspinbox.html">QStyleOptionSpinBox</a>&#160;<i>option</i>)</h3><p>Initialize <i>option</i> with the values from this <a href="qspinbox.html">QSpinBox</a>. This method is useful for subclasses
 when they need a <a href="qstyleoptionspinbox.html">QStyleOptionSpinBox</a>, but don't want
 to fill in all the information themselves.</p>
-<p>See also <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
+<p><b>See also</b> <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
 
 
 <h3 class="fn"><a name="inputMethodQuery" />QVariant QAbstractSpinBox.inputMethodQuery (<i>self</i>, <a href="qt.html#InputMethodQuery-enum">Qt.InputMethodQuery</a>)</h3><p>Reimplemented from <a href="qwidget.html#inputMethodQuery">QWidget.inputMethodQuery</a>().</p>
@@ -160,46 +160,26 @@ has changed since last interpretation it will emit signals.</p>
 <p>This function handles keyboard input.</p>
 <p>The following keys are handled specifically:</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p>Enter/Return</p>
-</td>
-<td>
-<p>This will reinterpret the text and emit a signal even if the
-value has not changed since last time a signal was emitted.</p>
-</td>
+<tr class="odd" valign="top">
+<td>Enter/Return</td>
+<td>This will reinterpret the text and emit a signal even if the
+value has not changed since last time a signal was emitted.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Up</p>
-</td>
-<td>
-<p>This will invoke stepBy(1)</p>
-</td>
+<tr class="even" valign="top">
+<td>Up</td>
+<td>This will invoke stepBy(1)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Down</p>
-</td>
-<td>
-<p>This will invoke stepBy(-1)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Down</td>
+<td>This will invoke stepBy(-1)</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>Page up</p>
-</td>
-<td>
-<p>This will invoke stepBy(10)</p>
-</td>
+<tr class="even" valign="top">
+<td>Page up</td>
+<td>This will invoke stepBy(10)</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p>Page down</p>
-</td>
-<td>
-<p>This will invoke stepBy(-10)</p>
-</td>
+<tr class="odd" valign="top">
+<td>Page down</td>
+<td>This will invoke stepBy(-10)</td>
 </tr>
 </table>
 
@@ -209,7 +189,7 @@ value has not changed since last time a signal was emitted.</p>
 
 <h3 class="fn"><a name="lineEdit" /><a href="qlineedit.html">QLineEdit</a> QAbstractSpinBox.lineEdit (<i>self</i>)</h3><p>This function returns a pointer to the line edit of the spin
 box.</p>
-<p>See also <a href="qabstractspinbox.html#setLineEdit">setLineEdit</a>().</p>
+<p><b>See also</b> <a href="qabstractspinbox.html#setLineEdit">setLineEdit</a>().</p>
 
 
 <h3 class="fn"><a name="minimumSizeHint" /><a href="qsize.html">QSize</a> QAbstractSpinBox.minimumSizeHint (<i>self</i>)</h3><p>Reimplemented from <a href="qwidget.html#minimumSizeHint-prop">QWidget.minimumSizeHint</a>().</p>
@@ -241,7 +221,7 @@ ownership of the new lineEdit</p>
 <p>If <a href="qlineedit.html#validator">QLineEdit.validator</a>()
 for the <i>lineEdit</i> returns 0, the internal validator of the
 spinbox will be set on the line edit.</p>
-<p>See also <a href="qabstractspinbox.html#lineEdit">lineEdit</a>().</p>
+<p><b>See also</b> <a href="qabstractspinbox.html#lineEdit">lineEdit</a>().</p>
 
 
 <h3 class="fn"><a name="setReadOnly" />QAbstractSpinBox.setReadOnly (<i>self</i>, bool&#160;<i>r</i>)</h3><h3 class="fn"><a name="setSpecialValueText" />QAbstractSpinBox.setSpecialValueText (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="setWrapping" />QAbstractSpinBox.setWrapping (<i>self</i>, bool&#160;<i>w</i>)</h3><h3 class="fn"><a name="showEvent" />QAbstractSpinBox.showEvent (<i>self</i>, <a href="qshowevent.html">QShowEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#showEvent">QWidget.showEvent</a>().</p>
@@ -263,8 +243,7 @@ It's this function's job to handle these situations.</p>
 
 <h3 class="fn"><a name="stepDown" />QAbstractSpinBox.stepDown (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void stepDown()</tt>.</p><p>Steps down by one linestep Calling this slot is analogous to
 calling stepBy(-1);</p>
-<p>See also <a href="qabstractspinbox.html#stepBy">stepBy</a>() and
-<a href="qabstractspinbox.html#stepUp">stepUp</a>().</p>
+<p><b>See also</b> <a href="qabstractspinbox.html#stepBy">stepBy</a>() and <a href="qabstractspinbox.html#stepUp">stepUp</a>().</p>
 
 
 <h3 class="fn"><a name="stepEnabled" /><a href="qabstractspinbox-stepenabled.html">StepEnabled</a> QAbstractSpinBox.stepEnabled (<i>self</i>)</h3><p>Virtual function that determines whether stepping up and down is
@@ -279,13 +258,12 @@ value is &gt; minimum() or'ed with <a href="qabstractspinbox.html#StepEnabledFla
 value &lt; maximum().</p>
 <p>If you subclass <a href="qabstractspinbox.html">QAbstractSpinBox</a> you will need to
 reimplement this function.</p>
-<p>See also <a href="qspinbox.html#minimum-prop">QSpinBox.minimum</a>(), <a href="qspinbox.html#maximum-prop">QSpinBox.maximum</a>(), and <a href="qabstractspinbox.html#wrapping-prop">wrapping</a>().</p>
+<p><b>See also</b> <a href="qspinbox.html#minimum-prop">QSpinBox.minimum</a>(), <a href="qspinbox.html#maximum-prop">QSpinBox.maximum</a>(), and <a href="qabstractspinbox.html#wrapping-prop">wrapping</a>().</p>
 
 
 <h3 class="fn"><a name="stepUp" />QAbstractSpinBox.stepUp (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void stepUp()</tt>.</p><p>Steps up by one linestep Calling this slot is analogous to
 calling stepBy(1);</p>
-<p>See also <a href="qabstractspinbox.html#stepBy">stepBy</a>() and
-<a href="qabstractspinbox.html#stepDown">stepDown</a>().</p>
+<p><b>See also</b> <a href="qabstractspinbox.html#stepBy">stepBy</a>() and <a href="qabstractspinbox.html#stepDown">stepDown</a>().</p>
 
 
 <h3 class="fn"><a name="text" />QString QAbstractSpinBox.text (<i>self</i>)</h3><h3 class="fn"><a name="timerEvent" />QAbstractSpinBox.timerEvent (<i>self</i>, <a href="qtimerevent.html">QTimerEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qobject.html#timerEvent">QObject.timerEvent</a>().</p>
@@ -302,4 +280,4 @@ subclasses.</p>
 the spinbox loses focus and when enter is pressed.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

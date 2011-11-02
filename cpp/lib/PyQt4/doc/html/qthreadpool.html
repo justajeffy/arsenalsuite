@@ -16,18 +16,18 @@ global QThreadPool object, which can be accessed by calling
 <p>To use one of the QThreadPool threads, subclass <a href="qrunnable.html">QRunnable</a> and implement the run() virtual
 function. Then create an object of that class and pass it to
 <a href="qthreadpool.html#start">QThreadPool.start</a>().</p>
-<pre class="highlightedCode brush: cpp">
- class HelloWorldTask : public QRunnable
+<pre class="cpp">
+ <span class="keyword">class</span> HelloWorldTask : <span class="keyword">public</span> <span class="type"><a href="qrunnable.html">QRunnable</a></span>
  {
-     void run()
+     <span class="type">void</span> run()
      {
-         qDebug() &lt;&lt; "Hello world from thread" &lt;&lt; QThread.currentThread();
+         <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Hello world from thread"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="type"><a href="qthread.html">QThread</a></span><span class="operator">.</span>currentThread();
      }
  }
 
- HelloWorldTask *hello = new HelloWorldTask();
-<span class="comment"> // QThreadPool takes ownership and deletes 'hello' automatically</span>
- QThreadPool.globalInstance()-&gt;start(hello);
+ HelloWorldTask <span class="operator">*</span>hello <span class="operator">=</span> <span class="keyword">new</span> HelloWorldTask();
+ <span class="comment">// QThreadPool takes ownership and deletes 'hello' automatically</span>
+ <span class="type">QThreadPool</span><span class="operator">.</span><a href="qthreadpool.html#globalInstance">globalInstance</a>()<span class="operator">-</span><span class="operator">&gt;</span><a href="qthreadpool.html#start">start</a>(hello);
 </pre>
 <p>QThreadPool deletes the <a href="qrunnable.html">QRunnable</a>
 automatically by default. Use <a href="qrunnable.html#setAutoDelete">QRunnable.setAutoDelete</a>() to
@@ -74,7 +74,7 @@ is useful when a thread goes to sleep waiting for more work,
 allowing other threads to continue. Be sure to call <a href="qthreadpool.html#reserveThread">reserveThread</a>() when done
 waiting, so that the thread pool can correctly maintain the
 <a href="qthreadpool.html#activeThreadCount-prop">activeThreadCount</a>().</p>
-<p>See also <a href="qthreadpool.html#reserveThread">reserveThread</a>().</p>
+<p><b>See also</b> <a href="qthreadpool.html#reserveThread">reserveThread</a>().</p>
 
 
 <h3 class="fn"><a name="reserveThread" />QThreadPool.reserveThread (<i>self</i>)</h3><p>Reserves one thread, disregarding <a href="qthreadpool.html#activeThreadCount-prop">activeThreadCount</a>()
@@ -85,7 +85,7 @@ be reused.</p>
 active threads. This means that by using this function, it is
 possible for <a href="qthreadpool.html#activeThreadCount-prop">activeThreadCount</a>()
 to return a value greater than <a href="qthreadpool.html#maxThreadCount-prop">maxThreadCount</a>() .</p>
-<p>See also <a href="qthreadpool.html#releaseThread">releaseThread</a>().</p>
+<p><b>See also</b> <a href="qthreadpool.html#releaseThread">releaseThread</a>().</p>
 
 
 <h3 class="fn"><a name="setExpiryTimeout" />QThreadPool.setExpiryTimeout (<i>self</i>, int&#160;<i>expiryTimeout</i>)</h3><h3 class="fn"><a name="setMaxThreadCount" />QThreadPool.setMaxThreadCount (<i>self</i>, int&#160;<i>maxThreadCount</i>)</h3><h3 class="fn"><a name="start" />QThreadPool.start (<i>self</i>, <a href="qrunnable.html">QRunnable</a>&#160;<i>runnable</i>, int&#160;<i>priority</i>&#160;=&#160;0)</h3><p>Reserves a thread and uses it to run <i>runnable</i>, unless
@@ -118,4 +118,4 @@ this function results in undefined behavior.</p>
 
 <h3 class="fn"><a name="waitForDone" />QThreadPool.waitForDone (<i>self</i>)</h3><p>Waits for each thread to exit and removes all threads from the
 thread pool.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

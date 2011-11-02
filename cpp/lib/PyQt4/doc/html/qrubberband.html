@@ -22,24 +22,24 @@ then call <a href="qrubberband.html#setGeometry">setGeometry</a>(),
 <a href="qrubberband.html#move">move</a>() or <a href="qrubberband.html#resize">resize</a>() to position and size it. A
 common pattern is to do this in conjunction with mouse events. For
 example:</p>
-<pre class="highlightedCode brush: cpp">
- void Widget.mousePressEvent(QMouseEvent *event)
+<pre class="cpp">
+ <span class="type">void</span> Widget<span class="operator">.</span><a href="qwidget.html#mousePressEvent">mousePressEvent</a>(<span class="type"><a href="qmouseevent.html">QMouseEvent</a></span> <span class="operator">*</span>event)
  {
-     origin = event-&gt;pos();
-     if (!rubberBand)
-         rubberBand = new QRubberBand(QRubberBand.Rectangle, this);
-     rubberBand-&gt;setGeometry(QRect(origin, QSize()));
-     rubberBand-&gt;show();
+     origin <span class="operator">=</span> event<span class="operator">-</span><span class="operator">&gt;</span>pos();
+     <span class="keyword">if</span> (<span class="operator">!</span>rubberBand)
+         rubberBand <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QRubberBand</span>(<span class="type">QRubberBand</span><span class="operator">.</span>Rectangle<span class="operator">,</span> <span class="keyword">this</span>);
+     rubberBand<span class="operator">-</span><span class="operator">&gt;</span>setGeometry(<span class="type"><a href="qrect.html">QRect</a></span>(origin<span class="operator">,</span> <span class="type"><a href="qsize.html">QSize</a></span>()));
+     rubberBand<span class="operator">-</span><span class="operator">&gt;</span>show();
  }
 
- void Widget.mouseMoveEvent(QMouseEvent *event)
+ <span class="type">void</span> Widget<span class="operator">.</span><a href="qwidget.html#mouseMoveEvent">mouseMoveEvent</a>(<span class="type"><a href="qmouseevent.html">QMouseEvent</a></span> <span class="operator">*</span>event)
  {
-     rubberBand-&gt;setGeometry(QRect(origin, event-&gt;pos()).normalized());
+     rubberBand<span class="operator">-</span><span class="operator">&gt;</span>setGeometry(<span class="type"><a href="qrect.html">QRect</a></span>(origin<span class="operator">,</span> event<span class="operator">-</span><span class="operator">&gt;</span>pos())<span class="operator">.</span>normalized());
  }
 
- void Widget.mouseReleaseEvent(QMouseEvent *event)
+ <span class="type">void</span> Widget<span class="operator">.</span><a href="qwidget.html#mouseReleaseEvent">mouseReleaseEvent</a>(<span class="type"><a href="qmouseevent.html">QMouseEvent</a></span> <span class="operator">*</span>event)
  {
-     rubberBand-&gt;hide();
+     rubberBand<span class="operator">-</span><span class="operator">&gt;</span>hide();
      <span class="comment">// determine selection, for example using QRect.intersects()</span>
      <span class="comment">// and QRect.contains().</span>
  }
@@ -58,14 +58,14 @@ was given when constructed.</p>
 hint that is passed down to the style system, and can be
 interpreted by each <a href="qstyle.html">QStyle</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QRubberBand.Line</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">A <a href="qrubberband.html">QRubberBand</a>
 can represent a vertical or horizontal line. Geometry is still
 given in <a href="qwidget.html#rect-prop">rect</a>() and the line
@@ -73,7 +73,7 @@ will fill the given geometry on most styles.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QRubberBand.Rectangle</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">A <a href="qrubberband.html">QRubberBand</a>
 can represent a rectangle. Some styles will interpret this as a
 filled (often semi-transparent) rectangle, or a rectangular
@@ -98,16 +98,16 @@ to make a semi-transparent filled selection rectangle.</p>
 <h3 class="fn"><a name="initStyleOption" />QRubberBand.initStyleOption (<i>self</i>, <a href="qstyleoptionrubberband.html">QStyleOptionRubberBand</a>&#160;<i>option</i>)</h3><p>Initialize <i>option</i> with the values from this <a href="qrubberband.html">QRubberBand</a>. This method is useful for
 subclasses when they need a <a href="qstyleoptionrubberband.html">QStyleOptionRubberBand</a>, but don't
 want to fill in all the information themselves.</p>
-<p>See also <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
+<p><b>See also</b> <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
 
 
 <h3 class="fn"><a name="move" />QRubberBand.move (<i>self</i>, <a href="qpoint.html">QPoint</a>&#160;<i>p</i>)</h3><p>Moves the rubberband to point (<i>x</i>, <i>y</i>).</p>
-<p>See also <a href="qrubberband.html#resize">resize</a>().</p>
+<p><b>See also</b> <a href="qrubberband.html#resize">resize</a>().</p>
 
 
 <h3 class="fn"><a name="move-2" />QRubberBand.move (<i>self</i>, int&#160;<i>ax</i>, int&#160;<i>ay</i>)</h3><p>This is an overloaded function.</p>
 <p>Moves the rubberband to point <i>p</i>.</p>
-<p>See also <a href="qrubberband.html#resize">resize</a>().</p>
+<p><b>See also</b> <a href="qrubberband.html#resize">resize</a>().</p>
 
 
 <h3 class="fn"><a name="moveEvent" />QRubberBand.moveEvent (<i>self</i>, <a href="qmoveevent.html">QMoveEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#moveEvent">QWidget.moveEvent</a>().</p>
@@ -118,12 +118,12 @@ want to fill in all the information themselves.</p>
 
 <h3 class="fn"><a name="resize" />QRubberBand.resize (<i>self</i>, int&#160;<i>w</i>, int&#160;<i>h</i>)</h3><p>Resizes the rubberband so that its width is <i>width</i>, and
 its height is <i>height</i>.</p>
-<p>See also <a href="qrubberband.html#move">move</a>().</p>
+<p><b>See also</b> <a href="qrubberband.html#move">move</a>().</p>
 
 
 <h3 class="fn"><a name="resize-2" />QRubberBand.resize (<i>self</i>, <a href="qsize.html">QSize</a>&#160;<i>s</i>)</h3><p>This is an overloaded function.</p>
 <p>Resizes the rubberband so that its new size is <i>size</i>.</p>
-<p>See also <a href="qrubberband.html#move">move</a>().</p>
+<p><b>See also</b> <a href="qrubberband.html#move">move</a>().</p>
 
 
 <h3 class="fn"><a name="resizeEvent" />QRubberBand.resizeEvent (<i>self</i>, <a href="qresizeevent.html">QResizeEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#resizeEvent">QWidget.resizeEvent</a>().</p>
@@ -131,7 +131,7 @@ its height is <i>height</i>.</p>
 
 <h3 class="fn"><a name="setGeometry" />QRubberBand.setGeometry (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><p>Sets the geometry of the rubber band to <i>rect</i>, specified
 in the coordinate system of its parent widget.</p>
-<p>See also <a href="qwidget.html#geometry-prop">QWidget.geometry</a>.</p>
+<p><b>See also</b> <a href="qwidget.html#geometry-prop">QWidget.geometry</a>.</p>
 
 
 <h3 class="fn"><a name="setGeometry-2" />QRubberBand.setGeometry (<i>self</i>, int&#160;<i>ax</i>, int&#160;<i>ay</i>, int&#160;<i>aw</i>, int&#160;<i>ah</i>)</h3><p>This is an overloaded function.</p>
@@ -146,4 +146,4 @@ upon construction.</p>
 
 
 <h3 class="fn"><a name="showEvent" />QRubberBand.showEvent (<i>self</i>, <a href="qshowevent.html">QShowEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#showEvent">QWidget.showEvent</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

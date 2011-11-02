@@ -67,14 +67,14 @@ do this, you can register an interpolator function for a given
 type. This function takes 3 parameters: the start value, the end
 value and the current progress.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QVariant myColorInterpolator(const QColor &amp;start, const QColor &amp;end, qreal progress)
+<pre class="cpp">
+ <span class="type"><a href="qvariant.html">QVariant</a></span> myColorInterpolator(<span class="keyword">const</span> <span class="type"><a href="qcolor.html">QColor</a></span> <span class="operator">&amp;</span>start<span class="operator">,</span> <span class="keyword">const</span> <span class="type"><a href="qcolor.html">QColor</a></span> <span class="operator">&amp;</span>end<span class="operator">,</span> <span class="type"><a href="qtcore.html#qreal-typedef">qreal</a></span> progress)
  {
-     ...
-     return QColor(...);
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+     <span class="keyword">return</span> <span class="type"><a href="qcolor.html">QColor</a></span>(<span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>);
  }
- ...
- qRegisterAnimationInterpolator&lt;QColor&gt;(myColorInterpolator);
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ <a href="qvariantanimation.html#qRegisterAnimationInterpolator">qRegisterAnimationInterpolator</a><span class="operator">&lt;</span><span class="type"><a href="qcolor.html">QColor</a></span><span class="operator">&gt;</span>(myColorInterpolator);
 </pre>
 <p>Another option is to reimplement <a href="qvariantanimation.html#interpolated">interpolated</a>(), which
 returns interpolation values for the value being interpolated.</p>
@@ -99,30 +99,30 @@ gracefully.</p>
 this function if you want your class to handle the types already
 supported by Qt (see class <a href="qvariantanimation.html">QVariantAnimation</a> description for a
 list of supported types).</p>
-<p>See also <a href="qeasingcurve.html">QEasingCurve</a>.</p>
+<p><b>See also</b> <a href="qeasingcurve.html">QEasingCurve</a>.</p>
 
 
 <h3 class="fn"><a name="keyValueAt" />QVariant QVariantAnimation.keyValueAt (<i>self</i>, float&#160;<i>step</i>)</h3><p>Returns the key frame value for the given <i>step</i>. The given
 <i>step</i> must be in the range 0 to 1. If there is no <a href="qvariantanimation.html#KeyValue-typedef">KeyValue</a> for
 <i>step</i>, it returns an invalid <a href="qvariant.html">QVariant</a>.</p>
-<p>See also <a href="qvariantanimation.html#keyValues">keyValues</a>() and <a href="qvariantanimation.html#setKeyValueAt">setKeyValueAt</a>().</p>
+<p><b>See also</b> <a href="qvariantanimation.html#keyValues">keyValues</a>() and <a href="qvariantanimation.html#setKeyValueAt">setKeyValueAt</a>().</p>
 
 
 <h3 class="fn"><a name="keyValues" />list-of-tuple-of-float-QVariant QVariantAnimation.keyValues (<i>self</i>)</h3><p>Returns the key frames of this animation.</p>
-<p>See also <a href="qvariantanimation.html#keyValueAt">keyValueAt</a>() and <a href="qvariantanimation.html#setKeyValues">setKeyValues</a>().</p>
+<p><b>See also</b> <a href="qvariantanimation.html#keyValueAt">keyValueAt</a>() and <a href="qvariantanimation.html#setKeyValues">setKeyValues</a>().</p>
 
 
 <h3 class="fn"><a name="setDuration" />QVariantAnimation.setDuration (<i>self</i>, int&#160;<i>msecs</i>)</h3><h3 class="fn"><a name="setEasingCurve" />QVariantAnimation.setEasingCurve (<i>self</i>, <a href="qeasingcurve.html">QEasingCurve</a>&#160;<i>easing</i>)</h3><h3 class="fn"><a name="setEndValue" />QVariantAnimation.setEndValue (<i>self</i>, QVariant&#160;<i>value</i>)</h3><h3 class="fn"><a name="setKeyValueAt" />QVariantAnimation.setKeyValueAt (<i>self</i>, float&#160;<i>step</i>, QVariant&#160;<i>value</i>)</h3><p>Creates a key frame at the given <i>step</i> with the given
 <i>value</i>. The given <i>step</i> must be in the range 0 to
 1.</p>
-<p>See also <a href="qvariantanimation.html#setKeyValues">setKeyValues</a>() and
+<p><b>See also</b> <a href="qvariantanimation.html#setKeyValues">setKeyValues</a>() and
 <a href="qvariantanimation.html#keyValueAt">keyValueAt</a>().</p>
 
 
 <h3 class="fn"><a name="setKeyValues" />QVariantAnimation.setKeyValues (<i>self</i>, list-of-tuple-of-float-QVariant&#160;<i>values</i>)</h3><p>Replaces the current set of key frames with the given
 <i>keyValues</i>. the step of the key frames must be in the range 0
 to 1.</p>
-<p>See also <a href="qvariantanimation.html#keyValues">keyValues</a>() and <a href="qvariantanimation.html#keyValueAt">keyValueAt</a>().</p>
+<p><b>See also</b> <a href="qvariantanimation.html#keyValues">keyValues</a>() and <a href="qvariantanimation.html#keyValueAt">keyValueAt</a>().</p>
 
 
 <h3 class="fn"><a name="setStartValue" />QVariantAnimation.setStartValue (<i>self</i>, QVariant&#160;<i>value</i>)</h3><h3 class="fn"><a name="startValue" />QVariant QVariantAnimation.startValue (<i>self</i>)</h3><h3 class="fn"><a name="updateCurrentTime" />QVariantAnimation.updateCurrentTime (<i>self</i>, int)</h3><p>Reimplemented from <a href="qabstractanimation.html#updateCurrentTime">QAbstractAnimation.updateCurrentTime</a>().</p>
@@ -131,7 +131,7 @@ to 1.</p>
 <h3 class="fn"><a name="updateCurrentValue" />QVariantAnimation.updateCurrentValue (<i>self</i>, QVariant&#160;<i>value</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>This pure virtual function is called every time the animation's
 current value changes. The <i>value</i> argument is the new current
 value.</p>
-<p>See also <a href="qvariantanimation.html#currentValue-prop">currentValue</a>.</p>
+<p><b>See also</b> <a href="qvariantanimation.html#currentValue-prop">currentValue</a>.</p>
 
 
 <h3 class="fn"><a name="updateState" />QVariantAnimation.updateState (<i>self</i>, <a href="qabstractanimation.html#State-enum">QAbstractAnimation.State</a>&#160;<i>newState</i>, <a href="qabstractanimation.html#State-enum">QAbstractAnimation.State</a>&#160;<i>oldState</i>)</h3><p>Reimplemented from <a href="qabstractanimation.html#updateState">QAbstractAnimation.updateState</a>().</p>
@@ -139,7 +139,7 @@ value.</p>
 
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="valueChanged" />void valueChanged (const QVariant&amp;)</h3><p>This is the default overload of this signal.</p><p><a href="qvariantanimation.html">QVariantAnimation</a> emits
 this signal whenever the current <i>value</i> changes.</p>
-<p>See also <a href="qvariantanimation.html#currentValue-prop">currentValue</a>,
+<p><b>See also</b> <a href="qvariantanimation.html#currentValue-prop">currentValue</a>,
 <a href="qvariantanimation.html#startValue-prop">startValue</a>,
 and <a href="qvariantanimation.html#endValue-prop">endValue</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

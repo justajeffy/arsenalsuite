@@ -21,46 +21,46 @@ objects. For example, if you have several custom widgets
 <tt>CustomWidgetOne</tt>, <tt>CustomWidgetTwo</tt> and
 <tt>CustomWidgetThree</tt>, the class definition may look like
 this:</p>
-<pre class="highlightedCode brush: cpp">
- #include customwidgetoneinterface.h
- #include customwidgettwointerface.h
- #include customwidgetthreeinterface.h
+<pre class="cpp">
+ <span class="preprocessor">#include customwidgetoneinterface.h</span>
+ <span class="preprocessor">#include customwidgettwointerface.h</span>
+ <span class="preprocessor">#include customwidgetthreeinterface.h</span>
 
- #include &lt;QtDesigner/QtDesigner&gt;
- #include &lt;QtCore/qplugin.h&gt;
+ <span class="preprocessor">#include &lt;QtDesigner/QtDesigner&gt;</span>
+ <span class="preprocessor">#include &lt;QtCore/qplugin.h&gt;</span>
 
- class MyCustomWidgets: public QObject, public QDesignerCustomWidgetCollectionInterface
+ <span class="keyword">class</span> MyCustomWidgets: <span class="keyword">public</span> <span class="type"><a href="qobject.html">QObject</a></span><span class="operator">,</span> <span class="keyword">public</span> <span class="type">QDesignerCustomWidgetCollectionInterface</span>
  {
      Q_OBJECT
-     Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
+     Q_INTERFACES(<span class="type">QDesignerCustomWidgetCollectionInterface</span>)
 
- public:
-     MyCustomWidgets(QObject *parent = 0);
+ <span class="keyword">public</span>:
+     MyCustomWidgets(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>parent <span class="operator">=</span> <span class="number">0</span>);
 
-     virtual QList&lt;QDesignerCustomWidgetInterface*&gt; customWidgets() const;
+     <span class="keyword">virtual</span> <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qdesignercustomwidgetinterface.html">QDesignerCustomWidgetInterface</a></span><span class="operator">*</span><span class="operator">&gt;</span> customWidgets() <span class="keyword">const</span>;
 
- private:
-     QList&lt;QDesignerCustomWidgetInterface*&gt; widgets;
+ <span class="keyword">private</span>:
+     <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qdesignercustomwidgetinterface.html">QDesignerCustomWidgetInterface</a></span><span class="operator">*</span><span class="operator">&gt;</span> widgets;
  };
 </pre>
 <p>In the class constructor you add the interfaces to your custom
 widgets to the list which you return in the <a href="qdesignercustomwidgetcollectioninterface.html#customWidgets">customWidgets</a>()
 function:</p>
-<pre class="highlightedCode brush: cpp">
- MyCustomWidgets.MyCustomWidgets(QObject *parent)
-         : QObject(parent)
+<pre class="cpp">
+ MyCustomWidgets<span class="operator">.</span>MyCustomWidgets(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>parent)
+         : <span class="type"><a href="qobject.html">QObject</a></span>(parent)
  {
-     widgets.append(new CustomWidgetOneInterface(this));
-     widgets.append(new CustomWidgetTwoInterface(this));
-     widgets.append(new CustomWidgetThreeInterface(this));
+     widgets<span class="operator">.</span>append(<span class="keyword">new</span> CustomWidgetOneInterface(<span class="keyword">this</span>));
+     widgets<span class="operator">.</span>append(<span class="keyword">new</span> CustomWidgetTwoInterface(<span class="keyword">this</span>));
+     widgets<span class="operator">.</span>append(<span class="keyword">new</span> CustomWidgetThreeInterface(<span class="keyword">this</span>));
  }
 
- QList&lt;QDesignerCustomWidgetInterface*&gt; MyCustomWidgets.customWidgets() const
+ <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qdesignercustomwidgetinterface.html">QDesignerCustomWidgetInterface</a></span><span class="operator">*</span><span class="operator">&gt;</span> MyCustomWidgets<span class="operator">.</span><a href="qdesignercustomwidgetcollectioninterface.html#customWidgets">customWidgets</a>() <span class="keyword">const</span>
  {
-     return widgets;
+     <span class="keyword">return</span> widgets;
  }
 
- Q_EXPORT_PLUGIN2(customwidgetsplugin, MyCustomWidgets)
+ <a href="qtplugin.html#Q_EXPORT_PLUGIN2">Q_EXPORT_PLUGIN2</a>(customwidgetsplugin<span class="operator">,</span> MyCustomWidgets)
 </pre>
 <p>Note that instead of exporting each custom widget plugin using
 the <a href="qtplugin.html#Q_EXPORT_PLUGIN2">Q_EXPORT_PLUGIN2</a>()
@@ -70,4 +70,4 @@ widgets. Without this macro, there is no way for <i>Qt Designer</i>
 to use them.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QDesignerCustomWidgetCollectionInterface" />QDesignerCustomWidgetCollectionInterface.__init__ (<i>self</i>)</h3><h3 class="fn"><a name="QDesignerCustomWidgetCollectionInterface-2" />QDesignerCustomWidgetCollectionInterface.__init__ (<i>self</i>, <a href="qdesignercustomwidgetcollectioninterface.html">QDesignerCustomWidgetCollectionInterface</a>)</h3><h3 class="fn"><a name="customWidgets" />list-of-QDesignerCustomWidgetInterface QDesignerCustomWidgetCollectionInterface.customWidgets (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns a list of interfaces to the collection's custom
 widgets.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

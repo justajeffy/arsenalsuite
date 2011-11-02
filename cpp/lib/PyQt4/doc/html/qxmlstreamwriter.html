@@ -34,17 +34,17 @@ be used for writing terminal elements that contain nothing but
 text.</p>
 <p>The following abridged code snippet shows the basic use of the
 class to write formatted XML with indentation:</p>
-<pre class="highlightedCode brush: cpp">
-     QXmlStreamWriter stream(&amp;output);
-     stream.setAutoFormatting(true);
-     stream.writeStartDocument();
+<pre class="cpp">
+     <span class="type">QXmlStreamWriter</span> stream(<span class="operator">&amp;</span>output);
+     stream<span class="operator">.</span>setAutoFormatting(<span class="keyword">true</span>);
+     stream<span class="operator">.</span>writeStartDocument();
      ...
-     stream.writeStartElement("bookmark");
-     stream.writeAttribute("href", "http://qt.nokia.com/");
-     stream.writeTextElement("title", "Qt Home");
-     stream.writeEndElement(); <span class="comment">// bookmark</span>
+     stream<span class="operator">.</span>writeStartElement(<span class="string">"bookmark"</span>);
+     stream<span class="operator">.</span>writeAttribute(<span class="string">"href"</span><span class="operator">,</span> <span class="string">"http://qt.nokia.com/"</span>);
+     stream<span class="operator">.</span>writeTextElement(<span class="string">"title"</span><span class="operator">,</span> <span class="string">"Qt Home"</span>);
+     stream<span class="operator">.</span>writeEndElement(); <span class="comment">// bookmark</span>
      ...
-     stream.writeEndDocument();
+     stream<span class="operator">.</span>writeEndDocument();
 </pre>
 <p>QXmlStreamWriter takes care of prefixing namespaces, all you
 have to do is specify the <tt>namespaceUri</tt> when writing
@@ -72,7 +72,7 @@ encodings can be enforced using <a href="qxmlstreamwriter.html#setCodec">setCode
 Example</a> illustrates how to use a stream writer to write an XML
 bookmark file (XBEL) that was previously read in by a <a href="qxmlstreamreader.html">QXmlStreamReader</a>.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QXmlStreamWriter" />QXmlStreamWriter.__init__ (<i>self</i>)</h3><p>Constructs a stream writer.</p>
-<p>See also <a href="qxmlstreamwriter.html#setDevice">setDevice</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="QXmlStreamWriter-2" />QXmlStreamWriter.__init__ (<i>self</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>device</i>)</h3><p>Constructs a stream writer that writes into <i>device</i>;</p>
@@ -87,12 +87,12 @@ is the same as creating an xml writer that operates on a <a href="qbuffer.html">
 
 
 <h3 class="fn"><a name="autoFormatting" />bool QXmlStreamWriter.autoFormatting (<i>self</i>)</h3><h3 class="fn"><a name="autoFormattingIndent" />int QXmlStreamWriter.autoFormattingIndent (<i>self</i>)</h3><h3 class="fn"><a name="codec" /><a href="qtextcodec.html">QTextCodec</a> QXmlStreamWriter.codec (<i>self</i>)</h3><p>Returns the codec that is currently assigned to the stream.</p>
-<p>See also <a href="qxmlstreamwriter.html#setCodec">setCodec</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#setCodec">setCodec</a>().</p>
 
 
 <h3 class="fn"><a name="device" /><a href="qiodevice.html">QIODevice</a> QXmlStreamWriter.device (<i>self</i>)</h3><p>Returns the current device associated with the <a href="qxmlstreamwriter.html">QXmlStreamWriter</a>, or 0 if no device has
 been assigned.</p>
-<p>See also <a href="qxmlstreamwriter.html#setDevice">setDevice</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="setAutoFormatting" />QXmlStreamWriter.setAutoFormatting (<i>self</i>, bool)</h3><h3 class="fn"><a name="setAutoFormattingIndent" />QXmlStreamWriter.setAutoFormattingIndent (<i>self</i>, int&#160;<i>spaces</i>)</h3><h3 class="fn"><a name="setCodec" />QXmlStreamWriter.setCodec (<i>self</i>, <a href="qtextcodec.html">QTextCodec</a>&#160;<i>codec</i>)</h3><p>Sets the codec for this stream to <i>codec</i>. The codec is
@@ -100,20 +100,20 @@ used for encoding any data that is written. By default, <a href="qxmlstreamwrite
 <p>The encoding information is stored in the initial xml tag which
 gets written when you call <a href="qxmlstreamwriter.html#writeStartDocument">writeStartDocument</a>().
 Call this function before calling <a href="qxmlstreamwriter.html#writeStartDocument">writeStartDocument</a>().</p>
-<p>See also <a href="qxmlstreamwriter.html#codec">codec</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#codec">codec</a>().</p>
 
 
 <h3 class="fn"><a name="setCodec-2" />QXmlStreamWriter.setCodec (<i>self</i>, str&#160;<i>codecName</i>)</h3><p>Sets the codec for this stream to the <a href="qtextcodec.html">QTextCodec</a> for the encoding specified by
 <i>codecName</i>. Common values for <tt>codecName</tt> include "ISO
 8859-1", "UTF-8", and "UTF-16". If the encoding isn't recognized,
 nothing happens.</p>
-<p>See also <a href="qtextcodec.html#codecForName">QTextCodec.codecForName</a>().</p>
+<p><b>See also</b> <a href="qtextcodec.html#codecForName">QTextCodec.codecForName</a>().</p>
 
 
 <h3 class="fn"><a name="setDevice" />QXmlStreamWriter.setDevice (<i>self</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>device</i>)</h3><p>Sets the current device to <i>device</i>. If you want the stream
 to write into a <a href="qbytearray.html">QByteArray</a>, you can
 create a <a href="qbuffer.html">QBuffer</a> device.</p>
-<p>See also <a href="qxmlstreamwriter.html#device">device</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#device">device</a>().</p>
 
 
 <h3 class="fn"><a name="writeAttribute" />QXmlStreamWriter.writeAttribute (<i>self</i>, QString&#160;<i>qualifiedName</i>, QString&#160;<i>value</i>)</h3><p>Writes an attribute with <i>name</i> and <i>value</i>, prefixed
@@ -142,7 +142,7 @@ referenced in an attribute not been declared yet, <a href="qxmlstreamwriter.html
 namespace declaration for it.</p>
 <p>This function can only be called after <a href="qxmlstreamwriter.html#writeStartElement">writeStartElement</a>()
 before any content is written, or after <a href="qxmlstreamwriter.html#writeEmptyElement">writeEmptyElement</a>().</p>
-<p>See also <a href="qxmlstreamwriter.html#writeAttribute">writeAttribute</a>() and
+<p><b>See also</b> <a href="qxmlstreamwriter.html#writeAttribute">writeAttribute</a>() and
 <a href="qxmlstreamwriter.html#writeNamespace">writeNamespace</a>().</p>
 
 
@@ -158,7 +158,7 @@ automatically escapes all non-content characters.</p>
 escaped as entity references "&amp;lt;", "&amp;amp;, and
 "&amp;quot;". To avoid the forbidden sequence "]]&gt;", "&gt;" is
 also escaped as "&amp;gt;".</p>
-<p>See also <a href="qxmlstreamwriter.html#writeEntityReference">writeEntityReference</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#writeEntityReference">writeEntityReference</a>().</p>
 
 
 <h3 class="fn"><a name="writeComment" />QXmlStreamWriter.writeComment (<i>self</i>, QString&#160;<i>text</i>)</h3><p>Writes <i>text</i> as XML comment, where <i>text</i> must not
@@ -170,7 +170,7 @@ does not provide any way to escape "-" in a comment.</p>
 valid states are supported.</p>
 <p>The purpose of this function is to support chained processing of
 XML data.</p>
-<p>See also <a href="qxmlstreamreader.html#tokenType">QXmlStreamReader.tokenType</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamreader.html#tokenType">QXmlStreamReader.tokenType</a>().</p>
 
 
 <h3 class="fn"><a name="writeDefaultNamespace" />QXmlStreamWriter.writeDefaultNamespace (<i>self</i>, QString&#160;<i>namespaceUri</i>)</h3><p>Writes a default namespace declaration for
@@ -195,7 +195,7 @@ declared, <a href="qxmlstreamwriter.html">QXmlStreamWriter</a> will
 generate a namespace declaration for it. Subsequent calls to
 <a href="qxmlstreamwriter.html#writeAttribute">writeAttribute</a>()
 will add attributes to this element.</p>
-<p>See also <a href="qxmlstreamwriter.html#writeNamespace">writeNamespace</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#writeNamespace">writeNamespace</a>().</p>
 
 
 <h3 class="fn"><a name="writeEmptyElement-2" />QXmlStreamWriter.writeEmptyElement (<i>self</i>, QString&#160;<i>namespaceUri</i>, QString&#160;<i>name</i>)</h3><p>This is an overloaded function.</p>
@@ -206,11 +206,11 @@ add attributes to this element.</p>
 
 <h3 class="fn"><a name="writeEndDocument" />QXmlStreamWriter.writeEndDocument (<i>self</i>)</h3><p>Closes all remaining open start elements and writes a
 newline.</p>
-<p>See also <a href="qxmlstreamwriter.html#writeStartDocument">writeStartDocument</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#writeStartDocument">writeStartDocument</a>().</p>
 
 
 <h3 class="fn"><a name="writeEndElement" />QXmlStreamWriter.writeEndElement (<i>self</i>)</h3><p>Closes the previous start element.</p>
-<p>See also <a href="qxmlstreamwriter.html#writeStartElement">writeStartElement</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#writeStartElement">writeStartElement</a>().</p>
 
 
 <h3 class="fn"><a name="writeEntityReference" />QXmlStreamWriter.writeEntityReference (<i>self</i>, QString&#160;<i>name</i>)</h3><p>Writes the entity reference <i>name</i> to the stream, as
@@ -239,20 +239,20 @@ declarations.</p>
 
 <h3 class="fn"><a name="writeStartDocument" />QXmlStreamWriter.writeStartDocument (<i>self</i>)</h3><p>Writes a document start with the XML version number
 <i>version</i>.</p>
-<p>See also <a href="qxmlstreamwriter.html#writeEndDocument">writeEndDocument</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#writeEndDocument">writeEndDocument</a>().</p>
 
 
 <h3 class="fn"><a name="writeStartDocument-2" />QXmlStreamWriter.writeStartDocument (<i>self</i>, QString&#160;<i>version</i>)</h3><p>Writes a document start with the XML version number
 <i>version</i> and a standalone attribute <i>standalone</i>.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qxmlstreamwriter.html#writeEndDocument">writeEndDocument</a>().</p>
+<p><b>See also</b> <a href="qxmlstreamwriter.html#writeEndDocument">writeEndDocument</a>().</p>
 
 
 <h3 class="fn"><a name="writeStartDocument-3" />QXmlStreamWriter.writeStartDocument (<i>self</i>, QString&#160;<i>version</i>, bool&#160;<i>standalone</i>)</h3><p>This is an overloaded function.</p>
 <p>Writes a document start with XML version number "1.0". This also
 writes the encoding information.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qxmlstreamwriter.html#writeEndDocument">writeEndDocument</a>() and
+<p><b>See also</b> <a href="qxmlstreamwriter.html#writeEndDocument">writeEndDocument</a>() and
 <a href="qxmlstreamwriter.html#setCodec">setCodec</a>().</p>
 
 
@@ -262,7 +262,7 @@ declared yet, <a href="qxmlstreamwriter.html">QXmlStreamWriter</a>
 will generate a namespace declaration for it. Subsequent calls to
 <a href="qxmlstreamwriter.html#writeAttribute">writeAttribute</a>()
 will add attributes to this element.</p>
-<p>See also <a href="qxmlstreamwriter.html#writeNamespace">writeNamespace</a>(),
+<p><b>See also</b> <a href="qxmlstreamwriter.html#writeNamespace">writeNamespace</a>(),
 <a href="qxmlstreamwriter.html#writeEndElement">writeEndElement</a>(), and
 <a href="qxmlstreamwriter.html#writeEmptyElement">writeEmptyElement</a>().</p>
 
@@ -271,7 +271,7 @@ will add attributes to this element.</p>
 <p>Writes a start element with <i>qualifiedName</i>. Subsequent
 calls to <a href="qxmlstreamwriter.html#writeAttribute">writeAttribute</a>() will
 add attributes to this element.</p>
-<p>See also <a href="qxmlstreamwriter.html#writeEndElement">writeEndElement</a>() and
+<p><b>See also</b> <a href="qxmlstreamwriter.html#writeEndElement">writeEndElement</a>() and
 <a href="qxmlstreamwriter.html#writeEmptyElement">writeEmptyElement</a>().</p>
 
 
@@ -280,10 +280,10 @@ specified <i>namespaceUri</i>, and <i>text</i>. If the namespace
 has not been declared, <a href="qxmlstreamwriter.html">QXmlStreamWriter</a> will generate a
 namespace declaration for it.</p>
 <p>This is a convenience function equivalent to:</p>
-<pre class="highlightedCode brush: cpp">
-         writeStartElement(namespaceUri, name);
-         writeCharacters(text);
-         writeEndElement();
+<pre class="cpp">
+         <a href="qxmlstreamwriter.html#writeStartElement">writeStartElement</a>(namespaceUri<span class="operator">,</span> name);
+         <a href="qxmlstreamwriter.html#writeCharacters">writeCharacters</a>(text);
+         <a href="qxmlstreamwriter.html#writeEndElement">writeEndElement</a>();
 </pre>
 
 
@@ -291,9 +291,9 @@ namespace declaration for it.</p>
 <p>Writes a text element with <i>qualifiedName</i> and
 <i>text</i>.</p>
 <p>This is a convenience function equivalent to:</p>
-<pre class="highlightedCode brush: cpp">
-         writeStartElement(qualifiedName);
-         writeCharacters(text);
-         writeEndElement();
+<pre class="cpp">
+         <a href="qxmlstreamwriter.html#writeStartElement">writeStartElement</a>(qualifiedName);
+         <a href="qxmlstreamwriter.html#writeCharacters">writeCharacters</a>(text);
+         <a href="qxmlstreamwriter.html#writeEndElement">writeEndElement</a>();
 </pre>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

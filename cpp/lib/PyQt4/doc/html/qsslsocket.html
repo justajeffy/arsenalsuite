@@ -27,11 +27,11 @@ unencrypted mode.</p>
 and start a secure connection by calling <a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>().
 This method starts an immediate SSL handshake once the connection
 has been established.</p>
-<pre class="highlightedCode brush: cpp">
- QSslSocket *socket = new QSslSocket(this);
- connect(socket, SIGNAL(encrypted()), this, SLOT(ready()));
+<pre class="cpp">
+ <span class="type">QSslSocket</span> <span class="operator">*</span>socket <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QSslSocket</span>(<span class="keyword">this</span>);
+ <a href="qobject.html#connect">connect</a>(socket<span class="operator">,</span> SIGNAL(encrypted())<span class="operator">,</span> <span class="keyword">this</span><span class="operator">,</span> SLOT(ready()));
 
- socket-&gt;connectToHostEncrypted("imap.example.com", 993);
+ socket<span class="operator">-</span><span class="operator">&gt;</span><a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>(<span class="string">"imap.example.com"</span><span class="operator">,</span> <span class="number">993</span>);
 </pre>
 <p>As with a plain <a href="qtcpsocket.html">QTcpSocket</a>,
 QSslSocket enters the <a href="qabstractsocket.html#SocketState-enum">HostLookupState</a>,
@@ -54,15 +54,15 @@ with something like the example below, which first constructs an
 instance of QSslSocket and then calls <a href="qsslsocket.html#setSocketDescriptor">setSocketDescriptor</a>() to
 set the new socket's descriptor to the existing one passed in. It
 then initiates the SSL handshake by calling <a href="qsslsocket.html#startServerEncryption">startServerEncryption</a>().</p>
-<pre class="highlightedCode brush: cpp">
- void SslServer.incomingConnection(int socketDescriptor)
+<pre class="cpp">
+ <span class="type">void</span> SslServer<span class="operator">.</span>incomingConnection(<span class="type">int</span> socketDescriptor)
  {
-     QSslSocket *serverSocket = new QSslSocket;
-     if (serverSocket-&gt;setSocketDescriptor(socketDescriptor)) {
-         connect(serverSocket, SIGNAL(encrypted()), this, SLOT(ready()));
-         serverSocket-&gt;startServerEncryption();
-     } else {
-         delete serverSocket;
+     <span class="type">QSslSocket</span> <span class="operator">*</span>serverSocket <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QSslSocket</span>;
+     <span class="keyword">if</span> (serverSocket<span class="operator">-</span><span class="operator">&gt;</span>setSocketDescriptor(socketDescriptor)) {
+         connect(serverSocket<span class="operator">,</span> SIGNAL(encrypted())<span class="operator">,</span> <span class="keyword">this</span><span class="operator">,</span> SLOT(ready()));
+         serverSocket<span class="operator">-</span><span class="operator">&gt;</span>startServerEncryption();
+     } <span class="keyword">else</span> {
+         <span class="keyword">delete</span> serverSocket;
      }
  }
 </pre>
@@ -88,17 +88,17 @@ and <a href="qsslsocket.html#waitForDisconnected">waitForDisconnected</a>(). It
 also provides <a href="qsslsocket.html#waitForEncrypted">waitForEncrypted</a>(), which
 will block the calling thread until an encrypted connection has
 been established.</p>
-<pre class="highlightedCode brush: cpp">
- QSslSocket socket;
- socket.connectToHostEncrypted("http.example.com", 443);
- if (!socket.waitForEncrypted()) {
-     qDebug() &lt;&lt; socket.errorString();
-     return false;
+<pre class="cpp">
+ <span class="type">QSslSocket</span> socket;
+ socket<span class="operator">.</span><a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>(<span class="string">"http.example.com"</span><span class="operator">,</span> <span class="number">443</span>);
+ <span class="keyword">if</span> (<span class="operator">!</span>socket<span class="operator">.</span>waitForEncrypted()) {
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> socket<span class="operator">.</span>errorString();
+     <span class="keyword">return</span> <span class="keyword">false</span>;
  }
 
- socket.write("GET / HTTP/1.0\r\n\r\n");
- while (socket.waitForReadyRead())
-     qDebug() &lt;&lt; socket.readAll().data();
+ socket<span class="operator">.</span><a href="qiodevice.html#write">write</a>(<span class="string">"GET / HTTP/1.0\r\n\r\n"</span>);
+ <span class="keyword">while</span> (socket<span class="operator">.</span>waitForReadyRead())
+     <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> socket<span class="operator">.</span><a href="qiodevice.html#readAll">readAll</a>()<span class="operator">.</span>data();
 </pre>
 <p>QSslSocket provides an extensive, easy-to-use API for handling
 cryptographic ciphers, private keys, and local, peer, and
@@ -142,14 +142,14 @@ qmake variable.</p>
 AutoVerifyPeer, which selects an appropriate mode depending on the
 socket's QSocket.SslMode.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSslSocket.VerifyNone</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign"><a href="qsslsocket.html">QSslSocket</a> will
 not request a certificate from the peer. You can set this mode if
 you are not interested in the identity of the other side of the
@@ -159,7 +159,7 @@ requested.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSslSocket.QueryPeer</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign"><a href="qsslsocket.html">QSslSocket</a> will
 request a certificate from the peer, but does not require this
 certificate to be valid. This is useful when you want to display
@@ -168,7 +168,7 @@ SSL handshake. This mode is the default for servers.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSslSocket.VerifyPeer</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign"><a href="qsslsocket.html">QSslSocket</a> will
 request a certificate from the peer during the SSL handshake phase,
 and requires that this certificate is valid. On failure, <a href="qsslsocket.html">QSslSocket</a> will emit the <a href="qsslsocket.html#sslErrors">QSslSocket.sslErrors</a>() signal.
@@ -176,39 +176,39 @@ This mode is the default for clients.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSslSocket.AutoVerifyPeer</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign"><a href="qsslsocket.html">QSslSocket</a> will
 automatically use QueryPeer for server sockets and VerifyPeer for
 client sockets.</td>
 </tr>
 </table>
 <p>This enum was introduced or modified in Qt 4.4.</p>
-<p>See also <a href="qsslsocket.html#peerVerifyMode">QSslSocket.peerVerifyMode</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#peerVerifyMode">QSslSocket.peerVerifyMode</a>().</p>
 
 
 <h3 class="fn"><a name="SslMode-enum" />QSslSocket.SslMode</h3><p>Describes the connection modes available for <a href="qsslsocket.html">QSslSocket</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSslSocket.UnencryptedMode</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The socket is unencrypted. Its behavior is
 identical to <a href="qtcpsocket.html">QTcpSocket</a>.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSslSocket.SslClientMode</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The socket is a client-side SSL socket. It is
 either alreayd encrypted, or it is in the SSL handshake phase (see
 <a href="qsslsocket.html#isEncrypted">QSslSocket.isEncrypted</a>()).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSslSocket.SslServerMode</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The socket is a server-side SSL socket. It is
 either already encrypted, or it is in the SSL handshake phase (see
 <a href="qsslsocket.html#isEncrypted">QSslSocket.isEncrypted</a>()).</td>
@@ -224,7 +224,7 @@ suite is set to the one returned by the static method <a href="qsslsocket.html#d
 <a href="qabstractsocket.html#disconnectFromHost">disconnectFromHost</a>(),
 this function immediately closes the socket, clearing any pending
 data in the write buffer.</p>
-<p>See also <a href="qabstractsocket.html#disconnectFromHost">disconnectFromHost</a>()
+<p><b>See also</b> <a href="qabstractsocket.html#disconnectFromHost">disconnectFromHost</a>()
 and <a href="qsslsocket.html#close">close</a>().</p>
 
 
@@ -232,7 +232,7 @@ and <a href="qsslsocket.html#close">close</a>().</p>
 database. The CA certificate database is used by the socket during
 the handshake phase to validate the peer's certificate.</p>
 <p>To add multiple certificates, use <a href="qsslsocket.html#addCaCertificates">addCaCertificates</a>().</p>
-<p>See also <a href="qsslsocket.html#caCertificates">caCertificates</a>() and <a href="qsslsocket.html#setCaCertificates">setCaCertificates</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#caCertificates">caCertificates</a>() and <a href="qsslsocket.html#setCaCertificates">setCaCertificates</a>().</p>
 
 
 <h3 class="fn"><a name="addCaCertificates" />bool QSslSocket.addCaCertificates (<i>self</i>, QString&#160;<i>path</i>, <a href="qssl.html#EncodingFormat-enum">QSsl.EncodingFormat</a>&#160;<i>format</i>&#160;=&#160;QSsl.Pem, <a href="qregexp.html#PatternSyntax-enum">QRegExp.PatternSyntax</a>&#160;<i>syntax</i>&#160;=&#160;QRegExp.FixedString)</h3><p>Searches all files in the <i>path</i> for certificates encoded
@@ -244,7 +244,7 @@ certificate database; otherwise returns false.</p>
 <p>The CA certificate database is used by the socket during the
 handshake phase to validate the peer's certificate.</p>
 <p>For more precise control, use <a href="qsslsocket.html#addCaCertificate">addCaCertificate</a>().</p>
-<p>See also <a href="qsslsocket.html#addCaCertificate">addCaCertificate</a>() and
+<p><b>See also</b> <a href="qsslsocket.html#addCaCertificate">addCaCertificate</a>() and
 <a href="qsslcertificate.html#fromPath">QSslCertificate.fromPath</a>().</p>
 
 
@@ -252,13 +252,13 @@ handshake phase to validate the peer's certificate.</p>
 database. The CA certificate database is used by the socket during
 the handshake phase to validate the peer's certificate.</p>
 <p>For more precise control, use <a href="qsslsocket.html#addCaCertificate">addCaCertificate</a>().</p>
-<p>See also <a href="qsslsocket.html#caCertificates">caCertificates</a>() and <a href="qsslsocket.html#addDefaultCaCertificate">addDefaultCaCertificate</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#caCertificates">caCertificates</a>() and <a href="qsslsocket.html#addDefaultCaCertificate">addDefaultCaCertificate</a>().</p>
 
 
 <h3 class="fn"><a name="addDefaultCaCertificate" />QSslSocket.addDefaultCaCertificate (<a href="qsslcertificate.html">QSslCertificate</a>&#160;<i>certificate</i>)</h3><p>Adds <i>certificate</i> to the default CA certificate database.
 Each SSL socket's CA certificate database is initialized to the
 default CA certificate database.</p>
-<p>See also <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>()
+<p><b>See also</b> <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>()
 and <a href="qsslsocket.html#addCaCertificates">addCaCertificates</a>().</p>
 
 
@@ -270,7 +270,7 @@ Returns true if any CA certificates are added to the default
 database.</p>
 <p>Each SSL socket's CA certificate database is initialized to the
 default CA certificate database.</p>
-<p>See also <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>(),
+<p><b>See also</b> <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>(),
 <a href="qsslsocket.html#addCaCertificates">addCaCertificates</a>(), and
 <a href="qsslsocket.html#addDefaultCaCertificate">addDefaultCaCertificate</a>().</p>
 
@@ -278,7 +278,7 @@ default CA certificate database.</p>
 <h3 class="fn"><a name="addDefaultCaCertificates-2" />QSslSocket.addDefaultCaCertificates (list-of-QSslCertificate&#160;<i>certificates</i>)</h3><p>Adds <i>certificates</i> to the default CA certificate database.
 Each SSL socket's CA certificate database is initialized to the
 default CA certificate database.</p>
-<p>See also <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>()
+<p><b>See also</b> <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>()
 and <a href="qsslsocket.html#addCaCertificates">addCaCertificates</a>().</p>
 
 
@@ -300,7 +300,7 @@ certificate database is used by the socket during the handshake
 phase to validate the peer's certificate. It can be moodified prior
 to the handshake with <a href="qsslsocket.html#addCaCertificate">addCaCertificate</a>(), <a href="qsslsocket.html#addCaCertificates">addCaCertificates</a>(), and
 <a href="qsslsocket.html#setCaCertificates">setCaCertificates</a>().</p>
-<p>See also <a href="qsslsocket.html#addCaCertificate">addCaCertificate</a>(), <a href="qsslsocket.html#addCaCertificates">addCaCertificates</a>(), and
+<p><b>See also</b> <a href="qsslsocket.html#addCaCertificate">addCaCertificate</a>(), <a href="qsslsocket.html#addCaCertificates">addCaCertificates</a>(), and
 <a href="qsslsocket.html#setCaCertificates">setCaCertificates</a>().</p>
 
 
@@ -330,9 +330,7 @@ session cipher for <i>all</i> sockets by calling <a href="qsslsocket.html#setDef
 subset of the supported ciphers. You can revert to using the entire
 set by calling <a href="qsslsocket.html#setCiphers">setCiphers</a>() with the list
 returned by <a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().</p>
-<p>See also <a href="qsslsocket.html#setCiphers">setCiphers</a>(),
-<a href="qsslsocket.html#defaultCiphers">defaultCiphers</a>(),
-<a href="qsslsocket.html#setDefaultCiphers">setDefaultCiphers</a>(), and
+<p><b>See also</b> <a href="qsslsocket.html#setCiphers">setCiphers</a>(), <a href="qsslsocket.html#defaultCiphers">defaultCiphers</a>(), <a href="qsslsocket.html#setDefaultCiphers">setDefaultCiphers</a>(), and
 <a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().</p>
 
 
@@ -359,12 +357,12 @@ called, the connection is dropped, signal <a href="qabstractsocket.html#disconne
 and <a href="qsslsocket.html">QSslSocket</a> returns to the
 <a href="qabstractsocket.html#SocketState-enum">UnconnectedState</a>.</p>
 <p>If the SSL handshake is successful, <a href="qsslsocket.html">QSslSocket</a> emits <a href="qsslsocket.html#encrypted">encrypted</a>().</p>
-<pre class="highlightedCode brush: cpp">
- QSslSocket socket;
- connect(&amp;socket, SIGNAL(encrypted()), receiver, SLOT(socketEncrypted()));
+<pre class="cpp">
+ <span class="type"><a href="qsslsocket.html">QSslSocket</a></span> socket;
+ <a href="qobject.html#connect">connect</a>(<span class="operator">&amp;</span>socket<span class="operator">,</span> SIGNAL(encrypted())<span class="operator">,</span> receiver<span class="operator">,</span> SLOT(socketEncrypted()));
 
- socket.connectToHostEncrypted("imap", 993);
- socket-&gt;write("1 CAPABILITY\r\n");
+ socket<span class="operator">.</span>connectToHostEncrypted(<span class="string">"imap"</span><span class="operator">,</span> <span class="number">993</span>);
+ socket<span class="operator">-</span><span class="operator">&gt;</span><a href="qiodevice.html#write">write</a>(<span class="string">"1 CAPABILITY\r\n"</span>);
 </pre>
 <p><b>Note:</b> The example above shows that text can be written to
 the socket immediately after requesting the encrypted connection,
@@ -378,7 +376,7 @@ emitted.</p>
 on the server side of a connection, you should instead call
 <a href="qsslsocket.html#startServerEncryption">startServerEncryption</a>()
 upon receiving the incoming connection through <a href="qtcpserver.html">QTcpServer</a>.</p>
-<p>See also <a href="qabstractsocket.html#connectToHost">connectToHost</a>(), <a href="qsslsocket.html#startClientEncryption">startClientEncryption</a>(),
+<p><b>See also</b> <a href="qabstractsocket.html#connectToHost">connectToHost</a>(), <a href="qsslsocket.html#startClientEncryption">startClientEncryption</a>(),
 <a href="qsslsocket.html#waitForConnected">waitForConnected</a>(),
 and <a href="qsslsocket.html#waitForEncrypted">waitForEncrypted</a>().</p>
 
@@ -389,7 +387,7 @@ this overloaded method enables the usage of a different hostname
 (<i>sslPeerName</i>) for the certificate validation instead of the
 one used for the TCP connection (<i>hostName</i>).</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>().</p>
 
 
 <h3 class="fn"><a name="connectToHostImplementation" />QSslSocket.connectToHostImplementation (<i>self</i>, QString&#160;<i>hostName</i>, int&#160;<i>port</i>, <a href="qiodevice-openmode.html">QIODevice.OpenMode</a>&#160;<i>openMode</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void connectToHostImplementation(const QString&amp;,quint16,QIODevice::OpenMode)</tt>.</p><h3 class="fn"><a name="defaultCaCertificates" />list-of-QSslCertificate QSslSocket.defaultCaCertificates ()</h3><p>Returns the current default CA certificate database. This
@@ -399,7 +397,7 @@ will be returned. You can override the default CA certificate
 database with your own CA certificate database using <a href="qsslsocket.html#setDefaultCaCertificates">setDefaultCaCertificates</a>().</p>
 <p>Each SSL socket's CA certificate database is initialized to the
 default CA certificate database.</p>
-<p>See also <a href="qsslsocket.html#setDefaultCaCertificates">setDefaultCaCertificates</a>()
+<p><b>See also</b> <a href="qsslsocket.html#setDefaultCaCertificates">setDefaultCaCertificates</a>()
 and <a href="qsslsocket.html#caCertificates">caCertificates</a>().</p>
 
 
@@ -412,7 +410,7 @@ in the list is the most preferred cipher).</p>
 supported by this system's SSL libraries, which may vary from
 system to system. The list of ciphers supported by this system's
 SSL libraries is returned by <a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().</p>
-<p>See also <a href="qsslsocket.html#setDefaultCiphers">setDefaultCiphers</a>() and
+<p><b>See also</b> <a href="qsslsocket.html#setDefaultCiphers">setDefaultCiphers</a>() and
 <a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().</p>
 
 
@@ -438,7 +436,8 @@ function, because <a href="qabstractsocket.html">QAbstractSocket</a> will start 
 automatically once control goes back to the event loop. In the
 absence of an event loop, call <a href="qsslsocket.html#waitForBytesWritten">waitForBytesWritten</a>()
 instead.</p>
-<p>See also <a href="qiodevice.html#write">write</a>() and <a href="qsslsocket.html#waitForBytesWritten">waitForBytesWritten</a>().</p>
+<p><b>See also</b> <a href="qiodevice.html#write">write</a>() and
+<a href="qsslsocket.html#waitForBytesWritten">waitForBytesWritten</a>().</p>
 
 
 <h3 class="fn"><a name="ignoreSslErrors" />QSslSocket.ignoreSslErrors (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void ignoreSslErrors()</tt>.</p><p>This slot tells <a href="qsslsocket.html">QSslSocket</a> to
@@ -458,7 +457,7 @@ unnecessary to call this function.</p>
 done with caution. A fundamental characteristic of secure
 connections is that they should be established with an error free
 handshake.</p>
-<p>See also <a href="qsslsocket.html#sslErrors">sslErrors</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#sslErrors">sslErrors</a>().</p>
 
 
 <h3 class="fn"><a name="ignoreSslErrors-2" />QSslSocket.ignoreSslErrors (<i>self</i>, list-of-QSslError&#160;<i>errors</i>)</h3><p>This is an overloaded function.</p>
@@ -467,22 +466,22 @@ ignore only the errors given in <i>errors</i>.</p>
 <p>Note that you can set the expected certificate in the SSL error:
 If, for instance, you want to connect to a server that uses a
 self-signed certificate, consider the following snippet:</p>
-<pre class="highlightedCode brush: cpp">
- QList&lt;QSslCertificate&gt; cert = QSslCertificate.fromPath(QLatin1String("server-certificate.pem"));
- QSslError error(QSslError.SelfSignedCertificate, cert.at(0));
- QList&lt;QSslError&gt; expectedSslErrors;
- expectedSslErrors.append(error);
+<pre class="cpp">
+ <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qsslcertificate.html">QSslCertificate</a></span><span class="operator">&gt;</span> cert <span class="operator">=</span> <span class="type"><a href="qsslcertificate.html">QSslCertificate</a></span><span class="operator">.</span>fromPath(QLatin1String(<span class="string">"server-certificate.pem"</span>));
+ <span class="type"><a href="qsslerror.html">QSslError</a></span> <a href="qabstractsocket.html#error">error</a>(<span class="type"><a href="qsslerror.html">QSslError</a></span><span class="operator">.</span>SelfSignedCertificate<span class="operator">,</span> cert<span class="operator">.</span>at(<span class="number">0</span>));
+ <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qsslerror.html">QSslError</a></span><span class="operator">&gt;</span> expectedSslErrors;
+ expectedSslErrors<span class="operator">.</span>append(error);
 
- QSslSocket socket;
- socket.ignoreSslErrors(expectedSslErrors);
- socket.connectToHostEncrypted("server.tld", 443);
+ <span class="type"><a href="qsslsocket.html">QSslSocket</a></span> socket;
+ socket<span class="operator">.</span><a href="qsslsocket.html#ignoreSslErrors">ignoreSslErrors</a>(expectedSslErrors);
+ socket<span class="operator">.</span><a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>(<span class="string">"server.tld"</span><span class="operator">,</span> <span class="number">443</span>);
 </pre>
 <p>Multiple calls to this function will replace the list of errors
 that were passed in previous calls. You can clear the list of
 errors you want to ignore by calling this function with an empty
 list.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qsslsocket.html#sslErrors">sslErrors</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#sslErrors">sslErrors</a>().</p>
 
 
 <h3 class="fn"><a name="isEncrypted" />bool QSslSocket.isEncrypted (<i>self</i>)</h3><p>Returns true if the socket is encrypted; otherwise, false is
@@ -495,12 +494,12 @@ received from the network, before you call <a href="qiodevice.html#read">read</a
 encrypted mode.</p>
 <p>You can call <a href="qsslsocket.html#sessionCipher">sessionCipher</a>() to find which
 cryptographic cipher is used to encrypt and decrypt your data.</p>
-<p>See also <a href="qsslsocket.html#mode">mode</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#mode">mode</a>().</p>
 
 
 <h3 class="fn"><a name="localCertificate" /><a href="qsslcertificate.html">QSslCertificate</a> QSslSocket.localCertificate (<i>self</i>)</h3><p>Returns the socket's local <a href="qsslcertificate.html">certificate</a>, or an empty certificate if
 no local certificate has been assigned.</p>
-<p>See also <a href="qsslsocket.html#setLocalCertificate">setLocalCertificate</a>() and
+<p><b>See also</b> <a href="qsslsocket.html#setLocalCertificate">setLocalCertificate</a>() and
 <a href="qsslsocket.html#privateKey">privateKey</a>().</p>
 
 
@@ -508,7 +507,7 @@ no local certificate has been assigned.</p>
 is either negotiating or in encrypted mode.</p>
 <p>When the mode changes, <a href="qsslsocket.html">QSslSocket</a>
 emits <a href="qsslsocket.html#modeChanged">modeChanged</a>()</p>
-<p>See also <a href="qsslsocket.html#SslMode-enum">SslMode</a>.</p>
+<p><b>See also</b> <a href="qsslsocket.html#SslMode-enum">SslMode</a>.</p>
 
 
 <h3 class="fn"><a name="peerCertificate" /><a href="qsslcertificate.html">QSslCertificate</a> QSslSocket.peerCertificate (<i>self</i>)</h3><p>Returns the peer's digital certificate (i.e., the immediate
@@ -529,7 +528,7 @@ certificate, or it can mean there is no connection.</p>
 <p>If you want to check the peer's complete chain of certificates,
 use <a href="qsslsocket.html#peerCertificateChain">peerCertificateChain</a>()
 to get them all at once.</p>
-<p>See also <a href="qsslsocket.html#peerCertificateChain">peerCertificateChain</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#peerCertificateChain">peerCertificateChain</a>().</p>
 
 
 <h3 class="fn"><a name="peerCertificateChain" />list-of-QSslCertificate QSslSocket.peerCertificateChain (<i>self</i>)</h3><p>Returns the peer's chain of digital certificates, or an empty
@@ -546,7 +545,7 @@ failed, or it can mean the host you are connected to doesn't have a
 certificate, or it can mean there is no connection.</p>
 <p>If you want to get only the peer's immediate certificate, use
 <a href="qsslsocket.html#peerCertificate">peerCertificate</a>().</p>
-<p>See also <a href="qsslsocket.html#peerCertificate">peerCertificate</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#peerCertificate">peerCertificate</a>().</p>
 
 
 <h3 class="fn"><a name="peerVerifyDepth" />int QSslSocket.peerVerifyDepth (<i>self</i>)</h3><p>Returns the maximum number of certificates in the peer's
@@ -557,7 +556,7 @@ the whole certificate chain should be checked.</p>
 peer's own certificate, then its issuer's certificate, and so
 on.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qsslsocket.html#setPeerVerifyDepth">setPeerVerifyDepth</a>() and
+<p><b>See also</b> <a href="qsslsocket.html#setPeerVerifyDepth">setPeerVerifyDepth</a>() and
 <a href="qsslsocket.html#peerVerifyMode">peerVerifyMode</a>().</p>
 
 
@@ -572,17 +571,17 @@ tells <a href="qsslsocket.html">QSslSocket</a> to use <a href="qsslsocket.html#P
 and <a href="qsslsocket.html#PeerVerifyMode-enum">QueryPeer</a> for
 servers.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qsslsocket.html#setPeerVerifyMode">setPeerVerifyMode</a>(),
+<p><b>See also</b> <a href="qsslsocket.html#setPeerVerifyMode">setPeerVerifyMode</a>(),
 <a href="qsslsocket.html#peerVerifyDepth">peerVerifyDepth</a>(),
 and <a href="qsslsocket.html#mode">mode</a>().</p>
 
 
 <h3 class="fn"><a name="privateKey" /><a href="qsslkey.html">QSslKey</a> QSslSocket.privateKey (<i>self</i>)</h3><p>Returns this socket's private key.</p>
-<p>See also <a href="qsslsocket.html#setPrivateKey">setPrivateKey</a>() and <a href="qsslsocket.html#localCertificate">localCertificate</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#setPrivateKey">setPrivateKey</a>() and <a href="qsslsocket.html#localCertificate">localCertificate</a>().</p>
 
 
 <h3 class="fn"><a name="protocol" /><a href="qssl.html#SslProtocol-enum">QSsl.SslProtocol</a> QSslSocket.protocol (<i>self</i>)</h3><p>Returns the socket's SSL protocol. By default, <a href="qssl.html#SslProtocol-enum">QSsl.SslV3</a> is used.</p>
-<p>See also <a href="qsslsocket.html#setProtocol">setProtocol</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#setProtocol">setProtocol</a>().</p>
 
 
 <h3 class="fn"><a name="readData" />str QSslSocket.readData (<i>self</i>, int&#160;<i>maxlen</i>)</h3><p>Reimplemented from <a href="qiodevice.html#readData">QIODevice.readData</a>().</p>
@@ -596,7 +595,7 @@ transmitted through the socket.</p>
 for setting the ordered list of ciphers from which the handshake
 phase will eventually select the session cipher. This ordered list
 must be in place before the handshake phase begins.</p>
-<p>See also <a href="qsslsocket.html#ciphers">ciphers</a>(),
+<p><b>See also</b> <a href="qsslsocket.html#ciphers">ciphers</a>(),
 <a href="qsslsocket.html#setCiphers">setCiphers</a>(), <a href="qsslsocket.html#setDefaultCiphers">setDefaultCiphers</a>(),
 <a href="qsslsocket.html#defaultCiphers">defaultCiphers</a>(), and
 <a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().</p>
@@ -610,7 +609,7 @@ certificate.</p>
 <p>The CA certificate database can be reset to the current default
 CA certificate database by calling this function with the list of
 CA certificates returned by <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>().</p>
-<p>See also <a href="qsslsocket.html#caCertificates">caCertificates</a>() and <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#caCertificates">caCertificates</a>() and <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>().</p>
 
 
 <h3 class="fn"><a name="setCiphers" />QSslSocket.setCiphers (<i>self</i>, list-of-QSslCipher&#160;<i>ciphers</i>)</h3><p>Sets the cryptographic cipher suite for this socket to
@@ -618,7 +617,7 @@ CA certificates returned by <a href="qsslsocket.html#defaultCaCertificates">defa
 list returned by <a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().</p>
 <p>Restricting the cipher suite must be done before the handshake
 phase, where the session cipher is chosen.</p>
-<p>See also <a href="qsslsocket.html#ciphers">ciphers</a>(),
+<p><b>See also</b> <a href="qsslsocket.html#ciphers">ciphers</a>(),
 <a href="qsslsocket.html#setDefaultCiphers">setDefaultCiphers</a>(), and
 <a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().</p>
 
@@ -627,15 +626,15 @@ phase, where the session cipher is chosen.</p>
 <i>ciphers</i>, which is a colon-separated list of cipher suite
 names. The ciphers are listed in order of preference, starting with
 the most preferred cipher. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QSslSocket socket;
- socket.setCiphers("DHE-RSA-AES256-SHA:DHE-DSS-AES256-SHA:AES256-SHA");
+<pre class="cpp">
+ <span class="type"><a href="qsslsocket.html">QSslSocket</a></span> socket;
+ socket<span class="operator">.</span><a href="qsslsocket.html#setCiphers">setCiphers</a>(<span class="string">"DHE-RSA-AES256-SHA:DHE-DSS-AES256-SHA:AES256-SHA"</span>);
 </pre>
 <p>Each cipher name in <i>ciphers</i> must be the name of a cipher
 in the list returned by <a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().
 Restricting the cipher suite must be done before the handshake
 phase, where the session cipher is chosen.</p>
-<p>See also <a href="qsslsocket.html#ciphers">ciphers</a>(),
+<p><b>See also</b> <a href="qsslsocket.html#ciphers">ciphers</a>(),
 <a href="qsslsocket.html#setDefaultCiphers">setDefaultCiphers</a>(), and
 <a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().</p>
 
@@ -648,7 +647,7 @@ can override the default CA certificate database with your own CA
 certificate database using this function.</p>
 <p>Each SSL socket's CA certificate database is initialized to the
 default CA certificate database.</p>
-<p>See also <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>()
+<p><b>See also</b> <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>()
 and <a href="qsslsocket.html#addDefaultCaCertificate">addDefaultCaCertificate</a>().</p>
 
 
@@ -658,9 +657,7 @@ the ciphers in the list returned by <a href="qsslsocket.html#supportedCiphers">s
 <p>Restricting the default cipher suite only affects SSL sockets
 that perform their handshake phase after the default cipher suite
 has been changed.</p>
-<p>See also <a href="qsslsocket.html#setCiphers">setCiphers</a>(),
-<a href="qsslsocket.html#defaultCiphers">defaultCiphers</a>(), and
-<a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#setCiphers">setCiphers</a>(), <a href="qsslsocket.html#defaultCiphers">defaultCiphers</a>(), and <a href="qsslsocket.html#supportedCiphers">supportedCiphers</a>().</p>
 
 
 <h3 class="fn"><a name="setLocalCertificate" />QSslSocket.setLocalCertificate (<i>self</i>, <a href="qsslcertificate.html">QSslCertificate</a>&#160;<i>certificate</i>)</h3><p>Sets the socket's local certificate to <i>certificate</i>. The
@@ -670,7 +667,7 @@ the local certificate, you must also set the private key.</p>
 <p>The local certificate and private key are always necessary for
 server sockets, but are also rarely used by client sockets if the
 server requires the client to authenticate.</p>
-<p>See also <a href="qsslsocket.html#localCertificate">localCertificate</a>() and
+<p><b>See also</b> <a href="qsslsocket.html#localCertificate">localCertificate</a>() and
 <a href="qsslsocket.html#setPrivateKey">setPrivateKey</a>().</p>
 
 
@@ -689,7 +686,7 @@ checked.</p>
 peer's own certificate, then its issuer's certificate, and so
 on.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qsslsocket.html#peerVerifyDepth">peerVerifyDepth</a>() and
+<p><b>See also</b> <a href="qsslsocket.html#peerVerifyDepth">peerVerifyDepth</a>() and
 <a href="qsslsocket.html#setPeerVerifyMode">setPeerVerifyMode</a>().</p>
 
 
@@ -706,7 +703,7 @@ servers.</p>
 <p>Setting this mode after encryption has started has no effect on
 the current connection.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qsslsocket.html#peerVerifyMode">peerVerifyMode</a>(), <a href="qsslsocket.html#setPeerVerifyDepth">setPeerVerifyDepth</a>(), and
+<p><b>See also</b> <a href="qsslsocket.html#peerVerifyMode">peerVerifyMode</a>(), <a href="qsslsocket.html#setPeerVerifyDepth">setPeerVerifyDepth</a>(), and
 <a href="qsslsocket.html#mode">mode</a>().</p>
 
 
@@ -717,8 +714,7 @@ servers that must prove their identity to SSL peers.</p>
 creating an SSL server socket. If you are creating an SSL client
 socket, the key and local certificate are required if your client
 must identify itself to an SSL server.</p>
-<p>See also <a href="qsslsocket.html#privateKey">privateKey</a>()
-and <a href="qsslsocket.html#setLocalCertificate">setLocalCertificate</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#privateKey">privateKey</a>() and <a href="qsslsocket.html#setLocalCertificate">setLocalCertificate</a>().</p>
 
 
 <h3 class="fn"><a name="setPrivateKey-2" />QSslSocket.setPrivateKey (<i>self</i>, QString&#160;<i>fileName</i>, <a href="qssl.html#KeyAlgorithm-enum">QSsl.KeyAlgorithm</a>&#160;<i>algorithm</i>&#160;=&#160;QSsl.Rsa, <a href="qssl.html#EncodingFormat-enum">QSsl.EncodingFormat</a>&#160;<i>format</i>&#160;=&#160;QSsl.Pem, <a href="qbytearray.html">QByteArray</a>&#160;<i>passPhrase</i>&#160;=&#160;QByteArray())</h3><p>This is an overloaded function.</p>
@@ -733,14 +729,13 @@ servers that must prove their identity to SSL peers.</p>
 creating an SSL server socket. If you are creating an SSL client
 socket, the key and local certificate are required if your client
 must identify itself to an SSL server.</p>
-<p>See also <a href="qsslsocket.html#privateKey">privateKey</a>()
-and <a href="qsslsocket.html#setLocalCertificate">setLocalCertificate</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#privateKey">privateKey</a>() and <a href="qsslsocket.html#setLocalCertificate">setLocalCertificate</a>().</p>
 
 
 <h3 class="fn"><a name="setProtocol" />QSslSocket.setProtocol (<i>self</i>, <a href="qssl.html#SslProtocol-enum">QSsl.SslProtocol</a>&#160;<i>protocol</i>)</h3><p>Sets the socket's SSL protocol to <i>protocol</i>. This will
 affect the next initiated handshake; calling this function on an
 already-encrypted socket will not affect the socket's protocol.</p>
-<p>See also <a href="qsslsocket.html#protocol">protocol</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#protocol">protocol</a>().</p>
 
 
 <h3 class="fn"><a name="setReadBufferSize" />QSslSocket.setReadBufferSize (<i>self</i>, int&#160;<i>size</i>)</h3><p>Sets the size of <a href="qsslsocket.html">QSslSocket</a>'s
@@ -756,13 +751,13 @@ by <i>openMode</i>, and enters the socket state specified by
 <i>state</i>.</p>
 <p><b>Note:</b> It is not possible to initialize two sockets with
 the same native socket descriptor.</p>
-<p>See also <a href="qabstractsocket.html#socketDescriptor">socketDescriptor</a>().</p>
+<p><b>See also</b> <a href="qabstractsocket.html#socketDescriptor">socketDescriptor</a>().</p>
 
 
 <h3 class="fn"><a name="setSocketOption" />QSslSocket.setSocketOption (<i>self</i>, <a href="qabstractsocket.html#SocketOption-enum">QAbstractSocket.SocketOption</a>&#160;<i>option</i>, QVariant&#160;<i>value</i>)</h3><p>Sets the given <i>option</i> to the value described by
 <i>value</i>.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qsslsocket.html#socketOption">socketOption</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#socketOption">socketOption</a>().</p>
 
 
 <h3 class="fn"><a name="setSslConfiguration" />QSslSocket.setSslConfiguration (<i>self</i>, <a href="qsslconfiguration.html">QSslConfiguration</a>&#160;<i>config</i>)</h3><p>Sets the socket's SSL configuration to be the contents of
@@ -771,7 +766,7 @@ ciphers, the private key and the CA certificates to those stored in
 <i>configuration</i>.</p>
 <p>It is not possible to set the SSL-state related fields.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qsslsocket.html#sslConfiguration">sslConfiguration</a>(), <a href="qsslsocket.html#setLocalCertificate">setLocalCertificate</a>(),
+<p><b>See also</b> <a href="qsslsocket.html#sslConfiguration">sslConfiguration</a>(), <a href="qsslsocket.html#setLocalCertificate">setLocalCertificate</a>(),
 <a href="qsslsocket.html#setPrivateKey">setPrivateKey</a>(),
 <a href="qsslsocket.html#setCaCertificates">setCaCertificates</a>(), and
 <a href="qsslsocket.html#setCiphers">setCiphers</a>().</p>
@@ -779,7 +774,7 @@ ciphers, the private key and the CA certificates to those stored in
 
 <h3 class="fn"><a name="socketOption" />QVariant QSslSocket.socketOption (<i>self</i>, <a href="qabstractsocket.html#SocketOption-enum">QAbstractSocket.SocketOption</a>&#160;<i>option</i>)</h3><p>Returns the value of the <i>option</i> option.</p>
 <p>This function was introduced in Qt 4.6.</p>
-<p>See also <a href="qsslsocket.html#setSocketOption">setSocketOption</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#setSocketOption">setSocketOption</a>().</p>
 
 
 <h3 class="fn"><a name="sslConfiguration" /><a href="qsslconfiguration.html">QSslConfiguration</a> QSslSocket.sslConfiguration (<i>self</i>)</h3><p>Returns the socket's SSL configuration state. The default SSL
@@ -788,7 +783,7 @@ certificates, no local private key or certificate.</p>
 <p>The SSL configuration also contains fields that can change with
 time without notice.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qsslsocket.html#setSslConfiguration">setSslConfiguration</a>(),
+<p><b>See also</b> <a href="qsslsocket.html#setSslConfiguration">setSslConfiguration</a>(),
 <a href="qsslsocket.html#localCertificate">localCertificate</a>(),
 <a href="qsslsocket.html#peerCertificate">peerCertificate</a>(),
 <a href="qsslsocket.html#peerCertificateChain">peerCertificateChain</a>(),
@@ -800,7 +795,7 @@ time without notice.</p>
 same list as <a href="qsslsocket.html">QSslSocket</a> passes via
 the sslErrors() signal. If the connection has been encrypted with
 no errors, this function will return an empty list.</p>
-<p>See also <a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>().</p>
 
 
 <h3 class="fn"><a name="startClientEncryption" />QSslSocket.startClientEncryption (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void startClientEncryption()</tt>.</p><p>Starts a delayed SSL handshake for a client connection. This
@@ -812,7 +807,7 @@ effect.</p>
 delayed SSL handshakes. Most other clients can avoid calling this
 function directly by using <a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>()
 instead, which automatically performs the handshake.</p>
-<p>See also <a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>()
+<p><b>See also</b> <a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>()
 and <a href="qsslsocket.html#startServerEncryption">startServerEncryption</a>().</p>
 
 
@@ -831,14 +826,14 @@ calling this function).</p>
 subclass of <a href="qtcpserver.html">QTcpServer</a> and
 reimplement <a href="qtcpserver.html#incomingConnection">QTcpServer.incomingConnection</a>().
 The returned socket descriptor is then passed to <a href="qsslsocket.html#setSocketDescriptor">QSslSocket.setSocketDescriptor</a>().</p>
-<p>See also <a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>()
+<p><b>See also</b> <a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>()
 and <a href="qsslsocket.html#startClientEncryption">startClientEncryption</a>().</p>
 
 
 <h3 class="fn"><a name="supportedCiphers" />list-of-QSslCipher QSslSocket.supportedCiphers ()</h3><p>Returns the list of cryptographic ciphers supported by this
 system. This list is set by the system's SSL libraries and may vary
 from system to system.</p>
-<p>See also <a href="qsslsocket.html#defaultCiphers">defaultCiphers</a>(), <a href="qsslsocket.html#ciphers">ciphers</a>(), and <a href="qsslsocket.html#setCiphers">setCiphers</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#defaultCiphers">defaultCiphers</a>(), <a href="qsslsocket.html#ciphers">ciphers</a>(), and <a href="qsslsocket.html#setCiphers">setCiphers</a>().</p>
 
 
 <h3 class="fn"><a name="supportsSsl" />bool QSslSocket.supportsSsl ()</h3><p>Returns true if this platform supports SSL; otherwise, returns
@@ -850,7 +845,7 @@ the connection phase.</p>
 the operating system. The CA certificate database returned by this
 function is used to initialize the database returned by <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>().
 You can replace that database with your own with <a href="qsslsocket.html#setDefaultCaCertificates">setDefaultCaCertificates</a>().</p>
-<p>See also <a href="qsslsocket.html#caCertificates">caCertificates</a>(), <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>(),
+<p><b>See also</b> <a href="qsslsocket.html#caCertificates">caCertificates</a>(), <a href="qsslsocket.html#defaultCaCertificates">defaultCaCertificates</a>(),
 and <a href="qsslsocket.html#setDefaultCaCertificates">setDefaultCaCertificates</a>().</p>
 
 
@@ -861,14 +856,14 @@ and <a href="qsslsocket.html#setDefaultCaCertificates">setDefaultCaCertificates<
 milliseconds, whichever happens first. If the connection has been
 established, this function returns true; otherwise it returns
 false.</p>
-<p>See also <a href="qabstractsocket.html#waitForConnected">QAbstractSocket.waitForConnected</a>().</p>
+<p><b>See also</b> <a href="qabstractsocket.html#waitForConnected">QAbstractSocket.waitForConnected</a>().</p>
 
 
 <h3 class="fn"><a name="waitForDisconnected" />bool QSslSocket.waitForDisconnected (<i>self</i>, int&#160;<i>msecs</i>&#160;=&#160;30000)</h3><p>Waits until the socket has disconnected or <i>msecs</i>
 milliseconds, whichever comes first. If the connection has been
 disconnected, this function returns true; otherwise it returns
 false.</p>
-<p>See also <a href="qabstractsocket.html#waitForDisconnected">QAbstractSocket.waitForDisconnected</a>().</p>
+<p><b>See also</b> <a href="qabstractsocket.html#waitForDisconnected">QAbstractSocket.waitForDisconnected</a>().</p>
 
 
 <h3 class="fn"><a name="waitForEncrypted" />bool QSslSocket.waitForEncrypted (<i>self</i>, int&#160;<i>msecs</i>&#160;=&#160;30000)</h3><p>Waits until the socket has completed the SSL handshake and has
@@ -878,13 +873,13 @@ function returns true; otherwise (e.g., the socket is disconnected,
 or the SSL handshake fails), false is returned.</p>
 <p>The following example waits up to one second for the socket to
 be encrypted:</p>
-<pre class="highlightedCode brush: cpp">
- socket-&gt;connectToHostEncrypted("imap", 993);
- if (socket-&gt;waitForEncrypted(1000))
-     qDebug("Encrypted!");
+<pre class="cpp">
+ socket<span class="operator">-</span><span class="operator">&gt;</span><a href="qsslsocket.html#connectToHostEncrypted">connectToHostEncrypted</a>(<span class="string">"imap"</span><span class="operator">,</span> <span class="number">993</span>);
+ <span class="keyword">if</span> (socket<span class="operator">-</span><span class="operator">&gt;</span>waitForEncrypted(<span class="number">1000</span>))
+     <a href="qtcore.html#qDebug">qDebug</a>(<span class="string">"Encrypted!"</span>);
 </pre>
 <p>If msecs is -1, this function will not time out.</p>
-<p>See also <a href="qsslsocket.html#startClientEncryption">startClientEncryption</a>(),
+<p><b>See also</b> <a href="qsslsocket.html#startClientEncryption">startClientEncryption</a>(),
 <a href="qsslsocket.html#startServerEncryption">startServerEncryption</a>(),
 <a href="qsslsocket.html#encrypted">encrypted</a>(), and <a href="qsslsocket.html#isEncrypted">isEncrypted</a>().</p>
 
@@ -897,7 +892,7 @@ be encrypted:</p>
 signal has been emitted, <a href="qsslsocket.html#isEncrypted">QSslSocket.isEncrypted</a>() will
 return true, and all further transmissions on the socket will be
 encrypted.</p>
-<p>See also <a href="qsslsocket.html#connectToHostEncrypted">QSslSocket.connectToHostEncrypted</a>()
+<p><b>See also</b> <a href="qsslsocket.html#connectToHostEncrypted">QSslSocket.connectToHostEncrypted</a>()
 and <a href="qsslsocket.html#isEncrypted">QSslSocket.isEncrypted</a>().</p>
 
 
@@ -905,14 +900,14 @@ and <a href="qsslsocket.html#isEncrypted">QSslSocket.isEncrypted</a>().</p>
 network. The <i>written</i> parameter contains the number of bytes
 that were successfully written.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qiodevice.html#bytesWritten">QIODevice.bytesWritten</a>().</p>
+<p><b>See also</b> <a href="qiodevice.html#bytesWritten">QIODevice.bytesWritten</a>().</p>
 
 
 <h3 class="fn"><a name="modeChanged" />void modeChanged (QSslSocket::SslMode)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when <a href="qsslsocket.html">QSslSocket</a> changes from <a href="qsslsocket.html#SslMode-enum">QSslSocket.UnencryptedMode</a> to
 either <a href="qsslsocket.html#SslMode-enum">QSslSocket.SslClientMode</a> or
 <a href="qsslsocket.html#SslMode-enum">QSslSocket.SslServerMode</a>.
 <i>mode</i> is the new mode.</p>
-<p>See also <a href="qsslsocket.html#mode">QSslSocket.mode</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#mode">QSslSocket.mode</a>().</p>
 
 
 <h3 class="fn"><a name="peerVerifyError" />void peerVerifyError (const QSslError&amp;)</h3><p>This is the default overload of this signal.</p><p><a href="qsslsocket.html">QSslSocket</a> can emit this signal
@@ -926,7 +921,7 @@ something's wrong. By connecting to this signal, you can manually
 choose to tear down the connection from inside the connected slot
 before the handshake has completed. If no action is taken, <a href="qsslsocket.html">QSslSocket</a> will proceed to emitting <a href="qsslsocket.html#sslErrors">QSslSocket.sslErrors</a>().</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qsslsocket.html#sslErrors">sslErrors</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#sslErrors">sslErrors</a>().</p>
 
 
 <h3 class="fn"><a name="sslErrors-2" />void sslErrors (const QList&lt;QSslError&gt;&amp;)</h3><p>This is the default overload of this signal.</p><p><a href="qsslsocket.html">QSslSocket</a> emits this signal after
@@ -946,7 +941,7 @@ peer.</p>
 <p>Note: You cannot use <a href="qt.html#ConnectionType-enum">Qt.QueuedConnection</a> when
 connecting to this signal, or calling <a href="qsslsocket.html#ignoreSslErrors">QSslSocket.ignoreSslErrors</a>()
 will have no effect.</p>
-<p>See also <a href="qsslsocket.html#peerVerifyError">peerVerifyError</a>().</p>
+<p><b>See also</b> <a href="qsslsocket.html#peerVerifyError">peerVerifyError</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

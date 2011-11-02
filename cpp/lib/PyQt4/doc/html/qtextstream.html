@@ -16,11 +16,11 @@ operators, you can conveniently read and write words, lines and
 numbers. For generating text, QTextStream supports formatting
 options for field padding and alignment, and formatting of numbers.
 Example:</p>
-<pre class="highlightedCode brush: cpp">
- QFile data("output.txt");
- if (data.open(QFile.WriteOnly | QFile.Truncate)) {
-     QTextStream out(&amp;data);
-     out &lt;&lt; "Result: " &lt;&lt; qSetFieldWidth(10) &lt;&lt; left &lt;&lt; 3.14 &lt;&lt; 2.7;
+<pre class="cpp">
+ <span class="type"><a href="qfile.html">QFile</a></span> data(<span class="string">"output.txt"</span>);
+ <span class="keyword">if</span> (data<span class="operator">.</span>open(<span class="type"><a href="qfile.html">QFile</a></span><span class="operator">.</span>WriteOnly <span class="operator">|</span> <span class="type"><a href="qfile.html">QFile</a></span><span class="operator">.</span>Truncate)) {
+     <span class="type">QTextStream</span> out(<span class="operator">&amp;</span>data);
+     out <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Result: "</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <a href="qtcore.html#qSetFieldWidth">qSetFieldWidth</a>(<span class="number">10</span>) <span class="operator">&lt;</span><span class="operator">&lt;</span> left <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="number">3.14</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="number">2.7</span>;
      <span class="comment">// writes "Result: 3.14      2.7       "</span>
  }
 </pre>
@@ -28,12 +28,12 @@ Example:</p>
 write console output. QTextStream is locale aware, and will
 automatically decode standard input using the correct codec.
 Example:</p>
-<pre class="highlightedCode brush: cpp">
- QTextStream stream(stdin);
- QString line;
- do {
-     line = stream.readLine();
- } while (!line.isNull());
+<pre class="cpp">
+ <span class="type">QTextStream</span> stream(stdin);
+ <span class="type"><a href="qstring.html">QString</a></span> line;
+ <span class="keyword">do</span> {
+     line <span class="operator">=</span> stream<span class="operator">.</span>readLine();
+ } <span class="keyword">while</span> (<span class="operator">!</span>line<span class="operator">.</span>isNull());
 </pre>
 <p>Note that you cannot use <a href="qtextstream.html#atEnd">QTextStream.atEnd</a>(), which returns
 true when you have reached the end of the data stream, with stdin.
@@ -86,15 +86,15 @@ assumed to be in hexadecimal form. If it starts with the digits
 the integer base, thereby disabling the automatic detection, by
 calling <a href="qtextstream.html#setIntegerBase">setIntegerBase</a>().
 Example:</p>
-<pre class="highlightedCode brush: cpp">
- QTextStream in("0x50 0x20");
- int firstNumber, secondNumber;
+<pre class="cpp">
+ <span class="type">QTextStream</span> in(<span class="string">"0x50 0x20"</span>);
+ <span class="type">int</span> firstNumber<span class="operator">,</span> secondNumber;
 
- in &gt;&gt; firstNumber;             <span class="comment">// firstNumber == 80</span>
- in &gt;&gt; dec &gt;&gt; secondNumber;     <span class="comment">// secondNumber == 0</span>
+ in <span class="operator">&gt;</span><span class="operator">&gt;</span> firstNumber;             <span class="comment">// firstNumber == 80</span>
+ in <span class="operator">&gt;</span><span class="operator">&gt;</span> dec <span class="operator">&gt;</span><span class="operator">&gt;</span> secondNumber;     <span class="comment">// secondNumber == 0</span>
 
- char ch;
- in &gt;&gt; ch;                      <span class="comment">// ch == 'x'</span>
+ <span class="type">char</span> ch;
+ in <span class="operator">&gt;</span><span class="operator">&gt;</span> ch;                      <span class="comment">// ch == 'x'</span>
 </pre>
 <p>QTextStream supports many formatting options for generating
 text. You can set the field width and pad character by calling
@@ -114,202 +114,106 @@ formatting options are also available through <a href="qtextstream.html#setNumbe
 QTextStream also defines several global manipulator functions:</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th>Manipulator</th>
 <th>Description</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><tt>bin</tt></p>
-</td>
-<td>
-<p>Same as setIntegerBase(2).</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>bin</tt></td>
+<td>Same as setIntegerBase(2).</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>oct</tt></p>
-</td>
-<td>
-<p>Same as setIntegerBase(8).</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>oct</tt></td>
+<td>Same as setIntegerBase(8).</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>dec</tt></p>
-</td>
-<td>
-<p>Same as setIntegerBase(10).</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>dec</tt></td>
+<td>Same as setIntegerBase(10).</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>hex</tt></p>
-</td>
-<td>
-<p>Same as setIntegerBase(16).</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>hex</tt></td>
+<td>Same as setIntegerBase(16).</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>showbase</tt></p>
-</td>
-<td>
-<p>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() | <a href="qtextstream.html#NumberFlag-enum">ShowBase</a>).</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>showbase</tt></td>
+<td>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() | <a href="qtextstream.html#NumberFlag-enum">ShowBase</a>).</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>forcesign</tt></p>
-</td>
-<td>
-<p>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() | <a href="qtextstream.html#NumberFlag-enum">ForceSign</a>).</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>forcesign</tt></td>
+<td>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() | <a href="qtextstream.html#NumberFlag-enum">ForceSign</a>).</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>forcepoint</tt></p>
-</td>
-<td>
-<p>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() | <a href="qtextstream.html#NumberFlag-enum">ForcePoint</a>).</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>forcepoint</tt></td>
+<td>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() | <a href="qtextstream.html#NumberFlag-enum">ForcePoint</a>).</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>noshowbase</tt></p>
-</td>
-<td>
-<p>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() &amp; ~<a href="qtextstream.html#NumberFlag-enum">ShowBase</a>).</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>noshowbase</tt></td>
+<td>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() &amp; ~<a href="qtextstream.html#NumberFlag-enum">ShowBase</a>).</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>noforcesign</tt></p>
-</td>
-<td>
-<p>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() &amp; ~<a href="qtextstream.html#NumberFlag-enum">ForceSign</a>).</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>noforcesign</tt></td>
+<td>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() &amp; ~<a href="qtextstream.html#NumberFlag-enum">ForceSign</a>).</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>noforcepoint</tt></p>
-</td>
-<td>
-<p>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() &amp; ~<a href="qtextstream.html#NumberFlag-enum">ForcePoint</a>).</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>noforcepoint</tt></td>
+<td>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() &amp; ~<a href="qtextstream.html#NumberFlag-enum">ForcePoint</a>).</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>uppercasebase</tt></p>
-</td>
-<td>
-<p>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() | <a href="qtextstream.html#NumberFlag-enum">UppercaseBase</a>).</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>uppercasebase</tt></td>
+<td>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() | <a href="qtextstream.html#NumberFlag-enum">UppercaseBase</a>).</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>uppercasedigits</tt></p>
-</td>
-<td>
-<p>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() | <a href="qtextstream.html#NumberFlag-enum">UppercaseDigits</a>).</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>uppercasedigits</tt></td>
+<td>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() | <a href="qtextstream.html#NumberFlag-enum">UppercaseDigits</a>).</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>lowercasebase</tt></p>
-</td>
-<td>
-<p>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() &amp; ~<a href="qtextstream.html#NumberFlag-enum">UppercaseBase</a>).</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>lowercasebase</tt></td>
+<td>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() &amp; ~<a href="qtextstream.html#NumberFlag-enum">UppercaseBase</a>).</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>lowercasedigits</tt></p>
-</td>
-<td>
-<p>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() &amp; ~<a href="qtextstream.html#NumberFlag-enum">UppercaseDigits</a>).</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>lowercasedigits</tt></td>
+<td>Same as setNumberFlags(<a href="qtextstream.html#numberFlags">numberFlags</a>() &amp; ~<a href="qtextstream.html#NumberFlag-enum">UppercaseDigits</a>).</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>fixed</tt></p>
-</td>
-<td>
-<p>Same as setRealNumberNotation(<a href="qtextstream.html#RealNumberNotation-enum">FixedNotation</a>).</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>fixed</tt></td>
+<td>Same as setRealNumberNotation(<a href="qtextstream.html#RealNumberNotation-enum">FixedNotation</a>).</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>scientific</tt></p>
-</td>
-<td>
-<p>Same as setRealNumberNotation(<a href="qtextstream.html#RealNumberNotation-enum">ScientificNotation</a>).</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>scientific</tt></td>
+<td>Same as setRealNumberNotation(<a href="qtextstream.html#RealNumberNotation-enum">ScientificNotation</a>).</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>left</tt></p>
-</td>
-<td>
-<p>Same as setFieldAlignment(<a href="qtextstream.html#FieldAlignment-enum">AlignLeft</a>).</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>left</tt></td>
+<td>Same as setFieldAlignment(<a href="qtextstream.html#FieldAlignment-enum">AlignLeft</a>).</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>right</tt></p>
-</td>
-<td>
-<p>Same as setFieldAlignment(<a href="qtextstream.html#FieldAlignment-enum">AlignRight</a>).</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>right</tt></td>
+<td>Same as setFieldAlignment(<a href="qtextstream.html#FieldAlignment-enum">AlignRight</a>).</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>center</tt></p>
-</td>
-<td>
-<p>Same as setFieldAlignment(<a href="qtextstream.html#FieldAlignment-enum">AlignCenter</a>).</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>center</tt></td>
+<td>Same as setFieldAlignment(<a href="qtextstream.html#FieldAlignment-enum">AlignCenter</a>).</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>endl</tt></p>
-</td>
-<td>
-<p>Same as operator&lt;&lt;('\n') and <a href="qtcore.html#flush">flush</a>().</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>endl</tt></td>
+<td>Same as operator&lt;&lt;('\n') and <a href="qtcore.html#flush">flush</a>().</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>flush</tt></p>
-</td>
-<td>
-<p>Same as <a href="qtcore.html#flush">flush</a>().</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>flush</tt></td>
+<td>Same as <a href="qtcore.html#flush">flush</a>().</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>reset</tt></p>
-</td>
-<td>
-<p>Same as <a href="qtcore.html#reset">reset</a>().</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>reset</tt></td>
+<td>Same as <a href="qtcore.html#reset">reset</a>().</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><tt>ws</tt></p>
-</td>
-<td>
-<p>Same as <a href="qtextstream.html#skipWhiteSpace">skipWhiteSpace</a>().</p>
-</td>
+<tr class="odd" valign="top">
+<td><tt>ws</tt></td>
+<td>Same as <a href="qtextstream.html#skipWhiteSpace">skipWhiteSpace</a>().</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><tt>bom</tt></p>
-</td>
-<td>
-<p>Same as setGenerateByteOrderMark(true).</p>
-</td>
+<tr class="even" valign="top">
+<td><tt>bom</tt></td>
+<td>Same as setGenerateByteOrderMark(true).</td>
 </tr>
 </table>
 <p>In addition, Qt provides three global manipulators that take a
@@ -317,142 +221,141 @@ parameter: <a href="qtcore.html#qSetFieldWidth">qSetFieldWidth</a>(), <a href="q
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="FieldAlignment-enum" />QTextStream.FieldAlignment</h3><p>This enum specifies how to align text in fields when the field
 is wider than the text that occupies it.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.AlignLeft</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Pad on the right side of fields.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.AlignRight</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Pad on the left side of fields.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.AlignCenter</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Pad on both sides of field.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QTextStream.AlignAccountingStyle</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">Same as AlignRight, except that the sign of a
 number is flush left.</td>
 </tr>
 </table>
-<p>See also <a href="qtextstream.html#setFieldAlignment">setFieldAlignment</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setFieldAlignment">setFieldAlignment</a>().</p>
 
 
 <h3 class="fn"><a name="NumberFlag-enum" />QTextStream.NumberFlag</h3><p>This enum specifies various flags that can be set to affect the
 output of integers, <tt>float</tt>s, and <tt>double</tt>s.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.ShowBase</tt></td>
-<td class=" topAlign"><tt>0x1</tt></td>
+<td class="topAlign"><tt>0x1</tt></td>
 <td class="topAlign">Show the base as a prefix if the base is 16
 ("0x"), 8 ("0"), or 2 ("0b").</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.ForcePoint</tt></td>
-<td class=" topAlign"><tt>0x2</tt></td>
+<td class="topAlign"><tt>0x2</tt></td>
 <td class="topAlign">Always put the decimal separator in numbers,
 even if there are no decimals.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.ForceSign</tt></td>
-<td class=" topAlign"><tt>0x4</tt></td>
+<td class="topAlign"><tt>0x4</tt></td>
 <td class="topAlign">Always put the sign in numbers, even for
 positive numbers.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.UppercaseBase</tt></td>
-<td class=" topAlign"><tt>0x8</tt></td>
+<td class="topAlign"><tt>0x8</tt></td>
 <td class="topAlign">Use uppercase versions of base prefixes ("0X",
 "0B").</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.UppercaseDigits</tt></td>
-<td class=" topAlign"><tt>0x10</tt></td>
+<td class="topAlign"><tt>0x10</tt></td>
 <td class="topAlign">Use uppercase letters for expressing digits 10
 to 35 instead of lowercase.</td>
 </tr>
 </table>
 <p>The NumberFlags type is a typedef for <a href="qflags.html">QFlags</a>&lt;NumberFlag&gt;. It stores an OR
 combination of NumberFlag values.</p>
-<p>See also <a href="qtextstream.html#setNumberFlags">setNumberFlags</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setNumberFlags">setNumberFlags</a>().</p>
 
 
 <h3 class="fn"><a name="RealNumberNotation-enum" />QTextStream.RealNumberNotation</h3><p>This enum specifies which notations to use for expressing
 <tt>float</tt> and <tt>double</tt> as strings.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.ScientificNotation</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Scientific notation (<tt>printf()</tt>'s
 <tt>%e</tt> flag).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.FixedNotation</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Fixed-point notation (<tt>printf()</tt>'s
 <tt>%f</tt> flag).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.SmartNotation</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Scientific or fixed-point notation, depending
 on which makes most sense (<tt>printf()</tt>'s <tt>%g</tt>
 flag).</td>
 </tr>
 </table>
-<p>See also <a href="qtextstream.html#setRealNumberNotation">setRealNumberNotation</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setRealNumberNotation">setRealNumberNotation</a>().</p>
 
 
 <h3 class="fn"><a name="Status-enum" />QTextStream.Status</h3><p>This enum describes the current status of the text stream.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.Ok</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The text stream is operating normally.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.ReadPastEnd</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The text stream has read past the end of the
 data in the underlying device.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextStream.ReadCorruptData</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The text stream has read corrupt data.</td>
 </tr>
 </table>
-<p>See also <a href="qtextstream.html#status">status</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#status">status</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QTextStream" />QTextStream.__init__ (<i>self</i>)</h3><p>Constructs a <a href="qtextstream.html">QTextStream</a>. Before
 you can use it for reading or writing, you must assign a device or
 a string.</p>
-<p>See also <a href="qtextstream.html#setDevice">setDevice</a>()
-and <a href="qtextstream.html#setString">setString</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setDevice">setDevice</a>() and <a href="qtextstream.html#setString">setString</a>().</p>
 
 
 <h3 class="fn"><a name="QTextStream-2" />QTextStream.__init__ (<i>self</i>, <a href="qiodevice.html">QIODevice</a>&#160;<i>device</i>)</h3><p>Constructs a <a href="qtextstream.html">QTextStream</a> that
@@ -466,10 +369,10 @@ to handle the FILE pointer.</p>
 <p>This constructor is useful for working directly with the common
 FILE based input and output streams: stdin, stdout and stderr.
 Example:</p>
-<pre class="highlightedCode brush: cpp">
- QString str;
- QTextStream in(stdin);
- in &gt;&gt; str;
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> str;
+ <span class="type"><a href="qtextstream.html">QTextStream</a></span> in(stdin);
+ in <span class="operator">&gt;</span><span class="operator">&gt;</span> str;
 </pre>
 
 
@@ -487,29 +390,27 @@ internal Unicode buffer.</p>
 <h3 class="fn"><a name="autoDetectUnicode" />bool QTextStream.autoDetectUnicode (<i>self</i>)</h3><p>Returns true if automatic Unicode detection is enabled,
 otherwise returns false. Automatic Unicode detection is enabled by
 default.</p>
-<p>See also <a href="qtextstream.html#setAutoDetectUnicode">setAutoDetectUnicode</a>()
+<p><b>See also</b> <a href="qtextstream.html#setAutoDetectUnicode">setAutoDetectUnicode</a>()
 and <a href="qtextstream.html#setCodec">setCodec</a>().</p>
 
 
 <h3 class="fn"><a name="codec" /><a href="qtextcodec.html">QTextCodec</a> QTextStream.codec (<i>self</i>)</h3><p>Returns the codec that is current assigned to the stream.</p>
-<p>See also <a href="qtextstream.html#setCodec">setCodec</a>(),
-<a href="qtextstream.html#setAutoDetectUnicode">setAutoDetectUnicode</a>(),
+<p><b>See also</b> <a href="qtextstream.html#setCodec">setCodec</a>(), <a href="qtextstream.html#setAutoDetectUnicode">setAutoDetectUnicode</a>(),
 and <a href="qtextstream.html#locale">locale</a>().</p>
 
 
 <h3 class="fn"><a name="device" /><a href="qiodevice.html">QIODevice</a> QTextStream.device (<i>self</i>)</h3><p>Returns the current device associated with the <a href="qtextstream.html">QTextStream</a>, or 0 if no device has been
 assigned.</p>
-<p>See also <a href="qtextstream.html#setDevice">setDevice</a>()
-and <a href="qtextstream.html#string">string</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setDevice">setDevice</a>() and <a href="qtextstream.html#string">string</a>().</p>
 
 
 <h3 class="fn"><a name="fieldAlignment" /><a href="qtextstream.html#FieldAlignment-enum">FieldAlignment</a> QTextStream.fieldAlignment (<i>self</i>)</h3><p>Returns the current field alignment.</p>
-<p>See also <a href="qtextstream.html#setFieldAlignment">setFieldAlignment</a>() and
+<p><b>See also</b> <a href="qtextstream.html#setFieldAlignment">setFieldAlignment</a>() and
 <a href="qtextstream.html#fieldWidth">fieldWidth</a>().</p>
 
 
 <h3 class="fn"><a name="fieldWidth" />int QTextStream.fieldWidth (<i>self</i>)</h3><p>Returns the current field width.</p>
-<p>See also <a href="qtextstream.html#setFieldWidth">setFieldWidth</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setFieldWidth">setFieldWidth</a>().</p>
 
 
 <h3 class="fn"><a name="flush" />QTextStream.flush (<i>self</i>)</h3><p>Flushes any buffered data waiting to be written to the
@@ -522,26 +423,25 @@ string, this function does nothing.</p>
 set to generate the UTF BOM (Byte Order Mark) when using a UTF
 codec; otherwise returns false. UTF BOM generation is set to false
 by default.</p>
-<p>See also <a href="qtextstream.html#setGenerateByteOrderMark">setGenerateByteOrderMark</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setGenerateByteOrderMark">setGenerateByteOrderMark</a>().</p>
 
 
 <h3 class="fn"><a name="integerBase" />int QTextStream.integerBase (<i>self</i>)</h3><p>Returns the current base of integers. 0 means that the base is
 detected when reading, or 10 (decimal) when generating numbers.</p>
-<p>See also <a href="qtextstream.html#setIntegerBase">setIntegerBase</a>(), <a href="qstring.html#number">QString.number</a>(), and <a href="qtextstream.html#numberFlags">numberFlags</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setIntegerBase">setIntegerBase</a>(), <a href="qstring.html#number">QString.number</a>(), and <a href="qtextstream.html#numberFlags">numberFlags</a>().</p>
 
 
 <h3 class="fn"><a name="locale" /><a href="qlocale.html">QLocale</a> QTextStream.locale (<i>self</i>)</h3><p>Returns the locale for this stream. The default locale is C.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qtextstream.html#setLocale">setLocale</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setLocale">setLocale</a>().</p>
 
 
 <h3 class="fn"><a name="numberFlags" /><a href="qtextstream-numberflags.html">NumberFlags</a> QTextStream.numberFlags (<i>self</i>)</h3><p>Returns the current number flags.</p>
-<p>See also <a href="qtextstream.html#setNumberFlags">setNumberFlags</a>(), <a href="qtextstream.html#integerBase">integerBase</a>(), and <a href="qtextstream.html#realNumberNotation">realNumberNotation</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setNumberFlags">setNumberFlags</a>(), <a href="qtextstream.html#integerBase">integerBase</a>(), and <a href="qtextstream.html#realNumberNotation">realNumberNotation</a>().</p>
 
 
 <h3 class="fn"><a name="padChar" />QChar QTextStream.padChar (<i>self</i>)</h3><p>Returns the current pad character.</p>
-<p>See also <a href="qtextstream.html#setPadChar">setPadChar</a>()
-and <a href="qtextstream.html#setFieldWidth">setFieldWidth</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setPadChar">setPadChar</a>() and <a href="qtextstream.html#setFieldWidth">setFieldWidth</a>().</p>
 
 
 <h3 class="fn"><a name="pos" />int QTextStream.pos (<i>self</i>)</h3><p>Returns the device position corresponding to the current
@@ -552,14 +452,13 @@ this function may have to seek the device to reconstruct a valid
 device position. This operation can be expensive, so you may want
 to avoid calling this function in a tight loop.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qtextstream.html#seek">seek</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#seek">seek</a>().</p>
 
 
 <h3 class="fn"><a name="read" />QString QTextStream.read (<i>self</i>, int&#160;<i>maxlen</i>)</h3><p>Reads at most <i>maxlen</i> characters from the stream, and
 returns the data read as a <a href="qstring.html">QString</a>.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtextstream.html#readAll">readAll</a>(),
-<a href="qtextstream.html#readLine">readLine</a>(), and <a href="qiodevice.html#read">QIODevice.read</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#readAll">readAll</a>(), <a href="qtextstream.html#readLine">readLine</a>(), and <a href="qiodevice.html#read">QIODevice.read</a>().</p>
 
 
 <h3 class="fn"><a name="readAll" />QString QTextStream.readAll (<i>self</i>)</h3><p>Reads the entire content of the stream, and returns it as a
@@ -568,7 +467,7 @@ working on large files, as it will consume a significant amount of
 memory.</p>
 <p>Calling <a href="qtextstream.html#readLine">readLine</a>() is
 better if you do not know how much data is available.</p>
-<p>See also <a href="qtextstream.html#readLine">readLine</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#readLine">readLine</a>().</p>
 
 
 <h3 class="fn"><a name="readLine" />QString QTextStream.readLine (<i>self</i>, int&#160;<i>maxLength</i>&#160;=&#160;0)</h3><p>Reads one line of text from the stream, and returns it as a
@@ -584,12 +483,12 @@ or "\r\n"), so calling <a href="qstring.html#trimmed">QString.trimmed</a>() is u
 return a null <a href="qstring.html">QString</a>. For strings, or
 for devices that support it, you can explicitly test for the end of
 the stream using <a href="qtextstream.html#atEnd">atEnd</a>().</p>
-<p>See also <a href="qtextstream.html#readAll">readAll</a>() and
-<a href="qiodevice.html#readLine">QIODevice.readLine</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#readAll">readAll</a>()
+and <a href="qiodevice.html#readLine">QIODevice.readLine</a>().</p>
 
 
 <h3 class="fn"><a name="realNumberNotation" /><a href="qtextstream.html#RealNumberNotation-enum">RealNumberNotation</a> QTextStream.realNumberNotation (<i>self</i>)</h3><p>Returns the current real number notation.</p>
-<p>See also <a href="qtextstream.html#setRealNumberNotation">setRealNumberNotation</a>(),
+<p><b>See also</b> <a href="qtextstream.html#setRealNumberNotation">setRealNumberNotation</a>(),
 <a href="qtextstream.html#realNumberPrecision">realNumberPrecision</a>(),
 <a href="qtextstream.html#numberFlags">numberFlags</a>(), and
 <a href="qtextstream.html#integerBase">integerBase</a>().</p>
@@ -598,7 +497,7 @@ the stream using <a href="qtextstream.html#atEnd">atEnd</a>().</p>
 <h3 class="fn"><a name="realNumberPrecision" />int QTextStream.realNumberPrecision (<i>self</i>)</h3><p>Returns the current real number precision, or the number of
 fraction digits <a href="qtextstream.html">QTextStream</a> will
 write when generating real numbers.</p>
-<p>See also <a href="qtextstream.html#setRealNumberPrecision">setRealNumberPrecision</a>(),
+<p><b>See also</b> <a href="qtextstream.html#setRealNumberPrecision">setRealNumberPrecision</a>(),
 <a href="qtextstream.html#setRealNumberNotation">setRealNumberNotation</a>(),
 <a href="qtextstream.html#realNumberNotation">realNumberNotation</a>(),
 <a href="qtextstream.html#numberFlags">numberFlags</a>(), and
@@ -612,7 +511,7 @@ device, string and any buffered data is left untouched.</p>
 
 <h3 class="fn"><a name="resetStatus" />QTextStream.resetStatus (<i>self</i>)</h3><p>Resets the status of the text stream.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtextstream.html#Status-enum">QTextStream.Status</a>, <a href="qtextstream.html#status">status</a>(), and <a href="qtextstream.html#setStatus">setStatus</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#Status-enum">QTextStream.Status</a>, <a href="qtextstream.html#status">status</a>(), and <a href="qtextstream.html#setStatus">setStatus</a>().</p>
 
 
 <h3 class="fn"><a name="seek" />bool QTextStream.seek (<i>self</i>, int&#160;<i>pos</i>)</h3><p>Seeks to the position <i>pos</i> in the device. Returns true on
@@ -626,7 +525,7 @@ UTF-16 or UTF-32 BOM (Byte Order Mark). If this mark is found,
 codec with the UTF codec.</p>
 <p>This function can be used together with <a href="qtextstream.html#setCodec">setCodec</a>(). It is common to set the
 codec to UTF-8, and then enable UTF-16 detection.</p>
-<p>See also <a href="qtextstream.html#autoDetectUnicode">autoDetectUnicode</a>() and
+<p><b>See also</b> <a href="qtextstream.html#autoDetectUnicode">autoDetectUnicode</a>() and
 <a href="qtextstream.html#setCodec">setCodec</a>().</p>
 
 
@@ -639,7 +538,8 @@ string, this function does nothing.</p>
 <p><b>Warning:</b> If you call this function while the text stream
 is reading from an open sequential socket, the internal buffer may
 still contain text decoded using the old codec.</p>
-<p>See also <a href="qtextstream.html#codec">codec</a>(), <a href="qtextstream.html#setAutoDetectUnicode">setAutoDetectUnicode</a>(),
+<p><b>See also</b> <a href="qtextstream.html#codec">codec</a>(),
+<a href="qtextstream.html#setAutoDetectUnicode">setAutoDetectUnicode</a>(),
 and <a href="qtextstream.html#setLocale">setLocale</a>().</p>
 
 
@@ -648,11 +548,11 @@ and <a href="qtextstream.html#setLocale">setLocale</a>().</p>
 8859-1", "UTF-8", and "UTF-16". If the encoding isn't recognized,
 nothing happens.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QTextStream out(&amp;file);
- out.setCodec("UTF-8");
+<pre class="cpp">
+ <span class="type"><a href="qtextstream.html">QTextStream</a></span> out(<span class="operator">&amp;</span>file);
+ out<span class="operator">.</span><a href="qtextstream.html#setCodec">setCodec</a>(<span class="string">"UTF-8"</span>);
 </pre>
-<p>See also <a href="qtextcodec.html#codecForName">QTextCodec.codecForName</a>() and
+<p><b>See also</b> <a href="qtextcodec.html#codecForName">QTextCodec.codecForName</a>() and
 <a href="qtextstream.html#setLocale">setLocale</a>().</p>
 
 
@@ -662,15 +562,15 @@ will call <a href="qtcore.html#flush">flush</a>() before the
 old device is replaced.</p>
 <p><b>Note:</b> This function resets locale to the default locale
 ('C') and codec to the default codec, <a href="qtextcodec.html#codecForLocale">QTextCodec.codecForLocale</a>().</p>
-<p>See also <a href="qtextstream.html#device">device</a>() and
-<a href="qtextstream.html#setString">setString</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#device">device</a>()
+and <a href="qtextstream.html#setString">setString</a>().</p>
 
 
 <h3 class="fn"><a name="setFieldAlignment" />QTextStream.setFieldAlignment (<i>self</i>, <a href="qtextstream.html#FieldAlignment-enum">FieldAlignment</a>&#160;<i>alignment</i>)</h3><p>Sets the field alignment to <i>mode</i>. When used together with
 <a href="qtextstream.html#setFieldWidth">setFieldWidth</a>(), this
 function allows you to generate formatted output with text aligned
 to the left, to the right or center aligned.</p>
-<p>See also <a href="qtextstream.html#fieldAlignment">fieldAlignment</a>() and <a href="qtextstream.html#setFieldWidth">setFieldWidth</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#fieldAlignment">fieldAlignment</a>() and <a href="qtextstream.html#setFieldWidth">setFieldWidth</a>().</p>
 
 
 <h3 class="fn"><a name="setFieldWidth" />QTextStream.setFieldWidth (<i>self</i>, int&#160;<i>width</i>)</h3><p>Sets the current field width to <i>width</i>. If <i>width</i> is
@@ -680,8 +580,7 @@ generated text.</p>
 to this stream after this function has been called (e.g., it also
 pads endl). This behavior is different from similar classes in the
 STL, where the field width only applies to the next element.</p>
-<p>See also <a href="qtextstream.html#fieldWidth">fieldWidth</a>()
-and <a href="qtextstream.html#setPadChar">setPadChar</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#fieldWidth">fieldWidth</a>() and <a href="qtextstream.html#setPadChar">setPadChar</a>().</p>
 
 
 <h3 class="fn"><a name="setGenerateByteOrderMark" />QTextStream.setGenerateByteOrderMark (<i>self</i>, bool&#160;<i>generate</i>)</h3><p>If <i>generate</i> is true and a UTF codec is used, <a href="qtextstream.html">QTextStream</a> will insert the BOM (Byte Order
@@ -689,7 +588,7 @@ Mark) before any data has been written to the device. If
 <i>generate</i> is false, no BOM will be inserted. This function
 must be called before any data is written. Otherwise, it does
 nothing.</p>
-<p>See also <a href="qtextstream.html#generateByteOrderMark">generateByteOrderMark</a>()
+<p><b>See also</b> <a href="qtextstream.html#generateByteOrderMark">generateByteOrderMark</a>()
 and <a href="qtcore.html#bom">bom</a>().</p>
 
 
@@ -700,7 +599,7 @@ for generating numbers. <i>base</i> can be either 2 (binary), 8
 the base by inspecting the data on the stream. When generating
 numbers, <a href="qtextstream.html">QTextStream</a> assumes base is
 10 unless the base has been set explicitly.</p>
-<p>See also <a href="qtextstream.html#integerBase">integerBase</a>(), <a href="qstring.html#number">QString.number</a>(), and <a href="qtextstream.html#setNumberFlags">setNumberFlags</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#integerBase">integerBase</a>(), <a href="qstring.html#number">QString.number</a>(), and <a href="qtextstream.html#setNumberFlags">setNumberFlags</a>().</p>
 
 
 <h3 class="fn"><a name="setLocale" />QTextStream.setLocale (<i>self</i>, <a href="qlocale.html">QLocale</a>&#160;<i>locale</i>)</h3><p>Sets the locale for this stream to <i>locale</i>. The specified
@@ -709,14 +608,14 @@ representations.</p>
 <p>The default locale is C and it is a special case - the thousands
 group separator is not used for backward compatibility reasons.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qtextstream.html#locale">locale</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#locale">locale</a>().</p>
 
 
 <h3 class="fn"><a name="setNumberFlags" />QTextStream.setNumberFlags (<i>self</i>, <a href="qtextstream-numberflags.html">NumberFlags</a>&#160;<i>flags</i>)</h3><p>Sets the current number flags to <i>flags</i>. <i>flags</i> is a
 set of flags from the <a href="qtextstream.html#NumberFlag-enum">NumberFlag</a> enum, and
 describes options for formatting generated code (e.g., whether or
 not to always write the base or sign of a number).</p>
-<p>See also <a href="qtextstream.html#numberFlags">numberFlags</a>(), <a href="qtextstream.html#setIntegerBase">setIntegerBase</a>(), and
+<p><b>See also</b> <a href="qtextstream.html#numberFlags">numberFlags</a>(), <a href="qtextstream.html#setIntegerBase">setIntegerBase</a>(), and
 <a href="qtextstream.html#setRealNumberNotation">setRealNumberNotation</a>().</p>
 
 
@@ -724,20 +623,20 @@ not to always write the base or sign of a number).</p>
 ASCII space character (' '), or <a href="qchar.html">QChar</a>(0x20). This character is used to fill in the
 space in fields when generating text.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QString s;
- QTextStream out(&amp;s);
- out.setFieldWidth(10);
- out.setFieldAlignment(QTextStream.AlignCenter);
- out.setPadChar('-');
- out &lt;&lt; "Qt" &lt;&lt; "rocks!";
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> s;
+ <span class="type"><a href="qtextstream.html">QTextStream</a></span> out(<span class="operator">&amp;</span>s);
+ out<span class="operator">.</span><a href="qtextstream.html#setFieldWidth">setFieldWidth</a>(<span class="number">10</span>);
+ out<span class="operator">.</span><a href="qtextstream.html#setFieldAlignment">setFieldAlignment</a>(<span class="type"><a href="qtextstream.html">QTextStream</a></span><span class="operator">.</span>AlignCenter);
+ out<span class="operator">.</span>setPadChar(<span class="char">'-'</span>);
+ out <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Qt"</span> <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"rocks!"</span>;
 </pre>
 <p>The string <tt>s</tt> contains:</p>
-<pre class="highlightedCode brush: cpp">
- ----Qt------rocks!--
+<pre class="cpp">
+ <span class="operator">-</span><span class="operator">-</span><span class="operator">-</span><span class="operator">-</span><span class="type"><a href="qt.html">Qt</a></span><span class="operator">-</span><span class="operator">-</span><span class="operator">-</span><span class="operator">-</span><span class="operator">-</span><span class="operator">-</span>rocks<span class="operator">!</span><span class="operator">-</span><span class="operator">-</span>
 </pre>
-<p>See also <a href="qtextstream.html#padChar">padChar</a>() and
-<a href="qtextstream.html#setFieldWidth">setFieldWidth</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#padChar">padChar</a>()
+and <a href="qtextstream.html#setFieldWidth">setFieldWidth</a>().</p>
 
 
 <h3 class="fn"><a name="setRealNumberNotation" />QTextStream.setRealNumberNotation (<i>self</i>, <a href="qtextstream.html#RealNumberNotation-enum">RealNumberNotation</a>&#160;<i>notation</i>)</h3><p>Sets the real number notation to <i>notation</i> (<a href="qtextstream.html#RealNumberNotation-enum">SmartNotation</a>,
@@ -745,7 +644,7 @@ space in fields when generating text.</p>
 <a href="qtextstream.html#RealNumberNotation-enum">ScientificNotation</a>).
 When reading and generating numbers, <a href="qtextstream.html">QTextStream</a> uses this value to detect the
 formatting of real numbers.</p>
-<p>See also <a href="qtextstream.html#realNumberNotation">realNumberNotation</a>(),
+<p><b>See also</b> <a href="qtextstream.html#realNumberNotation">realNumberNotation</a>(),
 <a href="qtextstream.html#setRealNumberPrecision">setRealNumberPrecision</a>(),
 <a href="qtextstream.html#setNumberFlags">setNumberFlags</a>(), and
 <a href="qtextstream.html#setIntegerBase">setIntegerBase</a>().</p>
@@ -756,38 +655,36 @@ value describes the number of fraction digits <a href="qtextstream.html">QTextSt
 real numbers.</p>
 <p>The precision cannot be a negative value. The default value is
 6.</p>
-<p>See also <a href="qtextstream.html#realNumberPrecision">realNumberPrecision</a>()
+<p><b>See also</b> <a href="qtextstream.html#realNumberPrecision">realNumberPrecision</a>()
 and <a href="qtextstream.html#setRealNumberNotation">setRealNumberNotation</a>().</p>
 
 
 <h3 class="fn"><a name="setStatus" />QTextStream.setStatus (<i>self</i>, <a href="qtextstream.html#Status-enum">Status</a>&#160;<i>status</i>)</h3><p>Sets the status of the text stream to the <i>status</i>
 given.</p>
 <p>This function was introduced in Qt 4.1.</p>
-<p>See also <a href="qtextstream.html#Status-enum">Status</a>,
-<a href="qtextstream.html#status">status</a>(), and <a href="qtextstream.html#resetStatus">resetStatus</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#Status-enum">Status</a>, <a href="qtextstream.html#status">status</a>(), and <a href="qtextstream.html#resetStatus">resetStatus</a>().</p>
 
 
 <h3 class="fn"><a name="setString" />QTextStream.setString (<i>self</i>, QString&#160;<i>string</i>, <a href="qiodevice-openmode.html">QIODevice.OpenMode</a>&#160;<i>mode</i>&#160;=&#160;QIODevice.ReadWrite)</h3><p>Sets the current string to <i>string</i>, using the given
 <i>openMode</i>. If a device has already been assigned, <a href="qtextstream.html">QTextStream</a> will call <a href="qtcore.html#flush">flush</a>() before replacing it.</p>
-<p>See also <a href="qtextstream.html#string">string</a>() and
-<a href="qtextstream.html#setDevice">setDevice</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#string">string</a>()
+and <a href="qtextstream.html#setDevice">setDevice</a>().</p>
 
 
 <h3 class="fn"><a name="skipWhiteSpace" />QTextStream.skipWhiteSpace (<i>self</i>)</h3><p>Reads and discards whitespace from the stream until either a
 non-space character is detected, or until <a href="qtextstream.html#atEnd">atEnd</a>() returns true. This function is
 useful when reading a stream character by character.</p>
 <p>Whitespace characters are all characters for which <a href="qchar.html#isSpace">QChar.isSpace</a>() returns true.</p>
-<p>See also <a href="qtextstream.html#operator-gt-gt">operator&gt;&gt;</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#operator-gt-gt">operator&gt;&gt;</a>().</p>
 
 
 <h3 class="fn"><a name="status" /><a href="qtextstream.html#Status-enum">Status</a> QTextStream.status (<i>self</i>)</h3><p>Returns the status of the text stream.</p>
-<p>See also <a href="qtextstream.html#Status-enum">QTextStream.Status</a>, <a href="qtextstream.html#setStatus">setStatus</a>(), and <a href="qtextstream.html#resetStatus">resetStatus</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#Status-enum">QTextStream.Status</a>, <a href="qtextstream.html#setStatus">setStatus</a>(), and <a href="qtextstream.html#resetStatus">resetStatus</a>().</p>
 
 
 <h3 class="fn"><a name="string" />QString QTextStream.string (<i>self</i>)</h3><p>Returns the current string assigned to the <a href="qtextstream.html">QTextStream</a>, or 0 if no string has been
 assigned.</p>
-<p>See also <a href="qtextstream.html#setString">setString</a>()
-and <a href="qtextstream.html#device">device</a>().</p>
+<p><b>See also</b> <a href="qtextstream.html#setString">setString</a>() and <a href="qtextstream.html#device">device</a>().</p>
 
 
-<h3 class="fn"><a name="__lshift__" /><a href="qtextstream.html">QTextStream</a> __lshift__ (<i>self</i>, <a href="qdomnode.html">QDomNode</a>)</h3><p>This method is only available if the QtXml module is imported.</p><h3 class="fn"><a name="__lshift__-21" /><a href="qtextstream.html">QTextStream</a> __lshift__ (<i>self</i>, <a href="qsplitter.html">QSplitter</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-21" /><a href="qtextstream.html">QTextStream</a> __rshift__ (<i>self</i>, <a href="qsplitter.html">QSplitter</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, float&#160;<i>f</i>)</h3><h3 class="fn"><a name="__lshift__-2" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, bool&#160;<i>b</i>)</h3><h3 class="fn"><a name="__lshift__-3" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__lshift__-4" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__lshift__-5" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__lshift__-6" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__lshift__-7" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>array</i>)</h3><h3 class="fn"><a name="__lshift__-8" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, QTextStreamManipulator&#160;<i>m</i>)</h3><h3 class="fn"><a name="__rshift__" /><a href="qtextstream.html">QTextStream</a> QTextStream.__rshift__ (<i>self</i>, QChar&#160;<i>ch</i>)</h3><h3 class="fn"><a name="__rshift__-2" /><a href="qtextstream.html">QTextStream</a> QTextStream.__rshift__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__rshift__-3" /><a href="qtextstream.html">QTextStream</a> QTextStream.__rshift__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>array</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__lshift__" /><a href="qtextstream.html">QTextStream</a> __lshift__ (<i>self</i>, <a href="qdomnode.html">QDomNode</a>)</h3><p>This method is only available if the QtXml module is imported.</p><h3 class="fn"><a name="__lshift__-21" /><a href="qtextstream.html">QTextStream</a> __lshift__ (<i>self</i>, <a href="qsplitter.html">QSplitter</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__rshift__-21" /><a href="qtextstream.html">QTextStream</a> __rshift__ (<i>self</i>, <a href="qsplitter.html">QSplitter</a>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__lshift__" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, float&#160;<i>f</i>)</h3><h3 class="fn"><a name="__lshift__-2" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, bool&#160;<i>b</i>)</h3><h3 class="fn"><a name="__lshift__-3" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__lshift__-4" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__lshift__-5" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, int&#160;<i>i</i>)</h3><h3 class="fn"><a name="__lshift__-6" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__lshift__-7" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>array</i>)</h3><h3 class="fn"><a name="__lshift__-8" /><a href="qtextstream.html">QTextStream</a> QTextStream.__lshift__ (<i>self</i>, QTextStreamManipulator&#160;<i>m</i>)</h3><h3 class="fn"><a name="__rshift__" /><a href="qtextstream.html">QTextStream</a> QTextStream.__rshift__ (<i>self</i>, QChar&#160;<i>ch</i>)</h3><h3 class="fn"><a name="__rshift__-2" /><a href="qtextstream.html">QTextStream</a> QTextStream.__rshift__ (<i>self</i>, QString&#160;<i>s</i>)</h3><h3 class="fn"><a name="__rshift__-3" /><a href="qtextstream.html">QTextStream</a> QTextStream.__rshift__ (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>array</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

@@ -16,9 +16,9 @@ in order to select one or many files or a directory.</p>
 <p>The easiest way to create a QFileDialog is to use the static
 functions. On Windows, Mac OS X, KDE and GNOME, these static
 functions will call the native file dialog when possible.</p>
-<pre class="highlightedCode brush: cpp">
- fileName = QFileDialog.getOpenFileName(this,
-     tr("Open Image"), "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"));
+<pre class="cpp">
+ fileName <span class="operator">=</span> <span class="type">QFileDialog</span><span class="operator">.</span><a href="qfiledialog.html#getOpenFileName">getOpenFileName</a>(<span class="keyword">this</span><span class="operator">,</span>
+     tr(<span class="string">"Open Image"</span>)<span class="operator">,</span> <span class="string">"/home/jana"</span><span class="operator">,</span> tr(<span class="string">"Image Files (*.png *.jpg *.bmp)"</span>));
 </pre>
 <p>In the above example, a modal QFileDialog is created using a
 static function. The dialog initially displays the contents of the
@@ -28,15 +28,15 @@ of the file dialog is set to <i>this</i>, and the window title is
 set to "Open Image".</p>
 <p>If you want to use multiple filters, separate each one with
 <i>two</i> semicolons. For example:</p>
-<pre class="highlightedCode brush: cpp">
- "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+<pre class="cpp">
+ <span class="string">"Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"</span>
 </pre>
 <p>You can create your own QFileDialog without using the static
 functions. By calling <a href="qfiledialog.html#fileMode-prop">setFileMode</a>(), you can specify
 what the user must select in the dialog:</p>
-<pre class="highlightedCode brush: cpp">
- QFileDialog dialog(this);
- dialog.setFileMode(QFileDialog.AnyFile);
+<pre class="cpp">
+ <span class="type">QFileDialog</span> dialog(<span class="keyword">this</span>);
+ dialog<span class="operator">.</span><a href="qfiledialog.html#fileMode-prop">setFileMode</a>(<span class="type">QFileDialog</span><span class="operator">.</span>AnyFile);
 </pre>
 <p>In the above example, the mode of the file dialog is set to
 <a href="qfiledialog.html#FileMode-enum">AnyFile</a>, meaning that
@@ -51,8 +51,8 @@ property contains the mode of operation for the dialog; this
 indicates what types of objects the user is expected to select. Use
 <a href="qfiledialog.html#setNameFilter">setNameFilter</a>() to set
 the dialog's file filter. For example:</p>
-<pre class="highlightedCode brush: cpp">
- dialog.setNameFilter(tr("Images (*.png *.xpm *.jpg)"));
+<pre class="cpp">
+ dialog<span class="operator">.</span><a href="qfiledialog.html#setNameFilter">setNameFilter</a>(tr(<span class="string">"Images (*.png *.xpm *.jpg)"</span>));
 </pre>
 <p>In the above example, the filter is set to <tt>"Images (*.png
 *.xpm *.jpg)"</tt>, this means that only files with the extension
@@ -67,15 +67,15 @@ the current directory as a list of file and directory names.
 list of file and directory names, but provides additional
 information alongside each name, such as the file size and
 modification date. Set the mode with <a href="qfiledialog.html#viewMode-prop">setViewMode</a>():</p>
-<pre class="highlightedCode brush: cpp">
- dialog.setViewMode(QFileDialog.Detail);
+<pre class="cpp">
+ dialog<span class="operator">.</span><a href="qfiledialog.html#viewMode-prop">setViewMode</a>(<span class="type">QFileDialog</span><span class="operator">.</span>Detail);
 </pre>
 <p>The last important function you will need to use when creating
 your own file dialog is <a href="qfiledialog.html#selectedFiles">selectedFiles</a>().</p>
-<pre class="highlightedCode brush: cpp">
- QStringList fileNames;
- if (dialog.exec())
-     fileNames = dialog.selectedFiles();
+<pre class="cpp">
+ <span class="type"><a href="qstringlist.html">QStringList</a></span> fileNames;
+ <span class="keyword">if</span> (dialog<span class="operator">.</span>exec())
+     fileNames <span class="operator">=</span> dialog<span class="operator">.</span><a href="qfiledialog.html#selectedFiles">selectedFiles</a>();
 </pre>
 <p>In the above example, a modal file dialog is created and shown.
 If the user clicked OK, the file they selected is put in
@@ -92,11 +92,11 @@ dialogs.</p>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.AcceptOpen</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.AcceptSave</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 </tr>
 </table>
 
@@ -108,23 +108,23 @@ dialogs.</p>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.LookIn</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.FileName</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.FileType</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.Accept</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.Reject</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 </tr>
 </table>
 
@@ -133,60 +133,60 @@ dialogs.</p>
 file dialog; i.e. what the dialog will return if the user clicks
 OK.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.AnyFile</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The name of a file, whether it exists or
 not.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.ExistingFile</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The name of a single existing file.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.Directory</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The name of a directory. Both files and
 directories are displayed.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.ExistingFiles</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The names of zero or more existing files.</td>
 </tr>
 </table>
 <p>This value is obsolete since Qt 4.5:</p>
 <table class="valuelist">
-<tr class="even">
+<tr class="even" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.DirectoryOnly</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Use <tt>Directory</tt> and setOption(<a href="qfiledialog.html#Option-enum">ShowDirsOnly</a>, true)
 instead.</td>
 </tr>
 </table>
-<p>See also <a href="qfiledialog.html#fileMode-prop">setFileMode</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#fileMode-prop">setFileMode</a>().</p>
 
 
 <h3 class="fn"><a name="Option-enum" />QFileDialog.Option</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.ShowDirsOnly</tt></td>
-<td class=" topAlign"><tt>0x00000001</tt></td>
+<td class="topAlign"><tt>0x00000001</tt></td>
 <td class="topAlign">Only show directories in the file dialog. By
 default both files and directories are shown. (Valid only in the
 <a href="qfiledialog.html#FileMode-enum">Directory</a> file
@@ -194,20 +194,20 @@ mode.)</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.DontResolveSymlinks</tt></td>
-<td class=" topAlign"><tt>0x00000002</tt></td>
+<td class="topAlign"><tt>0x00000002</tt></td>
 <td class="topAlign">Don't resolve symlinks in the file dialog. By
 default symlinks are resolved.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QFileDialog.DontConfirmOverwrite</tt></td>
-<td class=" topAlign"><tt>0x00000004</tt></td>
+<td class="topAlign"><tt>0x00000004</tt></td>
 <td class="topAlign">Don't ask for confirmation if an existing file
 is selected. By default confirmation is requested.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.DontUseNativeDialog</tt></td>
-<td class=" topAlign"><tt>0x00000010</tt></td>
+<td class="topAlign"><tt>0x00000010</tt></td>
 <td class="topAlign">Don't use the native file dialog. By default,
 the native file dialog is used unless you use a subclass of
 <a href="qfiledialog.html">QFileDialog</a> that contains the
@@ -215,19 +215,19 @@ the native file dialog is used unless you use a subclass of
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.ReadOnly</tt></td>
-<td class=" topAlign"><tt>0x00000020</tt></td>
+<td class="topAlign"><tt>0x00000020</tt></td>
 <td class="topAlign">Indicates that the model is readonly.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QFileDialog.HideNameFilterDetails</tt></td>
-<td class=" topAlign"><tt>0x00000040</tt></td>
+<td class="topAlign"><tt>0x00000040</tt></td>
 <td class="topAlign">Indicates if the file name filter details are
 hidden or not.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.DontUseSheet</tt></td>
-<td class=" topAlign"><tt>0x00000008</tt></td>
+<td class="topAlign"><tt>0x00000008</tt></td>
 <td class="topAlign">In previous versions of Qt, the static
 functions would create a sheet by default if the static function
 was given a parent. This is no longer supported and does nothing in
@@ -242,25 +242,25 @@ of Option values.</p>
 <h3 class="fn"><a name="ViewMode-enum" />QFileDialog.ViewMode</h3><p>This enum describes the view mode of the file dialog; i.e. what
 information about each file will be displayed.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.Detail</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Displays an icon, a name, and details for each
 item in the directory.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QFileDialog.List</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Displays only an icon and a name for each item
 in the directory.</td>
 </tr>
 </table>
-<p>See also <a href="qfiledialog.html#viewMode-prop">setViewMode</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#viewMode-prop">setViewMode</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QFileDialog" />QFileDialog.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>, <a href="qt-windowflags.html">Qt.WindowFlags</a>&#160;<i>f</i>)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a file dialog with the given <i>parent</i> and widget
 <i>flags</i>.</p>
 
@@ -280,7 +280,7 @@ semicolon-separated list of filters specified by <i>filter</i>.</p>
 
 <h3 class="fn"><a name="confirmOverwrite" />bool QFileDialog.confirmOverwrite (<i>self</i>)</h3><h3 class="fn"><a name="defaultSuffix" />QString QFileDialog.defaultSuffix (<i>self</i>)</h3><h3 class="fn"><a name="directory" /><a href="qdir.html">QDir</a> QFileDialog.directory (<i>self</i>)</h3><p>Returns the directory currently being displayed in the
 dialog.</p>
-<p>See also <a href="qfiledialog.html#setDirectory">setDirectory</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#setDirectory">setDirectory</a>().</p>
 
 
 <h3 class="fn"><a name="done" />QFileDialog.done (<i>self</i>, int&#160;<i>result</i>)</h3><p>Reimplemented from <a href="qdialog.html#done">QDialog.done</a>().</p>
@@ -288,16 +288,16 @@ dialog.</p>
 
 <h3 class="fn"><a name="fileMode" /><a href="qfiledialog.html#FileMode-enum">FileMode</a> QFileDialog.fileMode (<i>self</i>)</h3><h3 class="fn"><a name="filter" /><a href="qdir-filters.html">QDir.Filters</a> QFileDialog.filter (<i>self</i>)</h3><p>Returns the filter that is used when displaying files.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qfiledialog.html#setFilter">setFilter</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#setFilter">setFilter</a>().</p>
 
 
 <h3 class="fn"><a name="filters" />QStringList QFileDialog.filters (<i>self</i>)</h3><h3 class="fn"><a name="getExistingDirectory" />QString QFileDialog.getExistingDirectory (<a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None, QString&#160;<i>caption</i>&#160;=&#160;QString(), QString&#160;<i>directory</i>&#160;=&#160;QString(), <a href="qfiledialog-options.html">Options</a>&#160;<i>options</i>&#160;=&#160;QFileDialog.ShowDirsOnly)</h3><p>This is a convenience static function that will return an
 existing directory selected by the user.</p>
-<pre class="highlightedCode brush: cpp">
- QString dir = QFileDialog.getExistingDirectory(this, tr("Open Directory"),
-                                                 "/home",
-                                                 QFileDialog.ShowDirsOnly
-                                                 | QFileDialog.DontResolveSymlinks);
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> dir <span class="operator">=</span> <span class="type"><a href="qfiledialog.html">QFileDialog</a></span><span class="operator">.</span>getExistingDirectory(<span class="keyword">this</span><span class="operator">,</span> tr(<span class="string">"Open Directory"</span>)<span class="operator">,</span>
+                                                 <span class="string">"/home"</span><span class="operator">,</span>
+                                                 <span class="type"><a href="qfiledialog.html">QFileDialog</a></span><span class="operator">.</span>ShowDirsOnly
+                                                 <span class="operator">|</span> <span class="type"><a href="qfiledialog.html">QFileDialog</a></span><span class="operator">.</span>DontResolveSymlinks);
 </pre>
 <p>This function creates a modal file dialog with the given
 <i>parent</i> widget. If <i>parent</i> is not 0, the dialog will be
@@ -328,17 +328,17 @@ if the native file dialog is used.</p>
 <p><b>Warning:</b> Do not delete <i>parent</i> during the execution
 of the dialog. If you want to do this, you should create the dialog
 yourself using one of the <a href="qfiledialog.html">QFileDialog</a> constructors.</p>
-<p>See also <a href="qfiledialog.html#getOpenFileName">getOpenFileName</a>(), <a href="qfiledialog.html#getOpenFileNames">getOpenFileNames</a>(), and
+<p><b>See also</b> <a href="qfiledialog.html#getOpenFileName">getOpenFileName</a>(), <a href="qfiledialog.html#getOpenFileNames">getOpenFileNames</a>(), and
 <a href="qfiledialog.html#getSaveFileName">getSaveFileName</a>().</p>
 
 
 <h3 class="fn"><a name="getOpenFileName" />QString QFileDialog.getOpenFileName (<a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None, QString&#160;<i>caption</i>&#160;=&#160;QString(), QString&#160;<i>directory</i>&#160;=&#160;QString(), QString&#160;<i>filter</i>&#160;=&#160;QString(), <a href="qfiledialog-options.html">Options</a>&#160;<i>options</i>&#160;=&#160;0)</h3><p>This is a convenience static function that returns an existing
 file selected by the user. If the user presses Cancel, it returns a
 null string.</p>
-<pre class="highlightedCode brush: cpp">
- QString fileName = QFileDialog.getOpenFileName(this, tr("Open File"),
-                                                 "/home",
-                                                 tr("Images (*.png *.xpm *.jpg)"));
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> fileName <span class="operator">=</span> <span class="type"><a href="qfiledialog.html">QFileDialog</a></span><span class="operator">.</span>getOpenFileName(<span class="keyword">this</span><span class="operator">,</span> tr(<span class="string">"Open File"</span>)<span class="operator">,</span>
+                                                 <span class="string">"/home"</span><span class="operator">,</span>
+                                                 tr(<span class="string">"Images (*.png *.xpm *.jpg)"</span>));
 </pre>
 <p>The function creates a modal file dialog with the given
 <i>parent</i> widget. If <i>parent</i> is not 0, the dialog will be
@@ -350,8 +350,8 @@ selected is set to <i>selectedFilter</i>. The parameters
 <i>dir</i>, <i>selectedFilter</i>, and <i>filter</i> may be empty
 strings. If you want multiple filters, separate them with ';;', for
 example:</p>
-<pre class="highlightedCode brush: cpp">
- "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+<pre class="cpp">
+ <span class="string">"Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"</span>
 </pre>
 <p>The <i>options</i> argument holds various options about how to
 run the dialog, see the <a href="qfiledialog.html#Option-enum">QFileDialog.Option</a> enum for
@@ -375,19 +375,19 @@ native file dialog is used.</p>
 <p><b>Warning:</b> Do not delete <i>parent</i> during the execution
 of the dialog. If you want to do this, you should create the dialog
 yourself using one of the <a href="qfiledialog.html">QFileDialog</a> constructors.</p>
-<p>See also <a href="qfiledialog.html#getOpenFileNames">getOpenFileNames</a>(),
+<p><b>See also</b> <a href="qfiledialog.html#getOpenFileNames">getOpenFileNames</a>(),
 <a href="qfiledialog.html#getSaveFileName">getSaveFileName</a>(),
 and <a href="qfiledialog.html#getExistingDirectory">getExistingDirectory</a>().</p>
 
 
 <h3 class="fn"><a name="getOpenFileName-2" />QString QFileDialog.getOpenFileName (<a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None, QString&#160;<i>caption</i>&#160;=&#160;QString(), QString&#160;<i>directory</i>&#160;=&#160;QString(), QString&#160;<i>filter</i>&#160;=&#160;QString(), QString&#160;<i>selectedFilter</i>&#160;=&#160;None, <a href="qfiledialog-options.html">Options</a>&#160;<i>options</i>&#160;=&#160;0)</h3><h3 class="fn"><a name="getOpenFileNameAndFilter" />(QString, QString) QFileDialog.getOpenFileNameAndFilter (<a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None, QString&#160;<i>caption</i>&#160;=&#160;QString(), QString&#160;<i>directory</i>&#160;=&#160;QString(), QString&#160;<i>filter</i>&#160;=&#160;QString(), QString&#160;<i>initialFilter</i>&#160;=&#160;QString(), <a href="qfiledialog-options.html">Options</a>&#160;<i>options</i>&#160;=&#160;0)</h3><h3 class="fn"><a name="getOpenFileNames" />QStringList QFileDialog.getOpenFileNames (<a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None, QString&#160;<i>caption</i>&#160;=&#160;QString(), QString&#160;<i>directory</i>&#160;=&#160;QString(), QString&#160;<i>filter</i>&#160;=&#160;QString(), <a href="qfiledialog-options.html">Options</a>&#160;<i>options</i>&#160;=&#160;0)</h3><p>This is a convenience static function that will return one or
 more existing files selected by the user.</p>
-<pre class="highlightedCode brush: cpp">
- QStringList files = QFileDialog.getOpenFileNames(
-                         this,
-                         "Select one or more files to open",
-                         "/home",
-                         "Images (*.png *.xpm *.jpg)");
+<pre class="cpp">
+ <span class="type"><a href="qstringlist.html">QStringList</a></span> files <span class="operator">=</span> <span class="type"><a href="qfiledialog.html">QFileDialog</a></span><span class="operator">.</span>getOpenFileNames(
+                         <span class="keyword">this</span><span class="operator">,</span>
+                         <span class="string">"Select one or more files to open"</span><span class="operator">,</span>
+                         <span class="string">"/home"</span><span class="operator">,</span>
+                         <span class="string">"Images (*.png *.xpm *.jpg)"</span>);
 </pre>
 <p>This function creates a modal file dialog with the given
 <i>parent</i> widget. If <i>parent</i> is not 0, the dialog will be
@@ -400,8 +400,8 @@ the filter are shown. The filter selected is set to
 <i>selectedFilter</i> and <i>filter</i> may be empty strings. If
 you need multiple filters, separate them with ';;', for
 instance:</p>
-<pre class="highlightedCode brush: cpp">
- "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+<pre class="cpp">
+ <span class="string">"Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"</span>
 </pre>
 <p>The dialog's caption is set to <i>caption</i>. If <i>caption</i>
 is not specified then a default caption will be used.</p>
@@ -419,12 +419,12 @@ dialog, see the <a href="qfiledialog.html#Option-enum">QFileDialog.Option</a> en
 more information on the flags you can pass.</p>
 <p><b>Note:</b> If you want to iterate over the list of files, you
 should iterate over a copy. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QStringList list = files;
- QStringList.Iterator it = list.begin();
- while(it != list.end()) {
-     myProcessing(*it);
-     ++it;
+<pre class="cpp">
+ <span class="type"><a href="qstringlist.html">QStringList</a></span> list <span class="operator">=</span> files;
+ <span class="type"><a href="qstringlist.html">QStringList</a></span><span class="operator">.</span>Iterator it <span class="operator">=</span> list<span class="operator">.</span>begin();
+ <span class="keyword">while</span>(it <span class="operator">!</span><span class="operator">=</span> list<span class="operator">.</span>end()) {
+     myProcessing(<span class="operator">*</span>it);
+     <span class="operator">+</span><span class="operator">+</span>it;
  }
 </pre>
 <p>On Symbian^3 the parameter <i>selectedFilter</i> has no meaning
@@ -434,7 +434,7 @@ return a single filename.</p>
 <p><b>Warning:</b> Do not delete <i>parent</i> during the execution
 of the dialog. If you want to do this, you should create the dialog
 yourself using one of the <a href="qfiledialog.html">QFileDialog</a> constructors.</p>
-<p>See also <a href="qfiledialog.html#getOpenFileName">getOpenFileName</a>(), <a href="qfiledialog.html#getSaveFileName">getSaveFileName</a>(), and
+<p><b>See also</b> <a href="qfiledialog.html#getOpenFileName">getOpenFileName</a>(), <a href="qfiledialog.html#getSaveFileName">getSaveFileName</a>(), and
 <a href="qfiledialog.html#getExistingDirectory">getExistingDirectory</a>().</p>
 
 
@@ -443,10 +443,10 @@ name selected by the user. The file does not have to exist.</p>
 <p>It creates a modal file dialog with the given <i>parent</i>
 widget. If <i>parent</i> is not 0, the dialog will be shown
 centered over the parent widget.</p>
-<pre class="highlightedCode brush: cpp">
- QString fileName = QFileDialog.getSaveFileName(this, tr("Save File"),
-                            "/home/jana/untitled.png",
-                            tr("Images (*.png *.xpm *.jpg)"));
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> fileName <span class="operator">=</span> <span class="type"><a href="qfiledialog.html">QFileDialog</a></span><span class="operator">.</span>getSaveFileName(<span class="keyword">this</span><span class="operator">,</span> tr(<span class="string">"Save File"</span>)<span class="operator">,</span>
+                            <span class="string">"/home/jana/untitled.png"</span><span class="operator">,</span>
+                            tr(<span class="string">"Images (*.png *.xpm *.jpg)"</span>));
 </pre>
 <p>The file dialog's working directory will be set to <i>dir</i>.
 If <i>dir</i> includes a file name, the file will be selected. Only
@@ -454,8 +454,8 @@ files that match the <i>filter</i> are shown. The filter selected
 is set to <i>selectedFilter</i>. The parameters <i>dir</i>,
 <i>selectedFilter</i>, and <i>filter</i> may be empty strings.
 Multiple filters are separated with ';;'. For instance:</p>
-<pre class="highlightedCode brush: cpp">
- "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+<pre class="cpp">
+ <span class="string">"Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"</span>
 </pre>
 <p>The <i>options</i> argument holds various options about how to
 run the dialog, see the <a href="qfiledialog.html#Option-enum">QFileDialog.Option</a> enum for
@@ -483,33 +483,33 @@ is only used to define if the native file dialog is used.</p>
 <p><b>Warning:</b> Do not delete <i>parent</i> during the execution
 of the dialog. If you want to do this, you should create the dialog
 yourself using one of the <a href="qfiledialog.html">QFileDialog</a> constructors.</p>
-<p>See also <a href="qfiledialog.html#getOpenFileName">getOpenFileName</a>(), <a href="qfiledialog.html#getOpenFileNames">getOpenFileNames</a>(), and
+<p><b>See also</b> <a href="qfiledialog.html#getOpenFileName">getOpenFileName</a>(), <a href="qfiledialog.html#getOpenFileNames">getOpenFileNames</a>(), and
 <a href="qfiledialog.html#getExistingDirectory">getExistingDirectory</a>().</p>
 
 
 <h3 class="fn"><a name="getSaveFileName-2" />QString QFileDialog.getSaveFileName (<a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None, QString&#160;<i>caption</i>&#160;=&#160;QString(), QString&#160;<i>directory</i>&#160;=&#160;QString(), QString&#160;<i>filter</i>&#160;=&#160;QString(), QString&#160;<i>selectedFilter</i>&#160;=&#160;None, <a href="qfiledialog-options.html">Options</a>&#160;<i>options</i>&#160;=&#160;0)</h3><h3 class="fn"><a name="getSaveFileNameAndFilter" />(QString, QString) QFileDialog.getSaveFileNameAndFilter (<a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None, QString&#160;<i>caption</i>&#160;=&#160;QString(), QString&#160;<i>directory</i>&#160;=&#160;QString(), QString&#160;<i>filter</i>&#160;=&#160;QString(), QString&#160;<i>initialFilter</i>&#160;=&#160;QString(), <a href="qfiledialog-options.html">Options</a>&#160;<i>options</i>&#160;=&#160;0)</h3><h3 class="fn"><a name="history" />QStringList QFileDialog.history (<i>self</i>)</h3><p>Returns the browsing history of the filedialog as a list of
 paths.</p>
-<p>See also <a href="qfiledialog.html#setHistory">setHistory</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#setHistory">setHistory</a>().</p>
 
 
 <h3 class="fn"><a name="iconProvider" /><a href="qfileiconprovider.html">QFileIconProvider</a> QFileDialog.iconProvider (<i>self</i>)</h3><p>Returns the icon provider used by the filedialog.</p>
-<p>See also <a href="qfiledialog.html#setIconProvider">setIconProvider</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#setIconProvider">setIconProvider</a>().</p>
 
 
 <h3 class="fn"><a name="isNameFilterDetailsVisible" />bool QFileDialog.isNameFilterDetailsVisible (<i>self</i>)</h3><h3 class="fn"><a name="isReadOnly" />bool QFileDialog.isReadOnly (<i>self</i>)</h3><h3 class="fn"><a name="itemDelegate" /><a href="qabstractitemdelegate.html">QAbstractItemDelegate</a> QFileDialog.itemDelegate (<i>self</i>)</h3><p>Returns the item delegate used to render the items in the views
 in the filedialog.</p>
-<p>See also <a href="qfiledialog.html#setItemDelegate">setItemDelegate</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#setItemDelegate">setItemDelegate</a>().</p>
 
 
 <h3 class="fn"><a name="labelText" />QString QFileDialog.labelText (<i>self</i>, <a href="qfiledialog.html#DialogLabel-enum">DialogLabel</a>&#160;<i>label</i>)</h3><p>Returns the text shown in the filedialog in the specified
 <i>label</i>.</p>
-<p>See also <a href="qfiledialog.html#setLabelText">setLabelText</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#setLabelText">setLabelText</a>().</p>
 
 
 <h3 class="fn"><a name="nameFilters" />QStringList QFileDialog.nameFilters (<i>self</i>)</h3><p>Returns the file type filters that are in operation on this file
 dialog.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qfiledialog.html#setNameFilters">setNameFilters</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#setNameFilters">setNameFilters</a>().</p>
 
 
 <h3 class="fn"><a name="open" />QFileDialog.open (<i>self</i>)</h3><p>This is an overloaded function.</p>
@@ -524,7 +524,7 @@ closed.</p>
 
 <h3 class="fn"><a name="open-2" />QFileDialog.open (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>receiver</i>, SLOT()SLOT()&#160;<i>member</i>)</h3><h3 class="fn"><a name="open-3" />QFileDialog.open (<i>self</i>, callable&#160;<i>receiver</i>)</h3><h3 class="fn"><a name="options" /><a href="qfiledialog-options.html">Options</a> QFileDialog.options (<i>self</i>)</h3><h3 class="fn"><a name="proxyModel" /><a href="qabstractproxymodel.html">QAbstractProxyModel</a> QFileDialog.proxyModel (<i>self</i>)</h3><p>Returns the proxy model used by the file dialog. By default no
 proxy is set.</p>
-<p>See also <a href="qfiledialog.html#setProxyModel">setProxyModel</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#setProxyModel">setProxyModel</a>().</p>
 
 
 <h3 class="fn"><a name="resolveSymlinks" />bool QFileDialog.resolveSymlinks (<i>self</i>)</h3><h3 class="fn"><a name="restoreState" />bool QFileDialog.restoreState (<i>self</i>, <a href="qbytearray.html">QByteArray</a>&#160;<i>state</i>)</h3><p>Restores the dialogs's layout, history and current directory to
@@ -547,30 +547,30 @@ selected files in the dialog. If no files are selected, or the mode
 is not <a href="qfiledialog.html#FileMode-enum">ExistingFiles</a>
 or <a href="qfiledialog.html#FileMode-enum">ExistingFile</a>,
 selectedFiles() contains the current path in the viewport.</p>
-<p>See also <a href="qfiledialog.html#selectedNameFilter">selectedNameFilter</a>() and
+<p><b>See also</b> <a href="qfiledialog.html#selectedNameFilter">selectedNameFilter</a>() and
 <a href="qfiledialog.html#selectFile">selectFile</a>().</p>
 
 
 <h3 class="fn"><a name="selectedFilter" />QString QFileDialog.selectedFilter (<i>self</i>)</h3><h3 class="fn"><a name="selectedNameFilter" />QString QFileDialog.selectedNameFilter (<i>self</i>)</h3><p>Returns the filter that the user selected in the file
 dialog.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qfiledialog.html#selectedFiles">selectedFiles</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#selectedFiles">selectedFiles</a>().</p>
 
 
 <h3 class="fn"><a name="selectFile" />QFileDialog.selectFile (<i>self</i>, QString&#160;<i>filename</i>)</h3><p>Selects the given <i>filename</i> in the file dialog.</p>
-<p>See also <a href="qfiledialog.html#selectedFiles">selectedFiles</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#selectedFiles">selectedFiles</a>().</p>
 
 
 <h3 class="fn"><a name="selectFilter" />QFileDialog.selectFilter (<i>self</i>, QString&#160;<i>filter</i>)</h3><h3 class="fn"><a name="selectNameFilter" />QFileDialog.selectNameFilter (<i>self</i>, QString&#160;<i>filter</i>)</h3><p>Sets the current file type <i>filter</i>. Multiple filters can
 be passed in <i>filter</i> by separating them with semicolons or
 spaces.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qfiledialog.html#setNameFilter">setNameFilter</a>(), <a href="qfiledialog.html#setNameFilters">setNameFilters</a>(), and
+<p><b>See also</b> <a href="qfiledialog.html#setNameFilter">setNameFilter</a>(), <a href="qfiledialog.html#setNameFilters">setNameFilters</a>(), and
 <a href="qfiledialog.html#selectedNameFilter">selectedNameFilter</a>().</p>
 
 
 <h3 class="fn"><a name="setAcceptMode" />QFileDialog.setAcceptMode (<i>self</i>, <a href="qfiledialog.html#AcceptMode-enum">AcceptMode</a>&#160;<i>mode</i>)</h3><h3 class="fn"><a name="setConfirmOverwrite" />QFileDialog.setConfirmOverwrite (<i>self</i>, bool&#160;<i>enabled</i>)</h3><h3 class="fn"><a name="setDefaultSuffix" />QFileDialog.setDefaultSuffix (<i>self</i>, QString&#160;<i>suffix</i>)</h3><h3 class="fn"><a name="setDirectory" />QFileDialog.setDirectory (<i>self</i>, QString&#160;<i>directory</i>)</h3><p>Sets the file dialog's current <i>directory</i>.</p>
-<p>See also <a href="qfiledialog.html#directory">directory</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#directory">directory</a>().</p>
 
 
 <h3 class="fn"><a name="setDirectory-2" />QFileDialog.setDirectory (<i>self</i>, <a href="qdir.html">QDir</a>&#160;<i>adirectory</i>)</h3><p>This is an overloaded function.</p>
@@ -579,17 +579,17 @@ spaces.</p>
 <h3 class="fn"><a name="setFileMode" />QFileDialog.setFileMode (<i>self</i>, <a href="qfiledialog.html#FileMode-enum">FileMode</a>&#160;<i>mode</i>)</h3><h3 class="fn"><a name="setFilter" />QFileDialog.setFilter (<i>self</i>, QString&#160;<i>filter</i>)</h3><p>Sets the filter used by the model to <i>filters</i>. The filter
 is used to specify the kind of files that should be shown.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qfiledialog.html#filter">filter</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#filter">filter</a>().</p>
 
 
 <h3 class="fn"><a name="setFilter-2" />QFileDialog.setFilter (<i>self</i>, <a href="qdir-filters.html">QDir.Filters</a>&#160;<i>filters</i>)</h3><h3 class="fn"><a name="setFilters" />QFileDialog.setFilters (<i>self</i>, QStringList&#160;<i>filters</i>)</h3><h3 class="fn"><a name="setHistory" />QFileDialog.setHistory (<i>self</i>, QStringList&#160;<i>paths</i>)</h3><p>Sets the browsing history of the filedialog to contain the given
 <i>paths</i>.</p>
-<p>See also <a href="qfiledialog.html#history">history</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#history">history</a>().</p>
 
 
 <h3 class="fn"><a name="setIconProvider" />QFileDialog.setIconProvider (<i>self</i>, <a href="qfileiconprovider.html">QFileIconProvider</a>&#160;<i>provider</i>)</h3><p>Sets the icon provider used by the filedialog to the specified
 <i>provider</i>.</p>
-<p>See also <a href="qfiledialog.html#iconProvider">iconProvider</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#iconProvider">iconProvider</a>().</p>
 
 
 <h3 class="fn"><a name="setItemDelegate" />QFileDialog.setItemDelegate (<i>self</i>, <a href="qabstractitemdelegate.html">QAbstractItemDelegate</a>&#160;<i>delegate</i>)</h3><p>Sets the item delegate used to render items in the views in the
@@ -604,13 +604,13 @@ been closed.</p>
 data roles, which is described by the <a href="qfilesystemmodel.html#Roles-enum">Roles</a> enum. You can use a
 <a href="qfileiconprovider.html">QFileIconProvider</a> if you only
 want custom icons.</p>
-<p>See also <a href="qfiledialog.html#itemDelegate">itemDelegate</a>(), <a href="qfiledialog.html#setIconProvider">setIconProvider</a>(), and
+<p><b>See also</b> <a href="qfiledialog.html#itemDelegate">itemDelegate</a>(), <a href="qfiledialog.html#setIconProvider">setIconProvider</a>(), and
 <a href="qfilesystemmodel.html">QFileSystemModel</a>.</p>
 
 
 <h3 class="fn"><a name="setLabelText" />QFileDialog.setLabelText (<i>self</i>, <a href="qfiledialog.html#DialogLabel-enum">DialogLabel</a>&#160;<i>label</i>, QString&#160;<i>text</i>)</h3><p>Sets the <i>text</i> shown in the filedialog in the specified
 <i>label</i>.</p>
-<p>See also <a href="qfiledialog.html#labelText">labelText</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#labelText">labelText</a>().</p>
 
 
 <h3 class="fn"><a name="setNameFilter" />QFileDialog.setNameFilter (<i>self</i>, QString&#160;<i>filter</i>)</h3><p>Sets the filter used in the file dialog to the given
@@ -619,34 +619,33 @@ want custom icons.</p>
 or more of <b>anything*something</b>, separated by spaces, then
 only the text contained in the parentheses is used as the filter.
 This means that these calls are all equivalent:</p>
-<pre class="highlightedCode brush: cpp">
- dialog.setNameFilter("All C++ files (*.cpp *.cc *.C *.cxx *.c++)");
- dialog.setNameFilter("*.cpp *.cc *.C *.cxx *.c++");
+<pre class="cpp">
+ dialog<span class="operator">.</span>setNameFilter(<span class="string">"All C++ files (*.cpp *.cc *.C *.cxx *.c++)"</span>);
+ dialog<span class="operator">.</span>setNameFilter(<span class="string">"*.cpp *.cc *.C *.cxx *.c++"</span>);
 </pre>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qfiledialog.html#setNameFilters">setNameFilters</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#setNameFilters">setNameFilters</a>().</p>
 
 
 <h3 class="fn"><a name="setNameFilterDetailsVisible" />QFileDialog.setNameFilterDetailsVisible (<i>self</i>, bool&#160;<i>enabled</i>)</h3><h3 class="fn"><a name="setNameFilters" />QFileDialog.setNameFilters (<i>self</i>, QStringList&#160;<i>filters</i>)</h3><p>Sets the <i>filters</i> used in the file dialog.</p>
-<pre class="highlightedCode brush: cpp">
- QStringList filters;
- filters &lt;&lt; "Image files (*.png *.xpm *.jpg)"
-         &lt;&lt; "Text files (*.txt)"
-         &lt;&lt; "Any files (*)";
+<pre class="cpp">
+ <span class="type"><a href="qstringlist.html">QStringList</a></span> filters;
+ filters <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Image files (*.png *.xpm *.jpg)"</span>
+         <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Text files (*.txt)"</span>
+         <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="string">"Any files (*)"</span>;
 
- QFileDialog dialog(this);
- dialog.setNameFilters(filters);
- dialog.exec();
+ <span class="type"><a href="qfiledialog.html">QFileDialog</a></span> dialog(<span class="keyword">this</span>);
+ dialog<span class="operator">.</span>setNameFilters(filters);
+ dialog<span class="operator">.</span><a href="qdialog.html#exec">exec_</a>();
 </pre>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qfiledialog.html#nameFilters">nameFilters</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#nameFilters">nameFilters</a>().</p>
 
 
 <h3 class="fn"><a name="setOption" />QFileDialog.setOption (<i>self</i>, <a href="qfiledialog.html#Option-enum">Option</a>&#160;<i>option</i>, bool&#160;<i>on</i>&#160;=&#160;True)</h3><p>Sets the given <i>option</i> to be enabled if <i>on</i> is true;
 otherwise, clears the given <i>option</i>.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qfiledialog.html#options-prop">options</a> and
-<a href="qfiledialog.html#testOption">testOption</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#options-prop">options</a> and <a href="qfiledialog.html#testOption">testOption</a>().</p>
 
 
 <h3 class="fn"><a name="setOptions" />QFileDialog.setOptions (<i>self</i>, <a href="qfiledialog-options.html">Options</a>&#160;<i>options</i>)</h3><h3 class="fn"><a name="setProxyModel" />QFileDialog.setProxyModel (<i>self</i>, <a href="qabstractproxymodel.html">QAbstractProxyModel</a>&#160;<i>model</i>)</h3><p>The <i>model</i> argument has it's ownership transferred to Qt.</p><p>Sets the model for the views to the given <i>proxyModel</i>.
@@ -655,27 +654,27 @@ example, to add columns, filter data or add drives.</p>
 <p>Any existing proxy model will be removed, but not deleted. The
 file dialog will take ownership of the <i>proxyModel</i>.</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qfiledialog.html#proxyModel">proxyModel</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#proxyModel">proxyModel</a>().</p>
 
 
 <h3 class="fn"><a name="setReadOnly" />QFileDialog.setReadOnly (<i>self</i>, bool&#160;<i>enabled</i>)</h3><h3 class="fn"><a name="setResolveSymlinks" />QFileDialog.setResolveSymlinks (<i>self</i>, bool&#160;<i>enabled</i>)</h3><h3 class="fn"><a name="setSidebarUrls" />QFileDialog.setSidebarUrls (<i>self</i>, list-of-QUrl&#160;<i>urls</i>)</h3><p>Sets the <i>urls</i> that are located in the sidebar.</p>
 <p>For instance:</p>
-<pre class="highlightedCode brush: cpp">
-     QList&lt;QUrl&gt; urls;
-     urls &lt;&lt; QUrl.fromLocalFile("/home/gvatteka/dev/qt-45")
-          &lt;&lt; QUrl.fromLocalFile(QDesktopServices.storageLocation(QDesktopServices.MusicLocation));
+<pre class="cpp">
+     <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qurl.html">QUrl</a></span><span class="operator">&gt;</span> urls;
+     urls <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="type"><a href="qurl.html">QUrl</a></span><span class="operator">.</span>fromLocalFile(<span class="string">"/home/gvatteka/dev/qt-45"</span>)
+          <span class="operator">&lt;</span><span class="operator">&lt;</span> <span class="type"><a href="qurl.html">QUrl</a></span><span class="operator">.</span>fromLocalFile(<span class="type"><a href="qdesktopservices.html">QDesktopServices</a></span><span class="operator">.</span>storageLocation(<span class="type"><a href="qdesktopservices.html">QDesktopServices</a></span><span class="operator">.</span>MusicLocation));
 
-     QFileDialog dialog;
-     dialog.setSidebarUrls(urls);
-     dialog.setFileMode(QFileDialog.AnyFile);
-     if(dialog.exec()) {
+     <span class="type"><a href="qfiledialog.html">QFileDialog</a></span> dialog;
+     dialog<span class="operator">.</span>setSidebarUrls(urls);
+     dialog<span class="operator">.</span>setFileMode(<span class="type"><a href="qfiledialog.html">QFileDialog</a></span><span class="operator">.</span>AnyFile);
+     <span class="keyword">if</span>(dialog<span class="operator">.</span>exec()) {
          <span class="comment">// ...</span>
      }
 </pre>
 <p>The file dialog will then look like this:</p>
 <p class="centerAlign"><img src="images/filedialogurls.png" /></p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qfiledialog.html#sidebarUrls">sidebarUrls</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#sidebarUrls">sidebarUrls</a>().</p>
 
 
 <h3 class="fn"><a name="setViewMode" />QFileDialog.setViewMode (<i>self</i>, <a href="qfiledialog.html#ViewMode-enum">ViewMode</a>&#160;<i>mode</i>)</h3><h3 class="fn"><a name="setVisible" />QFileDialog.setVisible (<i>self</i>, bool&#160;<i>visible</i>)</h3><p>Reimplemented from <a href="qwidget.html#visible-prop">QWidget.setVisible</a>().</p>
@@ -683,17 +682,16 @@ file dialog will take ownership of the <i>proxyModel</i>.</p>
 
 <h3 class="fn"><a name="sidebarUrls" />list-of-QUrl QFileDialog.sidebarUrls (<i>self</i>)</h3><p>Returns a list of urls that are currently in the sidebar</p>
 <p>This function was introduced in Qt 4.3.</p>
-<p>See also <a href="qfiledialog.html#setSidebarUrls">setSidebarUrls</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#setSidebarUrls">setSidebarUrls</a>().</p>
 
 
 <h3 class="fn"><a name="testOption" />bool QFileDialog.testOption (<i>self</i>, <a href="qfiledialog.html#Option-enum">Option</a>&#160;<i>option</i>)</h3><p>Returns true if the given <i>option</i> is enabled; otherwise,
 returns false.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<p>See also <a href="qfiledialog.html#options-prop">options</a> and
-<a href="qfiledialog.html#setOption">setOption</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#options-prop">options</a> and <a href="qfiledialog.html#setOption">setOption</a>().</p>
 <h3 class="fn"><a name="viewMode" /><a href="qfiledialog.html#ViewMode-enum">ViewMode</a> QFileDialog.viewMode (<i>self</i>)</h3><hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="currentChanged" />void currentChanged (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>When the current file changes, this signal is emitted with the
 new file name as the <i>path</i> parameter.</p>
-<p>See also <a href="qfiledialog.html#filesSelected">filesSelected</a>().</p>
+<p><b>See also</b> <a href="qfiledialog.html#filesSelected">filesSelected</a>().</p>
 
 
 <h3 class="fn"><a name="directoryEntered" />void directoryEntered (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the user enters a
@@ -704,13 +702,13 @@ new file name as the <i>path</i> parameter.</p>
 <h3 class="fn"><a name="fileSelected" />void fileSelected (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>When the selection changes and the dialog is accepted, this
 signal is emitted with the (possibly empty) selected
 <i>file</i>.</p>
-<p>See also <a href="qfiledialog.html#currentChanged">currentChanged</a>() and <a href="qdialog.html#DialogCode-enum">QDialog.Accepted</a>.</p>
+<p><b>See also</b> <a href="qfiledialog.html#currentChanged">currentChanged</a>() and <a href="qdialog.html#DialogCode-enum">QDialog.Accepted</a>.</p>
 
 
 <h3 class="fn"><a name="filesSelected" />void filesSelected (const QStringList&amp;)</h3><p>This is the default overload of this signal.</p><p>When the selection changes and the dialog is accepted, this
 signal is emitted with the (possibly empty) list of <i>selected</i>
 files.</p>
-<p>See also <a href="qfiledialog.html#currentChanged">currentChanged</a>() and <a href="qdialog.html#DialogCode-enum">QDialog.Accepted</a>.</p>
+<p><b>See also</b> <a href="qfiledialog.html#currentChanged">currentChanged</a>() and <a href="qdialog.html#DialogCode-enum">QDialog.Accepted</a>.</p>
 
 
 <h3 class="fn"><a name="filterSelected" />void filterSelected (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the user selects a
@@ -718,4 +716,4 @@ files.</p>
 <p>This function was introduced in Qt 4.3.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

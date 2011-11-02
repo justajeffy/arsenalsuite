@@ -84,7 +84,7 @@ changes all related QNetworkConfiguration instances change their
 state automatically.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="BearerType-enum" />QNetworkConfiguration.BearerType</h3><p>Specifies the type of bearer used by a configuration.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -92,7 +92,7 @@ state automatically.</p>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.BearerUnknown</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The type of bearer is unknown or unspecified.
 The <a href="qnetworkconfiguration.html#bearerTypeName">bearerTypeName</a>()
 function may return additional information.</td>
@@ -100,54 +100,54 @@ function may return additional information.</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.BearerEthernet</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The configuration is for an Ethernet
 interfaces.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.BearerWLAN</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The configuration is for a Wireless LAN
 interface.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkConfiguration.Bearer2G</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The configuration is for a CSD, GPRS, HSCSD,
 EDGE or cdmaOne interface.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.BearerCDMA2000</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The configuration is for CDMA interface.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.BearerWCDMA</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The configuration is for W-CDMA/UMTS
 interface.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.BearerHSPA</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">The configuration is for High Speed Packet
 Access (HSPA) interface.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.BearerBluetooth</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 <td class="topAlign">The configuration is for a Bluetooth
 interface.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.BearerWiMAX</tt></td>
-<td class=" topAlign"><tt>8</tt></td>
+<td class="topAlign"><tt>8</tt></td>
 <td class="topAlign">The configuration is for a WiMAX
 interface.</td>
 </tr>
@@ -156,7 +156,7 @@ interface.</td>
 
 <h3 class="fn"><a name="Purpose-enum" />QNetworkConfiguration.Purpose</h3><p>Specifies the purpose of the configuration.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -164,28 +164,28 @@ interface.</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.UnknownPurpose</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The configuration doesn't specify any purpose.
 This is the default value.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.PublicPurpose</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The configuration can be used for general
 purpose internet access.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.PrivatePurpose</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The configuration is suitable to access a
 private network such as an office Intranet.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.ServiceSpecificPurpose</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The configuration can be used for operator
 specific services (e.g. receiving MMS messages or content
 streaming).</td>
@@ -195,21 +195,21 @@ streaming).</td>
 
 <h3 class="fn"><a name="StateFlag-enum" />QNetworkConfiguration.StateFlag</h3><p>Specifies the configuration states.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkConfiguration.Undefined</tt></td>
-<td class=" topAlign"><tt>0x0000001</tt></td>
+<td class="topAlign"><tt>0x0000001</tt></td>
 <td class="topAlign">This state is used for transient
 configurations such as newly discovered WLANs for which the user
 has not actually created a configuration yet.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkConfiguration.Defined</tt></td>
-<td class=" topAlign"><tt>0x0000002</tt></td>
+<td class="topAlign"><tt>0x0000002</tt></td>
 <td class="topAlign">Defined configurations are known to the system
 but are not immediately usable (e.g. a configured WLAN is not
 within range or the Ethernet cable is currently not plugged into
@@ -218,7 +218,7 @@ the machine).</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.Discovered</tt></td>
-<td class=" topAlign"><tt>0x0000006</tt></td>
+<td class="topAlign"><tt>0x0000006</tt></td>
 <td class="topAlign">A discovered configuration can be immediately
 used to create a new <a href="qnetworksession.html">QNetworkSession</a>. An example of a
 discovered configuration could be a WLAN which is within in range.
@@ -232,7 +232,7 @@ points configurations has the Discovered state.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkConfiguration.Active</tt></td>
-<td class=" topAlign"><tt>0x000000e</tt></td>
+<td class="topAlign"><tt>0x000000e</tt></td>
 <td class="topAlign">The configuration is currently used by an open
 network session (see <a href="qnetworksession.html#isOpen">QNetworkSession.isOpen</a>()).
 However this does not mean that the current process is the entity
@@ -250,7 +250,7 @@ combination of StateFlag values.</p>
 
 <h3 class="fn"><a name="Type-enum" />QNetworkConfiguration.Type</h3><p>This enum describes the type of configuration.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -258,7 +258,7 @@ combination of StateFlag values.</p>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.InternetAccessPoint</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The configuration specifies the details for a
 single access point. Note that configurations of type
 InternetAccessPoint may be part of other QNetworkConfigurations of
@@ -267,7 +267,7 @@ type ServiceNetwork.</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.ServiceNetwork</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The configuration is based on a group of
 QNetworkConfigurations of type InternetAccessPoint. All group
 members can reach the same target network. This type of
@@ -278,7 +278,7 @@ also be called Service Network Access Point (SNAP).</td>
 <tr>
 <td class="topAlign">
 <tt>QNetworkConfiguration.UserChoice</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The configuration is a placeholder which will
 be resolved to an actual configuration by the platform when a
 session is opened. Depending on the platform the selection may
@@ -287,12 +287,12 @@ choice.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QNetworkConfiguration.Invalid</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The configuration is invalid.</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QNetworkConfiguration" />QNetworkConfiguration.__init__ (<i>self</i>)</h3><p>Constructs an invalid configuration object.</p>
-<p>See also <a href="qnetworkconfiguration.html#isValid">isValid</a>().</p>
+<p><b>See also</b> <a href="qnetworkconfiguration.html#isValid">isValid</a>().</p>
 
 
 <h3 class="fn"><a name="QNetworkConfiguration-2" />QNetworkConfiguration.__init__ (<i>self</i>, <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>&#160;<i>other</i>)</h3><p>Creates a copy of the <a href="qnetworkconfiguration.html">QNetworkConfiguration</a> object
@@ -326,90 +326,54 @@ unknown this function may return additional information if it is
 available; otherwise an empty string will be returned.</p>
 <table class="generic">
 <thead>
-<tr class="qt-style topAlign">
+<tr class="qt-style">
 <th><a href="qnetworkconfiguration.html#BearerType-enum">BearerType</a></th>
 <th>Value</th>
 </tr>
 </thead>
-<tr class="odd topAlign">
-<td>
-<p><a href="qnetworkconfiguration.html#BearerType-enum">BearerUnknown</a></p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qnetworkconfiguration.html#BearerType-enum">BearerUnknown</a></td>
 <td />
-<td>
-<p>The session is based on an unknown or unspecified bearer type.
-The value of the string returned describes the bearer type.</p>
-</td>
+<td>The session is based on an unknown or unspecified bearer type.
+The value of the string returned describes the bearer type.</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qnetworkconfiguration.html#BearerType-enum">BearerEthernet</a></p>
-</td>
-<td>
-<p>Ethernet</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qnetworkconfiguration.html#BearerType-enum">BearerEthernet</a></td>
+<td>Ethernet</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qnetworkconfiguration.html#BearerType-enum">BearerWLAN</a></p>
-</td>
-<td>
-<p>WLAN</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qnetworkconfiguration.html#BearerType-enum">BearerWLAN</a></td>
+<td>WLAN</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qnetworkconfiguration.html#BearerType-enum">Bearer2G</a></p>
-</td>
-<td>
-<p>2G</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qnetworkconfiguration.html#BearerType-enum">Bearer2G</a></td>
+<td>2G</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qnetworkconfiguration.html#BearerType-enum">BearerCDMA2000</a></p>
-</td>
-<td>
-<p>CDMA2000</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qnetworkconfiguration.html#BearerType-enum">BearerCDMA2000</a></td>
+<td>CDMA2000</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qnetworkconfiguration.html#BearerType-enum">BearerWCDMA</a></p>
-</td>
-<td>
-<p>WCDMA</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qnetworkconfiguration.html#BearerType-enum">BearerWCDMA</a></td>
+<td>WCDMA</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qnetworkconfiguration.html#BearerType-enum">BearerHSPA</a></p>
-</td>
-<td>
-<p>HSPA</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qnetworkconfiguration.html#BearerType-enum">BearerHSPA</a></td>
+<td>HSPA</td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p><a href="qnetworkconfiguration.html#BearerType-enum">BearerBluetooth</a></p>
-</td>
-<td>
-<p>Bluetooth</p>
-</td>
+<tr class="even" valign="top">
+<td><a href="qnetworkconfiguration.html#BearerType-enum">BearerBluetooth</a></td>
+<td>Bluetooth</td>
 </tr>
-<tr class="odd topAlign">
-<td>
-<p><a href="qnetworkconfiguration.html#BearerType-enum">BearerWiMAX</a></p>
-</td>
-<td>
-<p>WiMAX</p>
-</td>
+<tr class="odd" valign="top">
+<td><a href="qnetworkconfiguration.html#BearerType-enum">BearerWiMAX</a></td>
+<td>WiMAX</td>
 </tr>
 </table>
 <p>This function returns an empty string if this is an invalid
 configuration, a network configuration of type <a href="qnetworkconfiguration.html#Type-enum">QNetworkConfiguration.ServiceNetwork</a>
 or <a href="qnetworkconfiguration.html#Type-enum">QNetworkConfiguration.UserChoice</a>.</p>
-<p>See also <a href="qnetworkconfiguration.html#bearerType">bearerType</a>().</p>
+<p><b>See also</b> <a href="qnetworkconfiguration.html#bearerType">bearerType</a>().</p>
 
 
 <h3 class="fn"><a name="children" />list-of-QNetworkConfiguration QNetworkConfiguration.children (<i>self</i>)</h3><p>Returns all sub configurations of this network configuration in
@@ -432,7 +396,7 @@ valid. A configuration may become invalid if the user deletes the
 configuration or the configuration was default-constructed.</p>
 <p>The addition and removal of configurations can be monitored via
 the <a href="qnetworkconfigurationmanager.html">QNetworkConfigurationManager</a>.</p>
-<p>See also <a href="qnetworkconfigurationmanager.html">QNetworkConfigurationManager</a>.</p>
+<p><b>See also</b> <a href="qnetworkconfigurationmanager.html">QNetworkConfigurationManager</a>.</p>
 
 
 <h3 class="fn"><a name="name" />QString QNetworkConfiguration.name (<i>self</i>)</h3><p>Returns the user visible name of this configuration.</p>
@@ -458,4 +422,4 @@ service network can potentially support roaming of network
 sessions.</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QNetworkConfiguration.__eq__ (<i>self</i>, <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>&#160;<i>cp</i>)</h3><h3 class="fn"><a name="__ne__" />bool QNetworkConfiguration.__ne__ (<i>self</i>, <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>&#160;<i>cp</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QNetworkConfiguration.__eq__ (<i>self</i>, <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>&#160;<i>cp</i>)</h3><h3 class="fn"><a name="__ne__" />bool QNetworkConfiguration.__ne__ (<i>self</i>, <a href="qnetworkconfiguration.html">QNetworkConfiguration</a>&#160;<i>cp</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

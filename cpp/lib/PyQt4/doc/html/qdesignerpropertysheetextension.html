@@ -17,17 +17,17 @@ Designer's property editor.</p>
 functions that are typically used to query a widget's properties,
 and to manipulate the properties' appearance in the property
 editor. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QDesignerPropertySheetExtension *propertySheet  = 0;
- QExtensionManager manager = formEditor-&gt;extensionManager();
+<pre class="cpp">
+ <span class="type">QDesignerPropertySheetExtension</span> <span class="operator">*</span>propertySheet  <span class="operator">=</span> <span class="number">0</span>;
+ <span class="type"><a href="qextensionmanager.html">QExtensionManager</a></span> manager <span class="operator">=</span> formEditor<span class="operator">-</span><span class="operator">&gt;</span>extensionManager();
 
- propertySheet = qt_extension&lt;QDesignerPropertySheetExtension*&gt;(manager, widget);
- int index = propertySheet-&gt;indexOf(QLatin1String("margin"));
+ propertySheet <span class="operator">=</span> qt_extension<span class="operator">&lt;</span><span class="type">QDesignerPropertySheetExtension</span><span class="operator">*</span><span class="operator">&gt;</span>(manager<span class="operator">,</span> widget);
+ <span class="type">int</span> index <span class="operator">=</span> propertySheet<span class="operator">-</span><span class="operator">&gt;</span><a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(QLatin1String(<span class="string">"margin"</span>));
 
- propertySheet-&gt;setProperty(index, 10);
- propertySheet-&gt;setChanged(index, true);
+ propertySheet<span class="operator">-</span><span class="operator">&gt;</span><a href="qdesignerpropertysheetextension.html#setProperty">setProperty</a>(index<span class="operator">,</span> <span class="number">10</span>);
+ propertySheet<span class="operator">-</span><span class="operator">&gt;</span><a href="qdesignerpropertysheetextension.html#setChanged">setChanged</a>(index<span class="operator">,</span> <span class="keyword">true</span>);
 
- delete propertySheet;
+ <span class="keyword">delete</span> propertySheet;
 </pre>
 <p>Note that if you change the value of a property using the
 <a href="qdesignerpropertysheetextension.html#setProperty">QDesignerPropertySheetExtension.setProperty</a>()
@@ -61,15 +61,15 @@ inherit from both <a href="qobject.html">QObject</a> and
 QDesignerPropertySheetExtension. Then, since we are implementing an
 interface, we must ensure that it's made known to the meta object
 system using the <a href="qobject.html#Q_INTERFACES">Q_INTERFACES</a>() macro:</p>
-<pre class="highlightedCode brush: cpp">
- class MyPropertySheetExtension : public QObject,
-         public QDesignerPropertySheetExtension
+<pre class="cpp">
+ <span class="keyword">class</span> MyPropertySheetExtension : <span class="keyword">public</span> <span class="type"><a href="qobject.html">QObject</a></span><span class="operator">,</span>
+         <span class="keyword">public</span> <span class="type">QDesignerPropertySheetExtension</span>
  {
      Q_OBJECT
-     Q_INTERFACES(QDesignerPropertySheetExtension)
+     Q_INTERFACES(<span class="type">QDesignerPropertySheetExtension</span>)
 
- public:
-     ...
+ <span class="keyword">public</span>:
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
 <p>This enables <i>Qt Designer</i> to use <a href="qobject.html#qobject_cast">qobject_cast</a>() to query for
@@ -102,37 +102,37 @@ interface for custom extension factories. You can either create a
 new <a href="qextensionfactory.html">QExtensionFactory</a> and
 reimplement the <a href="qextensionfactory.html#createExtension">QExtensionFactory.createExtension</a>()
 function. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QObject *ANewExtensionFactory.createExtension(QObject *object,
-         const QString &amp;iid, QObject *parent) const
+<pre class="cpp">
+ <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>ANewExtensionFactory<span class="operator">.</span>createExtension(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>object<span class="operator">,</span>
+         <span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>iid<span class="operator">,</span> <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>parent) <span class="keyword">const</span>
  {
-     if (iid != Q_TYPEID(QDesignerPropertySheetExtension))
-         return 0;
+     <span class="keyword">if</span> (iid <span class="operator">!</span><span class="operator">=</span> Q_TYPEID(<span class="type">QDesignerPropertySheetExtension</span>))
+         <span class="keyword">return</span> <span class="number">0</span>;
 
-     if (MyCustomWidget *widget = qobject_cast&lt;MyCustomWidget*&gt;
+     <span class="keyword">if</span> (MyCustomWidget <span class="operator">*</span>widget <span class="operator">=</span> qobject_cast<span class="operator">&lt;</span>MyCustomWidget<span class="operator">*</span><span class="operator">&gt;</span>
             (object))
-         return new MyPropertySheetExtension(widget, parent);
+         <span class="keyword">return</span> <span class="keyword">new</span> MyPropertySheetExtension(widget<span class="operator">,</span> parent);
 
-     return 0;
+     <span class="keyword">return</span> <span class="number">0</span>;
  }
 </pre>
 <p>Or you can use an existing factory, expanding the <a href="qextensionfactory.html#createExtension">QExtensionFactory.createExtension</a>()
 function to make the factory able to create a property sheet
 extension extension as well. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QObject *AGeneralExtensionFactory.createExtension(QObject *object,
-         const QString &amp;iid, QObject *parent) const
+<pre class="cpp">
+ <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>AGeneralExtensionFactory<span class="operator">.</span>createExtension(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>object<span class="operator">,</span>
+         <span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>iid<span class="operator">,</span> <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>parent) <span class="keyword">const</span>
  {
-     MyCustomWidget *widget = qobject_cast&lt;MyCustomWidget*&gt;(object);
+     MyCustomWidget <span class="operator">*</span>widget <span class="operator">=</span> qobject_cast<span class="operator">&lt;</span>MyCustomWidget<span class="operator">*</span><span class="operator">&gt;</span>(object);
 
-     if (widget &amp;&amp; (iid == Q_TYPEID(QDesignerTaskMenuExtension))) {
-         return new MyTaskMenuExtension(widget, parent);
+     <span class="keyword">if</span> (widget <span class="operator">&amp;</span><span class="operator">&amp;</span> (iid <span class="operator">=</span><span class="operator">=</span> Q_TYPEID(<span class="type"><a href="qdesignertaskmenuextension.html">QDesignerTaskMenuExtension</a></span>))) {
+         <span class="keyword">return</span> <span class="keyword">new</span> MyTaskMenuExtension(widget<span class="operator">,</span> parent);
 
-     } else if (widget &amp;&amp; (iid == Q_TYPEID(QDesignerPropertySheetExtension))) {
-         return new MyPropertySheetExtension(widget, parent);
+     } <span class="keyword">else</span> <span class="keyword">if</span> (widget <span class="operator">&amp;</span><span class="operator">&amp;</span> (iid <span class="operator">=</span><span class="operator">=</span> Q_TYPEID(<span class="type">QDesignerPropertySheetExtension</span>))) {
+         <span class="keyword">return</span> <span class="keyword">new</span> MyPropertySheetExtension(widget<span class="operator">,</span> parent);
 
-     } else {
-         return 0;
+     } <span class="keyword">else</span> {
+         <span class="keyword">return</span> <span class="number">0</span>;
      }
  }
 </pre>
@@ -147,25 +147,25 @@ class to add custom items to <i>Qt Designer</i>'s task menu.</p>
 <h3 class="fn"><a name="hasReset" />bool QDesignerPropertySheetExtension.hasReset (<i>self</i>, int&#160;<i>index</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns true if the property at the given <i>index</i> has a
 reset button in <i>Qt Designer</i>'s property editor, otherwise
 false.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
 <a href="qdesignerpropertysheetextension.html#reset">reset</a>().</p>
 
 
 <h3 class="fn"><a name="indexOf" />int QDesignerPropertySheetExtension.indexOf (<i>self</i>, QString&#160;<i>name</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the index for a given property <i>name</i>.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#propertyName">propertyName</a>().</p>
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#propertyName">propertyName</a>().</p>
 
 
 <h3 class="fn"><a name="isAttribute" />bool QDesignerPropertySheetExtension.isAttribute (<i>self</i>, int&#160;<i>index</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns true if the property at the given <i>index</i> is an
 attribute, which will be <i>excluded</i> from the UI file,
 otherwise false.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
 <a href="qdesignerpropertysheetextension.html#setAttribute">setAttribute</a>().</p>
 
 
 <h3 class="fn"><a name="isChanged" />bool QDesignerPropertySheetExtension.isChanged (<i>self</i>, int&#160;<i>index</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns true if the value of the property at the given
 <i>index</i> differs from the property's default value, otherwise
 false.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(),
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(),
 <a href="qdesignerpropertysheetextension.html#setChanged">setChanged</a>(),
 and <a href="qdesignerpropertysheetextension.html#reset">reset</a>().</p>
 
@@ -173,12 +173,12 @@ and <a href="qdesignerpropertysheetextension.html#reset">reset</a>().</p>
 <h3 class="fn"><a name="isVisible" />bool QDesignerPropertySheetExtension.isVisible (<i>self</i>, int&#160;<i>index</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns true if the property at the given <i>index</i> is
 visible in <i>Qt Designer</i>'s property editor, otherwise
 false.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
 <a href="qdesignerpropertysheetextension.html#setVisible">setVisible</a>().</p>
 
 
 <h3 class="fn"><a name="property" />QVariant QDesignerPropertySheetExtension.property (<i>self</i>, int&#160;<i>index</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the value of the property at the given <i>index</i>.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(),
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(),
 <a href="qdesignerpropertysheetextension.html#setProperty">setProperty</a>(),
 and <a href="qdesignerpropertysheetextension.html#propertyGroup">propertyGroup</a>().</p>
 
@@ -192,18 +192,18 @@ function. The default group of any property is the name of the
 class that defines it. For example, the <a href="qobject.html#objectName-prop">QObject.objectName</a> property
 appears within the <a href="qobject.html">QObject</a> property
 group.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
 <a href="qdesignerpropertysheetextension.html#setPropertyGroup">setPropertyGroup</a>().</p>
 
 
 <h3 class="fn"><a name="propertyName" />QString QDesignerPropertySheetExtension.propertyName (<i>self</i>, int&#160;<i>index</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the name of the property at the given <i>index</i>.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>().</p>
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>().</p>
 
 
 <h3 class="fn"><a name="reset" />bool QDesignerPropertySheetExtension.reset (<i>self</i>, int&#160;<i>index</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Resets the value of the property at the given <i>index</i>, to
 the default value. Returns true if a default value could be found,
 otherwise false.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(),
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(),
 <a href="qdesignerpropertysheetextension.html#hasReset">hasReset</a>(), and
 <a href="qdesignerpropertysheetextension.html#isChanged">isChanged</a>().</p>
 
@@ -211,14 +211,14 @@ otherwise false.</p>
 <h3 class="fn"><a name="setAttribute" />QDesignerPropertySheetExtension.setAttribute (<i>self</i>, int&#160;<i>index</i>, bool&#160;<i>b</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>If <i>attribute</i> is true, the property at the given
 <i>index</i> is made an attribute which will be <i>excluded</i>
 from the UI file; otherwise it will be included.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
 <a href="qdesignerpropertysheetextension.html#isAttribute">isAttribute</a>().</p>
 
 
 <h3 class="fn"><a name="setChanged" />QDesignerPropertySheetExtension.setChanged (<i>self</i>, int&#160;<i>index</i>, bool&#160;<i>changed</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Sets whether the property at the given <i>index</i> is different
 from its default value, or not, depending on the <i>changed</i>
 parameter.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
 <a href="qdesignerpropertysheetextension.html#isChanged">isChanged</a>().</p>
 
 
@@ -230,7 +230,7 @@ property's value can be reverted using the undo stack, you must use
 the <a href="qdesignerformwindowcursorinterface.html#setProperty">QDesignerFormWindowCursorInterface.setProperty</a>()
 function, or its buddy <a href="qdesignerformwindowcursorinterface.html#setWidgetProperty">setWidgetProperty()</a>,
 instead.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(),
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(),
 <a href="qdesignerpropertysheetextension.html#property">property</a>(), and
 <a href="qdesignerpropertysheetextension.html#propertyGroup">propertyGroup</a>().</p>
 
@@ -243,7 +243,7 @@ of any property is the name of the class that defines it. For
 example, the <a href="qobject.html#objectName-prop">QObject.objectName</a> property
 appears within the <a href="qobject.html">QObject</a> property
 group.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(),
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>(),
 <a href="qdesignerpropertysheetextension.html#property">property</a>(), and
 <a href="qdesignerpropertysheetextension.html#propertyGroup">propertyGroup</a>().</p>
 
@@ -251,6 +251,6 @@ group.</p>
 <h3 class="fn"><a name="setVisible" />QDesignerPropertySheetExtension.setVisible (<i>self</i>, int&#160;<i>index</i>, bool&#160;<i>b</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>If <i>visible</i> is true, the property at the given
 <i>index</i> is visible in <i>Qt Designer</i>'s property editor;
 otherwise the property is hidden.</p>
-<p>See also <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
+<p><b>See also</b> <a href="qdesignerpropertysheetextension.html#indexOf">indexOf</a>() and
 <a href="qdesignerpropertysheetextension.html#isVisible">isVisible</a>().</p>
-<h3 class="fn"><a name="__len__" /> QDesignerPropertySheetExtension.__len__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__len__" /> QDesignerPropertySheetExtension.__len__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

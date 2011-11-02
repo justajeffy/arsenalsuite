@@ -27,26 +27,26 @@ set with <a href="qtextlayout.html#setText">setText</a>().</p>
 <p>The layout can be seen as a sequence of <a href="qtextline.html">QTextLine</a> objects; use <a href="qtextlayout.html#createLine">createLine</a>() to create a <a href="qtextline.html">QTextLine</a> instance, and <a href="qtextlayout.html#lineAt">lineAt</a>() or <a href="qtextlayout.html#lineForTextPosition">lineForTextPosition</a>() to
 retrieve created lines.</p>
 <p>Here is a code snippet that demonstrates the layout phase:</p>
-<pre class="highlightedCode brush: cpp">
- int leading = fontMetrics.leading();
- qreal height = 0;
- textLayout.beginLayout();
- while (1) {
-     QTextLine line = textLayout.createLine();
-     if (!line.isValid())
-         break;
+<pre class="cpp">
+ <span class="type">int</span> leading <span class="operator">=</span> fontMetrics<span class="operator">.</span>leading();
+ <span class="type"><a href="qtcore.html#qreal-typedef">qreal</a></span> height <span class="operator">=</span> <span class="number">0</span>;
+ textLayout<span class="operator">.</span><a href="qtextlayout.html#beginLayout">beginLayout</a>();
+ <span class="keyword">while</span> (<span class="number">1</span>) {
+     <span class="type"><a href="qtextline.html">QTextLine</a></span> line <span class="operator">=</span> textLayout<span class="operator">.</span>createLine();
+     <span class="keyword">if</span> (<span class="operator">!</span>line<span class="operator">.</span>isValid())
+         <span class="keyword">break</span>;
 
-     line.setLineWidth(lineWidth);
-     height += leading;
-     line.setPosition(QPointF(0, height));
-     height += line.height();
+     line<span class="operator">.</span>setLineWidth(lineWidth);
+     height <span class="operator">+</span><span class="operator">=</span> leading;
+     line<span class="operator">.</span>setPosition(<span class="type"><a href="qpointf.html">QPointF</a></span>(<span class="number">0</span><span class="operator">,</span> height));
+     height <span class="operator">+</span><span class="operator">=</span> line<span class="operator">.</span>height();
  }
- textLayout.endLayout();
+ textLayout<span class="operator">.</span><a href="qtextlayout.html#endLayout">endLayout</a>();
 </pre>
 <p>The text can then be rendered by calling the layout's <a href="qtextlayout.html#draw">draw</a>() function:</p>
-<pre class="highlightedCode brush: cpp">
- QPainter painter(this);
- textLayout.draw(&amp;painter, QPoint(0, 0));
+<pre class="cpp">
+ <span class="type"><a href="qpainter.html">QPainter</a></span> painter(<span class="keyword">this</span>);
+ textLayout<span class="operator">.</span><a href="qtextlayout.html#draw">draw</a>(<span class="operator">&amp;</span>painter<span class="operator">,</span> <span class="type"><a href="qpoint.html">QPoint</a></span>(<span class="number">0</span><span class="operator">,</span> <span class="number">0</span>));
 </pre>
 <p>For a given position in the text you can find a valid cursor
 position with <a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a>(),
@@ -60,15 +60,15 @@ position with <a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosi
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextLayout.SkipCharacters</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QTextLayout.SkipWords</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QTextLayout" />QTextLayout.__init__ (<i>self</i>)</h3><p>Constructs an empty text layout.</p>
-<p>See also <a href="qtextlayout.html#setText">setText</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#setText">setText</a>().</p>
 
 
 <h3 class="fn"><a name="QTextLayout-2" />QTextLayout.__init__ (<i>self</i>, QString&#160;<i>text</i>)</h3><p>Constructs a text layout to lay out the given <i>text</i>.</p>
@@ -83,7 +83,7 @@ the calculations will be done in screen metrics.</p>
 
 <h3 class="fn"><a name="QTextLayout-4" />QTextLayout.__init__ (<i>self</i>, <a href="qtextblock.html">QTextBlock</a>&#160;<i>b</i>)</h3><h3 class="fn"><a name="additionalFormats" />list-of-QTextLayout.FormatRange QTextLayout.additionalFormats (<i>self</i>)</h3><p>Returns the list of additional formats supported by the text
 layout.</p>
-<p>See also <a href="qtextlayout.html#setAdditionalFormats">setAdditionalFormats</a>()
+<p><b>See also</b> <a href="qtextlayout.html#setAdditionalFormats">setAdditionalFormats</a>()
 and <a href="qtextlayout.html#clearAdditionalFormats">clearAdditionalFormats</a>().</p>
 
 
@@ -96,12 +96,12 @@ layout.</p>
 
 <h3 class="fn"><a name="cacheEnabled" />bool QTextLayout.cacheEnabled (<i>self</i>)</h3><p>Returns true if the complete layout information is cached;
 otherwise returns false.</p>
-<p>See also <a href="qtextlayout.html#setCacheEnabled">setCacheEnabled</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#setCacheEnabled">setCacheEnabled</a>().</p>
 
 
 <h3 class="fn"><a name="clearAdditionalFormats" />QTextLayout.clearAdditionalFormats (<i>self</i>)</h3><p>Clears the list of additional formats supported by the text
 layout.</p>
-<p>See also <a href="qtextlayout.html#additionalFormats">additionalFormats</a>() and
+<p><b>See also</b> <a href="qtextlayout.html#additionalFormats">additionalFormats</a>() and
 <a href="qtextlayout.html#setAdditionalFormats">setAdditionalFormats</a>().</p>
 
 
@@ -151,7 +151,7 @@ corresponding position within the text is specified by
 
 <h3 class="fn"><a name="font" /><a href="qfont.html">QFont</a> QTextLayout.font (<i>self</i>)</h3><p>Returns the current font that is used for the layout, or a
 default font if none is set.</p>
-<p>See also <a href="qtextlayout.html#setFont">setFont</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#setFont">setFont</a>().</p>
 
 
 <h3 class="fn"><a name="isValidCursorPosition" />bool QTextLayout.isValidCursorPosition (<i>self</i>, int&#160;<i>pos</i>)</h3><p>Returns true if position <i>pos</i> is a valid cursor
@@ -169,17 +169,16 @@ In indic languages every syllable forms a grapheme cluster.</p>
 
 
 <h3 class="fn"><a name="lineAt" /><a href="qtextline.html">QTextLine</a> QTextLayout.lineAt (<i>self</i>, int&#160;<i>i</i>)</h3><p>Returns the <i>i</i>-th line of text in this text layout.</p>
-<p>See also <a href="qtextlayout.html#lineCount">lineCount</a>()
-and <a href="qtextlayout.html#lineForTextPosition">lineForTextPosition</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#lineCount">lineCount</a>() and <a href="qtextlayout.html#lineForTextPosition">lineForTextPosition</a>().</p>
 
 
 <h3 class="fn"><a name="lineCount" />int QTextLayout.lineCount (<i>self</i>)</h3><p>Returns the number of lines in this text layout.</p>
-<p>See also <a href="qtextlayout.html#lineAt">lineAt</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#lineAt">lineAt</a>().</p>
 
 
 <h3 class="fn"><a name="lineForTextPosition" /><a href="qtextline.html">QTextLine</a> QTextLayout.lineForTextPosition (<i>self</i>, int&#160;<i>pos</i>)</h3><p>Returns the line that contains the cursor position specified by
 <i>pos</i>.</p>
-<p>See also <a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a>()
+<p><b>See also</b> <a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a>()
 and <a href="qtextlayout.html#lineAt">lineAt</a>().</p>
 
 
@@ -187,26 +186,26 @@ and <a href="qtextlayout.html#lineAt">lineAt</a>().</p>
 essentially the width of the entire text.</p>
 <p><b>Warning:</b> This function only returns a valid value after
 the layout has been done.</p>
-<p>See also <a href="qtextlayout.html#minimumWidth">minimumWidth</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#minimumWidth">minimumWidth</a>().</p>
 
 
 <h3 class="fn"><a name="minimumWidth" />float QTextLayout.minimumWidth (<i>self</i>)</h3><p>The minimum width the layout needs. This is the width of the
 layout's smallest non-breakable substring.</p>
 <p><b>Warning:</b> This function only returns a valid value after
 the layout has been done.</p>
-<p>See also <a href="qtextlayout.html#maximumWidth">maximumWidth</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#maximumWidth">maximumWidth</a>().</p>
 
 
 <h3 class="fn"><a name="nextCursorPosition" />int QTextLayout.nextCursorPosition (<i>self</i>, int&#160;<i>oldPos</i>, <a href="qtextlayout.html#CursorMode-enum">CursorMode</a>&#160;<i>mode</i>&#160;=&#160;QTextLayout.SkipCharacters)</h3><p>Returns the next valid cursor position after <i>oldPos</i> that
 respects the given cursor <i>mode</i>.</p>
-<p>See also <a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a>()
+<p><b>See also</b> <a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a>()
 and <a href="qtextlayout.html#previousCursorPosition">previousCursorPosition</a>().</p>
 
 
 <h3 class="fn"><a name="position" /><a href="qpointf.html">QPointF</a> QTextLayout.position (<i>self</i>)</h3><p>The global position of the layout. This is independent of the
 bounding rectangle and of the layout process.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qtextlayout.html#setPosition">setPosition</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#setPosition">setPosition</a>().</p>
 
 
 <h3 class="fn"><a name="preeditAreaPosition" />int QTextLayout.preeditAreaPosition (<i>self</i>)</h3><p>Returns the position of the area in the text layout that will be
@@ -219,13 +218,13 @@ occurs.</p>
 
 <h3 class="fn"><a name="previousCursorPosition" />int QTextLayout.previousCursorPosition (<i>self</i>, int&#160;<i>oldPos</i>, <a href="qtextlayout.html#CursorMode-enum">CursorMode</a>&#160;<i>mode</i>&#160;=&#160;QTextLayout.SkipCharacters)</h3><p>Returns the first valid cursor position before <i>oldPos</i>
 that respects the given cursor <i>mode</i>.</p>
-<p>See also <a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a>()
+<p><b>See also</b> <a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a>()
 and <a href="qtextlayout.html#nextCursorPosition">nextCursorPosition</a>().</p>
 
 
 <h3 class="fn"><a name="setAdditionalFormats" />QTextLayout.setAdditionalFormats (<i>self</i>, list-of-QTextLayout.FormatRange&#160;<i>overrides</i>)</h3><p>Sets the additional formats supported by the text layout to
 <i>formatList</i>.</p>
-<p>See also <a href="qtextlayout.html#additionalFormats">additionalFormats</a>() and
+<p><b>See also</b> <a href="qtextlayout.html#additionalFormats">additionalFormats</a>() and
 <a href="qtextlayout.html#clearAdditionalFormats">clearAdditionalFormats</a>().</p>
 
 
@@ -236,16 +235,17 @@ layouting information away after a call to <a href="qtextlayout.html#endLayout">
 consumption. If you however want to draw the laid out text directly
 afterwards enabling caching might speed up drawing
 significantly.</p>
-<p>See also <a href="qtextlayout.html#cacheEnabled">cacheEnabled</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#cacheEnabled">cacheEnabled</a>().</p>
 
 
 <h3 class="fn"><a name="setFont" />QTextLayout.setFont (<i>self</i>, <a href="qfont.html">QFont</a>&#160;<i>f</i>)</h3><p>Sets the layout's font to the given <i>font</i>. The layout is
 invalidated and must be laid out again.</p>
-<p>See also <a href="qtextlayout.html#font">font</a>() and <a href="qtextlayout.html#text">text</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#font">font</a>() and
+<a href="qtextlayout.html#text">text</a>().</p>
 
 
 <h3 class="fn"><a name="setPosition" />QTextLayout.setPosition (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Moves the text layout to point <i>p</i>.</p>
-<p>See also <a href="qtextlayout.html#position">position</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#position">position</a>().</p>
 
 
 <h3 class="fn"><a name="setPreeditArea" />QTextLayout.setPreeditArea (<i>self</i>, int&#160;<i>position</i>, QString&#160;<i>text</i>)</h3><p>Sets the <i>position</i> and <i>text</i> of the area in the
@@ -256,20 +256,19 @@ layout that is processed before editing occurs.</p>
 invalidated and must be laid out again.</p>
 <p>Notice that when using this <a href="qtextlayout.html">QTextLayout</a> as part of a <a href="qtextdocument.html">QTextDocument</a> this method will have no
 effect.</p>
-<p>See also <a href="qtextlayout.html#text">text</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#text">text</a>().</p>
 
 
 <h3 class="fn"><a name="setTextOption" />QTextLayout.setTextOption (<i>self</i>, <a href="qtextoption.html">QTextOption</a>&#160;<i>option</i>)</h3><p>Sets the text option structure that controls the layout process
 to the given <i>option</i>.</p>
-<p>See also <a href="qtextlayout.html#textOption">textOption</a>()
-and <a href="qtextoption.html">QTextOption</a>.</p>
+<p><b>See also</b> <a href="qtextlayout.html#textOption">textOption</a>() and <a href="qtextoption.html">QTextOption</a>.</p>
 
 
 <h3 class="fn"><a name="text" />QString QTextLayout.text (<i>self</i>)</h3><p>Returns the layout's text.</p>
-<p>See also <a href="qtextlayout.html#setText">setText</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#setText">setText</a>().</p>
 
 
 <h3 class="fn"><a name="textOption" /><a href="qtextoption.html">QTextOption</a> QTextLayout.textOption (<i>self</i>)</h3><p>Returns the current text option used to control the layout
 process.</p>
-<p>See also <a href="qtextlayout.html#setTextOption">setTextOption</a>() and <a href="qtextoption.html">QTextOption</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qtextlayout.html#setTextOption">setTextOption</a>() and <a href="qtextoption.html">QTextOption</a>.</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

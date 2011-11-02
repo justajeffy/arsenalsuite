@@ -21,11 +21,11 @@ display data provided by models derived from the <a href="qabstractitemmodel.htm
 <p class="centerAlign"><img src="images/qcolumnview.png" /></p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QColumnView" />QColumnView.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a column view with a <i>parent</i> to represent a
 model's data. Use <a href="qcolumnview.html#setModel">setModel</a>() to set the model.</p>
-<p>See also <a href="qabstractitemmodel.html">QAbstractItemModel</a>.</p>
+<p><b>See also</b> <a href="qabstractitemmodel.html">QAbstractItemModel</a>.</p>
 
 
 <h3 class="fn"><a name="columnWidths" />list-of-int QColumnView.columnWidths (<i>self</i>)</h3><p>Returns a list of the width of all the columns in this view.</p>
-<p>See also <a href="qcolumnview.html#setColumnWidths">setColumnWidths</a>().</p>
+<p><b>See also</b> <a href="qcolumnview.html#setColumnWidths">setColumnWidths</a>().</p>
 
 
 <h3 class="fn"><a name="createColumn" /><a href="qabstractitemview.html">QAbstractItemView</a> QColumnView.createColumn (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>rootIndex</i>)</h3><p>To use a custom widget for the final column when you select an
@@ -33,7 +33,7 @@ item overload this function and return a widget. <i>index</i> is
 the root index that will be assigned to the view.</p>
 <p>Return the new view. <a href="qcolumnview.html">QColumnView</a>
 will automatically take ownership of the widget.</p>
-<p>See also <a href="qcolumnview.html#setPreviewWidget">setPreviewWidget</a>().</p>
+<p><b>See also</b> <a href="qcolumnview.html#setPreviewWidget">setPreviewWidget</a>().</p>
 
 
 <h3 class="fn"><a name="currentChanged" />QColumnView.currentChanged (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>current</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>previous</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void currentChanged(const QModelIndex&amp;,const QModelIndex&amp;)</tt>.</p><p>Reimplemented from <a href="qabstractitemview.html#currentChanged">QAbstractItemView.currentChanged</a>().</p>
@@ -50,7 +50,7 @@ them to the <i>column</i> such as the <a href="qabstractitemview.html#iconSize-p
 <a href="qabstractitemview.html#alternatingRowColors-prop">alternatingRowColors</a>().
 This can be useful when reimplementing <a href="qcolumnview.html#createColumn">createColumn</a>().</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qcolumnview.html#createColumn">createColumn</a>().</p>
+<p><b>See also</b> <a href="qcolumnview.html#createColumn">createColumn</a>().</p>
 
 
 <h3 class="fn"><a name="isIndexHidden" />bool QColumnView.isIndexHidden (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Reimplemented from <a href="qabstractitemview.html#isIndexHidden">QAbstractItemView.isIndexHidden</a>().</p>
@@ -62,7 +62,7 @@ the child index or down if there is no child</p>
 
 
 <h3 class="fn"><a name="previewWidget" /><a href="qwidget.html">QWidget</a> QColumnView.previewWidget (<i>self</i>)</h3><p>Returns the preview widget, or 0 if there is none.</p>
-<p>See also <a href="qcolumnview.html#setPreviewWidget">setPreviewWidget</a>() and
+<p><b>See also</b> <a href="qcolumnview.html#setPreviewWidget">setPreviewWidget</a>() and
 <a href="qcolumnview.html#updatePreviewWidget">updatePreviewWidget</a>().</p>
 
 
@@ -86,7 +86,7 @@ Extra values in the list are kept and used when the columns are
 created.</p>
 <p>If list contains too few values, only width of the rest of the
 columns will not be modified.</p>
-<p>See also <a href="qcolumnview.html#columnWidths">columnWidths</a>() and <a href="qcolumnview.html#createColumn">createColumn</a>().</p>
+<p><b>See also</b> <a href="qcolumnview.html#columnWidths">columnWidths</a>() and <a href="qcolumnview.html#createColumn">createColumn</a>().</p>
 
 
 <h3 class="fn"><a name="setModel" />QColumnView.setModel (<i>self</i>, <a href="qabstractitemmodel.html">QAbstractItemModel</a>&#160;<i>model</i>)</h3><p>Reimplemented from <a href="qabstractitemview.html#setModel">QAbstractItemView.setModel</a>().</p>
@@ -96,7 +96,7 @@ columns will not be modified.</p>
 <p>The <i>widget</i> becomes a child of the column view, and will
 be destroyed when the column area is deleted or when a new widget
 is set.</p>
-<p>See also <a href="qcolumnview.html#previewWidget">previewWidget</a>() and <a href="qcolumnview.html#updatePreviewWidget">updatePreviewWidget</a>().</p>
+<p><b>See also</b> <a href="qcolumnview.html#previewWidget">previewWidget</a>() and <a href="qcolumnview.html#updatePreviewWidget">updatePreviewWidget</a>().</p>
 
 
 <h3 class="fn"><a name="setResizeGripsVisible" />QColumnView.setResizeGripsVisible (<i>self</i>, bool&#160;<i>visible</i>)</h3><h3 class="fn"><a name="setRootIndex" />QColumnView.setRootIndex (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Reimplemented from <a href="qabstractitemview.html#setRootIndex">QAbstractItemView.setRootIndex</a>().</p>
@@ -120,7 +120,7 @@ is set.</p>
 <h3 class="fn"><a name="visualRegionForSelection" /><a href="qregion.html">QRegion</a> QColumnView.visualRegionForSelection (<i>self</i>, <a href="qitemselection.html">QItemSelection</a>&#160;<i>selection</i>)</h3><p>Reimplemented from <a href="qabstractitemview.html#visualRegionForSelection">QAbstractItemView.visualRegionForSelection</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="updatePreviewWidget" />void updatePreviewWidget (const QModelIndex&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the preview widget should be updated
 to provide rich information about <i>index</i></p>
-<p>See also <a href="qcolumnview.html#previewWidget">previewWidget</a>().</p>
+<p><b>See also</b> <a href="qcolumnview.html#previewWidget">previewWidget</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

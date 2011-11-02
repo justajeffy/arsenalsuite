@@ -33,8 +33,8 @@ import sipconfig
 
 
 # Initialise the globals.
-pyqt_version = 0x040805
-pyqt_version_str = "snapshot-4.8.5-a9b83eac34c4"
+pyqt_version = 0x040806
+pyqt_version_str = "snapshot-4.8.6-4726879563e5"
 
 sip_min_version = 0x040c02
 
@@ -1957,12 +1957,14 @@ SOURCES = %s
     f = open(cpp_file, "w")
 
     f.write(
-"""#include <QFile>
+"""#include <QCoreApplication>
+#include <QFile>
 #include <QLibraryInfo>
 #include <QTextStream>
 
-int main(int, char **)
+int main(int argc, char **argv)
 {
+    QCoreApplication app(argc, argv);
     QFile outf("%s");
 
     if (!outf.open(QIODevice::WriteOnly|QIODevice::Truncate|QIODevice::Text))

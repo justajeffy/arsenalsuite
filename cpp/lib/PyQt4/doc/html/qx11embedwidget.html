@@ -30,22 +30,22 @@ the window ID.</p>
 <p>This example shows an application that embeds a QX11EmbedWidget
 subclass into the window whose ID is passed as a command-line
 argument:</p>
-<pre class="highlightedCode brush: cpp">
- int main(int argc, char *argv[])
+<pre class="cpp">
+ <span class="type">int</span> main(<span class="type">int</span> argc<span class="operator">,</span> <span class="type">char</span> <span class="operator">*</span>argv<span class="operator">[</span><span class="operator">]</span>)
  {
-     QApplication app(argc, argv);
+     <span class="type"><a href="qapplication.html">QApplication</a></span> app(argc<span class="operator">,</span> argv);
 
-     if (app.arguments().count() != 2) {
-         qFatal("Error - expected window id as argument");
-         return 1;
+     <span class="keyword">if</span> (app<span class="operator">.</span>arguments()<span class="operator">.</span>count() <span class="operator">!</span><span class="operator">=</span> <span class="number">2</span>) {
+         <a href="qtcore.html#qFatal">qFatal</a>(<span class="string">"Error - expected window id as argument"</span>);
+         <span class="keyword">return</span> <span class="number">1</span>;
      }
 
-     QString windowId(app.arguments()[1]);
+     <span class="type"><a href="qstring.html">QString</a></span> windowId(app<span class="operator">.</span>arguments()<span class="operator">[</span><span class="number">1</span><span class="operator">]</span>);
      EmbedWidget window;
-     window.embedInto(windowId.toULong());
-     window.show();
+     window<span class="operator">.</span>embedInto(windowId<span class="operator">.</span>toULong());
+     window<span class="operator">.</span>show();
 
-     return app.exec();
+     <span class="keyword">return</span> app<span class="operator">.</span>exec();
  }
 </pre>
 <p>The problem of obtaining the window IDs is often solved by the
@@ -64,19 +64,19 @@ error occurs when embedding, <a href="qx11embedwidget.html#error">error</a>() is
 equivalent of QX11EmbedWidget is GtkPlug. The corresponding KDE 3
 widget is called QXEmbed.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Error-enum" />QX11EmbedWidget.Error</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QX11EmbedWidget.Unknown</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">An unrecognized error occurred.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QX11EmbedWidget.InvalidWindowID</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The X11 window ID of the container was
 invalid. This error is usually triggered by passing an invalid
 window ID to <a href="qx11embedwidget.html#embedInto">embedInto</a>().</td>
@@ -98,7 +98,7 @@ function will behave unpredictably.</p>
 
 <h3 class="fn"><a name="error" /><a href="qx11embedwidget.html#Error-enum">Error</a> QX11EmbedWidget.error (<i>self</i>)</h3><p>Returns the type of error that occurred last. This is the same
 error code that is emitted by the error() signal.</p>
-<p>See also <a href="qx11embedwidget.html#Error-enum">Error</a>.</p>
+<p><b>See also</b> <a href="qx11embedwidget.html#Error-enum">Error</a>.</p>
 
 
 <h3 class="fn"><a name="event" />bool QX11EmbedWidget.event (<i>self</i>, <a href="qevent.html">QEvent</a>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -120,7 +120,7 @@ an XEmbed container.</p>
 <h3 class="fn"><a name="error-2" />void error (QX11EmbedWidget::Error)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted if an error occurred as a result of
 embedding into or communicating with a container. The specified
 <i>error</i> describes the problem that occurred.</p>
-<p>See also <a href="qx11embedwidget.html#Error-enum">QX11EmbedWidget.Error</a>.</p>
+<p><b>See also</b> <a href="qx11embedwidget.html#Error-enum">QX11EmbedWidget.Error</a>.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

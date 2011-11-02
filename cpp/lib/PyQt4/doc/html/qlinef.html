@@ -17,13 +17,9 @@ the line using floating point accuracy for coordinates. Use the
 <a href="qlinef.html#toLine">toLine</a>() function to retrieve an
 integer based copy of this line.</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/qline-point.png" /></p>
-</td>
-<td>
-<p><img src="images/qline-coordinates.png" /></p>
-</td>
+<tr class="odd" valign="top">
+<td><img src="images/qline-point.png" /></td>
+<td><img src="images/qline-coordinates.png" /></td>
 </tr>
 </table>
 <p>The positions of the line's start and end points can be
@@ -51,38 +47,30 @@ be traversed using the <a href="qlinef.html#pointAt">pointAt</a>()
 function.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="IntersectType-enum" />QLineF.IntersectType</h3><p>Describes the intersection between two lines.</p>
 <table class="generic">
-<tr class="odd topAlign">
-<td>
-<p><img src="images/qlinef-unbounded.png" /></p>
-</td>
-<td>
-<p><img src="images/qlinef-bounded.png" /></p>
-</td>
+<tr class="odd" valign="top">
+<td><img src="images/qlinef-unbounded.png" /></td>
+<td><img src="images/qlinef-bounded.png" /></td>
 </tr>
-<tr class="even topAlign">
-<td>
-<p>QLineF.UnboundedIntersection</p>
-</td>
-<td>
-<p>QLineF.BoundedIntersection</p>
-</td>
+<tr class="even" valign="top">
+<td>QLineF.UnboundedIntersection</td>
+<td>QLineF.BoundedIntersection</td>
 </tr>
 </table>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLineF.NoIntersection</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Indicates that the lines do not intersect;
 i.e. they are parallel.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLineF.UnboundedIntersection</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The two lines intersect, but not within the
 range defined by their lengths. This will be the case if the lines
 are not parallel.</td>
@@ -92,19 +80,19 @@ are not parallel.</td>
 this value if the intersect point is within the start and end point
 of only one of the lines.</p>
 <table class="valuelist">
-<tr class="even">
+<tr class="even" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QLineF.BoundedIntersection</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The two lines intersect with each other within
 the start and end points of each line.</td>
 </tr>
 </table>
-<p>See also <a href="qlinef.html#intersect">intersect</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#intersect">intersect</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QLineF" />QLineF.__init__ (<i>self</i>, <a href="qline.html">QLine</a>&#160;<i>line</i>)</h3><p>Constructs a null line.</p>
 
 
@@ -118,15 +106,16 @@ the start and end points of each line.</td>
 
 <h3 class="fn"><a name="QLineF-4" />QLineF.__init__ (<i>self</i>, float&#160;<i>x1pos</i>, float&#160;<i>y1pos</i>, float&#160;<i>x2pos</i>, float&#160;<i>y2pos</i>)</h3><p>Construct a <a href="qlinef.html">QLineF</a> object from the
 given integer-based <i>line</i>.</p>
-<p>See also <a href="qlinef.html#toLine">toLine</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#toLine">toLine</a>().</p>
 
 
 <h3 class="fn"><a name="QLineF-5" />QLineF.__init__ (<i>self</i>, <a href="qlinef.html">QLineF</a>)</h3><h3 class="fn"><a name="angle" />float QLineF.angle (<i>self</i>, <a href="qlinef.html">QLineF</a>&#160;<i>l</i>)</h3><p>Returns the angle of the line in degrees.</p>
-<p>Positive values for the angles mean counter-clockwise while
-negative values mean the clockwise direction. Zero degrees is at
-the 3 o'clock position.</p>
+<p>The return value will be in the range of values from 0.0 up to
+but not including 360.0. The angles are measured counter-clockwise
+from a point on the x-axis to the right of the origin (x &gt;
+0).</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qlinef.html#setAngle">setAngle</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#setAngle">setAngle</a>().</p>
 
 
 <h3 class="fn"><a name="angle-2" />float QLineF.angle (<i>self</i>)</h3><h3 class="fn"><a name="angleTo" />float QLineF.angleTo (<i>self</i>, <a href="qlinef.html">QLineF</a>&#160;<i>l</i>)</h3><p>Returns the angle (in degrees) from this line to the given
@@ -137,15 +126,15 @@ point of the extended lines that serves as origin (see <a href="qlinef.html#Inte
 add to this line to make it have the same angle as the given
 <i>line</i>, going counter-clockwise.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qlinef.html#intersect">intersect</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#intersect">intersect</a>().</p>
 
 
 <h3 class="fn"><a name="dx" />float QLineF.dx (<i>self</i>)</h3><p>Returns the horizontal component of the line's vector.</p>
-<p>See also <a href="qlinef.html#dy">dy</a>() and <a href="qlinef.html#pointAt">pointAt</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#dy">dy</a>() and <a href="qlinef.html#pointAt">pointAt</a>().</p>
 
 
 <h3 class="fn"><a name="dy" />float QLineF.dy (<i>self</i>)</h3><p>Returns the vertical component of the line's vector.</p>
-<p>See also <a href="qlinef.html#dx">dx</a>() and <a href="qlinef.html#pointAt">pointAt</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#dx">dx</a>() and <a href="qlinef.html#pointAt">pointAt</a>().</p>
 
 
 <h3 class="fn"><a name="fromPolar" /><a href="qlinef.html">QLineF</a> QLineF.fromPolar (float&#160;<i>length</i>, float&#160;<i>angle</i>)</h3><p>Returns a <a href="qlinef.html">QLineF</a> with the given
@@ -169,29 +158,29 @@ point; otherwise returns false.</p>
 
 
 <h3 class="fn"><a name="length" />float QLineF.length (<i>self</i>)</h3><p>Returns the length of the line.</p>
-<p>See also <a href="qlinef.html#setLength">setLength</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#setLength">setLength</a>().</p>
 
 
 <h3 class="fn"><a name="normalVector" /><a href="qlinef.html">QLineF</a> QLineF.normalVector (<i>self</i>)</h3><p>Returns a line that is perpendicular to this line with the same
 starting point and length.</p>
 <p class="centerAlign"><img src="images/qlinef-normalvector.png" /></p>
-<p>See also <a href="qlinef.html#unitVector">unitVector</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#unitVector">unitVector</a>().</p>
 
 
 <h3 class="fn"><a name="p1" /><a href="qpointf.html">QPointF</a> QLineF.p1 (<i>self</i>)</h3><p>Returns the line's start point.</p>
-<p>See also <a href="qlinef.html#setP1">setP1</a>(), <a href="qlinef.html#x1">x1</a>(), <a href="qlinef.html#y1">y1</a>(), and
-<a href="qlinef.html#p2">p2</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#setP1">setP1</a>(),
+<a href="qlinef.html#x1">x1</a>(), <a href="qlinef.html#y1">y1</a>(), and <a href="qlinef.html#p2">p2</a>().</p>
 
 
 <h3 class="fn"><a name="p2" /><a href="qpointf.html">QPointF</a> QLineF.p2 (<i>self</i>)</h3><p>Returns the line's end point.</p>
-<p>See also <a href="qlinef.html#setP2">setP2</a>(), <a href="qlinef.html#x2">x2</a>(), <a href="qlinef.html#y2">y2</a>(), and
-<a href="qlinef.html#p1">p1</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#setP2">setP2</a>(),
+<a href="qlinef.html#x2">x2</a>(), <a href="qlinef.html#y2">y2</a>(), and <a href="qlinef.html#p1">p1</a>().</p>
 
 
 <h3 class="fn"><a name="pointAt" /><a href="qpointf.html">QPointF</a> QLineF.pointAt (<i>self</i>, float&#160;<i>t</i>)</h3><p>Returns the point at the parameterized position specified by
 <i>t</i>. The function returns the line's start point if t = 0, and
 its end point if t = 1.</p>
-<p>See also <a href="qlinef.html#dx">dx</a>() and <a href="qlinef.html#dy">dy</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#dx">dx</a>() and <a href="qlinef.html#dy">dy</a>().</p>
 
 
 <h3 class="fn"><a name="setAngle" />QLineF.setAngle (<i>self</i>, float&#160;<i>angle</i>)</h3><p>Sets the angle of the line to the given <i>angle</i> (in
@@ -201,44 +190,47 @@ line such that the line has the given angle.</p>
 negative values mean the clockwise direction. Zero degrees is at
 the 3 o'clock position.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qlinef.html#angle">angle</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#angle">angle</a>().</p>
 
 
 <h3 class="fn"><a name="setLength" />QLineF.setLength (<i>self</i>, float&#160;<i>len</i>)</h3><p>Sets the length of the line to the given <i>length</i>. <a href="qlinef.html">QLineF</a> will move the end point - <a href="qlinef.html#p2">p2</a>() - of the line to give the line its new
 length.</p>
 <p>If the line is a null line, the length will remain zero
 regardless of the length specified.</p>
-<p>See also <a href="qlinef.html#length">length</a>() and <a href="qlinef.html#isNull">isNull</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#length">length</a>() and
+<a href="qlinef.html#isNull">isNull</a>().</p>
 
 
 <h3 class="fn"><a name="setLine" />QLineF.setLine (<i>self</i>, float&#160;<i>aX1</i>, float&#160;<i>aY1</i>, float&#160;<i>aX2</i>, float&#160;<i>aY2</i>)</h3><p>Sets this line to the start in <i>x1</i>, <i>y1</i> and end in
 <i>x2</i>, <i>y2</i>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qlinef.html#setP1">setP1</a>(), <a href="qlinef.html#setP2">setP2</a>(), <a href="qlinef.html#p1">p1</a>(),
-and <a href="qlinef.html#p2">p2</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#setP1">setP1</a>(),
+<a href="qlinef.html#setP2">setP2</a>(), <a href="qlinef.html#p1">p1</a>(), and <a href="qlinef.html#p2">p2</a>().</p>
 
 
 <h3 class="fn"><a name="setP1" />QLineF.setP1 (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>aP1</i>)</h3><p>Sets the starting point of this line to <i>p1</i>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qlinef.html#setP2">setP2</a>() and <a href="qlinef.html#p1">p1</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#setP2">setP2</a>() and
+<a href="qlinef.html#p1">p1</a>().</p>
 
 
 <h3 class="fn"><a name="setP2" />QLineF.setP2 (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>aP2</i>)</h3><p>Sets the end point of this line to <i>p2</i>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qlinef.html#setP1">setP1</a>() and <a href="qlinef.html#p2">p2</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#setP1">setP1</a>() and
+<a href="qlinef.html#p2">p2</a>().</p>
 
 
 <h3 class="fn"><a name="setPoints" />QLineF.setPoints (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>aP1</i>, <a href="qpointf.html">QPointF</a>&#160;<i>aP2</i>)</h3><p>Sets the start point of this line to <i>p1</i> and the end point
 of this line to <i>p2</i>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qlinef.html#setP1">setP1</a>(), <a href="qlinef.html#setP2">setP2</a>(), <a href="qlinef.html#p1">p1</a>(),
-and <a href="qlinef.html#p2">p2</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#setP1">setP1</a>(),
+<a href="qlinef.html#setP2">setP2</a>(), <a href="qlinef.html#p1">p1</a>(), and <a href="qlinef.html#p2">p2</a>().</p>
 
 
 <h3 class="fn"><a name="toLine" /><a href="qline.html">QLine</a> QLineF.toLine (<i>self</i>)</h3><p>Returns an integer based copy of this line.</p>
 <p>Note that the returned line's start and end points are rounded
 to the nearest integer.</p>
-<p>See also <a href="qlinef.html#QLineF">QLineF</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#QLineF">QLineF</a>().</p>
 
 
 <h3 class="fn"><a name="translate" />QLineF.translate (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>point</i>)</h3><p>Translates this line by the given <i>offset</i>.</p>
@@ -261,23 +253,23 @@ and <i>dy</i>.</p>
 
 <h3 class="fn"><a name="unitVector" /><a href="qlinef.html">QLineF</a> QLineF.unitVector (<i>self</i>)</h3><p>Returns the unit vector for this line, i.e a line starting at
 the same point as <i>this</i> line with a length of 1.0.</p>
-<p>See also <a href="qlinef.html#normalVector">normalVector</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#normalVector">normalVector</a>().</p>
 
 
 <h3 class="fn"><a name="x1" />float QLineF.x1 (<i>self</i>)</h3><p>Returns the x-coordinate of the line's start point.</p>
-<p>See also <a href="qlinef.html#p1">p1</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#p1">p1</a>().</p>
 
 
 <h3 class="fn"><a name="x2" />float QLineF.x2 (<i>self</i>)</h3><p>Returns the x-coordinate of the line's end point.</p>
-<p>See also <a href="qlinef.html#p2">p2</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#p2">p2</a>().</p>
 
 
 <h3 class="fn"><a name="y1" />float QLineF.y1 (<i>self</i>)</h3><p>Returns the y-coordinate of the line's start point.</p>
-<p>See also <a href="qlinef.html#p1">p1</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#p1">p1</a>().</p>
 
 
 <h3 class="fn"><a name="y2" />float QLineF.y2 (<i>self</i>)</h3><p>Returns the y-coordinate of the line's end point.</p>
-<p>See also <a href="qlinef.html#p2">p2</a>().</p>
+<p><b>See also</b> <a href="qlinef.html#p2">p2</a>().</p>
 
 
-<h3 class="fn"><a name="__mul__-3" /><a href="qlinef.html">QLineF</a> __mul__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>&#160;<i>m</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__mul__-9" /><a href="qlinef.html">QLineF</a> __mul__ (<i>self</i>, <a href="qtransform.html">QTransform</a>&#160;<i>m</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__bool__" />int QLineF.__bool__ (<i>self</i>)</h3><h3 class="fn"><a name="__eq__" />bool QLineF.__eq__ (<i>self</i>, <a href="qlinef.html">QLineF</a>&#160;<i>d</i>)</h3><h3 class="fn"><a name="__ne__" />bool QLineF.__ne__ (<i>self</i>, <a href="qlinef.html">QLineF</a>&#160;<i>d</i>)</h3><h3 class="fn"><a name="__repr__" />str QLineF.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__mul__-3" /><a href="qlinef.html">QLineF</a> __mul__ (<i>self</i>, <a href="qmatrix.html">QMatrix</a>&#160;<i>m</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__mul__-9" /><a href="qlinef.html">QLineF</a> __mul__ (<i>self</i>, <a href="qtransform.html">QTransform</a>&#160;<i>m</i>)</h3><p>This method is only available if the QtGui module is imported.</p><h3 class="fn"><a name="__bool__" />int QLineF.__bool__ (<i>self</i>)</h3><h3 class="fn"><a name="__eq__" />bool QLineF.__eq__ (<i>self</i>, <a href="qlinef.html">QLineF</a>&#160;<i>d</i>)</h3><h3 class="fn"><a name="__ne__" />bool QLineF.__ne__ (<i>self</i>, <a href="qlinef.html">QLineF</a>&#160;<i>d</i>)</h3><h3 class="fn"><a name="__repr__" />str QLineF.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

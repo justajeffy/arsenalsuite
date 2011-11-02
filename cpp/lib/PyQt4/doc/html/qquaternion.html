@@ -24,8 +24,8 @@ coordinates, and a scalar representing the rotation angle.</p>
 
 <h3 class="fn"><a name="QQuaternion-3" />QQuaternion.__init__ (<i>self</i>, float&#160;<i>aScalar</i>, <a href="qvector3d.html">QVector3D</a>&#160;<i>aVector</i>)</h3><p>Constructs a quaternion vector from the specified <i>vector</i>
 and <i>scalar</i>.</p>
-<p>See also <a href="qquaternion.html#vector">vector</a>() and
-<a href="qquaternion.html#scalar">scalar</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#vector">vector</a>()
+and <a href="qquaternion.html#scalar">scalar</a>().</p>
 
 
 <h3 class="fn"><a name="QQuaternion-4" />QQuaternion.__init__ (<i>self</i>, <a href="qvector4d.html">QVector4D</a>&#160;<i>aVector</i>)</h3><p>Constructs a quaternion from the components of
@@ -57,11 +57,11 @@ quaternion are set to 0.0; otherwise returns false.</p>
 
 <h3 class="fn"><a name="length" />float QQuaternion.length (<i>self</i>)</h3><p>Returns the length of the quaternion. This is also called the
 "norm".</p>
-<p>See also <a href="qquaternion.html#lengthSquared">lengthSquared</a>() and <a href="qquaternion.html#normalized">normalized</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#lengthSquared">lengthSquared</a>() and <a href="qquaternion.html#normalized">normalized</a>().</p>
 
 
 <h3 class="fn"><a name="lengthSquared" />float QQuaternion.lengthSquared (<i>self</i>)</h3><p>Returns the squared length of the quaternion.</p>
-<p>See also <a href="qquaternion.html#length">length</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#length">length</a>().</p>
 
 
 <h3 class="fn"><a name="nlerp" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.nlerp (<a href="qquaternion.html">QQuaternion</a>&#160;<i>q1</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>, float&#160;<i>t</i>)</h3><p>Interpolates along the shortest linear path between the
@@ -74,14 +74,14 @@ will be returned.</p>
 <p>The nlerp() function is typically faster than <a href="qquaternion.html#slerp">slerp</a>() and will give approximate
 results to spherical interpolation that are good enough for some
 applications.</p>
-<p>See also <a href="qquaternion.html#slerp">slerp</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#slerp">slerp</a>().</p>
 
 
 <h3 class="fn"><a name="normalize" />QQuaternion.normalize (<i>self</i>)</h3><p>Normalizes the currect quaternion in place. Nothing happens if
 this is a null quaternion or the length of the quaternion is very
 close to 1.</p>
-<p>See also <a href="qquaternion.html#length">length</a>() and
-<a href="qquaternion.html#normalized">normalized</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#length">length</a>()
+and <a href="qquaternion.html#normalized">normalized</a>().</p>
 
 
 <h3 class="fn"><a name="normalized" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.normalized (<i>self</i>)</h3><p>Returns the normalized unit form of this quaternion.</p>
@@ -89,57 +89,57 @@ close to 1.</p>
 If the length of the quaternion is very close to 1, then the
 quaternion will be returned as-is. Otherwise the normalized form of
 the quaternion of length 1 will be returned.</p>
-<p>See also <a href="qquaternion.html#length">length</a>() and
-<a href="qquaternion.html#normalize">normalize</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#length">length</a>()
+and <a href="qquaternion.html#normalize">normalize</a>().</p>
 
 
 <h3 class="fn"><a name="rotatedVector" /><a href="qvector3d.html">QVector3D</a> QQuaternion.rotatedVector (<i>self</i>, <a href="qvector3d.html">QVector3D</a>&#160;<i>vector</i>)</h3><p>Rotates <i>vector</i> with this quaternion to produce a new
 vector in 3D space. The following code:</p>
-<pre class="highlightedCode brush: cpp">
- QVector3D result = q.rotatedVector(vector);
+<pre class="cpp">
+ QVector3D result <span class="operator">=</span> q<span class="operator">.</span>rotatedVector(vector);
 </pre>
 <p>is equivalent to the following:</p>
-<pre class="highlightedCode brush: cpp">
- QVector3D result = (q * QQuaternion(0, vector) * q.conjugate()).vector();
+<pre class="cpp">
+ QVector3D result <span class="operator">=</span> (q <span class="operator">*</span> <span class="type"><a href="qquaternion.html">QQuaternion</a></span>(<span class="number">0</span><span class="operator">,</span> vector) <span class="operator">*</span> q<span class="operator">.</span>conjugate())<span class="operator">.</span><a href="qquaternion.html#vector">vector</a>();
 </pre>
 
 
 <h3 class="fn"><a name="scalar" />float QQuaternion.scalar (<i>self</i>)</h3><p>Returns the scalar component of this quaternion.</p>
-<p>See also <a href="qquaternion.html#setScalar">setScalar</a>(),
-<a href="qquaternion.html#x">x</a>(), <a href="qquaternion.html#y">y</a>(), and <a href="qquaternion.html#z">z</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#setScalar">setScalar</a>(), <a href="qquaternion.html#x">x</a>(), <a href="qquaternion.html#y">y</a>(),
+and <a href="qquaternion.html#z">z</a>().</p>
 
 
 <h3 class="fn"><a name="setScalar" />QQuaternion.setScalar (<i>self</i>, float&#160;<i>aScalar</i>)</h3><p>Sets the scalar component of this quaternion to
 <i>scalar</i>.</p>
-<p>See also <a href="qquaternion.html#scalar">scalar</a>(),
+<p><b>See also</b> <a href="qquaternion.html#scalar">scalar</a>(),
 <a href="qquaternion.html#setX">setX</a>(), <a href="qquaternion.html#setY">setY</a>(), and <a href="qquaternion.html#setZ">setZ</a>().</p>
 
 
 <h3 class="fn"><a name="setVector" />QQuaternion.setVector (<i>self</i>, <a href="qvector3d.html">QVector3D</a>&#160;<i>aVector</i>)</h3><p>Sets the vector component of this quaternion to
 <i>vector</i>.</p>
-<p>See also <a href="qquaternion.html#vector">vector</a>() and
-<a href="qquaternion.html#setScalar">setScalar</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#vector">vector</a>()
+and <a href="qquaternion.html#setScalar">setScalar</a>().</p>
 
 
 <h3 class="fn"><a name="setVector-2" />QQuaternion.setVector (<i>self</i>, float&#160;<i>aX</i>, float&#160;<i>aY</i>, float&#160;<i>aZ</i>)</h3><p>Sets the vector component of this quaternion to (<i>x</i>,
 <i>y</i>, <i>z</i>).</p>
-<p>See also <a href="qquaternion.html#vector">vector</a>() and
-<a href="qquaternion.html#setScalar">setScalar</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#vector">vector</a>()
+and <a href="qquaternion.html#setScalar">setScalar</a>().</p>
 
 
 <h3 class="fn"><a name="setX" />QQuaternion.setX (<i>self</i>, float&#160;<i>aX</i>)</h3><p>Sets the x coordinate of this quaternion's vector to the given
 <i>x</i> coordinate.</p>
-<p>See also <a href="qquaternion.html#x">x</a>(), <a href="qquaternion.html#setY">setY</a>(), <a href="qquaternion.html#setZ">setZ</a>(), and <a href="qquaternion.html#setScalar">setScalar</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#x">x</a>(), <a href="qquaternion.html#setY">setY</a>(), <a href="qquaternion.html#setZ">setZ</a>(), and <a href="qquaternion.html#setScalar">setScalar</a>().</p>
 
 
 <h3 class="fn"><a name="setY" />QQuaternion.setY (<i>self</i>, float&#160;<i>aY</i>)</h3><p>Sets the y coordinate of this quaternion's vector to the given
 <i>y</i> coordinate.</p>
-<p>See also <a href="qquaternion.html#y">y</a>(), <a href="qquaternion.html#setX">setX</a>(), <a href="qquaternion.html#setZ">setZ</a>(), and <a href="qquaternion.html#setScalar">setScalar</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#y">y</a>(), <a href="qquaternion.html#setX">setX</a>(), <a href="qquaternion.html#setZ">setZ</a>(), and <a href="qquaternion.html#setScalar">setScalar</a>().</p>
 
 
 <h3 class="fn"><a name="setZ" />QQuaternion.setZ (<i>self</i>, float&#160;<i>aZ</i>)</h3><p>Sets the z coordinate of this quaternion's vector to the given
 <i>z</i> coordinate.</p>
-<p>See also <a href="qquaternion.html#z">z</a>(), <a href="qquaternion.html#setX">setX</a>(), <a href="qquaternion.html#setY">setY</a>(), and <a href="qquaternion.html#setScalar">setScalar</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#z">z</a>(), <a href="qquaternion.html#setX">setX</a>(), <a href="qquaternion.html#setY">setY</a>(), and <a href="qquaternion.html#setScalar">setScalar</a>().</p>
 
 
 <h3 class="fn"><a name="slerp" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.slerp (<a href="qquaternion.html">QQuaternion</a>&#160;<i>q1</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>, float&#160;<i>t</i>)</h3><p>Interpolates along the shortest spherical path between the
@@ -149,30 +149,29 @@ travel between <i>q1</i> and <i>q2</i>.</p>
 <p>If <i>t</i> is less than or equal to 0, then <i>q1</i> will be
 returned. If <i>t</i> is greater than or equal to 1, then <i>q2</i>
 will be returned.</p>
-<p>See also <a href="qquaternion.html#nlerp">nlerp</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#nlerp">nlerp</a>().</p>
 
 
 <h3 class="fn"><a name="toVector4D" /><a href="qvector4d.html">QVector4D</a> QQuaternion.toVector4D (<i>self</i>)</h3><p>Returns this quaternion as a 4D vector.</p>
 
 
 <h3 class="fn"><a name="vector" /><a href="qvector3d.html">QVector3D</a> QQuaternion.vector (<i>self</i>)</h3><p>Returns the vector component of this quaternion.</p>
-<p>See also <a href="qquaternion.html#setVector">setVector</a>()
-and <a href="qquaternion.html#scalar">scalar</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#setVector">setVector</a>() and <a href="qquaternion.html#scalar">scalar</a>().</p>
 
 
 <h3 class="fn"><a name="x" />float QQuaternion.x (<i>self</i>)</h3><p>Returns the x coordinate of this quaternion's vector.</p>
-<p>See also <a href="qquaternion.html#setX">setX</a>(), <a href="qquaternion.html#y">y</a>(), <a href="qquaternion.html#z">z</a>(),
-and <a href="qquaternion.html#scalar">scalar</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#setX">setX</a>(),
+<a href="qquaternion.html#y">y</a>(), <a href="qquaternion.html#z">z</a>(), and <a href="qquaternion.html#scalar">scalar</a>().</p>
 
 
 <h3 class="fn"><a name="y" />float QQuaternion.y (<i>self</i>)</h3><p>Returns the y coordinate of this quaternion's vector.</p>
-<p>See also <a href="qquaternion.html#setY">setY</a>(), <a href="qquaternion.html#x">x</a>(), <a href="qquaternion.html#z">z</a>(),
-and <a href="qquaternion.html#scalar">scalar</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#setY">setY</a>(),
+<a href="qquaternion.html#x">x</a>(), <a href="qquaternion.html#z">z</a>(), and <a href="qquaternion.html#scalar">scalar</a>().</p>
 
 
 <h3 class="fn"><a name="z" />float QQuaternion.z (<i>self</i>)</h3><p>Returns the z coordinate of this quaternion's vector.</p>
-<p>See also <a href="qquaternion.html#setZ">setZ</a>(), <a href="qquaternion.html#x">x</a>(), <a href="qquaternion.html#y">y</a>(),
-and <a href="qquaternion.html#scalar">scalar</a>().</p>
+<p><b>See also</b> <a href="qquaternion.html#setZ">setZ</a>(),
+<a href="qquaternion.html#x">x</a>(), <a href="qquaternion.html#y">y</a>(), and <a href="qquaternion.html#scalar">scalar</a>().</p>
 
 
-<h3 class="fn"><a name="__add__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__add__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>)</h3><h3 class="fn"><a name="__div__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__div__ (<i>self</i>, float&#160;<i>divisor</i>)</h3><h3 class="fn"><a name="__eq__" />bool QQuaternion.__eq__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>)</h3><h3 class="fn"><a name="__iadd__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__iadd__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>quaternion</i>)</h3><h3 class="fn"><a name="__idiv__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__idiv__ (<i>self</i>, float&#160;<i>divisor</i>)</h3><h3 class="fn"><a name="__imul__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__imul__ (<i>self</i>, float&#160;<i>factor</i>)</h3><h3 class="fn"><a name="__imul__-2" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__imul__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>quaternion</i>)</h3><h3 class="fn"><a name="__isub__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__isub__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>quaternion</i>)</h3><h3 class="fn"><a name="__mul__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__mul__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>)</h3><h3 class="fn"><a name="__mul__-2" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__mul__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>quaternion</i>)</h3><h3 class="fn"><a name="__mul__-3" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__mul__ (<i>self</i>, float&#160;<i>factor</i>)</h3><h3 class="fn"><a name="__ne__" />bool QQuaternion.__ne__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>)</h3><h3 class="fn"><a name="__neg__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__neg__ (<i>self</i>)</h3><h3 class="fn"><a name="__repr__" />str QQuaternion.__repr__ (<i>self</i>)</h3><h3 class="fn"><a name="__sub__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__sub__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__add__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__add__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>)</h3><h3 class="fn"><a name="__div__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__div__ (<i>self</i>, float&#160;<i>divisor</i>)</h3><h3 class="fn"><a name="__eq__" />bool QQuaternion.__eq__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>)</h3><h3 class="fn"><a name="__iadd__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__iadd__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>quaternion</i>)</h3><h3 class="fn"><a name="__idiv__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__idiv__ (<i>self</i>, float&#160;<i>divisor</i>)</h3><h3 class="fn"><a name="__imul__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__imul__ (<i>self</i>, float&#160;<i>factor</i>)</h3><h3 class="fn"><a name="__imul__-2" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__imul__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>quaternion</i>)</h3><h3 class="fn"><a name="__isub__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__isub__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>quaternion</i>)</h3><h3 class="fn"><a name="__mul__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__mul__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>)</h3><h3 class="fn"><a name="__mul__-2" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__mul__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>quaternion</i>)</h3><h3 class="fn"><a name="__mul__-3" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__mul__ (<i>self</i>, float&#160;<i>factor</i>)</h3><h3 class="fn"><a name="__ne__" />bool QQuaternion.__ne__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>)</h3><h3 class="fn"><a name="__neg__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__neg__ (<i>self</i>)</h3><h3 class="fn"><a name="__repr__" />str QQuaternion.__repr__ (<i>self</i>)</h3><h3 class="fn"><a name="__sub__" /><a href="qquaternion.html">QQuaternion</a> QQuaternion.__sub__ (<i>self</i>, <a href="qquaternion.html">QQuaternion</a>&#160;<i>q2</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

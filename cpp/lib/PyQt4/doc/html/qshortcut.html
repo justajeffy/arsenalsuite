@@ -36,8 +36,8 @@ items as they are created. Alternatively, shortcuts may be
 associated with other types of actions in the <a href="qaction.html">QAction</a> class.</p>
 <p>The simplest way to create a shortcut for a particular widget is
 to construct the shortcut with a key sequence. For example:</p>
-<pre class="highlightedCode brush: cpp">
- shortcut = new QShortcut(QKeySequence(tr("Ctrl+O", "File|Open")),
+<pre class="cpp">
+ shortcut <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QShortcut</span>(<span class="type"><a href="qkeysequence.html">QKeySequence</a></span>(tr(<span class="string">"Ctrl+O"</span><span class="operator">,</span> <span class="string">"File|Open"</span>))<span class="operator">,</span>
                           parent);
 </pre>
 <p>When the user types the <a href="qkeysequence.html">key
@@ -51,7 +51,7 @@ disabled with <a href="qshortcut.html#enabled-prop">setEnabled</a>(), and can ha
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QShortcut" />QShortcut.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qshortcut.html">QShortcut</a> object for
 the <i>parent</i> widget. Since no shortcut key sequence is
 specified, the shortcut will not emit any signals.</p>
-<p>See also <a href="qshortcut.html#key-prop">setKey</a>().</p>
+<p><b>See also</b> <a href="qshortcut.html#key-prop">setKey</a>().</p>
 
 
 <h3 class="fn"><a name="QShortcut-2" />QShortcut.__init__ (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>key</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>, SLOT()&#160;<i>member</i>&#160;=&#160;0, SLOT()&#160;<i>ambiguousMember</i>&#160;=&#160;0, <a href="qt.html#ShortcutContext-enum">Qt.ShortcutContext</a>&#160;<i>context</i>&#160;=&#160;Qt.WindowShortcut)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qshortcut.html">QShortcut</a> object for
@@ -64,13 +64,13 @@ shortcut's <i>context</i>.</p>
 
 
 <h3 class="fn"><a name="autoRepeat" />bool QShortcut.autoRepeat (<i>self</i>)</h3><h3 class="fn"><a name="context" /><a href="qt.html#ShortcutContext-enum">Qt.ShortcutContext</a> QShortcut.context (<i>self</i>)</h3><h3 class="fn"><a name="event" />bool QShortcut.event (<i>self</i>, <a href="qevent.html">QEvent</a>&#160;<i>e</i>)</h3><h3 class="fn"><a name="id" />int QShortcut.id (<i>self</i>)</h3><p>Returns the shortcut's ID.</p>
-<p>See also <a href="qshortcutevent.html#shortcutId">QShortcutEvent.shortcutId</a>().</p>
+<p><b>See also</b> <a href="qshortcutevent.html#shortcutId">QShortcutEvent.shortcutId</a>().</p>
 
 
 <h3 class="fn"><a name="isEnabled" />bool QShortcut.isEnabled (<i>self</i>)</h3><h3 class="fn"><a name="key" /><a href="qkeysequence.html">QKeySequence</a> QShortcut.key (<i>self</i>)</h3><h3 class="fn"><a name="parentWidget" /><a href="qwidget.html">QWidget</a> QShortcut.parentWidget (<i>self</i>)</h3><p>Returns the shortcut's parent widget.</p>
 <h3 class="fn"><a name="setAutoRepeat" />QShortcut.setAutoRepeat (<i>self</i>, bool&#160;<i>on</i>)</h3><h3 class="fn"><a name="setContext" />QShortcut.setContext (<i>self</i>, <a href="qt.html#ShortcutContext-enum">Qt.ShortcutContext</a>&#160;<i>context</i>)</h3><h3 class="fn"><a name="setEnabled" />QShortcut.setEnabled (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setKey" />QShortcut.setKey (<i>self</i>, <a href="qkeysequence.html">QKeySequence</a>&#160;<i>key</i>)</h3><h3 class="fn"><a name="setWhatsThis" />QShortcut.setWhatsThis (<i>self</i>, QString&#160;<i>text</i>)</h3><h3 class="fn"><a name="whatsThis" />QString QShortcut.whatsThis (<i>self</i>)</h3><hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="activated" />void activated ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the user types the shortcut's key
 sequence.</p>
-<p>See also <a href="qshortcut.html#activatedAmbiguously">activatedAmbiguously</a>().</p>
+<p><b>See also</b> <a href="qshortcut.html#activatedAmbiguously">activatedAmbiguously</a>().</p>
 
 
 <h3 class="fn"><a name="activatedAmbiguously" />void activatedAmbiguously ()</h3><p>This is the default overload of this signal.</p><p>When a key sequence is being typed at the keyboard, it is said
@@ -81,7 +81,7 @@ activatedAmbiguously() is emitted if the key sequence is still
 ambiguous (i.e., it is the start of one or more other shortcuts).
 The <a href="qshortcut.html#activated">activated</a>() signal is
 not emitted in this case.</p>
-<p>See also <a href="qshortcut.html#activated">activated</a>().</p>
+<p><b>See also</b> <a href="qshortcut.html#activated">activated</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

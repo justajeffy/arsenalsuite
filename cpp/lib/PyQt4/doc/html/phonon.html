@@ -21,49 +21,49 @@ introductory tour of its features.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Category-enum" />Phonon.Category</h3><p>Sets the category your program should be listed in in the
 mixer.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.NoCategory</tt></td>
-<td class=" topAlign"><tt>-1</tt></td>
+<td class="topAlign"><tt>-1</tt></td>
 <td class="topAlign">Will make use of the default device.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.NotificationCategory</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">If the sounds produced are notifications
 (ping, beep and such) you should use this category.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.MusicCategory</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">If your application is a music player (like a
 jukebox or media player playing an audio file).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.VideoCategory</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">If the sound is the audio channel of a
 video.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.CommunicationCategory</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">If your applications produces sounds from
 communication with somebody else (VoIP, voice chat).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.GameCategory</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">Sound produced by a computer game should go
 into this category.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.AccessibilityCategory</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">Sounds produced for accessibility (e.g.,
 Text-To-Speech) Holds the largest value of categories.</td>
 </tr>
@@ -79,36 +79,35 @@ music.</p>
 
 <h3 class="fn"><a name="DiscType-enum" />Phonon.DiscType</h3><p>Enum to identify the media discs supported by <a href="phonon-mediaobject.html">MediaObject</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.NoDisc</tt></td>
-<td class=" topAlign"><tt>-1</tt></td>
+<td class="topAlign"><tt>-1</tt></td>
 <td class="topAlign">No disc was selected. This is only useful as a
 return value from MediaSource.diskType().</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.Cd</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">Identifies Audio CDs.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.Dvd</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Identifies DVDs (not arbitrary data DVDs, only
 movie DVDs).</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.Vcd</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Identifies Video CDs.</td>
 </tr>
 </table>
-<p>See also <a href="phonon-mediasource.html">MediaSource</a> and
-<a href="phonon-mediaobject.html">MediaObject</a>.</p>
+<p><b>See also</b> <a href="phonon-mediasource.html">MediaSource</a> and <a href="phonon-mediaobject.html">MediaObject</a>.</p>
 
 
 <h3 class="fn"><a name="ErrorType-enum" />Phonon.ErrorType</h3><p>This enum describes the severity when an error has occurred
@@ -119,21 +118,21 @@ Note that you should query the error when receiving the <a href="phonon-mediaobj
 signal, because the error type will be lost if the media object
 leaves the error state.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.NoError</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">No error. <a href="phonon-mediaobject.html#errorType">MediaObject.errorType</a>()
 returns this if <a href="phonon-mediaobject.html#state">MediaObject.state</a>() !=
 <a href="phonon.html#State-enum">Phonon.ErrorState</a>.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.NormalError</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">An error has occurred with the playback of the
 current source. It might be possible to continue playback, for
 instance, if only the audio stream in a video cannot be played
@@ -141,13 +140,13 @@ back. The media object will then leave the error state again.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.FatalError</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">. Something important does not work. Your
 program cannot continue the playback of the current source, but it
 might be possible to try another.</td>
 </tr>
 </table>
-<p>See also <a href="phonon-mediaobject.html#errorType">MediaObject.errorType</a>().</p>
+<p><b>See also</b> <a href="phonon-mediaobject.html#errorType">MediaObject.errorType</a>().</p>
 
 
 <h3 class="fn"><a name="MetaData-enum" />Phonon.MetaData</h3><p>Provided as keys for <a href="phonon-mediaobject.html#metaData">Phonon.MediaObject.metaData</a>().
@@ -160,36 +159,36 @@ specification</p>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.ArtistMetaData</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.AlbumMetaData</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.TitleMetaData</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.DateMetaData</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.GenreMetaData</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.TracknumberMetaData</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.DescriptionMetaData</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>Phonon.MusicBrainzDiscIdMetaData</tt></td>
-<td class=" topAlign"><tt>7</tt></td>
+<td class="topAlign"><tt>7</tt></td>
 </tr>
 </table>
 
@@ -204,14 +203,14 @@ signal.</p>
 <p>A media object can at any time change into any state, regardless
 of the state it previously had.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.LoadingState</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">After construction it might take a while
 before the media object is ready to <a href="phonon-mediaobject.html#play">play()</a>. This state is commonly
 used by backends to initialize the <a href="phonon-overview.html#phonon-overview">media graph</a> and loading
@@ -221,34 +220,34 @@ requested through a function call, e.g., <a href="phonon-mediaobject.html#play">
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.StoppedState</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">In the stopped state, the media object is
 ready to play its current media source. The current <a href="phonon-mediaobject.html#seek">position</a> in the media stream is
 then 0.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.PlayingState</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The media object is playing back its media
 source.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.BufferingState</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The Player is waiting for data to be able to
 start or continue playing. This state is commonly used to wait for
 media data over a network connection.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.PausedState</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The media player has currently paused its
 playback, i.e., it stops playing but keeps the current playback
 position in the stream.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.ErrorState</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">When a media object enters the error state a
 problem with the playback has occurred. The possible errors are
 grouped into two categories by <a href="phonon.html#ErrorType-enum">Phonon.ErrorType</a>, and the type
@@ -260,7 +259,7 @@ therefore change state from the ErrorState.</td>
 </tr>
 </table>
 <p>This enum was introduced or modified in Qt 4.4.</p>
-<p>See also <a href="phonon-mediaobject.html">MediaObject</a>.</p>
+<p><b>See also</b> <a href="phonon-mediaobject.html">MediaObject</a>.</p>
 
 
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="categoryToString" />QString Phonon.categoryToString (<a href="phonon.html#Category-enum">Category</a>&#160;<i>c</i>)</h3><p>Returns a (translated) string to show to the user identifying
@@ -285,4 +284,4 @@ to connect an output from <i>sink</i> The <a href="phonon-medianode.html">MediaN
 
 <h3 class="fn"><a name="phononVersion" />str Phonon.phononVersion ()</h3><p>Returns the Phonon version.</p>
 <p>This function was introduced in Qt 4.5.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

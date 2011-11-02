@@ -47,14 +47,14 @@ time of the drop are specified by <i>buttons</i> and
 
 
 <h3 class="fn"><a name="QDropEvent-2" />QDropEvent.__init__ (<i>self</i>, <a href="qdropevent.html">QDropEvent</a>)</h3><h3 class="fn"><a name="acceptProposedAction" />QDropEvent.acceptProposedAction (<i>self</i>)</h3><p>Sets the drop action to be the proposed action.</p>
-<p>See also <a href="qdropevent.html#setDropAction">setDropAction</a>(), <a href="qdropevent.html#proposedAction">proposedAction</a>(), and <a href="qevent.html#accept">accept</a>().</p>
+<p><b>See also</b> <a href="qdropevent.html#setDropAction">setDropAction</a>(), <a href="qdropevent.html#proposedAction">proposedAction</a>(), and <a href="qevent.html#accept">accept</a>().</p>
 
 
 <h3 class="fn"><a name="dropAction" /><a href="qt.html#DropAction-enum">Qt.DropAction</a> QDropEvent.dropAction (<i>self</i>)</h3><p>Returns the action to be performed on the data by the target.
 This may be different from the action supplied in <a href="qdropevent.html#proposedAction">proposedAction</a>() if you have
 called <a href="qdropevent.html#setDropAction">setDropAction</a>()
 to explicitly choose a drop action.</p>
-<p>See also <a href="qdropevent.html#setDropAction">setDropAction</a>().</p>
+<p><b>See also</b> <a href="qdropevent.html#setDropAction">setDropAction</a>().</p>
 
 
 <h3 class="fn"><a name="encodedData" /><a href="qbytearray.html">QByteArray</a> QDropEvent.encodedData (<i>self</i>, str)</h3><h3 class="fn"><a name="format" />str QDropEvent.format (<i>self</i>, int&#160;<i>n</i>&#160;=&#160;0)</h3><h3 class="fn"><a name="keyboardModifiers" /><a href="qt-keyboardmodifiers.html">Qt.KeyboardModifiers</a> QDropEvent.keyboardModifiers (<i>self</i>)</h3><p>Returns the modifier keys that are pressed.</p>
@@ -71,11 +71,11 @@ associated MIME type information.</p>
 
 
 <h3 class="fn"><a name="possibleActions" /><a href="qt-dropactions.html">Qt.DropActions</a> QDropEvent.possibleActions (<i>self</i>)</h3><p>Returns an OR-combination of possible drop actions.</p>
-<p>See also <a href="qdropevent.html#dropAction">dropAction</a>().</p>
+<p><b>See also</b> <a href="qdropevent.html#dropAction">dropAction</a>().</p>
 
 
 <h3 class="fn"><a name="proposedAction" /><a href="qt.html#DropAction-enum">Qt.DropAction</a> QDropEvent.proposedAction (<i>self</i>)</h3><p>Returns the proposed drop action.</p>
-<p>See also <a href="qdropevent.html#dropAction">dropAction</a>().</p>
+<p><b>See also</b> <a href="qdropevent.html#dropAction">dropAction</a>().</p>
 
 
 <h3 class="fn"><a name="provides" />bool QDropEvent.provides (<i>self</i>, str)</h3><h3 class="fn"><a name="setDropAction" />QDropEvent.setDropAction (<i>self</i>, <a href="qt.html#DropAction-enum">Qt.DropAction</a>&#160;<i>action</i>)</h3><p>Sets the <i>action</i> to be performed on the data by the
@@ -87,7 +87,7 @@ actions, the drag and drop operation will default to a copy
 operation.</p>
 <p>Once you have supplied a replacement drop action, call accept()
 instead of <a href="qdropevent.html#acceptProposedAction">acceptProposedAction</a>().</p>
-<p>See also <a href="qdropevent.html#dropAction">dropAction</a>().</p>
+<p><b>See also</b> <a href="qdropevent.html#dropAction">dropAction</a>().</p>
 
 
 <h3 class="fn"><a name="source" /><a href="qwidget.html">QWidget</a> QDropEvent.source (<i>self</i>)</h3><p>If the source of the drag operation is a widget in this
@@ -97,5 +97,5 @@ the <a href="qdrag.html">QDrag</a> object used instantiate the
 drag.</p>
 <p>This is useful if your widget needs special behavior when
 dragging to itself.</p>
-<p>See also <a href="qdrag.html#QDrag">QDrag.QDrag</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qdrag.html#QDrag">QDrag.QDrag</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

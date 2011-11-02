@@ -29,25 +29,25 @@ Designer</i>'s default task menu entries: <b>Cut</b>, <b>Copy</b>,
 <p>To create a custom task menu extension, your extension class
 must inherit from both <a href="qobject.html">QObject</a> and
 QDesignerTaskMenuExtension. For example:</p>
-<pre class="highlightedCode brush: cpp">
- class MyTaskMenuExtension : public QObject,
-         public QDesignerTaskMenuExtension
+<pre class="cpp">
+ <span class="keyword">class</span> MyTaskMenuExtension : <span class="keyword">public</span> <span class="type"><a href="qobject.html">QObject</a></span><span class="operator">,</span>
+         <span class="keyword">public</span> <span class="type">QDesignerTaskMenuExtension</span>
  {
      Q_OBJECT
-     Q_INTERFACES(QDesignerTaskMenuExtension)
+     Q_INTERFACES(<span class="type">QDesignerTaskMenuExtension</span>)
 
- public:
-     MyTaskMenuExtension(MyCustomWidget *widget, QObject *parent);
+ <span class="keyword">public</span>:
+     MyTaskMenuExtension(MyCustomWidget <span class="operator">*</span>widget<span class="operator">,</span> <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>parent);
 
-     QAction *preferredEditAction() const;
-     QList&lt;QAction *&gt; taskActions() const;
+     <span class="type"><a href="qaction.html">QAction</a></span> <span class="operator">*</span>preferredEditAction() <span class="keyword">const</span>;
+     <span class="type"><a href="qlist.html">QList</a></span><span class="operator">&lt;</span><span class="type"><a href="qaction.html">QAction</a></span> <span class="operator">*</span><span class="operator">&gt;</span> taskActions() <span class="keyword">const</span>;
 
- private slots:
-     void mySlot();
+ <span class="keyword">private</span> <span class="keyword">slots</span>:
+     <span class="type">void</span> mySlot();
 
- private:
-     MyCustomWidget *widget;
-     QAction *myAction;
+ <span class="keyword">private</span>:
+     MyCustomWidget <span class="operator">*</span>widget;
+     <span class="type"><a href="qaction.html">QAction</a></span> <span class="operator">*</span>myAction;
  };
 </pre>
 <p>Since we are implementing an interface, we must ensure that it
@@ -88,36 +88,36 @@ interface for custom extension factories. You can either create a
 new <a href="qextensionfactory.html">QExtensionFactory</a> and
 reimplement the <a href="qextensionfactory.html#createExtension">QExtensionFactory.createExtension</a>()
 function. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QObject *ANewExtensionFactory.createExtension(QObject *object,
-         const QString &amp;iid, QObject *parent) const
+<pre class="cpp">
+ <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>ANewExtensionFactory<span class="operator">.</span>createExtension(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>object<span class="operator">,</span>
+         <span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>iid<span class="operator">,</span> <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>parent) <span class="keyword">const</span>
  {
-     if (iid != Q_TYPEID(QDesignerTaskMenuExtension))
-         return 0;
+     <span class="keyword">if</span> (iid <span class="operator">!</span><span class="operator">=</span> Q_TYPEID(<span class="type">QDesignerTaskMenuExtension</span>))
+         <span class="keyword">return</span> <span class="number">0</span>;
 
-     if (MyCustomWidget *widget = qobject_cast&lt;MyCustomWidget*&gt;(object))
-         return new MyTaskMenuExtension(widget, parent);
+     <span class="keyword">if</span> (MyCustomWidget <span class="operator">*</span>widget <span class="operator">=</span> qobject_cast<span class="operator">&lt;</span>MyCustomWidget<span class="operator">*</span><span class="operator">&gt;</span>(object))
+         <span class="keyword">return</span> <span class="keyword">new</span> MyTaskMenuExtension(widget<span class="operator">,</span> parent);
 
-     return 0;
+     <span class="keyword">return</span> <span class="number">0</span>;
  }
 </pre>
 <p>Or you can use an existing factory, expanding the <a href="qextensionfactory.html#createExtension">QExtensionFactory.createExtension</a>()
 function to make the factory able to create a task menu extension
 as well. For example:</p>
-<pre class="highlightedCode brush: cpp">
- QObject *AGeneralExtensionFactory.createExtension(QObject *object,
-         const QString &amp;iid, QObject *parent) const
+<pre class="cpp">
+ <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>AGeneralExtensionFactory<span class="operator">.</span>createExtension(<span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>object<span class="operator">,</span>
+         <span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>iid<span class="operator">,</span> <span class="type"><a href="qobject.html">QObject</a></span> <span class="operator">*</span>parent) <span class="keyword">const</span>
  {
-     MyCustomWidget *widget = qobject_cast&lt;MyCustomWidget*&gt;(object);
+     MyCustomWidget <span class="operator">*</span>widget <span class="operator">=</span> qobject_cast<span class="operator">&lt;</span>MyCustomWidget<span class="operator">*</span><span class="operator">&gt;</span>(object);
 
-     if (widget &amp;&amp; (iid == Q_TYPEID(QDesignerContainerExtension))) {
-         return new MyContainerExtension(widget, parent);
+     <span class="keyword">if</span> (widget <span class="operator">&amp;</span><span class="operator">&amp;</span> (iid <span class="operator">=</span><span class="operator">=</span> Q_TYPEID(<span class="type"><a href="qdesignercontainerextension.html">QDesignerContainerExtension</a></span>))) {
+         <span class="keyword">return</span> <span class="keyword">new</span> MyContainerExtension(widget<span class="operator">,</span> parent);
 
-     } else if (widget &amp;&amp; (iid == Q_TYPEID(QDesignerTaskMenuExtension))) {
-         return new MyTaskMenuExtension(widget, parent);
+     } <span class="keyword">else</span> <span class="keyword">if</span> (widget <span class="operator">&amp;</span><span class="operator">&amp;</span> (iid <span class="operator">=</span><span class="operator">=</span> Q_TYPEID(<span class="type">QDesignerTaskMenuExtension</span>))) {
+         <span class="keyword">return</span> <span class="keyword">new</span> MyTaskMenuExtension(widget<span class="operator">,</span> parent);
 
-     } else {
-         return 0;
+     } <span class="keyword">else</span> {
+         <span class="keyword">return</span> <span class="number">0</span>;
      }
  }
 </pre>
@@ -137,4 +137,4 @@ be included in <i>Qt Designer</i>'s task menu when a plugin with
 the specified extension is selected.</p>
 <p>The function must be reimplemented to add actions to the
 list.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

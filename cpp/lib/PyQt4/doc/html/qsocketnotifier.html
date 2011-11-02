@@ -83,29 +83,29 @@ same file descriptor, you must create two socket notifiers. Note
 also that it is not possible to install two socket notifiers of the
 same type (Read, Write, Exception) on the same socket.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSocketNotifier.Read</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">There is data to be read.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSocketNotifier.Write</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">Data can be written.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSocketNotifier.Exception</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">An exception has occurred. We recommend
 against using this.</td>
 </tr>
 </table>
-<p>See also <a href="qsocketnotifier.html#QSocketNotifier">QSocketNotifier</a>() and
+<p><b>See also</b> <a href="qsocketnotifier.html#QSocketNotifier">QSocketNotifier</a>() and
 <a href="qsocketnotifier.html#type">type</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QSocketNotifier" />QSocketNotifier.__init__ (<i>self</i>, int&#160;<i>socket</i>, <a href="qsocketnotifier.html#Type-enum">Type</a>&#160;<i>type</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a socket notifier with the given <i>parent</i>. It
 enables the <i>socket</i>, and watches for events of the given
@@ -114,7 +114,7 @@ enables the <i>socket</i>, and watches for events of the given
 socket notifier, especially for write notifiers.</p>
 <p><b>Note for Windows users:</b> The socket passed to <a href="qsocketnotifier.html">QSocketNotifier</a> will become
 non-blocking, even if it was created as a blocking socket.</p>
-<p>See also <a href="qsocketnotifier.html#setEnabled">setEnabled</a>() and <a href="qsocketnotifier.html#isEnabled">isEnabled</a>().</p>
+<p><b>See also</b> <a href="qsocketnotifier.html#setEnabled">setEnabled</a>() and <a href="qsocketnotifier.html#isEnabled">isEnabled</a>().</p>
 
 
 <h3 class="fn"><a name="event" />bool QSocketNotifier.event (<i>self</i>, <a href="qevent.html">QEvent</a>)</h3><p>Reimplemented from <a href="qobject.html#event">QObject.event</a>().</p>
@@ -122,7 +122,7 @@ non-blocking, even if it was created as a blocking socket.</p>
 
 <h3 class="fn"><a name="isEnabled" />bool QSocketNotifier.isEnabled (<i>self</i>)</h3><p>Returns true if the notifier is enabled; otherwise returns
 false.</p>
-<p>See also <a href="qsocketnotifier.html#setEnabled">setEnabled</a>().</p>
+<p><b>See also</b> <a href="qsocketnotifier.html#setEnabled">setEnabled</a>().</p>
 
 
 <h3 class="fn"><a name="setEnabled" />QSocketNotifier.setEnabled (<i>self</i>, bool)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setEnabled(bool)</tt>.</p><p>If <i>enable</i> is true, the notifier is enabled; otherwise the
@@ -134,21 +134,21 @@ notifier).</p>
 <p>Write notifiers should normally be disabled immediately after
 the <a href="qsocketnotifier.html#activated">activated</a>() signal
 has been emitted</p>
-<p>See also <a href="qsocketnotifier.html#isEnabled">isEnabled</a>() and <a href="qsocketnotifier.html#activated">activated</a>().</p>
+<p><b>See also</b> <a href="qsocketnotifier.html#isEnabled">isEnabled</a>() and <a href="qsocketnotifier.html#activated">activated</a>().</p>
 
 
 <h3 class="fn"><a name="socket" />int QSocketNotifier.socket (<i>self</i>)</h3><p>Returns the socket identifier specified to the constructor.</p>
-<p>See also <a href="qsocketnotifier.html#type">type</a>().</p>
+<p><b>See also</b> <a href="qsocketnotifier.html#type">type</a>().</p>
 
 
 <h3 class="fn"><a name="type" /><a href="qsocketnotifier.html#Type-enum">Type</a> QSocketNotifier.type (<i>self</i>)</h3><p>Returns the socket event type specified to the constructor.</p>
-<p>See also <a href="qsocketnotifier.html#socket">socket</a>().</p>
+<p><b>See also</b> <a href="qsocketnotifier.html#socket">socket</a>().</p>
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="activated" />void activated (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the socket notifier is enabled
 and a socket event corresponding to its <a href="qsocketnotifier.html#Type-enum">type</a> occurs.</p>
 <p>The socket identifier is passed in the <i>socket</i>
 parameter.</p>
-<p>See also <a href="qsocketnotifier.html#type">type</a>() and
-<a href="qsocketnotifier.html#socket">socket</a>().</p>
+<p><b>See also</b> <a href="qsocketnotifier.html#type">type</a>()
+and <a href="qsocketnotifier.html#socket">socket</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

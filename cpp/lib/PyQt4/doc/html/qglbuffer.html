@@ -16,37 +16,37 @@ application can avoid uploading vertices, indices, texture image
 data, etc every time they are needed.</p>
 <p>QGLBuffer objects can be copied around as a reference to the
 underlying GL buffer object:</p>
-<pre class="highlightedCode brush: cpp">
- QGLBuffer buffer1(QGLBuffer.IndexBuffer);
- buffer1.create();
+<pre class="cpp">
+ <span class="type">QGLBuffer</span> buffer1(<span class="type">QGLBuffer</span><span class="operator">.</span>IndexBuffer);
+ buffer1<span class="operator">.</span><a href="qglbuffer.html#create">create</a>();
 
- QGLBuffer buffer2 = buffer1;
+ <span class="type">QGLBuffer</span> buffer2 <span class="operator">=</span> buffer1;
 </pre>
 <p>QGLBuffer performs a shallow copy when objects are copied in
 this manner, but does not implement copy-on-write semantics. The
 original object will be affected whenever the copy is modified.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Access-enum" />QGLBuffer.Access</h3><p>This enum defines the access mode for <a href="qglbuffer.html#map">QGLBuffer.map</a>().</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.ReadOnly</tt></td>
-<td class=" topAlign"><tt>0x88B8</tt></td>
+<td class="topAlign"><tt>0x88B8</tt></td>
 <td class="topAlign">The buffer will be mapped for reading
 only.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.WriteOnly</tt></td>
-<td class=" topAlign"><tt>0x88B9</tt></td>
+<td class="topAlign"><tt>0x88B9</tt></td>
 <td class="topAlign">The buffer will be mapped for writing
 only.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.ReadWrite</tt></td>
-<td class=" topAlign"><tt>0x88BA</tt></td>
+<td class="topAlign"><tt>0x88BA</tt></td>
 <td class="topAlign">The buffer will be mapped for reading and
 writing.</td>
 </tr>
@@ -56,33 +56,33 @@ writing.</td>
 <h3 class="fn"><a name="Type-enum" />QGLBuffer.Type</h3><p>This enum defines the type of GL buffer object to create with
 <a href="qglbuffer.html">QGLBuffer</a>.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.VertexBuffer</tt></td>
-<td class=" topAlign"><tt>0x8892</tt></td>
+<td class="topAlign"><tt>0x8892</tt></td>
 <td class="topAlign">Vertex buffer object for use when specifying
 vertex arrays.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.IndexBuffer</tt></td>
-<td class=" topAlign"><tt>0x8893</tt></td>
+<td class="topAlign"><tt>0x8893</tt></td>
 <td class="topAlign">Index buffer object for use with
 <tt>glDrawElements()</tt>.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.PixelPackBuffer</tt></td>
-<td class=" topAlign"><tt>0x88EB</tt></td>
+<td class="topAlign"><tt>0x88EB</tt></td>
 <td class="topAlign">Pixel pack buffer object for reading pixel
 data from the GL server (for example, with
 <tt>glReadPixels()</tt>). Not supported under OpenGL/ES.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.PixelUnpackBuffer</tt></td>
-<td class=" topAlign"><tt>0x88EC</tt></td>
+<td class="topAlign"><tt>0x88EC</tt></td>
 <td class="topAlign">Pixel unpack buffer object for writing pixel
 data to the GL server (for example, with <tt>glTexImage2D()</tt>).
 Not supported under OpenGL/ES.</td>
@@ -92,68 +92,68 @@ Not supported under OpenGL/ES.</td>
 
 <h3 class="fn"><a name="UsagePattern-enum" />QGLBuffer.UsagePattern</h3><p>This enum defines the usage pattern of a <a href="qglbuffer.html">QGLBuffer</a> object.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.StreamDraw</tt></td>
-<td class=" topAlign"><tt>0x88E0</tt></td>
+<td class="topAlign"><tt>0x88E0</tt></td>
 <td class="topAlign">The data will be set once and used a few times
 for drawing operations. Under OpenGL/ES 1.1 this is identical to
 StaticDraw.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.StreamRead</tt></td>
-<td class=" topAlign"><tt>0x88E1</tt></td>
+<td class="topAlign"><tt>0x88E1</tt></td>
 <td class="topAlign">The data will be set once and used a few times
 for reading data back from the GL server. Not supported under
 OpenGL/ES.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.StreamCopy</tt></td>
-<td class=" topAlign"><tt>0x88E2</tt></td>
+<td class="topAlign"><tt>0x88E2</tt></td>
 <td class="topAlign">The data will be set once and used a few times
 for reading data back from the GL server for use in further drawing
 operations. Not supported under OpenGL/ES.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.StaticDraw</tt></td>
-<td class=" topAlign"><tt>0x88E4</tt></td>
+<td class="topAlign"><tt>0x88E4</tt></td>
 <td class="topAlign">The data will be set once and used many times
 for drawing operations.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.StaticRead</tt></td>
-<td class=" topAlign"><tt>0x88E5</tt></td>
+<td class="topAlign"><tt>0x88E5</tt></td>
 <td class="topAlign">The data will be set once and used many times
 for reading data back from the GL server. Not supported under
 OpenGL/ES.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.StaticCopy</tt></td>
-<td class=" topAlign"><tt>0x88E6</tt></td>
+<td class="topAlign"><tt>0x88E6</tt></td>
 <td class="topAlign">The data will be set once and used many times
 for reading data back from the GL server for use in further drawing
 operations. Not supported under OpenGL/ES.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.DynamicDraw</tt></td>
-<td class=" topAlign"><tt>0x88E8</tt></td>
+<td class="topAlign"><tt>0x88E8</tt></td>
 <td class="topAlign">The data will be modified repeatedly and used
 many times for drawing operations.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.DynamicRead</tt></td>
-<td class=" topAlign"><tt>0x88E9</tt></td>
+<td class="topAlign"><tt>0x88E9</tt></td>
 <td class="topAlign">The data will be modified repeatedly and used
 many times for reading data back from the GL server. Not supported
 under OpenGL/ES.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGLBuffer.DynamicCopy</tt></td>
-<td class=" topAlign"><tt>0x88EA</tt></td>
+<td class="topAlign"><tt>0x88EA</tt></td>
 <td class="topAlign">The data will be modified repeatedly and used
 many times for reading data back from the GL server for use in
 further drawing operations. Not supported under OpenGL/ES.</td>
@@ -162,13 +162,13 @@ further drawing operations. Not supported under OpenGL/ES.</td>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QGLBuffer" />QGLBuffer.__init__ (<i>self</i>)</h3><p>Constructs a new buffer object of type <a href="qglbuffer.html#Type-enum">QGLBuffer.VertexBuffer</a>.</p>
 <p>Note: this constructor just creates the <a href="qglbuffer.html">QGLBuffer</a> instance. The actual buffer object
 in the GL server is not created until <a href="qglbuffer.html#create">create</a>() is called.</p>
-<p>See also <a href="qglbuffer.html#create">create</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#create">create</a>().</p>
 
 
 <h3 class="fn"><a name="QGLBuffer-2" />QGLBuffer.__init__ (<i>self</i>, <a href="qglbuffer.html#Type-enum">Type</a>&#160;<i>type</i>)</h3><p>Constructs a new buffer object of <i>type</i>.</p>
 <p>Note: this constructor just creates the <a href="qglbuffer.html">QGLBuffer</a> instance. The actual buffer object
 in the GL server is not created until <a href="qglbuffer.html#create">create</a>() is called.</p>
-<p>See also <a href="qglbuffer.html#create">create</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#create">create</a>().</p>
 
 
 <h3 class="fn"><a name="QGLBuffer-3" />QGLBuffer.__init__ (<i>self</i>, <a href="qglbuffer.html">QGLBuffer</a>&#160;<i>other</i>)</h3><p>Constructs a shallow copy of <i>other</i>.</p>
@@ -183,7 +183,8 @@ removed.</p>
 <p>It is assumed that <a href="qglbuffer.html#create">create</a>()
 has been called on this buffer and that it has been bound to the
 current context.</p>
-<p>See also <a href="qglbuffer.html#create">create</a>(), <a href="qglbuffer.html#read">read</a>(), and <a href="qglbuffer.html#write">write</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#create">create</a>(),
+<a href="qglbuffer.html#read">read</a>(), and <a href="qglbuffer.html#write">write</a>().</p>
 
 
 <h3 class="fn"><a name="allocate-2" />QGLBuffer.allocate (<i>self</i>, int&#160;<i>count</i>)</h3><p>This is an overloaded function.</p>
@@ -192,7 +193,7 @@ previous contents will be removed.</p>
 <p>It is assumed that <a href="qglbuffer.html#create">create</a>()
 has been called on this buffer and that it has been bound to the
 current context.</p>
-<p>See also <a href="qglbuffer.html#create">create</a>() and
+<p><b>See also</b> <a href="qglbuffer.html#create">create</a>() and
 <a href="qglbuffer.html#write">write</a>().</p>
 
 
@@ -203,13 +204,13 @@ GL implementation.</p>
 <p>The buffer must be bound to the same <a href="qglcontext.html">QGLContext</a> current when <a href="qglbuffer.html#create">create</a>() was called, or to another
 <a href="qglcontext.html">QGLContext</a> that is sharing with it.
 Otherwise, false will be returned from this function.</p>
-<p>See also <a href="qglbuffer.html#release">release</a>() and
-<a href="qglbuffer.html#create">create</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#release">release</a>()
+and <a href="qglbuffer.html#create">create</a>().</p>
 
 
 <h3 class="fn"><a name="bufferId" />int QGLBuffer.bufferId (<i>self</i>)</h3><p>Returns the GL identifier associated with this buffer; zero if
 the buffer has not been created.</p>
-<p>See also <a href="qglbuffer.html#isCreated">isCreated</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#isCreated">isCreated</a>().</p>
 
 
 <h3 class="fn"><a name="create" />bool QGLBuffer.create (<i>self</i>)</h3><p>Creates the buffer object in the GL server. Returns true if the
@@ -219,8 +220,7 @@ can only be used in that context (or any other context that is
 shared with it).</p>
 <p>This function will return false if the GL implementation does
 not support buffers, or there is no current <a href="qglcontext.html">QGLContext</a>.</p>
-<p>See also <a href="qglbuffer.html#isCreated">isCreated</a>(),
-<a href="qglbuffer.html#allocate">allocate</a>(), <a href="qglbuffer.html#write">write</a>(), and <a href="qglbuffer.html#destroy">destroy</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#isCreated">isCreated</a>(), <a href="qglbuffer.html#allocate">allocate</a>(), <a href="qglbuffer.html#write">write</a>(), and <a href="qglbuffer.html#destroy">destroy</a>().</p>
 
 
 <h3 class="fn"><a name="destroy" />QGLBuffer.destroy (<i>self</i>)</h3><p>Destroys this buffer object, including the storage being used in
@@ -230,7 +230,7 @@ invalid.</p>
 
 <h3 class="fn"><a name="isCreated" />bool QGLBuffer.isCreated (<i>self</i>)</h3><p>Returns true if this buffer has been created; false
 otherwise.</p>
-<p>See also <a href="qglbuffer.html#create">create</a>() and
+<p><b>See also</b> <a href="qglbuffer.html#create">create</a>() and
 <a href="qglbuffer.html#destroy">destroy</a>().</p>
 
 
@@ -243,7 +243,8 @@ has been called on this buffer and that it has been bound to the
 current context.</p>
 <p>This function is only supported under OpenGL/ES if the
 <tt>GL_OES_mapbuffer</tt> extension is present.</p>
-<p>See also <a href="qglbuffer.html#unmap">unmap</a>(), <a href="qglbuffer.html#create">create</a>(), and <a href="qglbuffer.html#bind">bind</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#unmap">unmap</a>(),
+<a href="qglbuffer.html#create">create</a>(), and <a href="qglbuffer.html#bind">bind</a>().</p>
 
 
 <h3 class="fn"><a name="read" />bool QGLBuffer.read (<i>self</i>, int&#160;<i>offset</i>, sip.voidptr&#160;<i>data</i>, int&#160;<i>count</i>)</h3><p>Reads the <i>count</i> bytes in this buffer starting at
@@ -252,13 +253,14 @@ reading from the buffer is not supported. Buffer reading is not
 supported under OpenGL/ES.</p>
 <p>It is assumed that this buffer has been bound to the current
 context.</p>
-<p>See also <a href="qglbuffer.html#write">write</a>() and <a href="qglbuffer.html#bind">bind</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#write">write</a>() and
+<a href="qglbuffer.html#bind">bind</a>().</p>
 
 
 <h3 class="fn"><a name="release" />QGLBuffer.release (<i>self</i>)</h3><p>Releases the buffer associated with this object from the current
 GL context.</p>
 <p>This function must be called with the same <a href="qglcontext.html">QGLContext</a> current as when <a href="qglbuffer.html#bind">bind</a>() was called on the buffer.</p>
-<p>See also <a href="qglbuffer.html#bind">bind</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#bind">bind</a>().</p>
 
 
 <h3 class="fn"><a name="release-2" />QGLBuffer.release (<a href="qglbuffer.html#Type-enum">Type</a>&#160;<i>type</i>)</h3><p>Releases the buffer associated with <i>type</i> in the current
@@ -266,14 +268,14 @@ GL context.</p>
 <p>This function is a direct call to <tt>glBindBuffer(type, 0)</tt>
 for use when the caller does not know which <a href="qglbuffer.html">QGLBuffer</a> has been bound to the context but
 wants to make sure that it is released.</p>
-<pre class="highlightedCode brush: cpp">
- QGLBuffer.release(QGLBuffer.VertexBuffer);
+<pre class="cpp">
+ <span class="type"><a href="qglbuffer.html">QGLBuffer</a></span><span class="operator">.</span><a href="qglbuffer.html#release">release</a>(<span class="type"><a href="qglbuffer.html">QGLBuffer</a></span><span class="operator">.</span>VertexBuffer);
 </pre>
 
 
 <h3 class="fn"><a name="setUsagePattern" />QGLBuffer.setUsagePattern (<i>self</i>, <a href="qglbuffer.html#UsagePattern-enum">UsagePattern</a>&#160;<i>value</i>)</h3><p>Sets the usage pattern for this buffer object to <i>value</i>.
 This function must be called before <a href="qglbuffer.html#allocate">allocate</a>() or <a href="qglbuffer.html#write">write</a>().</p>
-<p>See also <a href="qglbuffer.html#usagePattern">usagePattern</a>(), <a href="qglbuffer.html#allocate">allocate</a>(), and <a href="qglbuffer.html#write">write</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#usagePattern">usagePattern</a>(), <a href="qglbuffer.html#allocate">allocate</a>(), and <a href="qglbuffer.html#write">write</a>().</p>
 
 
 <h3 class="fn"><a name="size" />int QGLBuffer.size (<i>self</i>)</h3><p>Returns the size of the data in this buffer, for reading
@@ -281,8 +283,7 @@ operations. Returns -1 if fetching the buffer size is not
 supported, or the buffer has not been created.</p>
 <p>It is assumed that this buffer has been bound to the current
 context.</p>
-<p>See also <a href="qglbuffer.html#isCreated">isCreated</a>() and
-<a href="qglbuffer.html#bind">bind</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#isCreated">isCreated</a>() and <a href="qglbuffer.html#bind">bind</a>().</p>
 
 
 <h3 class="fn"><a name="type" /><a href="qglbuffer.html#Type-enum">Type</a> QGLBuffer.type (<i>self</i>)</h3><p>Returns the type of buffer represented by this object.</p>
@@ -295,12 +296,12 @@ succeeded; false otherwise.</p>
 context, and that it was previously mapped with <a href="qglbuffer.html#map">map</a>().</p>
 <p>This function is only supported under OpenGL/ES if the
 <tt>GL_OES_mapbuffer</tt> extension is present.</p>
-<p>See also <a href="qglbuffer.html#map">map</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#map">map</a>().</p>
 
 
 <h3 class="fn"><a name="usagePattern" /><a href="qglbuffer.html#UsagePattern-enum">UsagePattern</a> QGLBuffer.usagePattern (<i>self</i>)</h3><p>Returns the usage pattern for this buffer object. The default
 value is <a href="qglbuffer.html#UsagePattern-enum">StaticDraw</a>.</p>
-<p>See also <a href="qglbuffer.html#setUsagePattern">setUsagePattern</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#setUsagePattern">setUsagePattern</a>().</p>
 
 
 <h3 class="fn"><a name="write" />QGLBuffer.write (<i>self</i>, int&#160;<i>offset</i>, sip.voidptr&#160;<i>data</i>, int&#160;<i>count</i>)</h3><p>Replaces the <i>count</i> bytes of this buffer starting at
@@ -309,7 +310,8 @@ the buffer will be left unmodified.</p>
 <p>It is assumed that <a href="qglbuffer.html#create">create</a>()
 has been called on this buffer and that it has been bound to the
 current context.</p>
-<p>See also <a href="qglbuffer.html#create">create</a>(), <a href="qglbuffer.html#read">read</a>(), and <a href="qglbuffer.html#allocate">allocate</a>().</p>
+<p><b>See also</b> <a href="qglbuffer.html#create">create</a>(),
+<a href="qglbuffer.html#read">read</a>(), and <a href="qglbuffer.html#allocate">allocate</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

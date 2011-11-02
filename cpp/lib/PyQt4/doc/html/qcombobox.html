@@ -58,55 +58,58 @@ popuplist. You can access the model and view directly (with
 <a href="qcombobox.html#model">model</a>() and <a href="qcombobox.html#view">view</a>()), but QComboBox also provides
 functions to set and get item data (e.g., <a href="qcombobox.html#setItemData">setItemData</a>() and <a href="qcombobox.html#itemText">itemText</a>()). You can also set a new
 model and view (with <a href="qcombobox.html#setModel">setModel</a>() and <a href="qcombobox.html#setView">setView</a>()). For the text and icon in
-the combobox label, the data in the model that has the <a href="qt.html#ItemDataRole-enum">Qt.DisplayRole</a> and <a href="qt.html#ItemDataRole-enum">Qt.DecorationRole</a> is used.</p>
+the combobox label, the data in the model that has the <a href="qt.html#ItemDataRole-enum">Qt.DisplayRole</a> and <a href="qt.html#ItemDataRole-enum">Qt.DecorationRole</a> is used. Note
+that you cannot alter the <a href="qabstractitemview.html#SelectionMode-enum">SelectionMode</a> of
+the <a href="qcombobox.html#view">view</a>(), e.g., by using
+<a href="qabstractitemview.html#selectionMode-prop">setSelectionMode()</a>.</p>
 <p class="centerAlign"><img alt="Comboboxes in the different built-in styles." src="images/qstyle-comboboxes.png" /></p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="InsertPolicy-enum" />QComboBox.InsertPolicy</h3><p>This enum specifies what the <a href="qcombobox.html">QComboBox</a> should do when a new string is
 entered by the user.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QComboBox.NoInsert</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The string will not be inserted into the
 combobox.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QComboBox.InsertAtTop</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The string will be inserted as the first item
 in the combobox.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QComboBox.InsertAtCurrent</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The current item will be <i>replaced</i> by
 the string.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QComboBox.InsertAtBottom</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The string will be inserted after the last
 item in the combobox.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QComboBox.InsertAfterCurrent</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">The string is inserted after the current item
 in the combobox.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QComboBox.InsertBeforeCurrent</tt></td>
-<td class=" topAlign"><tt>5</tt></td>
+<td class="topAlign"><tt>5</tt></td>
 <td class="topAlign">The string is inserted before the current item
 in the combobox.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QComboBox.InsertAlphabetically</tt></td>
-<td class=" topAlign"><tt>6</tt></td>
+<td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">The string is inserted in the alphabetic order
 in the combobox.</td>
 </tr>
@@ -116,35 +119,35 @@ in the combobox.</td>
 <h3 class="fn"><a name="SizeAdjustPolicy-enum" />QComboBox.SizeAdjustPolicy</h3><p>This enum specifies how the size hint of the <a href="qcombobox.html">QComboBox</a> should adjust when new content is
 added or content changes.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QComboBox.AdjustToContents</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The combobox will always adjust to the
 contents</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QComboBox.AdjustToContentsOnFirstShow</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The combobox will adjust to its contents the
 first time it is shown.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QComboBox.AdjustToMinimumContentsLength</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">Use AdjustToContents or
 AdjustToContentsOnFirstShow instead.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QComboBox.AdjustToMinimumContentsLengthWithIcon</tt></td>
-<td class=" topAlign"><tt>3</tt></td>
+<td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The combobox will adjust to <a href="qcombobox.html#minimumContentsLength-prop">minimumContentsLength</a>
 plus space for an icon. For performance reasons use this policy on
 large models.</td>
@@ -185,7 +188,7 @@ combobox.</p>
 <h3 class="fn"><a name="completer" /><a href="qcompleter.html">QCompleter</a> QComboBox.completer (<i>self</i>)</h3><p>Returns the completer that is used to auto complete text input
 for the combobox.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qcombobox.html#setCompleter">setCompleter</a>() and <a href="qcombobox.html#editable-prop">editable</a>.</p>
+<p><b>See also</b> <a href="qcombobox.html#setCompleter">setCompleter</a>() and <a href="qcombobox.html#editable-prop">editable</a>.</p>
 
 
 <h3 class="fn"><a name="contextMenuEvent" />QComboBox.contextMenuEvent (<i>self</i>, <a href="qcontextmenuevent.html">QContextMenuEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#contextMenuEvent">QWidget.contextMenuEvent</a>().</p>
@@ -221,13 +224,13 @@ was shown inside the reimplemented <a href="qcombobox.html#showPopup">showPopup<
 reimplement the hidePopup() function to hide your custom pop-up and
 call the base class implementation to reset the internal state
 whenever your custom pop-up widget is hidden.</p>
-<p>See also <a href="qcombobox.html#showPopup">showPopup</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#showPopup">showPopup</a>().</p>
 
 
 <h3 class="fn"><a name="iconSize" /><a href="qsize.html">QSize</a> QComboBox.iconSize (<i>self</i>)</h3><h3 class="fn"><a name="initStyleOption" />QComboBox.initStyleOption (<i>self</i>, <a href="qstyleoptioncombobox.html">QStyleOptionComboBox</a>&#160;<i>option</i>)</h3><p>Initialize <i>option</i> with the values from this <a href="qcombobox.html">QComboBox</a>. This method is useful for
 subclasses when they need a <a href="qstyleoptioncombobox.html">QStyleOptionComboBox</a>, but don't
 want to fill in all the information themselves.</p>
-<p>See also <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
+<p><b>See also</b> <a href="qstyleoption.html#initFrom">QStyleOption.initFrom</a>().</p>
 
 
 <h3 class="fn"><a name="inputMethodEvent" />QComboBox.inputMethodEvent (<i>self</i>, <a href="qinputmethodevent.html">QInputMethodEvent</a>)</h3><p>Reimplemented from <a href="qwidget.html#inputMethodEvent">QWidget.inputMethodEvent</a>().</p>
@@ -243,7 +246,7 @@ combobox at the given <i>index</i>.</p>
 items, the new item is appended to the list of existing items. If
 the index is zero or negative, the new item is prepended to the
 list of existing items.</p>
-<p>See also <a href="qcombobox.html#insertItems">insertItems</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#insertItems">insertItems</a>().</p>
 
 
 <h3 class="fn"><a name="insertItem-2" />QComboBox.insertItem (<i>self</i>, int&#160;<i>index</i>, <a href="qicon.html">QIcon</a>&#160;<i>icon</i>, QString&#160;<i>text</i>, QVariant&#160;<i>userData</i>&#160;=&#160;QVariant())</h3><p>Inserts the <i>icon</i>, <i>text</i> and <i>userData</i> (stored
@@ -253,7 +256,7 @@ the combobox at the given <i>index</i>.</p>
 items, the new item is appended to the list of existing items. If
 the index is zero or negative, the new item is prepended to the
 list of existing items.</p>
-<p>See also <a href="qcombobox.html#insertItems">insertItems</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#insertItems">insertItems</a>().</p>
 
 
 <h3 class="fn"><a name="insertItems" />QComboBox.insertItems (<i>self</i>, int&#160;<i>index</i>, QStringList&#160;<i>texts</i>)</h3><p>Inserts the strings from the <i>list</i> into the combobox as
@@ -262,7 +265,7 @@ separate items, starting at the <i>index</i> specified.</p>
 items, the new items are appended to the list of existing items. If
 the index is zero or negative, the new items are prepended to the
 list of existing items.</p>
-<p>See also <a href="qcombobox.html#insertItem">insertItem</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#insertItem">insertItem</a>().</p>
 
 
 <h3 class="fn"><a name="insertPolicy" /><a href="qcombobox.html#InsertPolicy-enum">InsertPolicy</a> QComboBox.insertPolicy (<i>self</i>)</h3><h3 class="fn"><a name="insertSeparator" />QComboBox.insertSeparator (<i>self</i>, int&#160;<i>index</i>)</h3><p>Inserts a separator item into the combobox at the given
@@ -272,25 +275,25 @@ items, the new item is appended to the list of existing items. If
 the index is zero or negative, the new item is prepended to the
 list of existing items.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qcombobox.html#insertItem">insertItem</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#insertItem">insertItem</a>().</p>
 
 
 <h3 class="fn"><a name="isEditable" />bool QComboBox.isEditable (<i>self</i>)</h3><h3 class="fn"><a name="itemData" />QVariant QComboBox.itemData (<i>self</i>, int&#160;<i>index</i>, int&#160;<i>role</i>&#160;=&#160;Qt.UserRole)</h3><p>Returns the data for the given <i>role</i> in the given
 <i>index</i> in the combobox, or <a href="qvariant.html#Type-enum">QVariant.Invalid</a> if there is no data
 for this role.</p>
-<p>See also <a href="qcombobox.html#setItemData">setItemData</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#setItemData">setItemData</a>().</p>
 
 
 <h3 class="fn"><a name="itemDelegate" /><a href="qabstractitemdelegate.html">QAbstractItemDelegate</a> QComboBox.itemDelegate (<i>self</i>)</h3><p>Returns the item delegate used by the popup list view.</p>
-<p>See also <a href="qcombobox.html#setItemDelegate">setItemDelegate</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#setItemDelegate">setItemDelegate</a>().</p>
 
 
 <h3 class="fn"><a name="itemIcon" /><a href="qicon.html">QIcon</a> QComboBox.itemIcon (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the icon for the given <i>index</i> in the combobox.</p>
-<p>See also <a href="qcombobox.html#setItemIcon">setItemIcon</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#setItemIcon">setItemIcon</a>().</p>
 
 
 <h3 class="fn"><a name="itemText" />QString QComboBox.itemText (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the text for the given <i>index</i> in the combobox.</p>
-<p>See also <a href="qcombobox.html#setItemText">setItemText</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#setItemText">setItemText</a>().</p>
 
 
 <h3 class="fn"><a name="keyPressEvent" />QComboBox.keyPressEvent (<i>self</i>, <a href="qkeyevent.html">QKeyEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#keyPressEvent">QWidget.keyPressEvent</a>().</p>
@@ -302,14 +305,14 @@ for this role.</p>
 <h3 class="fn"><a name="lineEdit" /><a href="qlineedit.html">QLineEdit</a> QComboBox.lineEdit (<i>self</i>)</h3><p>Returns the line edit used to edit items in the combobox, or 0
 if there is no line edit.</p>
 <p>Only editable combo boxes have a line edit.</p>
-<p>See also <a href="qcombobox.html#setLineEdit">setLineEdit</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#setLineEdit">setLineEdit</a>().</p>
 
 
 <h3 class="fn"><a name="maxCount" />int QComboBox.maxCount (<i>self</i>)</h3><h3 class="fn"><a name="maxVisibleItems" />int QComboBox.maxVisibleItems (<i>self</i>)</h3><h3 class="fn"><a name="minimumContentsLength" />int QComboBox.minimumContentsLength (<i>self</i>)</h3><h3 class="fn"><a name="minimumSizeHint" /><a href="qsize.html">QSize</a> QComboBox.minimumSizeHint (<i>self</i>)</h3><p>Reimplemented from <a href="qwidget.html#minimumSizeHint-prop">QWidget.minimumSizeHint</a>().</p>
 
 
 <h3 class="fn"><a name="model" /><a href="qabstractitemmodel.html">QAbstractItemModel</a> QComboBox.model (<i>self</i>)</h3><p>Returns the model used by the combobox.</p>
-<p>See also <a href="qcombobox.html#setModel">setModel</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#setModel">setModel</a>().</p>
 
 
 <h3 class="fn"><a name="modelColumn" />int QComboBox.modelColumn (<i>self</i>)</h3><h3 class="fn"><a name="mousePressEvent" />QComboBox.mousePressEvent (<i>self</i>, <a href="qmouseevent.html">QMouseEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#mousePressEvent">QWidget.mousePressEvent</a>().</p>
@@ -331,7 +334,7 @@ This will update the current index if the index is removed.</p>
 
 <h3 class="fn"><a name="rootModelIndex" /><a href="qmodelindex.html">QModelIndex</a> QComboBox.rootModelIndex (<i>self</i>)</h3><p>Returns the root model item index for the items in the
 combobox.</p>
-<p>See also <a href="qcombobox.html#setRootModelIndex">setRootModelIndex</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#setRootModelIndex">setRootModelIndex</a>().</p>
 
 
 <h3 class="fn"><a name="setAutoCompletion" />QComboBox.setAutoCompletion (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setAutoCompletionCaseSensitivity" />QComboBox.setAutoCompletionCaseSensitivity (<i>self</i>, <a href="qt.html#CaseSensitivity-enum">Qt.CaseSensitivity</a>&#160;<i>sensitivity</i>)</h3><h3 class="fn"><a name="setCompleter" />QComboBox.setCompleter (<i>self</i>, <a href="qcompleter.html">QCompleter</a>&#160;<i>c</i>)</h3><p>Sets the <i>completer</i> to use instead of the current
@@ -340,7 +343,7 @@ disabled.</p>
 <p>By default, for an editable combo box, a <a href="qcompleter.html">QCompleter</a> that performs case insensitive
 inline completion is automatically created.</p>
 <p>This function was introduced in Qt 4.2.</p>
-<p>See also <a href="qcombobox.html#completer">completer</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#completer">completer</a>().</p>
 
 
 <h3 class="fn"><a name="setCurrentIndex" />QComboBox.setCurrentIndex (<i>self</i>, int&#160;<i>index</i>)</h3><h3 class="fn"><a name="setDuplicatesEnabled" />QComboBox.setDuplicatesEnabled (<i>self</i>, bool&#160;<i>enable</i>)</h3><h3 class="fn"><a name="setEditable" />QComboBox.setEditable (<i>self</i>, bool&#160;<i>editable</i>)</h3><h3 class="fn"><a name="setEditText" />QComboBox.setEditText (<i>self</i>, QString&#160;<i>text</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setEditText(const QString&amp;)</tt>.</p><p>Sets the <i>text</i> in the combobox's text edit.</p>
@@ -348,7 +351,7 @@ inline completion is automatically created.</p>
 
 <h3 class="fn"><a name="setFrame" />QComboBox.setFrame (<i>self</i>, bool)</h3><h3 class="fn"><a name="setIconSize" />QComboBox.setIconSize (<i>self</i>, <a href="qsize.html">QSize</a>&#160;<i>size</i>)</h3><h3 class="fn"><a name="setInsertPolicy" />QComboBox.setInsertPolicy (<i>self</i>, <a href="qcombobox.html#InsertPolicy-enum">InsertPolicy</a>&#160;<i>policy</i>)</h3><h3 class="fn"><a name="setItemData" />QComboBox.setItemData (<i>self</i>, int&#160;<i>index</i>, QVariant&#160;<i>value</i>, int&#160;<i>role</i>&#160;=&#160;Qt.UserRole)</h3><p>Sets the data <i>role</i> for the item on the given <i>index</i>
 in the combobox to the specified <i>value</i>.</p>
-<p>See also <a href="qcombobox.html#itemData">itemData</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#itemData">itemData</a>().</p>
 
 
 <h3 class="fn"><a name="setItemDelegate" />QComboBox.setItemDelegate (<i>self</i>, <a href="qabstractitemdelegate.html">QAbstractItemDelegate</a>&#160;<i>delegate</i>)</h3><p>Sets the item <i>delegate</i> for the popup list view. The
@@ -359,45 +362,46 @@ cause incorrect or unintuitive editing behavior since each view
 connected to a given delegate may receive the <a href="qabstractitemdelegate.html#closeEditor">closeEditor()</a> signal,
 and attempt to access, modify or close an editor that has already
 been closed.</p>
-<p>See also <a href="qcombobox.html#itemDelegate">itemDelegate</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#itemDelegate">itemDelegate</a>().</p>
 
 
 <h3 class="fn"><a name="setItemIcon" />QComboBox.setItemIcon (<i>self</i>, int&#160;<i>index</i>, <a href="qicon.html">QIcon</a>&#160;<i>icon</i>)</h3><p>Sets the <i>icon</i> for the item on the given <i>index</i> in
 the combobox.</p>
-<p>See also <a href="qcombobox.html#itemIcon">itemIcon</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#itemIcon">itemIcon</a>().</p>
 
 
 <h3 class="fn"><a name="setItemText" />QComboBox.setItemText (<i>self</i>, int&#160;<i>index</i>, QString&#160;<i>text</i>)</h3><p>Sets the <i>text</i> for the item on the given <i>index</i> in
 the combobox.</p>
-<p>See also <a href="qcombobox.html#itemText">itemText</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#itemText">itemText</a>().</p>
 
 
 <h3 class="fn"><a name="setLineEdit" />QComboBox.setLineEdit (<i>self</i>, <a href="qlineedit.html">QLineEdit</a>&#160;<i>edit</i>)</h3><p>The <i>edit</i> argument has it's ownership transferred to Qt.</p><p>Sets the line <i>edit</i> to use instead of the current line
 edit widget.</p>
 <p>The combo box takes ownership of the line edit.</p>
-<p>See also <a href="qcombobox.html#lineEdit">lineEdit</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#lineEdit">lineEdit</a>().</p>
 
 
 <h3 class="fn"><a name="setMaxCount" />QComboBox.setMaxCount (<i>self</i>, int&#160;<i>max</i>)</h3><h3 class="fn"><a name="setMaxVisibleItems" />QComboBox.setMaxVisibleItems (<i>self</i>, int&#160;<i>maxItems</i>)</h3><h3 class="fn"><a name="setMinimumContentsLength" />QComboBox.setMinimumContentsLength (<i>self</i>, int&#160;<i>characters</i>)</h3><h3 class="fn"><a name="setModel" />QComboBox.setModel (<i>self</i>, <a href="qabstractitemmodel.html">QAbstractItemModel</a>&#160;<i>model</i>)</h3><p>Sets the model to be <i>model</i>. <i>model</i> must not be 0.
 If you want to clear the contents of a model, call <a href="qcombobox.html#clear">clear</a>().</p>
-<p>See also <a href="qcombobox.html#model">model</a>() and <a href="qcombobox.html#clear">clear</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#model">model</a>() and
+<a href="qcombobox.html#clear">clear</a>().</p>
 
 
 <h3 class="fn"><a name="setModelColumn" />QComboBox.setModelColumn (<i>self</i>, int&#160;<i>visibleColumn</i>)</h3><h3 class="fn"><a name="setRootModelIndex" />QComboBox.setRootModelIndex (<i>self</i>, <a href="qmodelindex.html">QModelIndex</a>&#160;<i>index</i>)</h3><p>Sets the root model item <i>index</i> for the items in the
 combobox.</p>
-<p>See also <a href="qcombobox.html#rootModelIndex">rootModelIndex</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#rootModelIndex">rootModelIndex</a>().</p>
 
 
 <h3 class="fn"><a name="setSizeAdjustPolicy" />QComboBox.setSizeAdjustPolicy (<i>self</i>, <a href="qcombobox.html#SizeAdjustPolicy-enum">SizeAdjustPolicy</a>&#160;<i>policy</i>)</h3><h3 class="fn"><a name="setValidator" />QComboBox.setValidator (<i>self</i>, <a href="qvalidator.html">QValidator</a>&#160;<i>v</i>)</h3><p>Sets the <i>validator</i> to use instead of the current
 validator.</p>
-<p>See also <a href="qcombobox.html#validator">validator</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#validator">validator</a>().</p>
 
 
 <h3 class="fn"><a name="setView" />QComboBox.setView (<i>self</i>, <a href="qabstractitemview.html">QAbstractItemView</a>&#160;<i>itemView</i>)</h3><p>The <i>itemView</i> argument has it's ownership transferred to Qt.</p><p>Sets the view to be used in the combobox popup to the given
 <i>itemView</i>. The combobox takes ownership of the view.</p>
 <p>Note: If you want to use the convenience views (like <a href="qlistwidget.html">QListWidget</a>, <a href="qtablewidget.html">QTableWidget</a> or <a href="qtreewidget.html">QTreeWidget</a>), make sure to call <a href="qcombobox.html#setModel">setModel</a>() on the combobox with the
 convenience widgets model before calling this function.</p>
-<p>See also <a href="qcombobox.html#view">view</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#view">view</a>().</p>
 
 
 <h3 class="fn"><a name="showEvent" />QComboBox.showEvent (<i>self</i>, <a href="qshowevent.html">QShowEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#showEvent">QWidget.showEvent</a>().</p>
@@ -408,7 +412,7 @@ then the no items will be shown.</p>
 <p>If you reimplement this function to show a custom pop-up, make
 sure you call <a href="qcombobox.html#hidePopup">hidePopup</a>() to
 reset the internal state.</p>
-<p>See also <a href="qcombobox.html#hidePopup">hidePopup</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#hidePopup">hidePopup</a>().</p>
 
 
 <h3 class="fn"><a name="sizeAdjustPolicy" /><a href="qcombobox.html#SizeAdjustPolicy-enum">SizeAdjustPolicy</a> QComboBox.sizeAdjustPolicy (<i>self</i>)</h3><h3 class="fn"><a name="sizeHint" /><a href="qsize.html">QSize</a> QComboBox.sizeHint (<i>self</i>)</h3><p>Reimplemented from <a href="qwidget.html#sizeHint-prop">QWidget.sizeHint</a>().</p>
@@ -419,11 +423,11 @@ change the <a href="qcombobox.html#sizeAdjustPolicy-prop">sizeAdjustPolicy</a>.<
 
 <h3 class="fn"><a name="validator" /><a href="qvalidator.html">QValidator</a> QComboBox.validator (<i>self</i>)</h3><p>Returns the validator that is used to constrain text input for
 the combobox.</p>
-<p>See also <a href="qcombobox.html#setValidator">setValidator</a>() and <a href="qcombobox.html#editable-prop">editable</a>.</p>
+<p><b>See also</b> <a href="qcombobox.html#setValidator">setValidator</a>() and <a href="qcombobox.html#editable-prop">editable</a>.</p>
 
 
 <h3 class="fn"><a name="view" /><a href="qabstractitemview.html">QAbstractItemView</a> QComboBox.view (<i>self</i>)</h3><p>Returns the list view used for the combobox popup.</p>
-<p>See also <a href="qcombobox.html#setView">setView</a>().</p>
+<p><b>See also</b> <a href="qcombobox.html#setView">setView</a>().</p>
 
 
 <h3 class="fn"><a name="wheelEvent" />QComboBox.wheelEvent (<i>self</i>, <a href="qwheelevent.html">QWheelEvent</a>&#160;<i>e</i>)</h3><p>Reimplemented from <a href="qwidget.html#wheelEvent">QWidget.wheelEvent</a>().</p>
@@ -465,4 +469,4 @@ highlighted by the user. The item's <i>index</i> is passed.</p>
 highlighted by the user. The item's <i>text</i> is passed.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

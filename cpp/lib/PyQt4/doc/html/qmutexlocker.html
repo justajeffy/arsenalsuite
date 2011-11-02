@@ -23,38 +23,38 @@ mutex with <tt>unlock()</tt> and <tt>relock()</tt>. If locked, the
 mutex will be unlocked when the QMutexLocker is destroyed.</p>
 <p>For example, this complex function locks a <a href="qmutex.html">QMutex</a> upon entering the function and unlocks the
 mutex at all the exit points:</p>
-<pre class="highlightedCode brush: cpp">
- int complexFunction(int flag)
+<pre class="cpp">
+ <span class="type">int</span> complexFunction(<span class="type">int</span> flag)
  {
-     mutex.lock();
+     mutex<span class="operator">.</span>lock();
 
-     int retVal = 0;
+     <span class="type">int</span> retVal <span class="operator">=</span> <span class="number">0</span>;
 
-     switch (flag) {
-     case 0:
-     case 1:
-         mutex.unlock();
-         return moreComplexFunction(flag);
-     case 2:
+     <span class="keyword">switch</span> (flag) {
+     <span class="keyword">case</span> <span class="number">0</span>:
+     <span class="keyword">case</span> <span class="number">1</span>:
+         mutex<span class="operator">.</span>unlock();
+         <span class="keyword">return</span> moreComplexFunction(flag);
+     <span class="keyword">case</span> <span class="number">2</span>:
          {
-             int status = anotherFunction();
-             if (status &lt; 0) {
-                 mutex.unlock();
-                 return -2;
+             <span class="type">int</span> status <span class="operator">=</span> anotherFunction();
+             <span class="keyword">if</span> (status <span class="operator">&lt;</span> <span class="number">0</span>) {
+                 mutex<span class="operator">.</span>unlock();
+                 <span class="keyword">return</span> <span class="operator">-</span><span class="number">2</span>;
              }
-             retVal = status + flag;
+             retVal <span class="operator">=</span> status <span class="operator">+</span> flag;
          }
-         break;
-     default:
-         if (flag &gt; 10) {
-             mutex.unlock();
-             return -1;
+         <span class="keyword">break</span>;
+     <span class="keyword">default</span>:
+         <span class="keyword">if</span> (flag <span class="operator">&gt;</span> <span class="number">10</span>) {
+             mutex<span class="operator">.</span>unlock();
+             <span class="keyword">return</span> <span class="operator">-</span><span class="number">1</span>;
          }
-         break;
+         <span class="keyword">break</span>;
      }
 
-     mutex.unlock();
-     return retVal;
+     mutex<span class="operator">.</span>unlock();
+     <span class="keyword">return</span> retVal;
  }
 </pre>
 <p>This example function will get more complicated as it is
@@ -62,32 +62,32 @@ developed, which increases the likelihood that errors will
 occur.</p>
 <p>Using QMutexLocker greatly simplifies the code, and makes it
 more readable:</p>
-<pre class="highlightedCode brush: cpp">
- int complexFunction(int flag)
+<pre class="cpp">
+ <span class="type">int</span> complexFunction(<span class="type">int</span> flag)
  {
-     QMutexLocker locker(&amp;mutex);
+     <span class="type">QMutexLocker</span> locker(<span class="operator">&amp;</span>mutex);
 
-     int retVal = 0;
+     <span class="type">int</span> retVal <span class="operator">=</span> <span class="number">0</span>;
 
-     switch (flag) {
-     case 0:
-     case 1:
-         return moreComplexFunction(flag);
-     case 2:
+     <span class="keyword">switch</span> (flag) {
+     <span class="keyword">case</span> <span class="number">0</span>:
+     <span class="keyword">case</span> <span class="number">1</span>:
+         <span class="keyword">return</span> moreComplexFunction(flag);
+     <span class="keyword">case</span> <span class="number">2</span>:
          {
-             int status = anotherFunction();
-             if (status &lt; 0)
-                 return -2;
-             retVal = status + flag;
+             <span class="type">int</span> status <span class="operator">=</span> anotherFunction();
+             <span class="keyword">if</span> (status <span class="operator">&lt;</span> <span class="number">0</span>)
+                 <span class="keyword">return</span> <span class="operator">-</span><span class="number">2</span>;
+             retVal <span class="operator">=</span> status <span class="operator">+</span> flag;
          }
-         break;
-     default:
-         if (flag &gt; 10)
-             return -1;
-         break;
+         <span class="keyword">break</span>;
+     <span class="keyword">default</span>:
+         <span class="keyword">if</span> (flag <span class="operator">&gt;</span> <span class="number">10</span>)
+             <span class="keyword">return</span> <span class="operator">-</span><span class="number">1</span>;
+         <span class="keyword">break</span>;
      }
 
-     return retVal;
+     <span class="keyword">return</span> retVal;
  }
 </pre>
 <p>Now, the mutex will always be unlocked when the QMutexLocker
@@ -101,31 +101,31 @@ exception is passed up the stack to the calling function.</p>
 that returns the mutex on which the QMutexLocker is operating. This
 is useful for code that needs access to the mutex, such as <a href="qwaitcondition.html#wait">QWaitCondition.wait</a>(). For
 example:</p>
-<pre class="highlightedCode brush: cpp">
- class SignalWaiter
+<pre class="cpp">
+ <span class="keyword">class</span> SignalWaiter
  {
- private:
-     QMutexLocker locker;
+ <span class="keyword">private</span>:
+     <span class="type">QMutexLocker</span> locker;
 
- public:
-     SignalWaiter(QMutex *mutex)
+ <span class="keyword">public</span>:
+     SignalWaiter(<span class="type"><a href="qmutex.html">QMutex</a></span> <span class="operator">*</span>mutex)
          : locker(mutex)
      {
      }
 
-     void waitForSignal()
+     <span class="type">void</span> waitForSignal()
      {
-         ...
-         while (!signalled)
-             waitCondition.wait(locker.mutex());
-         ...
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+         <span class="keyword">while</span> (<span class="operator">!</span>signalled)
+             waitCondition<span class="operator">.</span>wait(locker<span class="operator">.</span>mutex());
+         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
      }
  };
 </pre><hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QMutexLocker" />QMutexLocker.__init__ (<i>self</i>, <a href="qmutex.html">QMutex</a>&#160;<i>m</i>)</h3><p>Constructs a <a href="qmutexlocker.html">QMutexLocker</a> and
 locks <i>mutex</i>. The mutex will be unlocked when the <a href="qmutexlocker.html">QMutexLocker</a> is destroyed. If <i>mutex</i>
 is zero, <a href="qmutexlocker.html">QMutexLocker</a> does
 nothing.</p>
-<p>See also <a href="qmutex.html#lock">QMutex.lock</a>().</p>
+<p><b>See also</b> <a href="qmutex.html#lock">QMutex.lock</a>().</p>
 
 
 <h3 class="fn"><a name="mutex" /><a href="qmutex.html">QMutex</a> QMutexLocker.mutex (<i>self</i>)</h3><p>Returns a pointer to the mutex that was locked in the
@@ -133,10 +133,10 @@ constructor.</p>
 
 
 <h3 class="fn"><a name="relock" />QMutexLocker.relock (<i>self</i>)</h3><p>Relocks an unlocked mutex locker.</p>
-<p>See also <a href="qmutexlocker.html#unlock">unlock</a>().</p>
+<p><b>See also</b> <a href="qmutexlocker.html#unlock">unlock</a>().</p>
 
 
 <h3 class="fn"><a name="unlock" />QMutexLocker.unlock (<i>self</i>)</h3><p>Unlocks this mutex locker. You can use <tt>relock()</tt> to lock
 it again. It does not need to be locked when destroyed.</p>
-<p>See also <a href="qmutexlocker.html#relock">relock</a>().</p>
-<h3 class="fn"><a name="__enter__" />object QMutexLocker.__enter__ (<i>self</i>)</h3><h3 class="fn"><a name="__exit__" />QMutexLocker.__exit__ (<i>self</i>, object&#160;<i>type</i>, object&#160;<i>value</i>, object&#160;<i>traceback</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qmutexlocker.html#relock">relock</a>().</p>
+<h3 class="fn"><a name="__enter__" />object QMutexLocker.__enter__ (<i>self</i>)</h3><h3 class="fn"><a name="__exit__" />QMutexLocker.__exit__ (<i>self</i>, object&#160;<i>type</i>, object&#160;<i>value</i>, object&#160;<i>traceback</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

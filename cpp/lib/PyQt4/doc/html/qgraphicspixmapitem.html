@@ -35,14 +35,14 @@ to get the current transformation mode for the item.</p>
 shape and opaque area.</p>
 <p>The default value is MaskShape.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsPixmapItem.MaskShape</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">The shape is determined by calling <a href="qpixmap.html#mask">QPixmap.mask</a>(). This shape includes only
 the opaque pixels of the pixmap. Because the shape is more complex,
 however, it can be slower than the other modes, and uses more
@@ -51,7 +51,7 @@ memory.</td>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsPixmapItem.BoundingRectShape</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">The shape is determined by tracing the outline
 of the pixmap. This is the fastest shape mode, but it does not take
 into account any transparent areas on the pixmap.</td>
@@ -59,7 +59,7 @@ into account any transparent areas on the pixmap.</td>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsPixmapItem.HeuristicMaskShape</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">The shape is determine by calling <a href="qpixmap.html#createHeuristicMask">QPixmap.createHeuristicMask</a>().
 The performance and memory consumption is similar to
 MaskShape.</td>
@@ -68,13 +68,13 @@ MaskShape.</td>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QGraphicsPixmapItem" />QGraphicsPixmapItem.__init__ (<i>self</i>, <a href="qgraphicsitem.html">QGraphicsItem</a>&#160;<i>parent</i>&#160;=&#160;None, <a href="qgraphicsscene.html">QGraphicsScene</a>&#160;<i>scene</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>The <i>scene</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qgraphicspixmapitem.html">QGraphicsPixmapItem</a>. <i>parent</i>
 is passed to <a href="qgraphicsitem.html">QGraphicsItem</a>'s
 constructor.</p>
-<p>See also <a href="qgraphicsscene.html#addItem">QGraphicsScene.addItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addItem">QGraphicsScene.addItem</a>().</p>
 
 
 <h3 class="fn"><a name="QGraphicsPixmapItem-2" />QGraphicsPixmapItem.__init__ (<i>self</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>, <a href="qgraphicsitem.html">QGraphicsItem</a>&#160;<i>parent</i>&#160;=&#160;None, <a href="qgraphicsscene.html">QGraphicsScene</a>&#160;<i>scene</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>The <i>scene</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qgraphicspixmapitem.html">QGraphicsPixmapItem</a>, using
 <i>pixmap</i> as the default pixmap. <i>parent</i> is passed to
 <a href="qgraphicsitem.html">QGraphicsItem</a>'s constructor.</p>
-<p>See also <a href="qgraphicsscene.html#addItem">QGraphicsScene.addItem</a>().</p>
+<p><b>See also</b> <a href="qgraphicsscene.html#addItem">QGraphicsScene.addItem</a>().</p>
 
 
 <h3 class="fn"><a name="boundingRect" /><a href="qrectf.html">QRectF</a> QGraphicsPixmapItem.boundingRect (<i>self</i>)</h3><p>Reimplemented from <a href="qgraphicsitem.html#boundingRect">QGraphicsItem.boundingRect</a>().</p>
@@ -88,7 +88,7 @@ constructor.</p>
 
 <h3 class="fn"><a name="offset" /><a href="qpointf.html">QPointF</a> QGraphicsPixmapItem.offset (<i>self</i>)</h3><p>Returns the pixmap item's <i>offset</i>, which defines the point
 of the top-left corner of the pixmap, in local coordinates.</p>
-<p>See also <a href="qgraphicspixmapitem.html#setOffset">setOffset</a>().</p>
+<p><b>See also</b> <a href="qgraphicspixmapitem.html#setOffset">setOffset</a>().</p>
 
 
 <h3 class="fn"><a name="opaqueArea" /><a href="qpainterpath.html">QPainterPath</a> QGraphicsPixmapItem.opaqueArea (<i>self</i>)</h3><p>Reimplemented from <a href="qgraphicsitem.html#opaqueArea">QGraphicsItem.opaqueArea</a>().</p>
@@ -98,12 +98,12 @@ of the top-left corner of the pixmap, in local coordinates.</p>
 
 
 <h3 class="fn"><a name="pixmap" /><a href="qpixmap.html">QPixmap</a> QGraphicsPixmapItem.pixmap (<i>self</i>)</h3><p>Returns the item's pixmap, or an invalid <a href="qpixmap.html">QPixmap</a> if no pixmap has been set.</p>
-<p>See also <a href="qgraphicspixmapitem.html#setPixmap">setPixmap</a>().</p>
+<p><b>See also</b> <a href="qgraphicspixmapitem.html#setPixmap">setPixmap</a>().</p>
 
 
 <h3 class="fn"><a name="setOffset" />QGraphicsPixmapItem.setOffset (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>offset</i>)</h3><p>Sets the pixmap item's offset to <i>offset</i>. <a href="qgraphicspixmapitem.html">QGraphicsPixmapItem</a> will draw its
 pixmap using <i>offset</i> for its top-left corner.</p>
-<p>See also <a href="qgraphicspixmapitem.html#offset">offset</a>().</p>
+<p><b>See also</b> <a href="qgraphicspixmapitem.html#offset">offset</a>().</p>
 
 
 <h3 class="fn"><a name="setOffset-2" />QGraphicsPixmapItem.setOffset (<i>self</i>, float&#160;<i>ax</i>, float&#160;<i>ay</i>)</h3><p>This convenience function is equivalent to calling
@@ -113,13 +113,13 @@ setOffset(<a href="qpointf.html">QPointF</a>(<i>x</i>,
 
 
 <h3 class="fn"><a name="setPixmap" />QGraphicsPixmapItem.setPixmap (<i>self</i>, <a href="qpixmap.html">QPixmap</a>&#160;<i>pixmap</i>)</h3><p>Sets the item's pixmap to <i>pixmap</i>.</p>
-<p>See also <a href="qgraphicspixmapitem.html#pixmap">pixmap</a>().</p>
+<p><b>See also</b> <a href="qgraphicspixmapitem.html#pixmap">pixmap</a>().</p>
 
 
 <h3 class="fn"><a name="setShapeMode" />QGraphicsPixmapItem.setShapeMode (<i>self</i>, <a href="qgraphicspixmapitem.html#ShapeMode-enum">ShapeMode</a>&#160;<i>mode</i>)</h3><p>Sets the item's shape mode to <i>mode</i>. The shape mode
 describes how <a href="qgraphicspixmapitem.html">QGraphicsPixmapItem</a> calculates its
 shape. The default mode is <a href="qgraphicspixmapitem.html#ShapeMode-enum">MaskShape</a>.</p>
-<p>See also <a href="qgraphicspixmapitem.html#shapeMode">shapeMode</a>() and <a href="qgraphicspixmapitem.html#ShapeMode-enum">ShapeMode</a>.</p>
+<p><b>See also</b> <a href="qgraphicspixmapitem.html#shapeMode">shapeMode</a>() and <a href="qgraphicspixmapitem.html#ShapeMode-enum">ShapeMode</a>.</p>
 
 
 <h3 class="fn"><a name="setTransformationMode" />QGraphicsPixmapItem.setTransformationMode (<i>self</i>, <a href="qt.html#TransformationMode-enum">Qt.TransformationMode</a>&#160;<i>mode</i>)</h3><p>Sets the pixmap item's transformation mode to <i>mode</i>, and
@@ -130,7 +130,7 @@ enables <a href="qpainter.html#RenderHint-enum">QPainter.SmoothPixmapTransform</
 on the painter, and the quality depends on the platform and
 viewport. The result is usually not as good as calling
 QPixmap.scale() directly.</p>
-<p>See also <a href="qgraphicspixmapitem.html#transformationMode">transformationMode</a>().</p>
+<p><b>See also</b> <a href="qgraphicspixmapitem.html#transformationMode">transformationMode</a>().</p>
 
 
 <h3 class="fn"><a name="shape" /><a href="qpainterpath.html">QPainterPath</a> QGraphicsPixmapItem.shape (<i>self</i>)</h3><p>Reimplemented from <a href="qgraphicsitem.html#shape">QGraphicsItem.shape</a>().</p>
@@ -139,15 +139,15 @@ QPixmap.scale() directly.</p>
 <h3 class="fn"><a name="shapeMode" /><a href="qgraphicspixmapitem.html#ShapeMode-enum">ShapeMode</a> QGraphicsPixmapItem.shapeMode (<i>self</i>)</h3><p>Returns the item's shape mode. The shape mode describes how
 <a href="qgraphicspixmapitem.html">QGraphicsPixmapItem</a>
 calculates its shape. The default mode is <a href="qgraphicspixmapitem.html#ShapeMode-enum">MaskShape</a>.</p>
-<p>See also <a href="qgraphicspixmapitem.html#setShapeMode">setShapeMode</a>() and
+<p><b>See also</b> <a href="qgraphicspixmapitem.html#setShapeMode">setShapeMode</a>() and
 <a href="qgraphicspixmapitem.html#ShapeMode-enum">ShapeMode</a>.</p>
 
 
 <h3 class="fn"><a name="transformationMode" /><a href="qt.html#TransformationMode-enum">Qt.TransformationMode</a> QGraphicsPixmapItem.transformationMode (<i>self</i>)</h3><p>Returns the transformation mode of the pixmap. The default mode
 is <a href="qt.html#TransformationMode-enum">Qt.FastTransformation</a>, which
 provides quick transformation with no smoothing.</p>
-<p>See also <a href="qgraphicspixmapitem.html#setTransformationMode">setTransformationMode</a>().</p>
+<p><b>See also</b> <a href="qgraphicspixmapitem.html#setTransformationMode">setTransformationMode</a>().</p>
 
 
 <h3 class="fn"><a name="type" />int QGraphicsPixmapItem.type (<i>self</i>)</h3><p>Reimplemented from <a href="qgraphicsitem.html#type">QGraphicsItem.type</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

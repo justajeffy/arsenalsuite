@@ -19,19 +19,19 @@ editor. QUndoCommand can apply a change to the document with
 with <a href="qundocommand.html#undo">undo</a>(). The
 implementations for these functions must be provided in a derived
 class.</p>
-<pre class="highlightedCode brush: cpp">
- class AppendText : public QUndoCommand
+<pre class="cpp">
+ <span class="keyword">class</span> AppendText : <span class="keyword">public</span> <span class="type">QUndoCommand</span>
  {
- public:
-     AppendText(QString *doc, const QString &amp;text)
-         : m_document(doc), m_text(text) { setText("append text"); }
-     virtual void undo()
-         { m_document-&gt;chop(m_text.length()); }
-     virtual void redo()
-         { m_document-&gt;append(m_text); }
- private:
-     QString *m_document;
-     QString m_text;
+ <span class="keyword">public</span>:
+     AppendText(<span class="type"><a href="qstring.html">QString</a></span> <span class="operator">*</span>doc<span class="operator">,</span> <span class="keyword">const</span> <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">&amp;</span>text)
+         : m_document(doc)<span class="operator">,</span> m_text(text) { setText(<span class="string">"append text"</span>); }
+     <span class="keyword">virtual</span> <span class="type">void</span> undo()
+         { m_document<span class="operator">-</span><span class="operator">&gt;</span>chop(m_text<span class="operator">.</span>length()); }
+     <span class="keyword">virtual</span> <span class="type">void</span> redo()
+         { m_document<span class="operator">-</span><span class="operator">&gt;</span>append(m_text); }
+ <span class="keyword">private</span>:
+     <span class="type"><a href="qstring.html">QString</a></span> <span class="operator">*</span>m_document;
+     <span class="type"><a href="qstring.html">QString</a></span> m_text;
  };
 </pre>
 <p>A QUndoCommand has an associated <a href="qundocommand.html#text">text</a>(). This is a short string
@@ -41,16 +41,16 @@ and <a href="qundostack.html#createRedoAction">QUndoStack.createRedoAction</a>()
 <p>QUndoCommand objects are owned by the stack they were pushed on.
 <a href="qundostack.html">QUndoStack</a> deletes a command if it
 has been undone and a new command is pushed. For example:</p>
-<pre class="highlightedCode brush: cpp">
- MyCommand *command1 = new MyCommand();
- stack-&gt;push(command1);
- MyCommand *command2 = new MyCommand();
- stack-&gt;push(command2);
+<pre class="cpp">
+ MyCommand <span class="operator">*</span>command1 <span class="operator">=</span> <span class="keyword">new</span> MyCommand();
+ stack<span class="operator">-</span><span class="operator">&gt;</span>push(command1);
+ MyCommand <span class="operator">*</span>command2 <span class="operator">=</span> <span class="keyword">new</span> MyCommand();
+ stack<span class="operator">-</span><span class="operator">&gt;</span>push(command2);
 
- stack-&gt;undo();
+ stack<span class="operator">-</span><span class="operator">&gt;</span><a href="qundocommand.html#undo">undo</a>();
 
- MyCommand *command3 = new MyCommand();
- stack-&gt;push(command3); <span class="comment">// command2 gets deleted</span>
+ MyCommand <span class="operator">*</span>command3 <span class="operator">=</span> <span class="keyword">new</span> MyCommand();
+ stack<span class="operator">-</span><span class="operator">&gt;</span>push(command3); <span class="comment">// command2 gets deleted</span>
 </pre>
 <p>In effect, when a command is pushed, it becomes the top-most
 command on the stack.</p>
@@ -65,14 +65,14 @@ case, the command will be owned by the parent.</p>
 doesn't provide its own implementation of <a href="qundocommand.html#undo">undo</a>() and <a href="qundocommand.html#redo">redo</a>(). Instead, it uses the base
 implementations of these functions, which simply call <a href="qundocommand.html#undo">undo</a>() or <a href="qundocommand.html#redo">redo</a>() on all its children. The parent
 should, however, have a meaningful <a href="qundocommand.html#text">text</a>().</p>
-<pre class="highlightedCode brush: cpp">
- QUndoCommand *insertRed = new QUndoCommand(); <span class="comment">// an empty command</span>
- insertRed-&gt;setText("insert red text");
+<pre class="cpp">
+ <span class="type">QUndoCommand</span> <span class="operator">*</span>insertRed <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QUndoCommand</span>(); <span class="comment">// an empty command</span>
+ insertRed<span class="operator">-</span><span class="operator">&gt;</span><a href="qundocommand.html#setText">setText</a>(<span class="string">"insert red text"</span>);
 
- new InsertText(document, idx, text, insertRed); <span class="comment">// becomes child of insertRed</span>
- new SetColor(document, idx, text.length(), Qt.red, insertRed);
+ <span class="keyword">new</span> InsertText(document<span class="operator">,</span> idx<span class="operator">,</span> text<span class="operator">,</span> insertRed); <span class="comment">// becomes child of insertRed</span>
+ <span class="keyword">new</span> SetColor(document<span class="operator">,</span> idx<span class="operator">,</span> text<span class="operator">.</span>length()<span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>red<span class="operator">,</span> insertRed);
 
- stack.push(insertRed);
+ stack<span class="operator">.</span>push(insertRed);
 </pre>
 <p>Another way to create macros is to use the convenience functions
 <a href="qundostack.html#beginMacro">QUndoStack.beginMacro</a>()
@@ -82,7 +82,7 @@ with parent <i>parent</i>.</p>
 <p>If <i>parent</i> is not 0, this command is appended to parent's
 child list. The parent command then owns this command and will
 delete it in its destructor.</p>
-<p>See also <a href="qundocommand.html#dtor.QUndoCommand">~QUndoCommand</a>().</p>
+<p><b>See also</b> <a href="qundocommand.html#dtor.QUndoCommand">~QUndoCommand</a>().</p>
 
 
 <h3 class="fn"><a name="QUndoCommand-2" />QUndoCommand.__init__ (<i>self</i>, QString&#160;<i>text</i>, <a href="qundocommand.html">QUndoCommand</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a <a href="qundocommand.html">QUndoCommand</a> object
@@ -90,18 +90,17 @@ with the given <i>parent</i> and <i>text</i>.</p>
 <p>If <i>parent</i> is not 0, this command is appended to parent's
 child list. The parent command then owns this command and will
 delete it in its destructor.</p>
-<p>See also <a href="qundocommand.html#dtor.QUndoCommand">~QUndoCommand</a>().</p>
+<p><b>See also</b> <a href="qundocommand.html#dtor.QUndoCommand">~QUndoCommand</a>().</p>
 
 
 <h3 class="fn"><a name="child" /><a href="qundocommand.html">QUndoCommand</a> QUndoCommand.child (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the child command at <i>index</i>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qundocommand.html#childCount">childCount</a>()
-and <a href="qundostack.html#command">QUndoStack.command</a>().</p>
+<p><b>See also</b> <a href="qundocommand.html#childCount">childCount</a>() and <a href="qundostack.html#command">QUndoStack.command</a>().</p>
 
 
 <h3 class="fn"><a name="childCount" />int QUndoCommand.childCount (<i>self</i>)</h3><p>Returns the number of child commands in this command.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qundocommand.html#child">child</a>().</p>
+<p><b>See also</b> <a href="qundocommand.html#child">child</a>().</p>
 
 
 <h3 class="fn"><a name="id" />int QUndoCommand.id (<i>self</i>)</h3><p>Returns the ID of this command.</p>
@@ -114,8 +113,7 @@ implementation returns -1.</p>
 <p><a href="qundostack.html#push">QUndoStack.push</a>() will only
 try to merge two commands if they have the same ID, and the ID is
 not -1.</p>
-<p>See also <a href="qundocommand.html#mergeWith">mergeWith</a>()
-and <a href="qundostack.html#push">QUndoStack.push</a>().</p>
+<p><b>See also</b> <a href="qundocommand.html#mergeWith">mergeWith</a>() and <a href="qundostack.html#push">QUndoStack.push</a>().</p>
 
 
 <h3 class="fn"><a name="mergeWith" />bool QUndoCommand.mergeWith (<i>self</i>, <a href="qundocommand.html">QUndoCommand</a>&#160;<i>other</i>)</h3><p>Attempts to merge this command with <i>command</i>. Returns true
@@ -128,16 +126,17 @@ command.</p>
 <p><a href="qundostack.html">QUndoStack</a> will only try to merge
 two commands if they have the same id, and the id is not -1.</p>
 <p>The default implementation returns false.</p>
-<pre class="highlightedCode brush: cpp">
- bool AppendText.mergeWith(const QUndoCommand *other)
+<pre class="cpp">
+ <span class="type">bool</span> AppendText<span class="operator">.</span>mergeWith(<span class="keyword">const</span> <span class="type"><a href="qundocommand.html">QUndoCommand</a></span> <span class="operator">*</span>other)
  {
-     if (other-&gt;id() != id()) <span class="comment">// make sure other is also an AppendText command</span>
-         return false;
-     m_text += static_cast&lt;const AppendText*&gt;(other)-&gt;m_text;
-     return true;
+     <span class="keyword">if</span> (other<span class="operator">-</span><span class="operator">&gt;</span>id() <span class="operator">!</span><span class="operator">=</span> id()) <span class="comment">// make sure other is also an AppendText command</span>
+         <span class="keyword">return</span> <span class="keyword">false</span>;
+     m_text <span class="operator">+</span><span class="operator">=</span> <span class="keyword">static_cast</span><span class="operator">&lt;</span><span class="keyword">const</span> AppendText<span class="operator">*</span><span class="operator">&gt;</span>(other)<span class="operator">-</span><span class="operator">&gt;</span>m_text;
+     <span class="keyword">return</span> <span class="keyword">true</span>;
  }
 </pre>
-<p>See also <a href="qundocommand.html#id">id</a>() and <a href="qundostack.html#push">QUndoStack.push</a>().</p>
+<p><b>See also</b> <a href="qundocommand.html#id">id</a>() and
+<a href="qundostack.html#push">QUndoStack.push</a>().</p>
 
 
 <h3 class="fn"><a name="redo" />QUndoCommand.redo (<i>self</i>)</h3><p>Applies a change to the document. This function must be
@@ -145,13 +144,14 @@ implemented in the derived class. Calling <a href="qundostack.html#push">QUndoSt
 leads to undefined beahavior.</p>
 <p>The default implementation calls redo() on all child
 commands.</p>
-<p>See also <a href="qundocommand.html#undo">undo</a>().</p>
+<p><b>See also</b> <a href="qundocommand.html#undo">undo</a>().</p>
 
 
 <h3 class="fn"><a name="setText" />QUndoCommand.setText (<i>self</i>, QString&#160;<i>text</i>)</h3><p>Sets the command's text to be the <i>text</i> specified.</p>
 <p>The specified text should be a short user-readable string
 describing what this command does.</p>
-<p>See also <a href="qundocommand.html#text">text</a>(), <a href="qundostack.html#createUndoAction">QUndoStack.createUndoAction</a>(),
+<p><b>See also</b> <a href="qundocommand.html#text">text</a>(),
+<a href="qundostack.html#createUndoAction">QUndoStack.createUndoAction</a>(),
 and <a href="qundostack.html#createRedoAction">QUndoStack.createRedoAction</a>().</p>
 
 
@@ -159,8 +159,7 @@ and <a href="qundostack.html#createRedoAction">QUndoStack.createRedoAction</a>()
 for example, "insert text".</p>
 <p>The text is used when the text properties of the stack's undo
 and redo actions are updated.</p>
-<p>See also <a href="qundocommand.html#setText">setText</a>(),
-<a href="qundostack.html#createUndoAction">QUndoStack.createUndoAction</a>(),
+<p><b>See also</b> <a href="qundocommand.html#setText">setText</a>(), <a href="qundostack.html#createUndoAction">QUndoStack.createUndoAction</a>(),
 and <a href="qundostack.html#createRedoAction">QUndoStack.createRedoAction</a>().</p>
 
 
@@ -170,5 +169,5 @@ be implemented in the derived class. Calling <a href="qundostack.html#push">QUnd
 leads to undefined beahavior.</p>
 <p>The default implementation calls undo() on all child commands in
 reverse order.</p>
-<p>See also <a href="qundocommand.html#redo">redo</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qundocommand.html#redo">redo</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

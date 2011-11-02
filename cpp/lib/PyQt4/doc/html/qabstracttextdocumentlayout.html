@@ -72,13 +72,13 @@ signal should be emitted.</li>
 should be emitted to schedule a repaint of areas in the layout that
 require repainting.</li>
 </ul>
-<p>See also <a href="qtextlayout.html">QTextLayout</a>.</p>
+<p><b>See also</b> <a href="qtextlayout.html">QTextLayout</a>.</p>
 
 
 <h3 class="fn"><a name="documentSize" /><a href="qsizef.html">QSizeF</a> QAbstractTextDocumentLayout.documentSize (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the total size of the document's layout.</p>
 <p>This information can be used by display widgets to update their
 scroll bars correctly.</p>
-<p>See also <a href="qabstracttextdocumentlayout.html#documentSizeChanged">documentSizeChanged</a>()
+<p><b>See also</b> <a href="qabstracttextdocumentlayout.html#documentSizeChanged">documentSizeChanged</a>()
 and <a href="qtextdocument.html#pageSize-prop">QTextDocument.pageSize</a>.</p>
 
 
@@ -96,7 +96,7 @@ the document.</p>
 handlers. This function is called only within Qt. Subclasses can
 reimplement this function to customize the drawing of inline
 objects.</p>
-<p>See also <a href="qabstracttextdocumentlayout.html#draw">draw</a>().</p>
+<p><b>See also</b> <a href="qabstracttextdocumentlayout.html#draw">draw</a>().</p>
 
 
 <h3 class="fn"><a name="format" /><a href="qtextcharformat.html">QTextCharFormat</a> QAbstractTextDocumentLayout.format (<i>self</i>, int&#160;<i>pos</i>)</h3><p>Returns the character format that is applicable at the given
@@ -116,12 +116,12 @@ was found.</p>
 
 
 <h3 class="fn"><a name="pageCount" />int QAbstractTextDocumentLayout.pageCount (<i>self</i>)</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>Returns the number of pages contained in the layout.</p>
-<p>See also <a href="qabstracttextdocumentlayout.html#pageCountChanged">pageCountChanged</a>().</p>
+<p><b>See also</b> <a href="qabstracttextdocumentlayout.html#pageCountChanged">pageCountChanged</a>().</p>
 
 
 <h3 class="fn"><a name="paintDevice" /><a href="qpaintdevice.html">QPaintDevice</a> QAbstractTextDocumentLayout.paintDevice (<i>self</i>)</h3><p>Returns the paint device used to render the document's
 layout.</p>
-<p>See also <a href="qabstracttextdocumentlayout.html#setPaintDevice">setPaintDevice</a>().</p>
+<p><b>See also</b> <a href="qabstracttextdocumentlayout.html#setPaintDevice">setPaintDevice</a>().</p>
 
 
 <h3 class="fn"><a name="positionInlineObject" />QAbstractTextDocumentLayout.positionInlineObject (<i>self</i>, <a href="qtextinlineobject.html">QTextInlineObject</a>&#160;<i>item</i>, int&#160;<i>posInDocument</i>, <a href="qtextformat.html">QTextFormat</a>&#160;<i>format</i>)</h3><p>Lays out the inline object <i>item</i> using the given text
@@ -131,7 +131,7 @@ the document.</p>
 <p>The default implementation does nothing. This function is called
 only within Qt. Subclasses can reimplement this function to
 customize the position of inline objects.</p>
-<p>See also <a href="qabstracttextdocumentlayout.html#drawInlineObject">drawInlineObject</a>().</p>
+<p><b>See also</b> <a href="qabstracttextdocumentlayout.html#drawInlineObject">drawInlineObject</a>().</p>
 
 
 <h3 class="fn"><a name="registerHandler" />QAbstractTextDocumentLayout.registerHandler (<i>self</i>, int&#160;<i>objectType</i>, <a href="qobject.html">QObject</a>&#160;<i>component</i>)</h3><p>Registers the given <i>component</i> as a handler for items of
@@ -153,7 +153,7 @@ function to customize the resizing of inline objects.</p>
 
 <h3 class="fn"><a name="setPaintDevice" />QAbstractTextDocumentLayout.setPaintDevice (<i>self</i>, <a href="qpaintdevice.html">QPaintDevice</a>&#160;<i>device</i>)</h3><p>Sets the paint device used for rendering the document's layout
 to the given <i>device</i>.</p>
-<p>See also <a href="qabstracttextdocumentlayout.html#paintDevice">paintDevice</a>().</p>
+<p><b>See also</b> <a href="qabstracttextdocumentlayout.html#paintDevice">paintDevice</a>().</p>
 
 
 <hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="documentSizeChanged" />void documentSizeChanged (const QSizeF&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the size of the document layout
@@ -163,7 +163,7 @@ should emit this signal when the document's entire layout size
 changes. This signal is useful for widgets that display text
 documents since it enables them to update their scroll bars
 correctly.</p>
-<p>See also <a href="qabstracttextdocumentlayout.html#documentSize">documentSize</a>().</p>
+<p><b>See also</b> <a href="qabstracttextdocumentlayout.html#documentSize">documentSize</a>().</p>
 
 
 <h3 class="fn"><a name="pageCountChanged" />void pageCountChanged (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the number of pages in the layout
@@ -172,7 +172,7 @@ changes; <i>newPages</i> is the updated page count.</p>
 should emit this signal when the number of pages in the layout has
 changed. Changes to the page count are caused by changes to the
 layout or the document content itself.</p>
-<p>See also <a href="qabstracttextdocumentlayout.html#pageCount">pageCount</a>().</p>
+<p><b>See also</b> <a href="qabstracttextdocumentlayout.html#pageCount">pageCount</a>().</p>
 
 
 <h3 class="fn"><a name="update" />void update (const QRectF&amp; = QRectF (0,0,1e+09,1e+09))</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when the rectangle <i>rect</i> has been
@@ -188,4 +188,4 @@ updated.</p>
 should emit this signal when the layout of <i>block</i> has changed
 in order to repaint.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

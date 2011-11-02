@@ -18,25 +18,25 @@ writing is complete.</p>
 <p>In many cases, QReadWriteLock is a direct competitor to <a href="qmutex.html">QMutex</a>. QReadWriteLock is a good choice if there
 are many concurrent reads and writing occurs infrequently.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- QReadWriteLock lock;
+<pre class="cpp">
+ <span class="type">QReadWriteLock</span> lock;
 
- void ReaderThread.run()
+ <span class="type">void</span> ReaderThread<span class="operator">.</span>run()
  {
-     ...
-     lock.lockForRead();
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+     lock<span class="operator">.</span>lockForRead();
      read_file();
-     lock.unlock();
-     ...
+     lock<span class="operator">.</span>unlock();
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 
- void WriterThread.run()
+ <span class="type">void</span> WriterThread<span class="operator">.</span>run()
  {
-     ...
-     lock.lockForWrite();
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+     lock<span class="operator">.</span>lockForWrite();
      write_file();
-     lock.unlock();
-     ...
+     lock<span class="operator">.</span>unlock();
+     <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 </pre>
 <p>To ensure that writers aren't blocked forever by readers,
@@ -53,14 +53,14 @@ Note that the lock type cannot be changed when trying to lock
 recursively, i.e. it is not possible to lock for reading in a
 thread that already has locked for writing (and vice versa).</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="RecursionMode-enum" />QReadWriteLock.RecursionMode</h3><table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QReadWriteLock.Recursive</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">In this mode, a thread can lock the same
 <a href="qreadwritelock.html">QReadWriteLock</a> multiple times and
 the mutex won't be unlocked until a corresponding number of
@@ -69,37 +69,33 @@ made.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QReadWriteLock.NonRecursive</tt></td>
-<td class=" topAlign"><tt>0</tt></td>
+<td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">In this mode, a thread may only lock a
 <a href="qreadwritelock.html">QReadWriteLock</a> once.</td>
 </tr>
 </table>
 <p>This enum was introduced or modified in Qt 4.4.</p>
-<p>See also <a href="qreadwritelock.html#QReadWriteLock">QReadWriteLock</a>().</p>
+<p><b>See also</b> <a href="qreadwritelock.html#QReadWriteLock">QReadWriteLock</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QReadWriteLock" />QReadWriteLock.__init__ (<i>self</i>)</h3><p>Constructs a <a href="qreadwritelock.html">QReadWriteLock</a>
 object in <a href="qreadwritelock.html#RecursionMode-enum">NonRecursive</a> mode.</p>
-<p>See also <a href="qreadwritelock.html#lockForRead">lockForRead</a>() and <a href="qreadwritelock.html#lockForWrite">lockForWrite</a>().</p>
+<p><b>See also</b> <a href="qreadwritelock.html#lockForRead">lockForRead</a>() and <a href="qreadwritelock.html#lockForWrite">lockForWrite</a>().</p>
 
 
 <h3 class="fn"><a name="QReadWriteLock-2" />QReadWriteLock.__init__ (<i>self</i>, <a href="qreadwritelock.html#RecursionMode-enum">RecursionMode</a>&#160;<i>recursionMode</i>)</h3><p>Constructs a <a href="qreadwritelock.html">QReadWriteLock</a>
 object in the given <i>recursionMode</i>.</p>
 <p>This function was introduced in Qt 4.4.</p>
-<p>See also <a href="qreadwritelock.html#lockForRead">lockForRead</a>(), <a href="qreadwritelock.html#lockForWrite">lockForWrite</a>(), and <a href="qreadwritelock.html#RecursionMode-enum">RecursionMode</a>.</p>
+<p><b>See also</b> <a href="qreadwritelock.html#lockForRead">lockForRead</a>(), <a href="qreadwritelock.html#lockForWrite">lockForWrite</a>(), and <a href="qreadwritelock.html#RecursionMode-enum">RecursionMode</a>.</p>
 
 
 <h3 class="fn"><a name="lockForRead" />QReadWriteLock.lockForRead (<i>self</i>)</h3><p>Locks the lock for reading. This function will block the current
 thread if any thread (including the current) has locked for
 writing.</p>
-<p>See also <a href="qreadwritelock.html#unlock">unlock</a>(),
-<a href="qreadwritelock.html#lockForWrite">lockForWrite</a>(), and
-<a href="qreadwritelock.html#tryLockForRead">tryLockForRead</a>().</p>
+<p><b>See also</b> <a href="qreadwritelock.html#unlock">unlock</a>(), <a href="qreadwritelock.html#lockForWrite">lockForWrite</a>(), and <a href="qreadwritelock.html#tryLockForRead">tryLockForRead</a>().</p>
 
 
 <h3 class="fn"><a name="lockForWrite" />QReadWriteLock.lockForWrite (<i>self</i>)</h3><p>Locks the lock for writing. This function will block the current
 thread if another thread has locked for reading or writing.</p>
-<p>See also <a href="qreadwritelock.html#unlock">unlock</a>(),
-<a href="qreadwritelock.html#lockForRead">lockForRead</a>(), and
-<a href="qreadwritelock.html#tryLockForWrite">tryLockForWrite</a>().</p>
+<p><b>See also</b> <a href="qreadwritelock.html#unlock">unlock</a>(), <a href="qreadwritelock.html#lockForRead">lockForRead</a>(), and <a href="qreadwritelock.html#tryLockForWrite">tryLockForWrite</a>().</p>
 
 
 <h3 class="fn"><a name="tryLockForRead" />bool QReadWriteLock.tryLockForRead (<i>self</i>)</h3><p>Attempts to lock for reading. If the lock was obtained, this
@@ -111,8 +107,7 @@ writing.</p>
 <p>If the lock was obtained, the lock must be unlocked with
 <a href="qreadwritelock.html#unlock">unlock</a>() before another
 thread can successfully lock it.</p>
-<p>See also <a href="qreadwritelock.html#unlock">unlock</a>() and
-<a href="qreadwritelock.html#lockForRead">lockForRead</a>().</p>
+<p><b>See also</b> <a href="qreadwritelock.html#unlock">unlock</a>() and <a href="qreadwritelock.html#lockForRead">lockForRead</a>().</p>
 
 
 <h3 class="fn"><a name="tryLockForRead-2" />bool QReadWriteLock.tryLockForRead (<i>self</i>, int&#160;<i>timeout</i>)</h3><p>This is an overloaded function.</p>
@@ -127,8 +122,7 @@ when <i>timeout</i> is negative.</p>
 <p>If the lock was obtained, the lock must be unlocked with
 <a href="qreadwritelock.html#unlock">unlock</a>() before another
 thread can successfully lock it.</p>
-<p>See also <a href="qreadwritelock.html#unlock">unlock</a>() and
-<a href="qreadwritelock.html#lockForRead">lockForRead</a>().</p>
+<p><b>See also</b> <a href="qreadwritelock.html#unlock">unlock</a>() and <a href="qreadwritelock.html#lockForRead">lockForRead</a>().</p>
 
 
 <h3 class="fn"><a name="tryLockForWrite" />bool QReadWriteLock.tryLockForWrite (<i>self</i>)</h3><p>Attempts to lock for writing. If the lock was obtained, this
@@ -138,8 +132,7 @@ reading or writing.</p>
 <p>If the lock was obtained, the lock must be unlocked with
 <a href="qreadwritelock.html#unlock">unlock</a>() before another
 thread can successfully lock it.</p>
-<p>See also <a href="qreadwritelock.html#unlock">unlock</a>() and
-<a href="qreadwritelock.html#lockForWrite">lockForWrite</a>().</p>
+<p><b>See also</b> <a href="qreadwritelock.html#unlock">unlock</a>() and <a href="qreadwritelock.html#lockForWrite">lockForWrite</a>().</p>
 
 
 <h3 class="fn"><a name="tryLockForWrite-2" />bool QReadWriteLock.tryLockForWrite (<i>self</i>, int&#160;<i>timeout</i>)</h3><p>This is an overloaded function.</p>
@@ -155,13 +148,12 @@ when <i>timeout</i> is negative.</p>
 <p>If the lock was obtained, the lock must be unlocked with
 <a href="qreadwritelock.html#unlock">unlock</a>() before another
 thread can successfully lock it.</p>
-<p>See also <a href="qreadwritelock.html#unlock">unlock</a>() and
-<a href="qreadwritelock.html#lockForWrite">lockForWrite</a>().</p>
+<p><b>See also</b> <a href="qreadwritelock.html#unlock">unlock</a>() and <a href="qreadwritelock.html#lockForWrite">lockForWrite</a>().</p>
 
 
 <h3 class="fn"><a name="unlock" />QReadWriteLock.unlock (<i>self</i>)</h3><p>Unlocks the lock.</p>
 <p>Attempting to unlock a lock that is not locked is an error, and
 will result in program termination.</p>
-<p>See also <a href="qreadwritelock.html#lockForRead">lockForRead</a>(), <a href="qreadwritelock.html#lockForWrite">lockForWrite</a>(), <a href="qreadwritelock.html#tryLockForRead">tryLockForRead</a>(), and
+<p><b>See also</b> <a href="qreadwritelock.html#lockForRead">lockForRead</a>(), <a href="qreadwritelock.html#lockForWrite">lockForWrite</a>(), <a href="qreadwritelock.html#tryLockForRead">tryLockForRead</a>(), and
 <a href="qreadwritelock.html#tryLockForWrite">tryLockForWrite</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

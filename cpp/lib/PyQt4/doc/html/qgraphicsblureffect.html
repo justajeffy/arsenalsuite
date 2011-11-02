@@ -22,7 +22,7 @@ specified in device coordinates.</p>
 control how blur effects are applied. The hints might not have an
 effect in all the paint engines.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
@@ -30,20 +30,20 @@ effect in all the paint engines.</p>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsBlurEffect.PerformanceHint</tt></td>
-<td class=" topAlign"><tt>0x00</tt></td>
+<td class="topAlign"><tt>0x00</tt></td>
 <td class="topAlign">Indicates that rendering performance is the
 most important factor, at the potential cost of lower quality.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QGraphicsBlurEffect.QualityHint</tt></td>
-<td class=" topAlign"><tt>0x01</tt></td>
+<td class="topAlign"><tt>0x01</tt></td>
 <td class="topAlign">Indicates that rendering quality is the most
 important factor, at the potential cost of lower performance.</td>
 </tr>
 <tr>
 <td class="topAlign">
 <tt>QGraphicsBlurEffect.AnimationHint</tt></td>
-<td class=" topAlign"><tt>0x02</tt></td>
+<td class="topAlign"><tt>0x02</tt></td>
 <td class="topAlign">Indicates that the blur radius is going to be
 animated, hinting that the implementation can keep a cache of
 blurred verisons of the source. Do not use this hint if the source
@@ -53,7 +53,7 @@ is going to be dynamically changing.</td>
 <p>This enum was introduced or modified in Qt 4.6.</p>
 <p>The BlurHints type is a typedef for <a href="qflags.html">QFlags</a>&lt;BlurHint&gt;. It stores an OR
 combination of BlurHint values.</p>
-<p>See also <a href="qgraphicsblureffect.html#blurHints-prop">blurHints</a>() and
+<p><b>See also</b> <a href="qgraphicsblureffect.html#blurHints-prop">blurHints</a>() and
 <a href="qgraphicsblureffect.html#blurHints-prop">setBlurHints</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QGraphicsBlurEffect" />QGraphicsBlurEffect.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a new <a href="qgraphicsblureffect.html">QGraphicsBlurEffect</a> instance. The
 <i>parent</i> parameter is passed to <a href="qgraphicseffect.html">QGraphicsEffect</a>'s constructor.</p>
@@ -72,4 +72,4 @@ changes. The <i>radius</i> parameter holds the effect's new blur
 radius.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

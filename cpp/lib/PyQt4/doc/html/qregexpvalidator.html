@@ -27,49 +27,49 @@ For example, "" and "A" are <a href="qvalidator.html#State-enum">Intermediate</a
 <a href="qvalidator.html#State-enum">Invalid</a>).</p>
 <p>For a brief introduction to Qt's regexp engine, see <a href="qregexp.html">QRegExp</a>.</p>
 <p>Example of use:</p>
-<pre class="highlightedCode brush: cpp">
-<span class="comment"> // regexp: optional '-' followed by between 1 and 3 digits</span>
- QRegExp rx("-?\\d{1,3}");
- QValidator *validator = new QRegExpValidator(rx, this);
+<pre class="cpp">
+ <span class="comment">// regexp: optional '-' followed by between 1 and 3 digits</span>
+ <span class="type"><a href="qregexp.html">QRegExp</a></span> rx(<span class="string">"-?\\d{1,3}"</span>);
+ <span class="type"><a href="qvalidator.html">QValidator</a></span> <span class="operator">*</span>validator <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QRegExpValidator</span>(rx<span class="operator">,</span> <span class="keyword">this</span>);
 
- QLineEdit *edit = new QLineEdit(this);
- edit-&gt;setValidator(validator);
+ <span class="type"><a href="qlineedit.html">QLineEdit</a></span> <span class="operator">*</span>edit <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlineedit.html">QLineEdit</a></span>(<span class="keyword">this</span>);
+ edit<span class="operator">-</span><span class="operator">&gt;</span>setValidator(validator);
 </pre>
 <p>Below we present some examples of validators. In practice they
 would normally be associated with a widget as in the example
 above.</p>
-<pre class="highlightedCode brush: cpp">
-<span class="comment"> // integers 1 to 9999</span>
- QRegExp rx("[1-9]\\d{0,3}");
-<span class="comment"> // the validator treats the regexp as "^[1-9]\\d{0,3}$"</span>
- QRegExpValidator v(rx, 0);
- QString s;
- int pos = 0;
+<pre class="cpp">
+ <span class="comment">// integers 1 to 9999</span>
+ <span class="type"><a href="qregexp.html">QRegExp</a></span> rx(<span class="string">"[1-9]\\d{0,3}"</span>);
+ <span class="comment">// the validator treats the regexp as "^[1-9]\\d{0,3}$"</span>
+ <span class="type">QRegExpValidator</span> v(rx<span class="operator">,</span> <span class="number">0</span>);
+ <span class="type"><a href="qstring.html">QString</a></span> s;
+ <span class="type">int</span> pos <span class="operator">=</span> <span class="number">0</span>;
 
- s = "0";     v.validate(s, pos);    <span class="comment">// returns Invalid</span>
- s = "12345"; v.validate(s, pos);    <span class="comment">// returns Invalid</span>
- s = "1";     v.validate(s, pos);    <span class="comment">// returns Acceptable</span>
+ s <span class="operator">=</span> <span class="string">"0"</span>;     v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos);    <span class="comment">// returns Invalid</span>
+ s <span class="operator">=</span> <span class="string">"12345"</span>; v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos);    <span class="comment">// returns Invalid</span>
+ s <span class="operator">=</span> <span class="string">"1"</span>;     v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos);    <span class="comment">// returns Acceptable</span>
 
- rx.setPattern("\\S+");            <span class="comment">// one or more non-whitespace characters</span>
- v.setRegExp(rx);
- s = "myfile.txt";  v.validate(s, pos); <span class="comment">// Returns Acceptable</span>
- s = "my file.txt"; v.validate(s, pos); <span class="comment">// Returns Invalid</span>
+ rx<span class="operator">.</span>setPattern(<span class="string">"\\S+"</span>);            <span class="comment">// one or more non-whitespace characters</span>
+ v<span class="operator">.</span><a href="qregexpvalidator.html#regExp-prop">setRegExp</a>(rx);
+ s <span class="operator">=</span> <span class="string">"myfile.txt"</span>;  v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos); <span class="comment">// Returns Acceptable</span>
+ s <span class="operator">=</span> <span class="string">"my file.txt"</span>; v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos); <span class="comment">// Returns Invalid</span>
 
-<span class="comment"> // A, B or C followed by exactly five digits followed by W, X, Y or Z</span>
- rx.setPattern("[A-C]\\d{5}[W-Z]");
- v.setRegExp(rx);
- s = "a12345Z"; v.validate(s, pos);        <span class="comment">// Returns Invalid</span>
- s = "A12345Z"; v.validate(s, pos);        <span class="comment">// Returns Acceptable</span>
- s = "B12";     v.validate(s, pos);        <span class="comment">// Returns Intermediate</span>
+ <span class="comment">// A, B or C followed by exactly five digits followed by W, X, Y or Z</span>
+ rx<span class="operator">.</span>setPattern(<span class="string">"[A-C]\\d{5}[W-Z]"</span>);
+ v<span class="operator">.</span><a href="qregexpvalidator.html#regExp-prop">setRegExp</a>(rx);
+ s <span class="operator">=</span> <span class="string">"a12345Z"</span>; v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos);        <span class="comment">// Returns Invalid</span>
+ s <span class="operator">=</span> <span class="string">"A12345Z"</span>; v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos);        <span class="comment">// Returns Acceptable</span>
+ s <span class="operator">=</span> <span class="string">"B12"</span>;     v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos);        <span class="comment">// Returns Intermediate</span>
 
-<span class="comment"> // match most 'readme' files</span>
- rx.setPattern("read\\S?me(\.(txt|asc|1st))?");
- rx.setCaseSensitive(false);
- v.setRegExp(rx);
- s = "readme";      v.validate(s, pos); <span class="comment">// Returns Acceptable</span>
- s = "README.1ST";  v.validate(s, pos); <span class="comment">// Returns Acceptable</span>
- s = "read me.txt"; v.validate(s, pos); <span class="comment">// Returns Invalid</span>
- s = "readm";       v.validate(s, pos); <span class="comment">// Returns Intermediate</span>
+ <span class="comment">// match most 'readme' files</span>
+ rx<span class="operator">.</span>setPattern(<span class="string">"read\\S?me(\.(txt|asc|1st))?"</span>);
+ rx<span class="operator">.</span>setCaseSensitive(<span class="keyword">false</span>);
+ v<span class="operator">.</span><a href="qregexpvalidator.html#regExp-prop">setRegExp</a>(rx);
+ s <span class="operator">=</span> <span class="string">"readme"</span>;      v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos); <span class="comment">// Returns Acceptable</span>
+ s <span class="operator">=</span> <span class="string">"README.1ST"</span>;  v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos); <span class="comment">// Returns Acceptable</span>
+ s <span class="operator">=</span> <span class="string">"read me.txt"</span>; v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos); <span class="comment">// Returns Invalid</span>
+ s <span class="operator">=</span> <span class="string">"readm"</span>;       v<span class="operator">.</span><a href="qregexpvalidator.html#validate">validate</a>(s<span class="operator">,</span> pos); <span class="comment">// Returns Intermediate</span>
 </pre><hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QRegExpValidator" />QRegExpValidator.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a validator with a <i>parent</i> object that accepts
 any string (including an empty one) as valid.</p>
 
@@ -92,5 +92,5 @@ matched.</p>
 <i>input</i> parameter.</p>
 <p>For example, if the regular expression is <b>\w\d\d</b>
 (word-character, digit, digit) then "A57" is <a href="qvalidator.html#State-enum">Acceptable</a>, "E5" is <a href="qvalidator.html#State-enum">Intermediate</a>, and "+9" is <a href="qvalidator.html#State-enum">Invalid</a>.</p>
-<p>See also <a href="qregexp.html#exactMatch">QRegExp.exactMatch</a>().</p>
-<h3 class="fn"><a name="validate-2" />(<a href="qvalidator.html#State-enum">QValidator.State</a>, int&#160;<i>pos</i>) QRegExpValidator.validate (<i>self</i>, QString&#160;<i>input</i>, int&#160;<i>pos</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qregexp.html#exactMatch">QRegExp.exactMatch</a>().</p>
+<h3 class="fn"><a name="validate-2" />(<a href="qvalidator.html#State-enum">QValidator.State</a>, int&#160;<i>pos</i>) QRegExpValidator.validate (<i>self</i>, QString&#160;<i>input</i>, int&#160;<i>pos</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

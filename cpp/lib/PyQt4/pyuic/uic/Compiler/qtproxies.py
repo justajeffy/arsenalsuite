@@ -113,9 +113,14 @@ class ProxyClassMember(object):
         return "%s.%s" % (self.proxy, self.function_name)
     
     def __call__(self, *args):
+        if self.function_name == 'setProperty':
+            args = (as_string(args[0], encode=False), as_string(args[1]))
+        else:
+            args = map(as_string, args)
+
         func_call = "%s.%s(%s)" % (self.proxy,
                                    self.function_name,
-                                   ", ".join(map(as_string, args)))
+                                   ", ".join(args))
         if self.flags & AS_ARGUMENT:
             self.proxy._uic_name = func_call
             return self.proxy
@@ -341,7 +346,11 @@ class QtGui(ProxyNamespace):
             return QtGui.QLayout("%s.layout()" % self,
                     False, (), noInstantiation=True)
 
-    class QAbstractScrollArea(QFrame): pass
+    class QAbstractScrollArea(QFrame):
+        def viewport(self):
+            return QtGui.QWidget("%s.viewport()" % self, False, (),
+                    noInstantiation=True)
+
     class QGraphicsView(QAbstractScrollArea): pass
     class QMdiArea(QAbstractScrollArea): pass
     class QPlainTextEdit(QAbstractScrollArea): pass
@@ -372,30 +381,18 @@ class QtGui(ProxyNamespace):
     class QListWidgetItem(ProxyClass): pass
 
     class QListWidget(QListView):
-        isSortingEnabled = i18n_func("isSortingEnabled")
         setSortingEnabled = i18n_void_func("setSortingEnabled")
-
-        def item(self, row):
-            return QtGui.QListWidgetItem("%s.item(%i)" % (self, row), False,
-                    (), noInstantiation=True)
+        isSortingEnabled = i18n_func("isSortingEnabled")
+        item = i18n_func("item")
 
     class QTableWidgetItem(ProxyClass): pass
 
     class QTableWidget(QTableView):
-        isSortingEnabled = i18n_func("isSortingEnabled")
         setSortingEnabled = i18n_void_func("setSortingEnabled")
-
-        def item(self, row, col):
-            return QtGui.QTableWidgetItem("%s.item(%i, %i)" % (self, row, col),
-                    False, (), noInstantiation=True)
-
-        def horizontalHeaderItem(self, col):
-            return QtGui.QTableWidgetItem("%s.horizontalHeaderItem(%i)" % (self, col),
-                    False, (), noInstantiation=True)
-
-        def verticalHeaderItem(self, row):
-            return QtGui.QTableWidgetItem("%s.verticalHeaderItem(%i)" % (self, row),
-                    False, (), noInstantiation=True)
+        isSortingEnabled = i18n_func("isSortingEnabled")
+        item = i18n_func("item")
+        horizontalHeaderItem = i18n_func("horizontalHeaderItem")
+        verticalHeaderItem = i18n_func("verticalHeaderItem")
 
     class QTreeWidgetItem(ProxyClass):
         def child(self, index):
@@ -403,8 +400,8 @@ class QtGui(ProxyNamespace):
                     False, (), noInstantiation=True)
 
     class QTreeWidget(QTreeView):
-        isSortingEnabled = i18n_func("isSortingEnabled")
         setSortingEnabled = i18n_void_func("setSortingEnabled")
+        isSortingEnabled = i18n_func("isSortingEnabled")
 
         def headerItem(self):
             return QtGui.QWidget("%s.headerItem()" % self, False, (),

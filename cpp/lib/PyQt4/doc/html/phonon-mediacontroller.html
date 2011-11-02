@@ -40,14 +40,14 @@ supported by Qt backends.</p>
 the type of media source, e.g., DVD or CD. We give examples for
 these sources.</p>
 <table class="valuelist">
-<tr class="odd">
+<tr class="odd" valign="top">
 <th class="tblConst">Constant</th>
 <th class="tblval">Value</th>
 <th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.MediaController.Angles</tt></td>
-<td class=" topAlign"><tt>1</tt></td>
+<td class="topAlign"><tt>1</tt></td>
 <td class="topAlign">In the VOB (DVD) format, it is possible to to
 give several video streams of the same scene, each of which
 displays the scene from a different angle. The DVD viewer can then
@@ -56,14 +56,14 @@ change between these angles.</td>
 <tr>
 <td class="topAlign">
 <tt>Phonon.MediaController.Chapters</tt></td>
-<td class=" topAlign"><tt>2</tt></td>
+<td class="topAlign"><tt>2</tt></td>
 <td class="topAlign">In the VOB format, chapters are points in a
 single video stream that can be played and seeked to
 separately.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>Phonon.MediaController.Titles</tt></td>
-<td class=" topAlign"><tt>4</tt></td>
+<td class="topAlign"><tt>4</tt></td>
 <td class="topAlign">On a CD, a title is a separate sound track. On
 DVD, a title is a separate VOB file.</td>
 </tr>
@@ -72,8 +72,7 @@ DVD, a title is a separate VOB file.</td>
 combination of Feature values.</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="MediaController" />MediaController.__init__ (<i>self</i>, <a href="phonon-mediaobject.html">MediaObject</a>&#160;<i>parent</i>)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs a new <a href="phonon-mediacontroller.html">MediaController</a> with the media
 object (<i>parent</i>) to be used by the media controller.</p>
-<p>See also <a href="phonon-mediaobject.html">MediaObject</a> and
-<a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediaobject.html">MediaObject</a> and <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="autoplayTitles" />bool MediaController.autoplayTitles (<i>self</i>)</h3><p>Returns true if titles will automatically be played when the
@@ -83,51 +82,51 @@ sequence when the media object's <a href="phonon-mediaobject.html#play">play()</
 the autoplay option is disabled, the media object will play the
 <a href="phonon-mediacontroller.html#currentTitle">MediaController.currentTitle()</a>{current
 title} and then finish the playback.</p>
-<p>See also <a href="phonon-mediacontroller.html#setAutoplayTitles">setAutoplayTitles</a>()
+<p><b>See also</b> <a href="phonon-mediacontroller.html#setAutoplayTitles">setAutoplayTitles</a>()
 and <a href="phonon-mediacontroller.html#currentTitle">currentTitle</a>().</p>
 
 
 <h3 class="fn"><a name="availableAngles" />int MediaController.availableAngles (<i>self</i>)</h3><p>Returns the available angles that is available for the current
 media source.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="availableAudioChannels" />list-of-Phonon.AudioChannelDescription MediaController.availableAudioChannels (<i>self</i>)</h3><h3 class="fn"><a name="availableChapters" />int MediaController.availableChapters (<i>self</i>)</h3><p>Returns the number of chapters the current media source
 contains.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="availableSubtitles" />list-of-Phonon.SubtitleDescription MediaController.availableSubtitles (<i>self</i>)</h3><h3 class="fn"><a name="availableTitles" />int MediaController.availableTitles (<i>self</i>)</h3><p>Returns the number of titles that the current media source
 contains.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="currentAngle" />int MediaController.currentAngle (<i>self</i>)</h3><p>Returns the angle that is currently used.</p>
-<p>See also <a href="phonon-mediacontroller.html#setCurrentAngle">setCurrentAngle</a>()
+<p><b>See also</b> <a href="phonon-mediacontroller.html#setCurrentAngle">setCurrentAngle</a>()
 and <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="currentAudioChannel" /><a href="phonon-audiochanneldescription.html">AudioChannelDescription</a> MediaController.currentAudioChannel (<i>self</i>)</h3><h3 class="fn"><a name="currentChapter" />int MediaController.currentChapter (<i>self</i>)</h3><p>Returns the chapter that is currently being played back.</p>
-<p>See also <a href="phonon-mediacontroller.html#setCurrentChapter">setCurrentChapter</a>()
+<p><b>See also</b> <a href="phonon-mediacontroller.html#setCurrentChapter">setCurrentChapter</a>()
 and <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="currentSubtitle" /><a href="phonon-subtitledescription.html">SubtitleDescription</a> MediaController.currentSubtitle (<i>self</i>)</h3><h3 class="fn"><a name="currentTitle" />int MediaController.currentTitle (<i>self</i>)</h3><p>Returns the title that is currently played back.</p>
 <p>The current title is 0 (the first) by default.</p>
-<p>See also <a href="phonon-mediacontroller.html#setCurrentTitle">setCurrentTitle</a>()
+<p><b>See also</b> <a href="phonon-mediacontroller.html#setCurrentTitle">setCurrentTitle</a>()
 and <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="nextTitle" />MediaController.nextTitle (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void nextTitle()</tt>.</p><p>Skips to the next title.</p>
 <p>If it was playing before the title change it will start playback
 on the next title if autoplayTitles is enabled.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="previousTitle" />MediaController.previousTitle (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void previousTitle()</tt>.</p><p>Skips to the previous title.</p>
 <p>If it was playing before the title change it will start playback
 on the previous title if autoplayTitles is enabled.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="setAutoplayTitles" />MediaController.setAutoplayTitles (<i>self</i>, bool)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setAutoplayTitles(bool)</tt>.</p><p>Sets the titles to play automatically when the media is played
@@ -137,58 +136,58 @@ sequence when the media object's <a href="phonon-mediaobject.html#play">play()</
 the autoplay option is disabled, the media object will play the
 <a href="phonon-mediacontroller.html#currentTitle">MediaController.currentTitle()</a>{current
 title} and then finish the playback.</p>
-<p>See also <a href="phonon-mediacontroller.html#autoplayTitles">autoplayTitles</a>()
+<p><b>See also</b> <a href="phonon-mediacontroller.html#autoplayTitles">autoplayTitles</a>()
 and <a href="phonon-mediacontroller.html#currentTitle">currentTitle</a>().</p>
 
 
 <h3 class="fn"><a name="setCurrentAngle" />MediaController.setCurrentAngle (<i>self</i>, int&#160;<i>angleNumber</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setCurrentAngle(int)</tt>.</p><p>Sets the current angle to the given <i>angleNumber</i> if the
 media file or device supports navigation by angle number.</p>
-<p>See also <a href="phonon-mediacontroller.html#currentAngle">currentAngle</a>() and
+<p><b>See also</b> <a href="phonon-mediacontroller.html#currentAngle">currentAngle</a>() and
 <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="setCurrentAudioChannel" />MediaController.setCurrentAudioChannel (<i>self</i>, <a href="phonon-audiochanneldescription.html">AudioChannelDescription</a>&#160;<i>stream</i>)</h3><h3 class="fn"><a name="setCurrentChapter" />MediaController.setCurrentChapter (<i>self</i>, int&#160;<i>chapterNumber</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setCurrentChapter(int)</tt>.</p><p>Sets the current chapter to the given <i>chapterNumber</i> if
 the media file or device supports navigation by chapter number.</p>
-<p>See also <a href="phonon-mediacontroller.html#currentChapter">currentChapter</a>()
+<p><b>See also</b> <a href="phonon-mediacontroller.html#currentChapter">currentChapter</a>()
 and <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="setCurrentSubtitle" />MediaController.setCurrentSubtitle (<i>self</i>, <a href="phonon-subtitledescription.html">SubtitleDescription</a>&#160;<i>stream</i>)</h3><h3 class="fn"><a name="setCurrentTitle" />MediaController.setCurrentTitle (<i>self</i>, int&#160;<i>titleNumber</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setCurrentTitle(int)</tt>.</p><p>Skips to the given title <i>titleNumber</i>.</p>
 <p>If it was playing before the title change it will start playback
 on the new title if autoplayTitles is enabled.</p>
-<p>See also <a href="phonon-mediacontroller.html#currentTitle">currentTitle</a>() and
+<p><b>See also</b> <a href="phonon-mediacontroller.html#currentTitle">currentTitle</a>() and
 <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="supportedFeatures" /><a href="phonon-mediacontroller-features.html">Features</a> MediaController.supportedFeatures (<i>self</i>)</h3><hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="angleChanged" />void angleChanged (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the current angle changes. The
 new angle number is given by <i>angleNumber</i>.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="availableAnglesChanged" />void availableAnglesChanged (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the number of available angles
 changes. The new number of available angles is given by
 <i>availableAngles</i>.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="availableAudioChannelsChanged" />void availableAudioChannelsChanged ()</h3><p>This is the default overload of this signal.</p><h3 class="fn"><a name="availableChaptersChanged" />void availableChaptersChanged (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the number of available chapters
 changes. The new number of available chapters is given by
 <i>availableChapters</i>.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="availableSubtitlesChanged" />void availableSubtitlesChanged ()</h3><p>This is the default overload of this signal.</p><h3 class="fn"><a name="availableTitlesChanged" />void availableTitlesChanged (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the number of available titles
 changes. The new number of available titles is given by
 <i>availableTitles</i>.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="chapterChanged" />void chapterChanged (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the current chapter changes. The
 new chapter number is given by <i>chapterNumber</i>.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
 
 
 <h3 class="fn"><a name="titleChanged" />void titleChanged (int)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the current title changes. The
 new title number is given by <i>titleNumber</i>.</p>
-<p>See also <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="phonon-mediacontroller.html#Feature-enum">Feature</a>.</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>

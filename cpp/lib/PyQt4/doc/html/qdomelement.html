@@ -21,23 +21,23 @@ functions. Attributes can be removed with <a href="qdomelement.html#removeAttrib
 namespace-aware equivalents to these functions, i.e. <a href="qdomelement.html#setAttributeNS">setAttributeNS</a>(), <a href="qdomelement.html#setAttributeNodeNS">setAttributeNodeNS</a>() and
 <a href="qdomelement.html#removeAttributeNS">removeAttributeNS</a>().</p>
 <p>If you want to access the text of a node use <a href="qdomelement.html#text">text</a>(), e.g.</p>
-<pre class="highlightedCode brush: cpp">
- QDomElement e = <span class="comment">//...</span>
-<span class="comment"> //...</span>
- QString s = e.text()
+<pre class="cpp">
+ <span class="type">QDomElement</span> e <span class="operator">=</span> <span class="comment">//...</span>
+ <span class="comment">//...</span>
+ <span class="type"><a href="qstring.html">QString</a></span> s <span class="operator">=</span> e<span class="operator">.</span><a href="qdomelement.html#text">text</a>()
 </pre>
 <p>The <a href="qdomelement.html#text">text</a>() function operates
 recursively to find the text (since not all elements contain text).
 If you want to find all the text in all of a node's children,
 iterate over the children looking for <a href="qdomtext.html">QDomText</a> nodes, e.g.</p>
-<pre class="highlightedCode brush: cpp">
- QString text;
- QDomElement element = doc.documentElement();
- for(QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
+<pre class="cpp">
+ <span class="type"><a href="qstring.html">QString</a></span> text;
+ <span class="type">QDomElement</span> element <span class="operator">=</span> doc<span class="operator">.</span>documentElement();
+ <span class="keyword">for</span>(<span class="type"><a href="qdomnode.html">QDomNode</a></span> n <span class="operator">=</span> element<span class="operator">.</span>firstChild(); <span class="operator">!</span>n<span class="operator">.</span>isNull(); n <span class="operator">=</span> n<span class="operator">.</span>nextSibling())
  {
-     QDomText t = n.toText();
-     if (!t.isNull())
-         text += t.data();
+     <span class="type"><a href="qdomtext.html">QDomText</a></span> t <span class="operator">=</span> n<span class="operator">.</span>toText();
+     <span class="keyword">if</span> (<span class="operator">!</span>t<span class="operator">.</span>isNull())
+         text <span class="operator">+</span><span class="operator">=</span> t<span class="operator">.</span>data();
  }
 </pre>
 <p>Note that we attempt to convert each node to a text node and use
@@ -51,11 +51,11 @@ have a specified tag name with <a href="qdomelement.html#elementsByTagName">elem
 <a href="qdomnode.html#previousSiblingElement">previousSiblingElement</a>().
 For example, to iterate over all child elements called "entry" in a
 root element called "database", you can use:</p>
-<pre class="highlightedCode brush: cpp">
- QDomDocument doc = <span class="comment">// ...</span>
- QDomElement root = doc.firstChildElement("database");
- QDomElement elt = root.firstChildElement("entry");
- for (; !elt.isNull(); elt = elt.nextSiblingElement("entry")) {
+<pre class="cpp">
+ <span class="type"><a href="qdomdocument.html">QDomDocument</a></span> doc <span class="operator">=</span> <span class="comment">// ...</span>
+ <span class="type">QDomElement</span> root <span class="operator">=</span> doc<span class="operator">.</span><a href="qdomnode.html#firstChildElement">firstChildElement</a>(<span class="string">"database"</span>);
+ <span class="type">QDomElement</span> elt <span class="operator">=</span> root<span class="operator">.</span><a href="qdomnode.html#firstChildElement">firstChildElement</a>(<span class="string">"entry"</span>);
+ <span class="keyword">for</span> (; <span class="operator">!</span>elt<span class="operator">.</span>isNull(); elt <span class="operator">=</span> elt<span class="operator">.</span>nextSiblingElement(<span class="string">"entry"</span>)) {
      <span class="comment">// ...</span>
  }
 </pre>
@@ -76,7 +76,7 @@ use <a href="qdomnode.html#cloneNode">cloneNode</a>().</p>
 
 <h3 class="fn"><a name="attribute" />QString QDomElement.attribute (<i>self</i>, QString&#160;<i>name</i>, QString&#160;<i>defaultValue</i>&#160;=&#160;QString())</h3><p>Returns the attribute called <i>name</i>. If the attribute does
 not exist <i>defValue</i> is returned.</p>
-<p>See also <a href="qdomelement.html#setAttribute">setAttribute</a>(), <a href="qdomelement.html#attributeNode">attributeNode</a>(), <a href="qdomelement.html#setAttributeNode">setAttributeNode</a>(), and
+<p><b>See also</b> <a href="qdomelement.html#setAttribute">setAttribute</a>(), <a href="qdomelement.html#attributeNode">attributeNode</a>(), <a href="qdomelement.html#setAttributeNode">setAttributeNode</a>(), and
 <a href="qdomelement.html#attributeNS">attributeNS</a>().</p>
 
 
@@ -84,7 +84,7 @@ not exist <i>defValue</i> is returned.</p>
 corresponds to the attribute called <i>name</i>. If no such
 attribute exists a <a href="qdomnode.html#isNull">null
 attribute</a> is returned.</p>
-<p>See also <a href="qdomelement.html#setAttributeNode">setAttributeNode</a>(),
+<p><b>See also</b> <a href="qdomelement.html#setAttributeNode">setAttributeNode</a>(),
 <a href="qdomelement.html#attribute">attribute</a>(), <a href="qdomelement.html#setAttribute">setAttribute</a>(), and <a href="qdomelement.html#attributeNodeNS">attributeNodeNS</a>().</p>
 
 
@@ -92,7 +92,7 @@ attribute</a> is returned.</p>
 corresponds to the attribute with the local name <i>localName</i>
 and the namespace URI <i>nsURI</i>. If no such attribute exists a
 <a href="qdomnode.html#isNull">null attribute</a> is returned.</p>
-<p>See also <a href="qdomelement.html#setAttributeNodeNS">setAttributeNodeNS</a>(),
+<p><b>See also</b> <a href="qdomelement.html#setAttributeNodeNS">setAttributeNodeNS</a>(),
 <a href="qdomelement.html#setAttributeNode">setAttributeNode</a>(),
 <a href="qdomelement.html#attribute">attribute</a>(), and <a href="qdomelement.html#setAttribute">setAttribute</a>().</p>
 
@@ -100,16 +100,13 @@ and the namespace URI <i>nsURI</i>. If no such attribute exists a
 <h3 class="fn"><a name="attributeNS" />QString QDomElement.attributeNS (<i>self</i>, QString&#160;<i>nsURI</i>, QString&#160;<i>localName</i>, QString&#160;<i>defaultValue</i>&#160;=&#160;QString())</h3><p>Returns the attribute with the local name <i>localName</i> and
 the namespace URI <i>nsURI</i>. If the attribute does not exist
 <i>defValue</i> is returned.</p>
-<p>See also <a href="qdomelement.html#setAttributeNS">setAttributeNS</a>(), <a href="qdomelement.html#attributeNodeNS">attributeNodeNS</a>(), <a href="qdomelement.html#setAttributeNodeNS">setAttributeNodeNS</a>(), and
+<p><b>See also</b> <a href="qdomelement.html#setAttributeNS">setAttributeNS</a>(), <a href="qdomelement.html#attributeNodeNS">attributeNodeNS</a>(), <a href="qdomelement.html#setAttributeNodeNS">setAttributeNodeNS</a>(), and
 <a href="qdomelement.html#attribute">attribute</a>().</p>
 
 
 <h3 class="fn"><a name="attributes" /><a href="qdomnamednodemap.html">QDomNamedNodeMap</a> QDomElement.attributes (<i>self</i>)</h3><p>Returns a <a href="qdomnamednodemap.html">QDomNamedNodeMap</a>
 containing all this element's attributes.</p>
-<p>See also <a href="qdomelement.html#attribute">attribute</a>(),
-<a href="qdomelement.html#setAttribute">setAttribute</a>(),
-<a href="qdomelement.html#attributeNode">attributeNode</a>(), and
-<a href="qdomelement.html#setAttributeNode">setAttributeNode</a>().</p>
+<p><b>See also</b> <a href="qdomelement.html#attribute">attribute</a>(), <a href="qdomelement.html#setAttribute">setAttribute</a>(), <a href="qdomelement.html#attributeNode">attributeNode</a>(), and <a href="qdomelement.html#setAttributeNode">setAttributeNode</a>().</p>
 
 
 <h3 class="fn"><a name="elementsByTagName" /><a href="qdomnodelist.html">QDomNodeList</a> QDomElement.elementsByTagName (<i>self</i>, QString&#160;<i>tagname</i>)</h3><p>Returns a <a href="qdomnodelist.html">QDomNodeList</a>
@@ -118,7 +115,7 @@ encountered during a preorder traversal of the element subtree with
 this element as its root. The order of the elements in the returned
 list is the order they are encountered during the preorder
 traversal.</p>
-<p>See also <a href="qdomelement.html#elementsByTagNameNS">elementsByTagNameNS</a>()
+<p><b>See also</b> <a href="qdomelement.html#elementsByTagNameNS">elementsByTagNameNS</a>()
 and <a href="qdomdocument.html#elementsByTagName">QDomDocument.elementsByTagName</a>().</p>
 
 
@@ -128,7 +125,7 @@ containing all descendants of this element with local name
 a preorder traversal of the element subtree with this element as
 its root. The order of the elements in the returned list is the
 order they are encountered during the preorder traversal.</p>
-<p>See also <a href="qdomelement.html#elementsByTagName">elementsByTagName</a>() and
+<p><b>See also</b> <a href="qdomelement.html#elementsByTagName">elementsByTagName</a>() and
 <a href="qdomdocument.html#elementsByTagNameNS">QDomDocument.elementsByTagNameNS</a>().</p>
 
 
@@ -153,25 +150,24 @@ returns false.</p>
 
 <h3 class="fn"><a name="removeAttribute" />QDomElement.removeAttribute (<i>self</i>, QString&#160;<i>name</i>)</h3><p>Removes the attribute called name <i>name</i> from this
 element.</p>
-<p>See also <a href="qdomelement.html#setAttribute">setAttribute</a>(), <a href="qdomelement.html#attribute">attribute</a>(), and <a href="qdomelement.html#removeAttributeNS">removeAttributeNS</a>().</p>
+<p><b>See also</b> <a href="qdomelement.html#setAttribute">setAttribute</a>(), <a href="qdomelement.html#attribute">attribute</a>(), and <a href="qdomelement.html#removeAttributeNS">removeAttributeNS</a>().</p>
 
 
 <h3 class="fn"><a name="removeAttributeNode" /><a href="qdomattr.html">QDomAttr</a> QDomElement.removeAttributeNode (<i>self</i>, <a href="qdomattr.html">QDomAttr</a>&#160;<i>oldAttr</i>)</h3><p>Removes the attribute <i>oldAttr</i> from the element and
 returns it.</p>
-<p>See also <a href="qdomelement.html#attributeNode">attributeNode</a>() and <a href="qdomelement.html#setAttributeNode">setAttributeNode</a>().</p>
+<p><b>See also</b> <a href="qdomelement.html#attributeNode">attributeNode</a>() and <a href="qdomelement.html#setAttributeNode">setAttributeNode</a>().</p>
 
 
 <h3 class="fn"><a name="removeAttributeNS" />QDomElement.removeAttributeNS (<i>self</i>, QString&#160;<i>nsURI</i>, QString&#160;<i>localName</i>)</h3><p>Removes the attribute with the local name <i>localName</i> and
 the namespace URI <i>nsURI</i> from this element.</p>
-<p>See also <a href="qdomelement.html#setAttributeNS">setAttributeNS</a>(), <a href="qdomelement.html#attributeNS">attributeNS</a>(), and <a href="qdomelement.html#removeAttribute">removeAttribute</a>().</p>
+<p><b>See also</b> <a href="qdomelement.html#setAttributeNS">setAttributeNS</a>(), <a href="qdomelement.html#attributeNS">attributeNS</a>(), and <a href="qdomelement.html#removeAttribute">removeAttribute</a>().</p>
 
 
 <h3 class="fn"><a name="setAttribute" />QDomElement.setAttribute (<i>self</i>, QString&#160;<i>name</i>, QString&#160;<i>value</i>)</h3><p>Adds an attribute called <i>name</i> with value <i>value</i>. If
 an attribute with the same name exists, its value is replaced by
 <i>value</i>.</p>
-<p>See also <a href="qdomelement.html#attribute">attribute</a>(),
-<a href="qdomelement.html#setAttributeNode">setAttributeNode</a>(),
-and <a href="qdomelement.html#setAttributeNS">setAttributeNS</a>().</p>
+<p><b>See also</b> <a href="qdomelement.html#attribute">attribute</a>(), <a href="qdomelement.html#setAttributeNode">setAttributeNode</a>(), and
+<a href="qdomelement.html#setAttributeNS">setAttributeNS</a>().</p>
 
 
 <h3 class="fn"><a name="setAttribute-2" />QDomElement.setAttribute (<i>self</i>, QString&#160;<i>name</i>, int&#160;<i>value</i>)</h3><p>This is an overloaded function.</p>
@@ -194,7 +190,7 @@ and <a href="qdomelement.html#setAttributeNS">setAttributeNS</a>().</p>
 <p>If the element has another attribute that has the same name as
 <i>newAttr</i>, this function replaces that attribute and returns
 it; otherwise the function returns a <a href="qdomnode.html#isNull">null attribute</a>.</p>
-<p>See also <a href="qdomelement.html#attributeNode">attributeNode</a>(), <a href="qdomelement.html#setAttribute">setAttribute</a>(), and <a href="qdomelement.html#setAttributeNodeNS">setAttributeNodeNS</a>().</p>
+<p><b>See also</b> <a href="qdomelement.html#attributeNode">attributeNode</a>(), <a href="qdomelement.html#setAttribute">setAttribute</a>(), and <a href="qdomelement.html#setAttributeNodeNS">setAttributeNodeNS</a>().</p>
 
 
 <h3 class="fn"><a name="setAttributeNodeNS" /><a href="qdomattr.html">QDomAttr</a> QDomElement.setAttributeNodeNS (<i>self</i>, <a href="qdomattr.html">QDomAttr</a>&#160;<i>newAttr</i>)</h3><p>Adds the attribute <i>newAttr</i> to this element.</p>
@@ -202,7 +198,7 @@ it; otherwise the function returns a <a href="qdomnode.html#isNull">null attribu
 name and namespace URI as <i>newAttr</i>, this function replaces
 that attribute and returns it; otherwise the function returns a
 <a href="qdomnode.html#isNull">null attribute</a>.</p>
-<p>See also <a href="qdomelement.html#attributeNodeNS">attributeNodeNS</a>(), <a href="qdomelement.html#setAttributeNS">setAttributeNS</a>(), and
+<p><b>See also</b> <a href="qdomelement.html#attributeNodeNS">attributeNodeNS</a>(), <a href="qdomelement.html#setAttributeNS">setAttributeNS</a>(), and
 <a href="qdomelement.html#setAttributeNode">setAttributeNode</a>().</p>
 
 
@@ -214,7 +210,7 @@ repaced by <i>value</i>.</p>
 <p>Although <i>qName</i> is the qualified name, the local name is
 used to decide if an existing attribute's value should be
 replaced.</p>
-<p>See also <a href="qdomelement.html#attributeNS">attributeNS</a>(), <a href="qdomelement.html#setAttributeNodeNS">setAttributeNodeNS</a>(), and
+<p><b>See also</b> <a href="qdomelement.html#attributeNS">attributeNS</a>(), <a href="qdomelement.html#setAttributeNodeNS">setAttributeNodeNS</a>(), and
 <a href="qdomelement.html#setAttribute">setAttribute</a>().</p>
 
 
@@ -231,30 +227,30 @@ replaced.</p>
 
 
 <h3 class="fn"><a name="setTagName" />QDomElement.setTagName (<i>self</i>, QString&#160;<i>name</i>)</h3><p>Sets this element's tag name to <i>name</i>.</p>
-<p>See also <a href="qdomelement.html#tagName">tagName</a>().</p>
+<p><b>See also</b> <a href="qdomelement.html#tagName">tagName</a>().</p>
 
 
 <h3 class="fn"><a name="tagName" />QString QDomElement.tagName (<i>self</i>)</h3><p>Returns the tag name of this element. For an XML element like
 this:</p>
-<pre class="highlightedCode brush: cpp">
- &lt;img src="myimg.png"&gt;
+<pre class="cpp">
+ <span class="operator">&lt;</span>img src<span class="operator">=</span><span class="string">"myimg.png"</span><span class="operator">&gt;</span>
 </pre>
 <p>the tagname would return "img".</p>
-<p>See also <a href="qdomelement.html#setTagName">setTagName</a>().</p>
+<p><b>See also</b> <a href="qdomelement.html#setTagName">setTagName</a>().</p>
 
 
 <h3 class="fn"><a name="text" />QString QDomElement.text (<i>self</i>)</h3><p>Returns the element's text or an empty string.</p>
 <p>Example:</p>
-<pre class="highlightedCode brush: cpp">
- &lt;h1&gt;Hello &lt;b&gt;Qt&lt;/b&gt; &lt;![CDATA[&lt;xml is cool&gt;]]&gt;&lt;/h1&gt;
+<pre class="cpp">
+ <span class="operator">&lt;</span>h1<span class="operator">&gt;</span>Hello <span class="operator">&lt;</span>b<span class="operator">&gt;</span><span class="type"><a href="qt.html">Qt</a></span><span class="operator">&lt;</span><span class="operator">/</span>b<span class="operator">&gt;</span> <span class="operator">&lt;</span><span class="operator">!</span><span class="operator">[</span>CDATA<span class="operator">[</span><span class="operator">&lt;</span>xml is cool<span class="operator">&gt;</span><span class="operator">]</span><span class="operator">]</span><span class="operator">&gt;</span><span class="operator">&lt;</span><span class="operator">/</span>h1<span class="operator">&gt;</span>
 </pre>
 <p>The function text() of the <a href="qdomelement.html">QDomElement</a> for the <tt>&lt;h1&gt;</tt> tag,
 will return the following text:</p>
-<pre class="highlightedCode brush: cpp">
- Hello Qt &lt;xml is cool&gt;
+<pre class="cpp">
+ Hello <span class="type"><a href="qt.html">Qt</a></span> <span class="operator">&lt;</span>xml is cool<span class="operator">&gt;</span>
 </pre>
 <p>Comments are ignored by this function. It only evaluates
 <a href="qdomtext.html">QDomText</a> and <a href="qdomcdatasection.html">QDomCDATASection</a> objects.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.5-a9b83eac34c4 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.3</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
