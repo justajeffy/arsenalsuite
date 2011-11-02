@@ -51,6 +51,7 @@ PyQt4.QtCore.Vector2D?10
 PyQt4.QtCore.Vector3D?10
 PyQt4.QtCore.Vector4D?10
 PyQt4.QtCore.Quaternion?10
+PyQt4.QtCore.EasingCurve?10
 PyQt4.QtCore.UserType?10
 PyQt4.QtCore.QtMsgType?10
 PyQt4.QtCore.QtDebugMsg?10
@@ -139,12 +140,37 @@ PyQt4.QtCore.qSetPadChar?4(QChar) -> QTextStreamManipulator
 PyQt4.QtCore.qSetRealNumberPrecision?4(int) -> QTextStreamManipulator
 PyQt4.QtCore.qSwap?4(QUrl, QUrl)
 PyQt4.QtCore.qSwap?4(QVariant, QVariant)
+PyQt4.QtCore.QSysInfo.WinVersion?10
+PyQt4.QtCore.QSysInfo.WV_32s?10
+PyQt4.QtCore.QSysInfo.WV_95?10
+PyQt4.QtCore.QSysInfo.WV_98?10
+PyQt4.QtCore.QSysInfo.WV_Me?10
+PyQt4.QtCore.QSysInfo.WV_DOS_based?10
+PyQt4.QtCore.QSysInfo.WV_NT?10
+PyQt4.QtCore.QSysInfo.WV_2000?10
+PyQt4.QtCore.QSysInfo.WV_XP?10
+PyQt4.QtCore.QSysInfo.WV_2003?10
+PyQt4.QtCore.QSysInfo.WV_VISTA?10
+PyQt4.QtCore.QSysInfo.WV_WINDOWS7?10
+PyQt4.QtCore.QSysInfo.WV_NT_based?10
+PyQt4.QtCore.QSysInfo.WV_4_0?10
+PyQt4.QtCore.QSysInfo.WV_5_0?10
+PyQt4.QtCore.QSysInfo.WV_5_1?10
+PyQt4.QtCore.QSysInfo.WV_5_2?10
+PyQt4.QtCore.QSysInfo.WV_6_0?10
+PyQt4.QtCore.QSysInfo.WV_6_1?10
+PyQt4.QtCore.QSysInfo.WV_CE?10
+PyQt4.QtCore.QSysInfo.WV_CENET?10
+PyQt4.QtCore.QSysInfo.WV_CE_5?10
+PyQt4.QtCore.QSysInfo.WV_CE_6?10
+PyQt4.QtCore.QSysInfo.WV_CE_based?10
 PyQt4.QtCore.QSysInfo.Endian?10
 PyQt4.QtCore.QSysInfo.BigEndian?10
 PyQt4.QtCore.QSysInfo.LittleEndian?10
 PyQt4.QtCore.QSysInfo.ByteOrder?10
 PyQt4.QtCore.QSysInfo.Sizes?10
 PyQt4.QtCore.QSysInfo.WordSize?10
+PyQt4.QtCore.QSysInfo.WindowsVersion?7
 PyQt4.QtCore.QSysInfo?1()
 PyQt4.QtCore.QSysInfo.__init__?1(self)
 PyQt4.QtCore.QSysInfo?1(QSysInfo)
@@ -158,6 +184,7 @@ PyQt4.QtCore.Qt.NavigationModeCursorForceVisible?10
 PyQt4.QtCore.Qt.GestureFlag?10
 PyQt4.QtCore.Qt.DontStartGestureOnChildren?10
 PyQt4.QtCore.Qt.ReceivePartialGestures?10
+PyQt4.QtCore.Qt.IgnoredGesturesPropagateToParent?10
 PyQt4.QtCore.Qt.GestureType?10
 PyQt4.QtCore.Qt.TapGesture?10
 PyQt4.QtCore.Qt.TapAndHoldGesture?10
@@ -259,6 +286,7 @@ PyQt4.QtCore.Qt.AA_MacPluginApplication?10
 PyQt4.QtCore.Qt.AA_DontUseNativeMenuBar?10
 PyQt4.QtCore.Qt.AA_MacDontSwapCtrlAndMeta?10
 PyQt4.QtCore.Qt.AA_S60DontConstructApplicationPanes?10
+PyQt4.QtCore.Qt.AA_S60DisablePartialScreenInputMode?10
 PyQt4.QtCore.Qt.WindowModality?10
 PyQt4.QtCore.Qt.NonModal?10
 PyQt4.QtCore.Qt.WindowModal?10
@@ -315,6 +343,7 @@ PyQt4.QtCore.Qt.IgnoreAction?10
 PyQt4.QtCore.Qt.LayoutDirection?10
 PyQt4.QtCore.Qt.LeftToRight?10
 PyQt4.QtCore.Qt.RightToLeft?10
+PyQt4.QtCore.Qt.LayoutDirectionAuto?10
 PyQt4.QtCore.Qt.ToolButtonStyle?10
 PyQt4.QtCore.Qt.ToolButtonIconOnly?10
 PyQt4.QtCore.Qt.ToolButtonTextOnly?10
@@ -453,6 +482,9 @@ PyQt4.QtCore.Qt.BusyCursor?10
 PyQt4.QtCore.Qt.LastCursor?10
 PyQt4.QtCore.Qt.BitmapCursor?10
 PyQt4.QtCore.Qt.CustomCursor?10
+PyQt4.QtCore.Qt.DragCopyCursor?10
+PyQt4.QtCore.Qt.DragMoveCursor?10
+PyQt4.QtCore.Qt.DragLinkCursor?10
 PyQt4.QtCore.Qt.UIEffect?10
 PyQt4.QtCore.Qt.UI_General?10
 PyQt4.QtCore.Qt.UI_AnimateMenu?10
@@ -917,6 +949,15 @@ PyQt4.QtCore.Qt.Key_TopMenu?10
 PyQt4.QtCore.Qt.Key_PowerDown?10
 PyQt4.QtCore.Qt.Key_Suspend?10
 PyQt4.QtCore.Qt.Key_ContrastAdjust?10
+PyQt4.QtCore.Qt.Key_MediaPause?10
+PyQt4.QtCore.Qt.Key_MediaTogglePlayPause?10
+PyQt4.QtCore.Qt.Key_LaunchG?10
+PyQt4.QtCore.Qt.Key_LaunchH?10
+PyQt4.QtCore.Qt.Key_ToggleCallHangup?10
+PyQt4.QtCore.Qt.Key_VoiceDial?10
+PyQt4.QtCore.Qt.Key_LastNumberRedial?10
+PyQt4.QtCore.Qt.Key_Camera?10
+PyQt4.QtCore.Qt.Key_CameraFocus?10
 PyQt4.QtCore.Qt.BGMode?10
 PyQt4.QtCore.Qt.TransparentMode?10
 PyQt4.QtCore.Qt.OpaqueMode?10
@@ -1034,6 +1075,10 @@ PyQt4.QtCore.Qt.WA_AcceptTouchEvents?10
 PyQt4.QtCore.Qt.WA_TouchPadAcceptSingleTouchEvents?10
 PyQt4.QtCore.Qt.WA_MergeSoftkeys?10
 PyQt4.QtCore.Qt.WA_MergeSoftkeysRecursively?10
+PyQt4.QtCore.Qt.WA_X11DoNotAcceptFocus?10
+PyQt4.QtCore.Qt.WA_LockPortraitOrientation?10
+PyQt4.QtCore.Qt.WA_LockLandscapeOrientation?10
+PyQt4.QtCore.Qt.WA_AutoOrientation?10
 PyQt4.QtCore.Qt.WindowState?10
 PyQt4.QtCore.Qt.WindowNoState?10
 PyQt4.QtCore.Qt.WindowMinimized?10
@@ -1072,6 +1117,8 @@ PyQt4.QtCore.Qt.WindowStaysOnBottomHint?10
 PyQt4.QtCore.Qt.WindowCloseButtonHint?10
 PyQt4.QtCore.Qt.MacWindowToolBarButtonHint?10
 PyQt4.QtCore.Qt.BypassGraphicsProxyWidget?10
+PyQt4.QtCore.Qt.WindowSoftkeysVisibleHint?10
+PyQt4.QtCore.Qt.WindowSoftkeysRespondHint?10
 PyQt4.QtCore.Qt.TextElideMode?10
 PyQt4.QtCore.Qt.ElideLeft?10
 PyQt4.QtCore.Qt.ElideRight?10
@@ -1119,6 +1166,7 @@ PyQt4.QtCore.Qt.NoButton?10
 PyQt4.QtCore.Qt.LeftButton?10
 PyQt4.QtCore.Qt.RightButton?10
 PyQt4.QtCore.Qt.MidButton?10
+PyQt4.QtCore.Qt.MiddleButton?10
 PyQt4.QtCore.Qt.XButton1?10
 PyQt4.QtCore.Qt.XButton2?10
 PyQt4.QtCore.Qt.MouseButtonMask?10
@@ -2000,6 +2048,25 @@ PyQt4.QtCore.QChar.toTitleCase?4(int) -> int
 PyQt4.QtCore.QChar.toCaseFolded?4(int) -> int
 PyQt4.QtCore.QChar.unicodeVersion?4(int) -> QChar.UnicodeVersion
 PyQt4.QtCore.QChar.decomposition?4(int) -> QString
+PyQt4.QtCore.QChar.isHighSurrogate?4(int) -> bool
+PyQt4.QtCore.QChar.isLowSurrogate?4(int) -> bool
+PyQt4.QtCore.QChar.requiresSurrogates?4(int) -> bool
+PyQt4.QtCore.POINT.x?7
+PyQt4.QtCore.POINT.y?7
+PyQt4.QtCore.POINT?1()
+PyQt4.QtCore.POINT.__init__?1(self)
+PyQt4.QtCore.POINT?1(POINT)
+PyQt4.QtCore.POINT.__init__?1(self, POINT)
+PyQt4.QtCore.MSG.hwnd?7
+PyQt4.QtCore.MSG.lParam?7
+PyQt4.QtCore.MSG.message?7
+PyQt4.QtCore.MSG.pt?7
+PyQt4.QtCore.MSG.time?7
+PyQt4.QtCore.MSG.wParam?7
+PyQt4.QtCore.MSG?1()
+PyQt4.QtCore.MSG.__init__?1(self)
+PyQt4.QtCore.MSG?1(MSG)
+PyQt4.QtCore.MSG.__init__?1(self, MSG)
 PyQt4.QtCore.QCoreApplication.Encoding?10
 PyQt4.QtCore.QCoreApplication.CodecForTr?10
 PyQt4.QtCore.QCoreApplication.UnicodeUTF8?10
@@ -2044,6 +2111,7 @@ PyQt4.QtCore.QCoreApplication.translate?4(str, str, str, QCoreApplication.Encodi
 PyQt4.QtCore.QCoreApplication.flush?4()
 PyQt4.QtCore.QCoreApplication.setAttribute?4(Qt.ApplicationAttribute, bool on=True)
 PyQt4.QtCore.QCoreApplication.testAttribute?4(Qt.ApplicationAttribute) -> bool
+PyQt4.QtCore.QCoreApplication.winEventFilter?4(MSG) -> (bool, int)
 PyQt4.QtCore.QCoreApplication.quit?4()
 PyQt4.QtCore.QCoreApplication.aboutToQuit?4()
 PyQt4.QtCore.QCoreApplication.event?4(QEvent) -> bool
@@ -2248,6 +2316,7 @@ PyQt4.QtCore.QDataStream.Qt_4_3?10
 PyQt4.QtCore.QDataStream.Qt_4_4?10
 PyQt4.QtCore.QDataStream.Qt_4_5?10
 PyQt4.QtCore.QDataStream.Qt_4_6?10
+PyQt4.QtCore.QDataStream.Qt_4_7?10
 PyQt4.QtCore.QDataStream?1()
 PyQt4.QtCore.QDataStream.__init__?1(self)
 PyQt4.QtCore.QDataStream?1(QIODevice)
@@ -2422,6 +2491,12 @@ PyQt4.QtCore.QDateTime.currentDateTime?4() -> QDateTime
 PyQt4.QtCore.QDateTime.fromString?4(QString, Qt.DateFormat format=Qt.TextDate) -> QDateTime
 PyQt4.QtCore.QDateTime.fromString?4(QString, QString) -> QDateTime
 PyQt4.QtCore.QDateTime.fromTime_t?4(int) -> QDateTime
+PyQt4.QtCore.QDateTime.toMSecsSinceEpoch?4() -> int
+PyQt4.QtCore.QDateTime.setMSecsSinceEpoch?4(int)
+PyQt4.QtCore.QDateTime.msecsTo?4(QDateTime) -> int
+PyQt4.QtCore.QDateTime.currentDateTimeUtc?4() -> QDateTime
+PyQt4.QtCore.QDateTime.fromMSecsSinceEpoch?4(int) -> QDateTime
+PyQt4.QtCore.QDateTime.currentMSecsSinceEpoch?4() -> int
 PyQt4.QtCore.QDir.SortFlag?10
 PyQt4.QtCore.QDir.Name?10
 PyQt4.QtCore.QDir.Time?10
@@ -2454,6 +2529,8 @@ PyQt4.QtCore.QDir.AllDirs?10
 PyQt4.QtCore.QDir.CaseSensitive?10
 PyQt4.QtCore.QDir.NoDotAndDotDot?10
 PyQt4.QtCore.QDir.NoFilter?10
+PyQt4.QtCore.QDir.NoDot?10
+PyQt4.QtCore.QDir.NoDotDot?10
 PyQt4.QtCore.QDir?1(QDir)
 PyQt4.QtCore.QDir.__init__?1(self, QDir)
 PyQt4.QtCore.QDir?1(QString path=QString())
@@ -2617,6 +2694,26 @@ PyQt4.QtCore.QEasingCurve.setType?4(QEasingCurve.Type)
 PyQt4.QtCore.QEasingCurve.setCustomType?4(callable)
 PyQt4.QtCore.QEasingCurve.customType?4() -> callable
 PyQt4.QtCore.QEasingCurve.valueForProgress?4(float) -> float
+PyQt4.QtCore.QElapsedTimer.ClockType?10
+PyQt4.QtCore.QElapsedTimer.SystemTime?10
+PyQt4.QtCore.QElapsedTimer.MonotonicClock?10
+PyQt4.QtCore.QElapsedTimer.TickCounter?10
+PyQt4.QtCore.QElapsedTimer.MachAbsoluteTime?10
+PyQt4.QtCore.QElapsedTimer?1()
+PyQt4.QtCore.QElapsedTimer.__init__?1(self)
+PyQt4.QtCore.QElapsedTimer?1(QElapsedTimer)
+PyQt4.QtCore.QElapsedTimer.__init__?1(self, QElapsedTimer)
+PyQt4.QtCore.QElapsedTimer.clockType?4() -> QElapsedTimer.ClockType
+PyQt4.QtCore.QElapsedTimer.isMonotonic?4() -> bool
+PyQt4.QtCore.QElapsedTimer.start?4()
+PyQt4.QtCore.QElapsedTimer.restart?4() -> int
+PyQt4.QtCore.QElapsedTimer.invalidate?4()
+PyQt4.QtCore.QElapsedTimer.isValid?4() -> bool
+PyQt4.QtCore.QElapsedTimer.elapsed?4() -> int
+PyQt4.QtCore.QElapsedTimer.hasExpired?4(int) -> bool
+PyQt4.QtCore.QElapsedTimer.msecsSinceReference?4() -> int
+PyQt4.QtCore.QElapsedTimer.msecsTo?4(QElapsedTimer) -> int
+PyQt4.QtCore.QElapsedTimer.secsTo?4(QElapsedTimer) -> int
 PyQt4.QtCore.QEventLoop.ProcessEventsFlag?10
 PyQt4.QtCore.QEventLoop.AllEvents?10
 PyQt4.QtCore.QEventLoop.ExcludeUserInputEvents?10
@@ -2882,6 +2979,7 @@ PyQt4.QtCore.QLibraryInfo.TranslationsPath?10
 PyQt4.QtCore.QLibraryInfo.SettingsPath?10
 PyQt4.QtCore.QLibraryInfo.DemosPath?10
 PyQt4.QtCore.QLibraryInfo.ExamplesPath?10
+PyQt4.QtCore.QLibraryInfo.ImportsPath?10
 PyQt4.QtCore.QLibraryInfo?1(QLibraryInfo)
 PyQt4.QtCore.QLibraryInfo.__init__?1(self, QLibraryInfo)
 PyQt4.QtCore.QLibraryInfo.licensee?4() -> QString
@@ -3243,6 +3341,11 @@ PyQt4.QtCore.QLocale.Yugoslavia?10
 PyQt4.QtCore.QLocale.Zambia?10
 PyQt4.QtCore.QLocale.Zimbabwe?10
 PyQt4.QtCore.QLocale.SerbiaAndMontenegro?10
+PyQt4.QtCore.QLocale.Montenegro?10
+PyQt4.QtCore.QLocale.Serbia?10
+PyQt4.QtCore.QLocale.SaintBarthelemy?10
+PyQt4.QtCore.QLocale.SaintMartin?10
+PyQt4.QtCore.QLocale.LatinAmericaAndTheCaribbean?10
 PyQt4.QtCore.QLocale.LastCountry?10
 PyQt4.QtCore.QLocale.Language?10
 PyQt4.QtCore.QLocale.C?10
@@ -3413,6 +3516,55 @@ PyQt4.QtCore.QLocale.Walamo?10
 PyQt4.QtCore.QLocale.Hawaiian?10
 PyQt4.QtCore.QLocale.Tyap?10
 PyQt4.QtCore.QLocale.Chewa?10
+PyQt4.QtCore.QLocale.Filipino?10
+PyQt4.QtCore.QLocale.SwissGerman?10
+PyQt4.QtCore.QLocale.SichuanYi?10
+PyQt4.QtCore.QLocale.Kpelle?10
+PyQt4.QtCore.QLocale.LowGerman?10
+PyQt4.QtCore.QLocale.SouthNdebele?10
+PyQt4.QtCore.QLocale.NorthernSotho?10
+PyQt4.QtCore.QLocale.NorthernSami?10
+PyQt4.QtCore.QLocale.Taroko?10
+PyQt4.QtCore.QLocale.Gusii?10
+PyQt4.QtCore.QLocale.Taita?10
+PyQt4.QtCore.QLocale.Fulah?10
+PyQt4.QtCore.QLocale.Kikuyu?10
+PyQt4.QtCore.QLocale.Samburu?10
+PyQt4.QtCore.QLocale.Sena?10
+PyQt4.QtCore.QLocale.NorthNdebele?10
+PyQt4.QtCore.QLocale.Rombo?10
+PyQt4.QtCore.QLocale.Tachelhit?10
+PyQt4.QtCore.QLocale.Kabyle?10
+PyQt4.QtCore.QLocale.Nyankole?10
+PyQt4.QtCore.QLocale.Bena?10
+PyQt4.QtCore.QLocale.Vunjo?10
+PyQt4.QtCore.QLocale.Bambara?10
+PyQt4.QtCore.QLocale.Embu?10
+PyQt4.QtCore.QLocale.Cherokee?10
+PyQt4.QtCore.QLocale.Morisyen?10
+PyQt4.QtCore.QLocale.Makonde?10
+PyQt4.QtCore.QLocale.Langi?10
+PyQt4.QtCore.QLocale.Ganda?10
+PyQt4.QtCore.QLocale.Bemba?10
+PyQt4.QtCore.QLocale.Kabuverdianu?10
+PyQt4.QtCore.QLocale.Meru?10
+PyQt4.QtCore.QLocale.Kalenjin?10
+PyQt4.QtCore.QLocale.Nama?10
+PyQt4.QtCore.QLocale.Machame?10
+PyQt4.QtCore.QLocale.Colognian?10
+PyQt4.QtCore.QLocale.Masai?10
+PyQt4.QtCore.QLocale.Soga?10
+PyQt4.QtCore.QLocale.Luyia?10
+PyQt4.QtCore.QLocale.Asu?10
+PyQt4.QtCore.QLocale.Teso?10
+PyQt4.QtCore.QLocale.Saho?10
+PyQt4.QtCore.QLocale.KoyraChiini?10
+PyQt4.QtCore.QLocale.Rwa?10
+PyQt4.QtCore.QLocale.Luo?10
+PyQt4.QtCore.QLocale.Chiga?10
+PyQt4.QtCore.QLocale.CentralMoroccoTamazight?10
+PyQt4.QtCore.QLocale.KoyraboroSenni?10
+PyQt4.QtCore.QLocale.Shambala?10
 PyQt4.QtCore.QLocale?1()
 PyQt4.QtCore.QLocale.__init__?1(self)
 PyQt4.QtCore.QLocale?1(QString)
@@ -3473,6 +3625,7 @@ PyQt4.QtCore.QLocale.standaloneMonthName?4(int, QLocale.FormatType format=QLocal
 PyQt4.QtCore.QLocale.standaloneDayName?4(int, QLocale.FormatType format=QLocale.LongFormat) -> QString
 PyQt4.QtCore.QLocale.amText?4() -> QString
 PyQt4.QtCore.QLocale.pmText?4() -> QString
+PyQt4.QtCore.QLocale.textDirection?4() -> Qt.LayoutDirection
 PyQt4.QtCore.QLocale.NumberOptions?1(QLocale.NumberOptions)
 PyQt4.QtCore.QLocale.NumberOptions.__init__?1(self, QLocale.NumberOptions)
 PyQt4.QtCore.QLocale.NumberOptions?1(int)
@@ -3668,6 +3821,8 @@ PyQt4.QtCore.QMetaType.QVector2D?10
 PyQt4.QtCore.QMetaType.QVector3D?10
 PyQt4.QtCore.QMetaType.QVector4D?10
 PyQt4.QtCore.QMetaType.QQuaternion?10
+PyQt4.QtCore.QMetaType.QEasingCurve?10
+PyQt4.QtCore.QMetaType.QVariant?10
 PyQt4.QtCore.QMetaType.User?10
 PyQt4.QtCore.QMetaType?1()
 PyQt4.QtCore.QMetaType.__init__?1(self)
@@ -3884,7 +4039,7 @@ PyQt4.QtCore.QProcess.setEnvironment?4(QStringList)
 PyQt4.QtCore.QProcess.environment?4() -> QStringList
 PyQt4.QtCore.QProcess.error?4() -> QProcess.ProcessError
 PyQt4.QtCore.QProcess.state?4() -> QProcess.ProcessState
-PyQt4.QtCore.QProcess.pid?4() -> int
+PyQt4.QtCore.QProcess.pid?4() -> sip.voidptr
 PyQt4.QtCore.QProcess.waitForStarted?4(int msecs=30000) -> bool
 PyQt4.QtCore.QProcess.waitForReadyRead?4(int msecs=30000) -> bool
 PyQt4.QtCore.QProcess.waitForBytesWritten?4(int msecs=30000) -> bool
@@ -4374,6 +4529,7 @@ PyQt4.QtCore.QState.addTransition?4(QObject, SIGNAL(), QAbstractState) -> QSigna
 PyQt4.QtCore.QState.addTransition?4(signal, QAbstractState) -> QSignalTransition
 PyQt4.QtCore.QState.addTransition?4(QAbstractState) -> QAbstractTransition
 PyQt4.QtCore.QState.removeTransition?4(QAbstractTransition)
+PyQt4.QtCore.QState.transitions?4() -> list-of-QAbstractTransition
 PyQt4.QtCore.QState.initialState?4() -> QAbstractState
 PyQt4.QtCore.QState.setInitialState?4(QAbstractState)
 PyQt4.QtCore.QState.childMode?4() -> QState.ChildMode
@@ -4746,7 +4902,9 @@ PyQt4.QtCore.QTextCodec.availableMibs?4() -> list-of-int
 PyQt4.QtCore.QTextCodec.codecForLocale?4() -> QTextCodec
 PyQt4.QtCore.QTextCodec.setCodecForLocale?4(QTextCodec)
 PyQt4.QtCore.QTextCodec.makeDecoder?4() -> QTextDecoder
+PyQt4.QtCore.QTextCodec.makeDecoder?4(QTextCodec.ConversionFlags) -> QTextDecoder
 PyQt4.QtCore.QTextCodec.makeEncoder?4() -> QTextEncoder
+PyQt4.QtCore.QTextCodec.makeEncoder?4(QTextCodec.ConversionFlags) -> QTextEncoder
 PyQt4.QtCore.QTextCodec.canEncode?4(QString) -> bool
 PyQt4.QtCore.QTextCodec.toUnicode?4(QByteArray) -> QString
 PyQt4.QtCore.QTextCodec.toUnicode?4(str) -> QString
@@ -4770,9 +4928,13 @@ PyQt4.QtCore.QTextCodec.ConverterState?1(QTextCodec.ConversionFlags flags=QTextC
 PyQt4.QtCore.QTextCodec.ConverterState.__init__?1(self, QTextCodec.ConversionFlags flags=QTextCodec.DefaultConversion)
 PyQt4.QtCore.QTextEncoder?1(QTextCodec)
 PyQt4.QtCore.QTextEncoder.__init__?1(self, QTextCodec)
+PyQt4.QtCore.QTextEncoder?1(QTextCodec, QTextCodec.ConversionFlags)
+PyQt4.QtCore.QTextEncoder.__init__?1(self, QTextCodec, QTextCodec.ConversionFlags)
 PyQt4.QtCore.QTextEncoder.fromUnicode?4(QString) -> QByteArray
 PyQt4.QtCore.QTextDecoder?1(QTextCodec)
 PyQt4.QtCore.QTextDecoder.__init__?1(self, QTextCodec)
+PyQt4.QtCore.QTextDecoder?1(QTextCodec, QTextCodec.ConversionFlags)
+PyQt4.QtCore.QTextDecoder.__init__?1(self, QTextCodec, QTextCodec.ConversionFlags)
 PyQt4.QtCore.QTextDecoder.toUnicode?4(str) -> QString
 PyQt4.QtCore.QTextDecoder.toUnicode?4(QString, str)
 PyQt4.QtCore.QTextDecoder.toUnicode?4(QByteArray) -> QString
@@ -4860,7 +5022,7 @@ PyQt4.QtCore.QThread.InheritPriority?10
 PyQt4.QtCore.QThread?1(QObject parent=None)
 PyQt4.QtCore.QThread.__init__?1(self, QObject parent=None)
 PyQt4.QtCore.QThread.currentThread?4() -> QThread
-PyQt4.QtCore.QThread.currentThreadId?4() -> int
+PyQt4.QtCore.QThread.currentThreadId?4() -> sip.voidptr
 PyQt4.QtCore.QThread.idealThreadCount?4() -> int
 PyQt4.QtCore.QThread.yieldCurrentThread?4()
 PyQt4.QtCore.QThread.isFinished?4() -> bool
@@ -5154,6 +5316,7 @@ PyQt4.QtCore.QVariant.Vector2D?10
 PyQt4.QtCore.QVariant.Vector3D?10
 PyQt4.QtCore.QVariant.Vector4D?10
 PyQt4.QtCore.QVariant.Quaternion?10
+PyQt4.QtCore.QVariant.EasingCurve?10
 PyQt4.QtCore.QVariant.UserType?10
 PyQt4.QtCore.QVariant?1()
 PyQt4.QtCore.QVariant.__init__?1(self)
@@ -5213,6 +5376,7 @@ PyQt4.QtCore.QVariant.nameToType?4(str) -> Type
 PyQt4.QtCore.QVariant.data?4() -> sip.voidptr
 PyQt4.QtCore.QVariant.toFloat?4() -> (float, bool)
 PyQt4.QtCore.QVariant.toReal?4() -> (float, bool)
+PyQt4.QtCore.QVariant.toEasingCurve?4() -> QEasingCurve
 PyQt4.QtCore.QWaitCondition?1()
 PyQt4.QtCore.QWaitCondition.__init__?1(self)
 PyQt4.QtCore.QWaitCondition.wait?4(QMutex, int msecs=ULONG_MAX) -> bool
@@ -5423,7 +5587,6 @@ PyQt4.QtCore.QPyNullVariant.userType?4() -> int
 PyQt4.QtCore.QPyNullVariant.typeName?4() -> str
 PyQt4.QtCore.QPyNullVariant.isNull?4() -> bool
 PyQt4.QtGui.qApp?7
-PyQt4.QtGui.qt_x11_wait_for_window_manager?4(QWidget)
 PyQt4.QtGui.qSwap?4(QBitmap, QBitmap)
 PyQt4.QtGui.qSwap?4(QBrush, QBrush)
 PyQt4.QtGui.qDrawShadeLine?4(QPainter, int, int, int, int, QPalette, bool sunken=True, int lineWidth=1, int midLineWidth=0)
@@ -5656,11 +5819,8 @@ PyQt4.QtGui.QWidget.removeAction?4(QAction)
 PyQt4.QtGui.QWidget.actions?4() -> list-of-QAction
 PyQt4.QtGui.QWidget.setWindowFlags?4(Qt.WindowFlags)
 PyQt4.QtGui.QWidget.overrideWindowFlags?4(Qt.WindowFlags)
-PyQt4.QtGui.QWidget.find?4(int) -> QWidget
+PyQt4.QtGui.QWidget.find?4(sip.voidptr) -> QWidget
 PyQt4.QtGui.QWidget.childAt?4(QPoint) -> QWidget
-PyQt4.QtGui.QWidget.x11Info?4() -> QX11Info
-PyQt4.QtGui.QWidget.x11PictureHandle?4() -> int
-PyQt4.QtGui.QWidget.handle?4() -> int
 PyQt4.QtGui.QWidget.setAttribute?4(Qt.WidgetAttribute, bool on=True)
 PyQt4.QtGui.QWidget.paintEngine?4() -> QPaintEngine
 PyQt4.QtGui.QWidget.ensurePolished?4()
@@ -5693,13 +5853,14 @@ PyQt4.QtGui.QWidget.dragLeaveEvent?4(QDragLeaveEvent)
 PyQt4.QtGui.QWidget.dropEvent?4(QDropEvent)
 PyQt4.QtGui.QWidget.showEvent?4(QShowEvent)
 PyQt4.QtGui.QWidget.hideEvent?4(QHideEvent)
+PyQt4.QtGui.QWidget.winEvent?4(MSG) -> (bool, int)
 PyQt4.QtGui.QWidget.changeEvent?4(QEvent)
 PyQt4.QtGui.QWidget.metric?4(QPaintDevice.PaintDeviceMetric) -> int
 PyQt4.QtGui.QWidget.inputMethodEvent?4(QInputMethodEvent)
 PyQt4.QtGui.QWidget.inputMethodQuery?4(Qt.InputMethodQuery) -> QVariant
 PyQt4.QtGui.QWidget.resetInputContext?4()
 PyQt4.QtGui.QWidget.updateMicroFocus?4()
-PyQt4.QtGui.QWidget.create?4(int window=0, bool initializeWindow=True, bool destroyOldWindow=True)
+PyQt4.QtGui.QWidget.create?4(sip.voidptr window=None, bool initializeWindow=True, bool destroyOldWindow=True)
 PyQt4.QtGui.QWidget.destroy?4(bool destroyWindow=True, bool destroySubWindows=True)
 PyQt4.QtGui.QWidget.focusNextPrevChild?4(bool) -> bool
 PyQt4.QtGui.QWidget.focusNextChild?4() -> bool
@@ -5712,7 +5873,7 @@ PyQt4.QtGui.QWidget.languageChange?4()
 PyQt4.QtGui.QWidget.childAt?4(int, int) -> QWidget
 PyQt4.QtGui.QWidget.windowType?4() -> Qt.WindowType
 PyQt4.QtGui.QWidget.windowFlags?4() -> Qt.WindowFlags
-PyQt4.QtGui.QWidget.winId?4() -> int
+PyQt4.QtGui.QWidget.winId?4() -> sip.voidptr
 PyQt4.QtGui.QWidget.isTopLevel?4() -> bool
 PyQt4.QtGui.QWidget.isWindow?4() -> bool
 PyQt4.QtGui.QWidget.isEnabled?4() -> bool
@@ -5761,7 +5922,7 @@ PyQt4.QtGui.QWidget.render?4(QPainter, QPoint targetOffset=QPoint(), QRegion sou
 PyQt4.QtGui.QWidget.setLocale?4(QLocale)
 PyQt4.QtGui.QWidget.locale?4() -> QLocale
 PyQt4.QtGui.QWidget.unsetLocale?4()
-PyQt4.QtGui.QWidget.effectiveWinId?4() -> int
+PyQt4.QtGui.QWidget.effectiveWinId?4() -> sip.voidptr
 PyQt4.QtGui.QWidget.nativeParentWidget?4() -> QWidget
 PyQt4.QtGui.QWidget.setWindowFilePath?4(QString)
 PyQt4.QtGui.QWidget.windowFilePath?4() -> QString
@@ -6147,10 +6308,12 @@ PyQt4.QtGui.QAbstractPrintDialog.PrintPageRange?10
 PyQt4.QtGui.QAbstractPrintDialog.PrintCollateCopies?10
 PyQt4.QtGui.QAbstractPrintDialog.PrintShowPageSize?10
 PyQt4.QtGui.QAbstractPrintDialog.DontUseSheet?10
+PyQt4.QtGui.QAbstractPrintDialog.PrintCurrentPage?10
 PyQt4.QtGui.QAbstractPrintDialog.PrintRange?10
 PyQt4.QtGui.QAbstractPrintDialog.AllPages?10
 PyQt4.QtGui.QAbstractPrintDialog.Selection?10
 PyQt4.QtGui.QAbstractPrintDialog.PageRange?10
+PyQt4.QtGui.QAbstractPrintDialog.CurrentPage?10
 PyQt4.QtGui.QAbstractPrintDialog?1(QPrinter, QWidget parent=None)
 PyQt4.QtGui.QAbstractPrintDialog.__init__?1(self, QPrinter, QWidget parent=None)
 PyQt4.QtGui.QAbstractPrintDialog.exec_?4() -> int
@@ -6332,7 +6495,7 @@ PyQt4.QtGui.QAbstractTextDocumentLayout.paintDevice?4() -> QPaintDevice
 PyQt4.QtGui.QAbstractTextDocumentLayout.document?4() -> QTextDocument
 PyQt4.QtGui.QAbstractTextDocumentLayout.registerHandler?4(int, QObject)
 PyQt4.QtGui.QAbstractTextDocumentLayout.handlerForObject?4(int) -> QTextObjectInterface
-PyQt4.QtGui.QAbstractTextDocumentLayout.update?4(QRectF rect=QRectF(0,0,1e+09,1e+09))
+PyQt4.QtGui.QAbstractTextDocumentLayout.update?4(QRectF rect=QRectF(0,0,1e+009,1e+009))
 PyQt4.QtGui.QAbstractTextDocumentLayout.documentSizeChanged?4(QSizeF)
 PyQt4.QtGui.QAbstractTextDocumentLayout.pageCountChanged?4(int)
 PyQt4.QtGui.QAbstractTextDocumentLayout.updateBlock?4(QTextBlock)
@@ -6480,10 +6643,6 @@ PyQt4.QtGui.QApplication?1(list-of-str, bool)
 PyQt4.QtGui.QApplication.__init__?1(self, list-of-str, bool)
 PyQt4.QtGui.QApplication?1(list-of-str, QApplication.Type)
 PyQt4.QtGui.QApplication.__init__?1(self, list-of-str, QApplication.Type)
-PyQt4.QtGui.QApplication?1(Display, int visual=0, int colormap=0)
-PyQt4.QtGui.QApplication.__init__?1(self, Display, int visual=0, int colormap=0)
-PyQt4.QtGui.QApplication?1(Display, list-of-str, int visual=0, int cmap=0)
-PyQt4.QtGui.QApplication.__init__?1(self, Display, list-of-str, int visual=0, int cmap=0)
 PyQt4.QtGui.QApplication.type?4() -> QApplication.Type
 PyQt4.QtGui.QApplication.style?4() -> QStyle
 PyQt4.QtGui.QApplication.setStyle?4(QStyle)
@@ -6541,8 +6700,6 @@ PyQt4.QtGui.QApplication.isRightToLeft?4() -> bool
 PyQt4.QtGui.QApplication.isLeftToRight?4() -> bool
 PyQt4.QtGui.QApplication.isEffectEnabled?4(Qt.UIEffect) -> bool
 PyQt4.QtGui.QApplication.setEffectEnabled?4(Qt.UIEffect, bool enabled=True)
-PyQt4.QtGui.QApplication.x11EventFilter?4(sip.voidptr) -> bool
-PyQt4.QtGui.QApplication.x11ProcessEvent?4(sip.voidptr) -> int
 PyQt4.QtGui.QApplication.isSessionRestored?4() -> bool
 PyQt4.QtGui.QApplication.sessionId?4() -> QString
 PyQt4.QtGui.QApplication.sessionKey?4() -> QString
@@ -6573,9 +6730,9 @@ PyQt4.QtGui.QApplication.alert?4(QWidget, int msecs=0)
 PyQt4.QtGui.QApplication.setGraphicsSystem?4(QString)
 PyQt4.QtGui.QApplication.setAutoSipEnabled?4(bool)
 PyQt4.QtGui.QApplication.autoSipEnabled?4() -> bool
-PyQt4.QtGui.QPixmap.ShareMode?10
-PyQt4.QtGui.QPixmap.ImplicitlyShared?10
-PyQt4.QtGui.QPixmap.ExplicitlyShared?10
+PyQt4.QtGui.QPixmap.HBitmapFormat?10
+PyQt4.QtGui.QPixmap.NoAlpha?10
+PyQt4.QtGui.QPixmap.PremultipliedAlpha?10
 PyQt4.QtGui.QPixmap?1()
 PyQt4.QtGui.QPixmap.__init__?1(self)
 PyQt4.QtGui.QPixmap?1(int, int)
@@ -6610,7 +6767,7 @@ PyQt4.QtGui.QPixmap.hasAlphaChannel?4() -> bool
 PyQt4.QtGui.QPixmap.createHeuristicMask?4(bool clipTight=True) -> QBitmap
 PyQt4.QtGui.QPixmap.createMaskFromColor?4(QColor, Qt.MaskMode) -> QBitmap
 PyQt4.QtGui.QPixmap.createMaskFromColor?4(QColor) -> QBitmap
-PyQt4.QtGui.QPixmap.grabWindow?4(int, int x=0, int y=0, int width=-1, int height=-1) -> QPixmap
+PyQt4.QtGui.QPixmap.grabWindow?4(sip.voidptr, int x=0, int y=0, int width=-1, int height=-1) -> QPixmap
 PyQt4.QtGui.QPixmap.grabWidget?4(QWidget, QRect) -> QPixmap
 PyQt4.QtGui.QPixmap.grabWidget?4(QWidget, int x=0, int y=0, int width=-1, int height=-1) -> QPixmap
 PyQt4.QtGui.QPixmap.scaled?4(int, int, Qt.AspectRatioMode aspectRatioMode=Qt.IgnoreAspectRatio, Qt.TransformationMode transformMode=Qt.FastTransformation) -> QPixmap
@@ -6621,25 +6778,27 @@ PyQt4.QtGui.QPixmap.transformed?4(QMatrix, Qt.TransformationMode mode=Qt.FastTra
 PyQt4.QtGui.QPixmap.trueMatrix?4(QMatrix, int, int) -> QMatrix
 PyQt4.QtGui.QPixmap.toImage?4() -> QImage
 PyQt4.QtGui.QPixmap.fromImage?4(QImage, Qt.ImageConversionFlags flags=Qt.AutoColor) -> QPixmap
+PyQt4.QtGui.QPixmap.fromImageReader?4(QImageReader, Qt.ImageConversionFlags flags=Qt.AutoColor) -> QPixmap
+PyQt4.QtGui.QPixmap.convertFromImage?4(QImage, Qt.ImageConversionFlags flags=Qt.AutoColor) -> bool
 PyQt4.QtGui.QPixmap.load?4(QString, str format=None, Qt.ImageConversionFlags flags=Qt.AutoColor) -> bool
 PyQt4.QtGui.QPixmap.loadFromData?4(str, str format=None, Qt.ImageConversionFlags flags=Qt.AutoColor) -> bool
 PyQt4.QtGui.QPixmap.loadFromData?4(QByteArray, str format=None, Qt.ImageConversionFlags flags=Qt.AutoColor) -> bool
 PyQt4.QtGui.QPixmap.save?4(QString, str format=None, int quality=-1) -> bool
 PyQt4.QtGui.QPixmap.save?4(QIODevice, str format=None, int quality=-1) -> bool
+PyQt4.QtGui.QPixmap.toWinHBITMAP?4(QPixmap.HBitmapFormat format=QPixmap.NoAlpha) -> sip.voidptr
+PyQt4.QtGui.QPixmap.fromWinHBITMAP?4(sip.voidptr, QPixmap.HBitmapFormat format=QPixmap.NoAlpha) -> QPixmap
+PyQt4.QtGui.QPixmap.toWinHICON?4() -> sip.voidptr
+PyQt4.QtGui.QPixmap.fromWinHICON?4(sip.voidptr) -> QPixmap
 PyQt4.QtGui.QPixmap.copy?4(QRect rect=QRect()) -> QPixmap
 PyQt4.QtGui.QPixmap.serialNumber?4() -> int
 PyQt4.QtGui.QPixmap.detach?4()
-PyQt4.QtGui.QPixmap.x11PictureHandle?4() -> int
 PyQt4.QtGui.QPixmap.isQBitmap?4() -> bool
-PyQt4.QtGui.QPixmap.x11Info?4() -> QX11Info
-PyQt4.QtGui.QPixmap.handle?4() -> int
 PyQt4.QtGui.QPixmap.paintEngine?4() -> QPaintEngine
 PyQt4.QtGui.QPixmap.metric?4(QPaintDevice.PaintDeviceMetric) -> int
 PyQt4.QtGui.QPixmap.copy?4(int, int, int, int) -> QPixmap
 PyQt4.QtGui.QPixmap.transformed?4(QTransform, Qt.TransformationMode mode=Qt.FastTransformation) -> QPixmap
 PyQt4.QtGui.QPixmap.trueMatrix?4(QTransform, int, int) -> QTransform
 PyQt4.QtGui.QPixmap.cacheKey?4() -> int
-PyQt4.QtGui.QPixmap.fromX11Pixmap?4(int, QPixmap.ShareMode mode=QPixmap.ImplicitlyShared) -> QPixmap
 PyQt4.QtGui.QPixmap.scroll?4(int, int, QRect) -> QRegion
 PyQt4.QtGui.QPixmap.scroll?4(int, int, int, int, int, int) -> QRegion
 PyQt4.QtGui.QBitmap?1()
@@ -6875,8 +7034,6 @@ PyQt4.QtGui.QColor.fromCmykF?4(float, float, float, float, float alpha=1) -> QCo
 PyQt4.QtGui.QColor.light?4(int factor=150) -> QColor
 PyQt4.QtGui.QColor.dark?4(int factor=200) -> QColor
 PyQt4.QtGui.QColor.isValid?4() -> bool
-PyQt4.QtGui.QColor.allowX11ColorNames?4() -> bool
-PyQt4.QtGui.QColor.setAllowX11ColorNames?4(bool)
 PyQt4.QtGui.QColor.lighter?4(int factor=150) -> QColor
 PyQt4.QtGui.QColor.darker?4(int factor=200) -> QColor
 PyQt4.QtGui.QColor.hsvHue?4() -> int
@@ -6896,6 +7053,7 @@ PyQt4.QtGui.QColor.setHslF?4(float, float, float, float alpha=1)
 PyQt4.QtGui.QColor.toHsl?4() -> QColor
 PyQt4.QtGui.QColor.fromHsl?4(int, int, int, int alpha=255) -> QColor
 PyQt4.QtGui.QColor.fromHslF?4(float, float, float, float alpha=1) -> QColor
+PyQt4.QtGui.QColor.isValidColor?4(QString) -> bool
 PyQt4.QtGui.QPushButton?1(QWidget parent=None)
 PyQt4.QtGui.QPushButton.__init__?1(self, QWidget parent=None)
 PyQt4.QtGui.QPushButton?1(QString, QWidget parent=None)
@@ -7210,7 +7368,7 @@ PyQt4.QtGui.QColorDialog?1(QColor, QWidget parent=None)
 PyQt4.QtGui.QColorDialog.__init__?1(self, QColor, QWidget parent=None)
 PyQt4.QtGui.QColorDialog.getColor?4(QColor initial=Qt.white, QWidget parent=None) -> QColor
 PyQt4.QtGui.QColorDialog.getColor?4(QColor, QWidget, QString, QColorDialog.ColorDialogOptions options=0) -> QColor
-PyQt4.QtGui.QColorDialog.getRgba?4(int initial=4294967295, QWidget parent=None) -> (int, bool)
+PyQt4.QtGui.QColorDialog.getRgba?4(int initial=2147483647, QWidget parent=None) -> (int, bool)
 PyQt4.QtGui.QColorDialog.customCount?4() -> int
 PyQt4.QtGui.QColorDialog.customColor?4(int) -> int
 PyQt4.QtGui.QColorDialog.setCustomColor?4(int, int)
@@ -8876,6 +9034,7 @@ PyQt4.QtGui.QFileSystemModel.fileInfo?4(QModelIndex) -> QFileInfo
 PyQt4.QtGui.QFileSystemModel.remove?4(QModelIndex) -> bool
 PyQt4.QtGui.QFileSystemModel.fileRenamed?4(QString, QString, QString)
 PyQt4.QtGui.QFileSystemModel.rootPathChanged?4(QString)
+PyQt4.QtGui.QFileSystemModel.directoryLoaded?4(QString)
 PyQt4.QtGui.QFileSystemModel.event?4(QEvent) -> bool
 PyQt4.QtGui.QFileSystemModel.timerEvent?4(QTimerEvent)
 PyQt4.QtGui.QFocusFrame?1(QWidget parent=None)
@@ -8927,6 +9086,7 @@ PyQt4.QtGui.QFont.PreferAntialias?10
 PyQt4.QtGui.QFont.NoAntialias?10
 PyQt4.QtGui.QFont.OpenGLCompatible?10
 PyQt4.QtGui.QFont.NoFontMerging?10
+PyQt4.QtGui.QFont.ForceIntegerMetrics?10
 PyQt4.QtGui.QFont.StyleHint?10
 PyQt4.QtGui.QFont.Helvetica?10
 PyQt4.QtGui.QFont.SansSerif?10
@@ -8938,6 +9098,9 @@ PyQt4.QtGui.QFont.OldEnglish?10
 PyQt4.QtGui.QFont.Decorative?10
 PyQt4.QtGui.QFont.System?10
 PyQt4.QtGui.QFont.AnyStyle?10
+PyQt4.QtGui.QFont.Cursive?10
+PyQt4.QtGui.QFont.Monospace?10
+PyQt4.QtGui.QFont.Fantasy?10
 PyQt4.QtGui.QFont?1()
 PyQt4.QtGui.QFont.__init__?1(self)
 PyQt4.QtGui.QFont?1(QString, int pointSize=-1, int weight=-1, bool italic=False)
@@ -8980,7 +9143,7 @@ PyQt4.QtGui.QFont.rawMode?4() -> bool
 PyQt4.QtGui.QFont.setRawMode?4(bool)
 PyQt4.QtGui.QFont.exactMatch?4() -> bool
 PyQt4.QtGui.QFont.isCopyOf?4(QFont) -> bool
-PyQt4.QtGui.QFont.handle?4() -> int
+PyQt4.QtGui.QFont.handle?4() -> sip.voidptr
 PyQt4.QtGui.QFont.setRawName?4(QString)
 PyQt4.QtGui.QFont.rawName?4() -> QString
 PyQt4.QtGui.QFont.key?4() -> QString
@@ -9449,6 +9612,8 @@ PyQt4.QtGui.QTapAndHoldGesture?1(QObject parent=None)
 PyQt4.QtGui.QTapAndHoldGesture.__init__?1(self, QObject parent=None)
 PyQt4.QtGui.QTapAndHoldGesture.position?4() -> QPointF
 PyQt4.QtGui.QTapAndHoldGesture.setPosition?4(QPointF)
+PyQt4.QtGui.QTapAndHoldGesture.setTimeout?4(int)
+PyQt4.QtGui.QTapAndHoldGesture.timeout?4() -> int
 PyQt4.QtGui.QGestureRecognizer.ResultFlag?10
 PyQt4.QtGui.QGestureRecognizer.Ignore?10
 PyQt4.QtGui.QGestureRecognizer.MayBeGesture?10
@@ -9730,6 +9895,12 @@ PyQt4.QtGui.QGraphicsItem.ItemZValueHasChanged?10
 PyQt4.QtGui.QGraphicsItem.ItemOpacityChange?10
 PyQt4.QtGui.QGraphicsItem.ItemOpacityHasChanged?10
 PyQt4.QtGui.QGraphicsItem.ItemScenePositionHasChanged?10
+PyQt4.QtGui.QGraphicsItem.ItemRotationChange?10
+PyQt4.QtGui.QGraphicsItem.ItemRotationHasChanged?10
+PyQt4.QtGui.QGraphicsItem.ItemScaleChange?10
+PyQt4.QtGui.QGraphicsItem.ItemScaleHasChanged?10
+PyQt4.QtGui.QGraphicsItem.ItemTransformOriginPointChange?10
+PyQt4.QtGui.QGraphicsItem.ItemTransformOriginPointHasChanged?10
 PyQt4.QtGui.QGraphicsItem.CacheMode?10
 PyQt4.QtGui.QGraphicsItem.NoCache?10
 PyQt4.QtGui.QGraphicsItem.ItemCoordinateCache?10
@@ -9947,6 +10118,7 @@ PyQt4.QtGui.QGraphicsItem.setTransformOriginPoint?4(float, float)
 PyQt4.QtGui.QGraphicsItem.stackBefore?4(QGraphicsItem)
 PyQt4.QtGui.QGraphicsItem.inputMethodHints?4() -> Qt.InputMethodHints
 PyQt4.QtGui.QGraphicsItem.setInputMethodHints?4(Qt.InputMethodHints)
+PyQt4.QtGui.QGraphicsItem.updateMicroFocus?4()
 PyQt4.QtGui.QGraphicsItem.GraphicsItemFlags?1(QGraphicsItem.GraphicsItemFlags)
 PyQt4.QtGui.QGraphicsItem.GraphicsItemFlags.__init__?1(self, QGraphicsItem.GraphicsItemFlags)
 PyQt4.QtGui.QGraphicsItem.GraphicsItemFlags?1(int)
@@ -10104,6 +10276,7 @@ PyQt4.QtGui.QGraphicsObject.yChanged?4()
 PyQt4.QtGui.QGraphicsObject.zChanged?4()
 PyQt4.QtGui.QGraphicsObject.rotationChanged?4()
 PyQt4.QtGui.QGraphicsObject.scaleChanged?4()
+PyQt4.QtGui.QGraphicsObject.updateMicroFocus?4()
 PyQt4.QtGui.QGraphicsTextItem?1(QGraphicsItem parent=None, QGraphicsScene scene=None)
 PyQt4.QtGui.QGraphicsTextItem.__init__?1(self, QGraphicsItem parent=None, QGraphicsScene scene=None)
 PyQt4.QtGui.QGraphicsTextItem?1(QString, QGraphicsItem parent=None, QGraphicsScene scene=None)
@@ -10291,6 +10464,9 @@ PyQt4.QtGui.QGraphicsWidget.grabMouseEvent?4(QEvent)
 PyQt4.QtGui.QGraphicsWidget.ungrabMouseEvent?4(QEvent)
 PyQt4.QtGui.QGraphicsWidget.grabKeyboardEvent?4(QEvent)
 PyQt4.QtGui.QGraphicsWidget.ungrabKeyboardEvent?4(QEvent)
+PyQt4.QtGui.QGraphicsWidget.autoFillBackground?4() -> bool
+PyQt4.QtGui.QGraphicsWidget.setAutoFillBackground?4(bool)
+PyQt4.QtGui.QGraphicsWidget.geometryChanged?4()
 PyQt4.QtGui.QGraphicsProxyWidget?1(QGraphicsItem parent=None, Qt.WindowFlags flags=0)
 PyQt4.QtGui.QGraphicsProxyWidget.__init__?1(self, QGraphicsItem parent=None, Qt.WindowFlags flags=0)
 PyQt4.QtGui.QGraphicsProxyWidget.setWidget?4(QWidget)
@@ -10534,6 +10710,9 @@ PyQt4.QtGui.QGraphicsScale.setZScale?4(float)
 PyQt4.QtGui.QGraphicsScale.applyTo?4(QMatrix4x4)
 PyQt4.QtGui.QGraphicsScale.originChanged?4()
 PyQt4.QtGui.QGraphicsScale.scaleChanged?4()
+PyQt4.QtGui.QGraphicsScale.xScaleChanged?4()
+PyQt4.QtGui.QGraphicsScale.yScaleChanged?4()
+PyQt4.QtGui.QGraphicsScale.zScaleChanged?4()
 PyQt4.QtGui.QGraphicsRotation?1(QObject parent=None)
 PyQt4.QtGui.QGraphicsRotation.__init__?1(self, QObject parent=None)
 PyQt4.QtGui.QGraphicsRotation.origin?4() -> QVector3D
@@ -10913,6 +11092,7 @@ PyQt4.QtGui.QIcon.themeSearchPaths?4() -> QStringList
 PyQt4.QtGui.QIcon.setThemeSearchPaths?4(QStringList)
 PyQt4.QtGui.QIcon.themeName?4() -> QString
 PyQt4.QtGui.QIcon.setThemeName?4(QString)
+PyQt4.QtGui.QIcon.name?4() -> QString
 PyQt4.QtGui.QIconEngine?1()
 PyQt4.QtGui.QIconEngine.__init__?1(self)
 PyQt4.QtGui.QIconEngine?1(QIconEngine)
@@ -10924,6 +11104,7 @@ PyQt4.QtGui.QIconEngine.addPixmap?4(QPixmap, QIcon.Mode, QIcon.State)
 PyQt4.QtGui.QIconEngine.addFile?4(QString, QSize, QIcon.Mode, QIcon.State)
 PyQt4.QtGui.QIconEngineV2.IconEngineHook?10
 PyQt4.QtGui.QIconEngineV2.AvailableSizesHook?10
+PyQt4.QtGui.QIconEngineV2.IconNameHook?10
 PyQt4.QtGui.QIconEngineV2?1()
 PyQt4.QtGui.QIconEngineV2.__init__?1(self)
 PyQt4.QtGui.QIconEngineV2?1(QIconEngineV2)
@@ -10933,6 +11114,7 @@ PyQt4.QtGui.QIconEngineV2.clone?4() -> QIconEngineV2
 PyQt4.QtGui.QIconEngineV2.read?4(QDataStream) -> bool
 PyQt4.QtGui.QIconEngineV2.write?4(QDataStream) -> bool
 PyQt4.QtGui.QIconEngineV2.availableSizes?4(QIcon.Mode mode=QIcon.Normal, QIcon.State state=QIcon.Off) -> list-of-QSize
+PyQt4.QtGui.QIconEngineV2.iconName?4() -> QString
 PyQt4.QtGui.QIconEngineV2.AvailableSizesArgument.mode?7
 PyQt4.QtGui.QIconEngineV2.AvailableSizesArgument.sizes?7
 PyQt4.QtGui.QIconEngineV2.AvailableSizesArgument.state?7
@@ -11058,6 +11240,7 @@ PyQt4.QtGui.QImage.cacheKey?4() -> int
 PyQt4.QtGui.QImage.colorCount?4() -> int
 PyQt4.QtGui.QImage.setColorCount?4(int)
 PyQt4.QtGui.QImage.byteCount?4() -> int
+PyQt4.QtGui.QImage.bitPlaneCount?4() -> int
 PyQt4.QtGui.QImageIOHandler.ImageOption?10
 PyQt4.QtGui.QImageIOHandler.Size?10
 PyQt4.QtGui.QImageIOHandler.ClipRect?10
@@ -11335,6 +11518,7 @@ PyQt4.QtGui.QItemSelectionRange.intersect?4(QItemSelectionRange) -> QItemSelecti
 PyQt4.QtGui.QItemSelectionRange.isValid?4() -> bool
 PyQt4.QtGui.QItemSelectionRange.indexes?4() -> list-of-QModelIndex
 PyQt4.QtGui.QItemSelectionRange.intersected?4(QItemSelectionRange) -> QItemSelectionRange
+PyQt4.QtGui.QItemSelectionRange.isEmpty?4() -> bool
 PyQt4.QtGui.QItemSelectionModel.SelectionFlag?10
 PyQt4.QtGui.QItemSelectionModel.NoUpdate?10
 PyQt4.QtGui.QItemSelectionModel.Clear?10
@@ -11498,6 +11682,8 @@ PyQt4.QtGui.QKeySequence?1()
 PyQt4.QtGui.QKeySequence.__init__?1(self)
 PyQt4.QtGui.QKeySequence?1(QKeySequence)
 PyQt4.QtGui.QKeySequence.__init__?1(self, QKeySequence)
+PyQt4.QtGui.QKeySequence?1(QString, QKeySequence.SequenceFormat)
+PyQt4.QtGui.QKeySequence.__init__?1(self, QString, QKeySequence.SequenceFormat)
 PyQt4.QtGui.QKeySequence?1(int, int key2=0, int key3=0, int key4=0)
 PyQt4.QtGui.QKeySequence.__init__?1(self, int, int key2=0, int key3=0, int key4=0)
 PyQt4.QtGui.QKeySequence?1(QVariant)
@@ -11559,6 +11745,10 @@ PyQt4.QtGui.QLabel.contextMenuEvent?4(QContextMenuEvent)
 PyQt4.QtGui.QLabel.focusInEvent?4(QFocusEvent)
 PyQt4.QtGui.QLabel.focusOutEvent?4(QFocusEvent)
 PyQt4.QtGui.QLabel.focusNextPrevChild?4(bool) -> bool
+PyQt4.QtGui.QLabel.setSelection?4(int, int)
+PyQt4.QtGui.QLabel.hasSelectedText?4() -> bool
+PyQt4.QtGui.QLabel.selectedText?4() -> QString
+PyQt4.QtGui.QLabel.selectionStart?4() -> int
 PyQt4.QtGui.QSpacerItem?1(int, int, QSizePolicy.Policy hPolicy=QSizePolicy.Minimum, QSizePolicy.Policy vPolicy=QSizePolicy.Minimum)
 PyQt4.QtGui.QSpacerItem.__init__?1(self, int, int, QSizePolicy.Policy hPolicy=QSizePolicy.Minimum, QSizePolicy.Policy vPolicy=QSizePolicy.Minimum)
 PyQt4.QtGui.QSpacerItem?1(QSpacerItem)
@@ -11713,6 +11903,8 @@ PyQt4.QtGui.QLineEdit.setTextMargins?4(int, int, int, int)
 PyQt4.QtGui.QLineEdit.getTextMargins?4() -> (int, int, int, int)
 PyQt4.QtGui.QLineEdit.setTextMargins?4(QMargins)
 PyQt4.QtGui.QLineEdit.textMargins?4() -> QMargins
+PyQt4.QtGui.QLineEdit.placeholderText?4() -> QString
+PyQt4.QtGui.QLineEdit.setPlaceholderText?4(QString)
 PyQt4.QtGui.QListView.ViewMode?10
 PyQt4.QtGui.QListView.ListMode?10
 PyQt4.QtGui.QListView.IconMode?10
@@ -12465,12 +12657,15 @@ PyQt4.QtGui.QPageSetupDialog.options?4() -> QPageSetupDialog.PageSetupDialogOpti
 PyQt4.QtGui.QPageSetupDialog.open?4()
 PyQt4.QtGui.QPageSetupDialog.open?4(QObject, SLOT())
 PyQt4.QtGui.QPageSetupDialog.open?4(callable)
+PyQt4.QtGui.QPageSetupDialog.setVisible?4(bool)
 PyQt4.QtGui.QPageSetupDialog.PageSetupDialogOptions?1(QPageSetupDialog.PageSetupDialogOptions)
 PyQt4.QtGui.QPageSetupDialog.PageSetupDialogOptions.__init__?1(self, QPageSetupDialog.PageSetupDialogOptions)
 PyQt4.QtGui.QPageSetupDialog.PageSetupDialogOptions?1(int)
 PyQt4.QtGui.QPageSetupDialog.PageSetupDialogOptions.__init__?1(self, int)
 PyQt4.QtGui.QPageSetupDialog.PageSetupDialogOptions?1()
 PyQt4.QtGui.QPageSetupDialog.PageSetupDialogOptions.__init__?1(self)
+PyQt4.QtGui.QPainter.PixmapFragmentHint?10
+PyQt4.QtGui.QPainter.OpaqueHint?10
 PyQt4.QtGui.QPainter.CompositionMode?10
 PyQt4.QtGui.QPainter.CompositionMode_SourceOver?10
 PyQt4.QtGui.QPainter.CompositionMode_DestinationOver?10
@@ -12712,12 +12907,37 @@ PyQt4.QtGui.QPainter.fillRect?4(QRect, Qt.BrushStyle)
 PyQt4.QtGui.QPainter.fillRect?4(QRectF, Qt.BrushStyle)
 PyQt4.QtGui.QPainter.beginNativePainting?4()
 PyQt4.QtGui.QPainter.endNativePainting?4()
+PyQt4.QtGui.QPainter.drawPixmapFragments?4(list, QPixmap, QPainter.PixmapFragmentHints hints=0)
+PyQt4.QtGui.QPainter.drawStaticText?4(QPointF, QStaticText)
+PyQt4.QtGui.QPainter.drawStaticText?4(QPoint, QStaticText)
+PyQt4.QtGui.QPainter.drawStaticText?4(int, int, QStaticText)
 PyQt4.QtGui.QPainter.RenderHints?1(QPainter.RenderHints)
 PyQt4.QtGui.QPainter.RenderHints.__init__?1(self, QPainter.RenderHints)
 PyQt4.QtGui.QPainter.RenderHints?1(int)
 PyQt4.QtGui.QPainter.RenderHints.__init__?1(self, int)
 PyQt4.QtGui.QPainter.RenderHints?1()
 PyQt4.QtGui.QPainter.RenderHints.__init__?1(self)
+PyQt4.QtGui.QPainter.PixmapFragment.height?7
+PyQt4.QtGui.QPainter.PixmapFragment.opacity?7
+PyQt4.QtGui.QPainter.PixmapFragment.rotation?7
+PyQt4.QtGui.QPainter.PixmapFragment.scaleX?7
+PyQt4.QtGui.QPainter.PixmapFragment.scaleY?7
+PyQt4.QtGui.QPainter.PixmapFragment.sourceLeft?7
+PyQt4.QtGui.QPainter.PixmapFragment.sourceTop?7
+PyQt4.QtGui.QPainter.PixmapFragment.width?7
+PyQt4.QtGui.QPainter.PixmapFragment.x?7
+PyQt4.QtGui.QPainter.PixmapFragment.y?7
+PyQt4.QtGui.QPainter.PixmapFragment?1()
+PyQt4.QtGui.QPainter.PixmapFragment.__init__?1(self)
+PyQt4.QtGui.QPainter.PixmapFragment?1(QPainter.PixmapFragment)
+PyQt4.QtGui.QPainter.PixmapFragment.__init__?1(self, QPainter.PixmapFragment)
+PyQt4.QtGui.QPainter.PixmapFragment.create?4(QPointF, QRectF, float scaleX=1, float scaleY=1, float rotation=0, float opacity=1) -> QPainter.PixmapFragment
+PyQt4.QtGui.QPainter.PixmapFragmentHints?1(QPainter.PixmapFragmentHints)
+PyQt4.QtGui.QPainter.PixmapFragmentHints.__init__?1(self, QPainter.PixmapFragmentHints)
+PyQt4.QtGui.QPainter.PixmapFragmentHints?1(int)
+PyQt4.QtGui.QPainter.PixmapFragmentHints.__init__?1(self, int)
+PyQt4.QtGui.QPainter.PixmapFragmentHints?1()
+PyQt4.QtGui.QPainter.PixmapFragmentHints.__init__?1(self)
 PyQt4.QtGui.QTextItem.RenderFlag?10
 PyQt4.QtGui.QTextItem.RightToLeft?10
 PyQt4.QtGui.QTextItem.Overline?10
@@ -12960,11 +13180,11 @@ PyQt4.QtGui.QPainterPathStroker.miterLimit?4() -> float
 PyQt4.QtGui.QPainterPathStroker.setCurveThreshold?4(float)
 PyQt4.QtGui.QPainterPathStroker.curveThreshold?4() -> float
 PyQt4.QtGui.QPainterPathStroker.setDashPattern?4(Qt.PenStyle)
-PyQt4.QtGui.QPainterPathStroker.setDashPattern?4(list-of-float)
-PyQt4.QtGui.QPainterPathStroker.dashPattern?4() -> list-of-float
 PyQt4.QtGui.QPainterPathStroker.createStroke?4(QPainterPath) -> QPainterPath
 PyQt4.QtGui.QPainterPathStroker.setDashOffset?4(float)
 PyQt4.QtGui.QPainterPathStroker.dashOffset?4() -> float
+PyQt4.QtGui.QPainterPathStroker.setDashPattern?4(list-of-float)
+PyQt4.QtGui.QPainterPathStroker.dashPattern?4() -> list-of-float
 PyQt4.QtGui.QPalette.ColorRole?10
 PyQt4.QtGui.QPalette.WindowText?10
 PyQt4.QtGui.QPalette.Foreground?10
@@ -13271,6 +13491,7 @@ PyQt4.QtGui.QPlainTextEdit.contentOffset?4() -> QPointF
 PyQt4.QtGui.QPlainTextEdit.blockBoundingRect?4(QTextBlock) -> QRectF
 PyQt4.QtGui.QPlainTextEdit.blockBoundingGeometry?4(QTextBlock) -> QRectF
 PyQt4.QtGui.QPlainTextEdit.getPaintContext?4() -> QAbstractTextDocumentLayout.PaintContext
+PyQt4.QtGui.QPlainTextEdit.anchorAt?4(QPoint) -> QString
 PyQt4.QtGui.QPlainTextDocumentLayout?1(QTextDocument)
 PyQt4.QtGui.QPlainTextDocumentLayout.__init__?1(self, QTextDocument)
 PyQt4.QtGui.QPlainTextDocumentLayout.draw?4(QPainter, QAbstractTextDocumentLayout.PaintContext)
@@ -13398,6 +13619,7 @@ PyQt4.QtGui.QPrinter.PrintRange?10
 PyQt4.QtGui.QPrinter.AllPages?10
 PyQt4.QtGui.QPrinter.Selection?10
 PyQt4.QtGui.QPrinter.PageRange?10
+PyQt4.QtGui.QPrinter.CurrentPage?10
 PyQt4.QtGui.QPrinter.OutputFormat?10
 PyQt4.QtGui.QPrinter.NativeFormat?10
 PyQt4.QtGui.QPrinter.PdfFormat?10
@@ -13501,10 +13723,10 @@ PyQt4.QtGui.QPrinter.numCopies?4() -> int
 PyQt4.QtGui.QPrinter.setPaperSource?4(QPrinter.PaperSource)
 PyQt4.QtGui.QPrinter.paperSource?4() -> QPrinter.PaperSource
 PyQt4.QtGui.QPrinter.supportedResolutions?4() -> list-of-int
+PyQt4.QtGui.QPrinter.setWinPageSize?4(int)
+PyQt4.QtGui.QPrinter.winPageSize?4() -> int
 PyQt4.QtGui.QPrinter.paperRect?4() -> QRect
 PyQt4.QtGui.QPrinter.pageRect?4() -> QRect
-PyQt4.QtGui.QPrinter.printerSelectionOption?4() -> QString
-PyQt4.QtGui.QPrinter.setPrinterSelectionOption?4(QString)
 PyQt4.QtGui.QPrinter.newPage?4() -> bool
 PyQt4.QtGui.QPrinter.abort?4() -> bool
 PyQt4.QtGui.QPrinter.printerState?4() -> QPrinter.PrinterState
@@ -13535,12 +13757,14 @@ PyQt4.QtGui.QPrinter.getPageMargins?4(QPrinter.Unit) -> (float, float, float, fl
 PyQt4.QtGui.QPrinter.actualNumCopies?4() -> int
 PyQt4.QtGui.QPrinter.metric?4(QPaintDevice.PaintDeviceMetric) -> int
 PyQt4.QtGui.QPrinter.setEngines?4(QPrintEngine, QPaintEngine)
+PyQt4.QtGui.QPrinter.setCopyCount?4(int)
+PyQt4.QtGui.QPrinter.copyCount?4() -> int
+PyQt4.QtGui.QPrinter.supportsMultipleCopies?4() -> bool
 PyQt4.QtGui.QPrintDialog?1(QPrinter, QWidget parent=None)
 PyQt4.QtGui.QPrintDialog.__init__?1(self, QPrinter, QWidget parent=None)
 PyQt4.QtGui.QPrintDialog?1(QWidget parent=None)
 PyQt4.QtGui.QPrintDialog.__init__?1(self, QWidget parent=None)
 PyQt4.QtGui.QPrintDialog.exec_?4() -> int
-PyQt4.QtGui.QPrintDialog.accept?4()
 PyQt4.QtGui.QPrintDialog.done?4(int)
 PyQt4.QtGui.QPrintDialog.setOption?4(QAbstractPrintDialog.PrintDialogOption, bool on=True)
 PyQt4.QtGui.QPrintDialog.testOption?4(QAbstractPrintDialog.PrintDialogOption) -> bool
@@ -13579,6 +13803,8 @@ PyQt4.QtGui.QPrintEngine.PPK_PaperSources?10
 PyQt4.QtGui.QPrintEngine.PPK_CustomPaperSize?10
 PyQt4.QtGui.QPrintEngine.PPK_PageMargins?10
 PyQt4.QtGui.QPrintEngine.PPK_PaperSize?10
+PyQt4.QtGui.QPrintEngine.PPK_CopyCount?10
+PyQt4.QtGui.QPrintEngine.PPK_SupportsMultipleCopies?10
 PyQt4.QtGui.QPrintEngine.PPK_CustomBase?10
 PyQt4.QtGui.QPrintEngine?1()
 PyQt4.QtGui.QPrintEngine.__init__?1(self)
@@ -13723,26 +13949,26 @@ PyQt4.QtGui.QProxyModel?1(QObject parent=None)
 PyQt4.QtGui.QProxyModel.__init__?1(self, QObject parent=None)
 PyQt4.QtGui.QProxyModel.setModel?4(QAbstractItemModel)
 PyQt4.QtGui.QProxyModel.model?4() -> QAbstractItemModel
-PyQt4.QtGui.QProxyModel.index?4(int, int, QModelIndex) -> QModelIndex
+PyQt4.QtGui.QProxyModel.index?4(int, int, QModelIndex parent=QModelIndex()) -> QModelIndex
 PyQt4.QtGui.QProxyModel.parent?4(QModelIndex) -> QModelIndex
 PyQt4.QtGui.QProxyModel.parent?4() -> QObject
-PyQt4.QtGui.QProxyModel.rowCount?4(QModelIndex) -> int
-PyQt4.QtGui.QProxyModel.columnCount?4(QModelIndex) -> int
-PyQt4.QtGui.QProxyModel.hasChildren?4(QModelIndex) -> bool
-PyQt4.QtGui.QProxyModel.data?4(QModelIndex, int) -> QVariant
-PyQt4.QtGui.QProxyModel.setData?4(QModelIndex, QVariant, int) -> bool
-PyQt4.QtGui.QProxyModel.headerData?4(int, Qt.Orientation, int) -> QVariant
-PyQt4.QtGui.QProxyModel.setHeaderData?4(int, Qt.Orientation, QVariant, int) -> bool
+PyQt4.QtGui.QProxyModel.rowCount?4(QModelIndex parent=QModelIndex()) -> int
+PyQt4.QtGui.QProxyModel.columnCount?4(QModelIndex parent=QModelIndex()) -> int
+PyQt4.QtGui.QProxyModel.hasChildren?4(QModelIndex parent=QModelIndex()) -> bool
+PyQt4.QtGui.QProxyModel.data?4(QModelIndex, int role=Qt.DisplayRole) -> QVariant
+PyQt4.QtGui.QProxyModel.setData?4(QModelIndex, QVariant, int role=Qt.EditRole) -> bool
+PyQt4.QtGui.QProxyModel.headerData?4(int, Qt.Orientation, int role=Qt.DisplayRole) -> QVariant
+PyQt4.QtGui.QProxyModel.setHeaderData?4(int, Qt.Orientation, QVariant, int role=Qt.EditRole) -> bool
 PyQt4.QtGui.QProxyModel.mimeTypes?4() -> QStringList
 PyQt4.QtGui.QProxyModel.mimeData?4(list-of-QModelIndex) -> QMimeData
 PyQt4.QtGui.QProxyModel.dropMimeData?4(QMimeData, Qt.DropAction, int, int, QModelIndex) -> bool
 PyQt4.QtGui.QProxyModel.supportedDropActions?4() -> Qt.DropActions
-PyQt4.QtGui.QProxyModel.insertRows?4(int, int, QModelIndex) -> bool
-PyQt4.QtGui.QProxyModel.insertColumns?4(int, int, QModelIndex) -> bool
+PyQt4.QtGui.QProxyModel.insertRows?4(int, int, QModelIndex parent=QModelIndex()) -> bool
+PyQt4.QtGui.QProxyModel.insertColumns?4(int, int, QModelIndex parent=QModelIndex()) -> bool
 PyQt4.QtGui.QProxyModel.fetchMore?4(QModelIndex)
 PyQt4.QtGui.QProxyModel.flags?4(QModelIndex) -> Qt.ItemFlags
-PyQt4.QtGui.QProxyModel.sort?4(int, Qt.SortOrder)
-PyQt4.QtGui.QProxyModel.match?4(QModelIndex, int, QVariant, int, Qt.MatchFlags) -> list-of-QModelIndex
+PyQt4.QtGui.QProxyModel.sort?4(int, Qt.SortOrder order=Qt.AscendingOrder)
+PyQt4.QtGui.QProxyModel.match?4(QModelIndex, int, QVariant, int hits=1, Qt.MatchFlags flags=Qt.MatchFlags(Qt.MatchStartsWith|Qt.MatchWrap)) -> list-of-QModelIndex
 PyQt4.QtGui.QProxyModel.span?4(QModelIndex) -> QSize
 PyQt4.QtGui.QProxyModel.submit?4() -> bool
 PyQt4.QtGui.QProxyModel.revert?4()
@@ -13930,6 +14156,7 @@ PyQt4.QtGui.QSizeGrip.mouseReleaseEvent?4(QMouseEvent)
 PyQt4.QtGui.QSizeGrip.mouseMoveEvent?4(QMouseEvent)
 PyQt4.QtGui.QSizeGrip.eventFilter?4(QObject, QEvent) -> bool
 PyQt4.QtGui.QSizeGrip.event?4(QEvent) -> bool
+PyQt4.QtGui.QSizeGrip.winEvent?4(MSG) -> (bool, int)
 PyQt4.QtGui.QSizeGrip.moveEvent?4(QMoveEvent)
 PyQt4.QtGui.QSizeGrip.showEvent?4(QShowEvent)
 PyQt4.QtGui.QSizeGrip.hideEvent?4(QHideEvent)
@@ -14203,6 +14430,7 @@ PyQt4.QtGui.QSplitterHandle.mouseReleaseEvent?4(QMouseEvent)
 PyQt4.QtGui.QSplitterHandle.event?4(QEvent) -> bool
 PyQt4.QtGui.QSplitterHandle.moveSplitter?4(int)
 PyQt4.QtGui.QSplitterHandle.closestLegalPosition?4(int) -> int
+PyQt4.QtGui.QSplitterHandle.resizeEvent?4(QResizeEvent)
 PyQt4.QtGui.QStackedLayout.StackingMode?10
 PyQt4.QtGui.QStackedLayout.StackOne?10
 PyQt4.QtGui.QStackedLayout.StackAll?10
@@ -14399,6 +14627,27 @@ PyQt4.QtGui.QStandardItem.appendColumn?4(list-of-QStandardItem)
 PyQt4.QtGui.QStandardItem.insertRows?4(int, list-of-QStandardItem)
 PyQt4.QtGui.QStandardItem.appendRows?4(list-of-QStandardItem)
 PyQt4.QtGui.QStandardItem.emitDataChanged?4()
+PyQt4.QtGui.QStaticText.PerformanceHint?10
+PyQt4.QtGui.QStaticText.ModerateCaching?10
+PyQt4.QtGui.QStaticText.AggressiveCaching?10
+PyQt4.QtGui.QStaticText?1()
+PyQt4.QtGui.QStaticText.__init__?1(self)
+PyQt4.QtGui.QStaticText?1(QString)
+PyQt4.QtGui.QStaticText.__init__?1(self, QString)
+PyQt4.QtGui.QStaticText?1(QStaticText)
+PyQt4.QtGui.QStaticText.__init__?1(self, QStaticText)
+PyQt4.QtGui.QStaticText.setText?4(QString)
+PyQt4.QtGui.QStaticText.text?4() -> QString
+PyQt4.QtGui.QStaticText.setTextFormat?4(Qt.TextFormat)
+PyQt4.QtGui.QStaticText.textFormat?4() -> Qt.TextFormat
+PyQt4.QtGui.QStaticText.setTextWidth?4(float)
+PyQt4.QtGui.QStaticText.textWidth?4() -> float
+PyQt4.QtGui.QStaticText.setTextOption?4(QTextOption)
+PyQt4.QtGui.QStaticText.textOption?4() -> QTextOption
+PyQt4.QtGui.QStaticText.size?4() -> QSizeF
+PyQt4.QtGui.QStaticText.prepare?4(QTransform matrix=QTransform(), QFont font=QFont())
+PyQt4.QtGui.QStaticText.setPerformanceHint?4(QStaticText.PerformanceHint)
+PyQt4.QtGui.QStaticText.performanceHint?4() -> QStaticText.PerformanceHint
 PyQt4.QtGui.QStatusBar?1(QWidget parent=None)
 PyQt4.QtGui.QStatusBar.__init__?1(self, QWidget parent=None)
 PyQt4.QtGui.QStatusBar.addWidget?4(QWidget, int stretch=0)
@@ -15804,6 +16053,11 @@ PyQt4.QtGui.QTextCursor.isCopyOf?4(QTextCursor) -> bool
 PyQt4.QtGui.QTextCursor.visualNavigation?4() -> bool
 PyQt4.QtGui.QTextCursor.setVisualNavigation?4(bool)
 PyQt4.QtGui.QTextCursor.document?4() -> QTextDocument
+PyQt4.QtGui.QTextCursor.positionInBlock?4() -> int
+PyQt4.QtGui.QTextCursor.setVerticalMovementX?4(int)
+PyQt4.QtGui.QTextCursor.verticalMovementX?4() -> int
+PyQt4.QtGui.QTextCursor.setKeepPositionOnInsert?4(bool)
+PyQt4.QtGui.QTextCursor.keepPositionOnInsert?4() -> bool
 PyQt4.QtGui.Qt.WhiteSpaceMode?10
 PyQt4.QtGui.Qt.WhiteSpaceNormal?10
 PyQt4.QtGui.Qt.WhiteSpacePre?10
@@ -15815,6 +16069,10 @@ PyQt4.QtGui.Qt.FuzzyHit?10
 PyQt4.QtGui.Qt.mightBeRichText?4(QString) -> bool
 PyQt4.QtGui.Qt.escape?4(QString) -> QString
 PyQt4.QtGui.Qt.convertFromPlainText?4(QString, Qt.WhiteSpaceMode mode=Qt.WhiteSpacePre) -> QString
+PyQt4.QtGui.QTextDocument.Stacks?10
+PyQt4.QtGui.QTextDocument.UndoStack?10
+PyQt4.QtGui.QTextDocument.RedoStack?10
+PyQt4.QtGui.QTextDocument.UndoAndRedoStacks?10
 PyQt4.QtGui.QTextDocument.ResourceType?10
 PyQt4.QtGui.QTextDocument.HtmlResource?10
 PyQt4.QtGui.QTextDocument.ImageResource?10
@@ -15913,6 +16171,7 @@ PyQt4.QtGui.QTextDocument.lineCount?4() -> int
 PyQt4.QtGui.QTextDocument.characterCount?4() -> int
 PyQt4.QtGui.QTextDocument.availableUndoSteps?4() -> int
 PyQt4.QtGui.QTextDocument.availableRedoSteps?4() -> int
+PyQt4.QtGui.QTextDocument.clearUndoRedoStacks?4(QTextDocument.Stacks stacks=QTextDocument.UndoAndRedoStacks)
 PyQt4.QtGui.QTextDocument.FindFlags?1(QTextDocument.FindFlags)
 PyQt4.QtGui.QTextDocument.FindFlags.__init__?1(self, QTextDocument.FindFlags)
 PyQt4.QtGui.QTextDocument.FindFlags?1(int)
@@ -16440,6 +16699,7 @@ PyQt4.QtGui.QTextLine.position?4() -> QPointF
 PyQt4.QtGui.QTextLine.leading?4() -> float
 PyQt4.QtGui.QTextLine.setLeadingIncluded?4(bool)
 PyQt4.QtGui.QTextLine.leadingIncluded?4() -> bool
+PyQt4.QtGui.QTextLine.horizontalAdvance?4() -> float
 PyQt4.QtGui.QTextObject?1(QTextDocument)
 PyQt4.QtGui.QTextObject.__init__?1(self, QTextDocument)
 PyQt4.QtGui.QTextObject.setFormat?4(QTextFormat)
@@ -16518,6 +16778,7 @@ PyQt4.QtGui.QTextBlock.blockNumber?4() -> int
 PyQt4.QtGui.QTextBlock.firstLineNumber?4() -> int
 PyQt4.QtGui.QTextBlock.setLineCount?4(int)
 PyQt4.QtGui.QTextBlock.lineCount?4() -> int
+PyQt4.QtGui.QTextBlock.textDirection?4() -> Qt.LayoutDirection
 PyQt4.QtGui.QTextBlock.iterator?1()
 PyQt4.QtGui.QTextBlock.iterator.__init__?1(self)
 PyQt4.QtGui.QTextBlock.iterator?1(QTextBlock.iterator)
@@ -16589,6 +16850,8 @@ PyQt4.QtGui.QTextOption.Tab.position?7
 PyQt4.QtGui.QTextOption.Tab.type?7
 PyQt4.QtGui.QTextOption.Tab?1()
 PyQt4.QtGui.QTextOption.Tab.__init__?1(self)
+PyQt4.QtGui.QTextOption.Tab?1(float, QTextOption.TabType, QChar delim=QChar())
+PyQt4.QtGui.QTextOption.Tab.__init__?1(self, float, QTextOption.TabType, QChar delim=QChar())
 PyQt4.QtGui.QTextOption.Tab?1(QTextOption.Tab)
 PyQt4.QtGui.QTextOption.Tab.__init__?1(self, QTextOption.Tab)
 PyQt4.QtGui.QTextTableCell?1()
@@ -16665,6 +16928,7 @@ PyQt4.QtGui.QToolBar.orientationChanged?4(Qt.Orientation)
 PyQt4.QtGui.QToolBar.iconSizeChanged?4(QSize)
 PyQt4.QtGui.QToolBar.toolButtonStyleChanged?4(Qt.ToolButtonStyle)
 PyQt4.QtGui.QToolBar.topLevelChanged?4(bool)
+PyQt4.QtGui.QToolBar.visibilityChanged?4(bool)
 PyQt4.QtGui.QToolBar.initStyleOption?4(QStyleOptionToolBar)
 PyQt4.QtGui.QToolBar.actionEvent?4(QActionEvent)
 PyQt4.QtGui.QToolBar.changeEvent?4(QEvent)
@@ -17201,6 +17465,8 @@ PyQt4.QtGui.QIntValidator?1(int, int, QObject)
 PyQt4.QtGui.QIntValidator.__init__?1(self, int, int, QObject)
 PyQt4.QtGui.QIntValidator.validate?4(QString, int) -> (QValidator.State, QString, int)
 PyQt4.QtGui.QIntValidator.validate?4(QString, int) -> (QValidator.State, int)
+PyQt4.QtGui.QIntValidator.fixup?4(QString) -> QString
+PyQt4.QtGui.QIntValidator.fixup?4(QString)
 PyQt4.QtGui.QIntValidator.setBottom?4(int)
 PyQt4.QtGui.QIntValidator.setTop?4(int)
 PyQt4.QtGui.QIntValidator.setRange?4(int, int)
@@ -17209,8 +17475,8 @@ PyQt4.QtGui.QIntValidator.top?4() -> int
 PyQt4.QtGui.QDoubleValidator.Notation?10
 PyQt4.QtGui.QDoubleValidator.StandardNotation?10
 PyQt4.QtGui.QDoubleValidator.ScientificNotation?10
-PyQt4.QtGui.QDoubleValidator?1(QObject)
-PyQt4.QtGui.QDoubleValidator.__init__?1(self, QObject)
+PyQt4.QtGui.QDoubleValidator?1(QObject parent=None)
+PyQt4.QtGui.QDoubleValidator.__init__?1(self, QObject parent=None)
 PyQt4.QtGui.QDoubleValidator?1(float, float, int, QObject)
 PyQt4.QtGui.QDoubleValidator.__init__?1(self, float, float, int, QObject)
 PyQt4.QtGui.QDoubleValidator.validate?4(QString, int) -> (QValidator.State, QString, int)
@@ -17224,8 +17490,8 @@ PyQt4.QtGui.QDoubleValidator.top?4() -> float
 PyQt4.QtGui.QDoubleValidator.decimals?4() -> int
 PyQt4.QtGui.QDoubleValidator.setNotation?4(QDoubleValidator.Notation)
 PyQt4.QtGui.QDoubleValidator.notation?4() -> QDoubleValidator.Notation
-PyQt4.QtGui.QRegExpValidator?1(QObject)
-PyQt4.QtGui.QRegExpValidator.__init__?1(self, QObject)
+PyQt4.QtGui.QRegExpValidator?1(QObject parent=None)
+PyQt4.QtGui.QRegExpValidator.__init__?1(self, QObject parent=None)
 PyQt4.QtGui.QRegExpValidator?1(QRegExp, QObject)
 PyQt4.QtGui.QRegExpValidator.__init__?1(self, QRegExp, QObject)
 PyQt4.QtGui.QRegExpValidator.validate?4(QString, int) -> (QValidator.State, QString, int)
@@ -17443,11 +17709,16 @@ PyQt4.QtGui.QWizard.restart?4()
 PyQt4.QtGui.QWizard.event?4(QEvent) -> bool
 PyQt4.QtGui.QWizard.resizeEvent?4(QResizeEvent)
 PyQt4.QtGui.QWizard.paintEvent?4(QPaintEvent)
+PyQt4.QtGui.QWizard.winEvent?4(MSG) -> (bool, int)
 PyQt4.QtGui.QWizard.done?4(int)
 PyQt4.QtGui.QWizard.initializePage?4(int)
 PyQt4.QtGui.QWizard.cleanupPage?4(int)
 PyQt4.QtGui.QWizard.removePage?4(int)
 PyQt4.QtGui.QWizard.pageIds?4() -> list-of-int
+PyQt4.QtGui.QWizard.setSideWidget?4(QWidget)
+PyQt4.QtGui.QWizard.sideWidget?4() -> QWidget
+PyQt4.QtGui.QWizard.pageAdded?4(int)
+PyQt4.QtGui.QWizard.pageRemoved?4(int)
 PyQt4.QtGui.QWizard.WizardOptions?1(QWizard.WizardOptions)
 PyQt4.QtGui.QWizard.WizardOptions.__init__?1(self, QWizard.WizardOptions)
 PyQt4.QtGui.QWizard.WizardOptions?1(int)
@@ -17510,71 +17781,6 @@ PyQt4.QtGui.QWorkspace.eventFilter?4(QObject, QEvent) -> bool
 PyQt4.QtGui.QWorkspace.showEvent?4(QShowEvent)
 PyQt4.QtGui.QWorkspace.hideEvent?4(QHideEvent)
 PyQt4.QtGui.QWorkspace.wheelEvent?4(QWheelEvent)
-PyQt4.QtGui.QX11EmbedWidget.Error?10
-PyQt4.QtGui.QX11EmbedWidget.Unknown?10
-PyQt4.QtGui.QX11EmbedWidget.Internal?10
-PyQt4.QtGui.QX11EmbedWidget.InvalidWindowID?10
-PyQt4.QtGui.QX11EmbedWidget?1(QWidget parent=None)
-PyQt4.QtGui.QX11EmbedWidget.__init__?1(self, QWidget parent=None)
-PyQt4.QtGui.QX11EmbedWidget.embedInto?4(int)
-PyQt4.QtGui.QX11EmbedWidget.containerWinId?4() -> int
-PyQt4.QtGui.QX11EmbedWidget.error?4() -> QX11EmbedWidget.Error
-PyQt4.QtGui.QX11EmbedWidget.containerClosed?4()
-PyQt4.QtGui.QX11EmbedWidget.embedded?4()
-PyQt4.QtGui.QX11EmbedWidget.error?4(QX11EmbedWidget.Error)
-PyQt4.QtGui.QX11EmbedWidget.eventFilter?4(QObject, QEvent) -> bool
-PyQt4.QtGui.QX11EmbedWidget.event?4(QEvent) -> bool
-PyQt4.QtGui.QX11EmbedWidget.resizeEvent?4(QResizeEvent)
-PyQt4.QtGui.QX11EmbedContainer.Error?10
-PyQt4.QtGui.QX11EmbedContainer.Unknown?10
-PyQt4.QtGui.QX11EmbedContainer.Internal?10
-PyQt4.QtGui.QX11EmbedContainer.InvalidWindowID?10
-PyQt4.QtGui.QX11EmbedContainer?1(QWidget parent=None)
-PyQt4.QtGui.QX11EmbedContainer.__init__?1(self, QWidget parent=None)
-PyQt4.QtGui.QX11EmbedContainer.clientWinId?4() -> int
-PyQt4.QtGui.QX11EmbedContainer.discardClient?4()
-PyQt4.QtGui.QX11EmbedContainer.embedClient?4(int)
-PyQt4.QtGui.QX11EmbedContainer.error?4() -> QX11EmbedContainer.Error
-PyQt4.QtGui.QX11EmbedContainer.minimumSizeHint?4() -> QSize
-PyQt4.QtGui.QX11EmbedContainer.clientClosed?4()
-PyQt4.QtGui.QX11EmbedContainer.clientIsEmbedded?4()
-PyQt4.QtGui.QX11EmbedContainer.error?4(QX11EmbedContainer.Error)
-PyQt4.QtGui.QX11EmbedContainer.eventFilter?4(QObject, QEvent) -> bool
-PyQt4.QtGui.QX11EmbedContainer.paintEvent?4(QPaintEvent)
-PyQt4.QtGui.QX11EmbedContainer.resizeEvent?4(QResizeEvent)
-PyQt4.QtGui.QX11EmbedContainer.showEvent?4(QShowEvent)
-PyQt4.QtGui.QX11EmbedContainer.hideEvent?4(QHideEvent)
-PyQt4.QtGui.QX11EmbedContainer.event?4(QEvent) -> bool
-PyQt4.QtGui.QX11Info?1()
-PyQt4.QtGui.QX11Info.__init__?1(self)
-PyQt4.QtGui.QX11Info?1(QX11Info)
-PyQt4.QtGui.QX11Info.__init__?1(self, QX11Info)
-PyQt4.QtGui.QX11Info.display?4() -> Display
-PyQt4.QtGui.QX11Info.appClass?4() -> str
-PyQt4.QtGui.QX11Info.screen?4() -> int
-PyQt4.QtGui.QX11Info.depth?4() -> int
-PyQt4.QtGui.QX11Info.cells?4() -> int
-PyQt4.QtGui.QX11Info.colormap?4() -> int
-PyQt4.QtGui.QX11Info.defaultColormap?4() -> bool
-PyQt4.QtGui.QX11Info.visual?4() -> sip.voidptr
-PyQt4.QtGui.QX11Info.defaultVisual?4() -> bool
-PyQt4.QtGui.QX11Info.appScreen?4() -> int
-PyQt4.QtGui.QX11Info.appDepth?4(int screen=-1) -> int
-PyQt4.QtGui.QX11Info.appCells?4(int screen=-1) -> int
-PyQt4.QtGui.QX11Info.appColormap?4(int screen=-1) -> int
-PyQt4.QtGui.QX11Info.appVisual?4(int screen=-1) -> sip.voidptr
-PyQt4.QtGui.QX11Info.appRootWindow?4(int screen=-1) -> int
-PyQt4.QtGui.QX11Info.appDefaultColormap?4(int screen=-1) -> bool
-PyQt4.QtGui.QX11Info.appDefaultVisual?4(int screen=-1) -> bool
-PyQt4.QtGui.QX11Info.appDpiX?4(int screen=-1) -> int
-PyQt4.QtGui.QX11Info.appDpiY?4(int screen=-1) -> int
-PyQt4.QtGui.QX11Info.setAppDpiX?4(int, int)
-PyQt4.QtGui.QX11Info.setAppDpiY?4(int, int)
-PyQt4.QtGui.QX11Info.appTime?4() -> int
-PyQt4.QtGui.QX11Info.appUserTime?4() -> int
-PyQt4.QtGui.QX11Info.setAppTime?4(int)
-PyQt4.QtGui.QX11Info.setAppUserTime?4(int)
-PyQt4.QtGui.QX11Info.isCompositingManagerRunning?4() -> bool
 PyQt4.QtGui.QPyTextObject?1(QObject parent=None)
 PyQt4.QtGui.QPyTextObject.__init__?1(self, QObject parent=None)
 PyQt4.QtHelp.QHelpContentItem.child?4(int) -> QHelpContentItem
@@ -17690,6 +17896,9 @@ PyQt4.QtMultimedia.QAbstractVideoBuffer.ReadWrite?10
 PyQt4.QtMultimedia.QAbstractVideoBuffer.HandleType?10
 PyQt4.QtMultimedia.QAbstractVideoBuffer.NoHandle?10
 PyQt4.QtMultimedia.QAbstractVideoBuffer.GLTextureHandle?10
+PyQt4.QtMultimedia.QAbstractVideoBuffer.XvShmImageHandle?10
+PyQt4.QtMultimedia.QAbstractVideoBuffer.CoreImageHandle?10
+PyQt4.QtMultimedia.QAbstractVideoBuffer.QPixmapHandle?10
 PyQt4.QtMultimedia.QAbstractVideoBuffer.UserHandle?10
 PyQt4.QtMultimedia.QAbstractVideoBuffer?1(QAbstractVideoBuffer.HandleType)
 PyQt4.QtMultimedia.QAbstractVideoBuffer.__init__?1(self, QAbstractVideoBuffer.HandleType)
@@ -17751,6 +17960,8 @@ PyQt4.QtMultimedia.QAudioDeviceInfo.supportedSampleTypes?4() -> list-of-QAudioFo
 PyQt4.QtMultimedia.QAudioDeviceInfo.defaultInputDevice?4() -> QAudioDeviceInfo
 PyQt4.QtMultimedia.QAudioDeviceInfo.defaultOutputDevice?4() -> QAudioDeviceInfo
 PyQt4.QtMultimedia.QAudioDeviceInfo.availableDevices?4(QAudio.Mode) -> list-of-QAudioDeviceInfo
+PyQt4.QtMultimedia.QAudioDeviceInfo.supportedSampleRates?4() -> list-of-int
+PyQt4.QtMultimedia.QAudioDeviceInfo.supportedChannelCounts?4() -> list-of-int
 PyQt4.QtMultimedia.QAudioFormat.Endian?10
 PyQt4.QtMultimedia.QAudioFormat.BigEndian?10
 PyQt4.QtMultimedia.QAudioFormat.LittleEndian?10
@@ -17776,6 +17987,10 @@ PyQt4.QtMultimedia.QAudioFormat.setByteOrder?4(QAudioFormat.Endian)
 PyQt4.QtMultimedia.QAudioFormat.byteOrder?4() -> QAudioFormat.Endian
 PyQt4.QtMultimedia.QAudioFormat.setSampleType?4(QAudioFormat.SampleType)
 PyQt4.QtMultimedia.QAudioFormat.sampleType?4() -> QAudioFormat.SampleType
+PyQt4.QtMultimedia.QAudioFormat.setSampleRate?4(int)
+PyQt4.QtMultimedia.QAudioFormat.sampleRate?4() -> int
+PyQt4.QtMultimedia.QAudioFormat.setChannelCount?4(int)
+PyQt4.QtMultimedia.QAudioFormat.channelCount?4() -> int
 PyQt4.QtMultimedia.QAudioInput?1(QAudioFormat format=QAudioFormat(), QObject parent=None)
 PyQt4.QtMultimedia.QAudioInput.__init__?1(self, QAudioFormat format=QAudioFormat(), QObject parent=None)
 PyQt4.QtMultimedia.QAudioInput?1(QAudioDeviceInfo, QAudioFormat format=QAudioFormat(), QObject parent=None)
@@ -18061,6 +18276,9 @@ PyQt4.QtNetwork.QAuthenticator.password?4() -> QString
 PyQt4.QtNetwork.QAuthenticator.setPassword?4(QString)
 PyQt4.QtNetwork.QAuthenticator.realm?4() -> QString
 PyQt4.QtNetwork.QAuthenticator.isNull?4() -> bool
+PyQt4.QtNetwork.QAuthenticator.option?4(QString) -> QVariant
+PyQt4.QtNetwork.QAuthenticator.options?4() -> dict-of-QString-QVariant
+PyQt4.QtNetwork.QAuthenticator.setOption?4(QString, QVariant)
 PyQt4.QtNetwork.QFtp.TransferType?10
 PyQt4.QtNetwork.QFtp.Binary?10
 PyQt4.QtNetwork.QFtp.Ascii?10
@@ -18379,12 +18597,17 @@ PyQt4.QtNetwork.QLocalSocket.error?4(QLocalSocket.LocalSocketError)
 PyQt4.QtNetwork.QLocalSocket.stateChanged?4(QLocalSocket.LocalSocketState)
 PyQt4.QtNetwork.QLocalSocket.readData?4(int) -> str
 PyQt4.QtNetwork.QLocalSocket.writeData?4(str) -> int
+PyQt4.QtNetwork.QNetworkAccessManager.NetworkAccessibility?10
+PyQt4.QtNetwork.QNetworkAccessManager.UnknownAccessibility?10
+PyQt4.QtNetwork.QNetworkAccessManager.NotAccessible?10
+PyQt4.QtNetwork.QNetworkAccessManager.Accessible?10
 PyQt4.QtNetwork.QNetworkAccessManager.Operation?10
 PyQt4.QtNetwork.QNetworkAccessManager.HeadOperation?10
 PyQt4.QtNetwork.QNetworkAccessManager.GetOperation?10
 PyQt4.QtNetwork.QNetworkAccessManager.PutOperation?10
 PyQt4.QtNetwork.QNetworkAccessManager.PostOperation?10
 PyQt4.QtNetwork.QNetworkAccessManager.DeleteOperation?10
+PyQt4.QtNetwork.QNetworkAccessManager.CustomOperation?10
 PyQt4.QtNetwork.QNetworkAccessManager?1(QObject parent=None)
 PyQt4.QtNetwork.QNetworkAccessManager.__init__?1(self, QObject parent=None)
 PyQt4.QtNetwork.QNetworkAccessManager.proxy?4() -> QNetworkProxy
@@ -18407,6 +18630,86 @@ PyQt4.QtNetwork.QNetworkAccessManager.setProxyFactory?4(QNetworkProxyFactory)
 PyQt4.QtNetwork.QNetworkAccessManager.cache?4() -> QAbstractNetworkCache
 PyQt4.QtNetwork.QNetworkAccessManager.setCache?4(QAbstractNetworkCache)
 PyQt4.QtNetwork.QNetworkAccessManager.deleteResource?4(QNetworkRequest) -> QNetworkReply
+PyQt4.QtNetwork.QNetworkAccessManager.sendCustomRequest?4(QNetworkRequest, QByteArray, QIODevice data=None) -> QNetworkReply
+PyQt4.QtNetwork.QNetworkAccessManager.setConfiguration?4(QNetworkConfiguration)
+PyQt4.QtNetwork.QNetworkAccessManager.configuration?4() -> QNetworkConfiguration
+PyQt4.QtNetwork.QNetworkAccessManager.activeConfiguration?4() -> QNetworkConfiguration
+PyQt4.QtNetwork.QNetworkAccessManager.setNetworkAccessible?4(QNetworkAccessManager.NetworkAccessibility)
+PyQt4.QtNetwork.QNetworkAccessManager.networkAccessible?4() -> QNetworkAccessManager.NetworkAccessibility
+PyQt4.QtNetwork.QNetworkAccessManager.networkAccessibleChanged?4(QNetworkAccessManager.NetworkAccessibility)
+PyQt4.QtNetwork.QNetworkConfigurationManager.Capability?10
+PyQt4.QtNetwork.QNetworkConfigurationManager.CanStartAndStopInterfaces?10
+PyQt4.QtNetwork.QNetworkConfigurationManager.DirectConnectionRouting?10
+PyQt4.QtNetwork.QNetworkConfigurationManager.SystemSessionSupport?10
+PyQt4.QtNetwork.QNetworkConfigurationManager.ApplicationLevelRoaming?10
+PyQt4.QtNetwork.QNetworkConfigurationManager.ForcedRoaming?10
+PyQt4.QtNetwork.QNetworkConfigurationManager.DataStatistics?10
+PyQt4.QtNetwork.QNetworkConfigurationManager.NetworkSessionRequired?10
+PyQt4.QtNetwork.QNetworkConfigurationManager?1(QObject parent=None)
+PyQt4.QtNetwork.QNetworkConfigurationManager.__init__?1(self, QObject parent=None)
+PyQt4.QtNetwork.QNetworkConfigurationManager.capabilities?4() -> QNetworkConfigurationManager.Capabilities
+PyQt4.QtNetwork.QNetworkConfigurationManager.defaultConfiguration?4() -> QNetworkConfiguration
+PyQt4.QtNetwork.QNetworkConfigurationManager.allConfigurations?4(QNetworkConfiguration.StateFlags flags=0) -> list-of-QNetworkConfiguration
+PyQt4.QtNetwork.QNetworkConfigurationManager.configurationFromIdentifier?4(QString) -> QNetworkConfiguration
+PyQt4.QtNetwork.QNetworkConfigurationManager.updateConfigurations?4()
+PyQt4.QtNetwork.QNetworkConfigurationManager.isOnline?4() -> bool
+PyQt4.QtNetwork.QNetworkConfigurationManager.configurationAdded?4(QNetworkConfiguration)
+PyQt4.QtNetwork.QNetworkConfigurationManager.configurationRemoved?4(QNetworkConfiguration)
+PyQt4.QtNetwork.QNetworkConfigurationManager.configurationChanged?4(QNetworkConfiguration)
+PyQt4.QtNetwork.QNetworkConfigurationManager.onlineStateChanged?4(bool)
+PyQt4.QtNetwork.QNetworkConfigurationManager.updateCompleted?4()
+PyQt4.QtNetwork.QNetworkConfigurationManager.Capabilities?1(QNetworkConfigurationManager.Capabilities)
+PyQt4.QtNetwork.QNetworkConfigurationManager.Capabilities.__init__?1(self, QNetworkConfigurationManager.Capabilities)
+PyQt4.QtNetwork.QNetworkConfigurationManager.Capabilities?1(int)
+PyQt4.QtNetwork.QNetworkConfigurationManager.Capabilities.__init__?1(self, int)
+PyQt4.QtNetwork.QNetworkConfigurationManager.Capabilities?1()
+PyQt4.QtNetwork.QNetworkConfigurationManager.Capabilities.__init__?1(self)
+PyQt4.QtNetwork.QNetworkConfiguration.BearerType?10
+PyQt4.QtNetwork.QNetworkConfiguration.BearerUnknown?10
+PyQt4.QtNetwork.QNetworkConfiguration.BearerEthernet?10
+PyQt4.QtNetwork.QNetworkConfiguration.BearerWLAN?10
+PyQt4.QtNetwork.QNetworkConfiguration.Bearer2G?10
+PyQt4.QtNetwork.QNetworkConfiguration.BearerCDMA2000?10
+PyQt4.QtNetwork.QNetworkConfiguration.BearerWCDMA?10
+PyQt4.QtNetwork.QNetworkConfiguration.BearerHSPA?10
+PyQt4.QtNetwork.QNetworkConfiguration.BearerBluetooth?10
+PyQt4.QtNetwork.QNetworkConfiguration.BearerWiMAX?10
+PyQt4.QtNetwork.QNetworkConfiguration.StateFlag?10
+PyQt4.QtNetwork.QNetworkConfiguration.Undefined?10
+PyQt4.QtNetwork.QNetworkConfiguration.Defined?10
+PyQt4.QtNetwork.QNetworkConfiguration.Discovered?10
+PyQt4.QtNetwork.QNetworkConfiguration.Active?10
+PyQt4.QtNetwork.QNetworkConfiguration.Purpose?10
+PyQt4.QtNetwork.QNetworkConfiguration.UnknownPurpose?10
+PyQt4.QtNetwork.QNetworkConfiguration.PublicPurpose?10
+PyQt4.QtNetwork.QNetworkConfiguration.PrivatePurpose?10
+PyQt4.QtNetwork.QNetworkConfiguration.ServiceSpecificPurpose?10
+PyQt4.QtNetwork.QNetworkConfiguration.Type?10
+PyQt4.QtNetwork.QNetworkConfiguration.InternetAccessPoint?10
+PyQt4.QtNetwork.QNetworkConfiguration.ServiceNetwork?10
+PyQt4.QtNetwork.QNetworkConfiguration.UserChoice?10
+PyQt4.QtNetwork.QNetworkConfiguration.Invalid?10
+PyQt4.QtNetwork.QNetworkConfiguration?1()
+PyQt4.QtNetwork.QNetworkConfiguration.__init__?1(self)
+PyQt4.QtNetwork.QNetworkConfiguration?1(QNetworkConfiguration)
+PyQt4.QtNetwork.QNetworkConfiguration.__init__?1(self, QNetworkConfiguration)
+PyQt4.QtNetwork.QNetworkConfiguration.state?4() -> QNetworkConfiguration.StateFlags
+PyQt4.QtNetwork.QNetworkConfiguration.type?4() -> QNetworkConfiguration.Type
+PyQt4.QtNetwork.QNetworkConfiguration.purpose?4() -> QNetworkConfiguration.Purpose
+PyQt4.QtNetwork.QNetworkConfiguration.bearerName?4() -> QString
+PyQt4.QtNetwork.QNetworkConfiguration.bearerType?4() -> QNetworkConfiguration.BearerType
+PyQt4.QtNetwork.QNetworkConfiguration.bearerTypeName?4() -> QString
+PyQt4.QtNetwork.QNetworkConfiguration.identifier?4() -> QString
+PyQt4.QtNetwork.QNetworkConfiguration.isRoamingAvailable?4() -> bool
+PyQt4.QtNetwork.QNetworkConfiguration.children?4() -> list-of-QNetworkConfiguration
+PyQt4.QtNetwork.QNetworkConfiguration.name?4() -> QString
+PyQt4.QtNetwork.QNetworkConfiguration.isValid?4() -> bool
+PyQt4.QtNetwork.QNetworkConfiguration.StateFlags?1(QNetworkConfiguration.StateFlags)
+PyQt4.QtNetwork.QNetworkConfiguration.StateFlags.__init__?1(self, QNetworkConfiguration.StateFlags)
+PyQt4.QtNetwork.QNetworkConfiguration.StateFlags?1(int)
+PyQt4.QtNetwork.QNetworkConfiguration.StateFlags.__init__?1(self, int)
+PyQt4.QtNetwork.QNetworkConfiguration.StateFlags?1()
+PyQt4.QtNetwork.QNetworkConfiguration.StateFlags.__init__?1(self)
 PyQt4.QtNetwork.QNetworkCookie.RawForm?10
 PyQt4.QtNetwork.QNetworkCookie.NameAndValueOnly?10
 PyQt4.QtNetwork.QNetworkCookie.Full?10
@@ -18594,6 +18897,7 @@ PyQt4.QtNetwork.QNetworkReply.ProtocolUnknownError?10
 PyQt4.QtNetwork.QNetworkReply.ProtocolInvalidOperationError?10
 PyQt4.QtNetwork.QNetworkReply.ProtocolFailure?10
 PyQt4.QtNetwork.QNetworkReply.ContentReSendError?10
+PyQt4.QtNetwork.QNetworkReply.TemporaryNetworkFailureError?10
 PyQt4.QtNetwork.QNetworkReply?1(QObject parent=None)
 PyQt4.QtNetwork.QNetworkReply.__init__?1(self, QObject parent=None)
 PyQt4.QtNetwork.QNetworkReply.abort?4()
@@ -18631,6 +18935,14 @@ PyQt4.QtNetwork.QNetworkReply.setAttribute?4(QNetworkRequest.Attribute, QVariant
 PyQt4.QtNetwork.QNetworkReply.isFinished?4() -> bool
 PyQt4.QtNetwork.QNetworkReply.isRunning?4() -> bool
 PyQt4.QtNetwork.QNetworkReply.ignoreSslErrors?4(list-of-QSslError)
+PyQt4.QtNetwork.QNetworkReply.rawHeaderPairs?4() -> list-of-tuple-of-QByteArray-QByteArray
+PyQt4.QtNetwork.QNetworkRequest.Priority?10
+PyQt4.QtNetwork.QNetworkRequest.HighPriority?10
+PyQt4.QtNetwork.QNetworkRequest.NormalPriority?10
+PyQt4.QtNetwork.QNetworkRequest.LowPriority?10
+PyQt4.QtNetwork.QNetworkRequest.LoadControl?10
+PyQt4.QtNetwork.QNetworkRequest.Automatic?10
+PyQt4.QtNetwork.QNetworkRequest.Manual?10
 PyQt4.QtNetwork.QNetworkRequest.CacheLoadControl?10
 PyQt4.QtNetwork.QNetworkRequest.AlwaysNetwork?10
 PyQt4.QtNetwork.QNetworkRequest.PreferNetwork?10
@@ -18647,6 +18959,10 @@ PyQt4.QtNetwork.QNetworkRequest.SourceIsFromCacheAttribute?10
 PyQt4.QtNetwork.QNetworkRequest.DoNotBufferUploadDataAttribute?10
 PyQt4.QtNetwork.QNetworkRequest.HttpPipeliningAllowedAttribute?10
 PyQt4.QtNetwork.QNetworkRequest.HttpPipeliningWasUsedAttribute?10
+PyQt4.QtNetwork.QNetworkRequest.CustomVerbAttribute?10
+PyQt4.QtNetwork.QNetworkRequest.CookieLoadControlAttribute?10
+PyQt4.QtNetwork.QNetworkRequest.AuthenticationReuseAttribute?10
+PyQt4.QtNetwork.QNetworkRequest.CookieSaveControlAttribute?10
 PyQt4.QtNetwork.QNetworkRequest.User?10
 PyQt4.QtNetwork.QNetworkRequest.UserMax?10
 PyQt4.QtNetwork.QNetworkRequest.KnownHeaders?10
@@ -18674,6 +18990,51 @@ PyQt4.QtNetwork.QNetworkRequest.sslConfiguration?4() -> QSslConfiguration
 PyQt4.QtNetwork.QNetworkRequest.setSslConfiguration?4(QSslConfiguration)
 PyQt4.QtNetwork.QNetworkRequest.setOriginatingObject?4(QObject)
 PyQt4.QtNetwork.QNetworkRequest.originatingObject?4() -> QObject
+PyQt4.QtNetwork.QNetworkRequest.priority?4() -> QNetworkRequest.Priority
+PyQt4.QtNetwork.QNetworkRequest.setPriority?4(QNetworkRequest.Priority)
+PyQt4.QtNetwork.QNetworkSession.SessionError?10
+PyQt4.QtNetwork.QNetworkSession.UnknownSessionError?10
+PyQt4.QtNetwork.QNetworkSession.SessionAbortedError?10
+PyQt4.QtNetwork.QNetworkSession.RoamingError?10
+PyQt4.QtNetwork.QNetworkSession.OperationNotSupportedError?10
+PyQt4.QtNetwork.QNetworkSession.InvalidConfigurationError?10
+PyQt4.QtNetwork.QNetworkSession.State?10
+PyQt4.QtNetwork.QNetworkSession.Invalid?10
+PyQt4.QtNetwork.QNetworkSession.NotAvailable?10
+PyQt4.QtNetwork.QNetworkSession.Connecting?10
+PyQt4.QtNetwork.QNetworkSession.Connected?10
+PyQt4.QtNetwork.QNetworkSession.Closing?10
+PyQt4.QtNetwork.QNetworkSession.Disconnected?10
+PyQt4.QtNetwork.QNetworkSession.Roaming?10
+PyQt4.QtNetwork.QNetworkSession?1(QNetworkConfiguration, QObject parent=None)
+PyQt4.QtNetwork.QNetworkSession.__init__?1(self, QNetworkConfiguration, QObject parent=None)
+PyQt4.QtNetwork.QNetworkSession.isOpen?4() -> bool
+PyQt4.QtNetwork.QNetworkSession.configuration?4() -> QNetworkConfiguration
+PyQt4.QtNetwork.QNetworkSession.interface?4() -> QNetworkInterface
+PyQt4.QtNetwork.QNetworkSession.state?4() -> QNetworkSession.State
+PyQt4.QtNetwork.QNetworkSession.error?4() -> QNetworkSession.SessionError
+PyQt4.QtNetwork.QNetworkSession.errorString?4() -> QString
+PyQt4.QtNetwork.QNetworkSession.sessionProperty?4(QString) -> QVariant
+PyQt4.QtNetwork.QNetworkSession.setSessionProperty?4(QString, QVariant)
+PyQt4.QtNetwork.QNetworkSession.bytesWritten?4() -> int
+PyQt4.QtNetwork.QNetworkSession.bytesReceived?4() -> int
+PyQt4.QtNetwork.QNetworkSession.activeTime?4() -> int
+PyQt4.QtNetwork.QNetworkSession.waitForOpened?4(int msecs=30000) -> bool
+PyQt4.QtNetwork.QNetworkSession.open?4()
+PyQt4.QtNetwork.QNetworkSession.close?4()
+PyQt4.QtNetwork.QNetworkSession.stop?4()
+PyQt4.QtNetwork.QNetworkSession.migrate?4()
+PyQt4.QtNetwork.QNetworkSession.ignore?4()
+PyQt4.QtNetwork.QNetworkSession.accept?4()
+PyQt4.QtNetwork.QNetworkSession.reject?4()
+PyQt4.QtNetwork.QNetworkSession.stateChanged?4(QNetworkSession.State)
+PyQt4.QtNetwork.QNetworkSession.opened?4()
+PyQt4.QtNetwork.QNetworkSession.closed?4()
+PyQt4.QtNetwork.QNetworkSession.error?4(QNetworkSession.SessionError)
+PyQt4.QtNetwork.QNetworkSession.preferredConfigurationChanged?4(QNetworkConfiguration, bool)
+PyQt4.QtNetwork.QNetworkSession.newConfigurationActivated?4()
+PyQt4.QtNetwork.QNetworkSession.connectNotify?4(SIGNAL())
+PyQt4.QtNetwork.QNetworkSession.disconnectNotify?4(SIGNAL())
 PyQt4.QtNetwork.QSsl.SslProtocol?10
 PyQt4.QtNetwork.QSsl.SslV3?10
 PyQt4.QtNetwork.QSsl.SslV2?10
@@ -18724,7 +19085,7 @@ PyQt4.QtNetwork.QSslCertificate.toDer?4() -> QByteArray
 PyQt4.QtNetwork.QSslCertificate.fromPath?4(QString, QSsl.EncodingFormat format=QSsl.Pem, QRegExp.PatternSyntax syntax=QRegExp.FixedString) -> list-of-QSslCertificate
 PyQt4.QtNetwork.QSslCertificate.fromDevice?4(QIODevice, QSsl.EncodingFormat format=QSsl.Pem) -> list-of-QSslCertificate
 PyQt4.QtNetwork.QSslCertificate.fromData?4(QByteArray, QSsl.EncodingFormat format=QSsl.Pem) -> list-of-QSslCertificate
-PyQt4.QtNetwork.QSslCertificate.handle?4() -> int
+PyQt4.QtNetwork.QSslCertificate.handle?4() -> sip.voidptr
 PyQt4.QtNetwork.QSslConfiguration?1()
 PyQt4.QtNetwork.QSslConfiguration.__init__?1(self)
 PyQt4.QtNetwork.QSslConfiguration?1(QSslConfiguration)
@@ -18816,7 +19177,7 @@ PyQt4.QtNetwork.QSslKey.type?4() -> QSsl.KeyType
 PyQt4.QtNetwork.QSslKey.algorithm?4() -> QSsl.KeyAlgorithm
 PyQt4.QtNetwork.QSslKey.toPem?4(QByteArray passPhrase=QByteArray()) -> QByteArray
 PyQt4.QtNetwork.QSslKey.toDer?4(QByteArray passPhrase=QByteArray()) -> QByteArray
-PyQt4.QtNetwork.QSslKey.handle?4() -> int
+PyQt4.QtNetwork.QSslKey.handle?4() -> sip.voidptr
 PyQt4.QtNetwork.QTcpSocket?1(QObject parent=None)
 PyQt4.QtNetwork.QTcpSocket.__init__?1(self, QObject parent=None)
 PyQt4.QtNetwork.QSslSocket.PeerVerifyMode?10
@@ -18920,6 +19281,7 @@ PyQt4.QtNetwork.QTcpServer.errorString?4() -> QString
 PyQt4.QtNetwork.QTcpServer.setProxy?4(QNetworkProxy)
 PyQt4.QtNetwork.QTcpServer.proxy?4() -> QNetworkProxy
 PyQt4.QtNetwork.QTcpServer.incomingConnection?4(int)
+PyQt4.QtNetwork.QTcpServer.addPendingConnection?4(QTcpSocket)
 PyQt4.QtNetwork.QTcpServer.newConnection?4()
 PyQt4.QtNetwork.QUdpSocket.BindFlag?10
 PyQt4.QtNetwork.QUdpSocket.DefaultForPlatform?10
@@ -18990,6 +19352,313 @@ PyQt4.QtNetwork.QUrlInfo.greaterThan?4(QUrlInfo, QUrlInfo, int) -> bool
 PyQt4.QtNetwork.QUrlInfo.lessThan?4(QUrlInfo, QUrlInfo, int) -> bool
 PyQt4.QtNetwork.QUrlInfo.equal?4(QUrlInfo, QUrlInfo, int) -> bool
 PyQt4.QtNetwork.QUrlInfo.setLastRead?4(QDateTime)
+PyQt4.QtDeclarative.QDeclarativeComponent.Status?10
+PyQt4.QtDeclarative.QDeclarativeComponent.Null?10
+PyQt4.QtDeclarative.QDeclarativeComponent.Ready?10
+PyQt4.QtDeclarative.QDeclarativeComponent.Loading?10
+PyQt4.QtDeclarative.QDeclarativeComponent.Error?10
+PyQt4.QtDeclarative.QDeclarativeComponent?1(QDeclarativeEngine, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeComponent.__init__?1(self, QDeclarativeEngine, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeComponent?1(QDeclarativeEngine, QString, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeComponent.__init__?1(self, QDeclarativeEngine, QString, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeComponent?1(QDeclarativeEngine, QUrl, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeComponent.__init__?1(self, QDeclarativeEngine, QUrl, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeComponent.status?4() -> QDeclarativeComponent.Status
+PyQt4.QtDeclarative.QDeclarativeComponent.isNull?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeComponent.isReady?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeComponent.isError?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeComponent.isLoading?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeComponent.errors?4() -> list-of-QDeclarativeError
+PyQt4.QtDeclarative.QDeclarativeComponent.progress?4() -> float
+PyQt4.QtDeclarative.QDeclarativeComponent.url?4() -> QUrl
+PyQt4.QtDeclarative.QDeclarativeComponent.create?4(QDeclarativeContext context=None) -> QObject
+PyQt4.QtDeclarative.QDeclarativeComponent.beginCreate?4(QDeclarativeContext) -> QObject
+PyQt4.QtDeclarative.QDeclarativeComponent.completeCreate?4()
+PyQt4.QtDeclarative.QDeclarativeComponent.loadUrl?4(QUrl)
+PyQt4.QtDeclarative.QDeclarativeComponent.setData?4(QByteArray, QUrl)
+PyQt4.QtDeclarative.QDeclarativeComponent.creationContext?4() -> QDeclarativeContext
+PyQt4.QtDeclarative.QDeclarativeComponent.statusChanged?4(QDeclarativeComponent.Status)
+PyQt4.QtDeclarative.QDeclarativeComponent.progressChanged?4(float)
+PyQt4.QtDeclarative.QDeclarativeContext?1(QDeclarativeEngine, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeContext.__init__?1(self, QDeclarativeEngine, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeContext?1(QDeclarativeContext, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeContext.__init__?1(self, QDeclarativeContext, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeContext.isValid?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeContext.engine?4() -> QDeclarativeEngine
+PyQt4.QtDeclarative.QDeclarativeContext.parentContext?4() -> QDeclarativeContext
+PyQt4.QtDeclarative.QDeclarativeContext.contextObject?4() -> QObject
+PyQt4.QtDeclarative.QDeclarativeContext.setContextObject?4(QObject)
+PyQt4.QtDeclarative.QDeclarativeContext.contextProperty?4(QString) -> QVariant
+PyQt4.QtDeclarative.QDeclarativeContext.setContextProperty?4(QString, QObject)
+PyQt4.QtDeclarative.QDeclarativeContext.setContextProperty?4(QString, QVariant)
+PyQt4.QtDeclarative.QDeclarativeContext.resolvedUrl?4(QUrl) -> QUrl
+PyQt4.QtDeclarative.QDeclarativeContext.setBaseUrl?4(QUrl)
+PyQt4.QtDeclarative.QDeclarativeContext.baseUrl?4() -> QUrl
+PyQt4.QtDeclarative.QDeclarativeEngine.ObjectOwnership?10
+PyQt4.QtDeclarative.QDeclarativeEngine.CppOwnership?10
+PyQt4.QtDeclarative.QDeclarativeEngine.JavaScriptOwnership?10
+PyQt4.QtDeclarative.QDeclarativeEngine?1(QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeEngine.__init__?1(self, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeEngine.rootContext?4() -> QDeclarativeContext
+PyQt4.QtDeclarative.QDeclarativeEngine.clearComponentCache?4()
+PyQt4.QtDeclarative.QDeclarativeEngine.importPathList?4() -> QStringList
+PyQt4.QtDeclarative.QDeclarativeEngine.setImportPathList?4(QStringList)
+PyQt4.QtDeclarative.QDeclarativeEngine.addImportPath?4(QString)
+PyQt4.QtDeclarative.QDeclarativeEngine.pluginPathList?4() -> QStringList
+PyQt4.QtDeclarative.QDeclarativeEngine.setPluginPathList?4(QStringList)
+PyQt4.QtDeclarative.QDeclarativeEngine.addPluginPath?4(QString)
+PyQt4.QtDeclarative.QDeclarativeEngine.importPlugin?4(QString, QString) -> (bool, QString)
+PyQt4.QtDeclarative.QDeclarativeEngine.setNetworkAccessManagerFactory?4(QDeclarativeNetworkAccessManagerFactory)
+PyQt4.QtDeclarative.QDeclarativeEngine.networkAccessManagerFactory?4() -> QDeclarativeNetworkAccessManagerFactory
+PyQt4.QtDeclarative.QDeclarativeEngine.networkAccessManager?4() -> QNetworkAccessManager
+PyQt4.QtDeclarative.QDeclarativeEngine.addImageProvider?4(QString, QDeclarativeImageProvider)
+PyQt4.QtDeclarative.QDeclarativeEngine.imageProvider?4(QString) -> QDeclarativeImageProvider
+PyQt4.QtDeclarative.QDeclarativeEngine.removeImageProvider?4(QString)
+PyQt4.QtDeclarative.QDeclarativeEngine.setOfflineStoragePath?4(QString)
+PyQt4.QtDeclarative.QDeclarativeEngine.offlineStoragePath?4() -> QString
+PyQt4.QtDeclarative.QDeclarativeEngine.baseUrl?4() -> QUrl
+PyQt4.QtDeclarative.QDeclarativeEngine.setBaseUrl?4(QUrl)
+PyQt4.QtDeclarative.QDeclarativeEngine.outputWarningsToStandardError?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeEngine.setOutputWarningsToStandardError?4(bool)
+PyQt4.QtDeclarative.QDeclarativeEngine.contextForObject?4(QObject) -> QDeclarativeContext
+PyQt4.QtDeclarative.QDeclarativeEngine.setContextForObject?4(QObject, QDeclarativeContext)
+PyQt4.QtDeclarative.QDeclarativeEngine.setObjectOwnership?4(QObject, QDeclarativeEngine.ObjectOwnership)
+PyQt4.QtDeclarative.QDeclarativeEngine.objectOwnership?4(QObject) -> QDeclarativeEngine.ObjectOwnership
+PyQt4.QtDeclarative.QDeclarativeEngine.quit?4()
+PyQt4.QtDeclarative.QDeclarativeEngine.warnings?4(list-of-QDeclarativeError)
+PyQt4.QtDeclarative.QDeclarativeError?1()
+PyQt4.QtDeclarative.QDeclarativeError.__init__?1(self)
+PyQt4.QtDeclarative.QDeclarativeError?1(QDeclarativeError)
+PyQt4.QtDeclarative.QDeclarativeError.__init__?1(self, QDeclarativeError)
+PyQt4.QtDeclarative.QDeclarativeError.isValid?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeError.url?4() -> QUrl
+PyQt4.QtDeclarative.QDeclarativeError.setUrl?4(QUrl)
+PyQt4.QtDeclarative.QDeclarativeError.description?4() -> QString
+PyQt4.QtDeclarative.QDeclarativeError.setDescription?4(QString)
+PyQt4.QtDeclarative.QDeclarativeError.line?4() -> int
+PyQt4.QtDeclarative.QDeclarativeError.setLine?4(int)
+PyQt4.QtDeclarative.QDeclarativeError.column?4() -> int
+PyQt4.QtDeclarative.QDeclarativeError.setColumn?4(int)
+PyQt4.QtDeclarative.QDeclarativeError.toString?4() -> QString
+PyQt4.QtDeclarative.QDeclarativeExpression?1()
+PyQt4.QtDeclarative.QDeclarativeExpression.__init__?1(self)
+PyQt4.QtDeclarative.QDeclarativeExpression?1(QDeclarativeContext, QObject, QString, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeExpression.__init__?1(self, QDeclarativeContext, QObject, QString, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeExpression.engine?4() -> QDeclarativeEngine
+PyQt4.QtDeclarative.QDeclarativeExpression.context?4() -> QDeclarativeContext
+PyQt4.QtDeclarative.QDeclarativeExpression.expression?4() -> QString
+PyQt4.QtDeclarative.QDeclarativeExpression.setExpression?4(QString)
+PyQt4.QtDeclarative.QDeclarativeExpression.notifyOnValueChanged?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeExpression.setNotifyOnValueChanged?4(bool)
+PyQt4.QtDeclarative.QDeclarativeExpression.sourceFile?4() -> QString
+PyQt4.QtDeclarative.QDeclarativeExpression.lineNumber?4() -> int
+PyQt4.QtDeclarative.QDeclarativeExpression.setSourceLocation?4(QString, int)
+PyQt4.QtDeclarative.QDeclarativeExpression.scopeObject?4() -> QObject
+PyQt4.QtDeclarative.QDeclarativeExpression.hasError?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeExpression.clearError?4()
+PyQt4.QtDeclarative.QDeclarativeExpression.error?4() -> QDeclarativeError
+PyQt4.QtDeclarative.QDeclarativeExpression.evaluate?4() -> (QVariant, bool)
+PyQt4.QtDeclarative.QDeclarativeExpression.valueChanged?4()
+PyQt4.QtDeclarative.QDeclarativeExtensionPlugin?1(QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeExtensionPlugin.__init__?1(self, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativeExtensionPlugin.registerTypes?4(str)
+PyQt4.QtDeclarative.QDeclarativeExtensionPlugin.initializeEngine?4(QDeclarativeEngine, str)
+PyQt4.QtDeclarative.QDeclarativeImageProvider.ImageType?10
+PyQt4.QtDeclarative.QDeclarativeImageProvider.Image?10
+PyQt4.QtDeclarative.QDeclarativeImageProvider.Pixmap?10
+PyQt4.QtDeclarative.QDeclarativeImageProvider?1(QDeclarativeImageProvider.ImageType)
+PyQt4.QtDeclarative.QDeclarativeImageProvider.__init__?1(self, QDeclarativeImageProvider.ImageType)
+PyQt4.QtDeclarative.QDeclarativeImageProvider?1(QDeclarativeImageProvider)
+PyQt4.QtDeclarative.QDeclarativeImageProvider.__init__?1(self, QDeclarativeImageProvider)
+PyQt4.QtDeclarative.QDeclarativeImageProvider.imageType?4() -> QDeclarativeImageProvider.ImageType
+PyQt4.QtDeclarative.QDeclarativeImageProvider.requestImage?4(QString, QSize, QSize) -> QImage
+PyQt4.QtDeclarative.QDeclarativeImageProvider.requestPixmap?4(QString, QSize, QSize) -> QPixmap
+PyQt4.QtDeclarative.QDeclarativeParserStatus?1()
+PyQt4.QtDeclarative.QDeclarativeParserStatus.__init__?1(self)
+PyQt4.QtDeclarative.QDeclarativeParserStatus?1(QDeclarativeParserStatus)
+PyQt4.QtDeclarative.QDeclarativeParserStatus.__init__?1(self, QDeclarativeParserStatus)
+PyQt4.QtDeclarative.QDeclarativeParserStatus.classBegin?4()
+PyQt4.QtDeclarative.QDeclarativeParserStatus.componentComplete?4()
+PyQt4.QtDeclarative.QDeclarativeItem.TransformOrigin?10
+PyQt4.QtDeclarative.QDeclarativeItem.TopLeft?10
+PyQt4.QtDeclarative.QDeclarativeItem.Top?10
+PyQt4.QtDeclarative.QDeclarativeItem.TopRight?10
+PyQt4.QtDeclarative.QDeclarativeItem.Left?10
+PyQt4.QtDeclarative.QDeclarativeItem.Center?10
+PyQt4.QtDeclarative.QDeclarativeItem.Right?10
+PyQt4.QtDeclarative.QDeclarativeItem.BottomLeft?10
+PyQt4.QtDeclarative.QDeclarativeItem.Bottom?10
+PyQt4.QtDeclarative.QDeclarativeItem.BottomRight?10
+PyQt4.QtDeclarative.QDeclarativeItem?1(QDeclarativeItem parent=None)
+PyQt4.QtDeclarative.QDeclarativeItem.__init__?1(self, QDeclarativeItem parent=None)
+PyQt4.QtDeclarative.QDeclarativeItem.parentItem?4() -> QDeclarativeItem
+PyQt4.QtDeclarative.QDeclarativeItem.setParentItem?4(QDeclarativeItem)
+PyQt4.QtDeclarative.QDeclarativeItem.childrenRect?4() -> QRectF
+PyQt4.QtDeclarative.QDeclarativeItem.clip?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeItem.setClip?4(bool)
+PyQt4.QtDeclarative.QDeclarativeItem.baselineOffset?4() -> float
+PyQt4.QtDeclarative.QDeclarativeItem.setBaselineOffset?4(float)
+PyQt4.QtDeclarative.QDeclarativeItem.setWidth?4(float)
+PyQt4.QtDeclarative.QDeclarativeItem.implicitWidth?4() -> float
+PyQt4.QtDeclarative.QDeclarativeItem.setHeight?4(float)
+PyQt4.QtDeclarative.QDeclarativeItem.implicitHeight?4() -> float
+PyQt4.QtDeclarative.QDeclarativeItem.transformOrigin?4() -> QDeclarativeItem.TransformOrigin
+PyQt4.QtDeclarative.QDeclarativeItem.setTransformOrigin?4(QDeclarativeItem.TransformOrigin)
+PyQt4.QtDeclarative.QDeclarativeItem.smooth?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeItem.setSmooth?4(bool)
+PyQt4.QtDeclarative.QDeclarativeItem.boundingRect?4() -> QRectF
+PyQt4.QtDeclarative.QDeclarativeItem.paint?4(QPainter, QStyleOptionGraphicsItem, QWidget)
+PyQt4.QtDeclarative.QDeclarativeItem.hasFocus?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeItem.keepMouseGrab?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeItem.setKeepMouseGrab?4(bool)
+PyQt4.QtDeclarative.QDeclarativeItem.isComponentComplete?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeItem.sceneEvent?4(QEvent) -> bool
+PyQt4.QtDeclarative.QDeclarativeItem.event?4(QEvent) -> bool
+PyQt4.QtDeclarative.QDeclarativeItem.itemChange?4(QGraphicsItem.GraphicsItemChange, QVariant) -> QVariant
+PyQt4.QtDeclarative.QDeclarativeItem.setImplicitWidth?4(float)
+PyQt4.QtDeclarative.QDeclarativeItem.widthValid?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeItem.setImplicitHeight?4(float)
+PyQt4.QtDeclarative.QDeclarativeItem.heightValid?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeItem.classBegin?4()
+PyQt4.QtDeclarative.QDeclarativeItem.componentComplete?4()
+PyQt4.QtDeclarative.QDeclarativeItem.keyPressEvent?4(QKeyEvent)
+PyQt4.QtDeclarative.QDeclarativeItem.keyReleaseEvent?4(QKeyEvent)
+PyQt4.QtDeclarative.QDeclarativeItem.inputMethodEvent?4(QInputMethodEvent)
+PyQt4.QtDeclarative.QDeclarativeItem.inputMethodQuery?4(Qt.InputMethodQuery) -> QVariant
+PyQt4.QtDeclarative.QDeclarativeItem.geometryChanged?4(QRectF, QRectF)
+PyQt4.QtDeclarative.QDeclarativeListReference?1()
+PyQt4.QtDeclarative.QDeclarativeListReference.__init__?1(self)
+PyQt4.QtDeclarative.QDeclarativeListReference?1(QObject, str, QDeclarativeEngine engine=None)
+PyQt4.QtDeclarative.QDeclarativeListReference.__init__?1(self, QObject, str, QDeclarativeEngine engine=None)
+PyQt4.QtDeclarative.QDeclarativeListReference?1(QDeclarativeListReference)
+PyQt4.QtDeclarative.QDeclarativeListReference.__init__?1(self, QDeclarativeListReference)
+PyQt4.QtDeclarative.QDeclarativeListReference.isValid?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeListReference.object?4() -> QObject
+PyQt4.QtDeclarative.QDeclarativeListReference.listElementType?4() -> QMetaObject
+PyQt4.QtDeclarative.QDeclarativeListReference.canAppend?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeListReference.canAt?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeListReference.canClear?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeListReference.canCount?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeListReference.append?4(QObject) -> bool
+PyQt4.QtDeclarative.QDeclarativeListReference.at?4(int) -> QObject
+PyQt4.QtDeclarative.QDeclarativeListReference.clear?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeListReference.count?4() -> int
+PyQt4.QtDeclarative.QDeclarativeNetworkAccessManagerFactory?1()
+PyQt4.QtDeclarative.QDeclarativeNetworkAccessManagerFactory.__init__?1(self)
+PyQt4.QtDeclarative.QDeclarativeNetworkAccessManagerFactory?1(QDeclarativeNetworkAccessManagerFactory)
+PyQt4.QtDeclarative.QDeclarativeNetworkAccessManagerFactory.__init__?1(self, QDeclarativeNetworkAccessManagerFactory)
+PyQt4.QtDeclarative.QDeclarativeNetworkAccessManagerFactory.create?4(QObject) -> QNetworkAccessManager
+PyQt4.QtDeclarative.QDeclarativeProperty.Type?10
+PyQt4.QtDeclarative.QDeclarativeProperty.Invalid?10
+PyQt4.QtDeclarative.QDeclarativeProperty.Property?10
+PyQt4.QtDeclarative.QDeclarativeProperty.SignalProperty?10
+PyQt4.QtDeclarative.QDeclarativeProperty.PropertyTypeCategory?10
+PyQt4.QtDeclarative.QDeclarativeProperty.InvalidCategory?10
+PyQt4.QtDeclarative.QDeclarativeProperty.List?10
+PyQt4.QtDeclarative.QDeclarativeProperty.Object?10
+PyQt4.QtDeclarative.QDeclarativeProperty.Normal?10
+PyQt4.QtDeclarative.QDeclarativeProperty?1()
+PyQt4.QtDeclarative.QDeclarativeProperty.__init__?1(self)
+PyQt4.QtDeclarative.QDeclarativeProperty?1(QObject)
+PyQt4.QtDeclarative.QDeclarativeProperty.__init__?1(self, QObject)
+PyQt4.QtDeclarative.QDeclarativeProperty?1(QObject, QDeclarativeContext)
+PyQt4.QtDeclarative.QDeclarativeProperty.__init__?1(self, QObject, QDeclarativeContext)
+PyQt4.QtDeclarative.QDeclarativeProperty?1(QObject, QDeclarativeEngine)
+PyQt4.QtDeclarative.QDeclarativeProperty.__init__?1(self, QObject, QDeclarativeEngine)
+PyQt4.QtDeclarative.QDeclarativeProperty?1(QObject, QString)
+PyQt4.QtDeclarative.QDeclarativeProperty.__init__?1(self, QObject, QString)
+PyQt4.QtDeclarative.QDeclarativeProperty?1(QObject, QString, QDeclarativeContext)
+PyQt4.QtDeclarative.QDeclarativeProperty.__init__?1(self, QObject, QString, QDeclarativeContext)
+PyQt4.QtDeclarative.QDeclarativeProperty?1(QObject, QString, QDeclarativeEngine)
+PyQt4.QtDeclarative.QDeclarativeProperty.__init__?1(self, QObject, QString, QDeclarativeEngine)
+PyQt4.QtDeclarative.QDeclarativeProperty?1(QDeclarativeProperty)
+PyQt4.QtDeclarative.QDeclarativeProperty.__init__?1(self, QDeclarativeProperty)
+PyQt4.QtDeclarative.QDeclarativeProperty.type?4() -> QDeclarativeProperty.Type
+PyQt4.QtDeclarative.QDeclarativeProperty.isValid?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.isProperty?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.isSignalProperty?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.propertyType?4() -> int
+PyQt4.QtDeclarative.QDeclarativeProperty.propertyTypeCategory?4() -> QDeclarativeProperty.PropertyTypeCategory
+PyQt4.QtDeclarative.QDeclarativeProperty.propertyTypeName?4() -> str
+PyQt4.QtDeclarative.QDeclarativeProperty.name?4() -> QString
+PyQt4.QtDeclarative.QDeclarativeProperty.read?4() -> QVariant
+PyQt4.QtDeclarative.QDeclarativeProperty.read?4(QObject, QString) -> QVariant
+PyQt4.QtDeclarative.QDeclarativeProperty.read?4(QObject, QString, QDeclarativeContext) -> QVariant
+PyQt4.QtDeclarative.QDeclarativeProperty.read?4(QObject, QString, QDeclarativeEngine) -> QVariant
+PyQt4.QtDeclarative.QDeclarativeProperty.write?4(QVariant) -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.write?4(QObject, QString, QVariant) -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.write?4(QObject, QString, QVariant, QDeclarativeContext) -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.write?4(QObject, QString, QVariant, QDeclarativeEngine) -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.reset?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.hasNotifySignal?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.needsNotifySignal?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.connectNotifySignal?4(QObject, SLOT()) -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.connectNotifySignal?4(callable) -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.connectNotifySignal?4(QObject, int) -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.isWritable?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.isDesignable?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.isResettable?4() -> bool
+PyQt4.QtDeclarative.QDeclarativeProperty.object?4() -> QObject
+PyQt4.QtDeclarative.QDeclarativeProperty.index?4() -> int
+PyQt4.QtDeclarative.QDeclarativeProperty.property?4() -> QMetaProperty
+PyQt4.QtDeclarative.QDeclarativeProperty.method?4() -> QMetaMethod
+PyQt4.QtDeclarative.QDeclarativePropertyMap?1(QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativePropertyMap.__init__?1(self, QObject parent=None)
+PyQt4.QtDeclarative.QDeclarativePropertyMap.value?4(QString) -> QVariant
+PyQt4.QtDeclarative.QDeclarativePropertyMap.insert?4(QString, QVariant)
+PyQt4.QtDeclarative.QDeclarativePropertyMap.clear?4(QString)
+PyQt4.QtDeclarative.QDeclarativePropertyMap.keys?4() -> QStringList
+PyQt4.QtDeclarative.QDeclarativePropertyMap.count?4() -> int
+PyQt4.QtDeclarative.QDeclarativePropertyMap.size?4() -> int
+PyQt4.QtDeclarative.QDeclarativePropertyMap.isEmpty?4() -> bool
+PyQt4.QtDeclarative.QDeclarativePropertyMap.contains?4(QString) -> bool
+PyQt4.QtDeclarative.QDeclarativePropertyMap.valueChanged?4(QString, QVariant)
+PyQt4.QtDeclarative.QDeclarativePropertyValueSource?1()
+PyQt4.QtDeclarative.QDeclarativePropertyValueSource.__init__?1(self)
+PyQt4.QtDeclarative.QDeclarativePropertyValueSource?1(QDeclarativePropertyValueSource)
+PyQt4.QtDeclarative.QDeclarativePropertyValueSource.__init__?1(self, QDeclarativePropertyValueSource)
+PyQt4.QtDeclarative.QDeclarativePropertyValueSource.setTarget?4(QDeclarativeProperty)
+PyQt4.QtDeclarative.QDeclarativeScriptString?1()
+PyQt4.QtDeclarative.QDeclarativeScriptString.__init__?1(self)
+PyQt4.QtDeclarative.QDeclarativeScriptString?1(QDeclarativeScriptString)
+PyQt4.QtDeclarative.QDeclarativeScriptString.__init__?1(self, QDeclarativeScriptString)
+PyQt4.QtDeclarative.QDeclarativeScriptString.context?4() -> QDeclarativeContext
+PyQt4.QtDeclarative.QDeclarativeScriptString.setContext?4(QDeclarativeContext)
+PyQt4.QtDeclarative.QDeclarativeScriptString.scopeObject?4() -> QObject
+PyQt4.QtDeclarative.QDeclarativeScriptString.setScopeObject?4(QObject)
+PyQt4.QtDeclarative.QDeclarativeScriptString.script?4() -> QString
+PyQt4.QtDeclarative.QDeclarativeScriptString.setScript?4(QString)
+PyQt4.QtDeclarative.QDeclarativeView.Status?10
+PyQt4.QtDeclarative.QDeclarativeView.Null?10
+PyQt4.QtDeclarative.QDeclarativeView.Ready?10
+PyQt4.QtDeclarative.QDeclarativeView.Loading?10
+PyQt4.QtDeclarative.QDeclarativeView.Error?10
+PyQt4.QtDeclarative.QDeclarativeView.ResizeMode?10
+PyQt4.QtDeclarative.QDeclarativeView.SizeViewToRootObject?10
+PyQt4.QtDeclarative.QDeclarativeView.SizeRootObjectToView?10
+PyQt4.QtDeclarative.QDeclarativeView?1(QWidget parent=None)
+PyQt4.QtDeclarative.QDeclarativeView.__init__?1(self, QWidget parent=None)
+PyQt4.QtDeclarative.QDeclarativeView?1(QUrl, QWidget parent=None)
+PyQt4.QtDeclarative.QDeclarativeView.__init__?1(self, QUrl, QWidget parent=None)
+PyQt4.QtDeclarative.QDeclarativeView.source?4() -> QUrl
+PyQt4.QtDeclarative.QDeclarativeView.setSource?4(QUrl)
+PyQt4.QtDeclarative.QDeclarativeView.engine?4() -> QDeclarativeEngine
+PyQt4.QtDeclarative.QDeclarativeView.rootContext?4() -> QDeclarativeContext
+PyQt4.QtDeclarative.QDeclarativeView.rootObject?4() -> QGraphicsObject
+PyQt4.QtDeclarative.QDeclarativeView.resizeMode?4() -> QDeclarativeView.ResizeMode
+PyQt4.QtDeclarative.QDeclarativeView.setResizeMode?4(QDeclarativeView.ResizeMode)
+PyQt4.QtDeclarative.QDeclarativeView.status?4() -> QDeclarativeView.Status
+PyQt4.QtDeclarative.QDeclarativeView.errors?4() -> list-of-QDeclarativeError
+PyQt4.QtDeclarative.QDeclarativeView.sizeHint?4() -> QSize
+PyQt4.QtDeclarative.QDeclarativeView.initialSize?4() -> QSize
+PyQt4.QtDeclarative.QDeclarativeView.sceneResized?4(QSize)
+PyQt4.QtDeclarative.QDeclarativeView.statusChanged?4(QDeclarativeView.Status)
+PyQt4.QtDeclarative.QDeclarativeView.resizeEvent?4(QResizeEvent)
+PyQt4.QtDeclarative.QDeclarativeView.paintEvent?4(QPaintEvent)
+PyQt4.QtDeclarative.QDeclarativeView.timerEvent?4(QTimerEvent)
+PyQt4.QtDeclarative.QDeclarativeView.eventFilter?4(QObject, QEvent) -> bool
+PyQt4.QtDeclarative.QPyDeclarativePropertyValueSource?1(QObject parent=None)
+PyQt4.QtDeclarative.QPyDeclarativePropertyValueSource.__init__?1(self, QObject parent=None)
 PyQt4.QtOpenGL.QGL.FormatOption?10
 PyQt4.QtOpenGL.QGL.DoubleBuffer?10
 PyQt4.QtOpenGL.QGL.DepthBuffer?10
@@ -19011,6 +19680,8 @@ PyQt4.QtOpenGL.QGL.NoStereoBuffers?10
 PyQt4.QtOpenGL.QGL.IndirectRendering?10
 PyQt4.QtOpenGL.QGL.NoOverlay?10
 PyQt4.QtOpenGL.QGL.NoSampleBuffers?10
+PyQt4.QtOpenGL.QGL.DeprecatedFunctions?10
+PyQt4.QtOpenGL.QGL.NoDeprecatedFunctions?10
 PyQt4.QtOpenGL.QGL.setPreferredPaintEngine?4(QPaintEngine.Type)
 PyQt4.QtOpenGL.QGL.FormatOptions?1(QGL.FormatOptions)
 PyQt4.QtOpenGL.QGL.FormatOptions.__init__?1(self, QGL.FormatOptions)
@@ -19018,6 +19689,10 @@ PyQt4.QtOpenGL.QGL.FormatOptions?1(int)
 PyQt4.QtOpenGL.QGL.FormatOptions.__init__?1(self, int)
 PyQt4.QtOpenGL.QGL.FormatOptions?1()
 PyQt4.QtOpenGL.QGL.FormatOptions.__init__?1(self)
+PyQt4.QtOpenGL.QGLFormat.OpenGLContextProfile?10
+PyQt4.QtOpenGL.QGLFormat.NoProfile?10
+PyQt4.QtOpenGL.QGLFormat.CoreProfile?10
+PyQt4.QtOpenGL.QGLFormat.CompatibilityProfile?10
 PyQt4.QtOpenGL.QGLFormat.OpenGLVersionFlag?10
 PyQt4.QtOpenGL.QGLFormat.OpenGL_Version_None?10
 PyQt4.QtOpenGL.QGLFormat.OpenGL_Version_1_1?10
@@ -19028,6 +19703,10 @@ PyQt4.QtOpenGL.QGLFormat.OpenGL_Version_1_5?10
 PyQt4.QtOpenGL.QGLFormat.OpenGL_Version_2_0?10
 PyQt4.QtOpenGL.QGLFormat.OpenGL_Version_2_1?10
 PyQt4.QtOpenGL.QGLFormat.OpenGL_Version_3_0?10
+PyQt4.QtOpenGL.QGLFormat.OpenGL_Version_3_1?10
+PyQt4.QtOpenGL.QGLFormat.OpenGL_Version_3_2?10
+PyQt4.QtOpenGL.QGLFormat.OpenGL_Version_3_3?10
+PyQt4.QtOpenGL.QGLFormat.OpenGL_Version_4_0?10
 PyQt4.QtOpenGL.QGLFormat.OpenGL_ES_Common_Version_1_0?10
 PyQt4.QtOpenGL.QGLFormat.OpenGL_ES_CommonLite_Version_1_0?10
 PyQt4.QtOpenGL.QGLFormat.OpenGL_ES_Common_Version_1_1?10
@@ -19088,6 +19767,11 @@ PyQt4.QtOpenGL.QGLFormat.blueBufferSize?4() -> int
 PyQt4.QtOpenGL.QGLFormat.setSwapInterval?4(int)
 PyQt4.QtOpenGL.QGLFormat.swapInterval?4() -> int
 PyQt4.QtOpenGL.QGLFormat.openGLVersionFlags?4() -> QGLFormat.OpenGLVersionFlags
+PyQt4.QtOpenGL.QGLFormat.setVersion?4(int, int)
+PyQt4.QtOpenGL.QGLFormat.majorVersion?4() -> int
+PyQt4.QtOpenGL.QGLFormat.minorVersion?4() -> int
+PyQt4.QtOpenGL.QGLFormat.setProfile?4(QGLFormat.OpenGLContextProfile)
+PyQt4.QtOpenGL.QGLFormat.profile?4() -> QGLFormat.OpenGLContextProfile
 PyQt4.QtOpenGL.QGLFormat.OpenGLVersionFlags?1(QGLFormat.OpenGLVersionFlags)
 PyQt4.QtOpenGL.QGLFormat.OpenGLVersionFlags.__init__?1(self, QGLFormat.OpenGLVersionFlags)
 PyQt4.QtOpenGL.QGLFormat.OpenGLVersionFlags?1(int)
@@ -19118,7 +19802,6 @@ PyQt4.QtOpenGL.QGLContext.bindTexture?4(QPixmap, int target=GL_TEXTURE_2D, int f
 PyQt4.QtOpenGL.QGLContext.drawTexture?4(QRectF, int, int textureTarget=GL_TEXTURE_2D)
 PyQt4.QtOpenGL.QGLContext.drawTexture?4(QPointF, int, int textureTarget=GL_TEXTURE_2D)
 PyQt4.QtOpenGL.QGLContext.bindTexture?4(QString) -> int
-PyQt4.QtOpenGL.QGLContext.chooseVisual?4() -> sip.voidptr
 PyQt4.QtOpenGL.QGLContext.deleteTexture?4(int)
 PyQt4.QtOpenGL.QGLContext.setTextureCacheLimit?4(int)
 PyQt4.QtOpenGL.QGLContext.textureCacheLimit?4() -> int
@@ -19195,6 +19878,48 @@ PyQt4.QtOpenGL.QGLWidget.glDraw?4()
 PyQt4.QtOpenGL.QGLWidget.fontDisplayListBase?4(QFont, int listBase=2000) -> int
 PyQt4.QtOpenGL.QGLWidget.bindTexture?4(QImage, int, int, QGLContext.BindOptions) -> int
 PyQt4.QtOpenGL.QGLWidget.bindTexture?4(QPixmap, int, int, QGLContext.BindOptions) -> int
+PyQt4.QtOpenGL.QGLBuffer.UsagePattern?10
+PyQt4.QtOpenGL.QGLBuffer.StreamDraw?10
+PyQt4.QtOpenGL.QGLBuffer.StreamRead?10
+PyQt4.QtOpenGL.QGLBuffer.StreamCopy?10
+PyQt4.QtOpenGL.QGLBuffer.StaticDraw?10
+PyQt4.QtOpenGL.QGLBuffer.StaticRead?10
+PyQt4.QtOpenGL.QGLBuffer.StaticCopy?10
+PyQt4.QtOpenGL.QGLBuffer.DynamicDraw?10
+PyQt4.QtOpenGL.QGLBuffer.DynamicRead?10
+PyQt4.QtOpenGL.QGLBuffer.DynamicCopy?10
+PyQt4.QtOpenGL.QGLBuffer.Type?10
+PyQt4.QtOpenGL.QGLBuffer.VertexBuffer?10
+PyQt4.QtOpenGL.QGLBuffer.IndexBuffer?10
+PyQt4.QtOpenGL.QGLBuffer.PixelPackBuffer?10
+PyQt4.QtOpenGL.QGLBuffer.PixelUnpackBuffer?10
+PyQt4.QtOpenGL.QGLBuffer.Access?10
+PyQt4.QtOpenGL.QGLBuffer.ReadOnly?10
+PyQt4.QtOpenGL.QGLBuffer.WriteOnly?10
+PyQt4.QtOpenGL.QGLBuffer.ReadWrite?10
+PyQt4.QtOpenGL.QGLBuffer?1()
+PyQt4.QtOpenGL.QGLBuffer.__init__?1(self)
+PyQt4.QtOpenGL.QGLBuffer?1(QGLBuffer.Type)
+PyQt4.QtOpenGL.QGLBuffer.__init__?1(self, QGLBuffer.Type)
+PyQt4.QtOpenGL.QGLBuffer?1(QGLBuffer)
+PyQt4.QtOpenGL.QGLBuffer.__init__?1(self, QGLBuffer)
+PyQt4.QtOpenGL.QGLBuffer.type?4() -> QGLBuffer.Type
+PyQt4.QtOpenGL.QGLBuffer.usagePattern?4() -> QGLBuffer.UsagePattern
+PyQt4.QtOpenGL.QGLBuffer.setUsagePattern?4(QGLBuffer.UsagePattern)
+PyQt4.QtOpenGL.QGLBuffer.create?4() -> bool
+PyQt4.QtOpenGL.QGLBuffer.isCreated?4() -> bool
+PyQt4.QtOpenGL.QGLBuffer.destroy?4()
+PyQt4.QtOpenGL.QGLBuffer.bind?4() -> bool
+PyQt4.QtOpenGL.QGLBuffer.release?4()
+PyQt4.QtOpenGL.QGLBuffer.release?4(QGLBuffer.Type)
+PyQt4.QtOpenGL.QGLBuffer.bufferId?4() -> int
+PyQt4.QtOpenGL.QGLBuffer.size?4() -> int
+PyQt4.QtOpenGL.QGLBuffer.read?4(int, sip.voidptr, int) -> bool
+PyQt4.QtOpenGL.QGLBuffer.write?4(int, sip.voidptr, int)
+PyQt4.QtOpenGL.QGLBuffer.allocate?4(sip.voidptr, int)
+PyQt4.QtOpenGL.QGLBuffer.allocate?4(int)
+PyQt4.QtOpenGL.QGLBuffer.map?4(QGLBuffer.Access) -> sip.voidptr
+PyQt4.QtOpenGL.QGLBuffer.unmap?4() -> bool
 PyQt4.QtOpenGL.QGLColormap?1()
 PyQt4.QtOpenGL.QGLColormap.__init__?1(self)
 PyQt4.QtOpenGL.QGLColormap?1(QGLColormap)
@@ -19209,8 +19934,8 @@ PyQt4.QtOpenGL.QGLColormap.entryRgb?4(int) -> int
 PyQt4.QtOpenGL.QGLColormap.entryColor?4(int) -> QColor
 PyQt4.QtOpenGL.QGLColormap.find?4(int) -> int
 PyQt4.QtOpenGL.QGLColormap.findNearest?4(int) -> int
-PyQt4.QtOpenGL.QGLColormap.handle?4() -> int
-PyQt4.QtOpenGL.QGLColormap.setHandle?4(int)
+PyQt4.QtOpenGL.QGLColormap.handle?4() -> sip.voidptr
+PyQt4.QtOpenGL.QGLColormap.setHandle?4(sip.voidptr)
 PyQt4.QtOpenGL.QGLFramebufferObject.Attachment?10
 PyQt4.QtOpenGL.QGLFramebufferObject.NoAttachment?10
 PyQt4.QtOpenGL.QGLFramebufferObject.CombinedDepthStencil?10
@@ -19274,7 +19999,7 @@ PyQt4.QtOpenGL.QGLPixelBuffer.drawTexture?4(QRectF, int, int textureTarget=GL_TE
 PyQt4.QtOpenGL.QGLPixelBuffer.drawTexture?4(QPointF, int, int textureTarget=GL_TEXTURE_2D)
 PyQt4.QtOpenGL.QGLPixelBuffer.deleteTexture?4(int)
 PyQt4.QtOpenGL.QGLPixelBuffer.size?4() -> QSize
-PyQt4.QtOpenGL.QGLPixelBuffer.handle?4() -> int
+PyQt4.QtOpenGL.QGLPixelBuffer.handle?4() -> sip.voidptr
 PyQt4.QtOpenGL.QGLPixelBuffer.toImage?4() -> QImage
 PyQt4.QtOpenGL.QGLPixelBuffer.paintEngine?4() -> QPaintEngine
 PyQt4.QtOpenGL.QGLPixelBuffer.format?4() -> QGLFormat
@@ -19284,6 +20009,7 @@ PyQt4.QtOpenGL.QGLPixelBuffer.devType?4() -> int
 PyQt4.QtOpenGL.QGLShader.ShaderTypeBit?10
 PyQt4.QtOpenGL.QGLShader.Vertex?10
 PyQt4.QtOpenGL.QGLShader.Fragment?10
+PyQt4.QtOpenGL.QGLShader.Geometry?10
 PyQt4.QtOpenGL.QGLShader?1(QGLShader.ShaderType, QObject parent=None)
 PyQt4.QtOpenGL.QGLShader.__init__?1(self, QGLShader.ShaderType, QObject parent=None)
 PyQt4.QtOpenGL.QGLShader?1(QGLShader.ShaderType, QGLContext, QObject parent=None)
@@ -19296,6 +20022,7 @@ PyQt4.QtOpenGL.QGLShader.sourceCode?4() -> QByteArray
 PyQt4.QtOpenGL.QGLShader.isCompiled?4() -> bool
 PyQt4.QtOpenGL.QGLShader.log?4() -> QString
 PyQt4.QtOpenGL.QGLShader.shaderId?4() -> int
+PyQt4.QtOpenGL.QGLShader.hasOpenGLShaders?4(QGLShader.ShaderType, QGLContext context=None) -> bool
 PyQt4.QtOpenGL.QGLShader.ShaderType?1(QGLShader.ShaderType)
 PyQt4.QtOpenGL.QGLShader.ShaderType.__init__?1(self, QGLShader.ShaderType)
 PyQt4.QtOpenGL.QGLShader.ShaderType?1(int)
@@ -19394,6 +20121,14 @@ PyQt4.QtOpenGL.QGLShaderProgram.setUniformValue?4(str, QMatrix4x3)
 PyQt4.QtOpenGL.QGLShaderProgram.setUniformValue?4(str, QMatrix4x4)
 PyQt4.QtOpenGL.QGLShaderProgram.setUniformValue?4(str, QTransform)
 PyQt4.QtOpenGL.QGLShaderProgram.hasOpenGLShaderPrograms?4(QGLContext context=None) -> bool
+PyQt4.QtOpenGL.QGLShaderProgram.setGeometryOutputVertexCount?4(int)
+PyQt4.QtOpenGL.QGLShaderProgram.geometryOutputVertexCount?4() -> int
+PyQt4.QtOpenGL.QGLShaderProgram.setGeometryInputType?4(int)
+PyQt4.QtOpenGL.QGLShaderProgram.geometryInputType?4() -> int
+PyQt4.QtOpenGL.QGLShaderProgram.setGeometryOutputType?4(int)
+PyQt4.QtOpenGL.QGLShaderProgram.geometryOutputType?4() -> int
+PyQt4.QtOpenGL.QGLShaderProgram.setAttributeBuffer?4(int, int, int, int, int stride=0)
+PyQt4.QtOpenGL.QGLShaderProgram.setAttributeBuffer?4(str, int, int, int, int stride=0)
 PyQt4.QtScript.qScriptConnect?4(QObject, SIGNAL(), QScriptValue, QScriptValue) -> bool
 PyQt4.QtScript.qScriptDisconnect?4(QObject, SIGNAL(), QScriptValue, QScriptValue) -> bool
 PyQt4.QtScript.QScriptClass.Extension?10
@@ -19490,6 +20225,7 @@ PyQt4.QtScript.QScriptEngine.SkipMethodsInEnumeration?10
 PyQt4.QtScript.QScriptEngine.PreferExistingWrapperObject?10
 PyQt4.QtScript.QScriptEngine.ExcludeSuperClassContents?10
 PyQt4.QtScript.QScriptEngine.ExcludeDeleteLater?10
+PyQt4.QtScript.QScriptEngine.ExcludeSlots?10
 PyQt4.QtScript.QScriptEngine.ValueOwnership?10
 PyQt4.QtScript.QScriptEngine.QtOwnership?10
 PyQt4.QtScript.QScriptEngine.ScriptOwnership?10
@@ -19543,6 +20279,7 @@ PyQt4.QtScript.QScriptEngine.checkSyntax?4(QString) -> QScriptSyntaxCheckResult
 PyQt4.QtScript.QScriptEngine.installTranslatorFunctions?4(QScriptValue object=QScriptValue())
 PyQt4.QtScript.QScriptEngine.toObject?4(QScriptValue) -> QScriptValue
 PyQt4.QtScript.QScriptEngine.signalHandlerException?4(QScriptValue)
+PyQt4.QtScript.QScriptEngine.reportAdditionalMemoryCost?4(int)
 PyQt4.QtScript.QScriptEngine.QObjectWrapOptions?1(QScriptEngine.QObjectWrapOptions)
 PyQt4.QtScript.QScriptEngine.QObjectWrapOptions.__init__?1(self, QScriptEngine.QObjectWrapOptions)
 PyQt4.QtScript.QScriptEngine.QObjectWrapOptions?1(int)
@@ -20335,6 +21072,10 @@ PyQt4.QtWebKit.QGraphicsWebView.focusOutEvent?4(QFocusEvent)
 PyQt4.QtWebKit.QGraphicsWebView.inputMethodEvent?4(QInputMethodEvent)
 PyQt4.QtWebKit.QGraphicsWebView.focusNextPrevChild?4(bool) -> bool
 PyQt4.QtWebKit.QGraphicsWebView.sceneEvent?4(QEvent) -> bool
+PyQt4.QtWebKit.QGraphicsWebView.resizesToContents?4() -> bool
+PyQt4.QtWebKit.QGraphicsWebView.setResizesToContents?4(bool)
+PyQt4.QtWebKit.QGraphicsWebView.isTiledBackingStoreFrozen?4() -> bool
+PyQt4.QtWebKit.QGraphicsWebView.setTiledBackingStoreFrozen?4(bool)
 PyQt4.QtWebKit.QWebDatabase?1(QWebDatabase)
 PyQt4.QtWebKit.QWebDatabase.__init__?1(self, QWebDatabase)
 PyQt4.QtWebKit.QWebDatabase.name?4() -> QString
@@ -20509,6 +21250,8 @@ PyQt4.QtWebKit.QWebFrame.findFirstElement?4(QString) -> QWebElement
 PyQt4.QtWebKit.QWebFrame.contentsSizeChanged?4(QSize)
 PyQt4.QtWebKit.QWebFrame.loadStarted?4()
 PyQt4.QtWebKit.QWebFrame.loadFinished?4(bool)
+PyQt4.QtWebKit.QWebFrame.scrollToAnchor?4(QString)
+PyQt4.QtWebKit.QWebFrame.pageChanged?4()
 PyQt4.QtWebKit.QWebHistoryItem?1(QWebHistoryItem)
 PyQt4.QtWebKit.QWebHistoryItem.__init__?1(self, QWebHistoryItem)
 PyQt4.QtWebKit.QWebHistoryItem.originalUrl?4() -> QUrl
@@ -20551,6 +21294,7 @@ PyQt4.QtWebKit.QWebInspector.event?4(QEvent) -> bool
 PyQt4.QtWebKit.QWebInspector.resizeEvent?4(QResizeEvent)
 PyQt4.QtWebKit.QWebInspector.showEvent?4(QShowEvent)
 PyQt4.QtWebKit.QWebInspector.hideEvent?4(QHideEvent)
+PyQt4.QtWebKit.QWebInspector.closeEvent?4(QCloseEvent)
 PyQt4.QtWebKit.QWebPage.ErrorDomain?10
 PyQt4.QtWebKit.QWebPage.QtNetwork?10
 PyQt4.QtWebKit.QWebPage.Http?10
@@ -20639,6 +21383,7 @@ PyQt4.QtWebKit.QWebPage.AlignCenter?10
 PyQt4.QtWebKit.QWebPage.AlignJustified?10
 PyQt4.QtWebKit.QWebPage.AlignLeft?10
 PyQt4.QtWebKit.QWebPage.AlignRight?10
+PyQt4.QtWebKit.QWebPage.StopScheduledPageRefresh?10
 PyQt4.QtWebKit.QWebPage.NavigationType?10
 PyQt4.QtWebKit.QWebPage.NavigationTypeLinkClicked?10
 PyQt4.QtWebKit.QWebPage.NavigationTypeFormSubmitted?10
@@ -20834,6 +21579,13 @@ PyQt4.QtWebKit.QWebSettings.LocalStorageDatabaseEnabled?10
 PyQt4.QtWebKit.QWebSettings.LocalStorageEnabled?10
 PyQt4.QtWebKit.QWebSettings.LocalContentCanAccessRemoteUrls?10
 PyQt4.QtWebKit.QWebSettings.DnsPrefetchEnabled?10
+PyQt4.QtWebKit.QWebSettings.XSSAuditingEnabled?10
+PyQt4.QtWebKit.QWebSettings.AcceleratedCompositingEnabled?10
+PyQt4.QtWebKit.QWebSettings.SpatialNavigationEnabled?10
+PyQt4.QtWebKit.QWebSettings.LocalContentCanAccessFileUrls?10
+PyQt4.QtWebKit.QWebSettings.TiledBackingStoreEnabled?10
+PyQt4.QtWebKit.QWebSettings.FrameFlatteningEnabled?10
+PyQt4.QtWebKit.QWebSettings.SiteSpecificQuirksEnabled?10
 PyQt4.QtWebKit.QWebSettings.FontFamily?10
 PyQt4.QtWebKit.QWebSettings.StandardFont?10
 PyQt4.QtWebKit.QWebSettings.FixedFont?10
@@ -21638,16 +22390,413 @@ PyQt4.QtXmlPatterns.QXmlSchemaValidator.setUriResolver?4(QAbstractUriResolver)
 PyQt4.QtXmlPatterns.QXmlSchemaValidator.uriResolver?4() -> QAbstractUriResolver
 PyQt4.QtXmlPatterns.QXmlSchemaValidator.setNetworkAccessManager?4(QNetworkAccessManager)
 PyQt4.QtXmlPatterns.QXmlSchemaValidator.networkAccessManager?4() -> QNetworkAccessManager
-PyQt4.QtAssistant.QAssistantClient?1(QString, QObject parent=None)
-PyQt4.QtAssistant.QAssistantClient.__init__?1(self, QString, QObject parent=None)
-PyQt4.QtAssistant.QAssistantClient.isOpen?4() -> bool
-PyQt4.QtAssistant.QAssistantClient.setArguments?4(QStringList)
-PyQt4.QtAssistant.QAssistantClient.openAssistant?4()
-PyQt4.QtAssistant.QAssistantClient.closeAssistant?4()
-PyQt4.QtAssistant.QAssistantClient.showPage?4(QString)
-PyQt4.QtAssistant.QAssistantClient.assistantOpened?4()
-PyQt4.QtAssistant.QAssistantClient.assistantClosed?4()
-PyQt4.QtAssistant.QAssistantClient.error?4(QString)
+PyQt4.phonon.Phonon.ErrorType?10
+PyQt4.phonon.Phonon.NoError?10
+PyQt4.phonon.Phonon.NormalError?10
+PyQt4.phonon.Phonon.FatalError?10
+PyQt4.phonon.Phonon.Category?10
+PyQt4.phonon.Phonon.NoCategory?10
+PyQt4.phonon.Phonon.NotificationCategory?10
+PyQt4.phonon.Phonon.MusicCategory?10
+PyQt4.phonon.Phonon.VideoCategory?10
+PyQt4.phonon.Phonon.CommunicationCategory?10
+PyQt4.phonon.Phonon.GameCategory?10
+PyQt4.phonon.Phonon.AccessibilityCategory?10
+PyQt4.phonon.Phonon.State?10
+PyQt4.phonon.Phonon.LoadingState?10
+PyQt4.phonon.Phonon.StoppedState?10
+PyQt4.phonon.Phonon.PlayingState?10
+PyQt4.phonon.Phonon.BufferingState?10
+PyQt4.phonon.Phonon.PausedState?10
+PyQt4.phonon.Phonon.ErrorState?10
+PyQt4.phonon.Phonon.MetaData?10
+PyQt4.phonon.Phonon.ArtistMetaData?10
+PyQt4.phonon.Phonon.AlbumMetaData?10
+PyQt4.phonon.Phonon.TitleMetaData?10
+PyQt4.phonon.Phonon.DateMetaData?10
+PyQt4.phonon.Phonon.GenreMetaData?10
+PyQt4.phonon.Phonon.TracknumberMetaData?10
+PyQt4.phonon.Phonon.DescriptionMetaData?10
+PyQt4.phonon.Phonon.MusicBrainzDiscIdMetaData?10
+PyQt4.phonon.Phonon.DiscType?10
+PyQt4.phonon.Phonon.NoDisc?10
+PyQt4.phonon.Phonon.Cd?10
+PyQt4.phonon.Phonon.Dvd?10
+PyQt4.phonon.Phonon.Vcd?10
+PyQt4.phonon.Phonon.createPlayer?4(Phonon.Category, Phonon.MediaSource source=Phonon.MediaSource()) -> Phonon.MediaObject
+PyQt4.phonon.Phonon.createPath?4(Phonon.MediaNode, Phonon.MediaNode) -> Phonon.Path
+PyQt4.phonon.Phonon.categoryToString?4(Phonon.Category) -> QString
+PyQt4.phonon.Phonon.phononVersion?4() -> str
+PyQt4.phonon.Phonon.MediaNode.isValid?4() -> bool
+PyQt4.phonon.Phonon.MediaNode.inputPaths?4() -> list-of-Phonon.Path
+PyQt4.phonon.Phonon.MediaNode.outputPaths?4() -> list-of-Phonon.Path
+PyQt4.phonon.Phonon.AudioOutput?1(Phonon.Category, QObject parent=None)
+PyQt4.phonon.Phonon.AudioOutput.__init__?1(self, Phonon.Category, QObject parent=None)
+PyQt4.phonon.Phonon.AudioOutput?1(QObject parent=None)
+PyQt4.phonon.Phonon.AudioOutput.__init__?1(self, QObject parent=None)
+PyQt4.phonon.Phonon.AudioOutput.name?4() -> QString
+PyQt4.phonon.Phonon.AudioOutput.volume?4() -> float
+PyQt4.phonon.Phonon.AudioOutput.volumeDecibel?4() -> float
+PyQt4.phonon.Phonon.AudioOutput.category?4() -> Phonon.Category
+PyQt4.phonon.Phonon.AudioOutput.outputDevice?4() -> Phonon.AudioOutputDevice
+PyQt4.phonon.Phonon.AudioOutput.isMuted?4() -> bool
+PyQt4.phonon.Phonon.AudioOutput.setName?4(QString)
+PyQt4.phonon.Phonon.AudioOutput.setVolume?4(float)
+PyQt4.phonon.Phonon.AudioOutput.setVolumeDecibel?4(float)
+PyQt4.phonon.Phonon.AudioOutput.setOutputDevice?4(Phonon.AudioOutputDevice) -> bool
+PyQt4.phonon.Phonon.AudioOutput.setMuted?4(bool)
+PyQt4.phonon.Phonon.AudioOutput.volumeChanged?4(float)
+PyQt4.phonon.Phonon.AudioOutput.mutedChanged?4(bool)
+PyQt4.phonon.Phonon.AudioOutput.outputDeviceChanged?4(Phonon.AudioOutputDevice)
+PyQt4.phonon.Phonon.BackendCapabilities.notifier?4() -> Phonon.BackendCapabilities.Notifier
+PyQt4.phonon.Phonon.BackendCapabilities.availableMimeTypes?4() -> QStringList
+PyQt4.phonon.Phonon.BackendCapabilities.isMimeTypeAvailable?4(QString) -> bool
+PyQt4.phonon.Phonon.BackendCapabilities.availableAudioOutputDevices?4() -> list-of-Phonon.AudioOutputDevice
+PyQt4.phonon.Phonon.BackendCapabilities.availableAudioEffects?4() -> list-of-Phonon.EffectDescription
+PyQt4.phonon.Phonon.BackendCapabilities.availableAudioCaptureDevices?4() -> list-of-Phonon.AudioCaptureDevice
+PyQt4.phonon.Phonon.BackendCapabilities.Notifier.capabilitiesChanged?4()
+PyQt4.phonon.Phonon.BackendCapabilities.Notifier.availableAudioOutputDevicesChanged?4()
+PyQt4.phonon.Phonon.BackendCapabilities.Notifier.availableAudioCaptureDevicesChanged?4()
+PyQt4.phonon.Phonon.Effect?1(Phonon.EffectDescription, QObject parent=None)
+PyQt4.phonon.Phonon.Effect.__init__?1(self, Phonon.EffectDescription, QObject parent=None)
+PyQt4.phonon.Phonon.Effect.description?4() -> Phonon.EffectDescription
+PyQt4.phonon.Phonon.Effect.parameters?4() -> list-of-Phonon.EffectParameter
+PyQt4.phonon.Phonon.Effect.parameterValue?4(Phonon.EffectParameter) -> QVariant
+PyQt4.phonon.Phonon.Effect.setParameterValue?4(Phonon.EffectParameter, QVariant)
+PyQt4.phonon.Phonon.EffectParameter.Hint?10
+PyQt4.phonon.Phonon.EffectParameter.ToggledHint?10
+PyQt4.phonon.Phonon.EffectParameter.LogarithmicHint?10
+PyQt4.phonon.Phonon.EffectParameter.IntegerHint?10
+PyQt4.phonon.Phonon.EffectParameter?1(int, QString, Phonon.EffectParameter.Hints, QVariant, QVariant min=QVariant(), QVariant max=QVariant(), list-of-QVariant values=[], QString description=QString())
+PyQt4.phonon.Phonon.EffectParameter.__init__?1(self, int, QString, Phonon.EffectParameter.Hints, QVariant, QVariant min=QVariant(), QVariant max=QVariant(), list-of-QVariant values=[], QString description=QString())
+PyQt4.phonon.Phonon.EffectParameter?1(Phonon.EffectParameter)
+PyQt4.phonon.Phonon.EffectParameter.__init__?1(self, Phonon.EffectParameter)
+PyQt4.phonon.Phonon.EffectParameter.name?4() -> QString
+PyQt4.phonon.Phonon.EffectParameter.description?4() -> QString
+PyQt4.phonon.Phonon.EffectParameter.type?4() -> Type
+PyQt4.phonon.Phonon.EffectParameter.isLogarithmicControl?4() -> bool
+PyQt4.phonon.Phonon.EffectParameter.minimumValue?4() -> QVariant
+PyQt4.phonon.Phonon.EffectParameter.maximumValue?4() -> QVariant
+PyQt4.phonon.Phonon.EffectParameter.defaultValue?4() -> QVariant
+PyQt4.phonon.Phonon.EffectParameter.possibleValues?4() -> list-of-QVariant
+PyQt4.phonon.Phonon.EffectParameter.Hints?1(Phonon.EffectParameter.Hints)
+PyQt4.phonon.Phonon.EffectParameter.Hints.__init__?1(self, Phonon.EffectParameter.Hints)
+PyQt4.phonon.Phonon.EffectParameter.Hints?1(int)
+PyQt4.phonon.Phonon.EffectParameter.Hints.__init__?1(self, int)
+PyQt4.phonon.Phonon.EffectParameter.Hints?1()
+PyQt4.phonon.Phonon.EffectParameter.Hints.__init__?1(self)
+PyQt4.phonon.Phonon.EffectWidget?1(Phonon.Effect, QWidget parent=None)
+PyQt4.phonon.Phonon.EffectWidget.__init__?1(self, Phonon.Effect, QWidget parent=None)
+PyQt4.phonon.Phonon.MediaController.Feature?10
+PyQt4.phonon.Phonon.MediaController.Angles?10
+PyQt4.phonon.Phonon.MediaController.Chapters?10
+PyQt4.phonon.Phonon.MediaController.Titles?10
+PyQt4.phonon.Phonon.MediaController?1(Phonon.MediaObject)
+PyQt4.phonon.Phonon.MediaController.__init__?1(self, Phonon.MediaObject)
+PyQt4.phonon.Phonon.MediaController.supportedFeatures?4() -> Phonon.MediaController.Features
+PyQt4.phonon.Phonon.MediaController.availableAngles?4() -> int
+PyQt4.phonon.Phonon.MediaController.currentAngle?4() -> int
+PyQt4.phonon.Phonon.MediaController.availableChapters?4() -> int
+PyQt4.phonon.Phonon.MediaController.currentChapter?4() -> int
+PyQt4.phonon.Phonon.MediaController.availableTitles?4() -> int
+PyQt4.phonon.Phonon.MediaController.currentTitle?4() -> int
+PyQt4.phonon.Phonon.MediaController.autoplayTitles?4() -> bool
+PyQt4.phonon.Phonon.MediaController.setCurrentAngle?4(int)
+PyQt4.phonon.Phonon.MediaController.setCurrentChapter?4(int)
+PyQt4.phonon.Phonon.MediaController.setCurrentTitle?4(int)
+PyQt4.phonon.Phonon.MediaController.setAutoplayTitles?4(bool)
+PyQt4.phonon.Phonon.MediaController.nextTitle?4()
+PyQt4.phonon.Phonon.MediaController.previousTitle?4()
+PyQt4.phonon.Phonon.MediaController.availableAnglesChanged?4(int)
+PyQt4.phonon.Phonon.MediaController.angleChanged?4(int)
+PyQt4.phonon.Phonon.MediaController.availableChaptersChanged?4(int)
+PyQt4.phonon.Phonon.MediaController.chapterChanged?4(int)
+PyQt4.phonon.Phonon.MediaController.availableTitlesChanged?4(int)
+PyQt4.phonon.Phonon.MediaController.titleChanged?4(int)
+PyQt4.phonon.Phonon.MediaController.currentAudioChannel?4() -> Phonon.AudioChannelDescription
+PyQt4.phonon.Phonon.MediaController.currentSubtitle?4() -> Phonon.SubtitleDescription
+PyQt4.phonon.Phonon.MediaController.availableAudioChannels?4() -> list-of-Phonon.AudioChannelDescription
+PyQt4.phonon.Phonon.MediaController.availableSubtitles?4() -> list-of-Phonon.SubtitleDescription
+PyQt4.phonon.Phonon.MediaController.setCurrentAudioChannel?4(Phonon.AudioChannelDescription)
+PyQt4.phonon.Phonon.MediaController.setCurrentSubtitle?4(Phonon.SubtitleDescription)
+PyQt4.phonon.Phonon.MediaController.availableSubtitlesChanged?4()
+PyQt4.phonon.Phonon.MediaController.availableAudioChannelsChanged?4()
+PyQt4.phonon.Phonon.MediaController.Features?1(Phonon.MediaController.Features)
+PyQt4.phonon.Phonon.MediaController.Features.__init__?1(self, Phonon.MediaController.Features)
+PyQt4.phonon.Phonon.MediaController.Features?1(int)
+PyQt4.phonon.Phonon.MediaController.Features.__init__?1(self, int)
+PyQt4.phonon.Phonon.MediaController.Features?1()
+PyQt4.phonon.Phonon.MediaController.Features.__init__?1(self)
+PyQt4.phonon.Phonon.MediaObject?1(QObject parent=None)
+PyQt4.phonon.Phonon.MediaObject.__init__?1(self, QObject parent=None)
+PyQt4.phonon.Phonon.MediaObject.state?4() -> Phonon.State
+PyQt4.phonon.Phonon.MediaObject.hasVideo?4() -> bool
+PyQt4.phonon.Phonon.MediaObject.isSeekable?4() -> bool
+PyQt4.phonon.Phonon.MediaObject.tickInterval?4() -> int
+PyQt4.phonon.Phonon.MediaObject.metaData?4(QString) -> QStringList
+PyQt4.phonon.Phonon.MediaObject.metaData?4(Phonon.MetaData) -> QStringList
+PyQt4.phonon.Phonon.MediaObject.metaData?4() -> dict-of-QString-list-of-QString
+PyQt4.phonon.Phonon.MediaObject.errorString?4() -> QString
+PyQt4.phonon.Phonon.MediaObject.errorType?4() -> Phonon.ErrorType
+PyQt4.phonon.Phonon.MediaObject.currentSource?4() -> Phonon.MediaSource
+PyQt4.phonon.Phonon.MediaObject.setCurrentSource?4(Phonon.MediaSource)
+PyQt4.phonon.Phonon.MediaObject.queue?4() -> list-of-Phonon.MediaSource
+PyQt4.phonon.Phonon.MediaObject.setQueue?4(list-of-Phonon.MediaSource)
+PyQt4.phonon.Phonon.MediaObject.setQueue?4(list-of-QUrl)
+PyQt4.phonon.Phonon.MediaObject.enqueue?4(Phonon.MediaSource)
+PyQt4.phonon.Phonon.MediaObject.enqueue?4(list-of-Phonon.MediaSource)
+PyQt4.phonon.Phonon.MediaObject.enqueue?4(list-of-QUrl)
+PyQt4.phonon.Phonon.MediaObject.clearQueue?4()
+PyQt4.phonon.Phonon.MediaObject.currentTime?4() -> int
+PyQt4.phonon.Phonon.MediaObject.totalTime?4() -> int
+PyQt4.phonon.Phonon.MediaObject.remainingTime?4() -> int
+PyQt4.phonon.Phonon.MediaObject.prefinishMark?4() -> int
+PyQt4.phonon.Phonon.MediaObject.setPrefinishMark?4(int)
+PyQt4.phonon.Phonon.MediaObject.transitionTime?4() -> int
+PyQt4.phonon.Phonon.MediaObject.setTransitionTime?4(int)
+PyQt4.phonon.Phonon.MediaObject.setTickInterval?4(int)
+PyQt4.phonon.Phonon.MediaObject.play?4()
+PyQt4.phonon.Phonon.MediaObject.pause?4()
+PyQt4.phonon.Phonon.MediaObject.stop?4()
+PyQt4.phonon.Phonon.MediaObject.seek?4(int)
+PyQt4.phonon.Phonon.MediaObject.clear?4()
+PyQt4.phonon.Phonon.MediaObject.stateChanged?4(Phonon.State, Phonon.State)
+PyQt4.phonon.Phonon.MediaObject.tick?4(int)
+PyQt4.phonon.Phonon.MediaObject.metaDataChanged?4()
+PyQt4.phonon.Phonon.MediaObject.seekableChanged?4(bool)
+PyQt4.phonon.Phonon.MediaObject.hasVideoChanged?4(bool)
+PyQt4.phonon.Phonon.MediaObject.bufferStatus?4(int)
+PyQt4.phonon.Phonon.MediaObject.finished?4()
+PyQt4.phonon.Phonon.MediaObject.currentSourceChanged?4(Phonon.MediaSource)
+PyQt4.phonon.Phonon.MediaObject.aboutToFinish?4()
+PyQt4.phonon.Phonon.MediaObject.prefinishMarkReached?4(int)
+PyQt4.phonon.Phonon.MediaObject.totalTimeChanged?4(int)
+PyQt4.phonon.Phonon.MediaSource.Type?10
+PyQt4.phonon.Phonon.MediaSource.Invalid?10
+PyQt4.phonon.Phonon.MediaSource.LocalFile?10
+PyQt4.phonon.Phonon.MediaSource.Url?10
+PyQt4.phonon.Phonon.MediaSource.Disc?10
+PyQt4.phonon.Phonon.MediaSource.Stream?10
+PyQt4.phonon.Phonon.MediaSource.Empty?10
+PyQt4.phonon.Phonon.MediaSource?1(QString)
+PyQt4.phonon.Phonon.MediaSource.__init__?1(self, QString)
+PyQt4.phonon.Phonon.MediaSource?1(QUrl)
+PyQt4.phonon.Phonon.MediaSource.__init__?1(self, QUrl)
+PyQt4.phonon.Phonon.MediaSource?1(Phonon.DiscType, QString deviceName=QString())
+PyQt4.phonon.Phonon.MediaSource.__init__?1(self, Phonon.DiscType, QString deviceName=QString())
+PyQt4.phonon.Phonon.MediaSource?1(QIODevice)
+PyQt4.phonon.Phonon.MediaSource.__init__?1(self, QIODevice)
+PyQt4.phonon.Phonon.MediaSource?1(Phonon.MediaSource)
+PyQt4.phonon.Phonon.MediaSource.__init__?1(self, Phonon.MediaSource)
+PyQt4.phonon.Phonon.MediaSource.setAutoDelete?4(bool)
+PyQt4.phonon.Phonon.MediaSource.autoDelete?4() -> bool
+PyQt4.phonon.Phonon.MediaSource.type?4() -> Phonon.MediaSource.Type
+PyQt4.phonon.Phonon.MediaSource.fileName?4() -> QString
+PyQt4.phonon.Phonon.MediaSource.url?4() -> QUrl
+PyQt4.phonon.Phonon.MediaSource.discType?4() -> Phonon.DiscType
+PyQt4.phonon.Phonon.MediaSource.deviceName?4() -> QString
+PyQt4.phonon.Phonon.AudioOutputDevice?1()
+PyQt4.phonon.Phonon.AudioOutputDevice.__init__?1(self)
+PyQt4.phonon.Phonon.AudioOutputDevice?1(int, dict-of-QByteArray-QVariant)
+PyQt4.phonon.Phonon.AudioOutputDevice.__init__?1(self, int, dict-of-QByteArray-QVariant)
+PyQt4.phonon.Phonon.AudioOutputDevice?1(Phonon.AudioOutputDevice)
+PyQt4.phonon.Phonon.AudioOutputDevice.__init__?1(self, Phonon.AudioOutputDevice)
+PyQt4.phonon.Phonon.AudioOutputDevice.description?4() -> QString
+PyQt4.phonon.Phonon.AudioOutputDevice.index?4() -> int
+PyQt4.phonon.Phonon.AudioOutputDevice.isValid?4() -> bool
+PyQt4.phonon.Phonon.AudioOutputDevice.name?4() -> QString
+PyQt4.phonon.Phonon.AudioOutputDevice.property?4(str) -> QVariant
+PyQt4.phonon.Phonon.AudioOutputDevice.propertyNames?4() -> list-of-QByteArray
+PyQt4.phonon.Phonon.AudioOutputDevice.fromIndex?4(int) -> Phonon.AudioOutputDevice
+PyQt4.phonon.Phonon.EffectDescription?1()
+PyQt4.phonon.Phonon.EffectDescription.__init__?1(self)
+PyQt4.phonon.Phonon.EffectDescription?1(int, dict-of-QByteArray-QVariant)
+PyQt4.phonon.Phonon.EffectDescription.__init__?1(self, int, dict-of-QByteArray-QVariant)
+PyQt4.phonon.Phonon.EffectDescription?1(Phonon.EffectDescription)
+PyQt4.phonon.Phonon.EffectDescription.__init__?1(self, Phonon.EffectDescription)
+PyQt4.phonon.Phonon.EffectDescription.description?4() -> QString
+PyQt4.phonon.Phonon.EffectDescription.index?4() -> int
+PyQt4.phonon.Phonon.EffectDescription.isValid?4() -> bool
+PyQt4.phonon.Phonon.EffectDescription.name?4() -> QString
+PyQt4.phonon.Phonon.EffectDescription.property?4(str) -> QVariant
+PyQt4.phonon.Phonon.EffectDescription.propertyNames?4() -> list-of-QByteArray
+PyQt4.phonon.Phonon.EffectDescription.fromIndex?4(int) -> Phonon.EffectDescription
+PyQt4.phonon.Phonon.SubtitleDescription?1()
+PyQt4.phonon.Phonon.SubtitleDescription.__init__?1(self)
+PyQt4.phonon.Phonon.SubtitleDescription?1(int, dict-of-QByteArray-QVariant)
+PyQt4.phonon.Phonon.SubtitleDescription.__init__?1(self, int, dict-of-QByteArray-QVariant)
+PyQt4.phonon.Phonon.SubtitleDescription?1(Phonon.SubtitleDescription)
+PyQt4.phonon.Phonon.SubtitleDescription.__init__?1(self, Phonon.SubtitleDescription)
+PyQt4.phonon.Phonon.SubtitleDescription.description?4() -> QString
+PyQt4.phonon.Phonon.SubtitleDescription.index?4() -> int
+PyQt4.phonon.Phonon.SubtitleDescription.isValid?4() -> bool
+PyQt4.phonon.Phonon.SubtitleDescription.name?4() -> QString
+PyQt4.phonon.Phonon.SubtitleDescription.property?4(str) -> QVariant
+PyQt4.phonon.Phonon.SubtitleDescription.propertyNames?4() -> list-of-QByteArray
+PyQt4.phonon.Phonon.SubtitleDescription.fromIndex?4(int) -> Phonon.SubtitleDescription
+PyQt4.phonon.Phonon.AudioChannelDescription?1()
+PyQt4.phonon.Phonon.AudioChannelDescription.__init__?1(self)
+PyQt4.phonon.Phonon.AudioChannelDescription?1(int, dict-of-QByteArray-QVariant)
+PyQt4.phonon.Phonon.AudioChannelDescription.__init__?1(self, int, dict-of-QByteArray-QVariant)
+PyQt4.phonon.Phonon.AudioChannelDescription?1(Phonon.AudioChannelDescription)
+PyQt4.phonon.Phonon.AudioChannelDescription.__init__?1(self, Phonon.AudioChannelDescription)
+PyQt4.phonon.Phonon.AudioChannelDescription.description?4() -> QString
+PyQt4.phonon.Phonon.AudioChannelDescription.index?4() -> int
+PyQt4.phonon.Phonon.AudioChannelDescription.isValid?4() -> bool
+PyQt4.phonon.Phonon.AudioChannelDescription.name?4() -> QString
+PyQt4.phonon.Phonon.AudioChannelDescription.property?4(str) -> QVariant
+PyQt4.phonon.Phonon.AudioChannelDescription.propertyNames?4() -> list-of-QByteArray
+PyQt4.phonon.Phonon.AudioChannelDescription.fromIndex?4(int) -> Phonon.AudioChannelDescription
+PyQt4.phonon.Phonon.AudioCaptureDevice?1()
+PyQt4.phonon.Phonon.AudioCaptureDevice.__init__?1(self)
+PyQt4.phonon.Phonon.AudioCaptureDevice?1(int, dict-of-QByteArray-QVariant)
+PyQt4.phonon.Phonon.AudioCaptureDevice.__init__?1(self, int, dict-of-QByteArray-QVariant)
+PyQt4.phonon.Phonon.AudioCaptureDevice?1(Phonon.AudioCaptureDevice)
+PyQt4.phonon.Phonon.AudioCaptureDevice.__init__?1(self, Phonon.AudioCaptureDevice)
+PyQt4.phonon.Phonon.AudioCaptureDevice.description?4() -> QString
+PyQt4.phonon.Phonon.AudioCaptureDevice.index?4() -> int
+PyQt4.phonon.Phonon.AudioCaptureDevice.isValid?4() -> bool
+PyQt4.phonon.Phonon.AudioCaptureDevice.name?4() -> QString
+PyQt4.phonon.Phonon.AudioCaptureDevice.property?4(str) -> QVariant
+PyQt4.phonon.Phonon.AudioCaptureDevice.propertyNames?4() -> list-of-QByteArray
+PyQt4.phonon.Phonon.AudioCaptureDevice.fromIndex?4(int) -> Phonon.AudioCaptureDevice
+PyQt4.phonon.Phonon.AudioOutputDeviceModel?1(QObject parent=None)
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.__init__?1(self, QObject parent=None)
+PyQt4.phonon.Phonon.AudioOutputDeviceModel?1(list-of-Phonon.AudioOutputDevice, QObject parent=None)
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.__init__?1(self, list-of-Phonon.AudioOutputDevice, QObject parent=None)
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.tupleIndexOrder?4() -> list-of-int
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.tupleIndexAtPositionIndex?4(int) -> int
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.moveUp?4(QModelIndex)
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.moveDown?4(QModelIndex)
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.setModelData?4(list-of-Phonon.AudioOutputDevice)
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.modelData?4() -> list-of-Phonon.AudioOutputDevice
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.modelData?4(QModelIndex) -> Phonon.AudioOutputDevice
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.rowCount?4(QModelIndex parent=QModelIndex()) -> int
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.data?4(QModelIndex, int role=Qt.DisplayRole) -> QVariant
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.flags?4(QModelIndex) -> Qt.ItemFlags
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.mimeData?4(list-of-QModelIndex) -> QMimeData
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.supportedDropActions?4() -> Qt.DropActions
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.dropMimeData?4(QMimeData, Qt.DropAction, int, int, QModelIndex) -> bool
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.removeRows?4(int, int, QModelIndex parent=QModelIndex()) -> bool
+PyQt4.phonon.Phonon.AudioOutputDeviceModel.mimeTypes?4() -> QStringList
+PyQt4.phonon.Phonon.EffectDescriptionModel?1(QObject parent=None)
+PyQt4.phonon.Phonon.EffectDescriptionModel.__init__?1(self, QObject parent=None)
+PyQt4.phonon.Phonon.EffectDescriptionModel?1(list-of-Phonon.EffectDescription, QObject parent=None)
+PyQt4.phonon.Phonon.EffectDescriptionModel.__init__?1(self, list-of-Phonon.EffectDescription, QObject parent=None)
+PyQt4.phonon.Phonon.EffectDescriptionModel.tupleIndexOrder?4() -> list-of-int
+PyQt4.phonon.Phonon.EffectDescriptionModel.tupleIndexAtPositionIndex?4(int) -> int
+PyQt4.phonon.Phonon.EffectDescriptionModel.moveUp?4(QModelIndex)
+PyQt4.phonon.Phonon.EffectDescriptionModel.moveDown?4(QModelIndex)
+PyQt4.phonon.Phonon.EffectDescriptionModel.setModelData?4(list-of-Phonon.EffectDescription)
+PyQt4.phonon.Phonon.EffectDescriptionModel.modelData?4() -> list-of-Phonon.EffectDescription
+PyQt4.phonon.Phonon.EffectDescriptionModel.modelData?4(QModelIndex) -> Phonon.EffectDescription
+PyQt4.phonon.Phonon.EffectDescriptionModel.rowCount?4(QModelIndex parent=QModelIndex()) -> int
+PyQt4.phonon.Phonon.EffectDescriptionModel.data?4(QModelIndex, int role=Qt.DisplayRole) -> QVariant
+PyQt4.phonon.Phonon.EffectDescriptionModel.flags?4(QModelIndex) -> Qt.ItemFlags
+PyQt4.phonon.Phonon.EffectDescriptionModel.mimeData?4(list-of-QModelIndex) -> QMimeData
+PyQt4.phonon.Phonon.EffectDescriptionModel.supportedDropActions?4() -> Qt.DropActions
+PyQt4.phonon.Phonon.EffectDescriptionModel.dropMimeData?4(QMimeData, Qt.DropAction, int, int, QModelIndex) -> bool
+PyQt4.phonon.Phonon.EffectDescriptionModel.removeRows?4(int, int, QModelIndex parent=QModelIndex()) -> bool
+PyQt4.phonon.Phonon.EffectDescriptionModel.mimeTypes?4() -> QStringList
+PyQt4.phonon.Phonon.Path?1()
+PyQt4.phonon.Phonon.Path.__init__?1(self)
+PyQt4.phonon.Phonon.Path?1(Phonon.Path)
+PyQt4.phonon.Phonon.Path.__init__?1(self, Phonon.Path)
+PyQt4.phonon.Phonon.Path.isValid?4() -> bool
+PyQt4.phonon.Phonon.Path.insertEffect?4(Phonon.EffectDescription, Phonon.Effect before=None) -> Phonon.Effect
+PyQt4.phonon.Phonon.Path.insertEffect?4(Phonon.Effect, Phonon.Effect before=None) -> bool
+PyQt4.phonon.Phonon.Path.removeEffect?4(Phonon.Effect) -> bool
+PyQt4.phonon.Phonon.Path.effects?4() -> list-of-Phonon.Effect
+PyQt4.phonon.Phonon.Path.reconnect?4(Phonon.MediaNode, Phonon.MediaNode) -> bool
+PyQt4.phonon.Phonon.Path.disconnect?4() -> bool
+PyQt4.phonon.Phonon.Path.source?4() -> Phonon.MediaNode
+PyQt4.phonon.Phonon.Path.sink?4() -> Phonon.MediaNode
+PyQt4.phonon.Phonon.SeekSlider?1(QWidget parent=None)
+PyQt4.phonon.Phonon.SeekSlider.__init__?1(self, QWidget parent=None)
+PyQt4.phonon.Phonon.SeekSlider?1(Phonon.MediaObject, QWidget parent=None)
+PyQt4.phonon.Phonon.SeekSlider.__init__?1(self, Phonon.MediaObject, QWidget parent=None)
+PyQt4.phonon.Phonon.SeekSlider.hasTracking?4() -> bool
+PyQt4.phonon.Phonon.SeekSlider.setTracking?4(bool)
+PyQt4.phonon.Phonon.SeekSlider.pageStep?4() -> int
+PyQt4.phonon.Phonon.SeekSlider.setPageStep?4(int)
+PyQt4.phonon.Phonon.SeekSlider.singleStep?4() -> int
+PyQt4.phonon.Phonon.SeekSlider.setSingleStep?4(int)
+PyQt4.phonon.Phonon.SeekSlider.orientation?4() -> Qt.Orientation
+PyQt4.phonon.Phonon.SeekSlider.isIconVisible?4() -> bool
+PyQt4.phonon.Phonon.SeekSlider.iconSize?4() -> QSize
+PyQt4.phonon.Phonon.SeekSlider.mediaObject?4() -> Phonon.MediaObject
+PyQt4.phonon.Phonon.SeekSlider.setOrientation?4(Qt.Orientation)
+PyQt4.phonon.Phonon.SeekSlider.setIconVisible?4(bool)
+PyQt4.phonon.Phonon.SeekSlider.setIconSize?4(QSize)
+PyQt4.phonon.Phonon.SeekSlider.setMediaObject?4(Phonon.MediaObject)
+PyQt4.phonon.Phonon.VideoPlayer?1(Phonon.Category, QWidget parent=None)
+PyQt4.phonon.Phonon.VideoPlayer.__init__?1(self, Phonon.Category, QWidget parent=None)
+PyQt4.phonon.Phonon.VideoPlayer?1(QWidget parent=None)
+PyQt4.phonon.Phonon.VideoPlayer.__init__?1(self, QWidget parent=None)
+PyQt4.phonon.Phonon.VideoPlayer.totalTime?4() -> int
+PyQt4.phonon.Phonon.VideoPlayer.currentTime?4() -> int
+PyQt4.phonon.Phonon.VideoPlayer.volume?4() -> float
+PyQt4.phonon.Phonon.VideoPlayer.isPlaying?4() -> bool
+PyQt4.phonon.Phonon.VideoPlayer.isPaused?4() -> bool
+PyQt4.phonon.Phonon.VideoPlayer.load?4(Phonon.MediaSource)
+PyQt4.phonon.Phonon.VideoPlayer.play?4(Phonon.MediaSource)
+PyQt4.phonon.Phonon.VideoPlayer.play?4()
+PyQt4.phonon.Phonon.VideoPlayer.pause?4()
+PyQt4.phonon.Phonon.VideoPlayer.stop?4()
+PyQt4.phonon.Phonon.VideoPlayer.seek?4(int)
+PyQt4.phonon.Phonon.VideoPlayer.setVolume?4(float)
+PyQt4.phonon.Phonon.VideoPlayer.mediaObject?4() -> Phonon.MediaObject
+PyQt4.phonon.Phonon.VideoPlayer.audioOutput?4() -> Phonon.AudioOutput
+PyQt4.phonon.Phonon.VideoPlayer.videoWidget?4() -> Phonon.VideoWidget
+PyQt4.phonon.Phonon.VideoPlayer.finished?4()
+PyQt4.phonon.Phonon.VideoWidget.ScaleMode?10
+PyQt4.phonon.Phonon.VideoWidget.FitInView?10
+PyQt4.phonon.Phonon.VideoWidget.ScaleAndCrop?10
+PyQt4.phonon.Phonon.VideoWidget.AspectRatio?10
+PyQt4.phonon.Phonon.VideoWidget.AspectRatioAuto?10
+PyQt4.phonon.Phonon.VideoWidget.AspectRatioWidget?10
+PyQt4.phonon.Phonon.VideoWidget.AspectRatio4_3?10
+PyQt4.phonon.Phonon.VideoWidget.AspectRatio16_9?10
+PyQt4.phonon.Phonon.VideoWidget?1(QWidget parent=None)
+PyQt4.phonon.Phonon.VideoWidget.__init__?1(self, QWidget parent=None)
+PyQt4.phonon.Phonon.VideoWidget.aspectRatio?4() -> Phonon.VideoWidget.AspectRatio
+PyQt4.phonon.Phonon.VideoWidget.scaleMode?4() -> Phonon.VideoWidget.ScaleMode
+PyQt4.phonon.Phonon.VideoWidget.brightness?4() -> float
+PyQt4.phonon.Phonon.VideoWidget.contrast?4() -> float
+PyQt4.phonon.Phonon.VideoWidget.hue?4() -> float
+PyQt4.phonon.Phonon.VideoWidget.saturation?4() -> float
+PyQt4.phonon.Phonon.VideoWidget.setFullScreen?4(bool)
+PyQt4.phonon.Phonon.VideoWidget.exitFullScreen?4()
+PyQt4.phonon.Phonon.VideoWidget.enterFullScreen?4()
+PyQt4.phonon.Phonon.VideoWidget.setAspectRatio?4(Phonon.VideoWidget.AspectRatio)
+PyQt4.phonon.Phonon.VideoWidget.setScaleMode?4(Phonon.VideoWidget.ScaleMode)
+PyQt4.phonon.Phonon.VideoWidget.setBrightness?4(float)
+PyQt4.phonon.Phonon.VideoWidget.setContrast?4(float)
+PyQt4.phonon.Phonon.VideoWidget.setHue?4(float)
+PyQt4.phonon.Phonon.VideoWidget.setSaturation?4(float)
+PyQt4.phonon.Phonon.VideoWidget.mouseMoveEvent?4(QMouseEvent)
+PyQt4.phonon.Phonon.VideoWidget.event?4(QEvent) -> bool
+PyQt4.phonon.Phonon.VideoWidget.snapshot?4() -> QImage
+PyQt4.phonon.Phonon.VolumeSlider?1(QWidget parent=None)
+PyQt4.phonon.Phonon.VolumeSlider.__init__?1(self, QWidget parent=None)
+PyQt4.phonon.Phonon.VolumeSlider?1(Phonon.AudioOutput, QWidget parent=None)
+PyQt4.phonon.Phonon.VolumeSlider.__init__?1(self, Phonon.AudioOutput, QWidget parent=None)
+PyQt4.phonon.Phonon.VolumeSlider.hasTracking?4() -> bool
+PyQt4.phonon.Phonon.VolumeSlider.setTracking?4(bool)
+PyQt4.phonon.Phonon.VolumeSlider.pageStep?4() -> int
+PyQt4.phonon.Phonon.VolumeSlider.setPageStep?4(int)
+PyQt4.phonon.Phonon.VolumeSlider.singleStep?4() -> int
+PyQt4.phonon.Phonon.VolumeSlider.setSingleStep?4(int)
+PyQt4.phonon.Phonon.VolumeSlider.isMuteVisible?4() -> bool
+PyQt4.phonon.Phonon.VolumeSlider.iconSize?4() -> QSize
+PyQt4.phonon.Phonon.VolumeSlider.maximumVolume?4() -> float
+PyQt4.phonon.Phonon.VolumeSlider.orientation?4() -> Qt.Orientation
+PyQt4.phonon.Phonon.VolumeSlider.audioOutput?4() -> Phonon.AudioOutput
+PyQt4.phonon.Phonon.VolumeSlider.setMaximumVolume?4(float)
+PyQt4.phonon.Phonon.VolumeSlider.setOrientation?4(Qt.Orientation)
+PyQt4.phonon.Phonon.VolumeSlider.setMuteVisible?4(bool)
+PyQt4.phonon.Phonon.VolumeSlider.setIconSize?4(QSize)
+PyQt4.phonon.Phonon.VolumeSlider.setAudioOutput?4(Phonon.AudioOutput)
 PyQt4.QtDesigner.QDesignerActionEditorInterface?1(QWidget, Qt.WindowFlags flags=0)
 PyQt4.QtDesigner.QDesignerActionEditorInterface.__init__?1(self, QWidget, Qt.WindowFlags flags=0)
 PyQt4.QtDesigner.QDesignerActionEditorInterface.core?4() -> QDesignerFormEditorInterface
@@ -21939,3 +23088,47 @@ PyQt4.QtDesigner.QPyDesignerContainerExtension?1(QObject)
 PyQt4.QtDesigner.QPyDesignerContainerExtension.__init__?1(self, QObject)
 PyQt4.QtDesigner.QPyDesignerPropertySheetExtension?1(QObject)
 PyQt4.QtDesigner.QPyDesignerPropertySheetExtension.__init__?1(self, QObject)
+PyQt4.QAxContainer.QAxBase?1()
+PyQt4.QAxContainer.QAxBase.__init__?1(self)
+PyQt4.QAxContainer.QAxBase?1(QAxBase)
+PyQt4.QAxContainer.QAxBase.__init__?1(self, QAxBase)
+PyQt4.QAxContainer.QAxBase.control?4() -> QString
+PyQt4.QAxContainer.QAxBase.dynamicCall?4(str, QVariant v1=QVariant(), QVariant v2=QVariant(), QVariant v3=QVariant(), QVariant v4=QVariant(), QVariant v5=QVariant(), QVariant v6=QVariant(), QVariant v7=QVariant(), QVariant v8=QVariant()) -> QVariant
+PyQt4.QAxContainer.QAxBase.dynamicCall?4(str, list-of-QVariant) -> QVariant
+PyQt4.QAxContainer.QAxBase.querySubObject?4(str, QVariant v1=QVariant(), QVariant v2=QVariant(), QVariant v3=QVariant(), QVariant v4=QVariant(), QVariant v5=QVariant(), QVariant v6=QVariant(), QVariant v7=QVariant(), QVariant v8=QVariant()) -> QAxObject
+PyQt4.QAxContainer.QAxBase.querySubObject?4(str, list-of-QVariant) -> QAxObject
+PyQt4.QAxContainer.QAxBase.propertyBag?4() -> dict-of-QString-QVariant
+PyQt4.QAxContainer.QAxBase.setPropertyBag?4(dict-of-QString-QVariant)
+PyQt4.QAxContainer.QAxBase.generateDocumentation?4() -> QString
+PyQt4.QAxContainer.QAxBase.propertyWritable?4(str) -> bool
+PyQt4.QAxContainer.QAxBase.setPropertyWritable?4(str, bool)
+PyQt4.QAxContainer.QAxBase.isNull?4() -> bool
+PyQt4.QAxContainer.QAxBase.verbs?4() -> QStringList
+PyQt4.QAxContainer.QAxBase.asVariant?4() -> QVariant
+PyQt4.QAxContainer.QAxBase.signal?4(QString, int, sip.voidptr)
+PyQt4.QAxContainer.QAxBase.propertyChanged?4(QString)
+PyQt4.QAxContainer.QAxBase.exception?4(int, QString, QString, QString)
+PyQt4.QAxContainer.QAxBase.clear?4()
+PyQt4.QAxContainer.QAxBase.setControl?4(QString) -> bool
+PyQt4.QAxContainer.QAxBase.disableMetaObject?4()
+PyQt4.QAxContainer.QAxBase.disableClassInfo?4()
+PyQt4.QAxContainer.QAxBase.disableEventSink?4()
+PyQt4.QAxContainer.QAxObject?1(QObject parent=None)
+PyQt4.QAxContainer.QAxObject.__init__?1(self, QObject parent=None)
+PyQt4.QAxContainer.QAxObject?1(QString, QObject parent=None)
+PyQt4.QAxContainer.QAxObject.__init__?1(self, QString, QObject parent=None)
+PyQt4.QAxContainer.QAxObject.doVerb?4(QString) -> bool
+PyQt4.QAxContainer.QAxObject.connectNotify?4(str)
+PyQt4.QAxContainer.QAxWidget?1(QWidget parent=None, Qt.WindowFlags f=0)
+PyQt4.QAxContainer.QAxWidget.__init__?1(self, QWidget parent=None, Qt.WindowFlags f=0)
+PyQt4.QAxContainer.QAxWidget?1(QString, QWidget parent=None, Qt.WindowFlags f=0)
+PyQt4.QAxContainer.QAxWidget.__init__?1(self, QString, QWidget parent=None, Qt.WindowFlags f=0)
+PyQt4.QAxContainer.QAxWidget.clear?4()
+PyQt4.QAxContainer.QAxWidget.doVerb?4(QString) -> bool
+PyQt4.QAxContainer.QAxWidget.sizeHint?4() -> QSize
+PyQt4.QAxContainer.QAxWidget.minimumSizeHint?4() -> QSize
+PyQt4.QAxContainer.QAxWidget.createHostWindow?4(bool) -> bool
+PyQt4.QAxContainer.QAxWidget.changeEvent?4(QEvent)
+PyQt4.QAxContainer.QAxWidget.resizeEvent?4(QResizeEvent)
+PyQt4.QAxContainer.QAxWidget.translateKeyEvent?4(int, int) -> bool
+PyQt4.QAxContainer.QAxWidget.connectNotify?4(str)
