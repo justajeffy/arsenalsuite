@@ -169,8 +169,10 @@ void loadPythonPlugins()
 
     PyObject * sys_path = getModuleAttr("sys", "path");
 
-    if (!sys_path)
+    if (!sys_path) {
+        LOG_1( "Python Initialization Failure: Failed to get sys.path" );
         return;
+    }
 
     QString dir = QDir::currentPath();
 
