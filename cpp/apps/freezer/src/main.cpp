@@ -151,7 +151,7 @@ void loadPythonPlugins()
 		"\t\tself.modules['blur.Classes'] = imp.load_module('blur.Classes',None,'',('','',imp.C_BUILTIN))\n"
 		"\t\tself.modules['blur.Stonegui'] = imp.load_module('blur.Stonegui',None,'',('','',imp.C_BUILTIN))\n"
 		"\t\tself.modules['blur.Classesui'] = imp.load_module('blur.Classesui',None,'',('','',imp.C_BUILTIN))\n"
-		"\t\tself.modules['blur.Absubmit'] = imp.load_module('blur.Absubmit',None,'',('','',imp.C_BUILTIN))\n"
+		"\t\tself.modules['blur.absubmit'] = imp.load_module('blur.absubmit',None,'',('','',imp.C_BUILTIN))\n"
 		"\t\tself.modules['blur.Freezer'] = imp.load_module('blur.Freezer',None,'',('','',imp.C_BUILTIN))\n"
 		"\tdef find_module(self,fullname,path=None):\n"
 		"\t\tif fullname in self.modules:\n"

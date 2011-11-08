@@ -24,7 +24,7 @@ nsi = NSISTarget("freezer_installer",path,"freezer.nsi")
 # Use Static python modules on windows
 deps = None
 if sys.platform == 'win32':
-	deps = ["sipstatic","pystonestatic","pystoneguistatic","pyclassesstatic","pyclassesuistatic","classes","libfreezer","pyfreezerstatic",ini]
+	deps = ["sipstatic","pystonestatic","pystoneguistatic","pyclassesstatic","pyclassesuistatic","classes","libfreezer","pyfreezerstatic","pyabsubmitstatic",ini]
 else:
 	deps = ["sipstatic","pystone","pystonegui","pyclasses","pyclassesui","classes","libfreezer","pyfreezer",ini]
 
