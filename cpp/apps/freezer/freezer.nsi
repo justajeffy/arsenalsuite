@@ -54,6 +54,7 @@ Section "install"
     File ..\..\lib\freezer\freezer.dll
 	File ..\..\lib\classesui\classesui.dll
 	File ..\..\lib\absubmit\absubmit.dll
+	File /r afplugins
 	SetOutPath $INSTDIR\images
 	File "images\*.*"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "DisplayName" "${MUI_PRODUCT} (remove only)"
