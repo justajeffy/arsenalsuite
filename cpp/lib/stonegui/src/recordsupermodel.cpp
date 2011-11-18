@@ -6,16 +6,12 @@
 #include "recorddrag.h"
 
 QModelIndexList RecordDataTranslatorInterface::appendRecordList(RecordList rl, const QModelIndex & parent )
-{
-	return insertRecordList(model()->rowCount(parent),rl,parent);
-}
+{ return insertRecordList(model()->rowCount(parent),rl,parent); }
 
 const char * RecordDataTranslatorInterface::IfaceName = "RecordDataTranslatorInterface";
 
 const void * RecordDataTranslatorInterface::iface( const char * iface ) const
-{
-	return strcmp(iface,IfaceName) == 0 ? this : 0;
-}
+{ return strcmp(iface,IfaceName) == 0 ? this : 0; }
 
 const RecordDataTranslatorInterface * RecordDataTranslatorInterface::cast( const ModelDataTranslator * trans )
 { return trans ? (const RecordDataTranslatorInterface*)trans->iface(IfaceName) : 0; }
@@ -172,7 +168,7 @@ Record RecordSuperModel::getRecord(const QModelIndex & i) const
 {
 	if( !i.isValid() ) return Record();
 	RecordDataTranslatorInterface * rdt = recordDataTranslator(i);
-	if( rdt )
+	if( rdt ) 
 		return rdt->getRecord(i);
 	//LOG_1( "No RecordDataTranslator found for index" );
 	return Record();
@@ -184,7 +180,12 @@ RecordList RecordSuperModel::listFromIS( const QItemSelection & is )
 	foreach( QItemSelectionRange sr, is ) {
 		QModelIndex i = sr.topLeft();
 		do {
-			ret += getRecord(i);
+            Record r = getRecord(i);
+            if( r.isValid() )
+    			ret += getRecord(i);
+            else
+                LOG_1("Empty selection?");
+
 			i = i.sibling( i.row() + 1, 0 );
 		} while( sr.contains(i) );
 	}
@@ -257,7 +258,9 @@ void RecordSuperModel::setupChildren( const QModelIndex & parent, const RecordLi
 	clearChildren(parent);
 	
 	ModelDataTranslator * trans = translator(parent);
-	if( !trans ) trans = treeBuilder()->defaultTranslator();
+	if( !trans ) {
+        trans = treeBuilder()->defaultTranslator();
+    }
 
 	const RecordDataTranslatorInterface * rdt = RecordDataTranslatorInterface::cast(trans);
 	if( rdt )

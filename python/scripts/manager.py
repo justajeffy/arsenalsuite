@@ -1106,7 +1106,7 @@ def manager3():
 if VERBOSE_DEBUG:
     profile = cProfile.Profile()
 
-def handler(signum, frame):
+def handler(signum):
     print 'Signal handler called with signal', signum
     profileName = "/tmp/manager.profile"
     kProfile = lsprofcalltree.KCacheGrind(profile)
@@ -1114,7 +1114,7 @@ def handler(signum, frame):
     kProfile.output(kFile)
     kFile.close()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     if VERBOSE_DEBUG:
         #signal.signal(signal.SIGHUP, handler)
         #profile.runctx('manager3()', globals(), locals())

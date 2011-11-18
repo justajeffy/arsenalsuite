@@ -162,6 +162,35 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int queryPosOffset, FieldLis
 	}
 }
 
+RecordImp::RecordImp( QSqlQuery & q, Table * table, int queryPosOffset, FieldList * incomingFields )
+: mState( 0 )
+, mTable( table )
+, mValues( 0 )
+, mModifiedBits( 0 )
+, mLiterals( 0 )
+, mNotSelectedBits( 0 )
+{
+    sRecordImpCount++;
+    if( table ) {
+        table->mImpCount++;
+        FieldList allFields = table->schema()->fields();
+        int size = allFields.size();
+        mValues = new VariantVector( size );
+        int pos = queryPosOffset;
+        foreach( Field * f, allFields ) {
+            bool isIncoming = !f->flag(Field::LocalVariable) && ( incomingFields ? incomingFields->contains(f) : !f->flag(Field::NoDefaultSelect) );
+            if( isIncoming )
+                (*mValues)[f->pos()] = f->coerce(q.value(pos++));
+            else {
+                (*mValues)[f->pos()] = f->defaultValue();
+                if( !f->flag(Field::LocalVariable) ) mNotSelectedBits = setBit( mNotSelectedBits, f->pos(), true, allFields.size() );
+            }
+        }
+        mState = COMMITTED;
+//      printf( "NEW RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
+    }
+}
+
 RecordImp::RecordImp( Table * table, QSqlQuery & q, int * queryColPos, FieldList * incomingFields )
 : mState( 0 )
 , mTable( table )
@@ -187,7 +216,7 @@ RecordImp::RecordImp( Table * table, QSqlQuery & q, int * queryColPos, FieldList
 			}
 		}
 		mState = COMMITTED;
-		//printf( "NEW RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
+//		printf( "NEW RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
 	}
 }
 
@@ -198,7 +227,7 @@ RecordImp::~RecordImp()
 		mTable->mImpCount--;
 		//printf( "DELETE RecordImp %p Table: %s Key: %i Table Count: %i\n", this, qPrintable(mTable->tableName()), key(), mTable->mImpCount );
 	}
-	delete mValues;
+    delete mValues;
 	mValues = 0;
 	delete [] mModifiedBits;
 	mModifiedBits = 0;

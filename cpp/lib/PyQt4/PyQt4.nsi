@@ -170,7 +170,7 @@ Section "Extension modules" SecModules
     File .\__init__.py
     File .\Qt\Qt.pyd
     File .\pyqtconfig.py
-    File .\QtAssistant\QtAssistant.pyd
+    #File .\QtAssistant\QtAssistant.pyd
     File .\QtCore\QtCore.pyd
     File .\QtGui\QtGui.pyd
     File .\QtNetwork\QtNetwork.pyd

@@ -65,11 +65,15 @@ int HostServiceItem::compare( const QModelIndex & a, const QModelIndex & b, int 
 QVariant HostServiceItem::modelData( const QModelIndex & idx, int role ) const
 {
 	if( role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ForegroundRole ) {
-		if( idx.column() == 0 ) return mHost.name() + " [" + mHostStatus.slaveStatus() + "]";
+		if( idx.column() == 0 ) return mHost.name();
+        if( idx.column() == 1 ) return mHostStatus.slaveStatus();
+        if( idx.column() == 2 ) return mHost.os();
+        if( idx.column() == 3 ) return mHost.userIsLoggedIn() ? "Logged On" : "Logged Off";
+
 		HostServiceModel * m = model(idx);
 		if( role == Qt::EditRole )
-			return qVariantFromValue<Record>(m->findHostService( mHost, idx.column() ));
-		QVariant d = m->serviceData( mHost, idx.column(), role );
+			return qVariantFromValue<Record>(m->findHostService( mHost, idx.column() - 3));
+		QVariant d = m->serviceData( mHost, idx.column() - 3, role );
 		if( role == Qt::ForegroundRole ) {
 			QString txt = d.toString();
 			return (txt == "Enabled" ? Qt::green : (txt == "Disabled" ? Qt::red : Qt::black));
@@ -81,9 +85,9 @@ QVariant HostServiceItem::modelData( const QModelIndex & idx, int role ) const
 
 bool HostServiceItem::setModelData( const QModelIndex & idx, const QVariant & v, int role )
 {
-	if( role == Qt::EditRole && idx.column() > 0 ) {
+	if( role == Qt::EditRole && idx.column() > 3 ) {
 		HostServiceModel * m = model(idx);
-		HostService hs = m->findHostService( mHost, idx.column() );
+		HostService hs = m->findHostService( mHost, idx.column() - 3);
 		switch( v.toInt() ) {
 			case 0:
 			case 1:
@@ -101,7 +105,7 @@ bool HostServiceItem::setModelData( const QModelIndex & idx, const QVariant & v,
 Qt::ItemFlags HostServiceItem::modelFlags( const QModelIndex & idx )
 {
 	Qt::ItemFlags ret = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-	return idx.column() == 0 ? ret : Qt::ItemFlags(ret | Qt::ItemIsEditable);
+	return idx.column() < 4 ? ret : Qt::ItemFlags(ret | Qt::ItemIsEditable);
 }
 
 Record HostServiceItem::getRecord()
@@ -116,6 +120,11 @@ HostServiceModel::HostServiceModel( QObject * parent )
 
 	// Set HostService index to cache
 	updateServices();
+
+    // Initialize the list
+    currentFilteredList = Host::select();
+
+    hostFiltering = statusFiltering = osFiltering = userFiltering = false;
 }
 
 void HostServiceModel::updateServices()
@@ -125,7 +134,7 @@ void HostServiceModel::updateServices()
 	HostService::schema()->setPreloadEnabled( true );
 	mServices = Service::select().sorted( "service" );
 	LOG_5( mServices.services().join(",") );
-	setHeaderLabels( QStringList() << "Host" << mServices.services() );
+	setHeaderLabels( QStringList() << "Host" << "Status" << "OS" << "User Logged" << mServices.services() );
 	HostList hosts = Host::select();
 	// Keep the list in memory until the items can store each hoststatus record
 	HostStatusList statuses = HostStatus::select();
@@ -148,7 +157,7 @@ HostService HostServiceModel::findHostService( const Host & host, int column ) c
 
 HostService HostServiceModel::findHostService( const QModelIndex & idx ) const
 {
-	return findHostService( getRecord(idx), idx.column() );
+	return findHostService( getRecord(idx), idx.column() - 3);
 }
 
 QVariant HostServiceModel::serviceData ( const Host & host, int column, int ) const
@@ -159,9 +168,121 @@ QVariant HostServiceModel::serviceData ( const Host & host, int column, int ) co
 	return "No Service";
 }
 
-void HostServiceModel::setHostFilter( const QString & filter )
+void HostServiceModel::setHostFilter( const QString & filter, bool cascading )
 {
-	setRootList( Host::select().filter( "name", QRegExp( filter ) ) );
+    currentHostFilter = filter;
+
+    if( filter != "" ) {
+        hostFiltering = true;
+
+        if( cascading )
+            currentFilteredList = currentFilteredList.filter( "name", QRegExp( filter ) );
+        else
+            currentFilteredList = Host::select().filter( "name", QRegExp( filter ) );
+    } else {
+        hostFiltering = false;
+
+        currentFilteredList = Host::select();
+    }
+
+    if( !cascading ) {
+        if( statusFiltering )
+            setStatusFilter( currentStatusFilter , true);
+        if( osFiltering )
+            setOSFilter( currentOsFilter , true);
+        if( userFiltering )
+            setUserLoggedFilter( userFiltering , true);
+    }
+
+  	setRootList( currentFilteredList );
+}
+
+void HostServiceModel::setStatusFilter( const QString & filter , bool cascading)
+{
+    currentStatusFilter = filter;
+
+    if( filter != "" ) {
+        statusFiltering = true;
+        
+        if( cascading ) {
+            HostStatusList statuses = currentFilteredList.hostStatuses().filter( "slavestatus", QRegExp( filter ));
+            currentFilteredList = statuses.hosts();
+        } else {
+            HostStatusList statuses = HostStatus::select().filter( "slavestatus", QRegExp( filter ));
+            currentFilteredList = statuses.hosts();
+        }
+    } else {
+        statusFiltering = false;
+
+        currentFilteredList = Host::select();
+    }
+
+    if( !cascading ) {
+        if( hostFiltering )
+            setHostFilter( currentHostFilter , true);
+        if( osFiltering )
+            setOSFilter( currentOsFilter , true);
+        if( userFiltering )
+            setUserLoggedFilter( userFiltering , true);
+    }
+
+    setRootList( currentFilteredList );
+}
+
+void HostServiceModel::setOSFilter( const QString & filter , bool cascading)
+{
+    currentOsFilter = filter;
+
+    if( filter != "" ) {
+        osFiltering = true;
+
+        if( cascading )
+            currentFilteredList = currentFilteredList.filter( "os", QRegExp( filter ) );
+        else
+            currentFilteredList = Host::select().filter( "os", QRegExp( filter ) );
+    } else {
+        osFiltering = false;
+
+        currentFilteredList = Host::select();
+    }
+
+    if( !cascading ) {
+        if( hostFiltering )
+            setHostFilter( currentHostFilter , true);
+        if( statusFiltering )
+            setStatusFilter( currentStatusFilter , true);
+        if( userFiltering )
+            setUserLoggedFilter( userFiltering , true);
+    }
+
+    setRootList( currentFilteredList );
+}
+
+void HostServiceModel::setUserLoggedFilter( bool filter, bool useLoggedIn, bool cascading)
+{
+    if( filter ) {
+        userFiltering = true;
+
+        if( cascading )
+            currentFilteredList = currentFilteredList.filter( "userisloggedin", useLoggedIn );
+        else
+            currentFilteredList = Host::select().filter( "userisloggedin", useLoggedIn );
+    } else {
+        userFiltering = false;
+
+        currentFilteredList = Host::select();
+    }
+
+    if( !cascading ) {
+        if( hostFiltering )
+            setHostFilter( currentHostFilter , true);
+        if( statusFiltering )
+            setStatusFilter( currentStatusFilter , true);
+        if( osFiltering )
+            setOSFilter( currentOsFilter , true);
+    }
+
+    setRootList( currentFilteredList );
 }
 
 class HostServiceDelegate : public RecordDelegate
@@ -215,12 +336,28 @@ HostServiceMatrix::HostServiceMatrix( QWidget * parent )
 	setModel( mModel );
 	setItemDelegate( new HostServiceDelegate(this) );
 	connect( this, SIGNAL( showMenu( const QPoint &, const QModelIndex & ) ), SLOT( slotShowMenu( const QPoint &, const QModelIndex & ) ) );
+
+    hostFTimer = new QTimer(this);
+    statusFTimer = new QTimer(this);
+    osFTimer = new QTimer(this);
+
+    connect( hostFTimer, SIGNAL(timeout()), this, SLOT( hostTimerExpired() ) );
+    connect( statusFTimer, SIGNAL(timeout()), this, SLOT( statusTimerExpired() ) );
+    connect( osFTimer, SIGNAL(timeout()), this, SLOT( osTimerExpired() ) );
+
+    hostFTimer->setSingleShot( true );
+    statusFTimer->setSingleShot( true );
+    osFTimer->setSingleShot( true );
+
 	setSelectionBehavior( QAbstractItemView::SelectItems );
 	header()->setStretchLastSection( false );
 
 	connect( Service::table(), SIGNAL( added(RecordList) ), SLOT( updateServices() ) );
 	connect( Service::table(), SIGNAL( removed(RecordList) ), SLOT( updateServices() ) );
 	connect( Service::table(), SIGNAL( updated(Record,Record) ), SLOT( updateServices() ) );
+
+    userFiltering = false;
+    useLoggedIn = true;
 }
 
 HostServiceModel * HostServiceMatrix::getModel() const
@@ -231,7 +368,47 @@ HostServiceModel * HostServiceMatrix::getModel() const
 void HostServiceMatrix::setHostFilter( const QString & filter )
 {
 	mHostFilter = filter;
-	mModel->setHostFilter( filter );
+    hostFTimer->start(300);
+}
+
+void HostServiceMatrix::hostTimerExpired()
+{
+    mModel->setHostFilter( mHostFilter );
+}
+
+void HostServiceMatrix::setStatusFilter( const QString & filter )
+{
+    mHostStatusFilter = filter;
+    statusFTimer->start(300);
+}
+
+void HostServiceMatrix::statusTimerExpired()
+{
+    mModel->setStatusFilter( mHostStatusFilter );
+}
+
+void HostServiceMatrix::setOSFilter( const QString & filter )
+{
+    mHostOsFilter = filter;
+    osFTimer->start(300);
+}
+
+void HostServiceMatrix::osTimerExpired()
+{
+    mModel->setOSFilter( mHostOsFilter );
+}
+
+void HostServiceMatrix::setUserLoggedFilter( int filter )
+{
+    userFiltering = filter > 0;
+    mModel->setUserLoggedFilter( filter > 0 , useLoggedIn);
+}
+
+void HostServiceMatrix::setUserLoggedType( bool type )
+{
+    useLoggedIn = type;
+    if( userFiltering )
+        mModel->setUserLoggedFilter( true, useLoggedIn );
 }
 
 void HostServiceMatrix::setServiceFilter( const QString & filter )
@@ -263,8 +440,12 @@ void HostServiceMatrix::slotShowMenu( const QPoint & pos, const QModelIndex & /*
 			HostServiceList toUpdate;
 			foreach( QModelIndex idx, sel.indexes() ) {
 				HostService hs = mModel->findHostService( idx );
-				hs.setEnabled( result == en );
-				toUpdate += hs;
+                // We only want to manipulate what we've filtered out.
+                if( mServiceFilter == "" || QRegExp(mServiceFilter).indexIn(hs.service().service()) > -1)
+                {
+    				hs.setEnabled( result == en );
+    				toUpdate += hs;
+                }
 			}
 			if( result == en || result == dis ) {
 				toUpdate.commit();
@@ -306,6 +487,11 @@ HostServiceMatrixWindow::HostServiceMatrixWindow( QWidget * parent )
 	mCentralWidget->layout()->addWidget(mView);
 	mView->show();
 	connect( mHostFilterEdit, SIGNAL( textChanged( const QString & ) ), mView, SLOT( setHostFilter( const QString & ) ) );
+    connect( mHostStatusFilterEdit, SIGNAL( textChanged( const QString & ) ), mView, SLOT( setStatusFilter( const QString & ) ) );
+    connect( mHostOsFilterEdit, SIGNAL( textChanged( const QString & ) ), mView, SLOT( setOSFilter( const QString & ) ) );
+    connect( mHostUserLoggedInCheckbox, SIGNAL( stateChanged( int ) ), mView, SLOT( setUserLoggedFilter( int ) ) );
+    connect( mUserLoggedInType, SIGNAL( toggled( bool ) ), mView, SLOT( setUserLoggedType( bool ) ) );
+
 	connect( mServiceFilterEdit, SIGNAL( textChanged( const QString & ) ), mView, SLOT( setServiceFilter( const QString & ) ) );
 	QMenu * fileMenu = menuBar()->addMenu( "&File" );
 	fileMenu->addAction( "&New Service", this, SLOT( newService() ) );

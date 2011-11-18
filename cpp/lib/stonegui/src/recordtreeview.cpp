@@ -884,7 +884,7 @@ Record RecordTreeView::current()
 RecordList RecordTreeView::selection()
 {
 	RecordSuperModel * rsm = model();
-	if( rsm )
+	if( rsm ) 
 		return rsm->listFromIS( selectionModel()->selection() );
 	return RecordList();
 }

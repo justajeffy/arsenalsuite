@@ -1,4 +1,22 @@
 
+class RecordItemBase : ItemBase
+{
+%TypeHeaderCode
+#include <recordsupermodel.h>
+%End
+public:
+    RecordList children( const QModelIndex & );
+    Qt::ItemFlags modelFlags( const QModelIndex & );
+};
+
+class SipRecordItemBase : RecordItemBase
+{
+%TypeHeaderCode
+#include <recordsupermodel.h>
+%End
+public:
+    SipRecordItemBase(ModelTreeBuilder * builder);
+};
 
 class RecordDataTranslatorInterface : ModelDataTranslator /Abstract/
 {
@@ -41,6 +59,26 @@ public:
 	int recordColumnPos( int column, const Record & ) const;
 	bool columnIsEditable( int column ) const;
 	TableSchema * columnForeignKeyTable( int column ) const;
+};
+
+class SipRecordDataTranslatorBase : RecordDataTranslatorBase
+{
+%TypeHeaderCode
+#include <recordsupermodel.h>
+%End
+public:
+    SipRecordDataTranslatorBase(ModelTreeBuilder * builder /TransferThis/ );
+    ~SipRecordDataTranslatorBase();
+
+    virtual Record getRecord(const QModelIndex &) const;
+
+    virtual QVariant modelData( void * dataPtr, const QModelIndex &, int role ) const;
+    virtual bool setModelData( void * dataPtr, const QModelIndex &, const QVariant &, int);
+    virtual void setup(const QModelIndex & idx, const Record & record );
+    virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const;
+    virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const;
+
+    virtual QModelIndexList insertRecordList(int row, RecordList & rl /TransferThis/, const QModelIndex & parent = QModelIndex() );
 };
 
 class RecordDataTranslator : RecordDataTranslatorBase
