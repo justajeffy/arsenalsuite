@@ -93,16 +93,16 @@ public:
 	virtual void deleteData( void * dataPtr ) = 0;
 	virtual void constructData( void * dataPtr, void * copySource = 0 ) = 0;
 	virtual void copyData( void * dataPtr, void * copySource ) = 0;
-	void rawCopy( void * dataPtr, void * copySource ) { memcpy( dataPtr, copySource, dataSize() ); }
+	virtual void rawCopy( void * dataPtr, void * copySource ) { memcpy( dataPtr, copySource, dataSize() ); }
 	virtual const void * iface( const char * ) const { return 0; }
-	QModelIndex insert( int row, const QModelIndex & parent = QModelIndex() );
-	QModelIndex append( const QModelIndex & parent = QModelIndex() );
+	virtual QModelIndex insert( int row, const QModelIndex & parent = QModelIndex() );
+	virtual QModelIndex append( const QModelIndex & parent = QModelIndex() );
 
 	static void * dataPtr( const QModelIndex & idx );
 	static ModelDataTranslator * translator( const QModelIndex & idx );
-	SuperModel * model() { return mBuilder->model(); }
-protected:
-	ModelTreeBuilder * mBuilder;
+	virtual SuperModel * model() { return mBuilder->model(); }
+	
+    ModelTreeBuilder * mBuilder;
 };
 
 template<class TYPE, class BASE = ModelDataTranslator> class TemplateDataTranslator : public BASE

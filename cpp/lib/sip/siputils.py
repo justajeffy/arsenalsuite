@@ -1197,8 +1197,8 @@ class Makefile:
         strip is set if the files should be stripped after been installed.
         """
         # Help package builders.
-        if self.generator == "UNIX":
-            dst = "$(DESTDIR)" + dst
+#        if self.generator == "UNIX":
+#            dst = "$(DESTDIR)" + dst
 
         mfile.write("\t@%s %s " % (self.chkdir, _quote(dst)))
 

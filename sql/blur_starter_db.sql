@@ -9,24 +9,6 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET escape_string_warning = off;
 
---
--- Name: jabberd; Type: SCHEMA; Schema: -; Owner: farmer
---
-
-CREATE SCHEMA jabberd;
-
-
-ALTER SCHEMA jabberd OWNER TO farmer;
-
---
--- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: farmer
---
-
-CREATE OR REPLACE PROCEDURAL LANGUAGE plpgsql;
-
-
-ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO farmer;
-
 SET search_path = public, pg_catalog;
 
 --
@@ -920,7 +902,7 @@ BEGIN
 
 SELECT INTO _ret job.slots, 
 js.averagedonetime,
-(select MAX(maxmemory) FROM jobassignment ja WHERE ja.fkeyjob = keyjob) as maxmemory
+(select MAX(maxmemory) FROM jobassignment ja WHERE ja.fkeyjob = keyjob and fkeyjobassignmentstatus=4) as maxmemory
 FROM job
 JOIN jobstatus js on js.fkeyjob = keyjob
 WHERE shotName = _shot 
@@ -947,7 +929,7 @@ CREATE FUNCTION get_wayward_hosts() RETURNS SETOF integer
 DECLARE
 	hs hoststatus;
 BEGIN
-	FOR hs IN SELECT * FROM HostStatus WHERE slavestatus IS NOT NULL AND slavestatus NOT IN ('offline','restart','sleeping','waking','no-ping','stopping') AND now() - slavepulse > '10 minutes'::interval LOOP
+	FOR hs IN SELECT * FROM HostStatus WHERE slavestatus IS NOT NULL AND slavestatus NOT IN ('offline','restart','restarting','sleeping','waking','no-ping','stopping','maintenance') AND now() - slavepulse > '10 minutes'::interval LOOP
 		RETURN NEXT hs.fkeyhost;
 	END LOOP;
 
@@ -983,7 +965,7 @@ BEGIN
 		RETURN NEXT ret;
 	END LOOP;
 
-	FOR hs IN SELECT * FROM HostStatus WHERE slavestatus IS NOT NULL AND slavestatus IN ('ready','copy','busy','offline') AND (slavepulse IS NULL OR (now() - slavepulse) > (pulse_period + loop_time)) LOOP
+	FOR hs IN SELECT * FROM HostStatus WHERE slavestatus IS NOT NULL AND slavestatus IN ('ready','copy','busy','offline','maintenance','restarting') AND (slavepulse IS NULL OR (now() - slavepulse) > (pulse_period*2 + loop_time)) LOOP
 		ret := ROW(hs.fkeyhost,2);
 		RETURN NEXT ret;
 	END LOOP;
@@ -1809,7 +1791,7 @@ BEGIN
         PERFORM update_job_task_counts(NEW.keyjob);
     END IF;
 
-    IF NEW.status IN ('verify', 'suspended', 'deleted') AND OLD.status != 'submit' THEN
+    IF NEW.status IN ('verify', 'suspended', 'deleted') AND OLD.status NOT IN ('submit','done','suspended') THEN
         PERFORM cancel_job_assignments(NEW.keyjob, 'cancelled', 'new');
     END IF;
 
@@ -2471,6 +2453,56 @@ $$;
 ALTER FUNCTION public.update_job_hard_deps(_keyjob integer) OWNER TO farmer;
 
 --
+-- Name: update_job_hard_deps_2(integer); Type: FUNCTION; Schema: public; Owner: farmer
+--
+
+CREATE FUNCTION update_job_hard_deps_2(_keyjob integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    childDepRec RECORD;
+    jobDepRec RECORD;
+    newstatus text;
+BEGIN
+    -- iterate through all a jobs children when its status has changed
+    FOR jobDepRec IN
+        SELECT fkeyjob as childKey 
+        FROM jobdep
+        WHERE fkeydep = _keyjob AND deptype = 1
+    LOOP
+        newstatus := 'ready';
+
+        -- if it's a hard dependency, check all possible parents to make sure they are
+        -- done as well
+	FOR childDepRec IN
+		SELECT status
+                FROM jobdep
+                JOIN job ON jobdep.fkeydep = job.keyjob
+                WHERE keyjob != _keyjob AND fkeyjob = jobDepRec.childKey AND deptype = 1
+        LOOP
+                -- if a parent is not done or deleted then the child should stay on holding
+                IF childDepRec.status != 'done' AND childDepRec.status != 'deleted' THEN
+                    newstatus := 'holding';
+                END IF;
+		EXIT WHEN newStatus = 'holding';
+        END LOOP;
+
+	-- for suspend dependencies, we want to fire regardless of other parents
+	--IF (_oldstatus = 'started' OR _oldstatus = 'ready') AND _newstatus = 'suspended' AND jobDepRec.childDepType = 3 THEN
+	--END IF;
+
+        -- this update should be a null op if the newstatus doesn't change
+        UPDATE job SET status = newstatus WHERE keyjob = jobDepRec.childKey;
+        INSERT INTO jobhistory (fkeyjob, message) VALUES (jobDepRec.childKey, 'Job status set to: ' || newstatus || ' by hard parent job');
+    END LOOP;
+    RETURN;
+END;    
+$$;
+
+
+ALTER FUNCTION public.update_job_hard_deps_2(_keyjob integer) OWNER TO farmer;
+
+--
 -- Name: update_job_health(); Type: FUNCTION; Schema: public; Owner: farmer
 --
 
@@ -3029,7 +3061,8 @@ CREATE TABLE job (
     maxquiettime integer DEFAULT 3600 NOT NULL,
     autoadaptslots integer DEFAULT (-1) NOT NULL,
     fkeyjobenvironment integer,
-    suspendedts timestamp without time zone
+    suspendedts timestamp without time zone,
+    toggleflags integer
 );
 
 
@@ -3116,180 +3149,6 @@ CREATE OPERATOR / (
 
 
 ALTER OPERATOR public./ (interval, interval) OWNER TO farmer;
-
-SET search_path = jabberd, pg_catalog;
-
---
--- Name: active; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
---
-
-CREATE TABLE active (
-    "collection-owner" text,
-    "object-sequence" integer,
-    "time" integer
-);
-
-
-ALTER TABLE jabberd.active OWNER TO farmer;
-
---
--- Name: authreg; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
---
-
-CREATE TABLE authreg (
-    username text,
-    realm text,
-    password text,
-    token text,
-    sequence integer,
-    hash text
-);
-
-
-ALTER TABLE jabberd.authreg OWNER TO farmer;
-
---
--- Name: logout; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
---
-
-CREATE TABLE logout (
-    "collection-owner" text,
-    "object-sequence" integer,
-    "time" integer
-);
-
-
-ALTER TABLE jabberd.logout OWNER TO farmer;
-
---
--- Name: object-sequence; Type: SEQUENCE; Schema: jabberd; Owner: farmer
---
-
-CREATE SEQUENCE "object-sequence"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE jabberd."object-sequence" OWNER TO farmer;
-
---
--- Name: object-sequence; Type: SEQUENCE SET; Schema: jabberd; Owner: farmer
---
-
-SELECT pg_catalog.setval('"object-sequence"', 1, false);
-
-
---
--- Name: privacy-items; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
---
-
-CREATE TABLE "privacy-items" (
-    "collection-owner" text,
-    "object-sequence" integer,
-    list text,
-    type text,
-    value text,
-    deny integer,
-    "order" integer,
-    block integer
-);
-
-
-ALTER TABLE jabberd."privacy-items" OWNER TO farmer;
-
---
--- Name: private; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
---
-
-CREATE TABLE private (
-    "collection-owner" text,
-    "object-sequence" integer,
-    ns text,
-    xml text
-);
-
-
-ALTER TABLE jabberd.private OWNER TO farmer;
-
---
--- Name: queue; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
---
-
-CREATE TABLE queue (
-    "collection-owner" text,
-    "object-sequence" integer,
-    xml text
-);
-
-
-ALTER TABLE jabberd.queue OWNER TO farmer;
-
---
--- Name: roster-groups; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
---
-
-CREATE TABLE "roster-groups" (
-    "collection-owner" text,
-    "object-sequence" integer,
-    jid text,
-    "group" text
-);
-
-
-ALTER TABLE jabberd."roster-groups" OWNER TO farmer;
-
---
--- Name: roster-items; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
---
-
-CREATE TABLE "roster-items" (
-    "collection-owner" text,
-    "object-sequence" integer,
-    jid text,
-    name text,
-    ask integer,
-    "to" boolean,
-    "from" boolean
-);
-
-
-ALTER TABLE jabberd."roster-items" OWNER TO farmer;
-
---
--- Name: vcard; Type: TABLE; Schema: jabberd; Owner: farmer; Tablespace: 
---
-
-CREATE TABLE vcard (
-    "collection-owner" text,
-    "object-sequence" integer,
-    fn text,
-    nickname text,
-    url text,
-    tel text,
-    email text,
-    title text,
-    role text,
-    bday text,
-    "desc" text,
-    "n-given" text,
-    "n-family" text,
-    "adr-street" text,
-    "adr-extadd" text,
-    "adr-locality" text,
-    "adr-region" text,
-    "adr-pcode" text,
-    "adr-country" text,
-    "org-orgname" text,
-    "org-orgunit" text
-);
-
-
-ALTER TABLE jabberd.vcard OWNER TO farmer;
-
-SET search_path = public, pg_catalog;
 
 --
 -- Name: host_keyhost_seq; Type: SEQUENCE; Schema: public; Owner: farmer
@@ -5806,6 +5665,7 @@ CREATE TABLE job3delight (
     minmemory integer,
     scenename text,
     shotname text,
+    toggleflags integer,
     width integer,
     height integer,
     framestart integer,
@@ -5973,6 +5833,7 @@ CREATE TABLE jobbatch (
     fkeyjobfilterset integer,
     maxerrors integer,
     fkeyjobenvironment integer,
+    toggleflags integer,
     cmd text,
     restartafterfinish boolean DEFAULT false,
     restartaftershutdown boolean,
@@ -6253,7 +6114,7 @@ ALTER SEQUENCE jobfiltermessage_keyjobfiltermessage_seq OWNED BY jobfiltermessag
 -- Name: jobfiltermessage_keyjobfiltermessage_seq; Type: SEQUENCE SET; Schema: public; Owner: farmer
 --
 
-SELECT pg_catalog.setval('jobfiltermessage_keyjobfiltermessage_seq', 128, true);
+SELECT pg_catalog.setval('jobfiltermessage_keyjobfiltermessage_seq', 181, true);
 
 
 --
@@ -6414,6 +6275,7 @@ ALTER TABLE public.jobhistorytype OWNER TO farmer;
 CREATE TABLE jobmantra100 (
     fkeyjobfilterset integer,
     maxerrors integer,
+    toggleflags integer,
     keyjobmantra100 integer NOT NULL,
     forceraytrace boolean,
     geocachesize integer,
@@ -6504,6 +6366,100 @@ SELECT pg_catalog.setval('jobmantra95_keyjobmantra95_seq', 1, false);
 
 
 --
+-- Name: jobmax; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE jobmax (
+    camera text,
+    elementfile text,
+    exrattributes text,
+    exrchannels text,
+    exrcompression integer,
+    exrsavebitdepth integer,
+    exrsaveregion boolean,
+    exrsavescanline boolean,
+    exrtilesize integer,
+    exrversion integer,
+    fileoriginal text,
+    flag_h integer,
+    flag_v integer,
+    flag_w integer,
+    flag_x2 integer,
+    flag_xa integer,
+    flag_xc integer,
+    flag_xd integer,
+    flag_xe integer,
+    flag_xf integer,
+    flag_xh integer,
+    flag_xk integer,
+    flag_xn integer,
+    flag_xo integer,
+    flag_xp integer,
+    flag_xv integer,
+    frameend integer,
+    framelist text,
+    framestart integer,
+    plugininipath text,
+    startupscript text
+)
+INHERITS (job);
+
+
+ALTER TABLE public.jobmax OWNER TO postgres;
+
+--
+-- Name: jobmax10; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobmax10 (
+)
+INHERITS (jobmax);
+
+
+ALTER TABLE public.jobmax10 OWNER TO farmer;
+
+--
+-- Name: jobmax2009; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobmax2009 (
+)
+INHERITS (jobmax);
+
+
+ALTER TABLE public.jobmax2009 OWNER TO farmer;
+
+--
+-- Name: jobmax2010; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobmax2010 (
+)
+INHERITS (jobmax);
+
+
+ALTER TABLE public.jobmax2010 OWNER TO farmer;
+
+--
+-- Name: jobmaxscript; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE TABLE jobmaxscript (
+    script text,
+    maxtime integer,
+    outputfiles text,
+    silent boolean,
+    maxversion text,
+    runmax64 boolean,
+    runpythonscript boolean,
+    use3dsmaxcmd boolean
+)
+INHERITS (job);
+
+
+ALTER TABLE public.jobmaxscript OWNER TO farmer;
+
+--
 -- Name: jobmaya; Type: TABLE; Schema: public; Owner: farmer; Tablespace: 
 --
 
@@ -6526,6 +6482,7 @@ CREATE TABLE jobmaya (
     fkeyjobfilterset integer,
     maxerrors integer,
     fkeyjobenvironment integer,
+    toggleflags integer,
     framestart integer,
     frameend integer,
     camera text,
@@ -6736,6 +6693,7 @@ CREATE TABLE jobnaiad (
     notifycompletemessage text,
     notifyerrormessage text,
     fkeyjobenvironment integer,
+    toggleflags integer,
     framestart integer,
     frameend integer,
     threads integer,
@@ -6755,6 +6713,7 @@ ALTER TABLE public.jobnaiad OWNER TO farmer;
 
 CREATE TABLE jobnuke (
     fkeyjobenvironment integer,
+    toggleflags integer,
     framestart integer,
     frameend integer,
     outputcount integer,
@@ -7378,7 +7337,7 @@ ALTER TABLE public.license_usage OWNER TO farmer;
 --
 
 CREATE VIEW license_usage_2 AS
-    SELECT service.service, (license.total - license.reserved), count(ja.keyjobassignment) AS count FROM ((((service JOIN jobservice js ON ((js.fkeyservice = service.keyservice))) JOIN job ON ((js.fkeyjob = job.keyjob))) LEFT JOIN jobassignment ja ON (((ja.fkeyjob = job.keyjob) AND (ja.fkeyjobassignmentstatus < 4)))) JOIN license ON ((service.fkeylicense = license.keylicense))) GROUP BY service.service, license.total, license.reserved;
+    SELECT service.service, (license.total - license.reserved), count(ja.keyjobassignment) AS count FROM (((jobservice js JOIN service ON ((js.fkeyservice = service.keyservice))) LEFT JOIN jobassignment ja ON (((ja.fkeyjobassignmentstatus < 4) AND (ja.fkeyjob = js.fkeyjob)))) JOIN license ON ((service.fkeylicense = license.keylicense))) GROUP BY service.service, license.total, license.reserved;
 
 
 ALTER TABLE public.license_usage_2 OWNER TO farmer;
@@ -9425,7 +9384,7 @@ ALTER TABLE public.trackerstatus OWNER TO farmer;
 --
 
 CREATE VIEW user_service_current AS
-    SELECT ((usr.name || ':'::text) || service.service), sum(jobstatus.hostsonjob) AS sum FROM ((((usr JOIN job ON (((usr.keyelement = job.fkeyusr) AND (job.status = ANY (ARRAY['ready'::text, 'started'::text]))))) JOIN jobstatus jobstatus ON ((job.keyjob = jobstatus.fkeyjob))) JOIN jobservice js ON ((job.keyjob = js.fkeyjob))) JOIN service ON ((service.keyservice = js.fkeyservice))) GROUP BY usr.name, service.service;
+    SELECT ((usr.name || ':'::text) || service.service), sum(ja.assignslots) AS sum FROM ((((usr JOIN job ON (((usr.keyelement = job.fkeyusr) AND (job.status = ANY (ARRAY['ready'::text, 'started'::text]))))) JOIN jobassignment ja ON (((job.keyjob = ja.fkeyjob) AND (ja.fkeyjobassignmentstatus < 4)))) JOIN jobservice js ON ((job.keyjob = js.fkeyjob))) JOIN service ON ((service.keyservice = js.fkeyservice))) GROUP BY usr.name, service.service;
 
 
 ALTER TABLE public.user_service_current OWNER TO farmer;
@@ -9850,82 +9809,6 @@ ALTER TABLE userservice ALTER COLUMN keyuserservice SET DEFAULT nextval('userser
 ALTER TABLE version ALTER COLUMN keyversion SET DEFAULT nextval('version_keyversion_seq'::regclass);
 
 
-SET search_path = jabberd, pg_catalog;
-
---
--- Data for Name: active; Type: TABLE DATA; Schema: jabberd; Owner: farmer
---
-
-COPY active ("collection-owner", "object-sequence", "time") FROM stdin;
-\.
-
-
---
--- Data for Name: authreg; Type: TABLE DATA; Schema: jabberd; Owner: farmer
---
-
-COPY authreg (username, realm, password, token, sequence, hash) FROM stdin;
-\.
-
-
---
--- Data for Name: logout; Type: TABLE DATA; Schema: jabberd; Owner: farmer
---
-
-COPY logout ("collection-owner", "object-sequence", "time") FROM stdin;
-\.
-
-
---
--- Data for Name: privacy-items; Type: TABLE DATA; Schema: jabberd; Owner: farmer
---
-
-COPY "privacy-items" ("collection-owner", "object-sequence", list, type, value, deny, "order", block) FROM stdin;
-\.
-
-
---
--- Data for Name: private; Type: TABLE DATA; Schema: jabberd; Owner: farmer
---
-
-COPY private ("collection-owner", "object-sequence", ns, xml) FROM stdin;
-\.
-
-
---
--- Data for Name: queue; Type: TABLE DATA; Schema: jabberd; Owner: farmer
---
-
-COPY queue ("collection-owner", "object-sequence", xml) FROM stdin;
-\.
-
-
---
--- Data for Name: roster-groups; Type: TABLE DATA; Schema: jabberd; Owner: farmer
---
-
-COPY "roster-groups" ("collection-owner", "object-sequence", jid, "group") FROM stdin;
-\.
-
-
---
--- Data for Name: roster-items; Type: TABLE DATA; Schema: jabberd; Owner: farmer
---
-
-COPY "roster-items" ("collection-owner", "object-sequence", jid, name, ask, "to", "from") FROM stdin;
-\.
-
-
---
--- Data for Name: vcard; Type: TABLE DATA; Schema: jabberd; Owner: farmer
---
-
-COPY vcard ("collection-owner", "object-sequence", fn, nickname, url, tel, email, title, role, bday, "desc", "n-given", "n-family", "adr-street", "adr-extadd", "adr-locality", "adr-region", "adr-pcode", "adr-country", "org-orgname", "org-orgunit") FROM stdin;
-\.
-
-
-SET search_path = public, pg_catalog;
-
 --
 -- Data for Name: abdownloadstat; Type: TABLE DATA; Schema: public; Owner: farmer
 --
@@ -10117,8 +10000,8 @@ COPY config (keyconfig, config, value) FROM stdin;
 28	assburnerLoopTime	3000
 33	arsenalMaxAutoAdapts	1
 13	arsenalSortMethod	key_darwin
-31	arsenalAssignSloppiness	5.0
-32	arsenalAssignMaxHosts	0.1
+32	arsenalAssignMaxHosts	0.4
+31	arsenalAssignSloppiness	20.0
 \.
 
 
@@ -10533,7 +10416,7 @@ COPY hoststatus (keyhoststatus, fkeyhost, slavestatus, laststatuschange, slavepu
 -- Data for Name: job; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY job (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts) FROM stdin;
+COPY job (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags) FROM stdin;
 \.
 
 
@@ -10541,7 +10424,7 @@ COPY job (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, host
 -- Data for Name: job3delight; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY job3delight (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, width, height, framestart, frameend, threads, processes, jobscript, jobscriptparam, renderdlcmd) FROM stdin;
+COPY job3delight (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, width, height, framestart, frameend, threads, processes, jobscript, jobscriptparam, renderdlcmd) FROM stdin;
 \.
 
 
@@ -10579,7 +10462,7 @@ COPY jobassignmentstatus (keyjobassignmentstatus, status) FROM stdin;
 -- Data for Name: jobbatch; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobbatch (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, cmd, restartafterfinish, restartaftershutdown, passslaveframesasparam, disablewow64fsredirect) FROM stdin;
+COPY jobbatch (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, cmd, restartafterfinish, restartaftershutdown, passslaveframesasparam, disablewow64fsredirect) FROM stdin;
 \.
 
 
@@ -10644,40 +10527,51 @@ COPY joberrorhandlerscript (keyjoberrorhandlerscript, script) FROM stdin;
 --
 
 COPY jobfiltermessage (keyjobfiltermessage, fkeyjobfiltertype, fkeyjobfilterset, regex, comment, enabled) FROM stdin;
-7	3	1	Received signal	\N	t
 9	2	3	^Error:	\N	t
 26	5	1	Internal 3Delight Message code: 45 -> "Can't load requested shader", message severity: 2	 	t
 122	2	1	Got Error: dspy_tiff: cannot open output file '/tmp/null' (system\nerror: No such file or directory)	\N	t
-13	2	4	^Error:	\N	t
 14	2	4	^Unable to access file	\N	t
 15	2	4	CAUGHT SIGNAL SIGABRT	\N	t
-1	3	1	cannot open output file	\N	t
+8	3	1	3DL ERROR R5030:	\N	t
 101	3	6	bash: .* Segmentation fault	\N	t
+127	2	6	ImportError:	\N	f
 104	2	6	AttributeError: 'NoneType' object has no attribute 'acquire'	\N	t
-4	3	6	^renderdl: cannot open input file	\N	t
-126	3	6	AttributeError: .* '[^(set|acquire)]'	\N	t
-123	3	6	ERROR: unrecognized arguments:	\N	t
-124	3	6	IndexError: list index out of range	\N	t
-125	3	2	ERROR: .* Missing input channel	\N	t
-127	2	6	ImportError:	\N	t
+13	2	4	^Error:	\N	f
+131	1	2	OSError: [Errno 13] Permission denied	\N	t
+126	3	6	AttributeError: .* '[^(set|acquire)]'	\N	f
 2	2	1	3DL SEVERE ERROR L2033	\N	t
 128	3	2	Shuffle_Input_Channels.in: .* is not a layer or channel name	\N	t
-3	3	1	Command exited with non-zero status	\N	t
+181	5	1	CrowdProcedural::doRender median split	\N	t
+123	3	6	ERROR: unrecognized arguments:	\N	f
 5	2	1	^3DL INFO L2374: no license available	\N	t
+121	3	6	bash: .* command not found	\N	f
 6	2	1	Could not find file:	\N	t
-8	3	1	3DL ERROR R5030:	\N	t
+102	3	6	tank.common.errors	\N	f
+3	3	1	Command exited with non-zero status (?!255)\\d+	\N	t
+129	3	2	Write failed .* Read-only file system.	\N	t
+125	5	2	ERROR: .* Missing input channel	\N	t
+4	4	6	^renderdl: cannot open input file	\N	t
+135	3	6	DRD_ERROR: A rib file cache	\N	f
+171	2	6	created required directory -> **** ERROR: path does not exist	\N	t
+136	2	6	socket.error: (60, 'Operation timed out')	\N	t
+137	4	2	Interprocess lock failed: /Local/nuke_temp/tilecache/DiskSize.lock	\N	t
 21	2	1	Transport endpoint is not connected:	\N	t
-22	3	1	3DL ERROR T2373: cannot read 3D texture file	\N	t
-23	3	1	R5030: error reading from point cloud file	\N	t
+175	2	1	mesh internal path .* is invalid	\N	t
+176	3	6	Fatal Error. Attempting to save in	\N	t
+138	5	1	access attribute user:primType	\N	t
+22	1	1	3DL ERROR T2373: cannot read 3D texture file	\N	t
+63	1	6	3DL ERROR T2087	\N	t
+1	1	1	cannot open output file	\N	t
 28	2	1	message contents: T2040	\N	t
-102	3	6	tank.common.errors	\N	t
-30	3	1	TextureLoader: file doesn't exist /drd/jobs/hf2/tank/	\N	t
+173	3	1	ReferenceManager::getAnimDb: load failed	\N	f
+172	3	6	RuntimeError: ${VERSION} or ${FROZEN_VERSION} are uninitialized 	\N	f
+130	1	1	.rat.zfile	\N	f
 103	2	6	Please check for a valid license server host	\N	t
 105	2	6	psycopg2.ProgrammingError	\N	t
 106	3	6	IOError:	\N	t
 107	4	6	No space left on device	\N	t
 108	2	6	AssertionError:	\N	t
-121	3	6	bash: .* command not found	\N	t
+30	1	1	TextureLoader: file doesn't exist /drd/jobs/hf2/tank/	\N	t
 18	2	4	CAUGHT SIGNAL SIGSEGV	\N	t
 19	3	2	No NI file specified. Stop teasing Naiad	\N	t
 20	2	2	Error checking out license: LM-X Error	\N	t
@@ -10688,26 +10582,37 @@ COPY jobfiltermessage (keyjobfiltermessage, fkeyjobfiltertype, fkeyjobfilterset,
 35	2	1	DRD_ERROR_RETRY	\N	t
 53	3	1	code: 13 -> "Arbitrary program limit"	\N	f
 54	2	6	Hbatch job wouldn't run due to 'No License Found' error	\N	t
-56	3	1	T2028: netcache: lock file has disappeared	\N	t
+56	1	1	T2028: netcache: lock file has disappeared	\N	t
+174	2	1	3DL INFO L2034: all licenses are taken, waiting for a free license	\N	f
 62	2	3	'No License Found'	\N	t
 16	3	4	dammit	\N	f
 17	3	4	exist	\N	f
 11	2	2	FOUNDRY LICENSE ERROR	\N	t
-10	3	1	Read-only file system	\N	t
-57	3	1	error message: R5022	\N	t
+10	1	1	Read-only file system	\N	t
+57	1	1	error message: R5022	\N	t
+59	1	1	message contents: P1165	\N	f
+60	1	1	message contents: P1111	\N	t
+178	2	1	renderdl: cannot open input file	\N	t
+177	2	1	system error: No such file or directory	\N	t
 58	3	1	Cannot find method "get_pointcloudname"	\N	t
-59	3	1	message contents: P1165	\N	f
-60	3	1	message contents: P1111	\N	t
-61	3	1	input in flex scanner failed	\N	t
-63	3	6	3DL ERROR T2087	\N	t
+134	1	2	CrowdProcedural.ERROR: NO LODs DEFINED	\N	t
 64	3	6	Batch script exited with result: 1	\N	t
 99	3	6	Expression recursion too deep	\N	t
 100	3	6	Error rendering child	\N	t
-49	5	1	No space left on device.	\N	t
-50	5	6	Fatal error: Segmentation fault	\N	t
-52	5	1	netcache: could not copy file from	\N	t
+179	2	1	3DL ERROR P1051	\N	f
+124	5	6	IndexError: list index out of range	\N	f
+7	3	1	Received signal	\N	t
+23	3	1	R5030: error reading from point cloud file	\N	t
+61	5	1	input in flex scanner failed	\N	t
+180	3	6	,False	\N	f
+40	1	1	3DL ERROR: .* Invalid char:	\N	t
+96	3	1	Received signal 11	\N	t
+38	2	1	DRD ERROR: couldn't find file .*\\.exr.*	\N	t
+90	1	1	Exception occurred in python burner: Please contact IT	\N	t
 32	3	1	"Internal 3Delight Message code: 24 -> "Bad begin-end nesting", message severity: 2	\N	t
 33	2	1	^DRD ERROR: EXR is not complete	\N	t
+49	5	1	No space left on device.	\N	f
+50	5	6	Fatal error: Segmentation fault	\N	f
 34	2	6	^DRD_ERROR: A rib file	\N	t
 36	1	1	DRD_ERROR_FATAL	\N	t
 117	3	6	Cook error in input:	\N	t
@@ -10717,10 +10622,9 @@ COPY jobfiltermessage (keyjobfiltermessage, fkeyjobfiltertype, fkeyjobfilterset,
 89	3	3	Foundry::Cache::CacheDiskSizeLockFailed	\N	t
 92	2	3	attempting to kill process	\N	t
 43	3	5	NAIAD ERROR	\N	t
+52	5	1	netcache: could not copy file from	\N	f
 37	1	1	DRD_RIB_FATAL	\N	t
-38	2	1	DRD ERROR: couldn't find file	\N	f
 39	2	1	^DRD ERROR: post_renderdl_frame command failed on file	\N	t
-40	3	1	3DL ERROR: .* Invalid char:	\N	t
 41	3	1	imdisplay-bin: Unable to open the mplay application	\N	t
 44	3	1	ERROR: File is empty	\N	t
 45	3	1	!!! CAUGHT SIGNAL	\N	t
@@ -10744,24 +10648,22 @@ COPY jobfiltermessage (keyjobfiltermessage, fkeyjobfiltertype, fkeyjobfilterset,
 85	3	1	Cannot read image file .* File is not an image file	\N	t
 86	3	1	Cannot access the OTL source	\N	t
 87	3	6	NameError: name 'left' is not defined	\N	t
-90	4	1	Exception occurred in python burner: Please contact IT	\N	t
 91	4	1	No space left on device	\N	t
-96	3	1	Received signal 11	\N	t
 109	3	6	TypeError:	\N	f
 110	3	6	Unable to initialize rendering module	\N	t
 112	2	6	DtexOpenFile error	\N	t
 115	3	6	maya_pipe.api.maya_roles.MayaRoleError:	\N	t
 111	3	3	IOError:	\N	t
-114	3	6	Read error: No such file or directory	\N	t
+114	3	6	Read error: No such file or directory	\N	f
+98	2	1	3DL ERROR S2050	\N	f
 120	3	6	yaml.parser.ParserError:	\N	t
 119	3	6	meme.core.exceptions	\N	t
+93	1	6	Error: maximum recursion depth exceeded	\N	t
 118	3	6	Asked for too-large .* input image	\N	t
-93	1	6	Error: maximum recursion depth exceeded	\N	f
+113	3	6	RuntimeError	\N	t
 94	5	1	TESTING: VTimeVariable::getIndex	\N	t
 95	2	1	LZWDecode : Not enough data at scanline	\N	t
 97	2	6	Batch script exited with result: 3	\N	t
-98	2	1	3DL ERROR S2050	\N	t
-113	3	6	RuntimeError:	\N	t
 116	3	6	Invalid pickle location value. This argument must be used to store a file	\N	t
 \.
 
@@ -10813,7 +10715,7 @@ COPY jobhistorytype (keyjobhistorytype, type) FROM stdin;
 -- Data for Name: jobmantra100; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmantra100 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, keyjobmantra100, forceraytrace, geocachesize, height, qualityflag, renderquality, threads, width) FROM stdin;
+COPY jobmantra100 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, keyjobmantra100, forceraytrace, geocachesize, height, qualityflag, renderquality, threads, width) FROM stdin;
 \.
 
 
@@ -10821,7 +10723,47 @@ COPY jobmantra100 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkey
 -- Data for Name: jobmantra95; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmantra95 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, keyjobmantra95, forceraytrace, geocachesize, height, qualityflag, renderquality, threads, width) FROM stdin;
+COPY jobmantra95 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, keyjobmantra95, forceraytrace, geocachesize, height, qualityflag, renderquality, threads, width) FROM stdin;
+\.
+
+
+--
+-- Data for Name: jobmax; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY jobmax (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, camera, elementfile, exrattributes, exrchannels, exrcompression, exrsavebitdepth, exrsaveregion, exrsavescanline, exrtilesize, exrversion, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart, plugininipath, startupscript) FROM stdin;
+\.
+
+
+--
+-- Data for Name: jobmax10; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY jobmax10 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, camera, elementfile, exrattributes, exrchannels, exrcompression, exrsavebitdepth, exrsaveregion, exrsavescanline, exrtilesize, exrversion, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart, plugininipath, startupscript) FROM stdin;
+\.
+
+
+--
+-- Data for Name: jobmax2009; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY jobmax2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, camera, elementfile, exrattributes, exrchannels, exrcompression, exrsavebitdepth, exrsaveregion, exrsavescanline, exrtilesize, exrversion, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart, plugininipath, startupscript) FROM stdin;
+\.
+
+
+--
+-- Data for Name: jobmax2010; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY jobmax2010 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, camera, elementfile, exrattributes, exrchannels, exrcompression, exrsavebitdepth, exrsaveregion, exrsavescanline, exrtilesize, exrversion, fileoriginal, flag_h, flag_v, flag_w, flag_x2, flag_xa, flag_xc, flag_xd, flag_xe, flag_xf, flag_xh, flag_xk, flag_xn, flag_xo, flag_xp, flag_xv, frameend, framelist, framestart, plugininipath, startupscript) FROM stdin;
+\.
+
+
+--
+-- Data for Name: jobmaxscript; Type: TABLE DATA; Schema: public; Owner: farmer
+--
+
+COPY jobmaxscript (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, script, maxtime, outputfiles, silent, maxversion, runmax64, runpythonscript, use3dsmaxcmd) FROM stdin;
 \.
 
 
@@ -10829,7 +10771,7 @@ COPY jobmantra95 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyu
 -- Data for Name: jobmaya; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmaya (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10837,7 +10779,7 @@ COPY jobmaya (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, 
 -- Data for Name: jobmaya2008; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya2008 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmaya2008 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10845,7 +10787,7 @@ COPY jobmaya2008 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyu
 -- Data for Name: jobmaya2009; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmaya2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10853,7 +10795,7 @@ COPY jobmaya2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyu
 -- Data for Name: jobmaya2011; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya2011 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmaya2011 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10861,7 +10803,7 @@ COPY jobmaya2011 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyu
 -- Data for Name: jobmaya7; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmaya7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10869,7 +10811,7 @@ COPY jobmaya7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr,
 -- Data for Name: jobmaya8; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmaya8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10877,7 +10819,7 @@ COPY jobmaya8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr,
 -- Data for Name: jobmaya85; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmaya85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmaya85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10885,7 +10827,7 @@ COPY jobmaya85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr
 -- Data for Name: jobmentalray2009; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmentalray2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmentalray2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10893,7 +10835,7 @@ COPY jobmentalray2009 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, 
 -- Data for Name: jobmentalray2011; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmentalray2011 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmentalray2011 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10901,7 +10843,7 @@ COPY jobmentalray2011 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, 
 -- Data for Name: jobmentalray7; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmentalray7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmentalray7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10909,7 +10851,7 @@ COPY jobmentalray7 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fke
 -- Data for Name: jobmentalray8; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmentalray8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmentalray8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10917,7 +10859,7 @@ COPY jobmentalray8 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fke
 -- Data for Name: jobmentalray85; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobmentalray85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
+COPY jobmentalray85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, camera, renderer, projectpath, width, height, append) FROM stdin;
 \.
 
 
@@ -10925,7 +10867,7 @@ COPY jobmentalray85 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fk
 -- Data for Name: jobnaiad; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobnaiad (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, threads, append, restartcache, fullframe, forcerestart) FROM stdin;
+COPY jobnaiad (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, threads, append, restartcache, fullframe, forcerestart) FROM stdin;
 \.
 
 
@@ -10933,7 +10875,7 @@ COPY jobnaiad (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr,
 -- Data for Name: jobnuke; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobnuke (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, outputcount, viewname, nodes, terminalonly) FROM stdin;
+COPY jobnuke (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, outputcount, viewname, nodes, terminalonly) FROM stdin;
 \.
 
 
@@ -10941,7 +10883,7 @@ COPY jobnuke (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, 
 -- Data for Name: jobnuke51; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobnuke51 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, outputcount) FROM stdin;
+COPY jobnuke51 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, outputcount) FROM stdin;
 \.
 
 
@@ -10949,7 +10891,7 @@ COPY jobnuke51 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr
 -- Data for Name: jobnuke52; Type: TABLE DATA; Schema: public; Owner: farmer
 --
 
-COPY jobnuke52 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, framestart, frameend, outputcount) FROM stdin;
+COPY jobnuke52 (keyjob, fkeyelement, fkeyhost, fkeyjobtype, fkeyproject, fkeyusr, hostlist, job, jobtime, outputpath, status, submitted, started, ended, expires, deleteoncomplete, hostsonjob, taskscount, tasksunassigned, tasksdone, tasksaveragetime, priority, errorcount, queueorder, packettype, packetsize, queueeta, notifyonerror, notifyoncomplete, maxtasktime, cleaned, filesize, btinfohash, rendertime, abversion, deplist, args, filename, filemd5sum, fkeyjobstat, username, domain, password, stats, currentmapserverweight, loadtimeaverage, tasksassigned, tasksbusy, prioritizeoutertasks, outertasksassigned, lastnotifiederrorcount, taskscancelled, taskssuspended, health, maxloadtime, license, maxmemory, fkeyjobparent, endedts, startedts, submittedts, maxhosts, personalpriority, loggingenabled, environment, runassubmitter, checkfilemd5, uploadedfile, framenth, framenthmode, exclusiveassignment, hastaskprogress, minmemory, scenename, shotname, slots, fkeyjobfilterset, maxerrors, notifycompletemessage, notifyerrormessage, fkeywrangler, maxquiettime, autoadaptslots, fkeyjobenvironment, suspendedts, toggleflags, framestart, frameend, outputcount) FROM stdin;
 \.
 
 
@@ -11074,7 +11016,6 @@ COPY jobtypemapping (keyjobtypemapping, fkeyjobtype, fkeymapping) FROM stdin;
 --
 
 COPY license (keylicense, license, fkeyhost, fkeysoftware, total, reserved, inuse) FROM stdin;
-19	ocula	\N	\N	5	0	0
 18	vue	\N	\N	13	0	0
 20	mentalray	\N	\N	112	8	0
 24	rollingshutter	\N	\N	5	0	0
@@ -11084,12 +11025,19 @@ COPY license (keylicense, license, fkeyhost, fkeysoftware, total, reserved, inus
 25	tank	\N	\N	100	0	4
 29	truelight01_transfer	\N	\N	3	0	0
 30	gpu	\N	\N	10	0	0
-23	mantra	\N	\N	800	0	13
-17	3delight	\N	\N	2000	0	0
 22	naiad	\N	\N	10	0	6
-16	nuke_r	\N	\N	122	0	0
-31	bl401_transfer	\N	\N	4	0	0
+16	nuke_r	\N	\N	600	0	0
 15	fah	\N	\N	8	0	0
+33	needsTank	\N	\N	100	0	0
+37	bl402_transfer	\N	\N	5	0	0
+34	bulk_container_creation	\N	\N	1	0	0
+35	bl801_transfer	\N	\N	8	0	0
+36	bl201_transfer	\N	\N	8	0	0
+31	bl401_transfer	\N	\N	5	0	0
+32	tankpublish	\N	\N	50	0	0
+17	3delight	\N	\N	1400	0	0
+23	mantra	\N	\N	1200	0	13
+19	ocula	\N	\N	20	0	0
 \.
 
 
@@ -11387,7 +11335,6 @@ COPY service (keyservice, service, description, fkeylicense, enabled, forbiddenp
 61	WIP-Writer	\N	\N	t	\N	t	\N	\N	\N
 62	truelight01_transfer	\N	29	t	\N	t	\N	\N	\N
 37	GPU	\N	30	t	\N	t	\N	\N	\N
-36	3Delight	\N	\N	t	\N	t	\N	\N	\N
 9	MentalRay	\N	\N	t	\N	\N	\N	\N	\N
 35	fah	\N	\N	t	\N	t	\N	\N	\N
 43	Vue	\N	\N	t	\N	t	\N	\N	\N
@@ -11396,7 +11343,14 @@ COPY service (keyservice, service, description, fkeylicense, enabled, forbiddenp
 254	diframecache	\N	\N	t	\N	\N	\N	\N	\N
 49	tank	\N	25	t	\N	\N	\N	\N	\N
 255	bl401_transfer	\N	31	t	\N	\N	\N	\N	\N
-256	tankpublish	\N	\N	t	\N	\N	\N	\N	\N
+256	tankpublish	\N	32	t	\N	\N	\N	\N	\N
+257	needsTank	\N	33	t	\N	\N	\N	\N	\N
+262	hosts_24GB+	\N	\N	t	\N	\N	\N	\N	\N
+261	bulk_container_creation	\N	34	t	\N	\N	\N	\N	\N
+258	bl801_transfer	\N	35	t	\N	\N	\N	\N	\N
+259	bl201_transfer	\N	36	t	\N	\N	\N	\N	\N
+260	bl402_transfer	\N	37	t	\N	\N	\N	\N	\N
+36	3Delight	\N	\N	t	\N	t	\N	\N	\N
 \.
 
 
@@ -12679,6 +12633,14 @@ ALTER TABLE ONLY employee
 
 
 --
+-- Name: pkey_job3delight; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY job3delight
+    ADD CONSTRAINT pkey_job3delight PRIMARY KEY (keyjob);
+
+
+--
 -- Name: pkey_job_maya2008; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
 --
 
@@ -12716,6 +12678,22 @@ ALTER TABLE ONLY jobbatch
 
 ALTER TABLE ONLY jobmentalray85
     ADD CONSTRAINT pkey_jobmentalray85 PRIMARY KEY (keyjob);
+
+
+--
+-- Name: pkey_jobnaiad; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY jobnaiad
+    ADD CONSTRAINT pkey_jobnaiad PRIMARY KEY (keyjob);
+
+
+--
+-- Name: pkey_jobnuke; Type: CONSTRAINT; Schema: public; Owner: farmer; Tablespace: 
+--
+
+ALTER TABLE ONLY jobnuke
+    ADD CONSTRAINT pkey_jobnuke PRIMARY KEY (keyjob);
 
 
 --
@@ -13266,6 +13244,20 @@ CREATE INDEX x_jfm_set ON jobfiltermessage USING btree (fkeyjobfilterset);
 
 
 --
+-- Name: x_job3delight_project; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_job3delight_project ON job3delight USING btree (fkeyproject);
+
+
+--
+-- Name: x_job3delight_shotname; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_job3delight_shotname ON job3delight USING btree (shotname);
+
+
+--
 -- Name: x_job3delight_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
@@ -13329,6 +13321,13 @@ CREATE INDEX x_jobbatch_project ON jobbatch USING btree (fkeyproject);
 
 
 --
+-- Name: x_jobbatch_shotname; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobbatch_shotname ON jobbatch USING btree (shotname);
+
+
+--
 -- Name: x_jobbatch_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
@@ -13347,6 +13346,13 @@ CREATE INDEX x_jobbatch_user ON jobbatch USING btree (fkeyusr);
 --
 
 CREATE INDEX x_joberror_cleared ON joberror USING btree (cleared);
+
+
+--
+-- Name: x_joberror_fkeyhost; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_joberror_fkeyhost ON joberror USING btree (fkeyhost);
 
 
 --
@@ -13483,10 +13489,31 @@ CREATE INDEX x_jobnuke52_status ON jobnuke52 USING btree (status);
 
 
 --
+-- Name: x_jobnuke_project; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobnuke_project ON jobnuke USING btree (fkeyproject);
+
+
+--
+-- Name: x_jobnuke_shotname; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobnuke_shotname ON jobnuke USING btree (shotname);
+
+
+--
 -- Name: x_jobnuke_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_jobnuke_status ON jobnuke USING btree (status);
+
+
+--
+-- Name: x_jobnuke_user; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobnuke_user ON jobnuke USING btree (fkeyusr);
 
 
 --
@@ -13511,17 +13538,17 @@ CREATE INDEX x_jobstatus_job ON jobstatus USING btree (fkeyjob);
 
 
 --
--- Name: x_jobstatus_queueorder; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
---
-
-CREATE INDEX x_jobstatus_queueorder ON jobstatus USING btree (queueorder);
-
-
---
 -- Name: x_jobtask_status; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
 --
 
 CREATE INDEX x_jobtask_status ON jobtask USING btree (status);
+
+
+--
+-- Name: x_jobtaskassignment_jobtask; Type: INDEX; Schema: public; Owner: farmer; Tablespace: 
+--
+
+CREATE INDEX x_jobtaskassignment_jobtask ON jobtaskassignment USING btree (fkeyjobtask);
 
 
 --
@@ -14244,6 +14271,28 @@ GRANT ALL ON FUNCTION after_update_jobtask() TO farmers;
 
 
 --
+-- Name: are_ontens_complete(integer); Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION are_ontens_complete(_fkeyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION are_ontens_complete(_fkeyjob integer) FROM postgres;
+GRANT ALL ON FUNCTION are_ontens_complete(_fkeyjob integer) TO postgres;
+GRANT ALL ON FUNCTION are_ontens_complete(_fkeyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION are_ontens_complete(_fkeyjob integer) TO farmers;
+
+
+--
+-- Name: are_ontens_dispatched(integer); Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION are_ontens_dispatched(_fkeyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION are_ontens_dispatched(_fkeyjob integer) FROM postgres;
+GRANT ALL ON FUNCTION are_ontens_dispatched(_fkeyjob integer) TO postgres;
+GRANT ALL ON FUNCTION are_ontens_dispatched(_fkeyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION are_ontens_dispatched(_fkeyjob integer) TO farmers;
+
+
+--
 -- Name: assign_single_host(integer, integer, integer[]); Type: ACL; Schema: public; Owner: farmer
 --
 
@@ -14376,6 +14425,17 @@ GRANT ALL ON FUNCTION get_iterative_tasks(_fkeyjob integer, max_tasks integer, s
 
 
 --
+-- Name: get_iterative_tasks_2(integer, integer, integer, boolean); Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strict_stripe boolean) FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strict_stripe boolean) FROM postgres;
+GRANT ALL ON FUNCTION get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strict_stripe boolean) TO postgres;
+GRANT ALL ON FUNCTION get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strict_stripe boolean) TO PUBLIC;
+GRANT ALL ON FUNCTION get_iterative_tasks_2(_fkeyjob integer, max_tasks integer, stripe integer, strict_stripe boolean) TO farmers;
+
+
+--
 -- Name: get_iterative_tasks_debug(integer, integer, integer); Type: ACL; Schema: public; Owner: farmer
 --
 
@@ -14384,6 +14444,28 @@ REVOKE ALL ON FUNCTION get_iterative_tasks_debug(_fkeyjob integer, max_tasks int
 GRANT ALL ON FUNCTION get_iterative_tasks_debug(_fkeyjob integer, max_tasks integer, stripe integer) TO farmer;
 GRANT ALL ON FUNCTION get_iterative_tasks_debug(_fkeyjob integer, max_tasks integer, stripe integer) TO PUBLIC;
 GRANT ALL ON FUNCTION get_iterative_tasks_debug(_fkeyjob integer, max_tasks integer, stripe integer) TO farmers;
+
+
+--
+-- Name: get_job_efficiency(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION get_job_efficiency(_keyhost integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_job_efficiency(_keyhost integer) FROM farmer;
+GRANT ALL ON FUNCTION get_job_efficiency(_keyhost integer) TO farmer;
+GRANT ALL ON FUNCTION get_job_efficiency(_keyhost integer) TO PUBLIC;
+GRANT ALL ON FUNCTION get_job_efficiency(_keyhost integer) TO farmers;
+
+
+--
+-- Name: get_pass_preseed(text, text); Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION get_pass_preseed(_shot text, _pass text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION get_pass_preseed(_shot text, _pass text) FROM postgres;
+GRANT ALL ON FUNCTION get_pass_preseed(_shot text, _pass text) TO postgres;
+GRANT ALL ON FUNCTION get_pass_preseed(_shot text, _pass text) TO PUBLIC;
+GRANT ALL ON FUNCTION get_pass_preseed(_shot text, _pass text) TO farmers;
 
 
 --
@@ -14745,6 +14827,17 @@ GRANT ALL ON TABLE jobdep TO farmers;
 
 
 --
+-- Name: jobdep_recursive(text); Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION jobdep_recursive(keylist text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION jobdep_recursive(keylist text) FROM postgres;
+GRANT ALL ON FUNCTION jobdep_recursive(keylist text) TO postgres;
+GRANT ALL ON FUNCTION jobdep_recursive(keylist text) TO PUBLIC;
+GRANT ALL ON FUNCTION jobdep_recursive(keylist text) TO farmers;
+
+
+--
 -- Name: joberror_inc(); Type: ACL; Schema: public; Owner: farmer
 --
 
@@ -14767,12 +14860,24 @@ GRANT ALL ON FUNCTION jobtaskassignment_update() TO farmers;
 
 
 --
+-- Name: pg_stat_statements(); Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION pg_stat_statements(OUT userid oid, OUT dbid oid, OUT query text, OUT calls bigint, OUT total_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint) FROM PUBLIC;
+REVOKE ALL ON FUNCTION pg_stat_statements(OUT userid oid, OUT dbid oid, OUT query text, OUT calls bigint, OUT total_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint) FROM postgres;
+GRANT ALL ON FUNCTION pg_stat_statements(OUT userid oid, OUT dbid oid, OUT query text, OUT calls bigint, OUT total_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint) TO postgres;
+GRANT ALL ON FUNCTION pg_stat_statements(OUT userid oid, OUT dbid oid, OUT query text, OUT calls bigint, OUT total_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint) TO PUBLIC;
+GRANT ALL ON FUNCTION pg_stat_statements(OUT userid oid, OUT dbid oid, OUT query text, OUT calls bigint, OUT total_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint) TO farmers;
+
+
+--
 -- Name: pg_stat_statements_reset(); Type: ACL; Schema: public; Owner: postgres
 --
 
 REVOKE ALL ON FUNCTION pg_stat_statements_reset() FROM PUBLIC;
 REVOKE ALL ON FUNCTION pg_stat_statements_reset() FROM postgres;
 GRANT ALL ON FUNCTION pg_stat_statements_reset() TO postgres;
+GRANT ALL ON FUNCTION pg_stat_statements_reset() TO farmers;
 
 
 --
@@ -14897,6 +15002,17 @@ GRANT ALL ON FUNCTION update_job_hard_deps(_keyjob integer) TO farmers;
 
 
 --
+-- Name: update_job_hard_deps_2(integer); Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON FUNCTION update_job_hard_deps_2(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_hard_deps_2(_keyjob integer) FROM farmer;
+GRANT ALL ON FUNCTION update_job_hard_deps_2(_keyjob integer) TO farmer;
+GRANT ALL ON FUNCTION update_job_hard_deps_2(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_hard_deps_2(_keyjob integer) TO farmers;
+
+
+--
 -- Name: update_job_health(); Type: ACL; Schema: public; Owner: farmer
 --
 
@@ -14982,6 +15098,17 @@ REVOKE ALL ON FUNCTION update_job_task_counts(_keyjob integer) FROM farmer;
 GRANT ALL ON FUNCTION update_job_task_counts(_keyjob integer) TO farmer;
 GRANT ALL ON FUNCTION update_job_task_counts(_keyjob integer) TO PUBLIC;
 GRANT ALL ON FUNCTION update_job_task_counts(_keyjob integer) TO farmers;
+
+
+--
+-- Name: update_job_task_counts_2(integer); Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION update_job_task_counts_2(_keyjob integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION update_job_task_counts_2(_keyjob integer) FROM postgres;
+GRANT ALL ON FUNCTION update_job_task_counts_2(_keyjob integer) TO postgres;
+GRANT ALL ON FUNCTION update_job_task_counts_2(_keyjob integer) TO PUBLIC;
+GRANT ALL ON FUNCTION update_job_task_counts_2(_keyjob integer) TO farmers;
 
 
 --
@@ -15557,6 +15684,24 @@ REVOKE ALL ON TABLE config FROM PUBLIC;
 REVOKE ALL ON TABLE config FROM farmer;
 GRANT ALL ON TABLE config TO farmer;
 GRANT ALL ON TABLE config TO farmers;
+
+
+--
+-- Name: darwinweight; Type: ACL; Schema: public; Owner: farmers
+--
+
+REVOKE ALL ON TABLE darwinweight FROM PUBLIC;
+REVOKE ALL ON TABLE darwinweight FROM farmers;
+GRANT ALL ON TABLE darwinweight TO farmers;
+
+
+--
+-- Name: darwinweight_keydarwinscore_seq; Type: ACL; Schema: public; Owner: farmers
+--
+
+REVOKE ALL ON SEQUENCE darwinweight_keydarwinscore_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE darwinweight_keydarwinscore_seq FROM farmers;
+GRANT ALL ON SEQUENCE darwinweight_keydarwinscore_seq TO farmers;
 
 
 --
@@ -16696,6 +16841,60 @@ GRANT ALL ON SEQUENCE jobmantra95_keyjobmantra95_seq TO farmers;
 
 
 --
+-- Name: jobmax; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE jobmax FROM PUBLIC;
+REVOKE ALL ON TABLE jobmax FROM postgres;
+GRANT ALL ON TABLE jobmax TO postgres;
+GRANT ALL ON TABLE jobmax TO farmers;
+
+
+--
+-- Name: jobmax10; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmax10 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmax10 FROM farmer;
+GRANT ALL ON TABLE jobmax10 TO farmer;
+GRANT ALL ON TABLE jobmax10 TO PUBLIC;
+GRANT ALL ON TABLE jobmax10 TO farmers;
+
+
+--
+-- Name: jobmax2009; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmax2009 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmax2009 FROM farmer;
+GRANT ALL ON TABLE jobmax2009 TO farmer;
+GRANT ALL ON TABLE jobmax2009 TO PUBLIC;
+GRANT ALL ON TABLE jobmax2009 TO farmers;
+
+
+--
+-- Name: jobmax2010; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmax2010 FROM PUBLIC;
+REVOKE ALL ON TABLE jobmax2010 FROM farmer;
+GRANT ALL ON TABLE jobmax2010 TO farmer;
+GRANT ALL ON TABLE jobmax2010 TO PUBLIC;
+GRANT ALL ON TABLE jobmax2010 TO farmers;
+
+
+--
+-- Name: jobmaxscript; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON TABLE jobmaxscript FROM PUBLIC;
+REVOKE ALL ON TABLE jobmaxscript FROM farmer;
+GRANT ALL ON TABLE jobmaxscript TO farmer;
+GRANT ALL ON TABLE jobmaxscript TO PUBLIC;
+GRANT ALL ON TABLE jobmaxscript TO farmers;
+
+
+--
 -- Name: jobmaya; Type: ACL; Schema: public; Owner: farmer
 --
 
@@ -16998,6 +17197,16 @@ REVOKE ALL ON TABLE jobstatusskipreason FROM farmer;
 GRANT ALL ON TABLE jobstatusskipreason TO farmer;
 GRANT ALL ON TABLE jobstatusskipreason TO PUBLIC;
 GRANT ALL ON TABLE jobstatusskipreason TO farmers;
+
+
+--
+-- Name: jobstatusskipreason_keyjobstatusskipreason_seq; Type: ACL; Schema: public; Owner: farmer
+--
+
+REVOKE ALL ON SEQUENCE jobstatusskipreason_keyjobstatusskipreason_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE jobstatusskipreason_keyjobstatusskipreason_seq FROM farmer;
+GRANT ALL ON SEQUENCE jobstatusskipreason_keyjobstatusskipreason_seq TO farmer;
+GRANT ALL ON SEQUENCE jobstatusskipreason_keyjobstatusskipreason_seq TO farmers;
 
 
 --
@@ -17482,6 +17691,7 @@ REVOKE ALL ON TABLE pg_stat_statements FROM PUBLIC;
 REVOKE ALL ON TABLE pg_stat_statements FROM postgres;
 GRANT ALL ON TABLE pg_stat_statements TO postgres;
 GRANT SELECT ON TABLE pg_stat_statements TO PUBLIC;
+GRANT ALL ON TABLE pg_stat_statements TO farmers;
 
 
 --
@@ -17697,6 +17907,16 @@ REVOKE ALL ON TABLE running_shots_averagetime_3 FROM farmer;
 GRANT ALL ON TABLE running_shots_averagetime_3 TO farmer;
 GRANT ALL ON TABLE running_shots_averagetime_3 TO PUBLIC;
 GRANT ALL ON TABLE running_shots_averagetime_3 TO farmers;
+
+
+--
+-- Name: running_shots_averagetime_4; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE running_shots_averagetime_4 FROM PUBLIC;
+REVOKE ALL ON TABLE running_shots_averagetime_4 FROM postgres;
+GRANT ALL ON TABLE running_shots_averagetime_4 TO postgres;
+GRANT ALL ON TABLE running_shots_averagetime_4 TO farmers;
 
 
 --
@@ -18413,17 +18633,6 @@ REVOKE ALL ON TABLE versionfiletracker FROM PUBLIC;
 REVOKE ALL ON TABLE versionfiletracker FROM farmer;
 GRANT ALL ON TABLE versionfiletracker TO farmer;
 GRANT ALL ON TABLE versionfiletracker TO farmers;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: -; Owner: farmer
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE farmer REVOKE ALL ON TABLES  FROM PUBLIC;
-ALTER DEFAULT PRIVILEGES FOR ROLE farmer REVOKE ALL ON TABLES  FROM farmer;
-ALTER DEFAULT PRIVILEGES FOR ROLE farmer GRANT ALL ON TABLES  TO farmer;
-ALTER DEFAULT PRIVILEGES FOR ROLE farmer GRANT ALL ON TABLES  TO PUBLIC;
-ALTER DEFAULT PRIVILEGES FOR ROLE farmer GRANT ALL ON TABLES  TO farmers;
 
 
 --

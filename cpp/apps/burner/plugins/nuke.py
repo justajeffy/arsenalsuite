@@ -120,8 +120,8 @@ class NukeBurner(JobBurner):
         JobBurner.slotProcessOutputLine(self,line,channel)
         #Log( "NukeBurner::slotReadOutput() called, ready to read output" )
         # Frame status
-        if self.frameDone.indexIn(line) >= 0: pass
-        elif self.frameStart.indexIn(line) >= 0:
+        if self.frameDone.indexIn(line) >= 0:
+        #elif self.frameStart.indexIn(line) >= 0:
             self.OutputsReported = self.OutputsReported + 1
             self.logMessage( "NukeBurner::slotReadOutput() output detected %s of %s" % (self.OutputsReported, self.OutputsExpected) )
             if self.OutputsReported == self.OutputsExpected:

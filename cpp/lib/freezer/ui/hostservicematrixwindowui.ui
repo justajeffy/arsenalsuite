@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>553</width>
-    <height>458</height>
+    <width>1061</width>
+    <height>637</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,11 +27,9 @@
        <number>6</number>
       </property>
       <item>
-       <widget class="RecordCombo" name="mHostGroupCombo">
+       <widget class="RecordCombo" name="mHostGroupCombo" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-          <hsizetype>13</hsizetype>
-          <vsizetype>13</vsizetype>
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -72,6 +70,50 @@
        <widget class="QLineEdit" name="mHostFilterEdit"/>
       </item>
       <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Status Filter</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="mHostStatusFilterEdit"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>OS Filter</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="mHostOsFilterEdit"/>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="mHostUserLoggedInCheckbox">
+        <property name="text">
+         <string>User</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="mUserLoggedInType">
+        <property name="text">
+         <string>Logged In</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="mUserLoggedOutType">
+        <property name="text">
+         <string>Logged out</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Service Filter:</string>
@@ -90,13 +132,20 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>553</width>
+     <width>1061</width>
      <height>25</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RecordCombo</class>
+   <extends>QWidget</extends>
+   <header>recordcombo.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

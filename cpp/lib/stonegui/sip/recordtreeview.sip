@@ -76,6 +76,8 @@ public:
 
 	int sizeHintForColumn( int column ) const;
 
+    QItemSelectionModel * selectionModel() const;
+
 public slots:
 	void setSelection( const RecordList & rl );
 	void setCurrent( const Record & r );
@@ -83,7 +85,8 @@ public slots:
 	void scrollTo( const Record & );
 	void scrollTo( RecordList );
 
-signals:
+// Switched signals to protected since python receives a typeerror otherwise.
+protected:
 	void currentChanged( const Record & );
 	void selectionChanged( RecordList );
 	void clicked( const Record & );
