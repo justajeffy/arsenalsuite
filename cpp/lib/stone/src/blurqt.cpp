@@ -166,6 +166,11 @@ QString stoneOptionsHelp()
 }
 
 /// Initialises the stone library using a supplied configuration file. Returns if it was able to read the configuration file successfully
+/// This function can be called multiple times.  The first time all needed Qt configuration(addLibraryPath,qRegisterMetaType) is done
+/// regardless of the config file being found.  Any subsequent times the config file will be read.
+/// The first config file that is found will become the primary and will be the destination
+/// of saved settings when shutdown is called.
+
 bool initConfig( const QString & configName, const QString & logfile )
 {
 	if( !QCoreApplication::instance() ) {
@@ -174,35 +179,42 @@ bool initConfig( const QString & configName, const QString & logfile )
 		new QCoreApplication(argc, (char**)0);
 	}
 
-    // Check to see if we can open up the configuration file to begin with.
-    QFile file( configName );
-    if( !file.exists() ) {
-        printf("Could not find %s\n", qPrintable(configName));
-        return false;
-    }
-
+	if( !sConfig ) {
+		sConfig = new IniConfig();
+		qRegisterMetaType<Record>("Record");
+		qRegisterMetaType<RecordList>("RecordList");
+		qRegisterMetaType<Interval>("Interval");
 #ifdef Q_OS_WIN
-	// Used for 64 bit dlls, won't show up under syswow64
 #ifdef Q_OS_WIN64
-	QCoreApplication::addLibraryPath("c:/windows/system32/blur64/");
+		// Used for 64 bit dlls, won't show up under syswow64
+		QCoreApplication::addLibraryPath("c:/windows/system32/blur64/");
 #else
-	QCoreApplication::addLibraryPath("c:/blur/common/");
+		QCoreApplication::addLibraryPath("c:/blur/common/");
 #endif
 #endif // Q_OS_WIN
-	sLogFile = logfile;
-	if( !sLogFile.isEmpty() && sLogFile.right(4) != ".log" )
-		sLogFile = sLogFile + ".log";
-	if( !sConfig ) {
-		sConfigName = configName;
-		sConfig = new IniConfig();
+	}
+	
+    // Check to see if the configuration file exists
+	bool configExists = QFile::exists( configName );
+	if( !configExists )
+		printf("Could not find %s\n", qPrintable(configName));
+
+	if( configExists ) {
+		// The first config file that is found will become the primary and will be the destination
+		// of saved settings when shutdown is called.
+		if( sConfigName.isEmpty() )
+			sConfigName = configName;
 		sConfig->setFileName( configName );
 		sConfig->readFromFile();
 	}
-	qRegisterMetaType<Record>("Record");
-	qRegisterMetaType<RecordList>("RecordList");
-	qRegisterMetaType<Interval>("Interval");
 
-    return true;
+	if( !logfile.isEmpty() ) {
+		sLogFile = logfile;
+		if( !sLogFile.isEmpty() && sLogFile.right(4) != ".log" )
+			sLogFile = sLogFile + ".log";
+	}
+
+    return configExists;
 }
 
 void initUserConfig( const QString & fileName )
