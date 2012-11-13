@@ -1,7 +1,7 @@
 // This is the SIP interface definition for the Qt support for the standard
 // Python DBus bindings.
 //
-// Copyright (c) 2007 Phil Thompson
+// Copyright (c) 2012 Riverbank Computing Limited
 //
 // Licensed under the Academic Free License version 2.1
 //
@@ -271,7 +271,11 @@ void pyqtDBusHelper::readSocket(int fd)
         {
             watcher.read->setEnabled(false);
             dbus_watch_handle(watcher.watch, DBUS_WATCH_READABLE);
-            watcher.read->setEnabled(true);
+
+            // The notifier could have just been destroyed.
+            if (watcher.read)
+                watcher.read->setEnabled(true);
+
             break;
         }
 
@@ -295,7 +299,11 @@ void pyqtDBusHelper::writeSocket(int fd)
         {
             watcher.write->setEnabled(false);
             dbus_watch_handle(watcher.watch, DBUS_WATCH_WRITABLE);
-            watcher.write->setEnabled(true);
+
+            // The notifier could have just been destroyed.
+            if (watcher.write)
+                watcher.write->setEnabled(true);
+
             break;
         }
 
@@ -392,6 +400,24 @@ static PyMethodDef module_functions[] = {
 
 
 // The module entry point.
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit_qt()
+{
+    static PyModuleDef module_def = {
+        PyModuleDef_HEAD_INIT,
+        "qt",
+        NULL,
+        -1,
+        module_functions,
+    };
+
+    // Import the generic part of the Python DBus bindings.
+    if (import_dbus_bindings("dbus.mainloop.qt") < 0)
+        return 0;
+
+    return PyModule_Create(&module_def);
+}
+#else
 PyMODINIT_FUNC initqt()
 {
     // Import the generic part of the Python DBus bindings.
@@ -400,3 +426,4 @@ PyMODINIT_FUNC initqt()
 
     Py_InitModule("qt", module_functions);
 }
+#endif

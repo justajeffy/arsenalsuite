@@ -117,12 +117,15 @@ will be called to get the property value.</td>
 <td class="topAlign">The property is defined by a function which
 will be called to set the property value.</td>
 </tr>
-<tr>
-<td class="topAlign"><tt>QScriptValue.QObjectMember</tt></td>
-<td class="topAlign"><tt>0x00000020</tt></td>
-<td class="topAlign">This flag is used to indicate that an existing
-property is a <a href="qobject.html">QObject</a> member (a property
-or method).</td>
+</table>
+<p>This flag is used to indicate that an existing property is a
+<a href="qobject.html">QObject</a> member (a property or
+method).</p>
+<table class="valuelist">
+<tr class="even" valign="top">
+<th class="tblConst">Constant</th>
+<th class="tblval">Value</th>
+<th class="tbldscr">Description</th>
 </tr>
 <tr>
 <td class="topAlign"><tt>QScriptValue.KeepExistingFlags</tt></td>
@@ -131,13 +134,9 @@ or method).</td>
 property's flags should be left unchanged. If the property doesn't
 exist, the default flags (0) will be used.</td>
 </tr>
-<tr>
-<td class="topAlign"><tt>QScriptValue.UserRange</tt></td>
-<td class="topAlign"><tt>0xff000000</tt></td>
-<td class="topAlign">Flags in this range are not used by Qt Script,
-and can be used for custom purposes.</td>
-</tr>
 </table>
+<p>Flags in this range are not used by Qt Script, and can be used
+for custom purposes.</p>
 <p>The PropertyFlags type is a typedef for <a href="qflags.html">QFlags</a>&lt;PropertyFlag&gt;. It stores an OR
 combination of PropertyFlag values.</p>
 
@@ -790,4 +789,4 @@ recursively; cyclic references are not followed.</td>
 <p><b>See also</b> <a href="qscriptvalue.html#isVariant">isVariant</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

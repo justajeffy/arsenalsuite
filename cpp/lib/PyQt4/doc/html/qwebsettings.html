@@ -9,7 +9,7 @@ body { background: #ffffff; color: black; }
 </style></head><body><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr /><td align="left" valign="top" width="32"><img align="left" border="0" height="32" src="images/rb-logo.png" width="32" /></td><td width="1">&#160;&#160;</td><td class="postheader" valign="center"><a href="index.html"><font color="#004faf">Home</font></a>&#160;&#183; <a href="classes.html"><font color="#004faf">All Classes</font></a>&#160;&#183; <a href="modules.html"><font color="#004faf">Modules</font></a></td></table><h1 align="center">QWebSettings Class Reference<br /><sup><sup>[<a href="qtwebkit.html">QtWebKit</a> module]</sup></sup></h1><p>The QWebSettings class provides an object to store the settings
 used by <a href="qwebpage.html">QWebPage</a> and <a href="qwebframe.html">QWebFrame</a>. <a href="#details">More...</a></p>
 
-<h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qwebsettings.html#FontFamily-enum">FontFamily</a></b> { StandardFont, FixedFont, SerifFont, SansSerifFont, CursiveFont, FantasyFont }</li><li><div class="fn" />enum <b><a href="qwebsettings.html#FontSize-enum">FontSize</a></b> { MinimumFontSize, MinimumLogicalFontSize, DefaultFontSize, DefaultFixedFontSize }</li><li><div class="fn" />enum <b><a href="qwebsettings.html#WebAttribute-enum">WebAttribute</a></b> { AutoLoadImages, JavascriptEnabled, JavaEnabled, PluginsEnabled, ..., SiteSpecificQuirksEnabled }</li><li><div class="fn" />enum <b><a href="qwebsettings.html#WebGraphic-enum">WebGraphic</a></b> { MissingImageGraphic, MissingPluginGraphic, DefaultFrameIconGraphic, TextAreaSizeGripCornerGraphic }</li></ul><h3>Methods</h3><ul><li><div class="fn" />QString <b><a href="qwebsettings.html#defaultTextEncoding">defaultTextEncoding</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qwebsettings.html#fontFamily">fontFamily</a></b> (<i>self</i>, FontFamily&#160;<i>which</i>)</li><li><div class="fn" />int <b><a href="qwebsettings.html#fontSize">fontSize</a></b> (<i>self</i>, FontSize&#160;<i>type</i>)</li><li><div class="fn" />QString <b><a href="qwebsettings.html#localStoragePath">localStoragePath</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#resetAttribute">resetAttribute</a></b> (<i>self</i>, WebAttribute&#160;<i>attr</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#resetFontFamily">resetFontFamily</a></b> (<i>self</i>, FontFamily&#160;<i>which</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#resetFontSize">resetFontSize</a></b> (<i>self</i>, FontSize&#160;<i>type</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setAttribute">setAttribute</a></b> (<i>self</i>, WebAttribute&#160;<i>attr</i>, bool&#160;<i>on</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setDefaultTextEncoding">setDefaultTextEncoding</a></b> (<i>self</i>, QString&#160;<i>encoding</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setFontFamily">setFontFamily</a></b> (<i>self</i>, FontFamily&#160;<i>which</i>, QString&#160;<i>family</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setFontSize">setFontSize</a></b> (<i>self</i>, FontSize&#160;<i>type</i>, int&#160;<i>size</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setLocalStoragePath">setLocalStoragePath</a></b> (<i>self</i>, QString&#160;<i>path</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setUserStyleSheetUrl">setUserStyleSheetUrl</a></b> (<i>self</i>, QUrl&#160;<i>location</i>)</li><li><div class="fn" />bool <b><a href="qwebsettings.html#testAttribute">testAttribute</a></b> (<i>self</i>, WebAttribute&#160;<i>attr</i>)</li><li><div class="fn" />QUrl <b><a href="qwebsettings.html#userStyleSheetUrl">userStyleSheetUrl</a></b> (<i>self</i>)</li></ul><h3>Static Methods</h3><ul><li><div class="fn" /><b><a href="qwebsettings.html#clearIconDatabase">clearIconDatabase</a></b> ()</li><li><div class="fn" /><b><a href="qwebsettings.html#clearMemoryCaches">clearMemoryCaches</a></b> ()</li><li><div class="fn" /><b><a href="qwebsettings.html#enablePersistentStorage">enablePersistentStorage</a></b> (QString&#160;<i>path</i>&#160;=&#160;QString())</li><li><div class="fn" />QWebSettings <b><a href="qwebsettings.html#globalSettings">globalSettings</a></b> ()</li><li><div class="fn" />QString <b><a href="qwebsettings.html#iconDatabasePath">iconDatabasePath</a></b> ()</li><li><div class="fn" />QIcon <b><a href="qwebsettings.html#iconForUrl">iconForUrl</a></b> (QUrl&#160;<i>url</i>)</li><li><div class="fn" />int <b><a href="qwebsettings.html#maximumPagesInCache">maximumPagesInCache</a></b> ()</li><li><div class="fn" />int <b><a href="qwebsettings.html#offlineStorageDefaultQuota">offlineStorageDefaultQuota</a></b> ()</li><li><div class="fn" />QString <b><a href="qwebsettings.html#offlineStoragePath">offlineStoragePath</a></b> ()</li><li><div class="fn" />QString <b><a href="qwebsettings.html#offlineWebApplicationCachePath">offlineWebApplicationCachePath</a></b> ()</li><li><div class="fn" />int <b><a href="qwebsettings.html#offlineWebApplicationCacheQuota">offlineWebApplicationCacheQuota</a></b> ()</li><li><div class="fn" /><b><a href="qwebsettings.html#setIconDatabasePath">setIconDatabasePath</a></b> (QString&#160;<i>location</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setMaximumPagesInCache">setMaximumPagesInCache</a></b> (int&#160;<i>pages</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setObjectCacheCapacities">setObjectCacheCapacities</a></b> (int&#160;<i>cacheMinDeadCapacity</i>, int&#160;<i>cacheMaxDead</i>, int&#160;<i>totalCapacity</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setOfflineStorageDefaultQuota">setOfflineStorageDefaultQuota</a></b> (int&#160;<i>maximumSize</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setOfflineStoragePath">setOfflineStoragePath</a></b> (QString&#160;<i>path</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setOfflineWebApplicationCachePath">setOfflineWebApplicationCachePath</a></b> (QString&#160;<i>path</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setOfflineWebApplicationCacheQuota">setOfflineWebApplicationCacheQuota</a></b> (int&#160;<i>maximumSize</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setWebGraphic">setWebGraphic</a></b> (WebGraphic&#160;<i>type</i>, QPixmap&#160;<i>graphic</i>)</li><li><div class="fn" />QPixmap <b><a href="qwebsettings.html#webGraphic">webGraphic</a></b> (WebGraphic&#160;<i>type</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QWebSettings class provides an object to store the settings
+<h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qwebsettings.html#FontFamily-enum">FontFamily</a></b> { StandardFont, FixedFont, SerifFont, SansSerifFont, CursiveFont, FantasyFont }</li><li><div class="fn" />enum <b><a href="qwebsettings.html#FontSize-enum">FontSize</a></b> { MinimumFontSize, MinimumLogicalFontSize, DefaultFontSize, DefaultFixedFontSize }</li><li><div class="fn" />enum <b><a href="qwebsettings.html#WebAttribute-enum">WebAttribute</a></b> { AutoLoadImages, JavascriptEnabled, JavaEnabled, PluginsEnabled, ..., HyperlinkAuditingEnabled }</li><li><div class="fn" />enum <b><a href="qwebsettings.html#WebGraphic-enum">WebGraphic</a></b> { MissingImageGraphic, MissingPluginGraphic, DefaultFrameIconGraphic, TextAreaSizeGripCornerGraphic, ..., SearchCancelButtonPressedGraphic }</li></ul><h3>Methods</h3><ul><li><div class="fn" />QString <b><a href="qwebsettings.html#defaultTextEncoding">defaultTextEncoding</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qwebsettings.html#fontFamily">fontFamily</a></b> (<i>self</i>, FontFamily&#160;<i>which</i>)</li><li><div class="fn" />int <b><a href="qwebsettings.html#fontSize">fontSize</a></b> (<i>self</i>, FontSize&#160;<i>type</i>)</li><li><div class="fn" />QString <b><a href="qwebsettings.html#localStoragePath">localStoragePath</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#resetAttribute">resetAttribute</a></b> (<i>self</i>, WebAttribute&#160;<i>attr</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#resetFontFamily">resetFontFamily</a></b> (<i>self</i>, FontFamily&#160;<i>which</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#resetFontSize">resetFontSize</a></b> (<i>self</i>, FontSize&#160;<i>type</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setAttribute">setAttribute</a></b> (<i>self</i>, WebAttribute&#160;<i>attr</i>, bool&#160;<i>on</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setDefaultTextEncoding">setDefaultTextEncoding</a></b> (<i>self</i>, QString&#160;<i>encoding</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setFontFamily">setFontFamily</a></b> (<i>self</i>, FontFamily&#160;<i>which</i>, QString&#160;<i>family</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setFontSize">setFontSize</a></b> (<i>self</i>, FontSize&#160;<i>type</i>, int&#160;<i>size</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setLocalStoragePath">setLocalStoragePath</a></b> (<i>self</i>, QString&#160;<i>path</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setUserStyleSheetUrl">setUserStyleSheetUrl</a></b> (<i>self</i>, QUrl&#160;<i>location</i>)</li><li><div class="fn" />bool <b><a href="qwebsettings.html#testAttribute">testAttribute</a></b> (<i>self</i>, WebAttribute&#160;<i>attr</i>)</li><li><div class="fn" />QUrl <b><a href="qwebsettings.html#userStyleSheetUrl">userStyleSheetUrl</a></b> (<i>self</i>)</li></ul><h3>Static Methods</h3><ul><li><div class="fn" /><b><a href="qwebsettings.html#clearIconDatabase">clearIconDatabase</a></b> ()</li><li><div class="fn" /><b><a href="qwebsettings.html#clearMemoryCaches">clearMemoryCaches</a></b> ()</li><li><div class="fn" /><b><a href="qwebsettings.html#enablePersistentStorage">enablePersistentStorage</a></b> (QString&#160;<i>path</i>&#160;=&#160;QString())</li><li><div class="fn" />QWebSettings <b><a href="qwebsettings.html#globalSettings">globalSettings</a></b> ()</li><li><div class="fn" />QString <b><a href="qwebsettings.html#iconDatabasePath">iconDatabasePath</a></b> ()</li><li><div class="fn" />QIcon <b><a href="qwebsettings.html#iconForUrl">iconForUrl</a></b> (QUrl&#160;<i>url</i>)</li><li><div class="fn" />int <b><a href="qwebsettings.html#maximumPagesInCache">maximumPagesInCache</a></b> ()</li><li><div class="fn" />int <b><a href="qwebsettings.html#offlineStorageDefaultQuota">offlineStorageDefaultQuota</a></b> ()</li><li><div class="fn" />QString <b><a href="qwebsettings.html#offlineStoragePath">offlineStoragePath</a></b> ()</li><li><div class="fn" />QString <b><a href="qwebsettings.html#offlineWebApplicationCachePath">offlineWebApplicationCachePath</a></b> ()</li><li><div class="fn" />int <b><a href="qwebsettings.html#offlineWebApplicationCacheQuota">offlineWebApplicationCacheQuota</a></b> ()</li><li><div class="fn" /><b><a href="qwebsettings.html#setIconDatabasePath">setIconDatabasePath</a></b> (QString&#160;<i>location</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setMaximumPagesInCache">setMaximumPagesInCache</a></b> (int&#160;<i>pages</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setObjectCacheCapacities">setObjectCacheCapacities</a></b> (int&#160;<i>cacheMinDeadCapacity</i>, int&#160;<i>cacheMaxDead</i>, int&#160;<i>totalCapacity</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setOfflineStorageDefaultQuota">setOfflineStorageDefaultQuota</a></b> (int&#160;<i>maximumSize</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setOfflineStoragePath">setOfflineStoragePath</a></b> (QString&#160;<i>path</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setOfflineWebApplicationCachePath">setOfflineWebApplicationCachePath</a></b> (QString&#160;<i>path</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setOfflineWebApplicationCacheQuota">setOfflineWebApplicationCacheQuota</a></b> (int&#160;<i>maximumSize</i>)</li><li><div class="fn" /><b><a href="qwebsettings.html#setWebGraphic">setWebGraphic</a></b> (WebGraphic&#160;<i>type</i>, QPixmap&#160;<i>graphic</i>)</li><li><div class="fn" />QPixmap <b><a href="qwebsettings.html#webGraphic">webGraphic</a></b> (WebGraphic&#160;<i>type</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QWebSettings class provides an object to store the settings
 used by <a href="qwebpage.html">QWebPage</a> and <a href="qwebframe.html">QWebFrame</a>.</p>
 <p>Each <a href="qwebpage.html">QWebPage</a> object has its own
 QWebSettings object, which configures the settings for that page.
@@ -173,6 +173,13 @@ new windows. This is disabled by default.</td>
 </tr>
 <tr>
 <td class="topAlign">
+<tt>QWebSettings.JavascriptCanCloseWindows</tt></td>
+<td class="topAlign">?</td>
+<td class="topAlign">Specifies whether JavaScript programs can
+close windows. This is disabled by default.</td>
+</tr>
+<tr>
+<td class="topAlign">
 <tt>QWebSettings.JavascriptCanAccessClipboard</tt></td>
 <td class="topAlign"><tt>6</tt></td>
 <td class="topAlign">Specifies whether JavaScript programs can read
@@ -245,8 +252,8 @@ default.</td>
 <tt>QWebSettings.LocalStorageEnabled</tt></td>
 <td class="topAlign"><tt>13</tt></td>
 <td class="topAlign">Specifies whether support for the HTML 5 local
-storage feature is enabled or not. This is disabled by
-default.</td>
+storage feature is enabled or not. This is disabled by default.
+(This value was introduced in 4.6.)</td>
 </tr>
 <tr>
 <td class="topAlign">
@@ -262,7 +269,8 @@ QWebSettings.LocalStorageEnabled instead.</td>
 <td class="topAlign">Specifies whether locally loaded documents are
 allowed to access remote urls. This is disabled by default. For
 more information about security origins and local vs. remote
-content see <a href="qwebsecurityorigin.html">QWebSecurityOrigin</a>.</td>
+content see <a href="qwebsecurityorigin.html">QWebSecurityOrigin</a>. (This value was
+introduced in 4.6.)</td>
 </tr>
 <tr>
 <td class="topAlign">
@@ -366,6 +374,34 @@ could not be loaded.</td>
 <td class="topAlign"><tt>3</tt></td>
 <td class="topAlign">The graphic shown for the size grip of text
 areas.</td>
+</tr>
+<tr>
+<td class="topAlign">
+<tt>QWebSettings.DeleteButtonGraphic</tt></td>
+<td class="topAlign"><tt>4</tt></td>
+<td class="topAlign">The graphic shown for the
+WebKit-Editing-Delete-Button in Deletion UI.</td>
+</tr>
+<tr>
+<td class="topAlign">
+<tt>QWebSettings.InputSpeechButtonGraphic</tt></td>
+<td class="topAlign"><tt>5</tt></td>
+<td class="topAlign">The graphic shown in input fields that support
+speech recognition.</td>
+</tr>
+<tr>
+<td class="topAlign">
+<tt>QWebSettings.SearchCancelButtonGraphic</tt></td>
+<td class="topAlign"><tt>6</tt></td>
+<td class="topAlign">The graphic shown for clearing the text in a
+search field.</td>
+</tr>
+<tr>
+<td class="topAlign">
+<tt>QWebSettings.SearchCancelButtonPressedGraphic</tt></td>
+<td class="topAlign"><tt>7</tt></td>
+<td class="topAlign">The graphic shown when
+SearchCancelButtonGraphic is pressed.</td>
 </tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="clearIconDatabase" />QWebSettings.clearIconDatabase ()</h3><p>Clears the icon database.</p>
@@ -609,4 +645,4 @@ false.</p>
 <h3 class="fn"><a name="webGraphic" /><a href="qpixmap.html">QPixmap</a> QWebSettings.webGraphic (<a href="qwebsettings.html#WebGraphic-enum">WebGraphic</a>&#160;<i>type</i>)</h3><p>Returns a previously set pixmap used to draw replacement
 graphics of the specified <i>type</i>.</p>
 <p><b>See also</b> <a href="qwebsettings.html#setWebGraphic">setWebGraphic</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

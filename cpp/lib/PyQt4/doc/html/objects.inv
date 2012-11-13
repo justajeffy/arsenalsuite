@@ -1,6 +1,6 @@
 # Sphinx inventory version 1
 # Project: PyQt
-# Version: 4.8.6
+# Version: 4.9.5
 PyQt4.pyqtconfig mod build_system.html
 PyQt4.uic mod designer.html
 PyQt4.pyqtconfig.QtWebKitModuleMakefile class build_system.html
@@ -32,6 +32,7 @@ PyQt4.QtCore.pyqtSignal function new_style_signals_slots.html
 PyQt4.uic.compileUiDir function designer.html
 PyQt4.pyqtconfig.QtMultimediaModuleMakefile class build_system.html
 PyQt4.pyqtconfig.QtCoreModuleMakefile class build_system.html
+PyQt4.pyqtconfig.QtDBusModuleMakefile class build_system.html
 PyQt4.pyqtconfig.QtScriptToolsModuleMakefile class build_system.html
 PyQt4.pyqtconfig.Configuration.qt_winconfig attribute build_system.html
 disconnect method new_style_signals_slots.html

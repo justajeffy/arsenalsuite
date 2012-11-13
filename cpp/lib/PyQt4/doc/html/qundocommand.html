@@ -9,7 +9,7 @@ body { background: #ffffff; color: black; }
 </style></head><body><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr /><td align="left" valign="top" width="32"><img align="left" border="0" height="32" src="images/rb-logo.png" width="32" /></td><td width="1">&#160;&#160;</td><td class="postheader" valign="center"><a href="index.html"><font color="#004faf">Home</font></a>&#160;&#183; <a href="classes.html"><font color="#004faf">All Classes</font></a>&#160;&#183; <a href="modules.html"><font color="#004faf">Modules</font></a></td></table><h1 align="center">QUndoCommand Class Reference<br /><sup><sup>[<a href="qtgui.html">QtGui</a> module]</sup></sup></h1><p>The QUndoCommand class is the base class of all commands stored
 on a <a href="qundostack.html">QUndoStack</a>. <a href="#details">More...</a></p>
 
-<h3>Methods</h3><ul><li><div class="fn" /><b><a href="qundocommand.html#QUndoCommand">__init__</a></b> (<i>self</i>, QUndoCommand&#160;<i>parent</i>&#160;=&#160;None)</li><li><div class="fn" /><b><a href="qundocommand.html#QUndoCommand-2">__init__</a></b> (<i>self</i>, QString&#160;<i>text</i>, QUndoCommand&#160;<i>parent</i>&#160;=&#160;None)</li><li><div class="fn" />QUndoCommand <b><a href="qundocommand.html#child">child</a></b> (<i>self</i>, int&#160;<i>index</i>)</li><li><div class="fn" />int <b><a href="qundocommand.html#childCount">childCount</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qundocommand.html#id">id</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qundocommand.html#mergeWith">mergeWith</a></b> (<i>self</i>, QUndoCommand&#160;<i>other</i>)</li><li><div class="fn" /><b><a href="qundocommand.html#redo">redo</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qundocommand.html#setText">setText</a></b> (<i>self</i>, QString&#160;<i>text</i>)</li><li><div class="fn" />QString <b><a href="qundocommand.html#text">text</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qundocommand.html#undo">undo</a></b> (<i>self</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QUndoCommand class is the base class of all commands stored
+<h3>Methods</h3><ul><li><div class="fn" /><b><a href="qundocommand.html#QUndoCommand">__init__</a></b> (<i>self</i>, QUndoCommand&#160;<i>parent</i>&#160;=&#160;None)</li><li><div class="fn" /><b><a href="qundocommand.html#QUndoCommand-2">__init__</a></b> (<i>self</i>, QString&#160;<i>text</i>, QUndoCommand&#160;<i>parent</i>&#160;=&#160;None)</li><li><div class="fn" />QString <b><a href="qundocommand.html#actionText">actionText</a></b> (<i>self</i>)</li><li><div class="fn" />QUndoCommand <b><a href="qundocommand.html#child">child</a></b> (<i>self</i>, int&#160;<i>index</i>)</li><li><div class="fn" />int <b><a href="qundocommand.html#childCount">childCount</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qundocommand.html#id">id</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qundocommand.html#mergeWith">mergeWith</a></b> (<i>self</i>, QUndoCommand&#160;<i>other</i>)</li><li><div class="fn" /><b><a href="qundocommand.html#redo">redo</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qundocommand.html#setText">setText</a></b> (<i>self</i>, QString&#160;<i>text</i>)</li><li><div class="fn" />QString <b><a href="qundocommand.html#text">text</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qundocommand.html#undo">undo</a></b> (<i>self</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QUndoCommand class is the base class of all commands stored
 on a <a href="qundostack.html">QUndoStack</a>.</p>
 <p>For an overview of Qt's Undo Framework, see the <a href="qundo.html">overview document</a>.</p>
 <p>A QUndoCommand represents a single editing action on a document;
@@ -93,6 +93,16 @@ delete it in its destructor.</p>
 <p><b>See also</b> <a href="qundocommand.html#dtor.QUndoCommand">~QUndoCommand</a>().</p>
 
 
+<h3 class="fn"><a name="actionText" />QString QUndoCommand.actionText (<i>self</i>)</h3><p>Returns a short text string describing what this command does;
+for example, "insert text".</p>
+<p>The text is used when the text properties of the stack's undo
+and redo actions are updated.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qundocommand.html#text">text</a>(),
+<a href="qundocommand.html#setText">setText</a>(), <a href="qundostack.html#createUndoAction">QUndoStack.createUndoAction</a>(),
+and <a href="qundostack.html#createRedoAction">QUndoStack.createRedoAction</a>().</p>
+
+
 <h3 class="fn"><a name="child" /><a href="qundocommand.html">QUndoCommand</a> QUndoCommand.child (<i>self</i>, int&#160;<i>index</i>)</h3><p>Returns the child command at <i>index</i>.</p>
 <p>This function was introduced in Qt 4.4.</p>
 <p><b>See also</b> <a href="qundocommand.html#childCount">childCount</a>() and <a href="qundostack.html#command">QUndoStack.command</a>().</p>
@@ -150,16 +160,21 @@ commands.</p>
 <h3 class="fn"><a name="setText" />QUndoCommand.setText (<i>self</i>, QString&#160;<i>text</i>)</h3><p>Sets the command's text to be the <i>text</i> specified.</p>
 <p>The specified text should be a short user-readable string
 describing what this command does.</p>
+<p>If you need to have two different strings for <a href="qundocommand.html#text">text</a>() and <a href="qundocommand.html#actionText">actionText</a>(), separate them with
+"\n" and pass into this function. Even if you do not use this
+feature for English strings during development, you can still let
+translators use two different strings in order to match specific
+languages' needs. The described feature and the function <a href="qundocommand.html#actionText">actionText</a>() are available since
+Qt 4.8.</p>
 <p><b>See also</b> <a href="qundocommand.html#text">text</a>(),
-<a href="qundostack.html#createUndoAction">QUndoStack.createUndoAction</a>(),
+<a href="qundocommand.html#actionText">actionText</a>(), <a href="qundostack.html#createUndoAction">QUndoStack.createUndoAction</a>(),
 and <a href="qundostack.html#createRedoAction">QUndoStack.createRedoAction</a>().</p>
 
 
 <h3 class="fn"><a name="text" />QString QUndoCommand.text (<i>self</i>)</h3><p>Returns a short text string describing what this command does;
 for example, "insert text".</p>
-<p>The text is used when the text properties of the stack's undo
-and redo actions are updated.</p>
-<p><b>See also</b> <a href="qundocommand.html#setText">setText</a>(), <a href="qundostack.html#createUndoAction">QUndoStack.createUndoAction</a>(),
+<p>The text is used for names of items in <a href="qundoview.html">QUndoView</a>.</p>
+<p><b>See also</b> <a href="qundocommand.html#actionText">actionText</a>(), <a href="qundocommand.html#setText">setText</a>(), <a href="qundostack.html#createUndoAction">QUndoStack.createUndoAction</a>(),
 and <a href="qundostack.html#createRedoAction">QUndoStack.createRedoAction</a>().</p>
 
 
@@ -170,4 +185,4 @@ leads to undefined beahavior.</p>
 <p>The default implementation calls undo() on all child commands in
 reverse order.</p>
 <p><b>See also</b> <a href="qundocommand.html#redo">redo</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

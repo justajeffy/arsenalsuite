@@ -9,7 +9,7 @@ body { background: #ffffff; color: black; }
 </style></head><body><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr /><td align="left" valign="top" width="32"><img align="left" border="0" height="32" src="images/rb-logo.png" width="32" /></td><td width="1">&#160;&#160;</td><td class="postheader" valign="center"><a href="index.html"><font color="#004faf">Home</font></a>&#160;&#183; <a href="classes.html"><font color="#004faf">All Classes</font></a>&#160;&#183; <a href="modules.html"><font color="#004faf">Modules</font></a></td></table><h1 align="center">QElapsedTimer Class Reference<br /><sup><sup>[<a href="qtcore.html">QtCore</a> module]</sup></sup></h1><p>The QElapsedTimer class provides a fast way to calculate elapsed
 times. <a href="#details">More...</a></p>
 
-<h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qelapsedtimer.html#ClockType-enum">ClockType</a></b> { SystemTime, MonotonicClock, TickCounter, MachAbsoluteTime }</li></ul><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qelapsedtimer.html#QElapsedTimer">__init__</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qelapsedtimer.html#QElapsedTimer-2">__init__</a></b> (<i>self</i>, QElapsedTimer)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#elapsed">elapsed</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#hasExpired">hasExpired</a></b> (<i>self</i>, int&#160;<i>timeout</i>)</li><li><div class="fn" /><b><a href="qelapsedtimer.html#invalidate">invalidate</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#isValid">isValid</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#msecsSinceReference">msecsSinceReference</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#msecsTo">msecsTo</a></b> (<i>self</i>, QElapsedTimer&#160;<i>other</i>)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#restart">restart</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#secsTo">secsTo</a></b> (<i>self</i>, QElapsedTimer&#160;<i>other</i>)</li><li><div class="fn" /><b><a href="qelapsedtimer.html#start">start</a></b> (<i>self</i>)</li></ul><h3>Static Methods</h3><ul><li><div class="fn" />ClockType <b><a href="qelapsedtimer.html#clockType">clockType</a></b> ()</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#isMonotonic">isMonotonic</a></b> ()</li></ul><h3>Special Methods</h3><ul><li><div class="fn" />bool <b><a href="qelapsedtimer.html#__eq__">__eq__</a></b> (<i>self</i>, QElapsedTimer&#160;<i>other</i>)</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#__ge__">__ge__</a></b> (<i>self</i>, QElapsedTimer&#160;<i>v2</i>)</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#__lt__">__lt__</a></b> (<i>self</i>, QElapsedTimer&#160;<i>v2</i>)</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#__ne__">__ne__</a></b> (<i>self</i>, QElapsedTimer&#160;<i>other</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QElapsedTimer class provides a fast way to calculate elapsed
+<h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qelapsedtimer.html#ClockType-enum">ClockType</a></b> { SystemTime, MonotonicClock, TickCounter, MachAbsoluteTime, PerformanceCounter }</li></ul><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qelapsedtimer.html#QElapsedTimer">__init__</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qelapsedtimer.html#QElapsedTimer-2">__init__</a></b> (<i>self</i>, QElapsedTimer)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#elapsed">elapsed</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#hasExpired">hasExpired</a></b> (<i>self</i>, int&#160;<i>timeout</i>)</li><li><div class="fn" /><b><a href="qelapsedtimer.html#invalidate">invalidate</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#isValid">isValid</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#msecsSinceReference">msecsSinceReference</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#msecsTo">msecsTo</a></b> (<i>self</i>, QElapsedTimer&#160;<i>other</i>)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#nsecsElapsed">nsecsElapsed</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#restart">restart</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qelapsedtimer.html#secsTo">secsTo</a></b> (<i>self</i>, QElapsedTimer&#160;<i>other</i>)</li><li><div class="fn" /><b><a href="qelapsedtimer.html#start">start</a></b> (<i>self</i>)</li></ul><h3>Static Methods</h3><ul><li><div class="fn" />ClockType <b><a href="qelapsedtimer.html#clockType">clockType</a></b> ()</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#isMonotonic">isMonotonic</a></b> ()</li></ul><h3>Special Methods</h3><ul><li><div class="fn" />bool <b><a href="qelapsedtimer.html#__eq__">__eq__</a></b> (<i>self</i>, QElapsedTimer&#160;<i>other</i>)</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#__ge__">__ge__</a></b> (<i>self</i>, QElapsedTimer&#160;<i>v2</i>)</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#__lt__">__lt__</a></b> (<i>self</i>, QElapsedTimer&#160;<i>v2</i>)</li><li><div class="fn" />bool <b><a href="qelapsedtimer.html#__ne__">__ne__</a></b> (<i>self</i>, QElapsedTimer&#160;<i>other</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QElapsedTimer class provides a fast way to calculate elapsed
 times.</p>
 <p>The QElapsedTimer class is usually used to quickly calculate how
 much time has elapsed between two events. Its API is similar to
@@ -135,6 +135,14 @@ Symbian systems. This clock may overflow.</td>
 <td class="topAlign">The Mach kernel's absolute time (Mac OS X).
 This clock is monotonic and does not overflow.</td>
 </tr>
+<tr>
+<td class="topAlign">
+<tt>QElapsedTimer.PerformanceCounter</tt></td>
+<td class="topAlign"><tt>4</tt></td>
+<td class="topAlign">The high-resolution performance counter
+provided by Windows. This clock is monotonic and does not
+overflow.</td>
+</tr>
 </table>
 <a id="systemtime" name="systemtime" />
 <h5>SystemTime</h5>
@@ -155,7 +163,9 @@ Unix systems which support POSIX monotonic clocks
 <h5>TickCounter</h5>
 <p>The tick counter clock type is based on the system's or the
 processor's tick counter, multiplied by the duration of a tick.
-This clock type is used on Windows and Symbian platforms.</p>
+This clock type is used on Windows and Symbian platforms. If the
+high-precision performance counter is available on Windows, the
+<tt>PerformanceCounter</tt> clock type is used instead.</p>
 <p>The TickCounter clock type is the only clock type that may
 overflow. Windows Vista and Windows Server 2008 support the
 extended 64-bit tick counter, which allows avoiding the
@@ -178,6 +188,16 @@ kernels, such as that found on Mac OS X. This clock type is
 presented separately from MonotonicClock since Mac OS X is also a
 Unix system and may support a POSIX monotonic clock with values
 differing from the Mach absolute time.</p>
+<p>This clock is monotonic and does not overflow.</p>
+<a id="performancecounter" name="performancecounter" />
+<h5>PerformanceCounter</h5>
+<p>This clock uses the Windows functions
+<tt>QueryPerformanceCounter</tt> and
+<tt>QueryPerformanceFrequency</tt> to access the system's
+high-precision performance counter. Since this counter may not be
+available on all systems, <a href="qelapsedtimer.html">QElapsedTimer</a> will fall back to the
+<tt>TickCounter</tt> clock automatically, if this clock cannot be
+used.</p>
 <p>This clock is monotonic and does not overflow.</p>
 <p><b>See also</b> <a href="qelapsedtimer.html#clockType">clockType</a>() and <a href="qelapsedtimer.html#isMonotonic">isMonotonic</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QElapsedTimer" />QElapsedTimer.__init__ (<i>self</i>)</h3><h3 class="fn"><a name="QElapsedTimer-2" />QElapsedTimer.__init__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>)</h3><h3 class="fn"><a name="clockType" /><a href="qelapsedtimer.html#ClockType-enum">ClockType</a> QElapsedTimer.clockType ()</h3><p>Returns the clock type that this <a href="qelapsedtimer.html">QElapsedTimer</a> implementation uses.</p>
@@ -213,7 +233,7 @@ ones are monotonic.</p>
 <p><b>See also</b> <a href="qelapsedtimer.html#clockType">clockType</a>() and <a href="qelapsedtimer.html#ClockType-enum">QElapsedTimer.ClockType</a>.</p>
 
 
-<h3 class="fn"><a name="isValid" />bool QElapsedTimer.isValid (<i>self</i>)</h3><p>Returns true if this object was invalidated by a call to
+<h3 class="fn"><a name="isValid" />bool QElapsedTimer.isValid (<i>self</i>)</h3><p>Returns false if this object was invalidated by a call to
 <a href="qelapsedtimer.html#invalidate">invalidate</a>() and has
 not been restarted since.</p>
 <p><b>See also</b> <a href="qelapsedtimer.html#invalidate">invalidate</a>(), <a href="qelapsedtimer.html#start">start</a>(), and <a href="qelapsedtimer.html#restart">restart</a>().</p>
@@ -238,6 +258,16 @@ be negative.</p>
 were invalidated.</p>
 <p><b>See also</b> <a href="qelapsedtimer.html#secsTo">secsTo</a>()
 and <a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
+
+
+<h3 class="fn"><a name="nsecsElapsed" />int QElapsedTimer.nsecsElapsed (<i>self</i>)</h3><p>Returns the number of nanoseconds since this <a href="qelapsedtimer.html">QElapsedTimer</a> was last started. Calling
+this function in a <a href="qelapsedtimer.html">QElapsedTimer</a>
+that was invalidated will result in undefined results.</p>
+<p>On platforms that do not provide nanosecond resolution, the
+value returned will be the best estimate available.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qelapsedtimer.html#start">start</a>(),
+<a href="qelapsedtimer.html#restart">restart</a>(), <a href="qelapsedtimer.html#hasExpired">hasExpired</a>(), and <a href="qelapsedtimer.html#invalidate">invalidate</a>().</p>
 
 
 <h3 class="fn"><a name="restart" />int QElapsedTimer.restart (<i>self</i>)</h3><p>Restarts the timer and returns the time elapsed since the
@@ -291,4 +321,4 @@ such as:</p>
 <p><b>See also</b> <a href="qelapsedtimer.html#restart">restart</a>(), <a href="qelapsedtimer.html#invalidate">invalidate</a>(), and <a href="qelapsedtimer.html#elapsed">elapsed</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QElapsedTimer.__eq__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ge__" />bool QElapsedTimer.__ge__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>v2</i>)</h3><h3 class="fn"><a name="__lt__" />bool QElapsedTimer.__lt__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>v2</i>)</h3><h3 class="fn"><a name="__ne__" />bool QElapsedTimer.__ne__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QElapsedTimer.__eq__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ge__" />bool QElapsedTimer.__ge__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>v2</i>)</h3><h3 class="fn"><a name="__lt__" />bool QElapsedTimer.__lt__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>v2</i>)</h3><h3 class="fn"><a name="__ne__" />bool QElapsedTimer.__ne__ (<i>self</i>, <a href="qelapsedtimer.html">QElapsedTimer</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

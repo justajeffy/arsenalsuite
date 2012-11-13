@@ -194,7 +194,7 @@ The :mod:`~PyQt4.uic` module contains the following functions and objects.
     :rtype:
         the *form class* and the *Qt base class*.
 
-.. function:: loadUi(uifile[, baseinstance=None])
+.. function:: loadUi(uifile[, baseinstance=None[, package='']])
 
     Load a Qt Designer ``.ui`` file and returns an instance of the user
     interface.
@@ -205,6 +205,9 @@ The :mod:`~PyQt4.uic` module contains the following functions and objects.
         the optional instance of the *Qt base class*.  If specified then the
         user interface is created in it.  Otherwise a new instance of the base
         class is automatically created.
+    :param package:
+        the optional package that is the base package for any relative imports
+        of custom widgets.
     :rtype:
         the ``QWidget`` sub-class that implements the user interface.
 

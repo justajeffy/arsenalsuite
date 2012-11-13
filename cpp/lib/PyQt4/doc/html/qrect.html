@@ -54,8 +54,8 @@ the intersection rectangle, and the <a href="qrect.html#united">united</a>() fun
 rectangle that encloses the given rectangle and this:</p>
 <table class="generic">
 <tr class="odd" valign="top">
-<td><img src="images/qrect-intersect.png" /></td>
-<td><img src="images/qrect-unite.png" /></td>
+<td><img alt="" src="images/qrect-intersect.png" /></td>
+<td><img alt="" src="images/qrect-unite.png" /></td>
 </tr>
 <tr class="even" valign="top">
 <td><a href="qrect.html#intersected">intersected</a>()</td>
@@ -87,16 +87,16 @@ will be rendered to the right and below the mathematical rectangle
 as in the one pixel case.</p>
 <table class="generic">
 <tr class="odd" valign="top">
-<td><img src="images/qrect-diagram-zero.png" /></td>
-<td><img src="images/qrect-diagram-one.png" /></td>
+<td><img alt="" src="images/qrect-diagram-zero.png" /></td>
+<td><img alt="" src="images/qrect-diagram-one.png" /></td>
 </tr>
 <tr class="even" valign="top">
 <td>Logical representation</td>
 <td>One pixel wide pen</td>
 </tr>
 <tr class="odd" valign="top">
-<td><img src="images/qrect-diagram-two.png" /></td>
-<td><img src="images/qrect-diagram-three.png" /></td>
+<td><img alt="" src="images/qrect-diagram-two.png" /></td>
+<td><img alt="" src="images/qrect-diagram-three.png" /></td>
 </tr>
 <tr class="even" valign="top">
 <td>Two pixel wide pen</td>
@@ -116,7 +116,7 @@ rectangle to the given x coordinate (it may change the width, but
 will never change the rectangle's right edge) and <a href="qrect.html#moveLeft">moveLeft</a>() moves the entire rectangle
 horizontally, leaving the rectangle's left edge at the given x
 coordinate and its size unchanged.</p>
-<p class="centerAlign"><img src="images/qrect-coordinates.png" /></p>
+<p class="centerAlign"><img alt="" src="images/qrect-coordinates.png" /></p>
 <p>Note that for historical reasons the values returned by the
 <a href="qrect.html#bottom">bottom</a>() and <a href="qrect.html#right">right</a>() functions deviate from the true
 bottom-right corner of the rectangle: The <a href="qrect.html#right">right</a>() function returns <i><a href="qrect.html#left">left</a>() + <a href="qrect.html#width">width</a>() - 1</i> and the <a href="qrect.html#bottom">bottom</a>() function returns <i><a href="qrect.html#top">top</a>() + <a href="qrect.html#height">height</a>() - 1</i>. The same is the case for
@@ -246,7 +246,7 @@ and <a href="qrect.html#getRect">getRect</a>().</p>
 <h3 class="fn"><a name="intersect" /><a href="qrect.html">QRect</a> QRect.intersect (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="intersected" /><a href="qrect.html">QRect</a> QRect.intersected (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>other</i>)</h3><p>Returns the intersection of this rectangle and the given
 <i>rectangle</i>. Note that <tt>r.intersected(s)</tt> is equivalent
 to <tt>r &amp; s</tt>.</p>
-<p class="centerAlign"><img src="images/qrect-intersect.png" /></p>
+<p class="centerAlign"><img alt="" src="images/qrect-intersect.png" /></p>
 <p>This function was introduced in Qt 4.2.</p>
 <p><b>See also</b> <a href="qrect.html#intersects">intersects</a>(), <a href="qrect.html#united">united</a>(), and <a href="qrect.html#operator-and-eq">operator&amp;=</a>().</p>
 
@@ -519,7 +519,7 @@ relative to the current position.</p>
 
 <h3 class="fn"><a name="unite" /><a href="qrect.html">QRect</a> QRect.unite (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="united" /><a href="qrect.html">QRect</a> QRect.united (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><p>Returns the bounding rectangle of this rectangle and the given
 <i>rectangle</i>.</p>
-<p class="centerAlign"><img src="images/qrect-unite.png" /></p>
+<p class="centerAlign"><img alt="" src="images/qrect-unite.png" /></p>
 <p>This function was introduced in Qt 4.2.</p>
 <p><b>See also</b> <a href="qrect.html#intersected">intersected</a>().</p>
 
@@ -539,4 +539,4 @@ to <a href="qrect.html#top">top</a>().</p>
 <p><b>See also</b> <a href="qrect.html#setY">setY</a>(), <a href="qrect.html#x">x</a>(), and <a href="qrect.html#topLeft">topLeft</a>().</p>
 
 
-<h3 class="fn"><a name="__and__" /><a href="qrect.html">QRect</a> QRect.__and__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__bool__" />int QRect.__bool__ (<i>self</i>)</h3><h3 class="fn"><a name="__contains__" />int QRect.__contains__ (<i>self</i>, <a href="qpoint.html">QPoint</a>&#160;<i>p</i>)</h3><h3 class="fn"><a name="__contains__-2" />int QRect.__contains__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__eq__" />bool QRect.__eq__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r2</i>)</h3><h3 class="fn"><a name="__iand__" /><a href="qrect.html">QRect</a> QRect.__iand__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__ior__" /><a href="qrect.html">QRect</a> QRect.__ior__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__ne__" />bool QRect.__ne__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r2</i>)</h3><h3 class="fn"><a name="__or__" /><a href="qrect.html">QRect</a> QRect.__or__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__repr__" />str QRect.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__and__" /><a href="qrect.html">QRect</a> QRect.__and__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__bool__" />int QRect.__bool__ (<i>self</i>)</h3><h3 class="fn"><a name="__contains__" />int QRect.__contains__ (<i>self</i>, <a href="qpoint.html">QPoint</a>&#160;<i>p</i>)</h3><h3 class="fn"><a name="__contains__-2" />int QRect.__contains__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__eq__" />bool QRect.__eq__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r2</i>)</h3><h3 class="fn"><a name="__iand__" /><a href="qrect.html">QRect</a> QRect.__iand__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__ior__" /><a href="qrect.html">QRect</a> QRect.__ior__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__ne__" />bool QRect.__ne__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r2</i>)</h3><h3 class="fn"><a name="__or__" /><a href="qrect.html">QRect</a> QRect.__or__ (<i>self</i>, <a href="qrect.html">QRect</a>&#160;<i>r</i>)</h3><h3 class="fn"><a name="__repr__" />str QRect.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

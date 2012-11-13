@@ -33,6 +33,14 @@
 #include <qdom.h>
 #include "rcc.h"
 
+
+#if QT_VERSION >= 0x050000
+#define hash_name   qt_hash
+#else
+#define hash_name   qHash
+#endif
+
+
 static bool qt_rcc_write_number(FILE *out, quint32 number, int width)
 {
     int dividend = 1;
@@ -150,7 +158,7 @@ qint64 RCCFileInfo::writeDataName(FILE *out, qint64 offset)
     offset += 2;
 
     //write the hash
-    qt_rcc_write_number(out, qHash(name), 4);
+    qt_rcc_write_number(out, hash_name(name), 4);
     fprintf(out, "\\\n");
     offset += 4;
 
@@ -399,7 +407,7 @@ RCCResourceLibrary::writeHeader(FILE *out)
     fprintf(out, "# -*- coding: utf-8 -*-\n\n");
     fprintf(out, "# Resource object code\n");
     fprintf(out, "#\n");
-    fprintf(out, "# Created: %s\n", QDateTime::currentDateTime().toString().toLatin1().constData());
+    fprintf(out, "# Created: %s\n", QDateTime::currentDateTime().toString().toUtf8().constData());
     fprintf(out, "#      by: The Resource Compiler for PyQt (Qt v%s)\n", QT_VERSION_STR);
     fprintf(out, "#\n");
     fprintf(out, "# WARNING! All changes made in this file will be lost!\n");
@@ -469,7 +477,7 @@ RCCResourceLibrary::writeDataNames(FILE *out)
 
 static bool qt_rcc_compare_hash(const RCCFileInfo *left, const RCCFileInfo *right)
 {
-    return qHash(left->name) < qHash(right->name);
+    return hash_name(left->name) < hash_name(right->name);
 }
 
 bool

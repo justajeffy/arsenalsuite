@@ -1,6 +1,6 @@
 // This is the signal/slot helper code for SIP.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -192,7 +192,7 @@ extern "C" void *sipQtCreateUniversalSlot(sipWrapper *tx, const char *sig,
 
     res = new PyQtProxy(tx, sig, rxObj, slot, member, flags);
 
-    if (res->real_slot.signature)
+    if (res->metaObject())
     {
         // If the receiver is a QObject then move the proxy to the same thread.
         if (qrx)
@@ -261,7 +261,7 @@ extern "C" int sipQtConnect(void *tx, const char *sig, void *rx, const char *slo
     int res;
 
     Py_BEGIN_ALLOW_THREADS
-    res = QObject::connect(reinterpret_cast<QObject *>(tx), sig,
+    res = (bool)QObject::connect(reinterpret_cast<QObject *>(tx), sig,
                            reinterpret_cast<QObject *>(rx), slot,
                            (Qt::ConnectionType)type);
     Py_END_ALLOW_THREADS
@@ -440,7 +440,11 @@ bool qpycore_emit(QObject *qtx, int signal_index,
     }
 
     Py_BEGIN_ALLOW_THREADS
+#if QT_VERSION >= 0x050000
+    QMetaObject::activate(qtx, signal_index, argv);
+#else
     QMetaObject::activate(qtx, signal_index, signal_index, argv);
+#endif
     Py_END_ALLOW_THREADS
 
     delete[] argv;

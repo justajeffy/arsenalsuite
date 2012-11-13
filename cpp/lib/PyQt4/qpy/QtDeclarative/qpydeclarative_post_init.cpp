@@ -1,6 +1,6 @@
 // This is the initialisation support code for the QtDeclarative module.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -25,6 +25,9 @@
 
 #include <Python.h>
 
+#include "sipAPIQtDeclarative.h"
+
+#include "qpydeclarative_chimera_helpers.h"
 #include "qpydeclarativelistproperty.h"
 
 
@@ -51,4 +54,20 @@ void qpydeclarative_post_init(PyObject *module_dict)
 
     if (PyDict_SetItemString(module_dict, "QPyDeclarativeListProperty", inst) < 0)
         Py_FatalError("PyQt4.QtDeclarative: Failed to set QPyDeclarativeListProperty instance");
+
+    // Get the Chimera helper registration functions.
+    void (*register_to_pyobject)(ToPyObjectFn);
+    register_to_pyobject = (void (*)(ToPyObjectFn))sipImportSymbol(
+            "qpycore_register_to_pyobject");
+    register_to_pyobject(qpydeclarative_to_pyobject);
+
+    void (*register_to_qvariant)(ToQVariantFn);
+    register_to_qvariant = (void (*)(ToQVariantFn))sipImportSymbol(
+            "qpycore_register_to_qvariant");
+    register_to_qvariant(qpydeclarative_to_qvariant);
+
+    void (*register_to_qvariant_data)(ToQVariantDataFn);
+    register_to_qvariant_data = (void (*)(ToQVariantDataFn))sipImportSymbol(
+            "qpycore_register_to_qvariant_data");
+    register_to_qvariant_data(qpydeclarative_to_qvariant_data);
 }

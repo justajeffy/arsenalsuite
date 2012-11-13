@@ -76,7 +76,8 @@ OR-ed together from the following list:</p>
 frame's JavaScript context. The <i>object</i> will be inserted as a
 child of the frame's window object.</p>
 <p>Qt properties will be exposed as JavaScript properties and slots
-as JavaScript methods.</p>
+as JavaScript methods. The interaction between C++ and JavaScript
+is explained in the documentation of the <a href="qtwebkit-bridge.html">QtWebKit bridge</a>.</p>
 <p>If you want to ensure that your <a href="qtwebkit-bridge.html#qobjects">QObjects</a> remain accessible
 after loading a new URL, you should add them in a slot connected to
 the <a href="qwebframe.html#javaScriptWindowObjectCleared">javaScriptWindowObjectCleared</a>()
@@ -189,6 +190,7 @@ with the same attribute name.</p>
 
 
 <h3 class="fn"><a name="page" /><a href="qwebpage.html">QWebPage</a> QWebFrame.page (<i>self</i>)</h3><p>The web page that contains this frame.</p>
+<p><b>See also</b> <a href="qwebframe.html#pageChanged">pageChanged</a>().</p>
 
 
 <h3 class="fn"><a name="parentFrame" /><a href="qwebframe.html">QWebFrame</a> QWebFrame.parentFrame (<i>self</i>)</h3><p>Returns the parent frame of this frame, or 0 if the frame is the
@@ -306,10 +308,15 @@ unless otherwise specified. For example, the encoding of an
 external script can be specified through the charset attribute of
 the HTML script tag. It is also possible for the encoding to be
 specified by web server.</p>
+<p>This is a convenience function equivalent to setContent(html,
+"text/html", <a href="qwebframe.html#baseUrl-prop">baseUrl</a>).</p>
 <p><b>Note:</b> This method will not affect session or global
 history for the frame.</p>
-<p><b>See also</b> <a href="qwebframe.html#toHtml">toHtml</a>() and
-<a href="qwebframe.html#setContent">setContent</a>().</p>
+<p><b>Warning:</b> This function works only for HTML, for other
+mime types (i.e. XHTML, SVG) <a href="qwebframe.html#setContent">setContent</a>() should be used
+instead.</p>
+<p><b>See also</b> <a href="qwebframe.html#toHtml">toHtml</a>(),
+<a href="qwebframe.html#setContent">setContent</a>(), and <a href="qwebframe.html#load">load</a>().</p>
 
 
 <h3 class="fn"><a name="setScrollBarPolicy" />QWebFrame.setScrollBarPolicy (<i>self</i>, <a href="qt.html#Orientation-enum">Qt.Orientation</a>&#160;<i>orientation</i>, <a href="qt.html#ScrollBarPolicy-enum">Qt.ScrollBarPolicy</a>&#160;<i>policy</i>)</h3><p>Sets the scrollbar policy for the scrollbar defined by
@@ -386,7 +393,13 @@ started.</p>
 <p><b>See also</b> <a href="qwebframe.html#loadFinished">loadFinished</a>().</p>
 
 
-<h3 class="fn"><a name="pageChanged" />void pageChanged ()</h3><p>This is the default overload of this signal.</p><h3 class="fn"><a name="titleChanged" />void titleChanged (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the title of the frame changes.
+<h3 class="fn"><a name="pageChanged" />void pageChanged ()</h3><p>This is the default overload of this signal.</p><p>This signal is emitted when this frame has been moved to a
+different <a href="qwebpage.html">QWebPage</a>.</p>
+<p>This function was introduced in Qt 4.7.</p>
+<p><b>See also</b> <a href="qwebframe.html#page">page</a>().</p>
+
+
+<h3 class="fn"><a name="titleChanged" />void titleChanged (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the title of the frame changes.
 The <i>title</i> string specifies the new title.</p>
 <p><b>See also</b> <a href="qwebframe.html#title-prop">title</a>().</p>
 
@@ -395,4 +408,4 @@ The <i>title</i> string specifies the new title.</p>
 frame's title is received. The new URL is specified by
 <i>url</i>.</p>
 <p><b>See also</b> <a href="qwebframe.html#url-prop">url</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

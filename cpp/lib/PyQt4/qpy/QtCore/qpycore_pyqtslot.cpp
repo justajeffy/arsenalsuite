@@ -1,7 +1,7 @@
 // This is the implementation of the pySlot (and deprecated pyqtSignature)
 // decorator.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -39,6 +39,54 @@
 static PyObject *decorate(Chimera::Signature *parsed_sig, PyObject *res_obj,
         const char *context);
 extern "C" {static PyObject *decorator(PyObject *self, PyObject *f);}
+
+
+// Get the bound QObject and slot signature from a callable (which should be a
+// decorated method).
+QByteArray qpycore_pyqtslot_get_parts(PyObject *callable, QObject **qrx)
+{
+    PyObject *qobj_obj, *decorations;
+    int is_err = 0;
+    void *qobj;
+    Chimera::Signature *sig;
+    QByteArray slot;
+
+    // Get the QObject.
+    qobj_obj = PyMethod_Self(callable);
+
+    if (!qobj_obj)
+        goto bad_callable;
+
+    qobj = sipForceConvertToType(qobj_obj, sipType_QObject, 0,
+            SIP_NO_CONVERTORS, 0, &is_err);
+
+    if (is_err)
+        goto bad_callable;
+
+    *qrx = reinterpret_cast<QObject *>(qobj);
+
+    // Get the decoration.
+    decorations = PyObject_GetAttr(callable, qpycore_signature_attr_name);
+
+    if (!decorations)
+        goto bad_callable;
+
+    // Use the first one ignoring any others.
+    sig = Chimera::Signature::fromPyObject(PyList_GET_ITEM(decorations, 0));
+    Py_DECREF(decorations);
+
+    slot = sig->signature;
+    slot.prepend('1');
+
+    return slot;
+
+bad_callable:
+    PyErr_SetString(PyExc_TypeError,
+            "callable must be a method of a QtCore.QObject instance decorated "
+            "by QtCore.pyqtSlot");
+
+    return QByteArray();
+}
 
 
 // This implements the pyqtSlot decorator.

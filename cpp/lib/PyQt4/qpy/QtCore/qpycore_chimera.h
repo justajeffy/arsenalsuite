@@ -1,6 +1,6 @@
 // This is the interface of the Chimera and related classes.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -31,6 +31,7 @@
 
 #include <QByteArray>
 #include <QHash>
+#include <QList>
 #include <QMetaProperty>
 #include <QVariant>
 
@@ -56,6 +57,21 @@ public:
 
     // Parses a C++ type name as a type.  Return 0 if there was an error.
     static const Chimera *parse(const QByteArray &name);
+
+    // Register a function for converting a QVariant to a Python object.
+    typedef bool (*ToPyObjectFn)(const QVariant *, PyObject **);
+    typedef QList<ToPyObjectFn> ToPyObjectConvertors;
+    static void registerToPyObject(ToPyObjectFn);
+
+    // Register a function for converting a Python object to a QVariant.
+    typedef bool (*ToQVariantFn)(PyObject *, QVariant *, bool *);
+    typedef QList<ToQVariantFn> ToQVariantConvertors;
+    static void registerToQVariant(ToQVariantFn);
+
+    // Register a function for converting a Python object to QVariant data.
+    typedef bool (*ToQVariantDataFn)(PyObject *, void *, int, bool *);
+    typedef QList<ToQVariantDataFn> ToQVariantDataConvertors;
+    static void registerToQVariantData(ToQVariantDataFn);
 
     class Signature
     {
@@ -248,14 +264,21 @@ private:
     // The cache of previously parsed argument type lists.
     static QHash<QByteArray, QList<const Chimera *> > _previously_parsed;
 
+    // The registered QVariant to PyObject convertors.
+    static ToPyObjectConvertors _registered_PyObject_convertors;
+
+    // The registered PyObject to QVariant convertors.
+    static ToQVariantConvertors _registered_QVariant_convertors;
+
+    // The registered PyObject to QVariant data convertors.
+    static ToQVariantDataConvertors _registered_QVariant_data_convertors;
+
     Chimera();
 
     bool parse_cpp_type(const QByteArray &type);
     bool parse_py_type(PyTypeObject *type_obj);
     sipAssignFunc get_assign_helper() const;
     void set_flag();
-    static int QList_QObject_metatype();
-    bool to_QList_QObject(PyObject *py, QList<QObject *> &cpp) const;
     bool to_QVariantList(PyObject *py, QVariantList &cpp) const;
     bool to_QVariantMap(PyObject *py, QVariantMap &cpp) const;
 #if QT_VERSION >= 0x040500

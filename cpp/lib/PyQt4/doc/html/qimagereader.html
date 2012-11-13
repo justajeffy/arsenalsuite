@@ -498,8 +498,16 @@ do so.</p>
 <td>SVG</td>
 <td>Scalable Vector Graphics</td>
 </tr>
+<tr class="even" valign="top">
+<td>TGA</td>
+<td>Targa Image Format</td>
+</tr>
 </table>
 <p>Reading and writing SVG files is supported through Qt's <a href="qtsvg.html">SVG Module</a>.</p>
+<p>TGA support only extends to reading non-RLE compressed files. In
+particular calls to <a href="http://doc.qt.nokia.com/4.7-snapshot/qimageioplugin.html#capabilities">
+capabilities</a> for the tga plugin returns only <a href="qimageioplugin.html#Capability-enum">QImageIOPlugin.CanRead</a>,
+not <a href="qimageioplugin.html#Capability-enum">QImageIOPlugin.CanWrite</a>.</p>
 <p>To configure Qt with GIF support, pass <tt>-qt-gif</tt> to the
 <tt>configure</tt> script or check the appropriate option in the
 graphical installer.</p>
@@ -546,4 +554,4 @@ text for a certain key.</p>
 <p><b>See also</b> <a href="qimagereader.html#text">text</a>(),
 <a href="qimagewriter.html#setText">QImageWriter.setText</a>(),
 and <a href="qimage.html#textKeys">QImage.textKeys</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

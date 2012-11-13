@@ -1,6 +1,6 @@
 // This contains the meta-type used by PyQt.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -60,16 +60,13 @@
 #endif
 
 #include "qpycore_chimera.h"
+#include "qpycore_classinfo.h"
 #include "qpycore_misc.h"
 #include "qpycore_pyqtproperty.h"
 #include "qpycore_pyqtsignal.h"
+#include "qpycore_qmetaobjectbuilder.h"
 #include "qpycore_sip.h"
 #include "qpycore_types.h"
-
-
-// The type of the static meta-call function.
-typedef int (*static_metacall_func)(sipTypeDef *, QMetaObject::Call, int,
-        void **);
 
 
 // Forward declarations.
@@ -84,8 +81,10 @@ static void *qpointer_access_func(sipSimpleWrapper *w, AccessFuncOp op);
 }
 
 static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt);
+#if QT_VERSION < 0x050000
 static int add_arg_names(qpycore_metaobject *qo, const QByteArray &sig,
         int empty);
+#endif
 static const QMetaObject *get_scope_qmetaobject(const Chimera *ct);
 static const QMetaObject *get_qmetaobject(pyqtWrapperType *pyqt_wt);
 
@@ -176,13 +175,27 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
 {
     PyTypeObject *pytype = (PyTypeObject *)pyqt_wt;
     qpycore_metaobject *qo = new qpycore_metaobject;
+#if QT_VERSION >= 0x050000
+    QMetaObjectBuilder builder;
+#endif
+
+    // Get any class info.
+    QList<ClassInfo> class_info_list = qpycore_get_class_info_list();
 
     // Get the super-type's meta-object.
+#if QT_VERSION >= 0x050000
+    builder.setSuperClass(get_qmetaobject((pyqtWrapperType *)pytype->tp_base));
+#else
     qo->mo.d.superdata = get_qmetaobject((pyqtWrapperType *)pytype->tp_base);
+#endif
 
     // Get the name of the type.  Dynamic types have simple names.
+#if QT_VERSION >= 0x050000
+    builder.setClassName(pytype->tp_name);
+#else
     qo->str_data = pytype->tp_name;
     qo->str_data.append('\0');
+#endif
 
     // Go through the class dictionary getting all PyQt properties, slots,
     // signals or a (deprecated) sequence of signals.
@@ -190,10 +203,12 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
     typedef QPair<PyObject *, PyObject *> prop_data;
     QMap<uint, prop_data> pprops;
     QList<QByteArray> psigs;
-    QList<const QMetaObject *> enum_scopes;
     SIP_SSIZE_T pos = 0;
     PyObject *key, *value;
+#if QT_VERSION < 0x050000
     bool has_notify_signal = false;
+    QList<const QMetaObject *> enum_scopes;
+#endif
 
     while (PyDict_Next(pytype->tp_dict, &pos, &key, &value))
     {
@@ -257,9 +272,15 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
                 // hierarchy.
                 const QMetaObject *mo = get_scope_qmetaobject(pp->pyqtprop_parsed_type);
 
+#if QT_VERSION >= 0x050000
+                if (mo)
+                    builder.addRelatedMetaObject(mo);
+#else
                 if (mo && !enum_scopes.contains(mo))
                     enum_scopes.append(mo);
+#endif
 
+#if QT_VERSION < 0x050000
                 // See if the property has a notify signal so that we can
                 // allocate space for it in the meta-object.  We will check if
                 // it is valid later on.  If there is one property with a
@@ -267,6 +288,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
                 // properties.
                 if (pp->pyqtprop_notify)
                     has_notify_signal = true;
+#endif
             }
             else if (PyType_IsSubtype(Py_TYPE(value), &qpycore_pyqtSignal_Type))
             {
@@ -330,6 +352,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
 
     qo->nr_signals = psigs.count();
 
+#if QT_VERSION < 0x050000
     // Create and fill the extradata array.
     if (enum_scopes.isEmpty())
     {
@@ -353,6 +376,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         qo->mo.d.extradata = objects;
 #endif
     }
+#endif
 
     // Initialise the header section of the data table.  Note that Qt v4.5
     // introduced revision 2 which added constructors.  However the design is
@@ -361,6 +385,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
     // created.  So we stick with revision 1 (and don't allow pyqtSlot() to
     // decorate __init__).
 
+#if QT_VERSION < 0x050000
 #if QT_VERSION >= 0x040600
     const int revision = 4;
     const int header_size = 14;
@@ -369,10 +394,12 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
     const int header_size = 10;
 #endif
 
-    int data_len = header_size + qo->nr_signals * 5 + qo->pslots.count() * 5 + 
+    int data_len = header_size + class_info_list.count() * 2 +
+            qo->nr_signals * 5 + qo->pslots.count() * 5 + 
             pprops.count() * (has_notify_signal ? 4 : 3) + 1;
     uint *data = new uint[data_len];
-    int g_offset = header_size;
+    int i_offset = header_size;
+    int g_offset = i_offset + class_info_list.count() * 2;
     int s_offset = g_offset + qo->nr_signals * 5;
     int p_offset = s_offset + qo->pslots.count() * 5;
     int n_offset = p_offset + pprops.count() * 3;
@@ -383,7 +410,35 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
 
     // The revision number.
     data[0] = revision;
+#endif
 
+    // Set up any class information.
+    if (class_info_list.count() > 0)
+    {
+#if QT_VERSION < 0x050000
+        data[2] = class_info_list.count();
+        data[3] = i_offset;
+#endif
+
+        for (int i = 0; i < class_info_list.count(); ++i)
+        {
+            const ClassInfo &ci = class_info_list.at(i);
+
+#if QT_VERSION >= 0x050000
+            builder.addClassInfo(ci.first, ci.second);
+#else
+            data[i_offset + (i * 2) + 0] = qo->str_data.size();
+            qo->str_data.append(ci.first.constData());
+            qo->str_data.append('\0');
+
+            data[i_offset + (i * 2) + 1] = qo->str_data.size();
+            qo->str_data.append(ci.second.constData());
+            qo->str_data.append('\0');
+#endif
+        }
+    }
+
+#if QT_VERSION < 0x050000
     // Set up the methods count and offset.
     if (qo->nr_signals || qo->pslots.count())
     {
@@ -405,12 +460,16 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
 #if QT_VERSION >= 0x040600
     data[13] = qo->nr_signals;
 #endif
+#endif
 
     // Add the signals to the meta-object.
     for (int g = 0; g < qo->nr_signals; ++g)
     {
         const QByteArray &norm = psigs.at(g);
 
+#if QT_VERSION >= 0x050000
+        builder.addSignal(norm.mid(1));
+#else
         // Add the (non-existent) argument names.
         data[g_offset + (g * 5) + 1] = add_arg_names(qo, norm, empty);
 
@@ -423,6 +482,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         data[g_offset + (g * 5) + 2] = empty;
         data[g_offset + (g * 5) + 3] = empty;
         data[g_offset + (g * 5) + 4] = 0x05;
+#endif
     }
 
     // Add the slots to the meta-object.
@@ -431,6 +491,9 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         const qpycore_slot &slot = qo->pslots.at(s);
         const QByteArray &sig = slot.signature->signature;
 
+#if QT_VERSION >= 0x050000
+        QMetaMethodBuilder slot_builder = builder.addSlot(sig);
+#else
         // Add the (non-existent) argument names.
         data[s_offset + (s * 5) + 1] = add_arg_names(qo, sig, empty);
 
@@ -438,14 +501,20 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         data[s_offset + (s * 5) + 0] = qo->str_data.size();
         qo->str_data.append(sig);
         qo->str_data.append('\0');
+#endif
 
         // Add any type.
         if (slot.signature->result)
         {
+#if QT_VERSION >= 0x050000
+            slot_builder.setReturnType(slot.signature->result->name());
+#else
             data[s_offset + (s * 5) + 2] = qo->str_data.size();
             qo->str_data.append(slot.signature->result->name());
             qo->str_data.append('\0');
+#endif
         }
+#if QT_VERSION < 0x050000
         else
         {
             data[s_offset + (s * 5) + 2] = empty;
@@ -454,10 +523,13 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         // Add the tag and flags.
         data[s_offset + (s * 5) + 3] = empty;
         data[s_offset + (s * 5) + 4] = 0x0a;
+#endif
     }
 
     // Add the properties to the meta-object.
+#if QT_VERSION < 0x050000
     QList<uint> notify_signals;
+#endif
     QMapIterator<uint, prop_data> it(pprops);
 
     for (int p = 0; it.hasNext(); ++p)
@@ -467,7 +539,71 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         const prop_data &pprop = it.value();
         const char *prop_name = SIPBytes_AS_STRING(pprop.first);
         qpycore_pyqtProperty *pp = (qpycore_pyqtProperty *)pprop.second;
+        int notifier_id;
+#if QT_VERSION < 0x050000
+        uint flags = 0;
+#endif
 
+        if (pp->pyqtprop_notify)
+        {
+            qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)pp->pyqtprop_notify;
+            const QByteArray &sig = ps->master->overloads->at(ps->master_index)->signature;
+
+#if QT_VERSION >= 0x050000
+            notifier_id = builder.indexOfSignal(sig.mid(1));
+#else
+            notifier_id = psigs.indexOf(sig);
+#endif
+
+            if (notifier_id < 0)
+            {
+                PyErr_Format(PyExc_TypeError,
+                        "the notify signal '%s' was not defined in this class",
+                        sig.constData() + 1);
+
+                // Note that we leak the property name.
+                return -1;
+            }
+
+#if QT_VERSION < 0x050000
+            notify_signals.append(notifier_id);
+            flags |= 0x00400000;
+#endif
+        }
+        else
+        {
+#if QT_VERSION >= 0x050000
+            notifier_id = -1;
+#else
+            notify_signals.append(0);
+#endif
+        }
+
+#if QT_VERSION >= 0x050000
+        // A Qt v5 revision 7 meta-object holds the QMetaType::Type of the type
+        // or its name if it is unresolved (ie. not known to the type system).
+        // In Qt v4 both are held.  For QObject sub-classes Chimera will fall
+        // back to the QMetaType::QObjectStar if there is no specific meta-type
+        // for the sub-class.  This means that, for Qt v4,
+        // QMetaProperty::read() can handle the type.  However, Qt v5 doesn't
+        // know that the unresolved type is a QObject sub-class.  Therefore we
+        // have to tell it that the property is a QObject, rather than the
+        // sub-class.  This means that QMetaProperty.typeName() will always
+        // return "QObject*".
+        QByteArray prop_type;
+
+        if (pp->pyqtprop_parsed_type->metatype() == QMetaType::QObjectStar)
+            prop_type = "QObject*";
+        else
+            prop_type = pp->pyqtprop_parsed_type->name();
+
+        QMetaPropertyBuilder prop_builder = builder.addProperty(prop_name,
+                prop_type, notifier_id);
+
+        // Reset the defaults.
+        prop_builder.setReadable(false);
+        prop_builder.setWritable(false);
+#else
         // Add the property name.
         data[p_offset + (p * 3) + 0] = qo->str_data.size();
         qo->str_data.append(prop_name);
@@ -481,11 +617,11 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         // There are only 8 bits available for the type so use the special
         // value if more are required.
         uint metatype = pp->pyqtprop_parsed_type->metatype();
-        uint flags = 0;
 
         if (metatype > 0xff)
         {
 #if QT_VERSION >= 0x040600
+            // Qt assumes it is an enum.
             metatype = 0;
             flags |= 0x00000008;
 #else
@@ -494,26 +630,41 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
             metatype = 0xff;
 #endif
         }
+#endif
 
         // Enum or flag.
         if (pp->pyqtprop_parsed_type->isEnum() || pp->pyqtprop_parsed_type->isFlag())
         {
+#if QT_VERSION >= 0x050000
+            prop_builder.setEnumOrFlag(true);
+#else
 #if QT_VERSION >= 0x040600
             metatype = 0;
 #endif
             flags |= 0x00000008;
+#endif
         }
 
+#if QT_VERSION < 0x050000
         flags |= metatype << 24;
+#endif
 
         if (pp->pyqtprop_get && PyCallable_Check(pp->pyqtprop_get))
             // Readable.
+#if QT_VERSION >= 0x050000
+            prop_builder.setReadable(true);
+#else
             flags |= 0x00000001;
+#endif
 
         if (pp->pyqtprop_set && PyCallable_Check(pp->pyqtprop_set))
         {
             // Writable.
+#if QT_VERSION >= 0x050000
+            prop_builder.setWritable(true);
+#else
             flags |= 0x00000002;
+#endif
 
             // See if the name of the setter follows the Designer convention.
             // If so tell the UI compilers not to use setProperty().
@@ -532,7 +683,11 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
                             ascii[1] == 'e' && ascii[2] == 't' &&
                             ascii[3] == toupper(prop_name[0]) &&
                             qstrcmp(&ascii[4], &prop_name[1]) == 0)
+#if QT_VERSION >= 0x050000
+                        prop_builder.setStdCppSet(true);
+#else
                         flags |= 0x00000100;
+#endif
                 }
 
                 Py_DECREF(ascii_obj);
@@ -543,36 +698,27 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
 
         if (pp->pyqtprop_reset && PyCallable_Check(pp->pyqtprop_reset))
             // Resetable.
+#if QT_VERSION >= 0x050000
+            prop_builder.setResettable(true);
+#else
             flags |= 0x00000004;
-
-        if (pp->pyqtprop_notify)
-        {
-            qpycore_pyqtSignal *ps = (qpycore_pyqtSignal *)pp->pyqtprop_notify;
-            const QByteArray &sig = ps->master->overloads->at(ps->master_index)->signature;
-            int idx = psigs.indexOf(sig);
-
-            if (idx < 0)
-            {
-                PyErr_Format(PyExc_TypeError,
-                        "the notify signal '%s' was not defined in this class",
-                        sig.constData() + 1);
-
-                // Note that we leak the property name and definition.
-                return -1;
-            }
-
-            notify_signals.append(idx);
-            flags |= 0x00400000;
-        }
-        else
-        {
-            notify_signals.append(0);
-        }
+#endif
 
         // Add the property flags.
+#if QT_VERSION >= 0x050000
+        // Note that Qt4 always seems to have ResolveEditable set but
+        // QMetaObjectBuilder doesn't provide an API call to do it.
+        prop_builder.setDesignable(pp->pyqtprop_flags & 0x00001000);
+        prop_builder.setScriptable(pp->pyqtprop_flags & 0x00004000);
+        prop_builder.setStored(pp->pyqtprop_flags & 0x00010000);
+        prop_builder.setUser(pp->pyqtprop_flags & 0x00100000);
+        prop_builder.setConstant(pp->pyqtprop_flags & 0x00000400);
+        prop_builder.setFinal(pp->pyqtprop_flags & 0x00000800);
+#else
         flags |= pp->pyqtprop_flags;
 
         data[p_offset + (p * 3) + 2] = flags;
+#endif
 
         // Save the property data for qt_metacall().  (We already have a
         // reference.)
@@ -582,6 +728,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         Py_DECREF(pprop.first);
     }
 
+#if QT_VERSION < 0x050000
     // Add the indices of the notify signals.
     if (has_notify_signal)
     {
@@ -590,10 +737,15 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
         while (notify_it.hasNext())
             data[n_offset++] = notify_it.next();
     }
+#endif
 
     // Initialise the rest of the meta-object.
+#if QT_VERSION >= 0x050000
+    qo->mo = builder.toMetaObject();
+#else
     qo->mo.d.stringdata = qo->str_data.constData();
     qo->mo.d.data = data;
+#endif
 
     // Save the meta-object.
     pyqt_wt->metaobject = qo;
@@ -602,6 +754,7 @@ static int create_dynamic_metaobject(pyqtWrapperType *pyqt_wt)
 }
 
 
+#if QT_VERSION < 0x050000
 // Add the (non-existent) argument names for a signature and return their index
 // in the meta-object string data.
 static int add_arg_names(qpycore_metaobject *qo, const QByteArray &sig,
@@ -625,6 +778,7 @@ static int add_arg_names(qpycore_metaobject *qo, const QByteArray &sig,
 
     return anames;
 }
+#endif
 
 
 // Return the QMetaObject for an enum type's scope.
@@ -653,7 +807,7 @@ static const QMetaObject *get_qmetaobject(pyqtWrapperType *pyqt_wt)
 {
     // See if it's a sub-type of a wrapped type.
     if (pyqt_wt->metaobject)
-        return &pyqt_wt->metaobject->mo;
+        return QPYCORE_QMETAOBJECT(pyqt_wt->metaobject);
 
     // It's a wrapped type.
     return reinterpret_cast<const QMetaObject *>(((pyqt4ClassTypeDef *)((sipWrapperType *)pyqt_wt)->type)->qt4_static_metaobject);

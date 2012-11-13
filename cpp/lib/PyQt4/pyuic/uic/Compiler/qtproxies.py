@@ -1,6 +1,6 @@
 #############################################################################
 ##
-## Copyright (C) 2011 Riverbank Computing Limited.
+## Copyright (C) 2012 Riverbank Computing Limited.
 ## Copyright (C) 2006 Thorsten Marek.
 ## All right reserved.
 ##
@@ -114,13 +114,13 @@ class ProxyClassMember(object):
     
     def __call__(self, *args):
         if self.function_name == 'setProperty':
-            args = (as_string(args[0], encode=False), as_string(args[1]))
+            str_args = (as_string(args[0], encode=False), as_string(args[1]))
         else:
-            args = map(as_string, args)
+            str_args = map(as_string, args)
 
         func_call = "%s.%s(%s)" % (self.proxy,
                                    self.function_name,
-                                   ", ".join(args))
+                                   ", ".join(str_args))
         if self.flags & AS_ARGUMENT:
             self.proxy._uic_name = func_call
             return self.proxy
@@ -243,7 +243,9 @@ class QtGui(ProxyNamespace):
             return i18n_string(text or "", disambig)
         translate = staticmethod(translate)
 
-    class QIcon(ProxyClass): pass
+    class QIcon(ProxyClass):
+        class fromTheme(ProxyClass): pass
+
     class QConicalGradient(ProxyClass): pass
     class QLinearGradient(ProxyClass): pass
     class QRadialGradient(ProxyClass): pass

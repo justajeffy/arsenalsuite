@@ -66,7 +66,11 @@ add them to a wizard. For more advanced examples, see <a href="dialogs-classwiza
      wizard<span class="operator">.</span>addPage(createConclusionPage());
 
      wizard<span class="operator">.</span>setWindowTitle(<span class="string">"Trivial Wizard"</span>);
+ <span class="preprocessor">#ifdef Q_OS_SYMBIAN</span>
+     wizard<span class="operator">.</span>showMaximized();
+ <span class="preprocessor">#else</span>
      wizard<span class="operator">.</span>show();
+ <span class="preprocessor">#endif</span>
 
      <span class="keyword">return</span> app<span class="operator">.</span>exec();
  }
@@ -92,16 +96,16 @@ want the same look on all platforms).</p>
 </tr>
 </thead>
 <tr class="odd" valign="top">
-<td><img src="images/qtwizard-classic1.png" /></td>
-<td><img src="images/qtwizard-modern1.png" /></td>
-<td><img src="images/qtwizard-mac1.png" /></td>
-<td><img src="images/qtwizard-aero1.png" /></td>
+<td><img alt="" src="images/qtwizard-classic1.png" /></td>
+<td><img alt="" src="images/qtwizard-modern1.png" /></td>
+<td><img alt="" src="images/qtwizard-mac1.png" /></td>
+<td><img alt="" src="images/qtwizard-aero1.png" /></td>
 </tr>
 <tr class="even" valign="top">
-<td><img src="images/qtwizard-classic2.png" /></td>
-<td><img src="images/qtwizard-modern2.png" /></td>
-<td><img src="images/qtwizard-mac2.png" /></td>
-<td><img src="images/qtwizard-aero2.png" /></td>
+<td><img alt="" src="images/qtwizard-classic2.png" /></td>
+<td><img alt="" src="images/qtwizard-modern2.png" /></td>
+<td><img alt="" src="images/qtwizard-mac2.png" /></td>
+<td><img alt="" src="images/qtwizard-aero2.png" /></td>
 </tr>
 </table>
 <p>Note: <a href="qwizard.html#WizardStyle-enum">AeroStyle</a> has
@@ -150,7 +154,7 @@ by <a href="qwizard.html#WizardStyle-enum">ClassicStyle</a> and
 </ul>
 <p>The diagram belows shows how QWizard renders these attributes,
 assuming they are all present and <a href="qwizard.html#WizardStyle-enum">ModernStyle</a> is used:</p>
-<p class="centerAlign"><img src="images/qtwizard-nonmacpage.png" /></p>
+<p class="centerAlign"><img alt="" src="images/qtwizard-nonmacpage.png" /></p>
 <p>When a <a href="qwizardpage.html#subTitle-prop">subTitle</a> is
 set, QWizard displays it in a header, in which case it also uses
 the <a href="qwizard.html#WizardPixmap-enum">BannerPixmap</a> and
@@ -164,7 +168,7 @@ the button row. Typically, the page is a <a href="qwizardpage.html">QWizardPage<
 child widgets (<a href="qlabel.html">QLabel</a>s, <a href="qlineedit.html">QLineEdit</a>s, etc.).</p>
 <p>If the wizard's style is <a href="qwizard.html#WizardStyle-enum">MacStyle</a>, the page looks
 radically different:</p>
-<p class="centerAlign"><img src="images/qtwizard-macpage.png" /></p>
+<p class="centerAlign"><img alt="" src="images/qtwizard-macpage.png" /></p>
 <p>The watermark, banner, and logo pixmaps are ignored by the
 <a href="qwizard.html#WizardStyle-enum">MacStyle</a>. If the
 <a href="qwizard.html#WizardPixmap-enum">BackgroundPixmap</a> is
@@ -297,7 +301,7 @@ traversal paths based on the information provided by the user. The
 <a href="dialogs-licensewizard.html">License Wizard</a> example
 illustrates this. It provides five wizard pages; depending on which
 options are selected, the user can reach different pages.</p>
-<p class="centerAlign"><img src="images/licensewizard-flow.png" /></p>
+<p class="centerAlign"><img alt="" src="images/licensewizard-flow.png" /></p>
 <p>In complex wizards, pages are identified by IDs. These IDs are
 typically defined using an enum. For example:</p>
 <pre class="cpp">
@@ -1068,4 +1072,4 @@ wizard. The page's <i>id</i> is passed as parameter.</p>
 <p><b>See also</b> <a href="qwizard.html#removePage">removePage</a>() and <a href="qwizard.html#startId-prop">startId</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

@@ -36,10 +36,10 @@ constructed, the first method is easier to use:</p>
      <span class="keyword">new</span> <span class="type"><a href="qlistwidgetitem.html">QListWidgetItem</a></span>(tr(<span class="string">"Pine"</span>)<span class="operator">,</span> listWidget);
 </pre>
 <p>If you need to insert a new item into the list at a particular
-position, it is more required to construct the item without a
-parent widget and use the <a href="qlistwidget.html#insertItem">insertItem</a>() function to place it
-within the list. The list widget will take ownership of the
-item.</p>
+position, then it should be constructed without a parent widget.
+The <a href="qlistwidget.html#insertItem">insertItem</a>() function
+should then be used to place it within the list. The list widget
+will take ownership of the item.</p>
 <pre class="cpp">
      <span class="type"><a href="qlistwidgetitem.html">QListWidgetItem</a></span> <span class="operator">*</span>newItem <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qlistwidgetitem.html">QListWidgetItem</a></span>;
      newItem<span class="operator">-</span><span class="operator">&gt;</span>setText(itemText);
@@ -298,4 +298,4 @@ mouse button is pressed on an item in the widget.</p>
 and <a href="qlistwidget.html#currentItemChanged">currentItemChanged</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

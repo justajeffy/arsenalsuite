@@ -1,6 +1,6 @@
 #############################################################################
 ##
-## Copyright (C) 2011 Riverbank Computing Limited.
+## Copyright (C) 2012 Riverbank Computing Limited.
 ## Copyright (C) 2006 Thorsten Marek.
 ## All right reserved.
 ##
@@ -102,10 +102,26 @@ class QObjectCreator(object):
         self._modules.append(self._customWidgets)
 
     def createQObject(self, classname, *args, **kwargs):
-        classType = self.findQObjectType(classname)
-        if classType:
-            return self._cpolicy.instantiate(classType, *args, **kwargs)
-        raise NoSuchWidgetError(classname)
+        # Handle regular and custom widgets.
+        factory = self.findQObjectType(classname)
+
+        if factory is None:
+            # Handle scoped names, typically static factory methods.
+            parts = classname.split('.')
+
+            if len(parts) > 1:
+                factory = self.findQObjectType(parts[0])
+
+                if factory is not None:
+                    for part in parts[1:]:
+                        factory = getattr(factory, part, None)
+                        if factory is None:
+                            break
+
+            if factory is None:
+                raise NoSuchWidgetError(classname)
+
+        return self._cpolicy.instantiate(factory, *args, **kwargs)
 
     def invoke(self, rname, method, args=()):
         return self._cpolicy.invoke(rname, method, args)

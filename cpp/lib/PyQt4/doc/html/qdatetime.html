@@ -437,6 +437,7 @@ this datetime, the value returned is negative.</p>
 converted to <a href="qt.html#TimeSpec-enum">Qt.UTC</a> to ensure
 that the result is correct if one of the two datetimes has daylight
 saving time (DST) and the other doesn't.</p>
+<p>This function was introduced in Qt 4.7.</p>
 <p><b>See also</b> <a href="qdatetime.html#addMSecs">addMSecs</a>(), <a href="qdatetime.html#daysTo">daysTo</a>(), and <a href="qtime.html#msecsTo">QTime.msecsTo</a>().</p>
 
 
@@ -674,7 +675,10 @@ names. An example of this formatting is "Wed May 20 03:40:13
 <p>If the <i>format</i> is <a href="qt.html#DateFormat-enum">Qt.ISODate</a>, the string format
 corresponds to the ISO 8601 extended specification for
 representations of dates and times, taking the form
-YYYY-MM-DDTHH:MM:SS.</p>
+YYYY-MM-DDTHH:mm:ss[Z|[+|-]HH:mm], depending on the <a href="qdatetime.html#timeSpec">timeSpec</a>() of the <a href="qdatetime.html">QDateTime</a>. If the <a href="qdatetime.html#timeSpec">timeSpec</a>() is <a href="qt.html#TimeSpec-enum">Qt.UTC</a>, Z will be appended to the
+string; if the <a href="qdatetime.html#timeSpec">timeSpec</a>() is
+<a href="qt.html#TimeSpec-enum">Qt.OffsetFromUTC</a> the offset in
+hours and minutes from UTC will be appended to the string.</p>
 <p>If the <i>format</i> is <a href="qt.html#DateFormat-enum">Qt.SystemLocaleShortDate</a> or <a href="qt.html#DateFormat-enum">Qt.SystemLocaleLongDate</a>, the string
 format depends on the locale settings of the system. Identical to
 calling <a href="qlocale.html#system">QLocale.system</a>().toString(datetime,
@@ -723,4 +727,4 @@ this datetime, but specified using the <a href="qt.html#TimeSpec-enum">Qt.UTC</a
 <p><b>See also</b> <a href="qdatetime.html#toTimeSpec">toTimeSpec</a>().</p>
 
 
-<h3 class="fn"><a name="__bool__" />int QDateTime.__bool__ (<i>self</i>)</h3><h3 class="fn"><a name="__eq__" />bool QDateTime.__eq__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ge__" />bool QDateTime.__ge__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__gt__" />bool QDateTime.__gt__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__hash__" />int QDateTime.__hash__ (<i>self</i>)</h3><h3 class="fn"><a name="__le__" />bool QDateTime.__le__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__lt__" />bool QDateTime.__lt__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QDateTime.__ne__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__repr__" />str QDateTime.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__bool__" />int QDateTime.__bool__ (<i>self</i>)</h3><h3 class="fn"><a name="__eq__" />bool QDateTime.__eq__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ge__" />bool QDateTime.__ge__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__gt__" />bool QDateTime.__gt__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__hash__" />int QDateTime.__hash__ (<i>self</i>)</h3><h3 class="fn"><a name="__le__" />bool QDateTime.__le__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__lt__" />bool QDateTime.__lt__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__ne__" />bool QDateTime.__ne__ (<i>self</i>, <a href="qdatetime.html">QDateTime</a>&#160;<i>other</i>)</h3><h3 class="fn"><a name="__repr__" />str QDateTime.__repr__ (<i>self</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

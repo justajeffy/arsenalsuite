@@ -1,6 +1,6 @@
 #############################################################################
 ##
-## Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+## Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 ## 
 ## This file is part of PyQt.
 ## 
@@ -25,7 +25,13 @@
 #############################################################################
 
 
+import sys
 import os.path
+
+if sys.hexversion >= 0x03000000:
+    from PyQt4.uic.port_v3.as_string import as_string
+else:
+    from PyQt4.uic.port_v2.as_string import as_string
 
 
 class IconCache(object):
@@ -48,6 +54,16 @@ class IconCache(object):
 
     def get_icon(self, iconset):
         """Return an icon described by the given iconset tag."""
+
+        # Handle a themed icon.
+        theme = iconset.attrib.get('theme')
+        if theme is not None:
+            return self._object_factory.createQObject("QIcon.fromTheme",
+                    'icon', (as_string(theme), ), is_attribute=False)
+
+        # Handle an empty iconset property.
+        if iconset.text is None:
+            return None
 
         iset = _IconSet(iconset, self._base_dir)
 

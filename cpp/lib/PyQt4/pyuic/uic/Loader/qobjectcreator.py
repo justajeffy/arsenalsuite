@@ -70,29 +70,54 @@ class _ModuleWrapper(object):
 
 
 class _CustomWidgetLoader(object):
-    def __init__(self):
+    def __init__(self, package):
         # should it stay this way?
-        sys.path.append(".")
+        if '.' not in sys.path:
+            sys.path.append('.')
+
         self._widgets = {}
         self._modules = {}
+        self._package = package
         
     def addCustomWidget(self, widgetClass, baseClass, module):
         assert widgetClass not in self._widgets
         self._widgets[widgetClass] = module
     
     def search(self, cls):
-        try:
-            module = self._widgets[cls]
-            if module not in self._modules:
-                self._modules[module] = __import__(module, {}, {}, (cls,))
-            
-            return getattr(self._modules[module], cls)
-        except KeyError:
-            pass
-        return None
+        module_name = self._widgets.get(cls)
+        if module_name is None:
+            return None
+
+        module = self._modules.get(module_name)
+        if module is None:
+            if module_name.startswith('.'):
+                if self._package == '':
+                    raise ImportError(
+                            "relative import of %s without base package specified" % module_name)
+
+                if self._package.startswith('.'):
+                    raise ImportError(
+                            "base package %s is relative" % self._package)
+
+                mname = self._package + module_name
+            else:
+                mname = module_name
+
+            try:
+                module = __import__(mname, {}, {}, (cls,))
+            except ValueError:
+                # Raise a more helpful exception.
+                raise ImportError("unable to import module %s" % mname)
+
+            self._modules[module_name] = module
+
+        return getattr(module, cls)
 
 
 class LoaderCreatorPolicy(object):
+    def __init__(self, package):
+        self._package = package
+
     def createQtGuiWrapper(self):
         return _QtGuiWrapper
     
@@ -100,7 +125,7 @@ class LoaderCreatorPolicy(object):
         return _ModuleWrapper(moduleName, classes)
     
     def createCustomWidgetLoader(self):
-        return _CustomWidgetLoader()
+        return _CustomWidgetLoader(self._package)
 
     def instantiate(self, clsObject, objectName, ctor_args, is_attribute=True):
         return clsObject(*ctor_args)

@@ -16,7 +16,7 @@ items in a <a href="qgraphicsscene.html">QGraphicsScene</a>.</p>
 custom items. This includes defining the item's geometry, collision
 detection, its painting implementation and item interaction through
 its event handlers. QGraphicsItem is part of the <a href="graphicsview.html">Graphics View Framework</a></p>
-<p class="centerAlign"><img src="images/graphicsview-items.png" /></p>
+<p class="centerAlign"><img alt="" src="images/graphicsview-items.png" /></p>
 <p>For convenience, Qt provides a set of standard graphics items
 for the most common shapes. These are:</p>
 <ul>
@@ -114,7 +114,7 @@ Unless the item has no parent, its position is in <i>parent</i>
 coordinates (i.e., the parent's local coordinates). Parent items
 propagate both their position and their transformation to all
 children.</p>
-<p class="centerAlign"><img src="images/graphicsview-parentchild.png" /></p>
+<p class="centerAlign"><img alt="" src="images/graphicsview-parentchild.png" /></p>
 <a id="transformations" name="transformations" /><a id="transformations" name="transformations" />
 <h3>Transformations</h3>
 <p>QGraphicsItem supports projective transformations in addition to
@@ -184,7 +184,7 @@ they were either added to the scene, or added to the same parent).
 If you add item A, and then B, then B will be on top of A. If you
 then add C, the items' stacking order will be A, then B, then
 C.</p>
-<p class="centerAlign"><img src="images/graphicsview-zorder.png" /></p>
+<p class="centerAlign"><img alt="" src="images/graphicsview-zorder.png" /></p>
 <p>This example shows the stacking order of all limbs of the robot
 from the <a href="graphicsview-dragdroprobot.html">Drag and Drop
 Robot</a> example. The torso is the root item (all other items are
@@ -1677,7 +1677,8 @@ or not it is actually being visualized by a <a href="qgraphicsview.html">QGraphi
 false is returned. <i>parent</i> can be 0, in which case this
 function will return whether the item is visible to the scene or
 not.</p>
-<p>An item may not be visible to its ancestors even if <a href="qgraphicsitem.html#isVisible">isVisible</a>() is true. If any
+<p>An item may not be visible to its ancestors even if <a href="qgraphicsitem.html#isVisible">isVisible</a>() is true. It may also
+be visible to its ancestors even if <a href="qgraphicsitem.html#isVisible">isVisible</a>() is false. If any
 ancestor is hidden, the item itself will be implicitly hidden, in
 which case this function will return false.</p>
 <p>This function was introduced in Qt 4.4.</p>
@@ -3147,4 +3148,4 @@ Type enum value. Example:</p>
  };
 </pre>
 <p><b>Note:</b> UserType = 65536</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

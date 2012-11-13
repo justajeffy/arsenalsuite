@@ -2,7 +2,7 @@
  * This is the Qt Designer plugin that collects all the Python plugins it can
  * find as a widget collection to Designer.
  *
- * Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
  * 
  * This file is part of PyQt.
  * 
@@ -99,8 +99,9 @@ PyCustomWidgets::PyCustomWidgets(QObject *parent) : QObject(parent)
     {
         QString dir = dirs.at(i);
 
-        // Get a list of all candidate plugin modules.
-        QStringList candidates = QDir(dir).entryList(QDir::Files);
+        // Get a list of all candidate plugin modules.  We sort by name to
+        // provide control over the order they are imported.
+        QStringList candidates = QDir(dir).entryList(QDir::Files, QDir::Name);
         QStringList plugins;
 
         for (int p = 0; p < candidates.size(); ++p)
@@ -160,15 +161,6 @@ PyCustomWidgets::PyCustomWidgets(QObject *parent) : QObject(parent)
                 return;
         }
 
-        // Make sure we have sip.unwrapinstance.
-        if (!qtdesigner_custom)
-        {
-            qtdesigner_custom = getModuleAttr("PyQt4.QtDesigner", "QPyDesignerCustomWidgetPlugin");
-
-            if (!qtdesigner_custom)
-                return;
-        }
-
         // Convert the directory to a Python object with native separators.
 #if QT_VERSION >= 0x040200
         dir = QDir::toNativeSeparators(dir);
@@ -176,14 +168,20 @@ PyCustomWidgets::PyCustomWidgets(QObject *parent) : QObject(parent)
         dir = QDir::convertSeparators(dir);
 #endif
 
-#if PY_MAJOR_VERSION >= 3
-        // This is a copy of qpycore_PyObject_FromQString().
+#if PY_VERSION_HEX >= 0x03030000
+        PyObject *dobj = PyUnicode_FromKindAndData(PyUnicode_2BYTE_KIND, dir.constData(), dir.length());
 
+        if (!dobj)
+        {
+            PyErr_Print();
+            continue;
+        }
+#elif PY_VERSION_HEX >= 0x03000000
 #if defined(Py_UNICODE_WIDE)
 #if QT_VERSION >= 0x040200
         QVector<uint> ucs4 = dir.toUcs4();
 
-        PyObject *dobj = PyUnicode_FromUnicode(NULL, ucs4.size());
+        PyObject *dobj = PyUnicode_FromUnicode(0, ucs4.size());
 
         if (!dobj)
         {
@@ -248,6 +246,17 @@ PyCustomWidgets::PyCustomWidgets(QObject *parent) : QObject(parent)
             {
                 PyErr_Print();
                 continue;
+            }
+
+            // Make sure we have QPyDesignerCustomWidgetPlugin.  We make sure
+            // this is after the import of the first plugin to allow that
+            // plugin to change any API versions.
+            if (!qtdesigner_custom)
+            {
+                qtdesigner_custom = getModuleAttr("PyQt4.QtDesigner", "QPyDesignerCustomWidgetPlugin");
+
+                if (!qtdesigner_custom)
+                    return;
             }
 
             // Go through the module looking for types that implement

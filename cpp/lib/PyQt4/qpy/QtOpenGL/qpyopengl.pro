@@ -1,7 +1,7 @@
 # This is the qmake project file for the QPy support code for the QtOpenGL
 # module.
 #
-# Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 # 
 # This file is part of PyQt.
 # 
@@ -35,7 +35,8 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES   = \
-            qpyopengl_attribute_array.cpp
+            qpyopengl_attribute_array.cpp \
+            qpyopengl_uniform_value_array.cpp
 
 HEADERS   = \
             qpyopengl_api.h

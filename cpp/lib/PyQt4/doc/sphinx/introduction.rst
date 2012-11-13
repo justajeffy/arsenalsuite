@@ -1,7 +1,7 @@
 Introduction
 ============
 
-This is the reference guide for PyQt snapshot-4.8.6-4726879563e5.  PyQt v4 is a set of
+This is the reference guide for PyQt snapshot-4.9.5-9eb6aac99275.  PyQt v4 is a set of
 `Python <http://www.python.org>`__ bindings for v4 of the Qt application
 framework from `Nokia <http://qt.nokia.com>`__.
 
@@ -101,6 +101,9 @@ number of Python extension modules.  These are all installed in the
   a cross-platform multimedia framework that enables the use of audio and video
   content in PyQt applications.
 
+- The :mod:`~PyQt4.QtDBus` module.  This Unix-only module provides classes that
+  support Inter-Process Communication using the D-Bus protocol.
+
 - The :mod:`~PyQt4.QtDeclarative` module.  This module provides a declarative
   framework for building highly dynamic, custom user interfaces using QML.
 
@@ -117,8 +120,8 @@ number of Python extension modules.  These are all installed in the
   Qt Designer to be extended using PyQt.  See :ref:`ref-designer-plugins` for a
   full description of how to do this.
 
-- The :mod:`~PyQt4.QAxContainer` module.  This module contains classes that
-  allow access to ActiveX controls and COM objects.
+- The :mod:`~PyQt4.QAxContainer` module.  This Windows-only module contains
+  classes that allow access to ActiveX controls and COM objects.
 
 - The :mod:`~PyQt4.Qt` module.  This module consolidates the classes contained
   in all of the modules described above into a single module.  This has the
@@ -128,15 +131,14 @@ number of Python extension modules.  These are all installed in the
   Whether you use this consolidated module, or the individual component modules
   is down to personal taste.
 
-- The `DBus <http://www.freedesktop.org/wiki/Software_2fdbus>`__ support
-  module is installed as :mod:`dbus.mainloop.qt`.  PyQt does not support Qt's
-  native DBus classes (which are very C++ orientated).  Instead the
-  :mod:`dbus.mainloop.qt` module provides support for the Qt event loop in the
-  same way that the :mod:`dbus.mainloop.glib` included with the standard
-  ``dbus-python`` bindings package provides support for the GLib event loop.
-  The API is described in :ref:`ref-dbus`.  It is only available for PyQt for
-  X11 and only if the ``dbus-python`` v0.80 (or later) bindings package is
-  installed.
+- The `DBus <http://www.freedesktop.org/wiki/Software/DBusBindings>`__ support
+  module is installed as :mod:`dbus.mainloop.qt`.  This module provides support
+  for the Qt event loop in the same way that the :mod:`dbus.mainloop.glib`
+  included with the standard ``dbus-python`` bindings package provides support
+  for the GLib event loop.  The API is described in :ref:`ref-dbus`.  It is
+  only available for PyQt for X11 and only if the ``dbus-python`` v0.80 (or
+  later) bindings package is installed.  The :mod:`~PyQt4.QtDBus` module
+  provides a more Qt-like interface to DBus.
 
 - The :mod:`~PyQt4.uic` module.  This module contains classes for handling the
   ``.ui`` files created by Qt Designer that describe the whole or part of a

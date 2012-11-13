@@ -20,12 +20,12 @@ to provide data to view classes such as <a href="qtableview.html">QTableView</a>
      model<span class="operator">-</span><span class="operator">&gt;</span>setTable(<span class="string">"employee"</span>);
      model<span class="operator">-</span><span class="operator">&gt;</span>setEditStrategy(<span class="type">QSqlTableModel</span><span class="operator">.</span>OnManualSubmit);
      model<span class="operator">-</span><span class="operator">&gt;</span>select();
-     model<span class="operator">-</span><span class="operator">&gt;</span>removeColumn(<span class="number">0</span>); <span class="comment">// don't show the ID</span>
      model<span class="operator">-</span><span class="operator">&gt;</span>setHeaderData(<span class="number">0</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>Horizontal<span class="operator">,</span> tr(<span class="string">"Name"</span>));
      model<span class="operator">-</span><span class="operator">&gt;</span>setHeaderData(<span class="number">1</span><span class="operator">,</span> <span class="type"><a href="qt.html">Qt</a></span><span class="operator">.</span>Horizontal<span class="operator">,</span> tr(<span class="string">"Salary"</span>));
 
      <span class="type"><a href="qtableview.html">QTableView</a></span> <span class="operator">*</span>view <span class="operator">=</span> <span class="keyword">new</span> <span class="type"><a href="qtableview.html">QTableView</a></span>;
      view<span class="operator">-</span><span class="operator">&gt;</span>setModel(model);
+     view<span class="operator">-</span><span class="operator">&gt;</span>hideColumn(<span class="number">0</span>); <span class="comment">// don't show the ID</span>
      view<span class="operator">-</span><span class="operator">&gt;</span>show();
 </pre>
 <p>We set the SQL table's name and the edit strategy, then we set
@@ -120,7 +120,8 @@ false.</p>
 <p><b>See also</b> <a href="qsqltablemodel.html#setEditStrategy">setEditStrategy</a>().</p>
 
 
-<h3 class="fn"><a name="fieldIndex" />int QSqlTableModel.fieldIndex (<i>self</i>, QString&#160;<i>fieldName</i>)</h3><p>Returns the index of the field <i>fieldName</i>.</p>
+<h3 class="fn"><a name="fieldIndex" />int QSqlTableModel.fieldIndex (<i>self</i>, QString&#160;<i>fieldName</i>)</h3><p>Returns the index of the field <i>fieldName</i>, or -1 if no
+corresponding field exists in the model.</p>
 
 
 <h3 class="fn"><a name="filter" />QString QSqlTableModel.filter (<i>self</i>)</h3><p>Returns the currently set filter.</p>
@@ -393,4 +394,4 @@ to (since it is a reference), for example to populate some fields
 with default values.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

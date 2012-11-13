@@ -1,6 +1,6 @@
 // This contains the implementation of the PyQtProxy class.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -29,9 +29,9 @@
 #include <QMetaObject>
 #include <QMutex>
 #include <QObject>
-#include <QThread>
 
 #include "qpycore_chimera.h"
+#include "qpycore_qmetaobjectbuilder.h"
 #include "qpycore_pyqtproxy.h"
 #include "qpycore_pyqtpyobject.h"
 #include "qpycore_sip.h"
@@ -40,12 +40,16 @@
 // Proxy flags.  Note that SIP_SINGLE_SHOT is part of the same flag-space.
 #define PROXY_OWNS_SLOT_SIG 0x10    // The proxy owns the slot signature.
 #define PROXY_SLOT_INVOKED  0x20    // The proxied slot is executing.
-#define PROXY_SLOT_DISABLED 0x40    // The proxied slot is disabled.
+#define PROXY_SLOT_DISABLED 0x40    // The proxy deleteLater() has been called
+                                    // or should be called after the slot has
+                                    // finished executing.
 
 
 // The last QObject sender.
 QObject *PyQtProxy::last_sender = 0;
 
+
+#if QT_VERSION < 0x050000
 
 static const uint slot_meta_data[] = {
     // content:
@@ -57,8 +61,8 @@ static const uint slot_meta_data[] = {
     0,    0, // enums/sets
 
     // slots: signature, parameters, type, tag, flags
-    11,   10,   10,   10, 0x0a,
     21,   10,   10,   10, 0x0a,
+    11,   10,   10,   10, 0x0a,
 
     0        // eod
 };
@@ -78,84 +82,26 @@ const QMetaObject PyQtProxy::staticMetaObject = {
     }
 };
 
+#endif
+
 
 // Create a universal proxy used as a signal.
 PyQtProxy::PyQtProxy(QObject *qtx, const char *sig)
     : QObject(), type(PyQtProxy::ProxySignal), proxy_flags(0),
-            signature(QMetaObject::normalizedSignature(sig))
+            signature(QMetaObject::normalizedSignature(sig)), meta_object(0)
 {
-    // Create a new meta-object on the heap so that it looks like it has a
-    // signal of the right name and signature.
-    sigmo = new QMetaObject;
-    sigmo->d.superdata = &QObject::staticMetaObject;
-    sigmo->d.extradata = 0;
-
-    // Calculate the size of the string meta-data as follows:
-    // - "PyQtProxy" and its terminating '\0' (ie. 9 + 1 bytes),
-    // - a '\0' used for any empty string,
-    // - "disable()" and its terminating '\0' (ie. 9 + 1 bytes),
-    // - the (non-existent) argument names (ie. use the empty string if there
-    //   is less that two arguments, otherwise a comma between each argument
-    //   and the terminating '\0'),
-    // - the name and full signature, less the initial type character, plus the
-    //   terminating '\0'.
-
-    const size_t fixed_len = 9 + 1 + 1 + 9 + 1;
-    const size_t empty_str = 9 + 1;
-
-    int nr_commas = signature.count(',');
-
-    size_t len = fixed_len
-                + (nr_commas >= 0 ? nr_commas + 1 : 0)
-                + signature.size() + 1;
-
-    char *smd = new char[len];
-
-    memcpy(smd, slot_meta_stringdata, fixed_len);
-
-    uint i = fixed_len, args_pos;
-
-    if (nr_commas > 0)
-    {
-        args_pos = i;
-
-        for (int c = 0; c < nr_commas; ++c)
-            smd[i++] = ',';
-
-        smd[i++] = '\0';
-    }
-    else
-        args_pos = empty_str;
-
-    uint sig_pos = i;
-    qstrcpy(&smd[i], signature.constData());
-
-    sigmo->d.stringdata = smd;
-
-    // Add the non-string data.
-    uint *data = new uint[21];
-
-    memcpy(data, slot_meta_data, 21 * sizeof (uint));
-
-    // Replace the second method (ie. unislot()) with the new signal.
-    data[15] = sig_pos;
-    data[16] = args_pos;
-    data[19] = 0x05;
-
-    sigmo->d.data = data;
-
     init(qtx, &proxy_signals, qtx);
 }
 
 
 // Create a universal proxy used as a slot.  Note that this will leak if there
 // is no signal transmitter (ie. no parent) and not marked as single shot.
-// There will be no parsed signature if there was a problem creating the proxy.
+// There will be no meta-object if there was a problem creating the proxy.
 PyQtProxy::PyQtProxy(sipWrapper *txObj, const char *sig, PyObject *rxObj,
         const char *slot, const char **member, int flags)
     : QObject(), type(PyQtProxy::ProxySlot),
             proxy_flags(PROXY_OWNS_SLOT_SIG | flags),
-            signature(QMetaObject::normalizedSignature(sig))
+            signature(QMetaObject::normalizedSignature(sig)), meta_object(0)
 {
     void *tx = 0;
     QObject *qtx = 0;
@@ -199,6 +145,7 @@ PyQtProxy::PyQtProxy(sipWrapper *txObj, const char *sig, PyObject *rxObj,
 
 
 // Create a universal proxy used as a slot being connected to a bound signal.
+// There will be no meta-object if there was a problem creating the proxy.
 PyQtProxy::PyQtProxy(qpycore_pyqtBoundSignal *bs, PyObject *rxObj,
         const char **member)
     : QObject(), type(PyQtProxy::ProxySlot), proxy_flags(0),
@@ -227,6 +174,94 @@ PyQtProxy::PyQtProxy(qpycore_pyqtBoundSignal *bs, PyObject *rxObj,
 // Initialisation common to all ctors.
 void PyQtProxy::init(QObject *qtx, PyQtProxy::ProxyHash *hash, void *key)
 {
+    // Create a new meta-object on the heap so that it looks like it has a
+    // signal of the right name and signature.
+#if QT_VERSION >= 0x050000
+    QMetaObjectBuilder builder;
+
+    builder.setClassName("PyQtProxy");
+    builder.setSuperClass(&QObject::staticMetaObject);
+
+    // Note that signals must be added before slots.
+    if (type == ProxySignal)
+        builder.addSignal(signature);
+    else
+        builder.addSlot("unislot()");
+
+    builder.addSlot("disable()");
+
+    meta_object = builder.toMetaObject();
+#else
+    if (type == ProxySignal)
+    {
+        QMetaObject *mo = new QMetaObject;
+        mo->d.superdata = &QObject::staticMetaObject;
+        mo->d.extradata = 0;
+
+        // Calculate the size of the string meta-data as follows:
+        // - "PyQtProxy" and its terminating '\0' (ie. 9 + 1 bytes),
+        // - a '\0' used for any empty string,
+        // - "disable()" and its terminating '\0' (ie. 9 + 1 bytes),
+        // - the (non-existent) argument names (ie. use the empty string if
+        //   there is less that two arguments, otherwise a comma between each
+        //   argument and the terminating '\0'),
+        // - the name and full signature, less the initial type character, plus
+        //   the terminating '\0'.
+
+        const size_t fixed_len = 9 + 1 + 1 + 9 + 1;
+        const size_t empty_str = 9 + 1;
+
+        int nr_commas = signature.count(',');
+
+        size_t len = fixed_len
+                    + (nr_commas >= 0 ? nr_commas + 1 : 0)
+                    + signature.size() + 1;
+
+        char *smd = new char[len];
+
+        memcpy(smd, slot_meta_stringdata, fixed_len);
+
+        uint i = fixed_len, args_pos;
+
+        if (nr_commas > 0)
+        {
+            args_pos = i;
+
+            for (int c = 0; c < nr_commas; ++c)
+                smd[i++] = ',';
+
+            smd[i++] = '\0';
+        }
+        else
+        {
+            args_pos = empty_str;
+        }
+
+        uint sig_pos = i;
+        qstrcpy(&smd[i], signature.constData());
+
+        mo->d.stringdata = smd;
+
+        // Add the non-string data.
+        uint *data = new uint[21];
+
+        memcpy(data, slot_meta_data, 21 * sizeof (uint));
+
+        // Replace the first method (ie. unislot()) with the new signal.
+        data[10] = sig_pos;
+        data[11] = args_pos;
+        data[14] = 0x05;
+
+        mo->d.data = data;
+
+        meta_object = mo;
+    }
+    else
+    {
+        meta_object = &staticMetaObject;
+    }
+#endif
+
     hashed = true;
     saved_key = key;
     transmitter = qtx;
@@ -295,34 +330,36 @@ PyQtProxy::~PyQtProxy()
         mutex->unlock();
     }
 
-    switch (type)
+    if (type == ProxySlot && real_slot.signature)
     {
-    case ProxySlot:
-        if (real_slot.signature)
+        // Qt can still be tidying up after Python has gone so make sure that
+        // it hasn't.
+        if (Py_IsInitialized())
         {
-            // Qt can still be tidying up after Python has gone so make sure
-            // that it hasn't.
-            if (Py_IsInitialized())
-            {
-                SIP_BLOCK_THREADS
-                sipFreeSipslot(&real_slot.sip_slot);
-                SIP_UNBLOCK_THREADS
-            }
-
-            if (proxy_flags & PROXY_OWNS_SLOT_SIG)
-                delete real_slot.signature;
-
-            real_slot.signature = 0;
+            SIP_BLOCK_THREADS
+            sipFreeSipslot(&real_slot.sip_slot);
+            SIP_UNBLOCK_THREADS
         }
 
-        break;
+        if (proxy_flags & PROXY_OWNS_SLOT_SIG)
+            delete real_slot.signature;
 
-    case ProxySignal:
-        // The casts are needed for MSVC 6.
-        delete[] const_cast<char *>(sigmo->d.stringdata);
-        delete[] const_cast<uint *>(sigmo->d.data);
-        delete sigmo;
-        break;
+        real_slot.signature = 0;
+    }
+
+    if (meta_object)
+    {
+#if QT_VERSION >= 0x050000
+        free(const_cast<QMetaObject *>(meta_object));
+#else
+        if (meta_object != &staticMetaObject)
+        {
+            // The casts are needed for MSVC 6.
+            delete[] const_cast<char *>(meta_object->d.stringdata);
+            delete[] const_cast<uint *>(meta_object->d.data);
+            delete meta_object;
+        }
+#endif
     }
 }
 
@@ -335,10 +372,7 @@ PyQtProxy::ProxyHash PyQtProxy::proxy_signals;
 
 const QMetaObject *PyQtProxy::metaObject() const
 {
-    if (type == ProxySignal)
-        return sigmo;
-
-    return &staticMetaObject;
+    return meta_object;
 }
 
 
@@ -347,7 +381,7 @@ void *PyQtProxy::qt_metacast(const char *_clname)
     if (!_clname)
         return 0;
 
-    if (!qstrcmp(_clname, slot_meta_stringdata))
+    if (qstrcmp(_clname, "PyQtProxy") == 0)
         return static_cast<void *>(const_cast<PyQtProxy *>(this));
 
     return QObject::qt_metacast(_clname);
@@ -366,14 +400,14 @@ int PyQtProxy::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id)
         {
         case 0:
-            disable();
+            if (type == ProxySignal)
+                QMetaObject::activate(this, meta_object, _id, _a);
+            else
+                unislot(_a);
             break;
 
         case 1:
-            if (type == ProxySignal)
-                QMetaObject::activate(this, sigmo, 1, _a);
-            else
-                unislot(_a);
+            disable();
             break;
         }
 
@@ -387,6 +421,12 @@ int PyQtProxy::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // This is the universal slot itself that dispatches to the real slot.
 void PyQtProxy::unislot(void **qargs)
 {
+    // If we are marked as disabled (possible if a queued signal has been
+    // disconnected but there is still a signal in the event queue) then just
+    // ignore the call.
+    if (proxy_flags & PROXY_SLOT_DISABLED)
+        return;
+
     // sender() must be called without the GIL to avoid possible deadlocks
     // between the GIL and Qt's internal thread data mutex.
     QObject *new_last_sender = sender();
@@ -415,10 +455,8 @@ void PyQtProxy::unislot(void **qargs)
         // Self destruct if we are a single shot or disabled.
         if (proxy_flags & (SIP_SINGLE_SHOT|PROXY_SLOT_DISABLED))
         {
-            if (QThread::currentThread() == thread())
-                delete this;
-            else
-                deleteLater();
+            // See the comment in disable() for why we deleteLater().
+            deleteLater();
         }
     }
 
@@ -437,12 +475,19 @@ void PyQtProxy::unislot(void **qargs)
 // until the proxied slot returns.
 void PyQtProxy::disable()
 {
-    if (proxy_flags & PROXY_SLOT_INVOKED)
-        proxy_flags |= PROXY_SLOT_DISABLED;
-    else if (QThread::currentThread() == thread())
-        delete this;
-    else
+    proxy_flags |= PROXY_SLOT_DISABLED;
+
+    // Delete it if the slot isn't currently executing, otherwise it will be
+    // done after the slot returns.  Note that we don't rely on deleteLater()
+    // providing the necessary delay because the slot could process the event
+    // loop and the proxy would be deleted too soon.
+    if ((proxy_flags & PROXY_SLOT_INVOKED) == 0)
+    {
+        // Despite what the Qt documentation suggests, if there are outstanding
+        // queued signals then we may crash so we always delete later when the
+        // event queue will have been flushed.
         deleteLater();
+    }
 }
 
 
@@ -530,10 +575,7 @@ void PyQtProxy::deleteSlotProxies(void *tx, const char *sig)
             up->hashed = false;
             it = proxy_slots.erase(it);
 
-            if (QThread::currentThread() == up->thread())
-                delete up;
-            else
-                up->deleteLater();
+            up->disable();
         }
         else
             ++it;

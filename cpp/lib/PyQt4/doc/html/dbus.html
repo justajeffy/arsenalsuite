@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The DBus Support Module &mdash; PyQt snapshot-4.8.6-4726879563e5 Reference Guide</title>
+    <title>DBus Support &mdash; PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '#',
-        VERSION:     'snapshot-4.8.6-4726879563e5',
+        VERSION:     'snapshot-4.9.5-9eb6aac99275',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/logo_tn.ico"/>
-    <link rel="top" title="PyQt snapshot-4.8.6-4726879563e5 Reference Guide" href="index.html" />
+    <link rel="top" title="PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide" href="index.html" />
     <link rel="next" title="Selecting Incompatible APIs" href="incompatible_apis.html" />
     <link rel="prev" title="Internationalisation of PyQt Applications" href="i18n.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="i18n.html" title="Internationalisation of PyQt Applications"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PyQt snapshot-4.8.6-4726879563e5 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -49,12 +49,67 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="the-dbus-support-module">
-<span id="ref-dbus"></span><h1>The DBus Support Module<a class="headerlink" href="#the-dbus-support-module" title="Permalink to this headline">¶</a></h1>
-<p>The DBus support module is installed as <tt class="xref docutils literal"><span class="pre">dbus.mainloop.qt</span></tt> and provides
-support for the Qt event loop to the standard <tt class="docutils literal"><span class="pre">dbus-python</span></tt> language
-bindings package.  The module&#8217;s API is almost identical to that of the
-<tt class="xref docutils literal"><span class="pre">dbus.mainloop.glib</span></tt> modules that provides support for the GLib event loop.</p>
+  <div class="section" id="dbus-support">
+<span id="ref-dbus"></span><h1>DBus Support<a class="headerlink" href="#dbus-support" title="Permalink to this headline">¶</a></h1>
+<p>PyQt provides two different modules that implement support for DBus.  The
+<tt class="xref docutils literal"><span class="pre">QtDBus</span></tt> module provides wrappers for the standard Qt DBus classes.
+The <tt class="xref docutils literal"><span class="pre">dbus.mainloop.qt</span></tt> module add support for the Qt event loop to the
+standard <tt class="docutils literal"><span class="pre">dbus-python</span></tt> Python module.</p>
+<div class="section" id="qtdbus">
+<h2><tt class="xref docutils literal"><span class="pre">QtDBus</span></tt><a class="headerlink" href="#qtdbus" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref docutils literal"><span class="pre">QtDBus</span></tt> module is used in a similar way to the C++ library it
+wraps.  The main difference is in the way it supports the demarshalling of
+DBus structures.  C++ relies on the template-based registration of types using
+<tt class="docutils literal"><span class="pre">qDBusRegisterMetaType()</span></tt> which isn&#8217;t possible from Python.  Instead a slot
+that accepts a DBus structure in an argument should specify a slot with a
+single <tt class="xref docutils literal"><span class="pre">QDBusMessage</span></tt> argument.  The implementation of the
+slot should then extract the arguments from the message using its
+<tt class="xref docutils literal"><span class="pre">arguments()</span></tt> method.</p>
+<p>For example, say we have a DBus method called <tt class="docutils literal"><span class="pre">setColors()</span></tt> that has a single
+argument that is an array of structures of three integers (red, green and
+blue).  The DBus signature of the argument would then be <tt class="docutils literal"><span class="pre">a(iii)</span></tt>.  In C++
+you would typically define a class to hold the red, green and blue values and
+so your code would include the following (incomplete) fragments:</p>
+<div class="highlight-python"><pre>struct Color
+{
+    int red;
+    int green;
+    int blue;
+};
+Q_DECLARE_METATYPE(Color)
+
+qDBusRegisterMetaType&lt;Color&gt;();
+
+class ServerAdaptor : public QDBusAbstractAdaptor
+{
+    Q_OBJECT
+
+public slots:
+    void setColors(QList&lt;const Color &amp;&gt; colors);
+};</pre>
+</div>
+<p>The Python version is, of course, much simpler:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ServerAdaptor</span><span class="p">(</span><span class="n">QDBusAbstractAdaptor</span><span class="p">):</span>
+
+    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="n">QDBusMessage</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">setColors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="c"># Get the single argument.</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">arguments</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c"># The argument will be a list of 3-tuples of ints.</span>
+        <span class="k">for</span> <span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span> <span class="ow">in</span> <span class="n">colors</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;RGB:&quot;</span><span class="p">,</span> <span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that this technique can be used for arguments of any type, it is only
+require if DBus structures are involved.</p>
+</div>
+<div class="section" id="dbus-mainloop-qt">
+<h2><tt class="xref docutils literal"><span class="pre">dbus.mainloop.qt</span></tt><a class="headerlink" href="#dbus-mainloop-qt" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref docutils literal"><span class="pre">dbus.mainloop.qt</span></tt> module provides support for the Qt event loop to
+<tt class="docutils literal"><span class="pre">dbus-python</span></tt>.  The module&#8217;s API is almost identical to that of the
+<tt class="xref docutils literal"><span class="pre">dbus.mainloop.glib</span></tt> modules that provides support for the GLib event
+loop.</p>
 <p>The <tt class="xref docutils literal"><span class="pre">dbus.mainloop.qt</span></tt> module contains the following function.</p>
 <dl class="function">
 <dt id="DBusQtMainLoop">
@@ -81,6 +136,7 @@ standard <tt class="docutils literal"><span class="pre">dbus-python</span></tt> 
 </pre></div>
 </div>
 </div>
+</div>
 
 
           </div>
@@ -91,6 +147,15 @@ standard <tt class="docutils literal"><span class="pre">dbus-python</span></tt> 
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/logo.png" alt="Logo"/>
             </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">DBus Support</a><ul>
+<li><a class="reference external" href="#qtdbus"><tt class="docutils literal"><span class="pre">QtDBus</span></tt></a></li>
+<li><a class="reference external" href="#dbus-mainloop-qt"><tt class="docutils literal"><span class="pre">dbus.mainloop.qt</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
             <h4>Previous topic</h4>
             <p class="topless"><a href="i18n.html"
                                   title="previous chapter">Internationalisation of PyQt Applications</a></p>
@@ -129,7 +194,7 @@ standard <tt class="docutils literal"><span class="pre">dbus-python</span></tt> 
         <li class="right" >
           <a href="i18n.html" title="Internationalisation of PyQt Applications"
              >previous</a> |</li>
-        <li><a href="index.html">PyQt snapshot-4.8.6-4726879563e5 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

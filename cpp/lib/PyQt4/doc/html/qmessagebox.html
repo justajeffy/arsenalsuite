@@ -37,7 +37,7 @@ simplest configuration is to set only the <a href="qmessagebox.html#text-prop">m
 <p>The user must click the <b>OK</b> button to dismiss the message
 box. The rest of the GUI is blocked until the message box is
 dismissed.</p>
-<p class="centerAlign"><img src="images/msgbox1.png" /></p>
+<p class="centerAlign"><img alt="" src="images/msgbox1.png" /></p>
 <p>A better approach than just alerting the user to an event is to
 also ask the user what to do about it. Store the question in the
 <a href="qmessagebox.html#informativeText-prop">informative
@@ -58,11 +58,11 @@ order is reversed.</p>
  msgBox<span class="operator">.</span><a href="qmessagebox.html#setDefaultButton">setDefaultButton</a>(<span class="type">QMessageBox</span><span class="operator">.</span>Save);
  <span class="type">int</span> ret <span class="operator">=</span> msgBox<span class="operator">.</span><a href="qmessagebox.html#exec">exec_</a>();
 </pre>
-<p>This is the approach recommended in the <a href="http://developer.apple.com/documentation/UserExperience/Conceptual/AppleHIGuidelines/XHIGWindows/chapter_18_section_7.html">
-Mac OS X Guidlines</a>. Similar guidlines apply for the other
+<p>This is the approach recommended in the <a href="http://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/AppleHIGuidelines/Windows/Windows.html#//apple_ref/doc/uid/20000961-BABCAJID">
+Mac OS X Guidelines</a>. Similar guidelines apply for the other
 platforms, but note the different ways the <a href="qmessagebox.html#informativeText-prop">informative text</a> is
 handled for different platforms.</p>
-<p class="centerAlign"><img src="images/msgbox2.png" /></p>
+<p class="centerAlign"><img alt="" src="images/msgbox2.png" /></p>
 <p>The <a href="qmessagebox.html#exec">exec_</a>() slot returns the
 <a href="qmessagebox.html#StandardButton-enum">StandardButtons</a>
 value of the button that was clicked.</p>
@@ -87,10 +87,10 @@ question, set the <a href="qmessagebox.html#detailedText-prop">detailed text</a>
 the <a href="qmessagebox.html#detailedText-prop">detailed text</a>
 property is set, the <b>Show Details...</b> button will be
 shown.</p>
-<p class="centerAlign"><img src="images/msgbox3.png" /></p>
+<p class="centerAlign"><img alt="" src="images/msgbox3.png" /></p>
 <p>Clicking the <b>Show Details...</b> button displays the detailed
 text.</p>
-<p class="centerAlign"><img src="images/msgbox4.png" /></p>
+<p class="centerAlign"><img alt="" src="images/msgbox4.png" /></p>
 <a id="rich-text-and-the-text-format-property" name="rich-text-and-the-text-format-property" />
 <h4>Rich Text and the Text Format Property</h4>
 <p>The <a href="qmessagebox.html#detailedText-prop">detailed
@@ -116,28 +116,28 @@ icons</a>. The following rules are guidelines:</p>
 <table class="generic">
 <tr class="odd" valign="top">
 <td>
-<p class="centerAlign"><img src="images/qmessagebox-quest.png" /></p>
+<p class="centerAlign"><img alt="" src="images/qmessagebox-quest.png" /></p>
 </td>
 <td><a href="qmessagebox.html#Icon-enum">Question</a></td>
 <td>For asking a question during normal operations.</td>
 </tr>
 <tr class="even" valign="top">
 <td>
-<p class="centerAlign"><img src="images/qmessagebox-info.png" /></p>
+<p class="centerAlign"><img alt="" src="images/qmessagebox-info.png" /></p>
 </td>
 <td><a href="qmessagebox.html#Icon-enum">Information</a></td>
 <td>For reporting information about normal operations.</td>
 </tr>
 <tr class="odd" valign="top">
 <td>
-<p class="centerAlign"><img src="images/qmessagebox-warn.png" /></p>
+<p class="centerAlign"><img alt="" src="images/qmessagebox-warn.png" /></p>
 </td>
 <td><a href="qmessagebox.html#Icon-enum">Warning</a></td>
 <td>For reporting non-critical errors.</td>
 </tr>
 <tr class="even" valign="top">
 <td>
-<p class="centerAlign"><img src="images/qmessagebox-crit.png" /></p>
+<p class="centerAlign"><img alt="" src="images/qmessagebox-crit.png" /></p>
 </td>
 <td><a href="qmessagebox.html#Icon-enum">Critical</a></td>
 <td>For reporting critical errors.</td>
@@ -799,4 +799,4 @@ yourself using one of the <a href="qmessagebox.html">QMessageBox</a> constructor
 clicked in returned in <i>button</i>.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

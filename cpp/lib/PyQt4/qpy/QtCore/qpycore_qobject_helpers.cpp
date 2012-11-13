@@ -1,6 +1,6 @@
 // This implements the helpers for QObject.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -54,7 +54,7 @@ const QMetaObject *qpycore_qobject_metaobject(sipSimpleWrapper *pySelf,
 {
     // Return the dynamic meta-object if there is one.
     if (pySelf && ((pyqtWrapperType *)Py_TYPE(pySelf))->metaobject)
-        return &((pyqtWrapperType *)Py_TYPE(pySelf))->metaobject->mo;
+        return QPYCORE_QMETAOBJECT(((pyqtWrapperType *)Py_TYPE(pySelf))->metaobject);
 
     // Fall back to the static Qt meta-object.
     return reinterpret_cast<const QMetaObject *>(((pyqt4ClassTypeDef *)base)->qt4_static_metaobject);
@@ -104,7 +104,7 @@ static int qt_metacall_worker(sipSimpleWrapper *pySelf, PyTypeObject *pytype,
                 QObject *qthis = reinterpret_cast<QObject *>(sipGetCppPtr(pySelf, sipType_QObject));
 
                 Py_BEGIN_ALLOW_THREADS
-                QMetaObject::activate(qthis, &qo->mo, _id, _a);
+                QMetaObject::activate(qthis, QPYCORE_QMETAOBJECT(qo), _id, _a);
                 Py_END_ALLOW_THREADS
             }
             else
@@ -303,11 +303,29 @@ PyObject *qpycore_qobject_staticmetaobject(PyObject *type_obj)
     const QMetaObject *mo;
 
     if (pyqt_wt->metaobject)
+    {
         // It's a sub-type of a wrapped type.
-        mo = &pyqt_wt->metaobject->mo;
+        mo = QPYCORE_QMETAOBJECT(pyqt_wt->metaobject);
+    }
     else
+    {
         // It's a wrapped type.
-        mo = reinterpret_cast<const QMetaObject *>(((pyqt4ClassTypeDef *)((sipWrapperType *)pyqt_wt)->type)->qt4_static_metaobject);
+        pyqt4ClassTypeDef *p4ctd = (pyqt4ClassTypeDef *)((sipWrapperType *)pyqt_wt)->type;
+
+        if (!p4ctd)
+        {
+            /*
+             * This is a side effect of a wrapped class not being fully ready
+             * until sip's meta-class's __init__() has run (rather than after
+             * its __new__() method as might be expected).
+             */
+            PyErr_SetString(PyExc_AttributeError,
+                    "staticMetaObject isn't available until the meta-class's __init__ returns");
+            return 0;
+        }
+
+        mo = reinterpret_cast<const QMetaObject *>(p4ctd->qt4_static_metaobject);
+    }
 
     return sipConvertFromType(const_cast<QMetaObject *>(mo), sipType_QMetaObject, 0);
 }

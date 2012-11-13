@@ -10,14 +10,14 @@ body { background: #ffffff; color: black; }
 model for a single database table, with foreign key support.
 <a href="#details">More...</a></p>
 
-<p>Inherits <a href="qsqltablemodel.html">QSqlTableModel</a>.</p><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#QSqlRelationalTableModel">__init__</a></b> (<i>self</i>, QObject&#160;<i>parent</i>&#160;=&#160;None, QSqlDatabase&#160;<i>db</i>&#160;=&#160;QSqlDatabase())</li><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#clear">clear</a></b> (<i>self</i>)</li><li><div class="fn" />QVariant <b><a href="qsqlrelationaltablemodel.html#data">data</a></b> (<i>self</i>, QModelIndex&#160;<i>index</i>, int&#160;<i>role</i>&#160;=&#160;Qt.DisplayRole)</li><li><div class="fn" />bool <b><a href="qsqlrelationaltablemodel.html#insertRowIntoTable">insertRowIntoTable</a></b> (<i>self</i>, QSqlRecord&#160;<i>values</i>)</li><li><div class="fn" />QString <b><a href="qsqlrelationaltablemodel.html#orderByClause">orderByClause</a></b> (<i>self</i>)</li><li><div class="fn" />QSqlRelation <b><a href="qsqlrelationaltablemodel.html#relation">relation</a></b> (<i>self</i>, int&#160;<i>column</i>)</li><li><div class="fn" />QSqlTableModel <b><a href="qsqlrelationaltablemodel.html#relationModel">relationModel</a></b> (<i>self</i>, int&#160;<i>column</i>)</li><li><div class="fn" />bool <b><a href="qsqlrelationaltablemodel.html#removeColumns">removeColumns</a></b> (<i>self</i>, int&#160;<i>column</i>, int&#160;<i>count</i>, QModelIndex&#160;<i>parent</i>&#160;=&#160;QModelIndex())</li><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#revertRow">revertRow</a></b> (<i>self</i>, int&#160;<i>row</i>)</li><li><div class="fn" />bool <b><a href="qsqlrelationaltablemodel.html#select">select</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qsqlrelationaltablemodel.html#selectStatement">selectStatement</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qsqlrelationaltablemodel.html#setData">setData</a></b> (<i>self</i>, QModelIndex&#160;<i>index</i>, QVariant&#160;<i>value</i>, int&#160;<i>role</i>&#160;=&#160;Qt.EditRole)</li><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#setRelation">setRelation</a></b> (<i>self</i>, int&#160;<i>column</i>, QSqlRelation&#160;<i>relation</i>)</li><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#setTable">setTable</a></b> (<i>self</i>, QString&#160;<i>tableName</i>)</li><li><div class="fn" />bool <b><a href="qsqlrelationaltablemodel.html#updateRowInTable">updateRowInTable</a></b> (<i>self</i>, int&#160;<i>row</i>, QSqlRecord&#160;<i>values</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QSqlRelationalTableModel class provides an editable data
+<p>Inherits <a href="qsqltablemodel.html">QSqlTableModel</a>.</p><h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qsqlrelationaltablemodel.html#JoinMode-enum">JoinMode</a></b> { InnerJoin, LeftJoin }</li></ul><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#QSqlRelationalTableModel">__init__</a></b> (<i>self</i>, QObject&#160;<i>parent</i>&#160;=&#160;None, QSqlDatabase&#160;<i>db</i>&#160;=&#160;QSqlDatabase())</li><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#clear">clear</a></b> (<i>self</i>)</li><li><div class="fn" />QVariant <b><a href="qsqlrelationaltablemodel.html#data">data</a></b> (<i>self</i>, QModelIndex&#160;<i>index</i>, int&#160;<i>role</i>&#160;=&#160;Qt.DisplayRole)</li><li><div class="fn" />bool <b><a href="qsqlrelationaltablemodel.html#insertRowIntoTable">insertRowIntoTable</a></b> (<i>self</i>, QSqlRecord&#160;<i>values</i>)</li><li><div class="fn" />QString <b><a href="qsqlrelationaltablemodel.html#orderByClause">orderByClause</a></b> (<i>self</i>)</li><li><div class="fn" />QSqlRelation <b><a href="qsqlrelationaltablemodel.html#relation">relation</a></b> (<i>self</i>, int&#160;<i>column</i>)</li><li><div class="fn" />QSqlTableModel <b><a href="qsqlrelationaltablemodel.html#relationModel">relationModel</a></b> (<i>self</i>, int&#160;<i>column</i>)</li><li><div class="fn" />bool <b><a href="qsqlrelationaltablemodel.html#removeColumns">removeColumns</a></b> (<i>self</i>, int&#160;<i>column</i>, int&#160;<i>count</i>, QModelIndex&#160;<i>parent</i>&#160;=&#160;QModelIndex())</li><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#revertRow">revertRow</a></b> (<i>self</i>, int&#160;<i>row</i>)</li><li><div class="fn" />bool <b><a href="qsqlrelationaltablemodel.html#select">select</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qsqlrelationaltablemodel.html#selectStatement">selectStatement</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qsqlrelationaltablemodel.html#setData">setData</a></b> (<i>self</i>, QModelIndex&#160;<i>index</i>, QVariant&#160;<i>value</i>, int&#160;<i>role</i>&#160;=&#160;Qt.EditRole)</li><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#setJoinMode">setJoinMode</a></b> (<i>self</i>, JoinMode&#160;<i>joinMode</i>)</li><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#setRelation">setRelation</a></b> (<i>self</i>, int&#160;<i>column</i>, QSqlRelation&#160;<i>relation</i>)</li><li><div class="fn" /><b><a href="qsqlrelationaltablemodel.html#setTable">setTable</a></b> (<i>self</i>, QString&#160;<i>tableName</i>)</li><li><div class="fn" />bool <b><a href="qsqlrelationaltablemodel.html#updateRowInTable">updateRowInTable</a></b> (<i>self</i>, int&#160;<i>row</i>, QSqlRecord&#160;<i>values</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QSqlRelationalTableModel class provides an editable data
 model for a single database table, with foreign key support.</p>
 <p>QSqlRelationalTableModel acts like <a href="qsqltablemodel.html">QSqlTableModel</a>, but allows columns to be
 set as foreign keys into other database tables.</p>
 <table class="generic">
 <tr class="odd" valign="top">
-<td><img src="images/noforeignkeys.png" /></td>
-<td><img src="images/foreignkeys.png" /></td>
+<td><img alt="" src="images/noforeignkeys.png" /></td>
+<td><img alt="" src="images/foreignkeys.png" /></td>
 </tr>
 </table>
 <p>The screenshot on the left shows a plain <a href="qsqltablemodel.html">QSqlTableModel</a> in a <a href="qtableview.html">QTableView</a>. Foreign keys (<tt>city</tt> and
@@ -53,8 +53,8 @@ on the view with an instance of <a href="qsqlrelationaldelegate.html">QSqlRelati
 <p>The <a href="sql-relationaltablemodel.html">sql/relationaltablemodel</a>
 example illustrates how to use QSqlRelationalTableModel in
 conjunction with <a href="qsqlrelationaldelegate.html">QSqlRelationalDelegate</a> to provide
-tables with foreigh key support.</p>
-<p class="centerAlign"><img src="images/relationaltable.png" /></p>
+tables with foreign key support.</p>
+<p class="centerAlign"><img alt="" src="images/relationaltable.png" /></p>
 <p>Notes:</p>
 <ul>
 <li>The table must have a primary key declared.</li>
@@ -79,6 +79,32 @@ should always be <a href="qt.html#ItemDataRole-enum">Qt.EditRole</a>, and when u
 <a href="qsqlrelationaltablemodel.html#data">data</a>() the role
 should always be <a href="qt.html#ItemDataRole-enum">Qt.DisplayRole</a>.</li>
 </ul>
+<hr /><h2>Type Documentation</h2><h3 class="fn"><a name="JoinMode-enum" />QSqlRelationalTableModel.JoinMode</h3><p>This enum specifies the type of mode to use when joining two
+tables.</p>
+<table class="valuelist">
+<tr class="odd" valign="top">
+<th class="tblConst">Constant</th>
+<th class="tblval">Value</th>
+<th class="tbldscr">Description</th>
+</tr>
+<tr>
+<td class="topAlign">
+<tt>QSqlRelationalTableModel.InnerJoin</tt></td>
+<td class="topAlign"><tt>0</tt></td>
+<td class="topAlign">Inner join mode, return rows when there is at
+least one match in both tables.</td>
+</tr>
+<tr>
+<td class="topAlign">
+<tt>QSqlRelationalTableModel.LeftJoin</tt></td>
+<td class="topAlign"><tt>1</tt></td>
+<td class="topAlign">Left join mode, returns all rows from the left
+table (table_name1), even if there are no matches in the right
+table (table_name2).</td>
+</tr>
+</table>
+<p>This enum was introduced or modified in Qt 4.8.</p>
+<p><b>See also</b> <a href="qsqlrelationaltablemodel.html#setJoinMode">QSqlRelationalTableModel.setJoinMode</a>().</p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QSqlRelationalTableModel" />QSqlRelationalTableModel.__init__ (<i>self</i>, <a href="qobject.html">QObject</a>&#160;<i>parent</i>&#160;=&#160;None, <a href="qsqldatabase.html">QSqlDatabase</a>&#160;<i>db</i>&#160;=&#160;QSqlDatabase())</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Creates an empty <a href="qsqlrelationaltablemodel.html">QSqlRelationalTableModel</a> and
 sets the parent to <i>parent</i> and the database connection to
 <i>db</i>. If <i>db</i> is not valid, the default database
@@ -137,6 +163,15 @@ otherwise the function returns false.</p>
 <p><b>See also</b> <a href="qsqltablemodel.html#editStrategy">editStrategy</a>(), <a href="qsqlrelationaltablemodel.html#data">data</a>(), <a href="qsqltablemodel.html#submit">submit</a>(), and <a href="qsqlrelationaltablemodel.html#revertRow">revertRow</a>().</p>
 
 
+<h3 class="fn"><a name="setJoinMode" />QSqlRelationalTableModel.setJoinMode (<i>self</i>, <a href="qsqlrelationaltablemodel.html#JoinMode-enum">JoinMode</a>&#160;<i>joinMode</i>)</h3><p>Sets the SQL join mode to the value given by <i>joinMode</i> to
+show or hide rows with NULL foreign keys.</p>
+<p>In <a href="qsqlrelationaltablemodel.html#JoinMode-enum">InnerJoin</a> mode
+(the default) these rows will not be shown; use the <a href="qsqlrelationaltablemodel.html#JoinMode-enum">LeftJoin</a> mode if
+you want to show them.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qsqlrelationaltablemodel.html#JoinMode-enum">QSqlRelationalTableModel.JoinMode</a>.</p>
+
+
 <h3 class="fn"><a name="setRelation" />QSqlRelationalTableModel.setRelation (<i>self</i>, int&#160;<i>column</i>, <a href="qsqlrelation.html">QSqlRelation</a>&#160;<i>relation</i>)</h3><p>Lets the specified <i>column</i> be a foreign index specified by
 <i>relation</i>.</p>
 <p>Example:</p>
@@ -158,4 +193,4 @@ another table.</p>
 
 
 <h3 class="fn"><a name="updateRowInTable" />bool QSqlRelationalTableModel.updateRowInTable (<i>self</i>, int&#160;<i>row</i>, <a href="qsqlrecord.html">QSqlRecord</a>&#160;<i>values</i>)</h3><p>Reimplemented from <a href="qsqltablemodel.html#updateRowInTable">QSqlTableModel.updateRowInTable</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

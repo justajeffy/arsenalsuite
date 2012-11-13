@@ -1,6 +1,6 @@
 // This is the implementation of the Chimera class.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -26,7 +26,6 @@
 #include <Python.h>
 
 #include <QByteArray>
-#include <QList>
 #include <QMetaObject>
 #include <QMetaType>
 
@@ -41,9 +40,17 @@
 // The registered int types.
 QList<QByteArray> Chimera::_registered_int_types;
 
-
 // The cache of previously parsed argument type lists.
 QHash<QByteArray, QList<const Chimera *> > Chimera::_previously_parsed;
+
+// The registered QVariant to PyObject convertors.
+Chimera::ToPyObjectConvertors Chimera::_registered_PyObject_convertors;
+
+// The registered PyObject to QVariant convertors.
+Chimera::ToQVariantConvertors Chimera::_registered_QVariant_convertors;
+
+// The registered PyObject to QVariant data convertors.
+Chimera::ToQVariantDataConvertors Chimera::_registered_QVariant_data_convertors;
 
 
 // Construct an invalid type.
@@ -83,6 +90,27 @@ void Chimera::registerIntType(const char *name)
 
     if (!_registered_int_types.contains(name_ba))
         _registered_int_types.append(name_ba);
+}
+
+
+// Register a QVariant to PyObject convertor.
+void Chimera::registerToPyObject(ToPyObjectFn fn)
+{
+    _registered_PyObject_convertors.append(fn);
+}
+
+
+// Register a PyObject to QVariant convertor.
+void Chimera::registerToQVariant(ToQVariantFn fn)
+{
+    _registered_QVariant_convertors.append(fn);
+}
+
+
+// Register a PyObject to QVariant data convertor.
+void Chimera::registerToQVariantData(ToQVariantDataFn fn)
+{
+    _registered_QVariant_data_convertors.append(fn);
 }
 
 
@@ -420,11 +448,15 @@ bool Chimera::parse_py_type(PyTypeObject *type_obj)
             // about but was registered by Qt.
             if (_metatype < QMetaType::User)
             {
+#if QT_VERSION < 0x050000
                 if (sipType_QWidget && PyType_IsSubtype(type_obj, sipTypeAsPyTypeObject(sipType_QWidget)))
                 {
                     _metatype = QMetaType::QWidgetStar;
                 }
                 else if (is_a_QObject)
+#else
+                if (is_a_QObject)
+#endif
                 {
                     _metatype = QMetaType::QObjectStar;
                 }
@@ -696,11 +728,15 @@ bool Chimera::parse_cpp_type(const QByteArray &type)
         {
             PyTypeObject *type_obj = sipTypeAsPyTypeObject(_type);
 
+#if QT_VERSION < 0x050000
             if (sipType_QWidget && PyType_IsSubtype(type_obj, sipTypeAsPyTypeObject(sipType_QWidget)))
             {
                 _metatype = QMetaType::QWidgetStar;
             }
             else if (PyType_IsSubtype(type_obj, sipTypeAsPyTypeObject(sipType_QObject)))
+#else
+            if (PyType_IsSubtype(type_obj, sipTypeAsPyTypeObject(sipType_QObject)))
+#endif
             {
                 _metatype = QMetaType::QObjectStar;
             }
@@ -724,6 +760,15 @@ bool Chimera::parse_cpp_type(const QByteArray &type)
 // convert exactly as requested.
 bool Chimera::fromPyObject(PyObject *py, void *cpp) const
 {
+    // Let any registered convertors have a go first.
+    for (int i = 0; i < _registered_QVariant_data_convertors.count(); ++i)
+    {
+        bool ok;
+
+        if (_registered_QVariant_data_convertors.at(i)(py, cpp, _metatype, &ok))
+            return ok;
+    }
+
     int iserr = 0;
 
     PyErr_Clear();
@@ -804,6 +849,7 @@ bool Chimera::fromPyObject(PyObject *py, void *cpp) const
                 sipType_QObject, 0, SIP_NO_CONVERTORS, 0, &iserr);
         break;
 
+#if QT_VERSION < 0x050000
     case QMetaType::QWidgetStar:
         if (sipType_QWidget)
         {
@@ -816,24 +862,16 @@ bool Chimera::fromPyObject(PyObject *py, void *cpp) const
         }
 
         break;
+#endif
 
     case QMetaType::QVariantList:
         {
-            QList<QObject *> qlo;
+            QVariantList ql;
 
-            if (to_QList_QObject(py, qlo))
-            {
-                *reinterpret_cast<QList<QObject *> *>(cpp) = qlo;
-            }
+            if (to_QVariantList(py, ql))
+                *reinterpret_cast<QVariantList *>(cpp) = ql;
             else
-            {
-                QVariantList ql;
-
-                if (to_QVariantList(py, ql))
-                    *reinterpret_cast<QVariantList *>(cpp) = ql;
-                else
-                    iserr = 1;
-            }
+                iserr = 1;
 
             break;
         }
@@ -959,6 +997,15 @@ bool Chimera::fromPyObject(PyObject *py, QVariant *var, bool strict) const
 
         *var = keep_as_pyobject(py);
         return true;
+    }
+
+    // Let any registered convertors have a go first.
+    for (int i = 0; i < _registered_QVariant_convertors.count(); ++i)
+    {
+        bool ok;
+
+        if (_registered_QVariant_convertors.at(i)(py, var, &ok))
+            return ok;
     }
 
     int iserr = 0, value_class_state;
@@ -1116,6 +1163,7 @@ bool Chimera::fromPyObject(PyObject *py, QVariant *var, bool strict) const
                 0, SIP_NO_CONVERTORS, 0, &iserr);
         break;
 
+#if QT_VERSION < 0x050000
     case QMetaType::QWidgetStar:
         if (sipType_QWidget)
         {
@@ -1128,29 +1176,20 @@ bool Chimera::fromPyObject(PyObject *py, QVariant *var, bool strict) const
         }
 
         break;
+#endif
 
     case QMetaType::QVariantList:
         {
-            QList<QObject *> qlo;
+            QVariantList ql;
 
-            if (to_QList_QObject(py, qlo))
+            if (to_QVariantList(py, ql))
             {
-                *var = QVariant(QList_QObject_metatype(), &qlo);
+                *var = QVariant(ql);
                 metatype_used = QMetaType::Void;
             }
             else
             {
-                QVariantList ql;
-
-                if (to_QVariantList(py, ql))
-                {
-                    *var = QVariant(ql);
-                    metatype_used = QMetaType::Void;
-                }
-                else
-                {
-                    iserr = 1;
-                }
+                iserr = 1;
             }
 
             break;
@@ -1333,32 +1372,13 @@ PyObject *Chimera::toPyObject(const QVariant &var) const
         }
     }
 
-    // Handle QList<QObject *>.
-    int lo_metatype = QList_QObject_metatype();
-
-    if (lo_metatype != 0 && lo_metatype == var.userType())
+    // Let any registered convertors have a go first.
+    for (int i = 0; i < _registered_PyObject_convertors.count(); ++i)
     {
-        const QList<QObject *> *cpp = reinterpret_cast<const QList<QObject *> *>(var.data());
+        PyObject *py;
 
-        PyObject *py_list = PyList_New(cpp->count());
-
-        if (!py_list)
-            return 0;
-
-        for (int i = 0; i < cpp->count(); ++i)
-        {
-            PyObject *obj = sipConvertFromType(cpp->at(i), sipType_QObject, 0);
-
-            if (!obj)
-            {
-                Py_DECREF(py_list);
-                return 0;
-            }
-
-            PyList_SET_ITEM(py_list, i, obj);
-        }
-
-        return py_list;
+        if (_registered_PyObject_convertors.at(i)(&var, &py))
+            return py;
     }
 
     return toPyObject(const_cast<void *>(var.data()));
@@ -1480,12 +1500,14 @@ PyObject *Chimera::toPyObject(void *cpp) const
                 sipType_QObject, 0);
         break;
 
+#if QT_VERSION < 0x050000
     case QMetaType::QWidgetStar:
         if (sipType_QWidget)
             py = sipConvertFromType(*reinterpret_cast<void **>(cpp),
                     sipType_QWidget, 0);
 
         break;
+#endif
 
     case QMetaType::QVariantList:
         {
@@ -1671,52 +1693,6 @@ QVariant Chimera::keep_as_pyobject(PyObject *py)
     PyQt_PyObject pyobj_wrapper(py);
 
     return QVariant(PyQt_PyObject::metatype, &pyobj_wrapper);
-}
-
-
-// Get the metatype for QList<QObject *> or 0 if it hasn't been registered.
-int Chimera::QList_QObject_metatype()
-{
-    static int lo_metatype = 0;
-
-    // We look each time until we find it because QtDeclarative could register
-    // it at any time.
-    if (lo_metatype == 0)
-        lo_metatype = QMetaType::type("QList<QObject*>");
-
-    return lo_metatype;
-}
-
-
-// Convert a Python list object to a QList<QObject*> and return true if there
-// was no error.
-bool Chimera::to_QList_QObject(PyObject *py, QList<QObject *>&cpp) const
-{
-    // We only try to convert if QList<QObject *> is a registered metatype.
-    if (QList_QObject_metatype() == 0)
-        return false;
-
-    Q_ASSERT(PyList_CheckExact(py));
-
-    for (SIP_SSIZE_T i = 0; i < PyList_GET_SIZE(py); ++i)
-    {
-        PyObject *val_obj = PyList_GET_ITEM(py, i);
-
-        if (!val_obj)
-            return false;
-
-        int iserr = 0;
-
-        QObject *val = reinterpret_cast<QObject *>(sipForceConvertToType(
-                val_obj, sipType_QObject, 0, SIP_NO_CONVERTORS, 0, &iserr));
-
-        if (iserr)
-            return false;
-
-        cpp.append(val);
-    }
-
-    return true;
 }
 
 

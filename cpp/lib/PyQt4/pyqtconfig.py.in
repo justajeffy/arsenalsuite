@@ -1,4 +1,4 @@
-# Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 # 
 # This file is part of PyQt.
 # 
@@ -278,3 +278,15 @@ class QAxContainerModuleMakefile(QtGuiModuleMakefile):
             kw["qt"] = ["QtCore", "QtGui", "QAxContainer"]
 
         QtGuiModuleMakefile.__init__(self, *args, **kw)
+
+
+class QtDBusModuleMakefile(QtCoreModuleMakefile):
+    """The Makefile class for modules that %Import QtDBus.
+    """
+    def __init__(self, *args, **kw):
+        """Initialise an instance of a module Makefile.
+        """
+        if "qt" not in kw:
+            kw["qt"] = ["QtCore", "QtDBus"]
+
+        QtCoreModuleMakefile.__init__(self, *args, **kw)

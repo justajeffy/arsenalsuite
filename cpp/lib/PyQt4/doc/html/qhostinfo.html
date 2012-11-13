@@ -32,12 +32,9 @@ the lookup ID.</p>
  <span class="type">QHostInfo</span><span class="operator">.</span><a href="qhostinfo.html#lookupHost">lookupHost</a>(<span class="string">"4.2.2.1"</span><span class="operator">,</span>
                        <span class="keyword">this</span><span class="operator">,</span> SLOT(printResults(<span class="type">QHostInfo</span>)));
 </pre>
-<p>The slot is invoked when the results are ready. (If you use Qt
-for Embedded Linux and disabled multithreading support by defining
-<tt>QT_NO_THREAD</tt>, <a href="qhostinfo.html#lookupHost">lookupHost</a>() will block until the
-lookup has finished.) The results are stored in a QHostInfo object.
-Call <a href="qhostinfo.html#addresses">addresses</a>() to get the
-list of IP addresses for the host, and <a href="qhostinfo.html#hostName">hostName</a>() to get the host name that
+<p>The slot is invoked when the results are ready. The results are
+stored in a QHostInfo object. Call <a href="qhostinfo.html#addresses">addresses</a>() to get the list of IP
+addresses for the host, and <a href="qhostinfo.html#hostName">hostName</a>() to get the host name that
 was looked up.</p>
 <p>If the lookup failed, <a href="qhostinfo.html#error">error</a>()
 returns the type of error that occurred. <a href="qhostinfo.html#errorString">errorString</a>() gives a
@@ -217,4 +214,4 @@ to <i>str</i> if the lookup failed.</p>
 and <a href="qhostinfo.html#lookupHost">lookupHost</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

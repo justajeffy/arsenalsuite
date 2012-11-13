@@ -1,6 +1,6 @@
 # This script generates the PyQt configuration and generates the Makefiles.
 #
-# Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 # 
 # This file is part of PyQt.
 # 
@@ -33,10 +33,10 @@ import sipconfig
 
 
 # Initialise the globals.
-pyqt_version = 0x040806
-pyqt_version_str = "snapshot-4.8.6-4726879563e5"
+pyqt_version = 0x040905
+pyqt_version_str = "snapshot-4.9.5-9eb6aac99275"
 
-sip_min_version = 0x040c02
+sip_min_version = 0x040e00
 
 qt_version = 0
 qt_edition = ""
@@ -50,6 +50,10 @@ qt_pluginsdir = None
 qt_xfeatures = None
 qt_shared = ""
 qt_framework = 0
+
+# This default value will be used by the code that bootstraps the Qt
+# configuration.
+qt_macx_spec = 'macx-g++'
 
 qt_sip_flags = []
 
@@ -66,13 +70,13 @@ dbuslibdirs = []
 dbuslibs = []
 
 
-# Under Windows qmake and the Qt DLLs must be into the system PATH otherwise
-# the dynamic linker won't be able to resolve the symbols.  On other systems we
+# Under Windows qmake and the Qt DLLs must be on the system PATH otherwise the
+# dynamic linker won't be able to resolve the symbols.  On other systems we
 # assume we can just run qmake by using its full pathname.
 if sys.platform == 'win32':
-    MSG_CHECK_QMAKE = "Make sure you have a working Qt v4 qmake on your PATH."
+    MSG_CHECK_QMAKE = "Make sure you have a working Qt qmake on your PATH."
 else:
-    MSG_CHECK_QMAKE = "Make sure you have a working Qt v4 qmake on your PATH or use the -q argument to explicitly specify a working Qt v4 qmake."
+    MSG_CHECK_QMAKE = "Make sure you have a working Qt qmake on your PATH or use the -q argument to explicitly specify a working Qt qmake."
 
 
 def find_default_qmake():
@@ -175,7 +179,7 @@ def create_optparser():
             "comments of generated code [default: include timestamps]")
 
     if sys.platform != 'win32':
-        if sys.platform in ('linux2', 'darwin'):
+        if sys.platform.startswith('linux') or sys.platform == 'darwin':
             pip_default = True
             pip_default_str = "enabled"
         else:
@@ -334,7 +338,10 @@ class ConfigurePyQt4:
             0x040700: "Qt_4_6_3",
             0x040701: "Qt_4_7_0",
             0x040702: "Qt_4_7_1",
-            0x050000: "Qt_4_7_2"
+            0x040800: "Qt_4_7_2",
+            0x040803: "Qt_4_8_0",
+            0x050000: "Qt_4_8_3",
+            0x060000: "Qt_5_0_0"
         }
 
     def check_modules(self):
@@ -356,23 +363,40 @@ class ConfigurePyQt4:
 
         check_module("QtGui", "qwidget.h", "new QWidget()")
         check_module("QtHelp", "qhelpengine.h", "new QHelpEngine(\"foo\")")
-        check_module("QtMultimedia", "QAudioDeviceInfo",
+        if qt_version < 0x050000: check_module("QtMultimedia", "QAudioDeviceInfo",
                 "new QAudioDeviceInfo()")
         check_module("QtNetwork", "qhostaddress.h", "new QHostAddress()")
-        check_module("QtDeclarative", "qdeclarativeview.h",
+        if qt_version < 0x050000: check_module("QtDBus", "qdbusconnection.h",
+                "QDBusConnection::systemBus()")
+        if qt_version < 0x050000: check_module("QtDeclarative", "qdeclarativeview.h",
                 "new QDeclarativeView()")
-        check_module("QtOpenGL", "qgl.h", "new QGLWidget()")
-        check_module("QtScript", "qscriptengine.h", "new QScriptEngine()")
-        check_module("QtScriptTools", "qscriptenginedebugger.h",
+        if qt_version < 0x050000: check_module("QtOpenGL", "qgl.h", "new QGLWidget()")
+        if qt_version < 0x050000: check_module("QtScript", "qscriptengine.h", "new QScriptEngine()")
+        if qt_version < 0x050000: check_module("QtScriptTools", "qscriptenginedebugger.h",
                 "new QScriptEngineDebugger()")
         check_module("QtSql", "qsqldatabase.h", "new QSqlDatabase()",
                 extra_libs=sql_libs)
         check_module("QtSvg", "qsvgwidget.h", "new QSvgWidget()")
-        check_module("QtTest", "QtTest", "QTest::qSleep(0)")
-        check_module("QtWebKit", "qwebpage.h", "new QWebPage()")
+        if qt_version < 0x050000: check_module("QtTest", "QtTest", "QTest::qSleep(0)")
+
+        # Qt v5-beta1 doesn't install the Headers directory for a framework
+        # build of QtWebKit on OS/X.
+        if qt_version >= 0x050000:
+            webkit_inc_dirs = [os.path.join(qt_incdir, "QtWebKit")]
+        else:
+            webkit_inc_dirs = None
+
+        check_module("QtWebKit", "qwebpage.h", "new QWebPage()",
+                extra_include_dirs=webkit_inc_dirs)
+
         check_module("QtXml", "qdom.h", "new QDomDocument()")
-        check_module("QtXmlPatterns", "qxmlname.h", "new QXmlName()")
-        check_module("phonon", "phonon/videowidget.h",
+
+        # Qt v5-beta1 causes compiler error messages.  Wait to see if it fixed
+        # in a later release.
+        if qt_version < 0x050000:
+            check_module("QtXmlPatterns", "qxmlname.h", "new QXmlName()")
+
+        if qt_version < 0x050000: check_module("phonon", "phonon/videowidget.h",
                 "new Phonon::VideoWidget()")
         check_module("QtAssistant", "qassistantclient.h",
                 "new QAssistantClient(\"foo\")", extra_lib_dirs=ass_lib_dirs,
@@ -383,10 +407,10 @@ class ConfigurePyQt4:
         elif sipcfg.universal:
             sipconfig.inform("QtDesigner module disabled with universal binaries.")
         else:
-            check_module("QtDesigner", "QExtensionFactory",
+            if qt_version < 0x050000: check_module("QtDesigner", "QExtensionFactory",
                     "new QExtensionFactory()")
 
-        check_module("QAxContainer", "qaxobject.h", "new QAxObject()",
+        if qt_version < 0x050000: check_module("QAxContainer", "qaxobject.h", "new QAxObject()",
                 extra_libs=["QAxContainer"])
 
         if os.path.isdir(os.path.join(src_dir, "dbus")):
@@ -461,6 +485,19 @@ class ConfigurePyQt4:
         if "QtNetwork" in pyqt_modules:
             generate_code("QtNetwork")
 
+        if "QtDBus" in pyqt_modules:
+            qpy_inc_dir, qpy_lib_dir, qpy_lib = self._qpy_directories("QtDBus", "qpydbus")
+
+            if opts.bigqt:
+                cons_xtra_incdirs.append(qpy_inc_dir)
+                cons_xtra_libdirs.append(qpy_lib_dir)
+                cons_xtra_libs.append(qpy_lib)
+
+                generate_code("QtDBus")
+            else:
+                generate_code("QtDBus", extra_include_dirs=[qpy_inc_dir],
+                        extra_lib_dirs=[qpy_lib_dir], extra_libs=[qpy_lib])
+
         if "QtOpenGL" in pyqt_modules:
             generate_OpenGL_extras()
 
@@ -501,7 +538,14 @@ class ConfigurePyQt4:
             generate_code("QtTest")
 
         if "QtWebKit" in pyqt_modules:
-            generate_code("QtWebKit")
+            # Qt v5-beta1 doesn't install the Headers directory for a framework
+            # build of QtWebKit on OS/X.
+            if qt_version >= 0x050000:
+                webkit_inc_dirs = [os.path.join(qt_incdir, "QtWebKit")]
+            else:
+                webkit_inc_dirs = None
+
+            generate_code("QtWebKit", extra_include_dirs=webkit_inc_dirs)
 
         if "QtXml" in pyqt_modules:
             generate_code("QtXml")
@@ -661,6 +705,9 @@ class ConfigurePyQt4:
         else:
             qpy_lib_dir = qpy_dir
 
+            if sys.platform == 'darwin' and opts.debug:
+                lib_name += '_debug'
+
         return os.path.join(src_dir, qpy_dir), os.path.abspath(qpy_lib_dir), lib_name
 
     def _static_plugins(self, mname):
@@ -744,6 +791,9 @@ class ConfigurePyQt4:
         if "QtGui" in pyqt_modules:
             qpylibs["QtGui"] = "qpygui.pro"
 
+        if "QtDBus" in pyqt_modules:
+            qpylibs["QtDBus"] = "qpydbus.pro"
+
         if "QtDeclarative" in pyqt_modules:
             qpylibs["QtDeclarative"] = "qpydeclarative.pro"
 
@@ -778,7 +828,7 @@ class ConfigurePyQt4:
                 f.write("QMAKE_MACOSX_DEPLOYMENT_TARGET = %s\n" % sipcfg.deployment_target)
 
             inc_path = [sipcfg.py_inc_dir]
-            if qpy in ("QtCore", "QtDeclarative", "QtOpenGL"):
+            if qpy in ("QtCore", "QtDBus", "QtDeclarative", "QtOpenGL"):
                 if sipcfg.sip_inc_dir != sipcfg.py_inc_dir:
                     inc_path.insert(0, sipcfg.sip_inc_dir)
 
@@ -899,6 +949,8 @@ include(%s)
         if "QtXml" in pyqt_modules:
             sipconfig.inform("Creating pylupdate4 Makefile...")
 
+            cxxflags_app = sipcfg.build_macros().get("CXXFLAGS_APP", "")
+
             makefile = sipconfig.ProgramMakefile(
                 configuration=sipcfg,
                 build_file=os.path.join(src_dir, "pylupdate", "pylupdate.sbf"),
@@ -913,13 +965,22 @@ include(%s)
                 deployment_target=sipcfg.deployment_target
             )
 
-            makefile.extra_include_dirs.append(os.path.join(src_dir, "pylupdate"))
+            makefile.extra_include_dirs.append(
+                    os.path.join(src_dir, "pylupdate"))
+
+            if cxxflags_app != "":
+                makefile.extra_cxxflags.append(cxxflags_app)
+
             makefile.generate()
             tool.append("pylupdate")
 
             sipconfig.inform("Creating pyrcc4 Makefile...")
 
             makefile = pyrccMakefile()
+
+            if cxxflags_app != "":
+                makefile.extra_cxxflags.append(cxxflags_app)
+
             makefile.generate()
             tool.append("pyrcc")
         else:
@@ -941,17 +1002,25 @@ include(%s)
                 from distutils.sysconfig import get_config_vars
                 ducfg = get_config_vars()
 
+                config_args = ducfg.get("CONFIG_ARGS", "")
+
                 if sys.platform == "darwin":
-                    # We need to work out how to specify the right framework
-                    # version.
-                    link = "-framework Python"
-                elif "--enable-shared" in ducfg.get("CONFIG_ARGS", ""):
+                    dynamic_pylib = "--enable-framework" in config_args
+
+                    # It's probably a Python bug that the library name doesn't
+                    # include the ABI information.
+                    abi = ""
+                else:
+                    dynamic_pylib = "--enable-shared" in config_args
+
+                if dynamic_pylib:
                     if glob.glob("%s/lib/libpython%d.%d*" % (ducfg["exec_prefix"], py_major, py_minor)):
                         lib_dir_flag = quote("-L%s/lib" % ducfg["exec_prefix"])
                     elif glob.glob("%s/libpython%d.%d*" % (ducfg["LIBDIR"], py_major, py_minor)):
                         lib_dir_flag = quote("-L%s" % ducfg["LIBDIR"])
                     else:
                         sipconfig.inform("Qt Designer plugin disabled because Python library couldn't be found")
+                        lib_dir_flag = ''
                         opts.designer_plugin = False
 
                     link = "%s -lpython%d.%d%s" % (lib_dir_flag, py_major, py_minor, abi)
@@ -1239,7 +1308,7 @@ def compile_qt_program(name, mname, extra_include_dirs=None, extra_lib_dirs=None
     opengl = (mname == "QtOpenGL")
 
     qt = [mname]
-    if mname in ("QtOpenGL", "QtWebKit"):
+    if mname in ("QtAssistant", "QtHelp", "QtOpenGL", "QtWebKit"):
         qt.append("QtCore")
 
     makefile = sipconfig.ProgramMakefile(sipcfg, console=1, qt=qt, warnings=0,
@@ -1352,8 +1421,10 @@ def check_dbus():
         sipconfig.inform("DBus v1 does not seem to be installed.")
         return
 
-    # Using str() means it will work with both Python v2 and v3.
-    for f in str(iflags).split():
+    if sys.hexversion >= 0x03000000:
+        iflags = iflags.decode()
+
+    for f in iflags.split():
         if f.startswith("-I"):
             dbusincdirs.append(f[2:])
         elif f.startswith("-L"):
@@ -1513,6 +1584,7 @@ def needed_qt_libs(mname, qt_libs):
     # as well as the libraries.
     LIB_DEPS = {
         "QtCore": [],
+        "QtDBus": ["QtCore"],
         "QtDeclarative": ["QtNetwork", "QtGui"],
         "QtGui": ["QtCore"],
         "QtHelp": ["QtGui"],
@@ -1738,9 +1810,9 @@ def fix_license(name):
 
 
 def check_license():
+    return
     """Handle the validation of the PyQt license.
     """
-    return
     try:
         import license
         ltype = license.LicenseType
@@ -1826,15 +1898,25 @@ def get_build_macros(overrides):
 
     overrides is a list of macros overrides from the user.
     """
+    global qt_macx_spec
+
     # Get the name of the qmake configuration file to take the macros from.
     if "QMAKESPEC" in list(os.environ.keys()):
         fname = os.environ["QMAKESPEC"]
 
         if not os.path.dirname(fname):
+            qt_macx_spec = fname
             fname = os.path.join(qt_datadir, "mkspecs", fname)
     elif sys.platform == "darwin":
         # The Qt Mac binary installer defaults to xcode which we don't want.
-        fname = os.path.join(qt_datadir, "mkspecs", "macx-g++")
+        # Use Qt5's macx-clang if it is available, otherwise fall back to
+        # macx-g++.
+        fname = os.path.join(qt_datadir, "mkspecs", "macx-clang")
+        if os.path.isdir(fname):
+            qt_macx_spec = "macx-clang"
+        else:
+            fname = os.path.join(qt_datadir, "mkspecs", "macx-g++")
+            qt_macx_spec = "macx-g++"
     else:
         fname = os.path.join(qt_datadir, "mkspecs", "default")
 
@@ -1855,7 +1937,27 @@ def get_build_macros(overrides):
         "QT_INSTALL_LIBS":      qt_libdir
     }
 
-    return sipconfig.parse_build_macros(fname, names, overrides, properties)
+    macros = sipconfig.parse_build_macros(fname, names, overrides, properties)
+
+    if macros is None:
+        return None
+
+    # Qt5 doesn't seem to support the specific macros so add them if they are
+    # missing.
+    if macros.get("INCDIR_QT", "") == "":
+        macros["INCDIR_QT"] = qt_incdir
+
+    if macros.get("LIBDIR_QT", "") == "":
+        macros["LIBDIR_QT"] = qt_libdir
+
+    if macros.get("MOC", "") == "":
+        default_moc = os.path.join(qt_bindir, "moc")
+        if sys.platform == 'win32':
+            default_moc += ".exe"
+
+        macros["MOC"] = default_moc
+
+    return macros
 
 
 def check_qt_installation(macros):
@@ -1904,7 +2006,7 @@ def fix_qmake_args(args=""):
     """
     if sys.platform == "darwin":
         # The Qt binary installer has macx-xcode as the default.
-        args = "-spec %s %s" % (sipcfg.platform, args)
+        args = "-spec %s %s" % (qt_macx_spec, args)
 
     return args
 
@@ -1962,6 +2064,14 @@ SOURCES = %s
 #include <QLibraryInfo>
 #include <QTextStream>
 
+// These seem to be missing from the Qt v5 beta.
+#if !defined(QT_EDITION_DESKTOP)
+#define QT_EDITION_DESKTOP      8
+#endif
+#if !defined(QT_EDITION_OPENSOURCE)
+#define QT_EDITION_OPENSOURCE   8
+#endif
+
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
@@ -1984,11 +2094,11 @@ int main(int argc, char **argv)
 
     out << QLibraryInfo::licensee() << '\\n';
 
-#if defined(QT_SHARED) || defined(QT_DLL)
+//#if defined(QT_SHARED) || defined(QT_DLL)
     out << "shared\\n";
-#else
-    out << "\\n";
-#endif
+//#else
+//    out << "\\n";
+//#endif
 
     // Determine which features should be disabled.
 
@@ -2086,7 +2196,7 @@ int main(int argc, char **argv)
     run_command(exe_file)
 
     if not os.access(out_file, os.F_OK):
-        sipconfig.error("%s failed to create %s. Make sure your Qt v4 installation is correct." % (exe_file, out_file))
+        sipconfig.error("%s failed to create %s. Make sure your Qt installation is correct." % (exe_file, out_file))
 
     # Read the directories.
     f = open(out_file, "r")

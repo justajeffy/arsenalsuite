@@ -1,6 +1,6 @@
 // This contains the definition of the PyQtProxy class.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -126,8 +126,8 @@ private:
     // This object's key in the relevant hash.
     void *saved_key;
 
-    // Only used when type is ProxySignal.
-    QMetaObject *sigmo;
+    // The meta-object.
+    const QMetaObject *meta_object;
 
     PyQtProxy(const PyQtProxy &);
     PyQtProxy &operator=(const PyQtProxy &);

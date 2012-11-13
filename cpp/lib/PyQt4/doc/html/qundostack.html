@@ -180,8 +180,9 @@ text of the command which will be redone in the next call to
 <a href="qundostack.html#redo">redo</a>(), prefixed by the
 specified <i>prefix</i>. If there is no command available for redo,
 this action will be disabled.</p>
-<p>If <i>prefix</i> is empty, the default prefix "Redo" is
-used.</p>
+<p>If <i>prefix</i> is empty, the default template "Redo %1" is
+used instead of prefix. Before Qt 4.8, the prefix "Redo" was used
+by default.</p>
 <p><b>See also</b> <a href="qundostack.html#createUndoAction">createUndoAction</a>(), <a href="qundostack.html#canRedo">canRedo</a>(), and <a href="qundocommand.html#text">QUndoCommand.text</a>().</p>
 
 
@@ -192,8 +193,9 @@ text of the command which will be undone in the next call to
 <a href="qundostack.html#undo">undo</a>(), prefixed by the
 specified <i>prefix</i>. If there is no command available for undo,
 this action will be disabled.</p>
-<p>If <i>prefix</i> is empty, the default prefix "Undo" is
-used.</p>
+<p>If <i>prefix</i> is empty, the default template "Undo %1" is
+used instead of prefix. Before Qt 4.8, the prefix "Undo" was used
+by default.</p>
 <p><b>See also</b> <a href="qundostack.html#createRedoAction">createRedoAction</a>(), <a href="qundostack.html#canUndo">canUndo</a>(), and <a href="qundocommand.html#text">QUndoCommand.text</a>().</p>
 
 
@@ -245,7 +247,8 @@ already been redone, this function does nothing.</p>
 
 <h3 class="fn"><a name="redoText" />QString QUndoStack.redoText (<i>self</i>)</h3><p>Returns the text of the command which will be redone in the next
 call to <a href="qundostack.html#redo">redo</a>().</p>
-<p><b>See also</b> <a href="qundocommand.html#text">QUndoCommand.text</a>() and <a href="qundostack.html#undoText">undoText</a>().</p>
+<p><b>See also</b> <a href="qundocommand.html#actionText">QUndoCommand.actionText</a>() and
+<a href="qundostack.html#undoText">undoText</a>().</p>
 
 
 <h3 class="fn"><a name="setActive" />QUndoStack.setActive (<i>self</i>, bool&#160;<i>active</i>&#160;=&#160;True)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setActive(bool = 1)</tt>.</p><h3 class="fn"><a name="setClean" />QUndoStack.setClean (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void setClean()</tt>.</p><p>Marks the stack as clean and emits <a href="qundostack.html#cleanChanged">cleanChanged</a>() if the stack was
@@ -280,7 +283,8 @@ already been undone, this function does nothing.</p>
 
 <h3 class="fn"><a name="undoLimit" />int QUndoStack.undoLimit (<i>self</i>)</h3><h3 class="fn"><a name="undoText" />QString QUndoStack.undoText (<i>self</i>)</h3><p>Returns the text of the command which will be undone in the next
 call to <a href="qundostack.html#undo">undo</a>().</p>
-<p><b>See also</b> <a href="qundocommand.html#text">QUndoCommand.text</a>() and <a href="qundostack.html#redoText">redoText</a>().</p>
+<p><b>See also</b> <a href="qundocommand.html#actionText">QUndoCommand.actionText</a>() and
+<a href="qundostack.html#redoText">redoText</a>().</p>
 
 
 <h3 class="fn"><a name="__len__" /> QUndoStack.__len__ (<i>self</i>)</h3><hr /><h2>Qt Signal Documentation</h2><h3 class="fn"><a name="canRedoChanged" />void canRedoChanged (bool)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the value of <a href="qundostack.html#canRedo">canRedo</a>() changes. It is used to
@@ -319,4 +323,4 @@ update the text property of the redo action returned by <a href="qundostack.html
 <h3 class="fn"><a name="undoTextChanged" />void undoTextChanged (const QString&amp;)</h3><p>This is the default overload of this signal.</p><p>This signal is emitted whenever the value of <a href="qundostack.html#undoText">undoText</a>() changes. It is used to
 update the text property of the undo action returned by <a href="qundostack.html#createUndoAction">createUndoAction</a>().
 <i>undoText</i> specifies the new text.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

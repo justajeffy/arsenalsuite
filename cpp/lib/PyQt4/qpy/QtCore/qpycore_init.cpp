@@ -1,6 +1,6 @@
 // This is the initialisation support code for the QtCore module.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -25,6 +25,7 @@
 
 #include <Python.h>
 
+#include "qpycore_chimera.h"
 #include "qpycore_qobject_helpers.h"
 #include "qpycore_shared.h"
 #include "qpycore_sip.h"
@@ -60,4 +61,15 @@ void qpycore_init()
 
     sipExportSymbol("qpycore_pyqtsignal_get_parts",
             (void *)qpycore_pyqtsignal_get_parts);
+    sipExportSymbol("qpycore_pyqtslot_get_parts",
+            (void *)qpycore_pyqtslot_get_parts);
+
+    sipExportSymbol("qpycore_qvariant_value", (void *)qpycore_qvariant_value);
+
+    sipExportSymbol("qpycore_register_to_pyobject",
+            (void *)Chimera::registerToPyObject);
+    sipExportSymbol("qpycore_register_to_qvariant",
+            (void *)Chimera::registerToQVariant);
+    sipExportSymbol("qpycore_register_to_qvariant_data",
+            (void *)Chimera::registerToQVariantData);
 }

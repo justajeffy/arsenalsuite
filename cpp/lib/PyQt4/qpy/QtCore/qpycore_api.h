@@ -1,7 +1,7 @@
 // This defines the API provided by this library.  It must not be explicitly
 // included by the library itself.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -39,7 +39,6 @@
 QT_BEGIN_NAMESPACE
 class QAbstractEventDispatcher;
 class QObject;
-class QSettings;
 QT_END_NAMESPACE
 
 
@@ -64,6 +63,9 @@ int qpycore_PySequence_Check_QStringList(PyObject *obj);
 PyObject *qpycore_PyObject_FromQVariant(const QVariant &qvar);
 QVariant qpycore_PyObject_AsQVariant(PyObject *obj, int *is_err);
 
+// Support for Q_CLASSINFO().
+PyObject *qpycore_ClassInfo(const char *name, const char *value);
+
 // Support for Q_FLAGS and Q_ENUMS.
 PyObject *qpycore_register_int_types(PyObject *type_names);
 
@@ -82,17 +84,15 @@ PyObject *qpycore_qobject_staticmetaobject(PyObject *type_obj);
 // Support for emitting signals.
 bool qpycore_qobject_emit(QObject *qtx, const char *sig, PyObject *sigargs);
 
+#if QT_VERSION < 0x050000
 // Support for QAbstractEventDispatcher.setEventFilter().
 PyObject *qpycore_qabstracteventdispatcher_seteventfilter(
         QAbstractEventDispatcher *disp, PyObject *filter);
+#endif
 
 // Support for QMetaObject.connectSlotsByName().
 void qpycore_qmetaobject_connectslotsbyname(QObject *qobj,
         PyObject *qobj_wrapper);
-
-// Support for QSettings.value().
-PyObject *qpycore_qsettings_value(const QSettings *qset, const QString &key,
-        const QVariant &defaultValue, PyObject *type);
 
 // Support for QPyNullVariant.
 QVariant *qpycore_qpynullvariant(PyObject *type);

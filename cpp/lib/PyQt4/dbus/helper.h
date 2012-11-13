@@ -1,7 +1,7 @@
 // This is the declaration of the helper class for the Qt specific support for
 // the standard Python DBus bindings.
 //
-// Copyright (c) 2007 Phil Thompson
+// Copyright (c) 2012 Riverbank Computing Limited
 //
 // Licensed under the Academic Free License version 2.1
 //
@@ -24,11 +24,12 @@
 #include <QList>
 #include <QMultiHash>
 #include <QObject>
+#include <QPointer>
+#include <QSocketNotifier>
 
 #include <dbus/dbus.h>
 
 
-class QSocketNotifier;
 class QTimerEvent;
 
 
@@ -42,8 +43,8 @@ public:
         Watcher() : watch(0), read(0), write(0) {}
 
         DBusWatch *watch;
-        QSocketNotifier *read;
-        QSocketNotifier *write;
+        QPointer<QSocketNotifier> read;
+        QPointer<QSocketNotifier> write;
     };
 
     typedef QMultiHash<int, Watcher> Watchers;
