@@ -43,15 +43,15 @@ platforms that are affected.</p>
 class, you cannot create objects of type <a href="qnetworkproxyfactory.html">QNetworkProxyFactory</a> directly.</p>
 
 
-<h3 class="fn"><a name="QNetworkProxyFactory-2" />QNetworkProxyFactory.__init__ (<i>self</i>, <a href="qnetworkproxyfactory.html">QNetworkProxyFactory</a>)</h3><h3 class="fn"><a name="proxyForQuery" />list-of-QNetworkProxy QNetworkProxyFactory.proxyForQuery (<a href="qnetworkproxyquery.html">QNetworkProxyQuery</a>&#160;<i>query</i>)</h3><p>This function examines takes the query request, <i>query</i>,
-examines the details of the type of socket or request and returns a
-list of <a href="qnetworkproxy.html">QNetworkProxy</a> objects that
+<h3 class="fn"><a name="QNetworkProxyFactory-2" />QNetworkProxyFactory.__init__ (<i>self</i>, <a href="qnetworkproxyfactory.html">QNetworkProxyFactory</a>)</h3><h3 class="fn"><a name="proxyForQuery" />list-of-QNetworkProxy QNetworkProxyFactory.proxyForQuery (<a href="qnetworkproxyquery.html">QNetworkProxyQuery</a>&#160;<i>query</i>)</h3><p>This function takes the query request, <i>query</i>, examines
+the details of the type of socket or request and returns a list of
+<a href="qnetworkproxy.html">QNetworkProxy</a> objects that
 indicate the proxy servers to be used, in order of preference.</p>
 
 
-<h3 class="fn"><a name="queryProxy" />list-of-QNetworkProxy QNetworkProxyFactory.queryProxy (<i>self</i>, <a href="qnetworkproxyquery.html">QNetworkProxyQuery</a>&#160;<i>query</i>&#160;=&#160;QNetworkProxyQuery())</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>This function examines takes the query request, <i>query</i>,
-examines the details of the type of socket or request and returns a
-list of <a href="qnetworkproxy.html">QNetworkProxy</a> objects that
+<h3 class="fn"><a name="queryProxy" />list-of-QNetworkProxy QNetworkProxyFactory.queryProxy (<i>self</i>, <a href="qnetworkproxyquery.html">QNetworkProxyQuery</a>&#160;<i>query</i>&#160;=&#160;QNetworkProxyQuery())</h3><p>This method is abstract and should be reimplemented in any sub-class.</p><p>This function takes the query request, <i>query</i>, examines
+the details of the type of socket or request and returns a list of
+<a href="qnetworkproxy.html">QNetworkProxy</a> objects that
 indicate the proxy servers to be used, in order of preference.</p>
 <p>When reimplementing this class, take care to return at least one
 element.</p>
@@ -96,9 +96,9 @@ system proxies.</p>
 <p>This function was introduced in Qt 4.6.</p>
 
 
-<h3 class="fn"><a name="systemProxyForQuery" />list-of-QNetworkProxy QNetworkProxyFactory.systemProxyForQuery (<a href="qnetworkproxyquery.html">QNetworkProxyQuery</a>&#160;<i>query</i>&#160;=&#160;QNetworkProxyQuery())</h3><p>This function examines takes the query request, <i>query</i>,
-examines the details of the type of socket or request and returns a
-list of <a href="qnetworkproxy.html">QNetworkProxy</a> objects that
+<h3 class="fn"><a name="systemProxyForQuery" />list-of-QNetworkProxy QNetworkProxyFactory.systemProxyForQuery (<a href="qnetworkproxyquery.html">QNetworkProxyQuery</a>&#160;<i>query</i>&#160;=&#160;QNetworkProxyQuery())</h3><p>This function takes the query request, <i>query</i>, examines
+the details of the type of socket or request and returns a list of
+<a href="qnetworkproxy.html">QNetworkProxy</a> objects that
 indicate the proxy servers to be used, in order of preference.</p>
 <p>This function can be used to determine the platform-specific
 proxy settings. This function will use the libraries provided by
@@ -120,9 +120,10 @@ SOCKS proxy is enabled in that configuration, this function will
 use the SOCKS server for all queries. If SOCKS isn't enabled, it
 will use the HTTPS proxy for all TcpSocket and UrlRequest
 queries.</p>
-<p>On other systems, there is no standardised method of obtaining
-the system proxy configuration. This function may be improved in
-future versions to support those systems.</p>
+<p>On other systems, this function will pick up proxy settings from
+the "http_proxy" environment variable. This variable must be a URL
+using one of the following schemes: "http", "socks5" or
+"socks5h".</p>
 <a id="limitations" name="limitations" />
 <h4>Limitations</h4>
 <p>These are the limitations for the current version of this
@@ -135,4 +136,4 @@ ECMAScript code.</li>
 <li>On Windows platforms, this function may take several seconds to
 execute depending on the configuration of the user's system.</li>
 </ul>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

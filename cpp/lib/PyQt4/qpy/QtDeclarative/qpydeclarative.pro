@@ -1,7 +1,7 @@
 # This is the qmake project file for the QPy support code for the QtDeclarative
 # module.
 #
-# Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 # 
 # This file is part of PyQt.
 # 
@@ -35,12 +35,14 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES   = \
+            qpydeclarative_chimera_helpers.cpp \
             qpydeclarative_listwrapper.cpp \
             qpydeclarative_post_init.cpp \
             qpydeclarativelistproperty.cpp
 
 HEADERS   = \
             qpydeclarative_api.h \
+            qpydeclarative_chimera_helpers.h \
             qpydeclarative_listwrapper.h \
             qpydeclarativelistproperty.h \
             qpydeclarativepropertyvaluesource.h

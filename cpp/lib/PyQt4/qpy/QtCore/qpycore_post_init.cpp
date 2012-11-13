@@ -1,6 +1,6 @@
 // This is the post-initialisation support code for the QtCore module.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -68,9 +68,13 @@ void qpycore_post_init(PyObject *module_dict)
                 (PyObject *)&qpycore_pyqtSignal_Type) < 0)
         Py_FatalError("PyQt4.QtCore: Failed to set pyqtSignal type");
 
-    // Initialise the private pyqtBoundSignal type.
+    // Initialise the pyqtBoundSignal type and add it to the module dictionary.
     if (PyType_Ready(&qpycore_pyqtBoundSignal_Type) < 0)
         Py_FatalError("PyQt4.QtCore: Failed to initialise pyqtBoundSignal type");
+
+    if (PyDict_SetItemString(module_dict, "pyqtBoundSignal",
+                (PyObject *)&qpycore_pyqtBoundSignal_Type) < 0)
+        Py_FatalError("PyQt4.QtCore: Failed to set pyqtBoundSignal type");
 
     // Initialise the private pyqtMethodProxy type.
     if (PyType_Ready(&qpycore_pyqtMethodProxy_Type) < 0)

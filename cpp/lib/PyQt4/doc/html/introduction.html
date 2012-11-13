@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Introduction &mdash; PyQt snapshot-4.8.6-4726879563e5 Reference Guide</title>
+    <title>Introduction &mdash; PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '#',
-        VERSION:     'snapshot-4.8.6-4726879563e5',
+        VERSION:     'snapshot-4.9.5-9eb6aac99275',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/logo_tn.ico"/>
-    <link rel="top" title="PyQt snapshot-4.8.6-4726879563e5 Reference Guide" href="index.html" />
+    <link rel="top" title="PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide" href="index.html" />
     <link rel="next" title="Potential Incompatibilities with Earlier Versions" href="incompatibilities.html" />
     <link rel="prev" title="PyQt Reference Guide" href="index.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="index.html" title="PyQt Reference Guide"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PyQt snapshot-4.8.6-4726879563e5 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -51,7 +51,7 @@
             
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>This is the reference guide for PyQt snapshot-4.8.6-4726879563e5.  PyQt v4 is a set of
+<p>This is the reference guide for PyQt snapshot-4.9.5-9eb6aac99275.  PyQt v4 is a set of
 <a class="reference external" href="http://www.python.org">Python</a> bindings for v4 of the Qt application
 framework from <a class="reference external" href="http://qt.nokia.com">Nokia</a>.</p>
 <p>There is a separate <a class="reference external" href="classes.html">PyQt Class Reference</a>.</p>
@@ -121,6 +121,8 @@ implement XQuery and XPath support for XML and custom data models.</li>
 <li>The <tt class="xref docutils literal"><span class="pre">phonon</span></tt> module.  This module contains classes that implement
 a cross-platform multimedia framework that enables the use of audio and video
 content in PyQt applications.</li>
+<li>The <tt class="xref docutils literal"><span class="pre">QtDBus</span></tt> module.  This Unix-only module provides classes that
+support Inter-Process Communication using the D-Bus protocol.</li>
 <li>The <tt class="xref docutils literal"><span class="pre">QtDeclarative</span></tt> module.  This module provides a declarative
 framework for building highly dynamic, custom user interfaces using QML.</li>
 <li>The <tt class="xref docutils literal"><span class="pre">QtMultimedia</span></tt> module.  This module provides low-level
@@ -133,8 +135,8 @@ help.  This module is not available with Qt v4.7 and later - use the
 <li>The <tt class="xref docutils literal"><span class="pre">QtDesigner</span></tt> module.  This module contains classes that allow
 Qt Designer to be extended using PyQt.  See <a class="reference external" href="designer.html#ref-designer-plugins"><em>Writing Qt Designer Plugins</em></a> for a
 full description of how to do this.</li>
-<li>The <tt class="xref docutils literal"><span class="pre">QAxContainer</span></tt> module.  This module contains classes that
-allow access to ActiveX controls and COM objects.</li>
+<li>The <tt class="xref docutils literal"><span class="pre">QAxContainer</span></tt> module.  This Windows-only module contains
+classes that allow access to ActiveX controls and COM objects.</li>
 <li>The <tt class="xref docutils literal"><span class="pre">Qt</span></tt> module.  This module consolidates the classes contained
 in all of the modules described above into a single module.  This has the
 advantage that you don&#8217;t have to worry about which underlying module contains
@@ -142,15 +144,14 @@ a particular class.  It has the disadvantage that it loads the whole of the
 Qt framework, thereby increasing the memory footprint of an application.
 Whether you use this consolidated module, or the individual component modules
 is down to personal taste.</li>
-<li>The <a class="reference external" href="http://www.freedesktop.org/wiki/Software_2fdbus">DBus</a> support
-module is installed as <tt class="xref docutils literal"><span class="pre">dbus.mainloop.qt</span></tt>.  PyQt does not support Qt&#8217;s
-native DBus classes (which are very C++ orientated).  Instead the
-<tt class="xref docutils literal"><span class="pre">dbus.mainloop.qt</span></tt> module provides support for the Qt event loop in the
-same way that the <tt class="xref docutils literal"><span class="pre">dbus.mainloop.glib</span></tt> included with the standard
-<tt class="docutils literal"><span class="pre">dbus-python</span></tt> bindings package provides support for the GLib event loop.
-The API is described in <a class="reference external" href="dbus.html#ref-dbus"><em>The DBus Support Module</em></a>.  It is only available for PyQt for
-X11 and only if the <tt class="docutils literal"><span class="pre">dbus-python</span></tt> v0.80 (or later) bindings package is
-installed.</li>
+<li>The <a class="reference external" href="http://www.freedesktop.org/wiki/Software/DBusBindings">DBus</a> support
+module is installed as <tt class="xref docutils literal"><span class="pre">dbus.mainloop.qt</span></tt>.  This module provides support
+for the Qt event loop in the same way that the <tt class="xref docutils literal"><span class="pre">dbus.mainloop.glib</span></tt>
+included with the standard <tt class="docutils literal"><span class="pre">dbus-python</span></tt> bindings package provides support
+for the GLib event loop.  The API is described in <a class="reference external" href="dbus.html#ref-dbus"><em>DBus Support</em></a>.  It is
+only available for PyQt for X11 and only if the <tt class="docutils literal"><span class="pre">dbus-python</span></tt> v0.80 (or
+later) bindings package is installed.  The <tt class="xref docutils literal"><span class="pre">QtDBus</span></tt> module
+provides a more Qt-like interface to DBus.</li>
 <li>The <a title="" class="reference external" href="designer.html#module-PyQt4.uic"><tt class="xref docutils literal"><span class="pre">uic</span></tt></a> module.  This module contains classes for handling the
 <tt class="docutils literal"><span class="pre">.ui</span></tt> files created by Qt Designer that describe the whole or part of a
 graphical user interface.  It includes classes that load a <tt class="docutils literal"><span class="pre">.ui</span></tt> file and
@@ -255,7 +256,7 @@ libraries - for example <a class="reference external" href="http://pyqwt.sourcef
         <li class="right" >
           <a href="index.html" title="PyQt Reference Guide"
              >previous</a> |</li>
-        <li><a href="index.html">PyQt snapshot-4.8.6-4726879563e5 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

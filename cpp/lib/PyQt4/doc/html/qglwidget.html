@@ -152,12 +152,82 @@ painting.</li>
 effort. One approach to doing this is shown in the <a href="opengl-overpainting.html">Overpainting</a> example.</p>
 <a id="threading" name="threading" />
 <h3>Threading</h3>
-<p>It is possible to render into a QGLWidget from another thread,
-but it requires that all access to the GL context is safe guarded.
-The Qt GUI thread will try to use the context in resizeEvent and
-paintEvent, so in order for threaded rendering using a GL widget to
-work, these functions need to be intercepted in the GUI thread and
-handled accordingly in the application.</p>
+<p>As of Qt version 4.8, support for doing threaded GL rendering
+has been improved. There are three scenarios that we currently
+support:</p>
+<ul>
+<li>1. Buffer swapping in a thread.
+<p>Swapping buffers in a double buffered context may be a
+synchronous, locking call that may be a costly operation in some GL
+implementations. Especially so on embedded devices. It's not
+optimal to have the CPU idling while the GPU is doing a buffer
+swap. In those cases it is possible to do the rendering in the main
+thread and do the actual buffer swap in a separate thread. This can
+be done with the following steps:</p>
+<p>1. Call <a href="qglwidget.html#doneCurrent">doneCurrent</a>()
+in the main thread when the rendering is finished.</p>
+<p>2. Notify the swapping thread that it can grab the context.</p>
+<p>3. Make the rendering context current in the swapping thread
+with <a href="qglwidget.html#makeCurrent">makeCurrent</a>() and
+then call <a href="qglwidget.html#swapBuffers">swapBuffers</a>().</p>
+<p>4. Call <a href="qglwidget.html#doneCurrent">doneCurrent</a>()
+in the swapping thread and notify the main thread that swapping is
+done.</p>
+<p>Doing this will free up the main thread so that it can continue
+with, for example, handling UI events or network requests. Even if
+there is a context swap involved, it may be preferable compared to
+having the main thread wait while the GPU finishes the swap
+operation. Note that this is highly implementation dependent.</p>
+</li>
+<li>2. Texture uploading in a thread.
+<p>Doing texture uploads in a thread may be very useful for
+applications handling large amounts of images that needs to be
+displayed, like for instance a photo gallery application. This is
+supported in Qt through the existing <a href="qglwidget.html#bindTexture">bindTexture</a>() API. A simple way of
+doing this is to create two sharing QGLWidgets. One is made current
+in the main GUI thread, while the other is made current in the
+texture upload thread. The widget in the uploading thread is never
+shown, it is only used for sharing textures with the main thread.
+For each texture that is bound via <a href="qglwidget.html#bindTexture">bindTexture</a>(), notify the main
+thread so that it can start using the texture.</p>
+</li>
+<li>3. Using <a href="qpainter.html">QPainter</a> to draw into a
+QGLWidget in a thread.
+<p>In Qt 4.8, it is possible to draw into a QGLWidget using a
+<a href="qpainter.html">QPainter</a> in a separate thread. Note
+that this is also possible for QGLPixelBuffers and
+QGLFramebufferObjects. Since this is only supported in the GL 2
+paint engine, OpenGL 2.0 or OpenGL ES 2.0 is required.</p>
+<p>QGLWidgets can only be created in the main GUI thread. This
+means a call to <a href="qglwidget.html#doneCurrent">doneCurrent</a>() is necessary to
+release the GL context from the main thread, before the widget can
+be drawn into by another thread. Also, the main GUI thread will
+dispatch resize and paint events to a QGLWidget when the widget is
+resized, or parts of it becomes exposed or needs redrawing. It is
+therefore necessary to handle those events because the default
+implementations inside QGLWidget will try to make the QGLWidget's
+context current, which again will interfere with any threads
+rendering into the widget. Reimplement <a href="qglwidget.html#paintEvent">QGLWidget.paintEvent</a>() and
+<a href="qglwidget.html#resizeEvent">QGLWidget.resizeEvent</a>()
+to notify the rendering thread that a resize or update is
+necessary, and be careful not to call the base class
+implementation. If you are rendering an animation, it might not be
+necessary to handle the paint event at all since the rendering
+thread is doing regular updates. Then it would be enough to
+reimplement <a href="qglwidget.html#paintEvent">QGLWidget.paintEvent</a>() to do
+nothing.</p>
+</li>
+</ul>
+<p>As a general rule when doing threaded rendering: be aware that
+binding and releasing contexts in different threads have to be
+synchronized by the user. A GL rendering context can only be
+current in one thread at any time. If you try to open a <a href="qpainter.html">QPainter</a> on a QGLWidget and the widget's
+rendering context is current in another thread, it will fail.</p>
+<p>Note that under X11 it is necessary to set the <a href="qt.html#ApplicationAttribute-enum">Qt.AA_X11InitThreads</a>
+application attribute to make the X11 library and GLX calls thread
+safe, otherwise the above scenarios will fail.</p>
+<p>In addition to this, rendering using raw GL calls in a separate
+thread is supported.</p>
 <p><i>OpenGL is a trademark of Silicon Graphics, Inc. in the United
 States and other countries.</i></p>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QGLWidget" />QGLWidget.__init__ (<i>self</i>, <a href="qwidget.html">QWidget</a>&#160;<i>parent</i>&#160;=&#160;None, <a href="qglwidget.html">QGLWidget</a>&#160;<i>shareWidget</i>&#160;=&#160;None, <a href="qt-windowflags.html">Qt.WindowFlags</a>&#160;<i>flags</i>&#160;=&#160;0)</h3><p>The <i>parent</i> argument, if not None, causes <i>self</i> to be owned by Qt instead of PyQt.</p><p>Constructs an OpenGL widget with a <i>parent</i> widget.</p>
@@ -540,4 +610,4 @@ executed.</p>
 <p>The widget's rendering context will become the current context
 and <a href="qglwidget.html#initializeGL">initializeGL</a>() will
 be called if it hasn't already been called.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

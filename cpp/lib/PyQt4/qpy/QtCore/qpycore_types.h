@@ -1,6 +1,6 @@
 // This defines the interfaces for the meta-type used by PyQt.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -52,11 +52,22 @@ struct qpycore_slot
 // This describes a dynamic meta-object.
 struct qpycore_metaobject
 {
-    // The meta-object itself.
+#if QT_VERSION >= 0x050000
+    // The meta-object built by QMetaObjectBuilder.
+    QMetaObject *mo;
+#define QPYCORE_QMETAOBJECT(qo) ((qo)->mo)
+#else
+    // The meta-object.
     QMetaObject mo;
+#define QPYCORE_QMETAOBJECT(qo) (&(qo)->mo)
 
     // The meta-object string data.
     QByteArray str_data;
+
+#if QT_VERSION >= 0x040600
+    QMetaObjectExtraData ed;
+#endif
+#endif
 
     // The list of properties.
     QList<qpycore_pyqtProperty *> pprops;
@@ -66,10 +77,6 @@ struct qpycore_metaobject
 
     // The number of signals.
     int nr_signals;
-
-#if QT_VERSION >= 0x040600
-    QMetaObjectExtraData ed;
-#endif
 };
 
 

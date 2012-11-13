@@ -255,7 +255,7 @@ sqlite:</p>
 <pre class="cpp">
  <span class="type"><a href="qsqldatabase.html">QSqlDatabase</a></span> db <span class="operator">=</span> <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>;
  <span class="type"><a href="qvariant.html">QVariant</a></span> v <span class="operator">=</span> db<span class="operator">.</span>driver()<span class="operator">-</span><span class="operator">&gt;</span>handle();
- <span class="keyword">if</span> (v<span class="operator">.</span>isValid() <span class="operator">&amp;</span><span class="operator">&amp;</span> qstrcmp(v<span class="operator">.</span>typeName()<span class="operator">,</span> <span class="string">"sqlite3*"</span>)<span class="operator">=</span><span class="operator">=</span><span class="number">0</span>) {
+ <span class="keyword">if</span> (v<span class="operator">.</span>isValid() <span class="operator">&amp;</span><span class="operator">&amp;</span> qstrcmp(v<span class="operator">.</span>typeName()<span class="operator">,</span> <span class="string">"sqlite3*"</span>) <span class="operator">=</span><span class="operator">=</span> <span class="number">0</span>) {
      <span class="comment">// v.data() returns a pointer to the handle</span>
      sqlite3 <span class="operator">*</span>handle <span class="operator">=</span> <span class="operator">*</span><span class="keyword">static_cast</span><span class="operator">&lt;</span>sqlite3 <span class="operator">*</span><span class="operator">*</span><span class="operator">&gt;</span>(v<span class="operator">.</span>data());
      <span class="keyword">if</span> (handle <span class="operator">!</span><span class="operator">=</span> <span class="number">0</span>) { <span class="comment">// check that it is not NULL</span>
@@ -265,12 +265,12 @@ sqlite:</p>
 </pre>
 <p>This snippet returns the handle for PostgreSQL or MySQL:</p>
 <pre class="cpp">
- <span class="keyword">if</span> (v<span class="operator">.</span>typeName() <span class="operator">=</span><span class="operator">=</span> <span class="string">"PGconn*"</span>) {
+ <span class="keyword">if</span> (qstrcmp(v<span class="operator">.</span>typeName()<span class="operator">,</span> <span class="string">"PGconn*"</span>) <span class="operator">=</span><span class="operator">=</span> <span class="number">0</span>) {
      PGconn <span class="operator">*</span>handle <span class="operator">=</span> <span class="operator">*</span><span class="keyword">static_cast</span><span class="operator">&lt;</span>PGconn <span class="operator">*</span><span class="operator">*</span><span class="operator">&gt;</span>(v<span class="operator">.</span>data());
      <span class="keyword">if</span> (handle <span class="operator">!</span><span class="operator">=</span> <span class="number">0</span>) <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
 
- <span class="keyword">if</span> (v<span class="operator">.</span>typeName() <span class="operator">=</span><span class="operator">=</span> <span class="string">"MYSQL*"</span>) {
+ <span class="keyword">if</span> (qstrcmp(v<span class="operator">.</span>typeName()<span class="operator">,</span> <span class="string">"MYSQL*"</span>) <span class="operator">=</span><span class="operator">=</span> <span class="number">0</span>) {
      MYSQL <span class="operator">*</span>handle <span class="operator">=</span> <span class="operator">*</span><span class="keyword">static_cast</span><span class="operator">&lt;</span>MYSQL <span class="operator">*</span><span class="operator">*</span><span class="operator">&gt;</span>(v<span class="operator">.</span>data());
      <span class="keyword">if</span> (handle <span class="operator">!</span><span class="operator">=</span> <span class="number">0</span>) <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
  }
@@ -553,4 +553,4 @@ the event notification.</p>
 <p><b>See also</b> <a href="qsqldriver.html#subscribeToNotification">subscribeToNotification</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

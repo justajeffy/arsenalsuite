@@ -1,7 +1,7 @@
 # This is the qmake project file for the QPy support code for the QtCore
 # module.
 #
-# Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 # 
 # This file is part of PyQt.
 # 
@@ -44,6 +44,7 @@ SOURCES   = \
             qpycore_chimera.cpp \
             qpycore_chimera_signature.cpp \
             qpycore_chimera_storage.cpp \
+            qpycore_classinfo.cpp \
             qpycore_init.cpp \
             qpycore_misc.cpp \
             qpycore_post_init.cpp \
@@ -60,16 +61,17 @@ SOURCES   = \
             qpycore_qobject_getattr.cpp \
             qpycore_qobject_helpers.cpp \
             qpycore_qpynullvariant.cpp \
-            qpycore_qsettings_value.cpp \
             qpycore_qstring.cpp \
             qpycore_qstringlist.cpp \
             qpycore_sip_helpers.cpp \
             qpycore_types.cpp \
-            qpycore_qvariant.cpp
+            qpycore_qvariant.cpp \
+            qpycore_qvariant_value.cpp
 
 HEADERS   = \
             qpycore_api.h \
             qpycore_chimera.h \
+            qpycore_classinfo.h \
             qpycore_misc.h \
             qpycore_namespace.h \
             qpycore_pyqtboundsignal.h \
@@ -78,6 +80,7 @@ HEADERS   = \
             qpycore_pyqtpyobject.h \
             qpycore_pyqtsignal.h \
             qpycore_pyqtmethodproxy.h \
+            qpycore_qmetaobjectbuilder.h \
             qpycore_qobject_helpers.h \
             qpycore_qpynullvariant.h \
             qpycore_sip.h \

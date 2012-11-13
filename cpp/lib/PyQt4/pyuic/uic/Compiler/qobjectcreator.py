@@ -1,6 +1,6 @@
 #############################################################################
 ##
-## Copyright (C) 2011 Riverbank Computing Limited.
+## Copyright (C) 2012 Riverbank Computing Limited.
 ## Copyright (C) 2006 Thorsten Marek.
 ## All right reserved.
 ##
@@ -100,7 +100,6 @@ class _CustomWidgetLoader(object):
         assert widgetClass not in self._widgets 
         self._widgets[widgetClass] = (baseClass, module)
 
-
     def _resolveBaseclass(self, baseClass):
         try:
             for x in range(0, 10):
@@ -114,18 +113,16 @@ class _CustomWidgetLoader(object):
         except KeyError:
             raise ValueError("unknown baseclass %s" % baseClass)
         
-
     def search(self, cls):
         try:
-            self._usedWidgets.add(cls)
             baseClass = self._resolveBaseclass(self._widgets[cls][0])
             DEBUG("resolved baseclass of %s: %s" % (cls, baseClass))
-            
-            return type(cls, (baseClass,),
-                        {"module" : ""})
-        
         except KeyError:
             return None
+
+        self._usedWidgets.add(cls)
+
+        return type(cls, (baseClass, ), {"module" : ""})
 
     def _writeImportCode(self):
         imports = {}

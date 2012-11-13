@@ -1,6 +1,6 @@
 #############################################################################
 ##
-## Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+## Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 ## 
 ## This file is part of PyQt.
 ## 
@@ -25,8 +25,10 @@
 #############################################################################
 
 
-from PyQt4.uic.Compiler.proxy_type import ProxyType
+from PyQt4.uic.Compiler.proxy_metaclass import ProxyMetaclass
 
 
-class ProxyBase(metaclass=ProxyType):
-    pass
+class ProxyBase(metaclass=ProxyMetaclass):
+    """ A base class for proxies using Python v3 syntax for setting the
+    meta-class.
+    """

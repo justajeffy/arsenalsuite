@@ -9,7 +9,7 @@ body { background: #ffffff; color: black; }
 </style></head><body><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr /><td align="left" valign="top" width="32"><img align="left" border="0" height="32" src="images/rb-logo.png" width="32" /></td><td width="1">&#160;&#160;</td><td class="postheader" valign="center"><a href="index.html"><font color="#004faf">Home</font></a>&#160;&#183; <a href="classes.html"><font color="#004faf">All Classes</font></a>&#160;&#183; <a href="modules.html"><font color="#004faf">Modules</font></a></td></table><h1 align="center">QTextLayout Class Reference<br /><sup><sup>[<a href="qtgui.html">QtGui</a> module]</sup></sup></h1><p>The QTextLayout class is used to lay out and render text.
 <a href="#details">More...</a></p>
 
-<h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qtextlayout.html#CursorMode-enum">CursorMode</a></b> { SkipCharacters, SkipWords }</li><li><div class="fn" />class <b><a href="qtextlayout-formatrange.html">FormatRange</a></b></li></ul><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qtextlayout.html#QTextLayout">__init__</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#QTextLayout-2">__init__</a></b> (<i>self</i>, QString&#160;<i>text</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#QTextLayout-3">__init__</a></b> (<i>self</i>, QString&#160;<i>text</i>, QFont&#160;<i>font</i>, QPaintDevice&#160;<i>paintDevice</i>&#160;=&#160;None)</li><li><div class="fn" /><b><a href="qtextlayout.html#QTextLayout-4">__init__</a></b> (<i>self</i>, QTextBlock&#160;<i>b</i>)</li><li><div class="fn" />list-of-QTextLayout.FormatRange <b><a href="qtextlayout.html#additionalFormats">additionalFormats</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#beginLayout">beginLayout</a></b> (<i>self</i>)</li><li><div class="fn" />QRectF <b><a href="qtextlayout.html#boundingRect">boundingRect</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qtextlayout.html#cacheEnabled">cacheEnabled</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#clearAdditionalFormats">clearAdditionalFormats</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#clearLayout">clearLayout</a></b> (<i>self</i>)</li><li><div class="fn" />QTextLine <b><a href="qtextlayout.html#createLine">createLine</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#draw">draw</a></b> (<i>self</i>, QPainter&#160;<i>p</i>, QPointF&#160;<i>pos</i>, list-of-QTextLayout.FormatRange&#160;<i>selections</i>&#160;=&#160;list-of-QTextLayout.FormatRange, QRectF&#160;<i>clip</i>&#160;=&#160;QRectF())</li><li><div class="fn" /><b><a href="qtextlayout.html#drawCursor">drawCursor</a></b> (<i>self</i>, QPainter&#160;<i>p</i>, QPointF&#160;<i>pos</i>, int&#160;<i>cursorPosition</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#drawCursor-2">drawCursor</a></b> (<i>self</i>, QPainter&#160;<i>p</i>, QPointF&#160;<i>pos</i>, int&#160;<i>cursorPosition</i>, int&#160;<i>width</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#endLayout">endLayout</a></b> (<i>self</i>)</li><li><div class="fn" />QFont <b><a href="qtextlayout.html#font">font</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a></b> (<i>self</i>, int&#160;<i>pos</i>)</li><li><div class="fn" />QTextLine <b><a href="qtextlayout.html#lineAt">lineAt</a></b> (<i>self</i>, int&#160;<i>i</i>)</li><li><div class="fn" />int <b><a href="qtextlayout.html#lineCount">lineCount</a></b> (<i>self</i>)</li><li><div class="fn" />QTextLine <b><a href="qtextlayout.html#lineForTextPosition">lineForTextPosition</a></b> (<i>self</i>, int&#160;<i>pos</i>)</li><li><div class="fn" />float <b><a href="qtextlayout.html#maximumWidth">maximumWidth</a></b> (<i>self</i>)</li><li><div class="fn" />float <b><a href="qtextlayout.html#minimumWidth">minimumWidth</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qtextlayout.html#nextCursorPosition">nextCursorPosition</a></b> (<i>self</i>, int&#160;<i>oldPos</i>, CursorMode&#160;<i>mode</i>&#160;=&#160;QTextLayout.SkipCharacters)</li><li><div class="fn" />QPointF <b><a href="qtextlayout.html#position">position</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qtextlayout.html#preeditAreaPosition">preeditAreaPosition</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qtextlayout.html#preeditAreaText">preeditAreaText</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qtextlayout.html#previousCursorPosition">previousCursorPosition</a></b> (<i>self</i>, int&#160;<i>oldPos</i>, CursorMode&#160;<i>mode</i>&#160;=&#160;QTextLayout.SkipCharacters)</li><li><div class="fn" /><b><a href="qtextlayout.html#setAdditionalFormats">setAdditionalFormats</a></b> (<i>self</i>, list-of-QTextLayout.FormatRange&#160;<i>overrides</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setCacheEnabled">setCacheEnabled</a></b> (<i>self</i>, bool&#160;<i>enable</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setFont">setFont</a></b> (<i>self</i>, QFont&#160;<i>f</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setPosition">setPosition</a></b> (<i>self</i>, QPointF&#160;<i>p</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setPreeditArea">setPreeditArea</a></b> (<i>self</i>, int&#160;<i>position</i>, QString&#160;<i>text</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setText">setText</a></b> (<i>self</i>, QString&#160;<i>string</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setTextOption">setTextOption</a></b> (<i>self</i>, QTextOption&#160;<i>option</i>)</li><li><div class="fn" />QString <b><a href="qtextlayout.html#text">text</a></b> (<i>self</i>)</li><li><div class="fn" />QTextOption <b><a href="qtextlayout.html#textOption">textOption</a></b> (<i>self</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QTextLayout class is used to lay out and render text.</p>
+<h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qtextlayout.html#CursorMode-enum">CursorMode</a></b> { SkipCharacters, SkipWords }</li><li><div class="fn" />class <b><a href="qtextlayout-formatrange.html">FormatRange</a></b></li></ul><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qtextlayout.html#QTextLayout">__init__</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#QTextLayout-2">__init__</a></b> (<i>self</i>, QString&#160;<i>text</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#QTextLayout-3">__init__</a></b> (<i>self</i>, QString&#160;<i>text</i>, QFont&#160;<i>font</i>, QPaintDevice&#160;<i>paintDevice</i>&#160;=&#160;None)</li><li><div class="fn" /><b><a href="qtextlayout.html#QTextLayout-4">__init__</a></b> (<i>self</i>, QTextBlock&#160;<i>b</i>)</li><li><div class="fn" />list-of-QTextLayout.FormatRange <b><a href="qtextlayout.html#additionalFormats">additionalFormats</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#beginLayout">beginLayout</a></b> (<i>self</i>)</li><li><div class="fn" />QRectF <b><a href="qtextlayout.html#boundingRect">boundingRect</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qtextlayout.html#cacheEnabled">cacheEnabled</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#clearAdditionalFormats">clearAdditionalFormats</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#clearLayout">clearLayout</a></b> (<i>self</i>)</li><li><div class="fn" />QTextLine <b><a href="qtextlayout.html#createLine">createLine</a></b> (<i>self</i>)</li><li><div class="fn" />Qt.CursorMoveStyle <b><a href="qtextlayout.html#cursorMoveStyle">cursorMoveStyle</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#draw">draw</a></b> (<i>self</i>, QPainter&#160;<i>p</i>, QPointF&#160;<i>pos</i>, list-of-QTextLayout.FormatRange&#160;<i>selections</i>&#160;=&#160;list-of-QTextLayout.FormatRange, QRectF&#160;<i>clip</i>&#160;=&#160;QRectF())</li><li><div class="fn" /><b><a href="qtextlayout.html#drawCursor">drawCursor</a></b> (<i>self</i>, QPainter&#160;<i>p</i>, QPointF&#160;<i>pos</i>, int&#160;<i>cursorPosition</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#drawCursor-2">drawCursor</a></b> (<i>self</i>, QPainter&#160;<i>p</i>, QPointF&#160;<i>pos</i>, int&#160;<i>cursorPosition</i>, int&#160;<i>width</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#endLayout">endLayout</a></b> (<i>self</i>)</li><li><div class="fn" />QFont <b><a href="qtextlayout.html#font">font</a></b> (<i>self</i>)</li><li><div class="fn" />list-of-QGlyphRun <b><a href="qtextlayout.html#glyphRuns">glyphRuns</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a></b> (<i>self</i>, int&#160;<i>pos</i>)</li><li><div class="fn" />int <b><a href="qtextlayout.html#leftCursorPosition">leftCursorPosition</a></b> (<i>self</i>, int&#160;<i>oldPos</i>)</li><li><div class="fn" />QTextLine <b><a href="qtextlayout.html#lineAt">lineAt</a></b> (<i>self</i>, int&#160;<i>i</i>)</li><li><div class="fn" />int <b><a href="qtextlayout.html#lineCount">lineCount</a></b> (<i>self</i>)</li><li><div class="fn" />QTextLine <b><a href="qtextlayout.html#lineForTextPosition">lineForTextPosition</a></b> (<i>self</i>, int&#160;<i>pos</i>)</li><li><div class="fn" />float <b><a href="qtextlayout.html#maximumWidth">maximumWidth</a></b> (<i>self</i>)</li><li><div class="fn" />float <b><a href="qtextlayout.html#minimumWidth">minimumWidth</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qtextlayout.html#nextCursorPosition">nextCursorPosition</a></b> (<i>self</i>, int&#160;<i>oldPos</i>, CursorMode&#160;<i>mode</i>&#160;=&#160;QTextLayout.SkipCharacters)</li><li><div class="fn" />QPointF <b><a href="qtextlayout.html#position">position</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qtextlayout.html#preeditAreaPosition">preeditAreaPosition</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qtextlayout.html#preeditAreaText">preeditAreaText</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qtextlayout.html#previousCursorPosition">previousCursorPosition</a></b> (<i>self</i>, int&#160;<i>oldPos</i>, CursorMode&#160;<i>mode</i>&#160;=&#160;QTextLayout.SkipCharacters)</li><li><div class="fn" />int <b><a href="qtextlayout.html#rightCursorPosition">rightCursorPosition</a></b> (<i>self</i>, int&#160;<i>oldPos</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setAdditionalFormats">setAdditionalFormats</a></b> (<i>self</i>, list-of-QTextLayout.FormatRange&#160;<i>overrides</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setCacheEnabled">setCacheEnabled</a></b> (<i>self</i>, bool&#160;<i>enable</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setCursorMoveStyle">setCursorMoveStyle</a></b> (<i>self</i>, Qt.CursorMoveStyle&#160;<i>style</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setFont">setFont</a></b> (<i>self</i>, QFont&#160;<i>f</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setPosition">setPosition</a></b> (<i>self</i>, QPointF&#160;<i>p</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setPreeditArea">setPreeditArea</a></b> (<i>self</i>, int&#160;<i>position</i>, QString&#160;<i>text</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setText">setText</a></b> (<i>self</i>, QString&#160;<i>string</i>)</li><li><div class="fn" /><b><a href="qtextlayout.html#setTextOption">setTextOption</a></b> (<i>self</i>, QTextOption&#160;<i>option</i>)</li><li><div class="fn" />QString <b><a href="qtextlayout.html#text">text</a></b> (<i>self</i>)</li><li><div class="fn" />QTextOption <b><a href="qtextlayout.html#textOption">textOption</a></b> (<i>self</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QTextLayout class is used to lay out and render text.</p>
 <p>It offers many features expected from a modern text layout
 engine, including Unicode compliant rendering, line breaking and
 handling of cursor positioning. It can also produce and render
@@ -88,6 +88,7 @@ and <a href="qtextlayout.html#clearAdditionalFormats">clearAdditionalFormats</a>
 
 
 <h3 class="fn"><a name="beginLayout" />QTextLayout.beginLayout (<i>self</i>)</h3><p>Begins the layout process.</p>
+<p><b>See also</b> <a href="qtextlayout.html#endLayout">endLayout</a>().</p>
 
 
 <h3 class="fn"><a name="boundingRect" /><a href="qrectf.html">QRectF</a> QTextLayout.boundingRect (<i>self</i>)</h3><p>The smallest rectangle that contains all the lines in the
@@ -127,6 +128,11 @@ left to be inserted into the layout, the <a href="qtextline.html">QTextLine</a> 
 (isValid() will return false).</p>
 
 
+<h3 class="fn"><a name="cursorMoveStyle" /><a href="qt.html#CursorMoveStyle-enum">Qt.CursorMoveStyle</a> QTextLayout.cursorMoveStyle (<i>self</i>)</h3><p>The cursor movement style of this <a href="qtextlayout.html">QTextLayout</a>. The default is <a href="qt.html#CursorMoveStyle-enum">Qt.LogicalMoveStyle</a>.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qtextlayout.html#setCursorMoveStyle">setCursorMoveStyle</a>().</p>
+
+
 <h3 class="fn"><a name="draw" />QTextLayout.draw (<i>self</i>, <a href="qpainter.html">QPainter</a>&#160;<i>p</i>, <a href="qpointf.html">QPointF</a>&#160;<i>pos</i>, list-of-QTextLayout.FormatRange&#160;<i>selections</i>&#160;=&#160;list-of-QTextLayout.FormatRange, <a href="qrectf.html">QRectF</a>&#160;<i>clip</i>&#160;=&#160;QRectF())</h3><p>Draws the whole layout on the painter <i>p</i> at the position
 specified by <i>pos</i>. The rendered layout includes the given
 <i>selections</i> and is clipped within the rectangle specified by
@@ -147,6 +153,7 @@ corresponding position within the text is specified by
 
 
 <h3 class="fn"><a name="endLayout" />QTextLayout.endLayout (<i>self</i>)</h3><p>Ends the layout process.</p>
+<p><b>See also</b> <a href="qtextlayout.html#beginLayout">beginLayout</a>().</p>
 
 
 <h3 class="fn"><a name="font" /><a href="qfont.html">QFont</a> QTextLayout.font (<i>self</i>)</h3><p>Returns the current font that is used for the layout, or a
@@ -154,7 +161,15 @@ default font if none is set.</p>
 <p><b>See also</b> <a href="qtextlayout.html#setFont">setFont</a>().</p>
 
 
-<h3 class="fn"><a name="isValidCursorPosition" />bool QTextLayout.isValidCursorPosition (<i>self</i>, int&#160;<i>pos</i>)</h3><p>Returns true if position <i>pos</i> is a valid cursor
+<h3 class="fn"><a name="glyphRuns" />list-of-QGlyphRun QTextLayout.glyphRuns (<i>self</i>)</h3><p>Returns the glyph indexes and positions for all glyphs in this
+<a href="qtextlayout.html">QTextLayout</a>. This is an expensive
+function, and should not be called in a time sensitive context.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qtextlayout.html#draw">draw</a>() and
+<a href="qpainter.html#drawGlyphRun">QPainter.drawGlyphRun</a>().</p>
+
+
+<h3 class="fn"><a name="isValidCursorPosition" />bool QTextLayout.isValidCursorPosition (<i>self</i>, int&#160;<i>pos</i>)</h3><p>/ Returns true if position <i>pos</i> is a valid cursor
 position.</p>
 <p>In a Unicode context some positions in the text are not valid
 cursor positions, because the position is inside a Unicode
@@ -166,6 +181,14 @@ by two characters, `A' (0x41), and the combining diaresis (0x308).
 A text cursor can only validly be positioned before or after these
 two characters, never between them since that wouldn't make sense.
 In indic languages every syllable forms a grapheme cluster.</p>
+
+
+<h3 class="fn"><a name="leftCursorPosition" />int QTextLayout.leftCursorPosition (<i>self</i>, int&#160;<i>oldPos</i>)</h3><p>Returns the cursor position to the left of <i>oldPos</i>, next
+to it. The position is dependent on the visual position of
+characters, after bi-directional reordering.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qtextlayout.html#rightCursorPosition">rightCursorPosition</a>()
+and <a href="qtextlayout.html#previousCursorPosition">previousCursorPosition</a>().</p>
 
 
 <h3 class="fn"><a name="lineAt" /><a href="qtextline.html">QTextLine</a> QTextLayout.lineAt (<i>self</i>, int&#160;<i>i</i>)</h3><p>Returns the <i>i</i>-th line of text in this text layout.</p>
@@ -197,7 +220,8 @@ the layout has been done.</p>
 
 
 <h3 class="fn"><a name="nextCursorPosition" />int QTextLayout.nextCursorPosition (<i>self</i>, int&#160;<i>oldPos</i>, <a href="qtextlayout.html#CursorMode-enum">CursorMode</a>&#160;<i>mode</i>&#160;=&#160;QTextLayout.SkipCharacters)</h3><p>Returns the next valid cursor position after <i>oldPos</i> that
-respects the given cursor <i>mode</i>.</p>
+respects the given cursor <i>mode</i>. Returns value of
+<i>oldPos</i>, if <i>oldPos</i> is not a valid cursor position.</p>
 <p><b>See also</b> <a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a>()
 and <a href="qtextlayout.html#previousCursorPosition">previousCursorPosition</a>().</p>
 
@@ -210,16 +234,27 @@ bounding rectangle and of the layout process.</p>
 
 <h3 class="fn"><a name="preeditAreaPosition" />int QTextLayout.preeditAreaPosition (<i>self</i>)</h3><p>Returns the position of the area in the text layout that will be
 processed before editing occurs.</p>
+<p><b>See also</b> <a href="qtextlayout.html#preeditAreaText">preeditAreaText</a>().</p>
 
 
 <h3 class="fn"><a name="preeditAreaText" />QString QTextLayout.preeditAreaText (<i>self</i>)</h3><p>Returns the text that is inserted in the layout before editing
 occurs.</p>
+<p><b>See also</b> <a href="qtextlayout.html#preeditAreaPosition">preeditAreaPosition</a>().</p>
 
 
 <h3 class="fn"><a name="previousCursorPosition" />int QTextLayout.previousCursorPosition (<i>self</i>, int&#160;<i>oldPos</i>, <a href="qtextlayout.html#CursorMode-enum">CursorMode</a>&#160;<i>mode</i>&#160;=&#160;QTextLayout.SkipCharacters)</h3><p>Returns the first valid cursor position before <i>oldPos</i>
-that respects the given cursor <i>mode</i>.</p>
+that respects the given cursor <i>mode</i>. Returns value of
+<i>oldPos</i>, if <i>oldPos</i> is not a valid cursor position.</p>
 <p><b>See also</b> <a href="qtextlayout.html#isValidCursorPosition">isValidCursorPosition</a>()
 and <a href="qtextlayout.html#nextCursorPosition">nextCursorPosition</a>().</p>
+
+
+<h3 class="fn"><a name="rightCursorPosition" />int QTextLayout.rightCursorPosition (<i>self</i>, int&#160;<i>oldPos</i>)</h3><p>Returns the cursor position to the right of <i>oldPos</i>, next
+to it. The position is dependent on the visual position of
+characters, after bi-directional reordering.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qtextlayout.html#leftCursorPosition">leftCursorPosition</a>() and
+<a href="qtextlayout.html#nextCursorPosition">nextCursorPosition</a>().</p>
 
 
 <h3 class="fn"><a name="setAdditionalFormats" />QTextLayout.setAdditionalFormats (<i>self</i>, list-of-QTextLayout.FormatRange&#160;<i>overrides</i>)</h3><p>Sets the additional formats supported by the text layout to
@@ -238,10 +273,18 @@ significantly.</p>
 <p><b>See also</b> <a href="qtextlayout.html#cacheEnabled">cacheEnabled</a>().</p>
 
 
+<h3 class="fn"><a name="setCursorMoveStyle" />QTextLayout.setCursorMoveStyle (<i>self</i>, <a href="qt.html#CursorMoveStyle-enum">Qt.CursorMoveStyle</a>&#160;<i>style</i>)</h3><p>Set the cursor movement style. If the <a href="qtextlayout.html">QTextLayout</a> is backed by a document, you can
+ignore this and use the option in <a href="qtextdocument.html">QTextDocument</a>, this option is for widgets
+like <a href="qlineedit.html">QLineEdit</a> or custom widgets
+without a <a href="qtextdocument.html">QTextDocument</a>. Default
+value is <a href="qt.html#CursorMoveStyle-enum">Qt.LogicalMoveStyle</a>.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qtextlayout.html#cursorMoveStyle">cursorMoveStyle</a>().</p>
+
+
 <h3 class="fn"><a name="setFont" />QTextLayout.setFont (<i>self</i>, <a href="qfont.html">QFont</a>&#160;<i>f</i>)</h3><p>Sets the layout's font to the given <i>font</i>. The layout is
 invalidated and must be laid out again.</p>
-<p><b>See also</b> <a href="qtextlayout.html#font">font</a>() and
-<a href="qtextlayout.html#text">text</a>().</p>
+<p><b>See also</b> <a href="qtextlayout.html#font">font</a>().</p>
 
 
 <h3 class="fn"><a name="setPosition" />QTextLayout.setPosition (<i>self</i>, <a href="qpointf.html">QPointF</a>&#160;<i>p</i>)</h3><p>Moves the text layout to point <i>p</i>.</p>
@@ -250,6 +293,8 @@ invalidated and must be laid out again.</p>
 
 <h3 class="fn"><a name="setPreeditArea" />QTextLayout.setPreeditArea (<i>self</i>, int&#160;<i>position</i>, QString&#160;<i>text</i>)</h3><p>Sets the <i>position</i> and <i>text</i> of the area in the
 layout that is processed before editing occurs.</p>
+<p><b>See also</b> <a href="qtextlayout.html#preeditAreaPosition">preeditAreaPosition</a>()
+and <a href="qtextlayout.html#preeditAreaText">preeditAreaText</a>().</p>
 
 
 <h3 class="fn"><a name="setText" />QTextLayout.setText (<i>self</i>, QString&#160;<i>string</i>)</h3><p>Sets the layout's text to the given <i>string</i>. The layout is
@@ -261,7 +306,7 @@ effect.</p>
 
 <h3 class="fn"><a name="setTextOption" />QTextLayout.setTextOption (<i>self</i>, <a href="qtextoption.html">QTextOption</a>&#160;<i>option</i>)</h3><p>Sets the text option structure that controls the layout process
 to the given <i>option</i>.</p>
-<p><b>See also</b> <a href="qtextlayout.html#textOption">textOption</a>() and <a href="qtextoption.html">QTextOption</a>.</p>
+<p><b>See also</b> <a href="qtextlayout.html#textOption">textOption</a>().</p>
 
 
 <h3 class="fn"><a name="text" />QString QTextLayout.text (<i>self</i>)</h3><p>Returns the layout's text.</p>
@@ -270,5 +315,5 @@ to the given <i>option</i>.</p>
 
 <h3 class="fn"><a name="textOption" /><a href="qtextoption.html">QTextOption</a> QTextLayout.textOption (<i>self</i>)</h3><p>Returns the current text option used to control the layout
 process.</p>
-<p><b>See also</b> <a href="qtextlayout.html#setTextOption">setTextOption</a>() and <a href="qtextoption.html">QTextOption</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<p><b>See also</b> <a href="qtextlayout.html#setTextOption">setTextOption</a>().</p>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

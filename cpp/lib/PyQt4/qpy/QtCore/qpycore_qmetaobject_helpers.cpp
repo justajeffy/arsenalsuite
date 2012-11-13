@@ -1,6 +1,6 @@
 // This implements the helpers for QMetaObject.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -145,7 +145,11 @@ static void connect(QObject *qobj, PyObject *slot_obj,
         if (mm.methodType() != QMetaMethod::Signal)
             continue;
 
+#if QT_VERSION >= 0x050000
+        QByteArray sig(mm.methodSignature());
+#else
         QByteArray sig(mm.signature());
+#endif
 
         if (Chimera::Signature::name(sig) != sname)
             continue;

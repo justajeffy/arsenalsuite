@@ -40,7 +40,9 @@ in order to create a *bound signal*.  This is the same mechanism that Python
 itself uses to create bound methods from class functions.
 
 A bound signal has ``connect()``, ``disconnect()`` and ``emit()`` methods that
-implement the associated functionality.
+implement the associated functionality.  It also has a ``signal`` attribute
+that is the signature of the signal that would be returned by Qt's ``SIGNAL()``
+macro.
 
 A signal may be overloaded, ie. a signal with a particular name may support
 more than one signature.  A signal may be indexed with a signature in order to
@@ -347,3 +349,16 @@ the optional argument::
     @pyqtSlot()
     def on_button_clicked(self):
         pass
+
+
+Mixing New-style and Old-style Connections
+------------------------------------------
+
+The implementation of new-style connections is slightly different to the
+implementation of old-style connections.  An application can freely use both
+styles subject to the restriction that any individual new-style connection
+should only be disconnected using the new style.  Similarly any individual
+old-style connection should only be disconnected using the old style.
+
+You should also be aware that :program:`pyuic4` generates code that uses
+old-style connections.

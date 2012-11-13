@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Potential Incompatibilities with Earlier Versions &mdash; PyQt snapshot-4.8.6-4726879563e5 Reference Guide</title>
+    <title>Potential Incompatibilities with Earlier Versions &mdash; PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '#',
-        VERSION:     'snapshot-4.8.6-4726879563e5',
+        VERSION:     'snapshot-4.9.5-9eb6aac99275',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/logo_tn.ico"/>
-    <link rel="top" title="PyQt snapshot-4.8.6-4726879563e5 Reference Guide" href="index.html" />
+    <link rel="top" title="PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide" href="index.html" />
     <link rel="next" title="Installing PyQt" href="installation.html" />
     <link rel="prev" title="Introduction" href="introduction.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="introduction.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PyQt snapshot-4.8.6-4726879563e5 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -51,6 +51,17 @@
             
   <div class="section" id="potential-incompatibilities-with-earlier-versions">
 <h1>Potential Incompatibilities with Earlier Versions<a class="headerlink" href="#potential-incompatibilities-with-earlier-versions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="pyqt-v4-9-2">
+<h2>PyQt v4.9.2<a class="headerlink" href="#pyqt-v4-9-2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="qpynullvariant">
+<h3>QPyNullVariant<a class="headerlink" href="#qpynullvariant" title="Permalink to this headline">¶</a></h3>
+<p>In previous versions a <tt class="docutils literal"><span class="pre">QPyNullVariant</span></tt> would always evaluate to <tt class="xref docutils literal"><span class="pre">True</span></tt>
+when converted to a bool.</p>
+<p>In this version a <tt class="docutils literal"><span class="pre">QPyNullVariant</span></tt> will always evaluate to <tt class="xref docutils literal"><span class="pre">False</span></tt> when
+converted to a bool.  This makes it behave like <tt class="xref docutils literal"><span class="pre">None</span></tt> in these
+circumstances.</p>
+</div>
+</div>
 <div class="section" id="pyqt-v4-8-3">
 <h2>PyQt v4.8.3<a class="headerlink" href="#pyqt-v4-8-3" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="sql-models">
@@ -63,7 +74,7 @@ between, for example, a null integer and an integer with the value zero.</p>
 QVariant.  Therefore the object read from an SQL model may now be a
 <tt class="docutils literal"><span class="pre">QPyNullVariant</span></tt> instance.</p>
 <p>A null <tt class="docutils literal"><span class="pre">QVariant</span></tt> is only converted to a <tt class="docutils literal"><span class="pre">QPyNullVariant</span></tt> if the underlying
-C++ type of the <tt class="docutils literal"><span class="pre">QVariant</span></tt> cannot be tested for null, i.e. is does not
+C++ type of the <tt class="docutils literal"><span class="pre">QVariant</span></tt> cannot be tested for null, i.e. it does not
 implement an <tt class="docutils literal"><span class="pre">isNull()</span></tt> method.  This ensures that existing code that uses
 non-SQL models will continue to work unchanged.</p>
 </div>
@@ -108,7 +119,6 @@ sub-classes of standard Python types and <tt class="docutils literal"><span clas
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="n">QVariant</span>
 
 <span class="k">class</span> <span class="nc">MyFloat</span><span class="p">(</span><span class="nb">float</span><span class="p">):</span>
-
     <span class="k">pass</span>
 
 <span class="n">myfloat</span> <span class="o">=</span> <span class="n">MyFloat</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
@@ -148,7 +158,6 @@ affected are those that <tt class="docutils literal"><span class="pre">QVariant<
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="n">QSize</span><span class="p">,</span> <span class="n">QVariant</span>
 
 <span class="k">class</span> <span class="nc">MySize</span><span class="p">(</span><span class="n">QSize</span><span class="p">):</span>
-
     <span class="k">pass</span>
 
 <span class="n">mysize</span> <span class="o">=</span> <span class="n">MySize</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
@@ -171,7 +180,7 @@ instance.  In other words, the following assertions would be true:</p>
 </pre></div>
 </div>
 <p>It is hoped that this change of behaviour will not have a significant impact.
-However if you need the old behaviour then simple create a copy of your
+However if you need the old behaviour then simply create a copy of your
 sub-class instance using the base class constructor as shown below:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">variant</span> <span class="o">=</span> <span class="n">QVariant</span><span class="p">(</span><span class="n">QSize</span><span class="p">(</span><span class="n">mysize</span><span class="p">))</span>
 </pre></div>
@@ -215,6 +224,10 @@ enforce this in case the default is changed in the future.</p>
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="#">Potential Incompatibilities with Earlier Versions</a><ul>
+<li><a class="reference external" href="#pyqt-v4-9-2">PyQt v4.9.2</a><ul>
+<li><a class="reference external" href="#qpynullvariant">QPyNullVariant</a></li>
+</ul>
+</li>
 <li><a class="reference external" href="#pyqt-v4-8-3">PyQt v4.8.3</a><ul>
 <li><a class="reference external" href="#sql-models">SQL Models</a></li>
 </ul>
@@ -278,7 +291,7 @@ enforce this in case the default is changed in the future.</p>
         <li class="right" >
           <a href="introduction.html" title="Introduction"
              >previous</a> |</li>
-        <li><a href="index.html">PyQt snapshot-4.8.6-4726879563e5 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

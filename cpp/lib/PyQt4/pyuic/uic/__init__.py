@@ -177,7 +177,7 @@ def compileUi(uifile, pyfile, execute=False, indent=4, pyqt3_wrapper=False, from
 
 
 def loadUiType(uifile, from_imports=False):
-    """loadUiType(uifile) -> (form class, base class)
+    """loadUiType(uifile, from_imports=False) -> (form class, base class)
 
     Load a Qt Designer .ui file and return the generated form class and the Qt
     base class.
@@ -205,8 +205,8 @@ def loadUiType(uifile, from_imports=False):
     return (ui_globals[winfo["uiclass"]], getattr(QtGui, winfo["baseclass"]))
 
 
-def loadUi(uifile, baseinstance=None):
-    """loadUi(uifile, baseinstance=None) -> widget
+def loadUi(uifile, baseinstance=None, package=''):
+    """loadUi(uifile, baseinstance=None, package='') -> widget
 
     Load a Qt Designer .ui file and return an instance of the user interface.
 
@@ -214,11 +214,13 @@ def loadUi(uifile, baseinstance=None):
     baseinstance is an optional instance of the Qt base class.  If specified
     then the user interface is created in it.  Otherwise a new instance of the
     base class is automatically created.
+    package is the optional package which is used as the base for any relative
+    imports of custom widgets.
     """
 
     from PyQt4.uic.Loader.loader import DynamicUILoader
 
-    return DynamicUILoader().loadUi(uifile, baseinstance)
+    return DynamicUILoader(package).loadUi(uifile, baseinstance)
 
 
 # The list of directories that are searched for widget plugins.

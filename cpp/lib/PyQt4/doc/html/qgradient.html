@@ -13,8 +13,10 @@ body { background: #ffffff; color: black; }
 <ul>
 <li><i>Linear</i> gradients interpolate colors between start and
 end points.</li>
-<li><i>Radial</i> gradients interpolate colors between a focal
-point and end points on a circle surrounding it.</li>
+<li><i>Simple</i> radial gradients interpolate colors between a
+focal point and end points on a circle surrounding it.</li>
+<li><i>Extended</i> radial gradients interpolate colors between a
+center and a focal circle.</li>
 <li><i>Conical</i> gradients interpolate colors around a center
 point.</li>
 </ul>
@@ -29,9 +31,9 @@ represented by a subclass of QGradient:</p>
 </tr>
 </thead>
 <tr class="odd" valign="top">
-<td><img src="images/qgradient-linear.png" /></td>
-<td><img src="images/qgradient-radial.png" /></td>
-<td><img src="images/qgradient-conical.png" /></td>
+<td><img alt="" src="images/qgradient-linear.png" /></td>
+<td><img alt="" src="images/qgradient-radial.png" /></td>
+<td><img alt="" src="images/qgradient-conical.png" /></td>
 </tr>
 </table>
 <p>The colors in a gradient are defined using stop points of the
@@ -70,9 +72,9 @@ method</a> can be retrieved using the <a href="qgradient.html#spread">spread</a>
 three different methods:</p>
 <table class="generic">
 <tr class="odd" valign="top">
-<td><img src="images/qradialgradient-pad.png" /></td>
-<td><img src="images/qradialgradient-repeat.png" /></td>
-<td><img src="images/qradialgradient-reflect.png" /></td>
+<td><img alt="" src="images/qradialgradient-pad.png" /></td>
+<td><img alt="" src="images/qradialgradient-repeat.png" /></td>
+<td><img alt="" src="images/qradialgradient-reflect.png" /></td>
 </tr>
 <tr class="even" valign="top">
 <td><a href="qgradient.html#Spread-enum">PadSpread</a></td>
@@ -240,4 +242,4 @@ and <a href="qgradient.html#setColorAt">setColorAt</a>().</p>
 <h3 class="fn"><a name="type" /><a href="qgradient.html#Type-enum">Type</a> QGradient.type (<i>self</i>)</h3><p>Returns the type of gradient.</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QGradient.__eq__ (<i>self</i>, <a href="qgradient.html">QGradient</a>&#160;<i>gradient</i>)</h3><h3 class="fn"><a name="__ne__" />bool QGradient.__ne__ (<i>self</i>, <a href="qgradient.html">QGradient</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QGradient.__eq__ (<i>self</i>, <a href="qgradient.html">QGradient</a>&#160;<i>gradient</i>)</h3><h3 class="fn"><a name="__ne__" />bool QGradient.__ne__ (<i>self</i>, <a href="qgradient.html">QGradient</a>&#160;<i>other</i>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

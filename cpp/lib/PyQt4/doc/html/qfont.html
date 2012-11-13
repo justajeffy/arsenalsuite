@@ -8,7 +8,7 @@ tr.address { font-family: sans-serif }
 body { background: #ffffff; color: black; }
 </style></head><body><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr /><td align="left" valign="top" width="32"><img align="left" border="0" height="32" src="images/rb-logo.png" width="32" /></td><td width="1">&#160;&#160;</td><td class="postheader" valign="center"><a href="index.html"><font color="#004faf">Home</font></a>&#160;&#183; <a href="classes.html"><font color="#004faf">All Classes</font></a>&#160;&#183; <a href="modules.html"><font color="#004faf">Modules</font></a></td></table><h1 align="center">QFont Class Reference<br /><sup><sup>[<a href="qtgui.html">QtGui</a> module]</sup></sup></h1><p>The QFont class specifies a font used for drawing text. <a href="#details">More...</a></p>
 
-<h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qfont.html#Capitalization-enum">Capitalization</a></b> { MixedCase, AllUppercase, AllLowercase, SmallCaps, Capitalize }</li><li><div class="fn" />enum <b><a href="qfont.html#SpacingType-enum">SpacingType</a></b> { PercentageSpacing, AbsoluteSpacing }</li><li><div class="fn" />enum <b><a href="qfont.html#Stretch-enum">Stretch</a></b> { UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, ..., UltraExpanded }</li><li><div class="fn" />enum <b><a href="qfont.html#Style-enum">Style</a></b> { StyleNormal, StyleItalic, StyleOblique }</li><li><div class="fn" />enum <b><a href="qfont.html#StyleHint-enum">StyleHint</a></b> { Helvetica, SansSerif, Times, Serif, ..., Fantasy }</li><li><div class="fn" />enum <b><a href="qfont.html#StyleStrategy-enum">StyleStrategy</a></b> { PreferDefault, PreferBitmap, PreferDevice, PreferOutline, ..., ForceIntegerMetrics }</li><li><div class="fn" />enum <b><a href="qfont.html#Weight-enum">Weight</a></b> { Light, Normal, DemiBold, Bold, Black }</li></ul><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qfont.html#QFont">__init__</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qfont.html#QFont-2">__init__</a></b> (<i>self</i>, QString&#160;<i>family</i>, int&#160;<i>pointSize</i>&#160;=&#160;-1, int&#160;<i>weight</i>&#160;=&#160;-1, bool&#160;<i>italic</i>&#160;=&#160;False)</li><li><div class="fn" /><b><a href="qfont.html#QFont-3">__init__</a></b> (<i>self</i>, QFont, QPaintDevice&#160;<i>pd</i>)</li><li><div class="fn" /><b><a href="qfont.html#QFont-4">__init__</a></b> (<i>self</i>, QFont)</li><li><div class="fn" /><b><a href="qfont.html#QFont-5">__init__</a></b> (<i>self</i>, QVariant&#160;<i>variant</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#bold">bold</a></b> (<i>self</i>)</li><li><div class="fn" />Capitalization <b><a href="qfont.html#capitalization">capitalization</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#defaultFamily">defaultFamily</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#exactMatch">exactMatch</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#family">family</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#fixedPitch">fixedPitch</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#fromString">fromString</a></b> (<i>self</i>, QString)</li><li><div class="fn" />int <b><a href="qfont.html#handle">handle</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#isCopyOf">isCopyOf</a></b> (<i>self</i>, QFont)</li><li><div class="fn" />bool <b><a href="qfont.html#italic">italic</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#kerning">kerning</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#key">key</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#lastResortFamily">lastResortFamily</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#lastResortFont">lastResortFont</a></b> (<i>self</i>)</li><li><div class="fn" />float <b><a href="qfont.html#letterSpacing">letterSpacing</a></b> (<i>self</i>)</li><li><div class="fn" />SpacingType <b><a href="qfont.html#letterSpacingType">letterSpacingType</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#overline">overline</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qfont.html#pixelSize">pixelSize</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qfont.html#pointSize">pointSize</a></b> (<i>self</i>)</li><li><div class="fn" />float <b><a href="qfont.html#pointSizeF">pointSizeF</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#rawMode">rawMode</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#rawName">rawName</a></b> (<i>self</i>)</li><li><div class="fn" />QFont <b><a href="qfont.html#resolve">resolve</a></b> (<i>self</i>, QFont)</li><li><div class="fn" /><b><a href="qfont.html#setBold">setBold</a></b> (<i>self</i>, bool&#160;<i>enable</i>)</li><li><div class="fn" /><b><a href="qfont.html#setCapitalization">setCapitalization</a></b> (<i>self</i>, Capitalization)</li><li><div class="fn" /><b><a href="qfont.html#setFamily">setFamily</a></b> (<i>self</i>, QString)</li><li><div class="fn" /><b><a href="qfont.html#setFixedPitch">setFixedPitch</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setItalic">setItalic</a></b> (<i>self</i>, bool&#160;<i>b</i>)</li><li><div class="fn" /><b><a href="qfont.html#setKerning">setKerning</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setLetterSpacing">setLetterSpacing</a></b> (<i>self</i>, SpacingType&#160;<i>type</i>, float&#160;<i>spacing</i>)</li><li><div class="fn" /><b><a href="qfont.html#setOverline">setOverline</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setPixelSize">setPixelSize</a></b> (<i>self</i>, int)</li><li><div class="fn" /><b><a href="qfont.html#setPointSize">setPointSize</a></b> (<i>self</i>, int)</li><li><div class="fn" /><b><a href="qfont.html#setPointSizeF">setPointSizeF</a></b> (<i>self</i>, float)</li><li><div class="fn" /><b><a href="qfont.html#setRawMode">setRawMode</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setRawName">setRawName</a></b> (<i>self</i>, QString)</li><li><div class="fn" /><b><a href="qfont.html#setStretch">setStretch</a></b> (<i>self</i>, int)</li><li><div class="fn" /><b><a href="qfont.html#setStrikeOut">setStrikeOut</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setStyle">setStyle</a></b> (<i>self</i>, Style&#160;<i>style</i>)</li><li><div class="fn" /><b><a href="qfont.html#setStyleHint">setStyleHint</a></b> (<i>self</i>, StyleHint&#160;<i>hint</i>, StyleStrategy&#160;<i>strategy</i>&#160;=&#160;QFont.PreferDefault)</li><li><div class="fn" /><b><a href="qfont.html#setStyleStrategy">setStyleStrategy</a></b> (<i>self</i>, StyleStrategy&#160;<i>s</i>)</li><li><div class="fn" /><b><a href="qfont.html#setUnderline">setUnderline</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setWeight">setWeight</a></b> (<i>self</i>, int)</li><li><div class="fn" /><b><a href="qfont.html#setWordSpacing">setWordSpacing</a></b> (<i>self</i>, float&#160;<i>spacing</i>)</li><li><div class="fn" />int <b><a href="qfont.html#stretch">stretch</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#strikeOut">strikeOut</a></b> (<i>self</i>)</li><li><div class="fn" />Style <b><a href="qfont.html#style">style</a></b> (<i>self</i>)</li><li><div class="fn" />StyleHint <b><a href="qfont.html#styleHint">styleHint</a></b> (<i>self</i>)</li><li><div class="fn" />StyleStrategy <b><a href="qfont.html#styleStrategy">styleStrategy</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#toString">toString</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#underline">underline</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qfont.html#weight">weight</a></b> (<i>self</i>)</li><li><div class="fn" />float <b><a href="qfont.html#wordSpacing">wordSpacing</a></b> (<i>self</i>)</li></ul><h3>Static Methods</h3><ul><li><div class="fn" /><b><a href="qfont.html#cacheStatistics">cacheStatistics</a></b> ()</li><li><div class="fn" /><b><a href="qfont.html#cleanup">cleanup</a></b> ()</li><li><div class="fn" /><b><a href="qfont.html#initialize">initialize</a></b> ()</li><li><div class="fn" /><b><a href="qfont.html#insertSubstitution">insertSubstitution</a></b> (QString, QString)</li><li><div class="fn" /><b><a href="qfont.html#insertSubstitutions">insertSubstitutions</a></b> (QString, QStringList)</li><li><div class="fn" /><b><a href="qfont.html#removeSubstitution">removeSubstitution</a></b> (QString)</li><li><div class="fn" />QString <b><a href="qfont.html#substitute">substitute</a></b> (QString)</li><li><div class="fn" />QStringList <b><a href="qfont.html#substitutes">substitutes</a></b> (QString)</li><li><div class="fn" />QStringList <b><a href="qfont.html#substitutions">substitutions</a></b> ()</li></ul><h3>Special Methods</h3><ul><li><div class="fn" />bool <b><a href="qfont.html#__eq__">__eq__</a></b> (<i>self</i>, QFont)</li><li><div class="fn" />bool <b><a href="qfont.html#__ge__">__ge__</a></b> (<i>self</i>, QFont)</li><li><div class="fn" />bool <b><a href="qfont.html#__lt__">__lt__</a></b> (<i>self</i>, QFont)</li><li><div class="fn" />bool <b><a href="qfont.html#__ne__">__ne__</a></b> (<i>self</i>, QFont)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QFont class specifies a font used for drawing text.</p>
+<h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qfont.html#Capitalization-enum">Capitalization</a></b> { MixedCase, AllUppercase, AllLowercase, SmallCaps, Capitalize }</li><li><div class="fn" />enum <b><a href="qfont.html#HintingPreference-enum">HintingPreference</a></b> { PreferDefaultHinting, PreferNoHinting, PreferVerticalHinting, PreferFullHinting }</li><li><div class="fn" />enum <b><a href="qfont.html#SpacingType-enum">SpacingType</a></b> { PercentageSpacing, AbsoluteSpacing }</li><li><div class="fn" />enum <b><a href="qfont.html#Stretch-enum">Stretch</a></b> { UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, ..., UltraExpanded }</li><li><div class="fn" />enum <b><a href="qfont.html#Style-enum">Style</a></b> { StyleNormal, StyleItalic, StyleOblique }</li><li><div class="fn" />enum <b><a href="qfont.html#StyleHint-enum">StyleHint</a></b> { Helvetica, SansSerif, Times, Serif, ..., Fantasy }</li><li><div class="fn" />enum <b><a href="qfont.html#StyleStrategy-enum">StyleStrategy</a></b> { PreferDefault, PreferBitmap, PreferDevice, PreferOutline, ..., ForceIntegerMetrics }</li><li><div class="fn" />enum <b><a href="qfont.html#Weight-enum">Weight</a></b> { Light, Normal, DemiBold, Bold, Black }</li></ul><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qfont.html#QFont">__init__</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qfont.html#QFont-2">__init__</a></b> (<i>self</i>, QString&#160;<i>family</i>, int&#160;<i>pointSize</i>&#160;=&#160;-1, int&#160;<i>weight</i>&#160;=&#160;-1, bool&#160;<i>italic</i>&#160;=&#160;False)</li><li><div class="fn" /><b><a href="qfont.html#QFont-3">__init__</a></b> (<i>self</i>, QFont, QPaintDevice&#160;<i>pd</i>)</li><li><div class="fn" /><b><a href="qfont.html#QFont-4">__init__</a></b> (<i>self</i>, QFont)</li><li><div class="fn" /><b><a href="qfont.html#QFont-5">__init__</a></b> (<i>self</i>, QVariant&#160;<i>variant</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#bold">bold</a></b> (<i>self</i>)</li><li><div class="fn" />Capitalization <b><a href="qfont.html#capitalization">capitalization</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#defaultFamily">defaultFamily</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#exactMatch">exactMatch</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#family">family</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#fixedPitch">fixedPitch</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#fromString">fromString</a></b> (<i>self</i>, QString)</li><li><div class="fn" />int <b><a href="qfont.html#handle">handle</a></b> (<i>self</i>)</li><li><div class="fn" />HintingPreference <b><a href="qfont.html#hintingPreference">hintingPreference</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#isCopyOf">isCopyOf</a></b> (<i>self</i>, QFont)</li><li><div class="fn" />bool <b><a href="qfont.html#italic">italic</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#kerning">kerning</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#key">key</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#lastResortFamily">lastResortFamily</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#lastResortFont">lastResortFont</a></b> (<i>self</i>)</li><li><div class="fn" />float <b><a href="qfont.html#letterSpacing">letterSpacing</a></b> (<i>self</i>)</li><li><div class="fn" />SpacingType <b><a href="qfont.html#letterSpacingType">letterSpacingType</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#overline">overline</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qfont.html#pixelSize">pixelSize</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qfont.html#pointSize">pointSize</a></b> (<i>self</i>)</li><li><div class="fn" />float <b><a href="qfont.html#pointSizeF">pointSizeF</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#rawMode">rawMode</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#rawName">rawName</a></b> (<i>self</i>)</li><li><div class="fn" />QFont <b><a href="qfont.html#resolve">resolve</a></b> (<i>self</i>, QFont)</li><li><div class="fn" /><b><a href="qfont.html#setBold">setBold</a></b> (<i>self</i>, bool&#160;<i>enable</i>)</li><li><div class="fn" /><b><a href="qfont.html#setCapitalization">setCapitalization</a></b> (<i>self</i>, Capitalization)</li><li><div class="fn" /><b><a href="qfont.html#setFamily">setFamily</a></b> (<i>self</i>, QString)</li><li><div class="fn" /><b><a href="qfont.html#setFixedPitch">setFixedPitch</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setHintingPreference">setHintingPreference</a></b> (<i>self</i>, HintingPreference&#160;<i>hintingPreference</i>)</li><li><div class="fn" /><b><a href="qfont.html#setItalic">setItalic</a></b> (<i>self</i>, bool&#160;<i>b</i>)</li><li><div class="fn" /><b><a href="qfont.html#setKerning">setKerning</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setLetterSpacing">setLetterSpacing</a></b> (<i>self</i>, SpacingType&#160;<i>type</i>, float&#160;<i>spacing</i>)</li><li><div class="fn" /><b><a href="qfont.html#setOverline">setOverline</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setPixelSize">setPixelSize</a></b> (<i>self</i>, int)</li><li><div class="fn" /><b><a href="qfont.html#setPointSize">setPointSize</a></b> (<i>self</i>, int)</li><li><div class="fn" /><b><a href="qfont.html#setPointSizeF">setPointSizeF</a></b> (<i>self</i>, float)</li><li><div class="fn" /><b><a href="qfont.html#setRawMode">setRawMode</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setRawName">setRawName</a></b> (<i>self</i>, QString)</li><li><div class="fn" /><b><a href="qfont.html#setStretch">setStretch</a></b> (<i>self</i>, int)</li><li><div class="fn" /><b><a href="qfont.html#setStrikeOut">setStrikeOut</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setStyle">setStyle</a></b> (<i>self</i>, Style&#160;<i>style</i>)</li><li><div class="fn" /><b><a href="qfont.html#setStyleHint">setStyleHint</a></b> (<i>self</i>, StyleHint&#160;<i>hint</i>, StyleStrategy&#160;<i>strategy</i>&#160;=&#160;QFont.PreferDefault)</li><li><div class="fn" /><b><a href="qfont.html#setStyleName">setStyleName</a></b> (<i>self</i>, QString&#160;<i>styleName</i>)</li><li><div class="fn" /><b><a href="qfont.html#setStyleStrategy">setStyleStrategy</a></b> (<i>self</i>, StyleStrategy&#160;<i>s</i>)</li><li><div class="fn" /><b><a href="qfont.html#setUnderline">setUnderline</a></b> (<i>self</i>, bool)</li><li><div class="fn" /><b><a href="qfont.html#setWeight">setWeight</a></b> (<i>self</i>, int)</li><li><div class="fn" /><b><a href="qfont.html#setWordSpacing">setWordSpacing</a></b> (<i>self</i>, float&#160;<i>spacing</i>)</li><li><div class="fn" />int <b><a href="qfont.html#stretch">stretch</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#strikeOut">strikeOut</a></b> (<i>self</i>)</li><li><div class="fn" />Style <b><a href="qfont.html#style">style</a></b> (<i>self</i>)</li><li><div class="fn" />StyleHint <b><a href="qfont.html#styleHint">styleHint</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#styleName">styleName</a></b> (<i>self</i>)</li><li><div class="fn" />StyleStrategy <b><a href="qfont.html#styleStrategy">styleStrategy</a></b> (<i>self</i>)</li><li><div class="fn" />QString <b><a href="qfont.html#toString">toString</a></b> (<i>self</i>)</li><li><div class="fn" />bool <b><a href="qfont.html#underline">underline</a></b> (<i>self</i>)</li><li><div class="fn" />int <b><a href="qfont.html#weight">weight</a></b> (<i>self</i>)</li><li><div class="fn" />float <b><a href="qfont.html#wordSpacing">wordSpacing</a></b> (<i>self</i>)</li></ul><h3>Static Methods</h3><ul><li><div class="fn" /><b><a href="qfont.html#cacheStatistics">cacheStatistics</a></b> ()</li><li><div class="fn" /><b><a href="qfont.html#cleanup">cleanup</a></b> ()</li><li><div class="fn" /><b><a href="qfont.html#initialize">initialize</a></b> ()</li><li><div class="fn" /><b><a href="qfont.html#insertSubstitution">insertSubstitution</a></b> (QString, QString)</li><li><div class="fn" /><b><a href="qfont.html#insertSubstitutions">insertSubstitutions</a></b> (QString, QStringList)</li><li><div class="fn" /><b><a href="qfont.html#removeSubstitution">removeSubstitution</a></b> (QString)</li><li><div class="fn" />QString <b><a href="qfont.html#substitute">substitute</a></b> (QString)</li><li><div class="fn" />QStringList <b><a href="qfont.html#substitutes">substitutes</a></b> (QString)</li><li><div class="fn" />QStringList <b><a href="qfont.html#substitutions">substitutions</a></b> ()</li></ul><h3>Special Methods</h3><ul><li><div class="fn" />bool <b><a href="qfont.html#__eq__">__eq__</a></b> (<i>self</i>, QFont)</li><li><div class="fn" />bool <b><a href="qfont.html#__ge__">__ge__</a></b> (<i>self</i>, QFont)</li><li><div class="fn" />bool <b><a href="qfont.html#__lt__">__lt__</a></b> (<i>self</i>, QFont)</li><li><div class="fn" />bool <b><a href="qfont.html#__ne__">__ne__</a></b> (<i>self</i>, QFont)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QFont class specifies a font used for drawing text.</p>
 <p>When you create a QFont object you specify various attributes
 that you want the font to have. Qt will use the font with the
 specified attributes, or if no matching font exists, Qt will use
@@ -181,6 +181,105 @@ first character of each word as an uppercase character.</td>
 </tr>
 </table>
 <p>This enum was introduced or modified in Qt 4.4.</p>
+
+
+<h3 class="fn"><a name="HintingPreference-enum" />QFont.HintingPreference</h3><p>This enum describes the different levels of hinting that can be
+applied to glyphs to improve legibility on displays where it might
+be warranted by the density of pixels.</p>
+<table class="valuelist">
+<tr class="odd" valign="top">
+<th class="tblConst">Constant</th>
+<th class="tblval">Value</th>
+<th class="tbldscr">Description</th>
+</tr>
+<tr>
+<td class="topAlign"><tt>QFont.PreferDefaultHinting</tt></td>
+<td class="topAlign"><tt>0</tt></td>
+<td class="topAlign">Use the default hinting level for the target
+platform.</td>
+</tr>
+<tr>
+<td class="topAlign"><tt>QFont.PreferNoHinting</tt></td>
+<td class="topAlign"><tt>1</tt></td>
+<td class="topAlign">If possible, render text without hinting the
+outlines of the glyphs. The text layout will be typographically
+accurate and scalable, using the same metrics as are used e.g. when
+printing.</td>
+</tr>
+<tr>
+<td class="topAlign"><tt>QFont.PreferVerticalHinting</tt></td>
+<td class="topAlign"><tt>2</tt></td>
+<td class="topAlign">If possible, render text with no horizontal
+hinting, but align glyphs to the pixel grid in the vertical
+direction. The text will appear crisper on displays where the
+density is too low to give an accurate rendering of the glyphs. But
+since the horizontal metrics of the glyphs are unhinted, the text's
+layout will be scalable to higher density devices (such as
+printers) without impacting details such as line breaks.</td>
+</tr>
+<tr>
+<td class="topAlign"><tt>QFont.PreferFullHinting</tt></td>
+<td class="topAlign"><tt>3</tt></td>
+<td class="topAlign">If possible, render text with hinting in both
+horizontal and vertical directions. The text will be altered to
+optimize legibility on the target device, but since the metrics
+will depend on the target size of the text, the positions of
+glyphs, line breaks, and other typographical detail will not scale,
+meaning that a text layout may look different on devices with
+different pixel densities.</td>
+</tr>
+</table>
+<p>Please note that this enum only describes a preference, as the
+full range of hinting levels are not supported on all of Qt's
+supported platforms. The following table details the effect of a
+given hinting preference on a selected set of target platforms.</p>
+<table class="generic">
+<thead>
+<tr class="qt-style">
+<th />
+<th>PreferDefaultHinting</th>
+<th>PreferNoHinting</th>
+<th>PreferVerticalHinting</th>
+<th>PreferFullHinting</th>
+</tr>
+</thead>
+<tr class="odd" valign="top">
+<td>Windows Vista (w/o Platform Update) and earlier</td>
+<td>Full hinting</td>
+<td>Full hinting</td>
+<td>Full hinting</td>
+<td>Full hinting</td>
+</tr>
+<tr class="even" valign="top">
+<td>Windows 7 and Windows Vista (w/Platform Update) and DirectWrite
+enabled in Qt</td>
+<td>Full hinting</td>
+<td>Vertical hinting</td>
+<td>Vertical hinting</td>
+<td>Full hinting</td>
+</tr>
+<tr class="odd" valign="top">
+<td><a href="qt-embedded-fonts.html#freetype">FreeType</a></td>
+<td>Operating System setting</td>
+<td>No hinting</td>
+<td>Vertical hinting (light)</td>
+<td>Full hinting</td>
+</tr>
+<tr class="even" valign="top">
+<td>Cocoa on Mac OS X</td>
+<td>No hinting</td>
+<td>No hinting</td>
+<td>No hinting</td>
+<td>No hinting</td>
+</tr>
+</table>
+<p><b>Note:</b> Please be aware that altering the hinting
+preference on Windows is available through the DirectWrite font
+engine. This is available on Windows Vista after installing the
+platform update, and on Windows 7. In order to use this extension,
+configure Qt using -directwrite. The target application will then
+depend on the availability of DirectWrite on the target system.</p>
+<p>This enum was introduced or modified in Qt 4.8.</p>
 
 
 <h3 class="fn"><a name="SpacingType-enum" />QFont.SpacingType</h3><table class="valuelist">
@@ -580,6 +679,12 @@ returned by <a href="qfont.html#toString">toString</a>().</p>
 access. Using this function is <i>not</i> portable.</p>
 
 
+<h3 class="fn"><a name="hintingPreference" /><a href="qfont.html#HintingPreference-enum">HintingPreference</a> QFont.hintingPreference (<i>self</i>)</h3><p>Returns the currently preferred hinting level for glyphs
+rendered with this font.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qfont.html#setHintingPreference">setHintingPreference</a>().</p>
+
+
 <h3 class="fn"><a name="initialize" />QFont.initialize ()</h3><h3 class="fn"><a name="insertSubstitution" />QFont.insertSubstitution (QString, QString)</h3><p>Inserts <i>substituteName</i> into the substitution table for
 the family <i>familyName</i>.</p>
 <p><b>See also</b> <a href="qfont.html#insertSubstitutions">insertSubstitutions</a>(),
@@ -732,6 +837,17 @@ fixed pitch off.</p>
 and <a href="qfontinfo.html">QFontInfo</a>.</p>
 
 
+<h3 class="fn"><a name="setHintingPreference" />QFont.setHintingPreference (<i>self</i>, <a href="qfont.html#HintingPreference-enum">HintingPreference</a>&#160;<i>hintingPreference</i>)</h3><p>Set the preference for the hinting level of the glyphs to
+<i>hintingPreference</i>. This is a hint to the underlying font
+rendering system to use a certain level of hinting, and has varying
+support across platforms. See the table in the documentation for
+<a href="qfont.html#HintingPreference-enum">QFont.HintingPreference</a>
+for more details.</p>
+<p>The default hinting preference is <a href="qfont.html#HintingPreference-enum">QFont.PreferDefaultHinting</a>.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qfont.html#hintingPreference">hintingPreference</a>().</p>
+
+
 <h3 class="fn"><a name="setItalic" />QFont.setItalic (<i>self</i>, bool&#160;<i>b</i>)</h3><p>Sets the <a href="qfont.html#style">style</a>() of the font to
 <a href="qfont.html#Style-enum">QFont.StyleItalic</a> if
 <i>enable</i> is true; otherwise the style is set to <a href="qfont.html#Style-enum">QFont.StyleNormal</a>.</p>
@@ -854,6 +970,13 @@ not provided by the window system.</p>
 <p><b>See also</b> <a href="qfont.html#StyleHint-enum">StyleHint</a>, <a href="qfont.html#styleHint">styleHint</a>(), <a href="qfont.html#StyleStrategy-enum">StyleStrategy</a>, <a href="qfont.html#styleStrategy">styleStrategy</a>(), and <a href="qfontinfo.html">QFontInfo</a>.</p>
 
 
+<h3 class="fn"><a name="setStyleName" />QFont.setStyleName (<i>self</i>, QString&#160;<i>styleName</i>)</h3><p>Sets the style name of the font to the given <i>styleName</i>.
+When set, other style properties like <a href="qfont.html#style">style</a>() and <a href="qfont.html#weight">weight</a>() will be ignored for font
+matching.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qfont.html#styleName">styleName</a>().</p>
+
+
 <h3 class="fn"><a name="setStyleStrategy" />QFont.setStyleStrategy (<i>self</i>, <a href="qfont.html#StyleStrategy-enum">StyleStrategy</a>&#160;<i>s</i>)</h3><p>Sets the style strategy for the font to <i>s</i>.</p>
 <p><b>See also</b> <a href="qfont.html#styleStrategy">styleStrategy</a>() and <a href="qfont.html#StyleStrategy-enum">QFont.StyleStrategy</a>.</p>
 
@@ -901,6 +1024,16 @@ matching</a> algorithm. See <a href="qfont.html#StyleHint-enum">QFont.StyleHint<
 available hints.</p>
 <p><b>See also</b> <a href="qfont.html#setStyleHint">setStyleHint</a>(), <a href="qfont.html#StyleStrategy-enum">QFont.StyleStrategy</a>, and
 <a href="qfontinfo.html#styleHint">QFontInfo.styleHint</a>().</p>
+
+
+<h3 class="fn"><a name="styleName" />QString QFont.styleName (<i>self</i>)</h3><p>Returns the requested font style name, it will be used to match
+the font with irregular styles (that can't be normalized in other
+style properties). It depends on system font support, thus only
+works for Mac OS X and X11 so far. On Windows irregular styles will
+be added as separate font families so there is no need for
+this.</p>
+<p>This function was introduced in Qt 4.8.</p>
+<p><b>See also</b> <a href="qfont.html#setStyleName">setStyleName</a>(), <a href="qfont.html#setFamily">setFamily</a>(), and <a href="qfont.html#setStyle">setStyle</a>().</p>
 
 
 <h3 class="fn"><a name="styleStrategy" /><a href="qfont.html#StyleStrategy-enum">StyleStrategy</a> QFont.styleStrategy (<i>self</i>)</h3><p>Returns the <a href="qfont.html#StyleStrategy-enum">StyleStrategy</a>.</p>
@@ -957,4 +1090,4 @@ values from <a href="qfont.html#Weight-enum">QFont.Weight</a>.</p>
 <p><b>See also</b> <a href="qfont.html#setWordSpacing">setWordSpacing</a>() and <a href="qfont.html#setLetterSpacing">setLetterSpacing</a>().</p>
 
 
-<h3 class="fn"><a name="__eq__" />bool QFont.__eq__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><h3 class="fn"><a name="__ge__" />bool QFont.__ge__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><h3 class="fn"><a name="__lt__" />bool QFont.__lt__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><h3 class="fn"><a name="__ne__" />bool QFont.__ne__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<h3 class="fn"><a name="__eq__" />bool QFont.__eq__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><h3 class="fn"><a name="__ge__" />bool QFont.__ge__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><h3 class="fn"><a name="__lt__" />bool QFont.__lt__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><h3 class="fn"><a name="__ne__" />bool QFont.__ne__ (<i>self</i>, <a href="qfont.html">QFont</a>)</h3><address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

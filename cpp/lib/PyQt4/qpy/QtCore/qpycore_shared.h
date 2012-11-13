@@ -1,7 +1,7 @@
 // This defines the interfaces to various odd and ends that are used internally
 // by this library and called from handwritten code.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -31,12 +31,14 @@
 #include <Python.h>
 
 #include <QtGlobal>
+#include <QByteArray>
 
 #include "qpycore_namespace.h"
 
 
 QT_BEGIN_NAMESPACE
 class QObject;
+class QVariant;
 QT_END_NAMESPACE
 
 
@@ -44,6 +46,8 @@ char **qpycore_ArgvToC(PyObject *argvlist, int &argc);
 void qpycore_UpdatePyArgv(PyObject *argvlist, int argc, char **argv);
 
 const char *qpycore_pyqtsignal_get_parts(PyObject *sig_obj, QObject **qtx);
+QByteArray qpycore_pyqtslot_get_parts(PyObject *callable, QObject **qrx);
 
+PyObject *qpycore_qvariant_value(QVariant &value, PyObject *type);
 
 #endif

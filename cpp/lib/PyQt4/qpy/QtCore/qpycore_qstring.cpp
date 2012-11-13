@@ -1,6 +1,6 @@
 // This is the support for QString.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -33,12 +33,30 @@
 #include "qpycore_sip.h"
 
 
+// Work out if we should enable PEP 393 support.  This is complicated by the
+// broken LLVM that XCode v4 installs.
+#if PY_VERSION_HEX >= 0x03030000
+#if defined(Q_OS_MAC)
+#if !defined(__llvm__) || defined(__clang__)
+// Python v3.3 on a Mac using either g++ or Clang, but not LLVM.
+#define PYQT_PEP_393
+#endif
+#else
+// Python v3.3 on a non-Mac.
+#define PYQT_PEP_393
+#endif
+#endif
+
+
 // Convert a QString to a Python Unicode object.
 PyObject *qpycore_PyObject_FromQString(const QString &qstr)
 {
     PyObject *obj;
 
-#if defined(Py_UNICODE_WIDE)
+#if defined(PYQT_PEP_393)
+    obj = PyUnicode_FromKindAndData(PyUnicode_2BYTE_KIND, qstr.constData(),
+            qstr.length());
+#elif defined(Py_UNICODE_WIDE)
 #if QT_VERSION >= 0x040200
     QVector<uint> ucs4 = qstr.toUcs4();
 
@@ -74,7 +92,38 @@ PyObject *qpycore_PyObject_FromQString(const QString &qstr)
 // Convert a Python Unicode object to a QString.
 QString qpycore_PyObject_AsQString(PyObject *obj)
 {
-#if defined(Py_UNICODE_WIDE)
+#if defined(PYQT_PEP_393)
+    SIP_SSIZE_T len = PyUnicode_GET_LENGTH(obj);
+
+    switch (PyUnicode_KIND(obj))
+    {
+    case PyUnicode_1BYTE_KIND:
+        return QString::fromLatin1((char *)PyUnicode_1BYTE_DATA(obj), len);
+
+    case PyUnicode_2BYTE_KIND:
+        // The (QChar *) cast should be safe.
+        return QString((QChar *)PyUnicode_2BYTE_DATA(obj), len);
+
+    case PyUnicode_4BYTE_KIND:
+#if QT_VERSION >= 0x040200
+        return QString::fromUcs4(PyUnicode_4BYTE_DATA(obj), len);
+#else
+        // Note that this code doesn't handle code points greater than 0xffff
+        // very well.
+
+        QString qstr;
+
+        Py_UCS4 *ucode = PyUnicode_4BYTE_DATA(obj);
+
+        for (SIP_SSIZE_T i = 0; i < len; ++i)
+            qstr.append((uint)ucode[i]);
+
+        return qstr;
+#endif
+    }
+
+    return QString();
+#elif defined(Py_UNICODE_WIDE)
 #if QT_VERSION >= 0x040200
     return QString::fromUcs4((const uint *)PyUnicode_AS_UNICODE(obj),
             PyUnicode_GET_SIZE(obj));

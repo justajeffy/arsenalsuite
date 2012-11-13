@@ -1,6 +1,20 @@
 Potential Incompatibilities with Earlier Versions
 =================================================
 
+PyQt v4.9.2
+-----------
+
+QPyNullVariant
+**************
+
+In previous versions a ``QPyNullVariant`` would always evaluate to ``True``
+when converted to a bool.
+
+In this version a ``QPyNullVariant`` will always evaluate to ``False`` when
+converted to a bool.  This makes it behave like ``None`` in these
+circumstances.
+
+
 PyQt v4.8.3
 -----------
 
@@ -17,7 +31,7 @@ QVariant.  Therefore the object read from an SQL model may now be a
 ``QPyNullVariant`` instance.
 
 A null ``QVariant`` is only converted to a ``QPyNullVariant`` if the underlying
-C++ type of the ``QVariant`` cannot be tested for null, i.e. is does not
+C++ type of the ``QVariant`` cannot be tested for null, i.e. it does not
 implement an ``isNull()`` method.  This ensures that existing code that uses
 non-SQL models will continue to work unchanged.
 
@@ -73,7 +87,6 @@ Take, for example, the following code::
     from PyQt4.QtCore import QVariant
 
     class MyFloat(float):
-
         pass
 
     myfloat = MyFloat(5.0)
@@ -116,7 +129,6 @@ Take, for example, the following code::
     from PyQt4.QtCore import QSize, QVariant
 
     class MySize(QSize):
-
         pass
 
     mysize = MySize(5, 5)
@@ -138,7 +150,7 @@ instance.  In other words, the following assertions would be true::
     assert(type(variant.toPyObject()) is QSize)
 
 It is hoped that this change of behaviour will not have a significant impact.
-However if you need the old behaviour then simple create a copy of your
+However if you need the old behaviour then simply create a copy of your
 sub-class instance using the base class constructor as shown below::
 
     variant = QVariant(QSize(mysize))

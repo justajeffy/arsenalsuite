@@ -15,8 +15,8 @@ PyQt Reference Guide
     gotchas
     designer
     resources
-    qvariant
-    qsettings
+    pyqt_qvariant
+    pyqt_qsettings
     qml
     webkit
     pickle

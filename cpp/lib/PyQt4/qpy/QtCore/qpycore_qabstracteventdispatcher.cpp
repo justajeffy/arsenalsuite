@@ -1,6 +1,6 @@
 // This implements the helpers for QAbstractEventDispatcher.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -30,6 +30,8 @@
 #include "qpycore_sip.h"
 
 
+#if QT_VERSION < 0x050000
+
 // A reference to the current Python event filter.
 static PyObject *py_event_filter = 0;
 
@@ -44,8 +46,7 @@ static QAbstractEventDispatcher *dispatcher = 0;
 static bool event_filter(void *message);
 
 
-// Implement QSettings.value() and allow the type of the returned object to be
-// explicitly specified.
+// The helper for QAbstractEventDispatcher::setEventFilter().
 PyObject *qpycore_qabstracteventdispatcher_seteventfilter(
         QAbstractEventDispatcher *dist, PyObject *filter)
 {
@@ -137,3 +138,5 @@ static bool event_filter(void *message)
 
     return res;
 }
+
+#endif

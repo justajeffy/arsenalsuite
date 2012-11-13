@@ -1,3 +1,50 @@
+v4.9.5 ??? ??? 2012
+  - Added support for Qt v4.8.3.
+  - Added support for Qt v5-beta1 (QtCore, QtGui, QtHelp, QtNetwork, QtSql,
+    QtSvg, QtWebKit and QtXml only).
+  - Implemented __str__ and __unicode__ for QChar.
+  - SIP v4.14 is now required.
+  - Bug fixes.
+
+v4.9.4 26th June 2012
+  - Bug fixes.
+
+v4.9.3 24th June 2012
+  - Bug fixes.
+
+v4.9.2 20th June 2012
+  - Added support for Qt v4.8.2.
+  - Added support for Qt v5-alpha (QtCore and QtGui only).
+  - Added support for Python v3.3.
+  - bool(QPyNullVariant(...)) now returns False rather than True to mimic the
+    behaviour of None.
+  - Exposed the pyqtBoundSignal type object in the QtCore module.
+  - Added the signal attribute to pyqtBoundSignal containing the signature that
+    would be returned by SIGNAL().
+  - Added the optional package argument to uic.loadUi() to properly handle
+    relative imports.
+  - pyuic4 now supports themed icons.
+  - Added the spreadsheet example from Hans-Peter Jansen.
+  - Bug fixes.
+
+v4.9.1 10th February 2012
+  - QPainter can now be used as a context manager.
+  - Added QMacPasteboardMime on OS/X.
+  - Added the missing QPixmap.HBitmapFormat.Alpha enum member on Windows.
+  - Added support for the Python v3 implementation of dbus-python.
+  - Bug fixes.
+
+v4.9 22nd December 2011
+  - Added support for Qt v4.8.0
+  - Added the QtDBus module and related examples.
+  - Added support for QtCore.Q_CLASSINFO().
+  - Added the missing QMenuBar.cornerWidget() and QMenuBar.setCornerWidget().
+  - Bug fixes.
+
+v4.8.6 25th October 2011
+  - Added support for Qt v4.7.4.
+  - Bug fixes.
+
 v4.8.5 2nd August 2011
   - Added support for Qt v4.7.3.
   - Added IPv6 support for QHostAddress.

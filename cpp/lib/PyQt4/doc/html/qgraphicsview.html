@@ -46,9 +46,7 @@ To set the visualized area rectangle yourself, you can call
 This will adjust the scroll bars' ranges appropriately. Note that
 although the scene supports a virtually unlimited size, the range
 of the scroll bars will never exceed the range of an integer
-(INT_MIN, INT_MAX). When the scene is larger than the scroll bars'
-values, you can choose to use <a href="qgraphicsview.html#translate">translate</a>() to navigate the
-scene instead.</p>
+(INT_MIN, INT_MAX).</p>
 <p>QGraphicsView visualizes the scene by calling <a href="qgraphicsview.html#render">render</a>(). By default, the items are
 drawn onto the viewport by using a regular <a href="qpainter.html">QPainter</a>, and using default render hints. To
 change the default render hints that QGraphicsView passes to
@@ -64,7 +62,9 @@ the viewport widget.</p>
 you can call one of the convenience functions <a href="qgraphicsview.html#rotate">rotate</a>(), <a href="qgraphicsview.html#scale">scale</a>(), <a href="qgraphicsview.html#translate">translate</a>() or <a href="qgraphicsview.html#shear">shear</a>(). The most two common
 transformations are scaling, which is used to implement zooming,
 and rotation. QGraphicsView keeps the center of the view fixed
-during a transformation.</p>
+during a transformation. Because of the scene alignment
+(setAligment()), translating the view will have no visual
+impact.</p>
 <p>You can interact with the items on the scene by using the mouse
 and keyboard. QGraphicsView translates the mouse and key events
 into <i>scene</i> events, (events that inherit <a href="qgraphicssceneevent.html">QGraphicsSceneEvent</a>,), and forward
@@ -86,7 +86,7 @@ and the item accessors <a href="qgraphicsview.html#items">items</a>() and <a hre
 to map points, rectangles, polygons and paths between view
 coordinates and scene coordinates, and to find items on the scene
 using view coordinates.</p>
-<p class="centerAlign"><img src="images/graphicsview-view.png" /></p>
+<p class="centerAlign"><img alt="" src="images/graphicsview-view.png" /></p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="CacheModeFlag-enum" />QGraphicsView.CacheModeFlag</h3><p>This enum describes the flags that you can set for a <a href="qgraphicsview.html">QGraphicsView</a>'s cache mode.</p>
 <table class="valuelist">
 <tr class="odd" valign="top">
@@ -871,4 +871,4 @@ coordinates.</p>
 
 
 <h3 class="fn"><a name="viewportUpdateMode" /><a href="qgraphicsview.html#ViewportUpdateMode-enum">ViewportUpdateMode</a> QGraphicsView.viewportUpdateMode (<i>self</i>)</h3><h3 class="fn"><a name="wheelEvent" />QGraphicsView.wheelEvent (<i>self</i>, <a href="qwheelevent.html">QWheelEvent</a>&#160;<i>event</i>)</h3><p>Reimplemented from <a href="qwidget.html#wheelEvent">QWidget.wheelEvent</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

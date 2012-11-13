@@ -9,7 +9,7 @@ body { background: #ffffff; color: black; }
 </style></head><body><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr /><td align="left" valign="top" width="32"><img align="left" border="0" height="32" src="images/rb-logo.png" width="32" /></td><td width="1">&#160;&#160;</td><td class="postheader" valign="center"><a href="index.html"><font color="#004faf">Home</font></a>&#160;&#183; <a href="classes.html"><font color="#004faf">All Classes</font></a>&#160;&#183; <a href="modules.html"><font color="#004faf">Modules</font></a></td></table><h1 align="center">QSystemLocale Class Reference<br /><sup><sup>[<a href="qtcore.html">QtCore</a> module]</sup></sup></h1><p>The QSystemLocale class can be used to finetune the system
 locale of the user. <a href="#details">More...</a></p>
 
-<h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qsystemlocale.html#QueryType-enum">QueryType</a></b> { LanguageId, CountryId, DecimalPoint, GroupSeparator, ..., PMText }</li></ul><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qsystemlocale.html#QSystemLocale">__init__</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qsystemlocale.html#QSystemLocale-2">__init__</a></b> (<i>self</i>, QSystemLocale)</li><li><div class="fn" />QLocale <b><a href="qsystemlocale.html#fallbackLocale">fallbackLocale</a></b> (<i>self</i>)</li><li><div class="fn" />QVariant <b><a href="qsystemlocale.html#query">query</a></b> (<i>self</i>, QueryType&#160;<i>type</i>, QVariant&#160;<i>in</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QSystemLocale class can be used to finetune the system
+<h3>Types</h3><ul><li><div class="fn" />enum <b><a href="qsystemlocale.html#QueryType-enum">QueryType</a></b> { LanguageId, ScriptId, CountryId, DecimalPoint, ..., NativeCountryName }</li></ul><h3>Methods</h3><ul><li><div class="fn" /><b><a href="qsystemlocale.html#QSystemLocale">__init__</a></b> (<i>self</i>)</li><li><div class="fn" /><b><a href="qsystemlocale.html#QSystemLocale-2">__init__</a></b> (<i>self</i>, QSystemLocale)</li><li><div class="fn" />QLocale <b><a href="qsystemlocale.html#fallbackLocale">fallbackLocale</a></b> (<i>self</i>)</li><li><div class="fn" />QVariant <b><a href="qsystemlocale.html#query">query</a></b> (<i>self</i>, QueryType&#160;<i>type</i>, QVariant&#160;<i>in</i>)</li></ul><a name="details" /><hr /><h2>Detailed Description</h2><p>The QSystemLocale class can be used to finetune the system
 locale of the user.</p>
 <p><b>Warning:</b> This class is only useful in very rare cases.
 Usually <a href="qlocale.html">QLocale</a> offers all the
@@ -28,6 +28,11 @@ information to return from the <a href="qsystemlocale.html#query">query</a>() me
 <td class="topAlign"><tt>QSystemLocale.LanguageId</tt></td>
 <td class="topAlign"><tt>0</tt></td>
 <td class="topAlign">a uint specifying the language.</td>
+</tr>
+<tr>
+<td class="topAlign"><tt>QSystemLocale.ScriptId</tt></td>
+<td class="topAlign"><tt>33</tt></td>
+<td class="topAlign">a uint specifying the script.</td>
 </tr>
 <tr>
 <td class="topAlign"><tt>QSystemLocale.CountryId</tt></td>
@@ -188,6 +193,80 @@ designator associated with a 12-hour clock.</td>
 <td class="topAlign">a string that represents the system PM
 designator associated with a 12-hour clock.</td>
 </tr>
+<tr>
+<td class="topAlign"><tt>QSystemLocale.FirstDayOfWeek</tt></td>
+<td class="topAlign"><tt>26</tt></td>
+<td class="topAlign">a <a href="qt.html#DayOfWeek-enum">Qt.DayOfWeek</a> enum specifiying the
+first day of the week</td>
+</tr>
+<tr>
+<td class="topAlign"><tt>QSystemLocale.CurrencySymbol</tt></td>
+<td class="topAlign"><tt>28</tt></td>
+<td class="topAlign">a string that represents a currency in a
+format QLocale.CurrencyFormat.</td>
+</tr>
+<tr>
+<td class="topAlign"><tt>QSystemLocale.CurrencyToString</tt></td>
+<td class="topAlign"><tt>29</tt></td>
+<td class="topAlign">a localized string representation of a number
+with a currency symbol. Converts a <a href="qsystemlocale-currencytostringargument.html">QSystemLocale.CurrencyToStringArgument</a>
+stored in the in variant to a <a href="qstring.html">QString</a>.</td>
+</tr>
+<tr>
+<td class="topAlign"><tt>QSystemLocale.UILanguages</tt></td>
+<td class="topAlign"><tt>30</tt></td>
+<td class="topAlign">a list of strings representing locale names
+that could be used for UI translation.</td>
+</tr>
+<tr>
+<td class="topAlign">
+<tt>QSystemLocale.StringToStandardQuotation</tt></td>
+<td class="topAlign"><tt>31</tt></td>
+<td class="topAlign">a <a href="qstring.html">QString</a>
+containing a quoted version of the string ref stored in the in
+variant using standard quotes.</td>
+</tr>
+<tr>
+<td class="topAlign">
+<tt>QSystemLocale.StringToAlternateQuotation</tt></td>
+<td class="topAlign"><tt>32</tt></td>
+<td class="topAlign">a <a href="qstring.html">QString</a>
+containing a quoted version of the string ref stored in the in
+variant using alternate quotes.</td>
+</tr>
+<tr>
+<td class="topAlign"><tt>QSystemLocale.Weekdays</tt></td>
+<td class="topAlign"><tt>27</tt></td>
+<td class="topAlign">a <a href="qlist.html">QList</a>&lt;<a href="qt.html#DayOfWeek-enum">Qt.DayOfWeek</a>&gt; specifying the
+regular weekdays</td>
+</tr>
+<tr>
+<td class="topAlign"><tt>QSystemLocale.LocaleChanged</tt></td>
+<td class="topAlign"><tt>35</tt></td>
+<td class="topAlign">this type is queried whenever the system
+locale is changed.</td>
+</tr>
+<tr>
+<td class="topAlign">
+<tt>QSystemLocale.ListToSeparatedString</tt></td>
+<td class="topAlign"><tt>34</tt></td>
+<td class="topAlign">a string that represents a join of a given
+<a href="qstringlist.html">QStringList</a> with a locale-defined
+separator.</td>
+</tr>
+<tr>
+<td class="topAlign">
+<tt>QSystemLocale.NativeLanguageName</tt></td>
+<td class="topAlign"><tt>36</tt></td>
+<td class="topAlign">a string that represents the name of the
+native language.</td>
+</tr>
+<tr>
+<td class="topAlign"><tt>QSystemLocale.NativeCountryName</tt></td>
+<td class="topAlign"><tt>37</tt></td>
+<td class="topAlign">a string that represents the name of the
+native country.</td>
+</tr>
 </table>
 <hr /><h2>Method Documentation</h2><h3 class="fn"><a name="QSystemLocale" />QSystemLocale.__init__ (<i>self</i>)</h3><p>Constructs a <a href="qsystemlocale.html">QSystemLocale</a>
 object. The constructor will automatically install this object as
@@ -203,4 +282,4 @@ locales.</p>
 Denotes the <i>type</i> of the query with <i>in</i> as input data
 depending on the query.</p>
 <p><b>See also</b> <a href="qsystemlocale.html#QueryType-enum">QSystemLocale.QueryType</a>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

@@ -92,6 +92,10 @@ calling process.</p>
 <p><b>Note:</b> On Symbian, setting environment or working
 directory is not supported. The working directory will always be
 the private directory of the running process.</p>
+<p><b>Note:</b> On QNX, setting the working directory may cause all
+application threads, with the exception of the QProcess caller
+thread, to temporarily freeze, owing to a limitation in the
+operating system.</p>
 <a id="synchronous-process-api" name="synchronous-process-api" />
 <h3>Synchronous Process API</h3>
 <p>QProcess provides a set of functions which allow it to be used
@@ -421,6 +425,8 @@ X, the SIGKILL signal is sent to the process.</p>
 <p>On Symbian, this function requires platform security capability
 <tt>PowerMgmt</tt>. If absent, the process will panic with
 KERN-EXEC 46.</p>
+<p><b>Note:</b> Killing running processes from other processes will
+typically cause a panic in Symbian due to platform security.</p>
 <p><b>See also</b> <a href="symbian-platform-security-requirements.html">Symbian Platform
 Security Requirements</a> and <a href="qprocess.html#terminate">terminate</a>().</p>
 
@@ -645,8 +651,8 @@ Example:</p>
 <p>You cannot exit the process (by calling exit(), for instance)
 from this function. If you need to stop the program before it
 starts execution, your workaround is to emit <a href="qprocess.html#finished">finished</a>() and then call exit().</p>
-<p><b>Warning:</b> This function is called by <a href="qprocess.html">QProcess</a> on Unix and Mac OS X only. On Windows,
-it is not called.</p>
+<p><b>Warning:</b> This function is called by <a href="qprocess.html">QProcess</a> on Unix and Mac OS X only. On Windows
+and QNX, it is not called.</p>
 
 
 <h3 class="fn"><a name="setWorkingDirectory" />QProcess.setWorkingDirectory (<i>self</i>, QString&#160;<i>dir</i>)</h3><p>Sets the working directory to <i>dir</i>. <a href="qprocess.html">QProcess</a> will start the process in this
@@ -655,6 +661,8 @@ working directory of the calling process.</p>
 <p><b>Note:</b> The working directory setting is ignored on
 Symbian; the private directory of the process is considered its
 working directory.</p>
+<p><b>Note:</b> On QNX, this may cause all application threads to
+temporarily freeze.</p>
 <p><b>See also</b> <a href="qprocess.html#workingDirectory">workingDirectory</a>() and
 <a href="qprocess.html#start">start</a>().</p>
 
@@ -726,6 +734,8 @@ quotes. The started process will run as a regular standalone
 process.</p>
 <p>The process will be started in the directory
 <i>workingDirectory</i>.</p>
+<p><b>Note:</b> On QNX, this may cause all application threads to
+temporarily freeze.</p>
 <p>If the function is successful then *<i>pid</i> is set to the
 process identifier of the started process.</p>
 
@@ -771,8 +781,7 @@ low-level C library functions like <tt>setenv</tt> ot
 <p>However, note that repeated calls to this function will recreate
 the list of environment variables, which is a non-trivial
 operation.</p>
-<p><b>Note:</b> For new code, it is recommended to use
-QProcessEvironment.systemEnvironment()</p>
+<p><b>Note:</b> For new code, it is recommended to use <a href="qprocessenvironment.html#systemEnvironment">QProcessEnvironment.systemEnvironment</a>()</p>
 <p>This function was introduced in Qt 4.1.</p>
 <p><b>See also</b> <a href="qprocessenvironment.html#systemEnvironment">QProcessEnvironment.systemEnvironment</a>(),
 <a href="qprocess.html#environment">environment</a>(), and <a href="qprocess.html#setEnvironment">setEnvironment</a>().</p>
@@ -884,4 +893,4 @@ when the process has started, and <a href="qprocess.html#state">state</a>() retu
 is the state <a href="qprocess.html">QProcess</a> changed to.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

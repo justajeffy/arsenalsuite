@@ -1,6 +1,6 @@
 // This contains the implementation of the pyqtBoundSignal type.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -46,6 +46,7 @@ static PyObject *pyqtBoundSignal_call(PyObject *self, PyObject *args,
 static void pyqtBoundSignal_dealloc(PyObject *self);
 static PyObject *pyqtBoundSignal_repr(PyObject *self);
 static PyObject *pyqtBoundSignal_get_doc(PyObject *self, void *);
+static PyObject *pyqtBoundSignal_get_signal(PyObject *self, void *);
 static PyObject *pyqtBoundSignal_connect(PyObject *self, PyObject *args,
         PyObject *kwd_args);
 static PyObject *pyqtBoundSignal_disconnect(PyObject *self, PyObject *args);
@@ -87,6 +88,9 @@ PyDoc_STRVAR(pyqtBoundSignal_emit_doc,
 "*args are the values that will be passed as arguments to all connected\n"
 "slots.");
 
+PyDoc_STRVAR(pyqtBoundSignal_signal_doc,
+"The signature of the signal that would be returned by SIGNAL()");
+
 
 // Define the methods.
 static PyMethodDef pyqtBoundSignal_methods[] = {
@@ -112,6 +116,8 @@ static PyMappingMethods pyqtBoundSignal_as_mapping = {
 // The getters/setters.
 static PyGetSetDef pyqtBoundSignal_getsets[] = {
     {(char *)"__doc__", pyqtBoundSignal_get_doc, NULL, NULL, NULL},
+    {(char *)"signal", pyqtBoundSignal_get_signal, NULL,
+            (char *)pyqtBoundSignal_signal_doc, NULL},
     {NULL, NULL, NULL, NULL, NULL}
 };
 
@@ -176,6 +182,21 @@ static PyObject *pyqtBoundSignal_get_doc(PyObject *self, void *)
     qpycore_pyqtBoundSignal *bs = (qpycore_pyqtBoundSignal *)self;
 
     return qpycore_get_signal_doc(bs->unbound_signal);
+}
+
+
+// The __signal__ getter.
+static PyObject *pyqtBoundSignal_get_signal(PyObject *self, void *)
+{
+    qpycore_pyqtBoundSignal *bs = (qpycore_pyqtBoundSignal *)self;
+
+    return
+#if PY_MAJOR_VERSION >= 3
+        PyUnicode_FromString
+#else
+        PyString_FromString
+#endif
+            (bs->bound_overload->signature.constData());
 }
 
 
@@ -343,7 +364,7 @@ static PyObject *pyqtBoundSignal_connect(PyObject *self, PyObject *args,
 
     proxy = new PyQtProxy(bs, slot_obj, &member);
 
-    if (proxy->real_slot.signature)
+    if (proxy->metaObject())
     {
         if (rx_qobj)
             proxy->moveToThread(rx_qobj->thread());
@@ -511,7 +532,13 @@ static PyObject *pyqtBoundSignal_emit(PyObject *self, PyObject *args)
     {
         int signal_index = bs->bound_qobject->metaObject()->indexOfSignal(bs->bound_overload->signature.constData() + 1);
 
-        Q_ASSERT(signal_index >= 0);
+        if (signal_index < 0)
+        {
+            PyErr_Format(PyExc_AttributeError,
+                    "signal was not defined in the first super-class of class '%s'",
+                    Py_TYPE(bs->bound_pyobject)->tp_name);
+            return 0;
+        }
 
         if (!qpycore_emit(bs->bound_qobject, signal_index, bs->bound_overload, args))
             return 0;

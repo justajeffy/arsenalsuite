@@ -32,6 +32,13 @@ multi-sampled pbuffer is requested under Windows, the
 <tt>render_texture</tt> extension is turned off for that
 pbuffer.</li>
 </ol>
+<a id="threading" name="threading" />
+<h3>Threading</h3>
+<p>As of Qt 4.8, it's possible to render into a QGLPixelBuffer
+using a <a href="qpainter.html">QPainter</a> in a separate thread.
+Note that OpenGL 2.0 or OpenGL ES 2.0 is required for this to work.
+Also, under X11, it's necessary to set the <a href="qt.html#ApplicationAttribute-enum">Qt.AA_X11InitThreads</a>
+application attribute.</p>
 <p>Pbuffers are provided by the OpenGL <tt>pbuffer</tt> extension;
 call hasOpenGLPbuffer() to find out if the system provides
 pbuffers.</p>
@@ -194,4 +201,4 @@ pbuffer.</p>
 to get dynamic updates of the texture.</p>
 <p><b>See also</b> <a href="qglpixelbuffer.html#generateDynamicTexture">generateDynamicTexture</a>()
 and <a href="qglpixelbuffer.html#bindToDynamicTexture">bindToDynamicTexture</a>().</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

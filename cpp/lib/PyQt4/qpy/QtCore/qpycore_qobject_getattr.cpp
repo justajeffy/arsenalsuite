@@ -1,6 +1,6 @@
 // This implements the helper for QObject.__getattr__().
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -58,7 +58,11 @@ PyObject *qpycore_qobject_getattr(QObject *qobj, PyObject *py_qobj,
 #endif
 
         // Get the method name.
+#if QT_VERSION >= 0x050000
+        QByteArray mname(method.methodSignature());
+#else
         QByteArray mname(method.signature());
+#endif
         int idx = mname.indexOf('(');
 
         if (idx >= 0)
@@ -101,7 +105,11 @@ PyObject *qpycore_qobject_getattr(QObject *qobj, PyObject *py_qobj,
             sig_hash = new SignalHash;
 
         PyObject *sig_obj;
+#if QT_VERSION >= 0x050000
+        QByteArray sig_str(method.methodSignature());
+#else
         QByteArray sig_str(method.signature());
+#endif
         SignalHash::const_iterator it = sig_hash->find(sig_str);
 
         if (it == sig_hash->end())

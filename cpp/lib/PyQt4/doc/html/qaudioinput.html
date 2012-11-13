@@ -27,46 +27,46 @@ record.</p>
 <a href="qaudioinput.html#start">start</a>() with a <a href="qiodevice.html">QIODevice</a> opened for writing. For instance, to
 record to a file, you can:</p>
 <pre class="cpp">
- <span class="type"><a href="qfile.html">QFile</a></span> outputFile;   <span class="comment">// class member.</span>
- <span class="type">QAudioInput</span><span class="operator">*</span> audio; <span class="comment">// class member.</span>
-</pre>
-<pre class="cpp">
- {
-   outputFile<span class="operator">.</span>setFileName(<span class="string">"/tmp/test.raw"</span>);
-   outputFile<span class="operator">.</span>open( <span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>WriteOnly <span class="operator">|</span> <span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>Truncate );
+     <span class="type"><a href="qfile.html">QFile</a></span> outputFile;         <span class="comment">// class member.</span>
+     <span class="type">QAudioInput</span> <span class="operator">*</span>audioInput;  <span class="comment">// class member.</span>
+     ...
+     <span class="type">void</span> startRecording()
+     {
+         outputFile<span class="operator">.</span>setFileName(<span class="string">"/tmp/test.raw"</span>);
+         outputFile<span class="operator">.</span>open( <span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>WriteOnly <span class="operator">|</span> <span class="type"><a href="qiodevice.html">QIODevice</a></span><span class="operator">.</span>Truncate );
 
-   <span class="type"><a href="qaudioformat.html">QAudioFormat</a></span> format;
-   <span class="comment">// set up the format you want, eg.</span>
-   format<span class="operator">.</span>setFrequency(<span class="number">8000</span>);
-   format<span class="operator">.</span>setChannels(<span class="number">1</span>);
-   format<span class="operator">.</span>setSampleSize(<span class="number">8</span>);
-   format<span class="operator">.</span>setCodec(<span class="string">"audio/pcm"</span>);
-   format<span class="operator">.</span>setByteOrder(<span class="type"><a href="qaudioformat.html">QAudioFormat</a></span><span class="operator">.</span>LittleEndian);
-   format<span class="operator">.</span>setSampleType(<span class="type"><a href="qaudioformat.html">QAudioFormat</a></span><span class="operator">.</span>UnSignedInt);
+         <span class="type"><a href="qaudioformat.html">QAudioFormat</a></span> format;
+         <span class="comment">// set up the format you want, eg.</span>
+         format<span class="operator">.</span>setFrequency(<span class="number">8000</span>);
+         format<span class="operator">.</span>setChannels(<span class="number">1</span>);
+         format<span class="operator">.</span>setSampleSize(<span class="number">8</span>);
+         format<span class="operator">.</span>setCodec(<span class="string">"audio/pcm"</span>);
+         format<span class="operator">.</span>setByteOrder(<span class="type"><a href="qaudioformat.html">QAudioFormat</a></span><span class="operator">.</span>LittleEndian);
+         format<span class="operator">.</span>setSampleType(<span class="type"><a href="qaudioformat.html">QAudioFormat</a></span><span class="operator">.</span>UnSignedInt);
 
-   <span class="type"><a href="qaudiodeviceinfo.html">QAudioDeviceInfo</a></span> info <span class="operator">=</span> <span class="type"><a href="qaudiodeviceinfo.html">QAudioDeviceInfo</a></span><span class="operator">.</span>defaultInputDevice();
-   <span class="keyword">if</span> (<span class="operator">!</span>info<span class="operator">.</span>isFormatSupported(format)) {
-       <a href="qtcore.html#qWarning">qWarning</a>()<span class="operator">&lt;</span><span class="operator">&lt;</span><span class="string">"default format not supported try to use nearest"</span>;
-       format <span class="operator">=</span> info<span class="operator">.</span>nearestFormat(format);
-   }
+         <span class="type"><a href="qaudiodeviceinfo.html">QAudioDeviceInfo</a></span> info <span class="operator">=</span> <span class="type"><a href="qaudiodeviceinfo.html">QAudioDeviceInfo</a></span><span class="operator">.</span>defaultInputDevice();
+         <span class="keyword">if</span> (<span class="operator">!</span>info<span class="operator">.</span>isFormatSupported(format)) {
+             <a href="qtcore.html#qWarning">qWarning</a>()<span class="operator">&lt;</span><span class="operator">&lt;</span><span class="string">"default format not supported try to use nearest"</span>;
+             format <span class="operator">=</span> info<span class="operator">.</span>nearestFormat(format);
+         }
 
-   audio <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QAudioInput</span>(format<span class="operator">,</span> <span class="keyword">this</span>);
-   <span class="type"><a href="qtimer.html">QTimer</a></span><span class="operator">.</span>singleShot(<span class="number">3000</span><span class="operator">,</span> <span class="keyword">this</span><span class="operator">,</span> SLOT(stopRecording()));
-   audio<span class="operator">-</span><span class="operator">&gt;</span>start(<span class="operator">&amp;</span>outputFile);
-   <span class="comment">// Records audio for 3000ms</span>
- }
+         audioInput <span class="operator">=</span> <span class="keyword">new</span> <span class="type">QAudioInput</span>(format<span class="operator">,</span> <span class="keyword">this</span>);
+         <span class="type"><a href="qtimer.html">QTimer</a></span><span class="operator">.</span>singleShot(<span class="number">3000</span><span class="operator">,</span> <span class="keyword">this</span><span class="operator">,</span> SLOT(stopRecording()));
+         audioInput<span class="operator">-</span><span class="operator">&gt;</span>start(<span class="operator">&amp;</span>outputFile);
+         <span class="comment">// Records audio for 3000ms</span>
+     }
 </pre>
 <p>This will start recording if the format specified is supported
 by the input device (you can check this with <a href="qaudiodeviceinfo.html#isFormatSupported">QAudioDeviceInfo.isFormatSupported</a>().
 In case there are any snags, use the <a href="qaudioinput.html#error">error</a>() function to check what went
 wrong. We stop recording in the <tt>stopRecording()</tt> slot.</p>
 <pre class="cpp">
- <span class="type">void</span> stopRecording()
- {
-   audio<span class="operator">-</span><span class="operator">&gt;</span>stop();
-   outputFile<span class="operator">-</span><span class="operator">&gt;</span>close();
-   <span class="keyword">delete</span> audio;
- }
+     <span class="type">void</span> stopRecording()
+     {
+         audioInput<span class="operator">-</span><span class="operator">&gt;</span>stop();
+         outputFile<span class="operator">.</span>close();
+         <span class="keyword">delete</span> audioInput;
+     }
 </pre>
 <p>At any point in time, QAudioInput will be in one of four states:
 active, suspended, stopped, or idle. These states are specified by
@@ -91,9 +91,9 @@ the error:</p>
      <span class="type">void</span> stateChanged(<span class="type"><a href="qaudio.html">QAudio</a></span><span class="operator">.</span>State newState)
      {
          <span class="keyword">switch</span>(newState) {
-             <span class="keyword">case</span> <span class="type"><a href="qaudio.html">QAudio</a></span><span class="operator">.</span>StopState:
-             <span class="keyword">if</span> (input<span class="operator">-</span><span class="operator">&gt;</span>error() <span class="operator">!</span><span class="operator">=</span> <span class="type"><a href="qaudio.html">QAudio</a></span><span class="operator">.</span>NoError) {
-                 <span class="comment">// Error handling</span>
+             <span class="keyword">case</span> <span class="type"><a href="qaudio.html">QAudio</a></span><span class="operator">.</span>StoppedState:
+             <span class="keyword">if</span> (audioInput<span class="operator">-</span><span class="operator">&gt;</span>error() <span class="operator">!</span><span class="operator">=</span> <span class="type"><a href="qaudio.html">QAudio</a></span><span class="operator">.</span>NoError) {
+                  <span class="comment">// Perform error handling</span>
              } <span class="keyword">else</span> {
 
              }
@@ -239,4 +239,4 @@ processed the interval set by setNotifyInterval(x).</p>
 changed.</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

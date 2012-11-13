@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>New-style Signal and Slot Support &mdash; PyQt snapshot-4.8.6-4726879563e5 Reference Guide</title>
+    <title>New-style Signal and Slot Support &mdash; PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '#',
-        VERSION:     'snapshot-4.8.6-4726879563e5',
+        VERSION:     'snapshot-4.9.5-9eb6aac99275',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="shortcut icon" href="_static/logo_tn.ico"/>
-    <link rel="top" title="PyQt snapshot-4.8.6-4726879563e5 Reference Guide" href="index.html" />
+    <link rel="top" title="PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide" href="index.html" />
     <link rel="next" title="Old-style Signal and Slot Support" href="old_style_signals_slots.html" />
     <link rel="prev" title="Support for Qt Properties" href="qt_properties.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="qt_properties.html" title="Support for Qt Properties"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">PyQt snapshot-4.8.6-4726879563e5 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -78,7 +78,9 @@ instance of the class then PyQt automatically binds the instance to the signal
 in order to create a <em>bound signal</em>.  This is the same mechanism that Python
 itself uses to create bound methods from class functions.</p>
 <p>A bound signal has <tt class="docutils literal"><span class="pre">connect()</span></tt>, <tt class="docutils literal"><span class="pre">disconnect()</span></tt> and <tt class="docutils literal"><span class="pre">emit()</span></tt> methods that
-implement the associated functionality.</p>
+implement the associated functionality.  It also has a <tt class="docutils literal"><span class="pre">signal</span></tt> attribute
+that is the signature of the signal that would be returned by Qt&#8217;s <tt class="docutils literal"><span class="pre">SIGNAL()</span></tt>
+macro.</p>
 <p>A signal may be overloaded, ie. a signal with a particular name may support
 more than one signature.  A signal may be indexed with a signature in order to
 select the one required.  A signature is a sequence of types.  A type is either
@@ -405,6 +407,16 @@ the optional argument:</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="mixing-new-style-and-old-style-connections">
+<h2>Mixing New-style and Old-style Connections<a class="headerlink" href="#mixing-new-style-and-old-style-connections" title="Permalink to this headline">¶</a></h2>
+<p>The implementation of new-style connections is slightly different to the
+implementation of old-style connections.  An application can freely use both
+styles subject to the restriction that any individual new-style connection
+should only be disconnected using the new style.  Similarly any individual
+old-style connection should only be disconnected using the old style.</p>
+<p>You should also be aware that <strong>pyuic4</strong> generates code that uses
+old-style connections.</p>
+</div>
 </div>
 
 
@@ -425,6 +437,7 @@ the optional argument:</p>
 <li><a class="reference external" href="#connecting-signals-using-keyword-arguments">Connecting Signals Using Keyword Arguments</a></li>
 <li><a class="reference external" href="#the-pyqtslot-decorator">The <tt class="docutils literal"><span class="pre">pyqtSlot()</span></tt> Decorator</a></li>
 <li><a class="reference external" href="#connecting-slots-by-name">Connecting Slots By Name</a></li>
+<li><a class="reference external" href="#mixing-new-style-and-old-style-connections">Mixing New-style and Old-style Connections</a></li>
 </ul>
 </li>
 </ul>
@@ -467,7 +480,7 @@ the optional argument:</p>
         <li class="right" >
           <a href="qt_properties.html" title="Support for Qt Properties"
              >previous</a> |</li>
-        <li><a href="index.html">PyQt snapshot-4.8.6-4726879563e5 Reference Guide</a> &raquo;</li> 
+        <li><a href="index.html">PyQt snapshot-4.9.5-9eb6aac99275 Reference Guide</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

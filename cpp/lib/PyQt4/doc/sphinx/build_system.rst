@@ -124,6 +124,12 @@ care of the details of the Qt installation.
     extension module that is built on the PyQt :mod:`~PyQt4.QtCore` module.
 
 
+.. class:: QtDBusModuleMakefile
+
+    This class encapsulates a Makefile to build a SIP generated Python
+    extension module that is built on the PyQt :mod:`~PyQt4.QtDBus` module.
+
+
 .. class:: QtDeclarativeModuleMakefile
 
     This class encapsulates a Makefile to build a SIP generated Python

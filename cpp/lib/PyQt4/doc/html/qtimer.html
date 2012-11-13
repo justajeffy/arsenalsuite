@@ -109,11 +109,15 @@ milliseconds.</p>
 
 <h3 class="fn"><a name="singleShot-2" />QTimer.singleShot (int&#160;<i>msec</i>, callable&#160;<i>receiver</i>)</h3><h3 class="fn"><a name="start" />QTimer.start (<i>self</i>, int&#160;<i>msec</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void start(int)</tt>.</p><p>Starts or restarts the timer with a timeout interval of
 <i>msec</i> milliseconds.</p>
+<p>If the timer is already running, it will be <a href="qtimer.html#stop">stopped</a> and restarted.</p>
+<p>If <a href="qtimer.html#singleShot-prop">singleShot</a> is true,
+the timer will be activated only once.</p>
 
 
 <h3 class="fn"><a name="start-2" />QTimer.start (<i>self</i>)</h3><p>This method is also a Qt slot with the C++ signature <tt>void start()</tt>.</p><p>This function overloads <a href="qtimer.html#start">start</a>().</p>
 <p>Starts or restarts the timer with the timeout specified in
 <a href="qtimer.html#interval-prop">interval</a>.</p>
+<p>If the timer is already running, it will be <a href="qtimer.html#stop">stopped</a> and restarted.</p>
 <p>If <a href="qtimer.html#singleShot-prop">singleShot</a> is true,
 the timer will be activated only once.</p>
 
@@ -131,4 +135,4 @@ returns -1.</p>
 <p><b>See also</b> <a href="qtimer.html#interval-prop">interval</a>, <a href="qtimer.html#start">start</a>(), and <a href="qtimer.html#stop">stop</a>().</p>
 
 
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>

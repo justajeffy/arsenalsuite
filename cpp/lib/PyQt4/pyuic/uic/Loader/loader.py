@@ -46,8 +46,8 @@ from PyQt4.uic.Loader.qobjectcreator import LoaderCreatorPolicy
 
 
 class DynamicUILoader(UIParser):
-    def __init__(self):
-        UIParser.__init__(self, QtCore, QtGui, LoaderCreatorPolicy())
+    def __init__(self, package):
+        UIParser.__init__(self, QtCore, QtGui, LoaderCreatorPolicy(package))
 
     def createToplevelWidget(self, classname, widgetname):
         if self.toplevelInst is not None:

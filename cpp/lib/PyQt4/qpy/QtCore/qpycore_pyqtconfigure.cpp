@@ -1,6 +1,6 @@
 // This implements the helper for QObject.pyqtConfigure().
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -59,26 +59,47 @@ int qpycore_pyqtconfigure(PyObject *self, QObject *qobj, PyObject *kwds)
 
         if (idx >= 0)
         {
-            const Chimera *ct = Chimera::parse(mo->property(idx));
+            QMetaProperty prop = mo->property(idx);
 
-            if (!ct)
+            // A negative type means a QVariant property.
+            if (prop.userType() >= 0)
             {
-                PyErr_Format(PyExc_TypeError,
-                        "'%s' keyword argument has an invalid type",
-                        enc_name.constData());
+                const Chimera *ct = Chimera::parse(prop);
 
-                return -1;
+                if (!ct)
+                {
+                    PyErr_Format(PyExc_TypeError,
+                            "'%s' keyword argument has an invalid type",
+                            enc_name.constData());
+
+                    return -1;
+                }
+
+                QVariant value;
+                bool valid = ct->fromPyObject(value_obj, &value);
+
+                delete ct;
+
+                if (!valid)
+                    return -1;
+
+                qobj->setProperty(enc_name.constData(), value);
             }
+            else
+            {
+                int value_state, iserr = 0;
 
-            QVariant value;
-            bool valid = ct->fromPyObject(value_obj, &value);
+                QVariant *value = reinterpret_cast<QVariant *>(
+                        sipForceConvertToType(value_obj, sipType_QVariant, 0,
+                                SIP_NOT_NONE, &value_state, &iserr));
 
-            delete ct;
+                if (iserr)
+                    return -1;
 
-            if (!valid)
-                return -1;
+                qobj->setProperty(enc_name.constData(), *value);
 
-            qobj->setProperty(enc_name.constData(), value);
+                sipReleaseType(value, sipType_QVariant, value_state);
+            }
         }
         else
         {

@@ -1,6 +1,6 @@
 // This is the SIP specification of the QPyNullVariant class.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -41,6 +41,12 @@ public:
     int userType() const;
     const char *typeName();
     bool isNull() const;
+
+    int __bool__() const;
+%MethodCode
+        // This makes QPyNullVariant behave like None when truth testing.
+        sipRes = 0;
+%End
 
 private:
     QPyNullVariant(const QPyNullVariant &);

@@ -31,11 +31,20 @@
 	!define _64_BIT
 !endif
 
+!ifdef _64_BIT
+	!define DESIGNER_PATH	"C:\windows\system32\blur64\designer\"
+	!define BIT_NAME ' x64'
+!endif
+!ifndef _64_BIT
+	!define DESIGNER_PATH	"C:\blur\common\designer\"
+	!define BIT_NAME ''
+!endif
+
 # These will change with different releases.
-!define PYQT_VERSION        "4.8.5-0"
+!define PYQT_VERSION        "4.9.5-0"
 !define PYQT_LICENSE        "GPL"
 !define PYQT_LICENSE_LC     "gpl"
-!define PYQT_QT_VERS        "4.6.1"
+!define PYQT_QT_VERS        "4.8.3"
 
 # These are all derived from the above.
 !define PYQT_NAME           "PyQt4 ${PYQT_LICENSE} v${PYQT_VERSION} ${PLATFORM}"
@@ -63,13 +72,20 @@ Click Next to continue."
 # Include the tools we use.
 !include MUI.nsh
 !include LogicLib.nsh
+!include FileFunc.nsh
 !include "x64.nsh"
+!include "..\..\..\nsis\FileSystem.nsh"
+!include "..\..\..\nsis\ReplaceSubStr.nsh"
+!include "..\..\..\nsis\GetParent.nsh"
+!include "..\..\..\nsis\LastInstall.nsh"
+!include "..\..\..\nsis\SoftwareINI.nsh"
 
 
 # Define the product name and installer executable.
 Name "PyQt4"
 Caption "${PYQT_NAME} Setup"
-OutFile "PyQt4_${PYQT_LICENSE_LC}_${PYQT_VERSION}-Py${PYTHON_VERSION}-${PLATFORM}.exe"
+!define OUT_FILE "PyQt4_${PYQT_LICENSE_LC}_${PYQT_VERSION}-Py${PYTHON_VERSION}-${PLATFORM}.exe"
+OutFile "${OUT_FILE}"
 
 
 # Set the install directory, from the registry if possible.
@@ -170,25 +186,27 @@ Section "Extension modules" SecModules
     File .\__init__.py
     File .\Qt\Qt.pyd
     File .\pyqtconfig.py
-    #File .\QtAssistant\QtAssistant.pyd
+    File .\QAxContainer\QAxContainer.pyd
+    File .\QtAssistant\QtAssistant.pyd
     File .\QtCore\QtCore.pyd
+    File .\QtDeclarative\QtDeclarative.pyd
+    File .\QtDesigner\QtDesigner.pyd
     File .\QtGui\QtGui.pyd
+    File .\QtHelp\QtHelp.pyd
+    File .\QtMultimedia\QtMultimedia.pyd
     File .\QtNetwork\QtNetwork.pyd
     File .\QtOpenGL\QtOpenGL.pyd
-    File .\QtSql\QtSql.pyd
-    File .\QtSvg\QtSvg.pyd
-    File .\QtXml\QtXml.pyd
-    File .\QtWebKit\QtWebKit.pyd
-    File .\QtXmlPatterns\QtXmlPatterns.pyd
-    File .\QtDesigner\QtDesigner.pyd
-    File .\QtHelp\QtHelp.pyd
     File .\QtScript\QtScript.pyd
     File .\QtScriptTools\QtScriptTools.pyd
+    File .\QtSql\QtSql.pyd
+    File .\QtSvg\QtSvg.pyd
     File .\QtTest\QtTest.pyd
-    File .\QtMultimedia\QtMultimedia.pyd
+    File .\QtWebKit\QtWebKit.pyd
+    File .\QtXml\QtXml.pyd
+    File .\QtXmlPatterns\QtXmlPatterns.pyd
     File .\phonon\phonon.pyd
-#    File ..\pyqtwinmigrate\sipQtWinMigrate\QtWinMigrate.pyd
-#    File ..\qscintilla\Python\QSci.pyd
+    #File ..\pyqtwinmigrate\sipQtWinMigrate\QtWinMigrate.pyd
+    #File ..\qscintilla\Python\QSci.pyd
 SectionEnd
 
 Section "Developer tools" SecTools
@@ -201,12 +219,10 @@ Section "Developer tools" SecTools
     File .\pyrcc\pyrcc4.exe
     File .\pyuic\pyuic4.bat
 
-!ifdef _64_BIT
-    SetOutPath "C:\windows\system32\blur64\designer\"
-!else
-    SetOutPath "C:\blur\common\designer\"
-!endif
-    File .\designer\release\pythonplugin.dll
+    SetOutPath "${DESIGNER_PATH}"
+	File .\designer\release\pythonplugin.dll
+	SetOutPath "${DESIGNER_PATH}\python"
+    #File ..\qt_installer\designer\python\blurdev_plugin.py
 
     SetOutPath $INSTDIR\Lib\site-packages\PyQt4
     File /r .\pyuic\uic
@@ -232,22 +248,31 @@ Section "Start Menu shortcuts" SecShortcuts
     IfFileExists "$PROGRAMFILES\PyQt4\examples" 0 +2
         CreateShortCut "$SMPROGRAMS\${PYQT_NAME}\Examples.lnk" "$PROGRAMFILES\PyQt4\examples"
 
-    CreateShortCut "$SMPROGRAMS\${PYQT_NAME}\Uninstall PyQt.lnk" "$PROGRAMFILES\PyQt4\Uninstall.exe"
+    CreateShortCut "$SMPROGRAMS\${PYQT_NAME}\Uninstall PyQt.lnk" "$INSTDIR\Lib\site-packages\PyQt4\Uninstall.exe"
 SectionEnd
 
 Section -post
-    # Tell Windows about the package.
-    WriteRegExpandStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4" "UninstallString" '"$PROGRAMFILES\PyQt4\Uninstall.exe"'
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4" "DisplayName" "${PYQT_NAME}"
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4" "DisplayVersion" "${PYQT_VERSION}"
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4" "NoModify" "1"
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4" "NoRepair" "1"
-
-    # Save the installation directory for the uninstaller.
-    WriteRegStr HKLM "Software\PyQt4" "" $INSTDIR
-
-    # Create the uninstaller.
-    WriteUninstaller "$PROGRAMFILES\PyQt4\Uninstall.exe"
+	# Register the uninstaler only if a cmd line arg was not passed in
+	ClearErrors
+	${GetParameters} $R1
+	${GetOptions} $R1 "/noUninstallerReg" $R2
+	IfErrors 0 makeInstaller
+		# build a registry safe install path key
+		!insertmacro ReplaceSubStr $INSTDIR "\" "/"
+		
+		# Tell Windows about the package.
+		WriteRegExpandStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4-$MODIFIED_STR" "UninstallString" '"$INSTDIR\Lib\site-packages\PyQt4\Uninstall.exe"'
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4-$MODIFIED_STR" "DisplayName" "${PYQT_NAME} ($INSTDIR)"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4-$MODIFIED_STR" "DisplayVersion" "${PYQT_VERSION}"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4-$MODIFIED_STR" "Publisher" "Blur Studio"
+		WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4-$MODIFIED_STR" "NoModify" "1"
+		WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4-$MODIFIED_STR" "NoRepair" "1"
+	makeInstaller:
+		# Create the uninstaller.
+		WriteUninstaller "$INSTDIR\Lib\site-packages\PyQt4\Uninstall.exe"
+		!insertmacro SetLastInstall "$INSTDIR\Lib\site-packages\PyQt4\Uninstall.exe"
+	# Update software.ini so we can track what software is installed on each system
+	!insertmacro UpdateSettingsINI ${BLUR_SOFTWARE_INI} "PyQt4 Python${PYTHON_VERSION}${BIT_NAME}" "${PYQT_VERSION}" "${OUT_FILE}"
 SectionEnd
 
 
@@ -266,12 +291,28 @@ QtOpenGL, QtSql, QtSvg and QtXml."
 
 
 Section "Uninstall"
-    # Get the install directory.
-    ReadRegStr $INSTDIR HKLM "Software\PyQt4" ""
+	!ifdef _64_BIT
+		SetRegView 64
+		${DisableX64FSRedirection}
+	!endif
+
+	Push $INSTDIR
+	Call un.GetParent
+	Call un.GetParent
+	Call un.GetParent
+	Pop $INSTDIR
 
     # The modules section.
     Delete $INSTDIR\Lib\site-packages\sip.pyd
     RMDir /r $INSTDIR\Lib\site-packages\PyQt4
+
+	# Remove the designer plugin
+	Delete "${DESIGNER_PATH}\python\blurdev_plugin.py"
+	# delete python if empty
+	#!insertmacro removeEmptyDirectory "${DESIGNER_PATH}\python"
+	Delete "${DESIGNER_PATH}\pythonplugin.dll"
+	# delete python if empty
+	#!insertmacro removeEmptyDirectory "${DESIGNER_PATH}"
 
     # The shortcuts section.
     RMDir /r "$SMPROGRAMS\${PYQT_NAME}"
@@ -282,9 +323,17 @@ Section "Uninstall"
     Delete $INSTDIR\pyuic4.bat
 
     # The examples section and the installer itself.
-    RMDir /r "$PROGRAMFILES\PyQt4"
+	MessageBox MB_YESNO "Do you want to remove the example files? This will remove them for all other installations of ${PYQT_NAME}" /SD IDYES IDNO AfterExamples
+		DetailPrint "Removing the example files"
+		RMDir /r "$PROGRAMFILES\PyQt4"
+		Goto Next
+	AfterExamples:
+		DetailPrint "Not removing the example files in $PROGRAMFILES\PyQt4"
+	Next:
+
+	# Can't store \'s as a registry key so replace with /
+	!insertmacro un.ReplaceSubStr $INSTDIR "\" "/"
 
     # Clean the registry.
-    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4"
-    DeleteRegKey HKLM "Software\PyQt4"
+    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\PyQt4-$MODIFIED_STR"
 SectionEnd

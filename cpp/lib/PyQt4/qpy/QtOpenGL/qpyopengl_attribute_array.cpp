@@ -1,6 +1,6 @@
 // This contains the support for shader attribute arrays.
 //
-// Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+// Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 // 
 // This file is part of PyQt.
 // 
@@ -23,12 +23,12 @@
 // WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 
+#include <Python.h>
+#include <sip.h>
+
 #include <QtGlobal>
 
 #if QT_VERSION >= 0x040600
-
-#include <Python.h>
-#include <sip.h>
 
 #include <qgl.h>
 #include <QVector2D>

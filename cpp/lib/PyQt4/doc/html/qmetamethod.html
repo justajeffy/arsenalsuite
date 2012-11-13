@@ -15,6 +15,9 @@ function.</p>
 <a href="qmetamethod.html#typeName">typeName</a>(), a <a href="qmetamethod.html#tag">tag</a>(), and an <a href="qmetamethod.html#access">access</a>() specifier. You can use
 <a href="qmetamethod.html#invoke">invoke</a>() to invoke the method
 on an arbitrary <a href="qobject.html">QObject</a>.</p>
+<p>A method will only be registered with the meta-object system if
+it is a slot, a signal, or declared with the <a href="qobject.html#Q_INVOKABLE">Q_INVOKABLE</a> macro. Constructors can
+also be registered with <a href="qobject.html#Q_INVOKABLE">Q_INVOKABLE</a>.</p>
 <hr /><h2>Type Documentation</h2><h3 class="fn"><a name="Access-enum" />QMetaMethod.Access</h3><p>This enum describes the access level of a method, following the
 conventions used in C++.</p>
 <table class="valuelist">
@@ -185,10 +188,28 @@ ignores return values.</p>
 
 <h3 class="fn"><a name="tag" />str QMetaMethod.tag (<i>self</i>)</h3><p>Returns the tag associated with this method.</p>
 <p>Tags are special macros recognized by <tt>moc</tt> that make it
-possible to add extra information about a method. For the moment,
-<tt>moc</tt> doesn't support any special tags.</p>
+possible to add extra information about a method.</p>
+<p>Tag information can be added in the following way in the
+function declaration:</p>
+<pre class="cpp">
+ <span class="preprocessor">#define THISISTESTTAG // tag text</span>
+ <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span>
+ <span class="keyword">private</span> <span class="keyword">slots</span>:
+     THISISTESTTAG <span class="type">void</span> testFunc();
+</pre>
+<p>and the information can be accessed by using:</p>
+<pre class="cpp">
+ MainWindow win;
+ win<span class="operator">.</span>show();
+
+ <span class="type">int</span> functionIndex <span class="operator">=</span> win<span class="operator">.</span>metaObject()<span class="operator">-</span><span class="operator">&gt;</span>indexOfSlot(<span class="string">"testFunc()"</span>);
+ <span class="type"><a href="qmetamethod.html">QMetaMethod</a></span> mm <span class="operator">=</span> metaObject()<span class="operator">-</span><span class="operator">&gt;</span>method(functionIndex);
+ <a href="qtcore.html#qDebug">qDebug</a>() <span class="operator">&lt;</span><span class="operator">&lt;</span> mm<span class="operator">.</span>tag(); <span class="comment">// prints THISISTESTTAG</span>
+</pre>
+<p>For the moment, <tt>moc</tt> doesn't support any special
+tags.</p>
 
 
 <h3 class="fn"><a name="typeName" />str QMetaMethod.typeName (<i>self</i>)</h3><p>Returns the return type of this method, or an empty string if
 the return type is <i>void</i>.</p>
-<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.8.6-4726879563e5 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2011</td><td align="right" width="25%">Qt&#160;4.7.4</td></tr></table></div></address></body></html>
+<address><hr /><div align="center"><table border="0" cellspacing="0" width="100%"><tr class="address"><td align="left" width="25%">PyQt&#160;snapshot-4.9.5-9eb6aac99275 for X11</td><td align="center" width="50%">Copyright &#169; <a href="http://www.riverbankcomputing.com">Riverbank&#160;Computing&#160;Ltd</a> and <a href="http://www.qtsoftware.com">Nokia</a> 2012</td><td align="right" width="25%">Qt&#160;4.8.3</td></tr></table></div></address></body></html>
