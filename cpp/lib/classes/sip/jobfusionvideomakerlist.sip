@@ -27,12 +27,16 @@ class JobFusionVideoMakerList : JobFusionList
 
 %End
 public:
-	JobFusionVideoMakerList();
-	JobFusionVideoMakerList( const RecordList &, Table * t = 0 );
-	JobFusionVideoMakerList( const JobFusionVideoMakerList & );
-	JobFusionVideoMakerList( const Record &, Table * t = 0 );
-	
-	~JobFusionVideoMakerList();
+	JobFusionVideoMakerList() /HoldGIL/;
+	JobFusionVideoMakerList( const RecordList &, Table * t = 0 ) /HoldGIL/;
+	JobFusionVideoMakerList( const JobFusionVideoMakerList & ) /HoldGIL/;
+	JobFusionVideoMakerList( const Record &, Table * t = 0 ) /HoldGIL/;
+	JobFusionVideoMakerList( SIP_PYLIST );
+%MethodCode
+	sipCpp = new JobFusionVideoMakerList( recordListFromPyList(a0), JobFusionVideoMaker::table() );
+%End
+
+	~JobFusionVideoMakerList() /HoldGIL/;
 
 //	void insert( JobFusionVideoMakerIter, const JobFusionVideoMaker & );
 
@@ -42,32 +46,39 @@ public:
 
 //	JobFusionVideoMakerIter remove( const JobFusionVideoMakerIter & );
 
-	int remove( const Record & );
+	int remove( const Record & ) /HoldGIL/;
 	
-	int remove();
+	int remove() throw(SqlException,LostConnectionException,PythonException);
 	
 	//JobFusionVideoMakerIter begin();
 
 	//JobFusionVideoMakerIter end();
 
-	Table * table() const;
-	TableSchema * schema() const;
+	Table * table() const /HoldGIL/;
+	TableSchema * schema() const /HoldGIL/;
 
-	MappedJobFusionVideoMakerList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
-	MappedJobFusionVideoMakerList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const;
-	MappedJobFusionVideoMakerList sorted( const QString & c, bool a = true ) const;
+	MappedJobFusionVideoMakerList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobFusionVideoMakerList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobFusionVideoMakerList sorted( const QString & c, bool a = true ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedJobFusionVideoMakerList unique() const;
 	MappedJobFusionVideoMakerList reversed() const;
 	MappedJobFusionVideoMakerList reloaded() const;
 
-	QStringList codecs() const;
+	QMap<QString,RecordList> groupedBy( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
+
+	PyObject * groupedBy( SIP_PYCALLABLE callable ) const throw(SqlException,LostConnectionException,PythonException);
+%MethodCode
+		sipRes = recordListGroupByCallable( sipCpp, a0, JobFusionVideoMaker::schema() );
+%End
+
+	QStringList codecs() const /HoldGIL/;
 	MappedJobFusionVideoMakerList & setCodecs( const QString & );
-	QStringList inputFramePaths() const;
+	QStringList inputFramePaths() const /HoldGIL/;
 	MappedJobFusionVideoMakerList & setInputFramePaths( const QString & );
-	QList<uint> sequenceFrameStarts() const;
+	QList<uint> sequenceFrameStarts() const /HoldGIL/;
 	MappedJobFusionVideoMakerList & setSequenceFrameStarts( const uint & );
-	QList<uint> sequenceFrameEnds() const;
+	QList<uint> sequenceFrameEnds() const /HoldGIL/;
 	MappedJobFusionVideoMakerList & setSequenceFrameEnds( const uint & );
 
 

@@ -81,9 +81,6 @@ Field::Field( TableSchema * table, const QString & name, Field::Type type, Field
 		mIndex->setField( this );
 		mIndex->addField( this );
 	}
-
-    mNameLower = mName.toLower();
-    mMethodNameLower = mMethodName.toLower();
 }
 
 Field::Field( TableSchema * table, const QString & name, const QString & fkeyTable, Field::Flags flags, bool index, int indexDeleteMode )
@@ -101,9 +98,6 @@ Field::Field( TableSchema * table, const QString & name, const QString & fkeyTab
 		mTable = 0;
 	if( index && mTable )
 		setHasIndex( true, indexDeleteMode );
-
-    mNameLower = mName.toLower();
-    mMethodNameLower = mMethodName.toLower();
 }
 
 Field::~Field()
@@ -131,17 +125,16 @@ void Field::setName( const QString & name )
 {
 	if( mMethodName.isEmpty() || mMethodName == mName || (flag( ForeignKey ) && mName.mid(4) == mMethodName) ) {
 		if( flag( ForeignKey ) && mName.left(4)=="fkey" )
-            setMethodName(name.mid(4));
+			mMethodName = name.mid(4);
 		else
-            setMethodName(name);
+			mMethodName = name;
 	}
 	mName = name;
-	mNameLower = name.toLower();
 }
 
-QString Field::placeholder() const
+QString Field::placeholder(int i) const
 {
-	return ":" + mNameLower;
+	return ":" + mName.toLower() + (i == 0 ? QString() : QString::number(i));
 }
 
 QString pluralizeName( const QString & name )
@@ -220,8 +213,8 @@ static FlagMap sFlagMap [] =
 	{ Field::Unique, "Unique" },
 	{ Field::LocalVariable, "LocalVariable" },
 	{ Field::ReverseAccess, "ReverseAccess" },
-    { Field::DisplayName, "DisplayName" },
-    { Field::NoDefaultSelect, "NoDefaultSelect" },
+	{ Field::TableDisplayName, "TableDisplayName" },
+	{ Field::NoDefaultSelect, "NoDefaultSelect" },
 	{ Field::None, 0 }
 };
 
@@ -251,10 +244,8 @@ QString Field::methodName() const
 
 void Field::setMethodName( const QString & mn )
 {
-	if( !mn.isEmpty() ) {
+	if( !mn.isEmpty() )
 		mMethodName = mn;
-		mMethodNameLower = mn.toLower();
-    }
 }
 
 QString fieldToDisplayName( const QString & name )
@@ -262,6 +253,7 @@ QString fieldToDisplayName( const QString & name )
 	QString ret = name;
 	if( !ret.isEmpty() ) {
 		ret.replace( QRegExp( "([A-Z])" ), " \\1" );
+		ret.replace( "_", " " );
 		ret[0] = ret[0].toUpper();
 	}
 	return ret.simplified();
@@ -445,7 +437,7 @@ const char * Field::variantTypeStrings[] =
 	"DateTime",
 	"Interval",
 	"Double",
-	"Float",
+	"Double", // Since we only really support postgres, where float and double are always double
 	"Bool",
 	"ByteArray",
 	"Color",
@@ -465,7 +457,7 @@ const char * Field::listTypeStrings[] =
 	"QList<QDateTime>",
 	"QList<Interval>",
 	"QList<double>",
-	"QList<float>",
+	"QList<double>", // Since we only really support postgres, where float and double are always double
 	"QList<bool>",
 	"QList<QByteArray>",
 	"QList<QColor>",
@@ -485,7 +477,7 @@ const char * Field::typeStrings[] =
 	"QDateTime",
 	"Interval",
 	"double",
-	"float",
+	"double",  // Since we only really support postgres, where float and double are always double
 	"bool",
 	"QByteArray",
 	"QColor",
@@ -524,6 +516,8 @@ Field::Type Field::stringToType( const QString & ts )
 	for( int i=(int)Invalid; typeStrings[i]; ++i )
 		if( typeStrings[i] == ts )
 			return (Field::Type)i;
+	if( ts.toLower() == "float" )
+		return Field::Float;
 	return Invalid;
 }
 
@@ -548,6 +542,8 @@ QVariant Field::variantFromString( const QString & str, Type t )
 		case Time:
 			return QVariant( QTime::fromString( str ) );
 		case Interval:
+			if( str.isNull() )
+				return QVariant( qMetaTypeId< ::Interval>() );
 			return qVariantFromValue( Interval::fromString( str ) );
 		case Double:
 			return QVariant( str.toDouble() );
@@ -678,7 +674,7 @@ int Field::qvariantType(Field::Type type)
  		(int)QVariant::Invalid, // Invalid=0,
 		(int)QVariant::String, // String,
 		(int)QVariant::UInt, // UInt,
-		(int)QVariant::ULongLong, // UInt8,
+		(int)QVariant::ULongLong, // ULongLong,
 		(int)QVariant::Int, //Int,
 		(int)QVariant::Date, //Date,
 		(int)QVariant::DateTime, //DateTime,
@@ -726,36 +722,35 @@ QString Field::diff( Field * after )
 // Optmized to not copy(because of implicit sharing) if one already contains all of two
 FieldList operator|(const FieldList & one, const FieldList & two)
 {
-    bool firstComplete = two.size() <= one.size();
-    FieldList ret;
-    foreach( Field * f, two )
-        if( !one.contains(f) ) {
-            if( firstComplete ) {
-                firstComplete = false;
-                ret = one;
-            }
-            ret += f;
-        }
-    return firstComplete ? one : ret;
+	bool firstComplete = two.size() <= one.size();
+	FieldList ret;
+	foreach( Field * f, two )
+		if( !one.contains(f) ) {
+			if( firstComplete ) {
+				firstComplete = false;
+				ret = one;
+			}
+			ret += f;
+		}
+	return firstComplete ? one : ret;
 }
 
 FieldList operator&(const FieldList & one, const FieldList & two)
 {
-    if( one.size() == two.size() ) {
-        bool same = true;
-        foreach( Field * f, one )
-            if( !two.contains(f) ) {
-                same = false;
-                break;
-            }
-        if( same ) return one;
-    }
-    FieldList ret;
-    foreach( Field * f, one )
-        if( two.contains(f) )
-            ret += f;
-    return ret;
+	if( one.size() == two.size() ) {
+		bool same = true;
+		foreach( Field * f, one )
+			if( !two.contains(f) ) {
+				same = false;
+				break;
+			}
+		if( same ) return one;
+	}
+	FieldList ret;
+	foreach( Field * f, one )
+		if( two.contains(f) )
+			ret += f;
+	return ret;
 }
 
 } //namespace
-

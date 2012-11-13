@@ -61,7 +61,7 @@ QString GridTemplateItem::textFromElement( const Element & element ) const
 		{
 			uint ct = columnType();
 			if( ct & Status )
-				ret += e.status();
+				ret += e.elementStatus().name();
 			if( ct & AssignedUsers )
 				ret += e.userStringList().join(",");
 			if( ct & CheckListSummary )

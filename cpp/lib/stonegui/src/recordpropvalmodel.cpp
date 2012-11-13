@@ -22,12 +22,11 @@
  */
 
 /*
- * $Id$
+ * $Id: recordpropvalmodel.cpp 11739 2011-06-24 00:05:10Z newellm $
  */
 
 #include "recordpropvalmodel.h"
 #include "table.h"
-#include "field.h"
 
 class PropValItem : public ItemBase
 {

@@ -30,6 +30,7 @@
 
 #include <qlist.h>
 #include <qstring.h>
+#include <qobject.h>
 
 #include "field.h"
 #include "indexschema.h"
@@ -41,9 +42,11 @@ class Table;
 class IndexSchema;
 class Record;
 class RecordList;
+class Trigger;
 
-class STONE_EXPORT TableSchema
+class STONE_EXPORT TableSchema : public QObject
 {
+Q_OBJECT
 public:
 	TableSchema( Schema * schema );
 	virtual ~TableSchema();
@@ -125,6 +128,8 @@ public:
 	/// Returns a list of all the fields in this table.
 	FieldList fields() { return mAllFieldsCache; }
 
+	FieldList defaultSelectFields() const;
+	
 	/// Returns a list of all the fields in this table that
 	/// are not inherited by the parent table.
 	FieldList ownedFields();
@@ -198,19 +203,29 @@ public:
 
 	QString diff( TableSchema * table );
 
+	// Takes ownership
+	void addTrigger( Trigger * trigger );
+	// Ownership given to caller
+	void removeTrigger( Trigger * trigger );
+	QList<Trigger*> triggers() const;
+
+signals:
+	void triggerAdded( Trigger * trigger );
+	
 protected:
-	virtual void preUpdate( const Record & updated, const Record & existing );
-	virtual void preInsert( RecordList );
-	virtual void preRemove( RecordList );
-
-	virtual void postUpdate( const Record & updated, const Record & old );
-	virtual void postInsert( RecordList );
-	virtual void postRemove( RecordList );
-
 	void recalcFieldPositions( int start = 0, bool skipSelf = false );
 	
 	void addChild( TableSchema * );
 	void removeChild( TableSchema * table );
+	
+	// Does not propogate to parent tables, done by the Table class itself in processIncoming
+	RecordList processIncomingTriggers( RecordList incoming );
+	RecordList processPreInsertTriggers( RecordList toInsert );
+	Record processPreUpdateTriggers( const Record & updated, const Record & before );
+	RecordList processPreDeleteTriggers( RecordList toDelete );
+	void processPostInsertTriggers( RecordList toInsert );
+	void processPostUpdateTriggers( const Record & updated, const Record & before );
+	void processPostDeleteTriggers( RecordList toDelete );
 
 	Schema * mSchema;
 	TableSchema * mParent;
@@ -232,6 +247,7 @@ protected:
 	bool mUseCodeGen;
 	bool mExpireKeyCache;
 
+	QList<Trigger*> mTriggers;
 	friend class Stone::Table;
 };
 

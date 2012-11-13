@@ -1,53 +1,67 @@
 
+#include <qmessagebox.h>
+
 #include "database.h"
 
 #include "host.h"
 #include "jobhistory.h"
 #include "jobhistorytype.h"
+#include "jobmapping.h"
 #include "jobtask.h"
-#include "jobtable.h"
 #include "jobdep.h"
+#include "jobtable.h"
+#include "jobtype.h"
+#include "jobtypemapping.h"
 #include "user.h"
 #include "group.h"
 #include "usergroup.h"
 
-bool Job::updateJobStatuses( JobList jobs, const QString & jobStatus, bool resetTasks )
+bool Job::updateJobStatuses( JobList jobs, const QString & jobStatus, bool resetTasks, bool restartHosts )
 {
 	if( jobs.isEmpty() )
 		return false;
 
+	QString keys = jobs.keyString();
+
 	Database::current()->beginTransaction();
 
-    if( resetTasks ) {
-        foreach( Job j, jobs ) {
-            JobDepList jdl = JobDep::recordsByJob(j);
-            JobTaskList jtl = j.jobTasks().filter("status", "cancelled",  /*keepMatches*/ false);
+	if( restartHosts ){
+		// Update each of the hosts that were working on the job
+		if( !Database::current()->exec("UPDATE HostStatus SET slaveStatus = 'starting' WHERE fkeyJob IN(" + keys + ");").isActive() ) {
+			Database::current()->rollbackTransaction();
+			return false;
+		}
+	}
 
-            bool isSoftDep = false;
-            foreach(JobDep jd, jdl){
-                if( jd.depType() == 2 ) {
-                    isSoftDep = true;
-                    break;
-                }
-            }
-
-            if( !isSoftDep )
-                jtl.setStatuses("new");
-            else
-                jtl.setStatuses("holding");
-
-            jtl.setColumnLiteral("fkeyjoboutput","NULL");
-            if( j.packetType() != "preassigned" )
-                jtl.setHosts(Host());
-            jtl.commit();
-        }
-    }
+	if( resetTasks ) {
+		// Reset the jobtasks to their new state
+		foreach( Job j, jobs ) {
+			QString sql("UPDATE JobTask SET status='new', startedts=NULL, endedts=NULL,");
+			if( j.packetType() != "preassigned" )
+				sql += " fkeyHost=NULL,";
+			sql += " memory=NULL, fkeyjoboutput=NULL, fkeyjobcommandhistory=NULL WHERE status!='cancelled' AND fkeyJob=?;";
+			Database::current()->exec( sql, VarList() << j.key() );
+		}
+	}
 
 	if( !jobStatus.isEmpty() ){
+
+		foreach( Job j, jobs )
+			if( j.status() != jobStatus )
+				j.addHistory( "Status change from" + j.status() + " to " + jobStatus );
+
 		// Update each of the Job records
-        jobs.setStatuses(jobStatus);
-        jobs.commit();
+		QString select("UPDATE Job SET status = '%1'");
+		if( jobStatus == "new" )
+			select += ", submitted=extract(epoch from now())";
+		select = QString( select + " WHERE keyJob IN("+ keys + ");" ).arg(jobStatus);
+		if( !Database::current()->exec( select ).isActive() ) {
+			Database::current()->rollbackTransaction();
+			return false;
+		}
+		
 	}
+
 
 	Database::current()->commitTransaction();
 	return true;
@@ -93,7 +107,8 @@ void Job::changeFrameRange( QList<int> frames, JobOutput output, bool changeCanc
 			if( !allTasks.contains( jt ) )
 				canceled += jt;
 	}
-	canceled.setHosts( Host() );
+	if( packetType() != "preassigned" )
+		canceled.setHosts( Host() );
 	canceled.setStatuses( "cancelled" );
 	
 	// Commit changes
@@ -106,7 +121,23 @@ void Job::changeFrameRange( QList<int> frames, JobOutput output, bool changeCanc
 	addHistory( "Job Frame List Changed" );
 }
 
-void Job::changePreassignedTaskList( HostList hosts, bool changeCancelledToNew )
+void Job::changePreassignedTaskListWithStatusPrompt( HostList hosts, QWidget * parent, bool changeCancelledToNew )
+{
+	int newTasksCount = changePreassignedTaskList( hosts, changeCancelledToNew, /* updateStatusIfNeeded = */ false );
+	if( status() == "done" && newTasksCount > 0 ) {
+		QMessageBox * mb = new QMessageBox(parent);
+		mb->setWindowTitle( "Job no longer done, choose next status" );
+		mb->setText( "You have the option to set the job status to Ready or Suspended.\n" );
+		mb->setDefaultButton( mb->addButton( "Suspended", QMessageBox::AcceptRole ) );
+		mb->addButton( "Ready", QMessageBox::RejectRole );
+		mb->exec();
+		int role =  mb->buttonRole(mb->clickedButton());
+		delete mb;
+		updateJobStatuses( JobList() += *this, role == QMessageBox::AcceptRole ? "suspended" : "ready", false, false );
+	}
+}
+
+int Job::changePreassignedTaskList( HostList hosts, bool changeCancelledToNew,  bool updateStatusIfNeeded )
 {
 	JobTaskList tasks = jobTasks(), toCancel, toCommit;
 	HostList current = tasks.hosts();
@@ -141,14 +172,32 @@ void Job::changePreassignedTaskList( HostList hosts, bool changeCancelledToNew )
 	Database::current()->exec( "SELECT update_job_task_counts(?);", VarList() << key() );
 	Database::current()->commitTransaction();
 
+	if( updateStatusIfNeeded && status() == "done" && hostsToAdd.size() + hostsToUncancel.size() > 0 )
+		updateJobStatuses( JobList() += *this, "suspended", false, false );
+	
 	addHistory( "Job Frame List Changed" );
+	return hostsToAdd.size() + hostsToUncancel.size();
 }
 
+MappingList Job::mappings() const
+{
+	MappingList mappings = jobType().jobTypeMappings().mappings();
+	MappingList jobMappings = this->jobMappings().mappings();
+	if( jobMappings.size() ) {
+		QMap<QString,Mapping> byMount = mappings.groupedBySingle<QString,Mapping>("mount");
+		foreach( Mapping m, jobMappings )
+			byMount[m.mount()] = m;
+		mappings.clear();
+		for( QMap<QString,Mapping>::iterator it = byMount.begin(); it != byMount.end(); ++it )
+			mappings.append( it.value() );
+	}
+	return mappings;
+}
 
 void Job::addHistory( const QString & message )
 {
-    if( message.isEmpty() )
-        return;
+	if( message.isEmpty() )
+		return;
 	JobHistory jh;
 	jh.setJob( *this );
 	jh.setMessage( message );
@@ -158,21 +207,12 @@ void Job::addHistory( const QString & message )
 	jh.commit();
 }
 
-void JobSchema::preUpdate( const Record & updated, const Record & old )
-{
-    Job newJob(updated);
-    Job oldJob(old);
-    // if the priority is being lowered, check to make sure they're allowed to do so
-    if( newJob.priority() < oldJob.priority() ) {
-        if( !User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) ) {
-            newJob.setPriority(oldJob.priority());
-        }
-    }
-    TableSchema::preUpdate(updated,old);
-}
+JobTrigger::JobTrigger()
+: Trigger( Trigger::PreUpdateTrigger )
+{}
 
-void JobSchema::postUpdate( const Record & updated, const Record & old )
+Record JobTrigger::preUpdate( const Record & updated, const Record & /*before*/ )
 {
-    Job(updated).addHistory(updated.changeString());
+	Job(updated).addHistory(updated.changeString());
+	return updated;
 }
-

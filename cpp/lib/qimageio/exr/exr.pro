@@ -8,20 +8,16 @@ DEFINES+=HAVE_EXR
 TARGET=exr
 
 unix {
-    INCLUDEPATH+=/drd/software/ext/openexr/lin64/v1_7_0_fPIC/include/OpenEXR/
-    INCLUDEPATH+=/drd/software/ext/ilmbase/lin64/v1_0_2_fPIC/include/OpenEXR/
-    LIBS+=-Wl,-rpath,/drd/software/ext/openexr/lin64/v1_7_0_fPIC/lib
-    LIBS+=-Wl,-rpath,/drd/software/ext/ilmbase/lin64/v1_0_2_fPIC/lib
-    #LIBS+=-L/drd/software/ext/openexr/lin64/20100218/lib
-
-    #INCLUDEPATH+=/usr/include/OpenEXR
+	INCLUDEPATH+=/usr/include/OpenEXR/
 	LIBS+=-lIex -lImath -lHalf -lIlmImf
 } else {
-	#DEFINES+=OPENEXR_DLL
+	DEFINES+=OPENEXR_DLL
 	CONFIG+=exceptions
-	INCLUDEPATH+=C:\openexr-1.4.0-vs2005\openexr-1.4.0-vs2005\include\OpenEXR
+	#INCLUDEPATH+=C:\openexr-1.4.0-vs2005\openexr-1.4.0-vs2005\include\OpenEXR
+	INCLUDEPATH+=C:\source\openexr_stuff\Deploy\include
 	#LIBS+="-LC:\openexr-1.4.0-vsnet2003\openexr-1.4.0-vsnet2003\lib"
-	LIBS+="-LC:\openexr-1.4.0a\openexr-1.4.0\bin"
+	#LIBS+="-LC:\openexr-1.4.0a\openexr-1.4.0\bin"
+	LIBS+=-LC:\source\openexr_stuff\Deploy\lib\x64\Release
 	LIBS+=-lIlmImf -lIex -lImath -lHalf -lIlmThread
 }
 
@@ -30,5 +26,5 @@ target.path=$$(QTDIR)/plugins/imageformats/
 INSTALLS+=target
 TEMPLATE=lib
 CONFIG+=plugin
-QT+=gui
+QT+=QtGui
 DESTDIR=./

@@ -35,6 +35,29 @@
 #include "interval.h"
 #include "tableschema.h"
 
+PythonException::PythonException()
+: type(0)
+, value(0)
+, traceback(0)
+{
+	SIP_BLOCK_THREADS
+	PyErr_Fetch(&type, &value, &traceback);
+	SIP_UNBLOCK_THREADS
+}
+
+PythonException::~PythonException() throw()
+{
+	Py_XDECREF(type);
+	Py_XDECREF(value);
+	Py_XDECREF(traceback);
+}
+
+void PythonException::restore()
+{
+	PyErr_Restore(type, value, traceback);
+	type = value = traceback = 0;
+}
+
 static inline void ensurePythonInitialized()
 {
 	if( ! Py_IsInitialized() )
@@ -59,15 +82,23 @@ const sipAPIDef * getSipAPI()
 	} else {
 
 		PyObject * sip_capiobj = PyDict_GetItemString(PyModule_GetDict(sip_sipmod),"_C_API");
+#if defined(SIP_USE_PYCAPSULE)
+		if (sip_capiobj == NULL || !PyCapsule_CheckExact(sip_capiobj))
+#else
 		if (sip_capiobj == NULL || !PyCObject_Check(sip_capiobj))
-			LOG_3( "getSipAPI: Unable to find _C_API object from sip modules dictionary" );
+#endif
+			LOG_3( QString("getSipAPI: Unable to find _C_API object from sip modules dictionary: Got 0x%1").arg((qulonglong)sip_capiobj,0,16) );
 		else
+#if defined(SIP_USE_PYCAPSULE)
+			api = reinterpret_cast<const sipAPIDef *>(PyCapsule_GetPointer(sip_capiobj, SIP_MODULE_NAME "._C_API"));
+#else
 			api = reinterpret_cast<const sipAPIDef *>(PyCObject_AsVoidPtr(sip_capiobj));
+#endif
 	}
     SIP_UNBLOCK_THREADS
 	return api;
 }
-
+/*
 sipExportedModuleDef * getSipModule( const char * name )
 {
 	const sipAPIDef * api = getSipAPI();
@@ -78,9 +109,10 @@ sipExportedModuleDef * getSipModule( const char * name )
 		LOG_5( "getSipModule: Unable to lookup module " + QString::fromLatin1(name) + " using api_find_module" );
 	return module;
 }
-
-sipTypeDef * getSipType( const char * module_name, const char * typeName )
+*/
+sipTypeDef * getSipType( const char * /*module_name*/, const char * typeName )
 {
+	/*
 	sipExportedModuleDef * module = getSipModule(module_name);
 	if( !module ) return 0;
 
@@ -90,9 +122,11 @@ sipTypeDef * getSipType( const char * module_name, const char * typeName )
 		if( //strcmp( type->td_name, typeName ) == 0 ||
 			 ( strcmp( sipNameFromPool( type->td_module, type->td_cname ), typeName ) == 0 ) )
 			return type;
-	}
+	}*/
+	const sipTypeDef * type = getSipAPI()->api_find_type(typeName);
+	if( type ) return const_cast<sipTypeDef*>(type);
 
-	LOG_5( "getSipType: Unabled to find " + QString::fromLatin1(typeName) + " in module " + QString::fromLatin1(module_name) );
+	LOG_5( "getSipType: Unabled to find " + QString::fromLatin1(typeName) );// + " in module " + QString::fromLatin1(module_name) );
 	return 0;
 }
 
@@ -242,28 +276,34 @@ PyObject * getClassObject( PyObject * pyObject )
 }
 
 // Returns a BORROWED reference
-PyObject * getPythonRecordClass()
+PyObject * getPythonClass( const char * moduleName, const char * typeName )
 {
 	PyObject * ret = 0;
 	ensurePythonInitialized();
 	// Return a NEW reference
 	SIP_BLOCK_THREADS
-	PyObject * module = PyImport_ImportModule( "blur.Stone" );
+	PyObject * module = PyImport_ImportModule( (char*)moduleName );
 	if( !module ) {
-		LOG_1( "getPythonRecordClass: Unable to load blur.Stone module" );
+		LOG_1( "getPythonRecordClass: Unable to load " + QString::fromLatin1(moduleName) + " module" );
 	} else {
 
 		// Returns a BORROWED reference
 		PyObject * moduleDict = PyModule_GetDict( module );
 		Py_DECREF(module);
 		if( !moduleDict ) {
-			LOG_1( "getPythonRecordClass: Unable to get dict for blur.Stone module" );
+			LOG_1( "getPythonRecordClass: Unable to get dict for " + QString::fromLatin1(moduleName) + " module" );
 		} else
 			// Returns a BORROWED reference
-			ret = PyDict_GetItemString( moduleDict, "Record" );
+			ret = PyDict_GetItemString( moduleDict, typeName );
 	}
 	SIP_UNBLOCK_THREADS
 	return ret;
+}
+
+// Returns a BORROWED reference
+PyObject * getPythonRecordClass()
+{
+	return getPythonClass( "blur.Stone", "Record" );
 }
 
 PyObject * sipWrapRecord( Record * r, bool makeCopy, TableSchema * defaultType )
@@ -423,7 +463,7 @@ RecordList recordListFromPyList( PyObject * a0 )
 	return ret;
 }
 
-PyObject * recordListGroupByCallable( RecordList * rl, PyObject * callable, TableSchema * defaultType )
+PyObject * recordListGroupByCallable( const RecordList * rl, PyObject * callable, TableSchema * defaultType )
 {
 	PyObject *d = PyDict_New();
 

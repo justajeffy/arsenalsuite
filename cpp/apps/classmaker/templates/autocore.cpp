@@ -40,9 +40,9 @@ t__List t__::select( const QString & where, const VarList & args )
 	return table()->select( where, args );
 }
 
-t__List t__::select( const QString & where )
+t__List t__::select( const Expression & exp )
 {
-	return table()->select( where );
+	return table()->select( exp );
 }
 
 Table * t__::table() {
@@ -52,3 +52,7 @@ Table * t__::table() {
 t__Schema * t__::schema() {
 	return t__Schema::instance();
 }
+
+struct t__::_c t__::c = {
+	<%SCHEMAFIELDDEFS%>
+};

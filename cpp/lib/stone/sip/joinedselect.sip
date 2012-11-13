@@ -138,5 +138,5 @@ public:
 		}
 %End
 
-	ResultSet select(const QString & where = QString(), QList<QVariant> args = QList<QVariant>());
+	ResultSet select(const QString & where = QString(), QList<QVariant> args = QList<QVariant>()) throw(SqlException,LostConnectionException,PythonException);
 };

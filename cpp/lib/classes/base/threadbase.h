@@ -21,7 +21,6 @@
  */
 
 #ifdef HEADER_FILES
-class Path;
 #endif
 
 #ifdef CLASS_FUNCTIONS

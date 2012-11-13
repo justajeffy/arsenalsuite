@@ -220,14 +220,16 @@ void MainWindow::expandChildTables( const QModelIndex & idx )
 	}
 }
 
+static const char * sFileDialogFilterString = "Schemas (*.xml *.schema);; All Files (*)";
+
 void MainWindow::slotOpenSchema()
 {
-	openSchema( QFileDialog::getOpenFileName( this, "Choose A Schema", QString::null, "Schemas (*.xml)" ) );
+	openSchema( QFileDialog::getOpenFileName( this, "Choose A Schema", QString::null, sFileDialogFilterString ) );
 }
 
 void MainWindow::slotImportSchema()
 {
-	QString schemaFile = QFileDialog::getOpenFileName( this, "Choose A Schema", QString::null, "Schemas (*.xml)" );
+	QString schemaFile = QFileDialog::getOpenFileName( this, "Choose A Schema", QString::null, sFileDialogFilterString );
 	if( schemaFile.size() ) {
 		if( mSchema ) {
 			mSchema->mergeXmlSchema( schemaFile, /*isfile=*/true, /*ignoreDocs*/false );

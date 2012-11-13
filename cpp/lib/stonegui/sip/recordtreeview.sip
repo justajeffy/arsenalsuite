@@ -40,6 +40,9 @@ public:
 
 	BusyWidget * busyWidget( bool autoCreate = true );
 	
+	void setPropagateGroupSelection( bool pgs );
+	bool propagateGroupSelection() const;
+
 public slots:
 	void expandRecursive( const QModelIndex & index = QModelIndex(), int levels = -1 );
 	void sortBySelection();
@@ -76,8 +79,6 @@ public:
 
 	int sizeHintForColumn( int column ) const;
 
-    QItemSelectionModel * selectionModel() const;
-
 public slots:
 	void setSelection( const RecordList & rl );
 	void setCurrent( const Record & r );
@@ -85,8 +86,7 @@ public slots:
 	void scrollTo( const Record & );
 	void scrollTo( RecordList );
 
-// Switched signals to protected since python receives a typeerror otherwise.
-protected:
+signals:
 	void currentChanged( const Record & );
 	void selectionChanged( RecordList );
 	void clicked( const Record & );

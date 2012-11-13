@@ -27,12 +27,16 @@ class JobRealFlowList : JobList
 
 %End
 public:
-	JobRealFlowList();
-	JobRealFlowList( const RecordList &, Table * t = 0 );
-	JobRealFlowList( const JobRealFlowList & );
-	JobRealFlowList( const Record &, Table * t = 0 );
-	
-	~JobRealFlowList();
+	JobRealFlowList() /HoldGIL/;
+	JobRealFlowList( const RecordList &, Table * t = 0 ) /HoldGIL/;
+	JobRealFlowList( const JobRealFlowList & ) /HoldGIL/;
+	JobRealFlowList( const Record &, Table * t = 0 ) /HoldGIL/;
+	JobRealFlowList( SIP_PYLIST );
+%MethodCode
+	sipCpp = new JobRealFlowList( recordListFromPyList(a0), JobRealFlow::table() );
+%End
+
+	~JobRealFlowList() /HoldGIL/;
 
 //	void insert( JobRealFlowIter, const JobRealFlow & );
 
@@ -42,33 +46,42 @@ public:
 
 //	JobRealFlowIter remove( const JobRealFlowIter & );
 
-	int remove( const Record & );
+	int remove( const Record & ) /HoldGIL/;
 	
-	int remove();
+	int remove() throw(SqlException,LostConnectionException,PythonException);
 	
 	//JobRealFlowIter begin();
 
 	//JobRealFlowIter end();
 
-	Table * table() const;
-	TableSchema * schema() const;
+	Table * table() const /HoldGIL/;
+	TableSchema * schema() const /HoldGIL/;
 
-	MappedJobRealFlowList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
-	MappedJobRealFlowList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const;
-	MappedJobRealFlowList sorted( const QString & c, bool a = true ) const;
+	MappedJobRealFlowList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobRealFlowList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobRealFlowList sorted( const QString & c, bool a = true ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedJobRealFlowList unique() const;
 	MappedJobRealFlowList reversed() const;
 	MappedJobRealFlowList reloaded() const;
 
-	QList<int> frameStarts() const;
+	QMap<QString,RecordList> groupedBy( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
+
+	PyObject * groupedBy( SIP_PYCALLABLE callable ) const throw(SqlException,LostConnectionException,PythonException);
+%MethodCode
+		sipRes = recordListGroupByCallable( sipCpp, a0, JobRealFlow::schema() );
+%End
+
+	QList<int> frameStarts() const /HoldGIL/;
 	MappedJobRealFlowList & setFrameStarts( const int & );
-	QList<int> frameEnds() const;
+	QList<int> frameEnds() const /HoldGIL/;
 	MappedJobRealFlowList & setFrameEnds( const int & );
-	QStringList simTypes() const;
+	QStringList simTypes() const /HoldGIL/;
 	MappedJobRealFlowList & setSimTypes( const QString & );
-	QList<uint> threadses() const;
+	QList<uint> threadses() const /HoldGIL/;
 	MappedJobRealFlowList & setThreadses( const uint & );
+	QStringList scripts() const /HoldGIL/;
+	MappedJobRealFlowList & setScripts( const QString & );
 
 
 };

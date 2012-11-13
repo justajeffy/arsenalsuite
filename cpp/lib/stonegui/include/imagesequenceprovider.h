@@ -29,7 +29,6 @@
 #define IMAGE_SEQUENCE_PROVIDER_H
 
 #include <qimage.h>
-#include <qwidget.h>
 #include <qcache.h>
 #include <qmutex.h>
 

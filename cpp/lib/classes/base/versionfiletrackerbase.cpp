@@ -31,7 +31,6 @@
 #include "path.h"
 #include "project.h"
 #include "rangefiletracker.h"
-#include "renderelements.h"
 #include "versionfiletracker.h"
 #include "filetrackerdep.h"
 
@@ -138,41 +137,6 @@ void VersionFileTracker::checkForUpdates()
 	setOldFileNames( ofn );
 	if( isRecord() )
 		commit();
-	
-	if( isRecord() ) {
-		RangeFileTrackerList out( outputs() );
-		QMap<QString,RangeFileTracker> rftMap;
-		foreach( RangeFileTracker rft, out )
-			rftMap[rft.path()] = rft;
-			
-		ResolutionList resolutions = Resolution::recordsByProject( element().project() );
-		QString red = renderElementDir( filePath() );
-		RenderElements res( red );
-		QStringList renders;
-		foreach( QString render, renders )
-		{
-			RenderElement * re = res.elementByName( render );
-			re->setGroup( "RENDER_SETTINGS" );
-			Path p( re->getString( "rendOutputFilename" ) );
-			RangeFileTracker rft;
-			bool hasDep = false;
-			if( rftMap.contains( p.dirPath() ) ) {
-				rft = rftMap[p.dirPath()];
-				hasDep = true;
-			}
-			rft.setFileNameTemplate( p.fileName() );
-			re->setGroup( "GENERAL" );
-			rft.setFrameStart( re->getInt( "timeRangeStart" ) );
-			rft.setFrameEnd( re->getInt( "timeRangeEnd" ) );
-			rft.commit();
-			if( !hasDep ) {
-				FileTrackerDep ftd;
-				ftd.setInput( *this );
-				ftd.setOutput( *this );
-				ftd.commit();
-			}
-		}
-	}
 }
 
 bool VersionFileTracker::doesTrackFile( const QString & fn )

@@ -23,11 +23,20 @@
  */
 
 #ifdef HEADER_FILES
+class JobType;
 #endif
 
 #ifdef CLASS_FUNCTIONS
 
+/// Maps this mapping. This function can be used without a database connection as long as
+/// Mapping.host() is cached in the Host key index.
 bool map( bool forceUnmount, QString * errorMsg );
+
+/// Blur specific function that tells if a path meets the criteria to be synced to the mirrors
+static bool isMirrorSyncPath( const QString & path);
+
+/// Returns true if the path will be available for jobs with jobType.  Checks isMirrorSyncPath where applicable
+static bool isMappedPath( const JobType & jobType, const QString & path );
 
 #endif
 

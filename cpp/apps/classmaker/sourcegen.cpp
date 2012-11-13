@@ -190,10 +190,24 @@ static void writeClass( TableSchema * table, const QString & path )
 	
 	
 	// methodDefs
-	QStringList memberCtorList;
+	QStringList memberCtorList, schemaFieldDefList;
 	QString methodDefs, sipMethodDefs, methods, listMethodDefs, sipListMethodDefs, listMethods, memberVars, memberCtors, setCode, getCode;
 	QString getColumn, setColumn, addFields, tableData;
-	QString tableMembers, schemaFieldDecls, schemaFieldDefs;
+	QString tableMembers, schemaFieldDecls;
+
+	foreach( Field * f, table->fields() ) {
+		QString camelMeth = f->methodName();
+		camelMeth[0] = camelMeth[0].toUpper();
+		if( f->flag( Field::PrimaryKey ) )
+			camelMeth = "Key";
+		QString fullCamelMeth = "t__::c." + camelMeth;
+		schemaFieldDefList += "0";
+		schemaFieldDecls += "\t\tStaticFieldExpression " + camelMeth + ";\n";
+		// Field comes from parent, we aren't creating the field below so we have
+		// to get it from the parent
+		if( f->table() != table )
+			addFields += "\t" + fullCamelMeth + " = b__::c." + camelMeth + ";\n";
+	}
 	
 	tableData += "const char * " + tbldef + " = \"" + tblname + "\";\n";
 	tableData += "const char * " + tblclassdef + " = \"" + name + "\";\n";
@@ -210,10 +224,8 @@ static void writeClass( TableSchema * table, const QString & path )
 		camelMeth[0] = camelMeth[0].toUpper();
 		if( f->flag( Field::PrimaryKey ) )
 			camelMeth = "Key";
-		schemaFieldDecls += "\tsnu___EXPORT extern Field * " + camelMeth + ";\n";
-		camelMeth = "t__Fields::" + camelMeth;
+		camelMeth = "t__::c." + camelMeth;
 		QString idx = camelMeth;
-		schemaFieldDefs += "Field * " + camelMeth + " = 0;\n";
 		
 		tableData += "const char * " + fndef + " = \"" + fn + "\";\n";
 		tableData += "const char * " + methdef + " = ";
@@ -232,22 +244,22 @@ static void writeClass( TableSchema * table, const QString & path )
 		addFields += "\t" + camelMeth + " = ";
 		if( f->flag( Field::ForeignKey ) ) {
 			QString fkt = f->foreignKey();
-			methodDefs += "\t" + retify(fkt) + " " + lcf( meth ) + "() const;\n";
+			methodDefs += "\t" + retify(fkt) + " " + lcf( meth ) + "(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const;\n";
 			methodDefs += "\tRET(t__) & set" + ucf( meth ) + "( const " + fkt + " & );\n";
-			sipMethodDefs += "\t" + retify(fkt) + " " + lcf( meth ) + "() const /HoldGIL/;\n";
+			sipMethodDefs += "\t" + retify(fkt) + " " + lcf( meth ) + "(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const /HoldGIL/;\n";
 			sipMethodDefs += "\tRET(t__) & set" + ucf( meth ) + "( const " + fkt + " & );\n";
-			methods += fkt + " t__::" + lcf( meth ) + "() const\n{\n";
-			methods += "\treturn foreignKey( " + idx + " );\n";
+			methods += fkt + " t__::" + lcf( meth ) + "(int lookupMode) const\n{\n";
+			methods += "\treturn foreignKey( " + idx + ", lookupMode );\n";
 			methods += "}\n\n";
 			methods += "t__ & t__::set" + ucf( meth ) + "( const " + fkt + " & val )\n{\n";
 			methods += "\tRecord::setForeignKey( " + idx + ", val );\n\treturn *this;\n";
 			methods += "}\n\n";
-			listMethodDefs += "\t" + retify(fkt + "List") + " " + lcf( pmeth ) + "() const;\n";
+			listMethodDefs += "\t" + retify(fkt + "List") + " " + lcf( pmeth ) + "(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const;\n";
 			listMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + fkt + " & );\n";
-			sipListMethodDefs += "\t" + retify(fkt + "List") + " " + lcf( pmeth ) + "() const /HoldGIL/;\n";
+			sipListMethodDefs += "\t" + retify(fkt + "List") + " " + lcf( pmeth ) + "(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const /HoldGIL/;\n";
 			sipListMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + fkt + " & );\n";
-			listMethods += fkt + "List t__List::" + lcf( pmeth ) + "() const\n{\n";
-			listMethods += "\treturn RecordList::foreignKey( " + idx + " );\n}\n\n";
+			listMethods += fkt + "List t__List::" + lcf( pmeth ) + "(int lookupMode) const\n{\n";
+			listMethods += "\treturn RecordList::foreignKey( " + idx + ", lookupMode );\n}\n\n";
 			listMethods += "t__List & t__List::set" + ucf( pmeth ) + "( const " + fkt + " & val )\n{\n";
 			listMethods += "\tRecordList::setForeignKey( " + idx + ", val );\n";
 			listMethods += "\treturn *this;\n";
@@ -276,8 +288,8 @@ static void writeClass( TableSchema * table, const QString & path )
 			methods += "}\n\n";
 			listMethodDefs += "\t" + f->listTypeString() + " " + lcf( pmeth ) + "() const;\n";
 			listMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + f->typeString() + " & );\n";
-            sipListMethodDefs += "\t" + f->listTypeString() + " " + lcf( pmeth ) + "() const /HoldGIL/;\n";
-            sipListMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + f->typeString() + " & );\n";
+			sipListMethodDefs += "\t" + f->listTypeString() + " " + lcf( pmeth ) + "() const /HoldGIL/;\n";
+			sipListMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + f->typeString() + " & );\n";
 			listMethods += f->listTypeString() + " t__List::" + lcf( pmeth ) + "() const\n{\n";
 			listMethods += "\t" + f->listTypeString() + " ret;\n";
 			listMethods += "\tif( d )\n";
@@ -345,23 +357,23 @@ static void writeClass( TableSchema * table, const QString & path )
 					addIdxCols += "\tm" + index->name() + "->addColumn( " + "__" + f->table()->className().toUpper() + "_" + fn.toUpper() + "_FIELD__ );\n";
 				tml += "const " + f->typeString() + " & " + fn;
 			}
- 			tableMembers += tml.join(", ") + ");\n";
-			indexDefs += args.join(", ") + " );\n";
+ 			tableMembers += tml.join(", ") + ", int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache );\n";
+			indexDefs += args.join(", ") + ", int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache );\n";
 		}
 
 		tableMembers += "\tIndexSchema * m" + index->name() + ";\n";
 		
 		if( !primaryKeyIndex ) {
 			if( index->holdsList() ){
-				indexMethods += "t__List t__::recordsBy" + index->name() + "( " + args.join(", ") + " )\n{\n";
-				indexMethods += "\treturn t__Schema::instance()->recordsBy" + index->name() + "( " + argsWOTypes.join(", ") + ");\n";
+				indexMethods += "t__List t__::recordsBy" + index->name() + "( " + args.join(", ") + ", int lookupMode )\n{\n";
+				indexMethods += "\treturn t__Schema::instance()->recordsBy" + index->name() + "( " + argsWOTypes.join(", ") + ", lookupMode );\n";
 				
-				indexFunctions += "t__List t__Schema::recordsBy" + index->name() + "( " + tml.join(", ") + " )\n{\n";
+				indexFunctions += "t__List t__Schema::recordsBy" + index->name() + "( " + tml.join(", ") + ", int lookupMode  )\n{\n";
 			} else {
-				indexMethods += "t__ t__::recordBy" + index->name() + "( " + args.join(", ") + " )\n{\n";
-				indexMethods += "\treturn t__Schema::instance()->recordBy" + index->name() + "( " + argsWOTypes.join(", ") + " );\n";
+				indexMethods += "t__ t__::recordBy" + index->name() + "( " + args.join(", ") + ", int lookupMode )\n{\n";
+				indexMethods += "\treturn t__Schema::instance()->recordBy" + index->name() + "( " + argsWOTypes.join(", ") + ", lookupMode );\n";
 				
-				indexFunctions += "t__ t__Schema::recordBy" + index->name() + "( " + tml.join(", ") + " )\n{\n";
+				indexFunctions += "t__ t__Schema::recordBy" + index->name() + "( " + tml.join(", ") + ", int lookupMode  )\n{\n";
 			}
 			indexMethods += "}\n";
 		
@@ -384,7 +396,7 @@ static void writeClass( TableSchema * table, const QString & path )
 				indexFunctions += "\targs += QVariant( " + fieldArgName(f->name()) + " );\n";
 			}
 		
-			indexFunctions += "\tret = table()->indexFromSchema( m" + index->name() + " )->recordsByIndex( args );\n";
+			indexFunctions += "\tret = table()->indexFromSchema( m" + index->name() + " )->recordsByIndex( args, lookupMode );\n";
 			if( index->holdsList() )
 				indexFunctions += "\treturn ret;\n";
 			else
@@ -410,11 +422,11 @@ static void writeClass( TableSchema * table, const QString & path )
 			classDefines += "class " + ret + ";\n";
 			classDefines += "class " + ret + "List;\n";
 			classHeaders += "#include \"" + t->className().toLower() + ".h\"\n";
-			methodDefs += "\t" + retify(ret) + " " + method + "() const;\n";
-			sipMethodDefs += "\t" + retify(ret) + " " + method + "() const;\n";
-			methods += ret + " t__::" + method + "() const\n{\n";
+			methodDefs += "\t" + retify(ret) + " " + method + "( int lookupMode=Index::UseCache|Index::PartialSelect|Index::UseSelect ) const;\n";
+			sipMethodDefs += "\t" + retify(ret) + " " + method + "( int lookupMode=Index::UseCache|Index::PartialSelect|Index::UseSelect ) const;\n";
+			methods += ret + " t__::" + method + "( int lookupMode ) const\n{\n";
 			methods += "\treturn " + t->className() + QString(f->flag( Field::Unique ) ? "::recordBy" : "::recordsBy") + f->index()->name() + "( ";
-			methods += "*this );\n}\n";
+			methods += "*this, lookupMode );\n}\n";
 
 			QString listMethod = method;
 
@@ -423,12 +435,12 @@ static void writeClass( TableSchema * table, const QString & path )
 				listMethod = pluralizeName(listMethod);
 			}
 
-			listMethodDefs += "\t" + retify(ret) + " " + listMethod + "();\n";
-            sipListMethodDefs += "\t" + retify(ret) + " " + listMethod + "();\n";
-
-			listMethods += ret + " t__List::" + listMethod + "()\n{\n";
+			listMethodDefs += "\t" + retify(ret) + " " + listMethod + "( int lookupMode=Index::UseCache|Index::PartialSelect|Index::UseSelect );\n";
+			sipListMethodDefs += "\t" + retify(ret) + " " + listMethod + "( int lookupMode=Index::UseCache|Index::PartialSelect|Index::UseSelect );\n";
+			
+			listMethods += ret + " t__List::" + listMethod + "( int lookupMode )\n{\n";
 			listMethods += "\tIndex * idx = " + t->className() + "::table()->indexFromField( \"" + f->name() + "\" );\n";
-            listMethods += "\treturn idx ? idx->recordsByIndexMulti( getValue( " + table->field(table->primaryKeyIndex())->table()->className() + "Fields::Key ) ) : " + t->className() + "List();\n}\n\n";
+			listMethods += "\treturn idx ? idx->recordsByIndexMulti( getValue( " + table->field(table->primaryKeyIndex())->table()->className() + "::c.Key ), lookupMode ) : " + t->className() + "List();\n}\n\n";
 		}
 	}
 
@@ -460,7 +472,10 @@ static void writeClass( TableSchema * table, const QString & path )
 		listMethods += "\t\tret += (*it).children( etl, recursive );\n\treturn ret;\n}\n";
 	}
 
+	QString schemaFieldDefs = schemaFieldDefList.join(",\n\t");
+	
 	QString temp = readFile( "templates/autocore.h" );
+	temp.replace( "<%SCHEMAFIELDDECLS%>", schemaFieldDecls );
 	temp.replace( "<%METHODDEFS%>", methodDefs );
 	temp.replace( "<%INDEXDEFS%>", indexDefs );
 	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
@@ -483,6 +498,7 @@ static void writeClass( TableSchema * table, const QString & path )
 	write( temp, path + "/autocore/" + name.toLower() + ".h" );
 
 	temp = readFile( "templates/autocore.sip" );
+	temp.replace( "<%SCHEMAFIELDDECLS%>", schemaFieldDecls );
 	temp.replace( "<%METHODDEFS%>", sipMethodDefs );
 	temp.replace( "<%INDEXDEFS%>", indexDefs );
 	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
@@ -504,6 +520,7 @@ static void writeClass( TableSchema * table, const QString & path )
 	write( temp, path + "/sip/" + name.toLower() + ".sip" );
 	
 	temp = readFile( "templates/autocore.cpp" );
+	temp.replace( "<%SCHEMAFIELDDEFS%>", schemaFieldDefs );
 	temp.replace( "<%CLASSHEADERS%>", classHeaders );
 	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
 	temp.replace( "<%CLASSDEFS%>", classDefines );

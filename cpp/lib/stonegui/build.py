@@ -25,6 +25,7 @@ StaticTarget = QMakeTarget("stoneguistatic",path,"stonegui.pro",["stone"],[],Tru
 
 #if sys.platform=="linux2":
 #	rpm = RPMTarget("stoneguirpm",'blur-stonegui',path,'../../../rpm/spec/stonegui.spec.template','1.0')
+#	pyrpm = RPMTarget('pystoneguirpm','pystonegui',path,'../../../rpm/spec/pystonegui.spec.template','1.0')
 
 if __name__ == "__main__":
 	build()

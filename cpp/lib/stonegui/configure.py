@@ -54,10 +54,10 @@ def doit():
 	qt_sip_flags = config.pyqt_sip_flags
 	if opt_generate_code:
 		if sys.platform=="win32":
-			sip_bin = "..\\sip\\sipgen\\sip.exe"
+				sip_bin = "..\\sip\\sipgen\\sip.exe"
 		else:
-			sip_bin = config.sip_bin
-		ret = os.system(" ".join([sip_bin, "-c", "sipStonegui", "-b", "sipStonegui/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, "-I", config.sip_mod_dir, config.pyqt_sip_flags, "sip/stonegui.sip"]))
+				sip_bin = config.sip_bin
+		ret = os.system(" ".join([sip_bin, "-e", "-k", "-c", "sipStonegui", "-b", "sipStonegui/" + build_file, "-I", config.pyqt_sip_dir, "-I", config.default_sip_dir, "-I", config.sip_mod_dir, config.pyqt_sip_flags, "sip/stonegui.sip"]))
 		if ret:
 			sys.exit(ret%255)
 
@@ -69,8 +69,8 @@ def doit():
 		build_file=build_file,
 		static=opt_static,
 		debug=opt_debug,
-        # Use the sip mod dir instead to adhere to the DESTDIR settings
-        install_dir=os.path.join(config.sip_mod_dir,"blur"),
+		# Use the sip mod dir instead to adhere to the DESTDIR settings
+		install_dir=os.path.join(config.sip_mod_dir,"blur"),
 #		install_dir=os.path.join(config.default_mod_dir,"blur"),
 		dir="sipStonegui"
 	)
@@ -83,8 +83,8 @@ def doit():
 
 	installs.append([sipfiles, os.path.join(config.default_sip_dir, "blur")])
 
-    # Use the sip mod dir instead for DESTDIR adherance
-    #installs.append(["stoneguiconfig.py", config.sip_mod_ri])
+	# Use the sip mod dir instead for DESTDIR adherance
+	#installs.append(["stoneguiconfig.py", config.sip_mod_ri])
 	#installs.append(["stoneguiconfig.py", config.default_mod_dir])
 
 	sipconfig.ParentMakefile(

@@ -23,20 +23,36 @@
 
 #ifdef HEADER_FILES
 #include "joboutput.h"
+#include "mapping.h"
+
+#include "trigger.h"
+class JobTrigger : public Trigger
+{
+public:
+	JobTrigger();
+	virtual Record preUpdate( const Record & /*updated*/, const Record & /*before*/ );
+};
 #endif
 
 #ifdef CLASS_FUNCTIONS
-	static bool updateJobStatuses( JobList jobs, const QString & jobStatus, bool resetTasks = false );
+	static bool updateJobStatuses( JobList jobs, const QString & jobStatus, bool resetTasks, bool restartHosts );
 
 	void changeFrameRange( QList<int>, JobOutput output = JobOutput(), bool changeCancelledToNew = true );
 
-	void changePreassignedTaskList( HostList hosts, bool changeCancelledToNew = true );
+	// If hosts are added(or uncancelled) to a done job, the jobs status will be updated to suspended
+	void changePreassignedTaskListWithStatusPrompt( HostList hosts, QWidget * parent = 0, bool changeCancelledToNew = false );
+	
+	// If updateStatusIfNeeded is true, and hosts are added(or uncancelled) to a done job, the jobs status will be updated to suspended
+	// Returns the number of tasks that were added or uncancelled, used by changePreassignedTaskListWithStatusPrompt.
+	int changePreassignedTaskList( HostList hosts, bool changeCancelledToNew = false, bool updateStatusIfNeeded = true );
 
 	void addHistory( const QString & message );
 
+	// Returns the proper mapping entries for this job.  The mapping entries are defined by the JobTypeMapping and JobMapping tables.
+	// JobMappings override any JobTypeMappings that have the same mount
+	MappingList mappings() const;
 #endif
 
-#ifdef TABLE_FUNCTIONS
-	virtual void preUpdate( const Record &, const Record & );
-	virtual void postUpdate( const Record & updated, const Record & old );
+#ifdef TABLE_CTOR
+	addTrigger( new JobTrigger() );
 #endif

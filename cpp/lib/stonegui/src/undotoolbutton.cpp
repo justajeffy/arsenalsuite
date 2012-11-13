@@ -22,53 +22,59 @@
  */
 
 /*
- * $Id: undotoolbutton.cpp 5411 2007-12-18 01:03:08Z brobison $
+ * $Id: undotoolbutton.cpp 12771 2012-02-21 18:03:54Z newellm $
  */
 
 #include <qmenu.h>
 
 #include "blurqt.h"
 #include "database.h"
-#include "undomanager.h"
 #include "undotoolbutton.h"
 #include "recordimp.h"
 #include "table.h"
 
-UndoRedoToolButton::UndoRedoToolButton( QWidget * parent, UndoManager * um, bool isUndo )
+UndoRedoToolButton::UndoRedoToolButton( QWidget * parent, QUndoStack * undoStack, bool isUndo )
 : QToolButton( parent )
 , mIsUndo( isUndo )
-, mUndoManager( um )
+, mUndoStack( undoStack )
 {
 	setToolTip( isUndo ? "Undo" : "Redo" );
 	setIcon( QIcon( isUndo ? ":/images/undo.png" : ":/images/redo.png" ) );
 	setIconSize( QSize( 22, 22 ) );
-	connect( um, SIGNAL( undoRedoChange( bool, bool ) ), SLOT( undoRedoChange( bool, bool ) ) );
-	connect( this, SIGNAL( clicked() ), um, isUndo ? SLOT( undo() ) : SLOT( redo() ) );
-	setEnabled( isUndo ? um->canUndo() : um->canRedo() );
+	if( isUndo )
+		connect( mUndoStack, SIGNAL( canUndo( bool ) ), SLOT( canUndoRedoChange( bool ) ) );
+	else
+		connect( mUndoStack, SIGNAL( canRedo( bool ) ), SLOT( canUndoRedoChange( bool ) ) );
+	connect( this, SIGNAL( clicked() ), mUndoStack, isUndo ? SLOT( undo() ) : SLOT( redo() ) );
+	setEnabled( isUndo ? mUndoStack->canUndo() : mUndoStack->canRedo() );
 }
+
 
 void UndoRedoToolButton::updatePopup()
 {
-	QMenu * pp = new QMenu( this );//popup();
+	QMenu * pp = new QMenu( this );
 	if( !pp ) {
 		pp = new QMenu( this );
-		connect( pp, SIGNAL( activated( int ) ), SLOT( menuItemClicked( int ) ) );
+		connect( pp, SIGNAL( triggered( QAction * ) ), SLOT( menuItemClicked( QAction * ) ) );
 	}
 	pp->clear();
-	QStringList items = mIsUndo ? mUndoManager->undoTitles( 10 ) : mUndoManager->redoTitles( 10 );
-	foreach( QString item, items )
-		pp->addAction( item );
+	int step = mIsUndo ? -1 : 1;
+	int stop = qBound(0, mUndoStack->index() + (mIsUndo ? -10 : 10), mUndoStack->count());
+	for( int i = mUndoStack->index() + step; i != stop; i += step ) {
+		QAction * act = pp->addAction( mUndoStack->text(i) );
+		act->setData( i );
+	}
 	setMenu( pp );
 }
 
-void UndoRedoToolButton::undoRedoChange( bool ua, bool ra )
+void UndoRedoToolButton::canUndoRedoChange( bool canUndoRedo )
 {
-	setEnabled( mIsUndo ? ua : ra );
+	setEnabled( canUndoRedo );
 	updatePopup();
 }
 
-void UndoRedoToolButton::menuItemClicked( int id )
+void UndoRedoToolButton::menuItemClicked( QAction * act )
 {
-	mIsUndo ? mUndoManager->undo( id ) : mUndoManager->redo( id );
+	mUndoStack->setIndex(act->data().toInt());
 }
 

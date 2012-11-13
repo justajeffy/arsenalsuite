@@ -27,12 +27,16 @@ class JobXSIScriptList : JobList
 
 %End
 public:
-	JobXSIScriptList();
-	JobXSIScriptList( const RecordList &, Table * t = 0 );
-	JobXSIScriptList( const JobXSIScriptList & );
-	JobXSIScriptList( const Record &, Table * t = 0 );
-	
-	~JobXSIScriptList();
+	JobXSIScriptList() /HoldGIL/;
+	JobXSIScriptList( const RecordList &, Table * t = 0 ) /HoldGIL/;
+	JobXSIScriptList( const JobXSIScriptList & ) /HoldGIL/;
+	JobXSIScriptList( const Record &, Table * t = 0 ) /HoldGIL/;
+	JobXSIScriptList( SIP_PYLIST );
+%MethodCode
+	sipCpp = new JobXSIScriptList( recordListFromPyList(a0), JobXSIScript::table() );
+%End
+
+	~JobXSIScriptList() /HoldGIL/;
 
 //	void insert( JobXSIScriptIter, const JobXSIScript & );
 
@@ -42,38 +46,45 @@ public:
 
 //	JobXSIScriptIter remove( const JobXSIScriptIter & );
 
-	int remove( const Record & );
+	int remove( const Record & ) /HoldGIL/;
 	
-	int remove();
+	int remove() throw(SqlException,LostConnectionException,PythonException);
 	
 	//JobXSIScriptIter begin();
 
 	//JobXSIScriptIter end();
 
-	Table * table() const;
-	TableSchema * schema() const;
+	Table * table() const /HoldGIL/;
+	TableSchema * schema() const /HoldGIL/;
 
-	MappedJobXSIScriptList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
-	MappedJobXSIScriptList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const;
-	MappedJobXSIScriptList sorted( const QString & c, bool a = true ) const;
+	MappedJobXSIScriptList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobXSIScriptList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobXSIScriptList sorted( const QString & c, bool a = true ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedJobXSIScriptList unique() const;
 	MappedJobXSIScriptList reversed() const;
 	MappedJobXSIScriptList reloaded() const;
 
-	QList<int> frameStarts() const;
+	QMap<QString,RecordList> groupedBy( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
+
+	PyObject * groupedBy( SIP_PYCALLABLE callable ) const throw(SqlException,LostConnectionException,PythonException);
+%MethodCode
+		sipRes = recordListGroupByCallable( sipCpp, a0, JobXSIScript::schema() );
+%End
+
+	QList<int> frameStarts() const /HoldGIL/;
 	MappedJobXSIScriptList & setFrameStarts( const int & );
-	QList<int> frameEnds() const;
+	QList<int> frameEnds() const /HoldGIL/;
 	MappedJobXSIScriptList & setFrameEnds( const int & );
-	QList<bool> scriptRequiresUis() const;
+	QList<bool> scriptRequiresUis() const /HoldGIL/;
 	MappedJobXSIScriptList & setScriptRequiresUis( const bool & );
-	QStringList scriptFiles() const;
+	QStringList scriptFiles() const /HoldGIL/;
 	MappedJobXSIScriptList & setScriptFiles( const QString & );
-	QStringList xsiFiles() const;
+	QStringList xsiFiles() const /HoldGIL/;
 	MappedJobXSIScriptList & setXsiFiles( const QString & );
-	QStringList scriptMethods() const;
+	QStringList scriptMethods() const /HoldGIL/;
 	MappedJobXSIScriptList & setScriptMethods( const QString & );
-	QStringList frameLists() const;
+	QStringList frameLists() const /HoldGIL/;
 	MappedJobXSIScriptList & setFrameLists( const QString & );
 
 

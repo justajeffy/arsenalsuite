@@ -32,7 +32,6 @@
 
 void HostStatus::returnSlaveFrames( bool commitHostStatus )
 {
-
 	Database::current()->beginTransaction();
 	Database::current()->exec( "SELECT return_slave_tasks_3(?)", VarList() << host().key() );
 	Database::current()->commitTransaction();

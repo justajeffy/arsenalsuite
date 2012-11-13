@@ -30,7 +30,6 @@
 #include "elementtype.h"
 #include "history.h"
 #include "record.h"
-#include "resolution.h"
 #include "projectstorage.h"
 #include "filetracker.h"
 
@@ -95,8 +94,6 @@ class QWidget;
 	
 	/// Returns the asset described by the uri notation.  The first name must be a project.
 	static Element fromUri( const QString & dotPath );
-	
-	QString status() const;
 	
 	/***************************************************************
 		Path functions

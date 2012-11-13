@@ -26,7 +26,7 @@ Q_OBJECT
 public:
 	HostHistoryView( QWidget * parent );
 
-	Host hostFilter() const;
+	HostList hostFilter() const;
 
 	Job jobFilter() const;
 
@@ -37,7 +37,7 @@ public:
 public slots:
 	void refresh();
 
-	void setHostFilter( const Host & );
+	void setHostFilter( HostList );
 	void setJobFilter( const Job & );
 	void setTaskFilter( const JobTask & );
 	void setLimit( int limit );
@@ -53,7 +53,7 @@ protected:
 	JobAssignmentTranslator * mTrans;
 	bool mRefreshScheduled;
 	Job mJobFilter;
-	Host mHostFilter;
+	HostList mHostFilter;
 	JobTask mJobTaskFilter;
 	int mLimit;
 	RecordList mCache;
@@ -67,11 +67,14 @@ public:
 	
 	HostHistoryView * view() const;
 
+public slots:
+	void setLimit();
+	
 protected:
 	void closeEvent( QCloseEvent * );
 
 	HostHistoryView * mView;
-	QAction * mCloseAction, * mRefreshAction;
+	QAction * mCloseAction, * mRefreshAction, * mSetLimitAction;
 };
 
 #endif // HOST_HISTORY_VIEW_H

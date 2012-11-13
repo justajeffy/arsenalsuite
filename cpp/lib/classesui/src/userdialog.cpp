@@ -26,41 +26,26 @@
 #include <qlineedit.h>
 #include <qpushbutton.h>
 
-#include "elementui.h"
-#include "host.h"
-#include "userdialog.h"
-#include "groupsdialog.h"
 #include "database.h"
 
-/**
- * Adds all of the host names to the combobox cb, and
- * sets the selected item to the host sel, if sel.isRecord()
- * returns true
- **/
-void addHosts( QComboBox * cb, const Host & sel = Host() )
-{
-	cb->clear();
-	QStringList hostSort = Host::select().names();
-	hostSort.sort();
-	
-	cb->addItem( "Host not set" );
-	cb->addItems( hostSort );
-	
-	int idx = cb->findText( sel.name() );
-	if( idx >= 0 )
-		cb->setCurrentIndex( idx );
-}
+#include "host.h"
 
-UserDialog::UserDialog( QWidget * parent )
+#include "elementui.h"
+#include "groupsdialog.h"
+#include "hostselector.h"
+#include "userdialog.h"
+
+UserDialog::UserDialog( QWidget * parent, ChangeSet changeSet )
 : QDialog( parent )
+, mChangeSet( changeSet.isValid() ? changeSet : ChangeSet::create("Create User") )
 , mIsEmp( true )
 {
 	setupUi( this );
 
+	connect( mAssignedHostsButton, SIGNAL( clicked() ), SLOT( slotEditHosts() ) );
 	connect( mEmployeeGroup, SIGNAL( toggled( bool ) ), SLOT( slotEmpToggle( bool ) ) );
 	connect( mEditGroups, SIGNAL( clicked() ), SLOT( slotEditGroups() ) );
-	addHosts( mHostCombo );
-	
+
 	if( !User::hasPerms( "UsrGrp", true ) ) {
 		mEditGroups->setText( "View Groups" );
 		mEditGroups->setEnabled( User::hasPerms( "UsrGrp" ) && User::hasPerms( "Group" ) );
@@ -71,6 +56,8 @@ UserDialog::UserDialog( QWidget * parent )
 
 Employee UserDialog::employee() const
 {
+	CS_ENABLE(mChangeSet);
+
 	Employee e( user() );
 	if( !e.isRecord() ){
 		e.setElementType( User::type() );
@@ -88,6 +75,8 @@ Employee UserDialog::employee() const
 
 User UserDialog::user() const
 {
+	CS_ENABLE(mChangeSet);
+
 	mUser.setName( mUserName->text() );
 	mUser.setUsr( mUserName->text() );
 	mUser.setPassword( mPassword->text() );
@@ -95,7 +84,6 @@ User UserDialog::user() const
 	mUser.setThreadNotifyByJabber( mNotifyJabberCheck->isChecked() ? 1 : 0 );
 	mUser.setHomeDir( "/home/netftp/ftpRoot/" + mUserName->text() );
 	mUser.setShell( mShellCheck->isChecked() ? "/bin/bash" : "/bin/false" );
-	mUser.setHost( Host::recordByName( mHostCombo->currentText() ) );
 	if( !mUser.gid() )
 		mUser.setGid( User::nextGID() );
 	if( !mUser.uid() )
@@ -107,9 +95,6 @@ void UserDialog::setUser( const User & u )
 {
 	mUserName->setText( u.name() );
 	mPassword->setText( u.password() );
-	Host h = u.host();
-	int idx = mHostCombo->findText( h.name() );
-	mHostCombo->setCurrentIndex( qMax(0,idx) );
 	mNotifyEmailCheck->setChecked( u.threadNotifyByEmail() );
 	mNotifyJabberCheck->setChecked( u.threadNotifyByJabber() );
 	mShellCheck->setChecked( u.shell() == "/bin/bash" );
@@ -120,8 +105,18 @@ void UserDialog::setUser( const User & u )
 	bool canEdit = User::hasPerms( "Usr", true );
 	mAdminGroup->setEnabled( canEdit );
 	mEmployeeGroup->setEnabled( canEdit );
-
 	mUser = u;
+
+	refreshAssignedHosts();
+	
+	if( mUser.isRecord() )
+		mChangeSet.setTitle( "Edit User" );
+}
+
+void UserDialog::refreshAssignedHosts()
+{
+	CS_ENABLE(mChangeSet);
+	mAssignedHostsEdit->setText( mUser.hosts().names().join(",") );
 }
 
 void UserDialog::setEmployee( const Employee & e )
@@ -139,8 +134,26 @@ void UserDialog::slotEmpToggle( bool emp )
 	mEmployeeGroup->setChecked( emp );
 }
 
+void UserDialog::slotEditHosts()
+{
+	CS_ENABLE(mChangeSet);
+	HostSelector * hs = new HostSelector(this);
+	hs->setHostList( mUser.hosts() );
+	if( hs->exec() == QDialog::Accepted ) {
+		HostList newAssignedHosts = hs->hostList();
+		HostList clearedHosts = mUser.hosts() - newAssignedHosts;
+		newAssignedHosts.setUsers( mUser );
+		newAssignedHosts.commit();
+		clearedHosts.setUsers( User() );
+		clearedHosts.commit();
+		refreshAssignedHosts();
+	}
+	delete hs;
+}
+
 void UserDialog::accept()
 {
+	CS_ENABLE(mChangeSet);
 	if( !mUser.isRecord() ) {
 		User u;
 		if( mIsEmp ) {
@@ -150,18 +163,8 @@ void UserDialog::accept()
 			mUser = User();
 			u = user();
 		}
+		u.setKeyUsr( u.key(true) );
 		u.commit();
-		u.setKeyUsr( u.key() );
-		u.commit();
-		UserGroupList ugl;
-		foreach( Group g, mNewUserGroups )
-		{
-			UserGroup ug;
-			ug.setUser( u );
-			ug.setGroup( g );
-			ugl += ug;
-		}
-		ugl.commit();
 	} else {
 		if( Employee( mUser ).isRecord() != mIsEmp ) {
 			// FIXME
@@ -171,25 +174,16 @@ void UserDialog::accept()
 		else
 			user().commit();
 	}
+
+	mChangeSet.commit();
 	QDialog::accept();
 }
 
 void UserDialog::slotEditGroups()
 {
-	GroupsDialog * gd = new GroupsDialog( this );
-	Database::current()->beginTransaction( "Edit User Group Associations" );
-
-	if( mUser.isRecord() )
-		gd->setUser( mUser );
-	else
-		gd->setCheckedGroups( mNewUserGroups );
-	if( gd->exec() == QDialog::Accepted )
-		Database::current()->commitTransaction();
-	else
-		Database::current()->rollbackTransaction();
-
-	if( !mUser.isRecord() )
-		mNewUserGroups = gd->checkedGroups();
+	GroupsDialog * gd = new GroupsDialog( this, mChangeSet.createChild("Edit User Group Associations") );
+	gd->setUser( mUser );
+	gd->exec();
 	delete gd;
 }
 

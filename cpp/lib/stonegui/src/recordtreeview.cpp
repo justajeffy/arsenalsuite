@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id$
+ * $Id: recordtreeview.cpp 13596 2012-09-17 23:43:49Z newellm $
  */
 
 #include <qapplication.h>
@@ -63,13 +63,14 @@ ExtTreeView::ExtTreeView( QWidget * parent, ExtDelegate * delegate )
 , mBusyWidget( 0 )
 , mHeaderClickIsResize( false )
 , mLastGroupColumn(-1)
+, mPropagateGroupSelection(true)
 {
 	header()->setClickable( true );
 	header()->setSortIndicatorShown( true );
 
 	setContextMenuPolicy( Qt::CustomContextMenu );
 	connect( this, SIGNAL( customContextMenuRequested( const QPoint & ) ), SLOT( slotCustomContextMenuRequested( const QPoint & ) ) );
-    connect( header(), SIGNAL( sectionResized( int, int, int ) ), SLOT( slotSectionResized() ) );
+	connect( header(), SIGNAL( sectionResized( int, int, int ) ), SLOT( slotSectionResized() ) );
 
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 
@@ -98,35 +99,39 @@ ExtTreeView::ExtTreeView( QWidget * parent, ExtDelegate * delegate )
 
 void ExtTreeView::addFilterLayout()
 {
-    QWidget * parentWidget = qobject_cast<QWidget*>(parent());
+	QWidget * parentWidget = qobject_cast<QWidget*>(parent());
 
-    QLayout * parentLayout = parentWidget->layout();
-    delete parentLayout;
+	QLayout * parentLayout = parentWidget->layout();
+	delete parentLayout;
 
-    QVBoxLayout * fooLay = new QVBoxLayout(parentWidget);
-    fooLay->setContentsMargins(0,0,0,0);
-    fooLay->setSpacing(0);
-    fooLay->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+	QVBoxLayout * fooLay = new QVBoxLayout(parentWidget);
+	fooLay->setContentsMargins(0,0,0,0);
+	fooLay->setSpacing(0);
+	fooLay->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mRecordFilterWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	mRecordFilterWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    fooLay->addWidget(mRecordFilterWidget);
-    fooLay->addWidget(this);
+	fooLay->addWidget(mRecordFilterWidget);
+	fooLay->addWidget(this);
 }
 
 void ExtTreeView::slotSectionResized()
 {
-    //LOG_3(" header click is for resizing, not sorting ");
-    mHeaderClickIsResize = true;
+	mHeaderClickIsResize = true;
 }
 
 bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 {
-    bool headerChild = false;
-    if( header()->children().contains(object) ) {
-        headerChild = true;
-    }
+	bool headerChild = false;
+	QObject * ob = object;
+	while( ob ) {
+		if( ob == header() ) {
+			headerChild = true;
+			break;
+		}
+		ob = ob->parent();
+	}
 
 	if( headerChild )
 	{
@@ -134,7 +139,6 @@ bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 			case QEvent::ChildAdded:
 			case QEvent::ChildPolished:
 			{
-                //LOG_3( "headerChild connect sectionResized" );
 				QChildEvent * ce = (QChildEvent*)event;
 				ce->child()->installEventFilter(this);
 				if( object == header() )
@@ -166,7 +170,7 @@ bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 				int section = header()->logicalIndexAt(mouseEvent->pos());
 				QList<SortColumnPair> sortColumns = sm->sortColumns();
 				Qt::SortOrder so = Qt::DescendingOrder;
-
+				
 				bool secondColumnSort = (mouseEvent->modifiers() & Qt::ControlModifier);
 				int checkExistingColumn = secondColumnSort ? 1 : 0;
 				// Toggle the direction if this column is already in the second place
@@ -180,7 +184,7 @@ bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 				}
 				if( toggleOrder )
 					so = (so == Qt::DescendingOrder) ? Qt::AscendingOrder : Qt::DescendingOrder;
-
+				
 				sortColumns.insert( (secondColumnSort && sortColumns.size() >= 1) ? 1 : 0,SortColumnPair(section,so));
 				sm->setSortColumns(sortColumns, /*forceResort = */ secondColumnSort );
 				// We have to trick the damn QHeaderView into getting our sort direction correct, we make it think
@@ -197,6 +201,7 @@ bool ExtTreeView::eventFilter( QObject * object, QEvent * event )
 	}
 	return false;
 }
+
 
 void ExtTreeView::showHeaderMenu( const QPoint & pos, int section )
 {
@@ -215,7 +220,8 @@ void ExtTreeView::showHeaderMenu( const QPoint & pos, int section )
 		sortBySelectionAction = sortOrderMenu->addAction( "Sort By Selection" );
 		sortOrderMenu->addSeparator();
 	}
-
+	
+	
 	QStringList hls;// = mModel->headerLabels();
 	QAbstractItemModel * mdl = model();
 	for( int i = 0; i < mdl->columnCount(); ++i )
@@ -237,22 +243,22 @@ void ExtTreeView::showHeaderMenu( const QPoint & pos, int section )
 			sortOrderColumnMap[act] = sc.first;
 		}
 	}
-
+	
 	QAction * groupAction = 0, * ungroupAction = 0;
-    if( sm && sm->grouper(false) ) {
-        ModelGrouper * grouper = sm->grouper();;
-        if( grouper->isGrouped() ) {
-            int groupColumn = grouper->groupColumn();
+	if( sm && sm->grouper(false) ) {
+		ModelGrouper * grouper = sm->grouper();;
+		if( grouper->isGrouped() ) {
+			int groupColumn = grouper->groupColumn();
 			ungroupAction = menu->addAction( "Ungroup " + hls[groupColumn] );
 		} else if( section >= 0 ) {
 			groupAction = menu->addAction( "Group rows by " + hls[section] );
-		} else
+		} else 
 			LOG_1( "Not a valid section" );
 	} else
 		LOG_1( "Not a grouping tree builder" );
-
+	
 	emit aboutToShowHeaderMenu( menu );
-
+	
 	QAction * ret = menu->exec( pos );
 	delete menu;
 
@@ -282,9 +288,9 @@ void ExtTreeView::showHeaderMenu( const QPoint & pos, int section )
 	} else if( ret && ret == sortBySelectionAction ) {
 		sortBySelection();
 	} else if( ret && ret == groupAction ) {
-        sm->grouper()->groupByColumn( section );
+		sm->grouper()->groupByColumn( section );
 	} else if( ret && ret == ungroupAction ) {
-        sm->grouper()->ungroup();
+		sm->grouper()->ungroup();
 	}
 }
 
@@ -356,10 +362,44 @@ QModelIndexList ExtTreeView::selectedRows()
 
 void ExtTreeView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
+	if( mPropagateGroupSelection ) {
+		SuperModel * sm = dynamic_cast<SuperModel*>(model());
+		ModelGrouper * grp = sm->grouper(false);
+		ModelDataTranslator * gt = grp ? grp->groupedItemTranslator() : 0;
+		QItemSelectionModel * sel = selectionModel();
+		if( sm && gt ) {
+			QItemSelection selected2(selected);
+			if( sel->selection().size() == 1 && selected.size() == 0 && deselected.size() )
+				selected2 = sel->selection();
+			QItemSelection toSelect, toDeselect;
+			foreach( QItemSelectionRange range, selected2 ) {
+				QModelIndex topLeft = range.topLeft();
+				while(1) {
+					if( gt == sm->translator(topLeft) )
+						toSelect += QItemSelectionRange( topLeft.child( 0, topLeft.column() ), topLeft.child( sm->rowCount(topLeft) - 1, range.bottomRight().column() ) );
+					if( topLeft.row() >= range.bottom() ) break;
+					topLeft = topLeft.sibling(topLeft.row()+1,topLeft.column());
+				}
+			}
+			foreach( QItemSelectionRange range, deselected ) {
+				QModelIndex topLeft = range.topLeft();
+				while(1) {
+					if( gt == sm->translator(topLeft) )
+						toDeselect += QItemSelectionRange( topLeft.child( 0, topLeft.column() ), topLeft.child( sm->rowCount(topLeft) - 1, range.bottomRight().column() ) );
+					if( topLeft.row() >= range.bottom() ) break;
+					topLeft = topLeft.sibling(topLeft.row()+1,topLeft.column());
+				}
+			}
+			sel->select( toSelect, QItemSelectionModel::Select );
+			sel->select( toDeselect, QItemSelectionModel::Deselect );
+		}
+	}
+
 	if( !mShowGrid ) {
 		QTreeView::selectionChanged(selected,deselected);
 		return;
 	}
+
 	QRect rect = visualRegionForSelection(deselected).boundingRect();
 	setDirtyRegion( QRegion( rect.adjusted(0,-1,0,0) ) );
 	rect = visualRegionForSelection(selected).boundingRect();
@@ -368,15 +408,15 @@ void ExtTreeView::selectionChanged(const QItemSelection &selected, const QItemSe
 
 void ExtTreeView::setModel( QAbstractItemModel * model )
 {
-    SuperModel * sm = dynamic_cast<SuperModel*>(model);
-    if( sm ) {
-        QList<SortColumnPair> sortColumns = sm->sortColumns();
-        header()->setSortIndicator( sortColumns.size() ? sortColumns[0].first : 0, sm->sortOrder() );
-        connect( model, SIGNAL( grouperChanged( ModelGrouper* ) ), SLOT( slotGrouperChanged( ModelGrouper * ) ) );
-        // If the grouper is already set/created, then connect to it now
-        if( sm->grouper(false) )
-            slotGrouperChanged( sm->grouper() );
-    }
+	SuperModel * sm = dynamic_cast<SuperModel*>(model);
+	if( sm ) {
+		QList<SortColumnPair> sortColumns = sm->sortColumns();
+		header()->setSortIndicator( sortColumns.size() ? sortColumns[0].first : 0, sm->sortOrder() );
+		connect( model, SIGNAL( grouperChanged( ModelGrouper* ) ), SLOT( slotGrouperChanged( ModelGrouper * ) ) );
+		// If the grouper is already set/created, then connect to it now
+		if( sm->grouper(false) )
+			slotGrouperChanged( sm->grouper() );
+	}
 	QTreeView::setModel( model );
 	if( mColumnAutoResize )
 		doAutoColumnConnections();
@@ -391,15 +431,15 @@ bool ExtTreeView::columnAutoResize( int col ) const
 
 void ExtTreeView::scheduleResizeAutoColumns()
 {
-    if ( !mAutoResizeScheduled ) {
-        mAutoResizeScheduled = true;
-        QTimer::singleShot( 0, this, SLOT( resizeAutoColumns() ) );
-    }
+	if( !mAutoResizeScheduled ) {
+		mAutoResizeScheduled = true;
+		QTimer::singleShot( 0, this, SLOT( resizeAutoColumns() ) );
+	}
 }
 
 void ExtTreeView::resizeAutoColumns()
 {
-    mAutoResizeScheduled = false;
+	mAutoResizeScheduled = false;
 	for( int i=0; i< qMin(model()->columnCount(),mAutoResizeColumns.size()); i++ ) {
 		//LOG_5( "ExtTreeView::resizeAutoColumns: Checking column " + QString::number(i) );
 		if( mAutoResizeColumns.at(i) ) {
@@ -425,16 +465,16 @@ void ExtTreeView::expandRecursive( const QModelIndex & index, int levels )
 
 static bool modelIndexRowCmp( const QModelIndex & i1, const QModelIndex & i2 )
 {
-    return i1.row() < i2.row();
+	return i1.row() < i2.row();
 }
 
 void ExtTreeView::sortBySelection()
 {
-    SuperModel * sm = dynamic_cast<SuperModel*>(model());
-    QModelIndexList selected = selectedRows();
-    qSort( selected.begin(), selected.end(), modelIndexRowCmp );
-    if( sm )
-        sm->moveToTop( selected );
+	SuperModel * sm = dynamic_cast<SuperModel*>(model());
+	QModelIndexList selected = selectedRows();
+	qSort( selected.begin(), selected.end(), modelIndexRowCmp );
+	if( sm )
+		sm->moveToTop( selected );
 }
 
 int ExtTreeView::sizeHintForColumn( int column, int * height ) const
@@ -444,33 +484,32 @@ int ExtTreeView::sizeHintForColumn( int column, int * height ) const
 	QModelIndex index;
 	QSize size;
 	int w = 0;
-
-    if( height ) *height = 0;
+	if( height ) *height = 0;
 	ModelIter it( model(), ModelIter::Filter(ModelIter::Recursive | ModelIter::DescendOpenOnly), 0, const_cast<ExtTreeView*>(this) );
 	for( ; it.isValid(); ++it ) {
 		index = (*it).sibling((*it).row(), column);
 		size = delegate->sizeHint(option, index);
 		w = qMax(w, size.width() + (column == 0 ? indentation() * it.depth() : 0));
-        if( height ) *height += size.height();
+		if( height ) *height += size.height();
 	}
-
+	//LOG_5( "Calculated size hint: " + QString::number( w ) );
 	return w;
 }
 
 int ExtTreeView::sizeHintForColumn ( int column ) const
 {
-    return sizeHintForColumn( column, 0 );
+	return sizeHintForColumn( column, 0 );
 }
 
 QSize ExtTreeView::allContentsSizeHint()
 {
-    int width = 0, height = 0;
-    // Get height
-    sizeHintForColumn(0,&height);
-    height += header()->height();
-    for( int i=0; i < model()->columnCount(); i++ )
-        width += columnWidth(i);
-    return QSize(width,height);
+	int width = 0, height = 0;
+	// Get height
+	sizeHintForColumn(0,&height);
+	height += header()->height();
+	for( int i=0; i < model()->columnCount(); i++ )
+		width += columnWidth(i);
+	return QSize(width,height);
 }
 
 bool ExtTreeView::showBranches() const
@@ -482,6 +521,18 @@ void ExtTreeView::setShowBranches( bool showBranches )
 {
 	mShowBranches = showBranches;
 	update();
+}
+
+void ExtTreeView::setPropagateGroupSelection( bool pgs )
+{
+	if( mPropagateGroupSelection != pgs ) {
+		mPropagateGroupSelection = pgs;
+	}
+}
+
+bool ExtTreeView::propagateGroupSelection() const
+{
+	return mPropagateGroupSelection;
 }
 
 QStyleOptionViewItem ExtTreeView::viewOptions() const
@@ -518,7 +569,6 @@ void ExtTreeView::drawBranches ( QPainter * p, const QRect & rect, const QModelI
 		extraFlags |= QStyle::State_Enabled;
 	if (window()->isActiveWindow())
 		extraFlags |= QStyle::State_Active;
-
     const QAbstractItemModel * modelItem = index.model();
     QVariant bgColor = modelItem->data(index, Qt::BackgroundColorRole);
 
@@ -531,6 +581,8 @@ void ExtTreeView::drawBranches ( QPainter * p, const QRect & rect, const QModelI
 			level++;
 		}
 	}
+
+
 	//RecordTreeView * rtc = const_cast<RecordTreeView*>(this);
 	if( !mShowBranches )
 	{
@@ -546,14 +598,14 @@ void ExtTreeView::drawBranches ( QPainter * p, const QRect & rect, const QModelI
 
 	QPlastiqueStyle * ps = qobject_cast<QPlastiqueStyle*>(QApplication::style());
 	if( ps ) {
-        if( bgColor.isValid() && bgColor.type() == QVariant::Color && qvariant_cast<QColor>(bgColor).isValid() )
-        {
-            p->save();
-            p->setPen(qvariant_cast<QColor>(bgColor));
-            p->setBrush(qvariant_cast<QColor>(bgColor));
-            p->drawRect(rect);
-            p->restore();
-        }
+		if( bgColor.isValid() && bgColor.type() == QVariant::Color && qvariant_cast<QColor>(bgColor).isValid() )
+		{
+			p->save();
+			p->setPen(qvariant_cast<QColor>(bgColor));
+			p->setBrush(qvariant_cast<QColor>(bgColor));
+			p->drawRect(rect);
+			p->restore();
+		}
 
 		QRect primitive(rect.right(), rect.top(), indent, rect.height());
 	
@@ -604,61 +656,6 @@ void ExtTreeView::drawBranches ( QPainter * p, const QRect & rect, const QModelI
 	QTreeView::drawBranches( p, rect, index );
 }
 
-void ExtTreeView::slotGrouperChanged( ModelGrouper * grouper )
-{
-       if( grouper ) {
-               connect( grouper, SIGNAL( groupCreated( const QModelIndex & ) ), SLOT( slotGroupCreated( const QModelIndex & ) ) );
-               connect( grouper, SIGNAL( groupEmptied( const QModelIndex & ) ), SLOT( slotGroupEmptied( const QModelIndex & ) ) );
-               connect( grouper, SIGNAL( groupPopulated( const QModelIndex & ) ), SLOT( slotGroupPopulated( const QModelIndex & ) ) );
-               connect( grouper, SIGNAL( groupingChanged( bool ) ), SLOT( slotGroupingChanged() ) );
-       }
-}
-
-void ExtTreeView::slotGroupCreated( const QModelIndex & idx )
-{
-       SuperModel * sm = dynamic_cast<SuperModel*>(model());
-       if( sm && sm->grouper(false) ) {
-               QMap<QString,bool>::Iterator it = mGroupExpandState.find( sm->grouper()->groupValue(idx) );
-               if( (it != mGroupExpandState.end() && it.value()) || (it == mGroupExpandState.end() && sm->grouper()->expandNewGroups()) ) {
-                       //LOG_5( QString("Expanding new group, row %1").arg(idx.row()) );
-                       expand(idx);
-               }
-       }
-}
-
-void ExtTreeView::slotGroupEmptied( const QModelIndex & idx )
-{
-       SuperModel * sm = dynamic_cast<SuperModel*>(model());
-       if( sm && sm->grouper(false) && sm->grouper()->emptyGroupPolicy() == ModelGrouper::HideEmptyGroups ) {
-               //LOG_5( QString("Hiding empty group, row %1").arg(idx.row()) );
-               setRowHidden( idx.row(), idx.parent(), true );
-       }
-}
-
-void ExtTreeView::slotGroupPopulated( const QModelIndex & idx )
-{
-       //LOG_5( QString("Unhiding populated group, row %1").arg(idx.row()) );
-       // Since this will only happen if the empty group state is hide or do nothing, we are safe to always call this
-       setRowHidden( idx.row(), idx.parent(), false );
-}
-
-void ExtTreeView::slotGroupingChanged()
-{
-       SuperModel * sm = dynamic_cast<SuperModel*>(model());
-       if( sm && sm->grouper(false) ) {
-               ModelGrouper * grp = sm->grouper();
-               if( grp->groupColumn() != mLastGroupColumn ) {
-                       // We only keep track of group expand states for a single group column
-                       // If the user groups by a different column they'll have to re-expand/collapse,
-                       // otherwise we could end up keeping a large amount of data if we keep track of expanded/collapsed
-                       // state for each possible group value for each possible group column
-                       //LOG_5( "Clearing saved group expand states" );
-                       mGroupExpandState.clear();
-                       mLastGroupColumn = grp->groupColumn();
-               }
-       }
-}
-
 void ExtTreeView::slotCustomContextMenuRequested( const QPoint & p )
 {
 	QModelIndex under = indexAt( p );
@@ -700,15 +697,14 @@ void ExtTreeView::setupColumns( IniConfig & ini, const ColumnStruct columns [] )
 void ExtTreeView::saveColumns( IniConfig & ini, const ColumnStruct columns [] )
 {
 	QHeaderView * hdr = header();
-
 	for( int i=0; columns[i].name; i++ ) {
 		ini.writeInt( columns[i].iniName + QString("Size"), hdr->sectionSize( i ) );
 		ini.writeInt( columns[i].iniName + QString("Index"), hdr->visualIndex( i ) );
 		ini.writeBool( columns[i].iniName + QString("Hidden"), hdr->isSectionHidden( i ) );
 
-        QLineEdit *le = qobject_cast<QLineEdit*> (mRecordFilterWidget->mFilterMap[i]);
-        if ( le )
-            ini.writeString( columns[i].iniName + QString("ColumnFilter"), le->text() );
+		QLineEdit *le = qobject_cast<QLineEdit*> (mRecordFilterWidget->mFilterMap[i]);
+		if ( le )
+			ini.writeString( columns[i].iniName + QString("ColumnFilter"), le->text() );
     }
 }
 
@@ -718,21 +714,21 @@ void ExtTreeView::setupTreeView( IniConfig & ini, const ColumnStruct columns [] 
 	SuperModel * sm = dynamic_cast<SuperModel*>(model());
 	int sc = -1;
 	if( sm ) {
-        QList<SortColumnPair> sortColumns;
+		QList<SortColumnPair> sortColumns;
 		QList<int> scl = ini.readIntList( "SortColumnOrder" );
-        QStringList sortDirections= ini.readString( "SortColumnDirection" ).split( ',' );
-        for( int i = 0; i < scl.size(); ++i )
-            sortColumns.append( SortColumnPair( scl[i], (i < sortDirections.size()) && (sortDirections[i] == "Ascending") ? Qt::AscendingOrder : Qt::DescendingOrder ) );
-        sm->setSortColumns( sortColumns );
+		QStringList sortDirections= ini.readString( "SortColumnDirection" ).split( ',' );
+		for( int i = 0; i < scl.size(); ++i )
+			sortColumns.append( SortColumnPair( scl[i], (i < sortDirections.size()) && (sortDirections[i] == "Ascending") ? Qt::AscendingOrder : Qt::DescendingOrder ) );
+		sm->setSortColumns( sortColumns );
 		sc = scl.isEmpty() ? 0 : scl[0];
-        mLastGroupColumn = ini.readInt( "GroupedByColumn", -1 );
-        if( mLastGroupColumn >= 0 ) {
-            ModelGrouper * grouper = sm->grouper();
-            grouper->groupByColumn( mLastGroupColumn );
-            foreach( QString key, ini.keys() )
-                if( key.startsWith( "GroupExpandState:" ) )
-                    mGroupExpandState[key.mid(17)] = ini.readBool(key);
-        }
+		mLastGroupColumn = ini.readInt( "GroupedByColumn", -1 );
+		if( mLastGroupColumn >= 0 ) {
+			ModelGrouper * grouper = sm->grouper();
+			grouper->groupByColumn( mLastGroupColumn );
+			foreach( QString key, ini.keys() )
+				if( key.startsWith( "GroupExpandState:" ) )
+					mGroupExpandState[key.mid(17)] = ini.readBool(key);
+		}
 	} else
 		sc = ini.readInt("SortColumn", 0);
 	Qt::SortOrder order(Qt::SortOrder(ini.readInt("SortOrder",Qt::AscendingOrder)));
@@ -742,12 +738,12 @@ void ExtTreeView::setupTreeView( IniConfig & ini, const ColumnStruct columns [] 
 
 void ExtTreeView::setupRecordFilterWidget( IniConfig & ini, const ColumnStruct columns [] )
 {
-    if( !mRecordFilterWidget ) {
-        mRecordFilterWidget = new RecordFilterWidget();
-        addFilterLayout();
-    }
+	if( !mRecordFilterWidget ) {
+		mRecordFilterWidget = new RecordFilterWidget();
+		addFilterLayout();
+	}
 
-    mRecordFilterWidget->setupFilters( this, columns, ini );
+	mRecordFilterWidget->setupFilters( this, columns, ini );
 }
 
 void ExtTreeView::setupTreeView( const QString & group, const QString & key, const ColumnStruct columns [] )
@@ -764,32 +760,34 @@ void ExtTreeView::saveTreeView( IniConfig & ini, const ColumnStruct columns [] )
 {
 	saveColumns( ini, columns );
 	SuperModel * sm = dynamic_cast<SuperModel*>(model());
-    if( sm ) {
-        QList<int> sortColumns;
-        QStringList sortDirections;
-        foreach( SortColumnPair sc, sm->sortColumns() ) {
-            sortColumns.append( sc.first );
-            sortDirections.append( sc.second == Qt::DescendingOrder ? "Descending" : "Ascending" );
-        }
-        ini.writeIntList( "SortColumnOrder", sortColumns );
-        ini.writeString( "SortColumnDirection", sortDirections.join(",") );
-        if( sm->grouper(false) && sm->grouper()->isGrouped() ) {
-            ModelGrouper * grp = sm->grouper();
-            ModelDataTranslator * git = grp->groupedItemTranslator();
-            ini.writeInt( "GroupedByColumn", sm->grouper()->groupColumn() );
-            for( QMap<QString,bool>::Iterator it = mGroupExpandState.begin(); it != mGroupExpandState.end(); ++it )
-                ini.writeBool( "GroupExpandState:" + it.key(), it.value() );
-            for( ModelIter it(sm); it.isValid(); ++it ) {
-                QModelIndex idx(*it);
-                if( sm->translator(idx) == git )
-                    ini.writeBool( "GroupExpandState:" + grp->groupValue(idx), isExpanded(idx) );
-            }
-        } else {
-            ini.removeKey( "GroupedByColumn" );
-            foreach( QString key, ini.keys( QRegExp("^GroupExpandState:") ) )
-            ini.removeKey(key);
-        }
-    } else
+	if( sm ) {
+		QList<int> sortColumns;
+		QStringList sortDirections;
+		foreach( SortColumnPair sc, sm->sortColumns() ) {
+			sortColumns.append( sc.first );
+			sortDirections.append( sc.second == Qt::DescendingOrder ? "Descending" : "Ascending" );
+		}
+		ini.writeIntList( "SortColumnOrder", sortColumns );
+		ini.writeString( "SortColumnDirection", sortDirections.join(",") );
+		if( sm->grouper(false) && sm->grouper()->isGrouped() ) {
+			ModelGrouper * grp = sm->grouper();
+			ModelDataTranslator * git = grp->groupedItemTranslator();
+			ini.writeInt( "GroupedByColumn", sm->grouper()->groupColumn() );
+			for( QMap<QString,bool>::Iterator it = mGroupExpandState.begin(); it != mGroupExpandState.end(); ++it )
+				ini.writeBool( "GroupExpandState:" + it.key(), it.value() );
+			for( ModelIter it(sm); it.isValid(); ++it ) {
+				QModelIndex idx(*it);
+				if( sm->translator(idx) == git )
+					ini.writeBool( "GroupExpandState:" + grp->groupValue(idx), isExpanded(idx) );
+			}
+				
+		} else {
+			ini.removeKey( "GroupedByColumn" );
+			foreach( QString key, ini.keys( QRegExp("^GroupExpandState:") ) )
+				ini.removeKey(key);
+		}
+		
+	} else
 		ini.writeInt( "SortColumn", header()->sortIndicatorSection() );
 	ini.writeInt( "SortOrder", header()->sortIndicatorOrder() );
 }
@@ -805,29 +803,84 @@ void ExtTreeView::saveTreeView( const QString & group, const QString & key, cons
 
 BusyWidget * ExtTreeView::busyWidget( bool autoCreate )
 {
-    if( !mBusyWidget && autoCreate ) {
-        mBusyWidget = new BusyWidget( this, QPixmap( "images/rotating_head.png" ) );
-        mBusyWidget->move(0,header()->height());
-    }
-
-    return mBusyWidget;
+	if( !mBusyWidget && autoCreate ) {
+		mBusyWidget = new BusyWidget( this, QPixmap( "images/rotating_head.png" ) );
+		mBusyWidget->move(0,header()->height());
+	}
+	
+	return mBusyWidget;
 }
 
 void ExtTreeView::resizeEvent(QResizeEvent *event)
 {
-    //LOG_3("resizeEvent");
-    mHeaderClickIsResize = true;
-    QWidget::resizeEvent(event);
-    //if( mRecordFilterWidget )
-    //    mRecordFilterWidget->resize( width(), 20 );
+	//LOG_3("resizeEvent");
+	mHeaderClickIsResize = true;
+	QWidget::resizeEvent(event);
+	//if( mRecordFilterWidget )
+	//    mRecordFilterWidget->resize( width(), 20 );
+}
+
+void ExtTreeView::slotGrouperChanged( ModelGrouper * grouper )
+{
+	if( grouper ) {
+		connect( grouper, SIGNAL( groupCreated( const QModelIndex & ) ), SLOT( slotGroupCreated( const QModelIndex & ) ) );
+		connect( grouper, SIGNAL( groupEmptied( const QModelIndex & ) ), SLOT( slotGroupEmptied( const QModelIndex & ) ) );
+		connect( grouper, SIGNAL( groupPopulated( const QModelIndex & ) ), SLOT( slotGroupPopulated( const QModelIndex & ) ) );
+		connect( grouper, SIGNAL( groupingChanged( bool ) ), SLOT( slotGroupingChanged() ) );
+	}
 }
 
 void ExtTreeView::enableFilterWidget(bool enable)
 {
-    if(mRecordFilterWidget) {
-        mRecordFilterWidget->setVisible(enable);
-        mRecordFilterWidget->filterRows();
-    }
+	if(mRecordFilterWidget) {
+		mRecordFilterWidget->setVisible(enable);
+		mRecordFilterWidget->filterRows();
+	}
+}
+
+void ExtTreeView::slotGroupCreated( const QModelIndex & idx )
+{
+	SuperModel * sm = dynamic_cast<SuperModel*>(model());
+	if( sm && sm->grouper(false) ) {
+		QMap<QString,bool>::Iterator it = mGroupExpandState.find( sm->grouper()->groupValue(idx) );
+		if( (it != mGroupExpandState.end() && it.value()) || (it == mGroupExpandState.end() && sm->grouper()->expandNewGroups()) ) {
+//			LOG_5( QString("Expanding new group, row %1").arg(idx.row()) );
+			expand(idx);
+		}
+	}
+}
+
+void ExtTreeView::slotGroupEmptied( const QModelIndex & idx )
+{
+	SuperModel * sm = dynamic_cast<SuperModel*>(model());
+	if( sm && sm->grouper(false) && sm->grouper()->emptyGroupPolicy() == ModelGrouper::HideEmptyGroups ) {
+//		LOG_5( QString("Hiding empty group, row %1").arg(idx.row()) );
+		setRowHidden( idx.row(), idx.parent(), true );
+	}
+}
+
+void ExtTreeView::slotGroupPopulated( const QModelIndex & idx )
+{
+//	LOG_5( QString("Unhiding populated group, row %1").arg(idx.row()) );
+	// Since this will only happen if the empty group state is hide or do nothing, we are safe to always call this
+	setRowHidden( idx.row(), idx.parent(), false );
+}
+
+void ExtTreeView::slotGroupingChanged()
+{
+	SuperModel * sm = dynamic_cast<SuperModel*>(model());
+	if( sm && sm->grouper(false) ) {
+		ModelGrouper * grp = sm->grouper();
+		if( grp->groupColumn() != mLastGroupColumn ) {
+			// We only keep track of group expand states for a single group column
+			// If the user groups by a different column they'll have to re-expand/collapse,
+			// otherwise we could end up keeping a large amount of data if we keep track of expanded/collapsed
+			// state for each possible group value for each possible group column
+//			LOG_5( "Clearing saved group expand states" );
+			mGroupExpandState.clear();
+			mLastGroupColumn = grp->groupColumn();
+		}
+	}
 }
 
 RecordTreeView::RecordTreeView( QWidget * parent )
@@ -884,7 +937,7 @@ Record RecordTreeView::current()
 RecordList RecordTreeView::selection()
 {
 	RecordSuperModel * rsm = model();
-	if( rsm ) 
+	if( rsm )
 		return rsm->listFromIS( selectionModel()->selection() );
 	return RecordList();
 }

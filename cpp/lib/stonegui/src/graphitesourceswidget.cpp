@@ -80,5 +80,5 @@ void GraphiteSourcesWidget::showListMenu( const QPoint & point )
 			}
 		}
 	}
-	
+	delete menu;
 }

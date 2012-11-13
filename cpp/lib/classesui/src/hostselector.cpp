@@ -21,10 +21,10 @@
  *
  */
 
-/* $Author$
- * $LastChangedDate: 2010-03-08 17:38:00 +1100 (Mon, 08 Mar 2010) $
- * $Rev: 9421 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/classesui/src/hostselector.cpp $
+/* $Author: newellm $
+ * $LastChangedDate: 2012-10-11 14:54:13 -0700 (Thu, 11 Oct 2012) $
+ * $Rev: 13720 $
+ * $HeadURL: svn://newellm@svn.blur.com/blur/trunk/cpp/lib/classesui/src/hostselector.cpp $
  */
 
 #include <qcheckbox.h>
@@ -37,11 +37,15 @@
 #include <qtreewidget.h>
 
 #include "iniconfig.h"
-#include "modelgrouper.h"
 
+#include "modelgrouper.h"
+#include "modeliter.h"
+
+#include "department.h"
 #include "dynamichostgroup.h"
 #include "employee.h"
 #include "host.h"
+#include "hostinterface.h"
 #include "hostservice.h"
 #include "hoststatus.h"
 #include "hostgroup.h"
@@ -50,8 +54,8 @@
 #include "jobassignment.h"
 #include "jobtaskassignment.h"
 #include "jobtask.h"
-#include "user.h"
 #include "path.h"
+#include "user.h"
 
 #include "hostselector.h"
 #include "ui_savelistdialogui.h"
@@ -60,72 +64,81 @@ const ColumnStruct HostItem::host_columns [] =
 {
 	{ "Host", "HostColumn", 100, 0, false, true },
 	{ "Current Jobs", "CurrentJobColumn", 200, 1, false, false },
-	{ "Status", "StatusColumn", 50, 2, false, true },
+	{ "Status", "StatusColumn", 65, 2, false, true },
 	{ "Frames", "FramesColumn", 50, 3, false, false },
-	{ "OS", "OSColumn", 40, 4, false, true },
-	{ "Memory", "MemoryColumn", 30, 5, false, true },
-	{ "Mhz", "MhzColumn", 30, 6, false, true },
-	{ "User", "UserColumn", 60, 7, false, true },
+	{ "OS", "OSColumn", 120, 4, false, true },
+	{ "Memory", "MemoryColumn", 100, 5, false, true },
+	{ "Mhz", "MhzColumn", 75, 6, false, true },
+	{ "User", "UserColumn", 70, 7, false, true },
 	{ "Packet Weight", "PacketWeightColumn", 40, 8, true, false },
 	{ "Description", "DescriptionColumn", 200, 9, false, true },
-	{ "Pulse", "PulseColumn", 50, 10, false, false },
+	{ "Pulse", "PulseColumn", 130, 10, false, false },
 	{ "Key", "KeyColumn", 0, 11, true, true },
-	{ "OS Version", "OsVersionColumn", 40, 12, false, true },
-	{ "CPU Name", "CpuNameColumn", 40, 13, false, true },
-	{ "Arch", "ArchColumn", 40, 14, false, true },
-	{ "Services", "ServicesColumn", 100, 15, true, false },
-	{ "Avail. Mem", "AvailMemColumn", 40, 16, false, false },
-	{ "Puppet Pulse", "PuppetPulseColumn", 50, 17, false, false },
-	{ 0, 0, 0, 0, false, false }
+	{ "OS Version", "OsVersionColumn", 100, 12, false, true },
+	{ "CPU Name", "CpuNameColumn", 40, 14, false, true },
+	{ "Arch", "ArchColumn", 65, 15, false, true },
+	{ "Services", "ServicesColumn", 100, 16, true, false },
+	{ "Avail. Mem", "AvailMemColumn", 80, 17, false, false },
+	{ "IP Address", "IPAddressColumn", 45, 18, true, true },
+	{ "Domain", "DomainColumn", 45, 19, true, true },
+	{ "Department", "DepartmentColumn", 60, 20, true, true },
+	{ "System Uptime", "SystemUptimeColumn", 120, 21, false, false },
+	{ "Elapsed Task Time", "ElapsedTaskTimeColumn", 60, 22, false, false },
+	{ "OS Service Pack", "OSServicePackColumn", 60, 13, true, true },
+	{ "OS Build Number", "OSBuildNumberColumn", 60, 23, true, true },
+	{ "Video Card", "VideoCardColumn", 100, 24, true, true },
+	{ "Video Card Driver", "VideoCardDriverColumn", 120, 25, true, true },
+	{ "Video Memory", "VideoMemoryColumn", 100, 26, true, true },
+	{ 0, 0, 0, 0, false }
 };
 
 ViewColors * HostItem::HostColors = 0;
 
 void GroupedHostItem::init( const QModelIndex & idx )
 {
-       int slotCount=0;
-       foreach( QModelIndex i, ModelIter::collect( idx.child(0,0) ) ) {
-               if( HostTranslator::isType(i) ) {
-                       HostItem & hi = HostTranslator::data(i);
-                       slotCount += hi._jobName.toInt();
-               }
-       }
-       slotsOnGroup = QString::number(slotCount);
-    //colorOption = options.mJobColors->getColorOption("ready");
+	int slotCount=0;
+	foreach( QModelIndex i, ModelIter::collect( idx.child(0,0) ) ) {
+		if( HostTranslator::isType(i) ) {
+			HostItem & hi = HostTranslator::data(i);
+			slotCount += hi._jobName.toInt();
+		}
+	}
+	slotsOnGroup = QString::number(slotCount);
+	//colorOption = options.mJobColors->getColorOption("ready");
 }
 
 QVariant GroupedHostItem::modelData( const QModelIndex & i, int role ) const
 {
-       if( role == Qt::DisplayRole && i.column() == 0 )
-               return groupValue + " Hosts";
-       if( role == Qt::DisplayRole && i.column() == 1 )
-               return slotsOnGroup;
-       if( role == Qt::DisplayRole && i.column() == groupColumn )
-               return groupValue;
+	if( role == Qt::DisplayRole && i.column() == 0 )
+		return groupValue + " Hosts";
+	if( role == Qt::DisplayRole && i.column() == 1 )
+		return slotsOnGroup;
+	if( role == Qt::DisplayRole && i.column() == groupColumn )
+		return groupValue;
 
-       return ItemBase::modelData(i,role);
+	return ItemBase::modelData(i,role);
 }
 
 Qt::ItemFlags GroupedHostItem::modelFlags( const QModelIndex & )
 {
-       return Qt::ItemFlags(0);
+	return Qt::ItemFlags(0);
 }
 
 bool GroupedHostItem::setModelData( const QModelIndex & i, const QVariant & value, int role )
 {
-       if( role == ModelGrouper::GroupingUpdate ) {
-               init(i);
-               return true;
-       }
-       if( role == ModelGrouper::GroupingColumn ) {
-               groupColumn = value.toInt();
-               return true;
-       }
-       if( role == ModelGrouper::GroupingValue ) {
-               groupValue = value.toString();
-               return true;
-       }
-       return false;
+	if( role == ModelGrouper::GroupingUpdate ) {
+		init(i);
+		return true;
+	}
+	if( role == ModelGrouper::GroupingColumn ) {
+		groupColumn = value.toInt();
+		return true;
+	}
+	if( role == ModelGrouper::GroupingValue ) {
+		groupValue = value.toString();
+		return true;
+	}
+	return false;
 }
 
 void HostItem::setup( const Record & r, const QModelIndex &, bool loadJob ) {
@@ -135,26 +148,33 @@ void HostItem::setup( const Record & r, const QModelIndex &, bool loadJob ) {
 	ver = host.os() + " " + host.abVersion();
 	mem = QString("%1 Mb").arg(host.memory());
 	availMem = QString("%1 Mb").arg(QString::number(status.availableMemory()));
-	mhz = QString("%1 Mhz").arg(host.mhz()*host.cpus());
-	user = host.user().name();
-    now = QDateTime::currentDateTime();
-    puppetPulse = QDateTime(host.puppetPulse());
-    puppetIcon = ( puppetPulse < now.addSecs(-(6*60*60)) ) ? QIcon("images/exclamation.png") : QIcon("images/blank.png");
+	mhz = QString("%1 Mhz (%2)").arg(host.mhz()).arg(host.cpus());
+	now = QDateTime::currentDateTime();
+	puppetPulse = QDateTime(host.puppetPulse());
+	puppetIcon = ( puppetPulse < now.addSecs(-(6*60*60)) ) ? QIcon("images/exclamation.png") : QIcon("images/blank.png");
 	pulse = convertTime( status.slavePulse().secsTo(now) );
+	mhz = QString("%1 Mhz (%2)").arg(host.mhz()).arg(host.cpus());
+	User u = host.user();
+	Employee e(u);
+	user = e.isRecord() ? e.name() : u.name();
 	co = HostColors ? HostColors->getColorOption(status.slaveStatus()) : 0;
 	services = QString();
-    if( host.userIsLoggedIn())
-        icon = QPixmap("images/loggedin.png");
+	if( host.userIsLoggedIn())
+		icon = QPixmap("images/loggedin.png");
 	if( loadJob )
-		_jobName = jobName();
+		jobName();
+	uptimeInterval = status.systemStartupTimestamp().isNull() ? Interval() : Interval( status.systemStartupTimestamp(), QDateTime::currentDateTime() );
+	tasktimeInterval = status.taskStartTimestamp().isNull() ? Interval() : Interval( status.taskStartTimestamp(), QDateTime::currentDateTime() );
+	uptime = uptimeInterval == Interval() ? "" : uptimeInterval.toDisplayString();
+	tasktime = tasktimeInterval == Interval() ? "" : tasktimeInterval.toDisplayString();
 }
 
 QString HostItem::jobName() const
 {
 	if( !jobsLoaded ) {
-        // why is this so slow?
-        _jobName = host.hostStatus().activeAssignmentCount() > 0 ? QString::number( host.hostStatus().activeAssignmentCount() ) : "";
-        //host.activeAssignments().jobs().unique().names().join(", ");
+		// why is this so slow?
+		_jobName = host.hostStatus().activeAssignmentCount() > 0 ? QString::number( host.hostStatus().activeAssignmentCount() ) : "";
+		//host.activeAssignments().jobs().unique().names().join(", ");
 		jobsLoaded = true;
 	}
 	return _jobName;
@@ -162,25 +182,34 @@ QString HostItem::jobName() const
 
 QString HostItem::convertTime( int secs ) const
 {
-    int time = secs;
-    QString format = "second";
+	int time = secs;
+	QString format = "second";
 
-    if ( time > 60 ) {
-        time  /= 60;
-        format = "minute";
+	if ( time > 60 ) {
+		time  /= 60;
+		format = "minute";
 
-        if ( time > 60 ) {
-            time  /= 60;
-            format = "hour";
+		if ( time > 60 ) {
+			time  /= 60;
+			format = "hour";
 
-            if ( time > 24 ) {
-                time  /= 24;
-                format = "day";
-            }
-        }
-    }
+			if ( time > 24 ) {
+				time  /= 24;
+				format = "day";
+				}
+		}
+	}
 
-    return QString("%1 %2%3 ago").arg(QString::number(time), format, ( time > 1 ) ? QString("s") : QString(""));
+	return QString("%1 %2%3 ago").arg(QString::number(time), format, ( time > 1 ) ? QString("s") : QString(""));
+}
+
+QString HostItem::ipAddress() const
+{
+	if( !ipLoaded ) {
+		HostInterfaceList hil = host.hostInterfaces();
+		ip = hil.ips().join(",");
+	}
+	return ip;
 }
 
 static QVariant civ( const QColor & c )
@@ -220,17 +249,27 @@ QVariant HostItem::modelData( const QModelIndex & i, int role ) const
 			}
 			case 16: return availMem;
 			case 17: return ( puppetPulse.toString() != "" ) ? convertTime( puppetPulse.secsTo(now) ) : QString();
+			case 18: return ipAddress();
+			case 19: return host.windowsDomain();
+			case 20: return host.department().name();
+			case 21: return uptime;
+			case 22: return tasktime;
+			case 23: return host.servicePackVersion();
+			case 24: return QString::number(host.buildNumber());
+			case 25: return host.videoCard();
+			case 26: return host.videoCardDriver();
+			case 27: return QString("%1 Mb").arg(host.videoMemory());
 		}
 	} else if ( role == Qt::TextColorRole )
 		return co ? civ(co->fg) : QVariant();
 	else if( role == Qt::BackgroundColorRole )
 		return co ? civ(co->bg) : QVariant();
-    else if ( role == Qt::DecorationRole ) {
-        if ( col == 17 )
-            return QVariant( puppetIcon );
-        if ( col == 7 )
-            return icon;
-    }
+	else if ( role == Qt::DecorationRole ) {
+		if ( col == 17 )
+			return QVariant( puppetIcon );
+		if ( col == 7 )
+			return icon;
+	}
 
 	return QVariant();
 }
@@ -254,8 +293,8 @@ char HostItem::getSortChar() const {
 	else if( stat=="offline" ) return 'o';
 	else if( stat=="no-pulse" ) return 'p';
 	else if( stat=="no-ping" ) return 'q';
-    else if( stat=="restarting" ) return 'r';
-    else if( stat=="maintenance" ) return 's';
+	else if( stat=="restarting" ) return 'r';
+	else if( stat=="maintenance" ) return 's';
 	else return 'z';
 }
 
@@ -273,11 +312,15 @@ int HostItem::compare( const QModelIndex & a, const QModelIndex & b, int col, bo
 		int valb = col == 5 ? other.host.memory() : other.host.mhz();
 		return vala - valb;
 	}
-    if( col == 10 || col == 17 ) {
-        int datea = col == 10 ? now.secsTo( status.slavePulse() ) : now.secsTo( puppetPulse );
-        int dateb = col == 10 ? now.secsTo( other.status.slavePulse() ) : now.secsTo( other.puppetPulse );
-        return datea - dateb;
-    }
+	if( col == 10 || col == 17 ) {
+		int datea = col == 10 ? now.secsTo( status.slavePulse() ) : now.secsTo( puppetPulse );
+		int dateb = col == 10 ? now.secsTo( other.status.slavePulse() ) : now.secsTo( other.puppetPulse );
+		return datea - dateb;
+	}
+	if( col == 20 )
+		return Interval::compare(uptimeInterval,other.uptimeInterval);
+	if( col == 21 )
+		return Interval::compare(tasktimeInterval,other.tasktimeInterval);
 	return ItemBase::compare(a,b,col,asc);
 }
 
@@ -361,12 +404,14 @@ HostSelector::HostSelector( QWidget * parent )
 	mHostTree->setModel( mModel );
 	mModel->setHeaderLabels( QStringList() << "Host" << "Status" << "Version" << "Memory" << "Mhz" << "User" << "Description" );
 
-    for( int i=0; i < mModel->columnCount(); i++ )
-        mHostTree->setColumnAutoResize(i,true);
-
+	for( int i=0; i < mModel->columnCount(); i++ )
+		mHostTree->setColumnAutoResize(i,true);
 	mModel->setAutoSort(true);
-    //mModel->grouper()->setGroupedItemTranslator( new GroupedHostTranslator(this) );
-	mModel->sort(0,Qt::DescendingOrder);
+	mModel->sort(0,Qt::AscendingOrder);
+	connect( mModel, SIGNAL(dataChanged(const QModelIndex&,const QModelIndex&)), SLOT(updateCheckCount()) );
+
+	//mModel->grouper()->setGroupedItemTranslator( new GroupedHostTranslator(this) );
+	
 	connect( SelectAll, SIGNAL( clicked() ), SLOT( selectAll() ) );
 	connect( CheckSelected, SIGNAL( clicked() ), SLOT( checkSelected() ) );
 	connect( UnCheckSelected, SIGNAL( clicked() ), SLOT( uncheckSelected() ) );
@@ -389,6 +434,12 @@ HostSelector::HostSelector( QWidget * parent )
 
 	mHostGroupCombo->setColumn( "name" );
 
+	mHostFilterEdit->label()->setText( "Host Name Filter:" );
+	mHostFilterEdit->setMatchField( Host::c.Name );
+	mHostFilterEdit->setUpdateMode(FilterEdit::UpdateOnEdit);
+	connect( mHostFilterEdit, SIGNAL(filterChanged(const Expression &)), SLOT(filter(const Expression &)) );
+	
+	refresh();
 	refreshHostGroups();
 }
 
@@ -425,30 +476,49 @@ void HostSelector::refresh()
 
 void HostSelector::performRefresh()
 {
-	HostList hl;
-	if( mServiceFilter.isEmpty() )
-		hl = Host::select();
-	else
-		// Fancy select because we need hosts that have ALL services, not any of the services in the filter.
-		hl = Host::select( "WHERE keyhost IN (SELECT fkeyhost FROM "
-			" (SELECT count(*), fkeyhost"
-            " FROM HostService"
-            " WHERE HostService.fkeyservice IN (" + mServiceFilter.keyString() + ")"
-            " AND HostService.enabled=true GROUP BY fkeyhost) AS iq "
-			"WHERE count=?)", VarList() << mServiceFilter.size() );
-	HostStatusList hsl = HostStatus::select( "fkeyhost in (" + hl.keyString() + ")" );
+	Expression e;
+	if( mServiceFilter.size() )
+		e = Host::c.Key.in( Expression::sql( "(SELECT fkeyhost FROM "
+			"(SELECT count(*), fkeyhost FROM HostService WHERE HostService.fkeyservice IN (" + mServiceFilter.keyString() + ") AND HostService.enabled=true GROUP BY fkeyhost) AS iq "
+			"WHERE count=" + QString::number(mServiceFilter.size()) + ")" ) );
+	HostList hl = Host::select(e);
+	HostStatusList hsl = hl.hostStatuses();
+	if( mNeedsSelected.isEmpty() )
+		mNeedsSelected = mModel->getRecords( ModelIter::collect(mModel,ModelIter::Checked) );
 	mModel->updateRecords( hl );
+	mRefreshPending = false;
 
 	if( !mNeedsSelected.isEmpty() ) {
-                updateList( mNeedsSelected );
+		updateList( mNeedsSelected );
+		mNeedsSelected.clear();
 	}
-	mRefreshPending = false;
+}
+
+void HostSelector::filter( const Expression & exp )
+{
+	for( ModelIter it(mModel); it.isValid(); ++it )
+		mHostTree->setRowHidden( (*it).row(), (*it).parent(), (exp.isValid() && !exp.matches(mModel->getRecord(*it))) );
+	updateCheckCount();
+}
+
+void HostSelector::updateCheckCount()
+{
+	int checked = 0, checkedHidden = 0;
+	for( ModelIter it(mModel); it.isValid(); ++it )
+		if( mModel->data( *it, Qt::CheckStateRole ).toInt() == Qt::Checked ) {
+			checked++;
+			if( mHostTree->isRowHidden( (*it).row(), (*it).parent() ) )
+				checkedHidden++;
+		}
+	QString rt = "Checked Hosts: " + QString::number(checked);
+	if( checkedHidden )
+		rt += " <b style=\"color:red\">Checked Hidden: " + QString::number(checkedHidden) + "</b>";
+	mCheckedStatusLabel->setText(rt);
 }
 
 void HostSelector::setHostList( const QString & hostList )
 {
-        mNeedsSelected = hostListFromString(hostList);
-        performRefresh();
+	updateList(hostListFromString(hostList));
 }
 
 void HostSelector::setHostList( const RecordList & hrl )

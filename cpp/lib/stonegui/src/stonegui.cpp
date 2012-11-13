@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id$
+ * $Id: stonegui.cpp 13595 2012-09-17 21:35:20Z newellm $
  */
 
 #include <qsqldatabase.h>
@@ -40,6 +40,7 @@ static ConnectionWatcher * sWatcher = 0;
 
 ConnectionWatcher::ConnectionWatcher()
 : mDialog( 0 )
+, mMutex(QMutex::Recursive)
 {
 	Connection * c = Database::current()->connection();
 	connect( c, SIGNAL( connectionLost2() ), SLOT( connectionLost() ) );

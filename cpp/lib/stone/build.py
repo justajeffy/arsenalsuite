@@ -15,7 +15,7 @@ if sys.platform != 'win32':
 
 # Python module targets
 SipTarget("pystone",path,False,None,["sip:install","pyqt:install","stone"])
-sst = SipTarget("pystonestatic",path,True)
+sst = SipTarget("pystonestatic",path,True,None,["sip:install","pyqt:install","stone"])
 
 # Create the main qmake target
 QMakeTarget("stone",path,"stone.pro")

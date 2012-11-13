@@ -69,13 +69,13 @@ public:
 	/**
 	*  Merges this schema with the current schema
 	*/
-	bool mergeXmlSchema( const QString & schemaFile, bool isFile = true, bool ignoreDocs = true, QList<TableSchema*> * tables = 0 );
+	bool mergeXmlSchema( const QString & schemaFile, bool isFile = true, bool ignoreDocs = true, QList<TableSchema*> * tables = 0, bool verbose = false );
 	
 	/**
 	*  Loads the database table definitions from
 	*  the 'schema' xml file, or string if isFile is false
 	*/
-	static Schema * createFromXmlSchema( const QString & schema, bool isFile = true, bool ignoreDocs = true );
+	static Schema * createFromXmlSchema( const QString & schema, bool isFile = true, bool ignoreDocs = true, bool verbose = false );
 	
 	
 	/** Writes an XML schema file to dest
@@ -87,10 +87,6 @@ public:
 	
 	static QString diff( Schema * before, Schema * after );
 	
-signals:
-	void tableAdded( TableSchema * table );
-	void tableRemove( TableSchema * table );
-
 protected:
 	QMap<QString,TableSchema*> mTablesByName, mTablesByClass;
 	QString mName;

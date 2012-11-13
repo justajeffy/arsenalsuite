@@ -19,9 +19,9 @@ public:
 	void tableRenamed( TableSchema * table, const QString & oldName );
 	void tableClassRenamed( TableSchema * table, const QString & oldName );
 
-	bool mergeXmlSchema( const QString & schemaFile, bool isFile = true, bool ignoreDocs = true, QList<TableSchema*> * tables /Out/ = 0 );
+	bool mergeXmlSchema( const QString & schemaFile, bool isFile = true, bool ignoreDocs = true, QList<TableSchema*> * tables /Out/ = 0, bool verbose = false );
 	
-	static Schema * createFromXmlSchema( const QString & schema, bool isFile = true, bool ignoreDocs = true );
+	static Schema * createFromXmlSchema( const QString & schema, bool isFile = true, bool ignoreDocs = true, bool verbose = false );
 	
 	bool writeXmlSchema( const QString & dest, QString * xml = 0, QList<TableSchema*> tables = QList<TableSchema*>() ) const;
 

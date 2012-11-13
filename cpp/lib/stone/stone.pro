@@ -1,21 +1,23 @@
 
+include(svnrev.pri)
+
 MOC_DIR=.out
 OBJECTS_DIR=.out
 UI_DIR=.out
 
 SOURCES += \
 	src/blurqt.cpp \
+	src/changeset.cpp \
 	src/connection.cpp \
 	src/dateutil.cpp \
-	src/iniconfig.cpp \
-	src/recordproxy.cpp \
-	src/renderelements.cpp \
 	src/database.cpp \
+	src/expression.cpp \
 	src/field.cpp \
 	src/freezercore.cpp \
 	src/graphite.cpp \
 	src/index.cpp \
 	src/indexschema.cpp \
+	src/iniconfig.cpp \
 	src/interval.cpp \
 	src/joinedselect.cpp \
 	src/path.cpp \
@@ -29,16 +31,16 @@ SOURCES += \
 	src/record.cpp \
 	src/recordlist.cpp \
 	src/recordimp.cpp \
+	src/recordproxy.cpp \
 	src/recordxml.cpp \
-	src/remotelogserver.cpp \
 	src/resultset.cpp \
+	src/remotelogserver.cpp \
 	src/schema.cpp \
 	src/sqlerrorhandler.cpp \
 	src/table.cpp \
 	src/tableschema.cpp \
 	src/transactionmgr.cpp \
 	src/updatemanager.cpp \
-	src/undomanager.cpp \
 	src/multilog.cpp \
 	src/md5_globalstuff.cpp \
 	src/md5.cpp \
@@ -47,20 +49,20 @@ SOURCES += \
 	
 HEADERS += \
 	include/blurqt.h \
+	include/changeset.h \
 	include/connection.h \
 	include/dateutil.h \
-	include/iniconfig.h \
-	include/recordproxy.h \
-	include/renderelements.h \
 	include/database.h \
+	include/expression.h \
 	include/field.h \
 	include/freezercore.h \
-    include/graphite.h \
-    include/graphite_p.h \
+	include/graphite.h \
+	include/graphite_p.h \
 	include/index.h \
 	include/indexschema.h \
+	include/iniconfig.h \
 	include/interval.h \
-    include/joincondition.h \
+	include/joinedselect.h \
 	include/path.h \
 	include/packetsocket.h \
 	include/pgconnection.h \
@@ -71,16 +73,17 @@ HEADERS += \
 	include/record.h \
 	include/recordimp.h \
 	include/recordlist.h \
+	include/recordproxy.h \
 	include/recordxml.h \
 	include/remotelogserver.h \
-    include/resultset.h \
+	include/resultset.h \
 	include/schema.h \
 	include/sqlerrorhandler.h \
 	include/table.h \
 	include/tableschema.h \
 	include/transactionmgr.h \
+	include/trigger.h \
 	include/updatemanager.h \
-	include/undomanager.h \
 	include/multilog.h \
 	include/md5_bithelp.h \
 	include/md5_globalstuff.h \ 
@@ -93,24 +96,26 @@ DEPENDPATH+=src include
 DEFINES+=STONE_MAKE_DLL
 
 win32 {
-	LIBS+=-lPsapi -lMpr -ladvapi32 -lshell32 -luser32 -lpdh -lUserenv -lnetapi32
+	LIBS+=-lPsapi -lMpr -ladvapi32 -lshell32 -luser32 -lpdh -lUserenv -lnetapi32 -lGdi32
 	LIBS+=-Lc:\IntelLib
 	PY_PATH=$$system("python -c \"from distutils.sysconfig import get_config_vars; print get_config_vars()['prefix']\"")
 	INCLUDEPATH+=$$system("python -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
 	PY_VERSION=$$system("python -c \"from distutils.sysconfig import get_python_version; print get_python_version().replace('.','')\"")
-	message(Python Version is $$PY_VERSION Python lib path is $$PY_LIB_PATH)
+	message(Python Version is $$PY_VERSION Python lib path is $${PY_PATH}\libs)
 	LIBS+=-L$${PY_PATH}\libs -lpython$${PY_VERSION}
-}
 
-isEmpty( PYTHON ) {
-    PYTHON="python"
+	#QMAKE_CXXFLAGS+=/Z7
+	#QMAKE_LFLAGS+=/DEBUG
 }
 
 unix {
-	PY_VERSION=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_version; print get_python_version()\"")
+	INCLUDEPATH+=$$system("python -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
+	PY_VERSION=$$system("python -c \"from distutils.sysconfig import get_python_version; print get_python_version()\"")
+
+	#QMAKE_CXXFLAGS+=-std=c++0x
 	message(Python Version is $$PY_VERSION)
-        INCLUDEPATH += ../sip/siplib/
-	INCLUDEPATH +=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
+	INCLUDEPATH += /usr/include/python$${PY_VERSION}/
+	INCLUDEPATH += ../sip/siplib/
 	LIBS+=-lpython$${PY_VERSION}
 }
 
@@ -126,10 +131,10 @@ contains( DEFINES, versioned ) {
 }
 
 unix {
-	target.path=$$(DESTDIR)/usr/local/lib
+	target.path=/usr/local/lib
 }
 win32 {
-	target.path=$$(DESTDIR)/blur/common/
+	target.path=c:/blur/common/
 }
 
 INSTALLS += target

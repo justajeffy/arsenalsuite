@@ -36,6 +36,8 @@ public:
 	QRect readRect( const QString & key, const QRect & def=QRect() ) const;
 	QList<int> readIntList( const QString & key, const QList<int> & def = QList<int>() ) const;
 	QByteArray readByteArray( const QString & key, const QByteArray & def = QByteArray() ) const;
+	QDateTime readDateTime( const QString & key, const QDateTime & def = QDateTime() ) const;
+	Interval readInterval( const QString & key, const Interval & def = Interval() ) const;
 
 	void writeBool( const QString & key, bool val);
 	void writeInt( const QString & key, int val);
@@ -46,6 +48,8 @@ public:
 	void writeRect( const QString & key, const QRect & val );
 	void writeIntList( const QString & key, const QList<int> & val );
 	void writeByteArray( const QString & key, const QByteArray & val );
+	void writeDateTime( const QString & key, const QDateTime & val );
+	void writeInterval( const QString & key, const Interval & val );
 	
 	void removeKey( const QString & key );
 	void removeSection( const QString & group );

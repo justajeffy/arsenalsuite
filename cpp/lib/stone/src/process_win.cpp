@@ -30,6 +30,8 @@
 
 #include <qlibrary.h>
 #include <qtimer.h>
+#include <qpixmap.h>
+#include <qimage.h>
 
 #include "process.h"
 
@@ -1088,6 +1090,34 @@ bool killProcess(int pid)
 	return ret;
 }
 
+QDateTime winFileTimeToQDT( FILETIME * pFileTime )
+{
+	QDateTime ret;
+	SYSTEMTIME systemTime;
+	if( FileTimeToSystemTime( pFileTime, &systemTime ) != 0 ) {
+		ret = QDateTime( QDate( systemTime.wYear, systemTime.wMonth, systemTime.wDay ), QTime( systemTime.wHour, systemTime.wMinute, systemTime.wSecond, systemTime.wMilliseconds ) );
+	} else {
+		LOG_1( "FileTimeToSystemTime failed with error: " + QString::number( GetLastError() ) );
+	}
+	return ret;
+}
+
+QDateTime processStartTime(int pid)
+{
+	QDateTime ret;
+	HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION, FALSE, pid );
+	if( hProcess ) {
+		FILETIME creationTime, exitTime, kernelTime, userTime;
+		if( GetProcessTimes( hProcess, &creationTime, &exitTime, &kernelTime, &userTime ) != 0 ) {
+			ret = winFileTimeToQDT(&creationTime);
+		} else {
+			LOG_1( "GetProcessTimes failed with error: " + QString::number( GetLastError() ) );
+		}
+		CloseHandle(hProcess);
+	}
+	return ret;
+}
+
 bool setProcessPriorityClass( int pid, DWORD priorityClass )
 {
 	HANDLE h;
@@ -1776,6 +1806,73 @@ bool qSetCurrentProcessExplicitAppUserModelID( const QString & appId )
 	}
 	return false;
 }
+
+QString currentExecutableFilePath()
+{
+	wchar_t executableNameW[512];
+	DWORD len = GetModuleFileNameW( NULL, executableNameW, 512 );
+	if( len == 0 ) {
+		LOG_1( "GetModuleFileNameW failed, error was: " + QString::number( GetLastError() ) );
+		return QString();
+	}
+	return QString::fromWCharArray( executableNameW, len );
+}
+
+bool saveScreenShot( const QString & path )
+{
+	// get the device context of the screen
+	HDC hScreenDC = CreateDC(L"DISPLAY", NULL, NULL, NULL);     
+	if( hScreenDC == NULL ) {
+		LOG_1( "CreateDC(\"DISPLAY\", NULL, NULL, NULL) failed" );
+		return false;
+	}
+	
+	// and a device context to put it in
+	HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
+	if( hMemoryDC == NULL ) {
+		LOG_1( "CreateCompatibleDC(hScreenDC) failed" );
+		DeleteDC(hScreenDC);
+		return false;
+	}
+	
+	int width = GetDeviceCaps(hScreenDC, HORZRES);
+	int height = GetDeviceCaps(hScreenDC, VERTRES);
+
+	// maybe worth checking these are positive values
+	HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, width, height);
+	if( hBitmap == NULL ) {
+		LOG_1( "CreateCompatibleBitmap(hScreenDC, x, y) failed" );
+		DeleteDC(hMemoryDC);
+		DeleteDC(hScreenDC);
+		return false;
+	}
+	
+	// get a new bitmap
+	HGDIOBJ hOldBitmap = SelectObject(hMemoryDC, hBitmap);
+
+	if( BitBlt(hMemoryDC, 0, 0, width, height, hScreenDC, 0, 0, SRCCOPY) == 0 ) {
+		LOG_1( "BitBlt from screen to memory failed" );
+		DeleteDC(hMemoryDC);
+		DeleteDC(hScreenDC);
+		return false;
+	}
+	
+	SelectObject(hMemoryDC, hOldBitmap);
+
+	QPixmap pixmap = QPixmap::fromWinHBITMAP( hBitmap );
+	QImage image = pixmap.toImage();
+	bool ret = image.save( path );
+	if( !ret )
+		LOG_1( "Failed to save screenshot to file " + path );
+
+	// clean up
+	DeleteDC(hMemoryDC);
+	DeleteDC(hScreenDC);
+	DeleteObject(hBitmap);
+
+	return ret;
+}
+
 
 #endif // Q_OS_WIN
 

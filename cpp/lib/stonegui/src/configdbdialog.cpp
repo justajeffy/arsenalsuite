@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: configdbdialog.cpp 9064 2009-11-23 01:13:50Z brobison $
+ * $Id: configdbdialog.cpp 8976 2009-11-09 18:57:32Z newellm $
  */
 
 #include <qlineedit.h>

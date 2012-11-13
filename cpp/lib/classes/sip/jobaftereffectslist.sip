@@ -27,12 +27,16 @@ class JobAfterEffectsList : JobList
 
 %End
 public:
-	JobAfterEffectsList();
-	JobAfterEffectsList( const RecordList &, Table * t = 0 );
-	JobAfterEffectsList( const JobAfterEffectsList & );
-	JobAfterEffectsList( const Record &, Table * t = 0 );
-	
-	~JobAfterEffectsList();
+	JobAfterEffectsList() /HoldGIL/;
+	JobAfterEffectsList( const RecordList &, Table * t = 0 ) /HoldGIL/;
+	JobAfterEffectsList( const JobAfterEffectsList & ) /HoldGIL/;
+	JobAfterEffectsList( const Record &, Table * t = 0 ) /HoldGIL/;
+	JobAfterEffectsList( SIP_PYLIST );
+%MethodCode
+	sipCpp = new JobAfterEffectsList( recordListFromPyList(a0), JobAfterEffects::table() );
+%End
+
+	~JobAfterEffectsList() /HoldGIL/;
 
 //	void insert( JobAfterEffectsIter, const JobAfterEffects & );
 
@@ -42,34 +46,35 @@ public:
 
 //	JobAfterEffectsIter remove( const JobAfterEffectsIter & );
 
-	int remove( const Record & );
+	int remove( const Record & ) /HoldGIL/;
 	
-	int remove();
+	int remove() throw(SqlException,LostConnectionException,PythonException);
 	
 	//JobAfterEffectsIter begin();
 
 	//JobAfterEffectsIter end();
 
-	Table * table() const;
-	TableSchema * schema() const;
+	Table * table() const /HoldGIL/;
+	TableSchema * schema() const /HoldGIL/;
 
-	MappedJobAfterEffectsList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
-	MappedJobAfterEffectsList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const;
-	MappedJobAfterEffectsList sorted( const QString & c, bool a = true ) const;
+	MappedJobAfterEffectsList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobAfterEffectsList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobAfterEffectsList sorted( const QString & c, bool a = true ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedJobAfterEffectsList unique() const;
 	MappedJobAfterEffectsList reversed() const;
 	MappedJobAfterEffectsList reloaded() const;
 
-	QList<uint> frameStarts() const;
-	MappedJobAfterEffectsList & setFrameStarts( const uint & );
-	QList<uint> frameEnds() const;
-	MappedJobAfterEffectsList & setFrameEnds( const uint & );
-	QList<uint> widths() const;
-	MappedJobAfterEffectsList & setWidths( const uint & );
-	QList<uint> heights() const;
-	MappedJobAfterEffectsList & setHeights( const uint & );
-	QStringList comps() const;
+	QMap<QString,RecordList> groupedBy( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
+
+	PyObject * groupedBy( SIP_PYCALLABLE callable ) const throw(SqlException,LostConnectionException,PythonException);
+%MethodCode
+		sipRes = recordListGroupByCallable( sipCpp, a0, JobAfterEffects::schema() );
+%End
+
+	QList<bool> ignoreMissingEffectses() const /HoldGIL/;
+	MappedJobAfterEffectsList & setIgnoreMissingEffectses( const bool & );
+	QStringList comps() const /HoldGIL/;
 	MappedJobAfterEffectsList & setComps( const QString & );
 
 

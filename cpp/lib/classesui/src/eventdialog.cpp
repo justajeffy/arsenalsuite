@@ -20,7 +20,7 @@ EventDialog::~EventDialog()
 void EventDialog::setEvent( const Calendar & c )
 {
 	mEvent = c;
-	mDescriptionEdit->setPlainText( mEvent.calendar() );
+	mDescriptionEdit->setPlainText( mEvent.name() );
 	mWhenDateTimeEdit->setDateTime( mEvent.dateTime() );
 	mCategoryCombo->setCurrent( mEvent.category() );
 	mProjectCombo->setProject( mEvent.project() );
@@ -28,7 +28,7 @@ void EventDialog::setEvent( const Calendar & c )
 
 void EventDialog::accept()
 {
-	mEvent.setCalendar( mDescriptionEdit->toPlainText() );
+	mEvent.setName( mDescriptionEdit->toPlainText() );
 	mEvent.setDateTime( mWhenDateTimeEdit->dateTime() );
 	mEvent.setUser( User::currentUser() );
 	mEvent.setCategory( mCategoryCombo->current() );

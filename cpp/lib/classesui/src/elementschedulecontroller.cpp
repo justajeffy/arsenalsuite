@@ -785,7 +785,7 @@ QColor CalendarEntry::color() const
 
 QString CalendarEntry::toolTip( const QDate &, int ) const
 {
-	return "Posted By: " + mCal.user().displayName() + "\n" + mCal.calendar();
+	return "Posted By: " + mCal.user().displayName() + "\n" + mCal.name();
 }
 
 void CalendarEntry::popup( QWidget * parent, const QPoint & pos, const QDate &, ScheduleSelection sel  )
@@ -845,7 +845,7 @@ int CalendarEntry::heightForWidth( int width, QPaintDevice * device, const Sched
 //	if( mLastWidth != width ) {
 		mLastWidth = width;
 		QFont font( displayOptions.entryFont, device );
-		return QFontMetrics(font,device).boundingRect( 0, 0, width - 12, 100000, Qt::TextWordWrap, mCal.calendar() ).height();
+		return QFontMetrics(font,device).boundingRect( 0, 0, width - 12, 100000, Qt::TextWordWrap, mCal.name() ).height();
 //	}
 	return mLastHeight;
 }
@@ -886,7 +886,7 @@ void CalendarEntry::paint( const PaintOptions & po )
 	p->setBrush( QBrush() );
 	p->setPen( sc.value() > 125 ? Qt::black : Qt::white );
 	p->setFont( po.displayOptions->entryFont );
-	p->drawText( po.spanRect.adjusted(4,2,-6,0), Qt::TextWordWrap, mCal.calendar() );
+	p->drawText( po.spanRect.adjusted(4,2,-6,0), Qt::TextWordWrap, mCal.name() );
 }
 
 TimeSpanEntry::TimeSpanEntry( ScheduleRow * row, const Element & element )

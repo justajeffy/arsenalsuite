@@ -39,6 +39,7 @@ using namespace Stone;
 
 class STONE_EXPORT PGConnection : public QSqlDbConnection
 {
+Q_OBJECT
 public:
 	PGConnection();
 
@@ -63,7 +64,7 @@ public:
 
 	virtual uint newPrimaryKey( TableSchema * );
 
-	virtual RecordList selectFrom( Table * table, const QString & from, const QList<QVariant> & args );
+	virtual RecordList selectFrom( Table * table, const QString & from, const QList<QVariant> & args = QList<QVariant>() );
 
 	/// Same as above, but won't select from offspring
 	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() );
@@ -73,25 +74,40 @@ public:
 
 	virtual void selectFields( Table * table, RecordList, FieldList );
 
-	virtual bool insert( Table *, const RecordList & rl, bool newPrimaryKey = true );
+	virtual void insert( Table *, const RecordList & rl );
 
 	/**
 	 * Generates and executes a sql update
 	 * to the database.
 	 **/
-	virtual bool update( Table *, RecordImp * imp, Record * returnValues );
+	virtual bool update( Table *, RecordImp * imp, Record * returnValues = 0 );
+	virtual bool update( Table * table, RecordList records, RecordList * returnValues = 0 );
 
 	virtual int remove( Table *, const QString &, QList<int> * rowsDeleted = 0 );
 
 	virtual bool createIndex( IndexSchema * schema );
 
 	bool checkVersion( int major, int minor ) const;
-protected:
-	QString getSqlFields(TableSchema*, const QString & _tableAlias = QString());
 
+	TableSchema * tableByOid( uint oid, Schema * );
+	uint oidByTable( TableSchema * );
+
+	bool verifyChangeTrigger( TableSchema * table, bool create = false );
+
+signals:
+	void notification( const QString & name );
+
+protected:
+	QString getSqlFields(TableSchema*, const QString & _tableAlias = QString(), bool needTableOid = false, FieldList * usedFields = 0, int * pkeyPos=0);
+
+	void loadTableOids();
+	bool verifyTriggerExists( TableSchema * table, const QString & triggerName );
+	
 	QHash<TableSchema*,QString> mSqlFields;
 	int mVersionMajor, mVersionMinor;
 	bool mUseMultiTableSelect;
+	QMap<uint, QString> mTablesByOid;
+	QMap<QString, uint> mOidsByTable;
 };
 
 #endif // PG_CONNECTION_H

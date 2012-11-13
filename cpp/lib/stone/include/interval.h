@@ -41,7 +41,8 @@ public:
 	Interval( const QDate &, const QDate & );
 	Interval( int seconds = 0, int microseconds = 0 );
 	Interval( int months, int days, int seconds, int microseconds = 0 );
-
+	Interval( const QString & string );
+	
 	enum Order {
 		Microseconds = 1,
 		Milliseconds,
@@ -112,7 +113,7 @@ public:
 
 	qint64 asOrder( Order order ) const;
 	
-	// Same as toString( Years, Microseconds, AutoChopMinimum | AutoChopMaximum ), which is compatible with postgres input/output.
+	// Same as toString( Years, Microseconds, TrimMinimum | TrimMaximum ), which is compatible with postgres input/output.
 	QString toString() const;
 
 	QString toString( Order maximumOrder, Order minimumOrder = Seconds, int flags = TrimMinimum | TrimMaximum ) const;

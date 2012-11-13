@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: undotoolbutton.h 5411 2007-12-18 01:03:08Z brobison $
+ * $Id: undotoolbutton.h 12771 2012-02-21 18:03:54Z newellm $
  */
 
 #ifndef UNDO_TOOL_BUTTON_H
@@ -31,7 +31,7 @@
 #include <qobject.h>
 #include <qlist.h>
 #include <qtoolbutton.h>
-#include <undomanager.h>
+#include <qundostack.h>
 
 #include "stonegui.h"
 #include "record.h"
@@ -41,17 +41,17 @@ class STONEGUI_EXPORT UndoRedoToolButton : public QToolButton
 {
 Q_OBJECT
 public:
-	UndoRedoToolButton( QWidget * parent, UndoManager *, bool isUndo );
+	UndoRedoToolButton( QWidget * parent, QUndoStack *, bool isUndo );
 	
 	void updatePopup();
 	
 public slots:
-	void undoRedoChange( bool, bool );
-	void menuItemClicked( int );
+	void canUndoRedoChange( bool );
+	void menuItemClicked( QAction * );
 	
 protected:
 	bool mIsUndo;
-	UndoManager * mUndoManager;
+	QUndoStack * mUndoStack;
 };
 
 #endif // UNDO_TOOL_BUTTON_H

@@ -1,6 +1,5 @@
 
-import os
-import sys
+import os, sys
 from blur.build import *
 
 path = os.path.dirname(os.path.abspath(__file__))
@@ -16,10 +15,7 @@ if sys.platform=="linux2":
 
 # Python module target
 pc = SipTarget("pyabsubmit",path)
-pc.pre_deps =["libabsubmit","pyclasses:install"]
-
-pcs = SipTarget("pyabsubmitstatic",path,True)
-pcs.pre_deps =["libabsubmit","pyclassesstatic:install"]
+pc.pre_deps = ["libabsubmit","pyclasses:install"]
 
 if __name__ == "__main__":
 	build()

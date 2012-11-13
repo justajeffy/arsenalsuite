@@ -152,6 +152,8 @@ STONE_EXPORT void vncHost(const QString & host);
 /// and name( if name is not null )
 STONE_EXPORT bool isRunning(int pid, const QString & name = QString::null);
 
+STONE_EXPORT QDateTime processStartTime(int pid);
+
 /// Kills process with pid
 STONE_EXPORT bool killProcess(qint32 pid);
 
@@ -288,6 +290,11 @@ STONE_EXPORT QString localDomain();
 // Qt wrapper for windows 7 SetCurrentProcessExplicitAppUserModelID
 // Use this to provide proper task bar grouping
 STONE_EXPORT bool qSetCurrentProcessExplicitAppUserModelID( const QString & appId );
+
+STONE_EXPORT QString currentExecutableFilePath();
+
+/// Path must be a valid file path with an image extension that can be saved by QImage
+STONE_EXPORT bool saveScreenShot( const QString & path );
 
 #endif
 

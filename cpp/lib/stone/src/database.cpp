@@ -40,7 +40,6 @@
 #include "table.h"
 #include "recordimp.h"
 #include "updatemanager.h"
-#include "undomanager.h"
 #include "schema.h"
 
 namespace Stone {
@@ -79,9 +78,12 @@ Database::Database( Schema * schema, Connection * conn )
 
 Database::~Database()
 {
+	TableList topLevelTables;
 	foreach( Table * t, tables() )
 		if( !t->parent() )
-			delete t;
+			topLevelTables += t;
+	foreach( Table * t, topLevelTables )
+		delete t;
 }
 
 Connection * Database::connection() const
@@ -91,6 +93,10 @@ Connection * Database::connection() const
 
 void Database::setConnection( Connection * c )
 {
+	if( c && c->capabilities() & Connection::Cap_Notifications ) {
+		LOG_5( QString("Notification signal connected to connection 0x%1").arg((qulonglong)c,0,16) );
+		connect( c, SIGNAL(notification(const QString&)), SLOT(dispatchNotification(const QString&)) );
+	}
 	mConnections.setLocalData( c );
 }
 
@@ -111,30 +117,18 @@ void Database::setUndoEnabled( bool ue )
 
 void Database::recordsAdded( const RecordList & added, bool local )
 {
-	if( local && mUndoEnabled )
-		UndoManager::instance()->addOperation( new RecordUndoOperation( added, RecordUndoOperation::INSERT ) );
-	
 	emit recordsAddedSignal( added );
 	flushUpdateBuffer();
 }
 
 void Database::recordsRemoved( const RecordList & removed, bool local )
 {
-	if( local && mUndoEnabled )
-		UndoManager::instance()->addOperation( new RecordUndoOperation( removed, RecordUndoOperation::DELETE ) );
-
 	emit recordsRemovedSignal( removed );
 	flushUpdateBuffer();
 }
 
 void Database::recordUpdated( const Record & current, const Record & old, bool local )
 {
-	if( local && mUndoEnabled ) {
-		RecordList recs;
-		recs += current;
-		recs += old;
-		UndoManager::instance()->addOperation( new RecordUndoOperation( recs, RecordUndoOperation::UPDATE ) );
-	}
 	emit recordUpdatedSignal( current, old );
 	if( local )
 		flushUpdateBuffer();
@@ -256,8 +250,6 @@ bool Database::ensureInsideTransaction()
 	if( mInsideTransactionCount > 0 && !mReallyInsideTransaction && !mRolledBack ) {
 		mReallyInsideTransaction = true;
 		connection()->beginTransaction();
-		if( mEchoMode & (EchoInsert|EchoUpdate|EchoDelete) )
-			LOG_3( "BEGIN;" );
 		// Only allow a transaction to be open for 1 minute
 		// TODO, make this configurable, with a global default
 		// and a per-transaction override
@@ -275,12 +267,6 @@ void Database::flushUpdateBuffer()
 void Database::beginTransaction( const QString & title )
 {
 	mInsideTransactionCount++;
-	if( mUndoEnabled ) {
-		if( mInsideTransactionCount==1 )
-			UndoManager::instance()->startBlock( title );
-		else
-			UndoManager::instance()->pushTitle( title );
-	}
 }
 
 void Database::commitTransaction()
@@ -294,20 +280,14 @@ void Database::commitTransaction()
 		
 		if( mReallyInsideTransaction ){
 			mTransactionTimer->stop();
-			if( mEchoMode & (EchoInsert|EchoUpdate|EchoDelete) )
-				LOG_3( "COMMIT;" );
 			mReallyInsideTransaction = false;
 			connection()->commitTransaction();
 		}
 
-		if( mUndoEnabled )
-			UndoManager::instance()->commitBlock();
-
 		UpdateManager::instance()->flushPending();
 		
 		mRolledBack = false;
-	} else if( mUndoEnabled )
-		UndoManager::instance()->popTitle();
+	}
 }
 
 void Database::rollbackTransaction()
@@ -322,14 +302,9 @@ void Database::rollbackTransaction()
 
 	if( mReallyInsideTransaction ) {
 		mTransactionTimer->stop();
-		if( mEchoMode & (EchoInsert|EchoUpdate|EchoDelete) )
-			LOG_3( "ROLLBACK;" );
 		mReallyInsideTransaction = false;
 		connection()->rollbackTransaction();
 	}
-	
-	if( mUndoEnabled )
-		UndoManager::instance()->rollbackBlock();
 }
 
 void Database::transactionTimeout()
@@ -428,6 +403,39 @@ bool Database::popQueueRecordSignals()
 	if( mQueueRecordSignalsStack.size() )
 		mQueueRecordSignals = mQueueRecordSignalsStack.pop();
 	return mQueueRecordSignals;
+}
+
+static const char * preload_change_str = "_preload_change";
+
+void Database::dispatchNotification( const QString & name )
+{
+	LOG_5( "Recieved postgres notification: " + name );
+	if( name.endsWith( QString::fromAscii(preload_change_str) ) ) {
+		QString tableName = name.left( name.size() - strlen(preload_change_str) );
+		Table * table = tableByName( tableName );
+		if( !table ) {
+			LOG_1( "Couldn't find table for preload change: " + tableName );
+			return;
+		}
+		table->invalidatePreload();
+	} else
+		LOG_1( "Unknown notification recieved: " + name );
+}
+
+
+bool Database::setupPreloadListen(Table * table)
+{
+	Connection * conn = connection();
+	if( !conn->capabilities() & Connection::Cap_ChangeNotifications ) {
+		LOG_1( "Change Notifications needed for preload listening, but not available" );
+		return false;
+	}
+	if( !conn->verifyChangeTrigger(table->schema()) ) {
+		LOG_1( "Change Trigger not available on table " + table->schema()->tableName() );
+		return false;
+	}
+	conn->listen( table->schema()->tableName().toLower() + QString::fromAscii(preload_change_str) );
+	return true;
 }
 
 } // namespace Stone

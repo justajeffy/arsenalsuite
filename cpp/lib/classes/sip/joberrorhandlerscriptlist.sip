@@ -27,12 +27,16 @@ class JobErrorHandlerScriptList : RecordList
 
 %End
 public:
-	JobErrorHandlerScriptList();
-	JobErrorHandlerScriptList( const RecordList &, Table * t = 0 );
-	JobErrorHandlerScriptList( const JobErrorHandlerScriptList & );
-	JobErrorHandlerScriptList( const Record &, Table * t = 0 );
-	
-	~JobErrorHandlerScriptList();
+	JobErrorHandlerScriptList() /HoldGIL/;
+	JobErrorHandlerScriptList( const RecordList &, Table * t = 0 ) /HoldGIL/;
+	JobErrorHandlerScriptList( const JobErrorHandlerScriptList & ) /HoldGIL/;
+	JobErrorHandlerScriptList( const Record &, Table * t = 0 ) /HoldGIL/;
+	JobErrorHandlerScriptList( SIP_PYLIST );
+%MethodCode
+	sipCpp = new JobErrorHandlerScriptList( recordListFromPyList(a0), JobErrorHandlerScript::table() );
+%End
+
+	~JobErrorHandlerScriptList() /HoldGIL/;
 
 //	void insert( JobErrorHandlerScriptIter, const JobErrorHandlerScript & );
 
@@ -42,26 +46,33 @@ public:
 
 //	JobErrorHandlerScriptIter remove( const JobErrorHandlerScriptIter & );
 
-	int remove( const Record & );
+	int remove( const Record & ) /HoldGIL/;
 	
-	int remove();
+	int remove() throw(SqlException,LostConnectionException,PythonException);
 	
 	//JobErrorHandlerScriptIter begin();
 
 	//JobErrorHandlerScriptIter end();
 
-	Table * table() const;
-	TableSchema * schema() const;
+	Table * table() const /HoldGIL/;
+	TableSchema * schema() const /HoldGIL/;
 
-	MappedJobErrorHandlerScriptList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
-	MappedJobErrorHandlerScriptList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const;
-	MappedJobErrorHandlerScriptList sorted( const QString & c, bool a = true ) const;
+	MappedJobErrorHandlerScriptList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobErrorHandlerScriptList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobErrorHandlerScriptList sorted( const QString & c, bool a = true ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedJobErrorHandlerScriptList unique() const;
 	MappedJobErrorHandlerScriptList reversed() const;
 	MappedJobErrorHandlerScriptList reloaded() const;
 
-	QStringList scripts() const;
+	QMap<QString,RecordList> groupedBy( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
+
+	PyObject * groupedBy( SIP_PYCALLABLE callable ) const throw(SqlException,LostConnectionException,PythonException);
+%MethodCode
+		sipRes = recordListGroupByCallable( sipCpp, a0, JobErrorHandlerScript::schema() );
+%End
+
+	QStringList scripts() const /HoldGIL/;
 	MappedJobErrorHandlerScriptList & setScripts( const QString & );
 
 

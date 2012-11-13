@@ -702,7 +702,7 @@ QModelIndex SuperModel::parent( const QModelIndex & idx ) const
 	return QModelIndex();
 }
 
-QModelIndex SuperModel::sibling( int row, int column, const QModelIndex & idx )
+QModelIndex SuperModel::sibling( int row, int column, const QModelIndex & idx ) const
 {
 	if( !idx.isValid() || row < 0 ) return QModelIndex();
 	ModelNode * node = indexToNode(idx);
@@ -740,29 +740,11 @@ int SuperModel::rowCount( const QModelIndex & parent ) const
 	return ret;
 }
 
-int SuperModel::rowCountWithoutLoad( const QModelIndex & parent ) const
-{
-	if( !parent.isValid() ) return rootNode() ? rootNode()->rowCount() : 0;
-	ModelNode * node = indexToNode(parent);
-	// This line skips the loading by calling hasChildren with skipTreeBuilderCheck=true
-	ModelNode * childNode = node->hasChildren(parent,false,true) ? node->child(parent) : 0;
-	int ret = (childNode ? childNode->rowCount() : 0);
-	return ret;
-}
-
-
 bool SuperModel::hasChildren( const QModelIndex & parent ) const
 {
 	if( !parent.isValid() ) return rootNode()->rowCount() > 0;
 	ModelNode * node = indexToNode(parent);
 	return node->hasChildren(parent);
-}
-
-bool SuperModel::hasChildrenWithoutLoad( const QModelIndex & parent ) const
-{
-	if( !parent.isValid() ) return rootNode()->rowCount() > 0;
-	ModelNode * node = indexToNode(parent);
-	return node->hasChildren(parent,false,true);
 }
 
 bool SuperModel::childrenLoaded( const QModelIndex & parent )
@@ -968,8 +950,6 @@ QModelIndexList SuperModel::move( QModelIndexList indexes, const QModelIndex & d
 	bool stealObjects = true;
 	int currentDestRow = insertPos;
 	int totalMoved = 0;
-    // Temporarily commented out because of verbosity
-//	dump();
 	for( TransRowSpanMap::Iterator it = spansByTrans.begin(); it != spansByTrans.end(); ++it ) {
 		ModelDataTranslator * trans = it.key();
 		QList<RowSpan> & spanList = it.value();
@@ -1331,7 +1311,6 @@ void SuperModel::closeInsertClosure()
 
 void SuperModel::setColumnFilter( uint column, const QString & filter )
 {
-    //LOG_1(QString("setting filter for column %1 to %2").arg(QString::number(column)).arg(filterString));
-    mColumnFilterMap[column] = filter;
+	//LOG_1(QString("setting filter for column %1 to %2").arg(QString::number(column)).arg(filterString));
+	mColumnFilterMap[column] = filter;
 }
-

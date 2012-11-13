@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: remotelogserver.h 8500 2009-06-24 07:47:18Z brobison $
+ * $Id$
  */
 
 

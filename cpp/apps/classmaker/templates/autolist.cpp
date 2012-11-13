@@ -58,14 +58,14 @@ t__Iter t__List::at( uint pos )
 	return (d && (int)pos < d->mList.size()) ? t__Iter( d->mList.begin() + pos ) : end();
 }
 
+t__List t__List::slice( int start, int end, int step )
+{
+	return t__List(RecordList::slice(start,end,step));
+}
+
 t__Iter t__List::find( const Record & val )
 {
 	return d ? t__Iter( d->mList.begin() + d->mList.indexOf( val.imp() ) ) : end();
-}
-
-int t__List::remove( const Record & t )
-{
-	return RecordList::remove( t );
 }
 
 t__Iter t__List::remove( const t__Iter & it )

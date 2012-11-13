@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: renderelements.cpp 8590 2009-07-16 00:09:51Z brobison $
+ * $Id: renderelements.cpp 5409 2007-12-18 00:32:50Z brobison $
  */
 
 #include <qfile.h>
@@ -189,10 +189,10 @@ QString renderElementDir( const QString & maxFilePath )
 {
 	QString eldir = maxFilePath;
 	eldir = eldir.replace( ".max", "" ) + ".render_elements/";
-	if( Stone::Path( eldir ).dirExists() )
+	if( Path( eldir ).dirExists() )
 		return eldir;
-	eldir = Stone::Path( maxFilePath ).dirPath() + "/render_elements/";
-	if( Stone::Path( eldir ).dirExists() )
+	eldir = Path( maxFilePath ).dirPath() + "/render_elements/";
+	if( Path( eldir ).dirExists() )
 		return eldir;
 	return QString::null;
 }

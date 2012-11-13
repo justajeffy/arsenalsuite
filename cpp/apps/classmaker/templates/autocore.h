@@ -9,6 +9,7 @@
 #include <qimage.h>
 
 #include "snl__.h"
+#include "expression.h"
 #include "interval.h"
 #include "joinedselect.h"
 #include "table.h"
@@ -73,11 +74,11 @@ public:
 
 	t__ & operator=( const t__ & other );
 
+
 <%METHODDEFS%>
 
-	static t__List select( const QString & where, const VarList & args );
-	static t__List select( const QString & where = QString::null );
-	
+	static t__List select( const QString & where = QString(), const VarList & args = VarList() );
+	static t__List select( const Expression & exp );
 	// Usage
 	// Employee::join<UserGroup>().join<Group>().select()
 	template<typename T> static JoinedSelect join( QString condition = QString(), JoinType joinType = InnerJoin, bool ignoreResults = false, const QString & alias = QString() )
@@ -86,6 +87,11 @@ public:
 <%INDEXDEFS%>
 
 <%ELEMENTHACKS%>
+
+	struct _c {
+<%SCHEMAFIELDDECLS%>
+	};
+	static _c c;
 
 #define CLASS_FUNCTIONS
 <%BASEHEADER%>

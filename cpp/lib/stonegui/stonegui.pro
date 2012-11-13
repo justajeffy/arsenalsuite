@@ -3,12 +3,15 @@ MOC_DIR=.out
 OBJECTS_DIR=.out
 UI_DIR=.out
 
-FORMS+=ui/lostconnectiondialogui.ui \
+RESOURCES += stonegui.qrc
+
+FORMS+= \
 	ui/addlinkdialog.ui \
+	ui/lostconnectiondialogui.ui \
 	ui/configdbdialogui.ui \
-    ui/graphitedialogui.ui \
-    ui/graphitesourceswidgetui.ui \
-    ui/graphiteoptionswidgetui.ui \
+	ui/graphitedialogui.ui \
+	ui/graphitesourceswidgetui.ui \
+	ui/graphiteoptionswidgetui.ui \
 	ui/imagesequencewidget.ui \
 	ui/remotetailwindowui.ui
 
@@ -16,19 +19,22 @@ SOURCES += \
 	src/actions.cpp \
 	src/busywidget.cpp \
 	src/configdbdialog.cpp \
+	src/extgraphicsscene.cpp \
+	src/exttreewidgetitem.cpp \
 	src/ffimagesequenceprovider.cpp \
 #	src/phononimagesequenceprovider.cpp \
 	src/fieldcheckbox.cpp \
 	src/fieldlineedit.cpp \
 	src/fieldtextedit.cpp \
 	src/fieldspinbox.cpp \
+	src/filteredit.cpp \
 	src/glutil.cpp \
-    src/graphitedialog.cpp \
-    src/graphitesource.cpp \
-    src/graphitesourceswidget.cpp \
-    src/graphiteoptionswidget.cpp \
-    src/graphitewidget.cpp \
-    src/htmlhighlighter.cpp \
+	src/graphitedialog.cpp \
+	src/graphitesource.cpp \
+	src/graphitesourceswidget.cpp \
+	src/graphiteoptionswidget.cpp \
+	src/graphitewidget.cpp \
+	src/htmlhighlighter.cpp \
 	src/iconserver.cpp \
 	src/imagesequenceprovider.cpp \
 	src/lostconnectiondialog.cpp \
@@ -47,32 +53,35 @@ SOURCES += \
 	src/recordpropvaltree.cpp \
 	src/recordsupermodel.cpp \
 	src/recordtreeview.cpp \
+	src/richtexteditor.cpp \
 	src/stonegui.cpp \
 	src/supermodel.cpp \
 	src/remotetailwidget.cpp \
 	src/remotetailwindow.cpp \
 	src/imagesequencewidget.cpp \
 	src/undotoolbutton.cpp \
-	src/viewcolors.cpp \
-    src/richtexteditor.cpp
+	src/viewcolors.cpp
 
 HEADERS += \
 	include/actions.h \
 	include/busywidget.h \
 	include/configdbdialog.h \
+	include/extgraphicsscene.h \
+	include/exttreewidgetitem.h \
 	include/ffimagesequenceprovider.h \
 #	include/phononimagesequenceprovider.h \
 	include/fieldcheckbox.h \
 	include/fieldlineedit.h \
 	include/fieldtextedit.h \
 	include/fieldspinbox.h \
+	include/filteredit.h \
 	include/glutil.h \
-    include/graphitedialog.h \
-    include/graphitesource.h \
-    include/graphitesourceswidget.h \
-    include/graphiteoptionswidget.h \
-    include/graphitewidget.h \
-    include/htmlhighlighter.h \
+	include/graphitedialog.h \
+	include/graphitesource.h \
+	include/graphitesourceswidget.h \
+	include/graphiteoptionswidget.h \
+	include/graphitewidget.h \
+	include/htmlhighlighter.h \
 	include/iconserver.h \
 	include/imagesequenceprovider.h \
 	include/lostconnectiondialog.h \
@@ -91,14 +100,14 @@ HEADERS += \
 	include/recordsupermodel.h \
 #	include/tardstyle.h \
 	include/recordtreeview.h \
+	include/richtexteditor.h \
 	include/stonegui.h \
 	include/supermodel.h \
 	include/remotetailwidget.h \
 	include/remotetailwindow.h \
 	include/imagesequencewidget.h \
 	include/undotoolbutton.h \
-	include/viewcolors.h \
-    include/richtexteditor.h
+	include/viewcolors.h
 
 INCLUDEPATH+=include src .out ../stone/include ../stone/.out
 
@@ -110,6 +119,10 @@ win32 {
 	LIBS+=-L../stone -lstone
 }
 
+unix {
+	INCLUDEPATH+=/usr/include/stone
+}
+
 macx{
 	INCLUDEPATH += /Developer/SDKs/MacOSX10.5.sdk/usr/X11R6/include/
 	QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
@@ -117,19 +130,11 @@ macx{
 }
 
 # FFmpeg support
-unix:DEFINES-=USE_FFMPEG
+#unix:DEFINES+=USE_FFMPEG
 #win32:DEFINES+=USE_FFMPEG
 
 contains( DEFINES, USE_FFMPEG ) {
-	win32 {
-		INCLUDEPATH += c:/msys/1.0/local/include/ffmpeg
-		LIBS+=-Lc:/msys/1.0/local/lib -lavcodec -lavformat -lavutil
-	}
-	
-	unix {
-		INCLUDEPATH += /usr/local/include/ffmpeg/
-		LIBS+=-L/usr/local/lib/ -lavcodec -lavutil -lavformat
-	}
+	include(ffmpeg.pri)
 }
 
 # Phonon support
@@ -141,10 +146,10 @@ contains( DEFINES, USE_PHONON ) {
 # Grphviz support
 unix:DEFINES+=USE_GRAPHVIZ
 contains( DEFINES, USE_GRAPHVIZ ) {
-    INCLUDES += gvgraph.h
-    SOURCES += gvgraph.cpp
-    INCLUDEPATH += /usr/include
-    LIBS+=-lgraph -lgvc
+	INCLUDES += gvgraph.h
+	SOURCES += gvgraph.cpp
+	INCLUDEPATH += /usr/include
+	LIBS+=-lgraph -lgvc
 }
 
 DEFINES+=STONEGUI_MAKE_DLL

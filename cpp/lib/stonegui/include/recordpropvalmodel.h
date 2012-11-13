@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id$
+ * $Id: recordpropvalmodel.h 11912 2011-07-27 18:31:20Z newellm $
  */
 
 #ifndef RECORD_PROP_VAL_MODEL_H
@@ -31,6 +31,7 @@
 #include "blurqt.h"
 
 #include "recordsupermodel.h"
+#include "field.h"
 
 /**
  *  This class implements the QAbstractItemModel interface.

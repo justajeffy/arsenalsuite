@@ -33,12 +33,14 @@
 #include <qvector.h>
 
 #include "blurqt.h"
+#include "changeset.h"
 
 class QVariant;
 class QSqlQuery;
 
 typedef QVector<QVariant> VariantVector;
 template <class T> class QList;
+class PGConnection;
 
 namespace Stone {
 
@@ -47,6 +49,8 @@ class KeyIndex;
 class Field;
 typedef QList<Field *> FieldList;
 class Table;
+class Connection;
+class ChildIter;
 
 	/**
  *  This class stores data for a single record in the layout
@@ -66,14 +70,18 @@ public:
 	// If fields is 0, then q should have data for every non-local field that doesn't have NoDefaultSelect set
 	// otherwise fields should contain the full list of fields contained in q
 	RecordImp( Table * table, QSqlQuery & q, int queryPosOffset = 0, FieldList * fields = 0 );
-
-    RecordImp( QSqlQuery & q, Table * table, int queryPosOffset = 0, FieldList * fields = 0 );
 	
 	// Loads mValues with the data in the sql query, indexed by the entries in the queryColPos array
 	// If fields is 0, then q should have data for every non-local field that doesn't have NoDefaultSelect set
 	// otherwise fields should contain the full list of fields contained in q
 	RecordImp( Table * table, QSqlQuery & q, int * queryColPos, FieldList * fields = 0 );
-	
+
+	// Loads mValues with the data in the sql query, indexed by the entries in the queryColPos array
+	// queryColPos.size() should equal the number of non-local columns in the table
+	// If the column in queryColPos is -1, then the column was not selected and the not selected bit should
+	// be set
+	RecordImp( Table * table, QSqlQuery & q, const QVector<int> & queryColPos );
+
 	~RecordImp();
 	
 	/// Adds 1 to the reference count
@@ -98,6 +106,8 @@ public:
 	///  RecordImp's table has columns.
 	void set( QVariant * v );
 
+	void updateChildren();
+	
 	///  Returns the QVariant value at the position \param col
 	const QVariant & getColumn( int col ) const;
 	
@@ -123,7 +133,7 @@ public:
 	Table * table() const { return mTable; }
 
 	/// Creates a copy of this RecordImp
-	RecordImp * copy();
+	RecordImp * copy( bool attachToPristine = true );
 
 	/// Returns the primary key for this record
 	/// This is inlined as a special case because we can ensure the primary key
@@ -137,7 +147,7 @@ public:
 	/// background thread.
 	/// May return a different referenced RecordImp, if so
 	/// will dereference this
-	RecordImp * commit(bool newPrimaryKey=true,bool sync=true);
+	RecordImp * commit();
 
 	/// Removes the record from the database.
 	void remove();
@@ -153,8 +163,7 @@ public:
 	bool isColumnLiteral( uint col ) const;
 	void clearColumnLiterals();
 	
-	enum {
-		NEWRECORD = 0,
+	enum State {
 		COMMITTED = 1,
 		MODIFIED = 2,
 		DELETED = 4,
@@ -165,26 +174,77 @@ public:
 		EMPTY_SHARED = 8,
 		// This is used (primarily by undo manager) to commit all fields
 		// without having to mark each as modified.
-		COMMIT_ALL_FIELDS = 16
+		COMMIT_ALL_FIELDS = 16,
+		// This is used when a RecordImp is thrown away either because the
+		// data was committed or because the changeset it belonged to was
+		// rolled back.
+		DISCARDED = 32,
+		INSERT_PENDING = 64,
+		UPDATE_PENDING = 128,
+		DELETE_PENDING = 256,
+		INSERT_PENDING_CHILD = 512,
+		MODIFIED_SINCE_QUEUED = 1024,
+		HOLDS_OLD_VALUES = 2048,
 	};
 
 	QString debugString();
 
+	// Used by Table to mark the record committed.  Pass 0 to clear the COMMITTED
+	// flag.
+	void setCommitted(uint key);
+	
 	int mState;
 
 	VariantVector * values() { return mValues; }
 
 	static int totalCount();
+	
+	bool hasVersions() const { return mNext != 0; }
+
+	RecordImp * first() {
+		RecordImp * ret = this;
+		while( ret->mParent )
+			ret = ret->mParent;
+		return ret;
+	}
+	
+	bool isChild( RecordImp * imp ) {
+		while( imp ) {
+			if( imp->mParent == this ) return true;
+			imp = imp->mParent;
+		}
+		return false;
+	}
+
+	bool hasChild( RecordImp * imp ) {
+		// Children always come after their parent in the list
+		// There should never be a circumstance where a non-child
+		// gets in between
+		return imp && imp->mNext && imp->mNext->mParent == imp;
+	}
 protected:
+	RecordImp * version(const ChangeSet & cs);
 	QAtomicInt mRefCount;
 	Table * mTable;
 	VariantVector * mValues;
 	char * mModifiedBits;
 	char * mLiterals;
 	char * mNotSelectedBits;
+	// Circular linked list of RecordImps representing this record
+	// Each entry in the list is either the pristine copy, or a modified
+	// copy, possibly associated with a changeset.  The circular nature 
+	// avoids the needs for a double linked list, and is plenty fast since
+	// there should rarely be more than two entries, the pristine and the modified.
+	RecordImp * mNext;
+	RecordImp * mParent;
+	ChangeSetWeakRef mChangeSet;
 	friend class Record;
+	friend class RecordList;
 	friend class Table;
 	friend class KeyIndex;
+	friend class Connection;
+	friend class ::PGConnection;
+	friend class ChildIter;
 };
 
 } //namespace

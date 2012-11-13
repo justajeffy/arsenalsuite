@@ -32,8 +32,6 @@
 	QString displayPath() const;
 	QString prettyPath() const;
 
-	QString status() const;
-
 	/***************************************************************
 		Path functions
 	****************************************************************/

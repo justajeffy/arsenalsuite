@@ -7,23 +7,12 @@ sippath = os.path.join(path,'sipClasses')
 
 try:
 	os.mkdir(sippath)
-except: pass
+except:	pass
 
 pre_deps = ["stone"]
 post_deps = []
 
-# Here is the static command for running classmaker to generate the classes
-classmakercmd = 'cd ../../apps/classmaker && ./classmaker'
-if sys.platform == 'win32':
-	classmakercmd = 'classmaker.exe'
-
-# Run using cmd in path, unless we are inside the tree
-if os.path.isfile(os.path.join(path,'../../apps/classmaker/',classmakercmd)):
-	if sys.platform != 'win32':
-		classmakercmd = './' + classmakercmd
-	classmakercmd = 'cd ../../apps/classmaker && ' + classmakercmd
-
-classgen = StaticTarget("classgen",path,classmakercmd + " -s " + path + "/schema.xml -o " + path,["classmaker"],shell=True)
+classgen = ClassGenTarget("classgen",path,path + "/schema.xml", ["classmaker"])
 pre_deps.append(classgen)
 
 # Python module targets, both depend on classes
@@ -38,6 +27,12 @@ if sys.platform != 'win32':
 	LibInstallTarget("classesinstall",path,"classes","/usr/lib/")
 
 QMakeTarget("classes",path,"classes.pro",pre_deps,post_deps)
+
+# Create versioned dll and lib file
+svnpri = WCRevTarget("classeslibsvnrevpri",path,"../..","svnrev-template.pri","svnrev.pri")
+#post_deps.append(LibVersionTarget("classeslibversion","lib/classes","../..","classes"))
+sv = QMakeTarget("classesversioned",path,"classes.pro",pre_deps + [svnpri],post_deps)
+sv.Defines = ["versioned"]
 
 if sys.platform=="linux2":
 	rpm = RPMTarget('classesrpm','blur-classes',path,'../../../rpm/spec/classes.spec.template','1.0',["stonerpm", "classes","classesui","classmaker","pyclasses","pyclassesui"])

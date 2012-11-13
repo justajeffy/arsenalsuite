@@ -362,6 +362,7 @@ void ThreadViewInternal::unreadFilterChanged()
 
 void ThreadViewInternal::showLastDaysToggled( bool sld )
 {
+	Q_UNUSED(sld);
 	int ld = mLastDays;
 	//mDaysCombo->setEnabled( sld );
 	//mLastDays = sld ? mDaysCombo->currentText().toInt() : 0;
@@ -370,6 +371,7 @@ void ThreadViewInternal::showLastDaysToggled( bool sld )
 
 void ThreadViewInternal::showLastDaysChanged( const QString & ldt )
 {
+	Q_UNUSED(ldt);
 	int ld = mLastDays;
 	//mLastDays = mShowLastCheck->isChecked() ? ldt.toInt() : 0;
 	//if( ld > mLastDays )

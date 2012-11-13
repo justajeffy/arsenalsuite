@@ -28,9 +28,13 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#include <stdexcept>
+
+#include <qdatetime.h>
+#include <qmap.h>
 #include <qsqldatabase.h>
 #include <qvariant.h>
-#include <qdatetime.h>
+#include <qvector.h>
 
 #include "record.h"
 
@@ -41,6 +45,50 @@ class Schema;
 class TableSchema;
 class IndexSchema;
 class Table;
+class Expression;
+
+struct RecordReturn
+{
+	// The table if no tableOidPos exists
+	Table * table;
+	// Holds the column that contains the return value's table oid for this record, -1 if none
+	int tableOidPos;
+	// For each table, a vector of integers that represent the column of the result set that contains
+	// each column of data in the table.  -1 for columns that weren't selected.
+	// The size of the vector must match table->schema()->fieldCount().
+	QMap<Table*,QVector<int> > columnPositions;
+};
+
+/// Thrown any time a database error happens except connection
+/// errors which are handled with the LostConnectionException class.
+class STONE_EXPORT SqlException : public std::exception
+{
+public:
+	SqlException( const QString & sql, const QString & error );
+	~SqlException() throw() {}
+	QString sql() const;
+	QString error() const;
+	virtual const char * what() const throw();
+protected:
+	QString mSql, mError;
+	mutable QByteArray mCString;
+};
+
+/// This is thrown if there is an error executing sql and
+/// either a transaction is open or the connection retries
+/// expire.  The reason it never reconnects when inside a
+/// transaction is that it would introduce non atomic behavior
+/// for code that needs to run in a transaction if a statement
+/// was automatically executed outside the transaction in a new
+/// connection.
+/// see Connection::setMaxConnectionAttempts
+class STONE_EXPORT LostConnectionException : public std::exception
+{
+public:
+	LostConnectionException();
+	~LostConnectionException() throw() {}
+	virtual const char * what() const throw();
+};
 
 /**
 * \class Connection
@@ -104,7 +152,10 @@ public:
 		Cap_Transactions = 		1 << 3,
 		Cap_CheckPoints = 		1 << 4,
 		Cap_IndexCreation = 	1 << 5,
-		Cap_MultiTableSelect = 	1 << 6
+		Cap_MultiTableSelect = 	1 << 6,
+		Cap_TableOids = 		1 << 7,
+		Cap_Notifications = 	1 << 8,
+		Cap_ChangeNotifications = 1 << 9
 	};
 
 	/** Returns an enum containing each of the Capabilities of this
@@ -129,6 +180,8 @@ public:
 	/** Returns a string with the host/port/user/password and options, useful for error messages */
 	virtual QString connectString() = 0;
 
+	virtual bool closeConnection() = 0;
+	
 	//
 	// Db table verification and creation
 	//
@@ -162,9 +215,12 @@ public:
 	 */
 	virtual bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 ) = 0;
 
+	virtual RecordList executeExpression( Table * table, FieldList fields, const Expression & exp );
+	virtual QMap<Table*,RecordList> executeExpression( Table * table, const RecordReturn & rr, const Expression & exp );
+
 	/// Selects all columns except those marked NoDefaultSelect, using from and args
 	/// It is expected that from will return rows of type table
-	virtual RecordList selectFrom( Table * table, const QString & from, const QList<QVariant> & args ) = 0;
+	virtual RecordList selectFrom( Table * table, const QString & from, const QList<QVariant> & args = QList<QVariant>() ) = 0;
 
 	/// Selects all columns except those marked NoDefaultSelect, from table using where and args
 	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() ) = 0;
@@ -179,15 +235,18 @@ public:
 
 	virtual void selectFields( Table * table, RecordList, FieldList ) = 0;
 	
-	/// inserts a RecordList into the database, by default use the sequence to 
-	/// generate a new primary key
-	virtual bool insert( Table *, const RecordList & rl, bool newPrimaryKey = true ) = 0;
+	/// Inserts a RecordList into the database, by default use the sequence to 
+	/// generate a new primary key.
+	///
+	/// Implementations must set the primary key on each record
+	virtual void insert( Table *, const RecordList & rl ) = 0;
 
 	/**
 	 * Generates and executes a sql update
 	 * to the database.
 	 **/
 	virtual bool update( Table *, RecordImp * imp, Record * returnValues = 0 ) = 0;
+	virtual bool update( Table * table, RecordList records, RecordList * returnValues = 0 ) = 0;
 
 	/// deletes a list of primary key ids from a table
 	virtual int remove( Table *, const QString & keyList, QList<int> * rowsDeleted = 0 ) = 0;
@@ -199,6 +258,13 @@ public:
 
 	/// Implement if providing Cap_IndexCreation
 	virtual bool createIndex( IndexSchema * ) { return false; }
+
+	virtual void listen( const QString & /*notificationName*/ ) {}
+	
+	virtual bool verifyChangeTrigger( TableSchema *, bool /* create */ = false ) { return false; }
+	
+	virtual TableSchema * tableByOid( uint oid, Schema * );
+	virtual uint oidByTable( TableSchema * );
 
 signals:
 	/** Emmitted when the connection is lost
@@ -278,8 +344,12 @@ public:
 	/** Returns true if there is currently a connection to the db */
 	virtual bool isConnected();
 
+	virtual bool closeConnection();
+	
 	/** Returns a string with the host/port/user/password and options, useful for error messages */
 	virtual QString connectString();
+
+	virtual void listen( const QString & notificationName );
 
 	static bool isConnectionError( const QSqlError & e );
 protected:
@@ -287,6 +357,7 @@ protected:
 
 	QSqlDatabase mDb;
 	QString mExtraConnectOptions;
+	bool mInsideTransaction;
 };
 
 } // namespace

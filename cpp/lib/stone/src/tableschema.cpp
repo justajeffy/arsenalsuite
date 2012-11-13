@@ -28,6 +28,7 @@
 #include "database.h"
 #include "schema.h"
 #include "tableschema.h"
+#include "trigger.h"
 
 namespace Stone {
 
@@ -60,6 +61,8 @@ TableSchema::~TableSchema()
 		mParent->removeChild( this );
 	while( !mFields.isEmpty() )
 		delete *mFields.begin();
+	foreach( Trigger * trigger, mTriggers )
+		delete trigger;
 }
 
 Record TableSchema::load( QVariant * v )
@@ -299,6 +302,17 @@ FieldList TableSchema::ownedFields()
 	return mFields;
 }
 
+FieldList TableSchema::defaultSelectFields() const
+{
+	FieldList ret;
+	foreach( Field * field, mAllColumnsCache )
+	{
+		if( !field->flag(Field::NoDefaultSelect) )
+			ret << field;
+	}
+	return ret;
+}
+
 Field * TableSchema::field( const QString & fieldName, bool silent )
 {
 	QString fnl = fieldName.toLower();
@@ -401,42 +415,6 @@ IndexSchema * TableSchema::index( const QString & name ) const
 	return 0;
 }
 
-void TableSchema::preUpdate( const Record & u, const Record & r )
-{
-	if( mParent )
-		mParent->preUpdate( u, r );
-}
-
-void TableSchema::preInsert( RecordList rl )
-{
-	if( mParent )
-		mParent->preInsert( rl );
-}
-
-void TableSchema::preRemove( RecordList rl )
-{
-	if( mParent )
-		mParent->preRemove( rl );
-}
-
-void TableSchema::postUpdate( const Record & u, const Record & r )
-{
-	if( mParent )
-		mParent->postUpdate( u, r );
-}
-
-void TableSchema::postInsert( RecordList rl )
-{
-	if( mParent )
-		mParent->postInsert( rl );
-}
-
-void TableSchema::postRemove( RecordList rl )
-{
-	if( mParent )
-		mParent->postRemove( rl );
-}
-
 QString TableSchema::diff( TableSchema * after )
 {
 	QStringList changes;
@@ -464,6 +442,114 @@ QString TableSchema::diff( TableSchema * after )
 	}
 	changes = changes.filter( QRegExp( "." ) );
 	return changes.isEmpty() ? QString() : (tableName() + " Changes:\n\t" + changes.join("\n\t"));
+}
+
+void TableSchema::addTrigger( Trigger * trigger )
+{
+	mTriggers.push_front(trigger);
+	emit triggerAdded(trigger);
+}
+
+void TableSchema::removeTrigger( Trigger * trigger )
+{
+	mTriggers.removeAll(trigger);
+}
+
+QList<Trigger*> TableSchema::triggers() const
+{
+	return mTriggers;
+}
+
+RecordList TableSchema::processIncomingTriggers( RecordList incoming )
+{
+	
+	foreach( Trigger * trigger, mTriggers )
+	if( trigger->mTriggerTypes & Trigger::IncomingTrigger )
+		incoming = trigger->incoming(incoming);
+	return incoming;
+}
+
+RecordList TableSchema::processPreInsertTriggers( RecordList toInsert )
+{
+	foreach( Trigger * trigger, mTriggers )
+		if( trigger->mTriggerTypes & Trigger::PreInsertTrigger )
+			toInsert = trigger->preInsert(toInsert);
+	if( mParent )
+		toInsert = mParent->processPreInsertTriggers(toInsert);
+	return toInsert;
+}
+
+Record TableSchema::processPreUpdateTriggers( const Record & updated, const Record & before )
+{
+	Record toUpdate(updated);
+	foreach( Trigger * trigger, mTriggers )
+		if( trigger->mTriggerTypes & Trigger::PreUpdateTrigger ) {
+			toUpdate = trigger->preUpdate(toUpdate, before);
+			// If the trigger returns the old record then we reject the update and stop processing
+			if( toUpdate.imp() == before.imp() )
+				return toUpdate;
+		}
+	if( mParent )
+		toUpdate = mParent->processPreUpdateTriggers( toUpdate, before );
+	return toUpdate;
+}
+
+RecordList TableSchema::processPreDeleteTriggers( RecordList toDelete )
+{
+	foreach( Trigger * trigger, mTriggers )
+		if( trigger->mTriggerTypes & Trigger::PreDeleteTrigger )
+			toDelete = trigger->preDelete( toDelete );
+	if( mParent )
+		toDelete = mParent->processPreDeleteTriggers( toDelete );
+	return toDelete;
+}
+
+void TableSchema::processPostInsertTriggers( RecordList toInsert )
+{
+	foreach( Trigger * trigger, mTriggers )
+		if( trigger->mTriggerTypes & Trigger::PostInsertTrigger ) {
+			try {
+				trigger->postInsert(toInsert);
+			} catch (const std::exception & e) {
+				qDebug() << "Caught exception from post insert trigger: " << e.what();
+			} catch (...) {
+				qDebug() << "Caught unknown(doesn't inherit from std::exception) exception from post insert trigger";
+			}
+		}
+	if( mParent )
+		mParent->processPostInsertTriggers(toInsert);
+}
+
+void TableSchema::processPostUpdateTriggers( const Record & updated, const Record & before )
+{
+	foreach( Trigger * trigger, mTriggers )
+		if( trigger->mTriggerTypes & Trigger::PostUpdateTrigger ) {
+			try {
+				trigger->postUpdate( updated, before );
+			} catch (const std::exception & e) {
+				qDebug() << "Caught exception from post update trigger: " << e.what();
+			} catch (...) {
+				qDebug() << "Caught unknown(doesn't inherit from std::exception) exception from post update trigger";
+			}
+		}
+	if( mParent )
+		mParent->processPostUpdateTriggers( updated, before );
+}
+
+void TableSchema::processPostDeleteTriggers( RecordList deleted )
+{
+	foreach( Trigger * trigger, mTriggers )
+		if( trigger->mTriggerTypes & Trigger::PostDeleteTrigger ) {
+			try {
+				trigger->postDelete(deleted);
+			} catch (const std::exception & e) {
+				qDebug() << "Caught exception from post delete trigger: " << e.what();
+			} catch (...) {
+				qDebug() << "Caught unknown(doesn't inherit from std::exception) exception from post delete trigger";
+			}
+		}
+	if( mParent )
+		mParent->processPostDeleteTriggers( deleted );
 }
 
 } // namespace

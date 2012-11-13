@@ -28,6 +28,7 @@
 #include "mainwindow.h"
 #include "schema.h"
 #include "sourcegen.h"
+#include "process.h"
 
 static void usage()
 {
@@ -45,10 +46,15 @@ int main( int argc, char * argv[] )
 #else
 	bool useGUI = true;
 #endif // Q_WS_X11
+
+#ifdef Q_OS_WIN
+	QDir::setCurrent( QFileInfo(currentExecutableFilePath()).path() );
+#endif
+	
 	QApplication a( argc, argv, useGUI );
 
 	if( !initConfig( "classmaker.ini" ) )
-        return -1;
+		return -1;
 
 	Schema * schema = 0;
 	QString fileName;

@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: transactionmgr.h 8497 2009-06-24 06:49:01Z brobison $
+ * $Id$
  */
 
 #ifndef TRANSACTION_MGR_H

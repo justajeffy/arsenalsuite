@@ -77,6 +77,61 @@
 %End
 };
 
+
+class exception {
+%TypeHeaderCode
+#include <stdexcept>
+using std::exception;
+%End
+public:
+  exception () throw();
+  exception (const exception&) throw();
+  //exception& operator= (const exception&) throw();
+  virtual ~exception() throw();
+  virtual const char* what() const throw();
+};
+
+class SqlException : exception
+{
+%TypeHeaderCode
+#include <connection.h>
+using std::exception;
+%End
+public:
+	SqlException( const QString & sql, const QString & error );
+	~SqlException() throw();
+	QString sql() const;
+	QString error() const;
+	virtual const char * what() const throw();
+};
+
+class LostConnectionException : public exception
+{
+%TypeHeaderCode
+#include <connection.h>
+using std::exception;
+%End
+public:
+	LostConnectionException();
+	~LostConnectionException() throw();
+	virtual const char * what() const throw();
+};
+
+/*
+%Exception SqlException(SIP_Exception)
+{
+%TypeHeaderCode
+#include <connection.h>
+%End
+%RaiseCode
+	const char *detail = sipExceptionRef.what();
+	SIP_BLOCK_THREADS
+	PyErr_SetString( sipException_SqlException, detail );
+	SIP_UNBLOCK_THREADS
+%End
+};
+*/
+
 class Connection : QObject
 {
 %TypeHeaderCode
@@ -138,42 +193,48 @@ public:
 
 	virtual bool checkConnection();
 
+	virtual bool closeConnection() = 0;
+
 	virtual QString connectString() = 0;
 
-	virtual bool tableExists( TableSchema * schema ) = 0;
+	virtual bool tableExists( TableSchema * schema ) throw(SqlException,LostConnectionException) = 0;
 
-	virtual bool verifyTable( TableSchema * schema, bool createMissingColumns = false, QString * output=0 ) = 0;
+	virtual bool verifyTable( TableSchema * schema, bool createMissingColumns = false, QString * output=0 ) throw(SqlException,LostConnectionException) = 0;
 
-	virtual bool createTable( TableSchema * schema, QString * output = 0 ) = 0;
+	virtual bool createTable( TableSchema * schema, QString * output = 0 ) throw(SqlException,LostConnectionException) = 0;
 
-	virtual TableSchema * importTableSchema() = 0;
+	virtual TableSchema * importTableSchema() throw(SqlException,LostConnectionException) = 0;
 
-	virtual Schema * importDatabaseSchema() = 0;
+	virtual Schema * importDatabaseSchema() throw(SqlException,LostConnectionException) = 0;
 
-	virtual uint newPrimaryKey( TableSchema * ) = 0;
+	virtual uint newPrimaryKey( TableSchema * ) throw(SqlException,LostConnectionException) = 0;
 
-	virtual QSqlQuery exec( const QString & sql, const QList<QVariant> & vars = QList<QVariant>(), bool reExecLostConn = true, Table * table = 0 ) = 0 /PyName=exec_/;
+	virtual QSqlQuery exec( const QString & sql, const QList<QVariant> & vars = QList<QVariant>(), bool reExecLostConn = true, Table * table = 0 ) throw(SqlException,LostConnectionException) = 0 /PyName=exec_/;
 
-	virtual bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 ) = 0 /PyName=exec_/;
+	virtual bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 ) throw(SqlException,LostConnectionException) = 0 /PyName=exec_/;
 
-	virtual RecordList selectFrom( Table * table, const QString & from, const QList<QVariant> & args ) = 0;
+	virtual RecordList executeExpression( Table * table, QList<Field*> fields, const Expression & exp ) throw(SqlException,LostConnectionException);
+	//virtual QMap<Table*,RecordList> executeExpression( Table * table, const RecordReturn & rr, const Expression & exp );
 
-	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() ) = 0;
-	virtual QList<RecordList> joinedSelect( const JoinedSelect &, QString where, QList<QVariant> vars ) = 0;
+	virtual RecordList selectFrom( Table * table, const QString & from, const QList<QVariant> & args ) throw(SqlException,LostConnectionException) = 0;
 
-	virtual void selectFields( Table * table, RecordList, QList<Field*> ) = 0;
+	virtual RecordList selectOnly( Table *, const QString & where = QString::null, const QList<QVariant> & vars = QList<QVariant>() ) throw(SqlException,LostConnectionException) = 0;
+	virtual QList<RecordList> joinedSelect( const JoinedSelect &, QString where, QList<QVariant> vars ) throw(SqlException,LostConnectionException) = 0;
 
-	virtual bool insert( Table *, const RecordList & rl, bool newPrimaryKey = true ) = 0;
+	virtual void selectFields( Table * table, RecordList, QList<Field*> ) throw(SqlException,LostConnectionException) = 0;
 
-	virtual bool update( Table *, RecordImp * imp, Record * returnValues = 0 ) = 0;
+	virtual void insert( Table *, const RecordList & rl ) throw(SqlException,LostConnectionException) = 0;
 
-	virtual int remove( Table *, const QString &, QList<int> * rowsDeleted = 0 ) = 0;
+	virtual bool update( Table *, RecordImp * imp, Record * returnValues = 0 ) throw(SqlException,LostConnectionException) = 0;
+	virtual bool update( Table * table, RecordList records, RecordList * returnValues = 0 ) throw(SqlException,LostConnectionException) = 0;
 
-	virtual bool beginTransaction();
-	virtual bool commitTransaction();
-	virtual bool rollbackTransaction();
+	virtual int remove( Table *, const QString &, QList<int> * rowsDeleted = 0 ) throw(SqlException,LostConnectionException) = 0;
 
-	virtual bool createIndex( IndexSchema * );
+	virtual bool beginTransaction() throw(SqlException,LostConnectionException);
+	virtual bool commitTransaction() throw(SqlException,LostConnectionException);
+	virtual bool rollbackTransaction() throw(SqlException,LostConnectionException);
+
+	virtual bool createIndex( IndexSchema * ) throw(SqlException,LostConnectionException);
 
 signals:
 	void connectionLost();
@@ -199,19 +260,21 @@ public:
 
 	QSqlDatabase db() const;
 
-	virtual QSqlQuery exec( const QString & sql, const QList<QVariant> & vars = QList<QVariant>(), bool reExecLostConn = true, Table * table = 0 ) /PyName=exec_/;
+	virtual QSqlQuery exec( const QString & sql, const QList<QVariant> & vars = QList<QVariant>(), bool reExecLostConn = true, Table * table = 0 ) throw(SqlException,LostConnectionException) /PyName=exec_/;
 
-	virtual bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 ) /PyName=exec_/;
+	virtual bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 ) throw(SqlException,LostConnectionException) /PyName=exec_/;
 
-	virtual bool beginTransaction();
-	virtual bool commitTransaction();
-	virtual bool rollbackTransaction();
+	virtual bool beginTransaction() throw(SqlException,LostConnectionException);
+	virtual bool commitTransaction() throw(SqlException,LostConnectionException);
+	virtual bool rollbackTransaction() throw(SqlException,LostConnectionException);
 
 	virtual bool reconnect();
 	
 	virtual bool isConnected();
 
 	virtual bool checkConnection();
+
+	virtual bool closeConnection();
 
 	virtual QString connectString();
 

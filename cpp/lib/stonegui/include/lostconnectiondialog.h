@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id$
+ * $Id: lostconnectiondialog.h 10005 2010-06-17 00:12:01Z newellm $
  */
 
 #ifndef LOST_CONNECTION_DIALOG_H

@@ -62,6 +62,12 @@ public:
 	void setColumnGroupRegex( int column, const QRegExp & = QRegExp() );
 	QRegExp columnGroupRegex( int column ) const;
 	
+	// By default the value used for grouping is Qt::DisplayRole.  This
+	// function lets you define a custom role for each column grouping,
+	// so that customized grouping can be implemented.
+	void setColumnGroupRole( int column, int role );
+	int columnGroupRole(int column) const;
+	
 	QString groupValue( const QModelIndex & idx );
 
 	EmptyGroupPolicy emptyGroupPolicy() const;
@@ -100,10 +106,17 @@ protected:
 	SuperModel * mModel;
 	ModelDataTranslator * mTranslator;
 	int mGroupColumn;
+	
+	// These are just current values and are updated each time mGroupColumn changes
+	int mGroupRole;
+	QRegExp mGroupRegEx;
+	
 	bool mIsGrouped, mInsertingGroupItems, mUpdateScheduled;
 	QList<QPersistentModelIndex> mGroupItemsToUpdate, mItemsToRegroup;
 	typedef QMap<int,QRegExp> ColumnRegexMap;
 	ColumnRegexMap mColumnRegexMap;
+	typedef QMap<int,int> ColumnRoleMap;
+	ColumnRoleMap mColumnRoleMap;
 	EmptyGroupPolicy mEmptyGroupPolicy;
 	bool mExpandNewGroups;
 };

@@ -36,7 +36,6 @@
 
 #include "table.h"
 #include "updatemanager.h"
-#include "undomanager.h"
 #include "record.h"
 #include "connection.h"
 
@@ -48,16 +47,11 @@ namespace Stone {
 class Schema;
 class Table;
 class UpdateManager;
-class RecordUndoOperation;
 
-/** 
- *  \class Database
- *
- *  The Database class encapsulates a group of tables.
+/** The Database class encapsulates a group of tables.
  *  It provides events when data is changed in those tables.
  *  It keeps track of the sql execution time.  It controls
  *  whether or not to log sql.  It controls transactions.
- *
  *  \ingroup Stone
  */
 class STONE_EXPORT Database : public QObject
@@ -217,16 +211,18 @@ public:
 signals:
 
 	/** Emitted anytime any records are added to any of the tables in this database */
-	void recordsAddedSignal( const RecordList & );
+	void recordsAddedSignal( RecordList );
 	/** Emitted anytime any records are removed from any of the tables in this database */
-	void recordsRemovedSignal( const RecordList & );
+	void recordsRemovedSignal( RecordList );
 	/** Emitted anytime a record from this database is updated */
-	void recordUpdatedSignal( const Record & current, const Record & updated );
+	void recordUpdatedSignal( Record current, Record updated );
 	void recordsIncomingSignal( const RecordList & );
 
 protected slots:
 	void transactionTimeout();
 
+	void dispatchNotification( const QString & name );
+	
 protected:
 	/** Called by the tables, to indicate when records have been added.
 	 */
@@ -245,6 +241,8 @@ protected:
 	 */
 	void recordsIncoming( const RecordList &, bool co = false );
 
+	bool setupPreloadListen( Table * table );
+	
 	// These delete actions need to be added to
 	// not-yet-created tables.
 	FieldList mPendingDeleteActions;
@@ -276,8 +274,7 @@ protected:
 	int mRefCount;
 
 	friend class ::Table;
-	friend class Stone::UpdateManager;
-	friend class Stone::RecordUndoOperation;
+	friend class ::UpdateManager;
 };
 
 }

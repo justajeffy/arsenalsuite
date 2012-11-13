@@ -21,6 +21,16 @@
  */
 
 #ifdef HEADER_FILES
+#include "trigger.h"
+
+class JobDepTrigger : public Trigger
+{
+public:
+	JobDepTrigger();
+	
+	void postInsert( RecordList jobDeps );
+	void postDelete( RecordList jobDeps );
+};
 #endif
 
 #ifdef CLASS_FUNCTIONS
@@ -28,6 +38,8 @@
 #endif
 
 #ifdef TABLE_FUNCTIONS
-	void postInsert( RecordList );
-	void postRemove( RecordList );
+#endif
+
+#ifdef TABLE_CTOR
+	addTrigger( new JobDepTrigger );
 #endif

@@ -60,7 +60,7 @@ UpdateManager::UpdateManager()
 	
 	mLastTransactionProcessed = 0;
 	
-	mEnabled = cfg.readBool( "Enabled", true );
+	mEnabled = cfg.readBool( "Enabled", false );
 	cfg.popSection();
 	
 	if( !mEnabled )

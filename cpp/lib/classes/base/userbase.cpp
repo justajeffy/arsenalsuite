@@ -110,16 +110,15 @@ void User::setCurrentUser( const QString & username )
 
 bool User::isUserLoggedIn( const QString & username )
 {
-    User u;
-    u = User::recordByUserName(username.toLower());
+	User u(User::recordByUserName(username.toLower()));
 
-    if (u.isRecord()) {
-        Host h = u.host();
-        if (h.isRecord())
-            return h.userIsLoggedIn();
-    }
+	if (u.isRecord()) {
+		foreach( Host h, u.hosts() )
+			if( h.userIsLoggedIn() )
+				return true;
+	}
 
-    return false;
+	return false;
 }
 
 User User::activeByUserName( const QString & un )
@@ -246,7 +245,7 @@ bool User::hasPerms( const QString & key, bool modify, const Project &  )
 		// Hmm, improper format
 		//LOG_5( "Checking permission record:\n " + p.dump() );
 		if( p.permission().length() != 4 ) {
-			LOG_5( "Invalid permission format for record\n" + p.dump() );
+			//LOG_5( "Invalid permission format for record\n" + p.dump() );
 			continue;
 		}
 		int useReg = p.permission()[0].digitValue();

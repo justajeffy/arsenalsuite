@@ -30,40 +30,72 @@ class JobFusion : Job
 
 %End
 public:
-	JobFusion();
+	JobFusion() /HoldGIL/;
 
-	JobFusion( uint key );
+	JobFusion( uint key ) throw(SqlException,LostConnectionException,PythonException);
 
-	JobFusion( const JobFusion & other );
+	JobFusion( const JobFusion & other ) /HoldGIL/;
 
-	JobFusion( const Record & r );
+	JobFusion( const Record & r ) /HoldGIL/;
 
-	JobFusion( RecordImp * imp, bool checkType = true );
+	JobFusion( RecordImp * imp, bool checkType = true ) /HoldGIL/;
 	
-	MappedJobFusion copy() const;
+	MappedJobFusion copy() const /HoldGIL/;
 
-	bool operator==( const Record & other ) const;
+	bool operator==( const Record & other ) const /HoldGIL/;
 
-	bool operator!=( const Record & other ) const;
+	bool operator!=( const Record & other ) const /HoldGIL/;
 	
-	bool operator <( const Record & other ) const;
+	bool operator <( const Record & other ) const /HoldGIL/;
 
-	long __hash__() const;
+	long __hash__() const /HoldGIL/;
 %MethodCode
 		sipRes = sipCpp->key();
 %End
 
-	QString frameList() const;
+	QString frameList() const /HoldGIL/;
 	MappedJobFusion & setFrameList( const QString & );
-	bool allFramesAsSingleTask() const;
+	bool allFramesAsSingleTask() const /HoldGIL/;
 	MappedJobFusion & setAllFramesAsSingleTask( const bool & );
-	uint outputCount() const;
+	uint outputCount() const /HoldGIL/;
 	MappedJobFusion & setOutputCount( const uint & );
+	bool reportedSaverError() const /HoldGIL/;
+	MappedJobFusion & setReportedSaverError( const bool & );
 
 
-	static MappedJobFusionList select( const QString & where = QString::null, const QList<QVariant> & args = QList<QVariant>() );
+	static MappedJobFusionList select( const QString & where = QString::null, const QList<QVariant> & args = QList<QVariant>() ) throw(SqlException,LostConnectionException,PythonException);
+	static MappedJobFusionList select( const Expression & ) throw(SqlException,LostConnectionException,PythonException);
 
-	MappedJobFusion reload( bool lockForUpdate = false );
+	static JoinedSelect join( SIP_PYOBJECT cls, QString condition = QString(), JoinType joinType = InnerJoin, bool ignoreResults = false, const QString & alias = QString() );
+%MethodCode
+		// Convert to python
+		Table * inst = 0;
+
+		if( !sipCanConvertToType(a0,sipType_Table,SIP_NOT_NONE) ) {
+			// Attempt to get the table * by calling the static method table()
+			if( !sipIsErr && !inst ) {
+				PyObject * pyTableMethod = PyObject_GetAttrString( a0, "table" );
+				if( pyTableMethod ) {
+					PyObject * pyTable = PyObject_CallObject( pyTableMethod, 0 );
+					if( pyTable && sipCanConvertToType(pyTable,sipType_Table,SIP_NOT_NONE) )
+						inst = (Table*)sipConvertToType(pyTable,sipType_Table,0,SIP_NOT_NONE,0,&sipIsErr);
+					Py_XDECREF(pyTable);
+					Py_XDECREF(pyTableMethod);
+				} else
+					sipIsErr = 1;
+			}
+		}
+		
+		if( !inst && !sipIsErr && a0 && sipCanConvertToType(a0,sipType_Table,SIP_NOT_NONE) ) {
+			inst = (Table*)sipConvertToType(a0,sipType_Table,0,SIP_NOT_NONE,0,&sipIsErr);
+		}
+
+		if( !sipIsErr ) {
+			sipRes = new JoinedSelect(JobFusion::table()->join( inst, *a1, a2, a3, *a4 ));
+		}
+%End
+
+	MappedJobFusion reload( bool lockForUpdate = false ) throw(SqlException,LostConnectionException,PythonException);
 
 
 
@@ -71,7 +103,84 @@ public:
 
 
 
-	static Table * table();
+	struct _c {
+		StaticFieldExpression Element;
+		StaticFieldExpression Host;
+		StaticFieldExpression JobType;
+		StaticFieldExpression Project;
+		StaticFieldExpression User;
+		StaticFieldExpression HostList;
+		StaticFieldExpression Name;
+		StaticFieldExpression OutputPath;
+		StaticFieldExpression Status;
+		StaticFieldExpression Key;
+		StaticFieldExpression DeleteOnComplete;
+		StaticFieldExpression Priority;
+		StaticFieldExpression PacketType;
+		StaticFieldExpression PacketSize;
+		StaticFieldExpression NotifyOnError;
+		StaticFieldExpression NotifyOnComplete;
+		StaticFieldExpression MaxTaskTime;
+		StaticFieldExpression Cleaned;
+		StaticFieldExpression FileSize;
+		StaticFieldExpression FileName;
+		StaticFieldExpression FileMd5sum;
+		StaticFieldExpression JobStat;
+		StaticFieldExpression UserName;
+		StaticFieldExpression Domain;
+		StaticFieldExpression Password;
+		StaticFieldExpression Stats;
+		StaticFieldExpression CurrentMapServerWeight;
+		StaticFieldExpression PrioritizeOuterTasks;
+		StaticFieldExpression MaxLoadTime;
+		StaticFieldExpression MaxMemory;
+		StaticFieldExpression JobParent;
+		StaticFieldExpression Submittedts;
+		StaticFieldExpression Startedts;
+		StaticFieldExpression Endedts;
+		StaticFieldExpression MaxHosts;
+		StaticFieldExpression PersonalPriority;
+		StaticFieldExpression LoggingEnabled;
+		StaticFieldExpression UploadedFile;
+		StaticFieldExpression CheckFileMd5;
+		StaticFieldExpression RunasSubmitter;
+		StaticFieldExpression FrameNth;
+		StaticFieldExpression FrameNthMode;
+		StaticFieldExpression ExclusiveAssignment;
+		StaticFieldExpression HasTaskProgress;
+		StaticFieldExpression MinMemory;
+		StaticFieldExpression ShotName;
+		StaticFieldExpression SceneName;
+		StaticFieldExpression AssignmentSlots;
+		StaticFieldExpression FilterSet;
+		StaticFieldExpression AllowPreemption;
+		StaticFieldExpression MinTaskNumber;
+		StaticFieldExpression MaxTaskNumber;
+		StaticFieldExpression ApplyProjectWeight;
+		StaticFieldExpression EstimatedMemory;
+		StaticFieldExpression VerifyError;
+		StaticFieldExpression MaxErrors;
+		StaticFieldExpression NotifyErrorMessage;
+		StaticFieldExpression NotifyCompleteMessage;
+		StaticFieldExpression Wrangler;
+		StaticFieldExpression MaxQuietTime;
+		StaticFieldExpression AutoAdaptSlots;
+		StaticFieldExpression Environment;
+		StaticFieldExpression Suspendedts;
+		StaticFieldExpression ToggleFlags;
+		StaticFieldExpression MidTaskNumber;
+		StaticFieldExpression AllowSmallerPackets;
+		StaticFieldExpression FrameList;
+		StaticFieldExpression AllFramesAsSingleTask;
+		StaticFieldExpression OutputCount;
+		StaticFieldExpression ReportedSaverError;
+
+	private:
+		_c();
+	};
+	static _c c;
+
+	static Table * table() /HoldGIL/;
 	//static JobFusionSchema * schema();
 };
 

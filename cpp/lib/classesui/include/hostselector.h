@@ -21,10 +21,10 @@
  *
  */
 
-/* $Author$
- * $LastChangedDate: 2010-02-10 15:06:55 +1100 (Wed, 10 Feb 2010) $
- * $Rev: 9329 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/classesui/include/hostselector.h $
+/* $Author: newellm $
+ * $LastChangedDate: 2012-10-11 14:54:13 -0700 (Thu, 11 Oct 2012) $
+ * $Rev: 13720 $
+ * $HeadURL: svn://newellm@svn.blur.com/blur/trunk/cpp/lib/classesui/include/hostselector.h $
  */
 
 #ifndef HOST_SELECTOR_H
@@ -45,48 +45,50 @@
 #include "viewcolors.h"
 
 class RecordModel;
-class ColorOption;
+struct ColorOption;
 
 CLASSESUI_EXPORT HostList hostListFromString( const QString & );
 
 struct CLASSESUI_EXPORT GroupedHostItem : public ItemBase
 {
-    QString groupValue, slotsOnGroup;
-    int groupColumn;
-    ColorOption * colorOption;
-    void init( const QModelIndex & idx );
-    QVariant modelData( const QModelIndex & i, int role ) const;
-    Qt::ItemFlags modelFlags( const QModelIndex & );
-    bool setModelData( const QModelIndex & i, const QVariant & value, int role );
+	QString groupValue, slotsOnGroup;
+	int groupColumn;
+	ColorOption * colorOption;
+	void init( const QModelIndex & idx );
+	QVariant modelData( const QModelIndex & i, int role ) const;
+	Qt::ItemFlags modelFlags( const QModelIndex & );
+	bool setModelData( const QModelIndex & i, const QVariant & value, int role );
 };
 
 typedef TemplateDataTranslator<GroupedHostItem> GroupedHostTranslator;
-
 
 class CLASSESUI_EXPORT HostItem : public RecordItemBase
 {
 public:
 	Host host;
 	HostStatus status;
-	mutable bool jobsLoaded;
-	mutable QString ver, mem, availMem, mhz, user, pulse, services, _jobName;
-    QDateTime now, puppetPulse;
-    QIcon puppetIcon;
+	mutable bool jobsLoaded, ipLoaded;
+	mutable Job job;
+	QDateTime now, puppetPulse;
+	QIcon puppetIcon;
+	QPixmap icon;
+	mutable QString ver, mem, availMem, mhz, user, pulse, services, ip, uptime, tasktime, _jobName;
+	mutable Interval uptimeInterval, tasktimeInterval;
 	ColorOption * co;
 	QString jobName() const;
+	QString ipAddress() const;
 	void setup( const Record & r, const QModelIndex &, bool loadJob = true );
 	QVariant modelData( const QModelIndex & i, int role ) const;
 	char getSortChar() const;
 	int compare( const QModelIndex & a, const QModelIndex & b, int, bool );
 	Qt::ItemFlags modelFlags( const QModelIndex & );
 	Record getRecord();
-    QPixmap icon;
 
 	static const ColumnStruct host_columns [];
 	static ViewColors * HostColors;
 
 private:
-    QString convertTime( int ) const;
+	QString convertTime( int ) const;
 };
 
 typedef TemplateRecordDataTranslator<HostItem> HostTranslator;
@@ -138,14 +140,20 @@ public slots:
 	void refresh();
 
 	void showOptionsMenu();
+	
+	void filter( const Expression & );
+	
 protected slots:
 	/// Performs the actual refresh
 	void performRefresh();
 	void performHostGroupRefresh();
+	void updateCheckCount();
+	
 protected:
 	void setSelected(bool check);
 
 	void updateList( HostList checked );
+
 
 	bool mRefreshPending, mHostGroupRefreshPending;
 	HostList mNeedsSelected;

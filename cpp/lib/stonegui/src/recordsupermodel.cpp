@@ -6,12 +6,16 @@
 #include "recorddrag.h"
 
 QModelIndexList RecordDataTranslatorInterface::appendRecordList(RecordList rl, const QModelIndex & parent )
-{ return insertRecordList(model()->rowCount(parent),rl,parent); }
+{
+	return insertRecordList(model()->rowCount(parent),rl,parent);
+}
 
 const char * RecordDataTranslatorInterface::IfaceName = "RecordDataTranslatorInterface";
 
 const void * RecordDataTranslatorInterface::iface( const char * iface ) const
-{ return strcmp(iface,IfaceName) == 0 ? this : 0; }
+{
+	return strcmp(iface,IfaceName) == 0 ? this : 0;
+}
 
 const RecordDataTranslatorInterface * RecordDataTranslatorInterface::cast( const ModelDataTranslator * trans )
 { return trans ? (const RecordDataTranslatorInterface*)trans->iface(IfaceName) : 0; }
@@ -168,7 +172,7 @@ Record RecordSuperModel::getRecord(const QModelIndex & i) const
 {
 	if( !i.isValid() ) return Record();
 	RecordDataTranslatorInterface * rdt = recordDataTranslator(i);
-	if( rdt ) 
+	if( rdt )
 		return rdt->getRecord(i);
 	//LOG_1( "No RecordDataTranslator found for index" );
 	return Record();
@@ -180,12 +184,7 @@ RecordList RecordSuperModel::listFromIS( const QItemSelection & is )
 	foreach( QItemSelectionRange sr, is ) {
 		QModelIndex i = sr.topLeft();
 		do {
-            Record r = getRecord(i);
-            if( r.isValid() )
-    			ret += getRecord(i);
-            else
-                LOG_1("Empty selection?");
-
+			ret += getRecord(i);
 			i = i.sibling( i.row() + 1, 0 );
 		} while( sr.contains(i) );
 	}
@@ -258,9 +257,7 @@ void RecordSuperModel::setupChildren( const QModelIndex & parent, const RecordLi
 	clearChildren(parent);
 	
 	ModelDataTranslator * trans = translator(parent);
-	if( !trans ) {
-        trans = treeBuilder()->defaultTranslator();
-    }
+	if( !trans ) trans = treeBuilder()->defaultTranslator();
 
 	const RecordDataTranslatorInterface * rdt = RecordDataTranslatorInterface::cast(trans);
 	if( rdt )
@@ -352,6 +349,7 @@ void RecordSuperModel::updateRecords( RecordList newRecords, const QModelIndex &
 		append( toAdd, parent );
 	} else
 		append( newRecords, parent );
+	checkAutoSort(parent);
 }
 
 void RecordSuperModel::remove( RecordList rl, bool recursive, const QModelIndex & parent )
@@ -369,7 +367,7 @@ QModelIndex RecordSuperModel::append( const Record & r, const QModelIndex & pare
 
 QModelIndexList RecordSuperModel::append( RecordList rl, const QModelIndex & parent, RecordDataTranslatorInterface * trans )
 {
-    return insert( rl, childrenLoaded(parent) ? rowCount(parent) : 0, parent, trans );
+	return insert( rl, childrenLoaded(parent) ? rowCount(parent) : 0, parent, trans );
 }
 
 void RecordSuperModel::updated( RecordList rl, bool recursive, const QModelIndex & parentIndex, bool loadChildren )

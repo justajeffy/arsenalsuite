@@ -64,6 +64,14 @@ bool isRunning(int pid, const QString &)
 		return false;
 }
 
+// Windows version in process_win.cpp
+#ifndef Q_OS_WIN
+QDateTime processStartTime(int pid)
+{
+	QDateTime ret;
+	return ret;
+}
+#endif
 
 int processID()
 {
@@ -295,7 +303,7 @@ qint32 qpidToId( Q_PID qpid )
 
 #ifndef Q_OS_WIN // Win32 version in process_win.cpp
 
-static int parsePSDump( qint32 wantedPid, const QString & psDump, int depth=0)
+static int parsePSDump( qint32 wantedPid, QString psDump, int depth=0)
 {
 	int memory = 0;
 	QRegExp rx("(\\d+)\\s+(\\d+)\\s+(\\d+)");
@@ -380,15 +388,6 @@ Interval systemUpTime()
 		return Interval::fromString(uptime);
 	}
 	return Interval();
-}
-
-/// Interval since the last input event(mouse movement, keyboard click, etc)
-//#include "idle.h"
-Interval idleTime()
-{
-	//Idle idle;
-	//return Interval(idle.idleTime());
-    return Interval();
 }
 
 #endif // !Q_OS_WIN

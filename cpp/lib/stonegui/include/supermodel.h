@@ -100,9 +100,9 @@ public:
 
 	static void * dataPtr( const QModelIndex & idx );
 	static ModelDataTranslator * translator( const QModelIndex & idx );
-	virtual SuperModel * model() { return mBuilder->model(); }
-	
-    ModelTreeBuilder * mBuilder;
+	SuperModel * model() { return mBuilder->model(); }
+protected:
+	ModelTreeBuilder * mBuilder;
 };
 
 template<class TYPE, class BASE = ModelDataTranslator> class TemplateDataTranslator : public BASE
@@ -277,11 +277,13 @@ public:
 /*
  * BEGIN AbstractItemModel functions
  */	
+	using QAbstractItemModel::parent;
+	
 	/// O(1) - Constant Runtime
 	QModelIndex parent( const QModelIndex & idx ) const;
 
 	/// O(1) - Constant Runtime
-	QModelIndex sibling( int row, int column, const QModelIndex & idx );
+	QModelIndex sibling( int row, int column, const QModelIndex & idx ) const;
 	
 	/// O(1) - Constant Runtime
 	/// Runtime dependent on node->child call, which could 
@@ -292,16 +294,12 @@ public:
 	/// Runtime dependent on childNode->rowCount call, which could 
 	/// be loading the data on demand
 	int rowCount( const QModelIndex & parent = QModelIndex() ) const;
-	/// Same as above but will not load the children using the treeBuilder
-	int rowCountWithoutLoad( const QModelIndex & parent = QModelIndex() ) const;
 
 	/// O(1) - Constant Runtime
 	/// Runtime dependent on node->hasChildren call, which could 
 	/// be loading the data on demand
 	bool hasChildren( const QModelIndex & parent ) const;
-	/// Same as above but will not load the children using the treeBuilder
-	bool hasChildrenWithoutLoad( const QModelIndex & ) const;
-	
+
 	int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
 	
 	QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
@@ -390,8 +388,8 @@ public:
 		SuperModel * mModel;
 	};
 
-    void setColumnFilter( uint column, const QString & filter );
-    QMap<uint, QString> mColumnFilterMap;
+	void setColumnFilter( uint column, const QString & filter );
+	QMap<uint, QString> mColumnFilterMap;
 
 signals:
 	void grouperChanged( ModelGrouper * grouper );

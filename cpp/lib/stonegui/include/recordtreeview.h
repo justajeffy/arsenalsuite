@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id$
+ * $Id: recordtreeview.h 13596 2012-09-17 23:43:49Z newellm $
  */
 
 #ifndef RECORD_TREE_VIEW_H
@@ -46,7 +46,7 @@ struct ColumnStruct {
 	int defaultSize;
 	int defaultPos;
 	bool defaultHidden;
-    bool filterEnabled;
+	bool filterEnabled;
 };
 
 class BusyWidget;
@@ -60,7 +60,7 @@ public:
 	void setModel( QAbstractItemModel * model );
 
 	QModelIndexList selectedRows();
-
+	
 	bool columnAutoResize( int col ) const;
 
 	/// If col is -1, then all columns are set to autoResize
@@ -69,9 +69,9 @@ public:
 	bool showBranches() const;
 	void setShowBranches( bool showBranches );
 
-    int sizeHintForColumn( int column, int * height ) const;
-    int sizeHintForColumn ( int column ) const;
-    QSize allContentsSizeHint();
+	int sizeHintForColumn( int column, int * height ) const;
+	int sizeHintForColumn ( int column ) const;
+	QSize allContentsSizeHint();
 
 	void setShowGrid( bool showGrid );
 	bool showGrid() const;
@@ -88,35 +88,38 @@ public:
 	void setupTreeView( const QString & group, const QString & key, const ColumnStruct columns [] );
 	void saveTreeView( const QString & group, const QString & key, const ColumnStruct columns [] );
 
-    void enableFilterWidget(bool);
+	void enableFilterWidget(bool);
+	
+	RecordFilterWidget * mRecordFilterWidget;
 
-    RecordFilterWidget * mRecordFilterWidget;
-
-    BusyWidget * busyWidget( bool autoCreate = true );
-
+	BusyWidget * busyWidget( bool autoCreate = true );
+	
+	void setPropagateGroupSelection( bool pgs );
+	bool propagateGroupSelection() const;
+	
 public slots:
 	void expandRecursive( const QModelIndex & index = QModelIndex(), int levels = -1 );
-    void addFilterLayout();
-    void sortBySelection();
+	void addFilterLayout();
+	void sortBySelection();
 
 signals:
-    void aboutToShowHeaderMenu( QMenu * );
+	void aboutToShowHeaderMenu( QMenu * );
 	void showMenu( const QPoint & pos, const QModelIndex & underMouse );
 	void columnVisibilityChanged( int column, bool visible );
 
 protected slots:
-    void scheduleResizeAutoColumns();
+	void scheduleResizeAutoColumns();
 	void resizeAutoColumns();
 	virtual void slotCustomContextMenuRequested( const QPoint & );
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
-    void slotSectionResized();
-
-    void slotGrouperChanged( ModelGrouper * grouper );
-    void slotGroupingChanged();
-    void slotGroupCreated( const QModelIndex & );
-    void slotGroupEmptied( const QModelIndex & );
-    void slotGroupPopulated( const QModelIndex & );
-
+	void slotSectionResized();
+	
+	void slotGrouperChanged( ModelGrouper * grouper );
+	void slotGroupingChanged();
+	void slotGroupCreated( const QModelIndex & );
+	void slotGroupEmptied( const QModelIndex & );
+	void slotGroupPopulated( const QModelIndex & );
+	
 protected:
 	void saveColumns( IniConfig & ini, const ColumnStruct columns [] );
 	void setupColumns( IniConfig & ini, const ColumnStruct columns [] );
@@ -135,16 +138,17 @@ protected:
 	bool mShowGrid;
 	QColor mGridColor, mGridColorHighlight;
 
-    friend class RecordFilterWidget;
+	friend class RecordFilterWidget;
 
-    void resizeEvent(QResizeEvent *event);
+	void resizeEvent(QResizeEvent *event);
 
-    BusyWidget * mBusyWidget;
-    bool mHeaderClickIsResize;
-
-    // Loaded from config file, so we can restore the expanded/collapsed state of each group
-    int mLastGroupColumn;
-    QMap<QString,bool> mGroupExpandState;
+	BusyWidget * mBusyWidget;
+	bool mHeaderClickIsResize;
+	
+	// Loaded from config file, so we can restore the expanded/collapsed state of each group
+	int mLastGroupColumn;
+	QMap<QString,bool> mGroupExpandState;
+	bool mPropagateGroupSelection;
 };
 
 class STONEGUI_EXPORT RecordTreeView : public ExtTreeView

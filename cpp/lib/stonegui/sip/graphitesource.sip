@@ -30,11 +30,41 @@ public:
 	QDateTime end() const;
 	void setDateRange( const QDateTime & start, const QDateTime & end );
 	
+	void setRelativeStart( const Interval & relativeStart );
+	void setRelativeEnd( const Interval & relativeEnd );
+
 	int minValue() const;
 	int maxValue() const;
 	void setValueRange( int minValue = INT_MAX, int maxValue = INT_MAX );
 	void setMinValue( int minValue = INT_MAX );
 	void setMaxValue( int maxValue = INT_MAX );
+
+	QList<QPair<QString,QString> > extraQueryItems() const;
+	void setExtraQueryItems( QList<QPair<QString,QString> > extra );
+	
+	void appendExtra( SIP_PYOBJECT );
+%MethodCode
+	if( PySequence_Check( a0 ) && PySequence_Size( a0 ) == 2 ) {
+		PyObject * pyfirst = PySequence_GetItem( a0, 0 ), * pysecond = PySequence_GetItem( a0, 1 );
+		if( sipCanConvertToType(pyfirst, sipType_QString, 0) && sipCanConvertToType(pysecond, sipType_QString, 0) ) {
+			int first_state, second_state, err = 0;
+			QString * first = (QString*)sipConvertToType( pyfirst, sipType_QString, 0, SIP_NOT_NONE, &first_state, &err );
+			QString * second = (QString*)sipConvertToType( pysecond, sipType_QString, 0, SIP_NOT_NONE, &second_state, &err );
+			if( !err )
+				sipCpp->appendExtra( qMakePair<QString,QString>(*first,*second) );
+			sipReleaseType( first, sipType_QString, first_state );
+			sipReleaseType( second, sipType_QString, second_state );
+		} else
+			sipIsErr = 1;
+		Py_XDECREF(pyfirst);
+		Py_XDECREF(pysecond);
+	} else
+		sipIsErr = 1;
+	if( sipIsErr )
+		PyErr_SetString(PyExc_ValueError, "appendExtra requires a sequence with two string values.");
+%End
+
+	QList<GraphiteDesc> generateTimeSeries( int count ) const;
 };
 
 class GraphiteSource : QObject

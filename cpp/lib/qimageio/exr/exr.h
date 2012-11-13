@@ -16,7 +16,7 @@
 class EXRHandler : public QImageIOHandler
 {
 public:
-    EXRHandler();
+    EXRHandler(bool applyGammaCorrection = true);
 
     /**
        Test if the file / stream can potentially read more data
@@ -53,6 +53,12 @@ public:
        Convenience routine. You should use canRead() instead.
     */
     static bool canRead( QIODevice *device );
+
+    QVariant option(ImageOption option) const;
+    void setOption(ImageOption option, const QVariant &value);
+    bool supportsOption(ImageOption option) const;
+protected:
+	bool mApplyGammaCorrection;
 };
 
 class EXRPlugin : public QImageIOPlugin

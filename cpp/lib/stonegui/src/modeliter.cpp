@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id$
+ * $Id: modeliter.cpp 6486 2008-05-02 01:34:01Z newellm $
  */
 
 #include <Qt>
@@ -99,7 +99,7 @@ ModelIter::Filter ModelIter::validateFilter( const Filter & f )
 	out |= excl( f, (DragEnabled|DragDisabled) );
 	out |= excl( f, (DropEnabled|DropDisabled) );
 	out |= excl( f, (Hidden|NotHidden) );
-    out |= excl( f, (Selected|Unselected) );
+	out |= excl( f, (Selected|Unselected) );
 	out |= (f & (Recursive|DescendOpenOnly));
 	return Filter(out);
 }
