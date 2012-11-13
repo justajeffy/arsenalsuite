@@ -42,6 +42,7 @@ typedef QList<QVariant> VarList;
 namespace Stone {
 class Connection;
 class Database;
+class Expression;
 class Field;
 class Index;
 class HashIndex;
@@ -126,6 +127,7 @@ public:
 	//
 	void preload();
 	bool isPreloaded() const;
+	void invalidatePreload();
 	
 	//
 	// Project Preload Functions
@@ -142,9 +144,13 @@ public:
 
 	/// Functions to retrieve records by key
 	///
-	Record record( uint key, bool select=true, bool useCache=true, bool baseOnly=false );
+	Record record( uint key, bool select, bool useCache, bool baseOnly );
+	Record record( uint key, int lookupMode = Index::UseCache | Index::UseSelect, bool baseOnly=false, bool * found = 0 );
+	
 	/// Selects all records
-	RecordList records( QList<uint> keys, bool select=true, bool useCache=true );
+	RecordList records( QList<uint> keys, bool select, bool useCache );
+	RecordList records( QList<uint> keys, int lookupMode = Index::UseCache | Index::UseSelect | Index::PartialSelect );
+
 	/// keystring is a comma seperated list of keys eg "1,2,3,4"
 	RecordList records( const QString & keystring );
 
@@ -162,10 +168,18 @@ public:
 		bool selectChildren = true,
 		bool expectSingle = false,
 		bool needResults = true );
+	RecordList select( 
+		const Expression & exp,
+		bool selectChildren = true,
+		bool expectSingle = false,
+		bool needResults = true );
 	
 	RecordList selectOnly( const QString & where, const VarList & args = VarList(), bool needResults = true, bool cacheIncoming = false );
+	RecordList selectOnly( const Expression & exp, bool needResults = true, bool cacheIncoming = false );
+	
 	RecordList selectMulti( TableList tables, const QString & innerWhere, const VarList & innerArgs = VarList(),
 			const QString & outerWhere = QString(), const VarList & outerArgs = VarList(), bool needResults = true, bool cacheIncoming = false );
+	RecordList selectMulti( TableList tables, const Expression & exp, bool needResults = true, bool cacheIncoming = false );
 
 	void selectFields( RecordList, FieldList );
 	
@@ -184,17 +198,28 @@ public:
 	 *
 	 *  @return false on failure
 	 */
-	bool insert( const Record & rb, bool newPrimaryKey = true );
-	bool insert( const RecordList & rb, bool newPrimaryKey = true );
-
+	bool insert( const Record & rb);
+	bool insert( const RecordList & rb);
+	void * insertBegin( RecordList );
+	bool insertComplete( void * insertState );
+	void insertRollback( void * insertState );
+	
 	void update( RecordImp * r );
+	void update( RecordList );
+	void * updateBegin( RecordList );
+	void updateComplete( void * updateState );
+	void updateRollback( void * updateState );
+	
 	/**
 	 * Removes the record from the indexes
 	 * and deletes the object
 	 **/
 	int remove( const Record & rb );
 	int remove( const RecordList & );
-
+	void * removeBegin( const RecordList & );
+	int removeComplete( void * removeState );
+	void removeRollback( void * removeState );
+	
 	/// Returns true if the table exists in the database, no schema verification is performed
 	bool exists() const;
 	/// Verify that the table and needed columns exist in the database
@@ -248,7 +273,9 @@ protected slots:
 	virtual void recordsAdded( RecordList, bool notifyIndexes = true );
 	virtual void recordsRemoved( RecordList, bool notifyIndexes = true );
 	virtual void recordUpdated( const Record &, const Record &, bool notifyIndexes = true );
-
+	
+	void slotTriggerAdded( Trigger * trigger );
+	
 protected:
 	void setup();
 
@@ -258,8 +285,11 @@ protected:
 
 	RecordList gatherToRemove( const RecordList & toRemove );
 
+	// Called for each record that comes in from a select, to see if there are
+	// existing copies that need updated
 	Record checkForUpdate( Record rec );
-	
+	void callUpdateSignals( const Record & pristine, const Record & old );
+
 	RecordList processIncoming( const RecordList &, bool cacheIncoming=false, bool checkForUpdates = true );
 
 	Database * mDatabase;
@@ -281,7 +311,7 @@ protected:
 	FieldList mDeleteActions;
 	
 	IndexList mIndexes;
-	bool mPreloaded;
+	bool mPreloaded, mPreloadNotificationsSetup;
 
 	int mSqlElapsed[4];
 	int mIndexElapsed[5];

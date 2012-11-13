@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: remotelogserver.cpp 8500 2009-06-24 07:47:18Z brobison $
+ * $Id$
  */
 
 #include <qbytearray.h>
@@ -830,5 +830,4 @@ void RemoteLogClientConnection::queueCommand( Command * command )
 	mCommandQueue.enqueue( command );
 }
 
-} //namespace
-
+} // namespace

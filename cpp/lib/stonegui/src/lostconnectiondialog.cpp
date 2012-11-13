@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: lostconnectiondialog.cpp 5411 2007-12-18 01:03:08Z brobison $
+ * $Id: lostconnectiondialog.cpp 9918 2010-05-26 21:52:41Z newellm $
  */
 
 #include <stdlib.h>
@@ -39,7 +39,7 @@
 #include "freezercore.h"
 #include "process.h"
 
-LostConnectionDialog::LostConnectionDialog( Connection * c, const QString & errorMsg )
+LostConnectionDialog::LostConnectionDialog( Stone::Connection * c, const QString & errorMsg )
 : QDialog( 0 )
 , mConnection( c )
 , mSecondsToRetry( 15 )

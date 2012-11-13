@@ -29,12 +29,16 @@ class JobErrorHandlerList : RecordList
 
 %End
 public:
-	JobErrorHandlerList();
-	JobErrorHandlerList( const RecordList &, Table * t = 0 );
-	JobErrorHandlerList( const JobErrorHandlerList & );
-	JobErrorHandlerList( const Record &, Table * t = 0 );
-	
-	~JobErrorHandlerList();
+	JobErrorHandlerList() /HoldGIL/;
+	JobErrorHandlerList( const RecordList &, Table * t = 0 ) /HoldGIL/;
+	JobErrorHandlerList( const JobErrorHandlerList & ) /HoldGIL/;
+	JobErrorHandlerList( const Record &, Table * t = 0 ) /HoldGIL/;
+	JobErrorHandlerList( SIP_PYLIST );
+%MethodCode
+	sipCpp = new JobErrorHandlerList( recordListFromPyList(a0), JobErrorHandler::table() );
+%End
+
+	~JobErrorHandlerList() /HoldGIL/;
 
 //	void insert( JobErrorHandlerIter, const JobErrorHandler & );
 
@@ -44,30 +48,37 @@ public:
 
 //	JobErrorHandlerIter remove( const JobErrorHandlerIter & );
 
-	int remove( const Record & );
+	int remove( const Record & ) /HoldGIL/;
 	
-	int remove();
+	int remove() throw(SqlException,LostConnectionException,PythonException);
 	
 	//JobErrorHandlerIter begin();
 
 	//JobErrorHandlerIter end();
 
-	Table * table() const;
-	TableSchema * schema() const;
+	Table * table() const /HoldGIL/;
+	TableSchema * schema() const /HoldGIL/;
 
-	MappedJobErrorHandlerList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
-	MappedJobErrorHandlerList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const;
-	MappedJobErrorHandlerList sorted( const QString & c, bool a = true ) const;
+	MappedJobErrorHandlerList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobErrorHandlerList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobErrorHandlerList sorted( const QString & c, bool a = true ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedJobErrorHandlerList unique() const;
 	MappedJobErrorHandlerList reversed() const;
 	MappedJobErrorHandlerList reloaded() const;
 
-	MappedJobTypeList jobTypes() const;
+	QMap<QString,RecordList> groupedBy( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
+
+	PyObject * groupedBy( SIP_PYCALLABLE callable ) const throw(SqlException,LostConnectionException,PythonException);
+%MethodCode
+		sipRes = recordListGroupByCallable( sipCpp, a0, JobErrorHandler::schema() );
+%End
+
+	MappedJobTypeList jobTypes(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const /HoldGIL/;
 	MappedJobErrorHandlerList & setJobTypes( const JobType & );
-	QStringList errorRegExs() const;
+	QStringList errorRegExs() const /HoldGIL/;
 	MappedJobErrorHandlerList & setErrorRegExs( const QString & );
-	MappedJobErrorHandlerScriptList jobErrorHandlerScripts() const;
+	MappedJobErrorHandlerScriptList jobErrorHandlerScripts(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const /HoldGIL/;
 	MappedJobErrorHandlerList & setJobErrorHandlerScripts( const JobErrorHandlerScript & );
 
 

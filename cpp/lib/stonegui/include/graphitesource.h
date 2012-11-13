@@ -34,6 +34,8 @@ public:
 
 	GraphiteDesc( QStringList sources = QStringList(), QSize size = QSize(640,480), AreaMode areaMode = None, const QDateTime & start = QDateTime(), const QDateTime & end = QDateTime(), int minValue = INT_MAX, int maxValue = INT_MAX );
 	
+	~GraphiteDesc();
+		
 	QUrl buildUrl( const QString & host = QString(), quint16 port = 80 ) const;
 	static GraphiteDesc fromUrl( const QString & url );
 	
@@ -48,7 +50,15 @@ public:
 	
 	QDateTime start() const;
 	QDateTime end() const;
+	Interval relativeStart() const;
+	Interval relativeEnd() const;
+	
+	void setStart( const QDateTime & start );
+	void setEnd( const QDateTime & end );
 	void setDateRange( const QDateTime & start, const QDateTime & end );
+
+	void setRelativeStart( const Interval & relativeStart );
+	void setRelativeEnd( const Interval & relativeEnd );
 	
 	int minValue() const;
 	int maxValue() const;
@@ -56,12 +66,23 @@ public:
 	void setMinValue( int minValue = INT_MAX );
 	void setMaxValue( int maxValue = INT_MAX );
 	
+	QList<QPair<QString,QString> > extraQueryItems() const;
+	void setExtraQueryItems( QList<QPair<QString,QString> > extra );
+	void appendExtra( QPair<QString,QString> extra );
+	
+	// Returns a time series of graphite descriptions based on the current settings
+	// Each graph will cover the same amount of time as this one, and will be adjacent
+	// to the one before it, starting with this one.
+	QList<GraphiteDesc> generateTimeSeries( int count ) const;
+	
 protected:
 	QStringList mSources;
 	QSize mSize;
 	AreaMode mAreaMode;
 	QDateTime mStart, mEnd;
+	Interval mRelativeStart, mRelativeEnd;
 	int mMinValue, mMaxValue;
+	QList<QPair<QString,QString> > mExtra;
 };
 
 class STONEGUI_EXPORT GraphiteSource : public QObject

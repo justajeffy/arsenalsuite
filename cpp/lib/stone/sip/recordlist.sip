@@ -33,31 +33,32 @@ public:
 	sipCpp = new RecordList( recordListFromPyList(a0) );
 %End
 
-    ~RecordList() /HoldGIL/;
-
 	MappedRecordList & operator += ( const Record & );
 	MappedRecordList & operator += ( const RecordList & );
 
-	MappedRecordList operator + ( const RecordList & );
+	MappedRecordList operator + ( const RecordList & ) const;
 
 	MappedRecordList & operator -= ( const RecordList & );
-	MappedRecordList operator - ( const RecordList & );
-	
+	MappedRecordList operator -= ( const Record & );
+
+	MappedRecordList operator - ( const RecordList & ) const;
+
 	// Returns the intersection of the two lists
-	MappedRecordList operator & ( const RecordList & );
+	MappedRecordList operator & ( const RecordList & ) const;
 
 	// Sets this as the intersection between this and other
 	// returns a reference to this
 	MappedRecordList & operator &= ( const RecordList & other );
 	
 	// Returns the union of this and other
-	MappedRecordList operator | ( const RecordList & other );
+	MappedRecordList operator | ( const RecordList & other ) const;
 	
 	// Sets this to the union of this and other
 	// Returns a reference to this
 	MappedRecordList & operator |= ( const RecordList & other );
 	
-	bool operator==( const RecordList & );
+	bool operator==( const RecordList & ) const;
+	bool operator!=( const RecordList & list ) const;
 
 //	RecordIter at( uint ) const;
 //	RecordImp * imp( uint ) const;
@@ -120,8 +121,8 @@ public:
 	
 	int remove( const Record & );
 %MethodCode
-		int ret = sipCpp->remove(*a0);
-		if( ret < 0 ) {
+		sipRes = sipCpp->remove(*a0);
+		if( sipRes < 0 ) {
 			sipIsErr = 1;
 			PyErr_SetString(PyExc_ValueError, "RecordList.remove(x): x not in list");
 		}
@@ -175,6 +176,24 @@ public:
 %End
 
 	SIP_PYOBJECT __repr__();
+%MethodCode
+	PyObject * mod = PyObject_GetAttrString( sipSelf, "__module__" );
+	if( !mod ) {
+		printf( "Class object had no __module__ attr\n" );
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	if( !PyString_Check(mod) ) {
+		printf( "__module__ attribute is not a string as expected\n" );
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	PyObject * ret = PyString_FromFormat("%s.%s( %s.%s().table().records([%s]) )", PyString_AsString(mod), sipSelf->ob_type->tp_name, PyString_AsString(mod), sipSelf->ob_type->tp_name, sipCpp->keyString().toLatin1().constData() );
+	Py_DECREF(mod);
+	return ret;
+%End
+
+	SIP_PYOBJECT __str__();
 %MethodCode
 	PyObject *s, *temp;
 	PyObject *pieces = NULL;
@@ -234,24 +253,24 @@ Done:
 	Py_XDECREF(pieces);
 %End
 
-	void selectFields( QList<Field*> fields = QList<Field*>(), bool refreshExisting = false );
+	void selectFields( QList<Field*> fields = QList<Field*>(), bool refreshExisting = false ) throw(SqlException,LostConnectionException,PythonException);
 
-	void commit( bool newPrimaryKeys = true, bool sync = true );
-	int remove();
+	void commit() throw(SqlException,LostConnectionException,PythonException);
+	int remove() throw(SqlException,LostConnectionException,PythonException);
 
-	QList<QVariant> getValue( const QString & column );
+	QList<QVariant> getValue( const QString & column ) throw(SqlException,LostConnectionException,PythonException);
 	void setValue( const QString & column, const QVariant & value );
 
-	QList<QVariant> getValue( int column );
-	QList<QVariant> getValue( Field * f ) const;
+	QList<QVariant> getValue( int column ) throw(SqlException,LostConnectionException,PythonException);
+	QList<QVariant> getValue( Field * f ) const throw(SqlException,LostConnectionException,PythonException);
 	void setValue( int column, const QVariant & value );
 	void setValue( Field * f, const QVariant & value );
 
-	QString	keyString() const;
+	QString keyString() const;
 
-	MappedRecordList foreignKey( int column ) const;
-	MappedRecordList foreignKey( const QString & column ) const;
-	MappedRecordList foreignKey( Field * f ) const;
+	MappedRecordList foreignKey( int column, int lookupMode = 0x7 ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedRecordList foreignKey( const QString & column, int lookupMode = 0x7 ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedRecordList foreignKey( Field * f, int lookupMode = 0x7 ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedRecordList setForeignKey( int column, const Record & fkey );
 	MappedRecordList setForeignKey( const QString & column, const Record & fkey );
@@ -269,13 +288,14 @@ Done:
 
 	MappedRecordList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
 	MappedRecordList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const;
+	MappedRecordList filter( const Expression &, bool keepMatches ) const;
 
-	QMap<QString,RecordList> groupedBy( const QString & column ) const;
+	QMap<QString,RecordList> groupedBy( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
 
-	//QMap<QVariant,MappedRecordList> groupedBy( const QString & column ) const;
-	QMap<MappedRecord,MappedRecordList> groupedByForeignKey( const QString & column ) const;
+	//QMap<QVariant,MappedRecordList> groupedBy( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
+	QMap<MappedRecord,MappedRecordList> groupedByForeignKey( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
 
-	PyObject * groupedBy( SIP_PYCALLABLE callable ) const /HoldGIL/;
+	PyObject * groupedBy( SIP_PYCALLABLE callable ) const throw(SqlException,LostConnectionException,PythonException) /HoldGIL/;
 %MethodCode
 		sipRes = recordListGroupByCallable( sipCpp, a0 );
 %End
@@ -338,17 +358,19 @@ Done:
 	return Py_None;
 %End
 
-	MappedRecordList sorted( const QString & column, bool asc = true ) const;
+	MappedRecordList sorted( const QString & column, bool asc = true ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedRecordList unique() const;
 
 	MappedRecordList reversed() const;
 
-	MappedRecordList copy( bool updateCopiedRelations = false );
+	MappedRecordList copy( Table * destTable = 0, bool updateCopiedRelations = false );
 	
-	void reload();
+	void reload() throw(SqlException,LostConnectionException,PythonException);
 
-	MappedRecordList reloaded() const;
+	MappedRecordList reloaded() const throw(SqlException,LostConnectionException,PythonException);
+
+	QString debug() const;
 
 	QString dump() const;
 };

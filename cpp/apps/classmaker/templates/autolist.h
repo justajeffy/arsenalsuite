@@ -44,13 +44,13 @@ public:
 
 	t__Iter at( uint );
 
+	t__List slice( int start, int end = INT_MAX, int step = 1 );
+	
 	t__Iter find( const Record & );
 
 	using b__List::remove;
 	t__Iter remove( const t__Iter & );
 
-	int remove( const Record & );
-	
 	t__Iter begin() const;
 
 	t__Iter end() const;

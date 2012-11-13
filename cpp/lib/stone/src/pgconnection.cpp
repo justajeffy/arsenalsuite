@@ -25,13 +25,16 @@
  * $Id$
  */
 
+#include <qsqldriver.h>
 #include <qsqlerror.h>
 #include <qsqlquery.h>
 #include <qregexp.h>
 
+#include "database.h"
 #include "iniconfig.h"
 #include "joinedselect.h"
 #include "pgconnection.h"
+#include "schema.h"
 #include "table.h"
 #include "tableschema.h"
 
@@ -41,6 +44,7 @@ PGConnection::PGConnection()
 , mVersionMinor( 0 )
 , mUseMultiTableSelect( false )
 {
+	connect( mDb.driver(), SIGNAL(notification(const QString&)), SIGNAL(notification(const QString&)) );
 }
 
 void PGConnection::setOptionsFromIni( const IniConfig & ini )
@@ -51,7 +55,8 @@ void PGConnection::setOptionsFromIni( const IniConfig & ini )
 
 Connection::Capabilities PGConnection::capabilities() const
 {
-	Connection::Capabilities ret = static_cast<Connection::Capabilities>(QSqlDbConnection::capabilities() | Cap_Inheritance | Cap_MultipleInsert | (mUseMultiTableSelect ? Cap_MultiTableSelect : 0));
+	Connection::Capabilities ret = static_cast<Connection::Capabilities>(QSqlDbConnection::capabilities() | Cap_Inheritance | Cap_MultipleInsert | (mUseMultiTableSelect ? Cap_MultiTableSelect : 0)
+		| Cap_TableOids | Cap_Notifications | Cap_ChangeNotifications );
 	if( checkVersion( 8, 2 ) )
 		ret = static_cast<Connection::Capabilities>(ret | Cap_Returning);
 	return ret;
@@ -93,8 +98,7 @@ bool PGConnection::reconnect()
 uint PGConnection::newPrimaryKey( TableSchema * schema )
 {
 	while( schema->parent() ) schema = schema->parent();
-	QString name = schema->tableName();
-	QString sql("SELECT nextval('" + name + "_key" + name + "_seq')" );
+	QString sql("SELECT nextval('" + schema->tableName().toLower() + "_" + schema->primaryKey().toLower() + "_seq')" );
 	QSqlQuery q = exec( sql );
 	if( q.isActive() && q.next() )
 		return q.value(0).toUInt();
@@ -269,6 +273,9 @@ bool PGConnection::verifyTable( TableSchema * schema, bool createMissingColumns,
 		}
 	}
 
+	if( schema->isPreloadEnabled() && !verifyChangeTrigger(schema,createMissingColumns) )
+		goto OUT;
+
 	ret = true;
 	
 	OUT:
@@ -308,6 +315,11 @@ bool PGConnection::createTable( TableSchema * schema, QString * output )
 		goto OUT;
 	}
 	
+	if( schema->isPreloadEnabled() && !verifyChangeTrigger(schema,true) ) {
+		out += warnAndRet( "Unable to create change trigger" );
+		goto OUT;
+	}
+
 	ret = true;
 	OUT:
 	if( output )
@@ -332,22 +344,54 @@ static QString tableQuoted( const QString & table )
 	return table;
 }
 
-QString PGConnection::getSqlFields( TableSchema * schema, const QString & _tableAlias )
+QString PGConnection::getSqlFields( TableSchema * schema, const QString & _tableAlias, bool needTableOid, FieldList * usedFields, int * pkeyPos )
 {
 	bool hasAlias = !_tableAlias.isEmpty();
 	QString alias( tableQuoted(hasAlias ? _tableAlias : schema->tableName()) );
-	QHash<TableSchema*,QString>::iterator it = hasAlias ? mSqlFields.end() : mSqlFields.find( schema );
+	QHash<TableSchema*,QString>::iterator it = (hasAlias || usedFields || pkeyPos) ? mSqlFields.end() : mSqlFields.find( schema );
+	QString ret;
 	if( it == mSqlFields.end() ) {
 		QStringList fields;
-		foreach( Field * f, schema->columns() )
-			if( !f->flag( Field::NoDefaultSelect ) )
+		int i = 0;
+		foreach( Field * f, schema->columns() ) {
+			if( pkeyPos && f->flag( Field::PrimaryKey ) )
+				*pkeyPos = i;
+			if( !f->flag( Field::NoDefaultSelect ) ) {
 				fields += f->name().toLower();
+				i++;
+				if( usedFields ) *usedFields += f;
+			}
+		}
 		QString sql = alias + ".\"" + fields.join( "\", " + alias + ".\"" ) + "\"";
 		if( !hasAlias )
 			mSqlFields.insert( schema, sql );
-		return sql;
+		ret = sql;
+	} else
+		ret = it.value();
+	if( needTableOid )
+		return alias + ".tableoid, " + ret;
+	return ret;
+}
+
+static QString prepareWhereClause(const QString & where)
+{
+	if( !where.isEmpty() ) {
+		QString w(where.trimmed());
+		bool needsWhere = true;
+		const char * keyWords[] = {"LIMIT","ORDER","WHERE","INNER","OUTER","LEFT","RIGHT","FULL","JOIN", 0};
+		for( int i = 0; keyWords[i]; ++i ) {
+			if( w.startsWith(keyWords[i], Qt::CaseInsensitive) ) {
+				needsWhere = false;
+				break;
+			}
+		}
+		if( needsWhere )
+			w = " WHERE " + w;
+		else
+			w = " " + w;
+		return w;
 	}
-	return it.value();
+	return where;
 }
 
 RecordList PGConnection::selectFrom( Table * table, const QString & _from, const QList<QVariant> & args )
@@ -369,41 +413,55 @@ RecordList PGConnection::selectFrom( Table * table, const QString & _from, const
 
 RecordList PGConnection::selectOnly( Table * table, const QString & where, const QList<QVariant> & args )
 {
-	QString from( " FROM ONLY " + tableQuoted(table->schema()->tableName()) ), w(where);
-	
-	if( !w.isEmpty() ) {
-		if( !w.contains("WHERE") )
-			from += " WHERE";
-		from += " " + w;
-	}
-
-	return selectFrom( table, from, args );
+	return selectFrom( table, "FROM ONLY " + tableQuoted(table->schema()->tableName()) + prepareWhereClause(where), args );
 }
 
 QList<RecordList> PGConnection::joinedSelect( const JoinedSelect & joined, QString where, QList<QVariant> args )
 {
+	Schema * schema = joined.table()->schema()->schema();
+	Database * db = joined.table()->database();
 	QList<RecordList> ret;
 	QList<JoinCondition> joinConditions = joined.joinConditions();
 	QList<Table*> tables;
+	QList<bool> usingTableOid;
+	QList<FieldList> fieldsPerTable;
+	QList<int> pkeyPositions;
+	
 	tables += joined.table();
+	usingTableOid += !joined.joinOnly();
 	QString query( "SELECT " );
 	// Generate column list
 	QStringList fields;
 
-	// Add initial table
-	ret += RecordList();
-	fields += getSqlFields(joined.table()->schema(), joined.alias());
+	{
+		// Add initial table
+		ret += RecordList();
+		int pkeyPos = -1;
+		FieldList fl;
+		fields += getSqlFields(joined.table()->schema(), joined.alias(), !joined.joinOnly(), &fl, &pkeyPos);
+		fieldsPerTable += fl;
+		pkeyPositions += pkeyPos;
+	}
 	
 	foreach( JoinCondition jc, joinConditions ) {
 		if( jc.ignoreResults )
 			continue;
 		tables += jc.table;
+		usingTableOid += !jc.joinOnly;
 		ret += RecordList();
-		fields += getSqlFields(jc.table->schema(), jc.alias);
+		FieldList fl;
+		int pkeyPos = -1;
+		fields += getSqlFields(jc.table->schema(), jc.alias, !jc.joinOnly, &fl, &pkeyPos);
+		fieldsPerTable += fl;
+		pkeyPositions += pkeyPos;
+		fl.clear();
 	}
 	
 	query += fields.join(", ");
-	query += " FROM ONLY " + tableQuoted(joined.table()->schema()->tableName());
+	query += " FROM ";
+	if( joined.joinOnly() )
+		query += "ONLY ";
+	query += tableQuoted(joined.table()->schema()->tableName());
 	
 	// Generate join list
 	int idx = 0;
@@ -422,7 +480,9 @@ QList<RecordList> PGConnection::joinedSelect( const JoinedSelect & joined, QStri
 				query += " OUTER";
 				break;
 		}
-		query += " JOIN ONLY ";
+		query += " JOIN ";
+		if( jc.joinOnly )
+			query += "ONLY ";
 		query += tableQuoted(jc.table->schema()->tableName());
 		if( !jc.alias.isEmpty() && jc.alias != jc.table->schema()->tableName() )
 			query += " AS " + jc.alias;
@@ -431,13 +491,7 @@ QList<RecordList> PGConnection::joinedSelect( const JoinedSelect & joined, QStri
 		++idx;
 	}
 	
-	if( !where.isEmpty() ) {
-		if( !where.contains("WHERE") )
-			query += " WHERE";
-		query += " " + where;
-	}
-
-	query += ";";
+	query += prepareWhereClause(where) + ";";
 	
 	QSqlQuery sq = exec( query, args, true /*retry*/, tables[0] );
 	
@@ -445,8 +499,24 @@ QList<RecordList> PGConnection::joinedSelect( const JoinedSelect & joined, QStri
 		int tableIndex = 0;
 		int colOffset = 0;
 		foreach( Table * table, tables ) {
-			ret[tableIndex] += Record( new RecordImp( table, sq, colOffset ), false );
-			colOffset += table->schema()->columns().size();
+			bool utoi = usingTableOid[tableIndex];
+			Table * destTable = table;
+			if( utoi ) {
+				colOffset++;
+				TableSchema * ts = tableByOid( sq.value(colOffset-1).toInt(), schema);
+				destTable = ts ? db->tableFromSchema(ts) : table;
+			}
+			
+			if( destTable ) {
+				int pkeyPos = pkeyPositions[tableIndex];
+				if( sq.value(colOffset + pkeyPos).toInt() != 0 )
+					ret[tableIndex] += Record( new RecordImp( destTable, sq, colOffset, &fieldsPerTable[tableIndex] ), false );
+				else
+					ret[tableIndex] += Record(table);
+			}
+			
+			colOffset += fieldsPerTable[tableIndex].size();
+			
 			++tableIndex;
 		}
 	}
@@ -464,11 +534,7 @@ QMap<Table *, RecordList> PGConnection::selectMulti( QList<Table*> tables,
 	QList<QVariant> allArgs;
 	QMap<Table*,QStringList> colsByTable;
 	QStringList selects;
-	QString innerW(innerWhere), outerW(outerWhere);
-	if( !innerW.isEmpty() && !innerW.toLower().contains("where") )
-		innerW = "WHERE " + innerW;
-	if( !outerW.isEmpty() && !outerW.toLower().contains("where") )
-		outerW = "WHERE " + outerW;
+	QString innerW(prepareWhereClause(innerWhere)), outerW(prepareWhereClause(outerWhere));
 
 	bool colsNeedTableName = innerW.toLower().contains( "join" );
 
@@ -562,29 +628,24 @@ void PGConnection::selectFields( Table * table, RecordList records, FieldList fi
 	}
 }
 
-bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimaryKey )
+void PGConnection::insert( Table * table, const RecordList & rl )
 {
 	if( rl.size() <= 0 )
-		return true;
+		return;
 
 	TableSchema * schema = table->schema();
-
-	// We can't insert a record with a 0 key !!!
-	foreach( Record r, rl )
-		if( !newPrimaryKey && !r.key() )
-			return false;
 
 	bool multiInsert = checkVersion( 8, 2 );
 
 	FieldList fields = schema->columns();
+	FieldList literals;
+	
 	// Generate the first half of the statement INSERT INTO table (col1, col2, col3) VALUES
 	QString sql( "INSERT INTO " + tableQuoted(schema->tableName()) + " ( " );
 	{
 		QStringList cols;
-		foreach( Field * f, fields ) {
-			if( !(f->flag( Field::PrimaryKey ) && newPrimaryKey) )
-				cols += f->name().toLower();
-		}
+		foreach( Field * f, fields )
+			cols += f->name().toLower();
 		sql += "\"" + cols.join( "\", \"" ) + "\" ) VALUES ";
 	}
 
@@ -600,24 +661,25 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 			{
 				int pos = f->pos();
 				// A deleted record wont have any columns marked as modified, so we'll commit them all
-				if( !(newPrimaryKey && f->flag( Field::PrimaryKey )) ) {
-					if( (rb->isColumnModified( pos ) || rb->mState == RecordImp::COMMIT_ALL_FIELDS) ) {
-						if( rb->isColumnLiteral( pos ) )
-							vals += rb->getColumn( pos ).toString();
-						else {
-							vals += "?";
-						}
-					} else
-						vals += "DEFAULT";
-				}
+				if( (f->flag(Field::PrimaryKey) && rb->getColumn(f).toInt() != 0) || rb->isColumnModified( pos ) || rb->mState == RecordImp::COMMIT_ALL_FIELDS ) {
+					if( rb->isColumnLiteral( pos ) ) {
+						literals += f;
+						vals += rb->getColumn( pos ).toString();
+					} else {
+						vals += "?";
+					}
+				} else
+					vals += "DEFAULT";
 			}
 			recVals +="( " + vals.join( "," ) + " ) ";
 		}
 		sql += recVals.join( ", " );
 
 		// if we generated a new primary key, return it for the key cache
-		if( newPrimaryKey )
-			sql += "RETURNING \"" + schema->primaryKey().toLower() + "\";";
+		sql += "RETURNING \"" + schema->primaryKey().toLower() + "\"";
+		foreach( Field * f, literals )
+			sql += ", \"" + f->name().toLower() + "\"";
+		sql += ";";
 		
 		VarList args;
 
@@ -626,7 +688,7 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 			RecordImp * rb = it.imp();
 			foreach( Field * f, fields ) {
 				int pos = f->pos();
-				if( !(newPrimaryKey && f->flag( Field::PrimaryKey )) && (rb->isColumnModified( pos ) || rb->mState == RecordImp::COMMIT_ALL_FIELDS) && !rb->isColumnLiteral( pos ) ) {
+				if( !rb->isColumnLiteral( pos ) && ((f->flag( Field::PrimaryKey ) && rb->getColumn(f).toInt() != 0) || (rb->isColumnModified( pos ) || rb->mState == RecordImp::COMMIT_ALL_FIELDS)) ) {
 					QVariant v = f->dbPrepare( rb->getColumn( f->pos() ) );
 					args += v;
 				}
@@ -634,23 +696,18 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 		}
 		QSqlQuery q = exec( sql, args, true /*retry*/, table );
 		if( q.isActive() ) {
-			if( newPrimaryKey && q.size() != (int)rl.size() ) {
+			if( q.size() != (int)rl.size() ) {
 				LOG_1( "INSERT succeeded but rows returned(primary keys) doesnt match number of records inserted" );
-				return false;
+				return;
 			}
-			// if we're getting new primary keys back from the database
-			// we want to update the Records with the new value
-			// and the Record should be "cleaned up" internally
+			
 			uint i = 0;
-			while( i < rl.size() ) {
-				Record r = rl[i];
-				if( newPrimaryKey ) {
-					q.next();
-					r.setValue( schema->primaryKeyIndex(), q.value(0).toUInt() );
-				}
-				r.imp()->mState = RecordImp::COMMITTED;
-				r.imp()->clearModifiedBits();
-				r.imp()->clearColumnLiterals();
+			while( q.next() ) {
+				Record r(rl[i]);
+				r.imp()->mValues->replace(schema->primaryKeyIndex(),q.value(0));
+				int ri = 1;
+				foreach( Field * f, literals )
+					r.imp()->mValues->replace(f->pos(),q.value(ri++));
 				i++;
 			}
 		}
@@ -667,15 +724,16 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 			{
 				int pos = f->pos();
 				// A deleted record wont have any columns marked as modified, so we'll commit them all
-				if( !(newPrimaryKey && f->flag( Field::PrimaryKey )) && (rb->isColumnModified( pos ) || rb->mState == RecordImp::COMMIT_ALL_FIELDS) ){
+				if( (f->flag(Field::PrimaryKey) && rb->getColumn(f).toInt() != 0) || rb->isColumnModified( pos ) || rb->mState == RecordImp::COMMIT_ALL_FIELDS ) {
 					if( nc ) { // Need a comma ?
 						sql += ", ";
 						values += ", ";
 					}
 					sql += "\"" + f->name().toLower() + "\"";
-					if( rb->isColumnLiteral( pos ) )
+					if( rb->isColumnLiteral( pos ) ) {
+						literals += f;
 						values += rb->getColumn( pos ).toString();
-					else {
+					} else {
 						values += f->placeholder();
 					}
 					nc = true;
@@ -690,42 +748,41 @@ bool PGConnection::insert( Table * table, const RecordList & rl, bool newPrimary
 			if( schema->inherits().size() )
 				base = schema->inherits()[0];
 		
-			if( newPrimaryKey ) {
-				if( checkVersion( 8, 2 ) )
-					sql += " RETURNING \"" + schema->primaryKey() + "\";";
-				else
-					sql += "; SELECT currval('" + base->tableName() + "_" + schema->primaryKey() + "_seq');";
-			}
+			if( checkVersion( 8, 2 ) ) {
+				sql += " RETURNING \"" + schema->primaryKey() + "\"";
+				foreach( Field * f, literals )
+					sql += ", \"" + f->name().toLower() + "\"";
+				sql += ";";
+			} else
+				sql += "; SELECT currval('" + base->tableName() + "_" + schema->primaryKey() + "_seq');";
 			
 			QSqlQuery q = fakePrepare(sql);
 		
 			foreach( Field * f, fields ) {
 				int pos = f->pos();
-				if( !(newPrimaryKey && f->flag( Field::PrimaryKey )) && ((rb->isColumnModified( pos ) || rb->mState == RecordImp::COMMIT_ALL_FIELDS) && !rb->isColumnLiteral( pos )) ) {
+				if( !rb->isColumnLiteral( pos ) && ((f->flag( Field::PrimaryKey ) && rb->getColumn(f).toInt() != 0) || (rb->isColumnModified( pos ) || rb->mState == RecordImp::COMMIT_ALL_FIELDS)) ) {
 					QVariant v = f->dbPrepare( rb->getColumn( pos ) );
 					q.bindValue( f->placeholder(), v );
 				}
 			}
 		
 			if( exec( q, true /*retry*/, table, /* Using fake prepare */ true ) ) {
-				if( newPrimaryKey ){
-					if( q.next() ) {
-		//				qWarning( "Table::insert: Setting primary key to " + QString::number( q.value(0).toUInt() ) );
-						rb->setColumn( schema->primaryKeyIndex(), q.value(0).toUInt() );
-					} else {
-						LOG_1( "Table::insert: Failed to get primary key after insert" );
-						return false;
-					}
+				if( q.next() ) {
+	//				qWarning( "Table::insert: Setting primary key to " + QString::number( q.value(0).toUInt() ) );
+					rb->mValues->replace(schema->primaryKeyIndex(),q.value(0));
+					int ri = 1;
+					foreach( Field * f, literals )
+						rb->mValues->replace(f->pos(),q.value(ri++));
+				} else {
+					LOG_1( "Table::insert: Failed to get primary key after insert" );
+					return;
 				}
-				rb->mState = RecordImp::COMMITTED;
-				rb->clearModifiedBits();
-				rb->clearColumnLiterals();
 			}
 		}
 
 	}
 	
-	return true;
+	return;
 }
 
 bool PGConnection::update( Table * table, RecordImp * imp, Record * returnValues )
@@ -787,6 +844,109 @@ bool PGConnection::update( Table * table, RecordImp * imp, Record * returnValues
 	return false;
 }
 
+struct ColUpdate {
+	Field * field;
+	// Records that need this field updated
+	RecordList records;
+};
+
+bool PGConnection::update( Table * table, RecordList records, RecordList * returnValues )
+{
+	// For a single record the other version provides more readable sql
+	if( records.size() == 1 ) {
+		Record retVal;
+		bool ret = update( table, records[0].imp(), returnValues ? &retVal : 0 );
+		if( returnValues )
+			returnValues->append(retVal);
+		return ret;
+	}
+	
+	QList<ColUpdate> colUpdates;
+	TableSchema * schema = table->schema();
+	FieldList fields = schema->columns();
+	QString pkn = schema->primaryKey(), tn = schema->tableName();
+	
+	foreach( Field * f, fields ) {
+		ColUpdate cu;
+		cu.field = f;
+		foreach( Record r, records ) {
+			if( r.imp()->isColumnModified(f->pos()) ) {
+				cu.records.append(r);
+			}
+		}
+		if( cu.records.size() )
+			colUpdates.append(cu);
+	}
+	
+	bool selectAfterUpdate = false;
+	FieldList fieldsToUpdate;
+	QStringList cols, values, valueAs;
+	valueAs += pkn;
+	foreach( const ColUpdate & cu, colUpdates ) {
+		fieldsToUpdate += cu.field;
+		QString col = "\"" + cu.field->name().toLower() + "\"";
+		if( cu.records.size() == records.size() ) {
+			col += " = v." + col;
+		} else {
+			col += " = CASE WHEN " + tn + "." + pkn + " IN (" + cu.records.keyString() + ") THEN v." + col + " ELSE " + tn + "." + col + " END";
+		}
+		cols += col;
+		valueAs += "\"" + cu.field->name().toLower() + "\"";
+	}
+	
+	typedef QPair<QString,QVariant> StrVarPair;
+	QList<StrVarPair> toBind;
+	int i = 0;
+	foreach( Record r, records ) {
+		QStringList rvals;
+		rvals += QString::number(r.key());
+		
+		foreach( Field * f, fieldsToUpdate ) {
+			if( !r.imp()->isColumnModified(f->pos()) ) {
+				rvals += "NULL::" + f->dbTypeString();
+				continue;
+			}
+			if( r.imp()->isColumnLiteral( f->pos() ) ) {
+				selectAfterUpdate = true;
+				rvals += r.imp()->getColumn(f).toString();
+			} else {
+				QString ph = f->placeholder(i);
+				QVariant val = f->dbPrepare(r.imp()->getColumn(f));
+				if( val.isNull() ) {
+					rvals += "NULL::" + f->dbTypeString();
+				} else {
+					rvals += ph;
+					toBind.append( qMakePair(ph,val) );
+				}
+			}
+		}
+		values.append( "(" + rvals.join(",") + ")" );
+		++i;
+	}
+	
+	
+	QString up("UPDATE %1 SET ");
+	up = up.arg( tableQuoted(schema->tableName()) );
+	up += cols.join(", ") + " FROM (VALUES " + values.join(", ") + ") AS v(" + valueAs.join(", ") + ") WHERE v." + pkn + "=" + tn + "." + pkn;
+	
+	if( returnValues )
+		up += " RETURNING " + getSqlFields( schema );
+	up += ";";
+
+	QSqlQuery q = fakePrepare( up );
+	foreach( StrVarPair svp, toBind )
+		q.bindValue( svp.first, svp.second );
+
+	if( exec( q, true /*retryLostConn*/, table, /*usingFakePrepare =*/ true ) ) {
+		if( returnValues ) {
+			while( q.next() )
+				returnValues->append( Record( new RecordImp( table, q ), false ) );
+		}
+		return true;
+	}
+	return false;
+}
+
 int PGConnection::remove( Table * table, const QString & keys, QList<int> * rowsDeleted )
 {
 	TableSchema * schema = table->schema();
@@ -823,3 +983,75 @@ bool PGConnection::createIndex( IndexSchema * schema )
 	return exec( cmd ).isActive();
 }
 
+void PGConnection::loadTableOids()
+{
+	QSqlQuery namespace_q = exec( "SELECT oid FROM pg_namespace WHERE nspname='public'" );
+	if( namespace_q.next() ) {
+		uint namespace_oid = namespace_q.value(0).toUInt();
+		QSqlQuery q = exec( "SELECT oid, relname FROM pg_class WHERE relkind='r' AND relnamespace=" + QString::number(namespace_oid) );
+		while( q.next() ) {
+			uint oid = q.value(0).toInt();
+			QString tableName = q.value(1).toString().toLower();
+			mTablesByOid[oid] = tableName;
+			mOidsByTable[tableName] = oid;
+		}
+	}
+}
+
+TableSchema * PGConnection::tableByOid( uint oid, Schema * schema )
+{
+	if( mTablesByOid.size() == 0 )
+		loadTableOids();
+	QMap<uint,QString>::iterator it = mTablesByOid.find( oid );
+	if( it != mTablesByOid.end() )
+		return schema->tableByName( it.value() );
+	if( oid != 0 )
+		LOG_1( "Unable to find table by oid: " + QString::number(oid) );
+	return 0;
+}
+
+uint PGConnection::oidByTable( TableSchema * schema )
+{
+	if( mTablesByOid.size() == 0 )
+		loadTableOids();
+	QMap<QString,uint>::iterator it = mOidsByTable.find( schema->tableName().toLower() );
+	if( it != mOidsByTable.end() )
+		return it.value();
+	LOG_1( "Unable to find oid for table: " + schema->tableName() );
+	return 0;
+}
+
+bool PGConnection::verifyTriggerExists( TableSchema * table, const QString & triggerName )
+{
+	LOG_5( "Verifying trigger " + triggerName + " for table " + table->tableName() + " with oid " + QString::number(oidByTable(table)) );
+	return exec( "SELECT 1 FROM pg_trigger WHERE tgrelid=? AND tgname=?", VarList() << QVariant(oidByTable(table)) << QVariant(triggerName) ).size() == 1;
+}
+
+static const char * listen_func_template = 
+"CREATE OR REPLACE FUNCTION %1_preload_trigger() RETURNS TRIGGER AS $$\n"
+"DECLARE\n"
+"BEGIN\n"
+"\tNOTIFY %2_preload_change;\n"
+"\tRETURN NEW;\n"
+"END;\n"
+"$$ LANGUAGE 'plpgsql';";
+
+static const char * listen_trig_template =
+"CREATE TRIGGER %1_preload_trigger AFTER INSERT OR DELETE OR UPDATE ON %2 FOR EACH STATEMENT EXECUTE PROCEDURE %3_preload_trigger();";
+
+static const char * preload_change_str = "_preload_trigger";
+
+bool PGConnection::verifyChangeTrigger( TableSchema * table, bool create )
+{
+	QString tableName = table->tableName();
+	QString triggerName = tableName.toLower() + QString::fromAscii(preload_change_str);
+	bool exists = verifyTriggerExists(table,triggerName);
+	if( exists || !create )
+		return exists;
+	
+	QString func = QString(listen_func_template).arg(tableName).arg(tableName);
+	QString trig = QString(listen_trig_template).arg(tableName).arg(tableName).arg(tableName);
+	exec(func);
+	exec(trig);
+	return true;
+}

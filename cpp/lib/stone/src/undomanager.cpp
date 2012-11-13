@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: undomanager.cpp 8495 2009-06-24 06:26:18Z brobison $
+ * $Id$
  */
 
 #include <qmenu.h>

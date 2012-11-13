@@ -1,4 +1,30 @@
 
+/*
+ *
+ * Copyright 2012 Blur Studio Inc.
+ *
+ * This file is part of libstone.
+ *
+ * libstone is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * libstone is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with libstone; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
+/*
+ * $Id$
+ */
+
 #include <qregexp.h>
 
 #include "connection.h"
@@ -9,11 +35,13 @@
 JoinedSelect::JoinedSelect(Table * primaryTable, QList<JoinCondition> joinConditions)
 : mTable( primaryTable )
 , mJoinConditions( joinConditions )
+, mJoinOnly( false )
 {}
 
 JoinedSelect::JoinedSelect(Table * primaryTable, const QString & alias)
 : mTable( primaryTable )
 , mAlias( alias )
+, mJoinOnly( false )
 {
 }
 
@@ -28,12 +56,15 @@ QList<JoinCondition> JoinedSelect::joinConditions() const
 
 JoinedSelect & JoinedSelect::join( Table * joinTable, const QString & condition, JoinType type, bool ignoreResults, const QString & alias )
 {
+	if( mJoinConditions.isEmpty() )
+		mJoinOnly = !(type == RightJoin || type == OuterJoin);
 	JoinCondition jc;
 	jc.table = joinTable;
 	jc.condition = condition;
 	jc.alias = alias;
 	jc.type = type;
 	jc.ignoreResults = ignoreResults;
+	jc.joinOnly = !(type == LeftJoin || type == OuterJoin);
 	mJoinConditions += jc;
 	return *this;
 }
@@ -70,14 +101,21 @@ ResultSet JoinedSelect::selectInherited(int condInheritIndex, const QString & _w
 {
 	ResultSet ret;
 	Table * orig = mJoinConditions[condInheritIndex].table;
-	foreach( Table * table, orig->tableTree() ) {
-		QString where(updateCondition(_where,orig,table));
-		JoinedSelect js = updateConditions(orig,table);
-		js.mJoinConditions[condInheritIndex].table = table;
+	if( mJoinConditions[condInheritIndex].joinOnly && orig->children().size() ) {
+		foreach( Table * table, orig->tableTree() ) {
+			QString where(updateCondition(_where,orig,table));
+			JoinedSelect js = updateConditions(orig,table);
+			js.mJoinConditions[condInheritIndex].table = table;
+			if( condInheritIndex + 1 == mJoinConditions.size() )
+				ret.append( js.selectSingleTable(where, args) );
+			else
+				ret.append( js.selectInherited(condInheritIndex+1,where,args) );
+		}
+	} else {
 		if( condInheritIndex + 1 == mJoinConditions.size() )
-			ret.append( js.selectSingleTable(where, args) );
+			ret.append( selectSingleTable(_where, args) );
 		else
-			ret.append( js.selectInherited(condInheritIndex+1,where,args) );
+			ret.append( selectInherited(condInheritIndex+1,_where,args) );
 	}
 	return ret;
 }
@@ -85,12 +123,15 @@ ResultSet JoinedSelect::selectInherited(int condInheritIndex, const QString & _w
 ResultSet JoinedSelect::select(const QString & _where, VarList args)
 {
 	ResultSet ret;
-	foreach( Table * table, mTable->tableTree() ) {
-		JoinedSelect js = updateConditions(mTable,table);
-		js.mTable = table;
-		QString where(updateCondition(_where,mTable,table));
-		ret.append(js.selectInherited(0,where,args));
-	}
+	if( mJoinOnly && mTable->children().size() ) {
+		foreach( Table * table, mTable->tableTree() ) {
+			JoinedSelect js = updateConditions(mTable,table);
+			js.mTable = table;
+			QString where(updateCondition(_where,mTable,table));
+			ret.append(js.selectInherited(0,where,args));
+		}
+	} else
+		ret.append( selectInherited(0,_where,args) );
 	return ret;
 }
 

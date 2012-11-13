@@ -31,6 +31,7 @@
 #include <algorithm>
 
 #include "blurqt.h"
+#include "expression.h"
 #include "table.h"
 #include "tableschema.h"
 #include "recordlist.h"
@@ -125,7 +126,7 @@ RecordList & RecordList::operator=( const RecordList & other )
 	return *this;
 }
 
-bool RecordList::operator==( const RecordList & other )
+bool RecordList::operator==( const RecordList & other ) const
 {
 	bool lh = (d && !d->mList.isEmpty());
 	bool rh = (other.d && !other.d->mList.isEmpty());
@@ -183,7 +184,7 @@ RecordList & RecordList::operator += ( const RecordList & list )
 	return *this;
 }
 
-RecordList RecordList::operator + ( const RecordList & other )
+RecordList RecordList::operator + ( const RecordList & other ) const
 {
 	RecordList copy( *this );
 	return copy += other;
@@ -194,81 +195,87 @@ RecordList & RecordList::operator -= ( const RecordList & rl )
 	detach();
 	QMap<RecordImp*,bool> map;
 	st_foreach( RecordIter, it, rl )
-		map[it.imp()] = true;
+		map[(*it).current()] = true;
 	for( RecordIter it = begin(); it != end(); )
-		if( !map.contains( it.imp() ) )
+		if( !map.contains( (*it).current() ) )
 			++it;
 		else
 			it = remove( it );
 	return *this;
 }
 
-RecordList RecordList::operator - ( const RecordList & rl )
+RecordList & RecordList::operator -= ( const Record & other )
 {
-	RecordList ret;
-	QMap<RecordImp*,bool> map;
-	st_foreach( RecordIter, it, rl )
-		map[it.imp()] = true;
-	st_foreach( RecordIter, it, (*this) )
-		if( !map.contains( it.imp() ) )
-			ret += *it;
-	return ret;	
+	remove(other);
+	return *this;
 }
 
-RecordList RecordList::operator & ( const RecordList & rl )
+RecordList RecordList::operator - ( const RecordList & rl ) const
 {
 	RecordList ret;
 	QMap<RecordImp*,bool> map;
-	st_foreach( RecordIter, it, rl )
-		map[it.imp()] = true;
-	st_foreach( RecordIter, it, (*this) )
-		if( map.contains( it.imp() ) )
-			ret += *it;
+	foreach( Record r, rl )
+		map[r.current()] = true;
+	foreach( Record r, (*this) )
+		if( !map.contains( r.current() ) )
+			ret += r;
+	return ret;
+}
+
+RecordList RecordList::operator & ( const RecordList & rl ) const
+{
+	RecordList ret;
+	QMap<RecordImp*,bool> map;
+	foreach( Record r, rl )
+		map[r.current()] = true;
+	foreach( Record r, (*this) )
+		if( map.contains( r.current() ) )
+			ret += r;
 	return ret;
 }
 
 RecordList & RecordList::operator &= ( const RecordList & rl )
 {
 	QMap<RecordImp*,bool> map;
-	st_foreach( RecordIter, it, rl )
-		map[it.imp()] = true;
+	foreach( Record r, rl )
+		map[r.current()] = true;
 	for( RecordIter it = begin(); it != end(); )
-		if( map.contains( it.imp() ) )
+		if( map.contains( (*it).current() ) )
 			++it;
 		else
 			it = remove( it );
 	return *this;
 }
 
-bool RecordList::operator && ( const RecordList & rl )
+bool RecordList::operator && ( const RecordList & rl ) const
 {
 	return !(*this & rl).isEmpty();
 }
 
-RecordList RecordList::operator | ( const RecordList & rl )
+RecordList RecordList::operator | ( const RecordList & rl ) const
 {
 	RecordList ret( rl );
 	QMap<RecordImp*,bool> map;
-	st_foreach( RecordIter, it, rl )
-		map[it.imp()] = true;
-	st_foreach( RecordIter, it, (*this) )
-		if( !map.contains( it.imp() ) )
-			ret += *it;
+	foreach( Record r, rl )
+		map[r.current()] = true;
+	foreach( Record r, (*this) )
+		if( !map.contains( r.current() ) )
+			ret += r;
 	return ret;
 }
 
 RecordList & RecordList::operator |= ( const RecordList & rl )
 {
 	QMap<RecordImp*,bool> map;
-	st_foreach( RecordIter, it, (*this) )
-		map[it.imp()] = true;
-	st_foreach( RecordIter, it, rl )
-		if( !map.contains( it.imp() ) )
-			(*this) += *it;
+	foreach( Record r, (*this) )
+		map[r.current()] = true;
+	foreach( Record r, rl )
+		if( !map.contains( r.current() ) )
+			(*this) += r;
 	return *this;
 }
 
-bool RecordList::operator || ( const RecordList & rl )
+bool RecordList::operator || ( const RecordList & rl ) const
 {
 	return !rl.isEmpty() || !isEmpty();
 }
@@ -329,25 +336,28 @@ RecordImp * RecordList::imp( uint pos ) const
 
 int RecordList::findIndex( const Record & r )
 {
-	if( d && r.imp() ){
-		return d->mList.indexOf( r.imp() );
-	}
+	RecordImp * cur = r.current();
+	for( int i = 0; i < size(); ++i )
+		if( this->operator[](i).current() == cur )
+			return i;
 	return -1;
 }
 
 RecordIter RecordList::find( const Record & val )
 {
-	if( !d || !val.imp() )
+	RecordImp * cur = val.current();
+	if( !d || !cur )
 		return end();
-	return RecordIter( d->mList.begin() + d->mList.indexOf( val.imp() ) );
+	return RecordIter( d->mList.begin() + findIndex(val) );
 }
 
 void RecordList::append( const Record & t )
 {
 	if( t.imp() ) {
 		detach();
-		d->mList += t.imp();
-		t.imp()->ref();
+		RecordImp * cur = t.imp();
+		d->mList += cur;
+		cur->ref();
 	}
 }
 	
@@ -356,8 +366,9 @@ void RecordList::insert( RecordIter it, const Record & r )
 	if( r.imp() ) {
 		detach();
 		it.make_valid( *this );
-		d->mList.insert( it.mIter, r.imp() );
-		r.imp()->ref();
+		RecordImp * cur = r.imp();
+		d->mList.insert( it.mIter, cur );
+		cur->ref();
 	}
 }
 
@@ -368,30 +379,15 @@ void RecordList::insert( int pos, const Record & r )
 		if( pos > size() ) pos = size();
 		if( pos < 0 ) pos = 0;
 		detach();
-		d->mList.insert( pos, r.imp() );
-		r.imp()->ref();
+		RecordImp * cur = r.imp();
+		d->mList.insert( pos, cur );
+		cur->ref();
 	}
 }
 
 bool RecordList::update( const Record & record )
 {
-	// No way to compare if the record doesn't have a primary key
-	// and likely the update isn't needed because a copy wasnt made
-	if( !record.isRecord() ) return false;
-
-	detach();
-
-	Table * table = record.table();
-	uint key = record.key();
-	for( QList<RecordImp*>::Iterator it = d->mList.begin(); it != d->mList.end(); ++it ) {
-		if( (*it)->table() == table && (*it)->key() == key && (*it) != record.imp() ) {
-			(*it)->deref();
-			(*it) = record.imp();
-			(*it)->ref();
-			return true;
-		}
-	}
-	return false;
+	return true;
 }
 
 void RecordList::detach( Table * table )
@@ -417,7 +413,16 @@ void RecordList::detach( Table * table )
 
 int RecordList::remove( const Record & t )
 {
-	return remove( t.imp() );
+	int ret = 0;
+	RecordImp * cur = t.current();
+	for( int i = 0; i < size(); ++i ) {
+		if( this->operator[](i).current() == cur ) {
+			detach();
+			remove( d->mList.begin() + i-- );
+			++ret;
+		}
+	}
+	return ret;
 }
 
 int RecordList::remove( RecordImp * imp )
@@ -459,7 +464,11 @@ Record RecordList::pop( int i )
 
 bool RecordList::contains( const Record & t ) const
 {
-	return (d && d->mList.contains( t.imp() ));
+	foreach( Record r, *this ) {
+		if( r == t )
+			return true;
+	}
+	return false;
 }
 
 bool RecordList::contains( RecordImp * ri ) const
@@ -531,30 +540,76 @@ void RecordList::selectFields( FieldList fields, bool refreshExisting )
 		it.key()->selectFields( it.value().first, it.value().second );
 }
 
-void RecordList::commit(bool newPrimaryKey, bool sync)
+void RecordList::makeCurrent()
 {
-	QMap<Table*,QList<RecordImp*> > byTable;
-	for( RecordIter it = begin(); it != end(); ++it )
-		byTable[(*it).imp()->table()] += (*it).imp();
-	for( QMap<Table*,QList<RecordImp*> >::Iterator it = byTable.begin(); it != byTable.end(); ++it ) {
-		Table * table = it.key();
-		QList<RecordImp*> imps = it.value();
-		RecordList toInsert;
-		foreach( RecordImp * imp, imps ) {
-			if( sync && !(imp->mState & RecordImp::COMMITTED) && !(imp->mState & RecordImp::DELETED) )
-				toInsert += imp;
-			else {
-				RecordImp * ret = imp->commit(newPrimaryKey,sync);
-				if( ret != imp ) {
-					int pos = d->mList.indexOf( imp );
-					if( pos >= 0 )
-						d->mList.replace( pos, ret );
-				}
+	if( d ) {
+		for( QList<RecordImp*>::Iterator it = d->mList.begin(); it != d->mList.end(); ++it ){
+			RecordImp * ri  = *it;
+			RecordImp * cur = Record(ri).current();
+			if( ri != cur ) {
+				cur->ref();
+				ri->deref();
+				*it = cur;
 			}
 		}
-		if( toInsert.size() )
-			table->insert( toInsert, newPrimaryKey );
 	}
+}
+
+void RecordList::commit()
+{
+	if( count() == 0 ) return;
+	
+	// Fastpath if one record, to avoid various allocations below
+	if( count() == 1 ) {
+		Record r = (*this)[0];
+		r.commit();
+		makeCurrent();
+		return;
+	}
+
+	ChangeSet cs = ChangeSet::current();
+	bool anonCs = !cs.isValid();
+	if( anonCs )
+		cs = ChangeSet::create();
+
+	QMap<Table*,RecordList> insert, update;
+	for( RecordIter it = begin(); it != end(); ++it ) {
+		// If it's attached to a changeset then simply call commit and 
+		// it'll be added to the changeset queue
+		RecordImp * imp = it.imp();
+		if( !anonCs ) {
+			ChangeSet::ChangeType type = ChangeSet::changeType(*it);
+			if( type == ChangeSet::Change_Insert )
+				insert[imp->table()] += *it;
+			else if( type == ChangeSet::Change_Update )
+				update[imp->table()] += *it;
+		} else {
+			imp = Record(imp).current();
+			//imp->mChangeSet = cs;
+			if( !(imp->mState & RecordImp::COMMITTED) && !(imp->mState & RecordImp::DELETED) ) {
+				insert[imp->table()] += *it;
+				imp->mChangeSet = cs;
+			}
+			else if( (imp->mState & (RecordImp::COMMITTED | RecordImp::MODIFIED)) == (RecordImp::COMMITTED | RecordImp::MODIFIED) ) {
+				update[imp->table()] += *it;
+				imp->mChangeSet = cs;
+			}
+		}
+	}
+	
+	for( QMap<Table*,RecordList>::Iterator it = insert.begin(); it != insert.end(); ++it ) {
+		cs.queue( ChangeSet::Change_Insert, it.value() );
+	}
+	
+	for( QMap<Table*,RecordList>::Iterator it = update.begin(); it != update.end(); ++it ) {
+		cs.queue( ChangeSet::Change_Update, it.value() );
+	}
+	
+	if( anonCs )
+		cs.commit();
+	
+	if( update.size() )
+		makeCurrent();
 }
 
 int RecordList::remove()
@@ -569,7 +624,12 @@ int RecordList::remove()
 
 	bool hasError = false;
 	int result = 0;
-
+	ChangeSet cs = ChangeSet::current();
+	bool anonCs = !cs.isValid();
+	if( anonCs )
+		cs = ChangeSet::create();
+	ChangeSetEnabler cse(cs);
+	
 	for( RecordIter it = recs_to_del.begin(); ; ++it )
 	{
 		Table * table = 0;
@@ -577,19 +637,28 @@ int RecordList::remove()
 		if( it != recs_to_del.end() )
 			table = it.imp()->table();
 
-		if( currentTable && currentTable!=table ){
-			int res = currentTable->remove( queue );
-			queue.clear();
-			if( res < 0 ) hasError = true;
-			else result += res;
+		if( currentTable && currentTable!=table ) {
+			int res = queue.size();
+			if(res > 0) {
+				cs.queue( ChangeSet::Change_Remove, queue );
+				queue.clear();
+				result += res;
+			}
 		}
 
 		if( it == recs_to_del.end() )
 			break;
 
 		currentTable = table;
-		queue += *it;
+		if( it != recs_to_del.end() ) {
+			if( (*it).key() && !(it.imp()->mState & RecordImp::DELETED) )
+				queue += Record(it.imp()->copy());
+		}
 	}
+	
+	if( anonCs )
+		cs.commit();
+
 	return hasError ? -1 : result;
 }
 
@@ -683,59 +752,78 @@ void RecordList::setValue( Field * f, const QVariant & value )
 	}
 }
 
-RecordList RecordList::foreignKey( int column ) const
+RecordList RecordList::foreignKey( int column, int lookupMode ) const
 {
 	QMap<TableSchema *, QList<uint> > fkeysByTable;
 	RecordList ret;
 	st_foreach( RecordIter, it, (*this) ) {
 		QVariant val = (*it).getValue( column );
-		if( val.userType() == qMetaTypeId<Record>() )
-			ret += qvariant_cast<Record>(val);
+		if( val.userType() == qMetaTypeId<Record>() ) {
+			Record r = qvariant_cast<Record>(val);
+			if( !(lookupMode & Index::UseCache) && r.isRecord() ) {
+				Table * t = (*it).table();
+				if( t ) {
+					TableSchema * ts = t->schema()->field(column)->foreignKeyTable();
+					if( ts )
+						fkeysByTable[ts] += r.key();
+				}
+			} else
+				ret += r;
+		}
 		else if( val.toInt() > 0 ) {
 			TableSchema * ts = (*it).table()->schema()->field(column)->foreignKeyTable();
-			fkeysByTable[ts] += val.toInt();
+			if( ts )
+				fkeysByTable[ts] += val.toInt();
 		}
 	}
 	for( QMap<TableSchema *, QList<uint> >::iterator it = fkeysByTable.begin(); it != fkeysByTable.end(); ++it ) {
-		ret += it.key()->table()->records( it.value() );
+		ret += it.key()->table()->records( it.value(), lookupMode );
 	}
 	return ret;
 }
 
-RecordList RecordList::foreignKey( Field * f ) const
+RecordList RecordList::foreignKey( Field * f, int lookupMode ) const
 {
 	QMap<TableSchema *, QList<uint> > fkeysByTable;
 	RecordList ret;
 	st_foreach( RecordIter, it, (*this) ) {
 		QVariant val = (*it).getValue( f );
-		if( val.userType() == qMetaTypeId<Record>() )
-			ret += qvariant_cast<Record>(val);
-		else if( val.toInt() > 0 ) {
+		if( val.userType() == qMetaTypeId<Record>() ) {
+			Record r = qvariant_cast<Record>(val);
+			if( !(lookupMode & Index::UseCache) && r.isRecord() )
+				fkeysByTable[f->foreignKeyTable()] += r.key();
+			else
+				ret += r;
+		} else if( val.toInt() > 0 ) {
 			TableSchema * ts = f->foreignKeyTable();
 			fkeysByTable[ts] += val.toInt();
 		}
 	}
 	for( QMap<TableSchema *, QList<uint> >::iterator it = fkeysByTable.begin(); it != fkeysByTable.end(); ++it ) {
-		ret += it.key()->table()->records( it.value() );
+		ret += it.key()->table()->records( it.value(), lookupMode );
 	}
 	return ret;
 }
 
-RecordList RecordList::foreignKey( const QString & column ) const
+RecordList RecordList::foreignKey( const QString & column, int lookupMode ) const
 {
 	QMap<TableSchema *, QList<uint> > fkeysByTable;
 	RecordList ret;
 	st_foreach( RecordIter, it, (*this) ) {
 		QVariant val = (*it).getValue( column );
-		if( val.userType() == qMetaTypeId<Record>() )
-			ret += qvariant_cast<Record>(val);
-		else if( val.toInt() > 0 ) {
+		if( val.userType() == qMetaTypeId<Record>() ) {
+			Record r = qvariant_cast<Record>(val);
+			if( !(lookupMode & Index::UseCache) && r.isRecord() )
+				fkeysByTable[(*it).table()->schema()->field(column)->foreignKeyTable()] += r.key();
+			else
+				ret += r;
+		} else if( val.toInt() > 0 ) {
 			TableSchema * ts = (*it).table()->schema()->field(column)->foreignKeyTable();
 			fkeysByTable[ts] += val.toInt();
 		}
 	}
 	for( QMap<TableSchema *, QList<uint> >::iterator it = fkeysByTable.begin(); it != fkeysByTable.end(); ++it ) {
-		ret += it.key()->table()->records( it.value() );
+		ret += it.key()->table()->records( it.value(), lookupMode );
 	}
 	return ret;
 }
@@ -851,6 +939,16 @@ RecordList RecordList::filter( const QString & column, const QRegExp & re, bool 
 	return ret;
 }
 
+RecordList RecordList::filter( const Expression & exp, bool keepMatches ) const
+{
+	RecordList ret;
+	foreach( Record r, *this ) {
+		if( exp.matches(r) == keepMatches )
+			ret.append(r);
+	}
+	return ret;
+}
+
 QMap<QString,RecordList> RecordList::groupedBy( const QString & column ) const
 {
 	QMap<QString,RecordList> ret;
@@ -953,6 +1051,14 @@ RecordList RecordList::reloaded() const
 	return ret;
 }
 
+QString RecordList::debug() const
+{
+	QStringList ret;
+	foreach( Record r, (*this) )
+		ret += r.debug();
+	return ret.join(", ");
+}
+
 QString RecordList::dump() const
 {
 	QStringList ret;
@@ -961,11 +1067,11 @@ QString RecordList::dump() const
 	return ret.join("\n\n");
 }
 
-RecordList RecordList::copy( bool updateCopiedRelations )
+RecordList RecordList::copy( Table * destTable, bool updateCopiedRelations )
 {
 	RecordList ret;
 	foreach( Record r, (*this) )
-		ret += r.copy();
+		ret += r.copy(destTable);
 	if( updateCopiedRelations ) {
 		foreach( Record r, ret ) {
 			TableSchema * ts = r.table()->schema();

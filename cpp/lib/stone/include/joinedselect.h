@@ -1,4 +1,30 @@
 
+/*
+ *
+ * Copyright 2012 Blur Studio Inc.
+ *
+ * This file is part of libstone.
+ *
+ * libstone is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * libstone is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with libstone; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
+/*
+ * $Id$
+ */
+
 #ifndef JOINED_SELECT_H
 #define JOINED_SELECT_H
 
@@ -28,7 +54,7 @@ public:
 	QString condition, alias;
 	JoinType type;
 	Table * table;
-	bool ignoreResults;
+	bool ignoreResults, joinOnly;
 };
 
 class STONE_EXPORT JoinedSelect
@@ -39,6 +65,12 @@ public:
 	
 	QString alias() const;
 	Table * table() const;
+	
+	// If this is set then any tables with inheritance will result in JOIN ONLY table, and multiple selects will be performed for each child table
+	// If false then the table will be selected without the only clause and return the table_oid to know the proper table for each row.  Unselected
+	// columns will have their NotSelected bits set
+	bool joinOnly() const { return mJoinOnly; }
+	
 	QList<JoinCondition> joinConditions() const;
 
 	JoinedSelect & join( Table * joinTable, const QString & condition = QString(), JoinType type = InnerJoin, bool ignoreResults = false, const QString & alias = QString() );
@@ -56,6 +88,7 @@ protected:
 	Table * mTable;
 	QString mAlias;
 	QList<JoinCondition> mJoinConditions;
+	bool mJoinOnly;
 };
 
 }; // namespace Stone

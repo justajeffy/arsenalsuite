@@ -21,7 +21,6 @@
  */
 
 #ifdef HEADER_FILES
-#include "resolution.h"
 class ShotGroup;
 #endif
 
@@ -30,13 +29,6 @@ class ShotGroup;
 	QString sortString() const;
 
 	QString displayNumber() const;
-
-	static void checkForFrameFiles( ShotList, const Resolution &, bool fillMissing=false );
-	static void deleteExtraFrameFiles( ShotList, const Resolution & );
-	
-	void createCompFileTrackers();
-	void createRenderFileTrackers();
-	void createFrames();
 
 	/// Convenience method, returns this shot's parent as a ShotGroup
 	ShotGroup sequence();

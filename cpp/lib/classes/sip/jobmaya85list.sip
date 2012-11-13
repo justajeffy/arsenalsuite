@@ -27,12 +27,16 @@ class JobMaya85List : JobMayaList
 
 %End
 public:
-	JobMaya85List();
-	JobMaya85List( const RecordList &, Table * t = 0 );
-	JobMaya85List( const JobMaya85List & );
-	JobMaya85List( const Record &, Table * t = 0 );
-	
-	~JobMaya85List();
+	JobMaya85List() /HoldGIL/;
+	JobMaya85List( const RecordList &, Table * t = 0 ) /HoldGIL/;
+	JobMaya85List( const JobMaya85List & ) /HoldGIL/;
+	JobMaya85List( const Record &, Table * t = 0 ) /HoldGIL/;
+	JobMaya85List( SIP_PYLIST );
+%MethodCode
+	sipCpp = new JobMaya85List( recordListFromPyList(a0), JobMaya85::table() );
+%End
+
+	~JobMaya85List() /HoldGIL/;
 
 //	void insert( JobMaya85Iter, const JobMaya85 & );
 
@@ -42,24 +46,31 @@ public:
 
 //	JobMaya85Iter remove( const JobMaya85Iter & );
 
-	int remove( const Record & );
+	int remove( const Record & ) /HoldGIL/;
 	
-	int remove();
+	int remove() throw(SqlException,LostConnectionException,PythonException);
 	
 	//JobMaya85Iter begin();
 
 	//JobMaya85Iter end();
 
-	Table * table() const;
-	TableSchema * schema() const;
+	Table * table() const /HoldGIL/;
+	TableSchema * schema() const /HoldGIL/;
 
-	MappedJobMaya85List filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
-	MappedJobMaya85List filter( const QString & column, const QVariant & value, bool keepMatches = true ) const;
-	MappedJobMaya85List sorted( const QString & c, bool a = true ) const;
+	MappedJobMaya85List filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobMaya85List filter( const QString & column, const QVariant & value, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedJobMaya85List sorted( const QString & c, bool a = true ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedJobMaya85List unique() const;
 	MappedJobMaya85List reversed() const;
 	MappedJobMaya85List reloaded() const;
+
+	QMap<QString,RecordList> groupedBy( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
+
+	PyObject * groupedBy( SIP_PYCALLABLE callable ) const throw(SqlException,LostConnectionException,PythonException);
+%MethodCode
+		sipRes = recordListGroupByCallable( sipCpp, a0, JobMaya85::schema() );
+%End
 
 
 

@@ -44,6 +44,7 @@ class Record;
 class RecordImp;
 class RecordList;
 class Table;
+class ChangeSet;
 
 /**
  * \ingroup Stone
@@ -59,6 +60,17 @@ public:
 		NoInfo,
 		RecordsFound
 	};
+	
+	enum LookupMode {
+		// Allow getting values from the cache if available
+		UseCache = 0x1,
+		// Allow selecting from the database if not all values are available in the cache(or not using the cache)
+		UseSelect = 0x2,
+		// Only select values missing from the cache.  Useful only with both UseCache and UseSelect defined.
+		// Only applicable to recordsByIndexMulti
+		PartialSelect = 0x4,
+	};
+	
 	IndexSchema * schema() const { return mSchema; }
 	Table * table() const { return mTable; }
 
@@ -72,27 +84,32 @@ public:
 	// This returns results for multiple index entries at once.
 	// The size of args must be a multiple of the number of columns
 	// used in this index.
-	RecordList recordsByIndexMulti( const QList<QVariant> & args );
+	RecordList recordsByIndexMulti( const QList<QVariant> & args, int lookupMode = UseCache | UseSelect | PartialSelect );
+	RecordList recordsByIndexMulti( const QList<QVariant> & args, bool select );
 
 	// Returns the records in the index that match args, will select
-	// from database if the records dont exist in the index
-	RecordList recordsByIndex( const QList<QVariant> & args );
-	RecordList recordsByIndex( const QVariant & arg );
-	RecordList recordsByIndex( const QVariant & arg1, const QVariant & arg2 );
-	RecordList recordsByIndex( const QVariant & arg1, const QVariant & arg2, const QVariant & arg3 );
+	// from database if the records dont exist in the index and select=true
+	// *deprecated*, use the methods below with lookupMode bit field
+	RecordList recordsByIndex( const QList<QVariant> & args, bool select );
+	Record recordByIndex( const QVariant & arg, bool select );
 
-	Record recordByIndex( const QVariant & arg );
-	Record recordByIndex( const QVariant & arg1, const QVariant & arg2 );
-	Record recordByIndex( const QVariant & arg1, const QVariant & arg2, const QVariant & arg3 );
+	RecordList recordsByIndex( const QList<QVariant> & args, int lookupMode = UseCache | UseSelect );
+	Record recordByIndex( const QVariant & arg, int lookupMode = UseCache | UseSelect );
 
 	virtual RecordList records( QList<QVariant> vars, int & status )=0;
 	virtual void setEmptyEntry( QList<QVariant> vars )=0;
 
+	// Records that have been created locally but not committed to the database
+	// This function is (currently) called when a record needs a primary key, though
+	// in the future it may be called the first time a record is assigned
+	virtual void recordsCreated( const RecordList & );
 	virtual void recordAdded( const Record & )=0;
 	virtual void recordRemoved( const Record & )=0;
 	virtual void recordUpdated( const Record &, const Record & )=0;
 	virtual void recordsIncoming( const RecordList &, bool ci = false )=0;
 	virtual void clear()=0;
+	virtual void reserve(int size);
+
 	void printStats();
 
 protected:
@@ -102,6 +119,10 @@ protected:
 private:
 	Index(const Index &) {}
 
+	bool checkMatch( const Record & record, const QList<QVariant> & args, int entryCount );
+	RecordList applyChangeSetHelper(ChangeSet cs, RecordList, const QList<QVariant> & args, int entryCount);
+	RecordList applyChangeSet(RecordList, const QList<QVariant> & args, int entryCount);
+	
 public:
 	uint mTime;
 	QMutex mMutex;
@@ -121,7 +142,7 @@ public:
 	virtual void recordUpdated( const Record &, const Record & );
 	virtual void recordsIncoming( const RecordList &, bool ci = false );
 	virtual void clear();
-
+	virtual void reserve(int size);
 protected:
 
 	void recordIncomingNode( VarHash *, int fieldIndex , RecordImp * );
@@ -143,6 +164,7 @@ public:
 	virtual RecordList records( QList<QVariant> vars, int & status );
 	virtual void setEmptyEntry( QList<QVariant> vars );
 	
+	virtual void recordsCreated( const RecordList & );
 	virtual void recordAdded( const Record & );
 	virtual void recordRemoved( const Record & );
 	virtual void recordUpdated( const Record &, const Record & );
@@ -158,8 +180,6 @@ protected:
 	uint mPrimaryKeyColumn;
 };
 
-/// @}
-
 } //namespace
 
 using Stone::Index;
@@ -170,6 +190,8 @@ typedef QList<Index*> IndexList;
 typedef QList<Index*>::Iterator IndexIter;
 
 #include "record.h"
+
+/// @}
 
 #endif // INDEX_H
 

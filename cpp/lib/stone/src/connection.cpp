@@ -41,6 +41,7 @@
 
 #include "connection.h"
 #include "database.h"
+#include "expression.h"
 #include "iniconfig.h"
 #include "sqlerrorhandler.h"
 #include "pgconnection.h"
@@ -52,6 +53,30 @@
 #endif
 
 namespace Stone {
+
+SqlException::SqlException( const QString & sql, const QString & error )
+: mSql(sql)
+, mError(error)
+{}
+
+QString SqlException::sql() const
+{ return mSql; }
+
+QString SqlException::error() const
+{ return mError; }
+
+const char * SqlException::what() const throw()
+{
+	if( mCString.isNull() )
+		mCString = QString("%1: %2").arg(mError).arg(mSql).toUtf8();
+	return mCString.constData();
+}
+
+LostConnectionException::LostConnectionException()
+{}
+
+const char * LostConnectionException::what() const throw()
+{ return "Lost Connection"; }
 
 Connection::Connection(QObject * parent)
 : QObject( parent )
@@ -149,6 +174,7 @@ static int qSqlConnNumber()
 }
 
 QSqlDbConnection::QSqlDbConnection( const QString & driverName )
+: mInsideTransaction( false )
 {
 	mDb = QSqlDatabase::addDatabase( driverName, "QSqlDbConnection" + QString::number(qSqlConnNumber()) );
 }
@@ -293,18 +319,22 @@ bool QSqlDbConnection::exec( QSqlQuery & query, bool reExecLostConn, Table * tab
 				}
 				break;
 			} else {
-				if( !isConnected() || isConnectionError(query.lastError() ) ) {
+				QSqlError error = query.lastError();
+				if( !isConnected() || isConnectionError(error) ) {
 					LOG_1( "Connection Error During " + queryNameFromType( queryType ) + (reExecLostConn ? (", retrying") : QString()) );
+					if( mInsideTransaction ) {
+						throw LostConnectionException();
+					}
 					reconnect();
 					continue;
 				}
-				mLastErrorText = query.executedQuery() + "\n" + query.lastError().text();
+				mLastErrorText = query.executedQuery() + "\n" + error.text();
 				LOG_1( mLastErrorText );
 				SqlErrorHandler::instance()->handleError( mLastErrorText );
+				throw SqlException(query.executedQuery(), mLastErrorText);
 				break;
 			}
 		} else {
-			LOG_5( "Here2" );
 			if( mMaxConnectionAttempts >= 0 && mConnectionAttempts++ >= mMaxConnectionAttempts )
 				break;
 			QDateTime now = QDateTime::currentDateTime();
@@ -323,16 +353,95 @@ bool QSqlDbConnection::exec( QSqlQuery & query, bool reExecLostConn, Table * tab
 					#endif
 				}
 			} while( now.secsTo( QDateTime::currentDateTime() ) < mReconnectDelay );
-			LOG_5( "Here3" );
 		}
 	} while( reExecLostConn );
 	return result;
 }
 
+RecordList Connection::executeExpression( Table * table, FieldList fields, const Expression & exp )
+{
+	RecordList ret;
+	
+	QSqlQuery sq = exec( exp.toString(Expression::QueryString), QList<QVariant>(), true /*retry*/, table );
+	while( sq.next() )
+		ret += Record( new RecordImp( table, sq, 0, &fields ), false );
+	return ret;
+}
+
+QMap<Table*,RecordList> Connection::executeExpression( Table * table, const RecordReturn & rr, const Expression & exp )
+{
+	Schema * schema = table->schema()->schema();
+	QSqlQuery sq = exec( exp.toString(Expression::QueryString), QList<QVariant>(), true /*retry*/, table );
+	QMap<Table*,RecordList> ret;
+	while( sq.next() ) {
+		Table * t = rr.table;
+		if( rr.tableOidPos >= 0 ) {
+			TableSchema * ts = tableByOid( sq.value(rr.tableOidPos).toUInt(), schema );
+			if( ts )
+				t = ts->table();
+			else {
+				LOG_1( "Unable to load record without table" );
+				continue;
+			}
+		}
+		if( t ) {
+			QMap<Table*,QVector<int> >::const_iterator it = rr.columnPositions.find(t);
+			if( it != rr.columnPositions.end() )
+				ret[t] += Record( new RecordImp( t, sq, *it ), false );
+		}
+	}
+	return ret;
+}
+
+TableSchema * Connection::tableByOid( uint oid, Schema * )
+{
+	return 0;
+}
+
+uint Connection::oidByTable( TableSchema * )
+{
+	return -1;
+}
+
+
+#if 0
+QList<RecordList> Connection::executeExpression( Table * table, QList<RecordReturn> rrl, const Expression & exp )
+{
+	Schema * schema = table->schema()->schema();
+	QList<RecordList> ret;
+	while(ret.size()) < rrl.size()) ret.append(RecordList());
+	
+	QSqlQuery sq = exec( exp.toString(Expression::QueryString), QList<QVariant>(), true /*retry*/, table );
+	while( sq.next() ) {
+		int retCol = 0;
+		foreach( const RecordReturn & rr, rrl ) {
+			Table * t = rr.table;
+			if( rr.tableOidPos >= 0 ) {
+				TableSchema * ts = tableByOid( sq.value(rr.tableOidPos).toUInt(), schema );
+				if( ts )
+					t = ts->table();
+				else {
+					LOG_1( "Unable to load record without table" );
+					continue;
+				}
+			}
+			if( t ) {
+				QMap<Table*,QVector<int> >::iterator it = rr.columnPositions.find(t);
+				if( it != rr.columnPositions.end() )
+					ret[retCol] += Record( new RecordImp( t, sq, *it ), false );
+			}
+			retCol++;
+		}
+	}
+	return ret;
+}
+#endif
+
 bool QSqlDbConnection::reconnect()
 {
 	if( mDb.isOpen() )
 		mDb.close();
+	mInsideTransaction = false;
 	mDb.setHostName( mHost );
 	mDb.setPort( mPort );
 	mDb.setDatabaseName( mDatabaseName );
@@ -355,6 +464,12 @@ bool QSqlDbConnection::isConnected()
 	return mDb.isOpen();
 }
 
+bool QSqlDbConnection::closeConnection()
+{
+	mDb.close();
+	return true;
+}
+
 QString QSqlDbConnection::connectString()
 {
 	return "Host: " + mDb.hostName() + " Port: " + QString::number(mDb.port()) + " Database: " + mDb.databaseName() + " User: " + mDb.userName() + " Options: " + mDb.connectOptions();
@@ -365,24 +480,43 @@ bool QSqlDbConnection::isConnectionError( const QSqlError & e )
 	if( e.type() == QSqlError::ConnectionError
 		|| e.databaseText().contains( "server closed the connection" )
 		|| e.databaseText().contains( "Software caused connection abort" )
-		|| e.databaseText().contains( "Connection timed out" ) )
+		|| e.databaseText().contains( "Connection timed out" )
+		// Seems that connection errors sometimes give no database text, just Unable to create query
+		|| (e.databaseText().isEmpty() && e.driverText().contains( "Unable to create query" )) )
 		return true;
 	return false;
 }
 
 bool QSqlDbConnection::beginTransaction()
 {
-	return mDb.transaction();
+	Database * db = Database::current();
+	if( db && (db->echoMode() & (Database::EchoInsert | Database::EchoUpdate | Database::EchoDelete) ) )
+		LOG_3( "BEGIN;" );
+	
+	return (mInsideTransaction = mDb.transaction());
 }
 
 bool QSqlDbConnection::commitTransaction()
 {
+	Database * db = Database::current();
+	if( db && (db->echoMode() & (Database::EchoInsert | Database::EchoUpdate | Database::EchoDelete) ) )
+		LOG_3( "COMMIT;" );
+	mInsideTransaction = false;
 	return mDb.commit();
 }
 
 bool QSqlDbConnection::rollbackTransaction()
 {
+	Database * db = Database::current();
+	if( db && (db->echoMode() & (Database::EchoInsert | Database::EchoUpdate | Database::EchoDelete) ) )
+		LOG_3( "ROLLBACK;" );
+	mInsideTransaction = false;
 	return mDb.rollback();
+}
+
+void QSqlDbConnection::listen( const QString & notificationName )
+{
+	mDb.driver()->subscribeToNotification(notificationName);
 }
 
 } //namespace

@@ -25,7 +25,7 @@
 
 #include "classesui.h"
 
-#include "resolution.h"
+#include "projectresolution.h"
 #include "ui_resolutiondialogui.h"
 
 class CLASSESUI_EXPORT ResolutionDialog : public QDialog, public Ui::ResolutionDialogUI
@@ -34,8 +34,8 @@ Q_OBJECT
 public:
 	ResolutionDialog( QWidget * parent );
 
-	Resolution resolution();
-	void setResolution( const Resolution & );
+	ProjectResolution resolution();
+	void setResolution( const ProjectResolution & );
 
 	virtual void accept();
 
@@ -43,7 +43,7 @@ public slots:
 	void setFillFrameImage();
 	
 protected:
-	Resolution mResolution;
+	ProjectResolution mResolution;
 
 };
 

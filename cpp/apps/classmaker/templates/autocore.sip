@@ -32,7 +32,7 @@ class t__ : b__
 public:
 	t__() /HoldGIL/;
 
-	t__( uint key );
+	t__( uint key ) throw(SqlException,LostConnectionException,PythonException);
 
 	t__( const t__ & other ) /HoldGIL/;
 
@@ -55,8 +55,9 @@ public:
 
 <%METHODDEFS%>
 
-	static Mappedt__List select( const QString & where = QString::null, const QList<QVariant> & args = QList<QVariant>() );
-	
+	static Mappedt__List select( const QString & where = QString::null, const QList<QVariant> & args = QList<QVariant>() ) throw(SqlException,LostConnectionException,PythonException);
+	static Mappedt__List select( const Expression & ) throw(SqlException,LostConnectionException,PythonException);
+
 	static JoinedSelect join( SIP_PYOBJECT cls, QString condition = QString(), JoinType joinType = InnerJoin, bool ignoreResults = false, const QString & alias = QString() );
 %MethodCode
 		// Convert to python
@@ -71,6 +72,7 @@ public:
 					if( pyTable && sipCanConvertToType(pyTable,sipType_Table,SIP_NOT_NONE) )
 						inst = (Table*)sipConvertToType(pyTable,sipType_Table,0,SIP_NOT_NONE,0,&sipIsErr);
 					Py_XDECREF(pyTable);
+					Py_XDECREF(pyTableMethod);
 				} else
 					sipIsErr = 1;
 			}
@@ -85,13 +87,20 @@ public:
 		}
 %End
 
-	Mappedt__ reload( bool lockForUpdate = false );
+	Mappedt__ reload( bool lockForUpdate = false ) throw(SqlException,LostConnectionException,PythonException);
 
 <%INDEXDEFS%>
 
 <%ELEMENTHACKS%>
 
 <%BASEHEADER%>
+
+	struct _c {
+<%SCHEMAFIELDDECLS%>
+	private:
+		_c();
+	};
+	static _c c;
 
 	static Table * table() /HoldGIL/;
 	//static t__Schema * schema();

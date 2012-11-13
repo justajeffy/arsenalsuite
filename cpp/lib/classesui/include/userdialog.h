@@ -24,11 +24,13 @@
 #ifndef USER_DIALOG_H
 #define USER_DIALOG_H
 
+#include "employee.h"
+#include "host.h"
+#include "group.h"
+
 #include "classesui.h"
 
-#include "employee.h"
 #include "ui_userdialogui.h"
-#include "group.h"
 
 /**
  * Dialog for creating new users
@@ -39,8 +41,10 @@ class CLASSESUI_EXPORT UserDialog : public QDialog, public Ui::UserDialogUI
 {
 Q_OBJECT
 public:
-	UserDialog( QWidget * parent=0 );
+	UserDialog( QWidget * parent=0, ChangeSet changeSet = ChangeSet() );
 
+	ChangeSet changeSet() const { return mChangeSet; }
+	
 	/**
 	 * Returns a User object set to the
 	 * current information in the dialog
@@ -58,12 +62,16 @@ public:
 	virtual void accept();
 public slots:
 
+	void slotEditHosts();
+	
 	void slotEmpToggle( bool );
 
 	void slotEditGroups();
 	
 protected:
+	void refreshAssignedHosts();
 
+	ChangeSet mChangeSet;
 	mutable User mUser;
 	
 	GroupList mNewUserGroups;

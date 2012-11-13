@@ -6,6 +6,7 @@ UI_DIR=.out
 #FORMS+=
 
 SOURCES += \
+	src/abadminplugin.cpp \
 	src/assetdialog.cpp \
 	src/assettemplatecombo.cpp \
 	src/assettemplatedialog.cpp \
@@ -20,13 +21,15 @@ SOURCES += \
 	src/elementui.cpp \
 	src/eventdialog.cpp \
 	src/filetrackerdialog.cpp \
+	src/graphitesavedialog.cpp \
 	src/groupsdialog.cpp \
 	src/hostselector.cpp \
 	src/hostdialog.cpp \
 	src/hosthistoryview.cpp \
 	src/hostinterfacedialog.cpp \
 	src/hostlistsdialog.cpp \
-	src/jobcommandhistorywindow.cpp \
+	src/jobassignmentwidget.cpp \
+	src/jobassignmentwindow.cpp \
 	src/notificationroutedialog.cpp \
 	src/notificationrouteview.cpp \
 	src/notificationview.cpp \
@@ -61,10 +64,11 @@ SOURCES += \
 	src/userdialog.cpp \
 	src/userroledialog.cpp \
 	src/usertaskdialog.cpp \
-    src/usernotifydialog.cpp \
+	src/usernotifydialog.cpp \
 	src/versiontrackerdialog.cpp
 
 HEADERS += \
+	include/abadminplugin.h \
 	include/addnotedialog.h \
 	include/assetdialog.h \
 	include/assettemplatecombo.h \
@@ -79,13 +83,15 @@ HEADERS += \
 	include/elementui.h \
 	include/eventdialog.h \
 	include/filetrackerdialog.h \
+	include/graphitesavedialog.h \
 	include/groupsdialog.h \
 	include/hostselector.h \
 	include/hostdialog.h \
 	include/hosthistoryview.h \
 	include/hostlistsdialog.h \
 	include/hostinterfacedialog.h \
-	include/jobcommandhistorywindow.h \
+	include/jobassignmentwidget.h \
+	include/jobassignmentwindow.h \
 	include/notificationroutedialog.h \
 	include/notificationrouteview.h \
 	include/notificationview.h \
@@ -120,7 +126,7 @@ HEADERS += \
 	include/userdialog.h \
 	include/usertaskdialog.h \
 	include/userroledialog.h \
-    include/usernotifydialog.h \
+	include/usernotifydialog.h \
 	include/versiontrackerdialog.h
 
 FORMS += \
@@ -134,12 +140,13 @@ FORMS += \
 	ui/assettemplatesdialogui.ui \
 	ui/assettemplatedialogui.ui \
 	ui/filetrackerdialogui.ui \
+	ui/graphitesavedialogui.ui \
 	ui/groupsdialogui.ui \
 	ui/hostdialogui.ui \
 	ui/hostlistsdialogui.ui \
 	ui/hostinterfacedialogui.ui \
 	ui/hostselectorbase.ui \
-	ui/jobcommandhistorywindowui.ui \
+	ui/jobassignmentwidgetui.ui \
 	ui/notificationroutedialogui.ui \
 	ui/notificationwidgetui.ui \
 	ui/pathtemplatedialogui.ui \
@@ -162,8 +169,11 @@ FORMS += \
 	ui/usertaskui.ui \
 	ui/userroleui.ui \
 	ui/userdialogui.ui \
-    ui/usernotifyui.ui \
+	ui/usernotifyui.ui \
 	ui/versiontrackerdialogui.ui
+
+RESOURCES += \
+	ui/threadview.qrc
 
 INCLUDEPATH+=src include .out ../stone/include ../stone/.out
 INCLUDEPATH+=../stonegui/include ../stonegui/.out
@@ -191,8 +201,6 @@ macx {
 }
 
 DEFINES+=CLASSESUI_MAKE_DLL
-
-RESOURCES+=ui/threadview.qrc
 
 TEMPLATE=lib
 TARGET=classesui

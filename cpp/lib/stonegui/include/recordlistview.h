@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordlistview.h 6486 2008-05-02 01:34:01Z newellm $
+ * $Id: recordlistview.h 13650 2012-10-01 22:12:31Z newellm $
  */
 
 #ifndef RECORD_LIST_VIEW_H
@@ -42,7 +42,7 @@ public:
 	RecordListView( QWidget * parent );
 	void setModel( RecordSuperModel * model );
 
-	RecordSuperModel * model();
+	RecordSuperModel * model() const;
 
 	Record current();
 

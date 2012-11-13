@@ -35,6 +35,7 @@
 
 
 namespace Stone {
+
 class TableSchema;
 class IndexSchema;
 
@@ -79,11 +80,11 @@ public:
 		Unique = 8,
 		LocalVariable = 16,
 		ReverseAccess = 32,
-        DisplayName = 64, // Used to indicate that a field is the primary name for a record, useful for generic debugging information, etc
-        NoDefaultSelect = 128, // Indicates a column is not selected by default, it will be selected when accessed or when manually specified
-        Compress = 256, // use qCompress to internally compress contents of this field - BUG FIXME
-        LastFlag = 512
-	};
+		TableDisplayName = 64, // Used to indicate that a field is the primary name for a record, useful for generic debug information, etc.
+		NoDefaultSelect = 128, // Indicates a column is not selected by default, it will be selected when accessed or when manually specified
+		Compress = 256, // use qCompress to internally compress contents of this field - BUG FIXME
+		LastFlag = 512
+	};	
 
 	/** 
 	 *  Constructs a new field that is not a foreign key.
@@ -102,13 +103,12 @@ public:
 
 	/** Returns the name of this field, as used by the database */
 	QString name() const;
-	QString mName, mNameLower;
 
 	/** Sets the name of this field, this must match the underlying database */
 	void setName( const QString & );
 
 	/** Returns the placeholder of this field, as used by the database */
-	QString placeholder() const;
+	QString placeholder( int i = 0 ) const;
 
 	QString generatedPluralMethodName() const;
 	QString pluralMethodName() const;
@@ -127,7 +127,6 @@ public:
 	 *  for the method name for generate classes.
 	 */
 	QString methodName() const;
-	QString mMethodName, mMethodNameLower;
 
 	/** Sets the method name for this field */
 	void setMethodName( const QString & );
@@ -253,7 +252,7 @@ public:
 	static int qvariantType(Field::Type);
 
 	QString diff( Field * after );
-
+	
 private:
 	static const char * typeStrings[];
 	static const char * listTypeStrings[];
@@ -263,6 +262,7 @@ private:
 protected:
 	struct ForeignKeyPrivate;
 	TableSchema * mTable;
+	QString mName, mMethodName;
 	mutable QString mDisplayName, mPluralMethodName;
 	Type mType;
 	Flags mFlags;
@@ -283,7 +283,6 @@ FieldList operator&(const FieldList & one, const FieldList & two);
 
 using Stone::Field;
 using Stone::FieldList;
-using Stone::FieldIter;
 
 #endif // FIELD_H
 

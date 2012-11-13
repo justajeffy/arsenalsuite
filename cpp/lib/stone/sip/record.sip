@@ -54,6 +54,9 @@ public:
 
 	~Record();
 
+	MappedRecord getVersion( const ChangeSet & cs ) const;
+	MappedRecord pristine() const;
+
 	bool operator==( const Record & other ) const;
 	bool operator!=( const Record & other ) const;
 	
@@ -105,6 +108,24 @@ public:
 
 	SIP_PYOBJECT __repr__();
 %MethodCode
+	PyObject * mod = PyObject_GetAttrString( sipSelf, "__module__" );
+	if( !mod ) {
+		printf( "Class object had no __module__ attr\n" );
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	if( !PyString_Check(mod) ) {
+		printf( "__module__ attribute is not a string as expected\n" );
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	PyObject * ret = PyString_FromFormat("%s.%s(%i)", PyString_AsString(mod), sipSelf->ob_type->tp_name, sipCpp->key());
+	Py_DECREF(mod);
+	return ret;
+%End
+
+	SIP_PYOBJECT __str__();
+%MethodCode
 	return PyString_FromFormat("<%s @%p *%i (%s)>",
 			 sipSelf->ob_type->tp_name, sipCpp->imp(), sipCpp->key(), sipCpp->displayName().toLatin1().constData());
 %End
@@ -113,9 +134,11 @@ public:
 
 	bool isRecord() const;
 
-	unsigned int key( bool generate = false ) const;
+	ChangeSet changeSet() const;
 
-	QVariant getValue( const QString & column ) const;
+	unsigned int key( bool generate = false ) const throw(SqlException,LostConnectionException,PythonException);
+
+	QVariant getValue( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedRecord & setValue( const QString & column, const QVariant & value );
 
@@ -125,39 +148,40 @@ public:
 	MappedRecord & setForeignKey( int column, const Record & other );
 	MappedRecord & setForeignKey( Field * field, const Record & other );
 
-	MappedRecord foreignKey( const QString & column ) const;
-	MappedRecord foreignKey( int column ) const;
-	MappedRecord foreignKey( Field * field ) const;
+	MappedRecord foreignKey( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedRecord foreignKey( int column ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedRecord foreignKey( Field * field ) const throw(SqlException,LostConnectionException,PythonException);
 
 	QString columnLiteral( const QString & column ) const;
 	
-	QVariant getValue( int column ) const;
-	QVariant getValue( Field * field ) const;
+	QVariant getValue( int column ) const throw(SqlException,LostConnectionException,PythonException);
+	QVariant getValue( Field * field ) const throw(SqlException,LostConnectionException,PythonException);
 
 	MappedRecord & setValue( int column, const QVariant & value );
 	MappedRecord & setValue( Field * field, const QVariant & value );
 
-	QString displayName() const;
+	QString displayName() const throw(SqlException,LostConnectionException,PythonException);
 	QString stateString() const;
+	QString debug() const;
 	QString dump() const;
 
 	QString changeString() const;
 
-	void selectFields( QList<Field*> fields = QList<Field*>(), bool refreshExisting = false );
+	void selectFields( QList<Field*> fields = QList<Field*>(), bool refreshExisting = false ) throw(SqlException,LostConnectionException,PythonException);
 
-	int remove();
+	int remove() throw(SqlException,LostConnectionException,PythonException);
 
-	MappedRecord & reload( bool lockForUpdate=false );
+	MappedRecord & reload( bool lockForUpdate=false ) throw(SqlException,LostConnectionException,PythonException);
 
-	MappedRecord & commit( bool sync = true );
+	MappedRecord & commit() throw(SqlException,LostConnectionException,PythonException);
 
 	RecordImp * imp() const;
 
-	bool isUpdated() const;
+	bool isUpdated( Field * f = 0 ) const;
 
 	Table * table() const;
 
-	MappedRecord copy() const;
+	MappedRecord copy(Table * destTable = 0) const;
 
 	static int totalRecordCount();
 	static int totalRecordImpCount();

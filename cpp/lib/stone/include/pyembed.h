@@ -36,13 +36,13 @@ using namespace Stone;
 extern "C" {
 	#include <Python.h>
 	#include <sip.h>
-	#include <node.h>
-	#include <compile.h>
-	#include <import.h>
-	#include <marshal.h>
-	#include <graminit.h>
-	#undef expr
-	#include <eval.h>
+//	#include <node.h>
+//	#include <compile.h>
+//	#include <import.h>
+//	#include <marshal.h>
+//	#include <graminit.h>
+//	#undef expr
+//	#include <eval.h>
 };
 
 #include <qstring.h>
@@ -50,13 +50,23 @@ extern "C" {
 #include "blurqt.h"
 #include "table.h"
 
+class STONE_EXPORT PythonException : public std::exception
+{
+public:
+	PythonException();
+	virtual ~PythonException() throw();
+	void restore();
+protected:
+	PyObject *type, *value, *traceback;
+};
+
 /// Returns a pointer to the single sip api object.  This is looked up via
 /// sip's python module dictionary, and cached in a static variable for the
 /// life of the program.
 STONE_EXPORT const sipAPIDef * getSipAPI();
 
 /// Returns the sip module by name, does not attempt to load the module
-STONE_EXPORT sipExportedModuleDef * getSipModule( const char * name );
+//STONE_EXPORT sipExportedModuleDef * getSipModule( const char * name );
 
 /// Returns the exported type inside a given sip module
 /// This lookup is not cached and the time to lookup is O(n), where n is the number
@@ -96,7 +106,7 @@ STONE_EXPORT RecordList recordListFromPyList( PyObject * pyObject );
 
 /// Calls callable on each record and uses the return value as the key for dict insertion
 /// Each dict value is a RecordList class or subclass if defaultType is passed
-STONE_EXPORT PyObject * recordListGroupByCallable( RecordList * rl, PyObject * callable, TableSchema * defaultType = 0 );
+STONE_EXPORT PyObject * recordListGroupByCallable( const RecordList * rl, PyObject * callable, TableSchema * defaultType = 0 );
 
 /// Returns true if the python object is a blur.Stone.Record class instance or subclass instance
 STONE_EXPORT bool isPythonRecordInstance( PyObject * pyObject );

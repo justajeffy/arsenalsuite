@@ -11,7 +11,7 @@
 #include "supermodel.h"
 
 namespace Stone {
-    class Table;
+	class Table;
 };
 using Stone::Table;
 
@@ -56,7 +56,7 @@ class STONEGUI_EXPORT RecordDataTranslatorBase : public RecordDataTranslatorInte
 public:
 	RecordDataTranslatorBase(ModelTreeBuilder * builder) : RecordDataTranslatorInterface(builder){}
 	~RecordDataTranslatorBase() {}
-
+	
 	virtual QVariant recordData(const Record &, const QModelIndex &, int role) const;
 	virtual bool setRecordData(Record, const QModelIndex &, const QVariant &, int role);
 	virtual Qt::ItemFlags recordFlags(const Record &, const QModelIndex &) const;
@@ -87,24 +87,24 @@ protected:
 class STONEGUI_EXPORT SipRecordDataTranslatorBase : public RecordDataTranslatorBase
 {
 public:
-    SipRecordDataTranslatorBase(ModelTreeBuilder * builder) : RecordDataTranslatorBase(builder){}
-    ~SipRecordDataTranslatorBase() {}
+	SipRecordDataTranslatorBase(ModelTreeBuilder * builder) : RecordDataTranslatorBase(builder){}
+	~SipRecordDataTranslatorBase() {}
 
-    virtual QVariant recordData(const Record & r, const QModelIndex & idx, int role) const { return RecordDataTranslatorBase::recordData(r, idx, role); }
+	virtual QVariant recordData(const Record & r, const QModelIndex & idx, int role) const { return RecordDataTranslatorBase::recordData(r, idx, role); }
 
-    virtual Record getRecord(const QModelIndex & idx) const { return Record(); }
-    virtual RecordList children(const QModelIndex &) const { return RecordList(); }
-    virtual void setup(const QModelIndex & idx, const Record & record ) {}
-    virtual QModelIndexList insertRecordList(int row, RecordList & rl, const QModelIndex & parent = QModelIndex() ) { return QModelIndexList(); }
+	virtual Record getRecord(const QModelIndex & ) const { return Record(); }
+	virtual RecordList children(const QModelIndex &) const { return RecordList(); }
+	virtual void setup(const QModelIndex &, const Record & ) {}
+	virtual QModelIndexList insertRecordList(int , RecordList & , const QModelIndex & = QModelIndex() ) { return QModelIndexList(); }
 
-    virtual int dataSize() { return 0; }
-    virtual QVariant modelData( void * dataPtr, const QModelIndex &, int role ) const { return QVariant(); }
-    virtual bool setModelData( void * dataPtr, const QModelIndex &, const QVariant & value, int role ) { return false; }
-    virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const { return 0; }
-    virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const { return 0; }
-    virtual void deleteData( void * dataPtr ) {}
-    virtual void constructData( void * dataPtr, void * copySource = 0 ) {}
-    virtual void copyData( void * dataPtr, void * copySource ) {}
+	virtual int dataSize() { return 0; }
+	virtual QVariant modelData( void *, const QModelIndex &, int ) const { return QVariant(); }
+	virtual bool setModelData( void *, const QModelIndex &, const QVariant &, int ) { return false; }
+	virtual Qt::ItemFlags modelFlags( void *, const QModelIndex & ) const { return 0; }
+	virtual int compare( void *, void *, const QModelIndex &, const QModelIndex &, int, bool ) const { return 0; }
+	virtual void deleteData( void * ) {}
+	virtual void constructData( void *, void * = 0 ) {}
+	virtual void copyData( void *, void * ) {}
 };
 
 /**
@@ -122,28 +122,28 @@ public:
  	QVariant modelData( void * dataPtr, const QModelIndex & idx, int role ) const {
 		QVariant ret = BASE::modelData(dataPtr,idx,role);
 		if( !ret.isValid() )
-			return recordData(getRecord(idx),idx,role);
+			return this->recordData(getRecord(idx),idx,role);
 		return ret;
 	}
 
 	bool setModelData( void * dataPtr, const QModelIndex & idx, const QVariant & value, int role ) {
 		bool ret = BASE::setModelData(dataPtr,idx,value,role);
 		if( !ret )
-			return setRecordData(getRecord(idx),idx,value,role);
+			return this->setRecordData(getRecord(idx),idx,value,role);
 		return ret;
 	}
 
 	Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & idx ) const
 	{
 		Qt::ItemFlags ret = BASE::modelFlags(dataPtr,idx);
-		if( ret == 0 ) return recordFlags(getRecord(idx),idx);
+		if( ret == 0 ) return this->recordFlags(getRecord(idx),idx);
 		return ret;
 	}
 
 	int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const
 	{
 		int ret = BASE::compare(dataPtr,dataPtr2,idx1,idx2,column,asc);
-		if( ret == 0 ) return recordCompare(getRecord(idx1),getRecord(idx2),idx1,idx2,column,asc);
+		if( ret == 0 ) return this->recordCompare(getRecord(idx1),getRecord(idx2),idx1,idx2,column,asc);
 		return ret;
 	}
 
@@ -156,7 +156,7 @@ public:
 	virtual RecordList children(const QModelIndex &idx) const {
 		RecordList ret = getChildrenStatic(idx);
 		if( ret.isEmpty() )
-			return recordChildren(getRecord(idx),idx);
+			return this->recordChildren(getRecord(idx),idx);
 		return ret;
 	}
 	virtual void setup(const QModelIndex & idx, const Record & record ) { BASE::data(idx).setup(record,idx); }
@@ -181,7 +181,7 @@ public:
 class STONEGUI_EXPORT SipRecordItemBase : public RecordItemBase
 {
 public:
-    SipRecordItemBase(ModelTreeBuilder * builder) {}
+	SipRecordItemBase(ModelTreeBuilder *) {}
 };
 
 /**
@@ -260,6 +260,7 @@ public slots:
 	virtual QModelIndex append( const Record &, const QModelIndex & parent = QModelIndex(), RecordDataTranslatorInterface * trans = 0 );
 	virtual QModelIndexList append( RecordList rl, const QModelIndex & parent = QModelIndex(), RecordDataTranslatorInterface * trans = 0 );
 	virtual void remove( RecordList rl, bool recursive = false, const QModelIndex & parent = QModelIndex() );
+	
 	virtual void updated( RecordList rl, bool recursive = false, const QModelIndex & parent = QModelIndex(), bool loadChildren = true );
 	virtual void updated( Record r) { updated( RecordList(r) ); }
 

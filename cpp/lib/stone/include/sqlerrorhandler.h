@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: sqlerrorhandler.h 6307 2008-04-15 18:55:35Z newellm $
+ * $Id$
  */
 
 #ifndef SQL_ERROR_HANDLER_H

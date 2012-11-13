@@ -24,6 +24,8 @@ GraphiteDesc::GraphiteDesc( QStringList sources, QSize size, AreaMode areaMode, 
 , mMaxValue( maxValue )
 {}
 
+GraphiteDesc::~GraphiteDesc()
+{}
 
 QString GraphiteDesc::areaModeToString( GraphiteDesc::AreaMode areaMode )
 {
@@ -48,6 +50,46 @@ GraphiteDesc::AreaMode GraphiteDesc::areaModeFromString( const QString & _areaMo
 	return GraphiteDesc::None;
 }
 
+static QString intervalToGraphite( Interval intv )
+{
+	if( (intv.months() > 0 || intv.days() > 0) && intv.seconds() == 0 )
+		return QString( "-%1d" ).arg( llabs(intv.asOrder(Interval::Days)) );
+	qint64 seconds = intv.asOrder(Interval::Seconds);
+	if( seconds % 60 == 0 )
+		return QString( "-%1min" ).arg( llabs(seconds / 60) );
+	return QString( "-%1s" ).arg( llabs(seconds) );
+}
+
+static Interval intervalFromGraphite( const QString & intStr )
+{
+	if( intStr.isEmpty() ) return Interval();
+	char lc = intStr.at(intStr.size()-1).toAscii();
+	int toChop = 1;
+	// min,mon are 3 letters, we'll use i,o to distinguish
+	if( lc == 'n' ) {
+		toChop = 3;
+		lc = intStr.at(intStr.size()-2).toAscii();
+	}
+	bool okay;
+	int num = intStr.left(intStr.size()-toChop).toInt(&okay);
+	if( !okay ) return Interval();
+	switch( lc ) {
+		case 's':
+			return Interval(num);
+		case 'i':
+			return Interval(num*60);
+		case 'h':
+			return Interval(num*60*60);
+		case 'd':
+			return Interval(0,num,0);
+		case 'o':
+			return Interval().addMonths(num);
+		case 'y':
+			return Interval(num,0,0);
+	}
+	return Interval();
+}
+
 QUrl GraphiteDesc::buildUrl( const QString & host, quint16 port ) const
 {
 	QUrl ret;
@@ -68,10 +110,16 @@ QUrl GraphiteDesc::buildUrl( const QString & host, quint16 port ) const
 		ret.addQueryItem( "max", QString::number(mMaxValue) );
 	if( mStart.isValid() )
 		ret.addQueryItem( "from", QString::number(mStart.toTime_t()) );
+	else if( mRelativeStart != Interval() )
+		ret.addQueryItem( "from", intervalToGraphite(mRelativeStart) );
 	if( mEnd.isValid() )
 		ret.addQueryItem( "until", QString::number(mEnd.toTime_t()) );
+	else if( mRelativeEnd != Interval() )
+		ret.addQueryItem( "until", intervalToGraphite(mRelativeEnd) );
 	ret.addQueryItem( "areaMode", areaModeToString(mAreaMode) );
-
+	QPair<QString,QString> pair;
+	foreach( pair, mExtra )
+		ret.addQueryItem( pair.first, pair.second );
 	return ret;
 }
 
@@ -79,25 +127,38 @@ GraphiteDesc GraphiteDesc::fromUrl( const QString & urlStr )
 {
 	GraphiteDesc ret;
 	QUrl url(urlStr);
-	ret.setSources( url.allQueryItemValues( "target" ) );
+	QPair<QString,QString> pair;
 	QSize size( 640, 480 );
-	if( url.hasQueryItem( "width" ) )
-		size.setWidth( url.queryItemValue( "width" ).toInt() );
-	if( url.hasQueryItem( "height" ) )
-		size.setHeight( url.queryItemValue( "height" ).toInt() );
+	ret.setSources( url.allQueryItemValues( "target" ) );
+	foreach( pair, url.queryItems() ) {
+		QString key = pair.first, value = pair.second;
+		if( key == "target" ) continue;
+		if( key == "width" )
+			size.setWidth( value.toInt() );
+		else if( key == "height" )
+			size.setHeight( value.toInt() );
+		else if( key == "min" )
+			ret.setMinValue( value.toInt() );
+		else if( key == "max" )
+			ret.setMaxValue( value.toInt() );
+		else if( key == "from" ) {
+			if( value.startsWith("-") )
+				ret.setRelativeStart(intervalFromGraphite(value));
+			else
+				ret.setStart(QDateTime::fromString(value));
+		}
+		else if( key == "until" ) {
+			if( value.startsWith("-") )
+				ret.setRelativeEnd(intervalFromGraphite(value));
+			else
+				ret.setEnd(QDateTime::fromString(value));
+		}
+		else if( key == "areaMode" )
+			ret.setAreaMode( areaModeFromString(value) );
+		else
+			ret.appendExtra( qMakePair<QString,QString>(key,value) );
+	}
 	ret.setSize( size );
-	if( url.hasQueryItem( "min" ) )
-		ret.setMinValue( url.queryItemValue( "min" ).toInt() );
-	if( url.hasQueryItem( "max" ) )
-		ret.setMaxValue( url.queryItemValue( "max" ).toInt() );
-	QDateTime start, end;
-	if( url.hasQueryItem( "from" ) )
-		start = QDateTime::fromString( url.queryItemValue( "from" ) );
-	if( url.hasQueryItem( "until" ) )
-		end = QDateTime::fromString( url.queryItemValue( "until" ) );
-	ret.setDateRange( start, end );
-	if( url.hasQueryItem( "areaMode" ) )
-		ret.setAreaMode( areaModeFromString( url.queryItemValue( "areaMode" ) ) );
 	return ret;
 }
 	
@@ -129,6 +190,32 @@ void GraphiteDesc::setAreaMode( AreaMode areaMode )
 
 QDateTime GraphiteDesc::start() const { return mStart; }
 QDateTime GraphiteDesc::end() const { return mEnd; }
+Interval GraphiteDesc::relativeStart() const { return mRelativeStart; }
+Interval GraphiteDesc::relativeEnd() const { return mRelativeEnd; }
+
+void GraphiteDesc::setStart( const QDateTime & start )
+{
+	mStart = start;
+	mRelativeStart = Interval();
+}
+
+void GraphiteDesc::setRelativeStart( const Interval & relativeStart )
+{
+	mRelativeStart = relativeStart;
+	mStart = QDateTime();
+}
+
+void GraphiteDesc::setEnd( const QDateTime & end )
+{
+	mEnd = end;
+	mRelativeEnd = Interval();
+}
+
+void GraphiteDesc::setRelativeEnd( const Interval & relativeEnd )
+{
+	mRelativeEnd = relativeEnd;
+	mEnd = QDateTime();
+}
 
 void GraphiteDesc::setDateRange( const QDateTime & start, const QDateTime & end )
 {
@@ -153,6 +240,58 @@ void GraphiteDesc::setMinValue( int minValue )
 void GraphiteDesc::setMaxValue( int maxValue )
 {
 	mMaxValue = maxValue;
+}
+
+QList<QPair<QString,QString> > GraphiteDesc::extraQueryItems() const
+{
+	return mExtra;
+}
+
+void GraphiteDesc::setExtraQueryItems( QList<QPair<QString,QString> > extra )
+{
+	mExtra = extra;
+}
+
+void GraphiteDesc::appendExtra( QPair<QString,QString> extra )
+{
+	mExtra.append( extra );
+}
+
+QList<GraphiteDesc> GraphiteDesc::generateTimeSeries( int count ) const
+{
+	QDateTime now( QDateTime::currentDateTime() );
+	QDateTime start = mStart;
+	if( !mStart.isValid() && mRelativeStart > 0 )
+		start = (mRelativeStart * -1.0).adjust(now);
+	if( !start.isValid() )
+		start = Interval::fromString("-1 day").adjust(now);
+	QDateTime end = mEnd;
+	if( !mEnd.isValid() && mRelativeEnd > 0 )
+		end = (mRelativeEnd * -1.0).adjust(now);
+	if( !end.isValid() )
+		end = now;
+	Interval span(start,end);
+	QList<GraphiteDesc> ret;
+	ret += *this;
+	bool hasRelativeStart = !mStart.isValid();
+	bool hasRelativeEnd = !mEnd.isValid();
+	for( int i = 0; i < count; i++ )
+	{
+		// Moving backward in time
+		end = start;
+		start = (span * -1.0).adjust(start);
+		GraphiteDesc gd(*this);
+		if( hasRelativeEnd )
+			gd.mRelativeEnd = Interval(end,now);
+		else
+			gd.mEnd = end;
+		if( hasRelativeStart )
+			gd.mRelativeStart = Interval(start,now);
+		else
+			gd.mStart = start;
+		ret += gd;
+	}
+	return ret;
 }
 
 int GraphiteSource::sNetworkAccessManagerRefCount = 0;
@@ -369,7 +508,7 @@ GraphiteGetResult GraphiteGetResult::adjustToInterval( const Interval & intv, co
 	while( count-- > 0 ) {
 		QDateTime curStart = (intv / -2.0).adjust(cur);
 		QDateTime curEnd = (intv / 2.0).adjust(cur);
-		LOG_1( QString( "Getting data from %1 to %2 to compute %3 with interval %4" ).arg( curStart.toString() ).arg( curEnd.toString() ).arg( cur.toString() ).arg( intv.toDisplayString() ) );
+		//LOG_1( QString( "Getting data from %1 to %2 to compute %3 with interval %4" ).arg( curStart.toString() ).arg( curEnd.toString() ).arg( cur.toString() ).arg( intv.toDisplayString() ) );
 		ret.data.append( qMakePair<QDateTime,double>( cur, getAverage( curStart, curEnd ) ) );
 		cur = intv.adjust(cur);
 	}

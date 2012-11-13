@@ -86,6 +86,21 @@ QRegExp ModelGrouper::columnGroupRegex( int column ) const
 	return it.value();
 }
 
+void ModelGrouper::setColumnGroupRole( int column, int role )
+{
+	if( role != Qt::DisplayRole )
+		mColumnRoleMap[column] = role;
+	else
+		mColumnRoleMap.remove(column);
+}
+
+int ModelGrouper::columnGroupRole(int column) const
+{
+	ColumnRoleMap::const_iterator it = mColumnRoleMap.find(column);
+	if( it == mColumnRoleMap.end() ) return Qt::DisplayRole;
+	return it.value();
+}
+
 ModelDataTranslator * ModelGrouper::groupedItemTranslator() const
 {
 	if( !mTranslator ) {
@@ -138,6 +153,8 @@ void ModelGrouper::groupByColumn( int column ) {
 	if( mIsGrouped ) ungroup();
 	
 	mGroupColumn = column;
+	mGroupRole = columnGroupRole(column);
+	mGroupRegEx = columnGroupRegex(column);
 	int count = model()->rowCount();
 	if( count > 0 )
 		groupRows( 0, count - 1 );
@@ -166,10 +183,9 @@ QString indexListToStr( QModelIndexList list )
 
 QString ModelGrouper::groupValue( const QModelIndex & idx )
 {
-	QRegExp regEx = columnGroupRegex(mGroupColumn);
-	QString strValue = model()->data( idx.column() == mGroupColumn ? idx : idx.sibling(idx.row(),mGroupColumn), Qt::DisplayRole ).toString();
-	if( !regEx.isEmpty() && regEx.isValid() && strValue.contains(regEx) )
-		strValue = regEx.cap(regEx.captureCount() > 1 ? 1 : 0);
+	QString strValue = model()->data( idx.column() == mGroupColumn ? idx : idx.sibling(idx.row(),mGroupColumn), mGroupRole ).toString();
+	if( !mGroupRegEx.isEmpty() && mGroupRegEx.isValid() && strValue.contains(mGroupRegEx) )
+		strValue = mGroupRegEx.cap(mGroupRegEx.captureCount() > 1 ? 1 : 0);
 	//LOG_5( QString("Index %1 grouped with value %2").arg(indexToStr(idx)).arg(strValue) );
 	return strValue;
 }
@@ -201,7 +217,7 @@ void ModelGrouper::group( GroupMap & grouped )
 				persistentGroupIndexes.append( *it );
 		foreach( QPersistentModelIndex idx, persistentGroupIndexes ) {
 			bool isEmptyGroup = model()->rowCount(idx) == 0;
-			QString groupVal = idx.sibling( idx.row(), mGroupColumn ).data( Qt::DisplayRole ).toString();
+			QString groupVal = idx.sibling( idx.row(), mGroupColumn ).data( ModelGrouper::GroupingValue ).toString();
 			GroupMap::Iterator mapIt = grouped.find( groupVal );
 			if( mapIt != grouped.end() ) {
 				QModelIndexList toMove(fromPersist(mapIt.value()));
@@ -328,7 +344,7 @@ void ModelGrouper::slotDataChanged( const QModelIndex & topLeft, const QModelInd
 			mGroupItemsToUpdate += parent;
 		scheduleUpdate();
 		if( topLeft.column() <= mGroupColumn && bottomRight.column() >= mGroupColumn ) {
-			QString parGroupValue = parent.sibling( parent.row(), mGroupColumn ).data( Qt::DisplayRole ).toString();
+			QString parGroupValue = parent.sibling( parent.row(), mGroupColumn ).data( ModelGrouper::GroupingValue ).toString();
 			QModelIndex it = topLeft, end = bottomRight;
 			QList<QPersistentModelIndex> changed;
 			while( it.isValid() && it.row() <= end.row() ) {

@@ -334,7 +334,7 @@ protected:
 class CLASSESUI_EXPORT CalendarPlugin
 {
 public:
-	virtual QList<ScheduleEntry*> range( ScheduleRow * row, const QDate & start, const QDate & end ) { return QList<ScheduleEntry*>(); }
+	virtual QList<ScheduleEntry*> range( ScheduleRow *, const QDate &, const QDate & ) { return QList<ScheduleEntry*>(); }
 	virtual QList<ScheduleRow*> dataSources( ScheduleController * ) { return QList<ScheduleRow*>(); }
 	virtual void populateViewMenu( QMenu * ) = 0;
 	virtual void populateToolBar( QToolBar * ) = 0;

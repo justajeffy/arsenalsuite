@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: quickdatastream.cpp 5409 2007-12-18 00:32:50Z brobison $
+ * $Id$
  */
 
 #include "quickdatastream.h"

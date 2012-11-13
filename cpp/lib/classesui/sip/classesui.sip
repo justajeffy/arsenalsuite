@@ -9,6 +9,8 @@
 
 %DefaultSupertype sip.wrapper
 
+%Include abadminplugin.sip
+%Include hostdialog.sip
 %Include projectcombo.sip
 %Include shotdialog.sip
 %Include dialogfactory.sip
@@ -19,3 +21,4 @@
 %Include elementui.sip
 %Include thumbnailui.sip
 %Include hostselector.sip
+%Include userdialog.sip

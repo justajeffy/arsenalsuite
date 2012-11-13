@@ -111,9 +111,9 @@ public:
 
 };
 
-/*
 QString driveMapping( char driveLetter );
 
+/*
 bool mapDrive( char driveLetter, const QString & uncPath, QString * errMsg=0 );
 //QValueList< QPair<char,QString> > driveMappings();
 */

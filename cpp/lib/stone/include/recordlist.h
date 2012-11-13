@@ -25,16 +25,18 @@
  * $Id$
  */
 
+#include "record.h"
+
 #ifndef RECORD_LIST_H
 #define RECORD_LIST_H
 
 #include <qlist.h>
 
-#include "record.h"
-
 class QRegExp;
 
 namespace Stone {
+
+class Expression;
 class Table;
 class RecordImp;
 class RecordIter;
@@ -84,19 +86,20 @@ public:
 
 	/// Returns a new \ref RecordList, with the contents of
 	/// \param list appended to the contents of this.
-	RecordList operator + ( const RecordList & list );
+	RecordList operator + ( const RecordList & list ) const;
 
 	/// Removes all occurances of the contents of \param list
 	/// from this list.
 	/// Returns a reference to this.
 	RecordList & operator -= ( const RecordList & list );
-
+	RecordList & operator -= ( const Record & other );
+	
 	/// Returns a copy of this list with all occurances of
 	/// \param list removed.
-	RecordList operator - ( const RecordList & list );
+	RecordList operator - ( const RecordList & list ) const;
 	
 	/// Returns the intersection of the two lists
-	RecordList operator & ( const RecordList & );
+	RecordList operator & ( const RecordList & ) const;
 
 	/// Sets this as the intersection between this and other
 	/// returns a reference to this
@@ -104,10 +107,10 @@ public:
 	
 	/// Returns true if the intersection between this and other
 	/// is not empty
-	bool operator && ( const RecordList & other );
+	bool operator && ( const RecordList & other ) const;
 	
 	/// Returns the union of this and other
-	RecordList operator | ( const RecordList & other );
+	RecordList operator | ( const RecordList & other ) const;
 	
 	/// Sets this to the union of this and other
 	/// Returns a reference to this
@@ -115,14 +118,14 @@ public:
 	
 	/// Returns true if the union of this and other
 	/// is not empty.
-	bool operator || ( const RecordList & other );
+	bool operator || ( const RecordList & other ) const;
 
 	/// Returns true if \param list contains the same
 	/// records as this list in the same order.
-	bool operator==( const RecordList & list );
+	bool operator==( const RecordList & list ) const;
 
 	/// Same as !(operator==(other))
-	bool operator!=( const RecordList & list ) { return !(this->operator==(list)); }
+	bool operator!=( const RecordList & list ) const { return !(this->operator==(list)); }
 
 	/// Returns a RecordIter object positioned on this
 	/// list at position \param n. If n is out of range,
@@ -170,8 +173,9 @@ public:
 	bool update( const Record & );
 	
 	/// Removes the first occurance of \param record from this list.
+	/// Will remove a different version of the same record
 	int remove( const Record & record );
-
+	
 	/// Removes the first occurance of the record that's RecordImp
 	/// is equal to \param imp.
 	int remove( RecordImp * imp );
@@ -188,9 +192,11 @@ public:
 	void clear();
 
 	/// Returns true if this list contains \param record
+	/// Different versions of the same record are considered a match
 	bool contains( const Record & record ) const;
 
 	/// Returns true if this list contains \param imp
+	/// Compares imps direct, will not return true if the list contains a different version of the record
 	bool contains( RecordImp * imp ) const;
 
 	/// Returns true if this list is empty.
@@ -204,7 +210,7 @@ public:
 	void selectFields( FieldList fields = FieldList(), bool refreshExisting = false );
 	
 	/// Calls Record::commit() on each record in this list.
-	void commit( bool newPrimaryKeys = true, bool sync = true );
+	void commit();
 
 	/// Calls Record::remove() on each record in this list.
 	/// Returns -1 on error, else the number of records
@@ -220,7 +226,6 @@ public:
 	/// each record in this list.
 	void setValue( const QString & column, const QVariant & value );
 
-	
 	/// Returns a QList<QVariant> list of values, filled with
 	/// the returned value after calling getValue( \param column )
 	/// on each value in this list.
@@ -233,9 +238,9 @@ public:
 	void setValue( Field * f, const QVariant & value );
 	
 	/// Returns the return values of Record::foreignKey for each record.
-	RecordList foreignKey( int column ) const;
-	RecordList foreignKey( const QString & column ) const;
-	RecordList foreignKey( Field * f ) const;
+	RecordList foreignKey( int column, int lookupMode = 0x7 /*Index::UseCache | Index::UseSelect | Index::PartialSelect*/ ) const;
+	RecordList foreignKey( const QString & column, int lookupMode = 0x7 /*Index::UseCache | Index::UseSelect | Index::PartialSelect*/ ) const;
+	RecordList foreignKey( Field * f, int lookupMode = 0x7 /*Index::UseCache | Index::UseSelect | Index::PartialSelect*/ ) const;
 	
 	RecordList & setForeignKey( int column, const Record & fkey );
 	RecordList & setForeignKey( const QString & column, const Record & fkey );
@@ -280,15 +285,19 @@ public:
 	/// else it will be all the non-matches
 	RecordList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
 
+	RecordList filter( const Expression &, bool keepMatches ) const;
+	
 	/// Returns a map, with the key equal to column for each value in the list
 	QMap<QString,RecordList> groupedBy( const QString & column ) const;
 
 	template<class KEY,class LIST> QMap<KEY,LIST> groupedBy( const QString & column ) const { return groupedBy<KEY,LIST,KEY,KEY>(column); }
 	template<class KEY,class LIST,class VARIANT_TYPE,class KEY_CAST_TYPE> QMap<KEY,LIST> groupedBy( const QString & column ) const;
 	template<class KEY> QMap<KEY,RecordList> groupedBy( const QString & column ) const { return groupedBy<KEY,RecordList>(column); }
+	template<class KEY,class VALUE,class VARIANT_TYPE,class KEY_CAST_TYPE> QMap<KEY,VALUE> groupedBySingle( const QString & column ) const;
+	template<class KEY,class VALUE> QMap<KEY,VALUE> groupedBySingle( const QString & column ) const { return groupedBySingle<KEY,VALUE,KEY,KEY>(column); }
 
-	template<class KEY,class LIST> QMap<KEY,LIST> groupedByForeignKey( const QString & column );
-	QMap<Record,RecordList> groupedByForeignKey( const QString & column ) { return groupedByForeignKey<Record,RecordList>(column); }
+	template<class KEY,class LIST> QMap<KEY,LIST> groupedByForeignKey( const QString & column ) const;
+	QMap<Record,RecordList> groupedByForeignKey( const QString & column ) const { return groupedByForeignKey<Record,RecordList>(column); }
 	
 	/// Sorts the list according the the value in column.
 	RecordList sorted( const QString & column, bool asc = true ) const;
@@ -299,7 +308,14 @@ public:
 	/// Returns a new list with the same contents as this, in reversed order.
 	RecordList reversed() const;
 	
-	RecordList copy( bool updateCopiedRelations = false );
+	/// If destTable is null then the copy is made from the current record's table
+	/// If destTable has a different TableSchema than the current record, then each
+	/// field is copied by database name, and if no match is found then by method name
+	/// If updateCopiedRelations is true, then for each record that has a foreignKey
+	/// pointing to another record in this list, the foreign key of the copied record
+	/// will be updated to point to the corrosponding copied record in the return list.
+	/// For example if you have list [ RecordA(fkeyB -> RecordB), RecordB ]
+	RecordList copy( Table * destTable = 0, bool updateCopiedRelations = false );
 
 	/// Calls Record::reload() on each record in this list.
 	void reload();
@@ -308,6 +324,8 @@ public:
 	/// Record::reload() on each record.
 	RecordList reloaded() const;
 
+	QString debug() const;
+
 	/// print human readable dump of the records
 	QString dump() const;
 
@@ -315,10 +333,14 @@ public:
 	// for Qt foreach compat
 	typedef RecordIter const_iterator;
 
+	// Updates each of the RecordImp *'s in the list to point to the current value
+	// defined by Record::current(). 
+	void makeCurrent();
 protected:
 
 	friend class RecordIter;
-
+	friend class ChangeSet;
+	
 	class Private;
 
 	/// Internally detaches this list by making a full copy
@@ -372,12 +394,22 @@ template<class KEY,class LIST,class VARIANT_TYPE,class KEY_CAST_TYPE> QMap<KEY,L
 	QMap<KEY,LIST> ret;
 	foreach( Record r, (*this) ) {
 		QVariant v = r.getValue(column);
-		ret[KEY_CAST_TYPE(qVariantValue<VARIANT_TYPE>(v))] += r;
+		ret[KEY_CAST_TYPE(v.value<VARIANT_TYPE>())] += r;
 	}
 	return ret;
 }
 
-template<class KEY,class LIST> QMap<KEY,LIST> RecordList::groupedByForeignKey( const QString & column )
+template<class KEY,class VALUE,class VARIANT_TYPE,class KEY_CAST_TYPE> QMap<KEY,VALUE> RecordList::groupedBySingle( const QString & column ) const
+{
+	QMap<KEY,VALUE> ret;
+	foreach( Record r, (*this) ) {
+		QVariant v = r.getValue(column);
+		ret[KEY_CAST_TYPE(v.value<VARIANT_TYPE>())] = r;
+	}
+	return ret;
+}
+
+template<class KEY,class LIST> QMap<KEY,LIST> RecordList::groupedByForeignKey( const QString & column ) const
 {
 	QMap<KEY,LIST> ret;
 	foreach( Record r, (*this) ) {

@@ -30,7 +30,6 @@
 #include "shotgroup.h"
 #include "project.h"
 #include "rangefiletracker.h"
-#include "renderelements.h"
 #include "path.h"
 
 QString Shot::sortString() const
@@ -44,31 +43,6 @@ QString Shot::displayNumber() const
 	QString snt;
 	snt.sprintf("%04i.%02i", (int)sn, int(sn*100.0 + .9999999)%100 );
 	return snt;
-}
-
-void Shot::checkForFrameFiles( ShotList sl, const Resolution & res, bool fillMissing )
-{
-	Q_UNUSED(sl);
-	Q_UNUSED(res);
-	Q_UNUSED(fillMissing);
-}
-
-void Shot::deleteExtraFrameFiles( ShotList sl, const Resolution & res )
-{
-	Q_UNUSED(sl);
-	Q_UNUSED(res);
-}
-
-void Shot::createCompFileTrackers()
-{
-}
-
-void Shot::createRenderFileTrackers()
-{
-}
-
-void Shot::createFrames()
-{
 }
 
 ShotGroup Shot::sequence()

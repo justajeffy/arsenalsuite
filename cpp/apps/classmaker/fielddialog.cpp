@@ -36,7 +36,7 @@ FieldDialog::FieldDialog( Field * field, QWidget * parent )
 	bool fk = field->flag( Field::ForeignKey );
 	mUI.mFKGroup->setEnabled( fk );
 	mUI.mListCheck->setChecked( field->flag( Field::Unique ) );
-	mUI.mDisplayNameCheck->setChecked( field->flag( Field::DisplayName ) );
+	mUI.mDisplayNameCheck->setChecked( field->flag( Field::TableDisplayName ) );
 	
 	if( fk ) {
 		mUI.mTableCombo->setCurrentIndex( mUI.mTableCombo->findText( field->foreignKey() ) );
@@ -79,7 +79,7 @@ void FieldDialog::applySettings()
 
 	QString ts = mUI.mType->currentText();
 	mField->setFlag( Field::Unique, mUI.mListCheck->isChecked() );
-	mField->setFlag( Field::DisplayName, mUI.mDisplayNameCheck->isChecked() );
+	mField->setFlag( Field::TableDisplayName, mUI.mDisplayNameCheck->isChecked() );
 	mField->setFlag( Field::NoDefaultSelect, !mUI.mDefaultSelectCheck->isChecked() );
 	if( ts == "Foreign Key" ) {
 		mField->setFlag( Field::ForeignKey, true );

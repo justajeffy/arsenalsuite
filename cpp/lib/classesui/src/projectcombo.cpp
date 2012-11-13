@@ -92,16 +92,12 @@ void ProjectCombo::doRefresh()
 	clear();
 	mCurrent = Project();
 
-	// Filter out templates, all real projects point to themselves
-	ProjectList ptl = Project::select("fkeyproject=keyelement");
-	if( !mStatusFilters.isEmpty() ) {
-		ProjectList tmp;
-		foreach( ProjectStatus ps, mStatusFilters )
-			tmp += ptl.filter( "fkeyprojectstatus", ps.key() );
-		ptl = tmp.unique();
-	}
-
-	ptl = ptl.sorted( "name" );
+	// Filter out templates, all real projects have non null fkeyprojectstatus
+	QString query("fkeyprojectstatus IS NOT NULL");
+	if( !mStatusFilters.isEmpty() )
+		query += " AND fkeyprojectstatus IN (" + mStatusFilters.keyString() + ")";
+	
+	ProjectList ptl = Project::select(query).sorted( "name" );
 
 	if( mShowSpecialItem ) {
 		Project p;

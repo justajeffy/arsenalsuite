@@ -174,7 +174,7 @@ QString stoneOptionsHelp()
 bool initConfig( const QString & configName, const QString & logfile )
 {
 	if( !QCoreApplication::instance() ) {
-		fprintf( stderr, "Calling initConfig before creating a QApplication object is not recommented\nCreating a QCoreApplication object now to avoid a crash\n" );
+		fprintf( stderr, "Calling initConfig before creating a QApplication object is not recommended\nCreating a QCoreApplication object now to avoid a crash\n" );
 		int argc = 0;
 		new QCoreApplication(argc, (char**)0);
 	}
@@ -193,8 +193,8 @@ bool initConfig( const QString & configName, const QString & logfile )
 #endif
 #endif // Q_OS_WIN
 	}
-	
-    // Check to see if the configuration file exists
+
+	// Check to see if the configuration file exists
 	bool configExists = QFile::exists( configName );
 	if( !configExists )
 		printf("Could not find %s\n", qPrintable(configName));
@@ -207,14 +207,14 @@ bool initConfig( const QString & configName, const QString & logfile )
 		sConfig->setFileName( configName );
 		sConfig->readFromFile();
 	}
-
+	
 	if( !logfile.isEmpty() ) {
 		sLogFile = logfile;
 		if( !sLogFile.isEmpty() && sLogFile.right(4) != ".log" )
 			sLogFile = sLogFile + ".log";
 	}
 
-    return configExists;
+	return configExists;
 }
 
 void initUserConfig( const QString & fileName )
@@ -246,11 +246,19 @@ void shutdown()
 
 IniConfig & config()
 {
+	if( !sConfig ) {
+		Log( "config() function called without a preceding initConfig call." );
+		sConfig = new IniConfig();
+	}
 	return *sConfig;
 }
 
 IniConfig & userConfig()
 {
+	if( !sUserConfig ) {
+		Log( "userConfig() function called without a preceding initUserConfig call." );
+		sUserConfig = new IniConfig();
+	}
 	return *sUserConfig;
 }
 
@@ -259,17 +267,20 @@ static bool sLoggingEnabled = true;
 Multilog * log()
 {
 	if( sLoggingEnabled && !mLog ) {
-		sConfig->pushSection( "Logging" );
-		sLoggingEnabled = sConfig->readBool( "Enabled", true );
-		if( sLoggingEnabled ) {
-			mLog = new Multilog(
-			sLogFile.isEmpty() ? sConfig->readString( "File", sConfigName.replace(".ini","") + ".log" ) : sLogFile, // Filename
-			sConfig->readBool( "EchoStdOut", true ),
-			sConfig->readInt( "MaxSeverity", 5 ), // Only critical and important errors by default
-			sConfig->readInt( "MaxFiles", 10 ),
-			sConfig->readInt( "MaxSize", 1024 * 1024 ) ); // One megabyte
-		}
-		sConfig->popSection();
+		if( sConfig ) {
+			sConfig->pushSection( "Logging" );
+			sLoggingEnabled = sConfig->readBool( "Enabled", true );
+			if( sLoggingEnabled ) {
+				mLog = new Multilog(
+				sLogFile.isEmpty() ? sConfig->readString( "File", sConfigName.replace(".ini","") + ".log" ) : sLogFile, // Filename
+				sConfig->readBool( "EchoStdOut", true ),
+				sConfig->readInt( "MaxSeverity", 5 ), // Only critical and important errors by default
+				sConfig->readInt( "MaxFiles", 10 ),
+				sConfig->readInt( "MaxSize", 1024 * 1024 ) ); // One megabyte
+			}
+			sConfig->popSection();
+		} else
+			sLoggingEnabled = false;
 	}
 	return mLog;
 }
@@ -278,7 +289,8 @@ void Log( const QString & message, int severity, const QString & file )
 {
 	if( sLoggingEnabled && log() ) {
 		log()->log( severity, message, file );
-	}
+	} else
+		printf( qPrintable( file + ": " + message ) );
 }
 
 bool sendEmail( QStringList recipients, const QString & subject, const QString & body, const QString & sender, QStringList attachments )
@@ -304,37 +316,37 @@ QString getUserName()
 
 QStringList getLoggedInUsers()
 {
-    LPWKSTA_USER_INFO_0 pBuf = NULL;
-    LPWKSTA_USER_INFO_0 pTmpBuf;
-    NET_API_STATUS nStatus;
+	LPWKSTA_USER_INFO_0 pBuf = NULL;
+	LPWKSTA_USER_INFO_0 pTmpBuf;
+	NET_API_STATUS nStatus;
 
-    DWORD dwEntriesRead = 0;
-    DWORD dwTotalEntries = 0;
+	DWORD dwEntriesRead = 0;
+	DWORD dwTotalEntries = 0;
 
-    nStatus = NetWkstaUserEnum(NULL, 0, (LPBYTE*)&pBuf, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, NULL);
+	nStatus = NetWkstaUserEnum(NULL, 0, (LPBYTE*)&pBuf, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, NULL);
 
-    QStringList users;
+	QStringList users;
 
-    if ((nStatus == 0) || (nStatus == ERROR_MORE_DATA))
-    {
-        if ((pTmpBuf = pBuf) != NULL)
-        {
-            for (DWORD i = 0; i < dwEntriesRead; ++i)
-            {
-                if (pTmpBuf == NULL)
-                {
-                    // Spit out an error
-                    LOG_1("Error occurred when attempting to retrived logged in user list");
-                    break;
-                }
+	if ((nStatus == 0) || (nStatus == ERROR_MORE_DATA))
+	{
+		if ((pTmpBuf = pBuf) != NULL)
+		{
+			for (DWORD i = 0; i < dwEntriesRead; ++i)
+			{
+				if (pTmpBuf == NULL)
+				{
+					// Spit out an error
+					LOG_1("Error occurred when attempting to retrived logged in user list");
+					break;
+				}
 
-                users.append(QString::fromWCharArray(pTmpBuf->wkui0_username));
-                ++pTmpBuf;
-            }
-        }
-    }
+				users.append(QString::fromWCharArray(pTmpBuf->wkui0_username));
+				++pTmpBuf;
+			}
+		}
+	}
 
-    return users;
+	return users;
 }
 
 #else
@@ -353,31 +365,31 @@ QString getUserName()
 
 QStringList getLoggedInUsers()
 {
-    QProcess * proc = new QProcess();
-    QStringList arguments;
-    proc->start("who", arguments);
+	QProcess * proc = new QProcess();
+	QStringList arguments;
+	proc->start("who", arguments);
 
-    QStringList output;
+	QStringList output;
 
-    bool ret = proc->waitForFinished(1000);
-    if( !ret ) return output;
+	bool ret = proc->waitForFinished(1000);
+	if( !ret ) return output;
 
-    while (proc->canReadLine())
-        output.append(proc->readLine());
+	while (proc->canReadLine())
+		output.append(proc->readLine());
 
-    QStringList users;
-    foreach( QString whoLine, output )
-    {
-        if (!whoLine.contains(":0"))
-            continue;
-        QStringList parts = whoLine.split(' ');
-        if( parts[1] == ":0" ) {
-            if (users.indexOf(parts[0]) == -1)
-                users.append(parts[0]);
-        }
-    }
+	QStringList users;
+	foreach( QString whoLine, output )
+	{
+		if (!whoLine.contains(":0"))
+			continue;
+		QStringList parts = whoLine.split(' ');
+		if( parts[1] == ":0" ) {
+			if (users.indexOf(parts[0]) == -1)
+				users.append(parts[0]);
+		}
+	}
 
-    return users;
+	return users;
 }
 
 #endif // Q_WS_WIN

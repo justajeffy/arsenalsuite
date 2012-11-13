@@ -9,14 +9,17 @@
 
 #include "iniconfig.h"
 
+#include "config.h"
 #include "filetracker.h"
 #include "hostservice.h"
 #include "jobdep.h"
+#include "jobenvironment.h"
+#include "joberror.h"
+#include "jobfilterset.h"
 #include "jobservice.h"
 #include "rangefiletracker.h"
 #include "service.h"
-#include "jobfilterset.h"
-#include "jobenvironment.h"
+
 
 #include "submitter.h"
 #include "path.h"
@@ -50,13 +53,14 @@ static FileTracker getOutputFileTracker( const QString & path )
 
 Submitter::Submitter( QObject * parent )
 : QObject(parent)
+, mState( New )
 , mUploadEnabled( true )
 , mFtp( 0 )
 , mFile( 0 )
 , mFile2( 0 )
-, mPort( 0 )
-, mRetries( 0 )
-, mTimeout( 0 )
+, mFtpPort( 0 )
+, mFtpRetries( 0 )
+, mFtpTimeout( 0 )
 , mCdCmdId( 0 )
 , mMkDirCmdId( 0 )
 , mPutCmdId( 0 )
@@ -70,10 +74,12 @@ Submitter::Submitter( QObject * parent )
 {
 	IniConfig & c = config();
 	c.pushSection( "UploadSettings" );
-	mHost = c.readString( "FtpHost", "stryfe" );
-	mPort = c.readInt( "FtpPort", 21 );
-	mRetries = c.readInt( "FtpRetries", 2 );
-	mTimeout = c.readInt( "FtpTimeout", 60 );
+	mFtpHost = Config::getString( "assburnerFtpHost", "stryfe" );
+	mFtpPort = Config::getInt( "assburnerFtpPort", 21 );
+	mFtpUser = Config::getString( "assburnerFtpUser", "assburner" );
+	mFtpPassword = Config::getString( "assburnerFtpPassword", "assburner" );
+	mFtpRetries = Config::getInt( "assburnerFtpRetries", 2 );
+	mFtpTimeout = Config::getInt( "assburnerFtpTimeout", 60 );
 	c.popSection();
 }
 
@@ -82,6 +88,11 @@ Submitter::~Submitter()
 	delete mVerifyTimer;
 	mVerifyTimer = 0;
 	ftpCleanup();
+}
+
+Submitter::State Submitter::state() const
+{
+	return mState;
 }
 
 void Submitter::setExitAppOnFinish( bool eaof )
@@ -104,22 +115,39 @@ Job Submitter::job()
 	return mJob;
 }
 
+void Submitter::setJob( const Job & job )
+{
+	mJob = job;
+	mJob.setStatus( "submit" );
+	mJob.setColumnLiteral( "submittedts", "now()" );
+	if( !mJob.host().isRecord() )
+		mJob.setHost( Host::currentHost() );
+	if( !mJob.user().isRecord() )
+		mJob.setUser( User::currentUser() );
+	mJob.commit();
+	LOG_5( "mJob committed" );
+}
+
 void Submitter::newJobOfType( const JobType & jobType )
 {
-    if( jobType.isRecord() ) {
-        if( !mJob.isValid() || mJob.imp()->table() == Job::table() ) {
-            LOG_5( "Setting mJob to new Job" + jobType.name() + " record" );
-            Table * t = Database::current()->tableByName( "Job" + jobType.name() );
-            if( t )
-                mJob = t->load();
-            else
-                LOG_5( "Table Job" + jobType.name() + " not found" );
-        }
-        mJob.setJobType( jobType );
-        mJob.setStatus( "submit" );
-        mJob.setColumnLiteral( "submittedts", "now()" );
-        mJob.commit();
-    }
+	if( jobType.isRecord() ) {
+		if( !mJob.isValid() || mJob.imp()->table() == Job::table() ) {
+			LOG_5( "Setting mJob to new Job" + jobType.name() + " record" );
+			Table * t = Database::current()->tableByName( "Job" + jobType.name() );
+			if( t )
+				mJob = t->load();
+			else
+				LOG_5( "Table Job" + jobType.name() + " not found" );
+		}
+		mJob.setJobType( jobType );
+		setJob( mJob );
+	} else
+		LOG_5( "JobType is not a valid record" );
+}
+
+void Submitter::addTasks( JobTaskList jtl )
+{
+	mTasks += jtl;
 }
 
 int Submitter::createTasks( QList<int> taskNumbers, QStringList labels, JobOutputList outputs, int frameNth, bool frameFill )
@@ -167,7 +195,7 @@ void Submitter::addJobOutput( const QString & outputPath, const QString & output
 	jo.commit();
 	mOutputs += jo;
 	LOG_5( "Created Output " + jo.name() + " with path: " + jo.fileTracker().filePath() );
-	createTasks( expandNumberList(frameList), taskLabels.split(','), JobOutputList() += jo, frameNth, frameFill );
+	createTasks( expandNumberList(frameList), taskLabels.split(','), JobOutputList(jo), frameNth, frameFill );
 }
 
 void Submitter::addServices( ServiceList services )
@@ -188,45 +216,64 @@ void Submitter::addDependencies( JobList deps, uint depType )
 	foreach( Job j, deps ) {
 		JobDep jd;
 		jd.setDep( j );
-        jd.setDepType( depType );
+		jd.setDepType( depType );
 		jdl += jd;
 	}
 	jdl.setJobs( mJob );
 	jdl.commit();
-	//mJobDeps += jdl;
+	mJobDeps += jdl;
+}
+
+void Submitter::addJobDeps( JobDepList deps )
+{
+	deps.commit();
+	mJobDeps += deps;
+}
+
+QString readValueFromFile( const QString & path, const QString & field )
+{
+	QFile file(path);
+	if( file.open(QIODevice::ReadOnly) )
+		return QTextStream( &file ).readAll();
+	else
+		LOG_1( "Unable to open field " + field + " value file: " + path );
+	return QString();
 }
 
 void Submitter::applyArgs( const QMap<QString,QString> & args )
 {
-    // first thing we check for is the job type
-    // this initialises the mJob member with the correct
-    // class
-    if( args.contains("jobType") ) {
-        JobType jt = JobType::recordByName( args["jobType"] );
-        if( jt.isRecord() ) {
-            newJobOfType( jt );
-        } else {
-            exitWithError( "Could not find jobtype: " + args["jobType"] );
-            return;
-        }
-        LOG_5( "Finished setting jobtype" );
-    }
+	if( args.contains("submitSuspended") )
+		mSubmitSuspended = QVariant(args["submitSuspended"]).toBool();
 
-    /// filterSet determines which message filters
-    /// are used to check for Errors.
-    if( args.contains("filterSet") ) {
-        JobFilterSet jfs = JobFilterSet::recordByName( args["filterSet"] );
-        if( jfs.isRecord() ) {
-            mJob.setFilterSet( jfs );
-        }
-    } else {
-        /// look for a filterSet named the jobType
-        JobFilterSet jfs = JobFilterSet::recordByName( mJob.jobType().name() );
-        if( jfs.isRecord() ) {
-            mJob.setFilterSet( jfs );
-        }
-    }
-    LOG_5( "Finished setting filterSet" );
+	// first thing we check for is the job type
+	// this initialises the mJob member with the correct
+	// class
+	if( args.contains("jobType") ) {
+		JobType jt = JobType::recordByName( args["jobType"] );
+		if( jt.isRecord() ) {
+			newJobOfType( jt );
+		} else {
+			exitWithError( "Could not find jobtype: " + args["jobType"] );
+			return;
+		}
+		LOG_5( "Finished setting jobtype" );
+	}
+
+	/// filterSet determines which message filters
+	/// are used to check for Errors.
+	if( args.contains("filterSet") ) {
+		JobFilterSet jfs = JobFilterSet::recordByName( args["filterSet"] );
+		if( jfs.isRecord() ) {
+			mJob.setFilterSet( jfs );
+		}
+	} else {
+		/// look for a filterSet named the jobType
+		JobFilterSet jfs = JobFilterSet::recordByName( mJob.jobType().name() );
+		if( jfs.isRecord() ) {
+			mJob.setFilterSet( jfs );
+		}
+	}
+	LOG_5( "Finished setting filterSet" );
 
 	if( args.contains("noCopy") ) {
 		mUploadEnabled = false;
@@ -234,26 +281,23 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
 		mJob.setCheckFileMd5( false );
 	}
 
-	if( args.contains("submitSuspended") )
-		mSubmitSuspended = QVariant(args["submitSuspended"]).toBool();
-
-    if( args.contains( "user" ) ) {
-        User u = User::activeByUserName( args["user"] );
-        if( u.isRecord() )
-            mJob.setUser( u );
-        else
-            exitWithError( "user named: "+ args["user"] + " not valid for submitting the job" );
-    } else if( !User::currentUser().isRecord() ) {
-        exitWithError( "Current user not valid for submitting the job" );
-    } else {
-        mJob.setUser( User::currentUser() );
-    }
-    LOG_5( "finished setting user" );
+	if( args.contains( "user" ) ) {
+		User u = User::activeByUserName( args["user"] );
+		if( u.isRecord() )
+			mJob.setUser( u );
+		else
+			exitWithError( "user named: "+ args["user"] + " not valid for submitting the job" );
+	} else if( !User::currentUser().isRecord() ) {
+		exitWithError( "Current user not valid for submitting the job" );
+	} else {
+		mJob.setUser( User::currentUser() );
+	}
+	LOG_5( "finished setting user" );
 
 	if( args.contains("job") ) {
 		mJob.setName( args["job"] );
-        LOG_5( "finishing setting job name" );
-    }
+		LOG_5( "finishing setting job name" );
+	}
 
 	if( args.contains( "projectName" ) ) {
 		Project p = Project::recordByName( args["projectName"] );
@@ -261,7 +305,7 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
 			LOG_1( "Project not found: " + args["projectName"] );
 		else
 			mJob.setProject( p );
-        LOG_5( "Finished setting project" );
+		LOG_5( "Finished setting project" );
 	}
 
 	if( args.contains( "host" ) ) {
@@ -270,65 +314,68 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
 			LOG_1( "Host not found: " + args["host"] );
 		else
 			mJob.setHost( h );
-        LOG_5( "finished setting host" );
+		LOG_5( "finished setting host" );
 	}
 
 	if( mJob.jobType().name().contains("Max") && !args.contains( "flag_xo" ) )
 		mJob.setValue( "flag_xo", QVariant(0) );
 
-    if( args.contains("deps") ) {
-        JobList jobs;
-        foreach( QString id, args["deps"].split(",") ) {
-            Job d = Job(id.toUInt());
-            if( d.isRecord() )
-                jobs += d;
-            else
-                LOG_1( "Dependency Job not found: " + id );
-        }
-        addDependencies( jobs );
-    }
+	if( args.contains("deps") ) {
+		JobList jobs;
+		foreach( QString id, args["deps"].split(",") ) {
+			Job d = Job(id.toUInt());
+			if( d.isRecord() )
+				jobs += d;
+			else
+				LOG_1( "Dependency Job not found: " + id );
+		}
+		addDependencies( jobs );
+	}
 
-    if( args.contains("linked") ) {
-        JobList jobs;
-        foreach( QString id, args["linked"].split(",") ) {
-            Job d = Job(id.toUInt());
-            if( d.isRecord() ) {
-                jobs += d;
-                /// if there are linked parent jobs, then any tasks for this job start
-                /// out "holding" for the parent tasks to complete
-                mInitialTaskStatus = "holding";
-            } else {
-                LOG_1( "Linked Job with same task count not found: " + id );
-            }
-        }
-        addDependencies( jobs, 2 /* depType */ );
-    }
+	if( args.contains("linked") ) {
+		JobList jobs;
+		foreach( QString id, args["linked"].split(",") ) {
+			Job d = Job(id.toUInt());
+			if( d.isRecord() ) {
+				jobs += d;
+				/// if there are linked parent jobs, then any tasks for this job start
+				/// out "holding" for the parent tasks to complete
+				mInitialTaskStatus = "holding";
+			} else {
+				LOG_1( "Linked Job with same task count not found: " + id );
+			}
+		}
+		addDependencies( jobs, 2 /* depType */ );
+	}
 
-    if( args.contains("suspendDeps") ) {
-        JobList jobs;
-        foreach( QString id, args["suspendDeps"].split(",") ) {
-            Job d = Job(id.toUInt());
-            if( d.isRecord() ) {
-                jobs += d;
-            } else {
-                LOG_1( "SuspendDep Job with same task count not found: " + id );
-            }
-        }
-        addDependencies( jobs, 3 /* depType */ );
-    }
+	if( args.contains("suspendDeps") ) {
+		JobList jobs;
+		foreach( QString id, args["suspendDeps"].split(",") ) {
+			Job d = Job(id.toUInt());
+			if( d.isRecord() ) {
+				jobs += d;
+			} else {
+				LOG_1( "SuspendDep Job with same task count not found: " + id );
+			}
+		}
+		addDependencies( jobs, 3 /* depType */ );
+	}
+		
+	if( args.contains("deleteDeps") ) {
+		JobList jobs;
+		foreach( QString id, args["deleteDeps"].split(",") ) {
+			Job d = Job(id.toUInt());
+			if( d.isRecord() ) {
+				jobs += d;
+			} else {
+				LOG_1( "deleteDep Job with same task count not found: " + id );
+			}
+		}
+		addDependencies( jobs, 4 /* depType */ );
+		}
 
-    if( args.contains("deleteDeps") ) {
-        JobList jobs;
-        foreach( QString id, args["deleteDeps"].split(",") ) {
-            Job d = Job(id.toUInt());
-            if( d.isRecord() ) {
-                jobs += d;
-            } else {
-                LOG_1( "deleteDep Job with same task count not found: " + id );
-            }
-        }
-        addDependencies( jobs, 4 /* depType */ );
-    }
+	if( !args.contains( "priority" ) )
+		mJob.setPriority( 50 );
 
 	if( args.contains("startupScript") ) {
 		QFile scriptFile(args["startupScript"]);
@@ -364,14 +411,13 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
 	// Create single output, backwards compatible
 	if( mOutputs.isEmpty() )
 		addJobOutput( args["outputPath"], "Output1", frameList, args.contains("taskLabels") ? args["taskLabels"] : "", frameNth, frameFill > 0 );
-
 	//else if( !frameList.isEmpty() )
 	//	setFrameList( frameList, args.contains("taskLabels") ? args["taskLabels"] : "" );
 
 	if( args.contains( "jobParentId" ) )
 		mJob.setJobParent( Job( args["jobParentId"].toInt() ) );
 
-	if( args.contains("services") ) {
+	if( args.contains("services" ) ) {
 		ServiceList services;
 		foreach( QString name, args["services"].split(",") ) {
 			Service s = Service::recordByName(name);
@@ -390,36 +436,53 @@ void Submitter::applyArgs( const QMap<QString,QString> & args )
 			addServices( jts );
 	}
 
-    // create a JobEnvironment record if required
-    if( args.contains("environment") ) {
-        JobEnvironment jenv;
-        jenv.setEnvironment( args["environment"] );
-        jenv.commit();
-        mJob.setEnvironment( jenv );
-    }
+	// create a JobEnvironment record if required
+	if( args.contains("environment") ) {
+		JobEnvironment jenv;
+		jenv.setEnvironment( args["environment"] );
+		jenv.commit();
+		mJob.setEnvironment( jenv );
+	}
 
     /// now we set any other argument assuming there is a database field with the arg name
 	Table * t = mJob.imp()->table();
 	for( QMap<QString,QString>::const_iterator it = args.begin(); it != args.end(); ++it )
 	{
-        if( it.key() == "environment" ) continue;
-
+		bool valueFromFile = false;
+		QString fieldName = it.key();
+		if( fieldName.startsWith( "@" ) ) {
+			valueFromFile = true;
+			fieldName = fieldName.mid(1);
+		}
+		if( it.key() == "environment" ) continue;
 		Field * f = t->schema()->field( it.key() );
 		if( f && !f->flag(Field::ForeignKey) ) {
 			LOG_5( "Setting " + it.key() + " to value " + it.value() );
+			QVariant value = it.value();
+			if( valueFromFile )
+				value = QVariant( readValueFromFile( it.value(), fieldName ) );
 			mJob.setValue( it.key(), QVariant( it.value() ) );
 		}
 	}
-
+	
 	LOG_5( "Finished applying args" );
 }
 
+
 void Submitter::submit()
 {
+	LOG_TRACE;
+	if( mState != New ) {
+		LOG_1( "submit called when state is not New" );
+		return;
+	}
+	mState = Submitting;
+	emit stateChange( Success, "Gathering Job Data" );
+
 	if( !checkFarmReady() )
 		return;
 
-    // submitCheck() will return 0 if everything is ok
+	// submitCheck() will return 0 if everything is ok
 	if( submitCheck() ) return;
 
 	bool jobHasFile = !mJob.fileName().isEmpty();
@@ -433,13 +496,16 @@ void Submitter::submit()
 		mJob.setStatus( mSubmitSuspended ? "verify-suspended" : "verify" );
 		mJob.commit();
 		printJobInfo();
-		emit submitSuccess();
-		if( mExitAppOnFinish ) {
-            foreach( QString dbName, QSqlDatabase::connectionNames() )
-                QSqlDatabase::database( dbName, false ).close();
-			qApp->exit(0);
-        }
+		_success();
 	}
+}
+
+Submitter::State Submitter::waitForFinished()
+{
+	while( mState == Submitting ) {
+		QCoreApplication::instance()->processEvents( QEventLoop::ExcludeUserInputEvents );
+	}
+	return mState;
 }
 
 bool Submitter::checkFarmReady()
@@ -454,17 +520,30 @@ bool Submitter::checkFarmReady()
 
 int Submitter::submitCheck()
 {
+	LOG_3( "Submitter::submitCheck" );
+
 	//
 	// Check required info
 	//
 	if( !mJob.jobType().isRecord() ) {
+		LOG_1( "Missing JobType" );
 		exitWithError( "Required parameter 'jobType' missing or invalid." );
 		return 1;
 	}
 
 	if( !mJob.isValid() || mJob.imp()->table() == Job::table() ) {
+		LOG_1( "Job not from valid table" );
 		exitWithError( "Job not from valid table" );
 		return 1;
+	}
+
+	if( !mJob.user().isRecord() ) {
+		if( !User::currentUser().isRecord() ) {
+			LOG_1( "Not valid user found for submitting the job" );
+			exitWithError( "Not valid user found for submitting the job" );
+			return 1;
+		}
+		mJob.setUser( User::currentUser() );
 	}
 
 	if( mJob.name().isEmpty() ) {
@@ -479,12 +558,16 @@ int Submitter::submitCheck()
 		return 1;
 	}
 
+	mJob.commit();
+	mTasks.setJobs( mJob );
+	mTasks.commit();
+
 	return 0;
 }
 
 void Submitter::checkFileFree()
 {
-	LOG_5( "Submitter::checkFileFree" );
+	LOG_3( "Submitter::checkFileFree" );
 	static int checkTime = 0;
 	if( !Path::checkFileFree( mJob.fileName() ) ) {
 		LOG_1( "Waiting 1 second for " + mJob.fileName() + " to become free (Path::checkFileFree)" );
@@ -505,6 +588,8 @@ void Submitter::checkMd5()
 	Md5 md5;
 	QString Md5Sum;
 	LOG_3("Submitter::checkMd5: running md5.calcMd5 on " + mSrc );
+	emit stateChange( Success, "Computing Job File Checksum" );
+
 	Md5Sum = md5.calcMd5( mSrc );
 	LOG_1("Submitter::checkMd5: fileMd5sum being set to " + Md5Sum );
 	mJob.setFileMd5sum( Md5Sum );
@@ -527,7 +612,7 @@ void Submitter::preCopy()
 	mDest = name + QString::number( mJob.key() ) + ext;
 	mFileName = "N:/" + mJob.user().name() + "/" + mDest;
 	mDest2 = name + QString::number( mJob.key() ) + ".txt";
-	mSrc2 = name + ".txt";
+	mSrc2 = path + name + ".txt";
 
 	mJob.setValue( "fileName", mFileName );
 	mJob.commit();
@@ -538,6 +623,7 @@ void Submitter::preCopy()
 void Submitter::startCopy()
 {
 	LOG_3( "Submitter::startCopy" );
+	emit stateChange( Success, "Uploading Job File" );
 	if( mFtp ) delete mFtp;
 	mFtp = new QFtp( this );
 	connect( mFtp, SIGNAL( stateChanged( int ) ), SLOT( ftpStateChange( int ) ) );
@@ -562,13 +648,13 @@ void Submitter::startCopy()
 		LOG_3("Submitter::startCopy have " + mSrc2 + ", will try to send");
 		mHaveJobInfoFile = true;
 	}
-	LOG_3( "Connecting to Ftp Server for Job file upload: " + mHost + ":" + QString::number( mPort ) );
-	if( !mFtp->connectToHost( mHost, mPort ) ) {
-		LOG_1( "Unable to connect to ftp server: " + mHost + ":" + QString::number( mPort ) );
-		exitWithError( "Unable to connect to ftp server: " + mHost + ":" + QString::number( mPort ) );
+	LOG_3( "Connecting to Ftp Server for Job file upload: " + mFtpHost + ":" + QString::number( mFtpPort ) );
+	if( !mFtp->connectToHost( mFtpHost, mFtpPort ) ) {
+		LOG_1( "Unable to connect to ftp server: " + mFtpHost + ":" + QString::number( mFtpPort ) );
+		exitWithError( "Unable to connect to ftp server: " + mFtpHost + ":" + QString::number( mFtpPort ) );
 		return;
 	}
-	mFtp->login();
+	mFtp->login(mFtpUser, mFtpPassword);
 	issueFtpCommands( false );
 }
 
@@ -597,7 +683,7 @@ void Submitter::postCopy()
 
 void Submitter::printJobInfo()
 {
-	LOG_5( "Submitter::printJobInfo()" );
+	LOG_3( "Submitter::printJobInfo()" );
 	QFile file;
 	QString msg = "Job Submitted: "+ QString::number(mJob.key())+"\n"; 
 	file.open(stdout, QIODevice::WriteOnly);
@@ -618,9 +704,7 @@ void Submitter::checkJobStatus()
 
 	if( status == "holding" || status == "ready" || status == "started" ) {
 		printJobInfo();
-		emit submitSuccess();
-		if( mExitAppOnFinish )
-			qApp->exit(0);
+		_success();
 		return;
 	}
 
@@ -631,10 +715,13 @@ void Submitter::checkJobStatus()
 
 	if( !mJob.isRecord() )
 		exitWithError( "The job has disappeered from the database" );
-	else if( status == "corrupt" )
-		exitWithError( "The job file on the server does not match the local job file.  The Upload was corrupted.  Please contact your System Admin.");
-	else
-		exitWithError( "Unknown submission Error: The Job has status: " + mJob.status() );
+	else {
+		JobError error = mJob.verifyError();
+		if( error.isRecord() ) {
+			exitWithError( error.message() );
+		} else
+			exitWithError( "Unknown submission Error: The Job has status: " + mJob.status() );
+	}
 }
 
 void Submitter::ftpStateChange( int state )
@@ -741,6 +828,7 @@ void Submitter::ftpTransferProgress( qint64 done, qint64 total )
 	if( progress - mProgress >= 5 ) {
 		LOG_3( "Uploaded " + QString::number( progress ) + "%" );
 		mProgress = progress;
+		emit uploadProgress( progress );
 	}
 }
 
@@ -754,15 +842,36 @@ void Submitter::ftpCleanup()
 	mFile2 = 0;
 }
 
+void Submitter::_success()
+{
+	mState = Success;
+	emit stateChange( Success, QString() );
+	emit submitSuccess();
+	if( mExitAppOnFinish ) {
+		foreach( QString dbName, QSqlDatabase::connectionNames() )
+			QSqlDatabase::database( dbName, false ).close();
+		qApp->exit( 0 );
+	}
+}
+
 void Submitter::exitWithError( const QString & error )
 {
+	mState = Error;
+	emit stateChange( Error, QString() );
+	int number = writeErrorFile( error );
+	mErrorText = error;
 	emit submitError( error );
 	LOG_1("ERROR: "+error);
 	if( mExitAppOnFinish ) {
-        foreach( QString dbName, QSqlDatabase::connectionNames() )
-            QSqlDatabase::database( dbName, false ).close();
+		foreach( QString dbName, QSqlDatabase::connectionNames() )
+			QSqlDatabase::database( dbName, false ).close();
 		qApp->exit( 1 );
-    }
+	}
+}
+
+QString Submitter::errorText() const
+{
+	return mErrorText;
 }
 
 static int getNextErrorNumber( const QString & directory )

@@ -3,17 +3,22 @@
 ; DESCRIPTION: Classmaker installer script
 ; (C) Blur Studio 2005
 
+!include classmaker-svnrev.nsi
 !define MUI_PRODUCT "Classmaker"
-!define MUI_VERSION "v1.0.X"
+!define MUI_VERSION "v1.0.${MUI_SVNREV}"
 
 !define QTDIR "C:\Qt\4.1.0\"
 
 Name "${MUI_PRODUCT} ${MUI_VERSION}"
 
 !include "MUI.nsh"
+!include "..\..\..\nsis\LastInstall.nsh"
+!include FileFunc.nsh
+!include "..\..\..\nsis\SoftwareINI.nsh"
 
 ; Name of resulting executable installer
-OutFile "classmaker_install.exe"
+!define OUT_FILE "classmaker_install_${MUI_SVNREV}.exe"
+OutFile "${OUT_FILE}"
 InstallDir "C:\\blur\\classmaker\\"
 
 !define MUI_FINISHPAGE
@@ -44,17 +49,36 @@ Section "install"
 	Delete "$QUICKLAUNCH\short*classmaker*lnk"
 	SetOutPath $INSTDIR
 	File classmaker.exe
-  	CreateShortCut "$DESKTOP\Classmaker 1.0.lnk" "$INSTDIR\classmaker.exe" ""
+;	File c:\mingw\bin\exchndl.dll
+	CreateShortCut "$DESKTOP\Classmaker 1.0.lnk" "$INSTDIR\classmaker.exe" ""
 	CreateShortcut "$QUICKLAUNCH\Classmaker 1.0.lnk" "$INSTDIR\classmaker.exe" ""
 	File classmaker.ini
-    File ..\..\lib\stone\stone.dll
-    File ..\..\lib\stonegui\stonegui.dll
+	File classmaker_version.txt
+	File ..\..\lib\stone\stone.dll
+	File ..\..\lib\stonegui\stonegui.dll
 	SetOutPath $INSTDIR\images
 	File "images\*.*"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "DisplayName" "${MUI_PRODUCT} (remove only)"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "UninstallString" "$INSTDIR\uninstall.exe"
-	WriteUninstaller "$INSTDIR\uninstall.exe"
 
+	; Associate with .schema files, along with an icon
+	WriteRegStr HKLM "Software\Classes\.schema" "" "classmaker_exe"
+	WriteRegStr HKLM "Software\Classes\classmaker_exe" "" "Used to edit the database schemas files."
+	WriteRegStr HKLM "Software\Classes\classmaker_exe\shell\Open\Command" "" 'C:\\blur\\classmaker\\classmaker.exe -s "%1"'
+	WriteRegStr HKLM "Software\Classes\classmaker_exe\DefaultIcon" "" "C:\\blur\\classmaker\\images\\icon.ico,0"
+
+	# Register the uninstaler only if a cmd line arg was not passed in
+	ClearErrors
+	${GetParameters} $R1
+	${GetOptions} $R1 "/noUninstallerReg" $R2
+	IfErrors 0 makeInstaller
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "DisplayName" "${MUI_PRODUCT} (remove only)"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "UninstallString" "$INSTDIR\uninstall.exe"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "Publisher" "Blur Studio"
+		WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}" "DisplayVersion" "${MUI_VERSION}"
+	makeInstaller:
+		WriteUninstaller "$INSTDIR\uninstall.exe"
+		!insertmacro SetLastInstall "$INSTDIR\${MUI_PRODUCT}\uninstall.exe"
+	# Update software.ini so we can track what software is installed on each system
+	!insertmacro UpdateSettingsINI ${BLUR_SOFTWARE_INI} "${MUI_PRODUCT}" "${MUI_VERSION}" "${OUT_FILE}"
 SectionEnd
 
 Section "Uninstall"

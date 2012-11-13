@@ -22,6 +22,8 @@
 
 #ifndef COMMIT_CODE
 
+#include "pyembed.h"
+
 #include <qprocess.h>
 #include <qsqlquery.h>
 #include <limits>
@@ -33,27 +35,37 @@
 #include "host.h"
 #include "hostload.h"
 #include "hostmapping.h"
+#include "jobtype.h"
+#include "jobtypemapping.h"
 #include "mapping.h"
 #include "mappingtype.h"
 #include "path.h"
 
 bool Mapping::map( bool forceUnmount, QString * errMsg )
 {
+	bool isLoadBalanced = false;
 	Host h = host();
-	LOG_5( "Mapping::map" );
+	LOG_TRACE
+	
+	if( h.isRecord() ) {
+		// Reload host to verify it is online/offline.  If we are not connected to the database
+		// then we will skip this check.
+		if( Database::current()->connection()->isConnected() )
+			h.reload();
+	}
 	// If there is a group of hosts, pick the one with the lowest load
-	if( !h.isRecord() ) {
-		
+	else { // !h.isRecord()
+		isLoadBalanced = true;
 		HostList hl = hostMappings().hosts();
 		LOG_5( "Got " + QString::number( hl.size() ) + " hosts for this mapping" );
 		hl.reload();
 		LOG_5( "Got " + QString::number( hl.size() ) + " hosts after reload" );
 		hl = hl.filter( "online", 1 );
 		LOG_5( "Got " + QString::number( hl.size() ) + " hosts after online filter" );
-		float bestLoad = std::numeric_limits<double>::max();
+		double bestLoad = std::numeric_limits<double>::max();
 		foreach( Host hit, hl ) {
 			HostLoad hl = hit.hostLoad();
-			float computedAvg = hl.loadAvg() + hl.loadAvgAdjust(); 
+			double computedAvg = hl.loadAvg() + hl.loadAvgAdjust();
 			LOG_5( "Checking host " + hit.name() + "  Load: " + QString::number( computedAvg ) + " Online: " + QString::number(hit.online()) );
 			if( hit.online() && computedAvg < bestLoad ) {
 				bestLoad = computedAvg;
@@ -86,7 +98,7 @@ bool Mapping::map( bool forceUnmount, QString * errMsg )
 			LOG_3( "Smb share mapped: " + unc + " to drive: " + mount() );
 	}
 #else
-	Q_UNUSED(forceUnmount);	
+	Q_UNUSED(forceUnmount);
 
 	if( mappingType().name() == "nfs" ) {
 		QString cmd;
@@ -103,10 +115,30 @@ bool Mapping::map( bool forceUnmount, QString * errMsg )
 #endif // Q_OS_WIN
 
 	// Update loadavgadjust, for better load balancing
-	if( ret )
-		Database::current()->connection()->exec("SELECT * FROM increment_loadavgadjust(" + QString::number(h.key()) + ")");
+	if( ret && isLoadBalanced )
+		Database::current()->exec("SELECT * FROM increment_loadavgadjust(" + QString::number(h.key()) + ")");
 
 	return ret;
+}
+
+bool Mapping::isMirrorSyncPath( const QString & fullPath )
+{
+	// Keep this in python so we can modify it quickly without recompile
+	return runPythonFunction( "blur.mappingutil", "isMirrorSyncPath", VarList() << QVariant(fullPath) ).toBool();
+}
+
+bool Mapping::isMappedPath( const JobType & jobType, const QString & path )
+{
+	QString drive = path[0].toLower();
+	MappingList mappings = jobType.jobTypeMappings().mappings();
+	foreach( Mapping mapping, mappings ) {
+		if( mapping.mount() == drive ) {
+			if( !mapping.host().isRecord() )
+				return isMirrorSyncPath( path );
+			return true;
+		}
+	}
+	return false;
 }
 
 #endif // CLASS_FUNCTIONS

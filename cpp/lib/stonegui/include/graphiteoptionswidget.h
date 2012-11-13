@@ -25,6 +25,7 @@ public slots:
 protected slots:
 	void timeRangeComboChanged();
 	void valueRangeComboChanged();
+	void showExtraListMenu( const QPoint & );
 	
 protected:
 	GraphiteWidget * mGraphiteWidget;

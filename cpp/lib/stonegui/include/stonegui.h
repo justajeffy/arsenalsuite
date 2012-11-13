@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id$
+ * $Id: stonegui.h 11672 2011-06-06 23:02:58Z newellm $
  */
 
 #ifndef STONE_GUI_H

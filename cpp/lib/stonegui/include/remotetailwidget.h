@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: remotetailwidget.h 8501 2009-06-24 07:47:46Z brobison $
+ * $Id: remotetailwidget.h 10005 2010-06-17 00:12:01Z newellm $
  */
 
 #ifndef REMOTE_TAIL_WIDGET_H

@@ -31,6 +31,7 @@
 #include <qstring.h>
 #include <qmap.h>
 #include <qcolor.h>
+#include <qdatetime.h>
 #include <qapplication.h>
 #include <qfont.h>
 #include <qrect.h>
@@ -38,6 +39,7 @@
 #include <qvariant.h>
 
 #include "blurqt.h"
+#include "interval.h"
 
 /**
  * \ingroup Stone
@@ -46,6 +48,7 @@
 class STONE_EXPORT IniConfig
 {
 public:
+	/** Sets the fileName to `configFile', then calls readFromFile **/
 	IniConfig(QString configFile);
 	IniConfig();
 	~IniConfig();
@@ -57,7 +60,7 @@ public:
 	 *  This is the default file for both readFromFile and writeToFile
 	 */
 	void setFileName(const QString & fileName);
-    const QString & fileName() const;
+	QString fileName() const;
 
 	/** Reads all values from the file, over-writes any existing entries in memory if overwriteExisting is true.
 	 *  If fileName is empty, uses the fileName last set with setFileName. */
@@ -94,8 +97,11 @@ public:
 	QSize readSize( const QString & key, const QSize & def=QSize( 16,16 ) ) const;
 	QRect readRect( const QString & key, const QRect & def=QRect() ) const;
 	QList<int> readIntList( const QString & key, const QList<int> & def = QList<int>() ) const;
+	QList<uint> readUIntList( const QString & key, const QList<uint> & def = QList<uint>() ) const;
 	QByteArray readByteArray( const QString & key, const QByteArray & def = QByteArray() ) const;
-
+	QDateTime readDateTime( const QString & key, const QDateTime & def = QDateTime() ) const;
+	Interval readInterval( const QString & key, const Interval & def = Interval() ) const;
+	
 	void writeValue( const QString & key, const QVariant & val);
 	/** Writes entries to the current section */
 	void writeBool( const QString & key, bool val);
@@ -112,19 +118,21 @@ public:
 	/// Sets key to the QRect value val in the current section
 	void writeRect( const QString & key, const QRect & val );
 	void writeIntList( const QString & key, const QList<int> & val );
+	void writeUIntList( const QString & key, const QList<uint> & val );
 	void writeByteArray( const QString & key, const QByteArray & val );
-
+	void writeDateTime( const QString & key, const QDateTime & val );
+	void writeInterval( const QString & key, const Interval & val );
+	
 	/// Removes the key/value pair that matches \param key from the current section
 	void removeKey( const QString & key );
 
 	/// Removes the entire section named \param group from this file.
 	void removeSection( const QString & group );
-
-    /// Removes any existing entries from \param dest and renames \param source to \param dest
-    void renameSection( const QString & source, const QString & dest );
-    /// Copies all entries from \param source to \param dest, removes any existing entries in \param dest if \param clearExisting is true
-    void copySection( const QString & source, const QString & dest, bool clearExisting = true );
-
+	/// Removes any existing entries from \param dest and renames \param source to \param dest
+	void renameSection( const QString & source, const QString & dest );
+	/// Copies all entries from \param source to \param dest, removes any existing entries in \param dest if \param clearExisting is true
+	void copySection( const QString & source, const QString & dest, bool clearExisting = true );
+	
 private:
 	// Prepares multiline strings to be properly stored in an ini file
 	QString encode( const QString & ) const;

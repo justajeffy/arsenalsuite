@@ -12,7 +12,7 @@
 !macro select_NT_profile UN
 Function ${UN}select_NT_profile
    ;MessageBox MB_YESNO|MB_ICONQUESTION "Change the environment for all users(Administrator permissions required)?" IDNO environment_single
-   	;DetailPrint "Selected environment for all users"
+   ;DetailPrint "Selected environment for all users"
    Push "all"
    ;Return
    ;environment_single:
@@ -56,6 +56,7 @@ FunctionEnd
 ;====================================================
 Function AddToPath
    Exch $0
+   DetailPrint "adding to path , $0"
    Push $1
    Push $2
   
@@ -87,18 +88,19 @@ Function AddToPath
 	     Push $1
 		 Push $0
 		 Call StrStr ; Find $0 in $1
-		 Pop $0
-		 IntCmp $0 -1 AddToPath_NotAlreadyInPath
+		 Pop $3
+		 IntCmp $3 -1 AddToPath_NotAlreadyInPath
 		 Goto AddToPath_Done
       AddToPath_NotAlreadyInPath:
-         StrCpy $2 "$1;$0"
+		DetailPrint "adding to path , $0"
+		 StrCpy $2 "$0;$1"
          Goto AddToPath_NTdoIt
       AddToPath_NTdoIt:
          StrCmp $4 "current" write_path_NT_current
             ClearErrors
             WriteRegExpandStr ${NT_all_env} "PATH" $2
             IfErrors 0 write_path_NT_resume
-            ;MessageBox MB_YESNO|MB_ICONQUESTION "The path could not be set for all users$$Should I try for the current user?" IDNO write_path_NT_failed
+            MessageBox MB_YESNO|MB_ICONQUESTION "The path could not be set for all users$$Should I try for the current user?" IDNO write_path_NT_failed
             ; change selection
             Push "current"
             StrCpy $4 "current"
@@ -107,7 +109,7 @@ Function AddToPath
             ClearErrors
             WriteRegExpandStr ${NT_current_env} "PATH" $2
             IfErrors 0 write_path_NT_resume
-            ;MessageBox MB_OK|MB_ICONINFORMATION "The path could not be set for the current user."
+            MessageBox MB_OK|MB_ICONINFORMATION "The path could not be set for the current user."
             Goto write_path_NT_failed
          write_path_NT_resume:
          SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000

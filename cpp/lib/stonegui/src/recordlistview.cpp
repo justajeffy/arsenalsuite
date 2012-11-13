@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: recordlistview.cpp 6486 2008-05-02 01:34:01Z newellm $
+ * $Id: recordlistview.cpp 13650 2012-10-01 22:12:31Z newellm $
  */
 
 #include "recordlistview.h"
@@ -43,7 +43,7 @@ void RecordListView::setModel( RecordSuperModel * model )
 		SLOT( slotSelectionChanged( const QItemSelection &, const QItemSelection & ) ) );
 }
 
-RecordSuperModel * RecordListView::model()
+RecordSuperModel * RecordListView::model() const
 {
 	return qobject_cast<RecordSuperModel*>(QListView::model());
 }

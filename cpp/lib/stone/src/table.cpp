@@ -25,6 +25,8 @@
  * $Id$
  */
 
+#include <memory>
+
 #include <qapplication.h>
 #include <qcursor.h>
 #include <qdatetime.h>
@@ -36,15 +38,17 @@
 
 #include "blurqt.h"
 #include "connection.h"
-#include "table.h"
-#include "recordimp.h"
-#include "updatemanager.h"
 #include "database.h"
+#include "expression.h"
 #include "freezercore.h"
+#include "indexschema.h"
+#include "recordimp.h"
 #include "record.h"
 #include "sqlerrorhandler.h"
+#include "table.h"
 #include "tableschema.h"
-#include "indexschema.h"
+#include "trigger.h"
+#include "updatemanager.h"
 
 namespace Stone {
 
@@ -54,9 +58,12 @@ Table::Table( Database * database, TableSchema * schema )
 , mKeyIndex( 0 )
 , mParent( 0 )
 , mPreloaded( false )
+, mPreloadNotificationsSetup(false)
 , mImpCount( 0 )
 , mEmptyImp( 0 )
 {
+	connect( schema, SIGNAL( triggerAdded( Trigger * ) ), SLOT( slotTriggerAdded( Trigger * ) ) );
+	
 	for( int i = 0; i < 4; i++ )
 		mSqlElapsed[i] = 0;
 	for( int i = 0; i < 5; i++ )
@@ -65,6 +72,9 @@ Table::Table( Database * database, TableSchema * schema )
 	mEmptyImp = new RecordImp( this, 0 );
 	mEmptyImp->mState = RecordImp::EMPTY_SHARED;
 	mEmptyImp->ref();
+	
+	foreach( Trigger * trigger, schema->triggers() )
+		slotTriggerAdded( trigger );
 }
 
 void Table::setup()
@@ -149,23 +159,39 @@ QList<Table*> Table::tableTree()
 
 Record Table::load( QVariant * v )
 {
-	return Record( new RecordImp( this, v ), false );
+	RecordImp * imp = mEmptyImp;
+	if( v ) {
+		imp = new RecordImp( this, v );
+		imp->mChangeSet = ChangeSet::current();
+	}
+	return Record(imp,false);
 }
 
 Record * Table::newObject()
 {
-	return new Record( new RecordImp( this ), false );
+	return new Record( mEmptyImp, false );
 }
 
 void Table::preload()
 {
-	if( schema()->isPreloadEnabled() && !mPreloaded )
+	if( schema()->isPreloadEnabled() && !mPreloaded ) {
+		if( !mPreloadNotificationsSetup ) {
+			mPreloadNotificationsSetup = true;
+			mDatabase->setupPreloadListen(this);
+		}
 		select("",VarList(), true, false, false);
+	}
 }
 
 bool Table::isPreloaded() const
 {
 	return mPreloaded;
+}
+
+void Table::invalidatePreload()
+{
+	mPreloaded = false;
+	preload();
 }
 
 void Table::preloadProject( uint pkey )
@@ -254,7 +280,8 @@ KeyIndex * Table::keyIndex() const
 void Table::clearIndexes()
 {
 	foreach( Index * i, mIndexes )
-		i->clear();
+		if( i != mKeyIndex )
+			i->clear();
 }
 
 void Table::addIndex( Index * index )
@@ -275,26 +302,35 @@ void Table::removeIndex( Index * index, bool dontDelete )
 
 Record Table::record( uint key, bool doSelect, bool useCache, bool baseOnly )
 {
+	return record( key, (doSelect ? Index::UseSelect : 0) | (useCache ? Index::UseCache : 0), baseOnly );
+}
+
+Record Table::record( uint key, int lookupMode, bool baseOnly, bool * _found )
+{
 	Record ret( this );
 
 	if( key==0 )
 		return ret;
 
+	bool found = false;
 	bool preloadCheck = false;
-	while( useCache ) {
+	while( lookupMode & Index::UseCache ) {
 		KeyIndex * ki = keyIndex();
 		if( ki ) {
-			bool found = false;
 			ret = ki->record( key, &found );
 			// Ignore empty entries for child tables
 			if( found )
-				return ret;
+				break;
 		}
 		if( !baseOnly ) {
 			foreach( Table * t, mChildren ) {
-				ret = t->record( key, false, true, false );
-				if( ret.isRecord() )
+				ret = t->record( key, Index::UseCache, false );
+				// If found in a child table, we don't need to check against the current
+				// changeset because that will have already been done
+				if( ret.isRecord() ) {
+					if( _found ) *_found = true;
 					return ret;
+				}
 			}
 		}
 
@@ -303,16 +339,33 @@ Record Table::record( uint key, bool doSelect, bool useCache, bool baseOnly )
 		preloadCheck = true;
 	}
 
-	if( doSelect ){
+	if( !found && (lookupMode & Index::UseSelect) ){
 		VarList args;
 		args += key;
 		RecordList res = select( mSchema->primaryKey() + "=?", args, !baseOnly, true );
-		if( res.size() )
+		if( res.size() ) {
+			if( _found ) *_found = true;
 			return res[0];
+		}
 		// Since this record was never found, we don't want to waste time selecting again
-		if( useCache && mKeyIndex )
+		if( mKeyIndex )
 			mKeyIndex->setEmptyEntry( args );
-	}	
+	}
+	
+	ChangeSet cs = ChangeSet::current();
+	if( cs.isValid() ) {
+		RecordList changes;
+		cs.visibleRecordsChanged( ret.isRecord() ? 0 : &changes, 0, ret.isRecord() ? &changes : 0, QList<Table*>()<<this );
+		if( ret.isRecord() ) {
+			if( changes.contains(ret) )
+				ret = Record();
+		} else {
+			foreach( Record r, changes )
+				if( r.key() == key )
+					ret = r;
+		}
+	}
+	if( _found ) *_found = found || ret.key() == key;
 	return ret;
 }
 
@@ -323,9 +376,14 @@ template<class T> static QList<T> unique( QList<T> list )
 
 RecordList Table::records( QList<uint> keys, bool select, bool useCache )
 {
+	return records( keys, (select ? Index::UseSelect : 0) | (useCache ? Index::UseCache : 0) | Index::PartialSelect );
+}
+
+RecordList Table::records( QList<uint> keys, int lookupMode )
+{
 	RecordList ret;
 	if( keys.isEmpty() )
-		return RecordList();
+		return ret;
 
 	// Make the list unique
 	keys = unique(keys);
@@ -334,17 +392,34 @@ RecordList Table::records( QList<uint> keys, bool select, bool useCache )
 	QList<uint> selecting;
 	foreach( uint key, keys ) {
 		if( key == 0 ) continue;
-		if( useCache ) {
-			Record r = record( key, false, true );
+		if( lookupMode & Index::UseCache ) {
+			bool found = false;
+			Record r = record( key, Index::UseCache, false, &found );
 			if( r.isRecord() ) {
 				ret += r;
 				continue;
-			}
+			} else if( found )
+				continue;
 		}
+		// If we have to select all of them, then stop checking the index
+		if( !(lookupMode & Index::PartialSelect) )
+			break;
+		
+		if( !(lookupMode & Index::UseSelect) )
+			continue;
+		
 		strs += QString::number( key );
 		selecting += key;
 	}
-	if( !strs.isEmpty() && select ) {
+	
+	if( ret.size() < keys.size() && (lookupMode & Index::UseSelect) ) {
+		if( !(lookupMode & Index::PartialSelect) ) {
+			foreach( uint key, keys )
+				strs << QString::number(key);
+			selecting = keys;
+			ret.clear();
+		}
+		
 		RecordList tmp = records( strs.join( "," ) );
 		// Set empty entries
 		if( selecting.size() != static_cast<int>(tmp.size()) ) {
@@ -391,7 +466,7 @@ void Table::recordsAdded( RecordList recs, bool notifyIndexes )
 	}
 
 	if( notifyIndexes && (QThread::currentThread() != qApp->thread() || mDatabase->queueRecordSignals()) ) {
-		QMetaObject::invokeMethod( this, "recordsAdded", Qt::QueuedConnection, Q_ARG(RecordList, recs), Q_ARG(bool, false) );
+		QMetaObject::invokeMethod( this, "added", Qt::QueuedConnection, Q_ARG(RecordList, recs), Q_ARG(bool, false) );
 		return;
 	}
 	
@@ -413,7 +488,7 @@ void Table::recordsRemoved( RecordList recs, bool notifyIndexes )
 	}
 
 	if( notifyIndexes && (QThread::currentThread() != qApp->thread() || mDatabase->queueRecordSignals()) ) {
-		QMetaObject::invokeMethod( this, "recordsRemoved", Qt::QueuedConnection, Q_ARG(RecordList, recs), Q_ARG(bool, false) );
+		QMetaObject::invokeMethod( this, "removed", Qt::QueuedConnection, Q_ARG(RecordList, recs), Q_ARG(bool, false) );
 		return;
 	}
 
@@ -434,11 +509,25 @@ void Table::recordUpdated( const Record & current, const Record & upd, bool noti
 	}
 
 	if( notifyIndexes && (QThread::currentThread() != qApp->thread() || mDatabase->queueRecordSignals()) ) {
-		QMetaObject::invokeMethod( this, "recordUpdated", Qt::QueuedConnection, Q_ARG(Record, current), Q_ARG(Record, upd), Q_ARG(bool, false) );
+		QMetaObject::invokeMethod( this, "updated", Qt::QueuedConnection, Q_ARG(Record, current), Q_ARG(Record, upd) );
 		return;
 	}
 
 	emit updated( current, upd );
+}
+
+void Table::slotTriggerAdded( Trigger * trigger )
+{
+	if( trigger->mTriggerTypes & Trigger::CreateTrigger ) {
+		// Have to temporarily change the state so that writing to the record doesn't cause a copy
+		mEmptyImp->mState = RecordImp::MODIFIED;
+		trigger->create( Record(mEmptyImp) );
+		mEmptyImp->mState = RecordImp::EMPTY_SHARED;
+		
+		// Since we only connect to the slot from our own tableschema, not children, we propogate here
+		if( mParent )
+			mParent->slotTriggerAdded(trigger);
+	}
 }
 
 RecordList Table::processIncoming( const RecordList & records, bool cacheIncoming, bool checkForUpdates )
@@ -447,18 +536,17 @@ RecordList Table::processIncoming( const RecordList & records, bool cacheIncomin
 	
 	if( checkForUpdates ) {
 		foreach( Record r, records )
-			processed += checkForUpdate( r );
+			processed.append( checkForUpdate( r ) );
 	} else
 		processed = records;
-	
+
+	processed = mSchema->processIncomingTriggers( processed );
+
 	if( mParent )
 		mParent->processIncoming( processed, cacheIncoming, false );
 	
-//	QTime time;
-//	time.start();
 	foreach( Index * i, mIndexes )
 		i->recordsIncoming( processed, cacheIncoming );
-//	addIndexTime( time.elapsed(), IndexIncoming );
 	
 	mDatabase->recordsIncoming( processed, cacheIncoming );
 	return processed;
@@ -467,6 +555,47 @@ RecordList Table::processIncoming( const RecordList & records, bool cacheIncomin
 JoinedSelect Table::join( Table * table, QString condition, JoinType joinType, bool ignoreResults, const QString & alias )
 {
 	return JoinedSelect( this ).join( table, condition, joinType, ignoreResults, alias );
+}
+
+static RecordList applyChangeSet( QList<Table*> tables, const RecordList & ret, const Expression & exp )
+{
+	ChangeSet cs(ChangeSet::current());
+	if( cs.isValid() ) {
+		RecordList added, updated, removed;
+		cs.visibleRecordsChanged(&added, &updated, &removed, tables);
+		RecordList ret2;
+		foreach( Record r, (ret-removed) + updated + added )
+			if( exp.matches(r) )
+				ret2.append(r);
+		qDebug() << "Got " << ret.size() << " records from database, " << ret2.size() << " after updating to reflect changeset";
+		return ret2.unique();
+	}
+	return ret;
+}
+
+RecordList Table::select( const Expression & exp, bool selectChildren, bool expectSingle, bool needResults )
+{
+	RecordList ret;
+	TableList tables;
+
+	// Fill mgl with tables to select from
+	if( selectChildren )
+		tables = tableTree();
+	else
+		tables += this;
+
+	if( tables.size() > 1 && (connection()->capabilities() & Connection::Cap_MultiTableSelect) ) {
+		ret = selectMulti( tables, exp, needResults, false );
+	} else
+	{
+		foreach( Table * t, tables ) {
+			ret += t->selectOnly( exp, needResults, false );
+			if( ret.size() && expectSingle )
+				break;
+		}
+	}
+
+	return ret;
 }
 
 RecordList Table::select( const QString & where, const VarList & args, bool selectChildren, bool expectSingle, bool needResults )
@@ -508,6 +637,15 @@ RecordList Table::select( const QString & where, const VarList & args, bool sele
 			w.replace( man->schema()->tableName() + ".", (*it)->schema()->tableName() + ".", Qt::CaseInsensitive);
 		}
 	}
+	
+	if( where.isEmpty() && ChangeSet::current().isValid() ) {
+		RecordList added, removed;
+		ChangeSet::current().visibleRecordsChanged(&added, 0, &removed, QList<Table*>() << this);
+		//qDebug() << ret.debug() << "\n" << removed.debug();
+		ret -= removed;
+		ret += added;
+	}
+	
 	return ret;
 }
 
@@ -572,12 +710,73 @@ RecordList Table::selectOnly( const QString & where, const VarList & args, bool 
 	if( where.toLower().contains( "for update" ) && !mDatabase->ensureInsideTransaction() )
 		return ret;
 	
-	ret = processIncoming( connection()->selectOnly( this, where, args ), cacheIncoming );
+	ret = connection()->selectOnly( this, where, args );
+	ret = processIncoming( ret, cacheIncoming );
 
-	// Don't select if where is empty and we already have the table contents
 	if( where.isEmpty() && mSchema->isPreloadEnabled() )
 		mPreloaded = true;
 
+	return ret;
+}
+
+RecordList Table::selectOnly( const Expression & exp, bool needResults, bool cacheIncoming )
+{
+	bool reflectsChangeset = false;
+	Connection * conn = connection();
+	FieldList fields = schema()->defaultSelectFields();
+	Expression transformed = Query( fields, Expression(this,/*only=*/true), exp ).prepareForExec(conn,&reflectsChangeset);
+	RecordList ret = processIncoming( conn->executeExpression(this,fields,transformed), cacheIncoming );
+	if( !reflectsChangeset )
+		ret = applyChangeSet( QList<Table*>() << this, ret, exp );
+	return ret;
+}
+
+RecordList Table::selectMulti( TableList tables, const Expression & exp, bool needResults, bool cacheIncoming )
+{
+	RecordList ret;
+	// If this table is preloaded, and a parent table is filling some
+	// caches, we need to return the records to fill the cache.
+	// Returning all values from this table should work fine.
+	// This could be slower in some situations if there is an index
+	// on this select in the db and there are a lot of records in
+	// this table, but usually one wouldn't use preload if there are
+	// a lot of records.
+	
+	// I dont think we actually hit this case currently, and it doesn't look correct because the child
+	// tables may not be preloaded, therefore we can't rely on their values being in our keyCache.
+	/*
+	if( mPreloaded && mKeyIndex && (!needResults || (innerWhere.isEmpty() && outerWhere.isEmpty())) ) {
+		//LOG_5( "Returning preloaded values" );
+		return mKeyIndex->values();
+	}*/
+	
+	// Expressions don't have for update support yet
+	//if( innerWhere.toLower().contains( "for update" ) && !mDatabase->ensureInsideTransaction() )
+	//	return ret;
+	bool reflectsChangeset = false;
+	Connection * conn = connection();
+	QList<RecordReturn> rrl;
+	Expression transformed = exp.copy().transformToInheritedUnion(tables,rrl).prepareForExec(conn,&reflectsChangeset,/*makeCopy=*/false);
+	
+	QMap<Table*,RecordList> resultsByTable;
+	if( rrl.size() == 1 )
+		resultsByTable = connection()->executeExpression( this, rrl[0], transformed );
+	else
+		LOG_1( "Unable to execute expression, the number of RecordReturn records isnt 1" );
+	
+	for( QMap<Table*,RecordList>::iterator it = resultsByTable.begin(); it != resultsByTable.end(); ++it ) {
+		Table * t = it.key();
+		ret += t->processIncoming( it.value(), cacheIncoming );
+	}
+
+	/*if( innerWhere.isEmpty() && outerWhere.isEmpty() && mSchema->isPreloadEnabled() ) {
+		foreach( Table * t, tables )
+			t->mPreloaded = true;
+	}*/
+
+	if( !reflectsChangeset )
+		ret = applyChangeSet( tables, ret, exp );
+	
 	return ret;
 }
 
@@ -592,10 +791,14 @@ RecordList Table::selectMulti( TableList tables, const QString & innerWhere, con
 	// on this select in the db and there are a lot of records in
 	// this table, but usually one wouldn't use preload if there are
 	// a lot of records.
+	
+	// I dont think we actually hit this case currently, and it doesn't look correct because the child
+	// tables may not be preloaded, therefore we can't rely on their values being in our keyCache.
+	/*
 	if( mPreloaded && mKeyIndex && (!needResults || (innerWhere.isEmpty() && outerWhere.isEmpty())) ) {
-		LOG_5( "Returning preloaded values" );
+		//LOG_5( "Returning preloaded values" );
 		return mKeyIndex->values();
-	}
+	}*/
 	
 	if( innerWhere.toLower().contains( "for update" ) && !mDatabase->ensureInsideTransaction() )
 		return ret;
@@ -630,112 +833,262 @@ void Table::selectFields( RecordList records, FieldList fields )
 	connection()->selectFields( this, validRecords, validFields );
 }
 
-bool Table::insert( const RecordList & rl, bool newPrimaryKey )
+struct InsertState
+{
+	RecordList toInsert, inserted;
+};
+
+void * Table::insertBegin( RecordList rl )
 {
 	if( !mDatabase->ensureInsideTransaction() )
-		return false;
+		return 0;
+	
+	RecordList toInsert = mSchema->processPreInsertTriggers( rl );
+	
+	if( toInsert.isEmpty() )
+		return 0;
+	
+	std::auto_ptr<InsertState> is(new InsertState);
+	is->toInsert = toInsert;
+	
+	foreach( Record r, toInsert ) {
+		RecordImp * copy = r.imp()->copy(false);
+		// Borrow the pointer to the modified bits
+		copy->mModifiedBits = r.imp()->mModifiedBits;
+		is->inserted.append(copy);
+	}
+	
+	try {
+		connection()->insert( this, is->inserted );
+	} catch(...) {
+		// Clear the borrowed pointer to avoid double delete
+		foreach( Record r, is->inserted )
+			r.imp()->mModifiedBits = 0;
+		throw;
+	}
+	
+	for( int i = 0; i < is->inserted.size(); ++i ) {
+		is->toInsert[i].imp()->setCommitted(is->inserted[i].imp()->key());
+		// Clear the borrowed pointer to avoid double delete
+		is->inserted[i].imp()->mModifiedBits = 0;
+	}
+	return is.release();
+}
 
-	mSchema->preInsert( rl );
-
-	connection()->insert( this, rl, newPrimaryKey );
-	//LOG_5( "postInsert" );
-	mSchema->postInsert( rl );
+bool Table::insertComplete( void * insertState )
+{
+	InsertState * is = (InsertState*)insertState;
+	
+	for( int i=0; i < is->toInsert.size(); ++i ) {
+		RecordImp * src = is->inserted[i].imp(), * dst = is->toInsert[i].imp();
+		qSwap( src->mValues, dst->mValues );
+		qSwap( src->mLiterals, dst->mLiterals );
+		// Clear the link from the now pristine record to the changeset
+		// It is now visible to all
+		dst->mChangeSet = ChangeSet();
+	}
+	
+	mSchema->processPostInsertTriggers( is->toInsert );
 
 	//LOG_5( "UpdateManager::recordsAdded" );
-	UpdateManager::instance()->recordsAdded( this, rl );
+	UpdateManager::instance()->recordsAdded( this, is->toInsert );
 	//LOG_5( "recordsAdded" );
-	recordsAdded( rl );
+	recordsAdded( is->toInsert );
 	//LOG_5( "mDatabase->recordsAdded" );
-	mDatabase->recordsAdded( rl, true );
-	//LOG_5( "done" );
+	mDatabase->recordsAdded( is->toInsert, true );
+	
+	delete is;
+
 	return true;
 }
 
-bool Table::insert( const Record & rb, bool newPrimaryKey )
+void Table::insertRollback( void * insertState )
 {
-	return insert( RecordList() += rb, newPrimaryKey );
+	InsertState * is = (InsertState*)insertState;
+	// Clear the committed state
+	foreach( Record r, is->toInsert ) {
+		r.imp()->setCommitted(0);
+	}
+	delete is;
 }
 
-Record Table::checkForUpdate( Record rec )
+bool Table::insert( const RecordList & rl )
 {
-	// If we can find the original record in our key cache,
-	// than we will
-	// 1. Create a temporary record with the old values
-	// 2. Updated the original with the new values
-	// 3. Call recordUpdated
-	if( !mKeyIndex ) return rec;
-	Record bu = mKeyIndex->record( rec.key(), 0 );
-	if( bu.isRecord() ) {
-		RecordImp * master = bu.imp();
-		Record old( master->copy(), false );
-		master->set( &(*rec.imp()->mValues)[0] );
+	void * insertState = insertBegin(rl);
+	return insertState ? insertComplete(insertState) : false;
+}
+
+bool Table::insert( const Record & rb )
+{
+	return insert( RecordList(rb) );
+}
+
+// incoming is either a record just created from data coming from the database(via select or update returning),
+// or it's the contents of a just executed update to the database, either way it reflects the current database state.
+// Now that we have linked versions on records we could theoretically avoid the swap below by marking the current pristine
+// record as discarded and marking the incoming as pristine, but that would need changes elsewhere in the record/recordimp/changeset
+// interactions.
+Record Table::checkForUpdate( Record incoming )
+{
+	Record pristine = mKeyIndex->record(incoming.key(),0).pristine();
+	
+	if( pristine.isValid() && pristine.imp() != incoming.imp() ) {
+		// We bypass the Records here and go straight to the recordimps, both for speed and
+		// because we don't want to be messing about with the changeset values, we already
+		// have the versions we want
+		RecordImp * pristine_imp = pristine.imp();
+		RecordImp * incoming_imp = incoming.imp();
+		
 		bool needsUpdateSignal = false;
 		FieldList fl = mSchema->fields();
 		foreach( Field * f, fl ) {
 			// Don't do a comparison if the before-update record didn't have this column selected
-			if( f->flag( Field::NoDefaultSelect ) && !bu.imp()->isColumnSelected( f->pos() ) )
+			if( f->flag( Field::NoDefaultSelect ) && !pristine_imp->isColumnSelected( f->pos() ) )
 				continue;
-			QVariant v1 = bu.getValue( f->pos() );
-			QVariant v2 = old.getValue( f->pos() );
+			QVariant v1 = pristine_imp->getColumn( f->pos() );
+			QVariant v2 = incoming_imp->getColumn( f->pos() );
 			if( (v1.isNull() != v2.isNull()) || (v1 != v2) ) {
-				//LOG_5( "Field " + f->name() + " updated from " + v2.toString() + " to " + v1.toString() );
 				needsUpdateSignal = true;
 				break;
 			}
 		}
-		if( needsUpdateSignal ) {
-			UpdateManager::instance()->recordUpdated( this, bu, old );
-			recordUpdated( bu, old );
-			mDatabase->recordUpdated( bu, old, true );
-		}
-		return bu;
+		
+		// Optimization to keep old values in memory if they haven't changed at all
+		if( !needsUpdateSignal )
+			return pristine;
+		
+		qSwap( incoming_imp->mValues, pristine_imp->mValues );
+		incoming_imp->mState |= RecordImp::HOLDS_OLD_VALUES;
+		
+		// Update all unchanged columns of any modified versions
+		pristine_imp->updateChildren();
+		
+		if( needsUpdateSignal )
+			callUpdateSignals(pristine,incoming);
+		return pristine;
 	}
-	return rec;
+	return incoming;
+}
+
+void Table::callUpdateSignals( const Record & pristine, const Record & old )
+{
+	mSchema->processPostUpdateTriggers( pristine, old );
+	UpdateManager::instance()->recordUpdated( this, pristine, old );
+	recordUpdated( pristine, old );
+	mDatabase->recordUpdated( pristine, old, true );
 }
 
 void Table::update( RecordImp * imp )
 {
-	// Must be a modified, committed record to be updated
-	if( imp->mState != (RecordImp::MODIFIED|RecordImp::COMMITTED) ) {
-		qWarning( "Table::update: Update on record that is not both committed and modified" );
-		return;
-	}
-	
-	bool nc = false, selectAfterUpdate = false;
-	FieldList fields = mSchema->columns();
-	
-	mSchema->preUpdate( Record(imp,false), mKeyIndex ? mKeyIndex->record( imp->key(), 0 ) : Record() );
+	update( RecordList(Record(imp)) );
+}
 
-	foreach( Field * f, schema()->columns() )
-		if( imp->isColumnLiteral( f->pos() ) ) {
-			selectAfterUpdate = true;
-			nc = true;
-		} else if ( imp->isColumnModified( f->pos() ) )
-			nc = true;
+struct UpdateState
+{
+	UpdateState() : selectAfterUpdate(false), askForRet(false) {}
+	RecordList ret, pristine, toUpdate;
+	bool selectAfterUpdate, askForRet;
+};
+
+void * Table::updateBegin( RecordList records )
+{
+	std::auto_ptr<UpdateState> us(new UpdateState);
 	
-	// There were no columns to update
-	if( !nc ) {
-		//qWarning( "Table::update: Record had MODIFIED field set, but no modified columns" );
-		return;
-	}
+	// Must be a modified, committed record to be updated
+	foreach( Record r, records ) {
+		RecordImp * imp = r.imp();
+		if( (imp->mState & (RecordImp::MODIFIED|RecordImp::COMMITTED)) != (RecordImp::MODIFIED|RecordImp::COMMITTED) ) {
+			qWarning( "Table::update: Update on record that is not both committed and modified" );
+			continue;
+		}
+
+		// There were no columns to update
+		if( !imp->mModifiedBits )  {
+			//qWarning( "Table::update: Record had MODIFIED field set, but no modified columns" );
+			continue;
+		}
 		
-	if( !mDatabase->ensureInsideTransaction() )
-		return;
+		Record p = r.pristine();
+		us->pristine.append(p);
+		r = mSchema->processPreUpdateTriggers( r, p );
+		us->selectAfterUpdate = us->selectAfterUpdate || bool(imp->mLiterals);
+		us->toUpdate.append(r);
+	}
+	
+	if( !mDatabase->ensureInsideTransaction() ) {
+		qDebug() << "Database ensure inside transaction failed";
+		return 0;
+	}
 	
 	Connection * c = connection();
-	Record ret(imp,false);
-	bool askForRet = selectAfterUpdate && (c->capabilities() & Connection::Cap_Returning);
-	bool success = c->update( this, imp, askForRet ? &ret : 0 );
-	if( success ) {
-		mSchema->postUpdate( ret, mKeyIndex ? mKeyIndex->record( imp->key(), 0 ) : Record() );
-		imp->clearModifiedBits();
-		if( selectAfterUpdate && !askForRet )
-			// Refresh the record from the database, to get any columns changed via triggers, etc.
-			selectOnly( mSchema->primaryKey() + "=" + QString::number( imp->key() ), VarList(), true );
-		else
-			// Check to see if the original record exists in memory, if so, update it
-			checkForUpdate( ret );
+
+	us->askForRet = us->selectAfterUpdate && (c->capabilities() & Connection::Cap_Returning);
+	bool success = c->update( this, us->toUpdate, us->askForRet ? &(us->ret) : 0 );
+	if( !success ) {
+		qDebug() << "Error sending update to the database";
+		return 0;
 	}
+	return us.release();
+}
+
+void Table::updateComplete( void * updateState )
+{
+	UpdateState * us = (UpdateState*)updateState;
+	
+	for( int i=0; i < us->toUpdate.size(); ++i ) {
+		RecordImp * pristine_imp = us->pristine[i].imp();
+		RecordImp * imp = us->toUpdate[i].imp();
+		
+		// Swap values from old to new
+		qSwap( imp->mValues, pristine_imp->mValues );
+		
+		// If we already got updated values then fill them in to the pristine
+		if( us->askForRet ) {
+			RecordImp * incoming_imp = us->ret[i].imp();
+			foreach( Field * f, mSchema->fields() ) {
+				int i = f->pos();
+				if( incoming_imp->isColumnSelected(i) ) {
+					pristine_imp->mValues->replace(i,incoming_imp->mValues->at(i));
+				}
+			}
+		}
+
+		imp->mState |= RecordImp::HOLDS_OLD_VALUES;
+		imp->clearColumnLiterals();
+	}
+	
+	if( us->selectAfterUpdate && !us->askForRet )
+			// Refresh the record from the database, to get any columns changed via triggers, etc.
+	
+			try {
+				// TODO: Need 2 stage select with the first stage executed in updateBegin, this can throw
+				// Leaving the changeset in a inconsistent state
+				selectOnly( mSchema->primaryKey() + " IN (" + us->toUpdate.keyString() + ")", VarList(), true );
+			} catch(...) {
+				qDebug() << "Exception thrown in updateComplete's select, this code needs fixed!";
+			}
+	else {
+		for( int i=0; i < us->toUpdate.size(); ++i ) {
+			Record p = us->pristine[i].imp();
+			// Then we update the pristine
+			p.imp()->updateChildren();
+
+			callUpdateSignals( p, us->askForRet ? us->ret[i] : us->toUpdate[i] );
+		}
+	}
+	delete us;
+}
+
+void Table::updateRollback( void * updateState )
+{
+	delete (UpdateState*)updateState;
+}
+
+void Table::update( RecordList records )
+{
+	void * updateState = updateBegin(records);
+	if( updateState )
+		updateComplete(updateState);
 }
 
 int Table::remove( const Record & rb )
@@ -743,10 +1096,28 @@ int Table::remove( const Record & rb )
 	return remove( RecordList() += Record( rb ) );
 }
 
-int Table::remove( const RecordList & const_list )
+struct RemoveState
 {
+	QList<int> removed;
+	RecordList rl;
+	int result;
+};
+
+void * Table::removeBegin( const RecordList & const_list )
+{
+	std::auto_ptr<RemoveState> rs(new RemoveState);
+	
 	RecordList rl( const_list );
-	rl = gatherToRemove( const_list );
+
+	rl = mSchema->processPreDeleteTriggers(rl);
+
+	// Pre-delete trigger may have removed all records
+	if( rl.isEmpty() ) {
+		qDebug() << "No records left to delete after processing pre delete triggers";
+		return 0;
+	}
+	
+	//rl = gatherToRemove( rl );
 	
 	for( RecordIter it = rl.begin(); it != rl.end(); )
 	{
@@ -754,44 +1125,59 @@ int Table::remove( const RecordList & const_list )
 			it = rl.remove( it );
 			continue;
 		}
-		//it.imp()->mState = RecordImp::DELETED;
 		++it;
 	}
 
-
 	if( !mDatabase->ensureInsideTransaction() )
-		return -1;
-
-	mSchema->preRemove( rl );
+		return 0;
 
 	QString keys = rl.keyString();
 
-	if( keys.isEmpty() )
+	if( keys.isEmpty() ) {
+		qDebug() << "No records with primary keys to delete";
 		return 0;
+	}
 	
-	QList<int> removed;
-	int result = connection()->remove( this, keys, &removed );
-	
-	if( result >= 0 ) {
+	rs->rl = rl;
+	rs->result = connection()->remove( this, keys, &(rs->removed) );
+	return rs.release();
+}
+
+int Table::removeComplete( void * removeState )
+{
+	RemoveState * rs = (RemoveState*)removeState;
+	if( rs->result >= 0 ) {
 		QSet<int> removedSet;
-		int partialDelete = (result != rl.size());
+		bool partialDelete = (rs->result != (int)rs->rl.size());
 		if( partialDelete )
-			removedSet = removed.toSet();
-		for( RecordIter it = rl.begin(); it != rl.end(); ) {
+			removedSet = rs->removed.toSet();
+		for( RecordIter it = rs->rl.begin(); it != rs->rl.end(); ) {
 			// Remove the records that weren't removed in the db
 			if( partialDelete && !removedSet.contains((*it).key()) ) {
-				it = rl.remove(it);
+				it = rs->rl.remove(it);
 				continue;
 			}
 			it.imp()->mState = RecordImp::DELETED;
 			++it;
 		}
-		UpdateManager::instance()->recordsDeleted( this, rl );
-		recordsRemoved( rl );
-		mDatabase->recordsRemoved( rl, true );
-		mSchema->postRemove(rl);
+		mSchema->processPostDeleteTriggers( rs->rl );
+		UpdateManager::instance()->recordsDeleted( this, rs->rl );
+		recordsRemoved( rs->rl );
+		mDatabase->recordsRemoved( rs->rl, true );
 	}
-	return result;
+	delete rs;
+	return rs->result;
+}
+
+void Table::removeRollback( void * removeState )
+{
+	delete (RemoveState*)removeState;
+}
+
+int Table::remove( const RecordList & const_list )
+{
+	void * removeState = removeBegin(const_list);
+	return removeState ? removeComplete(removeState) : 0;
 }
 
 RecordList Table::gatherToRemove( const RecordList & toRemove )
@@ -801,23 +1187,23 @@ RecordList Table::gatherToRemove( const RecordList & toRemove )
 	for( RecordIter it = toRemove.begin(); it != toRemove.end(); ++it )
 	{
 		if( (*it).key() == 0 ) continue;
-		if( mKeyIndex )
-			our_remove += mKeyIndex->record( (*it).key(), 0 );
-		else
-			our_remove += *it;
+		Record r = mKeyIndex ? mKeyIndex->record( (*it).key(), 0 ) : Record();
+		our_remove += r.isRecord() ? r : *it;
 		foreach( Field * f, das ) {
 			int dm = f->indexDeleteMode();
 			if( dm == Field::DoNothingOnDelete ) continue;
 			Table * t = mDatabase->tableFromSchema( f->table() );
 			Index * i = t->indexFromSchema( f->index() );
-			RecordList fkeys = i->recordsByIndex( (*it).key() );
+			RecordList fkeys = i->recordsByIndex( VarList() << QVariant((*it).key()) );
 			if( dm == Field::UpdateOnDelete ) {
 				for( RecordIter uit = fkeys.begin(); uit != fkeys.end(); ++uit )
 					(*it).setValue( f->name(), QVariant( 0 ) );
 				fkeys.commit();
 			} else if( dm == Field::CascadeOnDelete ) {
-				if( t == this )
+				if( t == this ) {
+					fkeys = mSchema->processPreDeleteTriggers(fkeys);
 					our_remove += gatherToRemove( fkeys );
+				}
 				else
 					fkeys.remove();
 			}

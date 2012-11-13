@@ -20,7 +20,6 @@
 #ifndef G10_BITHELP_H
 #define G10_BITHELP_H
 
-
 /****************
  * Rotate the 32 bit unsigned integer X by N bits left/right
  */

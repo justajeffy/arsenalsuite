@@ -4,10 +4,13 @@
 
 #include "blurqt.h"
 #include "database.h"
+#include "field.h"
 #include "freezercore.h"
 #include "record.h"
+#include "schema.h"
 
 #include "assettype.h"
+#include "jobtask.h"
 #include "filetracker.h"
 #include "pathtemplate.h"
 #include "project.h"
@@ -19,7 +22,8 @@ bool test3();
 bool test4();
 bool test5();
 bool test6();
-bool test7();
+//bool test7();
+bool test8();
 
 #define TEST(x)	{ \
 	QTime t; \
@@ -34,13 +38,14 @@ int main( int argc, char * argv [] )
 {
 	QApplication a( argc, argv );
 	initConfig( "test.ini" );
+	blurqt_loader();
 	TEST(1);
 	TEST(2);
 	TEST(3);
 	TEST(4);
 	TEST(5);
 	TEST(6);
-	TEST(7);
+	TEST(8);
 	shutdown();
 }
 
@@ -66,21 +71,32 @@ bool testInt( int target, int actual, const QString & test, bool expectEqual = t
 	return true;
 }
 
+bool testBool( bool target, bool actual, const QString & test )
+{
+	if( target != actual ) {
+		qWarning( "Test " + test + " failed" );
+		qWarning( "Expected: " + QString( target ? "true" : "false" ) );
+		qWarning( "Got: " + QString( actual ? "true" : "false" ) );
+		return false;
+	}
+	return true;
+}
+
 bool test1()
 {
 	QString test( "Database Connection" );
-	FreezerCore * fc = FreezerCore::instance();
-	return testInt( (int)fc->isConnected(), 1, test );
+	Connection * c = Database::current()->connection();
+	return testBool( true, c->checkConnection(), test );
 }
 
 Database * d = 0;
 Table * t = 0;
 bool test2()
 {
-	QString test( "Table::mergeSchema" );
-	d = Database::instance();
-	d->mergeSchema( "../schema.xml" );
-	t = d->tableByName( "JobTask" );
+	QString test( "Table::mergeXmlSchema" );
+	d = Database::current();
+	d->schema()->mergeXmlSchema( "../schema.xml" );
+	t = d->schema()->tableByName( "JobTask" )->table();
 	return testInt( 0, (int)t, test, false );
 }
 
@@ -109,12 +125,12 @@ bool test4()
 bool test5()
 {
 	QString test( "Record Ref Counting" );
-	RETFAIL( testInt( 2, r.imp()->refCount(), test + " 1" ) );
+	RETFAIL( testInt( 1, r.imp()->refCount(), test + " 1" ) );
 	Record mod = r;
-	RETFAIL( testInt( 3, r.imp()->refCount(), test + " 2" ) );
+	RETFAIL( testInt( 2, r.imp()->refCount(), test + " 2" ) );
 	mod.setValue( "fkeyJob", 112 );
 	RETFAIL( testInt( 1, mod.imp()->refCount(), test + " 3" ) );
-	RETFAIL( testInt( 2, r.imp()->refCount(), test + " 4" ) );
+	RETFAIL( testInt( 1, r.imp()->refCount(), test + " 4" ) );
 	mod.commit();
 	RETFAIL( testInt( 112, r.getValue( "fkeyJob" ).toInt(), test + " 5" ) );
 	mod = t->record( r.key(), true, false );
@@ -135,6 +151,15 @@ bool test6()
 	return true;
 }
 
+bool test8()
+{
+	QString test( "field list creation" );
+	FieldList fl = FieldList() << JobTaskFields::Key << JobTaskFields::FrameNumber << JobTaskFields::Host;
+	RETFAIL( testInt( 3, fl.size(), test ) );
+	return true;
+}
+
+/*
 bool test7()
 {
 	QString test( "PathTemplate methods" );
@@ -220,7 +245,7 @@ bool test7()
 	RETFAIL( testString( "G:/A_Project/An_Asset_Group/A_Character/Modeling/A_Character_v1_2.max", ft_wip.filePath(), test + ": rigging_final", true ) );
 	
 	return true;
-}
+}*/
 
 
 

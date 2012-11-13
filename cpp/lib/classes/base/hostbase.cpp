@@ -40,6 +40,7 @@
 #include "syslogseverity.h"
 #include "service.h"
 #include "hostservice.h"
+#include "hoststatus.h"
 #include "hostgroup.h"
 #include "hostgroupitem.h"
 
@@ -131,12 +132,12 @@ SYSTEM_INFO w32_getSystemInfo( bool * success )
 	return sysInfo;
 }
 
-QString w32_getOsVersion()
+QString w32_getOsVersion( QString * servicePackVersion = 0, int * buildNumber = 0 )
 {
 	QString ret;
 	OSVERSIONINFOEXW osvi;
+	SYSTEM_INFO systemInfo;
 	BOOL bOsVersionInfoEx;
-	
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEXW));
 	
 	// Try calling GetVersionEx using the OSVERSIONINFOEX structure.
@@ -149,6 +150,16 @@ QString w32_getOsVersion()
 		if (! GetVersionEx ( (OSVERSIONINFOW *) &osvi) ) 
 			return QString();
 	}
+	bool success = true;
+	systemInfo = w32_getSystemInfo( &success );
+	if( !success )
+		return QString();
+	
+	if( servicePackVersion )
+		*servicePackVersion = QString("%1.%2").arg(osvi.wServicePackMajor).arg(osvi.wServicePackMinor);
+	
+	if( buildNumber )
+		*buildNumber = osvi.dwBuildNumber;
 	
 	switch( osvi.dwMajorVersion ) {
 		case 4:
@@ -178,7 +189,16 @@ QString w32_getOsVersion()
 					ret = "Windows XP";
 					break;
 				case 2:
-					ret = "Windows Server 2003";
+					if( (osvi.wProductType == VER_NT_WORKSTATION) && (systemInfo.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64) )
+						ret = "Windows XP Professional x64";
+					else if(osvi.wSuiteMask & 0x00008000 /*VER_SUITE_WH_SERVER*/)
+						ret = "Windows Home Server";
+					else {
+						if( GetSystemMetrics(SM_SERVERR2) == 0 )
+							ret = "Windows Server 2003";
+						else
+							ret = "Windows Server 2003 R2";
+					}
 					break;
 			};
 		}
@@ -186,7 +206,17 @@ QString w32_getOsVersion()
 		{
 			switch( osvi.dwMinorVersion ) {
 				case 0:
-					ret = "Windows Vista";
+					if( osvi.wProductType != VER_NT_WORKSTATION )
+						ret = "Windows Server 2008";
+					else
+						ret = "Windows Vista";
+					break;
+				case 1:
+					if( osvi.wProductType != VER_NT_WORKSTATION )
+						ret = "Windows Server 2008 R2";
+					else
+						ret = "Windows 7";
+					break;
 			};
 		}
 	};
@@ -277,13 +307,29 @@ void Host::updateHardwareInfo()
 #endif
 		setOs( "win64" );
 		setArchitecture( arch );
-		setOsVersion( w32_getOsVersion() );
+		QString servicePackVersion;
+		int buildNumber;
+		setOsVersion( w32_getOsVersion(&servicePackVersion,&buildNumber) );
+		setServicePackVersion(servicePackVersion);
+		setBuildNumber(buildNumber);
 		setCpus( sysInfo.dwNumberOfProcessors );
 		QSettings mhzReg( "HKEY_LOCAL_MACHINE\\Hardware\\Description\\System\\CentralProcessor\\0", QSettings::NativeFormat );
 		setMhz( mhzReg.value( "~MHz" ).toInt() );
+		setWindowsDomain( localDomain() );
 	}
 #endif
 	commit();
+	
+	
+	/*
+	 * Anything that will change every time this function is run should probably be in HostStatus, not in Host.
+	 * All the above will be recalculated but rarely ever change and cause an actual update.
+	 */
+	
+	HostStatus hs = hostStatus();
+	Interval uptime = systemUpTime();
+	hs.setSystemStartupTimestamp( uptime == Interval() ? QDateTime() : (uptime * -1.0).adjust(QDateTime::currentDateTime()) );
+	hs.commit();
 }
 
 #endif // CLASS_FUNCTIONS

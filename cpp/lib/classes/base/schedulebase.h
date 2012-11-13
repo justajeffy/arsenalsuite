@@ -25,8 +25,8 @@
 
 #ifdef TABLE_FUNCTIONS
 
-	void postInsert( RecordList );
-	void postUpdate( const Record &, const Record & );
+//	void postInsert( RecordList );
+//	void postUpdate( const Record &, const Record & );
 
 #endif
 

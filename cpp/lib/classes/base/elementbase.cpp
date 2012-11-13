@@ -49,7 +49,6 @@
 #include "project.h"
 #include "projectstatus.h"
 #include "projectstorage.h"
-#include "renderelements.h"
 #include "schedule.h"
 #include "shot.h"
 #include "shotgroup.h"
@@ -332,11 +331,6 @@ QString Element::prettyPath() const {
 	Element par = parent();
 	bool ap = (par.isRecord()) && (par != *this);
 	return QString(ap ? par.prettyPath() : "") + "/" + name();
-}
-
-QString Element::status() const
-{
-	return elementStatus().name();
 }
 
 /******************************************

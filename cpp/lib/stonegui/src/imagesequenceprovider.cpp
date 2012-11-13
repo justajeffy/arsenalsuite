@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: imagesequenceprovider.cpp 8505 2009-06-24 08:01:20Z brobison $
+ * $Id: imagesequenceprovider.cpp 9918 2010-05-26 21:52:41Z newellm $
  */
 
 #include <qstringlist.h>
@@ -31,12 +31,8 @@
 #include <qfileinfo.h>
 #include <QGLContext>
 
-#include "path.h"
-namespace Stone {
-class Path;
-}
-
 #include "freezercore.h"
+#include "path.h"
 
 #include "imagesequenceprovider.h"
 
@@ -157,11 +153,12 @@ GLImageSequenceProvider::GLImageCacheNode::~GLImageCacheNode()
 	delete texture;
 }
 
-class GLPreloadTask : public Stone::ThreadTask
+using namespace Stone;
+class GLPreloadTask : public ThreadTask
 {
 public:
 	GLPreloadTask( GLImageSequenceProvider * provider, int fn )
-	: Stone::ThreadTask( QEvent::User + 1, provider )
+	: ThreadTask( QEvent::User + 1, provider )
 	, mProvider( provider )
 	, mFrameNumber( fn )
 	{}
@@ -169,7 +166,7 @@ public:
 	void run() {
 		if( !mCancel ) {
 			mProvider->mProviderMutex.lock();
-			LOG_5( "Executing preload task" );
+			//LOG_5( "Executing preload task" );
 			mProvider->loadAndCache( mFrameNumber, mProvider->mThreadGLContext );
 			mProvider->mPreloadTask = 0;
 			mProvider->mProviderMutex.unlock();
@@ -280,7 +277,7 @@ GLTexture * GLImageSequenceProvider::loadAndCache( int frameNumber, QGLContext *
 	GLImageCacheNode * node = new GLImageCacheNode( img.isNull() ? 0 : new GLTexture( context, img ), this, frameNumber );
 	emit imageStatusChange( frameNumber, img.isNull() ? ImageNotAvailable : ImageStatus(ImageAvailable | ImageCached) );
 
-	LOG_5( "Inserting image into cache with cost: " + QString::number( imageCost( img ) / 1024 ) + "Mb" );
+	//LOG_5( "Inserting image into cache with cost: " + QString::number( imageCost( img ) / 1024 ) + "Mb" );
 	mGLTextureCache.insert( frameNumber, node, imageCost( img ) );
 	return node->texture;
 }
@@ -290,14 +287,14 @@ GLTexture * GLImageSequenceProvider::glTexture( int frameNumber )
 	GLTexture * ret = 0;
 	if( !mProvider ) return ret;
 
-	LOG_5( "Frame " + QString::number( frameNumber ) + " requested, Current Cache Size: " + QString::number( mGLTextureCache.totalCost() / 1024 ) + "Mb" );
+	//LOG_5( "Frame " + QString::number( frameNumber ) + " requested, Current Cache Size: " + QString::number( mGLTextureCache.totalCost() / 1024 ) + "Mb" );
 
 	// Lock mutex, to ensure any threads loading a texture will either be completely done or not started
 	QMutexLocker l( &mProviderMutex );
 
 	GLImageCacheNode * node = mGLTextureCache.object( frameNumber );
 	if( node ) {
-		LOG_5( "Found Image in Cache, returning" );
+		//LOG_5( "Found Image in Cache, returning" );
 		ret = node->texture;
 	} else
 		ret = loadAndCache( frameNumber );
@@ -306,13 +303,13 @@ GLTexture * GLImageSequenceProvider::glTexture( int frameNumber )
 		if( frameNumber < frameEnd() ) {
 			if( frameNumber == mLastFrameNumber + 1 ) {
 				if( !mGLTextureCache.object( frameNumber + 1 ) ) {
-					LOG_5( "Starting preload task" );
+					//LOG_5( "Starting preload task" );
 					if( !mThreadGLContext ) {
 						mThreadGLContext = new QGLContext( mGLContext->format(), mGLContext->device() );
 						mThreadGLContext->create( mGLContext );
 					}
 					mPreloadTask = new GLPreloadTask( this, frameNumber + 1 );
-					Stone::FreezerCore::addTask( mPreloadTask );
+					FreezerCore::addTask( mPreloadTask );
 				} else
 					LOG_5( "Not preloading, next frame already cached" );
 			} else
@@ -321,6 +318,7 @@ GLTexture * GLImageSequenceProvider::glTexture( int frameNumber )
 			LOG_5( "Not preloading, frame is last in series" );
 	} else
 		LOG_5( "Not preloading, existing preload in progress" );
+
 	mLastFrameNumber = frameNumber;
 	return ret;
 }
@@ -366,7 +364,7 @@ public:
 	: mFrameStart( 0 )
 	, mFrameEnd( 0 )
 	{
-		mBasePath = Stone::Path(imagePath).dirPath() + framePathBaseName( imagePath );
+		mBasePath = Path(imagePath).dirPath() + framePathBaseName( imagePath );
 		QList<int> frames;
 		filesFromFramePath( mBasePath, &frames, &mPadWidth );
 		if( !frames.isEmpty() ) {

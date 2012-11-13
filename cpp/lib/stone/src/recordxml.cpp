@@ -1,4 +1,30 @@
 
+/*
+ *
+ * Copyright 2012 Blur Studio Inc.
+ *
+ * This file is part of libstone.
+ *
+ * libstone is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * libstone is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with libstone; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
+/*
+ * $Id$
+ */
+
 #include <qfile.h>
 
 #include "recordxml.h"
@@ -60,7 +86,7 @@ QDomDocument RecordXmlSaver::document() const
 	return mDocument;
 }
 
-bool RecordXmlSaver::saveToFile(const QString & fileName, QString * errorMessage)
+bool RecordXmlSaver::saveToFile(const QString & fileName, QString * )
 {
 	return writeFullFile( fileName, mDocument.toString() );
 }
@@ -70,7 +96,7 @@ bool RecordXmlSaver::toFile(RecordList rl, const QString & fileName, QString * e
 	return RecordXmlSaver(rl).saveToFile(fileName,errorMessage);
 }
 
-QDomDocument RecordXmlSaver::toDocument(RecordList rl, QString * errorMessage)
+QDomDocument RecordXmlSaver::toDocument(RecordList rl, QString *)
 {
 	return RecordXmlSaver(rl).document();
 }
@@ -100,7 +126,7 @@ QMap<Record,QDomElement> RecordXmlLoader::recordElementMap() const
 	return mRecordElementMap;
 }
 
-bool RecordXmlLoader::loadFile( const QString & fileName, QString * errorMessage)
+bool RecordXmlLoader::loadFile( const QString & fileName, QString * )
 {
 	QDomDocument doc;
 	QString _errorMessage;
@@ -132,7 +158,7 @@ Record RecordXmlLoader::recordByInternalId( int internalId )
 	return mInternalIdMap[internalId];
 }
 
-bool RecordXmlLoader::loadDocument( const QDomDocument & doc, QString * errorMessage)
+bool RecordXmlLoader::loadDocument( const QDomDocument & doc, QString *)
 {
 	QDomNode root = doc.firstChild();
 	QDomNode n = root.firstChild();
@@ -192,12 +218,12 @@ bool RecordXmlLoader::loadDocument( const QDomDocument & doc, QString * errorMes
 	return true;
 }
 
-RecordList RecordXmlLoader::fromFile(const QString & fileName, QString * errorMessage)
+RecordList RecordXmlLoader::fromFile(const QString & fileName, QString *)
 {
 	return RecordXmlLoader(fileName).records();
 }
 
-RecordList RecordXmlLoader::fromDocument(const QDomDocument & document, QString * errorMessage)
+RecordList RecordXmlLoader::fromDocument(const QDomDocument & document, QString *)
 {
 	return RecordXmlLoader(document).records();
 }

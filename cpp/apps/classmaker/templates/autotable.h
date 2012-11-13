@@ -8,16 +8,13 @@
 #include "index.h"
 #include "table.h"
 #include "tl__list.h"
+#include "expression.h"
 
 class t__;
 namespace Stone {
 class Database;
 }
 using namespace Stone;
-
-namespace t__Fields {
-	<%SCHEMAFIELDDECLS%>
-};
 
 class snu___EXPORT t__Schema : public TableSchema
 {

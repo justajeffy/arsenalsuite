@@ -1,5 +1,5 @@
 
-class TableSchema
+class TableSchema : QObject
 {
 %TypeHeaderCode
 #include <table.h>
@@ -95,14 +95,14 @@ public:
 
 	uint firstColumnIndex() const;
 
-protected:
-	virtual void preUpdate( const Record & updated, const Record & existing );
-	virtual void preInsert( RecordList );
-	virtual void preRemove( RecordList );
+	void addTrigger( Trigger * trigger /Transfer/ );
+	void removeTrigger( Trigger * trigger /TransferBack/ );
+	QList<Trigger*> triggers() const;
 
-	virtual void postUpdate( const Record & updated, const Record & old );
-	virtual void postInsert( RecordList );
-	virtual void postRemove( RecordList );
+signals:
+	void triggerAdded( Trigger * trigger );
+
+protected:
 
 	void recalcFieldPositions( int start = 0, bool skipSelf = false );
 

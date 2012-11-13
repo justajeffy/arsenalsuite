@@ -40,12 +40,12 @@ ResolutionDialog::ResolutionDialog( QWidget * parent )
 	mPixelAspectEdit->setText( "1.0" );
 }
 
-Resolution ResolutionDialog::resolution()
+ProjectResolution ResolutionDialog::resolution()
 {
 	return mResolution;
 }
 
-void ResolutionDialog::setResolution( const Resolution & r )
+void ResolutionDialog::setResolution( const ProjectResolution & r )
 {
 	mResolution = r;
 	mNameEdit->setText( r.name() );

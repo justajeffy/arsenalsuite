@@ -22,7 +22,7 @@
  */
 
 /*
- * $Id: indexschema.cpp 8507 2009-06-24 08:09:37Z brobison $
+ * $Id$
  */
 
 #include "indexschema.h"

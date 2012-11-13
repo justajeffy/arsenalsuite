@@ -47,7 +47,7 @@ void ElementModelItem::setup( const Record & el, const QModelIndex & index )
 			col2 = p.projectStatus().projectStatus();
 		} else {
 			statusColor.setNamedColor( element.elementStatus().color() );
-			col2 = element.status();
+			col2 = element.elementStatus().name();
 		}
 	}
 }

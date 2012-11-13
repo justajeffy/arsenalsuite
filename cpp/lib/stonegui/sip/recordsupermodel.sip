@@ -5,8 +5,8 @@ class RecordItemBase : ItemBase
 #include <recordsupermodel.h>
 %End
 public:
-    RecordList children( const QModelIndex & );
-    Qt::ItemFlags modelFlags( const QModelIndex & );
+	RecordList children( const QModelIndex & );
+	Qt::ItemFlags modelFlags( const QModelIndex & );
 };
 
 class SipRecordItemBase : RecordItemBase
@@ -15,7 +15,7 @@ class SipRecordItemBase : RecordItemBase
 #include <recordsupermodel.h>
 %End
 public:
-    SipRecordItemBase(ModelTreeBuilder * builder);
+	SipRecordItemBase(ModelTreeBuilder * builder);
 };
 
 class RecordDataTranslatorInterface : ModelDataTranslator /Abstract/
@@ -67,18 +67,18 @@ class SipRecordDataTranslatorBase : RecordDataTranslatorBase
 #include <recordsupermodel.h>
 %End
 public:
-    SipRecordDataTranslatorBase(ModelTreeBuilder * builder /TransferThis/ );
-    ~SipRecordDataTranslatorBase();
+	SipRecordDataTranslatorBase(ModelTreeBuilder * builder /TransferThis/ );
+	~SipRecordDataTranslatorBase();
 
-    virtual Record getRecord(const QModelIndex &) const;
+	virtual Record getRecord(const QModelIndex &) const;
 
-    virtual QVariant modelData( void * dataPtr, const QModelIndex &, int role ) const;
-    virtual bool setModelData( void * dataPtr, const QModelIndex &, const QVariant &, int);
-    virtual void setup(const QModelIndex & idx, const Record & record );
-    virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const;
-    virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const;
+	virtual QVariant modelData( void * dataPtr, const QModelIndex &, int role ) const;
+	virtual bool setModelData( void * dataPtr, const QModelIndex &, const QVariant &, int);
+	virtual void setup(const QModelIndex & idx, const Record & record );
+	virtual Qt::ItemFlags modelFlags( void * dataPtr, const QModelIndex & ) const;
+	virtual int compare( void * dataPtr, void * dataPtr2, const QModelIndex & idx1, const QModelIndex & idx2, int column, bool asc ) const;
 
-    virtual QModelIndexList insertRecordList(int row, RecordList & rl /TransferThis/, const QModelIndex & parent = QModelIndex() );
+	virtual QModelIndexList insertRecordList(int row, RecordList & rl /TransferThis/, const QModelIndex & parent = QModelIndex() );
 };
 
 class RecordDataTranslator : RecordDataTranslatorBase

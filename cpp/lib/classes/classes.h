@@ -11,6 +11,12 @@
 #define CLASSES_EXPORT Q_DECL_IMPORT
 #endif
 
+namespace Stone {
+class Database;
+class Schema;
+}
+using namespace Stone;
+
 /**
  * \defgroup Classes Classes - auto-generated classes to access database tables
  * \details Classes are defined using the app @ref classmaker
@@ -18,12 +24,6 @@
  * Additional methods for a database class can be defined in the base/ directory.
  */
 CLASSES_EXPORT void classes_loader();
-
-namespace Stone {
-class Schema;
-class Database;
-}
-using namespace Stone;
 
 CLASSES_EXPORT Schema * classesSchema();
 

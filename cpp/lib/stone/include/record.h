@@ -36,6 +36,7 @@
 template<class T> class QList;
 
 namespace Stone {
+class ChangeSet;
 class Field;
 class RecordImp;
 class Table;
@@ -70,6 +71,14 @@ public:
 	
 	~Record();
 
+	Record getVersion( const ChangeSet & cs ) const;
+	// This is the same as calling getVersion with an invalid changeset
+	// Provided for the sake of readability.
+	Record pristine() const;
+	// Returns the record that this record's changes are based off of
+	// May be the pristine or another changeset
+	Record parent() const;
+	
 	Record & operator=( const Record & r );
 
 	bool operator==( const Record & other ) const;
@@ -103,6 +112,8 @@ public:
 	/// Returns true if this record is in the database
 	bool isRecord() const;
 
+	ChangeSet changeSet() const;
+	
 	/// Returns this record's primary key
 	uint key( bool generate = false ) const;
 	/// Generates a primary key if needed, and returns it
@@ -120,7 +131,7 @@ public:
 	
 	Record foreignKey( const QString & column ) const;
 	Record foreignKey( int column ) const;
-	Record foreignKey( Field * field ) const;
+	Record foreignKey( Field * field, int lookupMode = 0x3 /*Index::UseCache|Index::UseSelect*/ ) const;
 	
 	/// Sets the column to a literal SQL value that will be used for
 	/// the next update/commit.  A null QString will clear the literal
@@ -144,6 +155,8 @@ public:
 
 	/// human readable output
 	QString displayName() const;
+	/// String representation for lower level logging
+	QString debug() const;
 	QString dump() const;
 	QString changeString() const;
 
@@ -170,15 +183,20 @@ public:
 	/// return before the primary key has been
 	/// set and before and recordsAdded/Updated signals
 	/// have been emmitted.
-	Record & commit( bool sync = true );
+	
+	/// Can throw SqlException and LostConnectionException.
+	Record & commit();
 
 	RecordImp * imp() const { return mImp; }
 	
-	bool isUpdated() const;
+	bool isUpdated( Field * f = 0 ) const;
 
 	Table * table() const;
 
-	Record copy() const;
+	/// If destTable is null then the copy is made from the current record's table
+	/// If destTable has a different TableSchema than the current record, then each
+	/// field is copied by database name, and if no match is found then by method name
+	Record copy( Table * destTable = 0 ) const;
 	
 	/// Number of Record objects in existence
 	static int totalRecordCount();
@@ -186,6 +204,8 @@ public:
 	static int totalRecordImpCount();
 
 	friend class Stone::RecordImp;
+	friend class RecordList;
+	RecordImp * current(bool read = true) const;
 protected:
 	void checkImpType(TableSchema * ts);
 };
@@ -197,7 +217,7 @@ using Stone::Record;
 #include "recordimp.h"
 
 inline bool Record::isValid() const
-{ return bool(mImp) && !(mImp->mState & RecordImp::EMPTY_SHARED); }
+{ return bool(mImp) && !(mImp->mState & (RecordImp::EMPTY_SHARED|RecordImp::DISCARDED)); }
 
 inline Stone::Table * Record::table() const
 { return mImp ? mImp->table() : 0; }

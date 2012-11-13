@@ -11,6 +11,8 @@
 
 %Include busywidget.sip
 %Include configdbdialog.sip
+%Include extgraphicsscene.sip
+%Include exttreewidgetitem.sip
 %Include fieldcheckbox.sip
 %Include fieldlineedit.sip
 %Include fieldspinbox.sip

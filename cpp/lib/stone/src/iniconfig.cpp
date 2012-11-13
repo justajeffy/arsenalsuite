@@ -33,6 +33,10 @@
 #include "blurqt.h"
 #include "iniconfig.h"
 
+#ifdef Q_OS_WIN
+#include "windows.h"
+#endif
+
 IniConfig::IniConfig(QString configFile)
 : mSection( QString::null )
 {
@@ -62,7 +66,7 @@ void IniConfig::setFileName(const QString & fileName)
 	mFile = fileName;
 }
 
-const QString & IniConfig::fileName() const
+QString IniConfig::fileName() const
 {
 	return mFile;
 }
@@ -74,15 +78,16 @@ void IniConfig::readFromFile( const QString & fileName, bool overwriteExisting )
 		file = mFile;
 
 	if( !QFile::exists(file) ) {
-        LOG_5( "Config file doesn't exist at: " + fileName );
+		LOG_5( "Config file doesn't exist at: " + file );
 		return;
-    }
+	}
+	
 	QFile cfgFile(file);
 	if( !cfgFile.open(QIODevice::ReadOnly) ) {
-        LOG_5( "Unable to open config file for reading at: " + fileName );
+		LOG_5( "Unable to open config file for reading at: " + fileName );
 		return;
-    }
-
+	}
+	
 	QTextStream in(&cfgFile);
 	while(!in.atEnd()){
 		QString l = in.readLine();
@@ -99,10 +104,11 @@ void IniConfig::readFromFile( const QString & fileName, bool overwriteExisting )
 		QString val = l.mid(equalsPos+1);
 		if( key.isEmpty() )
 			continue;
+		
 		if( overwriteExisting || !mValMap[mSection].contains( key ) ) {
 			mValMap[mSection][key] = val;
 			mValMap[mSection][key.toLower()] = val;
-        }
+		}
 	}
 	cfgFile.close();
 }
@@ -115,9 +121,9 @@ bool IniConfig::writeToFile( const QString & fileName )
 
 	QFile file(filePath);
 	if( !file.open(QIODevice::WriteOnly) ) {
-        LOG_1( "Unable to open config file for writing at: " + filePath );
+		LOG_1( "Unable to open config file for writing at: " + filePath );
 		return false;
-    }
+	}
 	QTextStream out(&file);
 	QMap<QString, QMap<QString,QString> >::Iterator it;
 	for(it = mValMap.begin(); it != mValMap.end(); ++it)
@@ -129,7 +135,7 @@ bool IniConfig::writeToFile( const QString & fileName )
 			out << "\n";
 		}
 	}
-    LOG_3( "Wrote config file to: " + filePath );
+	LOG_3( "Wrote config file to: " + filePath );
 	return true;
 }
 
@@ -156,10 +162,10 @@ QString IniConfig::currentSection() const
 
 void IniConfig::popSection()
 {
-    if( mSectionStack.size() ) {
-        mSection = mSectionStack.back();
-        mSectionStack.pop_back();
-    }
+	if( mSectionStack.size() ) {
+		mSection = mSectionStack.back();
+		mSectionStack.pop_back();
+	}
 }
 
 QStringList IniConfig::sections() const
@@ -280,6 +286,22 @@ QList<int> IniConfig::readIntList( const QString & key, const QList<int> & def )
 	return def;
 }
 
+QList<uint> IniConfig::readUIntList( const QString & key, const QList<uint> & def ) const
+{
+	if( mValMap[mSection].contains( key ) ) {
+		QStringList sl( mValMap[mSection][key].split(',') );
+		QList<uint> ret;
+		foreach( QString s, sl ) {
+			bool okay;
+			uint i = s.toUInt(&okay);
+			if( okay ) ret << i;
+		}
+		return ret;
+	}
+	const_cast<IniConfig*>(this)->writeUIntList( key, def );
+	return def;
+}
+
 QByteArray IniConfig::readByteArray( const QString & key, const QByteArray & def ) const
 {
 	if( mValMap[mSection].contains( key ) ) {
@@ -288,6 +310,24 @@ QByteArray IniConfig::readByteArray( const QString & key, const QByteArray & def
 		return QByteArray::fromBase64(base64);
 	}
 	const_cast<IniConfig*>(this)->writeByteArray( key, def );
+	return def;
+}
+
+QDateTime IniConfig::readDateTime( const QString & key, const QDateTime & def ) const
+{
+	if( mValMap[mSection].contains( key ) ) {
+		return QDateTime::fromString( mValMap[mSection][key] );
+	}
+	const_cast<IniConfig*>(this)->writeDateTime( key, def );
+	return def;
+}
+
+Interval IniConfig::readInterval( const QString & key, const Interval & def ) const
+{
+	if( mValMap[mSection].contains( key ) ) {
+		return Interval::fromString( mValMap[mSection][key] );
+	}
+	const_cast<IniConfig*>(this)->writeInterval( key, def );
 	return def;
 }
 
@@ -338,10 +378,28 @@ void IniConfig::writeIntList( const QString & key, const QList<int> & val )
 	mValMap[mSection][key] = sl.join(",");
 }
 
+void IniConfig::writeUIntList( const QString & key, const QList<uint> & val )
+{
+	QStringList sl;
+	foreach( uint i, val ) sl << QString::number(i);
+	mValMap[mSection][key] = sl.join(",");
+}
+
 void IniConfig::writeByteArray( const QString & key, const QByteArray & bytes )
 {
 	mValMap[mSection][key] = QString( bytes.toBase64() );
 }
+
+void IniConfig::writeDateTime( const QString & key, const QDateTime & val )
+{
+	mValMap[mSection][key] = val.toString(Qt::ISODate);
+}
+
+void IniConfig::writeInterval( const QString & key, const Interval & val )
+{
+	mValMap[mSection][key] = val.toString();
+}
+
 
 void IniConfig::removeSection( const QString & group )
 {
@@ -360,14 +418,14 @@ void IniConfig::renameSection( const QString & before, const QString & after )
 
 void IniConfig::copySection( const QString & sectionFrom, const QString & sectionTo, bool clearExisting )
 {
-    QMap<QString,QString> section;
-    if( mValMap.contains( sectionFrom ) ) {
-        section = mValMap[sectionFrom];
-        if( clearExisting )
-            removeSection( sectionTo );
-        foreach( QString key, section.keys() )
-            mValMap[sectionTo][key] = section[key];
-    }
+	QMap<QString,QString> section;
+	if( mValMap.contains( sectionFrom ) ) {
+		section = mValMap[sectionFrom];
+		if( clearExisting )
+			removeSection( sectionTo );
+		foreach( QString key, section.keys() )
+			mValMap[sectionTo][key] = section[key];
+	}
 }
 
 void IniConfig::removeKey( const QString & key )

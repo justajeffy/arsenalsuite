@@ -1,4 +1,6 @@
 
+#include <qinputdialog.h>
+#include <qmenubar.h>
 #include <qtimer.h>
 #include <qtoolbar.h>
 
@@ -17,7 +19,7 @@
 #include "recordpropvaltree.h"
 
 #include "hosthistoryview.h"
-#include "jobcommandhistorywindow.h"
+#include "jobassignmentwindow.h"
 
 static int jobServicesColumn = 0, statusColumn = 0;
 
@@ -75,6 +77,7 @@ HostHistoryView::HostHistoryView( QWidget * parent )
 	mTrans->setRecordColumnList( cols );
 	setModel( mModel );
 	setRootIsDecorated( true );
+
 	connect( this, SIGNAL( doubleClicked( const QModelIndex & ) ), SLOT( slotDoubleClicked( const QModelIndex & ) ) );
 }
 
@@ -85,6 +88,13 @@ void HostHistoryView::slotDoubleClicked( const QModelIndex & idx )
 	if( !ja.isRecord() && !jta.isRecord() ) return;
 
 	QString col = mTrans->recordColumnName( idx.column() ).toLower();
+	/*if( col == "fkeyjobcommandhistory" ) {
+		JobCommandHistoryWindow * jchw = new JobCommandHistoryWindow();
+		jchw->setAttribute( Qt::WA_DeleteOnClose, true );
+		jchw->jchWidget()->setJobCommandHistory( hh.jobCommandHistory() );
+		jchw->setWindowTitle("Job Executation Log: ");
+		jchw->show();
+	} */
 	if( col == "fkeyjoberror" ) {
 		RecordPropValTree * tree = new RecordPropValTree(0);
 		tree->setAttribute( Qt::WA_DeleteOnClose, true );
@@ -94,13 +104,13 @@ void HostHistoryView::slotDoubleClicked( const QModelIndex & idx )
 	} else if( ja.isRecord() ) {
 		JobAssignmentWindow * jaw = new JobAssignmentWindow();
 		jaw->setAttribute( Qt::WA_DeleteOnClose, true );
-		jaw->setJobAssignment( ja );
+		jaw->jaWidget()->setJobAssignment( ja );
 		jaw->setWindowTitle("Job Executation Log: ");
 		jaw->show();
 	}
 }
 
-Host HostHistoryView::hostFilter() const
+HostList HostHistoryView::hostFilter() const
 {
 	return mHostFilter;
 }
@@ -131,26 +141,14 @@ void HostHistoryView::refresh()
 void HostHistoryView::doRefresh()
 {
 	mRefreshScheduled = false;
-	QString where;
-	VarList args;
-	if( mHostFilter.isRecord() ) {
-		where += "fkeyhost=?";
-		args << mHostFilter.key();
-	}
-	if ( mJobFilter.isRecord() ) {
-		if( !where.isEmpty() ) where += " AND ";
-		where += "fkeyjob=?";
-		args << mJobFilter.key();
-	}
-	
-	if ( mJobTaskFilter.isRecord() ) {
-		if( !where.isEmpty() ) where += " AND ";
-		where += "keyjobassignment=?";
-		args << mJobTaskFilter.jobTaskAssignment().jobAssignment().key();
-	}
-	
-	where += " ORDER BY keyjobassignment DESC LIMIT " + QString::number( mLimit );
-	JobAssignmentList jal = JobAssignment::select( where, args );
+	Expression e;
+	if( mHostFilter.size() )
+		e = JobAssignment::c.Host.in(mHostFilter);
+	if( mJobFilter.isRecord() )
+		e &= JobAssignment::c.Job == mJobFilter;
+	if( mJobTaskFilter.isRecord() )
+		e &= JobAssignment::c.Key.in(Query(JobTaskAssignment::c.JobAssignment,JobTaskAssignment::c.JobTask==mJobTaskFilter));
+	JobAssignmentList jal = JobAssignment::select( e.orderBy(JobAssignment::c.Key,Expression::Descending).limit(mLimit) );
 
 	Index * jsi = JobService::table()->indexFromField( "fkeyjob" );
 	bool jsiRestore = false;
@@ -171,9 +169,9 @@ void HostHistoryView::doRefresh()
 	jsi->setCacheEnabled( jsiRestore );
 }
 
-void HostHistoryView::setHostFilter( const Host & host )
+void HostHistoryView::setHostFilter( HostList hostFilter )
 {
-	mHostFilter = host;
+	mHostFilter = hostFilter;
 	refresh();
 }
 
@@ -197,7 +195,7 @@ void HostHistoryView::setLimit( int limit )
 void HostHistoryView::clearFilters()
 {
 	mJobFilter = Job();
-	mHostFilter = Host();
+	mHostFilter = HostList();
 }
 
 
@@ -210,18 +208,25 @@ HostHistoryWindow::HostHistoryWindow( QWidget * parent )
 	setCentralWidget( mView );
 
 	mCloseAction = new QAction( "&Close", this );
-	connect( mCloseAction, SIGNAL( activated() ), SLOT( close() ) );
+	connect( mCloseAction, SIGNAL( triggered() ), SLOT( close() ) );
 	
 	mRefreshAction = new QAction( "&Refresh", this );
-	connect( mRefreshAction, SIGNAL( activated() ), mView, SLOT( refresh() ) );
+	connect( mRefreshAction, SIGNAL( triggered() ), mView, SLOT( refresh() ) );
 
-	QMenu * fileMenu = menuBar()->addMenu( "&File" );
-	fileMenu->addAction( mRefreshAction );
-	fileMenu->addSeparator();
-	fileMenu->addAction( mCloseAction );
+	mSetLimitAction = new QAction( "Set &Limit", this );
+	connect( mSetLimitAction, SIGNAL( triggered() ), this, SLOT( setLimit() ) );
 	
-	addToolBar("Main")->addAction( mRefreshAction );
+	QMenu * fileMenu = menuBar()->addMenu( "&File" );
+	fileMenu->addAction( mCloseAction );
 
+	QMenu * viewMenu = menuBar()->addMenu( "&View" );
+	viewMenu->addAction( mRefreshAction );
+	viewMenu->addAction( mSetLimitAction );
+	
+	QToolBar * tb = addToolBar("Main");
+	tb->addAction( mRefreshAction );
+	tb->addAction( mSetLimitAction );
+	
 	IniConfig & ini = userConfig();
 	ini.pushSection( "HostHistoryWindow" );
 	QByteArray geometry = ini.readByteArray( "WindowGeometry" );
@@ -235,6 +240,16 @@ HostHistoryWindow::HostHistoryWindow( QWidget * parent )
 HostHistoryView * HostHistoryWindow::view() const
 {
 	return mView;
+}
+
+void HostHistoryWindow::setLimit()
+{
+	bool okay;
+	int limit = QInputDialog::getInt( this, "Set history limit", "Set history limit", mView->limit(), 0, 100000, 1, &okay );
+	if( okay ) {
+		mView->setLimit( limit );
+		mView->refresh();
+	}
 }
 
 void HostHistoryWindow::closeEvent( QCloseEvent * ce )

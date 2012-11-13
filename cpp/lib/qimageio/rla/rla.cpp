@@ -1,4 +1,6 @@
 
+#include <stdio.h>
+
 #include <qimage.h>
 
 #include "rla.h"

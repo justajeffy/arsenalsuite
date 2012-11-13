@@ -14,8 +14,6 @@
 #include <ImfStandardAttributes.h>
 #include <ImathBox.h>
 #include <ImfInputFile.h>
-#include <ImfTestFile.h>
-#include <ImfTiledInputFile.h>
 #include <ImfBoxAttribute.h>
 #include <ImfChannelListAttribute.h>
 #include <ImfCompressionAttribute.h>
@@ -34,6 +32,7 @@
 #include <QImage>
 #include <QDataStream>
 #include <QImageIOPlugin>
+#include <qvariant.h>
 #include <qdebug.h>
 
 #include "exr.h"
@@ -85,10 +84,16 @@ void K_IStream::clear( )
  * format into the normal 32 bit pixel format. Process is from the
  * ILM code.
  */
-QRgb RgbaToQrgba(struct Imf::Rgba imagePixel)
+QRgb RgbaToQrgba(struct Imf::Rgba imagePixel, bool applyGamma)
 {
-	float r,g,b,a;
+	if( !applyGamma ) {
+		return qRgba( char (Imath::clamp ( imagePixel.r * 255.0f, 0.f, 255.f ) + .5f ),
+				  char (Imath::clamp ( imagePixel.g * 255.0f, 0.f, 255.f ) + .5f ),
+				  char (Imath::clamp ( imagePixel.b * 255.0f, 0.f, 255.f ) + .5f ),
+				  char (Imath::clamp ( imagePixel.a * 255.0f, 0.f, 255.f ) + .5f ) );
+	}
 
+	float r,g,b,a;
 	//  1) Compensate for fogging by subtracting defog
 	//     from the raw pixel values.
 	// Response: We work with defog of 0.0, so this is a no-op
@@ -97,10 +102,12 @@ QRgb RgbaToQrgba(struct Imf::Rgba imagePixel)
 	//     2^(exposure + 2.47393).
 	// Response: We work with exposure of 0.0.
 	// (2^2.47393) is 5.55555
-	r = imagePixel.r * 5.55555;
-	g = imagePixel.g * 5.55555;
-	b = imagePixel.b * 5.55555;
-	a = imagePixel.a * 5.55555;
+	#define EXR_EXPOSURE 5.55555
+	//#define EXR_EXPOSURE 11.1111f
+	r = imagePixel.r * EXR_EXPOSURE;
+	g = imagePixel.g * EXR_EXPOSURE;
+	b = imagePixel.b * EXR_EXPOSURE;
+	a = imagePixel.a * EXR_EXPOSURE;
 
 	//  3) Values, which are now 1.0, are called "middle gray".
 	//     If defog and exposure are both set to 0.0, then
@@ -130,29 +137,24 @@ QRgb RgbaToQrgba(struct Imf::Rgba imagePixel)
 //
 //  5) Gamma-correct the pixel values, assuming that the
 //     screen's gamma is 0.4545 (or 1/2.2).
-    r = Imath::Math<float>::pow (r, 0.4545);
-    g = Imath::Math<float>::pow (g, 0.4545);
-    b = Imath::Math<float>::pow (b, 0.4545);
-    a = Imath::Math<float>::pow (a, 0.4545);
+	r = Imath::Math<float>::pow (r, 0.4545);
+	g = Imath::Math<float>::pow (g, 0.4545);
+	b = Imath::Math<float>::pow (b, 0.4545);
+	a = Imath::Math<float>::pow (a, 0.4545);
 
 //  6) Scale the values such that pixels middle gray
 //     pixels are mapped to 84.66 (or 3.5 f-stops below
 //     the display's maximum intensity).
 //
 //  7) Clamp the values to [0, 255].
-/*
-	return qRgba( char (Imath::clamp ( r * 84.66f, 0.f, 255.f ) ),
-				  char (Imath::clamp ( g * 84.66f, 0.f, 255.f ) ),
-				  char (Imath::clamp ( b * 84.66f, 0.f, 255.f ) ),
-				  char (Imath::clamp ( a * 84.66f, 0.f, 255.f ) ) );
-                  */
-	return qRgba( qMax(0, qMin(255, (int)(r * 84.66))),
-                  qMax(0, qMin(255, (int)(g * 84.66))),
-                  qMax(0, qMin(255, (int)(b * 84.66))),
-                  qMax(0, qMin(255, (int)(a * 84.66))) );
+	return qRgba( char (Imath::clamp ( r * 84.66f, 0.f, 255.f ) + .5f ),
+				  char (Imath::clamp ( g * 84.66f, 0.f, 255.f ) + .5f ),
+				  char (Imath::clamp ( b * 84.66f, 0.f, 255.f ) + .5f ),
+				  char (Imath::clamp ( a * 84.66f, 0.f, 255.f ) + .5f ) );
 }
 
-EXRHandler::EXRHandler()
+EXRHandler::EXRHandler( bool applyGammaCorrection )
+: mApplyGammaCorrection( applyGammaCorrection )
 {
 }
 
@@ -167,49 +169,15 @@ QByteArray EXRHandler::name() const
 	return QByteArray("exr");
 }
 
-/*
 bool EXRHandler::read( QImage *outImage )
 {
-    QImage image(1, 1, QImage::Format_ARGB32);
-    if( image.isNull())
-        return false;
-
-    image.fill(0);
-    *outImage = image;
-    qWarning("EXRHandler::read()");
-
-    return true;
-}
-*/
-
-bool EXRHandler::read( QImage *outImage )
-{
-        return false;
-    K_IStream istr( device(), QByteArray() );
-
-    bool tiled;
-    if (! Imf::isOpenExrFile( istr, tiled ) )
-        return false;
-
-    if( tiled ) {
-        qWarning("exr is tiled!");
-        QImage image(1, 1, QImage::Format_ARGB32);
-        image.fill(0);
-        *outImage = image;
-        return true;
-    }
-    qWarning("exr is not tiled, proceeding with scanline");
-
     try
     {
 		int width, height;
 
-	//	K_IStream istr( device(), QByteArray() );
-		Imf::RgbaInputFile input_scanline( istr );
-        const Imf::Header *m_header = &(input_scanline.header());
-
-		Imath::Box2i dw = m_header->displayWindow();
-		Imath::Box2i dataWindow = m_header->dataWindow();
+		K_IStream istr( device(), QByteArray() );
+		Imf::RgbaInputFile file( istr );
+		Imath::Box2i dw = file.dataWindow();
 
         width  = dw.max.x - dw.min.x + 1;
         height = dw.max.y - dw.min.y + 1;
@@ -217,21 +185,18 @@ bool EXRHandler::read( QImage *outImage )
 		Imf::Array2D<Imf::Rgba> pixels;
 		pixels.resizeErase (height, width);
 
-        input_scanline.setFrameBuffer (&pixels[0][0] - dw.min.x - dw.min.y * width, 1, width);
-        input_scanline.readPixels (dataWindow.min.y, dataWindow.max.y);
+        file.setFrameBuffer (&pixels[0][0] - dw.min.x - dw.min.y * width, 1, width);
+        file.readPixels (dw.min.y, dw.max.y);
 
 		QImage image(width, height, QImage::Format_ARGB32);
 		if( image.isNull())
 			return false;
 
-        image.fill(0);
-
 		// somehow copy pixels into image
 		for ( int y=0; y < height; y++ ) {
-            if( y < dataWindow.min.y || y > dataWindow.max.y ) continue;
 			for ( int x=0; x < width; x++ ) {
-                if( x < dataWindow.min.x || x > dataWindow.max.x ) continue;
-                image.setPixel( x, y, RgbaToQrgba( pixels[y][x] ) );
+				// copy pixels(x,y) into image(x,y)
+				image.setPixel( x, y, RgbaToQrgba( pixels[y][x], mApplyGammaCorrection ) );
 			}
 		}
 
@@ -245,6 +210,7 @@ bool EXRHandler::read( QImage *outImage )
         return false;
     }
 }
+
 
 bool EXRHandler::write( const QImage &image )
 {
@@ -261,32 +227,44 @@ bool EXRHandler::canRead(QIODevice *device)
         return false;
     }
 
-    qint64 oldPos = device->pos();
-
-    QByteArray head = device->readLine(4);
-    int readBytes = head.size();
-    if (device->isSequential()) {
-        while (readBytes > 0)
-            device->ungetChar(head[readBytes-- - 1]);
-    } else {
-        device->seek(oldPos);
-    }
-
+    QByteArray head = device->peek(4);
+    //qDebug() << "Exr header" << head << "Size: " << head.size();
+	
     return Imf::isImfMagic( head.data() );
 }
 
+
+QVariant EXRHandler::option(ImageOption option) const
+{
+	if( option == QImageIOHandler::Gamma )
+		return mApplyGammaCorrection;
+	return QVariant();
+}
+
+void EXRHandler::setOption(ImageOption option, const QVariant &value)
+{
+	if( option == QImageIOHandler::Gamma && value.type() == QVariant::Bool )
+		mApplyGammaCorrection = value.toBool();
+}
+
+bool EXRHandler::supportsOption(ImageOption option) const
+{
+	if( option == QImageIOHandler::Gamma )
+		return true;
+	return false;
+}
 
 /* --- Plugin --- */
 
 QStringList EXRPlugin::keys() const
 {
-	return QStringList() << "exr" << "EXR";
+	return QStringList() << "exr" << "EXR" << "exr_nogamma";
 }
 
 
 QImageIOPlugin::Capabilities EXRPlugin::capabilities(QIODevice *device, const QByteArray &format) const
 {
-    if ( format == "exr" || format == "EXR" )
+    if ( format == "exr" || format == "EXR" || format == "exr_nogamma" )
 		return Capabilities(CanRead);
     if ( !format.isEmpty() )
         return 0;
@@ -301,7 +279,7 @@ QImageIOPlugin::Capabilities EXRPlugin::capabilities(QIODevice *device, const QB
 
 QImageIOHandler *EXRPlugin::create(QIODevice *device, const QByteArray &format) const
 {
-    QImageIOHandler *handler = new EXRHandler;
+    QImageIOHandler *handler = new EXRHandler(format != "exr_nogamma");
     handler->setDevice(device);
     handler->setFormat(format);
     return handler;

@@ -91,14 +91,14 @@ void Schema::tableClassRenamed( TableSchema * table, const QString & oldName )
 // Loads the database table definitions from
 // the 'schema' xml file
 //
-void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomElement> > * toParse, bool ignoreDocs, QList<TableSchema*> * parsed )
+void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomElement> > * toParse, bool ignoreDocs, QList<TableSchema*> * parsed, bool verbose=false )
 {
-	bool newTable = false;
+	//bool newTable = false;
 	QString tableName = table.attribute( "name" );
 
 	TableSchema * ret = schema->tableByName( tableName );
 	if( !ret ) {
-		newTable = true;
+		//newTable = true;
 		ret = new TableSchema( schema );
 		ret->setTableName( tableName );
 	}
@@ -122,8 +122,8 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 	if( parentSchema && parentSchema != ret->parent() )
 		ret->setParent( parentSchema );
 
-	if( newTable )
-		LOG_5( "Adding new table: " + tableName + " className: " + ret->className() + (parentSchema ? (" parent: " + parentSchema->tableName()) : QString()) );
+//	if( newTable )
+//		LOG_5( "Adding new table: " + tableName + " className: " + ret->className() + (parentSchema ? (" parent: " + parentSchema->tableName()) : QString()) );
 	
 	// Iterator through the table's nodes
 	QDomNode n = table.firstChild();
@@ -136,14 +136,18 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 			// Parse a column
 			if( el.tagName() == "column" ){
 				Field::Type ct = Field::stringToType( el.attribute( "type" ) );
+				if( ct == Field::Invalid ) {
+					LOG_1( "Field has invalid type: " + el.attribute("type") );
+					continue;
+				}
 				QString name = el.attribute( "name" );
 				if( !name.isEmpty() ) {
 					QDomElement fkey = el.firstChild().toElement();
 					Field * f = ret->field(name,/*silent=*/true);
 					bool modify = bool(f);
 					if( !modify ) {
-						if( !newTable )
-							LOG_5( "Adding new column: " + tableName + "." + name + "[" + el.attribute( "type" ) + "]" );
+						//if( !newTable )
+						//	LOG_5( "Adding new column: " + tableName + "." + name + "[" + el.attribute( "type" ) + "]" );
 						if( el.attribute( "pkey" ) == "true" )
 							f = new Field( ret, name, Field::UInt, Field::PrimaryKey );
 						else if( !fkey.isNull() && fkey.tagName() == "fkey" ) {
@@ -174,42 +178,42 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 					if( f ) {
 						QString methodName = el.attribute("methodName");
 						if( !methodName.isEmpty() ) {
-							if( modify && !f->methodName().isEmpty() && f->methodName() != methodName )
+							if( verbose && modify && !f->methodName().isEmpty() && f->methodName() != methodName )
 								LOG_5( QString("Changing %1.%2 methodName from %3 to %4").arg(ret->tableName()).arg(f->name()).arg(f->methodName()).arg(methodName) );
 							f->setMethodName( methodName );
 						}
 						QString pluralMethodName = el.attribute("pluralMethodName");
 						if( !pluralMethodName.isEmpty() ) {
-							if( modify && !f->pluralMethodName().isEmpty() && f->pluralMethodName() != pluralMethodName )
+							if( verbose && modify && !f->pluralMethodName().isEmpty() && f->pluralMethodName() != pluralMethodName )
 								LOG_5( QString("Changing %1.%2 pluralMethodName from %3 to %4").arg(ret->tableName()).arg(f->name()).arg(f->pluralMethodName()).arg(pluralMethodName) );
 							f->setPluralMethodName( pluralMethodName );
 						}
 						QString displayName = el.attribute( "displayName" );
 						if( !displayName.isEmpty() && f->displayName() != displayName ) {
-							if( modify && !f->displayName().isEmpty()  )
+							if( verbose && modify && !f->displayName().isEmpty()  )
 								LOG_5( QString("Changing %1.%2 display name from %3 to %4").arg(ret->tableName()).arg(f->name()).arg(f->displayName()).arg(displayName) );
 							f->setDisplayName( displayName );
 						}
 						if( f->flag(Field::ForeignKey) ) {
 							bool ra = el.attribute("reverseAccess") == "true";
-							if( modify && f->flag(Field::ReverseAccess) != ra )
+							if( verbose && modify && f->flag(Field::ReverseAccess) != ra )
 								LOG_5( QString("Changing %1.%2 reverse access from %3 to %4").arg(ret->tableName()).arg(f->name()).arg(f->flag(Field::ReverseAccess)).arg(ra) );
 							f->setFlag( Field::ReverseAccess, ra );
 						}
 						if( !ignoreDocs ) {
 							QString docs = el.attribute("docs");
-							if( modify && !docs.isEmpty() && f->docs() != docs )
+							if( verbose && modify && !docs.isEmpty() && f->docs() != docs )
 								LOG_5( QString("Changing %1.%2 docs from %3 to %4").arg(ret->tableName()).arg(f->name()).arg(f->docs()).arg(docs) );
 							f->setDocs( docs );
 						}
 						QString defValS = el.attribute("defaultValue");
 						if( !defValS.isEmpty() ) {
 							QVariant defVal = Field::variantFromString( defValS, f->type() );
-							if( modify && defVal != f->defaultValue() )
+							if( verbose && modify && defVal != f->defaultValue() )
 								LOG_5( QString("Changing %1.%2 default value from %3 to %4").arg(ret->tableName()).arg(f->name()).arg(f->defaultValue().toString()).arg(defVal.toString()) );
 							f->setDefaultValue( defVal );
 						}
-						f->setFlag( Field::DisplayName, el.attribute("displayName") == "true" );
+						f->setFlag( Field::TableDisplayName, el.attribute("tableDisplayName") == "true" );
 						f->setFlag( Field::NoDefaultSelect, el.attribute("noDefaultSelect") == "true" );
 					}
 				}
@@ -239,6 +243,8 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 						Field * f = ret->field( colName );
 						if( f )
 							newFields.append(f);
+						else
+							LOG_1( "ERROR: Column " + colName + " not found in table " + tableName + " for index " + name );
 					}
 					index_c = index_c.nextSibling();
 				}
@@ -259,11 +265,11 @@ void parseTable( Schema * schema, QDomElement table, QMap<QString, QList<QDomEle
 	// We can now parse all of it's children
 	QList<QDomElement> children = (*toParse)[ret->className()];
 	for( QList<QDomElement>::Iterator it = children.begin(); it != children.end(); ++it )
-		parseTable( schema, *it, toParse, ignoreDocs, parsed );
+		parseTable( schema, *it, toParse, ignoreDocs, parsed, verbose );
 	(*toParse).remove( ret->tableName() );
 }
 
-bool Schema::mergeXmlSchema( const QString & schema, bool isFile, bool ignoreDocs, QList<TableSchema*> * tables )
+bool Schema::mergeXmlSchema( const QString & schema, bool isFile, bool ignoreDocs, QList<TableSchema*> * tables, bool verbose )
 {
 	// Tables that we have deferred processing until their
 	// parent tables have been processed
@@ -275,7 +281,9 @@ bool Schema::mergeXmlSchema( const QString & schema, bool isFile, bool ignoreDoc
 	int errorLine, errorColumn;
 
 	if( isFile ) {
-		LOG_1( "Merging schema: " + schema );
+		if( verbose )
+			LOG_1( "Merging schema: " + schema );
+		
 		QFile file( schema );
 		if ( !file.open( QIODevice::ReadOnly ) ) {
 			LOG_1( "Database::mergeSchema: Couldn't Open File (" + schema + ")" );
@@ -310,7 +318,7 @@ bool Schema::mergeXmlSchema( const QString & schema, bool isFile, bool ignoreDoc
 			if( !parent.isNull() && !tableByName( parent ) )
 				parseAfterParent[parent] += table;
 			else
-				parseTable( this, table, &parseAfterParent, ignoreDocs, tables );
+				parseTable( this, table, &parseAfterParent, ignoreDocs, tables, verbose );
 		}
 		n = n.nextSibling();
 	}
@@ -318,10 +326,10 @@ bool Schema::mergeXmlSchema( const QString & schema, bool isFile, bool ignoreDoc
 	return true;
 }
 
-Schema * Schema::createFromXmlSchema( const QString & xmlSchema, bool isFile, bool ignoreDocs )
+Schema * Schema::createFromXmlSchema( const QString & xmlSchema, bool isFile, bool ignoreDocs, bool verbose )
 {
 	Schema * ret = new Schema();
-	if( !ret->mergeXmlSchema( xmlSchema, isFile, ignoreDocs ) ) {
+	if( !ret->mergeXmlSchema( xmlSchema, isFile, ignoreDocs, 0, verbose ) ) {
 		delete ret;
 		return 0;
 	}
@@ -401,8 +409,8 @@ bool Schema::writeXmlSchema( const QString & outputFile, QString * xmlOut, Table
 				column.setAttribute( "pkey", "true" );
 			if( f->flag( Field::ReverseAccess ) )
 				column.setAttribute( "reverseAccess", "true" );
-			if( f->flag( Field::DisplayName ) )
-				column.setAttribute( "displayName", "true" );
+			if( f->flag( Field::TableDisplayName ) )
+				column.setAttribute( "tableDisplayName", "true" );
 			if( f->flag( Field::NoDefaultSelect ) )
 				column.setAttribute( "noDefaultSelect", "true" );
 			if( f->flag( Field::ForeignKey ) ) {

@@ -14,7 +14,7 @@ class CLASSESUI_EXPORT ResinCrashDialog : public QDialog, public Ui::ResinCrashD
 {
 public:
 	ResinCrashDialog( QWidget * parent = 0 );
-	void setError( const QString & error ) {}
+	void setError( const QString & ) {}
 
 };
 

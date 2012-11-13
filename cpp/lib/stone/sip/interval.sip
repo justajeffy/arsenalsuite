@@ -10,6 +10,7 @@ public:
 	Interval( const QDate &, const QDate & );
 	Interval( int seconds, int microseconds = 0 );
 	Interval( int months, int days, int seconds, int microseconds = 0 );
+	Interval( const QString & );
 
 	Interval operator+( const Interval & other ) const;
 	//Interval & operator+=( const Interval & other );

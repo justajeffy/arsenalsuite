@@ -51,7 +51,7 @@ Q_OBJECT
 public:
 
 	Multilog( const QString & logfile, bool stdout_option = false, int severity = 1, int maxfiles = 10, unsigned int maxsize = 2097152);
-
+	
 	~Multilog();
 
 	/** Logs a message to the logfile.  The message will only be logged
@@ -95,9 +95,9 @@ signals:
 
 protected:
 	bool rotate( int buffer );
-    void renameCurrentLog();
-    void removeOldLogs();
-    bool openNewLog();
+	void renameCurrentLog();
+	void removeOldLogs();
+	bool openNewLog();
 
 	bool copy_logfile( QString inFileStr, QString outFileStr );
 
@@ -107,7 +107,7 @@ protected:
 	unsigned int mMaxSize;
 	QFileInfo mLogFileInfo;
 	QDir mLogFileDir;
-    int mLogFileSize;
+	int mLogFileSize;
 
 	QFile * mLogFile;
 	QTextStream * mLogStream;

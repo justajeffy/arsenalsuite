@@ -1,12 +1,17 @@
 
 #include "jobdeptable.h"
 #include "job.h"
+#include "jobdepbase.h"
+
+JobDepTrigger::JobDepTrigger()
+: Trigger( Trigger::PostInsertTrigger | Trigger::PostDeleteTrigger )
+{}
 
 /**
  *   If a dependency is added, check to see if the job now has unmet dependencies,
  *   if so, then set the job status to "holding"
  */
-void JobDepSchema::postInsert( RecordList jobDeps )
+void JobDepTrigger::postInsert( RecordList jobDeps )
 {
 	JobList toCommit;
 	foreach( JobDep jd, jobDeps ) {
@@ -18,15 +23,14 @@ void JobDepSchema::postInsert( RecordList jobDeps )
 			}
 		}
 	}
-	Job::updateJobStatuses( toCommit, "holding" );
-	TableSchema::postInsert( jobDeps );
+	Job::updateJobStatuses( toCommit, "holding", false, true );
 }
 
 /**
  *   If a dependency is removed, check to see if the job still has unmet dependencies,
  *   if not, then set the job status to "ready"
  */
-void JobDepSchema::postRemove( RecordList jobDeps )
+void JobDepTrigger::postDelete( RecordList jobDeps )
 {
 	JobList toCommit;
 	foreach( JobDep jd, jobDeps ) {
@@ -40,5 +44,4 @@ void JobDepSchema::postRemove( RecordList jobDeps )
 		}
 	}
 	toCommit.commit();
-	TableSchema::postRemove( jobDeps );
 }

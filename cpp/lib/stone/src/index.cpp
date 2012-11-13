@@ -31,6 +31,7 @@
 #include <qstringlist.h>
 
 #include "blurqt.h"
+#include "changeset.h"
 #include "database.h"
 #include "freezercore.h"
 #include "recordimp.h"
@@ -113,7 +114,76 @@ bool Index::cacheEnabled() const
 	return mUseCache;
 }
 
-RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
+bool Index::checkMatch( const Record & record, const QList<QVariant> & args, int entryCount )
+{
+	int entrySize = mSchema->columns().size();
+	FieldList fl = mSchema->columns();
+	for( int entry = 0; entry < entryCount; entry++ ) {
+		bool matches = true;
+		for( int i = 0; i < entrySize; i++ ) {
+			if( record.getValue(fl[i]) != args[entry * entrySize + i] ) {
+				matches = false;
+				break;
+			}
+		}
+		if( matches )
+			return true;
+	}
+	return false;
+}
+
+RecordList Index::applyChangeSetHelper(ChangeSet cs, RecordList records, const QList<QVariant> & args, int entryCount)
+{
+	if( !cs.isValid() ) return records;
+//	qDebug() << "Modifying index results for changeset " << cs.title() << cs.debug();
+	foreach( ChangeSet::Change change, cs.changes() ) {
+		if( change.type == ChangeSet::Change_Nested ) {
+			ChangeSet child = change.changeSet();
+			if( child.state() == ChangeSet::Committed || ChangeSet::current().isAnscestor(child) )
+				records = applyChangeSetHelper(child, records, args, entryCount);
+			continue;
+		}
+		foreach( Record r, change.records() ) {
+			for( int i = 0; i < entryCount; ++i ) {
+				switch( change.type ) {
+					case ChangeSet::Change_Insert:
+						if( checkMatch(r,args,entryCount) ) {
+							records += r;
+						}
+						break;
+					case ChangeSet::Change_Update:
+					{
+						bool inList = records.contains(r), matches = checkMatch(r,args,entryCount);
+						if( matches && !inList )
+							records.append(r);
+						else if( !matches && inList )
+							records.remove(r);
+						break;
+					}
+					case ChangeSet::Change_Remove:
+						records.remove(r);
+						break;
+				}
+			}
+		}
+	}
+	return records;
+}
+
+RecordList Index::applyChangeSet(RecordList records, const QList<QVariant> & args, int entryCount)
+{
+	ChangeSet cs = ChangeSet::current();
+	while( cs.parent().isValid() )
+		cs = cs.parent();
+	return applyChangeSetHelper(cs,records,args,entryCount);
+}
+
+RecordList Index::recordsByIndexMulti( const QList<QVariant> & args, bool select )
+{
+	return recordsByIndexMulti(args, select ? UseCache | UseSelect | PartialSelect : UseCache );
+}
+
+RecordList Index::recordsByIndexMulti( const QList<QVariant> & args, int lookupMode )
 {
 	RecordList ret;
 	int entrySize = mSchema->columns().size();
@@ -126,7 +196,7 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 	QBitArray needSelect(entryCount,true);
 	int needSelectCount = entryCount;
 	
-	if( mUseCache ) {
+	if( mUseCache && (lookupMode & UseCache) ) {
 		QString ppc = mTable->schema()->projectPreloadColumn();
 		// Doubtful that this is cheaper than filling the list normally?
 		QList<QVariant> entryArgs = QVector<QVariant>(entrySize).toList();
@@ -134,6 +204,7 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 		int useProjectPreload = ppc.isEmpty() ? 0 : -1;  // 1 if we checked and are using it, 0 if we checked and aren't
 		int projectPreloadColumn = 0;
 		int status = NoInfo;
+		ChangeSet cs = ChangeSet::current();
 		
 		for( int entry=0; entry < entryCount; entry++ ) {
 			for( int a=0; a < entrySize; a++ )
@@ -145,7 +216,7 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 				ret += entryRet;
 			}
 			
-			if( mTable->isPreloaded() ) {
+			if( status == NoInfo && mTable->isPreloaded() ) {
 				// If the table is preloaded, and this entry isn't found, then set an empty entry.
 				setEmptyEntry( entryArgs );
 				status = RecordsFound;
@@ -184,27 +255,28 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 			if( status == RecordsFound ) {
 				needSelect[entry] = false;
 				needSelectCount--;
-				continue;
 			}
 		}
 	}
 
-	if( needSelectCount == 0 )
-		return ret;
+	if( !(lookupMode & UseSelect) || needSelectCount == 0 )
+		return applyChangeSet(ret, args, entryCount);
 	
 	QList<QVariant> mod_args;
 	QString sel;
+	int selectCount = 0;
 	
 	if( entrySize == 1 && mSchema->columns()[0]->flag( Field::ForeignKey ) ) {
 		bool hasNull = false;
 		Field * f = mSchema->columns()[0];
 		QStringList ss;
 		for( int entry = 0; entry < entryCount; entry++ ) {
-			if( !needSelect[entry] ) continue;
+			if( (lookupMode & PartialSelect) && !needSelect[entry] ) continue;
 			if( args[entry].isNull() )
 				hasNull = true;
 			else
 				ss += args[entry].toString();
+			selectCount++;
 		}
 		sel = f->name() + " IN (" + ss.join(",") + ")";
 		if( hasNull )
@@ -213,7 +285,8 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 		// Setup sql
 		QStringList entryFilters;
 		for( int entry = 0; entry < entryCount; entry++ ) {
-			if( !needSelect[entry] ) continue;
+			if( (lookupMode & PartialSelect) && !needSelect[entry] ) continue;
+			selectCount++;
 			QStringList ss;
 			int column=0;
 			foreach( Field * f, mSchema->columns() ) {
@@ -239,14 +312,19 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 		mMutex.lock();
 		ciRestore = mCacheIncoming;
 		mCacheIncoming = true;
+		reserve(selectCount);
 	}
 
-	ret = mTable->select( sel, mod_args, true, false, true );
+	RecordList selected = mTable->select( sel, mod_args, true, false, true );
+	if( lookupMode & PartialSelect )
+		ret += selected;
+	else
+		ret = selected;
 
 	if( mUseCache ) {
 		QList<QVariant> entryArgs = QVector<QVariant>(entrySize).toList();
 		for( int entry = 0; entry < entryCount; entry++ ) {
-			if( !needSelect[entry] ) continue;
+			if( (lookupMode & PartialSelect) && !needSelect[entry] ) continue;
 			for( int column = 0; column < entrySize; ++column )
 				entryArgs[column] = args[entry*entrySize + column];
 			int status = NoInfo;
@@ -258,11 +336,19 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args )
 		mMutex.unlock();
 	}
 
-	return ret;
+	return applyChangeSet(ret, args, entryCount);
 }
 
+void Index::reserve(int)
+{
+}
 
-RecordList Index::recordsByIndex( const QList<QVariant> & args )
+RecordList Index::recordsByIndex( const QList<QVariant> & args, bool select )
+{
+	return recordsByIndex( args, select ? UseCache & UseSelect : UseCache );
+}
+
+RecordList Index::recordsByIndex( const QList<QVariant> & args, int lookupMode )
 {
 	RecordList ret;
 	int status = NoInfo;
@@ -270,10 +356,10 @@ RecordList Index::recordsByIndex( const QList<QVariant> & args )
 	if( args.size() != mSchema->columns().size() )
 		return ret;
 	
-	if( mUseCache ) {
+	if( (lookupMode & UseCache) && mUseCache ) {
 		ret = records( args, status );
 		if( status == RecordsFound )
-			return ret;
+			return applyChangeSet(ret, args, 1);
 
 		// See if this index has a field that matches the project_preload
 		bool projectPreloaded = false;
@@ -295,14 +381,17 @@ RecordList Index::recordsByIndex( const QList<QVariant> & args )
 			ret = records( args, status );
 			if( status == NoInfo )
 				setEmptyEntry( args );
-			return ret;
+			return applyChangeSet(ret, args, 1);
+		}
+
+		if( mTable->isPreloaded() ) {
+			setEmptyEntry( args );
+			return applyChangeSet(ret, args, 1);
 		}
 	}
 
-	if( mUseCache && mTable->isPreloaded() ) {
-		setEmptyEntry( args );
-		return ret;
-	}
+	if( !(lookupMode & UseSelect) )
+		return applyChangeSet(ret, args, 1);
 
 	int i=0;
 	QStringList ss;
@@ -333,66 +422,27 @@ RecordList Index::recordsByIndex( const QList<QVariant> & args )
 		mMutex.unlock();
 	} else
 		ret = mTable->select( sel, mod_args, true, false, true );
-	return ret;
+	return applyChangeSet(ret, args, 1);
 }
 
-RecordList Index::recordsByIndex( const QVariant & arg )
+
+Record Index::recordByIndex( const QVariant & arg, bool select )
 {
-	if( mSchema->columns().size() != 1 )
-		return RecordList();
-	return recordsByIndex( QList<QVariant>() += arg );
+	return recordByIndex(arg,select ? UseCache | UseSelect : UseCache);
 }
 
-RecordList Index::recordsByIndex( const QVariant & arg1, const QVariant & arg2 )
-{
-	if( mSchema->columns().size() != 2 )
-		return RecordList();
-	QList<QVariant> args;
-	args += arg1;
-	args += arg2;
-	return recordsByIndex( args );
-}
-
-RecordList Index::recordsByIndex( const QVariant & arg1, const QVariant & arg2, const QVariant & arg3 )
-{
-	if( mSchema->columns().size() != 3 )
-		return RecordList();
-	QList<QVariant> args;
-	args += arg1;
-	args += arg2;
-	args += arg3;
-	return recordsByIndex( args );
-}
-
-Record Index::recordByIndex( const QVariant & arg )
+Record Index::recordByIndex( const QVariant & arg, int lookupMode )
 {
 	if( mSchema->columns().size() != 1 )
 		return Record( mTable );
-	RecordList recs = recordsByIndex( arg );
+	RecordList recs = recordsByIndex( VarList() << arg, lookupMode );
 	if( recs.size() )
 		return recs[0];
 	return Record( mTable );
 }
 
-Record Index::recordByIndex( const QVariant & arg1, const QVariant & arg2 )
-{
-	if( mSchema->columns().size() != 2 )
-		return Record( mTable );
-	RecordList recs = recordsByIndex( arg1, arg2 );
-	if( recs.size() )
-		return recs[0];
-	return Record( mTable );
-}
-
-Record Index::recordByIndex( const QVariant & arg1, const QVariant & arg2, const QVariant & arg3 )
-{
-	if( mSchema->columns().size() != 3 )
-		return Record( mTable );
-	RecordList recs = recordsByIndex( arg1, arg2, arg3 );
-	if( recs.size() )
-		return recs[0];
-	return Record( mTable );
-}
+void Index::recordsCreated( const RecordList & )
+{}
 
 
 HashIndex::HashIndex( Table * parent, IndexSchema * schema )
@@ -626,6 +676,11 @@ void HashIndex::clear()
 	clearNode( mRoot, 0 );
 }
 
+void HashIndex::reserve(int space)
+{
+	mRoot->reserve(mRoot->size() + space);
+}
+
 void HashIndex::clearNode(VarHash * node, int fieldIndex )
 {
 	fieldIndex++;
@@ -668,6 +723,29 @@ KeyIndex::~KeyIndex()
 	clear();
 }
 
+void KeyIndex::recordsCreated( const RecordList & records )
+{
+	// Return if nothing to cache
+	if( !records.size() )
+		return;
+
+	//LOG_5( "Caching Incoming records in keyindex for table: " + mTable->tableName() + " index id: " + QString::number( (int)this ) );
+	TableSchema * schema = mTable->schema();
+	mMutex.lock();
+	st_foreach( RecordIter, rec, records ){
+		RecordImp * imp = rec.imp();
+		uint key = imp->key();
+		//LOG_5( "Caching key: " + QString::number( key ) );
+		if( key && imp && imp->table() == mTable ){
+			RecordImp * ri = mDict.value( key );
+			if( !ri || ri == (RecordImp*)1 || ri->refCount() == 0 )
+				mDict.insert( key, imp );
+		}
+	}
+	mMutex.unlock();
+
+}
+
 void KeyIndex::recordAdded( const Record & r )
 {
 	if( r.table() != mTable ) return;
@@ -677,11 +755,14 @@ void KeyIndex::recordAdded( const Record & r )
 	mMutex.lock();
 	RecordImp * fin = mDict.value( key );
 	if( !fin || fin == (RecordImp*)1 ) {
+		//qDebug() << "Key " << key << " added to keyindex";
 		fin = r.imp();
 		mDict.insert( key, fin );
-		if( needRef )
-			fin->ref();
 	}
+	// If fin is already in the dict, it was added by recordsCreated and does not have a reference
+	// so we ref the imp here always
+	if( needRef )
+		fin->ref();
 	mMutex.unlock();
 }
 
@@ -693,6 +774,7 @@ void KeyIndex::recordRemoved( const Record & r )
 	mMutex.lock();
 	RecordImp * fin = mDict.value( key );
 	if( fin && fin != (RecordImp*)1 ) {
+		//qDebug() << "Key " << key << " removed from keyindex";
 		mDict.insert( key, (RecordImp*)1 );
 		mMutex.unlock();
 		if( needRef )
@@ -733,38 +815,36 @@ void KeyIndex::recordsIncoming( const RecordList & records, bool )
 
 Record KeyIndex::record( uint key, bool * found )
 {
-	//LOG_5( "Checking " + mTable->tableName() + " KeyIndex for record: " + QString::number(key) + " index id: " + QString::number( (int)this ) );
+	//qDebug() << "Checking " << mTable->tableName() << " KeyIndex for record: " << key << " index id: " << this;
 
 	QMutexLocker locker( &mMutex );
 	RecordImp * ri = mDict.value( key );
 
+	Record ret;
 	// Not found
-	if( !ri ) return Record();
+	if( ri ) {
+		if( ri != (RecordImp*)1 ) {
+			while (1) {
+				int refCount = ri->refCount();
+				if( refCount == 0 ) return Record();
 
-	if( ri != (RecordImp*)1 ) {
-		while (1) {
-			int refCount = ri->refCount();
-			if( refCount == 0 ) return Record();
+				// We got a reference
+				if( ri->mRefCount.testAndSetRelaxed(refCount, refCount+1) )
+					break;
+			}
+		}
 
-			// We got a reference
-			if( ri->mRefCount.testAndSetRelaxed(refCount, refCount+1) )
-				break;
+		// Past here we either found a valid record, or found an "empty entry"(record does not exist in db)
+		if( found )
+			*found = true;
+
+		// "Empty Entry"
+		if( ri != (RecordImp*)1 ){
+			ret = Record( ri, false );
+			ri->mRefCount.deref();
 		}
 	}
-
-	// Past here we either found a valid record, or found an "empty entry"(record does not exist in db)
-	if( found )
-		*found = true;
-
-	// "Empty Entry"
-	if( ri == (RecordImp*)1 ){
-		//LOG_1( mTable->tableName() + " KeyIndex::record returning empty entry" );
-		return Record();
-	}
-
-	Record ret( ri, false );
-	ri->mRefCount.deref();
-	//LOG_1( mTable->tableName() + " KeyIndex::record returning " + QString::number( (int)ri ) + " with count " + QString::number( ri->refCount() ) );
+	//qDebug() << mTable->tableName() << " KeyIndex::record returning " << ri << " with count " << (ri ? ri->refCount() : 0);
 	return ret;
 }
 
@@ -772,8 +852,18 @@ RecordList KeyIndex::values()
 {
 	RecordList ret;
 	for( QHash<uint, RecordImp*>::const_iterator it = mDict.begin(); it != mDict.end(); ++it )
-		if( it.value() != (RecordImp*)1 )
-			ret += it.value();
+		if( it.value() != (RecordImp*)1 ) {
+			Record r(it.value());
+			// Will check if the record is deleted in the current changeset
+			if( r.isRecord() )
+				ret += it.value();
+		}
+	ChangeSet cs = ChangeSet::current();
+	if( cs.isValid() ) {
+		RecordList added, removed;
+		cs.visibleRecordsChanged( &added, 0, 0, QList<Table*>()<<mTable );
+		ret += added;
+	}
 	return ret;
 }
 
@@ -787,7 +877,7 @@ void KeyIndex::setEmptyEntry( QList<QVariant> vars )
 {
 	mMutex.lock();
 	if( vars.size() == 1 ) {
-		//LOG_1( mTable->tableName() + " KeyIndex::record setting empty entry for record " + QString::number( vars[0].toUInt() ) );
+		//qDebug() << mTable->tableName() << " KeyIndex::record setting empty entry for record " << vars[0].toUInt();
 		mDict.insert( vars[0].toUInt(),(RecordImp*)1 );
 	}
 	mMutex.unlock();
@@ -809,7 +899,7 @@ void KeyIndex::clear()
 	st_foreach( RecordIter, it, tmp )
 		if( needRef )
 			it.imp()->deref();
-
+	//qDebug() << mTable->tableName() << " KeyIndex cleared";
 }
 
 void KeyIndex::expire( uint recordKey, RecordImp * imp )
@@ -817,7 +907,7 @@ void KeyIndex::expire( uint recordKey, RecordImp * imp )
 	mMutex.lock();
 	if( mDict.value(recordKey) == imp ) {
 		mDict.remove( recordKey );
-		//LOG_5( "Expiring " + mTable->tableName() + " KeyIndex for record: " + QString::number(recordKey) + " index id: " + QString::number( (int)this ) );
+		//qDebug() <<  "Expiring " << mTable->tableName() << " KeyIndex for record: " << QString::number(recordKey) << " index id: " << this;
 	}
 	mMutex.unlock();
 }

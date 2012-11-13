@@ -20,10 +20,10 @@ public:
 
 	/// These methods are simply forwarded to connection
 	/// and documented there, only used to allow shorter code.
-	QSqlQuery exec( const QString & sql, const QList<QVariant> & vars = QList<QVariant>(), bool reExecLostConn = true, Table * table = 0 ) /PyName=exec_/;
-	bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 ) /PyName=exec_/;
+	QSqlQuery exec( const QString & sql, const QList<QVariant> & vars = QList<QVariant>(), bool reExecLostConn = true, Table * table = 0 ) throw(SqlException,LostConnectionException) /PyName=exec_/;
+	bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 ) throw(SqlException,LostConnectionException) /PyName=exec_/;
 
-	bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 );
+	bool exec( QSqlQuery & query, bool reExecLostConn = true, Table * table = 0 ) throw(SqlException,LostConnectionException);
 
 	Schema * schema() const;
 
@@ -55,19 +55,19 @@ public:
 
 	void beginTransaction( const QString & title = QString::null );
 
-	void commitTransaction();
+	void commitTransaction() throw(SqlException,LostConnectionException);
 
-	void rollbackTransaction();
+	void rollbackTransaction() throw(SqlException,LostConnectionException);
 	
-	bool ensureInsideTransaction();
+	bool ensureInsideTransaction() throw(SqlException,LostConnectionException);
 
 	void flushUpdateBuffer();
 
 	bool insideTransaction();
 
-	bool verifyTables( QString * output = 0 );
+	bool verifyTables( QString * output = 0 ) throw(SqlException,LostConnectionException);
 
-	bool createTables( QString * output = 0 );
+	bool createTables( QString * output = 0 ) throw(SqlException,LostConnectionException);
 
 	void addDeleteAction( Field * );
 	void removeDeleteAction( Field * );
@@ -84,9 +84,9 @@ public:
 
 signals:
 
-	void recordsAddedSignal( const RecordList & );
-	void recordsRemovedSignal( const RecordList & );
-	void recordUpdatedSignal( const Record & current, const Record & updated );
+	void recordsAddedSignal( RecordList );
+	void recordsRemovedSignal( RecordList );
+	void recordUpdatedSignal( Record current, Record updated );
 	void recordsIncomingSignal( const RecordList & );
 
 protected slots:

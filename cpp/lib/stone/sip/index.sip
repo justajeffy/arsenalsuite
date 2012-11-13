@@ -6,12 +6,27 @@ class Index /Abstract/
 #include <index.h>
 %End
 public:
+
+%ConvertToSubClassCode
+	sipClass = NULL;
+	if( dynamic_cast<HashIndex*>(sipCpp) )
+		sipClass = sipClass_HashIndex;
+	else if( dynamic_cast<KeyIndex*>(sipCpp) )
+		sipClass = sipClass_KeyIndex;
+%End
+
 	Index( Table * table /TransferThis/, IndexSchema * schema, bool useCache = false );
 	virtual ~Index();
 
 	enum {
 		NoInfo,
 		RecordsFound
+	};
+
+	enum LookupMode {
+		UseCache = 0x1,
+		UseSelect = 0x2,
+		PartialSelect = 0x4
 	};
 
 	IndexSchema * schema() const;
@@ -22,18 +37,16 @@ public:
 
 	void cacheIncoming( bool ci );
 
-	MappedRecordList recordsByIndexMulti( const QList<QVariant> & args );
+	MappedRecordList recordsByIndexMulti( const QList<QVariant> & args, int lookupMode = UseCache | UseSelect | PartialSelect ) throw(SqlException,LostConnectionException);
+	//MappedRecordList recordsByIndexMulti( const QList<QVariant> & args, bool select );
 
-	MappedRecordList recordsByIndex( const QList<QVariant> & args );
-	MappedRecordList recordsByIndex( const QVariant & arg );
-	MappedRecordList recordsByIndex( const QVariant & arg1, const QVariant & arg2 );
-	MappedRecordList recordsByIndex( const QVariant & arg1, const QVariant & arg2, const QVariant & arg3 );
+	//MappedRecordList recordsByIndex( const QList<QVariant> & args, bool select );
+	//MappedRecord recordByIndex( const QVariant & arg, bool select );
 
-	MappedRecord recordByIndex( const QVariant & arg );
-	MappedRecord recordByIndex( const QVariant & arg1, const QVariant & arg2 );
-	MappedRecord recordByIndex( const QVariant & arg1, const QVariant & arg2, const QVariant & arg3 );
+	MappedRecordList recordsByIndex( const QList<QVariant> & args, int lookupMode = UseCache | UseSelect ) throw(SqlException,LostConnectionException);
+	MappedRecord recordByIndex( const QVariant & arg, int lookupMode = UseCache | UseSelect ) throw(SqlException,LostConnectionException);
 
-	virtual MappedRecordList records( QList<QVariant> vars, int & status )=0;
+	virtual MappedRecordList records( QList<QVariant> vars, int & status ) =0;
 	virtual void setEmptyEntry( QList<QVariant> vars )=0;
 
 	virtual void recordAdded( const Record & )=0;

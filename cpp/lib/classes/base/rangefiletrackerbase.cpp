@@ -33,7 +33,7 @@
 #include "blurqt.h"
 #include "path.h"
 #include "project.h"
-
+#include "projectresolution.h"
 
 QString RangeFileTracker::fileName() const
 {
@@ -149,7 +149,7 @@ void RangeFileTracker::fillFrames( bool overwrite )
 
 void RangeFileTracker::fillFrame( int frame ) const
 {
-	Resolution r( resolution() );
+	ProjectResolution r( resolution() );
 	Path p( r.fillFrameFilePath() ); 
 	
 	if( !p.dir().mkdir() ) {

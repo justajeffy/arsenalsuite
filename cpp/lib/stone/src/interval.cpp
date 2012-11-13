@@ -69,6 +69,11 @@ Interval::Interval( int months, int days, int seconds, int microseconds )
 {
 }
 
+Interval::Interval( const QString & string )
+{
+	*this = Interval::fromString(string);
+}
+
 Interval Interval::operator+( const Interval & other ) const
 {
 	Interval ret(*this);

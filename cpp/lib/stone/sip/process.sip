@@ -79,16 +79,38 @@ bool systemShutdown( bool reboot = false, const QString & message = QString() );
 
 int killAllWindows( const QString & windowTitleRE );
 
-//QList<HWND> getWindowsByName( const QString & nameRE );
+%MappedType _HWND
+{
+%TypeHeaderCode
+typedef HWND _HWND;
+%End
+%ConvertFromTypeCode
+	PyObject * l;
+	l = PyLong_FromVoidPtr((void*)(*sipCpp));
+	return l;
+%End
+%ConvertToTypeCode
+	if( sipIsErr == NULL ) {
+		if( !PyLong_Check(sipPy) )
+			return 0;
+		return 1;
+	}
+	HWND ret = (HWND)PyLong_AsVoidPtr(sipPy);
+	*sipCppPtr = new HWND(ret);
+    return sipGetState(sipTransferObj);
+%End
+};
+
+QList<_HWND> getWindowsByName( const QString & nameRE );
 
 bool processHasNamedWindow( int pid, const QString & nameRE, bool processRecursive = false );
 
-//qint32 windowProcess( HWND hWin );
+qint32 windowProcess( _HWND hWin );
 
 struct WindowInfo {
 	QString title;
 	int processId;
-//	HWND hWin;
+	_HWND hWin;
 };
 
 QList<WindowInfo> windowInfoByProcess( int pid, bool recursive = false );
@@ -100,6 +122,10 @@ bool disableWindowsErrorReporting( const QString & );
 QString localDomain();
 
 bool qSetCurrentProcessExplicitAppUserModelID( const QString & appId );
+
+QString currentExecutableFilePath();
+
+bool saveScreenShot( const QString & path );
 
 %End
 

@@ -24,7 +24,7 @@
 
 #include "element.h"
 #include "schedule.h"
-
+/*
 static void updateAssetDates( ScheduleList tsl )
 {
 	ElementList toCommit;
@@ -51,6 +51,6 @@ void ScheduleSchema::postUpdate( const Record & updated, const Record & r )
 	updateAssetDates( updated );
 	TableSchema::postUpdate( updated, r );
 }
-
+*/
 #endif
 

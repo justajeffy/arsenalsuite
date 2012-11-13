@@ -28,15 +28,68 @@
 #ifdef USE_FFMPEG
 
 #define __STDC_CONSTANT_MACROS
+#define __STDC_LIMIT_MACROS
 
+#include <stdint.h>
+#include <inttypes.h>
+#include <stdio.h>
 #include "ffimagesequenceprovider.h"
 
 extern "C" {
-#include "avformat.h"
-#include "avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavcodec/avcodec.h"
+#include "libswscale/swscale.h"
+#include "libavutil/md5.h"
+#include "libavutil/log.h"
 }
 
 #include "blurqt.h"
+
+class FFLoader
+{
+public:
+	FFLoader();
+	
+	bool open( const QString & fileName );
+	bool seek( int frameNumber );
+	QImage readImage( int frameNumber );
+
+protected:
+	bool convertToRGB( AVFrame * frame, QImage * );
+	QImage convertToQImage( AVFrame * frame );
+
+	int64_t frameNumberToTimestamp( int frameNumber );
+
+	AVFrame * readNextFrame();
+
+	int mFrameStart, mFrameEnd;
+	double mFrameDuration;
+	FFImageSequenceProvider * mProvider;
+	AVFormatContext * mFormatContext;
+	AVCodecContext * mCodecContext;
+	AVCodec * mCodec;
+	AVDictionary * mCodecOpts;
+	AVFrame * mFrame;
+	int mStreamIndex;
+	AVStream * mStream;
+	bool mIsOpen;
+	AVPacket * mPacket;
+	int mPacketDataPos;
+	int mLastFrameRead;
+	QImage mLastImage;
+	SwsContext * mImgConvertCtx;
+	
+	QMutex mLoadedMutex;
+	QList<QPair<int,QImage> > mLoaded;
+};
+
+class FFLoaderThread : public QThread
+{
+public
+	FFLoaderThread( QObject * parent, FFLoader * loader );
+	
+	FFLoader * mLoader;
+};
 
 class FFImageSequenceProvider::Private
 {
@@ -46,28 +99,11 @@ public:
 
 	bool open( const QString & fileName );
 	bool seek( int frameNumber );
-	AVFrame * readNextFrame();
-	AVFrame * convertToRGB( AVFrame * frame );
-	QImage convertToQImage( AVFrame * frame );
-
 	QImage readImage( int frameNumber );
 
-	int64_t frameNumberToTimestamp( int frameNumber );
+protected:
 
-	int mFrameStart, mFrameEnd;
-	double mFrameDuration;
-	
-	FFImageSequenceProvider * mProvider;
-	AVFormatContext * mFormatContext;
-	AVCodecContext * mCodecContext;
-	AVCodec * mCodec;
-	int mStreamIndex;
-	AVStream * mStream;
-	bool mIsOpen;
-	AVPacket * mPacket;
-	int mPacketDataPos;
-	int mLastFrameRead;
-	QImage mLastImage;
+	FFLoaderThread * mLoaderThread;
 };
 
 FFImageSequenceProvider::Private::Private( FFImageSequenceProvider * provider )
@@ -75,59 +111,68 @@ FFImageSequenceProvider::Private::Private( FFImageSequenceProvider * provider )
 , mFormatContext( 0 )
 , mCodecContext( 0 )
 , mCodec( 0 )
+, mCodecOpts( 0 )
+, mFrame( 0 )
 , mStreamIndex( -1 )
 , mStream( 0 )
 , mIsOpen( false )
 , mPacket( 0 )
 , mPacketDataPos( 0 )
 , mLastFrameRead( -1 )
+, mImgConvertCtx( 0 )
 {}
 
 FFImageSequenceProvider::Private::~Private()
 {
+	if( mPacket )
+		av_free_packet( mPacket );
 	if( mCodecContext ) {
 		avcodec_close( mCodecContext );
 		mCodecContext = 0;
 	}
 	if( mFormatContext ) {
-		av_close_input_file( mFormatContext );
+		avformat_close_input( &mFormatContext );
 		mFormatContext = 0;
+	}
+	if( mImgConvertCtx ) {
+		sws_freeContext( mImgConvertCtx );
+		mImgConvertCtx = 0;
+	}
+	if( mFrame ) {
+		av_free(mFrame);
 	}
 }
 
 bool FFImageSequenceProvider::Private::open( const QString & fileName )
 {
 	QByteArray fileNameLatin1 = fileName.toLatin1();
-	if( av_open_input_file( &mFormatContext, fileNameLatin1.constData(), NULL, 0, NULL ) ) {
-		LOG_1( "av_open_input_file failed to open file: " + fileName );
+	
+	av_log_set_level(AV_LOG_DEBUG);
+	//mFormatContext = new AVFormatContext();
+	
+	if( avformat_open_input( &mFormatContext, fileNameLatin1.constData(), NULL, NULL ) ) {
+		LOG_1( "avformat_open_input failed to open file: " + fileName );
 		return false;
 	}
 
-	if( av_find_stream_info( mFormatContext ) < 0 ) {
+	if( avformat_find_stream_info( mFormatContext, NULL ) < 0 ) {
 		LOG_1( "av_find_stream_info failed to find stream info for file: " + fileName );
 		return false;
 	}
 
+#ifdef AV_DEBUG
 	dump_format( mFormatContext, 0, fileNameLatin1.constData(), false );
+#endif
 
-	QList<int> videoStreams;
-	for( int i = 0; i < mFormatContext->nb_streams; i++ ) {
-		if( mFormatContext->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO )
-			videoStreams += i;
-	}
-
-	// Take the first video stream for now
-	if( videoStreams.isEmpty() ) {
-		LOG_1( "No video streams found in file: " + fileName );
-		return false;
-	}
-	
-	mStreamIndex = videoStreams[0];
+	mStreamIndex = av_find_best_stream( mFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0 );
 	mStream = mFormatContext->streams[mStreamIndex];
 	mCodecContext = mStream->codec;
 
 	mCodec = avcodec_find_decoder( mCodecContext->codec_id );
-
+	
+	if(mCodec->capabilities & CODEC_CAP_DR1)
+		mCodecContext->flags |= CODEC_FLAG_EMU_EDGE;
+	
 	if( !mCodec ) {
 		LOG_5( "Unable to find decoder for stream" );
 		return false;
@@ -139,7 +184,7 @@ bool FFImageSequenceProvider::Private::open( const QString & fileName )
 		mCodecContext->flags |= CODEC_FLAG_TRUNCATED;
 	
 	// Open codec
-	if( avcodec_open(mCodecContext, mCodec) < 0 ) {
+	if( avcodec_open2(mCodecContext, mCodec, NULL) < 0 ) {
 		LOG_5( "Unable to open codec" );
 		return false;
 	}
@@ -166,127 +211,127 @@ int64_t FFImageSequenceProvider::Private::frameNumberToTimestamp( int frameNumbe
 	// timestamp = seconds / time_base
 	// timestamp = (frameNumber / frameRate) / time_base
 	// timestamp = frameNumber / (time_base * frameRate)
-	return (frameNumber * mStream->time_base.den * mStream->r_frame_rate.den) / (mStream->time_base.num * mStream->r_frame_rate.num);
+	return (int64_t(frameNumber) * mStream->time_base.den * mStream->r_frame_rate.den) / (int64_t(mStream->time_base.num) * mStream->r_frame_rate.num);
 }
 
 bool FFImageSequenceProvider::Private::seek( int frameNumber )
 {
-	//LOG_5( "Seeking frame " + QString::number( frameNumber ) );
 	mLastFrameRead = frameNumber - 1;
 	int64_t timestamp = frameNumberToTimestamp( frameNumber );
+	LOG_5( "Seeking frame " + QString::number( frameNumber ) );
 	if( mPacket ) {
 		av_free_packet( mPacket );
 		delete mPacket;
 		mPacket = 0;
 		mPacketDataPos = 0;
 	}
-	return av_seek_frame( mFormatContext, mStreamIndex, timestamp, AVSEEK_FLAG_ANY ) >= 0;
+	if( avformat_seek_file( mFormatContext, mStreamIndex, INT64_MIN, timestamp, INT64_MAX, 0 /*AVSEEK_FLAG_FRAME*/ ) < 0 ) {
+		LOG_1( "Failed to seek to frame" + QString::number(frameNumber) );
+		return false;
+	}
+	
+	avcodec_flush_buffers(mCodecContext);
+	
+	return true;
+}
+
+const char * packetMd5( AVPacket * pkt )
+{
+	static char out[35];
+	uint8_t md5sum[16];
+	av_md5_sum(md5sum, (const uint8_t*)(pkt->data), pkt->size);
+	out[0] = '0';
+	out[1] = 'x';
+	for( int i=0; i<16; ++i )
+		sprintf( &out[i+2], "%X%X", md5sum[i] & 0xf, md5sum[i] >> 4 );
+	return out;
 }
 
 AVFrame * FFImageSequenceProvider::Private::readNextFrame()
 {
-	AVFrame * frame;
-	frame = avcodec_alloc_frame();
+	if( !mFrame )
+		mFrame = avcodec_alloc_frame();
 
-	int bytesRemaining = 0;
-	int bytesDecoded = 0;
-	int frameFinished = 0;
+	int frameFinished = 0, err = 0;
 
 	mLastFrameRead++;
 
-	// Decode packets until we have decoded a complete frame
-	while(true)
-	{
-		// Work on the current packet until we have decoded all of it
-		while(bytesRemaining > 0)
-		{
-			// Decode the next chunk of data
-			bytesDecoded = avcodec_decode_video( mCodecContext, frame, &frameFinished, &mPacket->data[mPacketDataPos], bytesRemaining);
-
-			// Was there an error?
-			if(bytesDecoded < 0)
-			{
-				fprintf(stderr, "Error while decoding frame\n");
-				goto error_exit;
-			}
-
-			mPacketDataPos += bytesDecoded;
-			bytesRemaining -= bytesDecoded;
-
-			// Did we finish the current frame? Then we can return
-			if(frameFinished)
-				return frame;
-		}
-
-		// Read the next packet, skipping all packets that aren't for this
-		// stream
-		do
-		{
-			// Free old packet
-			if( mPacket ) {
-				av_free_packet( mPacket );
-				delete mPacket;
-				mPacket = 0;
-			}
-
-			mPacket = new AVPacket;
-			mPacketDataPos = 0;
-
-			// Read new packet
-			if( av_read_packet(mFormatContext, mPacket) < 0 )
-				goto error_exit;
-		} while ( mPacket->stream_index != mStreamIndex );
-
-		bytesRemaining = mPacket->size;
-    }
-
-error_exit:
-	av_free( frame );
-	return 0;
-}
-
-AVFrame * FFImageSequenceProvider::Private::convertToRGB( AVFrame * frame )
-{
-	AVFrame * frameRGB;
-	
-	// Allocate an AVFrame structure
-	frameRGB = avcodec_alloc_frame();
-	if( !frameRGB ) {
-		LOG_1( "Unable to allocate frameRGB" );
-		return 0;
+	if( !mPacket ) {
+		mPacket = new AVPacket;
+		av_init_packet(mPacket);
+		//mPacket->size = 0;
 	}
 	
-	avpicture_alloc( (AVPicture*)frameRGB, PIX_FMT_RGB32, mCodecContext->width, mCodecContext->height );
-	
-	img_convert( (AVPicture *)frameRGB, PIX_FMT_RGB32, (AVPicture*)frame, mCodecContext->pix_fmt, mCodecContext->width, mCodecContext->height);
+	while( frameFinished == 0 ) {
+		
+		if( mPacketDataPos >= mPacket->size ) {
+			av_free_packet(mPacket);
+			mPacketDataPos = 0;
+			while (true) {
+				if (av_read_frame(mFormatContext, mPacket) < 0) {
+					LOG_1( "av_read_frame returned error code: " + QString::number(err) );
+					return 0;
+				}
+				if( mPacket->stream_index == mStreamIndex ) break;
+				av_free_packet(mPacket);
+			}
+		}
+		
+		// preparing the packet that we will send to libavcodec
+		AVPacket packetToSend;
+		av_init_packet(&packetToSend);
+		packetToSend.data = mPacket->data + mPacketDataPos;
+		packetToSend.size = mPacket->size - mPacketDataPos;
 
-	return frameRGB;
+		// sending data to libavcodec
+		int processedLength = avcodec_decode_video2( mCodecContext, mFrame, &frameFinished, &packetToSend);
+		
+		if (processedLength < 0) {
+			av_free_packet(mPacket);
+			return 0;
+		}
+		
+		LOG_5( QString("Processed %1 bytes of %2 in packet").arg(processedLength).arg(mPacket->size) );
+		mPacketDataPos += processedLength;
+	}
+	
+	return mFrame;
+}
+
+bool FFImageSequenceProvider::Private::convertToRGB( AVFrame * frame, QImage * image )
+{
+	mImgConvertCtx = sws_getCachedContext( mImgConvertCtx, mCodecContext->width, mCodecContext->height, mCodecContext->pix_fmt,
+		mCodecContext->width, mCodecContext->height, PIX_FMT_BGRA, SWS_FAST_BILINEAR, NULL, NULL, NULL);
+
+	if (mImgConvertCtx == NULL)
+	{
+		LOG_1( "Failed to get SwsContext for image format conversion.");
+		return false;
+	}
+	
+	uint8_t * imgPlanes [] = { image->bits(), image->bits(), image->bits(), image->bits() };
+	int strides [] = { image->bytesPerLine(), image->bytesPerLine(), image->bytesPerLine(), image->bytesPerLine() };
+	return sws_scale( mImgConvertCtx, frame->data, frame->linesize, 0, mCodecContext->height, imgPlanes, strides) == image->height();
 }
 
 QImage FFImageSequenceProvider::Private::convertToQImage( AVFrame * frame )
 {
-	bool freeFrame = false;
-	if( mCodecContext->pix_fmt != PIX_FMT_RGB32 ) {
-		freeFrame = true;
-		frame = convertToRGB( frame );
-	}
+	QImage img( mCodecContext->width, mCodecContext->height, QImage::Format_ARGB32 );
 
-	QImage img( mCodecContext->width, mCodecContext->height, QImage::Format_RGB32 );
+	if( mCodecContext->pix_fmt != PIX_FMT_ARGB ) {
+		if( !convertToRGB( frame, &img ) ) {
+			LOG_1( "convertToRGB failed" );
+		}
+	} else
+		memcpy( img.bits(), frame->data[0], img.width() * img.height() * 4 );
 
-	memcpy( img.bits(), frame->data[0], img.width() * img.height() * 4 );
-
-	for( int i = 0; i < img.width() * img.height(); i++ ) {
+/*	for( int i = 0; i < img.width() * img.height(); i++ ) {
 		QRgb c =  img.pixel( i % img.width(), i / img.width() );
 		if( qRed(c) + qGreen(c) + qBlue(c) > 0 ) {
 			//LOG_5( "Image not all black" );
 			break;
 		}
-	}
-
-	if( freeFrame ) {
-		avpicture_free( (AVPicture*)frame );
-		av_free( frame );
-	}
+	} */
 
 	return img;
 }
@@ -309,7 +354,6 @@ QImage FFImageSequenceProvider::Private::readImage( int frameNumber )
 	if( !frame ) return QImage();
 	QImage img = convertToQImage( frame );
 	mLastImage = img;
-	av_free( frame );
 	return img;
 }
 
@@ -369,8 +413,8 @@ FFImageSequenceProviderPlugin::~FFImageSequenceProviderPlugin(){}
 QStringList FFImageSequenceProviderPlugin::fileExtensions()
 {
 	QStringList ret;
-	AVInputFormat * format = first_iformat;
-	for( ; format; format = format->next ) {
+	AVInputFormat * format = 0;
+	while( format = av_iformat_next(format) ) {
 		//fprintf( stderr, "avformat AVInputFormat: Name: %s Long Name %s Extensions %s\n", format->name, format->long_name, format->extensions );
 		if( format->extensions )
 			ret += QString::fromLatin1( format->extensions ).split(',');
@@ -378,7 +422,7 @@ QStringList FFImageSequenceProviderPlugin::fileExtensions()
 	}
 	ret << "mpg" << "mpeg" << "avi";
 	ret.sort();
-	LOG_5( "Supported Extensions: " + ret.join(",") );
+	//LOG_5( "Supported Extensions: " + ret.join(",") );
 	return ret;
 }
 
