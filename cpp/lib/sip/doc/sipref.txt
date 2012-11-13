@@ -3590,15 +3590,15 @@ For example::
 
 
 Used to define the name of an error handler function that is called when the python reimplementation of
-a virtual function throws an exception.  The call to the virtual error handler is inserted in the
+a virtual function throws an exception. The call to the virtual error handler is inserted in the
  `generated derived classes`_ to handle the exception before returning.
 
-%VirtualErrorHandler defines a module-wide default virtual error handler function.  One can specify virtual
+%VirtualErrorHandler defines a module-wide default virtual error handler function. One can specify virtual
 error handler functions per class or per virtual function by using an annotation.
 
-The named function must take two arguments.  This first is the class instance.  Generic virtual error handler
-functions can simply use 'const void *' to accept all class types.  The second argument is the const sipWrapper *
-which can be cast to a PyObject *.  These can be used to gather relevant debugging information, or to handle the
+The named function must take two arguments. This first is the class instance. Generic virtual error handler
+functions can simply use 'const void *' to accept all class types. The second argument is the const sipWrapper *
+which can be cast to a PyObject *. These can be used to gather relevant debugging information, or to handle the
 exception more intellegently by calling an error handler function on the c++ instance or the python instance.
 
 The virtual error handler is responsible for clearing the exception before returning.
@@ -3612,7 +3612,7 @@ void MyVirtualErrorHandler( const void *, const sipWrapper * );
 %ModuleCode
 void MyVirtualErrorHandler( const void * /*klass*/, const sipWrapper * /*pyObject*/ )
 {
-    PyErr_Print();
+  PyErr_Print();
 }
 %End
 

@@ -1,6 +1,6 @@
 # This script handles the SIP configuration and generates the Makefiles.
 #
-# Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+# Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
 #
 # This file is part of SIP.
 #
@@ -25,8 +25,8 @@ import siputils
 
 
 # Initialise the globals.
-sip_version = 0x040c05
-sip_version_str = "4.12.5-snapshot-de6a700f5faa"
+sip_version = 0x040e00
+sip_version_str = "4.14-snapshot-214dd6433474"
 py_version = sys.hexversion >> 8
 plat_py_site_dir = None
 plat_py_inc_dir = None
@@ -56,7 +56,7 @@ build_macro_names = [
     "CC",
     "CFLAGS",
     "CFLAGS_RELEASE", "CFLAGS_DEBUG",
-    "CFLAGS_CONSOLE", "CFLAGS_SHLIB", "CFLAGS_THREAD",
+    "CFLAGS_CONSOLE", "CFLAGS_SHLIB", "CFLAGS_APP", "CFLAGS_THREAD",
     "CFLAGS_MT", "CFLAGS_MT_DBG", "CFLAGS_MT_DLL", "CFLAGS_MT_DLLDBG",
     "CFLAGS_EXCEPTIONS_ON", "CFLAGS_EXCEPTIONS_OFF",
     "CFLAGS_RTTI_ON", "CFLAGS_RTTI_OFF",
@@ -66,7 +66,7 @@ build_macro_names = [
     "CXX",
     "CXXFLAGS",
     "CXXFLAGS_RELEASE", "CXXFLAGS_DEBUG",
-    "CXXFLAGS_CONSOLE", "CXXFLAGS_SHLIB", "CXXFLAGS_THREAD",
+    "CXXFLAGS_CONSOLE", "CXXFLAGS_SHLIB", "CXXFLAGS_APP", "CXXFLAGS_THREAD",
     "CXXFLAGS_MT", "CXXFLAGS_MT_DBG", "CXXFLAGS_MT_DLL", "CXXFLAGS_MT_DLLDBG",
     "CXXFLAGS_EXCEPTIONS_ON", "CXXFLAGS_EXCEPTIONS_OFF",
     "CXXFLAGS_RTTI_ON", "CXXFLAGS_RTTI_OFF",
@@ -153,7 +153,9 @@ def set_defaults():
     default_platform = "none"
 
     if sys.platform == "win32":
-        if py_version >= 0x020600:
+        if py_version >= 0x030300:
+            default_platform = "win32-msvc2010"
+        elif py_version >= 0x020600:
             default_platform = "win32-msvc2008"
         elif py_version >= 0x020400:
             default_platform = "win32-msvc.net"
