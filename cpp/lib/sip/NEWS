@@ -1,6 +1,50 @@
-v4.13 ??? October 2011
+v4.14 29th September 2012
+  - The internal API version is increased to 9.0 requiring the regeneration of
+    all modules.
+  - Added the %InstanceCode directive.
+  - Added the %VirtualErrorHandler directive.
+  - Added the default_VirtualErrorHandler argument to the %Module directive.
+  - Added the /VirtualErrorHandler/ class annotation.
+  - Added the /NoVirtualErrorHandler/ and /VirtualErrorHandler/ function
+    annotations.
+  - The /AllowNone/ and /NoRelease/ mapped type annotations can now be used
+    with mapped type templates.
+  - SIP_PLATFORM_* and SIP_TIMELINE_* preprocessor symbols are generated
+    corresponding to the '-t' arguments passed on the command line.
+  - Deprecated sipTransferBreak().
+  - For Python v2.x unsigned short and unsigned char (when used as a byte) are
+    now converted to int, rather than long, objects.
+  - Added support for MSVC 2010 to the build system.
+
+v4.13.3 20th June 2012
+  - The /NoRaisesPyException/ and /RaisesPyException/ function annotations can
+    now be applied to constructors.
+  - Added support for the Python v3.3 handling of Unicode.
+
+v4.13.2 10th February 2012
+  - A bug fix release.
+
+v4.13.1 22nd December 2011
+  - Deprecation warnings can no longer be disabled.
+  - Added the all_raise_py_exception argument to the %Module directive.
+  - Added the /NoRaisesPyException/ function annotation.
+  - Added the /PyName/ typedef annotation.
+  - Class templates now allow super-classes to be defined as template
+    arguments.
+  - Added support for 'public' preceding the name of a class in a super-class
+    list.
+  - Added support for 'protected' and 'private' preceding the name of a class
+    in a super-class list.  Any such super-class will be ignored.
+
+v4.13 25th October 2011
   - Added the %DefaultDocstringFormat directive.
   - Added the format argument to the %Docstring directive.
+  - %ConvertToSubClassCode can now cause a restart of the conversion process
+    using a different requested type.
+  - '*' and '&' are now supported as unary operators in expressions used in the
+    values of default arguments.
+  - The /Transfer/ annotation can now be used with the /Array/ annotation to
+    prevent the freeing of the temporary array of pointers.
 
 v4.12.4 2nd August 2011
   - PyLong_AsUnsignedLongMask() and PyLong_AsUnsignedLongLongMask() are now

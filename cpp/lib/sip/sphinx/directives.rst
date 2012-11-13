@@ -18,7 +18,7 @@ Revised Directive Syntax
 
 .. versionadded:: 4.12
 
-The directive syntax used in the current version has some problems:
+The directive syntax used in older versions has some problems:
 
 - it is inconsistent in places
 
@@ -205,11 +205,11 @@ The following variables are made available to the handwritten code:
 void \*\*sipPtrPtr
     This is the pointer used to return the address of the character buffer.
 
-:cmacro:`SIP_SSIZE_T` sipRes
+:c:macro:`SIP_SSIZE_T` sipRes
     The handwritten code should set this to the length of the character buffer
     or -1 if there was an error.
 
-:cmacro:`SIP_SSIZE_T` sipSegment
+:c:macro:`SIP_SSIZE_T` sipSegment
     This is the number of the segment of the character buffer.
 
 PyObject \*sipSelf
@@ -239,11 +239,11 @@ The following variables are made available to the handwritten code:
 void \*\*sipPtrPtr
     This is the pointer used to return the address of the read buffer.
 
-:cmacro:`SIP_SSIZE_T` sipRes
+:c:macro:`SIP_SSIZE_T` sipRes
     The handwritten code should set this to the length of the read buffer or
     -1 if there was an error.
 
-:cmacro:`SIP_SSIZE_T` sipSegment
+:c:macro:`SIP_SSIZE_T` sipSegment
     This is the number of the segment of the read buffer.
 
 PyObject \*sipSelf
@@ -270,11 +270,11 @@ The following variables are made available to the handwritten code:
     This is a pointer to the structure or class instance.  Its *type* is a
     pointer to the structure or class.
 
-:cmacro:`SIP_SSIZE_T` \*sipLenPtr
+:c:macro:`SIP_SSIZE_T` \*sipLenPtr
     This is the pointer used to return the total length in bytes of all
     segments of the buffer.
 
-:cmacro:`SIP_SSIZE_T` sipRes
+:c:macro:`SIP_SSIZE_T` sipRes
     The handwritten code should set this to the number of segments that make
     up the buffer.
 
@@ -305,11 +305,11 @@ The following variables are made available to the handwritten code:
 void \*\*sipPtrPtr
     This is the pointer used to return the address of the write buffer.
 
-:cmacro:`SIP_SSIZE_T` sipRes
+:c:macro:`SIP_SSIZE_T` sipRes
     The handwritten code should set this to the length of the write buffer or
     -1 if there was an error.
 
-:cmacro:`SIP_SSIZE_T` sipSegment
+:c:macro:`SIP_SSIZE_T` sipSegment
     This is the number of the segment of the write buffer.
 
 PyObject \*sipSelf
@@ -559,6 +559,13 @@ const sipTypeDef \*sipType
     have to recognise the exact class, only the most specific sub-class that
     it can.
 
+    The code may also set the value to a type that is apparently unrelated to
+    the requested type.  If this happens then the whole conversion process is
+    started again using the new type as the requested type.  This is typically
+    used to deal with classes that have more than one super-class that are
+    subject to this conversion process.  It allows the code for one super-class
+    to switch to the code for another (more appropriate) super-class.
+
 sipWrapperType \*sipClass
     .. deprecated:: 4.8
         Use ``sipType`` instead.
@@ -656,10 +663,11 @@ returned.
 If ``sipIsErr`` is not ``NULL`` then a combination of the following flags is
 returned.
 
-        - :cmacro:`SIP_TEMPORARY` is set to indicate that the returned instance
-          is a temporary and should be released to avoid a memory leak.
+        - :c:macro:`SIP_TEMPORARY` is set to indicate that the returned
+          instance is a temporary and should be released to avoid a memory
+          leak.
 
-        - :cmacro:`SIP_DERIVED_CLASS` is set to indicate that the type of the
+        - :c:macro:`SIP_DERIVED_CLASS` is set to indicate that the type of the
           returned instance is a derived class.  See
           :ref:`ref-derived-classes`.
 
@@ -740,9 +748,9 @@ When used in a class specification the handwritten code replaces the code that
 would normally be automatically generated.  This means that the handwritten
 code must also handle instances of the class itself and not just the additional
 types that are being supported.  This should be done by making calls to
-:cfunc:`sipCanConvertToType()` to check the object type and
-:cfunc:`sipConvertToType()` to convert the object.  The
-:cmacro:`SIP_NO_CONVERTORS` flag *must* be passed to both these functions to
+:c:func:`sipCanConvertToType()` to check the object type and
+:c:func:`sipConvertToType()` to convert the object.  The
+:c:macro:`SIP_NO_CONVERTORS` flag *must* be passed to both these functions to
 prevent recursive calls to the handwritten code.
 
 
@@ -761,7 +769,7 @@ copyright and licensing terms.
 For example::
 
     %Copying
-    Copyright (c) 2011 Riverbank Computing Limited
+    Copyright (c) 2012 Riverbank Computing Limited
     %End
 
 
@@ -1401,7 +1409,7 @@ This directive is used to specify handwritten code that is embedded in-line
 in the generated module initialisation code after the SIP module has been
 imported but before the module itself has been initialised.
 
-It is typically used to call :cfunc:`sipRegisterPyType()`.
+It is typically used to call :c:func:`sipRegisterPyType()`.
 
 For example::
 
@@ -1410,6 +1418,32 @@ For example::
         // the SIP module has been imported, but before other module-specific
         // initialisation has been completed.
     %End
+
+
+.. directive:: %InstanceCode
+
+.. versionadded:: 4.14
+
+.. parsed-literal::
+
+    %InstanceCode
+        *code*
+    %End
+
+There are a number of circumstances where SIP needs to create an instance of a
+C++ class but may not be able to do so.  For example the C++ class may be
+abstract or may not have an argumentless public constructor.  This directive is
+used in the definition of a class or mapped type to specify handwritten code to
+create an instance of the C++ class.  For example, if the C++ class is
+abstract, then the handwritten code may return an instance of a concrete
+sub-class.
+
+The following variable is made available to the handwritten code:
+
+*type* \*sipCpp
+    This must be set by the handwritten code to the address of an instance of
+    the C++ class.  It doesn't matter if the instance is on the heap or not as
+    it will never be explicitly destroyed.
 
 
 .. directive:: %License
@@ -1801,6 +1835,8 @@ then the pattern should instead be::
 .. parsed-literal::
 
     %Module(name = *dotted-name*
+            [, all_raise_py_exception = [True | False]]
+            [, default_VirtualErrorHandler = *name*]
             [, keyword_arguments = ["None" | "All" | "Optional"]]
             [, language = *string*]
             [, use_argument_names = [True | False]]
@@ -1813,6 +1849,17 @@ then the pattern should instead be::
 This directive is used to specify the name of a module and a number of other
 attributes.  ``name`` may contain periods to specify that the module is part of
 a Python package.
+
+``all_raise_py_exception`` specifies that all constructors, functions and
+methods defined in the module raise a Python exception to indicate that an
+error occurred.  It is the equivalent of using the :fanno:`RaisesPyException`
+function annotation on every constructor, function and method.
+
+``default_VirtualErrorHandler`` specifies the handler (defined by the
+:directive:`%VirtualErrorHandler` directive) that is called when a Python
+re-implementation of any virtual C++ function raises a Python exception.  If no
+handler is specified for a virtual C++ function then ``PyErr_Print()`` is
+called.
 
 ``keyword_arguments`` specifies the default level of support for Python keyword
 arguments.  See the :fanno:`KeywordArgs` annotation for an explaination of the
@@ -1974,6 +2021,12 @@ are processed or ignored.
 Platforms are mutually exclusive - only one platform can be enabled at a time.
 By default all platforms are disabled.  The SIP :option:`-t <sip -t>` command
 line option is used to enable a platform.
+
+.. versionadded:: 4.14
+
+If a platform is enabled then SIP will automatically generate a corresponding C
+preprocessor symbol for use by handwritten code.  The symbol is the name of
+the platform prefixed by ``SIP_PLATFORM_``.
 
 For example::
 
@@ -2163,6 +2216,12 @@ v4.12.  The name of the version is ``SIP_`` followed by the individual parts of
 the version number separated by an underscore.  SIP v4.12 is therefore
 ``SIP_4_12`` and SIP v4.13.2 is ``SIP_4_13_2``.
 
+.. versionadded:: 4.14
+
+If a particular version is enabled then SIP will automatically generate a
+corresponding C preprocessor symbol for use by handwritten code.  The symbol is
+the name of the version prefixed by ``SIP_TIMELINE_``.
+
 For example::
 
     %Timeline {V1_0 V1_1 V2_0 V3_0}
@@ -2321,7 +2380,7 @@ int a0Key
     where it is important to ensure that the corresponding Python object is not
     garbage collected too soon.  This only applies to output arguments that
     return ``'\0'`` terminated strings.  The variable would normally be passed
-    to :cfunc:`sipParseResult()` using either the ``A`` or ``B`` format
+    to :c:func:`sipParseResult()` using either the ``A`` or ``B`` format
     characters.
 
     If ``use_argument_names`` has been set in the :directive:`%Module`
@@ -2334,7 +2393,7 @@ int sipIsErr
 
 PyObject \*sipMethod
     This object is the Python reimplementation of the virtual C++ method.  It
-    is normally passed to :cfunc:`sipCallMethod()`.
+    is normally passed to :c:func:`sipCallMethod()`.
 
 *type* sipRes
     The handwritten code should set this to the result to be returned.  The
@@ -2345,14 +2404,14 @@ int sipResKey
     This variable is only made available if the result has a type where it is
     important to ensure that the corresponding Python object is not garbage
     collected too soon.  This only applies to ``'\0'`` terminated strings.  The
-    variable would normally be passed to :cfunc:`sipParseResult()` using either
-    the ``A`` or ``B`` format characters.
+    variable would normally be passed to :c:func:`sipParseResult()` using
+    either the ``A`` or ``B`` format characters.
 
 sipSimpleWrapper \*sipPySelf
     This variable is only made available if either the ``a0Key`` or
     ``sipResKey`` are made available.  It defines the context within which keys
     are unique.  The variable would normally be passed to
-    :cfunc:`sipParseResult()` using the ``S`` format character.
+    :c:func:`sipParseResult()` using the ``S`` format character.
 
 No variables are made available in the context of a destructor.
 
@@ -2397,3 +2456,36 @@ For example::
             }
     %End
     };
+
+
+.. directive:: %VirtualErrorHandler
+
+.. versionadded:: 4.14
+
+.. parsed-literal::
+
+    %VirtualErrorHandler(name = *name*)
+        *code*
+    %End
+
+This directive is used to define the handwritten code that implements a handler
+that is called when a Python re-implementation of a virtual C++ function raises
+a Python exception.  If a virtual C++ function does not have a handler the
+``PyErr_Print()`` function is called.
+
+The handler is called after all tidying up has been completed and with the
+Python Global Interpreter Lock (GIL) released.  Therefore the handler may
+change the execution path by, for example, throwing a C++ exception.
+
+The following variable is made available to the handwritten code:
+
+sipSimpleWrapper \*sipPySelf
+    This is the class instance containing the Python reimplementation.
+
+For example::
+
+    %VirtualErrorHandler my_handler
+        throw my_exception(sipPySelf);
+    %End
+
+.. seealso:: :fanno:`NoVirtualErrorHandler`, :fanno:`VirtualErrorHandler``, :canno:`VirtualErrorHandler`

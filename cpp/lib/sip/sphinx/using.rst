@@ -37,7 +37,7 @@ The corresponding SIP specification file would then look something like this::
 
     // Define the SIP wrapper to the word library.
 
-    %Module word 0
+    %Module word
 
     class Word {
 
@@ -56,10 +56,7 @@ file, but SIP does not include a full C++ parser.  Let's look at the
 differences between the two files.
 
     - The :directive:`%Module` directive has been added [#]_.  This is used to
-      name the Python module that is being created and to give it a
-      *generation* number.  In this example these are ``word`` and ``0``
-      respectively.  The generation number is effectively the version number of
-      the module.
+      name the Python module that is being created, ``word`` in this example.
 
     - The :directive:`%TypeHeaderCode` directive has been added.  The text
       between this and the following :directive:`%End` directive is included
@@ -158,7 +155,7 @@ The corresponding SIP specification file would then look something like this::
 
     /* Define the SIP wrapper to the word library. */
 
-    %CModule word 0
+    %Module(name=word, language="C")
 
     struct Word {
 
@@ -174,10 +171,10 @@ The corresponding SIP specification file would then look something like this::
 
 Again, let's look at the differences between the two files.
 
-    - The :directive:`%CModule` directive has been added.  This has the same
-      syntax as the :directive:`%Module` directive used in the previous example
-      but tells SIP that the library being wrapped is implemented in C rather
-      than C++.
+    - The :directive:`%Module` directive specifies that the library being
+      wrapped is implemented in C rather than C++.  Because we are now
+      supplying an optional argument to the directive we must also specify the
+      module name as an argument.
 
     - The :directive:`%TypeHeaderCode` directive has been added.
 
@@ -233,13 +230,13 @@ The corresponding SIP specification file would then look something like this::
 
     // Define the SIP wrapper to the hello library.
 
-    %Module hello 0
+    %Module hello
 
     %Import QtGui/QtGuimod.sip
 
     %If (Qt_4_2_0 -)
 
-    class Hello : QLabel {
+    class Hello : public QLabel {
 
     %TypeHeaderCode
     #include <hello.h>
@@ -275,9 +272,6 @@ previous examples.
       SIP specification.  The build system provides support to ``configure.py``
       scripts for working out the correct tags to use according to which
       version of the library is actually installed.
-
-    - The ``public`` keyword used in defining the super-classes has been
-      removed.  This is not supported by SIP.
 
     - The :aanno:`TransferThis` annotation has been added to the constructor's
       argument.  It specifies that if the argument is not 0 (i.e. the ``Hello``
@@ -467,8 +461,8 @@ C++ call the destructor).
 This applies equally to C structures where the structure is returned to the
 heap using the ``free()`` function.
 
-See also :cfunc:`sipTransferTo()`, :cfunc:`sipTransferBack()` and
-:cfunc:`sipTransferBreak()`.
+See also :c:func:`sipTransferTo()`, :c:func:`sipTransferBack()` and
+:c:func:`sipTransferBreak()`.
 
 
 .. _ref-types-metatypes:
@@ -508,7 +502,7 @@ by importing modules.
 
 If you want to use your own meta-type or super-type then they must be
 sub-classed from one of the SIP provided types.  Your types must be registered
-using :cfunc:`sipRegisterPyType()`.  This is normally done in code specified
+using :c:func:`sipRegisterPyType()`.  This is normally done in code specified
 using the :directive:`%InitialisationCode` directive.
 
 As an example, PyQt4 uses :directive:`%DefaultMetatype` to specify a new
@@ -533,7 +527,7 @@ tens of thousands of attributes.
 
 SIP allows you to extend the handling of lazy attributes to your own attribute
 types by allowing you to register an attribute getter handler (using
-:cfunc:`sipRegisterAttributeGetter()`).  This will be called just before a
+:c:func:`sipRegisterAttributeGetter()`).  This will be called just before a
 type's dictionary is accessed for the first time.
 
 
@@ -555,14 +549,14 @@ SIP v4.6 introduced support for wide characters (i.e. the ``wchar_t`` type).
 Python's C API includes support for converting between unicode objects and wide
 character strings and arrays.  When converting from a unicode object to wide
 characters SIP creates the string or array on the heap (using memory allocated
-using :cfunc:`sipMalloc()`).  This then raises the problem of how this memory
+using :c:func:`sipMalloc()`).  This then raises the problem of how this memory
 is subsequently freed.
 
 The following describes how SIP handles this memory in the different situations
 where this is an issue.
 
     - When a wide string or array is passed to a function or method then the
-      memory is freed (using :cfunc:`sipFree()`) after than function or method
+      memory is freed (using :c:func:`sipFree()`) after than function or method
       returns.
 
     - When a wide string or array is returned from a virtual method then SIP

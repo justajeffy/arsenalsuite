@@ -1,7 +1,7 @@
 /*
  * The main header file for SIP.
  *
- * Copyright (c) 2011 Riverbank Computing Limited <info@riverbankcomputing.com>
+ * Copyright (c) 2012 Riverbank Computing Limited <info@riverbankcomputing.com>
  *
  * This file is part of SIP.
  *
@@ -27,8 +27,8 @@
 /*
  * Define the SIP version number.
  */
-#define SIP_VERSION         0x040c05
-#define SIP_VERSION_STR     "4.12.5-snapshot-de6a700f5faa"
+#define SIP_VERSION         0x040e00
+#define SIP_VERSION_STR     "4.14-snapshot-214dd6433474"
 
 
 #ifdef TRUE
@@ -61,6 +61,7 @@
 #define MOD_IS_COMPOSITE        0x0004  /* It is a composite module. */
 #define MOD_IS_TRANSFORMED      0x0008  /* It's types have been transformed. */
 #define MOD_USE_ARG_NAMES       0x0010  /* Use real argument names. */
+#define MOD_ALL_RAISE_PY_EXC    0x0020  /* All callable raise a Python exception. */
 
 #define hasDelayedDtors(m)  ((m)->modflags & MOD_HAS_DELAYED_DTORS)
 #define setHasDelayedDtors(m)   ((m)->modflags |= MOD_HAS_DELAYED_DTORS)
@@ -73,6 +74,8 @@
 #define isTransformed(m)    ((m)->modflags & MOD_IS_TRANSFORMED)
 #define setUseArgNames(m)   ((m)->modflags |= MOD_USE_ARG_NAMES)
 #define useArgNames(m)      ((m)->modflags & MOD_USE_ARG_NAMES)
+#define setAllRaisePyException(m)   ((m)->modflags |= MOD_ALL_RAISE_PY_EXC)
+#define allRaisePyException(m)  ((m)->modflags & MOD_ALL_RAISE_PY_EXC)
 
 
 /* Handle section flags. */
@@ -171,6 +174,13 @@
 #define isDtor(cd)          ((cd)->classflags & (SECT_IS_PUBLIC | SECT_IS_PROT | SECT_IS_PRIVATE))
 
 
+/* Handle the second group of class flags. */
+#define CLASS2_TMPL_ARG     0x01        /* The class is a template argument. */
+
+#define isTemplateArg(cd)   ((cd)->classflags2 & CLASS2_TMPL_ARG)
+#define setTemplateArg(cd)  ((cd)->classflags2 |= CLASS2_TMPL_ARG)
+
+
 /* Handle ctor flags.  These are combined with the section flags. */
 
 #define CTOR_RELEASE_GIL    0x00000100  /* The ctor releases the GIL. */
@@ -179,6 +189,7 @@
 #define CTOR_HOLD_GIL       0x00000800  /* The ctor holds the GIL. */
 #define CTOR_XFERRED        0x00001000  /* Ownership is transferred. */
 #define CTOR_IS_DEPRECATED  0x00002000  /* The ctor is deprecated. */
+#define CTOR_RAISES_PY_EXC  0x00004000  /* It raises a Python exception. */
 
 #define isPublicCtor(c)     ((c)->ctorflags & SECT_IS_PUBLIC)
 #define setIsPublicCtor(c)  ((c)->ctorflags |= SECT_IS_PUBLIC)
@@ -198,6 +209,8 @@
 #define setIsResultTransferredCtor(c)   ((c)->ctorflags |= CTOR_XFERRED)
 #define isDeprecatedCtor(c) ((c)->ctorflags & CTOR_IS_DEPRECATED)
 #define setIsDeprecatedCtor(c)  ((c)->ctorflags |= CTOR_IS_DEPRECATED)
+#define raisesPyExceptionCtor(c)    ((c)->ctorflags & CTOR_RAISES_PY_EXC)
+#define setRaisesPyExceptionCtor(c) ((c)->ctorflags |= CTOR_RAISES_PY_EXC)
 
 
 /* Handle member flags. */
@@ -206,6 +219,7 @@
 #define MEMBR_NO_ARG_PARSER 0x0002      /* Don't generate an argument parser. */
 #define MEMBR_NOT_VERSIONED 0x0004      /* There is an unversioned overload. */
 #define MEMBR_KEYWORD_ARGS  0x0008      /* It allows keyword arguments. */
+#define MEMBR_HAS_PROTECTED 0x0010      /* It has a protected overload. */
 
 #define isNumeric(m)        ((m)->memberflags & MEMBR_NUMERIC)
 #define setIsNumeric(m)     ((m)->memberflags |= MEMBR_NUMERIC)
@@ -215,6 +229,8 @@
 #define setNotVersioned(m)  ((m)->memberflags |= MEMBR_NOT_VERSIONED)
 #define useKeywordArgs(m)   ((m)->memberflags & MEMBR_KEYWORD_ARGS)
 #define setUseKeywordArgs(m)    ((m)->memberflags |= MEMBR_KEYWORD_ARGS)
+#define hasProtected(m)     ((m)->memberflags & MEMBR_HAS_PROTECTED)
+#define setHasProtected(m)  ((m)->memberflags |= MEMBR_HAS_PROTECTED)
 
 
 /* Handle enum flags.  These are combined with the section flags. */
@@ -267,6 +283,7 @@
 #define OVER_REALLY_PROT    0x02000000  /* It really is protected. */
 #define OVER_IS_DELATTR     0x04000000  /* It is __delattr__. */
 #define OVER_RAISES_PY_EXC  0x08000000  /* It raises a Python exception. */
+#define OVER_NO_ERROR_HANDLER   0x10000000  /* It doesn't use a virtual error handler. */
 
 #define isPublic(o)         ((o)->overflags & SECT_IS_PUBLIC)
 #define setIsPublic(o)      ((o)->overflags |= SECT_IS_PUBLIC)
@@ -323,6 +340,8 @@
 #define setIsDelattr(o)     ((o)->overflags |= OVER_IS_DELATTR)
 #define raisesPyException(o)    ((o)->overflags & OVER_RAISES_PY_EXC)
 #define setRaisesPyException(o) ((o)->overflags |= OVER_RAISES_PY_EXC)
+#define noErrorHandler(o)   ((o)->overflags & OVER_NO_ERROR_HANDLER)
+#define setNoErrorHandler(o)    ((o)->overflags |= OVER_NO_ERROR_HANDLER)
 
 
 /* Handle variable flags. */
@@ -611,6 +630,13 @@ typedef enum {
 } ifaceFileType;
 
 
+/* A location in a .sip source file. */
+typedef struct {
+    int linenr;                         /* The line number. */
+    const char *name;                   /* The filename. */
+} sourceLocation;
+
+
 /* A software license. */
 
 typedef struct {
@@ -742,7 +768,6 @@ typedef struct _argList {
 
 
 /* A function call. */
-
 typedef struct _fcallDef {
     argDef type;                        /* The type. */
     int nrArgs;                         /* The number of arguments. */
@@ -758,6 +783,16 @@ typedef struct _apiVersionRangeDef {
     int index;                          /* The range index. */
     struct _apiVersionRangeDef *next;   /* The next in the list. */
 } apiVersionRangeDef;
+
+
+/* A virtual error handler. */
+typedef struct _virtErrorHandler {
+    const char *name;                   /* The name of the handler. */
+    codeBlockList *code;                /* The handler code. */
+    struct _moduleDef *mod;             /* The defining module. */
+    int index;                          /* The index within the module. */
+    struct _virtErrorHandler *next;     /* The next in the list. */
+} virtErrorHandler;
 
 
 /* A module definition. */
@@ -786,6 +821,7 @@ typedef struct _moduleDef {
     codeBlockList *unitcode;            /* Compilation unit code. */
     codeBlockList *unitpostinccode;     /* Compilation unit post-include code. */
     codeBlockList *docstring;           /* The docstring. */
+    const char *virt_error_handler;     /* The virtual error handler. */
     int parts;                          /* The number of parts generated. */
     const char *file;                   /* The filename. */
     qualDef *qualifiers;                /* The list of qualifiers. */
@@ -795,9 +831,9 @@ typedef struct _moduleDef {
     int nrexceptions;                   /* The nr. of exceptions. */
     int nrtypedefs;                     /* The nr. of typedefs. */
     int nrvirthandlers;                 /* The nr. of virtual handlers. */
+    int nrvirterrorhandlers;            /* The nr. of virtual error handlers. */
     int next_key;                       /* The next key to allocate. */
     struct _virtHandlerDef *virthandlers;   /* The virtual handlers. */
-    char * virterrorhandler;            /* Name of the default virtual error handler */
     licenseDef *license;                /* The software license. */
     struct _classDef *proxies;          /* The list of proxy classes. */
     struct _moduleDef *container;       /* The container module, if any. */
@@ -852,6 +888,7 @@ typedef struct _mappedTypeDef {
     ifaceFileDef *iff;                  /* The interface file. */
     struct _memberDef *members;         /* The static member functions. */
     struct _overDef *overs;             /* The static overloads. */
+    codeBlockList *instancecode;        /* Create instance code. */
     codeBlockList *typecode;            /* Type code. */
     codeBlockList *convfromcode;        /* Convert from C++ code. */
     codeBlockList *convtocode;          /* Convert to C++ code. */
@@ -939,6 +976,7 @@ typedef struct _propertyDef {
 /* An overloaded member function definition. */
 
 typedef struct _overDef {
+    sourceLocation sloc;                /* The source location. */
     char *cppname;                      /* The C++ name. */
     int overflags;                      /* The overload flags. */
     KwArgs kwargs;                      /* The keyword argument support. */
@@ -951,7 +989,7 @@ typedef struct _overDef {
     virtHandlerDef *virthandler;        /* The virtual handler. */
     char *prehook;                      /* The pre-hook name. */
     char *posthook;                     /* The post-hook name. */
-    char *virterrorhandler;             /* Name of function used to handle python exceptions that occur in overridden virtual handlers */
+    const char *virt_error_handler;     /* The virtual error handler. */
     struct _overDef *next;              /* Next in the list. */
 } overDef;
 
@@ -1055,9 +1093,9 @@ typedef struct _mroDef {
 
 typedef struct _classDef {
     unsigned classflags;                /* The class flags. */
+    unsigned classflags2;               /* The class flags, part 2. */
     int pyqt4_flags;                    /* The PyQt4 specific flags. */
     nameDef *pyname;                    /* The Python name. */
-    char * virterrorhandler;            /* Name of the default virtual error handler for the class */
     ifaceFileDef *iff;                  /* The interface file. */
     struct _classDef *ecd;              /* The enclosing scope. */
     struct _classDef *real;             /* The real class if this is a proxy or extender. */
@@ -1080,6 +1118,7 @@ typedef struct _classDef {
     codeBlockList *convtosubcode;       /* Convert to sub C++ code. */
     struct _classDef *subbase;          /* Sub-class base class. */
     codeBlockList *docstring;           /* Class and ctor docstrings. */
+    codeBlockList *instancecode;        /* Create instance code. */
     codeBlockList *convtocode;          /* Convert to C++ code. */
     codeBlockList *travcode;            /* Traverse code. */
     codeBlockList *clearcode;           /* Clear code. */
@@ -1091,6 +1130,7 @@ typedef struct _classDef {
     codeBlockList *charbufcode;         /* Character buffer code (Python v2). */
     codeBlockList *picklecode;          /* Pickle code. */
     propertyDef *properties;            /* The properties. */
+    const char *virt_error_handler;     /* The virtual error handler. */
     struct _classDef *next;             /* Next in the list. */
 } classDef;
 
@@ -1154,6 +1194,7 @@ typedef struct {
     enumDef *enums;                     /* List of enums. */
     varDef *vars;                       /* List of variables. */
     typedefDef *typedefs;               /* List of typedefs. */
+    virtErrorHandler *errorhandlers;    /* The list of virtual error handlers. */
     codeBlockList *exphdrcode;          /* Exported header code. */
     codeBlockList *docs;                /* Documentation. */
     int sigslots;                       /* Set if signals or slots are used. */
@@ -1185,10 +1226,11 @@ extern stringList *includeDirList;      /* The include directory list for SIP fi
 
 
 void parse(sipSpec *, FILE *, char *, stringList *, stringList *, KwArgs, int);
-void parserEOF(char *,parserContext *);
+void parserEOF(const char *,parserContext *);
 void transform(sipSpec *);
 void generateCode(sipSpec *, char *, char *, char *, const char *, int, int,
-        int, int, stringList *, const char *, int, int);
+        int, int, stringList *needed_qualifiers, stringList *, const char *,
+        int, int);
 void generateExtracts(sipSpec *pt, const stringList *extracts);
 void addExtractPart(sipSpec *pt, const char *id, int order, codeBlock *part);
 void generateAPI(sipSpec *pt, moduleDef *mod, const char *apiFile);
@@ -1198,6 +1240,7 @@ void warning(Warning w, const char *fmt, ...);
 void deprecated(const char *msg);
 void fatal(char *,...);
 void fatalScopedName(scopedNameDef *);
+void getSourceLocation(sourceLocation *slp);
 int setInputFile(FILE *open_fp, parserContext *pc, int optional);
 void resetLexerState();
 void *sipMalloc(size_t n);
@@ -1206,6 +1249,7 @@ char *sipStrdup(const char *);
 char *concat(const char *, ...);
 void append(char **, const char *);
 void addToUsedList(ifaceFileList **, ifaceFileDef *);
+int selectedQualifier(stringList *needed_qualifiers, qualDef *qd);
 int excludedFeature(stringList *,qualDef *);
 int sameSignature(signatureDef *,signatureDef *,int);
 int sameTemplateSignature(signatureDef *tmpl_sd, signatureDef *args_sd,
@@ -1231,6 +1275,7 @@ int isSSizeReturnSlot(memberDef *md);
 int isLongReturnSlot(memberDef *md);
 int isVoidReturnSlot(memberDef *md);
 int isNumberSlot(memberDef *md);
+int isInplaceNumberSlot(memberDef *md);
 int isRichCompareSlot(memberDef *md);
 mappedTypeDef *allocMappedType(sipSpec *pt, argDef *type);
 void appendString(stringList **headp, const char *s);
@@ -1383,13 +1428,15 @@ typedef struct _licenseCfg {
     const char *timestamp;
 } licenseCfg;
 
-/* %Module */
+/* %Module and its sub-directives. */
 typedef struct _moduleCfg {
     int token;
     int c_module;
     KwArgs kwargs;
     const char *name;
     int use_arg_names;
+    int all_raise_py_exc;
+    const char *def_error_handler;
     int version;
     codeBlock *docstring;
 } moduleCfg;
@@ -1416,5 +1463,11 @@ typedef struct _variableCfg {
     codeBlock *get_code;
     codeBlock *set_code;
 } variableCfg;
+
+/* %VirtualErrorHandler */
+typedef struct _vehCfg {
+    int token;
+    const char *name;
+} vehCfg;
 
 #endif
