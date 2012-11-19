@@ -17,11 +17,11 @@ if sys.platform == 'win32':
 	pre_deps.append(CopyTarget("stoneguiclasseslibcopy", path, os.path.join(lib_path,'stonegui/stonegui.dll'), "stonegui.dll"))
 
 #svn = WCRevTarget("classmakersvnrev",path,rev_path,"src/svnrev-template.h","src/svnrev.h")
-svnnsi = WCRevTarget("classmakersvnrevnsi",path,rev_path,"classmaker-svnrev-template.nsi","classmaker-svnrev.nsi")
-svntxt = WCRevTarget("classmakersvnrevtxt",path,rev_path,"classmaker_version_template.txt","classmaker_version.txt");
+#svnnsi = WCRevTarget("classmakersvnrevnsi",path,rev_path,"classmaker-svnrev-template.nsi","classmaker-svnrev.nsi")
+#svntxt = WCRevTarget("classmakersvnrevtxt",path,rev_path,"classmaker_version_template.txt","classmaker_version.txt");
 nsi = NSISTarget("classmaker_installer",path,"classmaker.nsi")
 
-QMakeTarget("classmaker",path,"classmaker.pro", pre_deps,[svnnsi,svntxt,nsi])
+QMakeTarget("classmaker",path,"classmaker.pro", pre_deps,[nsi])
 
 #if sys.platform=="linux2":
 #      rpm = RPMTarget('classmakerrpm','blur-classmaker',path,os.path.join(rpm_path,'classmaker.spec.template'),'1.0')
