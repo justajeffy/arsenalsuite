@@ -4,11 +4,20 @@
 %Import QtCore/QtCoremod.sip
 %Import QtGui/QtGuimod.sip
 %Import blur/classes.sip
+%Import blur/stonegui.sip
 
 %DefaultSupertype sip.wrapper
 
+%ModuleHeaderCode
+#include "afcommon.h"
+%End
+
+void exploreFile( QString path );
+
 %Include assfreezermenus.sip
 %Include assfreezerview.sip
+%Include graphiteview.sip
+%Include joblistwidget.sip
 %Include jobsettingswidget.sip
 %Include jobsettingswidgetplugin.sip
 %Include jobviewerplugin.sip

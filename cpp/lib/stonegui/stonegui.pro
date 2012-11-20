@@ -144,7 +144,7 @@ contains( DEFINES, USE_PHONON ) {
 }
 
 # Grphviz support
-unix:DEFINES+=USE_GRAPHVIZ
+#unix:DEFINES+=USE_GRAPHVIZ
 contains( DEFINES, USE_GRAPHVIZ ) {
 	INCLUDES += gvgraph.h
 	SOURCES += gvgraph.cpp

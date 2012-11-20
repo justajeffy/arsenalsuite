@@ -1,5 +1,5 @@
-typedef long GLint;
-typedef unsigned long GLuint;
-typedef unsigned long GLenum;
-typedef unsigned long GLbitfield;
+typedef int GLint;
+typedef unsigned GLuint;
+typedef unsigned GLenum;
+typedef unsigned GLbitfield;
 typedef float GLfloat;

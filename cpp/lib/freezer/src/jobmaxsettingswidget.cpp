@@ -22,10 +22,10 @@
  *
  */
 
-/* $Author$
- * $LastChangedDate: 2010-02-16 17:20:26 +1100 (Tue, 16 Feb 2010) $
- * $Rev: 9358 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/jobmaxsettingswidget.cpp $
+/* $Author: newellm $
+ * $LastChangedDate: 2012-04-13 15:32:08 -0700 (Fri, 13 Apr 2012) $
+ * $Rev: 12965 $
+ * $HeadURL: svn://newellm@svn.blur.com/blur/trunk/cpp/lib/assfreezer/src/jobmaxsettingswidget.cpp $
  */
 
 #include <qfiledialog.h>
@@ -40,6 +40,8 @@
 #include "host.h"
 #include "job.h"
 #include "jobmax.h"
+#include "jobhistory.h"
+#include "jobhistorytype.h"
 #include "jobtask.h"
 #include "jobservice.h"
 #include "service.h"
@@ -91,17 +93,6 @@ JobService JobMaxUtils::set64Service( JobService js, bool use64 )
 	Service newService = serviceCounterpart(js.service());
 	if( newService.isRecord() )
 		js.setService(newService);
-
-/*
-	JobHistory jh;
-	jh.setJob( js.job() );
-	jh.setMessage( "Job Service List Changed: " + oldServiceName + " to " + newService.service() );
-	jh.setUser( User::currentUser() );
-	jh.setHost( Host::currentHost() );
-	jh.setColumnLiteral( "created", "NOW()" );
-	jh.setType( JobHistoryType::recordByName( "info" ) );
-	jh.commit();
-    */
 
 	return js;
 }
@@ -156,30 +147,29 @@ void JobMaxUtils::apply64BitCheckBox( JobList jobs, QCheckBox * cb )
 	}
 }
 
-/*
-JobService JobMaxUtils::pcPreviewService( const Job & job )
+JobService JobMaxUtils::getService( const Job & job, const QString & service )
 {
 	JobServiceList jsl = mCJSW->getJobServices(job);
 	foreach( JobService js, jsl )
-		if( js.service().service() == "PCPreview" )
+		if( js.service().service() == service )
 			return js;
 	return JobService();
 }
 
-void JobMaxUtils::setPCPreviewService( const Job & job, bool needPcPreview )
+void JobMaxUtils::setService( const Job & job, const QString & service, bool setService )
 {
-	JobService js = pcPreviewService(job);
-	if( js.service().isRecord() == needPcPreview ) return;
-	if( needPcPreview ) {
+	JobService js = getService(job,service);
+	if( js.service().isRecord() == setService ) return;
+	if( setService ) {
 		js.setJob( job );
-		js.setService( Service::recordByName( "PCPreview" ) );
+		js.setService( Service::recordByName( service ) );
 		mCJSW->applyJobServices(job,js);
 	} else
 		mCJSW->removeJobServices(job,js);
 
 	JobHistory jh;
 	jh.setJob( js );
-	jh.setMessage( "Job Service List Changed: PCPreview " + needPcPreview ? "added" : "removed" );
+	jh.setMessage( "Job Service List Changed: " + service + (setService ? " added" : " removed") );
 	jh.setUser( User::currentUser() );
 	jh.setHost( Host::currentHost() );
 	jh.setColumnLiteral( "created", "NOW()" );
@@ -187,27 +177,24 @@ void JobMaxUtils::setPCPreviewService( const Job & job, bool needPcPreview )
 	jh.commit();
 }
 
-void JobMaxUtils::resetPCPreviewCheckBox( JobList jobs, QCheckBox * cb )
+void JobMaxUtils::resetServiceCheckBox( JobList jobs, const QString & service, QCheckBox * cb )
 {
-	uint isPCPreview = 0;
+	uint hasServiceCnt = 0;
 	foreach( Job j, jobs )
-		isPCPreview += pcPreviewService( j ).service().isRecord() ? 1 : 0;
+		hasServiceCnt += getService( j, service ).service().isRecord() ? 1 : 0;
 	
 	// Show it disabled if at least one of the selected job types support it
-	bool ts = isPCPreview > 0 && isPCPreview < jobs.size();
+	bool ts = hasServiceCnt > 0 && hasServiceCnt < jobs.size();
 	cb->setTristate( ts );
-	cb->setCheckState( ts ? Qt::PartiallyChecked : (isPCPreview > 0 ? Qt::Checked : Qt::Unchecked) );
+	cb->setCheckState( ts ? Qt::PartiallyChecked : (hasServiceCnt > 0 ? Qt::Checked : Qt::Unchecked) );
 }
 
-void JobMaxUtils::applyPCPreviewCheckBox( JobList jobs, QCheckBox * cb )
+void JobMaxUtils::applyServiceCheckBox( JobList jobs, const QString & service, QCheckBox * cb )
 {
-	if( cb->checkState() != Qt::PartiallyChecked ) {
-		bool pcPreview = cb->checkState() == Qt::Checked;
+	if( cb->checkState() != Qt::PartiallyChecked )
 		foreach( JobMax job, jobs )
-			setPCPreviewService( job, pcPreview );
-	}
+			setService( job, service, cb->checkState() == Qt::Checked );
 }
-*/
 
 JobMaxSettingsWidget::JobMaxSettingsWidget( QWidget * parent, JobSettingsWidget::Mode mode )
 : CustomJobSettingsWidget( parent, mode )
@@ -236,6 +223,7 @@ JobMaxSettingsWidget::JobMaxSettingsWidget( QWidget * parent, JobSettingsWidget:
 	connect( xcCheck, SIGNAL( toggled(bool) ), SLOT( settingsChange() ) );
 	connect( m64BitCheck, SIGNAL( toggled(bool) ), SLOT( settingsChange() ) );
 	connect( mPCPreviewServiceCheck, SIGNAL( toggled(bool) ), SLOT( settingsChange() ) );
+	connect( mRealflowRenderkitServiceCheck, SIGNAL( toggled(bool) ), SLOT( settingsChange() ) );
 	connect( mOutputPathEdit, SIGNAL( textEdited(const QString&) ), SLOT( settingsChange() ) );
 	connect( mBrowseOutputPathButton, SIGNAL( clicked() ), SLOT( browseOutputPath() ) );
 
@@ -277,7 +265,7 @@ QStringList JobMaxSettingsWidget::supportedJobTypes()
 
 QStringList JobMaxSettingsWidget::jobTypes()
 {
-	return (QStringList() << "Max7" << "Max8" << "Max9" << "Max10" << "Max2009");
+	return (QStringList() << "Max7" << "Max8" << "Max9" << "Max10" << "Max2009" << "Max2010" << "Max");
 }
 
 template<class T> static QList<T> unique( QList<T> list )
@@ -337,7 +325,12 @@ void JobMaxSettingsWidget::resetSettings()
 	}
 
 	reset64BitCheckBox( mSelectedJobs, m64BitCheck );
-		
+	resetServiceCheckBox( mSelectedJobs, "PCPreview", mPCPreviewServiceCheck );
+	resetServiceCheckBox( mSelectedJobs, "Realflow_Renderkit", mRealflowRenderkitServiceCheck );
+
+	QList<bool> canModifyOutputPath = unique(JobMaxList(mSelectedJobs).canModifyOutputPaths());
+	mOutputPathEdit->setReadOnly( !(canModifyOutputPath.size() == 1 && canModifyOutputPath[0] == true) );
+	
 	CustomJobSettingsWidget::resetSettings();
 }
 
@@ -355,10 +348,12 @@ void JobMaxSettingsWidget::applySettings()
 	mSelectedJobs = mProxy->records();
 
 	apply64BitCheckBox( mSelectedJobs, m64BitCheck );
+	applyServiceCheckBox( mSelectedJobs, "PCPreview", mPCPreviewServiceCheck );
+	applyServiceCheckBox( mSelectedJobs, "Realflow_Renderkit", mRealflowRenderkitServiceCheck );
 	//mSelectedJobs.setValue( "camera", CameraCombo->currentText() );
 
 	if( mMode == JobSettingsWidget::ModifyJobs ) {
-		foreach( Job js, mSelectedJobs ) {
+		foreach( JobMax js, mSelectedJobs ) {
 			if( mFrameNthChanges ) {
 				int start = js.getValue( "frameStart" ).toInt(), end = js.getValue( "frameEnd" ).toInt();
 				if( js.frameNth() != mFrameNth || start != mFrameNthStart || end != mFrameNthEnd || mFrameNthMode != js.frameNthMode() ) {
@@ -373,7 +368,9 @@ void JobMaxSettingsWidget::applySettings()
 					Database::current()->commitTransaction();
 				}
 			}
-			mFrameNthChanges = false;
+			if( js.isUpdated( Job::c.OutputPath ) )
+				js.setPassOutputPath( true );
+			mSelectedJobs.update(js);
 		}
 
 		mSelectedJobs.commit();

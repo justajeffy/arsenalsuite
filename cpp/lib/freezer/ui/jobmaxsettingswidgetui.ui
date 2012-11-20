@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>523</width>
-    <height>430</height>
+    <width>716</width>
+    <height>432</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,6 +30,13 @@
       <widget class="QCheckBox" name="mPCPreviewServiceCheck">
        <property name="text">
         <string>PCPreview Service</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="mRealflowRenderkitServiceCheck">
+       <property name="text">
+        <string>Realflow_Renderkit Service</string>
        </property>
       </widget>
      </item>
@@ -143,88 +150,28 @@
      <property name="title">
       <string>Flags*</string>
      </property>
-     <layout class="QGridLayout">
-      <property name="margin">
-       <number>4</number>
-      </property>
-      <property name="spacing">
-       <number>4</number>
-      </property>
-      <item row="2" column="1" colspan="2">
-       <widget class="FieldCheckBox" name="x2Check">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="FieldCheckBox" name="xhCheck">
         <property name="text">
-         <string>Force 2-Sided</string>
+         <string>Render Hidden</string>
         </property>
         <property name="field" stdset="0">
-         <string>flag_x2</string>
+         <string>flag_xh</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="3">
-       <widget class="FieldCheckBox" name="xkCheck">
+      <item row="0" column="1">
+       <widget class="FieldCheckBox" name="xdCheck">
         <property name="text">
-         <string>Super Black</string>
+         <string>Displacement</string>
         </property>
         <property name="field" stdset="0">
-         <string>flag_xk</string>
+         <string>flag_xd</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="FieldCheckBox" name="xfCheck">
-        <property name="text">
-         <string>Render to Fields</string>
-        </property>
-        <property name="field" stdset="0">
-         <string>flag_xf</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="2" colspan="2">
-       <widget class="FieldCheckBox" name="xcCheck">
-        <property name="text">
-         <string>True Color Output Dither</string>
-        </property>
-        <property name="field" stdset="0">
-         <string>flag_xc</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="2">
-       <widget class="FieldCheckBox" name="xnCheck">
-        <property name="text">
-         <string>Nth Serial Numbering</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="FieldCheckBox" name="xvCheck">
-        <property name="text">
-         <string>Video Color Check</string>
-        </property>
-        <property name="field" stdset="0">
-         <string>flag_xv</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2" colspan="2">
-       <widget class="FieldCheckBox" name="xpCheck">
-        <property name="text">
-         <string>Paletted Output Dither</string>
-        </property>
-        <property name="field" stdset="0">
-         <string>flag_xp</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="FieldCheckBox" name="vCheck">
-        <property name="text">
-         <string>Video Post</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
+      <item row="0" column="2">
        <widget class="FieldCheckBox" name="xeCheck">
         <property name="text">
          <string>Effects</string>
@@ -244,7 +191,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="2">
+      <item row="1" column="1">
        <widget class="FieldCheckBox" name="xaCheck">
         <property name="text">
          <string>Atmospherics</string>
@@ -254,23 +201,80 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="FieldCheckBox" name="xhCheck">
+      <item row="1" column="2">
+       <widget class="FieldCheckBox" name="vCheck">
         <property name="text">
-         <string>Render Hidden</string>
-        </property>
-        <property name="field" stdset="0">
-         <string>flag_xh</string>
+         <string>Video Post</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="FieldCheckBox" name="xdCheck">
+      <item row="2" column="0">
+       <widget class="FieldCheckBox" name="xfCheck">
         <property name="text">
-         <string>Displacement</string>
+         <string>Render to Fields</string>
         </property>
         <property name="field" stdset="0">
-         <string>flag_xd</string>
+         <string>flag_xf</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="FieldCheckBox" name="x2Check">
+        <property name="text">
+         <string>Force 2-Sided</string>
+        </property>
+        <property name="field" stdset="0">
+         <string>flag_x2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="FieldCheckBox" name="xkCheck">
+        <property name="text">
+         <string>Super Black</string>
+        </property>
+        <property name="field" stdset="0">
+         <string>flag_xk</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="FieldCheckBox" name="xvCheck">
+        <property name="text">
+         <string>Video Color Check</string>
+        </property>
+        <property name="field" stdset="0">
+         <string>flag_xv</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="FieldCheckBox" name="xpCheck">
+        <property name="text">
+         <string>Paletted Output Dither</string>
+        </property>
+        <property name="field" stdset="0">
+         <string>flag_xp</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="FieldCheckBox" name="xcCheck">
+        <property name="text">
+         <string>True Color Output Dither</string>
+        </property>
+        <property name="field" stdset="0">
+         <string>flag_xc</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="FieldCheckBox" name="xnCheck">
+        <property name="text">
+         <string>Nth Serial Rendering</string>
+        </property>
+        <property name="field" stdset="0">
+         <string>flag_xv</string>
         </property>
        </widget>
       </item>

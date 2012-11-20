@@ -1,8 +1,8 @@
 
-/* $Author$
- * $LastChangedDate: 2010-02-16 17:20:26 +1100 (Tue, 16 Feb 2010) $
- * $Rev: 9358 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/jobbatchsettingswidget.cpp $
+/* $Author: newellm $
+ * $LastChangedDate: 2010-05-27 16:13:16 -0700 (Thu, 27 May 2010) $
+ * $Rev: 9924 $
+ * $HeadURL: svn://newellm@ocelot/blur/trunk/cpp/lib/assfreezer/src/jobbatchsettingswidget.cpp $
  */
 
 

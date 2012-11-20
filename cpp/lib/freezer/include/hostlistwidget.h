@@ -2,22 +2,25 @@
 #ifndef HOST_LIST_WIDGET_H
 #define HOST_LIST_WIDGET_H
 
-#include "ui_hostlistwidgetui.h"
-
 #include <qstring.h>
 
 #include "service.h"
 
 #include "assfreezerview.h"
 
+#include "ui_hostlistwidgetui.h"
+
 class QAction;
 class QMenu;
 
-class FreezerWidget;
+class FilterEdit;
 class RecordTreeView;
+
+class FreezerWidget;
 
 void clearHostErrorsAndSetOffline( HostList hosts, bool offline);
 QString verifyKeyList( const QString & list, Table * table );
+QList<uint> verifyKeyList( const QList<uint> & list, Table * table );
 
 class FREEZER_EXPORT HostListWidget : public FreezerView, public Ui::HostListWidgetUI
 {
@@ -31,14 +34,14 @@ public:
 	QAction* RefreshHostsAction;
 	QAction* HostOnlineAction;
 	QAction* HostOfflineAction;
-    QAction* HostOfflineWhenDoneAction;
+	QAction* HostOfflineWhenDoneAction;
 	QAction* HostRestartAction;
 	QAction* HostRestartWhenDoneAction;
 	QAction* HostRebootAction;
 	QAction* HostRebootWhenDoneAction;
-    QAction* HostShutdownAction;
-    QAction* HostShutdownWhenDoneAction;
-    QAction* HostMaintenanceEnableAction;
+	QAction* HostShutdownAction;
+	QAction* HostShutdownWhenDoneAction;
+	QAction* HostMaintenanceEnableAction;
 
 	QAction* RestartAction;
 	QAction* VNCHostsAction;
@@ -53,11 +56,13 @@ public:
 	QAction* ShowHostErrorsAction;
 	QAction* ShowJobsAction;
 
-	//RecordTreeView * mHostTree;
+	FilterEdit * mHostFilterEdit;
 
 	virtual QToolBar * toolBar( QMainWindow * );
 	virtual void populateViewMenu( QMenu * );
 
+	RecordTreeView * hostTreeView() const;
+	
 public slots:
 
 	void hostListSelectionChanged();
@@ -67,23 +72,23 @@ public slots:
 	void setHostsOnline();
 	/// selected hosts are told to stop burning
 	void setHostsOffline();
-    void setHostsOfflineWhenDone();
+	void setHostsOfflineWhenDone();
 	/// selected hosts are told to exit, and the process monitor is responsible for restarting Burner
 	void setHostsRestart();
 	void setHostsRestartWhenDone();
 	void setHostsReboot();
 	void setHostsRebootWhenDone();
-    void setHostsShutdown();
-    void setHostsShutdownWhenDone();
+	void setHostsShutdown();
+	void setHostsShutdownWhenDone();
 
-    // Enable maintenance mode
-    void setHostsMaintenanceEnable();
+	// Enable maintenance mode
+	void setHostsMaintenanceEnable();
 
 	/// selected hosts are told to update to the latest Burner client
 	void setHostsClientUpdate();
 
-    void toggleFilter(bool);
-    void clearFilters();
+	void toggleFilter(bool);
+	void clearFilters();
 
 	/// opens vncviewer sessions to selected hosts
 	void vncHosts();
@@ -97,45 +102,43 @@ public slots:
 
 	void applyOptions();
 
-    void slotGroupingChanged(bool);
-
+	void slotGroupingChanged(bool);
+	
 protected:
 	/// refreshes the host list from the database
 	void doRefresh();
 
-	void save( IniConfig & ini );
-	void restore( IniConfig & ini );
+	void save( IniConfig & ini, bool = false );
+	void restore( IniConfig & ini, bool = false );
 
 	void customEvent( QEvent * evt );
 
-	//RecordTreeView * mHostTree;
+	RecordTreeView * mHostTree;
 
-	QString mServiceFilter;
-
-    bool mServiceDataRetrieved;
-    ServiceList mServiceList;
-
+	bool mServiceDataRetrieved;
+	ServiceList mServiceList, mServiceFilter;
+	
 	bool mHostTaskRunning;
 	bool mQueuedHostRefresh;
 
 	QToolBar * mToolBar;
 
-    HostList mHostsToSelect;
-
-    QString mStatsHTML;
+	HostList mHostsToSelect;
+	
+	QString mStatsHTML;
 
 public:
 	QMenu * mHostMenu,
 	 * mTailServiceLogMenu,
 	 * mHostServiceFilterMenu,
 	 * mCannedBatchJobMenu,
-     * mHostPluginMenu;
+	 * mHostPluginMenu;
 
-	friend class FreezerHostMenu;
-	friend class FreezerWidget;
+	friend class AssfreezerHostMenu;
+	friend class AssFreezerWidget;
 	friend class HostServiceFilterMenu;
 	friend class CannedBatchJobMenu;
-    friend class HostPluginMenu;
+	friend class HostPluginMenu;
 	friend class TailServiceLogMenu;
 };
 

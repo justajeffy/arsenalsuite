@@ -1,18 +1,19 @@
 
-/* $Author$
- * $LastChangedDate: 2010-02-18 14:36:10 +1100 (Thu, 18 Feb 2010) $
- * $Rev: 9369 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/jobsettingswidget.cpp $
+/* $Author: newellm $
+ * $LastChangedDate: 2011-12-13 12:58:31 -0800 (Tue, 13 Dec 2011) $
+ * $Rev: 12504 $
+ * $HeadURL: svn://newellm@svn.blur.com/blur/trunk/cpp/lib/assfreezer/src/jobsettingswidget.cpp $
  */
 
 #include "database.h"
 
+#include "group.h"
 #include "jobhistory.h"
 #include "jobhistorytype.h"
 #include "jobservice.h"
+#include "jobtask.h"
 #include "user.h"
 #include "usergroup.h"
-#include "group.h"
 
 #include "hostselector.h"
 
@@ -31,9 +32,13 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 {
 	setupUi(this);
 
+	mPersonalPriorityLabel->hide();
+	mPersonalPrioritySpin->hide();
+	mLoggingEnabledCheck->hide();
+	
 	/* Instant Settings connections */
-    connect( mResetInstantSettings, SIGNAL( clicked() ), SLOT( resetSettings() ) );
-    connect( mApplyInstantSettings, SIGNAL( clicked() ), SLOT( applySettings() ) );
+	connect( mResetInstantSettings, SIGNAL( clicked() ), SLOT( resetSettings() ) );
+	connect( mApplyInstantSettings, SIGNAL( clicked() ), SLOT( applySettings() ) );
 	connect( mPrioritySpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
 	connect( mPersonalPrioritySpin, SIGNAL( valueChanged(int,bool) ), SLOT( settingsChange() ) );
 	connect( mDeleteOnCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
@@ -45,13 +50,12 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 
 	//connect( mEmailErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
 	//connect( mEmailCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
-    connect( mEmailErrorListButton, SIGNAL( clicked() ), SLOT( showEmailErrorListWindow() ) );
-    connect( mJabberErrorListButton, SIGNAL( clicked() ), SLOT( showJabberErrorListWindow() ) );
-    //connect( mJabberErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
+	connect( mEmailErrorListButton, SIGNAL( clicked() ), SLOT( showEmailErrorListWindow() ) );
+	connect( mJabberErrorListButton, SIGNAL( clicked() ), SLOT( showJabberErrorListWindow() ) );
+	//connect( mJabberErrorsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
 	//connect( mJabberCompleteCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
-    connect( mEmailCompleteListButton, SIGNAL( clicked() ), SLOT( showEmailCompleteListWindow() ) );
-    connect( mJabberCompleteListButton, SIGNAL( clicked() ), SLOT( showJabberCompleteListWindow() ) );
-
+	connect( mEmailCompleteListButton, SIGNAL( clicked() ), SLOT( showEmailCompleteListWindow() ) );
+	connect( mJabberCompleteListButton, SIGNAL( clicked() ), SLOT( showJabberCompleteListWindow() ) );
 	connect( mUseAutoCheck, SIGNAL( stateChanged(int) ), SLOT( setAutoPacketSize(int) ) );
 	connect( mAllHostsCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
 	connect( mHostListButton, SIGNAL( clicked() ), SLOT( showHostSelector() ) );
@@ -60,16 +64,17 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 	connect( mMaxQuietTimeSpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
 	connect( mMinMemorySpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
 	connect( mMaxMemorySpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
-	connect( mMaxErrorsSpin, SIGNAL( valueChanged( int,bool ) ), SLOT( settingsChange() ) );
 	connect( mPrioritizeOuterTasksCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
 	connect( mEnvironmentButton, SIGNAL( clicked() ), SLOT( showEnvironmentWindow() ) );
 	connect( mServiceTree->model(), SIGNAL( dataChanged(const QModelIndex &, const QModelIndex &) ), SLOT( settingsChange() ) );
+	connect( mLoggingEnabledCheck, SIGNAL( stateChanged(int) ), SLOT( settingsChange() ) );
 
 	mSelectedJobsProxy = new RecordProxy( this );
 	mPrioritySpin->setProxy( mSelectedJobsProxy );
 	mPersonalPrioritySpin->setProxy( mSelectedJobsProxy );
 	mDeleteOnCompleteCheck->setProxy( mSelectedJobsProxy );
 	mPrioritizeOuterTasksCheck->setProxy( mSelectedJobsProxy );
+	mLoggingEnabledCheck->setProxy( mSelectedJobsProxy );
 
 	mPacketSizeSpin->setMinimum( 1 );
 	mSlotsSpin->setMinimum( 1 );
@@ -84,8 +89,8 @@ JobSettingsWidget::JobSettingsWidget( QWidget * parent, Mode mode )
 		mResetInstantSettings->hide();
 	}
 
-    // Store the user list once
-    mMainUserList = Employee::select();
+	// Store the user list once
+	mMainUserList = Employee::select();
 }
 
 JobSettingsWidget::~JobSettingsWidget()
@@ -142,10 +147,10 @@ void JobSettingsWidget::showHostSelector()
 	HostSelector hs(this);
 	if( mSelectedJobs.jobTypes().unique().size() == 1 )
 		hs.setServiceFilter( mSelectedJobs.jobServices().services().unique() );
-	hs.setHostList( mSelectedJobs[0].hostList() );
-
+	hs.setHostList( mUpdatedHostListString );
 	if( hs.exec() == QDialog::Accepted ){
-		mUpdatedHostList = hs.hostStringList();
+		mUpdatedHostListString = hs.hostStringList();
+		mUpdatedHostList = hs.hostList();
 		settingsChange();
 	}
 }
@@ -251,7 +256,7 @@ void JobSettingsWidget::resetSettings()
 	mSlotsSpin->setValues( castList<unsigned int, int>(mSelectedJobs.assignmentSlots()) );
 
 	QStringList packetTypes( unique( mSelectedJobs.packetTypes() ) );
-	bool containsFixedPacketType = packetTypes.contains( "preassigned" );
+	bool containsFixedPacketType = packetTypes.contains( "preassigned" ) || packetTypes.contains( "continuous" );
 	if( mMode == ModifyJobs ) {
 		mPacketCombo->setEnabled( !containsFixedPacketType && packetTypes.size() == 1 );
 		mPacketCombo->clear();
@@ -265,41 +270,128 @@ void JobSettingsWidget::resetSettings()
 	if( packetTypes.size() == 1 ) {
 		QString pt = packetTypes[0];
 		pt[0] = pt[0].toUpper();
-        //mPacketCombo->addItem( pt );
+		if( containsFixedPacketType )
+			mPacketCombo->addItem( pt );
 		mPacketCombo->setCurrentIndex( mPacketCombo->findText( pt ) );
 	} else
 		mPacketCombo->setCurrentIndex( -1 );
 
-    extractNotifyUsers();
-    mNotifyChanged = false;
+	extractNotifyUsers();
+	mNotifyChanged = false;
 
 	QStringList hostLists = mSelectedJobs.hostLists();
+	bool hasPreassigned = false;
 	QList<bool> emptyLists;
 	foreach( QString s, hostLists ) {
 		emptyLists.append( s.isEmpty() );
 	}
 
+	foreach( Job j, mSelectedJobs )
+		hasPreassigned |= j.packetType() == "preassigned";
+
 	Qt::CheckState allHosts = listToCheckState( emptyLists );
+	mAllHostsCheck->setEnabled( !hasPreassigned );
 	mAllHostsCheck->setTristate( allHosts == Qt::PartiallyChecked );
 	mAllHostsCheck->setCheckState( allHosts );
 	mHostListButton->setEnabled( allHosts == Qt::Unchecked );
-
-	mUpdatedHostList = QString();
-	mUpdatedEnvironment = QString();
-    buildServiceTree();
+	
+	mUpdatedHostList = HostList();
+	mUpdatedHostListString = QString();
+	mUpdatedEnvironment = mSelectedJobs[0].environment().environment();
+	buildServiceTree();
 	mChanges = false;
 
 	mApplyInstantSettings->setEnabled(false);
 	mResetInstantSettings->setEnabled(false);
 
-    if( !User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) ) {
-        mSlotsSpin->setEnabled(false);
-        mMinMemorySpin->setEnabled(false);
-        mMaxMemorySpin->setEnabled(false);
-        mMaxErrorsSpin->setEnabled(false);
-    }
+	if( !User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) ) {
+		mSlotsSpin->setEnabled(false);
+		mMinMemorySpin->setEnabled(false);
+		mMaxMemorySpin->setEnabled(false);
+		mMaxErrorsSpin->setEnabled(false);
+	}
 
 	mIgnoreChanges = false;
+}
+
+void JobSettingsWidget::extractNotifyUsers()
+{
+	emailErrorList.clear();
+	jabberErrorList.clear();
+
+	emailCompleteList.clear();
+	jabberCompleteList.clear();
+
+	foreach( Job j, mSelectedJobs )
+	{
+		QStringList parts = j.notifyOnError().split(',');
+		for( QStringList::Iterator it = parts.begin(); it != parts.end(); ++it)
+		{
+			QStringList userNotifyParts = it->split(':');
+			if( userNotifyParts.size() == 2 )
+			{
+				QString methods = userNotifyParts[1];
+				User user = User::recordByUserName(userNotifyParts[0]);
+				if( user.isRecord() )
+				{
+					if( methods.contains("e") )
+						if( !emailErrorList.contains(user) )
+							emailErrorList.append(user);
+
+					if( methods.contains("j") )
+						if( !jabberErrorList.contains(user) )
+							jabberErrorList.append(user);
+				}
+			}
+		}
+
+		parts = j.notifyOnComplete().split(',');
+		for( QStringList::Iterator it = parts.begin(); it != parts.end(); ++it)
+		{
+			QStringList userNotifyParts = it->split(':');
+			if( userNotifyParts.size() == 2 )
+			{
+				QString methods = userNotifyParts[1];
+				User user = User::recordByUserName(userNotifyParts[0]);
+				if( user.isRecord() )
+				{
+					if( methods.contains("e") )
+						if( !emailCompleteList.contains(user) )
+							emailCompleteList.append(user);
+
+					if( methods.contains("j") )
+						if( !jabberCompleteList.contains(user) )
+							jabberCompleteList.append(user);
+				}
+			}
+		}
+	}
+}
+
+QString JobSettingsWidget::buildNotifyString( UserList emailList, UserList jabberList )
+{
+	QString notifyString;
+	QStringList parts;
+
+	for( UserIter user = emailList.begin(); user != emailList.end(); ++user )
+	{
+		parts += (*user).name() + ":e";
+	}
+
+	for( UserIter user = jabberList.begin(); user != jabberList.end(); ++user)
+	{
+		if( parts.contains((*user).name() + ":e"))
+		{
+			int index = parts.indexOf((*user).name() + ":e");
+			parts[index] += "j";
+		}
+		else
+			parts += (*user).name() + ":j";
+	}
+
+	notifyString = parts.join(",");
+
+	return notifyString;
 }
 
 QString updateNotifyMethod( const QString & original, Qt::CheckState jabber, Qt::CheckState email )
@@ -334,86 +426,6 @@ QString updateOwnerNotifyString( const QString & original, User u, Qt::CheckStat
 	QString ret = parts.join(",");
 	LOG_5( "Updated notify string: " + ret );
 	return ret.isEmpty() ? QString::null : ret;
-}
-
-void JobSettingsWidget::extractNotifyUsers()
-{
-    emailErrorList.clear();
-    jabberErrorList.clear();
-
-    emailCompleteList.clear();
-    jabberCompleteList.clear();
-
-    foreach( Job j, mSelectedJobs )
-    {
-        QStringList parts = j.notifyOnError().split(',');
-        for( QStringList::Iterator it = parts.begin(); it != parts.end(); ++it)
-        {
-            QStringList userNotifyParts = it->split(':');
-            if( userNotifyParts.size() == 2 )
-            {
-                QString methods = userNotifyParts[1];
-                User user = User::recordByUserName(userNotifyParts[0]);
-                if( user.isRecord() )
-                {
-                    if( methods.contains("e") )
-                        if( !emailErrorList.contains(user) )
-                            emailErrorList.append(user);
-
-                    if( methods.contains("j") )
-                        if( !jabberErrorList.contains(user) )
-                            jabberErrorList.append(user);
-                }
-            }
-        }
-
-        parts = j.notifyOnComplete().split(',');
-        for( QStringList::Iterator it = parts.begin(); it != parts.end(); ++it)
-        {
-            QStringList userNotifyParts = it->split(':');
-            if( userNotifyParts.size() == 2 )
-            {
-                QString methods = userNotifyParts[1];
-                User user = User::recordByUserName(userNotifyParts[0]);
-                if( user.isRecord() )
-                {
-                    if( methods.contains("e") )
-                        if( !emailCompleteList.contains(user) )
-                            emailCompleteList.append(user);
-
-                    if( methods.contains("j") )
-                        if( !jabberCompleteList.contains(user) )
-                            jabberCompleteList.append(user);
-                }
-            }
-        }
-    }
-}
-
-QString JobSettingsWidget::buildNotifyString( UserList emailList, UserList jabberList )
-{
-    QString notifyString;
-    QStringList parts;
-
-    for( UserIter user = emailList.begin(); user != emailList.end(); ++user )
-    {
-        parts += (*user).name() + ":e";
-    }
-
-    for( UserIter user = jabberList.begin(); user != jabberList.end(); ++user)
-    {
-        if( parts.contains((*user).name() + ":e"))
-        {
-            int index = parts.indexOf((*user).name() + ":e");
-            parts[index] += "j";
-        }
-        else
-            parts += (*user).name() + ":j";
-    }
-
-    notifyString = parts.join(",");
-
-    return notifyString;
 }
 
 void JobSettingsWidget::setAutoPacketSize(int checkState)
@@ -455,11 +467,12 @@ void JobSettingsWidget::applySettings()
 		mSelectedJobs.setMaxMemories( mMaxMemorySpin->value() * 1024 );
 	if( mMaxErrorsSpin->changed() )
 		mSelectedJobs.setMaxErrors( mMaxErrorsSpin->value() );
+
 	if( mUseAutoCheck->checkState() != Qt::PartiallyChecked )
-        if( mPacketSizeSpin->changed() )
-            mSelectedJobs.setPacketSizes( mUseAutoCheck->isChecked() ? 0 : mPacketSizeSpin->value() );
-    if( mSlotsSpin->changed() )
-        mSelectedJobs.setAssignmentSlots( mSlotsSpin->value() );
+		if( mPacketSizeSpin->changed() )
+			mSelectedJobs.setPacketSizes( mUseAutoCheck->isChecked() ? 0 : mPacketSizeSpin->value() );
+	if( mSlotsSpin->changed() )
+		mSelectedJobs.setAssignmentSlots( mSlotsSpin->value() );
 
 	// Dont change preassigned jobs packet type
 	if( mPacketGroup->isEnabled() ) {
@@ -468,22 +481,29 @@ void JobSettingsWidget::applySettings()
 		mSelectedJobs.setPacketTypes( pt );
 	}
 
-	if( mAllHostsCheck->checkState() != Qt::PartiallyChecked && !mUpdatedHostList.isEmpty() )
-		mSelectedJobs.setHostLists( mAllHostsCheck->checkState() == Qt::Checked ? "" : mUpdatedHostList );
+	if( mAllHostsCheck->checkState() != Qt::PartiallyChecked ) {
+		if( mSelectedJobs[0].packetType() == "preassigned" ) {
+			// This will be empty if the list hasn't been updated
+			if( mUpdatedHostList.size() ) {
+				foreach( Job j, mSelectedJobs )
+					j.changePreassignedTaskListWithStatusPrompt( mUpdatedHostList, window() );
+			}
+		} else
+			mSelectedJobs.setHostLists( mAllHostsCheck->checkState() == Qt::Checked ? "" : mUpdatedHostListString );
+	}
+	if( mNotifyChanged ) {
+		// Build the user strings
+		QString notifyOnErrorString = buildNotifyString(emailErrorList, jabberErrorList);
+		QString notifyOnCompleteString = buildNotifyString(emailCompleteList, jabberCompleteList);
 
-    if( mNotifyChanged ) {
-        // Build the user strings
-        QString notifyOnErrorString = buildNotifyString(emailErrorList, jabberErrorList);
-        QString notifyOnCompleteString = buildNotifyString(emailCompleteList, jabberCompleteList);
-
-    	foreach( Job j, mSelectedJobs ) {
-            //j.setNotifyOnError( updateOwnerNotifyString( j.notifyOnError(), j.user(), mJabberErrorsCheck->checkState(), mEmailErrorsCheck->checkState() ) );
-            j.setNotifyOnError( notifyOnErrorString );
-    		//j.setNotifyOnComplete( updateOwnerNotifyString( j.notifyOnComplete(), j.user(), mJabberCompleteCheck->checkState(), mEmailCompleteCheck->checkState() ) );
-            j.setNotifyOnComplete( notifyOnCompleteString );
-    		mSelectedJobs.update(j);
-    	}
-    }
+		foreach( Job j, mSelectedJobs ) {
+			//j.setNotifyOnError( updateOwnerNotifyString( j.notifyOnError(), j.user(), mJabberErrorsCheck->checkState(), mEmailErrorsCheck->checkState() ) );
+			j.setNotifyOnError( notifyOnErrorString );
+				//j.setNotifyOnComplete( updateOwnerNotifyString( j.notifyOnComplete(), j.user(), mJabberCompleteCheck->checkState(), mEmailCompleteCheck->checkState() ) );
+			j.setNotifyOnComplete( notifyOnCompleteString );
+			mSelectedJobs.update(j);
+		}
+	}
 
 	if( mPrioritySpin->changed() )
 		mSelectedJobs.setPriorities( mPrioritySpin->value() );
@@ -491,11 +511,11 @@ void JobSettingsWidget::applySettings()
 	if( mPersonalPrioritySpin->changed() )
 		mSelectedJobs.setPersonalPriorities( mPersonalPrioritySpin->value() );
 
-    if( !mUpdatedEnvironment.isEmpty() ) {
-        JobEnvironmentList jel = mSelectedJobs.environments();
-        jel.setEnvironments( mUpdatedEnvironment );
-        jel.commit();
-    }
+	if( !mUpdatedEnvironment.isEmpty() ) {
+		JobEnvironmentList jel = mSelectedJobs.environments();
+		jel.setEnvironments( mUpdatedEnvironment );
+		jel.commit();
+	}
 
     saveServiceTree();
 
@@ -531,94 +551,94 @@ void JobSettingsWidget::settingsChange()
 
 void JobSettingsWidget::showEnvironmentWindow()
 {
-    JobEnvironmentWindow jew(this);
-    jew.setEnvironment( mSelectedJobs[0].environment().environment() );
-    if( jew.exec() == QDialog::Accepted ) {
-        mUpdatedEnvironment = jew.environment();
-        settingsChange();
-    }
+	JobEnvironmentWindow jew(this);
+	jew.setEnvironment( mUpdatedEnvironment );
+	if( jew.exec() == QDialog::Accepted ){
+		mUpdatedEnvironment = jew.environment();
+		settingsChange();
+	}
 }
 
 void JobSettingsWidget::showEmailErrorListWindow()
 {
-    UserNotifyDialog und(this);
-    und.setMainUserList(mMainUserList);
-    und.setUsers(emailErrorList);
-    if( und.exec() == QDialog::Accepted ) {
-        mNotifyChanged = true;
-        emailErrorList = und.userList();
-        settingsChange();
-    }
+	UserNotifyDialog und(this);
+	und.setMainUserList(mMainUserList);
+	und.setUsers(emailErrorList);
+	if( und.exec() == QDialog::Accepted ) {
+		mNotifyChanged = true;
+		emailErrorList = und.userList();
+		settingsChange();
+	}
 }
 
 void JobSettingsWidget::showJabberErrorListWindow()
 {
-    UserNotifyDialog und(this);
-    und.setMainUserList(mMainUserList);
-    und.setUsers(jabberErrorList);
-    if( und.exec() == QDialog::Accepted ) {
-        mNotifyChanged = true;
-        jabberErrorList = und.userList();
-        settingsChange();
-    }
+	UserNotifyDialog und(this);
+	und.setMainUserList(mMainUserList);
+	und.setUsers(jabberErrorList);
+	if( und.exec() == QDialog::Accepted ) {
+		mNotifyChanged = true;
+		jabberErrorList = und.userList();
+		settingsChange();
+	}
 }
 
 void JobSettingsWidget::showEmailCompleteListWindow()
 {
-    UserNotifyDialog und(this);
-    und.setMainUserList(mMainUserList);
-    und.setUsers(emailCompleteList);
-    if( und.exec() == QDialog::Accepted ) {
-        mNotifyChanged = true;
-        emailCompleteList = und.userList();
-        settingsChange();
-    }
+	UserNotifyDialog und(this);
+	und.setMainUserList(mMainUserList);
+	und.setUsers(emailCompleteList);
+	if( und.exec() == QDialog::Accepted ) {
+		mNotifyChanged = true;
+		emailCompleteList = und.userList();
+		settingsChange();
+	}
 }
 
 void JobSettingsWidget::showJabberCompleteListWindow()
 {
-    UserNotifyDialog und(this);
-    und.setMainUserList(mMainUserList);
-    und.setUsers(jabberCompleteList);
-    if( und.exec() == QDialog::Accepted ) {
-        mNotifyChanged = true;
-        jabberCompleteList = und.userList();
-        settingsChange();
-    }
+	UserNotifyDialog und(this);
+	und.setMainUserList(mMainUserList);
+	und.setUsers(jabberCompleteList);
+	if( und.exec() == QDialog::Accepted ) {
+		mNotifyChanged = true;
+		jabberCompleteList = und.userList();
+		settingsChange();
+	}
 }
 
 void JobSettingsWidget::buildServiceTree()
 {
-    mServiceTree->setRootElement();
+	mServiceTree->setRootElement();
 
-    QMap<uint, uint> depMap;
-    foreach( Job job, mSelectedJobs )
-    {
-        ServiceList installed = job.jobServices().services();
-        foreach( Service s, installed )
-        {
-            uint key = s.key();
-            if( !depMap.contains( key ) )
-                depMap[key] = 1;
-              else
-                depMap[key]++;
-        }
-    }
+	QMap<uint, uint> depMap;
+	foreach( Job job, mSelectedJobs )
+	{
+		ServiceList installed = job.jobServices().services();
+		foreach( Service s, installed )
+		{
+			uint key = s.key();
+			if( !depMap.contains( key ) )
+				depMap[key] = 1;
+				else
+				depMap[key]++;
+		}
+	}
 
-    ServiceList checked, tri;
-    for( QMap<uint, uint>::Iterator it = depMap.begin(); it != depMap.end(); ++it ){
-        if( it.value() == mSelectedJobs.size() )
-            checked += Service( it.key() );
-        else
-            tri += Service( it.key() );
-    }
+	ServiceList checked, tri;
+	for( QMap<uint, uint>::Iterator it = depMap.begin(); it != depMap.end(); ++it ){
+		if( it.value() == mSelectedJobs.size() )
+			checked += Service( it.key() );
+		else
+			tri += Service( it.key() );
+	}
 
-    mServiceTree->setChecked( checked );
-    mServiceTree->setNoChange( tri );
+	mServiceTree->setChecked( checked );
+	mServiceTree->setNoChange( tri );
 
-    mServiceTree->resizeColumnToContents(0);
-    mServiceTree->resizeColumnToContents(1);
-    mServiceTree->resizeColumnToContents(2);
+	mServiceTree->resizeColumnToContents(0);
+	mServiceTree->resizeColumnToContents(1);
+	mServiceTree->resizeColumnToContents(2);
 }
 
 void JobSettingsWidget::saveServiceTree()
@@ -647,7 +667,6 @@ void JobSettingsWidget::saveServiceTree()
 	}
 }
 
-
 CustomJobSettingsWidget::CustomJobSettingsWidget( QWidget * parent, JobSettingsWidget::Mode mode )
 : QGroupBox( parent )
 , mJobServiceBridge( 0 )
@@ -674,6 +693,16 @@ CustomJobSettingsWidget::CustomJobSettingsWidget( QWidget * parent, JobSettingsW
 CustomJobSettingsWidget::~CustomJobSettingsWidget()
 {
 	delete mJobServiceBridge;
+}
+
+JobSettingsWidget * CustomJobSettingsWidget::jobSettingsWidget() const
+{
+	QWidget * w = parentWidget();
+	while( w && !w->inherits("JobSettingsWidget") )
+		w = w->parentWidget();
+	if( w )
+		return (JobSettingsWidget*)w;
+	return 0;
 }
 
 void CustomJobSettingsWidget::setSelectedJobs( JobList selected )

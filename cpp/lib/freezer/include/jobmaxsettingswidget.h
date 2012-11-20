@@ -36,7 +36,9 @@
 #include "jobsettingswidget.h"
 #include "ui_jobmaxsettingswidgetui.h"
 
-class Stone::RecordProxy;
+namespace Stone {
+class RecordProxy;
+}
 using namespace Stone;
 
 class FREEZER_EXPORT JobMaxUtils
@@ -65,6 +67,11 @@ public:
 
 	void reset64BitCheckBox( JobList jobs, QCheckBox * cb );
 	void apply64BitCheckBox( JobList jobs, QCheckBox * cb );
+
+	JobService getService( const Job & job, const QString & service );
+	void setService( const Job & job, const QString & service, bool setService );
+	void resetServiceCheckBox( JobList jobs, const QString & service, QCheckBox * cb );
+	void applyServiceCheckBox( JobList jobs, const QString & service, QCheckBox * cb );
 
 protected:
 	CustomJobSettingsWidget * mCJSW;

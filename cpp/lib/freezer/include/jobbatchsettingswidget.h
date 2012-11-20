@@ -13,7 +13,9 @@
 #include "jobsettingswidget.h"
 #include "ui_jobbatchsettingswidgetui.h"
 
-class Stone::RecordProxy;
+namespace Stone {
+class RecordProxy;
+}
 using namespace Stone;
 
 class FREEZER_EXPORT JobBatchSettingsWidget : public CustomJobSettingsWidget, public Ui::JobBatchSettingsWidgetUI

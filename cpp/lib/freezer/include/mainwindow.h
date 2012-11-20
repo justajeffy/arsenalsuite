@@ -78,13 +78,18 @@ public slots:
 
 	void showProjectWeightDialog();
 	void showProjectReserveDialog();
+	void showManageHostListsDialog();
 
 	void showHostView();
 	void showJobView();
 
 	void createJobView();
 	void createHostView();
-	void closeCurrentView();
+	void createGraphiteView();
+	void createWebView();
+	void createErrorView();
+
+void closeCurrentView();
 
 	void cloneView( FreezerView * view );
 	void cloneCurrentView();
@@ -107,15 +112,16 @@ public slots:
 	void setCurrentView( const QString & );
 	void setCurrentView( FreezerView * );
 
-    void showNextView();
+	void showNextView();
 
-    void saveCurrentViewToFile();
-    void saveViewToFile( FreezerView * );
-    void loadViewFromFile(bool notUsed=true);
-    void loadViewFromFile(const QString &);
+	void saveCurrentViewToFile();
+	void saveViewToFile( FreezerView * );
+	void loadViewFromFile(bool notUsed=true);
+	void loadViewFromFile(const QString &);
 
-    void saveSettings();
+	void saveSettings();
 
+	void showLastVisitedView();
 signals:
     void currentViewChanged( FreezerView * );
 
@@ -140,7 +146,7 @@ private:
 	void saveView( FreezerView * );
 	void restoreViews();
 	FreezerView * restoreSavedView( const QString & viewName, bool updateWindow = true );
-	FreezerView * restoreView( IniConfig &, const QString & viewName, bool updateWindow = true );
+	FreezerView * restoreView( IniConfig &, const QString & viewName, bool updateWindow = true, bool forceFullRestore = false );
 
 	void repopulateToolBar();
 
@@ -153,9 +159,9 @@ private:
 	QTabWidget * mTabWidget;
 	QStackedWidget * mStackedWidget;
 
-	QList<FreezerView*> mViews;
 	FreezerView * mCurrentView;
-	
+	QList<FreezerView*> mViews, mViewVisitList;
+
 	JobListWidget * mJobPage;
 	HostListWidget * mHostPage;
 	QLabel * mCounterLabel;
@@ -184,6 +190,10 @@ private:
 
 	QAction * mNewJobViewAction;
 	QAction * mNewHostViewAction;
+	QAction * mNewGraphiteViewAction;
+	QAction * mNewWebViewAction;
+	QAction * mNewErrorViewAction;
+	QAction * mCloneViewAction;
 	QAction * mSaveViewAsAction;
 	QAction * mCloseViewAction;
 	QAction * mMoveViewLeftAction;

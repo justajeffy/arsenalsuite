@@ -51,6 +51,8 @@ protected slots:
 
 	void slotApply();
 
+	void selectFrameCyclerPath();
+
 	void changes();
 
 protected:

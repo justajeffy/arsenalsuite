@@ -65,9 +65,9 @@ void exploreFile( QString path )
 	QString cmd;
 	#ifdef Q_OS_WIN
 	cmd = "explorer.exe";
-	if( fi.isFile() ) {
+	if( fi.isFile() && fi.exists() ) {
 		args << "/select,";
-		args << path;
+		args << path.replace("/","\\");
 	} else
 		args << dirPath.replace("/", "\\");
 	#endif

@@ -38,26 +38,26 @@
      </item>
     </layout>
    </item>
-      <item>
-       <widget class="FieldCheckBox" name="mRunAsSubmitterCheck">
-        <property name="text">
-         <string>Run process as submitting user</string>
-        </property>
-        <property name="field" >
-         <string>runasSubmitter</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="FieldCheckBox" name="mPassFramesCheck">
-        <property name="text">
-         <string>Pass task list as argument to command</string>
-        </property>
-        <property name="field" >
-         <string>passSlaveFramesAsParam</string>
-        </property>
-       </widget>
-      </item>
+   <item>
+    <widget class="FieldCheckBox" name="mRunAsSubmitterCheck">
+     <property name="text">
+      <string>Run process as submitting user</string>
+     </property>
+     <property name="field" >
+      <string>runasSubmitter</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="FieldCheckBox" name="mPassFramesCheck">
+     <property name="text">
+      <string>Pass task list as argument to command</string>
+     </property>
+     <property name="field" >
+      <string>passSlaveFramesAsParam</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">

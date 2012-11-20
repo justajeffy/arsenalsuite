@@ -10,8 +10,8 @@
 #include "afcommon.h"
 
 class RecordTreeView;
-class HostErrorModel;
-class HostErrorListTask;
+class ErrorModel;
+class ErrorListTask;
 class QEvent;
 
 class FREEZER_EXPORT HostErrorWindow : public QMainWindow
@@ -34,15 +34,19 @@ protected slots:
 	void doRefresh();
 
 	void showMenu( const QPoint &, const Record & underMouse, RecordList selected );
+	void populateHeaderMenu( QMenu * );
+	void setShowClearedErrors( bool sce );
+	void slotGroupingChanged(bool grouped);
 
 protected:
 	void customEvent( QEvent * evt );
 	
 	Host mHost;
 	int mLimit;
-	HostErrorListTask * mTask;
+	bool mShowClearedErrors;
+	ErrorListTask * mTask;
 	bool mRefreshQueued, mRefreshScheduled;
-	HostErrorModel * mModel;
+	ErrorModel * mModel;
 	RecordTreeView * mErrorTree;
 };
 

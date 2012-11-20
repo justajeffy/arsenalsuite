@@ -85,6 +85,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RecordCombo</class>
+   <extends>QComboBox</extends>
+   <header>recordcombo.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

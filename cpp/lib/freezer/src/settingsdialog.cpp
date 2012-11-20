@@ -21,10 +21,10 @@
  *
  */
 
-/* $Author$
- * $LastChangedDate: 2010-03-25 12:18:02 +1100 (Thu, 25 Mar 2010) $
- * $Rev: 9589 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/settingsdialog.cpp $
+/* $Author: newellm $
+ * $LastChangedDate: 2011-02-14 13:26:36 -0800 (Mon, 14 Feb 2011) $
+ * $Rev: 10941 $
+ * $HeadURL: svn://newellm@ocelot/blur/trunk/cpp/lib/assfreezer/src/settingsdialog.cpp $
  */
 
 #include <qpushbutton.h>
@@ -46,17 +46,24 @@ SettingsDialog::SettingsDialog( QWidget * parent )
 	connect( OKButton, SIGNAL( clicked() ), SLOT( slotApply() ) );
 	opts = options;
 
+	mFrameCyclerPath->setText( opts.frameCyclerPath );
+	mFrameCyclerArgs->setText( opts.frameCyclerArgs );
 	mJobLimitSpin->setValue( opts.mLimit );
 	mDaysLimitSpin->setValue( opts.mDaysLimit );
 	mRefreshIntervalSpin->setValue( opts.mRefreshInterval );
 	mAutoRefreshOnWindowActivationCheck->setChecked( opts.mAutoRefreshOnWindowActivation );
 	mRefreshOnViewChangeCheck->setChecked( opts.mRefreshOnViewChange );
-
+	mDragStartDistanceSpin->setValue( qApp->startDragDistance() );
+	
+	connect( mFrameCyclerPath, SIGNAL( textChanged( const QString & ) ), SLOT( changes() ) );
+	connect( mFrameCyclerArgs, SIGNAL( textChanged( const QString & ) ), SLOT( changes() ) );
+	connect( mFrameCyclerPathButton, SIGNAL( clicked() ), SLOT( selectFrameCyclerPath() ) );
 	connect( mJobLimitSpin, SIGNAL( valueChanged( int ) ), SLOT( changes() ) );
 	connect( mDaysLimitSpin, SIGNAL( valueChanged( int ) ), SLOT( changes() ) );
 	connect( mRefreshIntervalSpin, SIGNAL( valueChanged( int ) ), SLOT( changes() ) );
 	connect( mAutoRefreshOnWindowActivationCheck, SIGNAL( toggled(bool) ), SLOT( changes() ) );
 	connect( mRefreshOnViewChangeCheck, SIGNAL( toggled(bool) ), SLOT( changes() ) );
+	connect( mDragStartDistanceSpin, SIGNAL( valueChanged(int) ), SLOT( changes() ) );
 
 	ApplyButton->setEnabled( false );
 }
@@ -64,11 +71,14 @@ SettingsDialog::SettingsDialog( QWidget * parent )
 void SettingsDialog::slotApply()
 {
 	if( mChanges ){
+		opts.frameCyclerPath = mFrameCyclerPath->text();
+		opts.frameCyclerArgs = mFrameCyclerArgs->text();
 		opts.mLimit = mJobLimitSpin->value();
 		opts.mDaysLimit = mDaysLimitSpin->value();
 		opts.mRefreshInterval = mRefreshIntervalSpin->value();
 		opts.mAutoRefreshOnWindowActivation = mAutoRefreshOnWindowActivationCheck->isChecked();
 		opts.mRefreshOnViewChange = mRefreshOnViewChangeCheck->isChecked();
+		qApp->setStartDragDistance( mDragStartDistanceSpin->value() );
 		options = opts;
 		mChanges = false;
 		ApplyButton->setEnabled( false );
@@ -80,5 +90,16 @@ void SettingsDialog::changes()
 {
 	mChanges = true;
 	ApplyButton->setEnabled( true );
+}
+
+void SettingsDialog::selectFrameCyclerPath()
+{
+	QString fcp = QFileDialog::getOpenFileName( this,
+		"Choose FrameCycler Executable", "C:\\Program Files\\", "Executables (*.exe)" );
+
+	if( QFile::exists( fcp ) ){
+		opts.frameCyclerPath = fcp;
+		mFrameCyclerPath->setText( fcp );
+	}
 }
 

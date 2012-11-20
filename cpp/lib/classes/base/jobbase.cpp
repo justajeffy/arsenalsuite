@@ -34,13 +34,26 @@ bool Job::updateJobStatuses( JobList jobs, const QString & jobStatus, bool reset
 	}
 
 	if( resetTasks ) {
-		// Reset the jobtasks to their new state
 		foreach( Job j, jobs ) {
-			QString sql("UPDATE JobTask SET status='new', startedts=NULL, endedts=NULL,");
+			JobDepList jdl = JobDep::recordsByJob(j);
+			JobTaskList jtl = j.jobTasks().filter("status", "cancelled",  /*keepMatches*/ false);
+			bool isSoftDep = false;
+			foreach(JobDep jd, jdl){
+				if( jd.depType() == 2 ) {
+					isSoftDep = true;
+					break;
+				}
+			}
+
+			if( !isSoftDep )
+				jtl.setStatuses("new");
+			else
+				jtl.setStatuses("holding");
+
+			jtl.setColumnLiteral("fkeyjoboutput","NULL");
 			if( j.packetType() != "preassigned" )
-				sql += " fkeyHost=NULL,";
-			sql += " memory=NULL, fkeyjoboutput=NULL, fkeyjobcommandhistory=NULL WHERE status!='cancelled' AND fkeyJob=?;";
-			Database::current()->exec( sql, VarList() << j.key() );
+				jtl.setHosts(Host());
+			jtl.commit();
 		}
 	}
 
