@@ -42,14 +42,14 @@ public slots:
 	void autoRefresh();
 
 	void showProjectWeightDialog();
-	//void showManageHostListsDialog();
+	void showManageHostListsDialog();
 
 	void showHostView();
 	void showJobView();
 
 	void createJobView();
 	void createHostView();
-	//void createGraphiteView();
+	void createGraphiteView();
 	
 	void closeCurrentView();
 

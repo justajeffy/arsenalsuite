@@ -33,6 +33,8 @@ w_qpy*.pro
 Qtmod.sip
 auto.pri
 loader.cpp
+moc_*.cpp
+build_resume.cache
 
 # switch to regexp syntax.
 syntax: regexp
@@ -49,12 +51,16 @@ syntax: regexp
 .*/freezer/freezer.dll$
 .*/freezer/freezer.lib$
 .*/classes/Makefile$
+.*/classes/classesconfig.py$
+.*/classes/ng_schema.xml$
 .*/classes/sip/.*?\.sip
 .*/classesui/Makefile$
 .*/classmaker/Makefile$
 .*/classmaker/classmaker$
 .*/stone/Makefile$
+.*/stone/stoneconfig.py$
 .*/stonegui/Makefile$
+.*stonegui/stoneguiconfig.py$
 .*_version\.txt$
 .*/qrc_.*\.cpp$
 .*/sip/Makefile
@@ -71,3 +77,9 @@ syntax: regexp
 .*/PyQt4/.*Makefile$
 .*/PyQt4/qtdirs.*
 .*/PyQt4/examples/.*
+.*/PyQt4/opengl_extras.cpp$
+.*/PyQt4/pylupdate/pylupdate4$
+.*/PyQt4/pyqtconfig.py$
+.*/PyQt4/pyrcc/pyrcc4$
+.*/PyQt4/pyuic/pyuic4$
+

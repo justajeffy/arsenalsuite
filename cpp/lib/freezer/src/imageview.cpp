@@ -21,54 +21,183 @@
  *
  */
 
-/* $Author$
- * $LastChangedDate: 2010-03-19 16:42:26 +1100 (Fri, 19 Mar 2010) $
- * $Rev: 9544 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/imageview.cpp $
+/* $Author: newellm $
+ * $LastChangedDate: 2012-10-05 13:15:42 -0700 (Fri, 05 Oct 2012) $
+ * $Rev: 13679 $
+ * $HeadURL: svn://newellm@svn.blur.com/blur/trunk/cpp/lib/assfreezer/src/imageview.cpp $
  */
 
+#include <qauthenticator.h>
+#include <qbuffer.h>
 #include <qfile.h>
-#include <qpixmap.h>
-#include <qpainter.h>
+#include <qfileinfo.h>
 #include <qimage.h>
-#include <qtimer.h>
-#include <qtooltip.h>
-#include <qprocess.h>
-#include <qregexp.h>
+#include <qimagereader.h>
 #include <qlayout.h>
 #include <qmessagebox.h>
-#include <qfileinfo.h>
+#include <qpainter.h>
+#include <qpixmap.h>
+#include <qprocess.h>
 #include <qqueue.h>
+#include <qregexp.h>
+#include <qsslerror.h>
+#include <qtimer.h>
+#include <qtooltip.h>
 
 #include "blurqt.h"
-#include "afcommon.h"
-#include "busywidget.h"
 #include "freezercore.h"
-#include "glwindow.h"
-#include "imageview.h"
 #include "process.h"
 #include "path.h"
+
+#include "busywidget.h"
+
+#include "afcommon.h"
+#include "glwindow.h"
+#include "imageview.h"
 
 #ifdef USE_IMAGE_MAGICK
 #include <Magick++.h>
 #endif
 
+
 enum {
     LOAD_IMAGE = QEvent::User
 };
 
-class LoadImageTask : public ThreadTask
+class LoadImageTask : public QEvent
 {
 public:
 	LoadImageTask( QObject * rec, const QString &, int );
-	void run();
+	
+	bool run();
+
+	QObject * reciever() const { return mReciever; }
+	
+	QObject * mReciever;
+	bool mCancel;
 	QString mPath;
 	int mFrame;
-	bool mExists;
+	bool mExists, mApplyGamma;
 	QImage mImg;
 	QTime mTimer;
 };
 
+NetworkTaskManager::NetworkTaskManager()
+: mNetworkAccessManager( 0 )
+{
+	mNetworkAccessManager = new QNetworkAccessManager(this);
+	connect( mNetworkAccessManager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), SLOT(slotAuthRequired(QNetworkReply*,QAuthenticator*)));
+	connect( mNetworkAccessManager, SIGNAL(finished(QNetworkReply*)), SLOT(slotFinished(QNetworkReply*)) );
+}
+	
+void NetworkTaskManager::startDownload( LoadImageTask * task )
+{
+	IniConfig & ini = config();
+	ini.pushSection( "Image_Loading" );
+	QString prefix = ini.readString( "HttpUrl" );
+	QString user = ini.readString( "HttpUser" );
+	QString password = ini.readString( "HttpPassword" );
+	ini.popSection();
+	
+	if( task->mPath[0].isLetter() )
+		task->mPath[0] = task->mPath[0].toLower();
+	
+	QUrl url( prefix + task->mPath.replace(":","").replace("\\","/") );
+	LOG_5( "Fetching URL: " + url.toString() );
+	QNetworkRequest request(url);
+	request.setRawHeader("Authorization", "Basic " + QByteArray(QString("%1:%2").arg(user).arg(password).toAscii()).toBase64()); 
+	QNetworkReply * reply = mNetworkAccessManager->get(request);
+	reply->setReadBufferSize(0);
+	connect( reply, SIGNAL(error(QNetworkReply::NetworkError)), SLOT(slotError(QNetworkReply::NetworkError)) );
+#ifndef QT_NO_OPENSSL
+	connect( reply, SIGNAL(sslErrors(const QList<QSslError> &)), SLOT(slotSslErrors(const QList<QSslError> &)) );
+#endif
+	mReplyDict[reply] = task;
+}
+	
+void NetworkTaskManager::slotAuthRequired( QNetworkReply *, QAuthenticator * auth )
+{
+	//qDebug() << "Got auth required signal";
+	IniConfig & ini = config();
+	ini.pushSection( "Image_Loading" );
+	auth->setUser( ini.readString( "HttpUser" ) );
+	auth->setPassword( ini.readString( "HttpPassword" ) );
+	ini.popSection();
+}
+
+void NetworkTaskManager::slotFinished( QNetworkReply * reply )
+{
+	//qDebug() << "Network reply finished";
+	LoadImageTask * task = mReplyDict[reply];
+	if( task ) {
+	/*	qDebug() << "Buffer size: " << reply->bytesAvailable();
+		foreach( QByteArray format, QImageReader::supportedImageFormats() )
+			qDebug() << format;
+		foreach( QNetworkReply::RawHeaderPair pair, reply->rawHeaderPairs() )
+			qDebug() << pair.first << pair.second; */
+		QString contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+		if( contentType.startsWith( "text" ) ) {
+	//		qDebug() << reply->readAll();
+			task->mExists = false;
+		} else {
+			QByteArray format, content = reply->readAll();
+			QBuffer buffer(&content);
+			if(contentType=="image/x-exr")
+				format="exr";
+			QImageReader imr(&buffer,format);
+			if( imr.canRead() ) {
+				task->mImg = imr.read();
+				task->mExists = !task->mImg.isNull();
+		//		qDebug() << "Image is null: " << task->mImg.isNull();
+				task->mExists = true;
+			} else {
+				//qDebug() << "Can't read image";
+				task->mExists = false;
+			}
+		}
+		if( task->mReciever )
+			QCoreApplication::postEvent( task->mReciever, task );
+	} else
+		LOG_3("Task not found for network reply");
+	mReplyDict.remove(reply);
+	reply->deleteLater();
+}
+
+void NetworkTaskManager::slotError(QNetworkReply::NetworkError error)
+{
+	LOG_3("Got network error: " + QString::number(error));
+	QNetworkReply * reply = qobject_cast<QNetworkReply*>(sender());
+	if( reply ) {
+		LoadImageTask * task = mReplyDict[reply];
+		if( task ) {
+			task->mExists = false;
+			if( task->mReciever )
+				QCoreApplication::postEvent( task->mReciever, task );
+			mReplyDict.remove(reply);
+		}
+		reply->deleteLater();
+	}
+}
+
+#ifndef QT_NO_OPENSSL
+void NetworkTaskManager::slotSslErrors(const QList<QSslError> & errors)
+{
+	bool onlyNoError = true;
+	foreach( QSslError error, errors ) {
+		LOG_3( "SSL Error: " + error.errorString() );
+		if( error.errorString() != "No error" )
+			onlyNoError = false;
+	}
+	if( QNetworkReply * reply = qobject_cast<QNetworkReply*>(sender()) ) {
+		if( onlyNoError )
+			reply->ignoreSslErrors();
+		else  {
+			reply->deleteLater();
+			mReplyDict.remove(reply);
+		}
+	}
+}
+#endif
 
 class LoadImageThread : public QThread
 {
@@ -80,24 +209,34 @@ public:
 	static LoadImageThread * instance();
 
 	void addTask( LoadImageTask * );
+
+	NetworkTaskManager * networkTaskManager();
+	
 protected:
 	QMutex mTaskMutex;
 	QWaitCondition mWait;
-
+	NetworkTaskManager * mNetworkTaskManager;
+	
 	QQueue<LoadImageTask*> mImageTasks;
 	bool mExit;
 };
 
 LoadImageThread::LoadImageThread()
-: mExit( false )
-{}
+: mNetworkTaskManager( 0 )
+, mExit( false )
+{
+
+}
 
 void LoadImageThread::run()
 {
+	mNetworkTaskManager = new NetworkTaskManager();
 	while( !mExit ) {
 		if( mImageTasks.isEmpty() ) {
+			QEventLoop ev;
+			ev.processEvents();
 			mTaskMutex.lock();
-			mWait.wait( &mTaskMutex, 50 );
+			mWait.wait( &mTaskMutex, 10 );
 			mTaskMutex.unlock();
 			continue;
 		}
@@ -106,10 +245,7 @@ void LoadImageThread::run()
 			delete task;
 			continue;
 		}
-		task->run();
-		if( task->mReciever )
-			QCoreApplication::postEvent( task->mReciever, task );
-		else
+		if( !task->run() )
 			delete task;
 	}
 }
@@ -130,66 +266,96 @@ void LoadImageThread::addTask( LoadImageTask * task )
 	mWait.wakeAll();
 }
 
+NetworkTaskManager * LoadImageThread::networkTaskManager()
+{
+	return mNetworkTaskManager;
+}
+
 LoadImageTask::LoadImageTask( QObject * rec, const QString & path, int frame )
-: ThreadTask( LOAD_IMAGE, rec )
+: QEvent( QEvent::Type(LOAD_IMAGE) )
+, mReciever( rec )
+, mCancel( false )
 , mPath( path )
 , mFrame( frame )
 {
-	mTimer.start();
+//	mTimer.start();
 }
 
-void LoadImageTask::run()
+bool LoadImageTask::run()
 {
-	LOG_5( "LoadImageTask::run: Loading " + mPath );
+	//LOG_5( "LoadImageTask::run: Loading " + mPath );
 	// do we even need to do this first, the load will fail anyways?
+	/*
 	if( !QFile::exists(mPath) ) {
 		mExists = false;
 		LOG_5( "frame does not exist: " + mPath );
 		return;
 	}
+	*/
 
-	mExists = true;
-	mImg = QImage( mPath );
+	IniConfig & ini = config();
+	ini.pushSection( "Image_Loading" );
+	QString readMode = ini.readString( "Mode", "file" );
+	ini.popSection();
+	
+	if( mPath == LOGO_PATH || mPath.startsWith("c:", Qt::CaseInsensitive) || readMode == "file" ) {
+		mExists = true;
+		QByteArray format;
+		if( mPath.endsWith( "exr" ) && !mApplyGamma )
+			format = "exr_nogamma";
+		QImageReader reader( mPath, format );
+		mImg = reader.read();
 
-#ifdef USE_IMAGE_MAGICK
-	if( mImg.isNull() ) {
-		LOG_5( "QImage loading failed, trying ImageMagick" );
-		mImg = ImageView::loadImageMagick(mPath);
+	#ifdef USE_IMAGE_MAGICK
+		if( mImg.isNull() ) {
+			LOG_5( "QImage loading failed, trying ImageMagick" );
+			mImg = ImageView::loadImageMagick(mPath);
+		}
+	#endif
+		if( mImg.isNull() ) {
+			mExists = false;
+			LOG_5( "QImage loading failed: " + mPath );
+			return true;
+		}
+		if( mReciever )
+			QCoreApplication::postEvent( mReciever, this );
+		return true;
+	} else if ( readMode == "http" ) {
+		((LoadImageThread*)QThread::currentThread())->networkTaskManager()->startDownload(this);
+		return true;
 	}
-#endif
-	if( mImg.isNull() ) {
-		mExists = false;
-		LOG_5( "QImage loading failed: " + mPath );
-		return;
-	}
-	LOG_5( "Image Loaded: " + mPath + " in " + QString::number( mTimer.elapsed() ) + "ms" );
+	return false;
+	//LOG_5( "Image Loaded: " + mPath + " in " + QString::number( mTimer.elapsed() ) + "ms" );
 }
 
 static bool hasOpenGL()
 {
-    static bool _hasOpenGL = false, _checked = false;
-    if( !_checked ) {
-        _checked = true;
-        _hasOpenGL = QGLFormat::hasOpenGL();
-        if( _hasOpenGL )
-            LOG_5( "Using OpenGL" );
-    }
-    return _hasOpenGL;
+	static bool _hasOpenGL = false, _checked = false;
+	if( !_checked ) {
+		_checked = true;
+		_hasOpenGL = QGLFormat::hasOpenGL();
+		if( _hasOpenGL )
+			LOG_5( "Using OpenGL" );
+	}
+	return _hasOpenGL;
 }
 
 ImageView::ImageView( QWidget * parent )
 : QWidget( parent )
 , mShown(-1)
 , mToShow(-2)
+, mShowAlpha( false )
+, mApplyGamma( false )
 , mPlaying(false)
 , mAllFramesLoaded(false)
 , mGLWindow( 0 )
+, mEndDigitsAreFrameNumber( true )
 , mMinFrame( 0 )
 , mMaxFrame( 0 )
 , mLooping( true )
 , mBusyWidget( 0 )
 {
-    if( hasOpenGL() ) {
+	if( hasOpenGL() ){
 		QHBoxLayout * hbox = new QHBoxLayout(this);
 		hbox->setMargin( 0 );
 		mGLWindow = new GLWindow( this );
@@ -201,10 +367,10 @@ ImageView::ImageView( QWidget * parent )
 	connect( &mImageCache, SIGNAL( frameStatusChange(int,int) ), SIGNAL( frameStatusChange(int,int) ) );
 
 	setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
-
-    mBusyWidget = new BusyWidget( this, QPixmap( "images/rotating_head.png" ) );
-    mBusyWidget->move(5,5);
-    mBusyWidget->hide();
+	
+	mBusyWidget = new BusyWidget( this, QPixmap( "images/rotating_head.png" ) );
+	mBusyWidget->move(5,5);
+	mBusyWidget->hide();
 }
 
 ImageView::~ImageView()
@@ -214,26 +380,33 @@ ImageView::~ImageView()
 
 bool ImageView::event( QEvent * event )
 {
-    // Show the logo on the first show event, after that
-    // the current image will already be shown
-    if( event->type() == QEvent::Show && mToShow == -2 ) {
-        setImageNumber();
-    }
-    return QWidget::event( event );
+	// Show the logo on the first show event, after that
+	// the current image will already be shown
+	if( event->type() == QEvent::Show && mToShow == -2 ) {
+		setImageNumber();
+	}
+	return QWidget::event( event );
 }
 
-void ImageView::setFrameRange(const QString & bp, int start, int end)
+void ImageView::reset()
 {
-	// Make sure it is transformed for this platform
-	//mBasePath = Path( bp ).path();
 	foreach( LoadImageTask * t, mTasks )
 		t->mCancel = true;
 	mTasks.clear();
 	mAllFramesLoaded = false;
 	mImageCache.clear();
-
 	mPlaying = false;
+}
+
+void ImageView::setFrameRange(const QString & bp, int start, int end, bool endDigitsAreFrameNumber)
+{
+	// Make sure it is transformed for this platform
+	//mBasePath = Path( bp ).path();
+	reset();
+
 	mBasePath = Path(bp).path();
+	mEndDigitsAreFrameNumber = endDigitsAreFrameNumber;
+	emit gammaOptionAvailable( mBasePath.endsWith( "exr" ) );
 	mMinFrame = qMin( start, end );
 	mMaxFrame = qMax( start, end );
 	LOG_5( "ImageView::setFrameRange: basePath=" + mBasePath + " start=" + QString::number(start) + " end=" + QString::number(end) );
@@ -250,7 +423,7 @@ void ImageView::customEvent( QEvent * evt )
 {
 	if( evt->type() == (int)LOAD_IMAGE ) {
 		LoadImageTask * lit = (LoadImageTask*)evt;
-		LOG_5( "ImageView::customEvent: LOAD_IMAGE: path=" + lit->mPath + " frame=" + QString::number(lit->mFrame) + " total elapsed: " + QString::number( lit->mTimer.elapsed() ) );
+	//	LOG_5( "ImageView::customEvent: LOAD_IMAGE: path=" + lit->mPath + " frame=" + QString::number(lit->mFrame) + " total elapsed: " + QString::number( lit->mTimer.elapsed() ) );
 		if( lit->mCancel ) {
 			LOG_5( "ImageView::customEvent: Load Cancelled" );
 			return;
@@ -258,29 +431,29 @@ void ImageView::customEvent( QEvent * evt )
 
 		if( lit->mExists ) {
 			if( !lit->mImg.isNull() ) {
-				LOG_5( "ImageView::customEvent: putting QImage in cache" );
+		//		LOG_5( "ImageView::customEvent: Loading QImage" );
 				if( mGLWindow ){
 					TexInfo t = mGLWindow->loadImage( &lit->mImg );
 					mImageCache.addTexInfo( lit->mFrame, t );
 				}else {
 					mImageCache.addImage( lit->mFrame, lit->mImg );
 				}
-                mImageCache.setStatus( lit->mFrame, ImageCache::ImageLoaded );
+				mImageCache.setStatus( lit->mFrame, ImageCache::ImageLoaded );
 			}
 			if( mToShow==lit->mFrame ){
-				LOG_5( "ImageView::customEvent: Showing image" );
+		//		LOG_5( "ImageView::customEvent: Showing image" );
 				showImage();
-			} else
-				LOG_5( "ImageView::customEvent: Not Showing Image Loaded Image: " + QString::number( lit->mFrame ) + " showing image: " + QString::number( mToShow ) );
+			} //else
+		//		LOG_5( "ImageView::customEvent: Not Showing Image Loaded Image: " + QString::number( lit->mFrame ) + " showing image: " + QString::number( mToShow ) );
 		} else {
 			LOG_5( "ImageView::customEvent: Image Not Found" );
 			mImageCache.setStatus( lit->mFrame, ImageCache::ImageNotFound );
+			if( mToShow == lit->mFrame ) {
+				mBusyWidget->stop();
+				mBusyWidget->hide();
+			}
 		}
 		mTasks.removeAll( lit );
-        if( lit->mFrame == mToShow ) {
-            mBusyWidget->stop();
-            mBusyWidget->hide();
-        }
 	}
 }
 
@@ -302,7 +475,7 @@ void ImageView::preloadImages()
 		i = mMinFrame;
 	while( mTasks.size() < 1 ) {
 		if( mImageCache.status( i ) == ImageCache::ImageNoInfo )
-			loadImage( makeFramePath( mBasePath, i ), i );
+			loadImage( makeFramePath( mBasePath, i, 4, mEndDigitsAreFrameNumber ), i );
 		
 		trys++;
 		if( trys > 3 )
@@ -326,6 +499,7 @@ void ImageView::preloadImages()
 void ImageView::loadImage( const QString & path, int image )
 {
 	LoadImageTask * lit = new LoadImageTask( this, path, image );
+	lit->mApplyGamma = mApplyGamma;
 	mTasks.push_front( lit );
 	LoadImageThread::instance()->addTask( lit );
 	mImageCache.setStatus( image, ImageCache::ImageLoading );
@@ -338,14 +512,14 @@ void ImageView::setImageNumber(int num)
         {
 		case ImageCache::ImageNoInfo:
 		{
-			QString path = (num==-1) ? QString( LOGO_PATH ) : makeFramePath( mBasePath, num );
+			QString path = (num==-1) ? QString( LOGO_PATH ) : makeFramePath( mBasePath, num, 4, mEndDigitsAreFrameNumber );
 			LOG_5( "ImageView::setImageNumber: No Info, fetching " + path );
 			mToShow = num;
 			loadImage( path, num );
-            if( !mPlaying ) {
-                mBusyWidget->show();
-                mBusyWidget->start();
-            }
+			if( !mPlaying ) {
+				mBusyWidget->show();
+				mBusyWidget->start();
+			}
 			break;
 		}
 		case ImageCache::ImageNotFound:
@@ -359,10 +533,10 @@ void ImageView::setImageNumber(int num)
 		{
 			LOG_5( "ImageView::setImageNumber: Waiting for image to load" );
 			mToShow = num;
-            if( !mPlaying ) {
-                mBusyWidget->show();
-                mBusyWidget->start();
-            }
+			if( !mPlaying ) {
+				mBusyWidget->show();
+				mBusyWidget->start();
+			}
 			break;
 		}
 		case ImageCache::ImageLoaded:
@@ -376,44 +550,20 @@ void ImageView::setImageNumber(int num)
 	}
 }
 
-void ImageView::showFrameCycler(int fn)
+void ImageView::showOutputPath( int frameNumber )
 {
-	QString path = mBasePath;
-	if(fn>=0)
-		path = makeFramePath(mBasePath, fn);
-	else
-		path.replace(QRegExp("[^\\\\/]*$"), "");
-	LOG_5( "ImageView::showFrameCycler: " + path );
-	openFrameCycler( path );
-}
-
-void ImageView::showOutputPath( int)
-{
-	QString path = mBasePath, cmd;
-	path = QFileInfo( path ).path();
-
-#ifdef Q_OS_WIN
-	path.replace("/", "\\");
-	cmd = "explorer.exe";
-#endif // Q_WS_WIN
-#ifdef Q_OS_LINUX
-	path.replace('\\', '/');
-	cmd = "konqueror";
-#endif
-#ifdef Q_OS_MAC
-	path.replace('\\', '/');
-	cmd = "open";
-#endif
-
-	QProcess::startDetached( cmd, QStringList() << path );
+	exploreFile( makeFramePath( mBasePath, frameNumber, 4, mEndDigitsAreFrameNumber ) );
 }
 
 void ImageView::showImage()
 {
-	QString path = makeFramePath(mBasePath, mToShow);
+	QString path = makeFramePath(mBasePath, mToShow, 4, mEndDigitsAreFrameNumber);
 	setToolTip( path );
 
 	LOG_5( "ImageView::showImage: " + path );
+
+	mBusyWidget->stop();
+	mBusyWidget->hide();
 
 	int status = mImageCache.status( mToShow );
 	int in = (status==ImageCache::ImageLoaded) ? mToShow : -1;
@@ -469,10 +619,11 @@ void ImageView::pause()
 
 void ImageView::paintEvent(QPaintEvent * pe)
 {
-    if( mScaled.isNull() ) {
-        QWidget::paintEvent(pe);
-        return;
-    }
+	if( mScaled.isNull() ) {
+		QWidget::paintEvent(pe);
+		return;
+	}
+	
 	QPainter p(this);
 
 	int x = (width() - mScaled.width())/2;
@@ -551,6 +702,15 @@ void ImageView::showAlpha( bool sa )
 	mShowAlpha = sa;
 }
 
+void ImageView::applyGamma( bool applyGamma )
+{
+	if( applyGamma != mApplyGamma ) {
+		mApplyGamma = applyGamma;
+		reset();
+		setImageNumber( mToShow );
+	}
+}
+
 void ImageView::setScaleMode( int scaleMode )
 {
 	if( mGLWindow )
@@ -587,23 +747,23 @@ QImage ImageView::loadImageMagick( const QString & path )
 		ret = QImage(img.columns(), img.rows(), QImage::Format_RGB32);
 		const Magick::PixelPacket *pixels;
 		Magick::ColorRGB rgb;
-		for (int y = 0; y < ret.height(); y++) {
+		for (int y = 0; y < (int)ret.height(); y++) {
 			pixels = img.getConstPixels(0, y, ret.width(), 1);
 			for (int x = 0; x < ret.width(); x++) {
 				rgb = (*(pixels + x));
 				ret.setPixel(x, y, QColor(
-                      qMax(0, qMin(255, (int)(255 * rgb.red())))
+					qMax(0, qMin(255, (int)(255 * rgb.red())))
 					, qMax(0, qMin(255, (int)(255 * rgb.green())))
 					, qMax(0, qMin(255, (int)(255 * rgb.blue())))
-                    ).rgb()
-                );
+					).rgb()
+				);
 			}
 		}
 	} catch(...) {
-        LOG_3("ImageMagick exception!");
+		LOG_3("ImageMagick exception!");
 		return ret;
 	}
-  return ret;
+	return ret;
 }
 #endif
 

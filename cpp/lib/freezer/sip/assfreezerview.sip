@@ -23,8 +23,8 @@ public:
 
 	virtual void applyOptions();
 
-	virtual void save( IniConfig & ini );
-	virtual void restore( IniConfig & ini );
+	virtual void save( IniConfig & ini, bool );
+	virtual void restore( IniConfig & ini, bool );
 
 	QString statusBarMessage() const;
 	void setStatusBarMessage( const QString & );

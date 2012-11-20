@@ -21,10 +21,10 @@
  *
  */
 
-/* $Author$
- * $LastChangedDate: 2007-09-22 05:48:04 +1000 (Sat, 22 Sep 2007) $
- * $Rev: 5069 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/tabtoolbar.cpp $
+/* $Author: newellm $
+ * $LastChangedDate: 2009-12-02 15:20:53 -0800 (Wed, 02 Dec 2009) $
+ * $Rev: 9126 $
+ * $HeadURL: svn://newellm@ocelot/blur/trunk/cpp/lib/assfreezer/src/tabtoolbar.cpp $
  */
 
 
@@ -64,32 +64,32 @@ TabToolBar::TabToolBar(QTabWidget * parent, ImageView * iv )
 	mAlpha = new QPushButton( QIcon( ":/images/show_alpha.png" ),"", this );
 	mAlpha->setCheckable( true );
 	mAlpha->setToolTip( "Show Alpha Channel" );
-    mAlpha->setMaximumSize(22, 22);
+	mAlpha->setMaximumSize(22, 22);
 
 	mPlay = new QPushButton( QIcon( ":/images/run.png" ), "", this );
 	mPlay->setToolTip( "Play Frames" );
-    mPlay->setMaximumSize(22, 22);
+	mPlay->setMaximumSize(22, 22);
 
 	mPause = new QPushButton( QIcon( ":/images/pause.png" ), "", this );
 	mPause->setEnabled( false );
 	mPause->setToolTip( "Pause Frames" );
-    mPause->setMaximumSize(22, 22);
+	mPause->setMaximumSize(22, 22);
 
-    QWidget * spacer = new QWidget();
-    spacer->setMaximumWidth(10);
+	QWidget * spacer = new QWidget();
+	spacer->setMaximumWidth(10);
 
-    QWidget * spacer2 = new QWidget();
-    spacer2->setMaximumWidth(10);
+	QWidget * spacer2 = new QWidget();
+	spacer2->setMaximumWidth(10);
 
 	QLabel * scaleLabel = new QLabel( "Scale:", this );
-    scaleLabel->setMaximumWidth(50);
+	scaleLabel->setMaximumWidth(50);
 
 	mScaleCombo = new QComboBox( this );
 	mScaleCombo->setEditable( true );
 //	mScaleCombo->setInsertionPolicy( QComboBox::NoInsertion );
 	mScaleCombo->installEventFilter( this );
 	mScaleCombo->lineEdit()->installEventFilter( this );
-    mScaleCombo->setMaximumWidth(60);
+	mScaleCombo->setMaximumWidth(60);
 
 	mScaleCombo->addItem( "0.5" );
 	mScaleCombo->addItem( "1.0" );
@@ -98,6 +98,12 @@ TabToolBar::TabToolBar(QTabWidget * parent, ImageView * iv )
 
 	mFreeScaleCheck = new QCheckBox( "Free Scale", this );
 	mFreeScaleCheck->setChecked( true );
+
+	mGamma = new QPushButton( QIcon(":/images/show_gamma.png"), "", this );
+	mGamma->setCheckable( true );
+	mGamma->setChecked( false );
+	mGamma->setToolTip( "Apply Screen Gamma Correction" );
+	mGamma->hide();
 
 	connect( mAlpha, SIGNAL( toggled( bool ) ), mImageView, SLOT( showAlpha( bool ) ) );
 	connect( mPlay, SIGNAL( clicked() ), SLOT( slotPlay() ) );
@@ -109,16 +115,16 @@ TabToolBar::TabToolBar(QTabWidget * parent, ImageView * iv )
 	controlsLayout->setSpacing(1);
 	controlsLayout->setMargin(0);
 	controlsLayout->addWidget(mAlpha);
+	controlsLayout->addWidget(mGamma);
 	controlsLayout->addWidget(mPlay);
 	controlsLayout->addWidget(mPause);
-	controlsLayout->addWidget(spacer);
 	controlsLayout->addWidget(scaleLabel);
 	controlsLayout->addWidget(mScaleCombo);
-	controlsLayout->addWidget(spacer2);
 	controlsLayout->addWidget(mFreeScaleCheck);
-
 	connect( mImageView, SIGNAL( scaleFactorChange( float ) ), SLOT( slotSetScaleFactor( float ) ) );
 	connect( mImageView, SIGNAL( scaleModeChange( int ) ), SLOT( slotScaleModeChanged( int ) ) );
+	connect( mImageView, SIGNAL( gammaOptionAvailable( bool ) ), mGamma, SLOT( setVisible( bool ) ) );
+	connect( mGamma, SIGNAL( toggled( bool ) ), mImageView, SLOT( applyGamma( bool ) ) );
 
 #ifdef Q_WS_MAC
 	if( qApp->style()->inherits("QMacStyle") ) {

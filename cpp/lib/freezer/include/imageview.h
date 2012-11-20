@@ -22,9 +22,9 @@
  */
 
 /* $Author$
- * $LastChangedDate: 2007-06-19 04:27:47 +1000 (Tue, 19 Jun 2007) $
- * $Rev: 4632 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/include/imageview.h $
+ * $LastChangedDate: 2009-11-23 11:30:56 +1100 (Mon, 23 Nov 2009) $
+ * $Rev: 9055 $
+ * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/include/items.h $
  */
 
 #ifndef IMAGE_VIEW_H
@@ -34,16 +34,42 @@
 #include <qdatetime.h>
 #include <qlist.h>
 #include <qpixmap.h>
+#include <qmap.h>
+#include <qnetworkreply.h>
 
 #include "imagecache.h"
 
 #include "afcommon.h"
 
 class QImage;
+class QNetworkAccessManager;
+class QAuthenticator;
+
 class GLWindow;
 class LTGA;
 class LoadImageTask;
 class BusyWidget;
+
+class NetworkTaskManager : public QObject
+{
+Q_OBJECT
+public:
+	NetworkTaskManager();
+	
+	void startDownload( LoadImageTask * );
+	
+public slots:
+	void slotAuthRequired( QNetworkReply *, QAuthenticator * );
+	void slotFinished( QNetworkReply * );
+	void slotError(QNetworkReply::NetworkError);
+#ifndef QT_NO_OPENSSL
+	void slotSslErrors(const QList<QSslError> & errors);
+#endif
+
+protected:
+	QNetworkAccessManager * mNetworkAccessManager;
+	QMap<QNetworkReply*, LoadImageTask*> mReplyDict;
+};
 
 class FREEZER_EXPORT ImageView : public QWidget
 {
@@ -53,7 +79,7 @@ public:
 	~ImageView();
 	
 	// Setup
-	void setFrameRange(const QString & basePath, int start, int end );
+	void setFrameRange(const QString & basePath, int start, int end, bool endDigitsAreFrameNumber );
 	const QString & basePath() const;
 
 	bool looping() const;
@@ -67,7 +93,6 @@ public slots:
 
 	// Navigation
 	void setImageNumber(int in=-1);
-	void showFrameCycler(int fn=-1);
 	void showOutputPath(int fn=-1);
 	void next();
 	void prev();
@@ -75,6 +100,7 @@ public slots:
 	void pause();
 
 	void showAlpha( bool );
+	void applyGamma( bool );
 	void setScaleMode( int );
 	void setScaleFactor( float );
 	
@@ -87,10 +113,12 @@ signals:
 	void scaleFactorChange( float sf );
 	void scaleModeChange( int );
 	void frameStatusChange(int,int);
+	void gammaOptionAvailable(bool);
 
 protected:
+	void reset();
 	void customEvent( QEvent * );
-    bool event( QEvent * );
+	bool event( QEvent * );
 	void showImage();
 	virtual void paintEvent(QPaintEvent *);
 	virtual void mousePressEvent(QMouseEvent *);
@@ -111,6 +139,7 @@ private:
 	QPixmap mScaled;
 	
 	bool mShowAlpha;
+	bool mApplyGamma;
 	bool mPlaying;
 	bool mAllFramesLoaded;
 
@@ -119,6 +148,7 @@ private:
 	ImageCache mImageCache;
 	QTime mLastFrameTime;
 
+	bool mEndDigitsAreFrameNumber;
 	int mMinFrame, mMaxFrame;
 
 	bool mLooping;
@@ -128,7 +158,7 @@ private:
 
 	QList<LoadImageTask*> mTasks;
 
-    BusyWidget * mBusyWidget;
+	BusyWidget * mBusyWidget;
 };
 
 

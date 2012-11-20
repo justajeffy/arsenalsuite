@@ -13,7 +13,7 @@ if app is None:
 	app = QCoreApplication(args)
 
 if sys.platform == 'win32':
-	initConfig('c:/blur/assburner/assburner.ini')
+	initConfig('c:/arsenalsuite/burner/burner.ini')
 else:
 	initConfig('/etc/db.ini')
 

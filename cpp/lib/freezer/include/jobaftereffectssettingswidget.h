@@ -35,7 +35,9 @@
 #include "jobsettingswidget.h"
 #include "ui_jobaftereffectssettingswidgetui.h"
 
-class Stone::RecordProxy;
+namespace Stone {
+class RecordProxy;
+}
 using namespace Stone;
 
 class FREEZER_EXPORT JobAfterEffectsSettingsWidget : public CustomJobSettingsWidget, public Ui::JobAfterEffectsSettingsWidgetUI

@@ -66,7 +66,7 @@
 /* Copy the first part of user declarations.  */
 
 /* Line 268 of yacc.c  */
-#line 19 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 19 "parser.y"
 
 #include <stdlib.h>
 #include <string.h>
@@ -225,7 +225,7 @@ static void mappedTypeAnnos(mappedTypeDef *mtd, optFlags *optflgs);
 
 
 /* Line 268 of yacc.c  */
-#line 229 "/blur/cpp/lib/sip/sipgen/parser.c"
+#line 229 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -540,7 +540,7 @@ typedef union YYSTYPE
 {
 
 /* Line 293 of yacc.c  */
-#line 176 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 176 "parser.y"
 
     char            qchar;
     char            *text;
@@ -585,7 +585,7 @@ typedef union YYSTYPE
 
 
 /* Line 293 of yacc.c  */
-#line 589 "/blur/cpp/lib/sip/sipgen/parser.c"
+#line 589 "y.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -597,7 +597,7 @@ typedef union YYSTYPE
 
 
 /* Line 343 of yacc.c  */
-#line 601 "/blur/cpp/lib/sip/sipgen/parser.c"
+#line 601 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -2932,7 +2932,7 @@ yyreduce:
         case 4:
 
 /* Line 1806 of yacc.c  */
-#line 523 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 523 "parser.y"
     {
             /*
              * We don't do these in parserEOF() because the parser is reading
@@ -2955,7 +2955,7 @@ yyreduce:
   case 51:
 
 /* Line 1806 of yacc.c  */
-#line 589 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 589 "parser.y"
     {
             if (notSkipping())
             {
@@ -2972,7 +2972,7 @@ yyreduce:
   case 52:
 
 /* Line 1806 of yacc.c  */
-#line 602 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 602 "parser.y"
     {
             if (notSkipping())
                 currentModule->defdocstring = convertFormat((yyvsp[(2) - (2)].defdocstring).name);
@@ -2982,7 +2982,7 @@ yyreduce:
   case 53:
 
 /* Line 1806 of yacc.c  */
-#line 608 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 608 "parser.y"
     {
             resetLexerState();
 
@@ -2993,7 +2993,7 @@ yyreduce:
   case 54:
 
 /* Line 1806 of yacc.c  */
-#line 613 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 613 "parser.y"
     {
             (yyval.defdocstring) = (yyvsp[(2) - (3)].defdocstring);
         }
@@ -3002,7 +3002,7 @@ yyreduce:
   case 56:
 
 /* Line 1806 of yacc.c  */
-#line 619 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 619 "parser.y"
     {
             (yyval.defdocstring) = (yyvsp[(1) - (3)].defdocstring);
 
@@ -3016,7 +3016,7 @@ yyreduce:
   case 57:
 
 /* Line 1806 of yacc.c  */
-#line 629 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 629 "parser.y"
     {
             (yyval.defdocstring).token = TK_NAME;
 
@@ -3027,7 +3027,7 @@ yyreduce:
   case 58:
 
 /* Line 1806 of yacc.c  */
-#line 636 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 636 "parser.y"
     {
             if (notSkipping())
             {
@@ -3040,7 +3040,7 @@ yyreduce:
   case 59:
 
 /* Line 1806 of yacc.c  */
-#line 645 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 645 "parser.y"
     {
             resetLexerState();
 
@@ -3051,7 +3051,7 @@ yyreduce:
   case 60:
 
 /* Line 1806 of yacc.c  */
-#line 650 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 650 "parser.y"
     {
             (yyval.defencoding) = (yyvsp[(2) - (3)].defencoding);
         }
@@ -3060,7 +3060,7 @@ yyreduce:
   case 62:
 
 /* Line 1806 of yacc.c  */
-#line 656 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 656 "parser.y"
     {
             (yyval.defencoding) = (yyvsp[(1) - (3)].defencoding);
 
@@ -3074,7 +3074,7 @@ yyreduce:
   case 63:
 
 /* Line 1806 of yacc.c  */
-#line 666 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 666 "parser.y"
     {
             (yyval.defencoding).token = TK_NAME;
 
@@ -3085,7 +3085,7 @@ yyreduce:
   case 64:
 
 /* Line 1806 of yacc.c  */
-#line 673 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 673 "parser.y"
     {
             /* Note that %Plugin is internal in SIP v4. */
 
@@ -3097,7 +3097,7 @@ yyreduce:
   case 65:
 
 /* Line 1806 of yacc.c  */
-#line 681 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 681 "parser.y"
     {
             resetLexerState();
 
@@ -3108,7 +3108,7 @@ yyreduce:
   case 66:
 
 /* Line 1806 of yacc.c  */
-#line 686 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 686 "parser.y"
     {
             (yyval.plugin) = (yyvsp[(2) - (3)].plugin);
         }
@@ -3117,7 +3117,7 @@ yyreduce:
   case 68:
 
 /* Line 1806 of yacc.c  */
-#line 692 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 692 "parser.y"
     {
             (yyval.plugin) = (yyvsp[(1) - (3)].plugin);
 
@@ -3131,7 +3131,7 @@ yyreduce:
   case 69:
 
 /* Line 1806 of yacc.c  */
-#line 702 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 702 "parser.y"
     {
             (yyval.plugin).token = TK_NAME;
 
@@ -3142,7 +3142,7 @@ yyreduce:
   case 70:
 
 /* Line 1806 of yacc.c  */
-#line 709 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 709 "parser.y"
     {
             if ((yyvsp[(2) - (3)].veh).name == NULL)
                 yyerror("%VirtualErrorHandler must have a 'name' argument");
@@ -3175,7 +3175,7 @@ yyreduce:
   case 71:
 
 /* Line 1806 of yacc.c  */
-#line 738 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 738 "parser.y"
     {
             resetLexerState();
 
@@ -3186,7 +3186,7 @@ yyreduce:
   case 72:
 
 /* Line 1806 of yacc.c  */
-#line 743 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 743 "parser.y"
     {
             (yyval.veh) = (yyvsp[(2) - (3)].veh);
         }
@@ -3195,7 +3195,7 @@ yyreduce:
   case 74:
 
 /* Line 1806 of yacc.c  */
-#line 749 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 749 "parser.y"
     {
             (yyval.veh) = (yyvsp[(1) - (3)].veh);
 
@@ -3209,7 +3209,7 @@ yyreduce:
   case 75:
 
 /* Line 1806 of yacc.c  */
-#line 759 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 759 "parser.y"
     {
             (yyval.veh).token = TK_NAME;
 
@@ -3220,7 +3220,7 @@ yyreduce:
   case 76:
 
 /* Line 1806 of yacc.c  */
-#line 766 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 766 "parser.y"
     {
             if (notSkipping())
             {
@@ -3250,7 +3250,7 @@ yyreduce:
   case 77:
 
 /* Line 1806 of yacc.c  */
-#line 792 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 792 "parser.y"
     {
             resetLexerState();
 
@@ -3264,7 +3264,7 @@ yyreduce:
   case 78:
 
 /* Line 1806 of yacc.c  */
-#line 800 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 800 "parser.y"
     {
             (yyval.api) = (yyvsp[(2) - (3)].api);
         }
@@ -3273,7 +3273,7 @@ yyreduce:
   case 80:
 
 /* Line 1806 of yacc.c  */
-#line 806 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 806 "parser.y"
     {
             (yyval.api) = (yyvsp[(1) - (3)].api);
 
@@ -3288,7 +3288,7 @@ yyreduce:
   case 81:
 
 /* Line 1806 of yacc.c  */
-#line 817 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 817 "parser.y"
     {
             (yyval.api).token = TK_NAME;
 
@@ -3300,7 +3300,7 @@ yyreduce:
   case 82:
 
 /* Line 1806 of yacc.c  */
-#line 823 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 823 "parser.y"
     {
             (yyval.api).token = TK_VERSION;
 
@@ -3312,7 +3312,7 @@ yyreduce:
   case 83:
 
 /* Line 1806 of yacc.c  */
-#line 831 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 831 "parser.y"
     {
             if (notSkipping())
             {
@@ -3366,7 +3366,7 @@ yyreduce:
   case 84:
 
 /* Line 1806 of yacc.c  */
-#line 881 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 881 "parser.y"
     {
             (yyval.exceptionbase).bibase = NULL;
             (yyval.exceptionbase).base = NULL;
@@ -3376,7 +3376,7 @@ yyreduce:
   case 85:
 
 /* Line 1806 of yacc.c  */
-#line 885 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 885 "parser.y"
     {
             exceptionDef *xd;
 
@@ -3454,7 +3454,7 @@ yyreduce:
   case 86:
 
 /* Line 1806 of yacc.c  */
-#line 959 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 959 "parser.y"
     {
             (yyval.exception) = (yyvsp[(2) - (4)].exception);
         }
@@ -3463,7 +3463,7 @@ yyreduce:
   case 88:
 
 /* Line 1806 of yacc.c  */
-#line 965 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 965 "parser.y"
     {
             (yyval.exception) = (yyvsp[(1) - (2)].exception);
 
@@ -3478,7 +3478,7 @@ yyreduce:
   case 89:
 
 /* Line 1806 of yacc.c  */
-#line 976 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 976 "parser.y"
     {
             (yyval.exception).token = TK_IF;
         }
@@ -3487,7 +3487,7 @@ yyreduce:
   case 90:
 
 /* Line 1806 of yacc.c  */
-#line 979 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 979 "parser.y"
     {
             (yyval.exception).token = TK_END;
         }
@@ -3496,7 +3496,7 @@ yyreduce:
   case 91:
 
 /* Line 1806 of yacc.c  */
-#line 982 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 982 "parser.y"
     {
             if (notSkipping())
             {
@@ -3516,7 +3516,7 @@ yyreduce:
   case 92:
 
 /* Line 1806 of yacc.c  */
-#line 996 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 996 "parser.y"
     {
             if (notSkipping())
             {
@@ -3536,7 +3536,7 @@ yyreduce:
   case 93:
 
 /* Line 1806 of yacc.c  */
-#line 1012 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1012 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -3545,7 +3545,7 @@ yyreduce:
   case 94:
 
 /* Line 1806 of yacc.c  */
-#line 1017 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1017 "parser.y"
     {
             if (notSkipping())
             {
@@ -3568,7 +3568,7 @@ yyreduce:
   case 96:
 
 /* Line 1806 of yacc.c  */
-#line 1036 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1036 "parser.y"
     {
             if (notSkipping())
             {
@@ -3633,7 +3633,7 @@ yyreduce:
   case 98:
 
 /* Line 1806 of yacc.c  */
-#line 1097 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1097 "parser.y"
     {
             if (notSkipping())
             {
@@ -3651,7 +3651,7 @@ yyreduce:
   case 103:
 
 /* Line 1806 of yacc.c  */
-#line 1117 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1117 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentMappedType->iff->hdrcode, (yyvsp[(1) - (1)].codeb));
@@ -3661,7 +3661,7 @@ yyreduce:
   case 104:
 
 /* Line 1806 of yacc.c  */
-#line 1121 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1121 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentMappedType->typecode, (yyvsp[(1) - (1)].codeb));
@@ -3671,7 +3671,7 @@ yyreduce:
   case 105:
 
 /* Line 1806 of yacc.c  */
-#line 1125 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1125 "parser.y"
     {
             if (notSkipping())
             {
@@ -3686,7 +3686,7 @@ yyreduce:
   case 106:
 
 /* Line 1806 of yacc.c  */
-#line 1134 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1134 "parser.y"
     {
             if (notSkipping())
             {
@@ -3701,7 +3701,7 @@ yyreduce:
   case 107:
 
 /* Line 1806 of yacc.c  */
-#line 1143 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1143 "parser.y"
     {
             if (notSkipping())
             {
@@ -3716,7 +3716,7 @@ yyreduce:
   case 110:
 
 /* Line 1806 of yacc.c  */
-#line 1156 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1156 "parser.y"
     {
             if (notSkipping())
             {
@@ -3734,7 +3734,7 @@ yyreduce:
   case 111:
 
 /* Line 1806 of yacc.c  */
-#line 1170 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1170 "parser.y"
     {
             if (currentSpec -> genc)
                 yyerror("namespace definition not allowed in a C module");
@@ -3762,7 +3762,7 @@ yyreduce:
   case 112:
 
 /* Line 1806 of yacc.c  */
-#line 1191 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1191 "parser.y"
     {
             if (notSkipping())
             {
@@ -3782,7 +3782,7 @@ yyreduce:
   case 117:
 
 /* Line 1806 of yacc.c  */
-#line 1215 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1215 "parser.y"
     {
             if (notSkipping())
             {
@@ -3798,7 +3798,7 @@ yyreduce:
   case 118:
 
 /* Line 1806 of yacc.c  */
-#line 1225 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1225 "parser.y"
     {
             if (notSkipping())
             {
@@ -3821,7 +3821,7 @@ yyreduce:
   case 121:
 
 /* Line 1806 of yacc.c  */
-#line 1248 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1248 "parser.y"
     {
             newQualifier(currentModule,-1,-1,(yyvsp[(1) - (1)].text),platform_qualifier);
         }
@@ -3830,7 +3830,7 @@ yyreduce:
   case 122:
 
 /* Line 1806 of yacc.c  */
-#line 1253 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1253 "parser.y"
     {
             if (notSkipping())
                 newQualifier(currentModule, -1, -1, (yyvsp[(2) - (2)].feature).name,
@@ -3841,7 +3841,7 @@ yyreduce:
   case 123:
 
 /* Line 1806 of yacc.c  */
-#line 1260 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1260 "parser.y"
     {
             resetLexerState();
 
@@ -3852,7 +3852,7 @@ yyreduce:
   case 124:
 
 /* Line 1806 of yacc.c  */
-#line 1265 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1265 "parser.y"
     {
             (yyval.feature) = (yyvsp[(2) - (3)].feature);
         }
@@ -3861,7 +3861,7 @@ yyreduce:
   case 126:
 
 /* Line 1806 of yacc.c  */
-#line 1271 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1271 "parser.y"
     {
             (yyval.feature) = (yyvsp[(1) - (3)].feature);
 
@@ -3875,7 +3875,7 @@ yyreduce:
   case 127:
 
 /* Line 1806 of yacc.c  */
-#line 1281 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1281 "parser.y"
     {
             (yyval.feature).token = TK_NAME;
 
@@ -3886,7 +3886,7 @@ yyreduce:
   case 128:
 
 /* Line 1806 of yacc.c  */
-#line 1288 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1288 "parser.y"
     {
             currentTimelineOrder = 0;
         }
@@ -3895,7 +3895,7 @@ yyreduce:
   case 129:
 
 /* Line 1806 of yacc.c  */
-#line 1291 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1291 "parser.y"
     {
             if (notSkipping())
             {
@@ -3922,7 +3922,7 @@ yyreduce:
   case 132:
 
 /* Line 1806 of yacc.c  */
-#line 1318 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1318 "parser.y"
     {
             newQualifier(currentModule, currentModule->nrtimelines,
                     currentTimelineOrder++, (yyvsp[(1) - (1)].text), time_qualifier);
@@ -3932,7 +3932,7 @@ yyreduce:
   case 133:
 
 /* Line 1806 of yacc.c  */
-#line 1324 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1324 "parser.y"
     {
             if (skipStackPtr >= MAX_NESTED_IF)
                 yyerror("Internal error: increase the value of MAX_NESTED_IF");
@@ -3949,7 +3949,7 @@ yyreduce:
   case 134:
 
 /* Line 1806 of yacc.c  */
-#line 1337 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1337 "parser.y"
     {
             (yyval.boolean) = platOrFeature((yyvsp[(1) - (1)].text),FALSE);
         }
@@ -3958,7 +3958,7 @@ yyreduce:
   case 135:
 
 /* Line 1806 of yacc.c  */
-#line 1340 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1340 "parser.y"
     {
             (yyval.boolean) = platOrFeature((yyvsp[(2) - (2)].text),TRUE);
         }
@@ -3967,7 +3967,7 @@ yyreduce:
   case 136:
 
 /* Line 1806 of yacc.c  */
-#line 1343 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1343 "parser.y"
     {
             (yyval.boolean) = (platOrFeature((yyvsp[(3) - (3)].text),FALSE) || (yyvsp[(1) - (3)].boolean));
         }
@@ -3976,7 +3976,7 @@ yyreduce:
   case 137:
 
 /* Line 1806 of yacc.c  */
-#line 1346 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1346 "parser.y"
     {
             (yyval.boolean) = (platOrFeature((yyvsp[(4) - (4)].text),TRUE) || (yyvsp[(1) - (4)].boolean));
         }
@@ -3985,7 +3985,7 @@ yyreduce:
   case 139:
 
 /* Line 1806 of yacc.c  */
-#line 1352 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1352 "parser.y"
     {
             (yyval.boolean) = timePeriod((yyvsp[(1) - (3)].text), (yyvsp[(3) - (3)].text));
         }
@@ -3994,7 +3994,7 @@ yyreduce:
   case 140:
 
 /* Line 1806 of yacc.c  */
-#line 1357 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1357 "parser.y"
     {
             if (skipStackPtr-- <= 0)
                 yyerror("Too many %End directives");
@@ -4004,7 +4004,7 @@ yyreduce:
   case 141:
 
 /* Line 1806 of yacc.c  */
-#line 1363 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1363 "parser.y"
     {
             optFlag *of;
 
@@ -4045,7 +4045,7 @@ yyreduce:
   case 142:
 
 /* Line 1806 of yacc.c  */
-#line 1400 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1400 "parser.y"
     {
             resetLexerState();
 
@@ -4059,7 +4059,7 @@ yyreduce:
   case 143:
 
 /* Line 1806 of yacc.c  */
-#line 1408 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1408 "parser.y"
     {
             (yyval.license).type = (yyvsp[(1) - (1)].text);
             (yyval.license).licensee = NULL;
@@ -4071,7 +4071,7 @@ yyreduce:
   case 144:
 
 /* Line 1806 of yacc.c  */
-#line 1414 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1414 "parser.y"
     {
             (yyval.license) = (yyvsp[(2) - (3)].license);
         }
@@ -4080,7 +4080,7 @@ yyreduce:
   case 146:
 
 /* Line 1806 of yacc.c  */
-#line 1420 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1420 "parser.y"
     {
             (yyval.license) = (yyvsp[(1) - (3)].license);
 
@@ -4097,7 +4097,7 @@ yyreduce:
   case 147:
 
 /* Line 1806 of yacc.c  */
-#line 1433 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1433 "parser.y"
     {
             (yyval.license).token = TK_NAME;
 
@@ -4111,7 +4111,7 @@ yyreduce:
   case 148:
 
 /* Line 1806 of yacc.c  */
-#line 1441 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1441 "parser.y"
     {
             (yyval.license).token = TK_LICENSEE;
 
@@ -4125,7 +4125,7 @@ yyreduce:
   case 149:
 
 /* Line 1806 of yacc.c  */
-#line 1449 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1449 "parser.y"
     {
             (yyval.license).token = TK_SIGNATURE;
 
@@ -4139,7 +4139,7 @@ yyreduce:
   case 150:
 
 /* Line 1806 of yacc.c  */
-#line 1457 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1457 "parser.y"
     {
             (yyval.license).token = TK_TIMESTAMP;
 
@@ -4153,7 +4153,7 @@ yyreduce:
   case 151:
 
 /* Line 1806 of yacc.c  */
-#line 1467 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1467 "parser.y"
     {
             if (notSkipping())
             {
@@ -4168,7 +4168,7 @@ yyreduce:
   case 152:
 
 /* Line 1806 of yacc.c  */
-#line 1478 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1478 "parser.y"
     {
             resetLexerState();
 
@@ -4179,7 +4179,7 @@ yyreduce:
   case 153:
 
 /* Line 1806 of yacc.c  */
-#line 1483 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1483 "parser.y"
     {
             (yyval.defmetatype) = (yyvsp[(2) - (3)].defmetatype);
         }
@@ -4188,7 +4188,7 @@ yyreduce:
   case 155:
 
 /* Line 1806 of yacc.c  */
-#line 1489 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1489 "parser.y"
     {
             (yyval.defmetatype) = (yyvsp[(1) - (3)].defmetatype);
 
@@ -4202,7 +4202,7 @@ yyreduce:
   case 156:
 
 /* Line 1806 of yacc.c  */
-#line 1499 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1499 "parser.y"
     {
             (yyval.defmetatype).token = TK_NAME;
 
@@ -4213,7 +4213,7 @@ yyreduce:
   case 157:
 
 /* Line 1806 of yacc.c  */
-#line 1506 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1506 "parser.y"
     {
             if (notSkipping())
             {
@@ -4228,7 +4228,7 @@ yyreduce:
   case 158:
 
 /* Line 1806 of yacc.c  */
-#line 1517 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1517 "parser.y"
     {
             resetLexerState();
 
@@ -4239,7 +4239,7 @@ yyreduce:
   case 159:
 
 /* Line 1806 of yacc.c  */
-#line 1522 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1522 "parser.y"
     {
             (yyval.defsupertype) = (yyvsp[(2) - (3)].defsupertype);
         }
@@ -4248,7 +4248,7 @@ yyreduce:
   case 161:
 
 /* Line 1806 of yacc.c  */
-#line 1528 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1528 "parser.y"
     {
             (yyval.defsupertype) = (yyvsp[(1) - (3)].defsupertype);
 
@@ -4262,7 +4262,7 @@ yyreduce:
   case 162:
 
 /* Line 1806 of yacc.c  */
-#line 1538 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1538 "parser.y"
     {
             (yyval.defsupertype).token = TK_NAME;
 
@@ -4273,7 +4273,7 @@ yyreduce:
   case 163:
 
 /* Line 1806 of yacc.c  */
-#line 1545 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1545 "parser.y"
     {
             if (notSkipping())
             {
@@ -4295,7 +4295,7 @@ yyreduce:
   case 164:
 
 /* Line 1806 of yacc.c  */
-#line 1563 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1563 "parser.y"
     {
             resetLexerState();
 
@@ -4306,7 +4306,7 @@ yyreduce:
   case 165:
 
 /* Line 1806 of yacc.c  */
-#line 1568 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1568 "parser.y"
     {
             (yyval.consmodule) = (yyvsp[(2) - (3)].consmodule);
         }
@@ -4315,7 +4315,7 @@ yyreduce:
   case 167:
 
 /* Line 1806 of yacc.c  */
-#line 1574 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1574 "parser.y"
     {
             (yyval.consmodule) = (yyvsp[(1) - (3)].consmodule);
 
@@ -4329,7 +4329,7 @@ yyreduce:
   case 168:
 
 /* Line 1806 of yacc.c  */
-#line 1584 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1584 "parser.y"
     {
             (yyval.consmodule).token = TK_NAME;
 
@@ -4340,7 +4340,7 @@ yyreduce:
   case 169:
 
 /* Line 1806 of yacc.c  */
-#line 1591 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1591 "parser.y"
     {
             (yyval.consmodule).token = 0;
             (yyval.consmodule).docstring = NULL;
@@ -4350,7 +4350,7 @@ yyreduce:
   case 170:
 
 /* Line 1806 of yacc.c  */
-#line 1595 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1595 "parser.y"
     {
             (yyval.consmodule) = (yyvsp[(2) - (4)].consmodule);
         }
@@ -4359,7 +4359,7 @@ yyreduce:
   case 172:
 
 /* Line 1806 of yacc.c  */
-#line 1601 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1601 "parser.y"
     {
             (yyval.consmodule) = (yyvsp[(1) - (2)].consmodule);
 
@@ -4373,7 +4373,7 @@ yyreduce:
   case 173:
 
 /* Line 1806 of yacc.c  */
-#line 1611 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1611 "parser.y"
     {
             (yyval.consmodule).token = TK_IF;
         }
@@ -4382,7 +4382,7 @@ yyreduce:
   case 174:
 
 /* Line 1806 of yacc.c  */
-#line 1614 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1614 "parser.y"
     {
             (yyval.consmodule).token = TK_END;
         }
@@ -4391,7 +4391,7 @@ yyreduce:
   case 175:
 
 /* Line 1806 of yacc.c  */
-#line 1617 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1617 "parser.y"
     {
             if (notSkipping())
             {
@@ -4409,7 +4409,7 @@ yyreduce:
   case 176:
 
 /* Line 1806 of yacc.c  */
-#line 1631 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1631 "parser.y"
     {
             if (notSkipping())
             {
@@ -4431,7 +4431,7 @@ yyreduce:
   case 177:
 
 /* Line 1806 of yacc.c  */
-#line 1649 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1649 "parser.y"
     {
             resetLexerState();
 
@@ -4442,7 +4442,7 @@ yyreduce:
   case 178:
 
 /* Line 1806 of yacc.c  */
-#line 1654 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1654 "parser.y"
     {
             (yyval.compmodule) = (yyvsp[(2) - (3)].compmodule);
         }
@@ -4451,7 +4451,7 @@ yyreduce:
   case 180:
 
 /* Line 1806 of yacc.c  */
-#line 1660 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1660 "parser.y"
     {
             (yyval.compmodule) = (yyvsp[(1) - (3)].compmodule);
 
@@ -4465,7 +4465,7 @@ yyreduce:
   case 181:
 
 /* Line 1806 of yacc.c  */
-#line 1670 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1670 "parser.y"
     {
             (yyval.compmodule).token = TK_NAME;
 
@@ -4476,7 +4476,7 @@ yyreduce:
   case 182:
 
 /* Line 1806 of yacc.c  */
-#line 1677 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1677 "parser.y"
     {
             (yyval.compmodule).token = 0;
             (yyval.compmodule).docstring = NULL;
@@ -4486,7 +4486,7 @@ yyreduce:
   case 183:
 
 /* Line 1806 of yacc.c  */
-#line 1681 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1681 "parser.y"
     {
             (yyval.compmodule) = (yyvsp[(2) - (4)].compmodule);
         }
@@ -4495,7 +4495,7 @@ yyreduce:
   case 185:
 
 /* Line 1806 of yacc.c  */
-#line 1687 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1687 "parser.y"
     {
             (yyval.compmodule) = (yyvsp[(1) - (2)].compmodule);
 
@@ -4509,7 +4509,7 @@ yyreduce:
   case 186:
 
 /* Line 1806 of yacc.c  */
-#line 1697 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1697 "parser.y"
     {
             (yyval.compmodule).token = TK_IF;
         }
@@ -4518,7 +4518,7 @@ yyreduce:
   case 187:
 
 /* Line 1806 of yacc.c  */
-#line 1700 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1700 "parser.y"
     {
             (yyval.compmodule).token = TK_END;
         }
@@ -4527,7 +4527,7 @@ yyreduce:
   case 188:
 
 /* Line 1806 of yacc.c  */
-#line 1703 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1703 "parser.y"
     {
             if (notSkipping())
             {
@@ -4545,7 +4545,7 @@ yyreduce:
   case 189:
 
 /* Line 1806 of yacc.c  */
-#line 1717 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1717 "parser.y"
     {
             if ((yyvsp[(2) - (3)].module).name == NULL)
                 yyerror("%Module must have a 'name' argument");
@@ -4562,7 +4562,7 @@ yyreduce:
   case 190:
 
 /* Line 1806 of yacc.c  */
-#line 1728 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1728 "parser.y"
     {
             deprecated("%CModule is deprecated, use %Module and the 'language' argument instead");
 
@@ -4576,7 +4576,7 @@ yyreduce:
   case 191:
 
 /* Line 1806 of yacc.c  */
-#line 1738 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1738 "parser.y"
     {
             resetLexerState();
 
@@ -4596,7 +4596,7 @@ yyreduce:
   case 192:
 
 /* Line 1806 of yacc.c  */
-#line 1752 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1752 "parser.y"
     {
             (yyval.module) = (yyvsp[(2) - (3)].module);
         }
@@ -4605,7 +4605,7 @@ yyreduce:
   case 194:
 
 /* Line 1806 of yacc.c  */
-#line 1758 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1758 "parser.y"
     {
             (yyval.module) = (yyvsp[(1) - (3)].module);
 
@@ -4625,7 +4625,7 @@ yyreduce:
   case 195:
 
 /* Line 1806 of yacc.c  */
-#line 1774 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1774 "parser.y"
     {
             (yyval.module).token = TK_KWARGS;
 
@@ -4642,7 +4642,7 @@ yyreduce:
   case 196:
 
 /* Line 1806 of yacc.c  */
-#line 1785 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1785 "parser.y"
     {
             (yyval.module).token = TK_LANGUAGE;
 
@@ -4665,7 +4665,7 @@ yyreduce:
   case 197:
 
 /* Line 1806 of yacc.c  */
-#line 1802 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1802 "parser.y"
     {
             (yyval.module).token = TK_NAME;
 
@@ -4682,7 +4682,7 @@ yyreduce:
   case 198:
 
 /* Line 1806 of yacc.c  */
-#line 1813 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1813 "parser.y"
     {
             (yyval.module).token = TK_USEARGNAMES;
 
@@ -4699,7 +4699,7 @@ yyreduce:
   case 199:
 
 /* Line 1806 of yacc.c  */
-#line 1824 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1824 "parser.y"
     {
             (yyval.module).token = TK_ALLRAISEPYEXC;
 
@@ -4716,7 +4716,7 @@ yyreduce:
   case 200:
 
 /* Line 1806 of yacc.c  */
-#line 1835 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1835 "parser.y"
     {
             (yyval.module).token = TK_DEFERRORHANDLER;
 
@@ -4733,7 +4733,7 @@ yyreduce:
   case 201:
 
 /* Line 1806 of yacc.c  */
-#line 1846 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1846 "parser.y"
     {
             if ((yyvsp[(3) - (3)].number) < 0)
                 yyerror("%Module 'version' argument cannot be negative");
@@ -4753,7 +4753,7 @@ yyreduce:
   case 202:
 
 /* Line 1806 of yacc.c  */
-#line 1862 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1862 "parser.y"
     {
             (yyval.module).token = 0;
             (yyval.module).docstring = NULL;
@@ -4763,7 +4763,7 @@ yyreduce:
   case 203:
 
 /* Line 1806 of yacc.c  */
-#line 1866 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1866 "parser.y"
     {
             (yyval.module) = (yyvsp[(2) - (4)].module);
         }
@@ -4772,7 +4772,7 @@ yyreduce:
   case 205:
 
 /* Line 1806 of yacc.c  */
-#line 1872 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1872 "parser.y"
     {
             (yyval.module) = (yyvsp[(1) - (2)].module);
 
@@ -4786,7 +4786,7 @@ yyreduce:
   case 206:
 
 /* Line 1806 of yacc.c  */
-#line 1882 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1882 "parser.y"
     {
             (yyval.module).token = TK_IF;
         }
@@ -4795,7 +4795,7 @@ yyreduce:
   case 207:
 
 /* Line 1806 of yacc.c  */
-#line 1885 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1885 "parser.y"
     {
             (yyval.module).token = TK_END;
         }
@@ -4804,7 +4804,7 @@ yyreduce:
   case 208:
 
 /* Line 1806 of yacc.c  */
-#line 1888 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1888 "parser.y"
     {
             (yyval.module).token = TK_AUTOPYNAME;
         }
@@ -4813,7 +4813,7 @@ yyreduce:
   case 209:
 
 /* Line 1806 of yacc.c  */
-#line 1891 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1891 "parser.y"
     {
             if (notSkipping())
             {
@@ -4831,7 +4831,7 @@ yyreduce:
   case 211:
 
 /* Line 1806 of yacc.c  */
-#line 1906 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1906 "parser.y"
     {
             /*
              * The grammar design is a bit broken and this is the easiest way
@@ -4851,7 +4851,7 @@ yyreduce:
   case 212:
 
 /* Line 1806 of yacc.c  */
-#line 1922 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1922 "parser.y"
     {
             (yyval.number) = -1;
         }
@@ -4860,7 +4860,7 @@ yyreduce:
   case 214:
 
 /* Line 1806 of yacc.c  */
-#line 1928 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1928 "parser.y"
     {
             if ((yyvsp[(2) - (2)].include).name == NULL)
                 yyerror("%Include must have a 'name' argument");
@@ -4873,7 +4873,7 @@ yyreduce:
   case 215:
 
 /* Line 1806 of yacc.c  */
-#line 1937 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1937 "parser.y"
     {
             resetLexerState();
 
@@ -4885,7 +4885,7 @@ yyreduce:
   case 216:
 
 /* Line 1806 of yacc.c  */
-#line 1943 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1943 "parser.y"
     {
             (yyval.include) = (yyvsp[(2) - (3)].include);
         }
@@ -4894,7 +4894,7 @@ yyreduce:
   case 218:
 
 /* Line 1806 of yacc.c  */
-#line 1949 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1949 "parser.y"
     {
             (yyval.include) = (yyvsp[(1) - (3)].include);
 
@@ -4909,7 +4909,7 @@ yyreduce:
   case 219:
 
 /* Line 1806 of yacc.c  */
-#line 1960 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1960 "parser.y"
     {
             (yyval.include).token = TK_NAME;
 
@@ -4921,7 +4921,7 @@ yyreduce:
   case 220:
 
 /* Line 1806 of yacc.c  */
-#line 1966 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1966 "parser.y"
     {
             (yyval.include).token = TK_OPTIONAL;
 
@@ -4933,7 +4933,7 @@ yyreduce:
   case 221:
 
 /* Line 1806 of yacc.c  */
-#line 1974 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1974 "parser.y"
     {
             deprecated("%OptionalInclude is deprecated, use %Include and the 'optional' argument instead");
 
@@ -4945,7 +4945,7 @@ yyreduce:
   case 222:
 
 /* Line 1806 of yacc.c  */
-#line 1982 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1982 "parser.y"
     {
             if (notSkipping())
                 newImport((yyvsp[(2) - (2)].import).name);
@@ -4955,7 +4955,7 @@ yyreduce:
   case 223:
 
 /* Line 1806 of yacc.c  */
-#line 1988 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1988 "parser.y"
     {
             resetLexerState();
 
@@ -4966,7 +4966,7 @@ yyreduce:
   case 224:
 
 /* Line 1806 of yacc.c  */
-#line 1993 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1993 "parser.y"
     {
             (yyval.import) = (yyvsp[(2) - (3)].import);
         }
@@ -4975,7 +4975,7 @@ yyreduce:
   case 226:
 
 /* Line 1806 of yacc.c  */
-#line 1999 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 1999 "parser.y"
     {
             (yyval.import) = (yyvsp[(1) - (3)].import);
 
@@ -4989,7 +4989,7 @@ yyreduce:
   case 227:
 
 /* Line 1806 of yacc.c  */
-#line 2009 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2009 "parser.y"
     {
             (yyval.import).token = TK_NAME;
 
@@ -5000,7 +5000,7 @@ yyreduce:
   case 228:
 
 /* Line 1806 of yacc.c  */
-#line 2016 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2016 "parser.y"
     {
             (yyval.codeb) = NULL;
         }
@@ -5009,7 +5009,7 @@ yyreduce:
   case 229:
 
 /* Line 1806 of yacc.c  */
-#line 2019 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2019 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5018,7 +5018,7 @@ yyreduce:
   case 230:
 
 /* Line 1806 of yacc.c  */
-#line 2024 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2024 "parser.y"
     {
             (yyval.codeb) = NULL;
         }
@@ -5027,7 +5027,7 @@ yyreduce:
   case 231:
 
 /* Line 1806 of yacc.c  */
-#line 2027 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2027 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5036,7 +5036,7 @@ yyreduce:
   case 232:
 
 /* Line 1806 of yacc.c  */
-#line 2032 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2032 "parser.y"
     {
             (yyval.codeb) = NULL;
         }
@@ -5045,7 +5045,7 @@ yyreduce:
   case 233:
 
 /* Line 1806 of yacc.c  */
-#line 2035 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2035 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5054,7 +5054,7 @@ yyreduce:
   case 234:
 
 /* Line 1806 of yacc.c  */
-#line 2040 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2040 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentModule->copying, (yyvsp[(2) - (2)].codeb));
@@ -5064,7 +5064,7 @@ yyreduce:
   case 235:
 
 /* Line 1806 of yacc.c  */
-#line 2046 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2046 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentSpec->exphdrcode, (yyvsp[(2) - (2)].codeb));
@@ -5074,7 +5074,7 @@ yyreduce:
   case 236:
 
 /* Line 1806 of yacc.c  */
-#line 2052 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2052 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentModule->hdrcode, (yyvsp[(2) - (2)].codeb));
@@ -5084,7 +5084,7 @@ yyreduce:
   case 237:
 
 /* Line 1806 of yacc.c  */
-#line 2058 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2058 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5093,7 +5093,7 @@ yyreduce:
   case 238:
 
 /* Line 1806 of yacc.c  */
-#line 2063 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2063 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5102,7 +5102,7 @@ yyreduce:
   case 239:
 
 /* Line 1806 of yacc.c  */
-#line 2068 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2068 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5111,7 +5111,7 @@ yyreduce:
   case 240:
 
 /* Line 1806 of yacc.c  */
-#line 2073 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2073 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5120,7 +5120,7 @@ yyreduce:
   case 241:
 
 /* Line 1806 of yacc.c  */
-#line 2078 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2078 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5129,7 +5129,7 @@ yyreduce:
   case 242:
 
 /* Line 1806 of yacc.c  */
-#line 2083 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2083 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5138,7 +5138,7 @@ yyreduce:
   case 243:
 
 /* Line 1806 of yacc.c  */
-#line 2088 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2088 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5147,7 +5147,7 @@ yyreduce:
   case 244:
 
 /* Line 1806 of yacc.c  */
-#line 2093 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2093 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5156,7 +5156,7 @@ yyreduce:
   case 245:
 
 /* Line 1806 of yacc.c  */
-#line 2098 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2098 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5165,7 +5165,7 @@ yyreduce:
   case 246:
 
 /* Line 1806 of yacc.c  */
-#line 2103 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2103 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5174,7 +5174,7 @@ yyreduce:
   case 247:
 
 /* Line 1806 of yacc.c  */
-#line 2108 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2108 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5183,7 +5183,7 @@ yyreduce:
   case 248:
 
 /* Line 1806 of yacc.c  */
-#line 2113 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2113 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentModule->cppcode, (yyvsp[(2) - (2)].codeb));
@@ -5193,7 +5193,7 @@ yyreduce:
   case 249:
 
 /* Line 1806 of yacc.c  */
-#line 2119 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2119 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -5202,7 +5202,7 @@ yyreduce:
   case 250:
 
 /* Line 1806 of yacc.c  */
-#line 2124 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2124 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentModule->preinitcode, (yyvsp[(2) - (2)].codeb));
@@ -5212,7 +5212,7 @@ yyreduce:
   case 251:
 
 /* Line 1806 of yacc.c  */
-#line 2130 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2130 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentModule->initcode, (yyvsp[(2) - (2)].codeb));
@@ -5222,7 +5222,7 @@ yyreduce:
   case 252:
 
 /* Line 1806 of yacc.c  */
-#line 2136 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2136 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentModule->postinitcode, (yyvsp[(2) - (2)].codeb));
@@ -5232,7 +5232,7 @@ yyreduce:
   case 253:
 
 /* Line 1806 of yacc.c  */
-#line 2142 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2142 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentModule->unitcode, (yyvsp[(2) - (2)].codeb));
@@ -5242,7 +5242,7 @@ yyreduce:
   case 254:
 
 /* Line 1806 of yacc.c  */
-#line 2148 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2148 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentModule->unitpostinccode, (yyvsp[(2) - (2)].codeb));
@@ -5252,7 +5252,7 @@ yyreduce:
   case 255:
 
 /* Line 1806 of yacc.c  */
-#line 2154 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2154 "parser.y"
     {
             /* Deprecated. */
         }
@@ -5261,7 +5261,7 @@ yyreduce:
   case 256:
 
 /* Line 1806 of yacc.c  */
-#line 2159 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2159 "parser.y"
     {
             if (notSkipping() && inMainModule())
                 appendCodeBlock(&currentSpec->docs, (yyvsp[(2) - (2)].codeb));
@@ -5271,7 +5271,7 @@ yyreduce:
   case 257:
 
 /* Line 1806 of yacc.c  */
-#line 2165 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2165 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentSpec->docs, (yyvsp[(2) - (2)].codeb));
@@ -5281,7 +5281,7 @@ yyreduce:
   case 258:
 
 /* Line 1806 of yacc.c  */
-#line 2171 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2171 "parser.y"
     {
             if (notSkipping())
                 addAutoPyName(currentModule, (yyvsp[(2) - (2)].autopyname).remove_leading);
@@ -5291,7 +5291,7 @@ yyreduce:
   case 259:
 
 /* Line 1806 of yacc.c  */
-#line 2177 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2177 "parser.y"
     {
             (yyval.autopyname) = (yyvsp[(2) - (3)].autopyname);
         }
@@ -5300,7 +5300,7 @@ yyreduce:
   case 261:
 
 /* Line 1806 of yacc.c  */
-#line 2183 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2183 "parser.y"
     {
             (yyval.autopyname) = (yyvsp[(1) - (3)].autopyname);
 
@@ -5314,7 +5314,7 @@ yyreduce:
   case 262:
 
 /* Line 1806 of yacc.c  */
-#line 2193 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2193 "parser.y"
     {
             (yyval.autopyname).token = TK_REMOVELEADING;
 
@@ -5325,7 +5325,7 @@ yyreduce:
   case 263:
 
 /* Line 1806 of yacc.c  */
-#line 2200 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2200 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(3) - (3)].codeb);
 
@@ -5409,7 +5409,7 @@ yyreduce:
   case 264:
 
 /* Line 1806 of yacc.c  */
-#line 2280 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2280 "parser.y"
     {
             (yyval.docstring).format = currentModule->defdocstring;
         }
@@ -5418,7 +5418,7 @@ yyreduce:
   case 265:
 
 /* Line 1806 of yacc.c  */
-#line 2283 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2283 "parser.y"
     {
             resetLexerState();
 
@@ -5429,7 +5429,7 @@ yyreduce:
   case 266:
 
 /* Line 1806 of yacc.c  */
-#line 2288 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2288 "parser.y"
     {
             (yyval.docstring) = (yyvsp[(2) - (3)].docstring);
         }
@@ -5438,7 +5438,7 @@ yyreduce:
   case 268:
 
 /* Line 1806 of yacc.c  */
-#line 2294 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2294 "parser.y"
     {
             (yyval.docstring) = (yyvsp[(1) - (3)].docstring);
 
@@ -5452,7 +5452,7 @@ yyreduce:
   case 269:
 
 /* Line 1806 of yacc.c  */
-#line 2304 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2304 "parser.y"
     {
             (yyval.docstring).token = TK_FORMAT;
 
@@ -5463,7 +5463,7 @@ yyreduce:
   case 270:
 
 /* Line 1806 of yacc.c  */
-#line 2311 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2311 "parser.y"
     {
             (yyval.codeb) = NULL;
         }
@@ -5472,7 +5472,7 @@ yyreduce:
   case 272:
 
 /* Line 1806 of yacc.c  */
-#line 2317 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2317 "parser.y"
     {
             if ((yyvsp[(2) - (3)].extract).id == NULL)
                 yyerror("%Extract must have an 'id' argument");
@@ -5485,7 +5485,7 @@ yyreduce:
   case 273:
 
 /* Line 1806 of yacc.c  */
-#line 2326 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2326 "parser.y"
     {
             resetLexerState();
 
@@ -5497,7 +5497,7 @@ yyreduce:
   case 274:
 
 /* Line 1806 of yacc.c  */
-#line 2332 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2332 "parser.y"
     {
             (yyval.extract) = (yyvsp[(2) - (3)].extract);
         }
@@ -5506,7 +5506,7 @@ yyreduce:
   case 276:
 
 /* Line 1806 of yacc.c  */
-#line 2338 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2338 "parser.y"
     {
             (yyval.extract) = (yyvsp[(1) - (3)].extract);
 
@@ -5521,7 +5521,7 @@ yyreduce:
   case 277:
 
 /* Line 1806 of yacc.c  */
-#line 2349 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2349 "parser.y"
     {
             (yyval.extract).token = TK_ID;
 
@@ -5533,7 +5533,7 @@ yyreduce:
   case 278:
 
 /* Line 1806 of yacc.c  */
-#line 2355 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2355 "parser.y"
     {
             (yyval.extract).token = TK_ORDER;
 
@@ -5548,7 +5548,7 @@ yyreduce:
   case 279:
 
 /* Line 1806 of yacc.c  */
-#line 2366 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2366 "parser.y"
     {
             /* Deprecated. */
         }
@@ -5557,7 +5557,7 @@ yyreduce:
   case 282:
 
 /* Line 1806 of yacc.c  */
-#line 2375 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2375 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(1) - (2)].codeb);
 
@@ -5571,7 +5571,7 @@ yyreduce:
   case 283:
 
 /* Line 1806 of yacc.c  */
-#line 2385 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2385 "parser.y"
     {
             if (notSkipping())
             {
@@ -5594,7 +5594,7 @@ yyreduce:
   case 285:
 
 /* Line 1806 of yacc.c  */
-#line 2404 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2404 "parser.y"
     {
             (yyval.text) = NULL;
         }
@@ -5603,7 +5603,7 @@ yyreduce:
   case 286:
 
 /* Line 1806 of yacc.c  */
-#line 2407 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2407 "parser.y"
     {
             (yyval.text) = (yyvsp[(1) - (1)].text);
         }
@@ -5612,7 +5612,7 @@ yyreduce:
   case 287:
 
 /* Line 1806 of yacc.c  */
-#line 2412 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2412 "parser.y"
     {
             (yyval.text) = NULL;
         }
@@ -5621,7 +5621,7 @@ yyreduce:
   case 288:
 
 /* Line 1806 of yacc.c  */
-#line 2415 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2415 "parser.y"
     {
             (yyval.text) = (yyvsp[(1) - (1)].text);
         }
@@ -5630,7 +5630,7 @@ yyreduce:
   case 295:
 
 /* Line 1806 of yacc.c  */
-#line 2430 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2430 "parser.y"
     {
             if (notSkipping())
             {
@@ -5670,7 +5670,7 @@ yyreduce:
   case 300:
 
 /* Line 1806 of yacc.c  */
-#line 2474 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2474 "parser.y"
     {
             (yyval.valp) = NULL;
         }
@@ -5679,7 +5679,7 @@ yyreduce:
   case 301:
 
 /* Line 1806 of yacc.c  */
-#line 2477 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2477 "parser.y"
     {
             (yyval.valp) = (yyvsp[(2) - (2)].valp);
         }
@@ -5688,7 +5688,7 @@ yyreduce:
   case 303:
 
 /* Line 1806 of yacc.c  */
-#line 2483 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2483 "parser.y"
     {
             valueDef *vd;
  
@@ -5710,7 +5710,7 @@ yyreduce:
   case 304:
 
 /* Line 1806 of yacc.c  */
-#line 2501 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2501 "parser.y"
     {
             (yyval.qchar) = '-';
         }
@@ -5719,7 +5719,7 @@ yyreduce:
   case 305:
 
 /* Line 1806 of yacc.c  */
-#line 2504 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2504 "parser.y"
     {
             (yyval.qchar) = '+';
         }
@@ -5728,7 +5728,7 @@ yyreduce:
   case 306:
 
 /* Line 1806 of yacc.c  */
-#line 2507 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2507 "parser.y"
     {
             (yyval.qchar) = '*';
         }
@@ -5737,7 +5737,7 @@ yyreduce:
   case 307:
 
 /* Line 1806 of yacc.c  */
-#line 2510 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2510 "parser.y"
     {
             (yyval.qchar) = '/';
         }
@@ -5746,7 +5746,7 @@ yyreduce:
   case 308:
 
 /* Line 1806 of yacc.c  */
-#line 2513 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2513 "parser.y"
     {
             (yyval.qchar) = '&';
         }
@@ -5755,7 +5755,7 @@ yyreduce:
   case 309:
 
 /* Line 1806 of yacc.c  */
-#line 2516 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2516 "parser.y"
     {
             (yyval.qchar) = '|';
         }
@@ -5764,7 +5764,7 @@ yyreduce:
   case 310:
 
 /* Line 1806 of yacc.c  */
-#line 2521 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2521 "parser.y"
     {
             (yyval.qchar) = '\0';
         }
@@ -5773,7 +5773,7 @@ yyreduce:
   case 311:
 
 /* Line 1806 of yacc.c  */
-#line 2524 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2524 "parser.y"
     {
             (yyval.qchar) = '!';
         }
@@ -5782,7 +5782,7 @@ yyreduce:
   case 312:
 
 /* Line 1806 of yacc.c  */
-#line 2527 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2527 "parser.y"
     {
             (yyval.qchar) = '~';
         }
@@ -5791,7 +5791,7 @@ yyreduce:
   case 313:
 
 /* Line 1806 of yacc.c  */
-#line 2530 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2530 "parser.y"
     {
             (yyval.qchar) = '-';
         }
@@ -5800,7 +5800,7 @@ yyreduce:
   case 314:
 
 /* Line 1806 of yacc.c  */
-#line 2533 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2533 "parser.y"
     {
             (yyval.qchar) = '+';
         }
@@ -5809,7 +5809,7 @@ yyreduce:
   case 315:
 
 /* Line 1806 of yacc.c  */
-#line 2536 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2536 "parser.y"
     {
             (yyval.qchar) = '*';
         }
@@ -5818,7 +5818,7 @@ yyreduce:
   case 316:
 
 /* Line 1806 of yacc.c  */
-#line 2539 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2539 "parser.y"
     {
             (yyval.qchar) = '&';
         }
@@ -5827,7 +5827,7 @@ yyreduce:
   case 317:
 
 /* Line 1806 of yacc.c  */
-#line 2544 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2544 "parser.y"
     {
             if ((yyvsp[(1) - (2)].qchar) != '\0' && (yyvsp[(2) - (2)].value).vtype == string_value)
                 yyerror("Invalid unary operator for string");
@@ -5845,7 +5845,7 @@ yyreduce:
   case 319:
 
 /* Line 1806 of yacc.c  */
-#line 2559 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2559 "parser.y"
     {
             if (currentSpec -> genc)
                 yyerror("Scoped names are not allowed in a C module");
@@ -5857,7 +5857,7 @@ yyreduce:
   case 320:
 
 /* Line 1806 of yacc.c  */
-#line 2567 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2567 "parser.y"
     {
             (yyval.scpvalp) = text2scopePart((yyvsp[(1) - (1)].text));
         }
@@ -5866,7 +5866,7 @@ yyreduce:
   case 321:
 
 /* Line 1806 of yacc.c  */
-#line 2572 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2572 "parser.y"
     {
             (yyval.boolean) = TRUE;
         }
@@ -5875,7 +5875,7 @@ yyreduce:
   case 322:
 
 /* Line 1806 of yacc.c  */
-#line 2575 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2575 "parser.y"
     {
             (yyval.boolean) = FALSE;
         }
@@ -5884,7 +5884,7 @@ yyreduce:
   case 323:
 
 /* Line 1806 of yacc.c  */
-#line 2580 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2580 "parser.y"
     {
             /*
              * We let the C++ compiler decide if the value is a valid one - no
@@ -5899,7 +5899,7 @@ yyreduce:
   case 324:
 
 /* Line 1806 of yacc.c  */
-#line 2589 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2589 "parser.y"
     {
             fcallDef *fcd;
 
@@ -5915,7 +5915,7 @@ yyreduce:
   case 325:
 
 /* Line 1806 of yacc.c  */
-#line 2599 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2599 "parser.y"
     {
             (yyval.value).vtype = real_value;
             (yyval.value).u.vreal = (yyvsp[(1) - (1)].real);
@@ -5925,7 +5925,7 @@ yyreduce:
   case 326:
 
 /* Line 1806 of yacc.c  */
-#line 2603 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2603 "parser.y"
     {
             (yyval.value).vtype = numeric_value;
             (yyval.value).u.vnum = (yyvsp[(1) - (1)].number);
@@ -5935,7 +5935,7 @@ yyreduce:
   case 327:
 
 /* Line 1806 of yacc.c  */
-#line 2607 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2607 "parser.y"
     {
             (yyval.value).vtype = numeric_value;
             (yyval.value).u.vnum = (yyvsp[(1) - (1)].boolean);
@@ -5945,7 +5945,7 @@ yyreduce:
   case 328:
 
 /* Line 1806 of yacc.c  */
-#line 2611 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2611 "parser.y"
     {
             (yyval.value).vtype = numeric_value;
             (yyval.value).u.vnum = 0;
@@ -5955,7 +5955,7 @@ yyreduce:
   case 329:
 
 /* Line 1806 of yacc.c  */
-#line 2615 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2615 "parser.y"
     {
             (yyval.value).vtype = string_value;
             (yyval.value).u.vstr = (yyvsp[(1) - (1)].text);
@@ -5965,7 +5965,7 @@ yyreduce:
   case 330:
 
 /* Line 1806 of yacc.c  */
-#line 2619 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2619 "parser.y"
     {
             (yyval.value).vtype = qchar_value;
             (yyval.value).u.vqchar = (yyvsp[(1) - (1)].qchar);
@@ -5975,7 +5975,7 @@ yyreduce:
   case 331:
 
 /* Line 1806 of yacc.c  */
-#line 2625 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2625 "parser.y"
     {
             /* No values. */
 
@@ -5986,7 +5986,7 @@ yyreduce:
   case 332:
 
 /* Line 1806 of yacc.c  */
-#line 2630 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2630 "parser.y"
     {
             /* The single or first expression. */
 
@@ -5998,7 +5998,7 @@ yyreduce:
   case 333:
 
 /* Line 1806 of yacc.c  */
-#line 2636 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2636 "parser.y"
     {
             /* Check that it wasn't ...(,expression...). */
 
@@ -6020,7 +6020,7 @@ yyreduce:
   case 334:
 
 /* Line 1806 of yacc.c  */
-#line 2654 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2654 "parser.y"
     {
             if (notSkipping())
             {
@@ -6044,7 +6044,7 @@ yyreduce:
   case 335:
 
 /* Line 1806 of yacc.c  */
-#line 2672 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2672 "parser.y"
     {
             if (notSkipping())
             {
@@ -6084,7 +6084,7 @@ yyreduce:
   case 336:
 
 /* Line 1806 of yacc.c  */
-#line 2708 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2708 "parser.y"
     {
             if (currentSpec -> genc && (yyvsp[(2) - (2)].scpvalp)->next != NULL)
                 yyerror("Namespaces not allowed in a C module");
@@ -6097,7 +6097,7 @@ yyreduce:
   case 337:
 
 /* Line 1806 of yacc.c  */
-#line 2714 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2714 "parser.y"
     {
             if (notSkipping())
             {
@@ -6132,7 +6132,7 @@ yyreduce:
   case 338:
 
 /* Line 1806 of yacc.c  */
-#line 2742 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2742 "parser.y"
     {
             if (notSkipping())
                 completeClass((yyvsp[(2) - (8)].scpvalp), &(yyvsp[(5) - (8)].optflags), (yyvsp[(7) - (8)].boolean));
@@ -6142,14 +6142,14 @@ yyreduce:
   case 339:
 
 /* Line 1806 of yacc.c  */
-#line 2748 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2748 "parser.y"
     {currentIsTemplate = TRUE;}
     break;
 
   case 340:
 
 /* Line 1806 of yacc.c  */
-#line 2748 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2748 "parser.y"
     {
             if (currentSpec->genc)
                 yyerror("Class templates not allowed in a C module");
@@ -6179,7 +6179,7 @@ yyreduce:
   case 341:
 
 /* Line 1806 of yacc.c  */
-#line 2774 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2774 "parser.y"
     {
             (yyval.signature) = (yyvsp[(3) - (4)].signature);
         }
@@ -6188,7 +6188,7 @@ yyreduce:
   case 342:
 
 /* Line 1806 of yacc.c  */
-#line 2779 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2779 "parser.y"
     {
             if (currentSpec->genc)
                 yyerror("Class definition not allowed in a C module");
@@ -6201,7 +6201,7 @@ yyreduce:
   case 343:
 
 /* Line 1806 of yacc.c  */
-#line 2785 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2785 "parser.y"
     {
             if (notSkipping())
             {
@@ -6233,7 +6233,7 @@ yyreduce:
   case 344:
 
 /* Line 1806 of yacc.c  */
-#line 2810 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2810 "parser.y"
     {
             if (notSkipping())
                 (yyval.klass) = completeClass((yyvsp[(2) - (8)].scpvalp), &(yyvsp[(5) - (8)].optflags), (yyvsp[(7) - (8)].boolean));
@@ -6243,7 +6243,7 @@ yyreduce:
   case 349:
 
 /* Line 1806 of yacc.c  */
-#line 2824 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2824 "parser.y"
     {
             if (notSkipping() && (yyvsp[(1) - (2)].token) == TK_PUBLIC)
             {
@@ -6286,7 +6286,7 @@ yyreduce:
   case 350:
 
 /* Line 1806 of yacc.c  */
-#line 2863 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2863 "parser.y"
     {
         (yyval.token) = TK_PUBLIC;
         }
@@ -6295,7 +6295,7 @@ yyreduce:
   case 351:
 
 /* Line 1806 of yacc.c  */
-#line 2866 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2866 "parser.y"
     {
         (yyval.token) = TK_PUBLIC;
         }
@@ -6304,7 +6304,7 @@ yyreduce:
   case 352:
 
 /* Line 1806 of yacc.c  */
-#line 2869 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2869 "parser.y"
     {
         (yyval.token) = TK_PROTECTED;
         }
@@ -6313,7 +6313,7 @@ yyreduce:
   case 353:
 
 /* Line 1806 of yacc.c  */
-#line 2872 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2872 "parser.y"
     {
         (yyval.token) = TK_PRIVATE;
         }
@@ -6322,7 +6322,7 @@ yyreduce:
   case 354:
 
 /* Line 1806 of yacc.c  */
-#line 2877 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2877 "parser.y"
     {
             (yyval.boolean) = FALSE;
         }
@@ -6331,7 +6331,7 @@ yyreduce:
   case 355:
 
 /* Line 1806 of yacc.c  */
-#line 2880 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2880 "parser.y"
     {
             (yyval.boolean) = TRUE;
         }
@@ -6340,7 +6340,7 @@ yyreduce:
   case 367:
 
 /* Line 1806 of yacc.c  */
-#line 2898 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2898 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentScope()->docstring, (yyvsp[(1) - (1)].codeb));
@@ -6350,7 +6350,7 @@ yyreduce:
   case 368:
 
 /* Line 1806 of yacc.c  */
-#line 2902 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2902 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentScope()->cppcode, (yyvsp[(1) - (1)].codeb));
@@ -6360,7 +6360,7 @@ yyreduce:
   case 369:
 
 /* Line 1806 of yacc.c  */
-#line 2906 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2906 "parser.y"
     {
             if (notSkipping())
                 appendCodeBlock(&currentScope()->iff->hdrcode, (yyvsp[(1) - (1)].codeb));
@@ -6370,7 +6370,7 @@ yyreduce:
   case 370:
 
 /* Line 1806 of yacc.c  */
-#line 2910 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2910 "parser.y"
     {
             if (notSkipping())
             {
@@ -6387,7 +6387,7 @@ yyreduce:
   case 371:
 
 /* Line 1806 of yacc.c  */
-#line 2921 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2921 "parser.y"
     {
             if (notSkipping())
             {
@@ -6404,7 +6404,7 @@ yyreduce:
   case 372:
 
 /* Line 1806 of yacc.c  */
-#line 2932 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2932 "parser.y"
     {
             if (notSkipping())
             {
@@ -6421,7 +6421,7 @@ yyreduce:
   case 373:
 
 /* Line 1806 of yacc.c  */
-#line 2943 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2943 "parser.y"
     {
             if (notSkipping())
             {
@@ -6438,7 +6438,7 @@ yyreduce:
   case 374:
 
 /* Line 1806 of yacc.c  */
-#line 2954 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2954 "parser.y"
     {
             if (notSkipping())
             {
@@ -6455,7 +6455,7 @@ yyreduce:
   case 375:
 
 /* Line 1806 of yacc.c  */
-#line 2965 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2965 "parser.y"
     {
             if (notSkipping())
             {
@@ -6472,7 +6472,7 @@ yyreduce:
   case 376:
 
 /* Line 1806 of yacc.c  */
-#line 2976 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2976 "parser.y"
     {
             if (notSkipping())
             {
@@ -6489,7 +6489,7 @@ yyreduce:
   case 377:
 
 /* Line 1806 of yacc.c  */
-#line 2987 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2987 "parser.y"
     {
             if (notSkipping())
             {
@@ -6506,7 +6506,7 @@ yyreduce:
   case 378:
 
 /* Line 1806 of yacc.c  */
-#line 2998 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 2998 "parser.y"
     {
             if (notSkipping())
             {
@@ -6523,7 +6523,7 @@ yyreduce:
   case 379:
 
 /* Line 1806 of yacc.c  */
-#line 3009 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3009 "parser.y"
     {
             if (notSkipping())
             {
@@ -6540,7 +6540,7 @@ yyreduce:
   case 383:
 
 /* Line 1806 of yacc.c  */
-#line 3023 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3023 "parser.y"
     {
             if (notSkipping())
             {
@@ -6557,7 +6557,7 @@ yyreduce:
   case 384:
 
 /* Line 1806 of yacc.c  */
-#line 3034 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3034 "parser.y"
     {
             if (notSkipping())
             {
@@ -6574,7 +6574,7 @@ yyreduce:
   case 385:
 
 /* Line 1806 of yacc.c  */
-#line 3045 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3045 "parser.y"
     {
             if (currentSpec -> genc)
                 yyerror("public section not allowed in a C module");
@@ -6587,7 +6587,7 @@ yyreduce:
   case 386:
 
 /* Line 1806 of yacc.c  */
-#line 3052 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3052 "parser.y"
     {
             if (currentSpec -> genc)
                 yyerror("protected section not allowed in a C module");
@@ -6600,7 +6600,7 @@ yyreduce:
   case 387:
 
 /* Line 1806 of yacc.c  */
-#line 3059 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3059 "parser.y"
     {
             if (currentSpec -> genc)
                 yyerror("private section not allowed in a C module");
@@ -6613,7 +6613,7 @@ yyreduce:
   case 388:
 
 /* Line 1806 of yacc.c  */
-#line 3066 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3066 "parser.y"
     {
             if (currentSpec -> genc)
                 yyerror("signals section not allowed in a C module");
@@ -6626,7 +6626,7 @@ yyreduce:
   case 389:
 
 /* Line 1806 of yacc.c  */
-#line 3075 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3075 "parser.y"
     {
             if ((yyvsp[(2) - (3)].property).name == NULL)
                 yyerror("A %Property directive must have a 'name' argument");
@@ -6643,7 +6643,7 @@ yyreduce:
   case 390:
 
 /* Line 1806 of yacc.c  */
-#line 3088 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3088 "parser.y"
     {
             (yyval.property) = (yyvsp[(2) - (3)].property);
         }
@@ -6652,7 +6652,7 @@ yyreduce:
   case 392:
 
 /* Line 1806 of yacc.c  */
-#line 3094 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3094 "parser.y"
     {
             (yyval.property) = (yyvsp[(1) - (3)].property);
 
@@ -6668,7 +6668,7 @@ yyreduce:
   case 393:
 
 /* Line 1806 of yacc.c  */
-#line 3106 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3106 "parser.y"
     {
             (yyval.property).token = TK_GET;
 
@@ -6681,7 +6681,7 @@ yyreduce:
   case 394:
 
 /* Line 1806 of yacc.c  */
-#line 3113 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3113 "parser.y"
     {
             (yyval.property).token = TK_NAME;
 
@@ -6694,7 +6694,7 @@ yyreduce:
   case 395:
 
 /* Line 1806 of yacc.c  */
-#line 3120 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3120 "parser.y"
     {
             (yyval.property).token = TK_SET;
 
@@ -6707,7 +6707,7 @@ yyreduce:
   case 396:
 
 /* Line 1806 of yacc.c  */
-#line 3129 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3129 "parser.y"
     {
             (yyval.property).token = 0;
             (yyval.property).docstring = NULL;
@@ -6717,7 +6717,7 @@ yyreduce:
   case 397:
 
 /* Line 1806 of yacc.c  */
-#line 3133 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3133 "parser.y"
     {
             (yyval.property) = (yyvsp[(2) - (4)].property);
         }
@@ -6726,7 +6726,7 @@ yyreduce:
   case 399:
 
 /* Line 1806 of yacc.c  */
-#line 3139 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3139 "parser.y"
     {
             (yyval.property) = (yyvsp[(1) - (2)].property);
 
@@ -6740,7 +6740,7 @@ yyreduce:
   case 400:
 
 /* Line 1806 of yacc.c  */
-#line 3149 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3149 "parser.y"
     {
             (yyval.property).token = TK_IF;
         }
@@ -6749,7 +6749,7 @@ yyreduce:
   case 401:
 
 /* Line 1806 of yacc.c  */
-#line 3152 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3152 "parser.y"
     {
             (yyval.property).token = TK_END;
         }
@@ -6758,7 +6758,7 @@ yyreduce:
   case 402:
 
 /* Line 1806 of yacc.c  */
-#line 3155 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3155 "parser.y"
     {
             if (notSkipping())
             {
@@ -6776,7 +6776,7 @@ yyreduce:
   case 405:
 
 /* Line 1806 of yacc.c  */
-#line 3173 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3173 "parser.y"
     {
             (yyval.number) = 0;
         }
@@ -6785,7 +6785,7 @@ yyreduce:
   case 406:
 
 /* Line 1806 of yacc.c  */
-#line 3176 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3176 "parser.y"
     {
             (yyval.number) = SECT_IS_SLOT;
         }
@@ -6794,7 +6794,7 @@ yyreduce:
   case 407:
 
 /* Line 1806 of yacc.c  */
-#line 3181 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3181 "parser.y"
     {
             /* Note that we allow non-virtual dtors in C modules. */
 
@@ -6860,14 +6860,14 @@ yyreduce:
   case 408:
 
 /* Line 1806 of yacc.c  */
-#line 3243 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3243 "parser.y"
     {currentCtorIsExplicit = TRUE;}
     break;
 
   case 411:
 
 /* Line 1806 of yacc.c  */
-#line 3247 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3247 "parser.y"
     {
             /* Note that we allow ctors in C modules. */
 
@@ -6916,7 +6916,7 @@ yyreduce:
   case 412:
 
 /* Line 1806 of yacc.c  */
-#line 3292 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3292 "parser.y"
     {
             (yyval.optsignature) = NULL;
         }
@@ -6925,7 +6925,7 @@ yyreduce:
   case 413:
 
 /* Line 1806 of yacc.c  */
-#line 3295 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3295 "parser.y"
     {
             parsingCSignature = TRUE;
         }
@@ -6934,7 +6934,7 @@ yyreduce:
   case 414:
 
 /* Line 1806 of yacc.c  */
-#line 3297 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3297 "parser.y"
     {
             (yyval.optsignature) = sipMalloc(sizeof (signatureDef));
 
@@ -6947,7 +6947,7 @@ yyreduce:
   case 415:
 
 /* Line 1806 of yacc.c  */
-#line 3306 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3306 "parser.y"
     {
             (yyval.optsignature) = NULL;
         }
@@ -6956,7 +6956,7 @@ yyreduce:
   case 416:
 
 /* Line 1806 of yacc.c  */
-#line 3309 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3309 "parser.y"
     {
             parsingCSignature = TRUE;
         }
@@ -6965,7 +6965,7 @@ yyreduce:
   case 417:
 
 /* Line 1806 of yacc.c  */
-#line 3311 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3311 "parser.y"
     {
             (yyval.optsignature) = sipMalloc(sizeof (signatureDef));
 
@@ -6979,7 +6979,7 @@ yyreduce:
   case 418:
 
 /* Line 1806 of yacc.c  */
-#line 3321 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3321 "parser.y"
     {
             (yyval.number) = FALSE;
         }
@@ -6988,7 +6988,7 @@ yyreduce:
   case 419:
 
 /* Line 1806 of yacc.c  */
-#line 3324 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3324 "parser.y"
     {
             (yyval.number) = TRUE;
         }
@@ -6997,7 +6997,7 @@ yyreduce:
   case 420:
 
 /* Line 1806 of yacc.c  */
-#line 3329 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3329 "parser.y"
     {
             if (notSkipping())
             {
@@ -7021,7 +7021,7 @@ yyreduce:
   case 421:
 
 /* Line 1806 of yacc.c  */
-#line 3347 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3347 "parser.y"
     {
             /*
              * It looks like an assignment operator (though we don't bother to
@@ -7047,7 +7047,7 @@ yyreduce:
   case 422:
 
 /* Line 1806 of yacc.c  */
-#line 3367 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3367 "parser.y"
     {
             if (notSkipping())
             {
@@ -7089,7 +7089,7 @@ yyreduce:
   case 423:
 
 /* Line 1806 of yacc.c  */
-#line 3403 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3403 "parser.y"
     {
             if (notSkipping())
             {
@@ -7174,210 +7174,210 @@ yyreduce:
   case 424:
 
 /* Line 1806 of yacc.c  */
-#line 3484 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3484 "parser.y"
     {(yyval.text) = "__add__";}
     break;
 
   case 425:
 
 /* Line 1806 of yacc.c  */
-#line 3485 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3485 "parser.y"
     {(yyval.text) = "__sub__";}
     break;
 
   case 426:
 
 /* Line 1806 of yacc.c  */
-#line 3486 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3486 "parser.y"
     {(yyval.text) = "__mul__";}
     break;
 
   case 427:
 
 /* Line 1806 of yacc.c  */
-#line 3487 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3487 "parser.y"
     {(yyval.text) = "__div__";}
     break;
 
   case 428:
 
 /* Line 1806 of yacc.c  */
-#line 3488 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3488 "parser.y"
     {(yyval.text) = "__mod__";}
     break;
 
   case 429:
 
 /* Line 1806 of yacc.c  */
-#line 3489 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3489 "parser.y"
     {(yyval.text) = "__and__";}
     break;
 
   case 430:
 
 /* Line 1806 of yacc.c  */
-#line 3490 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3490 "parser.y"
     {(yyval.text) = "__or__";}
     break;
 
   case 431:
 
 /* Line 1806 of yacc.c  */
-#line 3491 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3491 "parser.y"
     {(yyval.text) = "__xor__";}
     break;
 
   case 432:
 
 /* Line 1806 of yacc.c  */
-#line 3492 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3492 "parser.y"
     {(yyval.text) = "__lshift__";}
     break;
 
   case 433:
 
 /* Line 1806 of yacc.c  */
-#line 3493 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3493 "parser.y"
     {(yyval.text) = "__rshift__";}
     break;
 
   case 434:
 
 /* Line 1806 of yacc.c  */
-#line 3494 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3494 "parser.y"
     {(yyval.text) = "__iadd__";}
     break;
 
   case 435:
 
 /* Line 1806 of yacc.c  */
-#line 3495 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3495 "parser.y"
     {(yyval.text) = "__isub__";}
     break;
 
   case 436:
 
 /* Line 1806 of yacc.c  */
-#line 3496 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3496 "parser.y"
     {(yyval.text) = "__imul__";}
     break;
 
   case 437:
 
 /* Line 1806 of yacc.c  */
-#line 3497 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3497 "parser.y"
     {(yyval.text) = "__idiv__";}
     break;
 
   case 438:
 
 /* Line 1806 of yacc.c  */
-#line 3498 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3498 "parser.y"
     {(yyval.text) = "__imod__";}
     break;
 
   case 439:
 
 /* Line 1806 of yacc.c  */
-#line 3499 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3499 "parser.y"
     {(yyval.text) = "__iand__";}
     break;
 
   case 440:
 
 /* Line 1806 of yacc.c  */
-#line 3500 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3500 "parser.y"
     {(yyval.text) = "__ior__";}
     break;
 
   case 441:
 
 /* Line 1806 of yacc.c  */
-#line 3501 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3501 "parser.y"
     {(yyval.text) = "__ixor__";}
     break;
 
   case 442:
 
 /* Line 1806 of yacc.c  */
-#line 3502 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3502 "parser.y"
     {(yyval.text) = "__ilshift__";}
     break;
 
   case 443:
 
 /* Line 1806 of yacc.c  */
-#line 3503 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3503 "parser.y"
     {(yyval.text) = "__irshift__";}
     break;
 
   case 444:
 
 /* Line 1806 of yacc.c  */
-#line 3504 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3504 "parser.y"
     {(yyval.text) = "__invert__";}
     break;
 
   case 445:
 
 /* Line 1806 of yacc.c  */
-#line 3505 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3505 "parser.y"
     {(yyval.text) = "__call__";}
     break;
 
   case 446:
 
 /* Line 1806 of yacc.c  */
-#line 3506 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3506 "parser.y"
     {(yyval.text) = "__getitem__";}
     break;
 
   case 447:
 
 /* Line 1806 of yacc.c  */
-#line 3507 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3507 "parser.y"
     {(yyval.text) = "__lt__";}
     break;
 
   case 448:
 
 /* Line 1806 of yacc.c  */
-#line 3508 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3508 "parser.y"
     {(yyval.text) = "__le__";}
     break;
 
   case 449:
 
 /* Line 1806 of yacc.c  */
-#line 3509 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3509 "parser.y"
     {(yyval.text) = "__eq__";}
     break;
 
   case 450:
 
 /* Line 1806 of yacc.c  */
-#line 3510 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3510 "parser.y"
     {(yyval.text) = "__ne__";}
     break;
 
   case 451:
 
 /* Line 1806 of yacc.c  */
-#line 3511 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3511 "parser.y"
     {(yyval.text) = "__gt__";}
     break;
 
   case 452:
 
 /* Line 1806 of yacc.c  */
-#line 3512 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3512 "parser.y"
     {(yyval.text) = "__ge__";}
     break;
 
   case 453:
 
 /* Line 1806 of yacc.c  */
-#line 3515 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3515 "parser.y"
     {
             (yyval.number) = FALSE;
         }
@@ -7386,7 +7386,7 @@ yyreduce:
   case 454:
 
 /* Line 1806 of yacc.c  */
-#line 3518 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3518 "parser.y"
     {
             (yyval.number) = TRUE;
         }
@@ -7395,7 +7395,7 @@ yyreduce:
   case 455:
 
 /* Line 1806 of yacc.c  */
-#line 3523 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3523 "parser.y"
     {
             (yyval.number) = 0;
         }
@@ -7404,7 +7404,7 @@ yyreduce:
   case 456:
 
 /* Line 1806 of yacc.c  */
-#line 3526 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3526 "parser.y"
     {
             if ((yyvsp[(2) - (2)].number) != 0)
                 yyerror("Abstract virtual function '= 0' expected");
@@ -7416,7 +7416,7 @@ yyreduce:
   case 457:
 
 /* Line 1806 of yacc.c  */
-#line 3534 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3534 "parser.y"
     {
             (yyval.optflags).nrFlags = 0;
         }
@@ -7425,7 +7425,7 @@ yyreduce:
   case 458:
 
 /* Line 1806 of yacc.c  */
-#line 3537 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3537 "parser.y"
     {
             (yyval.optflags) = (yyvsp[(2) - (3)].optflags);
         }
@@ -7434,7 +7434,7 @@ yyreduce:
   case 459:
 
 /* Line 1806 of yacc.c  */
-#line 3543 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3543 "parser.y"
     {
             (yyval.optflags).flags[0] = (yyvsp[(1) - (1)].flag);
             (yyval.optflags).nrFlags = 1;
@@ -7444,7 +7444,7 @@ yyreduce:
   case 460:
 
 /* Line 1806 of yacc.c  */
-#line 3547 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3547 "parser.y"
     {
             /* Check there is room. */
 
@@ -7460,7 +7460,7 @@ yyreduce:
   case 461:
 
 /* Line 1806 of yacc.c  */
-#line 3559 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3559 "parser.y"
     {
             (yyval.flag).ftype = bool_flag;
             (yyval.flag).fname = (yyvsp[(1) - (1)].text);
@@ -7470,7 +7470,7 @@ yyreduce:
   case 462:
 
 /* Line 1806 of yacc.c  */
-#line 3563 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3563 "parser.y"
     {
             (yyval.flag) = (yyvsp[(3) - (3)].flag);
             (yyval.flag).fname = (yyvsp[(1) - (3)].text);
@@ -7480,7 +7480,7 @@ yyreduce:
   case 463:
 
 /* Line 1806 of yacc.c  */
-#line 3569 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3569 "parser.y"
     {
             (yyval.flag).ftype = (strchr((yyvsp[(1) - (1)].text), '.') != NULL) ? dotted_name_flag : name_flag;
             (yyval.flag).fvalue.sval = (yyvsp[(1) - (1)].text);
@@ -7490,7 +7490,7 @@ yyreduce:
   case 464:
 
 /* Line 1806 of yacc.c  */
-#line 3573 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3573 "parser.y"
     {
             apiVersionRangeDef *avd;
             int from, to;
@@ -7519,7 +7519,7 @@ yyreduce:
   case 465:
 
 /* Line 1806 of yacc.c  */
-#line 3596 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3596 "parser.y"
     {
             (yyval.flag).ftype = string_flag;
             (yyval.flag).fvalue.sval = convertFeaturedString((yyvsp[(1) - (1)].text));
@@ -7529,7 +7529,7 @@ yyreduce:
   case 466:
 
 /* Line 1806 of yacc.c  */
-#line 3600 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3600 "parser.y"
     {
             (yyval.flag).ftype = integer_flag;
             (yyval.flag).fvalue.ival = (yyvsp[(1) - (1)].number);
@@ -7539,7 +7539,7 @@ yyreduce:
   case 467:
 
 /* Line 1806 of yacc.c  */
-#line 3606 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3606 "parser.y"
     {
             (yyval.codeb) = NULL;
         }
@@ -7548,7 +7548,7 @@ yyreduce:
   case 468:
 
 /* Line 1806 of yacc.c  */
-#line 3609 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3609 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -7557,7 +7557,7 @@ yyreduce:
   case 469:
 
 /* Line 1806 of yacc.c  */
-#line 3614 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3614 "parser.y"
     {
             (yyval.codeb) = NULL;
         }
@@ -7566,7 +7566,7 @@ yyreduce:
   case 470:
 
 /* Line 1806 of yacc.c  */
-#line 3617 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3617 "parser.y"
     {
             (yyval.codeb) = (yyvsp[(2) - (2)].codeb);
         }
@@ -7575,7 +7575,7 @@ yyreduce:
   case 471:
 
 /* Line 1806 of yacc.c  */
-#line 3622 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3622 "parser.y"
     {
             int a, nrrxcon, nrrxdis, nrslotcon, nrslotdis, nrarray, nrarraysize;
 
@@ -7627,7 +7627,7 @@ yyreduce:
   case 472:
 
 /* Line 1806 of yacc.c  */
-#line 3670 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3670 "parser.y"
     {
             /* No arguments. */
 
@@ -7638,7 +7638,7 @@ yyreduce:
   case 473:
 
 /* Line 1806 of yacc.c  */
-#line 3675 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3675 "parser.y"
     {
             /* The single or first argument. */
 
@@ -7650,7 +7650,7 @@ yyreduce:
   case 474:
 
 /* Line 1806 of yacc.c  */
-#line 3681 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3681 "parser.y"
     {
             /* Check that it wasn't ...(,arg...). */
             if ((yyvsp[(1) - (3)].signature).nrArgs == 0)
@@ -7681,7 +7681,7 @@ yyreduce:
   case 475:
 
 /* Line 1806 of yacc.c  */
-#line 3708 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3708 "parser.y"
     {
             checkNoAnnos(&(yyvsp[(3) - (4)].optflags), "SIP_SIGNAL has no annotations");
 
@@ -7698,7 +7698,7 @@ yyreduce:
   case 476:
 
 /* Line 1806 of yacc.c  */
-#line 3719 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3719 "parser.y"
     {
             checkNoAnnos(&(yyvsp[(3) - (4)].optflags), "SIP_SLOT has no annotations");
 
@@ -7715,7 +7715,7 @@ yyreduce:
   case 477:
 
 /* Line 1806 of yacc.c  */
-#line 3730 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3730 "parser.y"
     {
             checkNoAnnos(&(yyvsp[(3) - (4)].optflags), "SIP_ANYSLOT has no annotations");
 
@@ -7732,7 +7732,7 @@ yyreduce:
   case 478:
 
 /* Line 1806 of yacc.c  */
-#line 3741 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3741 "parser.y"
     {
             const char *annos[] = {
                 "SingleShot",
@@ -7756,7 +7756,7 @@ yyreduce:
   case 479:
 
 /* Line 1806 of yacc.c  */
-#line 3759 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3759 "parser.y"
     {
             checkNoAnnos(&(yyvsp[(3) - (3)].optflags), "SIP_RXOBJ_DIS has no annotations");
 
@@ -7772,7 +7772,7 @@ yyreduce:
   case 480:
 
 /* Line 1806 of yacc.c  */
-#line 3769 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3769 "parser.y"
     {
             checkNoAnnos(&(yyvsp[(6) - (6)].optflags), "SIP_SLOT_CON has no annotations");
 
@@ -7794,7 +7794,7 @@ yyreduce:
   case 481:
 
 /* Line 1806 of yacc.c  */
-#line 3785 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3785 "parser.y"
     {
             checkNoAnnos(&(yyvsp[(6) - (6)].optflags), "SIP_SLOT_DIS has no annotations");
 
@@ -7816,7 +7816,7 @@ yyreduce:
   case 482:
 
 /* Line 1806 of yacc.c  */
-#line 3801 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3801 "parser.y"
     {
             checkNoAnnos(&(yyvsp[(3) - (3)].optflags), "SIP_QOBJECT has no annotations");
 
@@ -7830,7 +7830,7 @@ yyreduce:
   case 483:
 
 /* Line 1806 of yacc.c  */
-#line 3809 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3809 "parser.y"
     {
             (yyval.memArg) = (yyvsp[(1) - (2)].memArg);
             (yyval.memArg).defval = (yyvsp[(2) - (2)].valp);
@@ -7840,35 +7840,35 @@ yyreduce:
   case 484:
 
 /* Line 1806 of yacc.c  */
-#line 3816 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3816 "parser.y"
     {currentIsSignal = TRUE;}
     break;
 
   case 486:
 
 /* Line 1806 of yacc.c  */
-#line 3817 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3817 "parser.y"
     {currentIsSlot = TRUE;}
     break;
 
   case 489:
 
 /* Line 1806 of yacc.c  */
-#line 3822 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3822 "parser.y"
     {currentIsStatic = TRUE;}
     break;
 
   case 494:
 
 /* Line 1806 of yacc.c  */
-#line 3832 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3832 "parser.y"
     {currentOverIsVirt = TRUE;}
     break;
 
   case 497:
 
 /* Line 1806 of yacc.c  */
-#line 3836 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3836 "parser.y"
     {
             if (notSkipping())
             {
@@ -7924,7 +7924,7 @@ yyreduce:
   case 498:
 
 /* Line 1806 of yacc.c  */
-#line 3888 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3888 "parser.y"
     {
             (yyval.variable).token = 0;
             (yyval.variable).access_code = NULL;
@@ -7936,7 +7936,7 @@ yyreduce:
   case 499:
 
 /* Line 1806 of yacc.c  */
-#line 3894 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3894 "parser.y"
     {
             (yyval.variable) = (yyvsp[(2) - (3)].variable);
         }
@@ -7945,7 +7945,7 @@ yyreduce:
   case 501:
 
 /* Line 1806 of yacc.c  */
-#line 3900 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3900 "parser.y"
     {
             (yyval.variable) = (yyvsp[(1) - (2)].variable);
 
@@ -7961,7 +7961,7 @@ yyreduce:
   case 502:
 
 /* Line 1806 of yacc.c  */
-#line 3912 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3912 "parser.y"
     {
             (yyval.variable).token = TK_IF;
         }
@@ -7970,7 +7970,7 @@ yyreduce:
   case 503:
 
 /* Line 1806 of yacc.c  */
-#line 3915 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3915 "parser.y"
     {
             (yyval.variable).token = TK_END;
         }
@@ -7979,7 +7979,7 @@ yyreduce:
   case 504:
 
 /* Line 1806 of yacc.c  */
-#line 3918 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3918 "parser.y"
     {
             if (notSkipping())
             {
@@ -8000,7 +8000,7 @@ yyreduce:
   case 505:
 
 /* Line 1806 of yacc.c  */
-#line 3933 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3933 "parser.y"
     {
             if (notSkipping())
             {
@@ -8021,7 +8021,7 @@ yyreduce:
   case 506:
 
 /* Line 1806 of yacc.c  */
-#line 3948 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3948 "parser.y"
     {
             if (notSkipping())
             {
@@ -8042,7 +8042,7 @@ yyreduce:
   case 507:
 
 /* Line 1806 of yacc.c  */
-#line 3965 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3965 "parser.y"
     {
             (yyval.memArg) = (yyvsp[(2) - (4)].memArg);
             (yyval.memArg).nrderefs += (yyvsp[(3) - (4)].number);
@@ -8053,7 +8053,7 @@ yyreduce:
   case 508:
 
 /* Line 1806 of yacc.c  */
-#line 3970 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3970 "parser.y"
     {
             (yyval.memArg) = (yyvsp[(1) - (3)].memArg);
             (yyval.memArg).nrderefs += (yyvsp[(2) - (3)].number);
@@ -8071,7 +8071,7 @@ yyreduce:
   case 509:
 
 /* Line 1806 of yacc.c  */
-#line 3984 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 3984 "parser.y"
     {
             const char *annos[] = {
                 "AllowNone",
@@ -8166,7 +8166,7 @@ yyreduce:
   case 510:
 
 /* Line 1806 of yacc.c  */
-#line 4075 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4075 "parser.y"
     {
             (yyval.number) = 0;
         }
@@ -8175,7 +8175,7 @@ yyreduce:
   case 511:
 
 /* Line 1806 of yacc.c  */
-#line 4078 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4078 "parser.y"
     {
             if (currentSpec -> genc)
                 yyerror("References not allowed in a C module");
@@ -8187,7 +8187,7 @@ yyreduce:
   case 512:
 
 /* Line 1806 of yacc.c  */
-#line 4086 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4086 "parser.y"
     {
             (yyval.number) = 0;
         }
@@ -8196,7 +8196,7 @@ yyreduce:
   case 513:
 
 /* Line 1806 of yacc.c  */
-#line 4089 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4089 "parser.y"
     {
             (yyval.number) = (yyvsp[(1) - (2)].number) + 1;
         }
@@ -8205,7 +8205,7 @@ yyreduce:
   case 514:
 
 /* Line 1806 of yacc.c  */
-#line 4094 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4094 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = defined_type;
@@ -8219,7 +8219,7 @@ yyreduce:
   case 515:
 
 /* Line 1806 of yacc.c  */
-#line 4102 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4102 "parser.y"
     {
             templateDef *td;
 
@@ -8236,7 +8236,7 @@ yyreduce:
   case 516:
 
 /* Line 1806 of yacc.c  */
-#line 4113 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4113 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
 
@@ -8257,7 +8257,7 @@ yyreduce:
   case 517:
 
 /* Line 1806 of yacc.c  */
-#line 4128 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4128 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = ushort_type;
@@ -8267,7 +8267,7 @@ yyreduce:
   case 518:
 
 /* Line 1806 of yacc.c  */
-#line 4132 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4132 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = short_type;
@@ -8277,7 +8277,7 @@ yyreduce:
   case 519:
 
 /* Line 1806 of yacc.c  */
-#line 4136 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4136 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = uint_type;
@@ -8287,7 +8287,7 @@ yyreduce:
   case 520:
 
 /* Line 1806 of yacc.c  */
-#line 4140 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4140 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = uint_type;
@@ -8297,7 +8297,7 @@ yyreduce:
   case 521:
 
 /* Line 1806 of yacc.c  */
-#line 4144 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4144 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = int_type;
@@ -8307,7 +8307,7 @@ yyreduce:
   case 522:
 
 /* Line 1806 of yacc.c  */
-#line 4148 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4148 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = long_type;
@@ -8317,7 +8317,7 @@ yyreduce:
   case 523:
 
 /* Line 1806 of yacc.c  */
-#line 4152 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4152 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = ulong_type;
@@ -8327,7 +8327,7 @@ yyreduce:
   case 524:
 
 /* Line 1806 of yacc.c  */
-#line 4156 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4156 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = longlong_type;
@@ -8337,7 +8337,7 @@ yyreduce:
   case 525:
 
 /* Line 1806 of yacc.c  */
-#line 4160 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4160 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = ulonglong_type;
@@ -8347,7 +8347,7 @@ yyreduce:
   case 526:
 
 /* Line 1806 of yacc.c  */
-#line 4164 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4164 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = float_type;
@@ -8357,7 +8357,7 @@ yyreduce:
   case 527:
 
 /* Line 1806 of yacc.c  */
-#line 4168 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4168 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = double_type;
@@ -8367,7 +8367,7 @@ yyreduce:
   case 528:
 
 /* Line 1806 of yacc.c  */
-#line 4172 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4172 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = bool_type;
@@ -8377,7 +8377,7 @@ yyreduce:
   case 529:
 
 /* Line 1806 of yacc.c  */
-#line 4176 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4176 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = sstring_type;
@@ -8387,7 +8387,7 @@ yyreduce:
   case 530:
 
 /* Line 1806 of yacc.c  */
-#line 4180 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4180 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = ustring_type;
@@ -8397,7 +8397,7 @@ yyreduce:
   case 531:
 
 /* Line 1806 of yacc.c  */
-#line 4184 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4184 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = string_type;
@@ -8407,7 +8407,7 @@ yyreduce:
   case 532:
 
 /* Line 1806 of yacc.c  */
-#line 4188 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4188 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = wstring_type;
@@ -8417,7 +8417,7 @@ yyreduce:
   case 533:
 
 /* Line 1806 of yacc.c  */
-#line 4192 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4192 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = void_type;
@@ -8427,7 +8427,7 @@ yyreduce:
   case 534:
 
 /* Line 1806 of yacc.c  */
-#line 4196 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4196 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = pyobject_type;
@@ -8437,7 +8437,7 @@ yyreduce:
   case 535:
 
 /* Line 1806 of yacc.c  */
-#line 4200 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4200 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = pytuple_type;
@@ -8447,7 +8447,7 @@ yyreduce:
   case 536:
 
 /* Line 1806 of yacc.c  */
-#line 4204 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4204 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = pylist_type;
@@ -8457,7 +8457,7 @@ yyreduce:
   case 537:
 
 /* Line 1806 of yacc.c  */
-#line 4208 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4208 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = pydict_type;
@@ -8467,7 +8467,7 @@ yyreduce:
   case 538:
 
 /* Line 1806 of yacc.c  */
-#line 4212 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4212 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = pycallable_type;
@@ -8477,7 +8477,7 @@ yyreduce:
   case 539:
 
 /* Line 1806 of yacc.c  */
-#line 4216 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4216 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = pyslice_type;
@@ -8487,7 +8487,7 @@ yyreduce:
   case 540:
 
 /* Line 1806 of yacc.c  */
-#line 4220 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4220 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = pytype_type;
@@ -8497,7 +8497,7 @@ yyreduce:
   case 541:
 
 /* Line 1806 of yacc.c  */
-#line 4224 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4224 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = ssize_type;
@@ -8507,7 +8507,7 @@ yyreduce:
   case 542:
 
 /* Line 1806 of yacc.c  */
-#line 4228 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4228 "parser.y"
     {
             memset(&(yyval.memArg), 0, sizeof (argDef));
             (yyval.memArg).atype = ellipsis_type;
@@ -8517,7 +8517,7 @@ yyreduce:
   case 543:
 
 /* Line 1806 of yacc.c  */
-#line 4234 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4234 "parser.y"
     {
             /* The single or first type. */
 
@@ -8529,7 +8529,7 @@ yyreduce:
   case 544:
 
 /* Line 1806 of yacc.c  */
-#line 4240 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4240 "parser.y"
     {
             /* Check there is nothing after an ellipsis. */
             if ((yyvsp[(1) - (3)].signature).args[(yyvsp[(1) - (3)].signature).nrArgs - 1].atype == ellipsis_type)
@@ -8549,7 +8549,7 @@ yyreduce:
   case 545:
 
 /* Line 1806 of yacc.c  */
-#line 4256 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4256 "parser.y"
     {
             (yyval.throwlist) = NULL;
         }
@@ -8558,7 +8558,7 @@ yyreduce:
   case 546:
 
 /* Line 1806 of yacc.c  */
-#line 4259 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4259 "parser.y"
     {
             if (currentSpec->genc)
                 yyerror("Exceptions not allowed in a C module");
@@ -8570,7 +8570,7 @@ yyreduce:
   case 547:
 
 /* Line 1806 of yacc.c  */
-#line 4267 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4267 "parser.y"
     {
             /* Empty list so use a blank. */
 
@@ -8582,7 +8582,7 @@ yyreduce:
   case 548:
 
 /* Line 1806 of yacc.c  */
-#line 4273 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4273 "parser.y"
     {
             /* The only or first exception. */
 
@@ -8595,7 +8595,7 @@ yyreduce:
   case 549:
 
 /* Line 1806 of yacc.c  */
-#line 4280 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4280 "parser.y"
     {
             /* Check that it wasn't ...(,arg...). */
 
@@ -8615,7 +8615,7 @@ yyreduce:
 
 
 /* Line 1806 of yacc.c  */
-#line 8619 "/blur/cpp/lib/sip/sipgen/parser.c"
+#line 8619 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -8846,7 +8846,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 4296 "/blur/cpp/lib/sip/sipgen/parser.y"
+#line 4296 "parser.y"
 
 
 

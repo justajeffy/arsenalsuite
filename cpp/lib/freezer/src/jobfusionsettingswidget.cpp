@@ -22,7 +22,7 @@
  *
  */
 
-/* $Author$
+/* $Author: newellm $
  * $LastChangedDate: 2008-02-04 11:45:25 -0800 (Mon, 04 Feb 2008) $
  * $Rev: 5578 $
  * $HeadURL: svn://newellm@ocelot/blur/trunk/cpp/lib/assfreezer/src/jobfusionsettingswidget.cpp $
@@ -54,21 +54,21 @@ static JobService findFusionService( CustomJobSettingsWidget * cjsw, const Job &
 
 static void versionComboSetCurrent( RecordCombo * combo, CustomJobSettingsWidget * cjsw, JobList jobs )
 {
-    ServiceList sl;
-    foreach( Job j, jobs )
-        sl += findFusionService(cjsw, j).service();
-    sl = sl.unique();
+	ServiceList sl;
+	foreach( Job j, jobs )
+		sl += findFusionService(cjsw, j).service();
+	sl = sl.unique();
 
-    if( sl.size() != 1 )
-        combo->setCurrentIndex( -1 );
-    else
-        combo->setCurrent( sl[0] );
+	if( sl.size() != 1 )
+		combo->setCurrentIndex( -1 );
+	else
+		combo->setCurrent( sl[0] );
 }
 
 static void versionComboApplyCurrent( RecordCombo * combo, CustomJobSettingsWidget * cjsw, JobList jobs )
 {
 	// Apply changes from proxied widgets and get modified record list
-    Service newFusionService = combo->current();
+	Service newFusionService = combo->current();
 	if( !newFusionService.isRecord() ) {
 		LOG_1( "Unabled to find fusion service for version " + combo->currentText() );
 		return;
@@ -91,7 +91,6 @@ static void versionComboApplyCurrent( RecordCombo * combo, CustomJobSettingsWidg
 		jobService.setService( newFusionService );
 		jobService.setJob( jf );
 		cjsw->applyJobServices( jf, jobService );
-
 	}
 	history.commit();
 }
@@ -101,11 +100,13 @@ JobFusionSettingsWidget::JobFusionSettingsWidget( QWidget * parent, JobSettingsW
 {
 	setupUi( this );
 
+	mFusionVersionCombo->setColumn( "service" );
+	mFusionVersionCombo->setItems( Service::select().filter( "service", QRegExp( "^Fusion\\d" ) ) );
+
 	connect( mFusionVersionCombo, SIGNAL( activated(int) ), SLOT( settingsChange() ) );
 
 	if( mode == JobSettingsWidget::ModifyJobs )
 		mVerticalLayout->addLayout( mApplyResetLayout );
-
 }
 
 JobFusionSettingsWidget::~JobFusionSettingsWidget()
@@ -146,7 +147,7 @@ void JobFusionSettingsWidget::applySettings()
 	versionComboApplyCurrent( mFusionVersionCombo, this, mSelectedJobs );
 
 	if( mMode == JobSettingsWidget::ModifyJobs )
-		Job::updateJobStatuses( mSelectedJobs, "ready", true );
+		Job::updateJobStatuses( mSelectedJobs, "ready", true, true );
 
 	CustomJobSettingsWidget::applySettings();
 }
@@ -155,6 +156,9 @@ JobFusionVideoMakerSettingsWidget::JobFusionVideoMakerSettingsWidget( QWidget * 
 : CustomJobSettingsWidget( parent, mode )
 {
 	setupUi( this );
+
+	mFusionVersionCombo->setColumn( "service" );
+	mFusionVersionCombo->setItems( Service::select().filter( "service", QRegExp( "^Fusion\\d" ) ) );
 
 	connect( mFusionVersionCombo, SIGNAL( activated(int) ), SLOT( settingsChange() ) );
 
@@ -249,7 +253,7 @@ void JobFusionVideoMakerSettingsWidget::applySettings()
 	if( mMode == JobSettingsWidget::ModifyJobs ) {	
 		mSelectedJobs.commit();
 	
-		Job::updateJobStatuses( mSelectedJobs, "ready", true );
+		Job::updateJobStatuses( mSelectedJobs, "ready", true, true );
 	}
 
 	CustomJobSettingsWidget::applySettings();

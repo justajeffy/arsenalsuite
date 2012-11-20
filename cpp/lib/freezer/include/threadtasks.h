@@ -10,6 +10,7 @@
 #include "freezercore.h"
 
 #include "host.h"
+#include "hostinterface.h"
 #include "hoststatus.h"
 #include "job.h"
 #include "jobassignment.h"
@@ -71,16 +72,19 @@ public:
 class HostListTask : public ThreadTask
 {
 public:
-	HostListTask( QObject * rec, const QString & serviceFilter, bool loadHostServices );
-	
+	HostListTask( QObject * rec, ServiceList serviceFilter, ServiceList activeServices, const Expression & extraFilters, bool loadHostServices, bool loadHostInterfaces );
+
 	void run();
 	
-	QString mServiceFilter;
+	ServiceList mServiceFilter, mActiveServices;
+	Expression mExtraFilters;
 	HostList mReturn;
 	HostStatusList mHostStatuses;
 	JobAssignmentList mHostAssignments;
 	JobList mHostJobs;
+	HostInterfaceList mHostInterfaces;
 	bool mLoadHostServices;
+	bool mLoadHostInterfaces;
 };
 
 class UpdateHostListTask : public ThreadTask
@@ -101,6 +105,7 @@ public:
 	Job mJob;
 	JobTaskList mReturn;
 	JobTaskAssignmentList mTaskAssignments;
+	JobOutputList mOutputs;
 	QDateTime mCurTime;
 };
 
@@ -117,20 +122,27 @@ public:
 class ErrorListTask : public ThreadTask
 {
 public:
-	ErrorListTask( QObject * rec, const Job &, bool showCleared=false );
-	void run();
-	Job mJob;
-	JobErrorList mReturn;
-    bool mShowCleared;
-};
+	// Used for the Job error list
+	ErrorListTask( QObject * rec, const Job &, bool fetchClearedErrors = false );
 
-class HostErrorListTask : public ThreadTask
-{
-public:
-	HostErrorListTask( QObject * rec, const Host &, int limit );
+	// Used for the Host error list
+	ErrorListTask( QObject * rec, const Host &, int limit, bool showCleared );
+
+	// Used for the Error View
+	ErrorListTask( QObject * rec, JobList jobFilter, HostList hostFilter, ServiceList serviceFilter, JobTypeList jobTypeFilter, const QString & messageFilter, bool showServices, int limit, const Expression & extraFilters );
+
 	void run();
-	Host mHost;
+
+	// Filters
+	bool mFetchJobs, mFetchServices, mFetchClearedErrors;
 	int mLimit;
+	HostList mHostFilter;
+	JobList mJobFilter;
+	ServiceList mServiceFilter;
+	JobTypeList mJobTypeFilter;
+	QString mMessageFilter;
+	Expression mExtraFilters;
+
 	JobErrorList mReturn;
 	JobList mJobs;
 	JobServiceList mJobServices;
@@ -143,6 +155,7 @@ public:
 	void run();
 	JobTypeList mJobTypes;
 	ProjectList mProjects;
+	ServiceList mServices;
 	bool mHasData;
 };
 

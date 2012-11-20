@@ -6,11 +6,12 @@
 #include "freezercore.h"
 #include "iniconfig.h"
 
-#include "assfreezerview.h"
-#include "viewmanager.h"
 #include "group.h"
 #include "user.h"
 #include "usergroup.h"
+
+#include "assfreezerview.h"
+#include "viewmanager.h"
 
 FreezerView::FreezerView( QWidget * parent )
 : QWidget( parent )
@@ -18,7 +19,7 @@ FreezerView::FreezerView( QWidget * parent )
 , mRefreshCount( 0 )
 , mIniConfig()
 {
-    mIniConfig = userConfig();
+	mIniConfig = userConfig();
 }
 
 FreezerView::~FreezerView()
@@ -28,38 +29,39 @@ FreezerView::~FreezerView()
 
 QString FreezerView::generateViewCode()
 {
-    static int viewNum = 0;
-    QDateTime ctd = QDateTime::currentDateTime();
-    return QString::number( ctd.toTime_t() ) + QString::number( ctd.time().msec() ) + QString::number( viewNum++ );
+	static int viewNum = 0;
+	QDateTime ctd = QDateTime::currentDateTime();
+	return QString::number( ctd.toTime_t() ) + QString::number( ctd.time().msec() ) + QString::number( viewNum++ );
 }
 
 QString FreezerView::viewCode() const
 {
-    if( mViewCode.isEmpty() )
-        mViewCode = generateViewCode();
-    return mViewCode;
+	if( mViewCode.isEmpty() )
+		mViewCode = generateViewCode();
+	return mViewCode;
 }
 
 void FreezerView::setViewCode( const QString & viewCode )
 {
-    mViewCode = viewCode;
+	mViewCode = viewCode;
 }
 
 void FreezerView::refresh()
 {
-    if( !mRefreshScheduled ) {
-        mRefreshScheduled = true;
-        mRefreshCount++;
-        uint timeToRefresh = 1;
-        if( User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) )
-        if( mRefreshLast.secsTo(QDateTime::currentDateTime()) < 60 )
-            timeToRefresh = 60 - mRefreshLast.secsTo(QDateTime::currentDateTime());
-        if( User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) )
-            timeToRefresh = 1;
+	if( !mRefreshScheduled ) {
+		mRefreshScheduled = true;
+		mRefreshCount++;
+		uint timeToRefresh = 1;
+		if( User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) )
+			if( mRefreshLast.secsTo(QDateTime::currentDateTime()) < 60 )
+				timeToRefresh = 60 - mRefreshLast.secsTo(QDateTime::currentDateTime());
+		if( User::currentUser().userGroups().groups().contains( Group::recordByName("RenderOps") ) )
+			timeToRefresh = 1;
 
-        QTimer::singleShot( 1000*timeToRefresh, this, SLOT( doRefresh() ) );
-        mRefreshLast = QDateTime::currentDateTime();
-    }
+		QTimer::singleShot( 1000*timeToRefresh, this, SLOT( doRefresh() ) );
+		mRefreshLast = QDateTime::currentDateTime();
+		QTimer::singleShot( 0, this, SLOT( doRefresh() ) );
+	}
 }
 
 int FreezerView::refreshCount() const
@@ -74,13 +76,9 @@ void FreezerView::doRefresh()
 
 IniConfig & FreezerView::viewConfig()
 {
-    //mIniConfig.setSection( "View_" + viewCode() );
-    return mIniConfig;
-}
-
-void FreezerView::setViewConfig(IniConfig config)
-{
-    mIniConfig = config;
+	IniConfig & config = userConfig();
+	config.setSection( "View_" + viewCode() );
+	return config;
 }
 
 void FreezerView::restorePopup( QWidget * w )
@@ -151,12 +149,13 @@ void FreezerView::setViewName( const QString & viewName )
 	mViewName = viewName;
 }
 
-void FreezerView::save( IniConfig & ini )
+void FreezerView::save( IniConfig & ini, bool )
 {
 	ini.writeString("ViewName",mViewName);
+	ini.writeString("ViewType",viewType());
 }
 
-void FreezerView::restore( IniConfig & )
+void FreezerView::restore( IniConfig &, bool )
 {
 	applyOptions();
 }

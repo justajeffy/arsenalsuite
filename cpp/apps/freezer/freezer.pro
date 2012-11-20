@@ -50,15 +50,28 @@ unix{
 	LIBS+=-L../../lib/absubmit -labsubmit
 	LIBS+=-lutil
 
-	unix: LIBS+=-L$$(MAGICK_ROOT)/lib
-	unix: LIBS+=-Wl,-rpath,$$(MAGICK_ROOT)/lib
-
-    LIBS+=-lMagick++
-
 	PY_VERSION=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_version; print get_python_version()\"")
 	message(Python Version is $$PY_VERSION)
 	INCLUDEPATH+=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
 	LIBS+=-lpython$${PY_VERSION}
+	LIBS+=-lGLU
+}
+
+#DEFINES+=USE_IMAGE_MAGICK
+contains( DEFINES, USE_IMAGE_MAGICK ) {
+	unix:LIBS+=-L$$(MAGICK_ROOT)/lib
+	unix:INCLUDEPATH+=$$(MAGICK_ROOT)/include/ImageMagick
+
+	unix:LIBS+=-Wl,-rpath,$$(MAGICK_ROOT)/lib
+
+	unix:LIBS+=-lMagick++
+
+	#macx:INCLUDEPATH+=/usr/local/include
+	#macx:LIBS+=-lMagick++
+
+	win32:LIBS+=-lMagick++
+	win32:LIBS+=-L/ImageMagick/lib
+	win32:INCLUDEPATH+=/ImageMagick/include
 }
 
 # Python modules
@@ -88,7 +101,7 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET=10.5
 RESOURCES+=freezer.qrc
 
 CONFIG += qt thread warn_on opengl console
-QT+=opengl xml sql network
+QT+=opengl xml sql network webkit
 DESTDIR=./
 RC_FILE = freezer.rc
 TARGET=af

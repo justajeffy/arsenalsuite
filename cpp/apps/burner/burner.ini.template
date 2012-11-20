@@ -1,10 +1,9 @@
 [Assburner]
-AFPath=c:\blur\assfreezer\assfreezer.exe
+AFPath=c:\arsenalsuite\freezer\freezer.exe
 ApplicationName=ArsenalBurner
-ClientLogFile=assburner.log
-LogCommand=cmd.exe /c C:\max5\assburner3\Tail-4.2.12\tail.exe %1
+ClientLogFile=burner.log
 OnlineAfterIdleMinutes=-1
-SpoolDirectory=c:\blur\assburner\spool
+SpoolDirectory=c:\arsenalsuite\burner\spool
 
 [BackgroundMode]
 CutoffTime=60
@@ -35,7 +34,7 @@ Server=smtp.example.org
 [Logging]
 EchoStdOut=true
 Enabled=true
-File=/tmp/ab.log
+File=c:\arsenalsuite\burner\burner.log
 MaxFiles=2
 MaxSeverity=3
 MaxSize=104857600
@@ -43,7 +42,7 @@ MaxSize=104857600
 [LogonSession]
 Domain=bsi
 Password=password
-UseNewSession=true
+UseNewSession=false
 Username=magma
 
 [Update Server]

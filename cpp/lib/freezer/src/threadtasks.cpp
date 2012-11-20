@@ -1,15 +1,14 @@
 
-/* $Author$
- * $LastChangedDate: 2010-01-28 11:47:32 +1100 (Thu, 28 Jan 2010) $
- * $Rev: 9262 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/threadtasks.cpp $
+/* $Author: newellm $
+ * $LastChangedDate: 2012-11-13 14:26:11 -0800 (Tue, 13 Nov 2012) $
+ * $Rev: 13846 $
+ * $HeadURL: svn://newellm@svn.blur.com/blur/trunk/cpp/lib/assfreezer/src/threadtasks.cpp $
  */
 
 #include <qsqlquery.h>
 #include <qsqlerror.h>
 
 #include "database.h"
-
 
 #include "employee.h"
 #include "group.h"
@@ -38,13 +37,15 @@ void StaticJobListDataTask::run()
 		CHECK_CANCEL
 		// Ensure host table is preloaded
 		Host::select();
+		CHECK_CANCEL
+		mServices = Service::select( "WHERE keyService IN (SELECT fkeyService FROM JobService)" );
 		mHasData = staticJobListDataRetrieved = true;
-        // Cache information needed for permission checks
-        // Permission checks will happen when building menus
-        Employee::select();
-        Group::select();
-        Permission::select();
-        UserGroup::recordsByUser( User::currentUser() );
+		// Cache information needed for permission checks
+		// Permission checks will happen when building menus
+		Employee::select();
+		Group::select();
+		Permission::select();
+		UserGroup::recordsByUser( User::currentUser() );
 	}
 }
 
@@ -70,63 +71,63 @@ JobListTask::JobListTask( QObject * rec, const JobFilter & jf, const JobList & j
 
 void JobListTask::run()
 {
-	User::select(); // Make sure usr is loaded
-	CHECK_CANCEL
+//	User::select(); // Make sure usr is loaded
+//	CHECK_CANCEL
 
-    bool projectFilterShowingNone = (!mJobFilter.allProjectsShown && mJobFilter.visibleProjects.isEmpty() && !mJobFilter.showNonProjectJobs);
+	bool projectFilterShowingNone = (!mJobFilter.allProjectsShown && mJobFilter.visibleProjects.isEmpty() && !mJobFilter.showNonProjectJobs);
 
 	if( mJobList.size() ) {
 		mReturn = mJobList.reloaded();
 	} else
-
 	// If we have a project list, and all projects are hidden, then there will be no items, so just clear the list
-    if( !(projectFilterShowingNone || mJobFilter.typesToShow.isEmpty() || mJobFilter.statusToShow.isEmpty()) )
+	if( !(projectFilterShowingNone || mJobFilter.typesToShow.isEmpty() || mJobFilter.statusToShow.isEmpty() || mJobFilter.servicesToShow.isEmpty()) )
 	{
-		QStringList filters;
+		Expression e;
 		
-		//LOG_5( "Statuses to show: "	+ mJobFilter.statusToShow.join(",") );
+		//LOG_5( "Statuses to show: "   + mJobFilter.statusToShow.join(",") );
 		//LOG_5( "Hidden Projects: " + mJobFilter.hiddenProjects.join(",") );
 		//LOG_5( "Non-Project Jobs: " + QString(mJobFilter.showNonProjectJobs ? "true" : "false") );
 		//LOG_5( "User List: " + mJobFilter.userList.join(",") );
 
-		if( mJobFilter.statusToShow.size() > 0 && mJobFilter.statusToShow.size() != 8 )
-			filters << "status IN ('" + mJobFilter.statusToShow.join("','") + "')";
+			if( mJobFilter.statusToShow.size() > 0 && mJobFilter.statusToShow.size() != 9 )
+			e = Job::c.Status.in(mJobFilter.statusToShow);
 
 		if( mJobFilter.userList.size() > 0 )
-			filters << " (fkeyUsr IN (" + mJobFilter.userList.join(",") + ") or fkeywrangler IN(" + mJobFilter.userList.join(",") + ") )";
+			e &= Job::c.User.in(mJobFilter.userList);
+		
+		if( mJobFilter.servicesToShow.size() < mJobServices.size() )
+			e &= Job::c.Key.in( Query( JobService::c.Job, JobService::c.Service.in(mJobFilter.servicesToShow) ) );
 
-        if( !mJobFilter.allProjectsShown || !mJobFilter.showNonProjectJobs ) {
-            QString where = "(";
-            if( mJobFilter.visibleProjects.size() )
-                where += " fkeyproject IN (" + mJobFilter.visibleProjects.keyString() + ")";
-            if( mJobFilter.showNonProjectJobs ) {
-                if( mJobFilter.visibleProjects.size() )
-                    where += " OR";
-                where += " fkeyproject is null";
-            }
-            where += ")";
-            if( where != "()" )
-                filters << where;
-        }
-
+		if( mJobFilter.allProjectsShown && !mJobFilter.showNonProjectJobs )
+			e &= Job::c.Project.isNotNull() & (Job::c.Project != ev_(0));
+		else if( !mJobFilter.allProjectsShown ) {
+			QList<uint> projectKeys = mJobFilter.visibleProjects;
+			Expression sub;
+			if( mJobFilter.showNonProjectJobs ) {
+				projectKeys.append( 0 );
+				sub = Job::c.Project.isNull();
+			}
+			if( projectKeys.size() )
+				e &= (Job::c.Project.in(projectKeys) || sub);
+		}
 		if( mJobFilter.elementList.size() > 0 )
-			filters << " fkeyelement IN (" + mJobFilter.elementList.keyString() + ")";
+			e &= Job::c.Element.in(mJobFilter.elementList);
 
-		if( !mJobFilter.mExtraFilters.isEmpty() )
-			filters << mJobFilter.mExtraFilters;
+		if( mJobFilter.mDaysLimit > 0 )
+			//e &= Job::c.Submittedts > Expression::now() - Interval(0,mJobFilter.mDaysLimit,0);
+			e &= Expression::sql(QString(" AND submittedts > now()-'%1 days'::interval").arg(QString::number(mJobFilter.mDaysLimit)));
 
-		QString where = filters.isEmpty() ? "TRUE" : filters.join( " AND " );
-        QString limitWhere;
-        if( mJobFilter.mDaysLimit > 0 )
-            limitWhere += QString(" AND submittedts > now()-'%1 days'::interval").arg(QString::number(mJobFilter.mDaysLimit));
-        if( mJobFilter.mLimit > 0 )
-            limitWhere += " ORDER BY keyJob DESC LIMIT " + QString::number(mJobFilter.mLimit);
+		if( mJobFilter.mExtraFilters.isValid() )
+			e &= mJobFilter.mExtraFilters;
+
+		e = e.orderBy( Job::c.Key, Expression::Descending ).limit(mJobFilter.mLimit);
 
 		bool supportsMultiSelect = Database::current()->connection()->capabilities() & Connection::Cap_MultiTableSelect;
 		TableList tables;
 
 		CHECK_CANCEL
-		foreach( JobType jt, mJobFilter.typesToShow ) {
+		foreach( uint type, mJobFilter.typesToShow ) {
+			JobType jt( type );
 			if( !jt.isRecord() ) {
 				LOG_5( "JobType filter was not a valid record: " + jt.name() );
 				continue;
@@ -139,95 +140,102 @@ void JobListTask::run()
 			if( supportsMultiSelect )
 				tables += tbl;
 			else
-				mReturn += tbl->selectOnly( where+limitWhere );
+				mReturn += tbl->selectOnly( e );
 			CHECK_CANCEL
 		}
 		if( supportsMultiSelect )
-			mReturn = Database::current()->tableByName( "job" )->selectMulti( tables, where, VarList(), "WHERE TRUE"+limitWhere);
+			mReturn = Database::current()->tableByName( "job" )->selectMulti( tables, e );
 		CHECK_CANCEL
 	}
 
 	JobList jobsNeedingRefresh;
-    if( mFetchJobDeps && mReturn.size() ) {
-        JobList jobsNeedingDeps = mReturn;
+	if( mFetchJobDeps && mReturn.size() ) {
+		JobList jobsNeedingDeps = mReturn;
 		Index * idx = JobDep::table()->indexFromField( "fkeyJob" );
-        idx->cacheIncoming(true);
-        mJobDeps = JobDep::table()->selectFrom( "jobdep_recursive('" + jobsNeedingDeps.keyString() + "') AS JobDep" );
-        idx->cacheIncoming(false);
-        QMap<uint,JobDepList> depsByJob = mJobDeps.groupedBy<uint,JobDepList>("fkeyJob");
-        foreach( Job j, jobsNeedingDeps )
-            if( !depsByJob.contains(j.key()) )
-                idx->setEmptyEntry( QList<QVariant>() << j.getValue( "keyjob" ) );
-        mDependentJobs = mJobDeps.deps();
+		idx->cacheIncoming(true);
+		mJobDeps = JobDep::table()->selectFrom( "jobdep_recursive('" + jobsNeedingDeps.keyString() + "') AS JobDep" );
+		idx->cacheIncoming(false);
+		QMap<uint,JobDepList> depsByJob = mJobDeps.groupedBy<uint,JobDepList>("fkeyJob");
+		foreach( Job j, jobsNeedingDeps )
+			if( !depsByJob.contains(j.key()) )
+				idx->setEmptyEntry( QList<QVariant>() << j.getValue( "keyjob" ) );
+		mDependentJobs = mJobDeps.deps();
 		jobsNeedingRefresh = (mDependentJobs - mReturn);
-		if( jobsNeedingRefresh.size() )
-			Job::select("keyjob in (" + jobsNeedingRefresh.keyString() + ")");
+		jobsNeedingRefresh.reload();
 		CHECK_CANCEL
 	}
 
 	JobList allJobs = mReturn + jobsNeedingRefresh;
 	if( allJobs.size() ) {
-		JobStatus::select( "fkeyjob in (" + allJobs.keyString() + ")" );
+		allJobs.jobStatuses(Index::UseSelect); // Always does a full select
 		CHECK_CANCEL
 
 		if( mFetchJobServices )
-			mJobServices = JobService::select( "fkeyjob in (" + allJobs.keyString() + ")" );
-
-		CHECK_CANCEL
-        if( mFetchUserServices ) {
-            QSqlQuery q = Database::current()->exec( "SELECT * FROM user_service_current" );
-            while( q.next() ) {
-                QString key = q.value( 0 ).toString();
-                int value = q.value( 1 ).toInt();
-                mUserServiceCurrent[key] = value;
-            }
-            QSqlQuery q2 = Database::current()->exec( "SELECT * FROM user_service_limits" );
-            while( q2.next() ) {
-                QString key = q2.value( 0 ).toString();
-                int value = q2.value( 1 ).toInt();
-                mUserServiceLimits[key] = value;
-            }
-        }
-
-		CHECK_CANCEL
-        if( mFetchProjectSlots ) {
-            QSqlQuery q = Database::current()->exec( "SELECT * FROM project_slots_current" );
-            while( q.next() ) {
-                QString key = q.value( 0 ).toString();
-                int projectSlots = q.value( 1 ).toInt();
-                int reserve = q.value( 2 ).toInt();
-                int limit = q.value( 3 ).toInt();
-                mProjectSlots[key] = QString("%1:%2:%3").arg(projectSlots).arg(reserve).arg(limit);
-            }
-        }
-    }
-	//jobsNeedingRefresh.clear();
-	//allJobs.clear();
+			mJobServices = allJobs.jobServices(Index::UseSelect);
+	}
+	if( mFetchUserServices ) {
+		QSqlQuery q = Database::current()->exec( "SELECT * FROM user_service_current" );
+		while( q.next() ) {
+			QString key = q.value( 0 ).toString();
+			int value = q.value( 1 ).toInt();
+			mUserServiceCurrent[key] = value;
+		}
+		QSqlQuery q2 = Database::current()->exec( "SELECT * FROM user_service_limits" );
+		while( q2.next() ) {
+			QString key = q2.value( 0 ).toString();
+			int value = q2.value( 1 ).toInt();
+			mUserServiceLimits[key] = value;
+		}
+	}
+	CHECK_CANCEL
+	if( mFetchProjectSlots ) {
+		QSqlQuery q = Database::current()->exec( "SELECT * FROM project_slots_current" );
+		while( q.next() ) {
+			QString key = q.value( 0 ).toString();
+			int projectSlots = q.value( 1 ).toInt();
+			int reserve = q.value( 2 ).toInt();
+			int limit = q.value( 3 ).toInt();
+			mProjectSlots[key] = QString("%1:%2:%3").arg(projectSlots).arg(reserve).arg(limit);
+		}
+	}
 }
 
-HostListTask::HostListTask( QObject * rec, const QString & serviceFilter, bool loadHostServices )
+HostListTask::HostListTask( QObject * rec, ServiceList serviceFilter, ServiceList activeServices, const Expression & extraFilters, bool loadHostServices, bool loadHostInterfaces )
 : ThreadTask( HOST_LIST, rec )
 , mServiceFilter( serviceFilter )
+, mActiveServices( activeServices )
+, mExtraFilters( extraFilters )
 , mLoadHostServices( loadHostServices )
+, mLoadHostInterfaces( loadHostInterfaces )
 {
 }
 
 void HostListTask::run()
 {
 	if( !mServiceFilter.isEmpty() ) {
-		mReturn = Host::select(
-			"WHERE keyhost IN ( SELECT hostservice.fkeyhost FROM HostService WHERE fkeyservice IN (" + mServiceFilter + ") ) AND online=1" );
-        if( mReturn.size() ) {
-            CHECK_CANCEL
-            mHostStatuses = HostStatus::select( "fkeyhost in (" + mReturn.keyString() + ")" );
-            //CHECK_CANCEL
-            //mHostAssignments = JobAssignment::select( "WHERE fkeyhost IN (" + mReturn.keyString() +") AND fkeyjobassignmentstatus IN (SELECT keyjobassignmentstatus FROM jobassignmentstatus WHERE status IN ('ready','copy','busy'))" );
-            CHECK_CANCEL
-            mHostJobs = mHostAssignments.jobs();
-        }
+		Expression e;
+		if( mServiceFilter.size() < mActiveServices.size() )
+			e = Host::c.Key.in( Query( HostService::c.Host, HostService::c.Service.in(mServiceFilter) ) );
+		e &= Host::c.Online == ev_(1);
+		if( mExtraFilters.isValid() )
+			e &= mExtraFilters;
+		mReturn = e.select();
+		if( mReturn.size() ) {
+			CHECK_CANCEL
+			mHostStatuses = HostStatus::select(HostStatus::c.Host.in(mReturn));
+	//		CHECK_CANCEL
+	//		mHostJobs = mHostStatuses.jobs();
+		}
 	}
-	if( mLoadHostServices )
+	if( mLoadHostServices ) {
+		CHECK_CANCEL
+		// mReturn.hostServices();
 		HostService::select();
+	}
+	if( mLoadHostInterfaces ) {
+		CHECK_CANCEL
+		mHostInterfaces = mReturn.hostInterfaces();
+	}
 }
 
 FrameListTask::FrameListTask( QObject * rec, const Job & job )
@@ -237,15 +245,11 @@ FrameListTask::FrameListTask( QObject * rec, const Job & job )
 
 void FrameListTask::run()
 {
-	mReturn = JobTask::recordsByJob( mJob );
-	QStringList taskAssignmentKeys;
-	foreach( JobTask task, mReturn ) {
-		int jtak = task.getValue("fkeyjobtaskassignment").toInt();
-		if( jtak != 0 )
-			taskAssignmentKeys += QString::number(jtak);
-	}
-	if( taskAssignmentKeys.size() )
-		mTaskAssignments = JobTaskAssignment::select( "keyjobtaskassignment IN (" + taskAssignmentKeys.join(",") + ")" );
+	mReturn = mJob.jobTasks(Index::UseSelect);
+	CHECK_CANCEL
+	mTaskAssignments = mReturn.jobTaskAssignments(Index::UseSelect);
+	CHECK_CANCEL
+	mOutputs = mJob.jobOutputs(Index::UseSelect);
 	CHECK_CANCEL
 	QSqlQuery q = Database::current()->exec( "SELECT now();" );
 	if( q.next() )
@@ -261,41 +265,70 @@ void PartialFrameListTask::run()
 {
 	if( mJtl.size() == 0 )
 		return;
-	QString sel = "keyjobtask IN (" + mJtl.keyString() + ")";
-	mReturn = JobTask::select( sel );
+	mReturn = mJtl.reloaded();
 	CHECK_CANCEL
 	QSqlQuery q = Database::current()->exec( "SELECT now();" );
 	if( q.next() )
 		mCurTime = q.value( 0 ).toDateTime();
 }
 
-ErrorListTask::ErrorListTask( QObject * rec, const Job & job, bool showCleared )
+ErrorListTask::ErrorListTask( QObject * rec, const Job & job, bool fetchClearedErrors )
 : ThreadTask( ERROR_LIST, rec )
-, mJob( job )
-, mShowCleared( showCleared )
+, mFetchJobs(false)
+, mFetchServices(false)
+, mFetchClearedErrors( fetchClearedErrors )
+, mLimit( 0 )
+, mJobFilter(job)
 {}
-	
+
+ErrorListTask::ErrorListTask( QObject * rec, const Host & host, int limit, bool showCleared )
+: ThreadTask( ERROR_LIST, rec )
+, mFetchJobs(true)
+, mFetchServices(true)
+, mFetchClearedErrors( showCleared )
+, mLimit( limit )
+, mHostFilter(host)
+{}
+
+ErrorListTask::ErrorListTask( QObject * rec, JobList jobFilter, HostList hostFilter, ServiceList serviceFilter, JobTypeList jobTypeFilter, const QString & messageFilter, bool showServices, int limit, const Expression & extraFilters )
+: ThreadTask( ERROR_LIST, rec )
+, mFetchJobs(true)
+, mFetchServices(showServices)
+, mFetchClearedErrors(true)
+, mLimit( limit )
+, mHostFilter(hostFilter)
+, mJobFilter(jobFilter)
+, mServiceFilter(serviceFilter)
+, mJobTypeFilter(jobTypeFilter)
+, mMessageFilter(messageFilter)
+, mExtraFilters(extraFilters)
+{}
+
 void ErrorListTask::run()
 {
-//	mReturn = JobHistory::recordsByJob( mJob );
-    QString sql = "fkeyjob=?";
-    if(!mShowCleared)
-        sql += " AND cleared=false";
-	mReturn = JobError::select( sql, VarList() << mJob.key() );
-	LOG_5( "Error select finished" );
-}
-
-HostErrorListTask::HostErrorListTask( QObject * rec, const Host & host, int limit )
-: ThreadTask( HOST_ERROR_LIST, rec )
-, mHost( host )
-, mLimit( limit )
-{}
-
-void HostErrorListTask::run()
-{
-	mReturn = JobError::select( "fkeyhost=? ORDER BY keyjoberror desc LIMIT ?", VarList() << mHost.key() << mLimit );
-	mJobs = mReturn.jobs();
-	mJobServices = mJobs.jobServices();
+	Expression e;
+	if( mJobFilter.size() )
+		e &= JobError::c.Job.in(mJobFilter); // fkeyJob IN (*mJobFilter*)
+	if( mHostFilter.size() )
+		e &= JobError::c.Host.in(mHostFilter); // fkeyHost IN (*mHostFilter*)
+	if( !mFetchClearedErrors )
+		e &= (JobError::c.Cleared == ev_(false)) || JobError::c.Cleared.isNull(); // (cleared = false OR cleared IS NULL)
+	if( mServiceFilter.size() )
+		e &= JobError::c.Job.in( Query( JobService::c.Job, JobService::c.Service.in(mServiceFilter) ) ); // fkeyJob IN (SELECT fkeyjob FROM JobService WHERE fkeyService IN (*mServiceFilter*))
+	if( mJobTypeFilter.size() )
+		e &= JobError::c.Job.in( Query( Job::c.Key, Job::c.JobType.in(mJobTypeFilter) ) ); // fkeyJob IN (SELECT keyJob FROM Job WHERE fkeyJobType IN (*jobTypeFilter*))
+	if( mExtraFilters.isValid() )
+		e &= mExtraFilters;
+	if( mLimit ) {
+		// If there's a limit fetch the most recent errors
+		e = e.orderBy(JobError::c.LastOccurrence);
+		e = e.limit(mLimit);
+	}
+	mReturn = JobError::select(e);
+	if( mFetchJobs )
+		mJobs = mReturn.jobs(Index::UseSelect);
+	if( mFetchServices )
+		mJobServices = JobService::c.Job.in(mReturn).select();
 }
 
 CounterTask::CounterTask( QObject * rec )
@@ -315,7 +348,6 @@ void CounterTask::run()
 	}
 	CHECK_CANCEL
 	mManagerService = Service::recordByName( "AB_manager" );
-	LOG_5( "Returning CounterTask results" );
 }
 
 
@@ -330,6 +362,7 @@ void JobHistoryListTask::run()
 	mReturn = mJobs.jobHistories();
 }
 
+
 UpdateJobListTask::UpdateJobListTask( QObject * rec, const JobList & jobs, const QString & status )
 : ThreadTask( UPDATE_JOB_LIST, rec )
 , mReturn( jobs )
@@ -339,9 +372,9 @@ UpdateJobListTask::UpdateJobListTask( QObject * rec, const JobList & jobs, const
 
 void UpdateJobListTask::run()
 {
-    Job::updateJobStatuses( mReturn, mStatus, false );
-    //mReturn.setStatuses(mStatus);
-    //mReturn.commit();
+	Job::updateJobStatuses( mReturn, mStatus, false );
+	//mReturn.setStatuses(mStatus);
+	//mReturn.commit();
 }
 
 UpdateHostListTask::UpdateHostListTask( QObject * rec, const HostList & hosts, const QString & status )
@@ -353,17 +386,17 @@ UpdateHostListTask::UpdateHostListTask( QObject * rec, const HostList & hosts, c
 
 void UpdateHostListTask::run()
 {
-    Database::current()->beginTransaction();
+	Database::current()->beginTransaction();
 
-    HostStatusList hsl = mReturn.hostStatuses();
-    hsl.setSlaveStatuses(mStatus);
-    hsl.commit();
+	HostStatusList hsl = mReturn.hostStatuses();
+	hsl.setSlaveStatuses(mStatus);
+	hsl.commit();
 
-    QStringList returnTasksSql;
-    foreach( Host h, mReturn )
-        returnTasksSql += "return_slave_tasks_3(" + QString::number( h.key() ) + ")";
+	QStringList returnTasksSql;
+	foreach( Host h, mReturn )
+		returnTasksSql += "return_slave_tasks_3(" + QString::number( h.key() ) + ")";
 
-    Database::current()->exec("SELECT " + returnTasksSql.join(",") + ";");
-    Database::current()->commitTransaction();
+	Database::current()->exec("SELECT " + returnTasksSql.join(",") + ";");
+	Database::current()->commitTransaction();
 }
 

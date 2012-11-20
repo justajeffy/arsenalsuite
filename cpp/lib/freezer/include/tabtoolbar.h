@@ -57,7 +57,7 @@ public slots:
 protected:
 	virtual bool eventFilter( QObject *, QEvent * );
 
-	QPushButton * mNext, * mPrev, * mAlpha, * mPlay, * mPause;
+	QPushButton * mNext, * mPrev, * mAlpha, * mPlay, * mPause, * mGamma;
 	QComboBox * mScaleCombo;
 	QCheckBox * mFreeScaleCheck;
 	ImageView * mImageView;

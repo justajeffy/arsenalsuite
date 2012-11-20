@@ -14,7 +14,9 @@
 #include "jobmaxsettingswidget.h"
 #include "ui_jobmaxscriptsettingswidgetui.h"
 
-class Stone::RecordProxy;
+namespace Stone {
+	class RecordProxy;
+}
 using namespace Stone;
 
 class FREEZER_EXPORT JobMaxScriptSettingsWidget : public CustomJobSettingsWidget, public Ui::JobMaxScriptSettingsWidgetUI, public JobMaxUtils

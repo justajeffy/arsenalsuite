@@ -22,16 +22,18 @@
  *
  */
 
-/* $Author$
- * $LastChangedDate: 2010-02-16 17:20:26 +1100 (Tue, 16 Feb 2010) $
- * $Rev: 9358 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/src/jobaftereffectssettingswidget.cpp $
+/* $Author: newellm $
+ * $LastChangedDate: 2010-02-11 11:22:38 -0800 (Thu, 11 Feb 2010) $
+ * $Rev: 9347 $
+ * $HeadURL: svn://newellm@ocelot/blur/trunk/cpp/lib/assfreezer/src/jobaftereffectssettingswidget.cpp $
  */
 
 #include <qmessagebox.h>
 
 #include "recordproxy.h"
 
+#include "jobhistory.h"
+#include "jobhistorytype.h"
 #include "jobtask.h"
 #include "job.h"
 #include "host.h"
@@ -116,7 +118,7 @@ void JobAfterEffectsSettingsWidget::applySettings()
 	if( mMode == JobSettingsWidget::ModifyJobs ) {
 		mSelectedJobs.commit();
 
-		Job::updateJobStatuses( mSelectedJobs, "new", true );
+		Job::updateJobStatuses( mSelectedJobs, "new", true, true );
 	}
 
 	CustomJobSettingsWidget::applySettings();

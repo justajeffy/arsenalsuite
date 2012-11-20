@@ -4,6 +4,12 @@ class JobSettingsWidget : QWidget //, public Ui::JobSettingsWidgetUI
 %TypeHeaderCode
 #include <jobsettingswidget.h>
 %End
+%ConvertToSubClassCode
+	if( sipCpp->inherits( "JobSettingsWidget" ) )
+		sipType = sipType_JobSettingsWidget;
+	else
+		sipType = NULL;
+%End
 public:
 	enum Mode {
 		SubmitJobs,
@@ -66,6 +72,8 @@ public:
 	void applyJobServices( const Job &, JobServiceList );
 
 	void setJobServiceBridge( JobServiceBridge * /Transfer/ );
+
+	JobSettingsWidget * jobSettingsWidget() const;
 
 public slots:
 	virtual void resetSettings();

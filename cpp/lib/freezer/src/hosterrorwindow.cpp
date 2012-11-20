@@ -15,6 +15,7 @@
 HostErrorWindow::HostErrorWindow( QWidget * parent )
 : QMainWindow( parent )
 , mLimit( 50 )
+, mShowClearedErrors( true )
 , mTask( 0 )
 , mRefreshQueued( false )
 , mRefreshScheduled( false )
@@ -26,9 +27,14 @@ HostErrorWindow::HostErrorWindow( QWidget * parent )
 	mErrorTree = new RecordTreeView( this );
 	mErrorTree->setUniformRowHeights( false );
 	connect( mErrorTree, SIGNAL( showMenu( const QPoint &, const Record &, RecordList ) ), SLOT( showMenu( const QPoint &, const Record &, RecordList ) ) );
+	connect( mErrorTree, SIGNAL( aboutToShowHeaderMenu( QMenu * ) ), SLOT( populateHeaderMenu( QMenu * ) ) );
 
-	mModel = new HostErrorModel( mErrorTree );
+	mModel = new ErrorModel( mErrorTree );
 	mModel->setAutoSort( true );
+	
+	// Enable grouping
+	connect( mModel->grouper(), SIGNAL( groupingChanged(bool) ), SLOT( slotGroupingChanged(bool) ) );
+
 	mErrorTree->setModel( mModel );
 	IniConfig ini;
 	setupHostErrorView(mErrorTree,ini);
@@ -72,7 +78,7 @@ void HostErrorWindow::doRefresh()
 		return;
 	}
 
-	mTask = new HostErrorListTask( this, mHost, mLimit );
+	mTask = new ErrorListTask( this, mHost, mLimit, mShowClearedErrors );
 	FreezerCore::addTask( mTask );
 }
 
@@ -95,4 +101,24 @@ void HostErrorWindow::customEvent( QEvent * evt )
 		} else
 			statusBar()->clearMessage();
 	}
+}
+
+void HostErrorWindow::populateHeaderMenu( QMenu * menu )
+{
+	menu->addSeparator();
+	QAction * showClearedErrorsAction = menu->addAction( "Show Cleared Errors" );
+	showClearedErrorsAction->setCheckable( true );
+	showClearedErrorsAction->setChecked( mShowClearedErrors );
+	connect( showClearedErrorsAction, SIGNAL( toggled( bool ) ), SLOT( setShowClearedErrors( bool ) ) );
+}
+
+void HostErrorWindow::setShowClearedErrors( bool sce )
+{
+	mShowClearedErrors = sce;
+	refresh();
+}
+
+void HostErrorWindow::slotGroupingChanged(bool grouped)
+{
+	mErrorTree->setRootIsDecorated(grouped);
 }

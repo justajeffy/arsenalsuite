@@ -53,7 +53,7 @@ FREEZER_EXPORT extern const char * VNC_LINK;
 
 struct FREEZER_EXPORT Options
 {
-	Options() : mJobColors(0), mFrameColors(0), mErrorColors(0), mHostColors(0) {}
+	Options() : mJobColors(0), mFrameColors(0), mErrorColors(0), mHostColors(0), mControlModifierDepDragCheck(false) {}
 	ViewColors * mJobColors, * mFrameColors, * mErrorColors, * mHostColors;
 	QFont appFont;
 	QFont jobFont;
@@ -66,6 +66,7 @@ struct FREEZER_EXPORT Options
 	int mRefreshInterval; // Minutes
 	int mCounterRefreshInterval; // seconds
 	bool mAutoRefreshOnWindowActivation, mRefreshOnViewChange;
+	bool mControlModifierDepDragCheck;
 };
 
 FREEZER_EXPORT extern Options options;
@@ -82,24 +83,32 @@ struct FREEZER_EXPORT JobFilter {
 	// status filters
 	QStringList statusToShow;
 
-	// List of users to show, empty list shows all
-	QStringList userList;
+	// List of primary keys of users to show, empty list shows all.
+	QList<uint> userList;
 
-    // List of projects to hide, comma separated keys
-    ProjectList visibleProjects;
-    bool showNonProjectJobs, allProjectsShown;
+	// List of projects to hide, comma separated keys
+	QList<uint> visibleProjects;
+	bool showNonProjectJobs, allProjectsShown;
+
+	// Only used for loading old ini format, stored here until
+	// active projects select is finished
+	QList<uint> hiddenProjects;
 
 	// List of job types to show
-    JobTypeList typesToShow;
+	QList<uint> typesToShow;
+
+	QList<uint> servicesToShow;
 
 	// Elements ( shots ) to show
 	ElementList elementList;
-
+	
 	uint mLimit;
 	uint mDaysLimit;
 
-	QString mExtraFilters;
+	Expression mExtraFilters;
 };
+
+FREEZER_EXPORT void exploreFile( QString path );
 
 #endif // AFCOMMON_H
 

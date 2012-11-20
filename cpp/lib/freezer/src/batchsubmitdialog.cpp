@@ -37,7 +37,8 @@ BatchSubmitDialog::BatchSubmitDialog( QWidget * parent )
 	mProjectCombo->setSpecialItemText( "None" );
 	mProjectCombo->setShowSpecialItem( true );
 	mProjectCombo->setStatusFilters( ProjectStatus::recordByName( "Production" ) );
-	
+	// Default to priority 5
+	mPrioritySpin->setValue( 5 );
 	//mRunAsUserGroup->hide();
 }
 
@@ -184,8 +185,9 @@ void BatchSubmitDialog::accept()
 #ifdef Q_OS_WIN
 		p.start( "c:/blur/zip.exe -j " + archivePath + " " + path.path() );
 #else
-		p.start( "zip -j " + archivePath + " " + path.path() );
+		p.start( "zip -jr " + archivePath + " " + path.path() );
 #endif
+		p.waitForFinished();
 		if( p.exitCode() != 0 ) {
 			LOG_1( "Error creating archive, return value was " + QString::number( p.exitCode() ) + ", output was: " + QString::fromLatin1( p.readAllStandardOutput() ) );
 			error = true;
@@ -203,11 +205,8 @@ void BatchSubmitDialog::accept()
 	/*
 	 * Submit the job
 	 */
-	Submitter * s = new Submitter();
-	// Commits the job, status set to 'submit'
-	s->newJobOfType(JobType::recordByName( "Batch" ) );
-
-	JobBatch jb(s->job());
+	JobBatch jb;
+	jb.setJobType( JobType::recordByName( "Batch" ) );
 	jb.setName( jobName );
 	jb.setPacketSize( 1 );
 	jb.setPacketType( "preassigned" );
@@ -218,13 +217,18 @@ void BatchSubmitDialog::accept()
 	jb.setUser( User::currentUser() );
 	jb.setFileName( archivePath );
 	jb.setProject( mProjectCombo->project() );
+	if( mMaxHostsSpin->value() > 0 )
+		jb.setMaxHosts( mMaxHostsSpin->value() );
 	if( mRunAsUserGroup->isChecked() ) {
 		jb.setUserName( mUserName->text() );
-		//jb.setDomain( mDomain->text() );
-		//jb.setPassword( mPassword->text() );
+		jb.setDomain( mDomain->text() );
+		jb.setPassword( mPassword->text() );
 	}
-    jb.commit();
 
+	Submitter * s = new Submitter();
+	// Commits the job, status set to 'submit'
+	s->setJob( jb );
+	
 	int i=0;
 	JobTaskList tasks;
 	foreach( Host h, mHosts ) {
@@ -237,6 +241,8 @@ void BatchSubmitDialog::accept()
 	tasks.setStatuses( "new" );
 	tasks.commit();
 
+	s->addTasks( tasks );
+	s->addServices( ServiceList() += Service::recordByName( "Assburner" ) );
 	s->setSubmitSuspended( mStatusSuspendedRadio->isChecked() );
 	s->submit();
 

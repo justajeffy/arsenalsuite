@@ -21,10 +21,10 @@
  *
  */
 
-/* $Author$
- * $LastChangedDate: 2009-11-23 11:30:56 +1100 (Mon, 23 Nov 2009) $
- * $Rev: 9055 $
- * $HeadURL: svn://svn.blur.com/blur/branches/concurrent_burn/cpp/lib/assfreezer/include/items.h $
+/* $Author: newellm $
+ * $LastChangedDate: 2012-06-13 13:42:35 -0700 (Wed, 13 Jun 2012) $
+ * $Rev: 13251 $
+ * $HeadURL: svn://newellm@svn.blur.com/blur/trunk/cpp/lib/assfreezer/include/items.h $
  */
 
 #ifndef ITEMS_H
@@ -52,6 +52,7 @@
 #include "hostselector.h"
 #include "recordtreeview.h"
 #include "recordsupermodel.h"
+#include "modelgrouper.h"
 
 #include "afcommon.h"
 #include "displayprefsdialog.h"
@@ -68,6 +69,7 @@ struct FREEZER_EXPORT FrameItem : public RecordItemBase
 	static QDateTime CurTime;
 	JobTask task;
 	JobTaskAssignment currentAssignment;
+	JobOutput output;
 	QString hostName, label, time, memory, stat;
 	ColorOption * co;
 	int loadedStatus;
@@ -81,8 +83,9 @@ struct FREEZER_EXPORT FrameItem : public RecordItemBase
 
 typedef TemplateRecordDataTranslator<FrameItem> FrameTranslator;
 
-struct FREEZER_EXPORT ErrorItem : public RecordItemBase
+struct FREEZER_EXPORT JobErrorItem : public RecordItemBase
 {
+	static const int GroupRole = Qt::UserRole;
 	JobError error;
 	QString hostName, cnt, when, msg;
 	ColorOption * co;
@@ -93,7 +96,7 @@ struct FREEZER_EXPORT ErrorItem : public RecordItemBase
 	Record getRecord();
 };
 
-struct FREEZER_EXPORT HostErrorItem : public ErrorItem
+struct FREEZER_EXPORT ErrorItem : public JobErrorItem
 {
 	Job job;
 	JobType jobType;
@@ -102,22 +105,22 @@ struct FREEZER_EXPORT HostErrorItem : public ErrorItem
 	QVariant modelData( const QModelIndex & i, int role ) const;
 };
 
+typedef TemplateRecordDataTranslator<JobErrorItem> JobErrorTranslator;
 typedef TemplateRecordDataTranslator<ErrorItem> ErrorTranslator;
-typedef TemplateRecordDataTranslator<HostErrorItem> HostErrorTranslator;
 //typedef RecordModelImp<TreeNodeT<ErrorCache> > ErrorModel;
+
+class FREEZER_EXPORT JobErrorModel : public RecordSuperModel
+{
+Q_OBJECT
+public:
+	JobErrorModel( QObject * parent );
+};
 
 class FREEZER_EXPORT ErrorModel : public RecordSuperModel
 {
 Q_OBJECT
 public:
 	ErrorModel( QObject * parent );
-};
-
-class FREEZER_EXPORT HostErrorModel : public RecordSuperModel
-{
-Q_OBJECT
-public:
-	HostErrorModel( QObject * parent );
 
 	void setErrors( JobErrorList errors, JobList jobs, JobServiceList services );
 
@@ -138,23 +141,22 @@ struct FREEZER_EXPORT JobItem : public RecordItemBase
 	int compare( const QModelIndex & a, const QModelIndex & b, int, bool );
 	Qt::ItemFlags modelFlags( const QModelIndex & );
 	Record getRecord();
-    QString userToolTip;
-    QString projectToolTip;
+	QString userToolTip;
+	QString projectToolTip;
 
-    QString efficiency, bytesRead, bytesWrite, diskOps, cpuTime;
+	QString efficiency, bytesRead, bytesWrite, diskOps, cpuTime;
 };
 
 typedef TemplateRecordDataTranslator<JobItem> JobTranslator;
 
-struct FREEZER_EXPORT GroupedJobItem : public ItemBase
+struct FREEZER_EXPORT GroupedJobItem : public GroupItem
 {
-       QString avgTime, groupValue, slotsOnGroup;
-       int groupColumn;
-       ColorOption * colorOption;
-       void init( const QModelIndex & idx );
-       QVariant modelData( const QModelIndex & i, int role ) const;
-       Qt::ItemFlags modelFlags( const QModelIndex & );
-       bool setModelData( const QModelIndex & i, const QVariant & value, int role );
+	void init( const QModelIndex & idx );
+	virtual QString calculateGroupValue( const QModelIndex & self, int column);
+	QVariant modelData( const QModelIndex & i, int role ) const;
+	Qt::ItemFlags modelFlags( const QModelIndex & );
+	QString avgTime, slotsOnGroup;
+	ColorOption * colorOption;
 };
 
 typedef TemplateDataTranslator<GroupedJobItem> GroupedJobTranslator;
@@ -186,8 +188,8 @@ public slots:
 	void depsRemoved(RecordList);
 
 signals:
-    void dependencyAdded( const QModelIndex & parent );
-
+	void dependencyAdded( const QModelIndex & parent );
+	
 protected:
 	void addRemoveWorker( JobDepList, bool remove );
 
@@ -199,6 +201,8 @@ FREEZER_EXPORT void setupJobView( RecordTreeView *, IniConfig & );
 FREEZER_EXPORT void saveJobView( RecordTreeView *, IniConfig & );
 FREEZER_EXPORT void setupHostView( RecordTreeView *, IniConfig & );
 FREEZER_EXPORT void saveHostView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void setupJobErrorView( RecordTreeView *, IniConfig & );
+FREEZER_EXPORT void saveJobErrorView( RecordTreeView *, IniConfig & );
 FREEZER_EXPORT void setupHostErrorView( RecordTreeView *, IniConfig & );
 FREEZER_EXPORT void saveHostErrorView( RecordTreeView *, IniConfig & );
 FREEZER_EXPORT void setupErrorView( RecordTreeView *, IniConfig & );
@@ -216,8 +220,8 @@ public:
 	virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 protected:
 	ColorOption * mBusyColor, * mNewColor, * mDoneColor, * mSuspendedColor, * mCancelledColor, * mHoldingColor;
-    QPixmap taskProgressBar( int, const QString & ) const;
-    QPixmap gradientCache( int, const QChar & ) const;
+	QPixmap taskProgressBar( int, const QString & ) const;
+	QPixmap gradientCache( int, const QChar & ) const;
 };
 
 class FREEZER_EXPORT LoadedDelegate : public QItemDelegate
@@ -245,11 +249,11 @@ class FREEZER_EXPORT JobIconDelegate : public QItemDelegate
 {
 Q_OBJECT
 public:
-    JobIconDelegate( QObject * parent=0 ) : QItemDelegate( parent ) {}
-    ~JobIconDelegate() {}
-    virtual void paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+	JobIconDelegate( QObject * parent=0 ) : QItemDelegate( parent ) {}
+	~JobIconDelegate() {}
+	virtual void paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 protected:
-};
+	};
 
 #endif // ITEMS_H
 
