@@ -784,7 +784,7 @@ void CannedBatchJobMenu::slotActionTriggered( QAction * action )
 }
 
 HostPluginMenu::HostPluginMenu(HostListWidget * hostList)
-: HostListMenu(hostList, "Host Plugins")
+: HostListMenu<>(hostList, "Host Plugins")
 {}
 
 void HostPluginMenu::slotAboutToShow()
