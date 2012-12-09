@@ -150,9 +150,14 @@ public:
 
 	MappedRecord foreignKey( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
 	MappedRecord foreignKey( int column ) const throw(SqlException,LostConnectionException,PythonException);
-	MappedRecord foreignKey( Field * field ) const throw(SqlException,LostConnectionException,PythonException);
+        MappedRecord foreignKey( Field * field ) const throw(SqlException,LostConnectionException,PythonException) /HoldGIL/;
 
 	QString columnLiteral( const QString & column ) const;
+
+	SIP_PYOBJECT getPyValue( Field * field ) const throw(SqlException,LostConnectionException,PythonException);
+%MethodCode
+	return wrapQVariant(sipCpp->getValue(a0),false,true,a0->qvariantType());
+%End
 	
 	QVariant getValue( int column ) const throw(SqlException,LostConnectionException,PythonException);
 	QVariant getValue( Field * field ) const throw(SqlException,LostConnectionException,PythonException);
