@@ -530,7 +530,7 @@ void Table::slotTriggerAdded( Trigger * trigger )
 		}
 	}
 	foreach( Table * t, mChildren )
-		t->slotTriggerAdded );
+		t->slotTriggerAdded( trigger );
 }
 
 RecordList Table::processIncoming( const RecordList & records, bool cacheIncoming, bool checkForUpdates )
