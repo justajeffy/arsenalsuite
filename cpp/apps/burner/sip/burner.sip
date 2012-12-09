@@ -8,6 +8,10 @@
 
 %DefaultSupertype sip.wrapper
 
+%VirtualErrorHandler JobBurnerVirtualErrorHandler
+        throw PythonException();
+%End
+
 %ModuleHeaderCode
 	class JobBurner;
 	void JobBurnerVirtualErrorHandler( const JobBurner *, sipSimpleWrapper * );
@@ -22,6 +26,8 @@
 		const_cast<JobBurner*>(burner)->jobErrored( "Exception occurred in python burner: Please contact IT" ); //runPythonFunction( "traceback", "format_exc", VarList() ).toString() );
 	}
 %End
+
+
 
 class Slave : QObject
 {
