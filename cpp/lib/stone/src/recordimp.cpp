@@ -346,7 +346,7 @@ const QVariant & RecordImp::getColumn( int col ) const
 		return sNullVariant;
 	if( getBit( mNotSelectedBits, col ) ) {
 		PyThreadState *_save = 0;
-		if( Py_IsInitialized() && PyEval_ThreadsInitialized() && PyThreadState_GetDict() )
+		if( Py_IsInitialized() && PyEval_ThreadsInitialized() && PyGILState_GetThisThreadState() )
 			_save = PyEval_SaveThread();
 		mTable->selectFields( RecordList() += Record(const_cast<RecordImp*>(this)), FieldList() += mTable->schema()->field(col) );
 		if( _save )
