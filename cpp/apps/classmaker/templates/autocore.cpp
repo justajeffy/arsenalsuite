@@ -10,7 +10,7 @@
 <%TABLEDATA%>
 
 t__::t__()
-: b__( t__::table()->mEmptyImp, false )
+: b__( t__::table()->emptyImp(), false )
 {
 }
 

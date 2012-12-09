@@ -59,6 +59,8 @@ public:
 
 	Mappedt__List filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
 	Mappedt__List filter( const QString & column, const QVariant & value, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	Mappedt__List filter( const Expression &, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+
 	Mappedt__List sorted( const QString & c, bool a = true ) const throw(SqlException,LostConnectionException,PythonException);
 
 	Mappedt__List unique() const;

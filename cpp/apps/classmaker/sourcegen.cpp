@@ -246,7 +246,7 @@ static void writeClass( TableSchema * table, const QString & path )
 			QString fkt = f->foreignKey();
 			methodDefs += "\t" + retify(fkt) + " " + lcf( meth ) + "(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const;\n";
 			methodDefs += "\tRET(t__) & set" + ucf( meth ) + "( const " + fkt + " & );\n";
-			sipMethodDefs += "\t" + retify(fkt) + " " + lcf( meth ) + "(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const /HoldGIL/;\n";
+			sipMethodDefs += "\t" + retify(fkt) + " " + lcf( meth ) + "(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const  throw(SqlException,LostConnectionException,PythonException) /HoldGIL/;\n";
 			sipMethodDefs += "\tRET(t__) & set" + ucf( meth ) + "( const " + fkt + " & );\n";
 			methods += fkt + " t__::" + lcf( meth ) + "(int lookupMode) const\n{\n";
 			methods += "\treturn foreignKey( " + idx + ", lookupMode );\n";
@@ -256,7 +256,7 @@ static void writeClass( TableSchema * table, const QString & path )
 			methods += "}\n\n";
 			listMethodDefs += "\t" + retify(fkt + "List") + " " + lcf( pmeth ) + "(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const;\n";
 			listMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + fkt + " & );\n";
-			sipListMethodDefs += "\t" + retify(fkt + "List") + " " + lcf( pmeth ) + "(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const /HoldGIL/;\n";
+			sipListMethodDefs += "\t" + retify(fkt + "List") + " " + lcf( pmeth ) + "(int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache) const  throw(SqlException,LostConnectionException,PythonException) /HoldGIL/;\n";
 			sipListMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + fkt + " & );\n";
 			listMethods += fkt + "List t__List::" + lcf( pmeth ) + "(int lookupMode) const\n{\n";
 			listMethods += "\treturn RecordList::foreignKey( " + idx + ", lookupMode );\n}\n\n";
@@ -278,7 +278,7 @@ static void writeClass( TableSchema * table, const QString & path )
 		} else {
 			methodDefs += "\t" + f->typeString() + " " + lcf( meth ) + "() const;\n";
 			methodDefs += "\tRET(t__) & set" + ucf( meth ) + "( const " + f->typeString() + " & );\n";
-			sipMethodDefs += "\t" + f->typeString() + " " + lcf( meth ) + "() const /HoldGIL/;\n";
+			sipMethodDefs += "\t" + f->typeString() + " " + lcf( meth ) + "() const throw(SqlException,LostConnectionException,PythonException) /HoldGIL/;\n";
 			sipMethodDefs += "\tRET(t__) & set" + ucf( meth ) + "( const " + f->typeString() + " & );\n";
 			methods += f->typeString() + " t__::" + lcf( meth ) + "() const\n{\n";
 			methods += "\treturn " + f->typeFromVariantCode().arg( "Record::getValue( " + idx + " )") + ";\n";
@@ -288,7 +288,7 @@ static void writeClass( TableSchema * table, const QString & path )
 			methods += "}\n\n";
 			listMethodDefs += "\t" + f->listTypeString() + " " + lcf( pmeth ) + "() const;\n";
 			listMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + f->typeString() + " & );\n";
-			sipListMethodDefs += "\t" + f->listTypeString() + " " + lcf( pmeth ) + "() const /HoldGIL/;\n";
+			sipListMethodDefs += "\t" + f->listTypeString() + " " + lcf( pmeth ) + "() const throw(SqlException,LostConnectionException,PythonException) /HoldGIL/;\n";
 			sipListMethodDefs += "\tRET(t__List) & set" + ucf( pmeth ) + "( const " + f->typeString() + " & );\n";
 			listMethods += f->listTypeString() + " t__List::" + lcf( pmeth ) + "() const\n{\n";
 			listMethods += "\t" + f->listTypeString() + " ret;\n";
@@ -314,9 +314,10 @@ static void writeClass( TableSchema * table, const QString & path )
 		memberCtors = ": " + memberCtorList.join( "\n ," );
 
 	// indexDefs
-	QString indexDefs, indexMethods, addIdxCols, indexCtors, indexFunctions;
+	QString indexDefs, sipIndexDefs, indexMethods, addIdxCols, indexCtors, indexFunctions;
 	foreach( IndexSchema * index, indexes )
 	{
+		QString indexDef, sipIndexDef;
 		FieldList fl = index->columns();
 		if( fl.size() == 0 )
 			continue;
@@ -325,9 +326,9 @@ static void writeClass( TableSchema * table, const QString & path )
 
 		if( !primaryKeyIndex ) {
 			if( index->holdsList() )
-				indexDefs += "\tstatic RET(t__List) recordsBy" + index->name() + "( ";
+				indexDef += "\tstatic RET(t__List) recordsBy" + index->name() + "( ";
 			else
-				indexDefs += "\tstatic RET(t__) recordBy" + index->name() + "( ";
+				indexDef += "\tstatic RET(t__) recordBy" + index->name() + "( ";
 
 			tableMembers += QString(index->holdsList() ? "\tRET(t__List) recordsBy" : "\tRET(t__) recordBy");
 			tableMembers += index->name() + "( ";
@@ -358,7 +359,10 @@ static void writeClass( TableSchema * table, const QString & path )
 				tml += "const " + f->typeString() + " & " + fn;
 			}
  			tableMembers += tml.join(", ") + ", int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache );\n";
-			indexDefs += args.join(", ") + ", int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache );\n";
+			indexDef += args.join(", ") + ", int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache );";
+			sipIndexDef = indexDef + " throw(SqlException,LostConnectionException,PythonException)";
+			indexDefs += indexDef + ";\n";
+			sipIndexDefs += sipIndexDef + ";\n";
 		}
 
 		tableMembers += "\tIndexSchema * m" + index->name() + ";\n";
@@ -423,7 +427,7 @@ static void writeClass( TableSchema * table, const QString & path )
 			classDefines += "class " + ret + "List;\n";
 			classHeaders += "#include \"" + t->className().toLower() + ".h\"\n";
 			methodDefs += "\t" + retify(ret) + " " + method + "( int lookupMode=Index::UseCache|Index::PartialSelect|Index::UseSelect ) const;\n";
-			sipMethodDefs += "\t" + retify(ret) + " " + method + "( int lookupMode=Index::UseCache|Index::PartialSelect|Index::UseSelect ) const;\n";
+			sipMethodDefs += "\t" + retify(ret) + " " + method + "( int lookupMode=Index::UseCache|Index::PartialSelect|Index::UseSelect ) const throw(SqlException,LostConnectionException,PythonException);\n";
 			methods += ret + " t__::" + method + "( int lookupMode ) const\n{\n";
 			methods += "\treturn " + t->className() + QString(f->flag( Field::Unique ) ? "::recordBy" : "::recordsBy") + f->index()->name() + "( ";
 			methods += "*this, lookupMode );\n}\n";
@@ -436,7 +440,7 @@ static void writeClass( TableSchema * table, const QString & path )
 			}
 
 			listMethodDefs += "\t" + retify(ret) + " " + listMethod + "( int lookupMode=Index::UseCache|Index::PartialSelect|Index::UseSelect );\n";
-			sipListMethodDefs += "\t" + retify(ret) + " " + listMethod + "( int lookupMode=Index::UseCache|Index::PartialSelect|Index::UseSelect );\n";
+			sipListMethodDefs += "\t" + retify(ret) + " " + listMethod + "( int lookupMode=Index::UseCache|Index::PartialSelect|Index::UseSelect ) throw(SqlException,LostConnectionException,PythonException);\n";
 			
 			listMethods += ret + " t__List::" + listMethod + "( int lookupMode )\n{\n";
 			listMethods += "\tIndex * idx = " + t->className() + "::table()->indexFromField( \"" + f->name() + "\" );\n";
@@ -477,7 +481,7 @@ static void writeClass( TableSchema * table, const QString & path )
 	QString temp = readFile( "templates/autocore.h" );
 	temp.replace( "<%SCHEMAFIELDDECLS%>", schemaFieldDecls );
 	temp.replace( "<%METHODDEFS%>", methodDefs );
-	temp.replace( "<%INDEXDEFS%>", indexDefs );
+	temp.replace( "<%INDEXDEFS%>", sipIndexDefs );
 	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
 	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
 	temp.replace( "<%CLASSDEFS%>", classDefines );
