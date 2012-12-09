@@ -93,11 +93,13 @@ Connection * Database::connection() const
 
 void Database::setConnection( Connection * c )
 {
-	if( c && c->capabilities() & Connection::Cap_Notifications ) {
-		LOG_5( QString("Notification signal connected to connection 0x%1").arg((qulonglong)c,0,16) );
-		connect( c, SIGNAL(notification(const QString&)), SLOT(dispatchNotification(const QString&)) );
+	if( c ) {
+		connect( c, SIGNAL( connected() ), SLOT( connectionConnected() ) );
+		connect( c, SIGNAL( connectionLost() ), SLOT( connectionLost() ) );
+		if( c->isConnected() )
+			setupConnectionNotifications(c);
+		mConnections.setLocalData( c );
 	}
-	mConnections.setLocalData( c );
 }
 
 TableList Database::tables()
@@ -404,6 +406,28 @@ bool Database::popQueueRecordSignals()
 		mQueueRecordSignals = mQueueRecordSignalsStack.pop();
 	return mQueueRecordSignals;
 }
+
+void Database::connectionConnected()
+{
+	Connection * c = qobject_cast<Connection*>(sender());
+	if( c )
+		setupConnectionNotifications(c);
+	else
+		LOG_1( "Got signal with a Connection * sender" );
+}
+
+void Database::connectionLost()
+{
+}
+
+void Database::setupConnectionNotifications( Connection * c )
+{
+	if( c && c->capabilities() & Connection::Cap_Notifications ) {
+		LOG_5( QString("Notification signal connected to connection 0x%1").arg((qulonglong)c,0,16) );
+		connect( c, SIGNAL(notification(const QString&)), SLOT(dispatchNotification(const QString&)), Qt::ConnectionType(Qt::DirectConnection | Qt::UniqueConnection) );
+	}
+}
+
 
 static const char * preload_change_str = "_preload_change";
 

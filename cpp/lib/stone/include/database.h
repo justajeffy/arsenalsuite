@@ -222,7 +222,9 @@ protected slots:
 	void transactionTimeout();
 
 	void dispatchNotification( const QString & name );
-	
+
+	void connectionConnected();
+	void connectionLost();
 protected:
 	/** Called by the tables, to indicate when records have been added.
 	 */
@@ -240,6 +242,8 @@ protected:
 	 *  Used by the indexes for caching.
 	 */
 	void recordsIncoming( const RecordList &, bool co = false );
+
+	void setupConnectionNotifications( Connection * );
 
 	bool setupPreloadListen( Table * table );
 	

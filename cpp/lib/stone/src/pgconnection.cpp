@@ -79,6 +79,11 @@ static void getVersion( PGConnection * c, int & vMaj, int & vMin )
 
 bool PGConnection::checkVersion( int major, int minor ) const
 {
+	PGConnection * c = const_cast<PGConnection*>(this);
+	// By calling this we can ensure that we don't select the version twice by having this
+	// same function called from code connected to the connected signal.  The function will run
+	// twice but the first call will end up doing nothing since mVersionMajor will already be set.
+	c->checkConnection();
 	if( !mVersionMajor ) {
 		PGConnection * c = const_cast<PGConnection*>(this);
 		getVersion( c, c->mVersionMajor, c->mVersionMinor );
