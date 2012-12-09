@@ -300,7 +300,7 @@ bool QSqlDbConnection::exec( QSqlQuery & query, bool reExecLostConn, Table * tab
        }
 
        PyThreadState *_save = 0;
-       if( Py_IsInitialized() && PyEval_ThreadsInitialized() && PyThreadState_GetDict() )
+       if( Py_IsInitialized() && PyEval_ThreadsInitialized() && PyGILState_GetThisThreadState() )
                _save = PyEval_SaveThread();
 
        try {
