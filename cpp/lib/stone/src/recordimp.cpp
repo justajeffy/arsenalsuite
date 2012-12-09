@@ -30,8 +30,6 @@
 
 #include <qsqlquery.h>
 
-#include "Python.h"
-
 #include "blurqt.h"
 #include "freezercore.h"
 #include "index.h"
@@ -345,12 +343,7 @@ const QVariant & RecordImp::getColumn( int col ) const
 	if( !mTable || !mValues || col >= (int)mTable->schema()->fieldCount() || col < 0 )
 		return sNullVariant;
 	if( getBit( mNotSelectedBits, col ) ) {
-		PyThreadState *_save = 0;
-		if( Py_IsInitialized() && PyEval_ThreadsInitialized() && PyGILState_GetThisThreadState() )
-			_save = PyEval_SaveThread();
 		mTable->selectFields( RecordList() += Record(const_cast<RecordImp*>(this)), FieldList() += mTable->schema()->field(col) );
-		if( _save )
-			PyEval_RestoreThread(_save);
 	}
 	return mValues->at(col);
 }
