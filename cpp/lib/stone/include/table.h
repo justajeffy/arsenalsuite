@@ -321,9 +321,9 @@ protected:
 	friend class Stone::Database;
 	friend class Stone::Field;
 	friend class Stone::JoinedSelect;
+	RecordImp * mEmptyImp;
 public:
 	int mImpCount;
-	RecordImp * mEmptyImp;
 };
 
 } //namespace

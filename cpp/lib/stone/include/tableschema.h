@@ -219,6 +219,7 @@ protected:
 	void removeChild( TableSchema * table );
 	
 	// Does not propogate to parent tables, done by the Table class itself in processIncoming
+	void processCreateTriggers( Record & record );
 	RecordList processIncomingTriggers( RecordList incoming );
 	RecordList processPreInsertTriggers( RecordList toInsert );
 	Record processPreUpdateTriggers( const Record & updated, const Record & before );

@@ -50,7 +50,7 @@ RecordImp * Record::current( bool read ) const
 	if( !mImp->hasVersions() ) {
 		// If the changeset attached is not currently visible, then we return the empty imp
 		if( mImp->mChangeSet().isValid() && !cs.isVisible(mImp->mChangeSet) )
-			ret = mImp->mTable->mEmptyImp;
+			ret = mImp->mTable->emptyImp();
 	} else if( cs.isValid() || mImp->mChangeSet().isValid() ) {
 		bool readPristine = false;
 		if( read ) {
@@ -61,7 +61,7 @@ RecordImp * Record::current( bool read ) const
 		}
 		ret = mImp->version(readPristine ? ChangeSet() : cs);
 		if( ret->mChangeSet().isValid() && (!cs.isValid() || !cs.isVisible(ret->mChangeSet)) )
-			ret = mImp->mTable->mEmptyImp;
+			ret = mImp->mTable->emptyImp();
 		
 	} else {
 		// If we are holding a reference to a non-changeset modified copy that is already committed, then we need
@@ -97,7 +97,7 @@ Record::Record( Table * table )
 {
 	sRecordCount++;
 	if( table ) {
-		mImp = table->mEmptyImp;
+		mImp = table->emptyImp();
 		mImp->ref();
 	}
 }
@@ -612,7 +612,7 @@ void Record::checkImpType(TableSchema * ts)
 	}
 	
 	if( !mImp ) {
-		mImp = ts->table()->mEmptyImp;
+		mImp = ts->table()->emptyImp();
 		mImp->ref();
 	}
 }
