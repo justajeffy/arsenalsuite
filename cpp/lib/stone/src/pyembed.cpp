@@ -249,17 +249,17 @@ static sipTypeDef * sipQVariantType()
 static sipTypeDef * sipIntervalType()
 { static sipTypeDef * sIntervalW = 0; if( !sIntervalW ) sIntervalW = getSipType("blur.Stone", "Interval"); return sIntervalW; }
 
-sipTypeDef * getRecordType( const char * module, const QString & className )
+sipTypeDef * getRecordType( const char * module, const char * className )
 {
+	/*
 	QString hash = QString::fromLatin1(module) + "." + className;
 	static QHash<QString,sipTypeDef*> sipTypeHash;
 	
 	QHash<QString,sipTypeDef*>::iterator it = sipTypeHash.find( hash );
 	if( it != sipTypeHash.end() )
 		return it.value();
-	
-	sipTypeDef * ret = getSipType(module,className.toLatin1().constData());
-	sipTypeHash.insert( hash, ret );
+	*/
+	sipTypeDef * ret = getSipType(module,className);
 	return ret;
 }
 
@@ -310,7 +310,8 @@ PyObject * sipWrapRecord( Record * r, bool makeCopy, TableSchema * defaultType )
 {
 	PyObject * ret = 0;
 	// First we convert to Record using sip methods
-	sipTypeDef * type = getRecordType( "blur.Stone", "Record" );
+	static sipTypeDef * recordType = getRecordType( "blur.Stone", "Record" );
+	sipTypeDef * type = recordType;
 	if( type ) {
 		if( makeCopy )
 			ret = getSipAPI()->api_convert_from_new_type( new Record(*r), type, NULL );
@@ -375,8 +376,9 @@ PyObject * sipWrapRecord( Record * r, bool makeCopy, TableSchema * defaultType )
 PyObject * sipWrapRecordList( RecordList * rl, bool makeCopy, TableSchema * defaultType, bool allowUpcasting )
 {
 	PyObject * ret = 0;
+	static sipTypeDef * recordType = getRecordType( "blur.Stone", "RecordList" );
 	// First we convert to Record using sip methods
-	sipTypeDef * type = getRecordType( "blur.Stone", "RecordList" );
+	sipTypeDef * type = recordType;
 	if( type ) {
 		if( makeCopy )
 			ret = getSipAPI()->api_convert_from_new_type( new RecordList(*rl), type, NULL );
@@ -471,7 +473,7 @@ PyObject * recordListGroupByCallable( const RecordList * rl, PyObject * callable
 		return NULL;
 	
 	bool error = false;
-	sipTypeDef * rl_type = getRecordType( "blur.Stone", "RecordList" );
+	static sipTypeDef * rl_type = getRecordType( "blur.Stone", "RecordList" );
 	
 	foreach( Record r, *rl ) {
 		PyObject * py_r = sipWrapRecord( &r );
@@ -527,7 +529,7 @@ bool isPythonRecordInstance( PyObject * pyObject )
 
 Record sipUnwrapRecord( PyObject * pyObject )
 {
-	sipTypeDef * sipRecordType = getRecordType( "blur.Stone", "Record" );
+	static sipTypeDef * sipRecordType = getRecordType( "blur.Stone", "Record" );
 	Record ret;
 	SIP_BLOCK_THREADS
 	if( getSipAPI()->api_can_convert_to_type( pyObject, sipRecordType, 0 ) ) {
@@ -1069,3 +1071,21 @@ QString pythonExceptionTraceback( bool clearException )
 
 	return ret;
 }
+
+void printPythonStackTrace()
+{
+	SIP_BLOCK_THREADS
+	PyObject * traceback_module = PyImport_ImportModule("traceback");
+	if (traceback_module) {
+
+		/* Call the traceback module's format_exception function, which returns a list */
+		PyObject * ret = PyObject_CallMethod(traceback_module, "print_stack","");
+		if( !ret ) {
+			LOG_1( pythonExceptionTraceback(true) );
+		}
+		Py_XDECREF(ret);
+	} else
+		LOG_1( "Unable to load the traceback module, can't get exception text" );
+	SIP_UNBLOCK_THREADS
+}
+

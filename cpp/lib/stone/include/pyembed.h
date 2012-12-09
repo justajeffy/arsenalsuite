@@ -163,5 +163,7 @@ STONE_EXPORT PyObject * pyObjectFromQVariant( PyObject * py_qvariant );
 /// Clears the python exception by default
 STONE_EXPORT QString pythonExceptionTraceback( bool clearException = true );
 
+STONE_EXPORT void printPythonStackTrace();
+
 #endif // PY_EMBED_H
 
