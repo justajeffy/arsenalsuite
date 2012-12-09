@@ -69,12 +69,13 @@ Table::Table( Database * database, TableSchema * schema )
 	for( int i = 0; i < 5; i++ )
 		mIndexElapsed[i] = 0;
 
-	mEmptyImp = new RecordImp( this, 0 );
-	mEmptyImp->mState = RecordImp::EMPTY_SHARED;
-	mEmptyImp->ref();
-	
-	foreach( Trigger * trigger, schema->triggers() )
+	// Child tables are created after their parents, so the normal propogation in slotTriggerAdded
+	// won't be effective.  So we call slotTriggerAdded for parent tables here.
+	while( schema ) {
+		foreach( Trigger * trigger, schema->triggers() )
 		slotTriggerAdded( trigger );
+		schema = schema->parent();
+	}
 }
 
 void Table::setup()
@@ -113,8 +114,10 @@ Table::~Table()
 	foreach( Index * i, indexes() )
 		if( i != mKeyIndex )
 			delete i;
-	mEmptyImp->deref();
-	mEmptyImp = 0;
+	if( mEmptyImp ) {
+		mEmptyImp->deref();
+		mEmptyImp = 0;
+	}
 	if( mImpCount > 0 ) {
 		LOG_1( schema()->tableName() + " has " + QString::number( mImpCount ) + " references remaining" );
 	}
@@ -159,7 +162,7 @@ QList<Table*> Table::tableTree()
 
 Record Table::load( QVariant * v )
 {
-	RecordImp * imp = mEmptyImp;
+	RecordImp * imp = emptyImp();
 	if( v ) {
 		imp = new RecordImp( this, v );
 		imp->mChangeSet = ChangeSet::current();
@@ -169,7 +172,7 @@ Record Table::load( QVariant * v )
 
 Record * Table::newObject()
 {
-	return new Record( mEmptyImp, false );
+	return new Record( emptyImp(), false );
 }
 
 void Table::preload()
@@ -519,15 +522,15 @@ void Table::recordUpdated( const Record & current, const Record & upd, bool noti
 void Table::slotTriggerAdded( Trigger * trigger )
 {
 	if( trigger->mTriggerTypes & Trigger::CreateTrigger ) {
-		// Have to temporarily change the state so that writing to the record doesn't cause a copy
-		mEmptyImp->mState = RecordImp::MODIFIED;
-		trigger->create( Record(mEmptyImp) );
-		mEmptyImp->mState = RecordImp::EMPTY_SHARED;
-		
-		// Since we only connect to the slot from our own tableschema, not children, we propogate here
-		if( mParent )
-			mParent->slotTriggerAdded(trigger);
+		if( mEmptyImp ) {
+			// Have to temporarily change the state so that writing to the record doesn't cause a copy
+			mEmptyImp->mState = RecordImp::MODIFIED;
+			trigger->create( Record(mEmptyImp) );
+			mEmptyImp->mState = RecordImp::EMPTY_SHARED;
+		}
 	}
+	foreach( Table * t, mChildren )
+		t->slotTriggerAdded );
 }
 
 RecordList Table::processIncoming( const RecordList & records, bool cacheIncoming, bool checkForUpdates )
@@ -1312,6 +1315,15 @@ bool Table::createTable( QString * output )
 
 RecordImp * Table::emptyImp()
 {
+	if( !mEmptyImp ) {
+		mEmptyImp = new RecordImp( this, 0 );
+		mEmptyImp->ref();
+		// Have to temporarily change the state so that writing to the record doesn't cause a copy
+		mEmptyImp->mState = RecordImp::MODIFIED;
+		Record r(mEmptyImp);
+		mSchema->processCreateTriggers(r);
+		mEmptyImp->mState = RecordImp::EMPTY_SHARED;
+	}
 	return mEmptyImp;
 }
 

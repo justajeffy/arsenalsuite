@@ -460,6 +460,16 @@ QList<Trigger*> TableSchema::triggers() const
 	return mTriggers;
 }
 
+void TableSchema::processCreateTriggers( Record & record )
+{
+	foreach( Trigger * trigger, mTriggers )
+		if( trigger->mTriggerTypes & Trigger::CreateTrigger )
+			trigger->create(record);
+
+	if( mParent )
+		mParent->processCreateTriggers(record);
+}
+
 RecordList TableSchema::processIncomingTriggers( RecordList incoming )
 {
 	
