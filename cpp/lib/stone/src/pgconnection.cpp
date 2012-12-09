@@ -892,6 +892,8 @@ bool PGConnection::update( Table * table, RecordList records, RecordList * retur
 		QString col = "\"" + cu.field->name().toLower() + "\"";
 		if( cu.records.size() == records.size() ) {
 			col += " = v." + col;
+			if( cu.field->type() == Field::DateTime )
+				col += "::timestamp";
 		} else {
 			col += " = CASE WHEN " + tn + "." + pkn + " IN (" + cu.records.keyString() + ") THEN v." + col + " ELSE " + tn + "." + col + " END";
 		}
