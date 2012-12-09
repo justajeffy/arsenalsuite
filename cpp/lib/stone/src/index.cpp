@@ -292,7 +292,7 @@ RecordList Index::recordsByIndexMulti( const QList<QVariant> & args, int lookupM
 			foreach( Field * f, mSchema->columns() ) {
 				QString check = "(" + f->name();
 				QVariant arg = args[entry * entrySize + column];
-				if( f->flag( Field::ForeignKey ) && arg.toInt() == 0 ) {
+				if( (f->flag( Field::ForeignKey ) && arg.toInt() == 0) || arg.isNull() ) {
 					check += " is NULL)";
 				} else {
 					check += "=?)";
@@ -398,7 +398,7 @@ RecordList Index::recordsByIndex( const QList<QVariant> & args, int lookupMode )
 	QList<QVariant> mod_args(args);
 	foreach( Field * f, mSchema->columns() ) {
 		QString check = "(\"" + f->name().toLower();
-		if( f->flag( Field::ForeignKey ) && args[i].toInt() == 0 ) {
+		if( (f->flag( Field::ForeignKey ) && args[i].toInt() == 0) || args[i].isNull() ) {
 			check += "\" is NULL)";
 			//check += "\" is ?)";
 			// Make sure the variant is NULL
