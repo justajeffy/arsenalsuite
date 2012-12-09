@@ -286,9 +286,9 @@ Done:
 
 	Table * table() const;
 
-	MappedRecordList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const;
-	MappedRecordList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const;
-	MappedRecordList filter( const Expression &, bool keepMatches ) const;
+	MappedRecordList filter( const QString & column, const QRegExp & re, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedRecordList filter( const QString & column, const QVariant & value, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
+	MappedRecordList filter( const Expression &, bool keepMatches = true ) const throw(SqlException,LostConnectionException,PythonException);
 
 	QMap<QString,RecordList> groupedBy( const QString & column ) const throw(SqlException,LostConnectionException,PythonException);
 
