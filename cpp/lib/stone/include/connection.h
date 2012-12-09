@@ -266,6 +266,12 @@ public:
 	virtual TableSchema * tableByOid( uint oid, Schema * );
 	virtual uint oidByTable( TableSchema * );
 
+	// Use lowercase names
+	QStringList pythonStackTraceOnTables() const;
+	void setPythonStackTraceOnTables( const QStringList & tables );
+	void addPythonStackTraceOnTable( const QString & tableName );
+	void removePythonStackTraceOnTable( const QString & tableName );
+
 signals:
 	/** Emmitted when the connection is lost
 	 * control will not return to the main event
@@ -289,6 +295,8 @@ protected:
 	QString mHost, mUserName, mPassword, mDatabaseName;
 	int mPort, mReconnectDelay, mConnectionAttempts, mMaxConnectionAttempts;
 	QString mDatabaseType;
+	// List of tables to throw an exception whenever a sql command is to be executed, for debugging purposes
+	QStringList mPythonStackTraceOnTables;
 };
 
 /** 

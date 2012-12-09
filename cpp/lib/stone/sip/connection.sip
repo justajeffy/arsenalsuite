@@ -84,11 +84,21 @@ class exception {
 using std::exception;
 %End
 public:
-  exception () throw();
-  exception (const exception&) throw();
-  //exception& operator= (const exception&) throw();
-  virtual ~exception() throw();
-  virtual const char* what() const throw();
+	exception () throw();
+	exception (const exception&) throw();
+	//exception& operator= (const exception&) throw();
+	virtual ~exception() throw();
+	virtual const char* what() const throw();
+	const char * __str__();
+%MethodCode
+	sipRes = sipCpp->what();
+%End
+	const char * __repr__();
+%MethodCode
+	sipRes = sipCpp->what();
+%End
+
+
 };
 
 class SqlException : exception
@@ -235,6 +245,11 @@ public:
 	virtual bool rollbackTransaction() throw(SqlException,LostConnectionException);
 
 	virtual bool createIndex( IndexSchema * ) throw(SqlException,LostConnectionException);
+
+	QStringList pythonStackTraceOnTables() const;
+	void setPythonStackTraceOnTables( const QStringList & tables );
+	void addPythonStackTraceOnTable( const QString & tableName );
+	void removePythonStackTraceOnTable( const QString & tableName );
 
 signals:
 	void connectionLost();
