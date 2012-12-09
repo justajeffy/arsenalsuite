@@ -359,7 +359,7 @@ static void writeClass( TableSchema * table, const QString & path )
 				tml += "const " + f->typeString() + " & " + fn;
 			}
  			tableMembers += tml.join(", ") + ", int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache );\n";
-			indexDef += args.join(", ") + ", int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache );";
+			indexDef += args.join(", ") + ", int lookupMode = Index::UseSelect|Index::PartialSelect|Index::UseCache )";
 			sipIndexDef = indexDef + " throw(SqlException,LostConnectionException,PythonException)";
 			indexDefs += indexDef + ";\n";
 			sipIndexDefs += sipIndexDef + ";\n";
@@ -481,7 +481,7 @@ static void writeClass( TableSchema * table, const QString & path )
 	QString temp = readFile( "templates/autocore.h" );
 	temp.replace( "<%SCHEMAFIELDDECLS%>", schemaFieldDecls );
 	temp.replace( "<%METHODDEFS%>", methodDefs );
-	temp.replace( "<%INDEXDEFS%>", sipIndexDefs );
+	temp.replace( "<%INDEXDEFS%>", indexDefs );
 	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
 	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
 	temp.replace( "<%CLASSDEFS%>", classDefines );
@@ -504,7 +504,7 @@ static void writeClass( TableSchema * table, const QString & path )
 	temp = readFile( "templates/autocore.sip" );
 	temp.replace( "<%SCHEMAFIELDDECLS%>", schemaFieldDecls );
 	temp.replace( "<%METHODDEFS%>", sipMethodDefs );
-	temp.replace( "<%INDEXDEFS%>", indexDefs );
+	temp.replace( "<%INDEXDEFS%>", sipIndexDefs );
 	temp.replace( "<%ELEMENTHACKS%>", elementHacks );
 	temp.replace( "<%ELEMENTHEADERS%>", elementHeaders );
 	temp.replace( "<%CLASSDEFS%>", classDefines );
