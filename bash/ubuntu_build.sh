@@ -25,6 +25,6 @@ python build.py clean release build verbose install sip:skip sipstatic:skip pyqt
 python build.py clean release build verbose install sip:skip sipstatic:skip pyqt:skip absubmit pyabsubmit
 
 mkdir cpp/lib/freezer/sipFreezer
-python build.py clean release build verbose install sip:skip sipstatic:skip pyqt:skip stone:skip pystone:skip classes:skip pyclasses:skip classesui:skip pyclassesui:skip burner freezer
+python build.py clean release build verbose install sip:skip sipstatic:skip pyqt:skip stone:skip pystone:skip classes:skip pyclasses:skip burner freezer
 
 
