@@ -59,6 +59,7 @@ unix{
 	message(Python Version is $$PY_VERSION)
 	INCLUDEPATH+=$$system($$PYTHON " -c \"from distutils.sysconfig import get_python_inc; print get_python_inc()\"")
 	LIBS+=-lpython$${PY_VERSION}
+	LIBS+=-L/usr/lib/x86_64-linux-gnu/ -lGLU
 }
 
 # Python modules
@@ -87,7 +88,7 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET=10.5
 
 RESOURCES+=freezer.qrc
 
-CONFIG += qt thread warn_on opengl console
+CONFIG+=qt thread warn_on opengl console
 QT+=opengl xml sql network
 DESTDIR=./
 RC_FILE = freezer.rc

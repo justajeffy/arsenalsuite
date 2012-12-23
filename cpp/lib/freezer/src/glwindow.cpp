@@ -36,6 +36,7 @@
 
 #include "glwindow.h"
 #include "afcommon.h"
+#include "GL/glu.h"
 
 const char * FRAGMENT_SHADER =
 "struct Output"
